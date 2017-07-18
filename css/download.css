@@ -359,6 +359,18 @@
     display: table-cell;
 }
 
+.download .create-account-button,
+.download .get-more-bonues,
+.download .top-login-button,
+.download.overquota .pause-transfer {
+    display: none;
+}
+
+.not-logged .download.overquota .create-account-button,
+.logged .download.overquota .get-more-bonues,
+.download.overquota .see-our-plans {
+    display: block;
+}
 
 
 .download.in-progress, 

@@ -219,10 +219,12 @@ function dl_g(res) {
             
             fileSize = bytesToSize(res.s);
 
-            $('.file-info .download.info-txt.filename').text(filename).attr('title', filename);
-            $('.file-info .download.info-txt.small-txt').text(fileSize);
-            $('.bar-cell .download.bar-filesize').text(fileSize);
-            $('.info-block .block-view-file-type').addClass(fileIcon({ name: filename }));
+            $('.file-info .download.info-txt.filename, .download.bar-filename')
+                .text(filename).attr('title', filename);
+            $('.file-info .download.info-txt.small-txt, .bar-cell .download.bar-filesize')
+                .text(fileSize);
+            $('.info-block .block-view-file-type, .download .bar-cell .transfer-filetype-icon')
+                .addClass(fileIcon({ name: filename }));
 
             // XXX: remove this once all browsers support `text-overflow: ellipsis;`
             Soon(function() {
@@ -623,8 +625,6 @@ function dlcomplete(id)
     if (typeof id === 'object') id = id.dl_id;
 
     $('.download.progress-bar').width('100%');
-    $('.file-info .download.info-txt.small-txt').safeHTML(bytesToSize(fileSize));
-    $('.bar-cell .download.bar-filesize').text(bytesToSize(fileSize));
     
     if ($('#dlswf_' + id).length > 0)
     {

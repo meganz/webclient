@@ -666,11 +666,12 @@ MegaData.prototype.dlerror = function(dl, error) {
                     $('.download.eta-block span').text('');
                     $('.download.speed-block span').text('');
                     $('.download .pause-transfer').addClass('active');
-                    $('.download.error-text').addClass('overquota');
+                    $('.download.file-info').addClass('overquota');
                 }
                 else {
                     $('.download.error-text').text(errorstr);
-                    $('.download.error-text').removeClass('hidden overquota');
+                    $('.download.error-text').removeClass('hidden');
+                    $('.download.file-info').removeClass('overquota');
                     $('.download.main-transfer-info').addClass('hidden');
                 }
             }

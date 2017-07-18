@@ -702,7 +702,7 @@ var dlmanager = {
         }
 
         if (page === 'download') {
-            $('.download.error-text').removeClass('overquota');
+            $('.download.file-info').removeClass('overquota');
         }
         else {
             $('#' + ids.join(',#'))
@@ -1272,7 +1272,7 @@ function fm_tfspause(gid, overquota) {
 
         if (page === 'download') {
             if (overquota === true) {
-                $('.download.error-text').addClass('overquota');
+                $('.download.file-info').addClass('overquota');
             }
             $('.download .pause-transfer span').text(l[9118]);
             $('.download.scroll-block').addClass('paused');
@@ -1323,7 +1323,7 @@ function fm_tfsresume(gid) {
             var $tr = $('.transfer-table tr#' + gid);
 
             if (page === 'download'
-                    && $('.download.error-text').hasClass('overquota')
+                    && $('.download.file-info').hasClass('overquota')
                     || $tr.find('.transfer-status').hasClass('overquota')) {
 
                 if (page === 'download') {

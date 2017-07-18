@@ -14,8 +14,7 @@ git pull
 cd $(dirname $BASH_SOURCE)/../lang
 
 # Fetch the latest translations from Babel
-data=$(php -f ./translation.php);
-wget --post-data='u=Jq1EXnelOeQpj7UCaBa1&id=fetch&s=6&ids='$data https://babel.mega.co.nz -O lang.tar.gz
+wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz
 
 # Check if the fetch failed
 if [ $? -ne 0 ]; then

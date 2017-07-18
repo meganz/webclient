@@ -2,8 +2,8 @@
  * Ongoing transfers popup dialog
  * Account->Settings->Advanced->Transfers->Tooltip notification
  */
-mega.ui.tpp = (function () {
-    var self = this;
+mega.ui.tpp = function () {
+    "use strict";
 
     var opts = {
         dlg: {
@@ -12,11 +12,13 @@ mega.ui.tpp = (function () {
             enabled: true,
             dl: {
                 $: {},
-                class: '.download'
+                class: '.download',
+                paused: []// ids of paused dl items
             },
             ul: {
                 $: {},
-                class: '.upload'
+                class: '.upload',
+                paused: []// ids of paused ul items
             }
         },
         block: ['dl', 'ul'],
@@ -47,8 +49,12 @@ mega.ui.tpp = (function () {
      * @param {String} bl i.e. ['dl', 'ul'] download/upload block
      */
     var setTotal = function setTotal(value, bl) {
+        var total = opts.queue[bl].total;
+
         if (value) {
-            opts.queue[bl].total += value;
+            if (value > 0 || value < 0 && total > 1) {
+                opts.queue[bl].total += value;
+            }
         }
         else {
             opts.queue[bl].total = 0;
@@ -109,13 +115,21 @@ mega.ui.tpp = (function () {
     };
 
     /**
-     * Shows transfers popup dialog
+     * Set tpp enabled
+     * @param {Boolean} value To enable or not
+     */
+    var setEnabled = function setEnabled(value) {
+        opts.enabled = value;
+    };
+
+    /**
+     * * Shows transfers popup dialog
      */
     var show = function show() {
         var visible = isVisible();
         var enabled = isEnabled();
 
-        if (enabled && !visible && (M.currentdirid !== 'transfers') && mega.utils.hasPendingTransfers()) {
+        if (enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
             opts.dlg.$.show(opts.duration);
             setStatus(true);
         }
@@ -143,6 +157,7 @@ mega.ui.tpp = (function () {
 
         if ($item.is(':hidden')) {
             $item.removeClass('hidden');
+            setStatus(true);
         }
     };
 
@@ -194,8 +209,13 @@ mega.ui.tpp = (function () {
      * @param {String} block i.e. ['dl', 'ul'] download or upload
      */
     var setIndex = function setIndex(value, block) {
+        var index = opts.queue[block].index;
+        var total = opts.queue[block].total;
+
         if (value) {
-            opts.queue[block].index += value;
+            if (value > 0 && index < total || value < 0 && index > 1) {
+                opts.queue[block].index += value;
+            }
         }
         else {
             opts.queue[block].index = 0;
@@ -228,6 +248,84 @@ mega.ui.tpp = (function () {
     };
 
     /**
+     * Set state to paused for given dl/ul
+     * @param {String} id ul/dl item id
+     * @param {String} blk i.e. ['dl', 'ul']
+     */
+    var pause = function pause(id, blk) {
+        console.log('tpp.pause');
+
+        opts.dlg[blk].paused.push(id);
+        opts.dlg[blk].$.stxt.text('');
+        opts.dlg[blk].$.spd.text(l[1651]);
+    };
+
+    var getPausedNum = function getPausedNum(blk) {
+        console.log('tpp.getPaused');
+
+        return opts.dlg[blk].paused.length;
+    };
+
+    /** Remove unpaused gid from queue
+     * @param {String} id ul/dl item id
+     * @param {String} blk i.e. ['dl', 'ul']
+     */
+    var resume = function resume(id, blk) {
+        console.log('tpp.resume');
+        var arr = opts.dlg[blk].paused;
+
+        arr.splice($.inArray(id, arr), 1);
+    };
+
+    /**
+     * In case that user paused one of items in the dl/ul queue after some time
+     * when all non-paused items dl/ul is finished TPP must be updated
+     * with file name of paused item with appropriate status 'Paused'
+     * @param {Object} queue Item queue
+     * @param {String} blk i.e. ['dl', 'ul']
+     */
+    var statusPaused = function statusPaused(queue, blk) {
+        console.log('tpp.statusPaused');
+        var index = 0;
+        var total = 0;
+        var name = '';
+        var item = {};
+        var qLen = 0;
+        var len = 0;
+        var ulQLen = 0;
+        var dlQLen = 0;
+        var glb = Object.keys(GlobalProgress);
+        var pausedNum = getPausedNum(blk);// Number of paused items
+
+        if (glb.length) {
+            qLen = glb.length;// Total dl/ul items in queue
+            var tmp = JSON.stringify(glb).match(/ul_/g);
+
+            if (tmp) {
+                ulQLen = tmp.length;// Number of uploading items
+            }
+            dlQLen = qLen - ulQLen;
+            len = blk === 'dl' ? dlQLen : ulQLen;
+        }
+
+        if (pausedNum && pausedNum >= len) {// Update TPP
+            item = queue[0];
+            name = item.zipid ? item.zipname : item.n;
+            index = getIndex(blk) + 1;
+            total = getTotal(blk);
+
+            if (index > total) {
+                index = total;
+            }
+
+            opts.dlg[blk].$.crr.text(index);
+            opts.dlg[blk].$.stxt.text('');
+            opts.dlg[blk].$.spd.text(l[1651]);
+            opts.dlg[blk].$.name.text(name);// file name
+        }
+    };
+
+    /**
      * Get number of dl/ul bytes for given id
      * @param {String} blk i.e ['dl', 'ul'] download or upload
      * @return {Number} Amount of transfered data
@@ -247,7 +345,7 @@ mega.ui.tpp = (function () {
     };
 
     /**
-     * Calculates avg spped for block
+     * Calculates avg speed for block
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      * @returns {Number} dl/ul average speed in bytes per second
      */
@@ -271,8 +369,9 @@ mega.ui.tpp = (function () {
             console.error("FIXME: TypeError: Cannot read property 'css' of undefined");
             return false;
         }
+
+        var index = getIndex(blk);
         var len = getTotal(blk).toString();
-        var index = getIndex(blk).toString();
         var perc = getProgress(blk).toString();
         var avgSpeed = getAvgSpeed(blk);
         var speed;
@@ -292,51 +391,92 @@ mega.ui.tpp = (function () {
     };
 
     /**
+     * Updates current and total items in queue for dl/ul
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
+     */
+    var updateIndexes = function updateIndexes(blk) {
+        var index = getIndex(blk);
+        var tot = getTotal(blk).toString();
+
+        opts.dlg[blk].$.num.text(tot);
+        opts.dlg[blk].$.crr.text(index);
+    };
+    /**
      * Initialize transfer popup dialogs progress bar, file icon, name, speed,
      * current file index and total number of files in queue of dl or ul block
      * @param {Object} queue Download or upload queue
-     * @param {String} bl i.e. ['dl', 'ul'] download or upload
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
-    var _init = function _init(queue, bl) {
-        // var dlg = (bl === 'dl') ? '$dlBlock' : '$ulBlock';
+    var _init = function _init(queue, blk) {
         var name = '';
-        var index = getIndex(bl).toString();
-        var total = getTotal(bl).toString();
+        var index = getIndex(blk).toString();
+        var total = getTotal(blk).toString();
         var type = ext[fileext(name)];
-        var perc = getProgress(bl);
+        var perc = getProgress(blk);
 
         if (typeof type === 'undefined') {
             type = ext['*'][0];// general
         }
 
-        if (bl === 'dl') {
+        if (blk === 'dl') {
             name = queue.zipname || queue.n || queue.name;
         }
         else {
             name = queue.name;
         }
 
-        opts.dlg[bl].$.name.text(name);
-        opts.dlg[bl].$.crr.text(index);
-        opts.dlg[bl].$.num.text(total);
-        opts.dlg[bl].$.prg.css('width', perc + '%');
-        opts.dlg[bl].$.spd.text(l[1042]);
-        opts.dlg[bl].$.stxt.text('');
-        opts.dlg[bl].$.tfi
+        opts.dlg[blk].$.name.text(name);
+        opts.dlg[blk].$.crr.text(index);
+        opts.dlg[blk].$.num.text(total);
+        opts.dlg[blk].$.prg.css('width', perc + '%');
+        opts.dlg[blk].$.spd.text(l[1042]);
+        opts.dlg[blk].$.stxt.text('');
+        opts.dlg[blk].$.ibLeft.text(l[5528]);
+        opts.dlg[blk].$.tfi
             .removeClass()
             .addClass('transfer-filetype-icon ' + type + ' file');
     };
 
     /**
+     * Shows TPP as soon as file or folder is picked, instant initialization
+     * @param {String} bl Download or upload block i.e. ['dl', 'ul']
+     */
+    var started = function started(bl) {
+        if (!getIndex(bl)) {
+            resetBlock(bl);
+            showBlock(bl);
+            opts.dlg.$.show(opts.duration);
+        }
+    };
+
+    /**
+     * Cleanup all un-necessary elements on instant initialization
+     * @param {String} bl
+     */
+    var resetBlock = function resetBlock(bl) {
+        opts.dlg[bl].$.name.text('');
+        opts.dlg[bl].$.crr.text('');
+        opts.dlg[bl].$.num.text('');
+        opts.dlg[bl].$.prg.css('width', 0 + '%');
+        opts.dlg[bl].$.spd.text(l[1042]);
+        opts.dlg[bl].$.stxt.text('');
+        opts.dlg[bl].$.tfi.removeClass();
+        opts.dlg[bl].$.ibLeft.text('');
+    };
+
+    /**
      * Show tpp popup and dl/ul block
      * @param {Object} queue Download or upload queue
-     * @param {String} bl i.e. ['dl', 'ul'] download or upload
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
-    var start = function start(queue, bl) {
-        setIndex(1, bl);
-        if (getIndex(bl) === 1) {
-            _init(queue, bl);
-            showBlock(bl);
+    var start = function start(queue, blk) {
+        if (!getIndex(blk)) {
+            setIndex(1, blk);
+        }
+
+        if (getIndex(blk) === 1) {
+            _init(queue, blk);
+            showBlock(blk);
             show();
         }
     };
@@ -348,6 +488,7 @@ mega.ui.tpp = (function () {
         setTotal(0, blk);
         setTotalProgress(0, blk);
         setTransfered(-1, 0, blk);
+        opts.dlg[blk].paused = [];
     };
 
     mBroadcaster.addListener('fm:initialized', function() {
@@ -355,10 +496,12 @@ mega.ui.tpp = (function () {
         var isEph = isEphemeral();
 
         // Check if tpp used before, if not force usage
-        if ((typeof fmconfig.tpp === 'undefined') || isEph) {
+        if (typeof fmconfig.tpp === 'undefined' || isEph) {
             mega.config.set('tpp', true);
         }
-
+        else {
+            setEnabled(fmconfig.tpp);
+        }
         // Cache dialog
         opts.dlg.$ = $('.transfer-widget.popup');
         opts.dlg.dl.$ = opts.dlg.$.find('.download');
@@ -373,6 +516,7 @@ mega.ui.tpp = (function () {
             opts.dlg[blk].$.prg = opts.dlg[blk].$.find('.progress span');
             opts.dlg[blk].$.spd = opts.dlg[blk].$.find('.speed').text(l[1042]);
             opts.dlg[blk].$.stxt = opts.dlg[blk].$.find('.speed-txt');
+            opts.dlg[blk].$.ibLeft = opts.dlg[blk].$.find('.info-block.left .of');
             opts.dlg[blk].$.tfi = opts.dlg[blk].$.find('.transfer-filetype-icon');
         }
 
@@ -384,20 +528,16 @@ mega.ui.tpp = (function () {
 
             // Close button, Ongoing Transfers Popup Dialog
             $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
-                msgDialog('confirmation', '', l[16328], l[16329], function(e) {
-                    if (e) {
-                        mega.config.setn('tpp', false);
-                    }
-                });
+                opts.dlg.$.hide(opts.duration);
             });
         }
     });
 
     mBroadcaster.addListener('fmconfig:tpp', function(value) {
 
-        opts.enabled = value;
+        setEnabled(value);
         if (isEphemeral()) {
-            opts.enabled = true;
+            setEnabled(true);
         }
         var visible = isVisible();
 
@@ -414,18 +554,23 @@ mega.ui.tpp = (function () {
     return {
         show: show,
         hide: hide,
+        pause: pause,
+        resume: resume,
+        statusPaused: statusPaused,
         start: start,
         showBlock: showBlock,
         hideBlock: hideBlock,
         setTotal: setTotal,
         isVisible: isVisible,
         updateBlock: updateBlock,
+        updateIndexes: updateIndexes,
         setTotalProgress: setTotalProgress,
         setIndex: setIndex,
         setTransfered: setTransfered,
         setTime: setTime,
         getTime: getTime,
+        started: started,
         reset: reset
     };
 
-})();// END tpp, transfers popup dialog
+}();// END tpp, transfers popup dialog

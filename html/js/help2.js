@@ -9,17 +9,12 @@ var Help = (function() {
     var focus;
     var allTags = [];
     var titles = [];
-    var isScrolling = false;
     var $window = $(window);
     var $currentQuestion = null;
 
 
     function tagUri(tag) {
         return tag.toLowerCase().replace(/[^a-z0-9]/g, '_');
-    }
-
-    function contentChanged() {
-        $('.main-scroll-block').data('jsp').reinitialise();
     }
 
     function tagsPerDocument(documents, isClient) {
@@ -63,34 +58,14 @@ var Help = (function() {
         });
 
         $('.support-search').rebind('click', function(e) {
-
             e.preventDefault();
-            var $this = $(this);
             var $container = $('#help2-main');
-            var parent = $('.main-title-section');
-            var $popularQuestions = $(".popular-question-block");
-            var $searchForm = $(".support-search-container");
-            var $getStartTitle = $(".getstart-title-section", $container);
 
-            if ($this.is('.close')) {
-                $('.support-search-heading').removeClass('hidden');
-                $('.support-search-heading-close').addClass('hidden');
-                $('.search-section').fadeOut(300);
-                $this.removeClass('close');
-                parent.removeClass('hidden');
-                $popularQuestions.fadeOut(200);
-                $searchForm.fadeOut(200);
-                $getStartTitle.removeClass('hidden');
-            } else {
-                $('.support-search-heading').addClass('hidden');
-                $('.support-search-heading-close').removeClass('hidden');
-                $('.search-section').show();
-                $this.addClass('close');
-                parent.delay(240).addClass('hidden');
-                $popularQuestions.fadeIn(500);
-                $searchForm.fadeIn(400);
-                $getStartTitle.addClass('hidden');
-
+            if ($container.hasClass('search-overlay')) {
+                $container.removeClass('search-overlay');
+            }
+            else {
+                $container.addClass('search-overlay');
             }
         });
     }
@@ -100,9 +75,6 @@ var Help = (function() {
     }
 
     function selectMenuItem($element, $elements) {
-        if (isScrolling) {
-            return;
-        }
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
@@ -136,24 +108,25 @@ var Help = (function() {
                     location.hash = '#' + newpage;
                 }
             }
-        }, 1350);
+        }, 100);
     }
 
 
-    function scrollTo(selector) {
-        if (selector.length !== 1 || isScrolling) {
-            return;
+    function helpScrollTo(selector) {
+        var $target = $(selector);
+        var $dataTarget = $('*[data-update="' + selector + '"]');
+        if ($target.length) {
+            selectMenuItem($target);
+            $('.bottom-pages .fmholder').stop().animate({
+                scrollTop: $target.position().top - 20
+            }, 1000);
         }
-
-        $('.main-scroll-block').one('jsp-user-scroll-y', function() {
-            isScrolling = isScrolling === true ? false : isScrolling;
-            selectMenuItem(selector);
-        });
-        $('.main-scroll-block').data('jsp').scrollByY(
-            selector.offset().top,
-            true
-        );
-        isScrolling = true;
+        else if ($dataTarget.length) {
+            selectMenuItem($dataTarget);
+            $('.bottom-pages .fmholder').stop().animate({
+                scrollTop: $('*[data-update="' + selector + '"]').position().top - 20
+            }, 1000);
+        }
     }
 
     function filterContentByTag(tag) {
@@ -196,8 +169,6 @@ var Help = (function() {
                 $this.removeClass('gray-inactive');
             }
         });
-
-        contentChanged();
     }
 
     function patchLinks() {
@@ -322,8 +293,7 @@ var Help = (function() {
 
         function sent($parent) {
             $('.feedback-buttons,.feedback-suggestions-list', $parent).delay(500).fadeOut(500);
-            $parent.find($headFeedBack).delay(1000).fadeIn(500).children('p')
-                .text('Thank you for your feedback.', contentChanged);
+            $parent.find($headFeedBack).delay(1000).fadeIn(500).children('p').text(l[7004]);
         }
 
         $('.feedback-no').rebind('click', function() {
@@ -336,7 +306,7 @@ var Help = (function() {
 
             $this.parent().parent().children($headFeedBack).delay(200).fadeOut(300);
 
-            $this.parent().siblings('.feedback-suggestions-list').delay(500).fadeIn(500, contentChanged);
+            $this.parent().siblings('.feedback-suggestions-list').delay(500).fadeIn(500);
 
             $('.feedback-send').rebind('click', function() {
                 var data = {hash: $this.data('hash')};
@@ -427,6 +397,7 @@ var Help = (function() {
         var $cloneHeader = $(".support-section-header-clone", $container);
         var $closeIcon = $(".close-icon", $container);
         var $getStartTitle = $(".getstart-title-section", $container);
+        var $elements = $('.updateSelected:visible', $container);
         var timer;
 
         // Arrow Animation for Go back block
@@ -442,40 +413,57 @@ var Help = (function() {
             });
 
         $closeIcon.rebind('click', function() {
-            if (($mainTitleSection.hasClass('hidden')) || ($getStartTitle.hasClass('hidden'))) {
-                $('.search-section').fadeOut(300);
-                $(".support-search").addClass('close');
-                $mainTitleSection.removeClass('hidden');
-                $('.support-search-heading').removeClass('hidden');
-                $('.support-search-heading-close').addClass('hidden');
-                $getStartTitle.removeClass('hidden');
-            }
+            var $container = $('#help2-main');
+
+            $container.removeClass('search-overlay');
         });
 
-        if ($mainTitleSection.hasClass('hidden')) {
-            $cloneHeader.hide();
-            $searchHeader.fadeIn(300);
-        } else {
-            $cloneHeader.fadeIn(300);
-            $searchHeader.hide();
-        }
+        $searchHeader.fadeIn();
+        $cloneHeader.fadeOut();
 
-        var $html = $('html,body');
+        $('.bottom-pages .fmholder').rebind('scroll.helpmenu', function() {
+            var topPos = $(this).scrollTop();
+            var $current = $($('.updateSelected.current')[0]);
 
-        $html.rebind('scroll.help2', function() {
-            // TODO: write a cleanup function to be invoked when moving out of the #help section
-            if (String(getSitePath()).substr(0, 5) !== '/help') {
-                return $html.unbind('scroll.help2');
+            if ($current.length === 0) {
+                selectMenuItem($elements.eq(0), $current);
+            }
+            else {
+                var $new = getVisibleElement(topPos, [$current.prev(), $current, $current.next()]);
+                if ($new && $new !== $current) {
+                    selectMenuItem($new, $current);
+                }
             }
 
-            if (($sideBar.hasClass('fixed')) && (($sideBar).is(":visible"))) {
+            if (topPos > 195) {
+                if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
+                    $sideBar.css('top', topPos + 30 + 'px').addClass('fixed');
+                }
+                else {
+                    $sideBar.removeClass('fixed');
+                }
+            }
+            else {
+                $sideBar.removeAttr('style').removeClass('fixed');
+            }
+
+            if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
+                $cloneHeader.css('top', topPos + 60 + 'px').addClass('fixed');
+            }
+            else {
+                $cloneHeader.removeClass('fixed');
+            }
+
+            <!-- Search header !-->
+            if (topPos > 210) {
                 $searchHeader.fadeOut(10);
                 $cloneHeader.fadeIn(300);
-            } else {
+            }
+            else {
                 $searchHeader.fadeIn(300);
                 $cloneHeader.fadeOut(10);
             }
-        }).trigger('scroll');
+        });
 
         $searchContainer
             .rebind('mouseenter', function() {
@@ -587,6 +575,11 @@ var Help = (function() {
             var question = "";
             if (args.length === 3 || args.length === 2) {
                 question = args.pop();
+                if (args.length === 2) {// if this a question.
+                    if (question.lastIndexOf("-") !== -1) {
+                        question = question.substring(question.lastIndexOf("-") + 1);
+                    }
+                }
             } else if (args.length !== 1) {
                 loadSubPage('help');
                 return;
@@ -642,9 +635,9 @@ var Help = (function() {
             });
 
             if (question) {
-                $currentQuestion = $('#' + question);
+                $currentQuestion = '#' + question;
                 setTimeout(function() {
-                    scrollTo($currentQuestion);
+                    helpScrollTo($currentQuestion);
                 }, 400);
             }
         },
@@ -702,57 +695,6 @@ var Help = (function() {
         }
 
         return args[0][0];
-    }
-
-    function handleScroll() {
-
-        var $main = $('#help2-main');
-        var $menu = $('.sidebar-menu-container:visible');
-        var menuHeight = $menu.height();
-        var top   = $('.help-background-block').height();
-        var $elements = $('.updateSelected:visible', $main);
-        var isBottomScrolling;
-
-        $window.rebind('resize.help2', function() {
-            if ($('#help2-main').length === 0) {
-                return $window.unbind('resize.help2');
-            }
-            contentChanged();
-        });
-
-        $('.main-scroll-block').rebind('jsp-scroll-y.help2', function(e, scrollPositionY, atTop, atBottom) {
-
-            if ($('#help2-main').length === 0) {
-                return $('.main-scroll-block').unbind('jsp-scroll-y.help2');
-            }
-
-            var $current = $($('.updateSelected.current')[0]);
-            var jspHeight = $main.height();
-
-            if ($current.length === 0) {
-                selectMenuItem($elements.eq(0), $current);
-            } else {
-                var $new = getVisibleElement(scrollPositionY, [$current.prev(), $current, $current.next()]);
-                if ($new && $new !== $current) {
-                    selectMenuItem($new, $current);
-                }
-            }
-
-            if (jspHeight - scrollPositionY < menuHeight) {
-                if (!isBottomScrolling) {
-                    isBottomScrolling = true;
-                    $menu.css('margin-top', scrollPositionY - 290).removeClass('fixed');
-                }
-                return;
-            }
-
-            isBottomScrolling = false;
-            if (scrollPositionY >= top) {
-                $menu.removeAttr('style').addClass('fixed');
-            } else {
-                $menu.removeClass('fixed');
-            }
-        });
     }
 
 
@@ -826,7 +768,6 @@ var Help = (function() {
         doRouting();
         topmenuUI();
         sidebars();
-        mainScroll();
         userfeedback();
         homepageinteraction();
         searchBarInteraction();
@@ -860,12 +801,18 @@ var Help = (function() {
             }
         });
 
-        $('#help2-main').find('.scrollTo').rebind('click', function() {
+        $('#help2-main .scrollTo').rebind('click', function() {
             var $this = $(this);
+            var $target = $($(this).data('to'));
+
             if (!$this.is('.gray-inactive')) {
-                scrollTo($($(this).data('to')));
+                selectMenuItem($target);
+                $('.sidebar-menu-link.active').removeClass('active');
+                $this.addClass('active');
+                $('.bottom-pages .fmholder').stop().animate({
+                    scrollTop: $target.position().top - 20
+                }, 1000);
             }
-            return false;
         });
 
         // FAQ items logging
@@ -935,7 +882,6 @@ var Help = (function() {
             }
         });
 
-        handleScroll();
     };
 
     return ns;

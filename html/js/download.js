@@ -183,7 +183,7 @@ function dl_g(res) {
                 return false;
             }
 
-            var filename = fm_safename(fdl_file.n) || 'unknown.bin';
+            var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
 
             fdl_queue_var = {
@@ -197,7 +197,7 @@ function dl_g(res) {
                 onDownloadProgress: dlprogress,
                 onDownloadComplete: dlcomplete,
                 onDownloadStart: dlstart,
-                onDownloadError: M.dlerror,
+                onDownloadError: M.dlerror.bind(M),
                 onBeforeDownloadComplete: function() { }
             };
 
@@ -255,7 +255,7 @@ function dl_g(res) {
         }
         else if (is_mobile) {
             // Load the missing file decryption key dialog for mobile
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.decryptionKeyOverlay.show(dlpage_ph, false, key);
             return false;
         }
@@ -450,10 +450,17 @@ function importFile() {
                 k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dl_import[1]).slice(0, 8)))
             }]
     }, {
-        // Check response and if over quota show a special warning dialog
-        callback: function (result) {
-            if (result === EOVERQUOTA) {
-                alarm.overQuota.render();
+        callback: function (r) {
+            if (typeof r === 'object') {
+                $.onRenderNewSelectNode = r.f[0].h;
+            }
+            else {
+                console.error(r, api_strerror(r));
+
+                // if over quota show a special warning dialog
+                if (r === EOVERQUOTA) {
+                    alarm.overQuota.render();
+                }
             }
         }
     });
@@ -552,6 +559,12 @@ function start_import()
             }
             else {
                 loginDialog();
+
+                mBroadcaster.once('login', function() {
+                    setTimeout(function() {
+                        loadSubPage('fm');
+                    }, 750);
+                });
             }
         });
     }
@@ -617,7 +630,7 @@ function dlcomplete(id)
     }
     else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
     else $('.widget-circle').attr('class','widget-circle percents-0');
-    Soon(mega.utils.resetUploadDownload);
+    Soon(M.resetUploadDownload);
     $('.download.content-block').removeClass('downloading').addClass('download-complete');
     fdl_queue_var = false;
 

@@ -84,9 +84,6 @@ var mobile = {
             loadSubPage('register');
             return false;
         });
-
-        // If the Mega icon is clicked go to the home page
-        mobile.initHeaderMegaIcon();
     },
 
     /**
@@ -100,18 +97,24 @@ var mobile = {
         var $checkboxInput = $checkboxWrapper.find('.checkbox');
 
         // On clicking the checkbox or label
-        $container.off('tap').on('tap', function() {
+        $container.off('tap').on('tap', function(e) {
 
-            // If checked already, uncheck it
-            if ($checkboxInput.is(':checked')) {
+            // If user taps on link, open Terms page
+            if (!$(e.target).is('a')) {
 
-                $checkboxWrapper.addClass('checkboxOff').removeClass('checkboxOn');
-                $checkboxInput.prop('checked', false);
+                // If checked already, uncheck it
+                if ($checkboxInput.is(':checked')) {
+                    $checkboxWrapper.addClass('checkboxOff').removeClass('checkboxOn');
+                    $checkboxInput.prop('checked', false);
+                }
+                else {
+                    // Otherwise check it
+                    $checkboxWrapper.removeClass('checkboxOff').addClass('checkboxOn');
+                    $checkboxInput.prop('checked', true);
+                }
             }
             else {
-                // Otherwise check it
-                $checkboxWrapper.removeClass('checkboxOff').addClass('checkboxOn');
-                $checkboxInput.prop('checked', true);
+                loadSubPage('terms');
             }
 
             // Prevent double clicks
@@ -125,7 +128,7 @@ var mobile = {
     initHeaderMegaIcon: function() {
 
         // On Mega icon click
-        $('.fm-icon.mega').off('tap').on('tap', function() {
+        $('.mobile.fm-icon.mega').off('tap').on('tap', function() {
 
             // If logged in
             if (typeof u_attr !== 'undefined') {
@@ -136,8 +139,8 @@ var mobile = {
                 // Open the root cloud folder
                 loadSubPage('fm');
 
-                // If they were on the TOS page then the cloud doesn't reload for some reason so refresh
-                if (currentPage === 'terms') {
+                // If they were on the TOS or Pro page then the cloud doesn't reload for some reason so refresh
+                if ((currentPage === 'terms') || (currentPage === 'pro')) {
                     window.location.reload();
                 }
             }
@@ -148,6 +151,35 @@ var mobile = {
 
             return false;
         });
+    },
+
+    /**
+     * Changes the app store badge depending on what device they have
+     */
+    initMobileAppButton: function() {
+
+        var $appStoreButton = $('.download-app, .startpage .mobile-apps-button');
+
+        // Set the link
+        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
+
+        // If iOS, Windows or Android show the relevant app store badge
+        switch (ua.details.os) {
+
+            case 'iPad':
+            case 'iPhone':
+                $appStoreButton.removeClass('hidden').addClass('ios');
+                break;
+
+            case 'Windows Phone':
+                $appStoreButton.removeClass('hidden').addClass('wp');
+                break;
+
+            default:
+                // Android and others
+                $appStoreButton.removeClass('hidden').addClass('android');
+                break;
+        }
     }
 };
 
@@ -182,9 +214,6 @@ mobile.cloud = {
             // Don't render anything else for now
             return false;
         }
-
-        // Count the number of files in the folders
-        this.countFoldersAndFilesInFolders(false);
 
         // Render the file manager header, folders, files and footer
         this.renderHeader();
@@ -290,9 +319,6 @@ mobile.cloud = {
      */
     countAndUpdateSubFolderTotals: function() {
 
-        // Count the number of files in the folders
-        mobile.cloud.countFoldersAndFilesInFolders(true);
-
         // Loop through current view
         for (var i = 0; i < M.v.length; i++) {
 
@@ -303,14 +329,8 @@ mobile.cloud = {
             // If folder type
             if (nodeType === 1) {
 
-                var numOfFolders = 0;
-                var numOfFiles = 0;
-
-                // Check it is defined for this node, then get the number of folders and files inside the folder
-                if (typeof mobile.cloud.folderAndFileCounts[nodeHandle] !== 'undefined') {
-                    numOfFolders = mobile.cloud.folderAndFileCounts[nodeHandle].folders;
-                    numOfFiles = mobile.cloud.folderAndFileCounts[nodeHandle].files;
-                }
+                var numOfFolders = node.td;
+                var numOfFiles = node.tf;
 
                 // Translate the text for 1 file/folder or x files/folders
                 var foldersWording = (numOfFolders === 1) ? l[834] : l[832].replace('[X]', numOfFolders);
@@ -339,8 +359,8 @@ mobile.cloud = {
         mobile.cloud.renderFooter();
 
         // If in the current folder and this got removed, then we need to go back up and open the parent folder
-        if (M.currentdirid === nodeHandle || isCircular(nodeHandle, M.currentdirid) === true) {
-            parentHandle = parentHandle || Object(M.getNodeByHandle(nodeHandle)).p || RootbyId(nodeHandle);
+        if (M.currentdirid === nodeHandle || M.isCircular(nodeHandle, M.currentdirid) === true) {
+            parentHandle = parentHandle || Object(M.getNodeByHandle(nodeHandle)).p || M.getNodeRoot(nodeHandle);
             M.openFolder(parentHandle);
         }
     },
@@ -491,22 +511,7 @@ mobile.cloud = {
      */
     getFullSizeOfFolder: function() {
 
-        var fileSizesTotal = 0;
-
-        // Loop through all known nodes
-        for (var nodeHandle in M.d) {
-            if (M.d.hasOwnProperty(nodeHandle)) {
-
-                var node = M.d[nodeHandle];
-                var nodeType = node.t;
-                var nodeSize = node.s;
-
-                // If node is a file type, update the total
-                if (nodeType === 0) {
-                    fileSizesTotal += nodeSize;
-                }
-            }
-        }
+        var fileSizesTotal = Object(M.d[M.RootID]).tb;
 
         // Format the text e.g. 3 KB or 3 MB
         var fileSizesTotalFormatted = numOfBytes(fileSizesTotal);
@@ -637,14 +642,8 @@ mobile.cloud = {
     updateFolderTemplate: function($templateSelector, node) {
 
         var nodeHandle = node.h;
-        var numOfFolders = 0;
-        var numOfFiles = 0;
-
-        // Check it is defined for this node, then get the number of folders and files directly inside the folder
-        if (typeof this.folderAndFileCounts[nodeHandle] !== 'undefined') {
-            numOfFolders = this.folderAndFileCounts[nodeHandle].folders;
-            numOfFiles = this.folderAndFileCounts[nodeHandle].files;
-        }
+        var numOfFolders = node.td;
+        var numOfFiles = node.tf;
 
         // Translate the text for 1 file/folder or x files/folders
         var foldersWording = (numOfFolders === 1) ? l[834] : l[832].replace('[X]', numOfFolders);
@@ -674,53 +673,6 @@ mobile.cloud = {
     },
 
     /**
-     * Create a dictionary with the keys of the parent folder handles
-     * and the number of folders and files directly inside that folder
-     * @param {Boolean} forceUpdate If true, forces a recount e.g. after action packets have been received
-     */
-    countFoldersAndFilesInFolders: function(forceUpdate) {
-
-        // Don't count the folders and files every render, only if empty initially and after receiving action packets
-        if (!forceUpdate && (mobile.cloud.folderAndFileCounts !== null)) {
-            return false;
-        }
-
-        var folderAndFileCounts = {};
-
-        // Loop all known nodes
-        for (var nodeHandle in M.d) {
-            if (M.d.hasOwnProperty(nodeHandle)) {
-
-                var node = M.d[nodeHandle];
-                var parentHandle = node.p;
-                var nodeType = node.t;
-
-                // If the key is not set
-                if (typeof folderAndFileCounts[parentHandle] === 'undefined') {
-
-                    // Set the key to the parent handle and us an object to hold the number of folders and files
-                    folderAndFileCounts[parentHandle] = {
-                        folders: 0,
-                        files: 0
-                    };
-                }
-
-                // Increment the total for a folder found with this parent
-                if (nodeType) {
-                    folderAndFileCounts[parentHandle].folders += 1;
-                }
-                else {
-                    // Otherwise increment the total for a file found with this parent
-                    folderAndFileCounts[parentHandle].files += 1;
-                }
-            }
-        }
-
-        // Store for use later
-        mobile.cloud.folderAndFileCounts = folderAndFileCounts;
-    },
-
-    /**
      * Populate the template row for a file
      * @param {Object} $templateSelector The jQuery selector for the template
      * @param {Object} node The node object with values
@@ -734,7 +686,7 @@ mobile.cloud = {
 
         // Use the modified timestamp if available, or the MEGA created timestamp, then format date as 12 January 2016
         var modifiedTimestamp = node.mtime || node.ts;
-        var fileDate = humandate(modifiedTimestamp);
+        var fileDate = time2date(modifiedTimestamp, 2);
 
         // Map the file extension back to the image icon
         var iconName = fileIcon(node);
@@ -1012,7 +964,7 @@ mobile.deleteOverlay = {
         // Get initial overlay details
         var node = M.d[nodeHandle];
         var fileName = node.name;
-        var fileSizeBytes = node.s;
+        var fileSizeBytes = node.s || node.tb;
         var fileSize = numOfBytes(fileSizeBytes);
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
@@ -1113,7 +1065,7 @@ mobile.linkOverlay = {
         // Get initial overlay details
         var node = M.d[nodeHandle];
         var fileName = node.name;
-        var fileSizeBytes = node.s;
+        var fileSizeBytes = node.s || node.tb;
         var fileSize = numOfBytes(fileSizeBytes);
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
@@ -1449,7 +1401,7 @@ mobile.downloadOverlay = {
             };
 
             var redirectToStore = function() {
-                window.top.location = getStoreLink();
+                window.top.location = mobile.downloadOverlay.getStoreLink();
             };
 
             var redirect = function() {
@@ -1597,9 +1549,21 @@ mobile.downloadOverlay = {
         this.startTime = new Date().getTime();
 
         // Start download and show progress
-        mega.utils.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
+        M.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
 
+            // Show the download completed so they can open the file
             mobile.downloadOverlay.showDownloadComplete(data, nodeHandle);
+        })
+        .fail(function(data) {
+
+            // If over bandwidth quota
+            if (data.target.status === 509) {
+                dlmanager.showOverQuotaDialog();
+            }
+            else {
+                // Show message 'An error occurred, please try again.'
+                mobile.messageOverlay.show(l[8982]);
+            }
         });
     },
 
@@ -1690,10 +1654,10 @@ mobile.downloadOverlay = {
      */
     checkSupportedFile: function(node) {
 
+        var $body = $('body');
         var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
         var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
         var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
-        var $body = $('body');
 
         // Reset state back to default if re-opening the dialog from a previously disabled state
         $openInBrowserButton.removeClass('disabled');
@@ -1755,7 +1719,7 @@ mobile.downloadOverlay = {
         var $openInBrowserButton = $('.mobile.dl-browser');
 
         // Change the link
-        $downloadOnAppStoreButton.attr('href', this.getStoreLink());
+        $downloadOnAppStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
 
         switch (ua.details.os) {
             case 'iPad':
@@ -2050,7 +2014,7 @@ mobile.messageOverlay = {
         $firstMessage.text(firstMessage);
 
         // If there is a second message, set that
-        if (typeof optionalSecondMessage !== 'undefined') {
+        if ((typeof optionalSecondMessage !== 'undefined') && optionalSecondMessage) {
             $optionalSecondMessage.text(optionalSecondMessage);
         }
 
@@ -2088,7 +2052,7 @@ mobile.messageOverlay = {
 
 
 /**
- * Homepage for mobile with login/register functionality
+ * Login functionality
  */
 mobile.signin = {
 
@@ -2117,6 +2081,8 @@ mobile.signin = {
         // Initialise the Remember Me checkbox, top button tabs
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');
+        mobile.initHeaderMegaIcon();
+        mobile.initMobileAppButton();
     },
 
     /**
@@ -2226,11 +2192,22 @@ mobile.signin = {
                     // Set the u_type e.g. 3 is fully registered user
                     u_type = result;
 
-                    // Logging to see how many people are signing into the mobile site
-                    api_req({ a: 'log', e: 99629, m: 'Completed login on mobile webclient' });
+                    // Try getting the plan number they selected on Pro page
+                    var planNum = localStorage.getItem('proPageContinuePlanNum');
 
-                    // Load the file manager
-                    loadSubPage('fm');
+                    // If they did come from the Pro page, continue to Pro page Step 2
+                    if (planNum !== null) {
+
+                        // Remove the flag as it's no longer needed
+                        localStorage.removeItem('proPageContinuePlanNum');
+
+                        // Continue to the Pro payment page
+                        loadSubPage('propay_' + planNum);
+                    }
+                    else {
+                        // Load the file manager
+                        loadSubPage('fm');
+                    }
                 }
                 else {
                     // Otherwise they used an incorrect email or password so show an error
@@ -2272,6 +2249,8 @@ mobile.register = {
         // Initialise the login/register tabs and the Agree to Terms of Service checkbox
         mobile.initTabs('register');
         mobile.initCheckbox('confirm-terms');
+        mobile.initHeaderMegaIcon();
+        mobile.initMobileAppButton();
 
         // Activate register button when fields are complete
         this.initKeyupEvents();
@@ -2336,7 +2315,7 @@ mobile.register = {
             var $loader = this.$registerScreen.find('.estimator-loading-icon').addClass('loading');
 
             // On completion of loading, hide the loading spinner
-            mega.utils.require('zxcvbn_js')
+            M.require('zxcvbn_js')
                 .done(function() {
                     $loader.removeClass('loading');
                 });
@@ -2534,17 +2513,31 @@ mobile.register = {
 
                     api_req(ops);
 
-                    // Show signup link dialog
-                    mobile.register.showConfirmEmailScreen(registrationVars);
+                    // Try getting the plan number they selected on Pro page
+                    var planNum = localStorage.getItem('proPageContinuePlanNum');
+
+                    // If they did come from the Pro page, continue to Pro page Step 2 and skip email confirmation
+                    if (planNum !== null) {
+
+                        // Remove the flag as it's no longer needed
+                        localStorage.removeItem('proPageContinuePlanNum');
+
+                        // Continue to the Pro payment page
+                        loadSubPage('propay_' + planNum);
+                    }
+                    else {
+                        // Otherwise show the signup email confirmation screen
+                        mobile.register.showConfirmEmailScreen(registrationVars);
+                    }
                 }
 
                 // Show an error if the email is already in use
                 else if (result === EEXIST) {
-                    mobile.messageOverlay.show(l[9000], result);       // Error. This email address is already in use.
+                    mobile.messageOverlay.show(l[9000], result);    // Error. This email address is already in use.
                 }
                 else {
                     // Show an error
-                    mobile.messageOverlay.show(l[47], result);       // Oops, something went wrong.
+                    mobile.messageOverlay.show(l[47], result);      // Oops, something went wrong.
                 }
             }
         };
@@ -2718,86 +2711,6 @@ mobile.register = {
 
 
 /**
- * Home page functionality
- */
-mobile.home = {
-
-    /** jQuery selector for the home screen */
-    $screen: null,
-
-    /**
-     * Shows the home page and initialises functionality
-     */
-    show: function() {
-
-        // Cache selector
-        this.$screen = $('.mobile.homepage');
-
-        // Show the screen
-        this.$screen.removeClass('hidden');
-
-        // Initialise functionality
-        mobile.home.initBottomLinks();
-        mobile.home.initMobileAppButton();
-        mobile.initHeaderMegaIcon();
-        mobile.menu.showAndInit('home');
-    },
-
-    /**
-     * Initialise the Login and Register buttons in the footer of the homepage
-     */
-    initBottomLinks: function() {
-
-        var $loginButton = this.$screen.find('.bottom-link.sign-in');
-        var $registerButton = this.$screen.find('.bottom-link.register');
-
-        // On click/tap, load the login page
-        $loginButton.off('tap').on('tap', function() {
-
-            loadSubPage('login');
-            return false;
-        });
-
-        // On click/tap, load the register page
-        $registerButton.off('tap').on('tap', function() {
-
-            loadSubPage('register');
-            return false;
-        });
-    },
-
-    /**
-     * Changes the app store badge depending on what device they have
-     */
-    initMobileAppButton: function() {
-
-        var $appStoreButton = this.$screen.find('.download-app');
-
-        // Set the link
-        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
-
-        // If iOS, Windows or Android show the relevant app store badge
-        switch (ua.details.os) {
-
-            case 'iPad':
-            case 'iPhone':
-                $appStoreButton.removeClass('hidden').addClass('ios');
-                break;
-
-            case 'Windows Phone':
-                $appStoreButton.removeClass('hidden').addClass('wp');
-                break;
-
-            default:
-                // Android and others
-                $appStoreButton.removeClass('hidden').addClass('android');
-                break;
-        }
-    }
-};
-
-
-/**
  * The main menu (hamburger icon in top right) which lets the user do various tasks
  */
 mobile.menu = {
@@ -2809,8 +2722,10 @@ mobile.menu = {
      *                               menu item to indicate this is the current page.
      */
     showAndInit: function(currentScreen) {
+        "use strict";
 
         // Cache selectors
+        var $html = $('html');
         var $menuIcon = $('.mobile.fm-header .menu');
         var $darkOverlay = $('.mobile.dark-overlay');
         var $mainMenu = $('.mobile.main-menu');
@@ -2821,13 +2736,14 @@ mobile.menu = {
         var $userName = $avatarNameBlock.find('.user-name');
 
         var $menuButtons = $mainMenu.find('.menu-buttons');
+        var $menuButton = $mainMenu.find('.menu-button');
         var $loginMenuItem = $mainMenu.find('.menu-button.login');
         var $registerMenuItem = $mainMenu.find('.menu-button.register');
         var $cloudMenuItem = $mainMenu.find('.menu-button.cloud-drive');
         var $homeMenuItem = $mainMenu.find('.menu-button.home');
+        var $proMenuItem = $mainMenu.find('.menu-button.pro-plans');
         var $termsMenuItem = $mainMenu.find('.menu-button.terms-of-service');
         var $logoutMenuItem = $mainMenu.find('.menu-button.logout');
-        var $currentScreen = $mainMenu.find('.menu-button.' + currentScreen);
 
         // Show the menu / hamburger icon
         $menuIcon.removeClass('hidden');
@@ -2846,6 +2762,7 @@ mobile.menu = {
 
             // Show buttons
             $cloudMenuItem.removeClass('hidden');
+            $proMenuItem.removeClass('hidden');
             $termsMenuItem.removeClass('hidden');
             $logoutMenuItem.removeClass('hidden');
         }
@@ -2855,27 +2772,65 @@ mobile.menu = {
             $loginMenuItem.removeClass('hidden');
             $registerMenuItem.removeClass('hidden');
             $homeMenuItem.removeClass('hidden');
+            $proMenuItem.removeClass('hidden');
             $termsMenuItem.removeClass('hidden');
         }
 
         // Add a red bar style to the left of the menu item to indicate this is the current page
         $menuButtons.removeClass('current');
-        $currentScreen.addClass('current');
 
-        // On menu button click, show the menu
+        // If in the cloud drive, add a red bar next to that button
+        if (currentScreen.indexOf('fm') > -1) {
+            $cloudMenuItem.addClass('current');
+        }
+        else if (currentScreen.indexOf('pro') > -1) {
+            $proMenuItem.addClass('current');
+        }
+        else {
+            // Otherwise if it exists, add a red bar to the button matching the current page
+            try {
+                $mainMenu.find('.menu-button.' + currentScreen).addClass('current');
+            }
+            catch (exception) { }
+        }
+
+        // On menu button click
         $menuIcon.off('tap').on('tap', function() {
 
-            $mainMenu.addClass('active');
-            $darkOverlay.removeClass('hidden').addClass('active');
+            // Show the menu
+            $mainMenu.removeClass('hidden').addClass('active').animate(
+                {
+                    left: '25%',
+                    width: '75%'
+                },
+                200,
+                'swing',
+                function() {
+                    $html.addClass('overlayed');
+                    $darkOverlay.removeClass('hidden').addClass('active');
+                }
+            );
 
             return false;
         });
 
-        // On tapping/clicking the dark overlay or menu's close button, close the menu
+        // On tapping/clicking the dark overlay or menu's close button
         $darkOverlay.add($closeIcon).off('tap').on('tap', function() {
 
-            $mainMenu.removeClass('active');
+            // Close the menu
+            $html.removeClass('overlayed');
             $darkOverlay.addClass('hidden').removeClass('active');
+            $mainMenu.removeClass('active').animate(
+                {
+                    left: '100%',
+                    width: '0'
+                },
+                200,
+                'swing',
+                function() {
+                    $mainMenu.addClass('hidden');
+                }
+            );
 
             return false;
         });
@@ -2883,18 +2838,14 @@ mobile.menu = {
         // On the menu's Cloud Drive button, go to the root of the cloud drive
         $cloudMenuItem.off('tap').on('tap', function() {
 
-            // Close the menu
-            $mainMenu.removeClass('active');
-            $darkOverlay.addClass('hidden').removeClass('active');
-
             // Store the current page
             var currentPage = page;
 
             // Open the root cloud folder
             loadSubPage('fm');
 
-            // If they were on the TOS page then the cloud doesn't reload for some reason so refresh
-            if (currentPage === 'terms') {
+            // If they were on the TOS or Pro pages then the cloud doesn't reload for some reason so refresh
+            if ((currentPage === 'terms') || (currentPage.indexOf('pro') > -1)) {
                 window.location.reload();
             }
 
@@ -2905,11 +2856,8 @@ mobile.menu = {
         $logoutMenuItem.off('tap').on('tap', function() {
 
             // Log the user out and go back to the login page
-            mega.utils.logout();
+            M.logout();
             loadSubPage('login');
-
-            // Show a toast notification
-            mobile.showToast('Logout successful');
 
             return false;
         });
@@ -2928,6 +2876,21 @@ mobile.menu = {
             return false;
         });
 
+        // On the Home button tap/click go to the home page
+        $homeMenuItem.off('tap').on('tap', function() {
+
+            // Load the home/start page (if logged in this may just go back to cloud drive)
+            loadSubPage('start');
+            return false;
+        });
+
+        // On a Plans & Pricing button tap/click go to the Pro page
+        $proMenuItem.off('tap').on('tap', function() {
+
+            loadSubPage('pro');
+            return false;
+        });
+
         // On a Terms of Service button tap/click go to the TOS page
         $termsMenuItem.off('tap').on('tap', function() {
 
@@ -2935,15 +2898,13 @@ mobile.menu = {
             return false;
         });
 
-        // On the Home button tap/click go to the home page
-        $homeMenuItem.off('tap').on('tap', function() {
+        // On a Menu button tap/click hide menu
+        $menuButton.off('tap.hidemenu').on('tap.hidemenu', function() {
 
-            // Close the menu
+            $html.removeClass('overlayed');
             $mainMenu.removeClass('active');
             $darkOverlay.addClass('hidden').removeClass('active');
 
-            // Load the home/start page (if logged in this may just go back to cloud drive)
-            loadSubPage('start');
             return false;
         });
     }
@@ -2968,8 +2929,7 @@ mobile.terms = {
         // Log if they visited the TOS page
         api_req({ a: 'log', e: 99636, m: 'Visited Terms of Service page on mobile webclient' });
 
-        // Init menu and Mega icon
-        mobile.menu.showAndInit('terms-of-service');
+        // Init Mega (M) icon
         mobile.initHeaderMegaIcon();
     }
 };
@@ -3029,12 +2989,166 @@ mobile.upload = {
 
 
 /**
+ * The register/login prompt on the Pro page when they try to access step 2 without being logged in.
+ * This is the lightweight version of the showSignupPromptDialog function in proplan.js. When the user
+ * has completed login or registration they will be returned to the propay_x page they clicked on to
+ * continue with their purchase.
+ */
+mobile.proSignupPrompt = {
+
+    /** jQuery selector for the dialog */
+    $dialog: null,
+
+    /**
+     * Initialise the dialog and show it
+     */
+    init: function() {
+
+        // Cache the selector
+        this.$dialog = $('.mobile.loginrequired-dialog');
+
+        // Initialise the buttons
+        this.initCloseButton();
+        this.initRegisterButton();
+        this.initLoginButton();
+
+        // Show the dialog
+        this.$dialog.removeClass('hidden').addClass('overlay');
+    },
+
+    /**
+     * Initialise the Close icon in the top right of the dialog
+     */
+    initCloseButton: function() {
+
+        var $dialog = this.$dialog;
+        var $closeButton = $dialog.find('.fm-dialog-close');
+
+        // Add click/tap handler
+        $closeButton.off('tap').on('tap', function() {
+
+            // They don't want to continue with the Registration/Login so remove the flag
+            localStorage.removeItem('proPageContinuePlanNum');
+
+            // Hide the dialog
+            $dialog.addClass('hidden').removeClass('overlay');
+
+            // Prevent any additional clicks
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the Register button
+     */
+    initRegisterButton: function() {
+
+        var $this = this;
+        var $registerButton = $this.$dialog.find('.register');
+
+        // Add click/tap handler
+        $registerButton.off('tap').on('tap', function() {
+
+            // Set the plan number they selected into localStorage for use after Registration/Login
+            $this.setSelectedPlanNum();
+
+            // Hide the dialog
+            $this.$dialog.addClass('hidden').removeClass('overlay');
+
+            // Load the register page
+            loadSubPage('register');
+
+            // Prevent any additional clicks
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the Login button
+     */
+    initLoginButton: function() {
+
+        var $this = this;
+        var $loginButton = $this.$dialog.find('.login');
+
+        // Add click/tap handler
+        $loginButton.off('tap').on('tap', function() {
+
+            // Set the plan number they selected into localStorage for use after Registration/Login
+            $this.setSelectedPlanNum();
+
+            // Hide the dialog
+            $this.$dialog.addClass('hidden').removeClass('overlay');
+
+            // Load the login page
+            loadSubPage('login');
+
+            // Prevent any additional clicks
+            return false;
+        });
+    },
+
+    /**
+     * Sets the selected Pro plan number from what the user selected on the page into localStorage
+     */
+    setSelectedPlanNum: function() {
+
+        // Get the selected Pro card's data-payment attribute value
+        var selectedPlanNum = $('.reg-st3-membership-bl.selected').data('payment');
+
+        // Set the selected plan number so when they've completed Login and Registration they can proceed to pay
+        localStorage.setItem('proPageContinuePlanNum', selectedPlanNum);
+    }
+};
+
+
+/**
+ * Some additional functionality for the Pro pages
+ */
+mobile.propay = {
+
+    /**
+     * Extra initialisation code just for the mobile Pro payment page
+     */
+    init: function() {
+
+        var $stepTwo = $('.membership-step2');
+        var $contactUsButton = $stepTwo.find('.pro-bottom-button');
+
+        // Add click handler for the contact button
+        $contactUsButton.rebind('click', function() {
+            loadSubPage('contact');
+        });
+
+        // Show the page for mobile
+        $stepTwo.removeClass('hidden');
+    },
+
+    /**
+     * Filter the payment providers for mobile as only credit cards are available for now
+     * @param {Array} gatewayOptions All the payment providers
+     * @returns {Array} Returns a filtered list of the payment providers
+     */
+    filterPaymentProviderOptions: function(gatewayOptions) {
+
+        // Enabled payment providers for mobile so far are the credit card options
+        var mobileEnabledGateways = ['astropayVI', 'astropayMC', 'ecpVI', 'ecpMC', 'sabadellVI', 'sabadellMC'];
+
+        // Filter out anything else
+        var filteredGateways = gatewayOptions.filter(function(val) {
+            return (mobileEnabledGateways.indexOf(val.gatewayName) > -1);
+        });
+
+        return filteredGateways;
+    }
+};
+
+
+/**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
-mega.checkStorageQuota = function() {};
 
 mega.ui.tpp = {
-    megaUtilsResetUploadDownload: function() {},
     reset: function() {},
     setTotalProgress: function() {}
 };
@@ -3045,11 +3159,34 @@ var notify = {
     countAndShowNewNotifications: function() {}
 };
 
+var alarm = {
+    siteUpdate: {
+        init: function() {}
+    },
+    planExpired: {
+        lastPayment: null
+    }
+};
+
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
     // Call the mobile version
     mobile.messageOverlay.show(msg, submsg);
 }
+
+function fm_showoverlay() {
+
+    $('.fm-dialog-overlay').removeClass('hidden');
+    $('body').addClass('overlayed');
+}
+
+function fm_hideoverlay() {
+
+    $('.fm-dialog-overlay').addClass('hidden');
+    $('body').removeClass('overlayed');
+}
+
+mega.ui.showRegisterDialog = function() {};
 
 function removeUInode(nodeHandle, parentHandle) {
 
@@ -3058,4 +3195,9 @@ function removeUInode(nodeHandle, parentHandle) {
 }
 
 // Not required for mobile
-function fmtopUI() { }
+function fmtopUI() {}
+function topmenuUI() {}
+function sharedUInode() {}
+function addToMultiInputDropDownList() {}
+function removeFromMultiInputDDL() {}
+function closeDialog() {}

@@ -129,34 +129,41 @@ function dev_init(pp, appkey) {
             if ($(this).hasClass('contains-submenu')) {
                 $(this).next('.new-left-submenu').removeClass('hidden');
             }
-            var jsp = $('.main-scroll-block').data('jsp');
-            if ($(this).hasClass('preface') && jsp) {
-                jsp.scrollToY(0, 1);
+            /* TODO: set anchors */
+            var $target;
+
+            if ($(this).hasClass('preface')) {
+               $target = $('.dev-nw');
             }
             else if ($(this).hasClass('model')) {
-                jsp.scrollToElement('#doc_5', 1);
+                $target = $('#doc_5');
             }
             else if ($(this).hasClass('implementation')) {
-                jsp.scrollToElement('#doc_6', 1);
+                $target = $('#doc_6');
             }
             else if ($(this).hasClass('process')) {
-                jsp.scrollToElement('#doc_7', 1);
+               $target = $('#doc_7');
             }
             else if ($(this).hasClass('future')) {
-                jsp.scrollToElement('#doc_8', 1);
+                $target = $('#doc_8');
             }
             else if ($(this).hasClass('method')) {
-                jsp.scrollToElement('#doc_10', 1);
+                $target = $('#doc_10');
             }
             else if ($(this).hasClass('errorcodes')) {
-                jsp.scrollToElement('#doc_11', 1);
+                $target = $('#doc_11');
             }
             else if ($(this).hasClass('underhood')) {
-                jsp.scrollToElement('#doc_12', 1);
+                $target = $('#doc_12');
+            }
+
+            if ($target.length) {
+                $('.bottom-pages .fmholder').stop().animate({
+                    scrollTop: $target.position().top - 40
+                }, 1000);
             }
         }
     });
-    Soon(mainScroll);
     scrollMenu();
 }
 
@@ -268,12 +275,6 @@ function dev_app() {
     });
 
     $('.new-right-content-block.app').removeClass('hidden');
-    $('.main-scroll-block').jScrollPane({
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true,
-        mouseWheelSpeed: 50
-    });
 }
 
 
@@ -330,11 +331,5 @@ function sdk_key_render() {
                 }
             }
             loadSubPage('sdk_' + $(this).attr('id'));
-        });
-    $('.main-scroll-block').jScrollPane({
-            showArrows: true,
-            arrowSize: 5,
-            animateScroll: true,
-            mouseWheelSpeed: 50
         });
 }

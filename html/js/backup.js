@@ -17,7 +17,7 @@ function init_backup() {
         }
     });
 
-    if (is_extension || mega.utils.execCommandUsable()) {
+    if (is_extension || M.execCommandUsable()) {
         $('.backup-input-button').rebind('mouseover', function() {
             $('#backup_keyinput').select();
         });

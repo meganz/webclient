@@ -42,6 +42,7 @@
         // or leave blank for Sandbox 3.
         if (window.location.search.indexOf('apipath=staging') > -1) {
             localStorage.apipath = 'https://staging.api.mega.co.nz/';
+            localStorage.enableAllPaymentGateways = '1';
         }
         else if (window.location.search.indexOf('apipath=prod') > -1) {
             localStorage.apipath = 'https://eu.api.mega.co.nz/';
@@ -67,11 +68,6 @@
         }
         else if (window.location.search.indexOf('testOpenInApp=winphone') > -1) {
             localStorage.testOpenInApp = 'winphone';
-        }
-
-        // Force viewing of the site optimised for Google etc if requested
-        if (window.location.search.indexOf('searchbot=1') > -1) {
-            localStorage.testSearchEngineBot = '1';
         }
 
         // Use old URL hash logic for everything e.g. mega.nz/#blog instead of mega.nz/blog

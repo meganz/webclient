@@ -522,7 +522,7 @@ function fileIcon(node) {
     var icon;
 
     if (node.t) {
-        if (M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
+        if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
             icon = 'folder-shared';
         }
         else {

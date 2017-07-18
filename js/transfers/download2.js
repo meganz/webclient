@@ -102,7 +102,7 @@ var dlmanager = {
         dlQueue.pause();
         dlmanager.dlGetUrl(dl, function(error, res, o) {
             if (error) {
-                return Later(this.newUrl.bind(this, dl));
+                return later(this.newUrl.bind(this, dl));
             }
             dl.url = res.g;
 
@@ -202,7 +202,7 @@ var dlmanager = {
             }
 
             delete this._multiAbort;
-            Soon(mega.utils.resetUploadDownload);
+            Soon(M.resetUploadDownload);
         }
         else {
             if (typeof gid === 'object') {
@@ -286,7 +286,7 @@ var dlmanager = {
             }
 
             if (!this._multiAbort) {
-                Soon(mega.utils.resetUploadDownload);
+                Soon(M.resetUploadDownload);
             }
         }
     },
@@ -390,7 +390,7 @@ var dlmanager = {
 
         if (code === EKEY) {
             // TODO: Check if other codes should raise abort()
-            Later(function() {
+            later(function() {
                 dlmanager.abort(dl, true);
             });
         }
@@ -829,7 +829,7 @@ var dlmanager = {
             delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
 
             if ($(this).hasClass('reg-st3-membership-bl')) {
-                open(getAppBaseUrl() + '#pro_' + $(this).data('payment'));
+                open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
             }
             else {
                 open(getAppBaseUrl() + '#pro');
@@ -869,8 +869,7 @@ var dlmanager = {
 
         $('.bottom-tips a', $dialog).rebind('click', function() {
             open(getAppBaseUrl() +
-                '#help/client/webclient/cloud-drive/' +
-                'how-do-you-regulate-transfer-quota-utilisation'
+                '#help/client/webclient/cloud-drive/576ca738886688e7028b4599'
             );
         });
 
@@ -1018,6 +1017,12 @@ var dlmanager = {
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
 
+        // Add close button handler
+        $dialog.find('.fm-dialog-close').rebind('click.limitedbandwidth', function() {
+            fm_hideoverlay();
+            $dialog.addClass('hidden');
+        });
+
         this._overquotaClickListeners($dialog, flags, res || true);
     },
 
@@ -1092,7 +1097,7 @@ var dlmanager = {
                             if (ui.value < account.servbw_limit) {
                                 // retry download if less quota was chosen...
                                 loadingDialog.show();
-                                mega.api.req({a: 'up', srvratio: ui.value})
+                                M.req({a: 'up', srvratio: ui.value})
                                     .always(function() {
                                         loadingDialog.hide();
                                         dlmanager._onQuotaRetry(true);
@@ -1130,7 +1135,7 @@ var dlmanager = {
     },
 
     getCurrentDownloads: function() {
-        return array_unique(dl_queue.filter(isQueueActive).map(dlmanager.getGID));
+        return array.unique(dl_queue.filter(isQueueActive).map(dlmanager.getGID));
     },
 
     getCurrentDownloadsSize: function() {
@@ -1189,12 +1194,12 @@ var dlmanager = {
 
                     // if a min version is required, check for it
                     if (minVersion) {
-                        var runningVersion = mega.utils.vtol(is.v);
+                        var runningVersion = M.vtol(is.v);
 
                         if (typeof minVersion !== 'number'
                                 || parseInt(minVersion) !== minVersion) {
 
-                            minVersion = mega.utils.vtol(minVersion);
+                            minVersion = M.vtol(minVersion);
                         }
 
                         if (runningVersion < minVersion) {
@@ -1219,7 +1224,7 @@ var dlmanager = {
 
         if (typeof megasync === 'undefined') {
             timeout = 4000;
-            mega.utils.require('megasync_js').always(loader);
+            M.require('megasync_js').always(loader);
         }
         else {
             loader();
@@ -1293,6 +1298,11 @@ function fm_tfspause(gid, overquota) {
                 $tr.removeClass('transfer-error');
                 $tr.find('.transfer-status').text(l[7227]);
             }
+
+            if (fminitialized) {
+                // FIXME: do not rely on cached DOM nodes and just queue the paused state for transfers
+                mega.ui.tpp.pause(gid, gid[0] === 'u' ? 'ul' : 'dl');
+            }
         }
         return true;
     }
@@ -1303,6 +1313,10 @@ function fm_tfsresume(gid) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
         if (gid[0] === 'u') {
             ulQueue.resume(gid);
+
+            if (page !== 'download') {
+                mega.ui.tpp.resume(gid, 'ul');
+            }
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
@@ -1322,6 +1336,10 @@ function fm_tfsresume(gid) {
                 return dlmanager.showOverQuotaDialog();
             }
             dlQueue.resume(gid);
+
+            if (page !== 'download') {
+                mega.ui.tpp.resume(gid, 'dl');
+            }
 
             if (page === 'download') {
                 $('.download.status-txt, .download-info .text').text('').removeClass('blue');
@@ -1706,7 +1724,7 @@ DownloadQueue.prototype.push = function() {
     dl.io.progress = 0;
     dl.io.size = dl.size;
     dl.decrypter = 0;
-    dl.n = fm_safename(dl.n);
+    dl.n = M.getSafeName(dl.n);
 
     if (!dl.zipid) {
         dlmanager.dlWriter(dl);

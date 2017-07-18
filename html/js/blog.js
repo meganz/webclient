@@ -186,12 +186,6 @@ function blog_load() {
             $('.privacy-top-pad h1').text('Blog');
         }
     }
-    $('.main-scroll-block').jScrollPane({
-            showArrows: true,
-            arrowSize: 5,
-            animateScroll: true,
-            mouseWheelSpeed: 50
-        });
 }
 
 function blog_pager() {
@@ -351,7 +345,7 @@ if (typeof mobileblog !== 'undefined') {
         content = content.replace('[READMORE]', '').replace(/{staticpath}/g, staticpath);
         var date = new Date(blogposts[i].t * 1000);
         var blogdate = date.getDate() + '-' + (parseInt(date.getMonth()) + 1) + '-' + date.getFullYear();
-        var markup = '<div class="main-scroll-block">' +
+        var markup = '<div class="bottom-page scroll-block">' +
             '<div class="main-content-block blog-new">' +
                 '<div class="blog-new-full empty-bottom">' +
                     '<h2 id="blogarticle_title">' + escapeHTML(blogposts[i].h) + '</h2>' +

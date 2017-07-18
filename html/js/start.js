@@ -1,239 +1,238 @@
-function start_over() {
-    if (!$.startmotion) {
-        $.startmotion = true;
-    }
-    else {
-        return false;
-    }
-    $('.st-main-button-icon').fadeOut(100, function() {
-        $('.st-main-button-icon-hovered').fadeIn(450);
-        $.startignore = true;
-        $.startmotion = false;
-    });
-    $('.st-main-info').addClass('active');
-    $('.st-main-cursor').addClass('active');
-    $('.st-main-button').addClass('active');
-}
 
-function start_out() {
-    if (!$.startmotion) {
-        $.startmotion = true;
-    }
-    else {
-        return false;
-    }
-    $.startignore = false;
-    $('.st-main-button-icon-hovered').fadeOut(100, function() {
-        $('.st-main-button-icon').fadeIn(450);
-        $.startmotion = false;
-    });
-    $('.st-main-info').removeClass('active');
-    $('.st-main-cursor').removeClass('active');
-    $('.st-main-button').removeClass('active');
-}
+var achieve_data = false;
 
 function init_start() {
-    megainfotxt();
+	if (u_type > 0)
+	{
+		$('.startpage.register').text(l[164]);
+		$('.startpage.register').rebind('click', function () {
+			loadSubPage('fm');
+		});
 
-    if (lang !== 'en' && lang !== 'de') {
-        l[225] = l[225].toLowerCase();
-        l[225] = l[225].substr(0, 1).toUpperCase() + l[225].substr(1, l[225].length - 1).toLowerCase();
-    }
-    if (lang !== 'en') {
-        $('.st-main-info.uploadtxt').text(l[225]);
-    }
+		$('.startpage.try-mega').text(l[187]);
+		$('.startpage.try-mega').rebind('click', function () {
+			loadSubPage('fm/dashboard');
+		});
+	}
+	else {
+		$('.button-48-height.register').rebind('click', function () {
+        loadSubPage('register');
+		});
+		$('.startpage.try-mega').text(l[16535]);
+		$('.startpage.try-mega').rebind('click', function () {
+			if (u_type === false) {
+				// open file manager with ephemeral account
+				u_storage = init_storage(localStorage);
+				loadingDialog.show();
+				u_checklogin({
+					checkloginresult: function(u_ctx, r) {
+						u_type = r;
+						u_checked = true;
+						loadingDialog.hide();
+						loadSubPage('fm');
+					}
+				}, true);
+			}
+			else loadSubPage('fm');
+		});
+	}
 
-    if (page === 'start') {
-        $('.st-main-button-icon').rebind('mouseover', function(event) {
-            if (!$.dragging && !$.startscrolling) {
-                start_over();
-            }
-        });
+    // If Pro plan clicked, go to step 2
+    $('.reg-st3-membership-bl').rebind('click', function() {
 
-        $('.st-main-button-icon').rebind('mouseout', function(event) {
-            if (!$.startignore) {
-                setTimeout(function() {
-                    start_out();
-                }, 300);
-            }
-        });
+        // Get the Pro number from the box they clicked on
+        var proNum = $(this).attr('data-payment');
 
-        $('.st-main-button-icon-hovered').rebind('mouseout', function(event) {
-            if (!$.dragging) {
-                start_out();
-            }
-        });
-    }
-    $(window).rebind('resize.startpage', function(e) {
-        if (page === 'start' && $.infoscroll) {
-            startscrollIgnore(1000);
-            jScrollStart();
-        }
-    });
-    $('.st-bottom-scroll-button.scrolldown').rebind('click', function(event) {
-        if (page === 'download') {
-            loadSubPage('mega');
+        // If logged in, load the Pro payment page directly with the plan selected
+        if (u_attr) {
+            loadSubPage('propay_' + proNum);
         }
         else {
-            startpageScroll();
+            // Otherwise load the Pro plan selection page (Step 1)
+            loadSubPage('pro');
+
+            // Select the Pro plan on the Step 1 page
+            var $proBoxes = $('.membership-step1 .reg-st3-membership-bl');
+            $proBoxes.removeClass('selected');
+            $proBoxes.filter('.pro' + proNum).addClass('selected');
+
+            // Trigger the Register/Login dialog, after completion they will be
+            // directed to the Pro payment page with the plan already selected
+            showSignupPromptDialog();
         }
     });
 
-    $('.st-bottom-scroll-button.scrollup').rebind('click', function(event) {
-        startpageMain();
-    });
-
-    var el = '.st-mid-white-block';
-
-    $(el).rebind('mousewheel', function(e) {
-        if (e && e.originalEvent
-                && (e.originalEvent.wheelDelta < 0
-                    || e.originalEvent.deltaY > 0) && !$.infoscroll) {
-            startpageScroll();
-        }
-    });
-
-    // Show the home page main content immediately for search engines
-    if (is_search_engine_bot && (page === 'start')) {
-        startpageScroll();
-    }
-
-    if (page === 'start') {
+    if (!is_mobile && (page === 'start')) {
         InitFileDrag();
     }
-    if (getSitePath() === '/info') {
-        startpageScroll(1);
+    else if (is_mobile && (page === 'start')) {
+        mobile.initMobileAppButton();
     }
+    else if (page === 'download') {
+        $('.widget-block').hide();
+    }
+
+	startCountRenderData = {'users':'','files':''};
+    start_counts();
+
+	$('.bottom-page.top-header').text($('.bottom-page.top-header').text().replace('[A]','').replace('[/A]',''));
+
+	if (achieve_data) {
+		start_achievements(achieve_data);
+	}
+	else {
+		$('.bottom-page.white-block.top-pad.achievements').addClass('hidden');
+		api_req({"a":"mafu"}, {
+			callback: function(res) {
+				achieve_data=res;
+				start_achievements(res);
+			}
+		});
+	}
+
+	if (getCleanSitePath() === 'mobile') {
+		setTimeout(function() {
+			var offset = $(".bottom-page.bott-pad.mobile").offset();
+
+			if (offset) {
+				$('#startholder').animate({scrollTop: offset.top}, 800);
+			}
+		}, 1000);
+	}
+		
+	$('.bottom-page.scroll-block.startpage').rebind('scroll.limitcounter',function() {
+		if (page == 'start') start_countLimit = Date.now();
+	});
 }
 
-$.jScroll = {};
+var start_countLimit = 0;
 
 
-function jScrollStart() {
-    $('.st-main-block').jScrollPane({
+function start_achievements(res)
+{
+	if (res < 0) {
+		$('.bottom-page.white-block.top-pad.achievements').addClass('hidden');
+	}
+	else if (res && res.u && res.u[4] && res.u[5] && res.u[3]) {
+		// enable achievements:
+		$('.bottom-page.white-block.top-pad.achievements').removeClass('hidden');
+		var gbt = 'GB';
+		if (lang == 'fr') gbt = 'Go';
+		$('.achievements .megasync').html(escapeHTML(l[16632]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[4][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');
+		$('.achievements .invite').html(escapeHTML(l[16633]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[3][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');
+		$('.achievements .mobile').html(escapeHTML(l[16632]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[5][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');
+		$('.achievements .expiry').html('*' + escapeHTML(l[16631]).replace('[X]',parseInt(res.u[5][2].replace('d',''))));
+		$('.bottom-page.top-header').html(escapeHTML(l[16536]).replace('[A]','').replace('[/A]','*'));
+		$('.bottom-page.asterisktext').removeClass('hidden');
+	}
+}
+
+
+var start_countdata = false;
+
+function start_counts() {
+	if (start_countdata) return;
+	start_countdata=true;
+	start_APIcount();
+}
+
+start_APIcount_inflight=false;
+function start_APIcount() {
+	if (start_APIcount_inflight) return;
+	start_APIcount_inflight=true;
+	api_req({"a":"dailystats"}, {
+		callback: function(res) {
+			start_APIcountdata=res;
+			start_APIcountdata.timestamp = Date.now();
+			start_APIcount_inflight=false;
+			if (!start_countUpdate_inflight && page == 'start') start_countUpdate();
+		}
+	});
+}
+
+start_countUpdate_inflight=false;
+startCountRenderData = {};
+
+var RandomFactorTimestamp = 0;
+var start_Lcd = {};
+
+function start_countUpdate() {
+	
+	
+	
+	if (!start_countUpdate_inflight) startCountRenderData = {'users':'','files':''};
+	start_countUpdate_inflight=true;
+	if (page !== 'start') {
+		start_countdata=false;
+		start_countUpdate_inflight=false;
+		return false;
+	}
+	if (!start_Lcd.users) start_Lcd.users = start_APIcountdata.confirmedusers.total;
+	if (!start_Lcd.files) start_Lcd.files = start_APIcountdata.files.total;
+	if (!start_Lcd.ts) start_Lcd.ts = start_APIcountdata.timestamp;
+	if (!start_Lcd.timestamp) start_Lcd.timestamp = start_APIcountdata.timestamp;
+	var filesFactor = 1;
+	var usersFactor = 1;
+	if (start_Lcd.timestamp+10 < Date.now()) {
+		var rate = (Date.now() - start_Lcd.timestamp) / 86400000;
+		if (start_APIcountdata.timestamp > start_Lcd.ts+5000 && start_APIcountdata.timestamp+5000 > Date.now()) {
+			if (start_Lcd.users > start_APIcountdata.confirmedusers.total) usersFactor = 0.3;
+			else if (start_Lcd.users < start_APIcountdata.confirmedusers.total) usersFactor = 2;
+			if (start_Lcd.files > start_APIcountdata.files.total) filesFactor = 0.3;
+			else if (start_Lcd.files < start_APIcountdata.files.total) filesFactor = 2;
+		}
+		else {
+			filesFactor = 1;
+			usersFactor = 1;
+		}
+		if (RandomFactorTimestamp+500 < Date.now()) {
+			filesFactor *= Math.random()*.1-.05;
+			RandomFactorTimestamp = Date.now();
+		}
+		start_Lcd.users += rate * usersFactor * start_APIcountdata.confirmedusers.dailydelta;
+		start_Lcd.files += rate * filesFactor * start_APIcountdata.files.dailydelta;
+		start_Lcd.timestamp = Date.now();
+	}
+	function renderCounts(total,type) {
+		if (total.length == startCountRenderData[type].length) {
+			for (var i = 0, len = total.length; i < len; i++) {
+				if (startCountRenderData[type][i] !== total[i])
+				document.getElementById(type + '_number_' + i).innerHTML = total[i];
+			}
+		}
+		else {
+			var html = '';
+			for (var i = 0, len = total.length; i < len; i++) {
+				html += '<div class="flip-block"><div class="flip-bg" id="' + type + '_number_' + i + '">' + total[i] + '</div></div>';
+			}
+			$('.startpage.flip-wrapper.' + type).html(html);
+		}
+		startCountRenderData[type] = total;
+	}
+	renderCounts(String(Math.round(start_Lcd.users)),'users');
+	renderCounts(String(Math.round(start_Lcd.files)),'files');
+	var t=30;
+	
+	if (start_countLimit+100 > Date.now()) t=500;
+	setTimeout(start_countUpdate,t);
+	if (start_APIcountdata.timestamp+5000 < Date.now()) start_APIcount();
+}
+/*
+function bottompageScroll() {
+    $('.bottom-page.top-bl').height($('body').height());
+    $('.bottom-page.scroll-block').jScrollPane({
         showArrows: true,
         arrowSize: 5,
         animateScroll: true
     });
-    jScrollFade('.st-main-block');
-    $('.st-main-block').rebind('jsp-scroll-y.back', function(event, scrollPositionY, isAtTop, isAtBottom) {
-        if (isAtTop && !$.scrollIgnore) {
-            startpageMain();
-        }
-        else if (!isAtTop) {
-            startscrollIgnore(500);
-        }
+    jScrollFade('.bottom-page.scroll-block');
+}
+
+function initBottompageScroll() {
+    setTimeout(bottompageScroll, 300);
+
+    $(window).rebind('resize.bottompage', function(e) {
+        bottompageScroll()
     });
 }
-
-
-function startpageScroll(blockSwing) {
-    $.infoscroll = true;
-    if ($.hideTopMenu) {
-        $.hideTopMenu();
-    }
-    var el = '.st-mid-white-block';
-    $(el).addClass('active');
-    $('.st-main-bottom.scroll.floating').show();
-    $('.st-full-block').removeClass('hidden');
-
-    if (blockSwing) {
-        $('.st-main-block').scrollTop($('.st-main-block').height());
-        startpageJSP();
-    }
-    else {
-        $.startscrolling = true;
-        $('.st-main-block').animate({
-            scrollTop: $('.st-main-block').height()
-        }, '300', 'swing', function() {
-            setTimeout(startpageJSP, 50);
-            $.startscrolling = false;
-        });
-    }
-}
-
-
-function megainfotxt() {
-    if (lang !== 'en') {
-        $('.infotxt1').text(l[12]);
-        $('.infotxt2').text(l[1060]);
-        $('.infotxt3').text(l[1061]);
-        $('.infotxt4').text(l[1062]);
-        $('.infotxt5').text(l[1063]);
-        $('.infotxt6').text(l[1064]);
-        $('.infotxt7').text(l[1065]);
-        $('.infotxt8').text(l[1073]);
-        $('.infotxt9').text(l[1368].replace('[X]', ''));
-        $('.infotxt10').text(l[1369].replace('[X]', ''));
-        $('.fmholder').addClass(lang);
-    }
-    if (lang === 'fr') {
-        $('.st-small-red-txt.tb').text('To');
-    }
-
-    $('.st-apps-icon').rebind('click', function(e) {
-        if ($(this).hasClass('mobile')) {
-            loadSubPage('mobile');
-        }
-        else if ($(this).hasClass('sync')) {
-            loadSubPage('sync');
-        }
-        else if ($(this).hasClass('browser')) {
-            loadSubPage('plugin');
-        }
-        else if ($(this).hasClass('chat')) {
-            loadSubPage('blog_22');
-        }
-    });
-
-    clickURLs();
-}
-
-
-function startpageMain() {
-    $.infoscroll = false;
-    if (page === 'download') {
-        $('.widget-block').hide();
-    }
-    var el = '.st-mid-white-block';
-    $(el).show();
-    $('.top-head').show();
-    deleteScrollPanel('.st-main-block', 'jsp');
-    $('.st-main-block').scrollTop($('.st-main-block').height());
-    $('.st-main-bottom.scroll.floating').hide();
-    $.startscrolling = true;
-    $('.st-main-block').animate({
-        scrollTop: 0
-    }, '300', 'swing', function() {
-        var el = '.st-mid-white-block';
-    });
-    setTimeout(function() {
-        var el = '.st-mid-white-block';
-        $(el).removeClass('active');
-        $.startscrolling = false;
-    }, 295);
-}
-
-
-function startpageJSP() {
-    if (page === 'download') {
-        $('.download-mid-white-block').hide();
-    }
-    else {
-        $('.st-mid-white-block').hide();
-    }
-    $('.top-head').hide();
-    $('.st-main-block').scrollTop(0);
-    jScrollStart();
-}
-
-
-function startscrollIgnore(t) {
-    if (!$.scrollIgnore) {
-        $.scrollIgnore = 0;
-    }
-    $.scrollIgnore++;
-    setTimeout(function() {
-        $.scrollIgnore--;
-    }, t);
-}
+*/

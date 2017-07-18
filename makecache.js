@@ -248,7 +248,6 @@ function cacheHTML() {
 		}
 	});	
 	$('#hiddendiv .top-menu-content .submenu-item').addClass('expanded');
-	$('#hiddendiv .main-scroll-block').css('overflow','scroll');	
 	$('#hiddendiv a.logo').attr('href','https://mega.nz/');
 	
 	html = $('#hiddendiv').html();	

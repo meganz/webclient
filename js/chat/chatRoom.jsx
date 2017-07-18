@@ -114,7 +114,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         }
 
         self.lastActivity = ts;
-
         if (msg.userId === u_handle) {
             self.didInteraction(u_handle, ts);
             return;
@@ -595,7 +594,13 @@ ChatRoom.prototype.getRoomTitle = function() {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
-        return self.megaChat.getContactNameFromJid(participants[0]);
+        var name = self.megaChat.getContactNameFromJid(participants[0]);
+        if (!name) {
+            return "";
+        }
+        else {
+            return name;
+        }
     }
     else {
         if (self.topic && self.topic.substr) {
@@ -724,7 +729,7 @@ ChatRoom.prototype.show = function() {
         }
     }
 
-    sectionUIopen('conversations');
+    M.onSectionUIOpen('conversations');
 
 
     self.megaChat.currentlyOpenedChat = self.roomJid;
@@ -932,7 +937,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
 
 
     self.appendMessage(eventObject);
-    
+
     self._sendMessageToTransport(eventObject)
         .done(function(internalId) {
             eventObject.internalId = internalId;
@@ -1069,11 +1074,14 @@ ChatRoom.prototype.attachContacts = function(ids) {
 
     var nodesMeta = [];
     $.each(ids, function(k, nodeId) {
+        // TODO: @lp this should be M.u instead of M.d ?
         var node = M.d[nodeId];
+        var name = M.getNameByHandle(node.u);
+
         nodesMeta.push({
             'u': node.u,
             'email': node.m,
-            'name': node.firstName && node.lastName ? node.firstName + " " + node.lastName : node.m
+            'name': name || node.m
         });
     });
 
@@ -1211,7 +1219,7 @@ ChatRoom.prototype.recover = function() {
     var $startChatPromise;
     if (self.state !== ChatRoom.STATE.LEFT) {
         self.setState(ChatRoom.STATE.JOINING, true);
-        $startChatPromise = self.megaChat.karere.startChat([], self.type, 
+        $startChatPromise = self.megaChat.karere.startChat([], self.type,
             self.roomJid.split("@")[0], (self.type === "private" ? false : undefined));
 
         self.megaChat.trigger("onRoomCreated", [self]); // re-initialise plugins

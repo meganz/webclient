@@ -12620,7 +12620,7 @@
         "context": "A warning for serious infringers who have had their accounts suspended. This is shown to them during login in a dialog."
     },
     "8604": {
-        "text": "This gives you 500 GB of storage space and 2 TB of transfer quota per month for one year.",
+        "text": "This gives you 1 TB of storage space and 2 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO I annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8605": {
@@ -12628,7 +12628,7 @@
         "context": "Title of the in-app purchase for the PRO I annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8606": {
-        "text": "This gives you 500 GB of storage space and 2 TB of transfer quota for one month.",
+        "text": "This gives you 1 TB of storage space and 2 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO I monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8607": {
@@ -12636,7 +12636,7 @@
         "context": "Title of the in-app purchase for the PRO 1 monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
     "8608": {
-        "text": "This gives you 2 TB of storage space and 4 TB of transfer quota per month for one year.",
+        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO II annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8609": {
@@ -12644,7 +12644,7 @@
         "context": "Title of the in-app purchase for the PRO II annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8610": {
-        "text": "This gives you 2 TB of storage space and 4 TB of transfer quota for one month.",
+        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO II monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8611": {
@@ -12652,7 +12652,7 @@
         "context": "Title of the in-app purchase for the PRO II monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
     "8612": {
-        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota per month for one year.",
+        "text": "This gives you 8 TB of storage space and 16 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO III annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8613": {
@@ -12660,7 +12660,7 @@
         "context": "Title of the in-app purchase for the PRO III annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8614": {
-        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota for one month.",
+        "text": "This gives you 8 TB of storage space and 16 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO III monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8615": {
@@ -14096,8 +14096,8 @@
         "context": "Second paragraph of the screen to park an account"
     },
     "8992": {
-        "text": "Please enter you e-mail address below. You will receive a recovery link that will allow you to park your account.",
-        "context": "Text of the dialog message to ask for the link to park the account"
+        "text": "Please enter your e-mail address below. You will receive a recovery link that will allow you to park your account.",
+        "context": "Text of the dialog message to ask for the link to park the account "
     },
     "8993": {
         "text": "This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. If you do recall your parked account's password, please contact support@mega.nz",
@@ -14484,7 +14484,7 @@
         "context": "A title of a dialog which is displayed when a user has purchased an item from the store."
     },
     "9089": {
-        "text": "Your puchase of a MEGA subscription has not passed validation at our licence server. On restart of this app we will retry to validate your subscription licences. Please contact MEGA support if the error continues.",
+        "text": "Your purchase of a MEGA subscription has not passed validation at our licence server. On restart of this app we will retry to validate your subscription licences. Please contact MEGA support if the error continues.",
         "context": "A message in a dialog which is displayed when validation of the in app purchase has failed at the MEGA License server."
     },
     "9090": {
@@ -16023,10 +16023,6 @@
         "text": "Inside the app you can upgrade your storage space and transfer quota with a monthly or yearly subscription.",
         "context": "Paragraph 4 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
     },
-    "16372": {
-        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
-        "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
-    },
     "16373": {
         "text": "For more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/",
         "context": "Paragraph 6 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone. Please keep the multiple line format."
@@ -16924,7 +16920,7 @@
         "context": "Feature description for the startpage"
     },
     "16621": {
-        "text": "Encrypted Live Backup",
+        "text": "Live Encrypted Backup",
         "context": "Feature headline for the startpage. 'Live' implying it is always on and fully automatic"
     },
     "16622": {
@@ -17034,5 +17030,69 @@
     "16648": {
         "text": "Universal Declaration of Human Rights, Article 12.",
         "context": "Link to the Universal Declaration of Human Rights"
+    },
+    "16649": {
+        "text": "Save %1",
+        "context": "This is a small tooltip on the Pro page displaying how much money will be saved by switching to a yearly Pro plan. Please leave the %1 placeholder which will be replaced with the amount of savings. E.g. Save 10.00 EUR."
+    },
+    "16650": {
+        "text": "Failed to view the contact details. Please try again later.",
+        "context": "A dialog message which is displayed when the process\/request to view a contact's details failed."
+    },
+    "16651": {
+        "text": "Contact details failed",
+        "context": "The title of a dialog which is displayed when the process\/request to view a contact's details failed."
+    },
+    "16652": {
+        "text": "Failed to show the upload options. Please try again later.",
+        "context": "A dialog message which is displayed when the process\/request to show the upload options failed."
+    },
+    "16653": {
+        "text": "For the full featured experience, download our app or use the site on a PC.",
+        "context": "A sentence on the Login page of the mobile web site. It implies that the best experience comes from using the mobile apps, or the website when viewed on a PC\/desktop rather than a phone."
+    },
+    "16654": {
+        "text": "Don't show icons on the left pane of Windows Explorer",
+        "context": "Text next to a checkbox that allows to disable\/enable the visualization of MEGAsync icons on the left pane of Windows Explorer"
+    },
+    "16655": {
+        "text": "Open MEGA and sign in to continue",
+        "context": "This text is shown when you try to use a MEGA extension in iOS and you aren't logged in."
+    },
+    "16656": {
+        "text": "A log will be created in the Offline section (MEGAiOS.log). Logs can contain information related to your account.",
+        "context": "An alert message which is shown when the DEBUG mode is enabled. The .log file name does not need to be translated."
+    },
+    "16657": {
+        "text": "This could be due to the following reasons:\r\n- The folder link has been removed because of a ToS\/AUP violation.\r\n- Invalid URL \u2013 the link you are trying to access does not exist.\r\n- The folder link has been deleted by the user.",
+        "context": "An error message which is shown when a folder link doesn't exist."
+    },
+    "16658": {
+        "text": "This could be due to the following reasons:\r\n- The file has been removed because of a ToS\/AUP violation.\r\n- Invalid URL \u2013 the link you are trying to access does not exist.\r\n- The file has been deleted by the user.",
+        "context": "An error message which is shown when you open a file link and it's no longer available. It explains the reasons that could be causing it."
+    },
+    "16659": {
+        "text": "Show me away after 1 minute of inactivity",
+        "context": "Footer text to explain the meaning of the functionaly 'Auto-away' of your chat status."
+    },
+    "16660": {
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
+        "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "16664": {
+        "text": "The new password must be different from the old one.",
+        "context": "A message on an error dialog which is shown when a user tries to change their account password but the new password is the same as the old one."
+    },
+    "16665": {
+        "text": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
+        "context": "A message which is displayed when a user tries to upload a file to a synced folder which already contains the same filename. This message is asking for confirmation. Please keep the (%1) placeholder because it will be replaced with the name of the file."
+    },
+    "16666": {
+        "text": "Used quota for the last %1 hours: %2",
+        "context": "A label to indicate the quota usage for free users. Please keep the %1 and %2 placeholders as these will be replaced at runtime."
+    },
+    "16667": {
+        "text": "Back to PRO Plans",
+        "context": "A button on the second Pro page which lets the user return to the first Pro page to change their Pro plan."
     }
 }

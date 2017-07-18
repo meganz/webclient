@@ -248,7 +248,7 @@ var alarm = {
 
             // Get PRO plan name e.g. PRO III
             var proNum = this.lastPayment.p;
-            var proPlanName = getProPlan(proNum);
+            var proPlanName = pro.getProPlanName(proNum);
 
             // Convert the timestamps to yyyy-mm-dd format
             var purchasedDate = this.formatTimestampToDate(this.lastPayment.ts);
@@ -259,7 +259,7 @@ var alarm = {
             var planMonthsPluralisation = (planMonths > 1) ? l[6788] : l[913];
 
             // Get the display name, if it's an Astropay subgateway, then it will have it's own display name
-            var gatewayInfo = getGatewayName(gatewayId);
+            var gatewayInfo = pro.getPaymentGatewayName(gatewayId);
             var extraData = (typeof this.lastPayment.gwd !== 'undefined') ? this.lastPayment.gwd : null;
             var gatewayName = (extraData) ? extraData.gwname : gatewayInfo.name;
             var gatewayDisplayName = (extraData) ? extraData.label : gatewayInfo.displayName;
@@ -330,11 +330,8 @@ var alarm = {
                 // Add a log
                 api_req({ a: 'log', e: 99609, m: 'User chose to renew existing plan from the plan expiry dialog' });
 
-                // Get the link for the Pro page second step e.g. #pro_lite, #pro_1 etc
-                var proLink = (proNum === 4) ? 'lite' : proNum;
-
                 // Go to the second step of the Pro page which will pre-populate the details
-                loadSubPage('pro_' + proLink);
+                loadSubPage('propay_' + proNum);
             });
         },
 
@@ -535,7 +532,7 @@ var alarm = {
             var updateUrl = this.updateUrl + '?time=' + unixtime();
 
             // Fetch the latest current_ver.txt
-            mega.utils.xhr(updateUrl).done(function(event, data) {
+            M.xhr(updateUrl).done(function(event, data) {
 
                 // Try parse version info
                 try {
@@ -566,8 +563,8 @@ var alarm = {
             var $dialog = $('.top-warning-popup.site-update-available');
 
             // Convert versions to integers for easier comparison
-            var localVersion = mega.utils.vtol(buildVersion.website);
-            var serverVersion = mega.utils.vtol(serverBuildVersion.website);
+            var localVersion = M.vtol(buildVersion.website);
+            var serverVersion = M.vtol(serverBuildVersion.website);
 
             // Calculate the time when the update should be notified to the user (24 hours later)
             var currentTimestamp = unixtime();
@@ -640,7 +637,7 @@ var alarm = {
                 $button.removeClass('active');
 
                 // Check for pending transfers and if there are, prompt user to see if they want to continue
-                mega.utils.abortTransfers().then(function() {
+                M.abortTransfers().then(function() {
 
                     // Add a log
                     api_req({ a: 'log', e: 99612, m: 'User chose to update from site update dialog' });

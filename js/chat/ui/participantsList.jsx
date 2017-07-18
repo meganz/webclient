@@ -164,7 +164,7 @@ var ParticipantsListInner = React.createClass({
             )   :
             room.getContactParticipantsExceptMe();
 
-        removeValue(contacts, u_handle, true);
+        array.remove(contacts, u_handle, true);
 
         var firstVisibleUserNum = Math.floor(self.props.scrollPositionY/self.props.contactCardHeight);
         var visibleUsers = Math.ceil(self.props.scrollHeight/self.props.contactCardHeight);

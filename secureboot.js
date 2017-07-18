@@ -379,7 +379,7 @@ if (!b_u) try
     var contenterror = 0;
     var nocontentcheck = false;
 
-    if (!is_extension && (window.dd || location.host !== 'mega.nz')) {
+    if (!is_extension && (window.dd || (location.host !== 'mega.nz' && location.host !== 'webcache.googleusercontent.com'))) {
 
         nocontentcheck = true;
         var devhost = window.location.host;
@@ -1662,6 +1662,7 @@ else if (!b_u) {
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
         if (is_bot && locationSearchParams !== '') {
             userLang = locationSearchParams.replace('?', '');
+			console.log('userlang',userLang);
         }
         else {
             // Otherwise get the user's preferred language in their browser settings

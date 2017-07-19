@@ -13,7 +13,11 @@ function renderLinuxOptions(linuxsync) {
     if (l[1158].indexOf('Mac') > -1) {
         ostxt = l[1158].replace('Mac', 'Linux');
     }
-    $('.megaapp-button-info').safeHTML(l[12486]);
+    $('.megaapp-button-info.os').safeHTML(l[12486]);
+    $('.megaapp-button-info.linux-txt')
+        .safeHTML('<span class="nautilus-lnk">' +
+            'MEGA <a href="" class="red">Nautilus extension</a> (@@)</span>', l[2028])
+        .addClass('disabled');
     $('.megaapp-linux').removeClass('hidden');
     $('.architecture-checkbox input').bind('click', function() {
         $('.architecture-checkbox.radioOn').removeClass('radioOn').addClass('radioOff');
@@ -21,11 +25,11 @@ function renderLinuxOptions(linuxsync) {
         $(this).attr('checked', true);
     });
     $('.megasync .download-megasync').addClass('disabled');
-    $('.version-select-txt').text(l[2029]);
+    $('.megasync .megaapp-linux-default').text(l[7086]);
     var ua = navigator.userAgent.toLowerCase();
     if (ua.indexOf('i686') > -1
             || ua.indexOf('i386') > -1 || ua.indexOf('i586') > -1) {
-        $('.megaapp-button-info #rad1').click();
+        $('.megaapp-linux #rad1').click();
     }
     loadingDialog.hide();
 
@@ -33,7 +37,7 @@ function renderLinuxOptions(linuxsync) {
         changeLinux(linuxsync, $element.data('client-id'));
     });
 
-    $('.megaapp-button-info a').rebind('click', function(e) {
+    $('.megaapp-button-info.linux-txt a').rebind('click', function(e) {
         if (!nautilusurl) {
             return false;
         }
@@ -46,7 +50,7 @@ function renderLinuxOptions(linuxsync) {
         }
     });
 
-    $('.megaapp-button-info input').rebind('change', function(e) {
+    $('.megaapp-linux input').rebind('change', function(e) {
         if (syncsel) {
             setTimeout(function() {
                 changeLinux(linuxsync, syncsel);
@@ -54,7 +58,7 @@ function renderLinuxOptions(linuxsync) {
         }
     });
 
-    $('.megaapp-button-info a').rebind('click', function(e) {
+    $('.megaapp-button-info.os a').rebind('click', function(e) {
         if ($(this).hasClass('windows')) {
             sync_switchOS('windows');
         }
@@ -92,15 +96,16 @@ function init_sync() {
 
 function sync_switchOS(os) {
     var ostxt;
-    $('.linuxhint').hide();
+    nautilusurl = false;
+
     $('.megasync .download-megasync')
-        .attr('href', '')
+        .removeAttr('href')
         .removeClass('disabled');
     $('.megaapp-linux').addClass('hidden');
     $('.bottom-page.megasync').removeClass('linux');
     syncurl = megasync.getMegaSyncUrl(os);
     if (os === 'windows') {
-        $('.megaapp-button-info').safeHTML(l[12485]);
+        $('.megaapp-button-info.os').safeHTML(l[12485]);
         $('.megasync .download-megasync').attr('href', syncurl);
         //$('.megasync .download-megasync').unbind('click');
     }
@@ -112,16 +117,15 @@ function sync_switchOS(os) {
         if (l[1158].indexOf('Linux') > -1) {
             ostxt = l[1158].replace('Linux', 'Mac');
         }
-        $('.megaapp-button-info').safeHTML(l[12487]);
+        $('.megaapp-button-info.os').safeHTML(l[12487]);
         $('.megasync .download-megasync').attr('href', syncurl);
-        //$('.megasync .download-megasync').unbind('click');
     }
     else if (os === 'linux') {
         $('.bottom-page.megasync').addClass('linux');
         loadingDialog.show();
         megasync.getLinuxReleases(renderLinuxOptions);
     }
-    $('.megaapp-button-info a').rebind('click', function(e) {
+    $('.megaapp-button-info.os a').rebind('click', function(e) {
         if ($(this).hasClass('windows')) {
             sync_switchOS('windows');
         }
@@ -146,8 +150,9 @@ function changeLinux(linuxsync, i) {
             $('.radio-txt.32').hide();
         }
 
-        $('.version-select-txt').text(linuxsync[i].name);
+        $('.megasync .megaapp-linux-default').text(linuxsync[i].name);
         $('.megasync .download-megasync').removeClass('disabled');
+        $('.megaapp-button-info.linux-txt').removeClass('disabled');
         var platform = '64';
         var c = $('.linux32').parent().attr('class');
         if (c && c.indexOf('radioOn') > -1) {
@@ -157,17 +162,15 @@ function changeLinux(linuxsync, i) {
         nautilusurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform + "n");
         var filename = syncurl.split('/').pop();
         $('.megasync .download-megasync').attr('href', syncurl);
-        $('.megaapp-button-info a').attr('href', nautilusurl);
-        $('.linuxhint').safeHTML('*@@: <font style="font-family:courier;">@@ @@</font>',
-                                 l[1909], linuxsync[i].c, filename);
-        $('.linuxhint').show();
+        $('.megaapp-button-info.linux-txt a').attr('href', nautilusurl);
         syncsel = i;
     }
     else {
         syncurl = false;
         nautilusurl = false;
-        $('.linuxhint').hide();
         $('.megasync .download-megasync').addClass('disabled');
-        $('.version-select-txt').text(l[2029]);
+        $('.megaapp-button-info.linux-txt').addClass('disabled');
+        $('.megaapp-button-info.linux-txt a').removeAttr('href');
+        $('.megasync .megaapp-linux-default').text(l[7086]);
     }
 }

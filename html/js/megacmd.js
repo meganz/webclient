@@ -10,22 +10,25 @@ var osxurl = 'https://mega.nz/MEGAcmdSetup.dmg';
  */
 function cmd_switchOS(os) {
     var url;
-    $('.download-megacmd').removeClass('disabled');
-    $('.megaapp-linux:visible').addClass('hidden');
-    $('.bottom-page.megacmd').removeClass('linux');
+    var $content = $('.bottom-page.megacmd');
+    $content.find('.download-megacmd').removeClass('disabled');
+    $content.find('.megaapp-linux:visible').addClass('hidden');
+    $content.find('.bottom-page.megacmd').removeClass('linux');
+    $content.find('.bottom-page.megacmd').removeClass('linux');
 
     if (os === 'windows') {
-        $('.megaapp-button-info').safeHTML(l[12485]);
+        $content.find('.megaapp-button-info').safeHTML(l[12485]);
         url = windowsurl;
     }
     else if (os === 'mac') {
-        $('.megaapp-button-info').safeHTML(l[12487]);
+        $content.find('.megaapp-button-info').safeHTML(l[12487]);
         url = osxurl;
     }
     else if (os === 'linux') {
-        $('.megaapp-button-info').safeHTML(l[12486]);
-        $('.megaapp-linux').removeClass('hidden');
-        $('.bottom-page.megacmd').addClass('linux');
+        $content.find('.megaapp-button-info').safeHTML(l[12486]);
+        $content.find('.megaapp-linux-default').text(l[7086]);
+        $content.find('.megaapp-linux').removeClass('hidden');
+        $content.addClass('linux');
         linuxMegacmdDropdown();
     }
 
@@ -65,7 +68,7 @@ function initMegacmd() {
         cmd_switchOS('windows');
     }
 
-    $('.megaapp-button-info a').rebind('click', function(e) {
+    $('.megacmd .megaapp-button-info a').rebind('click', function(e) {
         if ($(this).hasClass('windows')) {
             cmd_switchOS('windows');
         }
@@ -84,18 +87,16 @@ function initMegacmd() {
  */
 function initMegacmdDownload(url) {
     var $button = $('.download-megacmd');
-    if (!$button.hasClass('disabled')) {
-        if (url) {
-            $button.rebind('click', function() {
+    $button.rebind('click', function() {
+        if (!$(this).hasClass('disabled')) {
+            if (url) {
                 window.location = url;
-            });
-        }
-        else {
-            $button.rebind('click', function() {
+            }
+            else {
                 window.location = $button.attr('data-link');
-            });
+            }      
         }
-    }
+    });
 }
 
 /**
@@ -107,7 +108,7 @@ function linuxMegacmdDropdown() {
     var $dropdown = $('.megaapp-dropdown'); 
     var $select = $dropdown.find('.megaapp-scr-pad');
     var $list = $dropdown.find('.megaapp-dropdown-list');
-    $button.addClass('disabled');
+    $button.addClass('disabled').attr('data-link','');
 
     CMS.get('cmd', function(err, content) {
         linuxnameindex = {};

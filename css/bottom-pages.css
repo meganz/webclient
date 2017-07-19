@@ -1082,6 +1082,22 @@ html.gbot {
 .megasync .megaapp-button-info {
     padding: 16px 0 61px 0;
 }
+.megaapp-button-info.linux-txt {
+    padding: 0 0 0 0;
+}
+.megaapp-button-info.disabled {
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
+.megaapp-button-info.disabled a {
+    cursor: default;
+}
+.megaapp-button-info .nautilus-lnk {
+    margin: 26px 5px -30px 0;
+    display: block;
+}
 .megasync .vertical-centered-bl .pages-nav.content-block {
     -webkit-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.05);
     -moz-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.05);
@@ -1098,13 +1114,15 @@ html.gbot {
     padding: 21px 0 0 0;
     margin-left: 34.5%;
 }
-
 @media only screen and (max-height: 685px) {
 .linux.megasync .button.download-megasync {
     margin-top: 18px;
 }
 .linux .bottom-page.img.sync-top {
     max-width: 40%;
+}
+.megaapp-button-info .nautilus-lnk {
+    margin: 26px 5px -10px 0;
 }
 }
 /* end of MEGAsync */

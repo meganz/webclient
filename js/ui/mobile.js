@@ -2137,6 +2137,9 @@ mobile.signin = {
                 return false;
             }
 
+            // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
+            $emailField.add($passwordField).blur();
+
             // Pass the details to the login flow
             mobile.signin.startLogin($signInButton, email, password, rememberMe);
 
@@ -2395,6 +2398,9 @@ mobile.register = {
                 return false;
             }
 
+            // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
+            $firstNameField.add($lastNameField).add($emailField).add($passwordField).add($confirmPasswordField).blur();
+
             // Clear old errors from past form submissions
             $containerFields.removeClass('incorrect');
 
@@ -2533,7 +2539,7 @@ mobile.register = {
 
                 // Show an error if the email is already in use
                 else if (result === EEXIST) {
-                    mobile.messageOverlay.show(l[9000], result);    // Error. This email address is already in use.
+                    mobile.messageOverlay.show(l[9000]);    // Error. This email address is already in use.
                 }
                 else {
                     // Show an error
@@ -2844,8 +2850,10 @@ mobile.menu = {
             // Open the root cloud folder
             loadSubPage('fm');
 
-            // If they were on the TOS or Pro pages then the cloud doesn't reload for some reason so refresh
-            if ((currentPage === 'terms') || (currentPage.indexOf('pro') > -1)) {
+            // If they were on the TOS, Pro or Contact pages then the cloud doesn't reload for some reason so refresh
+            if ((currentPage === 'terms') || (currentPage.indexOf('pro') > -1) ||
+                    (currentPage.indexOf('contact') > -1)) {
+
                 window.location.reload();
             }
 
@@ -3114,10 +3122,16 @@ mobile.propay = {
 
         var $stepTwo = $('.membership-step2');
         var $contactUsButton = $stepTwo.find('.pro-bottom-button');
+        var $backButton = $stepTwo.find('.js-back-to-plans');
 
         // Add click handler for the contact button
         $contactUsButton.rebind('click', function() {
             loadSubPage('contact');
+        });
+
+        // Add click handler to go back to the Pro page
+        $backButton.rebind('click', function() {
+            loadSubPage('pro');
         });
 
         // Show the page for mobile

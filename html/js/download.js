@@ -70,10 +70,10 @@ function dlinfo(ph,key,next)
     }
     else {
         // Initialise ads
-        megaAds.init();
+        //megaAds.init();
 
         // Initialise slide show
-        gifSlider.init();
+        //gifSlider.init();
     }
 }
 
@@ -99,8 +99,10 @@ function dl_g(res) {
     fdl_queue_var = null;
 
     $('.widget-block').addClass('hidden');
+	
+	
 
-    if (res === ETOOMANY) {
+    if (res === -1) {
         $('.download.scroll-block').addClass('not-available-user');
     }
     else if (typeof res === 'number' && res < 0) {
@@ -140,18 +142,30 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
+			megasync.isInstalled(function(err, is) {
+				if (!err && is)
+				{
+					$('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
+					$('#megaapp-download').prop('checked', true);
+				}
+				else 
+				{	
+					$('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
+					$('#megaapp-download').prop('checked', false);
+				}
+			});
+			
             $('#megaapp-download').rebind('change', function() {
+				console.log('change');
                 var $this = $(this);
-
                 if ($this.prop("checked")) {
-                    $this.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
-                    $this.parent().switchClass('checkboxOff', 'checkboxOn');
+                    $('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
+					$('#megaapp-download').prop('checked', true);
                 }
                 else {
-                    $this.switchClass('checkboxOn', 'checkboxOff').prop('checked', false);
-                    $this.parent().switchClass('checkboxOn', 'checkboxOff');
-                }
-    
+                    $('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
+					$('#megaapp-download').prop('checked', false);
+                }    
             });
             $('.download-button.with-megasync').rebind('click', function(e) {
                 if (!$(this).hasClass('downloading')) {

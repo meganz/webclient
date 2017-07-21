@@ -1026,15 +1026,18 @@ ChatRoom.prototype.attachNodes = function(ids) {
         }
     });
 
-    var $masterPromise = new $.Deferred();
+    var $masterPromise = new MegaPromise();
 
-    self._sendNodes(
-        ids,
-        users
-    )
-        .done(function() {
-            var nodesMeta = [];
-            $.each(ids, function(k, nodeId) {
+    var waitingPromises = [];
+    ids.forEach(function(nodeId) {
+        var proxyPromise = new MegaPromise();
+
+        self._sendNodes(
+            [nodeId],
+            users
+            )
+            .done(function () {
+                var nodesMeta = [];
                 var node = M.d[nodeId];
                 nodesMeta.push({
                     'h': node.h,
@@ -1045,22 +1048,23 @@ ChatRoom.prototype.attachNodes = function(ids) {
                     'fa': node.fa,
                     'ts': node.ts
                 });
+
+                // 1b, 1b, JSON
+                self.sendMessage(
+                    Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+                    Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
+                    JSON.stringify(nodesMeta)
+                );
+
+                proxyPromise.resolve([nodeId]);
+            })
+            .fail(function (r) {
+                proxyPromise.reject(r);
             });
+        waitingPromises.push(proxyPromise);
+    });
 
-            // 1b, 1b, JSON
-            self.sendMessage(
-                Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
-                Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
-                JSON.stringify(nodesMeta)
-            );
-
-            $masterPromise.resolve(
-                ids
-            );
-        })
-        .fail(function(r) {
-            $masterPromise.reject(r);
-        });
+    $masterPromise.linkDoneAndFailTo(MegaPromise.allDone(waitingPromises));
 
     return $masterPromise;
 };

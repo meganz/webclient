@@ -1042,10 +1042,20 @@ i.icons-sprite {
     width: 74px;
     height: 74px;
     background-image: url(../images/mega/download-dialog.png);
+    background-position: -622px -81px;
 }
 .download.big-icon.safari {
     background-position: -282px -81px;
 }
 .download.big-icon.ff {
     background-position: -412px -81px;
+}
+.download.big-icon.edge {
+    background-position: -412px -81px;
+}
+.download.big-icon.opera {
+    background-position: -82px -81px;
+}
+.download.big-icon.opera {
+    background-position: -522px -81px;
 }

@@ -1058,6 +1058,9 @@ scparser.$add('usc', function() {
 });
 
 scparser.$add('psts', function(a) {
+    if (!pfid && u_type) {
+        M.checkStorageQuota(2000);
+    }
     pro.processPaymentReceived(a);
 });
 

@@ -1044,18 +1044,18 @@ i.icons-sprite {
     background-image: url(../images/mega/download-dialog.png);
     background-position: -622px -81px;
 }
-.download.big-icon.safari {
+.safari .download.big-icon {
     background-position: -282px -81px;
 }
-.download.big-icon.ff {
+.ff .download.big-icon {
     background-position: -412px -81px;
 }
-.download.big-icon.edge {
+.edge .download.big-icon {
     background-position: -412px -81px;
 }
-.download.big-icon.opera {
+.opera .download.big-icon {
     background-position: -82px -81px;
 }
-.download.big-icon.opera {
+.ie .download.big-icon {
     background-position: -522px -81px;
 }

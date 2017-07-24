@@ -349,9 +349,9 @@
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);
-    box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(22,135,187,0.1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(22,135,187,0.1);
+    box-shadow: 0px 0px 0px 1px rgba(22,135,187,0.1);
     font-size: 14px;
     line-height: 22px;
     letter-spacing: 0.5px;
@@ -367,6 +367,11 @@
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+}
+.download.warning-block.ff, .download.warning-block.opera {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);
+    box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);
 }
 .download.warning-block.visible {
     margin-bottom: 0;

@@ -460,17 +460,49 @@
     display: inline-block;
     padding-top: 8px;
 }
-.megasync-close, .megasync-close-txt {
+.megasync-slider.button {
+    background-image: url(../images/mega/download-dialog.png);
+    background-position: 1px 0;
+    width:17px;
+    height: 32px;
+    position:absolute;
+    left: 22px;
+    top: 204px;
+    z-index: 10;
+     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    cursor: pointer;
+}
+.slide1 .megasync-slider.prev, .slide1 .megasync-slider.prev:hover, .slide3 .megasync-slider.next, .slide3 .megasync-slider.next:hover {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+    -moz-opacity: 0.2;
+    -khtml-opacity: 0.2;
+    opacity: 0.2;
+    cursor: default;
+}
+.megasync-slider.button:hover {
+     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+}
+.megasync-slider.button.next {
+    background-position: -44px 0;
+    left: auto;
+    right: 22px;
+}
+.megasync-close, .megasync-close-txt, .megasync-overlay .megasync-dropdown, .megasync-overlay.linux .megasync-dropdown {
     display: none;
 }
 .downloading .megasync-close, .downloading .megasync-close-txt {
     display: block;
-}
-.megasync-overlay .megasync-dropdown {
-    display: none;
-}
-.megasync-overlay.linux .megasync-dropdown {
-    display: none;
 }
 .downloading .download.buttons-block, .download-complete .download.buttons-block, .downloading .download.checkbox-bl, .downloading .download.bar-buttons, .download-complete .download.pause-button, .download-complete .download.bar-buttons, .download-complete .progress-cell.mid-pause, .download-complete .download.bar-buttons, .download-complete .download.checkbox-bl, .download-complete .download.speed-block, .download-complete .download.eta-block, .paused .download.eta-block i, .download-complete .download.progress-cell i {
     display: none;

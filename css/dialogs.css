@@ -1401,6 +1401,7 @@ li.token-input-token-invite .input-close {
     content:'';
     background-image: url(../images/mega/download-dialog.png);
     background-position: center -175px;
+    background-repeat: no-repeat;
     position: absolute;
     width: 100%;
     left: 0;

@@ -414,19 +414,26 @@ function megasyncOverlay() {
 
     $('.megasync-slider.button', $this).rebind('click', function()
     {
+        var $this = $(this);
         var activeSlide = parseInt($('.megasync-controls div.active').attr('data-slidernum'));
 
-        $('.megasync-content.slider').removeClass('slide1 slide2 slide3');
-
-        if ($(this).hasClass('prev')) {
+        if ($this.hasClass('prev')) {
             if (activeSlide > 1) {
                 $('.megasync-controls div.active').removeClass('active').prev().addClass('active');
-                $('.megasync-content.slider').addClass('slide' + (activeSlide - 1));
+                $('.megasync-content.slider')
+                    .removeClass('slide1 slide2 slide3')
+                    .addClass('slide' + (activeSlide - 1));
             }
-        } else {
+            else {
+                
+            }
+        }
+        else {
             if (activeSlide < slidesNum) {
                 $('.megasync-controls div.active').removeClass('active').next().addClass('active');
-                $('.megasync-content.slider').addClass('slide' + (activeSlide + 1));
+                $('.megasync-content.slider')
+                    .removeClass('slide1 slide2 slide3')
+                    .addClass('slide' + (activeSlide + 1));
             }
         }
     });

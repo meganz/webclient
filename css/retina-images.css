@@ -456,4 +456,8 @@ body.pro:after {
     background-image: url(../images/mega/top-sprite_v2@2x.png);
     background-size: 38px auto;
 }
+.download.big-icon, .fm-dialog-close.big, .megasync-img::before {
+    background-image: url(../images/mega/download-dialog@2x.png);
+    background-size: 768px auto;
+}
 }

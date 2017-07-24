@@ -167,21 +167,6 @@ function dl_g(res) {
 					$('#megaapp-download').prop('checked', false);
                 }    
             });
-            $('.download-button.with-megasync').rebind('click', function(e) {
-                if (!$(this).hasClass('downloading')) {
-                    loadingDialog.show();
-                    megasync.isInstalled(function(err, is) {
-                        // If 'msd' (MegaSync download) flag is turned on and application is installed
-                        loadingDialog.hide();
-                        if (res.msd !== 0 && (!err || is)) {
-                            $('.megasync-overlay').removeClass('downloading');
-                            megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
-                        } else {
-                            megasyncOverlay();
-                        }
-                    });
-                }
-            });
             $('.mid-button.download-file, .big-button.download-file, .mobile.dl-browser')
                 .rebind('click', function() {
                     if ($('#megaapp-download').is(':checked')) {
@@ -415,12 +400,14 @@ function setMobileAppInfo() {
 
 // MEGAsync dialog If filesize is too big for downloading through browser
 function megasyncOverlay() {
-    var $this = $('.megasync-overlay'),
-          slidesNum = $('.megasync-controls div').length;
+    var $this = $('.megasync-overlay');
+    var slidesNum = $('.megasync-controls div').length;
+    var $body = $('body');
 
     $this.addClass('msd-dialog').removeClass('hidden downloading');
+    $body.addClass('overlayed');
 
-    $('.megasync-button.download', $this).rebind('click', function(e)
+    $('.big-button.download-megasync', $this).rebind('click', function(e)
     {
         megasync.download(dlpage_ph, dlpage_key);
     });
@@ -453,16 +440,19 @@ function megasyncOverlay() {
 
     $('.megasync-info-txt a', $this).rebind('click', function(e) {
         $this.addClass('hidden');
+        $body.removeClass('overlayed');
         loadSubPage('pro');
     });
 
     $('.megasync-close, .fm-dialog-close', $this).rebind('click', function(e) {
         $this.addClass('hidden');
+        $body.removeClass('overlayed');
     });
 
     $('body').rebind('keyup.msd', function(e) {
         if (e.keyCode === 27) {
             $this.addClass('hidden');
+            $body.removeClass('overlayed');
         }
     });
 }

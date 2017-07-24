@@ -209,6 +209,7 @@ html.gbot {
     width: 100%;
     font-size: 0;
     overflow: hidden;
+    table-layout: fixed;
 }
 .bottom-page.dark-grey-block {
     background-color: #F3F3F3;

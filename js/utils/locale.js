@@ -375,6 +375,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[8654] = l[8654].replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
 
     l[8535] = l[8535].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[8752] = l[8752].replace('{0}', '<i class="medium-icon icons-sprite mega"></i>');
     l[8833] = l[8833].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[8850] = l[8850].replace('%1', '<span class="release-version"></span>');
     l[8851] = l[8851].replace('%1', '<span class="release-date-time"></span>');

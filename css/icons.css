@@ -1004,7 +1004,7 @@ i.icons-sprite {
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
 }
-.medium-icon.icons-sprite.big-mega {
+.medium-icon.icons-sprite.big-mega, .big-button .medium-icon.icons-sprite.mega {
         background-position: 2px -1006px;
 }
 .medium-icon.icons-sprite.download {
@@ -1037,4 +1037,15 @@ i.icons-sprite {
 .semi-small-icon.icons-sprite.green-tick {
     background-position: -28px -909px;
     width: 23px;
+}
+.download.big-icon {
+    width: 74px;
+    height: 74px;
+    background-image: url(../images/mega/download-dialog.png);
+}
+.download.big-icon.safari {
+    background-position: -282px -81px;
+}
+.download.big-icon.ff {
+    background-position: -412px -81px;
 }

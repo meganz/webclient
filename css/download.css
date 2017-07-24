@@ -305,7 +305,6 @@
     vertical-align: top;
     border: 0;
     margin: 0;
-    
 }
 .download.info-txt.small-txt hr::before, .bar-cell .download.bar-filesize hr::before {
     content: '/';
@@ -313,16 +312,16 @@
     vertical-align: top;
     padding: 0 5px;
 }
-    
 .download-complete .progress-cell .mid-pause {
     cursor: default;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
     -moz-opacity: 0.7;
     -khtml-opacity: 0.7;
     opacity: 0.7;
 }
 .download.error-text {
     padding: 13px 0 0 0;
+    font-size: 14px;
 }
 .download.error-text span {
     font-size: 16px;
@@ -343,7 +342,7 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: white;
-    position:absolute;
+    position: absolute;
     width: 100%;
     left: 50%;
     bottom: 109px;
@@ -363,8 +362,8 @@
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
-    visibility:hidden;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    visibility: hidden;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
@@ -372,7 +371,7 @@
 .download.warning-block.visible {
     margin-bottom: 0;
     visibility: visible;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
@@ -388,79 +387,6 @@
     display: block;
     padding: 11px 10px 9px 93px;
 }
-
-
-
-.downloading .download.buttons-block, 
-.download-complete .download.buttons-block,
-.downloading .download.checkbox-bl,
-.downloading .download.bar-buttons,
-.download-complete .download.pause-button,
-.download-complete .download.bar-buttons,
-.download-complete .progress-cell.mid-pause,
-.download-complete .download.bar-buttons,
-.download-complete .download.checkbox-bl,
-.download-complete .download.speed-block,
-.download-complete .download.eta-block,
-.paused .download.eta-block i,
-.download-complete .download.progress-cell i {
-    display: none;
-}
-
-.downloading .download.transfer-buttons,
-.downloading .download.bar-transfer-info,
-.download-complete .download bar-transfer-info,
-.download-complete .complete-block
- {
-    display: inline-block;
-}
-.downloading .download.progress-cell,
-.download-complete .download.progress-cell {
-    display: table-cell;
-}
-
-.download .create-account-button,
-.download .get-more-bonues,
-.download .top-login-button,
-.download.overquota .pause-transfer {
-    display: none;
-}
-
-.not-logged .download.overquota .create-account-button,
-.logged .download.overquota .get-more-bonues,
-.download.overquota .see-our-plans {
-    display: block;
-}
-
-
-.download.in-progress, 
-.download.some-reason, 
-.download.deleted-user, 
-.download.temporarty-error, 
-.not-available-user .download.info-block, 
-.not-available-user .download.buttons-block, 
-.not-available-user .download checkbox-bl,
-.temporary-na .download.info-block, 
-.temporary-na .download.buttons-block, 
-.temporary-na .download checkbox-bl,
-.na-some-reason .download.info-block, 
-.na-some-reason .download.buttons-block, 
-.na-some-reason .download checkbox-bl,
-.megasync-content.features {
-    display: none;
-}
-
-.downloading .download.in-progress, 
-.download-complete .download.download.in-progress, 
-.download-complete .download.percents-block, 
-.not-available-user .download.deleted-user, 
-.temporary-na .download.temporarty-error, 
-.na-some-reason .download.some-reason, 
-.downloading .megasync-content.features {
-    display: block;
-}
-
-
 .download.main-pad {
     display: table;
     width: 420px;
@@ -487,234 +413,10 @@
     line-height: 22px;
     color: #777777;
 }
-.button.download-button span {
-    font-size: 14px;
-    line-height: 17px;
-    display: block;
-    font-family: 'source_sans_proregular', Arial;
-}
-.button.download-button.dark-grey-txt {
-    color: #333333;
-}
-.button.download-button span.small-txt {
-    font-size: 12px;
-    line-height: 14px;
-    color: #777777;
-}
-.button.download-button.white-txt {
-    color: white;
-}
-.button.download-button.black-txt {
-    color: black;
-}
 .download.buttons-block {
     margin: 36px 0 0 0;
     font-size: 0;
     white-space: nowrap;
-}
-.download.icons-block {
-    min-height: 25px;
-}
-
-.download.percents-block {
-    float: right;
-    margin: 7px 0 0 0;
-    display: none;
-    text-align: right;
-}
-.download.percents-txt {
-    font-size: 24px;
-    line-height: 24px;
-    color: #333333;
-    font-family: 'source_sans_prolight';
-}
-.download.status-txt {
-    font-size: 12px;
-    line-height: 12px;
-    color: #D90007;
-    text-transform: lowercase;
-}
-.download.status-txt.green {
-    color: #31B500;
-}
-.download.status-txt.blue {
-    color: #2BA6DE;
-}
-.button.download-button {
-    min-width: 200px;
-    height: 64px;
-    background-color: #999999;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    display: inline-block;
-    margin: 0 0 0 12px;
-    padding: 10px 16px 0 16px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    cursor: pointer;
-    -webkit-transition: background-color 200ms ease-in-out;
-    -moz-transition: background-color 200ms ease-in-out;
-    -o-transition: background-color 200ms ease-in-out;
-    -ms-transition: background-color 200ms ease-in-out;
-    text-align: left;
-    font-size: 20px;
-    line-height: 25px;
-    color: #333333;
-    font-family: 'source_sans_prolight';
-    white-space: nowrap;
-}
-.button.download-button:hover {
-    background-color: #777777;
-}
-.button.download-button.light-red {
-    background-color: rgba( 255,51,58,0.8);
-}
-.button.download-button.light-red:hover {
-    background-color: rgba( 255,51,58,1);
-}
-.download-button.transparent, .download-button.transparent:hover {
-    background-color: transparent;
-}
-.download-button.transparent:hover {
-    color: #D90007;
-}
-.button.download-button.light-white {
-    background-color: rgba( 255,255,255,0.7);
-}
-.button.download-button.light-white:hover {
-    background-color: rgba( 255,255,255,0.9);
-}
-.button.download-button.red {
-    background-color: rgba( 217,0,7,0.7);
-}
-.button.download-button.red:hover {
-    background-color: rgba( 217,0,7,1);
-}
-.button.download-button.red.downloading, .button.download-button.red.downloading:hover {
-    background-color: transparent;
-    -webkit-box-shadow: inset 0px 0px 0px 2px rgba(217,0,7,1);
-    -moz-box-shadow: inset 0px 0px 0px 2px rgba(217,0,7,1);
-    box-shadow: inset 0px 0px 0px 2px rgba(217,0,7,1);
-    cursor: default;
-}
-.button.download-button.red.downloading {
-    color: rgba(217,0,7,1);
-}
-.button.download-button:first-child {
-    margin: 0;
-}
-.download.bottom-buttons {
-    position: absolute;
-    width: 100%;
-    width: -webkit-calc(100% - 600px);
-    width: -moz-calc(100% - 600px);
-    width: calc(100% - 600px);
-    text-align: center;
-    height: 130px;
-    border-top: 2px solid #fafafa;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    left: 300px;
-    bottom: 0;
-    padding: 34px 0 0 0;
-    z-index: 10;
-}
-.button.download-button.down-arrow, .button.download-button.to-clouddrive {
-    background-image: url(../images/mega/download-sprite-v7.png);
-    background-repeat: no-repeat;
-    background-position: 18px -124px;
-    padding-left: 56px;
-}
-.button.download-button.down-arrow.downloading {
-    background-position: 18px -384px;
-}
-.button.download-button.to-clouddrive {
-    background-position: -2px -249px;
-    padding: 10px 0 0 70px;
-    display: inline-block;
-    float: none;
-    min-width: 0;
-}
-.button.download-button.to-clouddrive:hover {
-    background-position: -2px -319px;
-}
-.download-icon {
-    display: inline-block;
-    float: left;
-    width: 25px;
-    height: 25px;
-    background-image: url(../images/mega/download-sprite-v7.png);
-    background-repeat: no-repeat;
-    background-position: left top;
-    vertical-align: top;
-}
-.download-icon.cloud-with-arrow {
-    float: left;
-    margin: 14px 0 0 0;
-    width: 28px;
-    height: 25px;
-}
-.download-icon.cloud-with-arrow {
-    float: left;
-    margin: 14px 0 0 0;
-}
-.download-icon.pause-icon {
-    background-position: -2px -49px;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-    -moz-opacity: 0.7;
-    -khtml-opacity: 0.7;
-    opacity: 0.7;
-}
-.download-icon.speed-icon {
-    background-position: -50px -49px;
-}
-.download-icon.clock-icon {
-    background-position: -100px -49px;
-}
-.pause-button:hover .download-icon.pause-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-}
-.pause-button.active .download-icon.pause-icon {
-    background-position: -2px -99px;
-}
-.download-info {
-    float: left;
-    margin: 0 21px 0 0;
-}
-.download.pause-button {
-    cursor: pointer;
-    float: left;
-    margin: 0 23px 0 0;
-}
-.download-info .text {
-    color: #333333;
-    font-size: 24px;
-    line-height: 24px;
-    padding-left: 6px;
-    font-family: 'source_sans_prolight';
-}
-.download-info .text span {
-    color: #777777;
-    font-size: 13px;
-    font-family: 'source_sans_proregular';
-    padding: 0 5px 0 3px;
-}
-.download-info .text.blue {
-    color: #2BA6DE;
-    font-size: 12px;
-    font-family: 'source_sans_proregular';
-    text-transform: lowercase;
 }
 .download.progress-block {
     height: 4px;
@@ -732,7 +434,6 @@
 }
 .paused .download.progress-bar, .download-complete .download.progress-bar {
     background-color: #FF5C61;
-    
 }
 .download.error-title {
     font-size: 16px;
@@ -755,7 +456,6 @@
     background-position: -200px -646px;
     padding-top: 0;
 }
-
 .megasync-bottom {
     display: inline-block;
     padding-top: 8px;
@@ -771,4 +471,28 @@
 }
 .megasync-overlay.linux .megasync-dropdown {
     display: none;
+}
+.downloading .download.buttons-block, .download-complete .download.buttons-block, .downloading .download.checkbox-bl, .downloading .download.bar-buttons, .download-complete .download.pause-button, .download-complete .download.bar-buttons, .download-complete .progress-cell.mid-pause, .download-complete .download.bar-buttons, .download-complete .download.checkbox-bl, .download-complete .download.speed-block, .download-complete .download.eta-block, .paused .download.eta-block i, .download-complete .download.progress-cell i {
+    display: none;
+}
+.downloading .download.transfer-buttons, .downloading .download.bar-transfer-info, .download-complete .download bar-transfer-info, .download-complete .complete-block {
+    display: inline-block;
+}
+.downloading .download.progress-cell, .download-complete .download.progress-cell {
+    display: table-cell;
+}
+.download .create-account-button, .download .get-more-bonues, .download .top-login-button, .download.overquota .pause-transfer {
+    display: none;
+}
+.not-logged .download.overquota .create-account-button, .logged .download.overquota .get-more-bonues, .download.overquota .see-our-plans {
+    display: block;
+}
+.download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .not-available-user .download checkbox-bl, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .temporary-na .download checkbox-bl, .na-some-reason .download.info-block, .na-some-reason .download.buttons-block, .na-some-reason .download checkbox-bl, .megasync-content.features, .not-available-user .download.checkbox-bl, .temporary-na .download.checkbox-bl, .na-some-reason .download.checkbox-bl, .download.deleted-user .download.checkbox-bl, .download.temporarty-error .download.checkbox-bl  .not-available-user .download.checkbox-bl, .temporary-na .download.checkbox-bl, .na-some-reason .download.checkbox-bl {
+    display: none;
+}
+.not-available-user .download.main-pad, .temporary-na .download.main-pad, .na-some-reason .download.main-pad {
+    height: auto;
+}
+.downloading .download.in-progress, .download-complete .download.download.in-progress, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
+    display: block;
 }

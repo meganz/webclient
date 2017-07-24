@@ -1278,7 +1278,6 @@ li.token-input-token-invite .input-close {
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
-    
 }
 .nw-dark-overlay.megasync-overlay.downloading {
     background-color: rgba(34,34,34,0.95);
@@ -1316,6 +1315,9 @@ li.token-input-token-invite .input-close {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+}
+.warning .megasync-content.slider {
+    margin-top: -301px;
 }
 .megasync-content.slider::before {
     content: '';
@@ -1529,7 +1531,7 @@ li.token-input-token-invite .input-close {
     position:relative;
     text-align: left;
 }
-.megasync-bottom-warning.visible {
+.megasync-bottom-warning.visible, .warning .megasync-bottom-warning {
     display: block;
 }
 .megasync-bottom-warning a {

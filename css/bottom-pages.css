@@ -210,9 +210,6 @@ html.gbot {
     font-size: 0;
     overflow: hidden;
 }
-.bottom-page.grey-with-opacity {
-    background-color: rgba(0,0,0,0.025);
-}
 .bottom-page.vertical-centered-bl.top-bl {
     table-layout: fixed;
 }

@@ -1040,8 +1040,9 @@ ChatRoom.prototype.attachNodes = function(ids) {
                     'h': node.h,
                     'k': node.k,
                     't': node.t,
-                    'name': node.name,
                     's': node.s,
+                    'name': node.name,
+                    'hash': node.hash,
                     'fa': node.fa,
                     'ts': node.ts
                 });
@@ -1054,9 +1055,7 @@ ChatRoom.prototype.attachNodes = function(ids) {
                 JSON.stringify(nodesMeta)
             );
 
-            $masterPromise.resolve(
-                ids
-            );
+            $masterPromise.resolve(ids);
         })
         .fail(function(r) {
             $masterPromise.reject(r);

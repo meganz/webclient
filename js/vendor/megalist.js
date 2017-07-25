@@ -100,6 +100,8 @@
             .addClass("megaList");
         this.listContainer = this.$listContainer[0];
 
+        this._lastScrollPosY = -1;
+
         var items = options.items;
         delete options.items;
         if (!items) {
@@ -167,12 +169,14 @@
         });
 
         $(document).bind('ps-scroll-y.ps' + this._generateEventNamespace(), function(e) {
-            if (self._isUserScroll === true && self.$listContainer.is(e.target)) {
-                console.log('scrollPosOnScroll:', e.target.scrollTop);
-                console.time('ps-scroll-y');
+            if (
+                self._lastScrollPosY !== e.target.scrollTop &&
+                self._isUserScroll === true &&
+                self.$listContainer.is(e.target)
+            ) {
+                self._lastScrollPosY = e.target.scrollTop;
                 self.trigger('onUserScroll', e);
                 self._onScroll(e);
-                console.timeEnd('ps-scroll-y');
             }
         });
     };
@@ -804,6 +808,8 @@
      * @private
      */
     MegaList.prototype._contentUpdated = function(forced) {
+        this._lastScrollPosY = -1;
+
         this._clearCalculated('contentWidth');
         this._clearCalculated('contentHeight');
         this._clearCalculated('visibleFirstItemNum');

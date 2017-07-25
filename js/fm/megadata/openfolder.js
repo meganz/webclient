@@ -38,7 +38,8 @@
             mBroadcaster.sendMessage('fm:initialized');
 
             if (d) {
-                console.debug('RootID=%s, InboxID=%s, RubbishID=%s', this.RootID, this.InboxID, this.RubbishID);
+                console.log('d%s, c%s, t%s', $.len(this.d), $.len(this.c), $.len(this.tree));
+                console.log('RootID=%s, InboxID=%s, RubbishID=%s', this.RootID, this.InboxID, this.RubbishID);
             }
 
             fcv_watch[M.RootID] = 1;
@@ -48,7 +49,7 @@
         }
 
         if (d) {
-            console.debug('previd=%s, currid=%s, currroot=%s',
+            console.log('previd=%s, currid=%s, currroot=%s',
                 maph(this.previousdirid), maph(this.currentdirid), maph(this.currentrootid));
         }
 
@@ -193,7 +194,7 @@
                 api_req({
                     a: 'fcv',
                     h: this.currentdirid,
-                    v: 1,
+                    v: 2,
                     f: f,
                     d: t,
                     td: n.td,

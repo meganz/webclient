@@ -829,7 +829,7 @@ var dlmanager = {
             delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
 
             if ($(this).hasClass('reg-st3-membership-bl')) {
-                open(getAppBaseUrl() + '#pro_' + $(this).data('payment'));
+                open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
             }
             else {
                 open(getAppBaseUrl() + '#pro');
@@ -869,8 +869,7 @@ var dlmanager = {
 
         $('.bottom-tips a', $dialog).rebind('click', function() {
             open(getAppBaseUrl() +
-                '#help/client/webclient/cloud-drive/' +
-                'how-do-you-regulate-transfer-quota-utilisation'
+                '#help/client/webclient/cloud-drive/576ca738886688e7028b4599'
             );
         });
 
@@ -1017,6 +1016,12 @@ var dlmanager = {
         }
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
+
+        // Add close button handler
+        $dialog.find('.fm-dialog-close').rebind('click.limitedbandwidth', function() {
+            fm_hideoverlay();
+            $dialog.addClass('hidden');
+        });
 
         this._overquotaClickListeners($dialog, flags, res || true);
     },
@@ -1293,6 +1298,11 @@ function fm_tfspause(gid, overquota) {
                 $tr.removeClass('transfer-error');
                 $tr.find('.transfer-status').text(l[7227]);
             }
+
+            if (fminitialized) {
+                // FIXME: do not rely on cached DOM nodes and just queue the paused state for transfers
+                mega.ui.tpp.pause(gid, gid[0] === 'u' ? 'ul' : 'dl');
+            }
         }
         return true;
     }
@@ -1303,6 +1313,10 @@ function fm_tfsresume(gid) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
         if (gid[0] === 'u') {
             ulQueue.resume(gid);
+
+            if (page !== 'download') {
+                mega.ui.tpp.resume(gid, 'ul');
+            }
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
@@ -1322,6 +1336,10 @@ function fm_tfsresume(gid) {
                 return dlmanager.showOverQuotaDialog();
             }
             dlQueue.resume(gid);
+
+            if (page !== 'download') {
+                mega.ui.tpp.resume(gid, 'dl');
+            }
 
             if (page === 'download') {
                 $('.download.status-txt, .download-info .text').text('').removeClass('blue');

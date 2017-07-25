@@ -278,13 +278,15 @@ function fmremovesync() {
                     tmp = M.currentdirid;
                     M.currentdirid = M.getNodeByHandle($.selected[0]).p || M.RubbishID;
                 }
-                M.clearRubbish(1);
-
-                if (tmp) {
-                    M.currentdirid = tmp;
-                }
-
-                showToast('settings', toastMessage);
+                M.clearRubbish(false)
+                    .always(function() {
+                        if (tmp) {
+                            M.currentdirid = tmp;
+                        }
+                    })
+                    .done(function() {
+                        showToast('settings', toastMessage);
+                    });
             }
         });
 

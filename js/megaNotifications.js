@@ -23,6 +23,7 @@
         self.logger = new MegaLogger("notifications", {}, options.parentLogger);
         self._notifications = [];
         self._counters = {};
+        self._lastBadgeCounter = 0;
 
 
         var sounds = [];
@@ -68,7 +69,11 @@
                         count += v ? v : 0;
                     });
 
-                    self.favico.badge(count);
+                    var badge = count > 9 ? "9+" : count;
+                    if (self._lastBadgeCounter !== badge) {
+                        self.favico.badge(badge);
+                        self._lastBadgeCounter = badge;
+                    }
 
                 });
         }

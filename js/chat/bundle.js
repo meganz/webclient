@@ -6128,7 +6128,7 @@ React.makeElement = React['createElement'];
 	            this.props.onHighlighted([node.h]);
 	        }
 
-	        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+	        if (this.props.folderSelectNotAllowed === true && node.t) {
 	            this.setState({ 'selected': [] });
 	            this.props.onSelected([]);
 	        } else {
@@ -6142,7 +6142,7 @@ React.makeElement = React['createElement'];
 	        e.stopPropagation();
 	        e.preventDefault();
 
-	        if (node.t === 1) {
+	        if (node.t) {
 
 	            self.setState({ 'selected': [], 'highlighted': [] });
 	            self.props.onSelected([]);
@@ -6171,7 +6171,7 @@ React.makeElement = React['createElement'];
 	                return;
 	            }
 
-	            var isFolder = node.t === 1;
+	            var isFolder = node.t;
 	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
 	            var tooltipElement = null;
@@ -10094,7 +10094,6 @@ React.makeElement = React['createElement'];
 	        }
 
 	        self.lastActivity = ts;
-
 	        if (msg.userId === u_handle) {
 	            self.didInteraction(u_handle, ts);
 	            return;
@@ -10760,10 +10759,12 @@ React.makeElement = React['createElement'];
 	    $.each(ids, function (k, nodeId) {
 
 	        var node = M.d[nodeId];
+	        var name = M.getNameByHandle(node.u);
+
 	        nodesMeta.push({
 	            'u': node.u,
 	            'email': node.m,
-	            'name': node.firstName && node.lastName ? node.firstName + " " + node.lastName : node.m
+	            'name': name || node.m
 	        });
 	    });
 

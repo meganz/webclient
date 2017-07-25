@@ -973,7 +973,7 @@ var notify = {
             }
 
             // If folder, increment
-            if (nodes[node].t == 1) {
+            if (nodes[node].t) {
                 folderCount++;
             }
             else {
@@ -1038,7 +1038,7 @@ var notify = {
     renderPayment: function($notificationHtml, notification) {
 
         var proLevel = notification.data.p;
-        var proPlan = getProPlan(proLevel);
+        var proPlan = pro.getProPlanName(proLevel);
         var success = (notification.data.r === 's') ? true : false;
         var header = l[1230];   // Payment info
         var title = '';

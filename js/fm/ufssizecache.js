@@ -54,6 +54,10 @@ UFSSizeCache.prototype.sum = function() {
 UFSSizeCache.prototype.save = function(rootNode) {
     this.sum();
 
+    if (d) {
+        console.debug('ufsc.save(%s)', rootNode ? rootNode.h : 'undef', rootNode, this);
+    }
+
     for (var h in this.cache) {
         var n = M.d[h];
         if (n) {
@@ -63,13 +67,22 @@ UFSSizeCache.prototype.save = function(rootNode) {
                     console.warn('Uh..oh... internal error, try menu->reload', rootNode.p, h, this.cache[h]);
                     if (d > 1) debugger
                 }
-                continue;
+                // continue;
             }
 
             n.td = (n.td || 0) + this.cache[h][4];
             n.tf = (n.tf || 0) + this.cache[h][5];
             n.tb = (n.tb || 0) + this.cache[h][6];
             this.addToDB(n);
+
+            if (!this.cache[h][3]) {
+                while ((n = M.d[n.p])) {
+                    n.td = (n.td || 0) + this.cache[h][4];
+                    n.tf = (n.tf || 0) + this.cache[h][5];
+                    n.tb = (n.tb || 0) + this.cache[h][6];
+                    this.addToDB(n);
+                }
+            }
         }
     }
 
@@ -77,10 +90,6 @@ UFSSizeCache.prototype.save = function(rootNode) {
         this._cache = this.cache;
     }
     delete this.cache;
-
-    if (rootNode) {
-        this.addNode(rootNode, true);
-    }
 };
 
 // Add node to indexedDB
@@ -113,11 +122,23 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     }
     var tmp = M.tree[p][n.h] = Object.create(null);
     tmp.name = n.name;
+    tmp.ts = n.ts;
     tmp.td = n.td || 0;
     tmp.tf = n.tf || 0;
     tmp.tb = n.tb || 0;
     tmp.h = n.h;
     tmp.p = n.p;
+    tmp.t = M.IS_TREE;
+
+    if (ignoreDB) {
+        if (n.t & M.IS_TREE) tmp.t = n.t;
+    }
+    else {
+        if (n.fav)                                                   tmp.t |= M.IS_FAV;
+        if (M.su.EXP && M.su.EXP[n.h])                               tmp.t |= M.IS_LINKED;
+        if (M.getNodeShareUsers(n, 'EXP').length || M.ps[n.h])       tmp.t |= M.IS_SHARED;
+        if (M.getNodeShare(n).down === 1)                            tmp.t |= M.IS_TAKENDOWN;
+    }
 
     if (n.su) {
         tmp.su = n.su;
@@ -129,7 +150,7 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     }
 
     if (fmdb && !ignoreDB) {
-        fmdb.add('fld', {
+        fmdb.add('tree', {
             h: n.h,
             d: tmp
         });
@@ -162,7 +183,7 @@ UFSSizeCache.prototype.delTreeNode = function(h, p) {
     }
 
     if (fmdb) {
-        fmdb.del('fld', h);
+        fmdb.del('tree', h);
     }
 };
 

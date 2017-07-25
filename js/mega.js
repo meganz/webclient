@@ -193,6 +193,9 @@ function sc_fqueuet(scni, packet) {
                 console.error('sc_fqueuet: invalid packet!');
             }
             else {
+                if (d > 1) {
+                    console.debug('sc_fqueuet', scni, packet, clone(scnodes));
+                }
                 for (var i = scnodes.length; i--;) {
                     result += sc_fqueue(scnodes[i].p, packet);
                 }
@@ -765,6 +768,9 @@ scparser.$add('t', function(a, scnodes) {
     }
     if (M.d[rootNode.h]) {
         // skip repetitive notification of (share) nodes
+        if (d) {
+            console.debug('skipping repetitive notification of (share) nodes');
+        }
         return;
     }
 
@@ -877,20 +883,45 @@ scparser.$add('se', {
 
 scparser.$add('ua', {
     r: function(a) {
-        // user attributes
-        if (fminitialized) {
+        'use strict';
+
+        if (Array.isArray(a.ua)) {
             var attrs = a.ua;
             var actionPacketUserId = a.u;
 
-            for (var j in attrs) {
+            for (var j = 0; j < attrs.length; j++) {
                 var attributeName = attrs[j];
 
-                attribCache.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
+                mega.attr.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
             }
         }
     },
     l: function(a) {
-        mega.attr.handleUserAttributeActionPackets(a, loadavatars);
+        'use strict';
+
+        if (Array.isArray(a.ua)) {
+            var attrs = a.ua;
+            var actionPacketUserId = a.u;
+
+            for (var j = 0; j < attrs.length; j++) {
+                var version = a.v && a.v[j];
+                var attributeName = attrs[j];
+
+                // fill version if missing
+                if (version && !mega.attr._versions[actionPacketUserId + "_" + attributeName]) {
+                    mega.attr._versions[actionPacketUserId + "_" + attributeName] = version;
+                }
+
+                // handle avatar related action packets (e.g. avatar modified)
+                if (attributeName === '+a') {
+                    loadavatars.push(actionPacketUserId);
+                }
+                else if (attributeName === 'firstname' || attributeName === 'lastname') {
+                    // handle firstname/lastname attributes
+                    mega.attr.uaPacketParser(attributeName, actionPacketUserId, true, version);
+                }
+            }
+        }
     }
 });
 
@@ -1027,7 +1058,10 @@ scparser.$add('usc', function() {
 });
 
 scparser.$add('psts', function(a) {
-    proPage.processPaymentReceived(a);
+    if (!pfid && u_type) {
+        M.checkStorageQuota(2000);
+    }
+    pro.processPaymentReceived(a);
 });
 
 scparser.$add('mcc', function(a) {
@@ -1508,9 +1542,13 @@ function emplacenode(node, noc) {
 
         if (node.hash) {
             if (!M.h[node.hash]) {
-                M.h[node.hash] = Hash();
+                M.h[node.hash] = node.h + ' ';
             }
-            M.h[node.hash][node.h] = 1;
+            else {
+                if (M.h[node.hash].indexOf(node.h) < 0) {
+                    M.h[node.hash] += node.h + ' ';
+                }
+            }
         }
     }
     else if (node.t > 1 && node.t < 5) {
@@ -1759,19 +1797,19 @@ function loadfm(force) {
             else {
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update
-                    f   : '&h, p, s, c',    // nodes - handle, parent, size (negative size: type), checksum
-                    s   : '&o_t',           // shares - origin/target; both incoming & outgoing
-                    ok  : '&h',             // ownerkeys for outgoing shares - handle
-                    mk  : '&h',             // missing node keys - handle
-                    u   : '&u',             // users - handle
-                    ph  : '&h',             // exported links - handle
-                    fld : '&h',             // folders - handle
-                    opc : '&p',             // outgoing pending contact - id
-                    ipc : '&p',             // incoming pending contact - id
-                    ps  : '&h_p',           // pending share - handle/id
-                    mcf : '&id',            // chats - id
-                    ua  : '&k',             // user attributes - key (maintained by IndexedBKVStorage)
-                    _sn : '&i',             // sn - fixed index 1
+                    f      : '&h, p, s, c',    // nodes - handle, parent, size (negative size: type), checksum
+                    s      : '&o_t',           // shares - origin/target; both incoming & outgoing
+                    ok     : '&h',             // ownerkeys for outgoing shares - handle
+                    mk     : '&h',             // missing node keys - handle
+                    u      : '&u',             // users - handle
+                    ph     : '&h',             // exported links - handle
+                    tree   : '&h',             // tree folders - handle
+                    opc    : '&p',             // outgoing pending contact - id
+                    ipc    : '&p',             // incoming pending contact - id
+                    ps     : '&h_p',           // pending share - handle/id
+                    mcf    : '&id',            // chats - id
+                    ua     : '&k',             // user attributes - key (maintained by IndexedBKVStorage)
+                    _sn    : '&i',             // sn - fixed index 1
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k', // queued chat messages - k
@@ -1888,7 +1926,7 @@ function dbfetchfm() {
                             opc: processOPC,
                             ipc: processIPC,
                             ps: processPS,
-                            fld: function(r) {
+                            tree: function(r) {
                                 for (var i = r.length; i--;) {
                                     ufsc.addTreeNode(r[i], true);
                                 }

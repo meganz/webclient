@@ -37,10 +37,29 @@ function init_start() {
 		});
 	}
 
-    $('.reg-st3-membership-bl').rebind('click', function(e) {
-        var proPlan = $(this).attr('data-payment');
-		if (proPlan == 4) proPlan = 'lite';
-        loadSubPage('pro_' + proPlan);
+    // If Pro plan clicked, go to step 2
+    $('.reg-st3-membership-bl').rebind('click', function() {
+
+        // Get the Pro number from the box they clicked on
+        var proNum = $(this).attr('data-payment');
+
+        // If logged in, load the Pro payment page directly with the plan selected
+        if (u_attr) {
+            loadSubPage('propay_' + proNum);
+        }
+        else {
+            // Otherwise load the Pro plan selection page (Step 1)
+            loadSubPage('pro');
+
+            // Select the Pro plan on the Step 1 page
+            var $proBoxes = $('.membership-step1 .reg-st3-membership-bl');
+            $proBoxes.removeClass('selected');
+            $proBoxes.filter('.pro' + proNum).addClass('selected');
+
+            // Trigger the Register/Login dialog, after completion they will be
+            // directed to the Pro payment page with the plan already selected
+            showSignupPromptDialog();
+        }
     });
 
     if (!is_mobile && (page === 'start')) {
@@ -76,7 +95,7 @@ function init_start() {
 			var offset = $(".bottom-page.bott-pad.mobile").offset();
 
 			if (offset) {
-				$('.bottom-page.scroll-block').animate({scrollTop: offset.top}, 800);
+				$('#startholder').animate({scrollTop: offset.top}, 800);
 			}
 		}, 1000);
 	}

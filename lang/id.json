@@ -3154,9 +3154,9 @@
     "8601": "Download dengan MEGAsync jika program sedang berjalan",
     "8602": "File ini akan di dekripsi saat cryptographic key tersedia.",
     "8603": "Anda sedang di skors karena pelanggaran Kebijakan Pelayanan.",
-    "8604": "Ini memberi anda 500 GB storage space dan 2 TB bandwidth per bulan selama setahun.",
+    "8604": "Ini memberi anda 500 GB storage space dan 2 TB bandwidth per bulan selama setahun.                ",
     "8605": "PRO I langganan tahunan",
-    "8606": "Ini memberi anda 500 GB storage space dan 2 TB bandwidth untuk satu bulan.",
+    "8606": "Ini memberi anda 500 GB storage space dan 2 TB bandwidth untuk satu bulan.                ",
     "8607": "PRO I langganan bulanan",
     "8608": "Ini memberi anda 2 TB storage space dan 4 TB bandwidth per bulan selama satu tahun.",
     "8609": "PRO II langganan tahunan",
@@ -4269,6 +4269,10 @@
     "16658": "This could be due to the following reasons:- The file has been removed because of a ToS\/AUP violation.- Invalid URL \u2013 the link you are trying to access does not exist.- The file has been deleted by the user.",
     "16659": "Show me away after 1 minute of inactivity",
     "16660": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
+    "16664": "The new password must be different from the old one.",
+    "16665": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
+    "16666": "Used quota for the last %1 hours: %2",
+    "16667": "Back to PRO Plans",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4530,6 +4534,7 @@
         "cancel-subscription-dialog-message": 16501,
         "public-links": 16516,
         "save-amount": 16649,
-        "for-full-featured-experience": 16653
+        "for-full-featured-experience": 16653,
+        "back-to-plans": 16667
     }
 }

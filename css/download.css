@@ -24,20 +24,7 @@
 }
 .download.top-bar.floating {
     position: fixed;
-    background: rgba(255, 255, 255, 0.25);
-}
-/* slightly transparent fallback */
-.download.top-bar.floating {
-    background-color: rgba(255, 255, 255, .9);
-}
-
-/* if backdrop support: very transparent and blurred */
-@supports ((-webkit-backdrop-filter: blur(2em)) or (backdrop-filter: blur(2em))) {
- .download.top-bar.floating {
- background-color: rgba(255, 255, 255, .5);
- -webkit-backdrop-filter: blur(2em);
- backdrop-filter: blur(2em);
-}
+    background: rgba(255, 255, 255,1);
 }
 .download.top-bar.floating.activated {
     top: 0;

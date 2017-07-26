@@ -81,6 +81,43 @@ var dlmanager = {
             });
     },
 
+    /**
+     * Browser query on maximum downloadable file size
+     * @returns {MegaPromise}
+     */
+    getMaximumDownloadSize: function() {
+        var promise = new MegaPromise();
+
+        var max = function() {
+            promise.resolve(Math.pow(2, 53));
+        };
+
+        if (dlMethod === FileSystemAPI) {
+            var success = function(used, remaining) {
+                promise.resolve(remaining);
+            };
+
+            if (navigator.webkitPersistentStorage) {
+                navigator.webkitPersistentStorage.queryUsageAndQuota(success, max);
+            }
+            else if (window.webkitStorageInfo) {
+                window.webkitStorageInfo.queryUsageAndQuota(1, success, max);
+            }
+            else {
+                // Hmm...
+                promise.resolve(-1);
+            }
+        }
+        else if (dlMethod === MemoryIO) {
+            promise.resolve(MemoryIO.fileSizeLimit);
+        }
+        else {
+            max();
+        }
+
+        return promise;
+    },
+
     newUrl: function DM_newUrl(dl, callback) {
         var gid = dl.dl_id || dl.ph;
 

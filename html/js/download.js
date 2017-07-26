@@ -4,6 +4,7 @@ var dl_import=false;
 var dl_attr;
 var fdl_queue_var=false;
 var fileSize;
+var maxDownloadSize = Math.pow(2, 53);
 
 var MOBILE_MAXFILESIZE = 100 * (1024 * 1024);
 var MOBILE_FILETYPES = {
@@ -99,8 +100,7 @@ function dl_g(res) {
     fdl_queue_var = null;
 
     $('.widget-block').addClass('hidden');
-	
-	
+
 
     if (res === -1) {
         $('.download.scroll-block').addClass('not-available-user');
@@ -142,38 +142,59 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
-			megasync.isInstalled(function(err, is) {
-				if (!err && is)
-				{
-					$('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
-					$('#megaapp-download').prop('checked', true);
-				}
-				else 
-				{	
-					$('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
-					$('#megaapp-download').prop('checked', false);
-				}
-			});
-			
-            $('#megaapp-download').rebind('change', function() {
-				console.log('change');
-                var $this = $(this);
-                if ($this.prop("checked")) {
-                    $('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
-					$('#megaapp-download').prop('checked', true);
+            var checkMegaSyncDownload = function() {
+                $('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
+                $('#megaapp-download').prop('checked', true);
+            };
+            var uncheckMegaSyncDownload = function() {
+                $('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
+                $('#megaapp-download').prop('checked', false);
+            };
+
+            dlmanager.getMaximumDownloadSize().done(function(size) {
+                maxDownloadSize = size;
+
+                if (fdl_filesize > maxDownloadSize) {
+                    checkMegaSyncDownload();
+                }
+                else if (localStorage.megaSyncDownloadUnchecked) {
+                    uncheckMegaSyncDownload();
                 }
                 else {
-                    $('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
-					$('#megaapp-download').prop('checked', false);
-                }    
+                    megasync.isInstalled(function(err, is) {
+                        if (!err && is) {
+                            checkMegaSyncDownload();
+                        }
+                        else {
+                            uncheckMegaSyncDownload();
+                        }
+                    });
+                }
             });
+
+            $('#megaapp-download').rebind('change', function() {
+                if ($(this).prop("checked")) {
+                    checkMegaSyncDownload();
+                    delete localStorage.megaSyncDownloadUnchecked;
+                }
+                else if (fdl_filesize > maxDownloadSize) {
+                    checkMegaSyncDownload();
+                    setBrowserWarningClasses('.download.warning-block');
+                }
+                else {
+                    uncheckMegaSyncDownload();
+                    localStorage.megaSyncDownloadUnchecked = 1;
+                }
+            });
+
             $('.mid-button.download-file, .big-button.download-file, .mobile.dl-browser')
                 .rebind('click', function() {
-                    if ($('#megaapp-download').is(':checked')) {
+                    if ($('#megaapp-download').prop("checked")) {
                         loadingDialog.show();
                         megasync.isInstalled(function(err, is) {
-                            // If 'msd' (MegaSync download) flag is turned on and application is installed
                             loadingDialog.hide();
+
+                            // If 'msd' (MegaSync download) flag is turned on and application is installed
                             if (res.msd !== 0 && (!err || is)) {
                                 $('.megasync-overlay').removeClass('downloading');
                                 megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
@@ -215,7 +236,7 @@ function dl_g(res) {
                 onDownloadError: M.dlerror.bind(M),
                 onBeforeDownloadComplete: function() { }
             };
-            
+
             fileSize = bytesToSize(res.s);
 
             $('.file-info .download.info-txt.filename, .download.bar-filename')
@@ -337,8 +358,8 @@ function dl_g(res) {
 function browserDownload() {
     // If regular download using Firefox and the total download is over 1GB then show the dialog
     // to use the extension, but not if they've seen the dialog before and ticked the checkbox
-    if (dlMethod === MemoryIO && !localStorage.firefoxDialog
-            && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
+    /*if (dlMethod === MemoryIO && !localStorage.firefoxDialog
+        && fdl_filesize > MemoryIO.fileSizeLimit && ua.engine === 'Gecko') {
         firefoxDialog();
     }
     else if (!is_mobile
@@ -347,14 +368,13 @@ function browserDownload() {
             && !localStorage.browserDialog) {
         browserDialog();
     }
-    else
+    else*/
     {
         $('.download.scroll-block').addClass('downloading');
         $('.standalone-download-message').removeClass('hidden');
 
         if (is_mobile) {
-            $('body').addClass('downloading')
-                .find('.bar').width('1%');
+            $('body').addClass('downloading').find('.bar').width('1%');
         }
 
         if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
@@ -398,6 +418,37 @@ function setMobileAppInfo() {
     }
 }
 
+function setBrowserWarningClasses(selector, $container) {
+    var uad = ua.details || false;
+    var $elm = $(selector, $container);
+
+    if (window.safari) {
+        $elm.addClass('safari');
+    }
+    else if (window.chrome) {
+        $elm.addClass('chrome');
+    }
+    else if (window.opr) {
+        $elm.addClass('opera');
+    }
+    else if (uad.engine === 'Gecko') {
+        $elm.addClass('ff');
+    }
+    else if (uad.engine === 'Trident') {
+        $elm.addClass('ie');
+    }
+    else if (uad.browser === 'Edge') {
+        $elm.addClass('edge');
+    }
+
+    if ($container) {
+        $container.addClass('warning');
+    }
+    else {
+        $elm.addClass('visible');
+    }
+}
+
 // MEGAsync dialog If filesize is too big for downloading through browser
 function megasyncOverlay() {
     var $this = $('.megasync-overlay');
@@ -406,6 +457,10 @@ function megasyncOverlay() {
 
     $this.addClass('msd-dialog').removeClass('hidden downloading');
     $body.addClass('overlayed');
+
+    if (fdl_filesize > maxDownloadSize) {
+        setBrowserWarningClasses('.megasync-bottom-warning', $this);
+    }
 
     $('.big-button.download-megasync', $this).rebind('click', function(e)
     {
@@ -425,7 +480,7 @@ function megasyncOverlay() {
                     .addClass('slide' + (activeSlide - 1));
             }
             else {
-                
+
             }
         }
         else {
@@ -636,7 +691,7 @@ function dlcomplete(id)
     if (typeof id === 'object') id = id.dl_id;
 
     $('.download.progress-bar').width('100%');
-    
+
     if ($('#dlswf_' + id).length > 0)
     {
         $('.fm-dialog-overlay').removeClass('hidden');

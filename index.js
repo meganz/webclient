@@ -91,22 +91,35 @@ function startMega() {
 }
 
 function topMenu(close) {
+
     if (close) {
         $.topMenu = '';
         $('.top-icon.menu').removeClass('active');
         $('.top-menu-popup').addClass('hidden');
+
+        if (is_mobile) {
+            $('html').removeClass('overlayed');
+            $('.mobile.dark-overlay').addClass('hidden').removeClass('active');
+        }
         $(window).unbind('resize.topmenu');
     }
     else {
         $.topMenu = 'topmenu';
         $('.top-icon.menu').addClass('active');
         $('.top-menu-popup').removeClass('hidden');
-        topMenuScroll();
-        $(window).rebind('resize.topmenu', function (e) {
-            if ($('.top-icon.menu').hasClass('active')) {
-                topMenuScroll();
-            }
-        });
+
+        if (!is_mobile) {
+            topMenuScroll();
+            $(window).rebind('resize.topmenu', function() {
+                if ($('.top-icon.menu').hasClass('active')) {
+                    topMenuScroll();
+                }
+            });
+        }
+        else {
+            $('html').addClass('overlayed');
+            $('.mobile.dark-overlay').removeClass('hidden').addClass('active');
+        }
     }
 }
 
@@ -1143,9 +1156,9 @@ function init_page() {
                 M.currentdirid = id;
             }
             if (is_mobile) {
-                parsepage(pages['mobile']);
+                $('#fmholder').safeHTML(translate(pages['mobile'].replace(/{staticpath}/g, staticpath)));
             }
-            else if (!is_mobile && $('#fmholder').html() === '') {
+            else if ($('#fmholder').html() === '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
 
@@ -1193,6 +1206,12 @@ function init_page() {
 
         $('#pageholder').hide();
         $('#startholder').hide();
+
+        // Prevent duplicate HTML content breaking things
+        if (is_mobile) {
+            $('#startholder').empty();
+        }
+
         if ($('#fmholder:visible').length == 0) {
             $('#fmholder').show();
             if (fminitialized && !is_mobile) {
@@ -1255,14 +1274,7 @@ function init_page() {
         alarm.siteUpdate.init();
     }
 
-    if (!is_mobile) {
-        topmenuUI();
-    }
-    else {
-        // Initialise the mobile menu (ToDo: in future use desktop responsive main menu)
-        mobile.initHeaderMegaIcon();
-        mobile.menu.showAndInit(page);
-    }
+    topmenuUI();
 
     loggedout = false;
     flhashchange = false;
@@ -1493,10 +1505,12 @@ function topmenuUI() {
         $('.top-icon.notification').show();
 
         // Show the rocket icon if achievements are enabled
+        if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
                 $('.top-icon.achievements').show();
             });
+        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1527,7 +1541,7 @@ function topmenuUI() {
         else {
             // Show the free badge
             $('.top-menu-item.upgrade-your-account').removeClass('hidden');
-            $('.membership-icon').attr('class', 'membership-icon');
+            $('.top-head .membership-icon').attr('class', 'membership-icon');
             $('.top-menu-item.account .right-el').text('FREE');
             $('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('.membership-popup').removeClass('pro-popup');
@@ -1618,7 +1632,6 @@ function topmenuUI() {
             $('.top-menu-item.login').addClass('hidden');
             $('.top-menu-item.logout').removeClass('hidden');
         }
-
     }
 
     $.hideTopMenu = function (e) {
@@ -1741,7 +1754,9 @@ function topmenuUI() {
             } else {
                 $(this).addClass('expanded');
             }
-            setTimeout(topMenuScroll,200);
+            if (!is_mobile) {
+                setTimeout(topMenuScroll, 200);
+            }
         }
         else {
             if ($('.light-overlay').is(':visible')) {
@@ -1780,7 +1795,9 @@ function topmenuUI() {
                 M.reload();
             }
             else if (className.indexOf('languages') > -1) {
-                langDialog.show();
+                if (!is_mobile) {
+                    langDialog.show();
+                }
             }
             else if (className.indexOf('logout') > -1) {
                 mLogout();
@@ -1788,6 +1805,11 @@ function topmenuUI() {
         }
         return false;
     });
+
+    // Initialise the language sub menu for mobile
+    if (is_mobile) {
+        mobile.languageMenu.init();
+    }
 
     $('.top-search-bl').rebind('click', function () {
         $(this).addClass('active');
@@ -1990,6 +2012,10 @@ function topmenuUI() {
         $('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
     }
 
+    // Initialise the header icon for mobile
+    if (is_mobile) {
+        mobile.initHeaderMegaIcon();
+    }
 
     // Initialise notification popup and tooltip
     if (typeof notify === 'object') {
@@ -2132,7 +2158,7 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(bmenu2));
     pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pagesmenu));
 
-    var $container = is_mobile ? $('body') : $('#startholder');
+    var $container = $('#startholder');
     $container
         .safeHTML('<div class="nav-overlay"></div>' +
             translate(pages['transferwidget']) + pagehtml)
@@ -2156,17 +2182,11 @@ function parsepage(pagehtml, pp) {
 
 function parsetopmenu() {
     var top;
-    if (!is_mobile) {
-        top = pages['top'].replace(/{staticpath}/g, staticpath);
-        if (document.location.href.substr(0, 19) == 'chrome-extension://') {
-            top = top.replace(/\/#/g, '/' + urlrootfile + '#');
-        }
-        top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
+    top = pages['top'].replace(/{staticpath}/g, staticpath);
+    if (document.location.href.substr(0, 19) === 'chrome-extension://') {
+        top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    /* TODO: import mobile top menu */
-    else {
-        top = pages['top-mobile'];
-    }
+    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     top = translate(top);
     return top;
 }

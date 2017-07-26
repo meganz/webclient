@@ -1844,6 +1844,7 @@ else if (!b_u) {
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
+        jsl.push({f:'html/top.html', n: 'top', j:0});
     } // !is_mobile
 
     // Transfers
@@ -1865,12 +1866,8 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
 
-
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
-    jsl.push({f:'html/top.html', n: 'top', j:0});
-    // TODO: include mobile top menu js stuff
-    jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
@@ -1904,6 +1901,7 @@ else if (!b_u) {
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
     }
 
+    jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {
@@ -1965,6 +1963,7 @@ else if (!b_u) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'html/top-mobile.html', n: 'top', j:0});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/ui/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
@@ -1981,14 +1980,8 @@ else if (!b_u) {
     if (is_extension) {
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
-    if (!is_mobile
-            && (
-                typeof Number.isNaN !== 'function' ||
-                typeof Set === 'undefined' ||
-                !Object.assign
-            )
-    ) {
 
+    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
 
@@ -2076,20 +2069,22 @@ else if (!b_u) {
             /* chat related js */
             'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
+            'appactivityhandler_js': {f:'js/appActivityHandler.js', n: 'appactivityhandler_js', j:1},
+            'keepalive_js': {f:'js/keepAlive.js', n: 'keepalive_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
             'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
             'ionsound_js': {f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1},
             'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},
             'strongvelope_js': {f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1},
-            'strophejingleadapt_js': {f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1},
+            'adapter_js': {f:'js/vendor/chat/adapter.js', n: 'adapter_js', j:1},
+            'megawebrtcadapt_js': {f:'js/chat/webrtcAdapter.js', n: 'megawebrtcadapt_js', j:1},
             'rtcstats_js': {f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1},
-            'rtcsession_js': {f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1},
+            'webrtcsdp_js': {f:'js/chat/webrtcSdp.js', n: 'webrtcsdp_js', j:1},
+            'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
+            'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
             'strophelight_js': {f:'js/vendor/chat/strophe.light.js', n: 'strophelight_js', j:1},
             'strophedisco_js': {f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1},
-            'strophejingle_js': {f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1},
-            'strophejinglesess_js': {f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1},
-            'strophejinglesdp_js': {f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1},
             'strophemuc_js': {f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1},
             'stropheroster_js': {f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1},
             'wildemitter_js': {f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1},
@@ -2098,7 +2093,6 @@ else if (!b_u) {
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
-            'karerePing_js': {f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1},
             'callManager_js': {f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1},
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
@@ -2107,9 +2101,7 @@ else if (!b_u) {
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
             'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
-            'keo_js': {f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
-            'karere_js': {f:'js/chat/karere.js', n: 'karere_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}

@@ -1044,6 +1044,9 @@ i.icons-sprite {
     background-image: url(../images/mega/download-dialog.png);
     background-position: -622px -81px;
 }
+.chrome .download.big-icon {
+    background-position: 0 -81px;
+}
 .safari .download.big-icon {
     background-position: -282px -81px;
 }

@@ -240,7 +240,7 @@
     vertical-align: top;
 }
 .download.big-button.red i {
-    margin: 14px 3px 0 0;
+    margin: 14px 3px 0 -1px;
 }
 .download.big-button:first-child {
     margin: 0;

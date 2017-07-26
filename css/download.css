@@ -571,7 +571,7 @@
     display: none;
 }
 .not-logged .download.overquota .create-account-button, .logged .download.overquota .get-more-bonues, .download.overquota .see-our-plans {
-    display: block;
+    display: inline-block;
 }
 .download.in-progress, .download.some-reason, .download.deleted-user, .download.temporarty-error, .not-available-user .download.info-block, .not-available-user .download.buttons-block, .not-available-user .download checkbox-bl, .temporary-na .download.info-block, .temporary-na .download.buttons-block, .temporary-na .download checkbox-bl, .na-some-reason .download.info-block, .na-some-reason .download.buttons-block, .na-some-reason .download checkbox-bl, .megasync-content.features, .not-available-user .download.checkbox-bl, .temporary-na .download.checkbox-bl, .na-some-reason .download.checkbox-bl, .download.deleted-user .download.checkbox-bl, .download.temporarty-error .download.checkbox-bl .not-available-user .download.checkbox-bl, .temporary-na .download.checkbox-bl, .na-some-reason .download.checkbox-bl {
     display: none;

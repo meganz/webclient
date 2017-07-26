@@ -1206,6 +1206,12 @@ function init_page() {
 
         $('#pageholder').hide();
         $('#startholder').hide();
+
+        // Prevent duplicate HTML content breaking things
+        if (is_mobile) {
+            $('#startholder').empty();
+        }
+
         if ($('#fmholder:visible').length == 0) {
             $('#fmholder').show();
             if (fminitialized && !is_mobile) {

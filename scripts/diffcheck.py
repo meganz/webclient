@@ -690,7 +690,7 @@ def main(base, target, norules, branch):
         total_errors += error_count
 
         # If a fatal issue is found, halt execution and quit
-        if False and fatal > 0:
+        if fatal > 0:
             break
 
     if total_errors > 0:

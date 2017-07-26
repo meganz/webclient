@@ -45,7 +45,7 @@ html.overlayed {
 }
 .overlayed body.mobile.bottom-pages {
     overflow: hidden;
-    position: absolute;
+    position: fixed;
 }
 /* Prevent selection and highlighting */
 body * {
@@ -119,6 +119,12 @@ ul, li {
 }
 .mobile.main-block.overlay.arranged-to-top {
     z-index: 1010;
+}
+.mobile.main-block.error-overlay {
+    left: 0;
+    position: absolute;
+    top: 0;
+    z-index: 100;
 }
 .mobile.content-row {
     display: table-row;
@@ -528,20 +534,6 @@ ul, li {
 .mobile.tablet-img-wrapper {
     margin: 0 50px;
 }
-.mobile.fm-dialog-close {
-    background-image: url("../images/mega/dialogs-sprite_v11.svg");
-    background-position: -53px -4825px;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    height: 30px;
-    opacity: 0.5;
-    position: absolute;
-    right: 30px;
-    top: 20px;
-    transition: opacity 200ms ease-in-out 0s;
-    width: 30px;
-    z-index: 10;
-}
 .mobile.tablet-img {
     max-width: 800px;
     height: 378px;
@@ -774,6 +766,21 @@ ul, li {
     background-position: -204px -1072px;
     margin: 8px 0 0 0;
     width: 36px;
+}
+.mobile.fm-dialog-close {
+    background: url(../images/mobile/mobile-sprite_v6.png);
+    background-position: -76px -1138px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    height: 40px;
+    margin: 13px 6px 0 7px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 42px;
+    z-index: 10;
 }
 .mobile.fm-header-txt {
     font-size: 20px;
@@ -1532,7 +1539,7 @@ div.checkboxOn, div.checkboxOff {
 
 /* Hide the dropdown on the MegaSync page */
 .megaapp-linux {
-	display: none;
+    display: none;
 }
 
 /* Terms of Service page */
@@ -1541,10 +1548,10 @@ div.checkboxOn, div.checkboxOff {
 }
 /* General Terms, Privacy Policy and Takedown guidance pages */
 .terms-general, .privacy-policy, .takedown-guidance, .contact-us {
-	padding: 50px 25px 50px 25px;
+    padding: 50px 25px 50px 25px;
 }
 .contact-us .contact-new-column {
-	margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1 {
     font-family: 'source_sans_prolight', sans-serif;
@@ -1554,7 +1561,7 @@ div.checkboxOn, div.checkboxOff {
 }
 .terms-of-service h2, .terms-general h2, .privacy-policy h2, .takedown-guidance h2, .contact-us .contact-new-title {
     font-family: 'source_sans_prolight', sans-serif;
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 300;
     color: #999;
 }
@@ -1694,14 +1701,14 @@ div.checkboxOn, div.checkboxOff {
     font-family: 'source_sans_prolight', sans-serif;
     font-size: 32px;
     line-height: 40px;
-    margin: 36px 24px 20px 24px;
+    margin: 36px 24px 55px 24px;
 }
 .mobile.membership-step2 .external-payment-options {
-	color: #667;
-	font-size: 16px;
-	line-height: 26px;
-	margin-top: 32px;
-	text-align: center;
+    color: #667;
+    font-size: 16px;
+    line-height: 26px;
+    margin-top: 32px;
+    text-align: center;
 }
 .mobile.membership-step2 .external-payment-options a {
     color: #D90007;
@@ -1715,18 +1722,31 @@ div.checkboxOn, div.checkboxOff {
     border: 1px solid rgba(0, 0, 0, 0.05);
     background-color: #fff;
     box-shadow: inset 0 -2px 0 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.15);
-    padding: 25px;
+    padding: 0 25px 25px 25px;
+    margin-top: -75px;
 }
 .mobile.payment-options .membership-icon {
     margin: 0 auto;
+    display: inline-block;
+    vertical-align: middle;
 }
 .mobile.payment-options .plan-name {
     color: #667;
-    font-family: 'source_sans_prolight', sans-serif;
+    font-family: 'source_sans_proregular', sans-serif;
     font-size: 20px;
-    line-height: 25px;
-    margin: 8px 0 48px 0;
+    line-height: 70px;
+    margin: 0 0 0 5px;
     text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+}
+.mobile.payment-options .subtle-bottom-border {
+    height: 1px;
+    background-color: #F2F2F2;
+    position: relative;
+    margin-right: -25px;
+    margin-left: -25px;
+    top: 0;
 }
 /* Override of styles from desktop pro.css */
 .mobile.membership-step2 .pro-gray-block {
@@ -1799,37 +1819,37 @@ div.checkboxOn, div.checkboxOff {
     line-height: 31px;
 }
 .mobile.membership-step2 .option-question.provider {
-    margin: 0 0 32px 0;
+    margin: 30px 0 32px 0;
 }
 .mobile.membership-step2 .option-question.duration {
-    margin: 56px 0 32px 0;
+    margin: 34px 0 32px 0;
 }
 .mobile.membership-step2 .option-question.renewal {
     margin-bottom: 30px;
 }
 .mobile.membership-icon {
-    width: 70px;
-    height: 70px;
-    background-image: url(../images/mega/startpage-sprite.png);
+    width: 32px;
+    height: 32px;
+    background-image: url(../images/mega/startpage-sprite_v1.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
     top: initial;
 }
 .mobile.membership-icon.free {
-    background-position: center -1561px;
+    background-position: 0 -1570px;
 }
 .mobile.membership-icon.pro4 {
-    background-position: center -1751px;
+    background-position: 0 -1620px;
 }
 .mobile.membership-icon.pro1 {
-    background-position: center -1841px;
+    background-position: 0 -1670px;
 }
 .mobile.membership-icon.pro2 {
-    background-position: center -1931px;
+    background-position: 0 -1720px;
 }
 .mobile.membership-icon.pro3 {
-    background-position: center -1661px;
+    background-position: 0 -1770px;
 }
 .mobile.membership-step2 .duration-options-list .membership-radio-label.checked, .mobile.membership-step2 .renewal-options-list .membership-radio-label.checked {
     color: #333;
@@ -1938,17 +1958,15 @@ div.checkboxOn, div.checkboxOff {
     margin-top: 4px;
 }
 .mobile.membership-step2 .duration-options-list .save-money {
-    position: absolute;
-    right: 10px;
     border-radius: 2px;
-    background: #2aaf5f;
-    padding: 5px 14px;
-    color: #fff;
-    font-size: 18px;
-    display: initial;
-    line-height: initial;
-    margin-left: 0;
-    top: 25px;
+    background: #FFF;
+    padding: 0;
+    color: #2aaf5f;
+    font-size: 16px;
+    display: block;
+    line-height: 20px;
+    margin-top: 35px;
+    margin-left: 28px;
 }
 .mobile.membership-step2 .renewal-options-list .membership-radio-label {
     background: none;
@@ -2250,7 +2268,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-step2 .charge-information-container {
     height: 55px;
     margin-top: 50px;
-    margin-bottom: 42px;
+    margin-bottom: 24px;
 }
 .mobile.membership-step2 .charge-information {
     background-color: #f7f8fa;
@@ -2623,17 +2641,17 @@ div.checkboxOn, div.checkboxOff {
 .astropay-dialog .disabled {
     background-color: #eb4444;
 }
-.astropay-dialog .mobile.fm-dialog-close {
+.astropay-dialog .mobile.fm-dialog-close, .payment-address-dialog .mobile.fm-dialog-close {
     box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.20);
     border-radius: 50%;
     background-color: white;
     border: 1px solid #eee;
-    background-position: -52px -4823px;
-    height: 32px;
+    background-position: -78px -1140px;
+    height: 38px;
     opacity: initial;
     position: fixed;
-    right: 12px;
-    width: 32px;
+    right: -3px;
+    width: 38px;
 }
 
 /* Credit card billing address dialog */
@@ -2648,18 +2666,6 @@ div.checkboxOn, div.checkboxOff {
 }
 .payment-address-dialog .mobile.content-cell {
     text-align: initial;
-}
-.payment-address-dialog .mobile.fm-dialog-close {
-    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.20);
-    border-radius: 50%;
-    background-color: white;
-    border: 1px solid #eee;
-    background-position: -52px -4823px;
-    height: 32px;
-    opacity: initial;
-    position: fixed;
-    right: 12px;
-    width: 32px;
 }
 .payment-address-dialog-body {
     padding: 24px 49px;
@@ -3239,17 +3245,98 @@ div.checkboxOn, div.checkboxOff {
 }
 /* End of Transfer quota exceeded dialog */
 
+/* New mobile PRO */
+.mobile.link-block {
+    margin: 33px 24px -26px 24px;
+    font-size: 14px;
+    line-height: 24px;
+    cursor: pointer;
+    color: #e83b3c;
+    position: relative;
+}
+.mobile.icon {
+    background-image: url(../images/mega/startpage-sprite_v1.png);
+    background-position: 0 -2109px;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 0 0 0;
+}
+/* end of New mobile PRO */
+
 .mobile.main-block.loginrequired-dialog {
-	position: fixed;
+    position: fixed;
 }
 .mobile.loginrequired-dialog .information {
-    font-size: 20px;
+    font-size: 16px;
     line-height: 20px;
     color: #667;
     white-space: normal;
     letter-spacing: 0.2px;
     padding: 0 0 0 0;
     margin: 20px 15px 30px 15px;
+}
+.mobile.top-menu-popup .top-icon.close {
+    background: url(../images/mobile/mobile-sprite_v6.png);
+    background-position: -65px -1143px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    height: 40px;
+    margin: 13px 6px 0 0px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    right: -11px;
+    top: -3px;
+    width: 42px;
+    z-index: 10;
+}
+/* Hide menu items which are not ready for mobile yet */
+.top-menu-content .not-mobile-ready {
+    display: none;
+}
+/* Prevent jspPane setting a style to put the margin out so the page indicator is no longer flush with the margin */
+.top-menu-popup .top-menu-scroll .jspPane {
+    margin-left: 0 !important;
+}
+/* Language menu */
+.language-template {
+    display: none;
+}
+.top-menu-item.submenu-item.languages::before {
+    background: none;
+}
+.top-menu-item.current {
+    color: #d90007;
+}
+.submenu-item.expanded + .top-submenu.language-items {
+    max-height: 1200px;
+}
+.top-submenu.language-items .top-menu-item .lang-name {
+    display: inline-block;
+}
+.top-submenu.language-items .top-menu-item .beta-text {
+    border: 1px solid rgba(192, 199, 203, 0.3);
+    border-radius: 7px;
+    box-sizing: border-box;
+    color: #c0c7cd;
+    display: none;
+    font-size: 10px;
+    font-style: normal;
+    line-height: 18px;
+    margin-left: 5px;
+    padding: 0 4px;
+    text-align: center;
+    text-transform: uppercase;
+}
+.top-submenu.language-items .top-menu-item.beta .beta-text {
+    display: inline-block;
+}
+.mobile.top-menu-popup .top-menu-item {
+    font-size: 15px;
+    line-height: 26px;
 }
 
 /* Only media queries after here */
@@ -3860,6 +3947,39 @@ div.checkboxOn, div.checkboxOff {
     }
     .mobile.top-links {
         padding: 18px 0 0 0;
+    }
+}
+
+/* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */
+@media only screen and (min-width: 400px) {
+    .mobile.membership-step2 .payment-options-list .payment-method {
+        float: left;
+        width: 154px;
+    }
+    .mobile.membership-step2 .provider-details .provider-name {
+        width: 97px;
+    }
+    .mobile.membership-step2 .payment-duration {
+        display: inline-block;
+        margin-bottom: 0;
+        margin-top: 0;
+        height: 80px;
+        vertical-align: middle;
+    }
+    .mobile.membership-step2 .payment-duration.template {
+        display: none;
+    }
+    .mobile.membership-step2 .duration-options-list .payment-duration:last-child {
+        margin-left: 70px;
+    }
+    .mobile.membership-step2 .renewal-options-list .renewal-option {
+        display: inline-block;
+    }
+    .mobile.membership-step2 .renewal-options-list .renewal-option:last-child {
+        margin-left: 110px;
+    }
+    .mobile.membership-step2 .option-question.renewal {
+        margin-top: 30px;
     }
 }
 

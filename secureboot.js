@@ -379,7 +379,7 @@ if (!b_u) try
     var contenterror = 0;
     var nocontentcheck = false;
 
-    if (!is_extension && (window.dd || location.host !== 'mega.nz')) {
+    if (!is_extension && (window.dd || (location.host !== 'mega.nz' && location.host !== 'webcache.googleusercontent.com'))) {
 
         nocontentcheck = true;
         var devhost = window.location.host;
@@ -1660,10 +1660,9 @@ else if (!b_u) {
         var langCodeVariant = null;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
-		
         if (is_bot && locationSearchParams !== '') {
             userLang = locationSearchParams.replace('?', '');
-			console.log(userLang);
+			console.log('userlang',userLang);
         }
         else {
             // Otherwise get the user's preferred language in their browser settings
@@ -1869,9 +1868,7 @@ else if (!b_u) {
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
-    jsl.push({f:'html/top.html', n: 'top', j:0});
-    // TODO: include mobile top menu js stuff
-    jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
+    jsl.push({f:'html/top' + (is_mobile ? '-mobile' : '') + '.html', n: 'top', j:0});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
@@ -1905,6 +1902,7 @@ else if (!b_u) {
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
     }
 
+    jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {

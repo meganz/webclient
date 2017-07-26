@@ -14096,8 +14096,8 @@
         "context": "Second paragraph of the screen to park an account"
     },
     "8992": {
-        "text": "Please enter you e-mail address below. You will receive a recovery link that will allow you to park your account.",
-        "context": "Text of the dialog message to ask for the link to park the account"
+        "text": "Please enter your e-mail address below. You will receive a recovery link that will allow you to park your account.",
+        "context": "Text of the dialog message to ask for the link to park the account "
     },
     "8993": {
         "text": "This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. If you do recall your parked account's password, please contact support@mega.nz",
@@ -14484,7 +14484,7 @@
         "context": "A title of a dialog which is displayed when a user has purchased an item from the store."
     },
     "9089": {
-        "text": "Your puchase of a MEGA subscription has not passed validation at our licence server. On restart of this app we will retry to validate your subscription licences. Please contact MEGA support if the error continues.",
+        "text": "Your purchase of a MEGA subscription has not passed validation at our licence server. On restart of this app we will retry to validate your subscription licences. Please contact MEGA support if the error continues.",
         "context": "A message in a dialog which is displayed when validation of the in app purchase has failed at the MEGA License server."
     },
     "9090": {
@@ -17082,5 +17082,17 @@
     "16664": {
         "text": "The new password must be different from the old one.",
         "context": "A message on an error dialog which is shown when a user tries to change their account password but the new password is the same as the old one."
+    },
+    "16665": {
+        "text": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
+        "context": "A message which is displayed when a user tries to upload a file to a synced folder which already contains the same filename. This message is asking for confirmation. Please keep the (%1) placeholder because it will be replaced with the name of the file."
+    },
+    "16666": {
+        "text": "Used quota for the last %1 hours: %2",
+        "context": "A label to indicate the quota usage for free users. Please keep the %1 and %2 placeholders as these will be replaced at runtime."
+    },
+    "16667": {
+        "text": "Back to PRO Plans",
+        "context": "A button on the second Pro page which lets the user return to the first Pro page to change their Pro plan."
     }
 }

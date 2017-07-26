@@ -94,7 +94,14 @@ var dlmanager = {
 
         if (dlMethod === FileSystemAPI) {
             var success = function(used, remaining) {
-                promise.resolve(remaining);
+                if (remaining < 1) {
+                    // either the user hasn't granted persistent quota or
+                    // we're in Incognito..let FileSystemAPI deal with it
+                    max();
+                }
+                else {
+                    promise.resolve(remaining);
+                }
             };
 
             if (navigator.webkitPersistentStorage) {

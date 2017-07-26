@@ -329,8 +329,8 @@
     padding: 9px 0 0 0;
     display: none;
 }
-.transfer-buttons .default-white-button, .transfer-buttons .default-grey-button {
-    margin: 0 8px 0;
+.transfer-buttons .default-white-button.inline, .transfer-buttons .default-grey-button.inline {
+    margin: 0 8px 0 0;
     padding: 0 12px;
 }
 .transfer-buttons .default-white-button.small i {

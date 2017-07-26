@@ -142,6 +142,10 @@
 }
 .download.mid-button i {
     margin: 2px -4px 0 0;
+    vertical-align: top;
+}
+.download.mid-button span {
+    vertical-align: top;
 }
 .download.mid-button::before, .download.big-button::before, .download.mid-button.red::after, .download.big-button.red::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
@@ -184,7 +188,7 @@
 }
 .download.big-button {
     height: 56px;
-    line-height: 54px;
+    line-height: 55px;
     letter-spacing: 0.5px;
     font-size: 18px;
     margin: 0 0 0 20px;
@@ -198,6 +202,7 @@
 .download.big-button span {
     position: relative;
     z-index: 10;
+    vertical-align: top;
 }
 .download.big-button:not(.red)::after {
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYWZhZmEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -231,10 +236,11 @@
     opacity: 0;
 }
 .download.big-button i, .big-button .medium-icon.icons-sprite.mega {
-    margin: -1px 5px 0 5px;
+    margin: 14px 5px 0 5px;
+    vertical-align: top;
 }
 .download.big-button.red i {
-    margin: -1px 3px 0 0;
+    margin: 14px 3px 0 0;
 }
 .download.big-button:first-child {
     margin: 0;
@@ -323,12 +329,9 @@
     padding: 9px 0 0 0;
     display: none;
 }
-.transfer-buttons .default-white-button {
-    margin: 0 0 0 8px;
+.transfer-buttons .default-white-button, .transfer-buttons .default-grey-button {
+    margin: 0 8px 0;
     padding: 0 12px;
-}
-.transfer-buttons .default-white-button:first-child {
-    margin: 0;
 }
 .transfer-buttons .default-white-button.small i {
     margin: 3px 1px 1px -7px;
@@ -564,7 +567,7 @@
 .downloading .download.progress-cell, .download-complete .download.progress-cell {
     display: table-cell;
 }
-.download .create-account-button, .download .get-more-bonues, .download .top-login-button, .download.overquota .pause-transfer {
+.download.overquota .pause-transfer {
     display: none;
 }
 .not-logged .download.overquota .create-account-button, .logged .download.overquota .get-more-bonues, .download.overquota .see-our-plans {

@@ -1420,7 +1420,7 @@ function topmenuUI() {
     $('.top-menu-item.refresh-item').addClass('hidden');
     $('.activity-status-block .activity-status,.activity-status-block').hide();
     $('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
-    $('.membership-status, .top-head .user-name, .top-icon.achievements').hide();
+    $('.membership-status, .top-head .user-name, .top-icon.achievements').addClass('hidden');
 
     if (fminitialized) {
         $('.top-search-bl').removeClass('hidden');
@@ -1485,12 +1485,12 @@ function topmenuUI() {
         $('.top-menu-item.account').removeClass('hidden');
         $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
-        $('.top-login-button').hide();
-        $('.membership-status').show();
-        $('.top-change-language').hide();
-        $('.create-account-button').hide();
-        $('.membership-status-block').show();
-        $('.top-icon.notification').show();
+        $('.top-login-button').addClass('hidden');
+        $('.membership-status').removeClass('hidden');
+        $('.top-change-language').addClass('hidden');
+        $('.create-account-button').addClass('hidden');
+        $('.membership-status-block').removeClass('hidden');
+        $('.top-icon.notification').removeClass('hidden');
 
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
@@ -1566,10 +1566,10 @@ function topmenuUI() {
         }
 
         $('.top-menu-item.upgrade-your-account').addClass('hidden');
-        $('.membership-status-block').hide();
-        $('.top-icon.notification').hide();
-        $('.top-icon.achievements').hide();
-        $('.create-account-button').show();
+        $('.membership-status-block').addClass('hidden');
+        $('.top-icon.notification').addClass('hidden');
+        $('.top-icon.achievements').addClass('hidden');
+        $('.create-account-button').removeClass('hidden');
         $('.create-account-button').rebind('click', function () {
             loadSubPage('register');
         });

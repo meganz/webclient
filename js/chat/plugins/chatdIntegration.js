@@ -161,7 +161,7 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
                         return;
                     }
                     allPromises.push(
-                        self.openChatFromApi(actionPacket, true)
+                        self.openChatFromApi(actionPacket, true, true)
                     );
                 });
 
@@ -289,7 +289,7 @@ ChatdIntegration._waitForProtocolHandler = function (chatRoom, cb) {
     }
 };
 
-ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
+ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missingMcf) {
     var self = this;
 
     var masterPromise = new MegaPromise();
@@ -306,6 +306,17 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         'u': clone(actionPacket.u),
         'ct': actionPacket.ct ? actionPacket.ct : null
     };
+
+    // is isMcf and triggered by a missingMcf in the 'f' treecache, trigger an immediate store in the fmdb
+    if (isMcf && missingMcf && fmdb) {
+        fmdb.add('mcf', {
+            g: actionPacket.g,
+            id: actionPacket.id,
+            p: actionPacket.p,
+            ts: actionPacket.ts,
+            u: actionPacket.u
+        });
+    }
 
     loadingDialog.hide();
 

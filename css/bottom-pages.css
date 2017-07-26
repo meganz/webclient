@@ -21,6 +21,9 @@ body.bottom-pages .fmholder {
     overflow-y: auto;
     position: relative;
 }
+body.bottom-pages.mobile .fmholder {
+    overflow: visible;
+}
 html.gbot {
     overflow-y: scroll;
 }

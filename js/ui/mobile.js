@@ -133,16 +133,8 @@ var mobile = {
             // If logged in
             if (typeof u_attr !== 'undefined') {
 
-                // Store the current page
-                var currentPage = page;
-
                 // Open the root cloud folder
                 loadSubPage('fm');
-
-                // If they were on the TOS or Pro page then the cloud doesn't reload for some reason so refresh
-                if ((currentPage === 'terms') || (currentPage === 'pro')) {
-                    window.location.reload();
-                }
             }
             else {
                 // Otherwise if not logged in, load the home page
@@ -215,6 +207,9 @@ mobile.cloud = {
             return false;
         }
 
+        // jQuery selectors
+        var $fileManager = $('.mobile.file-manager-block');
+
         // Render the file manager header, folders, files and footer
         this.renderHeader();
         this.renderFoldersAndFiles();
@@ -230,7 +225,7 @@ mobile.cloud = {
         loadingInitDialog.hide();
 
         // Show the file manager after everything is ready
-        $('.mobile.file-manager-block').removeClass('hidden');
+        $fileManager.removeClass('hidden');
 
         // Set viewmode to show thumbnails and render thumbnails after everything else because it can take longer
         M.viewmode = 1;
@@ -500,7 +495,7 @@ mobile.cloud = {
             }
 
             // Show the hamburger menu and initialise the upload button
-            mobile.menu.showAndInit('cloud-drive');
+            $menuIcon.removeClass('hidden');
             // mobile.upload.initUploadButton();         // ToDo: re-enable when finished
         }
     },
@@ -2717,209 +2712,6 @@ mobile.register = {
 
 
 /**
- * The main menu (hamburger icon in top right) which lets the user do various tasks
- */
-mobile.menu = {
-
-    /**
-     * Shows the menu icon and initialises the menu and its related options
-     * @param {String} currentScreen The screen the user is on e.g. 'home', 'login' etc which matches the class name of
-     *                               the menu button. This will have a red bar style applied to it on the left of the
-     *                               menu item to indicate this is the current page.
-     */
-    showAndInit: function(currentScreen) {
-        "use strict";
-
-        // Cache selectors
-        var $html = $('html');
-        var $menuIcon = $('.mobile.fm-header .menu');
-        var $darkOverlay = $('.mobile.dark-overlay');
-        var $mainMenu = $('.mobile.main-menu');
-        var $closeIcon = $mainMenu.find('.fm-icon.close');
-
-        var $avatarNameBlock = $mainMenu.find('.avatar-name-block');
-        var $avatar = $avatarNameBlock.find('.main-avatar');
-        var $userName = $avatarNameBlock.find('.user-name');
-
-        var $menuButtons = $mainMenu.find('.menu-buttons');
-        var $menuButton = $mainMenu.find('.menu-button');
-        var $loginMenuItem = $mainMenu.find('.menu-button.login');
-        var $registerMenuItem = $mainMenu.find('.menu-button.register');
-        var $cloudMenuItem = $mainMenu.find('.menu-button.cloud-drive');
-        var $homeMenuItem = $mainMenu.find('.menu-button.home');
-        var $proMenuItem = $mainMenu.find('.menu-button.pro-plans');
-        var $termsMenuItem = $mainMenu.find('.menu-button.terms-of-service');
-        var $logoutMenuItem = $mainMenu.find('.menu-button.logout');
-
-        // Show the menu / hamburger icon
-        $menuIcon.removeClass('hidden');
-
-        // If they are logged in
-        if (typeof u_attr !== 'undefined') {
-
-            // Generate the avatar from the user handle
-            var avatar = useravatar.contact(u_handle, '', 'div');
-
-            // Show the user's avatar and name
-            $avatarNameBlock.removeClass('hidden');
-            $avatar.safeHTML(avatar);
-            $avatar.find('.avatar').addClass('small-rounded-avatar');
-            $userName.text(u_attr.name);
-
-            // Show buttons
-            $cloudMenuItem.removeClass('hidden');
-            $proMenuItem.removeClass('hidden');
-            $termsMenuItem.removeClass('hidden');
-            $logoutMenuItem.removeClass('hidden');
-        }
-        else {
-            // Otherwise show other buttons for not logged in user
-            $menuButtons.addClass('logged-out');
-            $loginMenuItem.removeClass('hidden');
-            $registerMenuItem.removeClass('hidden');
-            $homeMenuItem.removeClass('hidden');
-            $proMenuItem.removeClass('hidden');
-            $termsMenuItem.removeClass('hidden');
-        }
-
-        // Add a red bar style to the left of the menu item to indicate this is the current page
-        $menuButtons.removeClass('current');
-
-        // If in the cloud drive, add a red bar next to that button
-        if (currentScreen.indexOf('fm') > -1) {
-            $cloudMenuItem.addClass('current');
-        }
-        else if (currentScreen.indexOf('pro') > -1) {
-            $proMenuItem.addClass('current');
-        }
-        else {
-            // Otherwise if it exists, add a red bar to the button matching the current page
-            try {
-                $mainMenu.find('.menu-button.' + currentScreen).addClass('current');
-            }
-            catch (exception) { }
-        }
-
-        // On menu button click
-        $menuIcon.off('tap').on('tap', function() {
-
-            // Show the menu
-            $mainMenu.removeClass('hidden').addClass('active').animate(
-                {
-                    left: '25%',
-                    width: '75%'
-                },
-                200,
-                'swing',
-                function() {
-                    $html.addClass('overlayed');
-                    $darkOverlay.removeClass('hidden').addClass('active');
-                }
-            );
-
-            return false;
-        });
-
-        // On tapping/clicking the dark overlay or menu's close button
-        $darkOverlay.add($closeIcon).off('tap').on('tap', function() {
-
-            // Close the menu
-            $html.removeClass('overlayed');
-            $darkOverlay.addClass('hidden').removeClass('active');
-            $mainMenu.removeClass('active').animate(
-                {
-                    left: '100%',
-                    width: '0'
-                },
-                200,
-                'swing',
-                function() {
-                    $mainMenu.addClass('hidden');
-                }
-            );
-
-            return false;
-        });
-
-        // On the menu's Cloud Drive button, go to the root of the cloud drive
-        $cloudMenuItem.off('tap').on('tap', function() {
-
-            // Store the current page
-            var currentPage = page;
-
-            // Open the root cloud folder
-            loadSubPage('fm');
-
-            // If they were on the TOS, Pro or Contact pages then the cloud doesn't reload for some reason so refresh
-            if ((currentPage === 'terms') || (currentPage.indexOf('pro') > -1) ||
-                    (currentPage.indexOf('contact') > -1)) {
-
-                window.location.reload();
-            }
-
-            return false;
-        });
-
-        // On the menu's Logout button
-        $logoutMenuItem.off('tap').on('tap', function() {
-
-            // Log the user out and go back to the login page
-            M.logout();
-            loadSubPage('login');
-
-            return false;
-        });
-
-        // On a Login button tap/click go to the login page
-        $loginMenuItem.off('tap').on('tap', function() {
-
-            loadSubPage('login');
-            return false;
-        });
-
-        // On a Create Account button tap/click go to the register page
-        $registerMenuItem.off('tap').on('tap', function() {
-
-            loadSubPage('register');
-            return false;
-        });
-
-        // On the Home button tap/click go to the home page
-        $homeMenuItem.off('tap').on('tap', function() {
-
-            // Load the home/start page (if logged in this may just go back to cloud drive)
-            loadSubPage('start');
-            return false;
-        });
-
-        // On a Plans & Pricing button tap/click go to the Pro page
-        $proMenuItem.off('tap').on('tap', function() {
-
-            loadSubPage('pro');
-            return false;
-        });
-
-        // On a Terms of Service button tap/click go to the TOS page
-        $termsMenuItem.off('tap').on('tap', function() {
-
-            loadSubPage('terms');
-            return false;
-        });
-
-        // On a Menu button tap/click hide menu
-        $menuButton.off('tap.hidemenu').on('tap.hidemenu', function() {
-
-            $html.removeClass('overlayed');
-            $mainMenu.removeClass('active');
-            $darkOverlay.addClass('hidden').removeClass('active');
-
-            return false;
-        });
-    }
-};
-
-
-/**
  * The Terms of Service page
  */
 mobile.terms = {
@@ -3125,13 +2917,15 @@ mobile.propay = {
         var $backButton = $stepTwo.find('.js-back-to-plans');
 
         // Add click handler for the contact button
-        $contactUsButton.rebind('click', function() {
+        $contactUsButton.off('tap').on('tap', function() {
             loadSubPage('contact');
+            return false;
         });
 
         // Add click handler to go back to the Pro page
-        $backButton.rebind('click', function() {
+        $backButton.off('tap').on('tap', function() {
             loadSubPage('pro');
+            return false;
         });
 
         // Show the page for mobile
@@ -3159,6 +2953,139 @@ mobile.propay = {
 
 
 /**
+ * Initialise the menu options for changing language
+ */
+mobile.languageMenu = {
+
+    /**
+     * Initialise the options
+     */
+    init: function() {
+
+        'use strict';
+
+        // Main tier 1 languages that we support (based on usage analysis)
+        var tierOneLangCodes = [
+            'es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'ar',
+            'nl', 'hu', 'cn', 'jp', 'kr', 'ro', 'id', 'th', 'vi', 'pl'
+        ];
+
+        // Remove all the tier 1 languages and we have only the tier 2 languages remaining
+        var allLangCodes = Object.keys(ln);
+        var tierTwoLangCodes = allLangCodes.filter(function(langCode) {
+            return tierOneLangCodes.indexOf(langCode) < 0;
+        });
+
+        // Remove old menu items in case this was re-rendered
+        $('.top-submenu.language-items .top-menu-item').not('.language-template').remove();
+
+        // Generate the HTML for tier one and tier two languages (second param set to true shows beta icon)
+        this.renderLanguages(tierOneLangCodes, false);
+        this.renderLanguages(tierTwoLangCodes, true);
+
+        // Initialise the handler for
+        this.initLanguageSelectionHandler();
+    },
+
+    /**
+     * Create the language HTML from a list of language codes
+     * @param {Array} langCodes Array of language codes e.g. ['en', 'es', ...]
+     * @param {Boolean} tierTwo If this is a tier two / beta language
+     */
+    renderLanguages: function(langCodes, tierTwo) {
+
+        'use strict';
+
+        // Cache selectors
+        var $template = $('.top-menu-item.language-template').clone();
+        var $languageItemsContainer = $('.top-submenu.language-items');
+
+        // Remove the template class
+        $template.removeClass('language-template');
+
+        // Sort languages by ISO 639-1 two letter language code (which is reasonably ordered anyway)
+        langCodes.sort(function(codeA, codeB) {
+            return codeA.localeCompare(codeB);
+        });
+
+        var html = '';
+
+        // Make single array with code, native lang name, and english lang name
+        for (var i = 0, length = langCodes.length; i < length; i++) {
+
+            var langCode = langCodes[i];            // Two letter language code e.g. de
+            var nativeName = ln[langCode];          // Deutsch
+            var englishName = ln2[langCode];        // German
+
+            // Clone the template
+            var $langHtml = $template.clone();
+
+            // Update the template details
+            $langHtml.attr('data-lang-code', langCode);
+            $langHtml.attr('title', englishName);
+            $langHtml.find('.lang-name').text(nativeName);
+
+            // If they have already chosen a language show it as selected
+            if (langCode === lang) {
+                $langHtml.addClass('current');
+            }
+
+            // If the beta language, show the beta icon
+            if (tierTwo) {
+                $langHtml.addClass('beta');
+            }
+
+            // Build up the HTML to be rendered
+            html += $langHtml.prop('outerHTML');
+        }
+
+        // Render the HTML
+        $languageItemsContainer.append(html);
+    },
+
+    /**
+     * Initialise the Save button to set the language and reload the page
+     */
+    initLanguageSelectionHandler: function() {
+
+        'use strict';
+        
+        var $languageItems = $('.top-submenu.language-items .top-menu-item');
+
+        // Initialise the save button
+        $languageItems.off('click tap').on('tap', function() {
+
+            // Get the selected code
+            var selectedLangCode = $(this).data('lang-code');
+
+            // If not the currently selected language, change to the selected language
+            if (selectedLangCode !== lang) {
+
+                // Store the new language in localStorage to be used upon reload
+                localStorage.lang = selectedLangCode;
+
+                // Set a language user attribute on the API (This is a private but unencrypted user
+                // attribute so that the API can read it and send emails in the correct language)
+                if (typeof u_attr !== 'undefined') {
+                    mega.attr.set(
+                        'lang',
+                        selectedLangCode,       // E.g. en, es, pt
+                        -2,                     // Set to private private not encrypted
+                        true                    // Set to non-historic, this won't retain previous values on API server
+                    );
+                }
+
+                // Reload the site
+                document.location.reload();
+            }
+
+            return false;
+        });
+    }
+};
+
+
+/**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
 
@@ -3170,7 +3097,8 @@ mega.ui.tpp = {
 var notify = {
     init: function() {},
     notifyFromActionPacket: function() {},
-    countAndShowNewNotifications: function() {}
+    countAndShowNewNotifications: function() {},
+    closePopup: function() {}
 };
 
 var alarm = {
@@ -3178,7 +3106,8 @@ var alarm = {
         init: function() {}
     },
     planExpired: {
-        lastPayment: null
+        lastPayment: null,
+        render: function() {}
     }
 };
 
@@ -3210,7 +3139,6 @@ function removeUInode(nodeHandle, parentHandle) {
 
 // Not required for mobile
 function fmtopUI() {}
-function topmenuUI() {}
 function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}

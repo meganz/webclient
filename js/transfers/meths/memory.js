@@ -179,11 +179,22 @@
     }
 
     MemoryIO.usable = function() {
-        MemoryIO.fileSizeLimit = localStorage.dlFileSizeLimit
-            || (1024 * 1024 * 1024 * (1 + browserdetails(ua).is64bit));
-
         return is_mobile || navigator.msSaveOrOpenBlob || hasDownloadAttr;
     };
+
+    mBroadcaster.once('startMega', function() {
+        var uad = ua.details || false;
+
+        if (localStorage.dlFileSizeLimit) {
+            MemoryIO.fileSizeLimit = parseInt(localStorage.dlFileSizeLimit);
+        }
+        else if (uad.engine === 'Trident' || uad.browser === 'Edge') {
+            MemoryIO.fileSizeLimit = 600 * 1024 * 1024;
+        }
+        else {
+            MemoryIO.fileSizeLimit = (1024 * 1024 * 1024 * (1 + uad.is64bit));
+        }
+    });
 
     scope.MemoryIO = MemoryIO;
 })(this);

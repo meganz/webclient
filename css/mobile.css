@@ -3338,6 +3338,10 @@ div.checkboxOn, div.checkboxOff {
     font-size: 15px;
     line-height: 26px;
 }
+.bottom-menu.copyrights {
+    position: static;
+    margin: 20px 0 0 0;
+}
 
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {

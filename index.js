@@ -49,15 +49,9 @@ function startMega() {
     if (!hashLogic) {
         $(window).rebind('popstate.mega', function(event) {
 
-            var currentPage = page;
             var state = event.originalEvent.state || {};
 
             loadSubPage(state.subpage || state.fmpage || location.hash, event);
-
-            // If on mobile TOS page and logged in, then the cloud doesn't reload for some reason so reload
-            if (is_mobile && (currentPage === 'terms') && (typeof u_attr !== 'undefined')) {
-                window.location.reload();
-            }
         });
     }
 
@@ -70,17 +64,19 @@ function startMega() {
         return false;
     }
 
-    if (pages['dialogs']) {
-        $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
-        delete pages['dialogs'];
-    }
-    if (pages['onboarding']) {
-        $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
-        delete pages['onboarding'];
-    }
-    if (pages['chat']) {
-        $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
-        delete pages['chat'];
+    if (!is_mobile) {
+        if (pages['dialogs']) {
+            $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
+            delete pages['dialogs'];
+        }
+        if (pages['onboarding']) {
+            $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
+            delete pages['onboarding'];
+        }
+        if (pages['chat']) {
+            $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
+            delete pages['chat'];
+        }
     }
     jsl = [];
     if(typeof(mega_custom_boot_fn) === 'undefined') {
@@ -2139,6 +2135,7 @@ function parsepage(pagehtml, pp) {
     $('#fmholder').hide();
     $('#pageholder').hide();
     $('#startholder').hide();
+
     pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');

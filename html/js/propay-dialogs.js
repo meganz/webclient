@@ -2091,3 +2091,19 @@ var bitcoinDialog = {
         });
     }
 };
+
+if (is_chrome_firefox) {
+    mBroadcaster.once('startMega', function() {
+        "use strict";
+
+        unionPay.redirectToSite =
+        sabadell.redirectToSite =
+            tryCatch(function(res) {
+                mozSendPOSTRequest(res.EUR.url, res.EUR.postdata);
+            }, function(error) {
+                msgDialog('warninga', l[135], l[47], error, function() {
+                    pro.propay.hideLoadingOverlay();
+                });
+            });
+    });
+}

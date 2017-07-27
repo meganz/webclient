@@ -145,6 +145,9 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
     it("core func test - DexieStorage preserve the order in which data is inserted/deleted", function(done) {
+        // FF 52
+        this.timeout(5000);
+
         var pq = promiseHelpers.promiseQueue();
 
         pq.whenFinished(function() {

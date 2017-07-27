@@ -1206,6 +1206,12 @@ function init_page() {
 
         $('#pageholder').hide();
         $('#startholder').hide();
+
+        // Prevent duplicate HTML content breaking things
+        if (is_mobile) {
+            $('#startholder').empty();
+        }
+
         if ($('#fmholder:visible').length == 0) {
             $('#fmholder').show();
             if (fminitialized && !is_mobile) {
@@ -2176,7 +2182,13 @@ function parsepage(pagehtml, pp) {
 
 function parsetopmenu() {
     var top;
-    top = pages['top'].replace(/{staticpath}/g, staticpath);
+
+    if (is_mobile) {
+        top = pages['top-mobile'].replace(/{staticpath}/g, staticpath);
+    }
+    else {
+        top = pages['top'].replace(/{staticpath}/g, staticpath);
+    }
     if (document.location.href.substr(0, 19) === 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }

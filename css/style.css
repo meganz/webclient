@@ -11910,6 +11910,17 @@ table {
 .downloading .megasync-close, .downloading .megasync-close-txt {
     display: block;
 }
+.megasync-overlay .megasync-dropdown {
+    float: none;
+    width: 230px;
+    margin: -20px auto 20px auto;
+}
+.megasync-close, .megasync-close-txt, .megasync-overlay .megasync-dropdown {
+    display: none;
+}
+.downloading .megasync-close, .downloading .megasync-close-txt, .megasync-overlay.linux .megasync-dropdown {
+    display: block;
+}
 .megasync-bottom {
     display: inline-block;
     padding-top: 8px;

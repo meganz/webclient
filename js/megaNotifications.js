@@ -69,12 +69,15 @@
                         count += v ? v : 0;
                     });
 
+
                     var badge = count > 9 ? "9+" : count;
                     if (self._lastBadgeCounter !== badge) {
-                        self.favico.badge(badge);
+                        delay('notifFavicoUpd', function () {
+                            self.favico.reset();
+                            self.favico.badge(badge);
+                        });
                         self._lastBadgeCounter = badge;
                     }
-
                 });
         }
 
@@ -262,11 +265,27 @@
         if (unread === true || self.options.alwaysPlaySound === true) {
             if (self.options.anfFlag && mega.notif.has(self.options.anfFlag) !== 0) {
                 if (self.options.sound) {
-                    ion.sound.stop(self.options.sound);
-                    ion.sound.play(self.options.sound, {
-                        loop: self.options.soundLoop,
-                        volume: self.options.soundVolume !== null ? self.options.soundVolume : self.megaNotifications.options.soundsVolume
-                    });
+                    var playSound = function() {
+                        ion.sound.stop(self.options.sound);
+                        ion.sound.play(self.options.sound, {
+                            loop: self.options.soundLoop,
+                            volume: self.options.soundVolume !== null ?
+                                self.options.soundVolume : self.megaNotifications.options.soundsVolume
+                        });
+                    };
+
+                    // if soundLoop is not true, then use 'delay' to eventually skip multiple sounds trying to play
+                    // at the same time
+                    if (!self.options.soundLoop) {
+                        delay('singletonSoundNotif', function () {
+                            playSound();
+                        });
+                    }
+                    else {
+                        playSound();
+                    }
+
+
                 }
             }
         }

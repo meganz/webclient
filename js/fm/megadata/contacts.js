@@ -34,13 +34,16 @@ MegaData.prototype.contactstatus = function(h, wantTimeStamp) {
 };
 
 MegaData.prototype.onlineStatusClass = function(os) {
-    if (os === 'dnd') {
+    if (os === 4 || os === 'dnd') {
+        // UserPresence.PRESENCE.DND
         return [l[5925], 'busy'];
     }
-    else if (os === 'away') {
+    else if (os === 2 || os === 'away') {
+        // UserPresence.PRESENCE.AWAY
         return [l[5924], 'away'];
     }
-    else if ((os === 'chat') || (os === 'available')) {
+    else if (os === 3 || os === 'chat' || os === 'available') {
+        // UserPresence.PRESENCE.ONLINE
         return [l[5923], 'online'];
     }
     else {
@@ -50,33 +53,20 @@ MegaData.prototype.onlineStatusClass = function(os) {
 
 MegaData.prototype.onlineStatusEvent = function(u, status) {
     if (u && megaChatIsReady) {
-        console.error('onlineStatusEvent', u.u, status);
         var e = $('.ustatus.' + u.u);
         if (e.length > 0) {
             $(e).removeClass('offline online busy away');
             $(e).addClass(this.onlineStatusClass(status)[1]);
         }
+        e = $('#contact_' + u.u);
+        if (e.length > 0) {
+            $(e).removeClass('offline online busy away');
+            $(e).addClass(this.onlineStatusClass(status)[1]);
+        }
 
-        var e = $('.fm-chat-user-status.' + u.u);
+        e = $('.fm-chat-user-status.' + u.u);
         if (e.length > 0) {
             $(e).safeHTML(this.onlineStatusClass(status)[0]);
-        }
-
-        if (
-            typeof $.sortTreePanel !== 'undefined' &&
-            typeof $.sortTreePanel.contacts !== 'undefined' &&
-            $.sortTreePanel.contacts.by === 'status'
-        ) {
-            // we need to resort
-            this.contacts();
-        }
-
-        if (getSitePath() === "/fm/" + u.u) {
-            // re-render the contact view page if the presence had changed
-            M.addContactUI();
-        }
-        if (u && u.u === u_handle) {
-            megaChat.renderMyStatus();
         }
     }
 };

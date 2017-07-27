@@ -209,7 +209,7 @@ pro.propay = {
         pro.propay.sortMembershipPlans();
 
         // Clear the radio options, in case they revisted the page
-        $('.duration-options-list .payment-duration:not(.template)').remove();
+        $('.duration-options-list .payment-duration').not('.template').remove();
 
         // Loop through the available plan durations for the current membership plan
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
@@ -233,7 +233,7 @@ pro.propay = {
                 }
 
                 // Build select option
-                var $durationOption = $('.payment-duration.template').clone();
+                var $durationOption = $('.payment-duration.template').first().clone();
 
                 // Update months and price
                 $durationOption.removeClass('template');

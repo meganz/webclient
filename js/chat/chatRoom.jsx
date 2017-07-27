@@ -8,7 +8,7 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  * Class used to represent a MUC Room in which the current user is present
  *
  * @param megaChat {Chat}
- * @param roomJid
+ * @param roomId
  * @param type {String} only "private" is supported for now
  * @param users {Array}
  * @param ctime {Integer} unix time
@@ -16,10 +16,10 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
+var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
     var self = this;
 
-    this.logger = MegaLogger.getLogger("room[" + roomJid + "]", {}, megaChat.logger);
+    this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
 
     this.megaChat = megaChat;
 
@@ -29,7 +29,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             state: null,
             users: [],
             attachments: null,
-            roomJid: null,
+            roomId: null,
             type: null,
             messages: [],
             ctime: 0,
@@ -49,12 +49,13 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         true
     );
 
-    this.users = users ? users : [];
-    this.roomJid = roomJid;
+    this.roomId = roomId;
     this.type = type;
     this.ctime = ctime;
     this.lastActivity = lastActivity ? lastActivity : 0;
     this.chatId = chatId;
+    this.chatIdBin = chatId ? base64urldecode(chatId) : "";
+
     this.chatShard = chatShard;
     this.chatdUrl = chatdUrl;
 
@@ -64,6 +65,19 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.attachments = new MegaDataMap(this);
     this.images = new MegaDataSortedMap("id", "delay", this);
 
+    self.members = {};
+
+    if (type === "private") {
+        users.forEach(function(userHandle) {
+            self.members[userHandle] = 3;
+        });
+    }
+    else {
+        users.forEach(function(userHandle) {
+            // while loading, set permissions to read only
+            self.members[userHandle] = 0;
+        });
+    }
     this.options = {
 
         /**
@@ -120,12 +134,11 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         }
 
         if (self.type === "private") {
-            var targetUserJid = self.getParticipantsExceptMe()[0];
+            var targetUserId = self.getParticipantsExceptMe()[0];
 
             var targetUserNode;
-            if (targetUserJid) {
-                targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
-                assert(M.u, 'M.u does not exists');
+            if (M.u[targetUserId]) {
+                targetUserNode = M.u[targetUserId];
             }
             else if(msg.userId) {
                 targetUserNode = M.u[msg.userId];
@@ -152,6 +165,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
                 contactHash = msg.userId;
             }
             else if (msg.getFromJid) {
+                debugger; // should not happen
                 contactHash = megaChat.getContactHashFromJid(msg.getFromJid());
             }
 
@@ -196,23 +210,23 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         }
     });
 
-    self.getParticipantsExceptMe().forEach(function(jid) {
-        var contact = self.megaChat.getContactFromJid(jid);
+    self.getParticipantsExceptMe().forEach(function(userHandle) {
+        var contact = M.u[userHandle];
         if (contact) {
             getLastInteractionWith(contact.u);
         }
     });
     self.megaChat.trigger('onRoomCreated', [self]);
 
-    $(window).rebind("focus." + self.roomJid, function() {
+    $(window).rebind("focus." + self.roomId, function() {
         if (self.isCurrentlyActive) {
             self.trigger("onChatShown");
         }
     });
 
-    self.megaChat.rebind("onRoomDestroy." + self.roomJid, function(e, room) {
-        if (room.roomJid == self.roomJid) {
-            $(window).unbind("focus." + self.roomJid);
+    self.megaChat.rebind("onRoomDestroy." + self.roomId, function(e, room) {
+        if (room.roomId == self.roomId) {
+            $(window).unbind("focus." + self.roomId);
         }
     });
 
@@ -389,88 +403,6 @@ ChatRoom.prototype.setType = function(type) {
 };
 
 /**
- * Set the users (participants) of the room.
- * This is different then the actual current room occupants, based on the XMPP info, because it should contain a list
- * of BARE jids which SHOULD be in the room.
- *
- * Note: All of those JIDs would get auto-invitations to join this room when they connect to the XMPP automatically.
- *
- * @param jids {Array} List of bare jids
- */
-ChatRoom.prototype.setUsers = function(jids) {
-    this.users = clone(jids);
-};
-
-
-/**
- * the same as .setUsers, w/ the difference that it will only add any of the user jids in `jids` to the `.users`,
- * instead of just overwriting the `.users` property
- *
- * @param jids {Array} List of bare jids
- */
-ChatRoom.prototype.syncUsers = function(jids) {
-    var self = this;
-
-    assert(jids, "Missing jids");
-
-    var users = clone(self.users);
-
-    $.each(jids, function(k, v) {
-        if (v) {
-            v = v.split("/")[0];
-            if (self.users.indexOf(v) === -1) {
-                users.push(
-                    v
-                )
-            }
-        }
-    });
-
-    if (users.length > self.users.length) {
-        self.setUsers(users);
-    }
-};
-
-/**
- * Check if participant exists in room
- *
- * @param jid {String} Full OR Bare jid
- * @param [strict] {boolean} If true, will only check for FULL jids.
- * @param [notMe] {boolean} set to true if you want the search to ignore if the matched partcipant === my bare jid
- * @returns {boolean}
- */
-ChatRoom.prototype.participantExistsInRoom = function(jid, strict, notMe) {
-    var self = this;
-
-    strict = strict || false;
-
-    var result = false;
-    $.each(self.users, function(k, v) {
-        if (!v) {
-            self.logger.error("missing contact: ", k);
-
-            return;
-        }
-        if (notMe) {
-            if (Karere.getNormalizedBareJid(v) === self.megaChat.karere.getBareJid()) {
-                return; // continue
-            }
-        }
-        if (strict && v === jid) {
-            result = true;
-            return false; // break;
-        }
-        else if (!strict && v.split("/")[0] === jid) {
-            result = true;
-            return false; // break;
-        }
-    });
-
-    return result;
-};
-
-
-/**
  * Get all participants in a chat room.
  *
  * @returns {Array}
@@ -478,112 +410,27 @@ ChatRoom.prototype.participantExistsInRoom = function(jid, strict, notMe) {
 ChatRoom.prototype.getParticipants = function() {
     var self = this;
 
-    var participants = {};
-
-
-    $.each(self.users, function(k, v) {
-        if (!v) {
-            self.logger.error("missing contact/user: ", k);
-
-            return;
-        }
-        participants[v.split("/")[0]] = true;
-    });
-
-    return Object.keys(participants);
+    return Object.keys(self.members);
 };
 
 /**
- * Get all users in the chat room.
+ * Get a list of the current participants for this room, excluding my handle (or if provided, userHandles
+ * would be used instead of the current room participants).
  *
+ * @param [userHandles] {Array}
  * @returns {Array}
  */
-ChatRoom.prototype.getUsers = function() {
+ChatRoom.prototype.getParticipantsExceptMe = function(userHandles) {
     var self = this;
-
-    return self.megaChat.karere.getUsersInChat(self.roomJid);
-};
-
-/**
- * Get all users in the chat room ordered by joining time.
- *
- * @returns {Array}
- */
-ChatRoom.prototype.getOrderedUsers = function() {
-    var self = this;
-
-    return self.megaChat.karere.getOrderedUsersInChat(self.roomJid);
-};
-
-/**
- * Get room owner (e.g. the oldest user who joined and is currently in the room)
- *
- * @returns {(string|null)}
- */
-ChatRoom.prototype.getRoomOwner = function() {
-    var self = this;
-
-    var users = self.megaChat.karere.getOrderedUsersInChat(self.roomJid);
-
-    return users[0];
-};
-
-/**
- * Get a list of the current participants for this room, excluding my jid (or if provided, exlucding any of the jids
- * founds in arr `jids`).
- *
- * @param [jids] {Array}
- * @returns {Array}
- */
-ChatRoom.prototype.getParticipantsExceptMe = function(jids) {
-    var self = this;
-    if (!jids) {
-        jids = self.getParticipants();
+    if (!userHandles) {
+        userHandles = self.getParticipants();
     }
-    var jidsWithoutMyself = clone(jids);
-    jidsWithoutMyself.splice($.inArray(self.megaChat.karere.getBareJid(), jidsWithoutMyself), 1);
+    var handlesWithoutMyself = clone(userHandles);
+    handlesWithoutMyself.splice($.inArray(u_handle, handlesWithoutMyself), 1);
 
-    return jidsWithoutMyself;
+    return handlesWithoutMyself;
 };
 
-
-/**
- * Used to conver participants (from jids) -> contacts (as user hashes).
- *
- * @param [jids] {Array} optional list of jids to be used for converting -> contact list (if not passed, the current
- * room jids would be used)
- * @returns {Array} array of user hashes with the participants in the room
- */
-ChatRoom.prototype.getContactParticipantsExceptMe = function(jids) {
-    var self = this;
-    var participantJids = self.getParticipantsExceptMe(jids);
-
-    return participantJids.map((jid) => {
-        var contactHash = megaJidToUserId(jid);
-        if (contactHash) {
-            return contactHash;
-        }
-    });
-};
-
-/**
- * Used to conver participants (from jids) -> contacts (as user hashes).
- *
- * @param [jids] {Array} optional list of jids to be used for converting -> contact list (if not passed, the current
- * room jids would be used)
- * @returns {Array} array of user hashes with the participants in the room
- */
-ChatRoom.prototype.getContactParticipants = function(jids) {
-    var self = this;
-    var participantJids = self.getParticipants(jids);
-
-    return participantJids.map((jid) => {
-        var contactHash = megaJidToUserId(jid);
-        if (contactHash) {
-            return contactHash;
-        }
-    });
-};
 
 /**
  * Get room title
@@ -594,13 +441,7 @@ ChatRoom.prototype.getRoomTitle = function() {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
-        var name = self.megaChat.getContactNameFromJid(participants[0]);
-        if (!name) {
-            return "";
-        }
-        else {
-            return name;
-        }
+        return M.getNameByHandle(participants[0]) || "";
     }
     else {
         if (self.topic && self.topic.substr) {
@@ -649,16 +490,10 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     }
 
 
-    if (self.roomJid.indexOf("@") != -1) {
+    if (self.roomId.indexOf("@") != -1) {
         if (self.state !== ChatRoom.STATE.LEFT) {
             self.setState(ChatRoom.STATE.LEAVING);
-
-            return self.megaChat.karere.leaveChat(self.roomJid).done(function () {
-                self.setState(ChatRoom.STATE.LEFT);
-                if (triggerLeaveRequest === true) {
-                    self.destroy();
-                }
-            });
+            self.setState(ChatRoom.STATE.LEFT);
         }
         else {
             return;
@@ -678,7 +513,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
 
     self.megaChat.trigger('onRoomDestroy', [self]);
     var mc = self.megaChat;
-    var roomJid = self.roomJid;
+    var roomJid = self.roomId;
 
     if (!self.stateIsLeftOrLeaving()) {
         self.leave(notifyOtherDevices);
@@ -722,7 +557,7 @@ ChatRoom.prototype.show = function() {
     //$('.nw-conversations-item').removeClass('selected');
 
 
-    if (self.megaChat.currentlyOpenedChat && self.megaChat.currentlyOpenedChat != self.roomJid) {
+    if (self.megaChat.currentlyOpenedChat && self.megaChat.currentlyOpenedChat != self.roomId) {
         var oldRoom = self.megaChat.getCurrentRoom();
         if (oldRoom) {
             oldRoom.hide();
@@ -732,8 +567,8 @@ ChatRoom.prototype.show = function() {
     M.onSectionUIOpen('conversations');
 
 
-    self.megaChat.currentlyOpenedChat = self.roomJid;
-    self.megaChat.lastOpenedChat = self.roomJid;
+    self.megaChat.currentlyOpenedChat = self.roomId;
+    self.megaChat.lastOpenedChat = self.roomId;
 
     self.trigger('activity');
     self.trigger('onChatShown');
@@ -760,13 +595,13 @@ ChatRoom.prototype.getRoomUrl = function() {
     var self = this;
     if (self.type === "private") {
         var participants = self.getParticipantsExceptMe();
-        var contact = self.megaChat.getContactFromJid(participants[0]);
+        var contact = M.u[participants[0]];
         if (contact) {
             return "fm/chat/" + contact.u;
         }
     }
     else if (self.type === "group") {
-            return "fm/chat/g/" + self.roomJid.split("@")[0];
+            return "fm/chat/g/" + self.roomId.split("@")[0];
     }
     else {
         throw new Error("Can't get room url for unknown room type.");
@@ -790,7 +625,7 @@ ChatRoom.prototype.hide = function() {
 
     self.isCurrentlyActive = false;
 
-    if (self.megaChat.currentlyOpenedChat === self.roomJid) {
+    if (self.megaChat.currentlyOpenedChat === self.roomId) {
         self.megaChat.currentlyOpenedChat = null;
     }
 };
@@ -799,7 +634,7 @@ ChatRoom.prototype.hide = function() {
  * Append message to the UI of this room.
  * Note: This method will also log the message, so that later when someone asks for message sync this log will be used.
  *
- * @param message {KarereEventObjects.IncomingMessage|KarereEventObjects.OutgoingMessage|ChatDialogMessage}
+ * @param message {Message|ChatDialogMessage}
  * @returns {boolean}
  */
 ChatRoom.prototype.appendMessage = function(message) {
@@ -809,40 +644,10 @@ ChatRoom.prototype.appendMessage = function(message) {
         return false;
     }
 
-    if (message.getFromJid && message.getFromJid() === self.roomJid) {
+    if (message.getFromJid && message.getFromJid() === self.roomId) {
         return false; // dont show any system messages (from the conf room)
     }
 
-    if (message instanceof KarereEventObjects.OutgoingMessage) {
-        $(message).rebind('onChange.rerenderOnChangeHandler' + this.roomJid.split("@")[0], function(
-            msg,
-            property,
-            oldVal,
-            newVal
-        ) {
-            if (property === "textContents" || property === "contents") {
-                self.trackDataChange();
-            }
-        });
-    }
-    else if (
-        message.getFromJid &&
-        message instanceof KarereEventObjects.IncomingMessage &&
-        Karere.getNormalizedBareJid(message.getFromJid()) === self.megaChat.karere.getJid()
-    ) {
-        // my own IncomingMessage message, should be converted to Outgoing
-        message = new KarereEventObjects.OutgoingMessage(
-            message.toJid,
-            message.fromJid,
-            message.type,
-            message.messageId,
-            message.contents,
-            message.meta,
-            message.delay,
-            message.meta && message.meta.state ? message.meta.state : message.state,
-            message.roomJid
-        );
-    }
     if (self.shownMessages[message.messageId]) {
 
         return false;
@@ -869,7 +674,6 @@ ChatRoom.prototype.appendMessage = function(message) {
     self.shownMessages[message.messageId] = true;
 
     self.megaChat.updateDashboard();
-    //self.trackDataChange();
 };
 
 
@@ -881,7 +685,7 @@ ChatRoom.prototype.appendMessage = function(message) {
 ChatRoom.prototype.getNavElement = function() {
     var self = this;
 
-    return $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
+    return $('.nw-conversations-item[data-room-id="' + self.chatId + '"]');
 };
 
 
@@ -907,50 +711,48 @@ ChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
     return pluginsForceQueue;
 };
 
+
 /**
  * Send message to this room
  *
  * @param message {String}
  * @param [meta] {Object}
  */
-ChatRoom.prototype.sendMessage = function(message, meta) {
+ChatRoom.prototype.sendMessage = function(message) {
     var self = this;
     var megaChat = this.megaChat;
-    meta = meta || {};
 
-    var messageId = megaChat.karere.generateMessageId(self.roomJid, JSON.stringify([message, meta]));
+    var messageId = megaChat.generateTempMessageId(self.roomId, message);
 
-    var eventObject = new KarereEventObjects.OutgoingMessage(
-        self.roomJid,
-        megaChat.karere.getJid(),
-        "groupchat",
-        messageId,
-        message,
-        meta,
-        unixtime(),
-        KarereEventObjects.OutgoingMessage.STATE.NOT_SENT,
-        self.roomJid
+    var msgObject = new Message(
+        self,
+        self.messagesBuff,
+        {
+            'messageId': messageId,
+            'userId': u_handle,
+            'message': message,
+            'textContents': message,
+            'delay': unixtime(),
+            'sent': Message.STATE.NOT_SENT
+        }
     );
-    eventObject.chatRoom = self;
-
-    eventObject.textContents = message;
 
 
-    self.appendMessage(eventObject);
+    self.appendMessage(msgObject);
 
-    self._sendMessageToTransport(eventObject)
+    self._sendMessageToTransport(msgObject)
         .done(function(internalId) {
-            eventObject.internalId = internalId;
-            eventObject.orderValue = internalId;
+            msgObject.internalId = internalId;
+            msgObject.orderValue = internalId;
         });
 };
 
 /**
  * This method will:
- * - eventually (if the user is connected) try to send this message to the xmpp server
+ * - eventually (if the user is connected) try to send this message to the chatd server
  * - mark the message as sent or unsent (if the user is not connected)
  *
- * @param messageObject {KarereEventObjects.OutgoingMessage}
+ * @param messageObject {Message}
  */
 ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
@@ -958,32 +760,12 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
 
     megaChat.trigger('onBeforeSendMessage', messageObject);
 
-    var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
-    if (messageMeta.isDeleted && messageMeta.isDeleted === true) {
-        return MegaPromise.reject();
-    }
-
-    if (messageObject.setDelay) {
-        // guarantee that all message's .delay would be === current time (e.g. the last time we tried to send them)
-        messageObject.setDelay(unixtime());
-    }
-
-
     return megaChat.plugins.chatdIntegration.sendMessage(
         self,
         messageObject
     );
 };
 
-
-/**
- * Helper for accessing options.mediaOptions;
- *
- * @returns {*}
- */
-ChatRoom.prototype.getMediaOptions = function() {
-    return this.callSession ? this.callSession.getMediaOptions : {};
-};
 
 /**
  * Internal method to notify the server that the specified `nodeids` are sent/shared to `users`
@@ -1018,7 +800,7 @@ ChatRoom.prototype.attachNodes = function(ids) {
     var users = [];
 
     $.each(self.getParticipantsExceptMe(), function(k, v) {
-        var contact = self.megaChat.getContactFromJid(v);
+        var contact = M.u[v];
         if (contact && contact.u) {
             users.push(
                 contact.u
@@ -1043,8 +825,9 @@ ChatRoom.prototype.attachNodes = function(ids) {
                     'h': node.h,
                     'k': node.k,
                     't': node.t,
-                    'name': node.name,
                     's': node.s,
+                    'name': node.name,
+                    'hash': node.hash,
                     'fa': node.fa,
                     'ts': node.ts
                 });
@@ -1056,12 +839,13 @@ ChatRoom.prototype.attachNodes = function(ids) {
                     JSON.stringify(nodesMeta)
                 );
 
-                proxyPromise.resolve([nodeId]);
-            })
-            .fail(function (r) {
-                proxyPromise.reject(r);
-            });
-        waitingPromises.push(proxyPromise);
+            proxyPromise.resolve(
+                [nodeId]
+            );
+        })
+        .fail(function(r) {
+            proxyPromise.reject(r);
+        });waitingPromises.push(proxyPromise);
     });
 
     $masterPromise.linkDoneAndFailTo(MegaPromise.allDone(waitingPromises));
@@ -1078,8 +862,7 @@ ChatRoom.prototype.attachContacts = function(ids) {
 
     var nodesMeta = [];
     $.each(ids, function(k, nodeId) {
-        // TODO: @lp this should be M.u instead of M.d ?
-        var node = M.d[nodeId];
+        var node = M.u[nodeId];
         var name = M.getNameByHandle(node.u);
 
         nodesMeta.push({
@@ -1105,7 +888,7 @@ ChatRoom.prototype.revokeAttachment = function(node) {
     var users = [];
 
     $.each(self.getParticipantsExceptMe(), function(k, v) {
-        var contact = self.megaChat.getContactFromJid(v);
+        var contact = M.u[v];
         if (contact && contact.u) {
             users.push(
                 contact.u
@@ -1220,19 +1003,14 @@ ChatRoom.prototype.recover = function() {
     var self = this;
 
     self.callRequest = null;
-    var $startChatPromise;
     if (self.state !== ChatRoom.STATE.LEFT) {
         self.setState(ChatRoom.STATE.JOINING, true);
-        $startChatPromise = self.megaChat.karere.startChat([], self.type,
-            self.roomJid.split("@")[0], (self.type === "private" ? false : undefined));
-
         self.megaChat.trigger("onRoomCreated", [self]); // re-initialise plugins
+        return MegaPromise.resolve();;
     }
     else {
-        $startChatPromise = MegaPromise.reject();
+        return MegaPromise.reject();
     }
-
-    return $startChatPromise;
 };
 
 

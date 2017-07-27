@@ -45,7 +45,7 @@ html.overlayed {
 }
 .overlayed body.mobile.bottom-pages {
     overflow: hidden;
-    position: absolute;
+    position: fixed;
 }
 /* Prevent selection and highlighting */
 body * {
@@ -1561,7 +1561,7 @@ div.checkboxOn, div.checkboxOff {
 }
 .terms-of-service h2, .terms-general h2, .privacy-policy h2, .takedown-guidance h2, .contact-us .contact-new-title {
     font-family: 'source_sans_prolight', sans-serif;
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 300;
     color: #999;
 }
@@ -3277,6 +3277,70 @@ div.checkboxOn, div.checkboxOff {
     letter-spacing: 0.2px;
     padding: 0 0 0 0;
     margin: 20px 15px 30px 15px;
+}
+.mobile.top-menu-popup .top-icon.close {
+    background: url(../images/mobile/mobile-sprite_v6.png);
+    background-position: -65px -1143px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    height: 40px;
+    margin: 13px 6px 0 0px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    right: -11px;
+    top: -3px;
+    width: 42px;
+    z-index: 10;
+}
+/* Hide menu items which are not ready for mobile yet */
+.top-menu-content .not-mobile-ready {
+    display: none;
+}
+/* Prevent jspPane setting a style to put the margin out so the page indicator is no longer flush with the margin */
+.top-menu-popup .top-menu-scroll .jspPane {
+    margin-left: 0 !important;
+}
+/* Language menu */
+.language-template {
+    display: none;
+}
+.top-menu-item.submenu-item.languages::before {
+    background: none;
+}
+.top-menu-item.current {
+    color: #d90007;
+}
+.submenu-item.expanded + .top-submenu.language-items {
+    max-height: 1200px;
+}
+.top-submenu.language-items .top-menu-item .lang-name {
+    display: inline-block;
+}
+.top-submenu.language-items .top-menu-item .beta-text {
+    border: 1px solid rgba(192, 199, 203, 0.3);
+    border-radius: 7px;
+    box-sizing: border-box;
+    color: #c0c7cd;
+    display: none;
+    font-size: 10px;
+    font-style: normal;
+    line-height: 18px;
+    margin-left: 5px;
+    padding: 0 4px;
+    text-align: center;
+    text-transform: uppercase;
+}
+.top-submenu.language-items .top-menu-item.beta .beta-text {
+    display: inline-block;
+}
+.mobile.top-menu-popup .top-menu-item {
+    font-size: 15px;
+    line-height: 26px;
+}
+.bottom-menu.copyrights {
+    position: static;
+    margin: 20px 0 0 0;
 }
 
 /* Only media queries after here */

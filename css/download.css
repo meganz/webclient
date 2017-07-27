@@ -539,10 +539,15 @@
     left: auto;
     right: 22px;
 }
-.megasync-close, .megasync-close-txt, .megasync-overlay .megasync-dropdown, .megasync-overlay.linux .megasync-dropdown {
+.megasync-overlay .megasync-dropdown {
+    float: none;
+    width: 230px;
+    margin: -20px auto 20px auto;
+}
+.megasync-close, .megasync-close-txt, .megasync-overlay .megasync-dropdown {
     display: none;
 }
-.downloading .megasync-close, .downloading .megasync-close-txt {
+.downloading .megasync-close, .downloading .megasync-close-txt, .megasync-overlay.linux .megasync-dropdown {
     display: block;
 }
 .downloading .download.buttons-block, .download-complete .download.buttons-block, .downloading .download.checkbox-bl, .downloading .download.bar-buttons, .download-complete .download.pause-button, .download-complete .download.bar-buttons, .download-complete .progress-cell.mid-pause, .download-complete .download.bar-buttons, .download-complete .download.checkbox-bl, .download-complete .download.speed-block, .download-complete .download.eta-block, .paused .download.eta-block i, .download-complete .download.progress-cell i {

@@ -1844,7 +1844,6 @@ else if (!b_u) {
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
-        jsl.push({f:'html/top.html', n: 'top', j:0});
     } // !is_mobile
 
     // Transfers
@@ -1868,6 +1867,14 @@ else if (!b_u) {
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
+
+    if (is_mobile) {
+        jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
+    }
+    else {
+        jsl.push({f:'html/top.html', n: 'top', j:0});
+    }
+
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
@@ -1963,7 +1970,6 @@ else if (!b_u) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-        jsl.push({f:'html/top-mobile.html', n: 'top', j:0});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/ui/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});

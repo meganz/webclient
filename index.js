@@ -2182,7 +2182,13 @@ function parsepage(pagehtml, pp) {
 
 function parsetopmenu() {
     var top;
-    top = pages['top'].replace(/{staticpath}/g, staticpath);
+
+    if (is_mobile) {
+        top = pages['top-mobile'].replace(/{staticpath}/g, staticpath);
+    }
+    else {
+        top = pages['top'].replace(/{staticpath}/g, staticpath);
+    }
     if (document.location.href.substr(0, 19) === 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }

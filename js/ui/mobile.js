@@ -127,11 +127,21 @@ var mobile = {
      */
     initHeaderMegaIcon: function() {
 
+        'use strict';
+
+        var $megaIcon = $('.mobile.fm-icon.mega');
+        var $otherPages = $('#fmholder > div');
+        var $cloudDrive = $('.mobile.file-manager-block');
+
         // On Mega icon click
-        $('.mobile.fm-icon.mega').off('tap').on('tap', function() {
+        $megaIcon.off('tap').on('tap', function() {
 
             // If logged in
             if (typeof u_attr !== 'undefined') {
+
+                // Hide other pages and show the Cloud Drive
+                $otherPages.addClass('hidden');
+                $cloudDrive.removeClass('hidden');
 
                 // Open the root cloud folder
                 loadSubPage('fm');

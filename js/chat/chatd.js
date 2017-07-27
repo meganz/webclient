@@ -585,7 +585,7 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd) {
         buf += cmd;
     }
     this.cmdq += buf;
-    if (this.logger.loggerIsEnabled) {
+    if (this.loggerIsEnabled) {
         this.logger.debug('send:', Chatd.cmdToString(buf, true));
     }
     return this.triggerSendIfAble();

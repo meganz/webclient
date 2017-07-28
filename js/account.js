@@ -760,7 +760,7 @@ function processEmailChangeActionPacket(ap) {
             else if (r[0] === "1" && megaChatIsReady) {
                 var room = megaChat.getPrivateRoom(u_h);
                 if (room && megaChat.plugins && megaChat.plugins.chatNotifications) {
-                    if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomJid) > 0) {
+                    if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomId) > 0) {
                         $elem.addClass('unread-conversations');
                     }
                     else {

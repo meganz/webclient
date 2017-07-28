@@ -443,6 +443,11 @@ def reduce_validator(file_line_mapping, **extra):
                     continue
                 line_length = len(line)
 
+                # Analyse CSS files...
+                if file_extension == '.css':
+                    fatal += inspectcss(file_path, line_number, line, result)
+                    continue
+
                 # If line length exceeded, log it and move onto the next file
                 if line_length > config.VALIDATOR_LINELEN_THRESHOLD:
                     fatal += 1
@@ -456,11 +461,6 @@ def reduce_validator(file_line_mapping, **extra):
                 # Analyse JavaScript files...
                 if file_extension in ['.js', '.jsx']:
                     fatal += inspectjs(file_path, line_number, line, result)
-                    continue
-
-                # Analyse CSS files...
-                if file_extension == '.css':
-                    fatal += inspectcss(file_path, line_number, line, result)
                     continue
 
         # Further inspect all modifications in a whole instead of per-lines

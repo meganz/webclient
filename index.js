@@ -1422,6 +1422,8 @@ function topmenuUI() {
 
     $('.top-icon.warning').addClass('hidden');
     $('.top-menu-item.upgrade-your-account,.top-menu-item.backup').addClass('hidden');
+    $('.top-menu-item.start').removeClass('hidden');
+    $('.top-menu-item.fm').addClass('hidden');
     $('.top-menu-item.logout').addClass('hidden');
     $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
     $('.top-menu-item.account').addClass('hidden');
@@ -1451,15 +1453,25 @@ function topmenuUI() {
     if (section === 'fm') {
         section = page.split('/')[1];
     }
-    $('.top-menu-item').removeClass('active');
 
-    if (section) {
+    // Get all menu items
+    var $topMenuItems = $('.top-menu-item');
+
+    // Remove red bar from all menu items
+    $topMenuItems.removeClass('active');
+
+    // If in mobile Cloud Drive, show red bar
+    if (is_mobile && page.indexOf('fm') === 0) {
+        $topMenuItems.filter('.fm').addClass('active');
+    }
+    else if (section) {
         // just in case, a payment provider appended any ?returnurl vars
         section = section.split("?")[0];
         section = section.replace(/[^a-zA-Z\-\_]/g, "");
 
-        var $menuItem = $('.top-menu-item.' + section);
+        var $menuItem = $topMenuItems.filter('.' + section);
         $menuItem.addClass('active');
+
         if ($menuItem.parent('.top-submenu').length) {
             $menuItem.parent('.top-submenu').prev().addClass('expanded');
         }
@@ -1489,6 +1501,8 @@ function topmenuUI() {
     $('.top-mega-version').text('v. ' + M.getSiteVersion());
 
     if (u_type) {
+        $('.top-menu-item.start').addClass('hidden');
+        $('.top-menu-item.fm').removeClass('hidden');
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $('.top-menu-item.account').removeClass('hidden');
         $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
@@ -1766,7 +1780,7 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
                 'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'wp'
+                'sync', 'takedown', 'terms', 'wp', 'start', 'fm'
             ];
 
             for (var i = subPages.length; i--;) {
@@ -1790,10 +1804,8 @@ function topmenuUI() {
             else if (className.indexOf('refresh') > -1) {
                 M.reload();
             }
-            else if (className.indexOf('languages') > -1) {
-                if (!is_mobile) {
-                    langDialog.show();
-                }
+            else if (!is_mobile && className.indexOf('languages') > -1) {
+                langDialog.show();
             }
             else if (className.indexOf('logout') > -1) {
                 mLogout();
@@ -2049,7 +2061,7 @@ function getTemplate(name) {
 function pagemetadata()
 {
 	var mega_desc = false;
-	
+
 	if (page == 'android')
 	{
 		mega_title = 'Android - MEGA';
@@ -2196,7 +2208,7 @@ function parsetopmenu() {
 
 
 function loadSubPage(tpage, event)
-{	
+{
     tpage = getCleanSitePath(tpage);
 
     if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {

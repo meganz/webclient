@@ -492,6 +492,7 @@
     font-size: 16px;
     line-height: 20px;
     letter-spacing: -0.1px;
+    padding: 0 0 10px 0;
     color: #D22400;
     font-family: 'Open Sans Semibold Italic', Arial;
 }
@@ -502,7 +503,7 @@
     padding-left: 40px;
 }
 .download.error-text.cross-icon {
-    background-position: -118px -870px;
+    background-position: -118px -872px;
     padding-left: 30px;
 }
 .download.error-text.error-icon {

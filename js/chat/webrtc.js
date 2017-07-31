@@ -30,7 +30,7 @@ RtcModule.NotSupportedError = function(message) {
     this.message = message;
     // Use V8's native method if available, otherwise fallback
     if ("captureStackTrace" in Error) {
-        Error.captureStackTrace(this, InvalidArgumentException);
+        Error.captureStackTrace(this, this.constructor);
     } else {
         this.stack = (new Error()).stack;
     }
@@ -1528,7 +1528,7 @@ Session.prototype.submitStats = function(termCode, errInfo) {
     } else { //no stats, but will still provide callId and duration
         stats = {
             cid: base64urlencode(this.sid),
-            bws: RTC.getBrowserVersion()
+            bws: stats_getBrowserVersion()
         };
 
         if (this._tsIceConn) {

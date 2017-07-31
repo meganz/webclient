@@ -1,4 +1,4 @@
-(function() {
+(function(scope) {
 function getBrowserVersion() {
     var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
     var ver = parseInt(ua.details.version);
@@ -7,11 +7,11 @@ function getBrowserVersion() {
     }
     return browser;
 }
-
-RTC.getBrowserVersion = getBrowserVersion;
-if (!RTC || !RTCPeerConnection.prototype.getStats || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
+scope.stats_getBrowserVersion = getBrowserVersion;
+if (!RTC || !RTCPeerConnection || !RTCPeerConnection.prototype.getStats || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
     return;
 }
+
 function prettyNum(v) {
     if (v > 1048576) {
         return (v/1048576).toFixed(1)+'M';
@@ -391,4 +391,4 @@ RTC.Stats = {
     Recorder: Recorder,
     statItemToString: statItemToString
 };
-})();
+})(window);

@@ -44,7 +44,7 @@ var Chatd = function(userId, options) {
         handleMessage: function(shard, msg, len) {},
         onUserJoinLeave: function(chatid, userid, priv) {},
         onUserOffline: function(chatid, userid, clientid) {},
-        onShutdown: function() {}
+        shutdown: function() {}
     };
 
     // load persistent client id, or generate one if none was stored

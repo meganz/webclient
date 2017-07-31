@@ -410,7 +410,7 @@
     -moz-box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);
     box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);
 }
-.download.warning-block.warning {
+.download.warning-block.default-warning {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(229,165,4,0.1);
     -moz-box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);
     box-shadow: 0px 0px 0px 1px rgba(230,92,0,0.1);

@@ -86,6 +86,11 @@ html.gbot {
     max-height: 900px;
     min-height: 555px;
 }
+.bottom-page.img-wrap::before {
+    content: '';
+    display: block;
+    height: 100%;
+}
 .mobile .bottom-page.top-bl {
     max-height: 1024px;
 }

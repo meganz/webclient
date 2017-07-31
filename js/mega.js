@@ -2731,25 +2731,6 @@ function init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
 
-            // XXX: Prevent known Strophe exceptions...
-            ['_onIdle', '_connect'].forEach(function(fn) {
-                var proto = Strophe.Websocket.prototype;
-                var unsafeFn = '_unsafe' + fn;
-
-                if (!proto[unsafeFn]) {
-                    proto[unsafeFn] = proto[fn];
-                    proto[fn] = function() {
-                        try {
-                            this[unsafeFn].apply(this, arguments);
-                        }
-                        catch (ex) {
-                            console.error('Caught Strophe exception.', ex);
-                        }
-                    };
-                }
-                proto = undefined;
-            });
-
             var _chat = new Chat();
 
             // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)

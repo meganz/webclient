@@ -40,6 +40,10 @@ var ParticipantsList = React.createClass({
         var $node = $(self.findDOMNode());
 
         var scrollHeight;
+        if (!self.refs.contactsListScroll) {
+            return null;
+        }
+
         var fitHeight = scrollHeight = self.refs.contactsListScroll.getContentHeight();
         if (fitHeight === 0) {
             // not visible at the moment.
@@ -78,16 +82,16 @@ var ParticipantsList = React.createClass({
         var self = this;
         var room = this.props.chatRoom;
 
-        if (!room || !room.roomJid) {
+        if (!room) {
             // destroyed
             return null;
         }
-        var contactJid;
+        var contactHandle;
         var contact;
         var contacts = room.getParticipantsExceptMe();
         if (contacts && contacts.length > 0) {
-            contactJid = contacts[0];
-            contact = room.megaChat.getContactFromJid(contactJid);
+            contactHandle = contacts[0];
+            contact = M.u[contactHandle];
         }
         else {
             contact = {};
@@ -133,7 +137,7 @@ var ParticipantsListInner = React.createClass({
         var self = this;
         var room = this.props.chatRoom;
 
-        if (!room || !room.roomJid) {
+        if (!room) {
             // destroyed
             return null;
         }
@@ -141,18 +145,18 @@ var ParticipantsListInner = React.createClass({
             // save some memory/DOM
             return false;
         }
-        var contactJid;
+        var contactHandle;
         var contact;
         var contacts = room.getParticipantsExceptMe();
         if (contacts && contacts.length > 0) {
-            contactJid = contacts[0];
-            contact = room.megaChat.getContactFromJid(contactJid);
+            contactHandle = contacts[0];
+            contact = M.u[contactHandle];
         }
         else {
             contact = {};
         }
 
-        var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
+        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
         var contactsList = [];
 
@@ -160,9 +164,9 @@ var ParticipantsListInner = React.createClass({
         contacts = room.type === "group" ?
             (
                 room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) :
-                    room.getContactParticipantsExceptMe()
+                    room.getParticipantsExceptMe()
             )   :
-            room.getContactParticipantsExceptMe();
+            room.getParticipantsExceptMe();
 
         array.remove(contacts, u_handle, true);
 

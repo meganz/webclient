@@ -276,7 +276,6 @@ var trackPropertyChanges = function(obj, properties, implementChangeListener) {
             if (typeof(this._data[k]) === 'undefined' || _properJSCmp(this._data[k], v) !== true) {
                 if (
                     typeof(this._data[k]) === 'undefined' &&
-                    typeof(defaultVal) !== 'undefined' &&
                     _properJSCmp(defaultVal, v) === true
                 ) {
                     // this._data[...] is empty and defaultVal == newVal, DON'T track updates.
@@ -284,7 +283,7 @@ var trackPropertyChanges = function(obj, properties, implementChangeListener) {
                 }
 
                 if (!ignoreDataChange) {
-                    this.trackDataChange();
+                    this.trackDataChange(this._data, k, v);
                 }
                 this._data[k] = v;
             }

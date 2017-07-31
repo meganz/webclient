@@ -71,11 +71,11 @@ def get_git_line_sets(base, target):
     file_line_mapping = collections.defaultdict(set)
     current_file = None
     for line in diff:
-        if line.startswith('+++'):
+        if line.startswith('+++ '):
             # Line giving target file.
             for_file = line.split()[1]
             current_file = tuple(re.split(PATH_SPLITTER, for_file[2:]))
-        elif line.startswith('@@'):
+        elif line.startswith('@@ '):
             # Line giving alteration line range of diff fragment.
             target_lines = line.split()[2].split(',')
             start_line = int(target_lines[0])
@@ -347,6 +347,20 @@ def analyse_files_for_special_chars(filename, result):
 
     return test_fail
 
+def inspectcss(file, ln, line, result):
+    fatal = 0
+    line = line.strip()
+    indent = ' ' * (len(file)+len(str(ln))+3)
+
+    # check potentially invalid url()s
+    match = re.search(r'url\([\'"]?/?images/mega', line)
+    if match:
+        fatal += 1
+        result.append('{}:{}: {}\n{}^ Potentially invalid url()'
+            .format(file, ln, line, indent))
+
+    return fatal
+
 def inspectjs(file, ln, line, result):
     fatal = 0
     line = line.strip()
@@ -403,7 +417,7 @@ def reduce_validator(file_line_mapping, **extra):
             continue
 
         # Ignore this specific file types
-        if file_extension in ['.json','.py','.sh', '.svg', '.css', '.html']:
+        if file_extension in ['.json','.py','.sh', '.svg', '.html']:
             continue
 
         # If .min.js is in the filename (most basic detection), then log it and move onto the next file
@@ -413,7 +427,7 @@ def reduce_validator(file_line_mapping, **extra):
                           .format(file_path, warning))
             continue
 
-        if os.path.getsize(file_path) > 120000:
+        if os.path.getsize(file_path) > 120000 and file_extension != '.css':
             result.append('The file "{}" has turned too big, '
                           'any new functions must be moved elsewhere.'.format(file_path))
             continue;
@@ -428,6 +442,11 @@ def reduce_validator(file_line_mapping, **extra):
                     # Not a changed line.
                     continue
                 line_length = len(line)
+
+                # Analyse CSS files...
+                if file_extension == '.css':
+                    fatal += inspectcss(file_path, line_number, line, result)
+                    continue
 
                 # If line length exceeded, log it and move onto the next file
                 if line_length > config.VALIDATOR_LINELEN_THRESHOLD:
@@ -445,13 +464,14 @@ def reduce_validator(file_line_mapping, **extra):
                     continue
 
         # Further inspect all modifications in a whole instead of per-lines
-        snippet = '\n'.join(lines)
-        # print('>>>>>>>>>>>>>>>>>> {}:{}'.format(file_path, snippet))
-        match = re.search(r'(\w+\s*\(\s*\n\s*[^\s,]{1,12})\s*(?:\n|$)', snippet)
-        if match:
-            fatal += 1
-            result.append('Found non-sensical statement spreaded '
-                'around several lines on file {}:\n{} ...'.format(file_path, match.group(1)))
+        if file_extension in ['.js', '.jsx']:
+            snippet = '\n'.join(lines)
+            # print('>>>>>>>>>>>>>>>>>> {}:{}'.format(file_path, snippet))
+            match = re.search(r'(\w+\s*\(\s*\n\s*[^\s,]{1,12})\s*(?:\n|$)', snippet)
+            if match:
+                fatal += 1
+                result.append('Found non-sensical statement spreaded '
+                    'around several lines on file {}:\n{} ...'.format(file_path, match.group(1)))
 
 
     # Add the number of errors and return in a nicely formatted way.

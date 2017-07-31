@@ -275,6 +275,29 @@ function mozFrom8(utf8) {
 	return mozUConv().ConvertToUnicode(utf8);
 }
 
+function mozSendPOSTRequest(url, data) {
+	var browser =
+		window.QueryInterface(Ci.nsIInterfaceRequestor)
+			.getInterface(Ci.nsIWebNavigation)
+			.QueryInterface(Ci.nsIDocShell)
+			.QueryInterface(Ci.nsIDocShellTreeItem)
+			.rootTreeItem
+			.QueryInterface(Ci.nsIInterfaceRequestor)
+			.getInterface(Ci.nsIDOMWindow)
+			.window.gBrowser;
+
+	var postData = Object.keys(data).map(k => k + '=' + encodeURIComponent(data[k])).join('&');
+	var formData = Cc["@mozilla.org/network/mime-input-stream;1"].createInstance(Ci.nsIMIMEInputStream);
+	var pdStream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
+
+	pdStream.setData(postData, postData.length);
+	formData.addHeader("Content-Type", "application/x-www-form-urlencoded");
+	formData.addContentLength = true;
+	formData.setData(pdStream);
+
+	browser.loadURIWithFlags(url, 0, null, null, formData);
+}
+
 function mozNotifyDL(fn,f) {
 	if (!mozPrefs.getBoolPref('notifydl')) {
 		return false;

@@ -6960,8 +6960,8 @@
         "context": ""
     },
     "6033": {
-        "text": "You don't have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card?\nPlease try to save\/copy the file to the your device's internal memory instead.",
-        "context": ""
+        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card?\r\nPlease try to save\/copy the file to your device's internal memory instead.",
+        "context": "A dialog message which is displayed when the process\/request to copy a file failed because the app or the user does not have write permission to copy into the destination (i.e. copy an unsupported file type into an SD card)."
     },
     "6034": {
         "text": "Unauthorized access",
@@ -7236,8 +7236,8 @@
         "context": ""
     },
     "6106": {
-        "text": "save",
-        "context": ""
+        "text": "Save",
+        "context": "A label for any Save button, link or title for saving a setting, image, etc."
     },
     "6107": {
         "text": "share",
@@ -7296,8 +7296,8 @@
         "context": ""
     },
     "6121": {
-        "text": "about",
-        "context": ""
+        "text": "About",
+        "context": "A label for any About button, link, text or title."
     },
     "6122": {
         "text": "We want to special thank the following companies\/people for making this app possible:",
@@ -8487,14 +8487,6 @@
         "text": "You can not sync a shared folder without Full Access permissions",
         "context": ""
     },
-    "7012": {
-        "text": "You are about to import this file to a synced folder.\nIf you enable downloading, the file will be duplicated on your computer.\nAre you sure?",
-        "context": ""
-    },
-    "7013": {
-        "text": "You are about to import these files to a synced folder.\nIf you enable downloading, the files will be duplicated on your computer.\nAre you sure?",
-        "context": ""
-    },
     "7014": {
         "text": "Your account has exceeded its allowed space quota.[A]Upgrade[\/A]and keep enjoying secure, end-to-end encrypted storage.",
         "context": ""
@@ -8849,14 +8841,6 @@
     },
     "7124": {
         "text": "No Photos or Videos",
-        "context": ""
-    },
-    "7125": {
-        "text": "You can take photos and videos using the camera, or sync photos and videos onto your %@\nusing iTunes.",
-        "context": ""
-    },
-    "7126": {
-        "text": "You can sync photos and videos onto your %@ using iTunes.",
         "context": ""
     },
     "7127": {
@@ -11840,8 +11824,8 @@
         "context": "Label for the auto camera upload service restrictions."
     },
     "8073": {
-        "text": "Saved for offline use",
-        "context": "Label for any 'Saved for offline' button, link, text, title, etc to indicate the content has already been saved for offline use."
+        "text": "Saved for offline",
+        "context": "A label for any 'Saved for offline' button, link, text or title to indicate that the content has already been saved for offline use."
     },
     "8074": {
         "text": "No files in your cloud drive",
@@ -17094,5 +17078,29 @@
     "16667": {
         "text": "Back to PRO Plans",
         "context": "A button on the second Pro page which lets the user return to the first Pro page to change their Pro plan."
+    },
+    "16668": {
+        "text": "Dashboard",
+        "context": "Button description. Opens section with account information."
+    },
+    "16669": {
+        "text": "Failed to share the file\/folder link. Please try again.",
+        "context": "A dialog message which is displayed when there was a failure when sharing a file or folder link."
+    },
+    "16670": {
+        "text": "Error sharing link",
+        "context": "A title of a dialog which is displayed when there is a failure sharing a file or folder link."
+    },
+    "16671": {
+        "text": "Download using the MEGA desktop app for faster downloads.",
+        "context": "A message about the MEGAsync application which allows the user to download files faster and more reliably."
+    },
+    "16672": {
+        "text": "Do you want to save the log file in an external location to use it later?",
+        "context": "A dialog message which is displayed when asking the user if they want to save the generated log file in a location external to the app."
+    },
+    "16673": {
+        "text": "Save the log file",
+        "context": "The title of a dialog which is displayed when asking the user if they want to save the generated log file to an external location from the app."
     }
 }

@@ -859,7 +859,15 @@ var dlmanager = {
 
                     this._overQuotaTimeLeftTick =
                         setInterval(function() {
-                            $countdown.safeHTML(secondsToTime(timeLeft--, 1));
+                            var time = secondsToTime(timeLeft--, 1);
+
+                            if (time) {
+                                $countdown.safeHTML(time);
+                            }
+                            else {
+                                $countdown.text('');
+                                clearInterval(dlmanager._overQuotaTimeLeftTick);
+                            }
                         }, 1000);
                 }
             }.bind(this)

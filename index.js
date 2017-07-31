@@ -49,15 +49,9 @@ function startMega() {
     if (!hashLogic) {
         $(window).rebind('popstate.mega', function(event) {
 
-            var currentPage = page;
             var state = event.originalEvent.state || {};
 
             loadSubPage(state.subpage || state.fmpage || location.hash, event);
-
-            // If on mobile TOS page and logged in, then the cloud doesn't reload for some reason so reload
-            if (is_mobile && (currentPage === 'terms') && (typeof u_attr !== 'undefined')) {
-                window.location.reload();
-            }
         });
     }
 
@@ -70,17 +64,19 @@ function startMega() {
         return false;
     }
 
-    if (pages['dialogs']) {
-        $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
-        delete pages['dialogs'];
-    }
-    if (pages['onboarding']) {
-        $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
-        delete pages['onboarding'];
-    }
-    if (pages['chat']) {
-        $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
-        delete pages['chat'];
+    if (!is_mobile) {
+        if (pages['dialogs']) {
+            $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
+            delete pages['dialogs'];
+        }
+        if (pages['onboarding']) {
+            $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
+            delete pages['onboarding'];
+        }
+        if (pages['chat']) {
+            $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
+            delete pages['chat'];
+        }
     }
     jsl = [];
     if(typeof(mega_custom_boot_fn) === 'undefined') {
@@ -91,22 +87,35 @@ function startMega() {
 }
 
 function topMenu(close) {
+
     if (close) {
         $.topMenu = '';
         $('.top-icon.menu').removeClass('active');
         $('.top-menu-popup').addClass('hidden');
+
+        if (is_mobile) {
+            $('html').removeClass('overlayed');
+            $('.mobile.dark-overlay').addClass('hidden').removeClass('active');
+        }
         $(window).unbind('resize.topmenu');
     }
     else {
         $.topMenu = 'topmenu';
         $('.top-icon.menu').addClass('active');
         $('.top-menu-popup').removeClass('hidden');
-        topMenuScroll();
-        $(window).rebind('resize.topmenu', function (e) {
-            if ($('.top-icon.menu').hasClass('active')) {
-                topMenuScroll();
-            }
-        });
+
+        if (!is_mobile) {
+            topMenuScroll();
+            $(window).rebind('resize.topmenu', function() {
+                if ($('.top-icon.menu').hasClass('active')) {
+                    topMenuScroll();
+                }
+            });
+        }
+        else {
+            $('html').addClass('overlayed');
+            $('.mobile.dark-overlay').removeClass('hidden').addClass('active');
+        }
     }
 }
 
@@ -1143,9 +1152,9 @@ function init_page() {
                 M.currentdirid = id;
             }
             if (is_mobile) {
-                parsepage(pages['mobile']);
+                $('#fmholder').safeHTML(translate(pages['mobile'].replace(/{staticpath}/g, staticpath)));
             }
-            else if (!is_mobile && $('#fmholder').html() === '') {
+            else if ($('#fmholder').html() === '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
 
@@ -1193,6 +1202,12 @@ function init_page() {
 
         $('#pageholder').hide();
         $('#startholder').hide();
+
+        // Prevent duplicate HTML content breaking things
+        if (is_mobile) {
+            $('#startholder').empty();
+        }
+
         if ($('#fmholder:visible').length == 0) {
             $('#fmholder').show();
             if (fminitialized && !is_mobile) {
@@ -1255,14 +1270,7 @@ function init_page() {
         alarm.siteUpdate.init();
     }
 
-    if (!is_mobile) {
-        topmenuUI();
-    }
-    else {
-        // Initialise the mobile menu (ToDo: in future use desktop responsive main menu)
-        mobile.initHeaderMegaIcon();
-        mobile.menu.showAndInit(page);
-    }
+    topmenuUI();
 
     loggedout = false;
     flhashchange = false;
@@ -1414,6 +1422,8 @@ function topmenuUI() {
 
     $('.top-icon.warning').addClass('hidden');
     $('.top-menu-item.upgrade-your-account,.top-menu-item.backup').addClass('hidden');
+    $('.top-menu-item.start').removeClass('hidden');
+    $('.top-menu-item.fm').addClass('hidden');
     $('.top-menu-item.logout').addClass('hidden');
     $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
     $('.top-menu-item.account').addClass('hidden');
@@ -1443,15 +1453,25 @@ function topmenuUI() {
     if (section === 'fm') {
         section = page.split('/')[1];
     }
-    $('.top-menu-item').removeClass('active');
 
-    if (section) {
+    // Get all menu items
+    var $topMenuItems = $('.top-menu-item');
+
+    // Remove red bar from all menu items
+    $topMenuItems.removeClass('active');
+
+    // If in mobile Cloud Drive, show red bar
+    if (is_mobile && page.indexOf('fm') === 0) {
+        $topMenuItems.filter('.fm').addClass('active');
+    }
+    else if (section) {
         // just in case, a payment provider appended any ?returnurl vars
         section = section.split("?")[0];
         section = section.replace(/[^a-zA-Z\-\_]/g, "");
 
-        var $menuItem = $('.top-menu-item.' + section);
+        var $menuItem = $topMenuItems.filter('.' + section);
         $menuItem.addClass('active');
+
         if ($menuItem.parent('.top-submenu').length) {
             $menuItem.parent('.top-submenu').prev().addClass('expanded');
         }
@@ -1481,6 +1501,8 @@ function topmenuUI() {
     $('.top-mega-version').text('v. ' + M.getSiteVersion());
 
     if (u_type) {
+        $('.top-menu-item.start').addClass('hidden');
+        $('.top-menu-item.fm').removeClass('hidden');
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $('.top-menu-item.account').removeClass('hidden');
         $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
@@ -1493,10 +1515,12 @@ function topmenuUI() {
         $('.top-icon.notification').removeClass('hidden');
 
         // Show the rocket icon if achievements are enabled
+        if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
                 $('.top-icon.achievements').show();
             });
+        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1527,7 +1551,7 @@ function topmenuUI() {
         else {
             // Show the free badge
             $('.top-menu-item.upgrade-your-account').removeClass('hidden');
-            $('.membership-icon').attr('class', 'membership-icon');
+            $('.top-head .membership-icon').attr('class', 'membership-icon');
             $('.top-menu-item.account .right-el').text('FREE');
             $('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('.membership-popup').removeClass('pro-popup');
@@ -1618,7 +1642,6 @@ function topmenuUI() {
             $('.top-menu-item.login').addClass('hidden');
             $('.top-menu-item.logout').removeClass('hidden');
         }
-
     }
 
     $.hideTopMenu = function (e) {
@@ -1741,7 +1764,9 @@ function topmenuUI() {
             } else {
                 $(this).addClass('expanded');
             }
-            setTimeout(topMenuScroll,200);
+            if (!is_mobile) {
+                setTimeout(topMenuScroll, 200);
+            }
         }
         else {
             if ($('.light-overlay').is(':visible')) {
@@ -1755,7 +1780,7 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
                 'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'wp'
+                'sync', 'takedown', 'terms', 'wp', 'start', 'fm'
             ];
 
             for (var i = subPages.length; i--;) {
@@ -1779,7 +1804,7 @@ function topmenuUI() {
             else if (className.indexOf('refresh') > -1) {
                 M.reload();
             }
-            else if (className.indexOf('languages') > -1) {
+            else if (!is_mobile && className.indexOf('languages') > -1) {
                 langDialog.show();
             }
             else if (className.indexOf('logout') > -1) {
@@ -1788,6 +1813,11 @@ function topmenuUI() {
         }
         return false;
     });
+
+    // Initialise the language sub menu for mobile
+    if (is_mobile) {
+        mobile.languageMenu.init();
+    }
 
     $('.top-search-bl').rebind('click', function () {
         $(this).addClass('active');
@@ -1990,6 +2020,10 @@ function topmenuUI() {
         $('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
     }
 
+    // Initialise the header icon for mobile
+    if (is_mobile) {
+        mobile.initHeaderMegaIcon();
+    }
 
     // Initialise notification popup and tooltip
     if (typeof notify === 'object') {
@@ -2027,7 +2061,7 @@ function getTemplate(name) {
 function pagemetadata()
 {
 	var mega_desc = false;
-	
+
 	if (page == 'android')
 	{
 		mega_title = 'Android - MEGA';
@@ -2113,6 +2147,7 @@ function parsepage(pagehtml, pp) {
     $('#fmholder').hide();
     $('#pageholder').hide();
     $('#startholder').hide();
+
     pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
@@ -2132,7 +2167,7 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(bmenu2));
     pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pagesmenu));
 
-    var $container = is_mobile ? $('body') : $('#startholder');
+    var $container = $('#startholder');
     $container
         .safeHTML('<div class="nav-overlay"></div>' +
             translate(pages['transferwidget']) + pagehtml)
@@ -2156,24 +2191,24 @@ function parsepage(pagehtml, pp) {
 
 function parsetopmenu() {
     var top;
-    if (!is_mobile) {
-        top = pages['top'].replace(/{staticpath}/g, staticpath);
-        if (document.location.href.substr(0, 19) == 'chrome-extension://') {
-            top = top.replace(/\/#/g, '/' + urlrootfile + '#');
-        }
-        top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
+
+    if (is_mobile) {
+        top = pages['top-mobile'].replace(/{staticpath}/g, staticpath);
     }
-    /* TODO: import mobile top menu */
     else {
-        top = pages['top-mobile'];
+        top = pages['top'].replace(/{staticpath}/g, staticpath);
     }
+    if (document.location.href.substr(0, 19) === 'chrome-extension://') {
+        top = top.replace(/\/#/g, '/' + urlrootfile + '#');
+    }
+    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     top = translate(top);
     return top;
 }
 
 
 function loadSubPage(tpage, event)
-{	
+{
     tpage = getCleanSitePath(tpage);
 
     if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {

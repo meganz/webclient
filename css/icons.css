@@ -1062,3 +1062,6 @@ i.icons-sprite {
 .ie .download.big-icon {
     background-position: -522px -81px;
 }
+.warning .download.big-icon {
+    background-position: -708px -76px;
+}

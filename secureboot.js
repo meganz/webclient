@@ -315,6 +315,8 @@ if (!b_u) try
         delete localStorage['$!--foo'];
     }
     catch (ex) {
+        console.error("!!!!", ex);
+
         storageQuotaError = (ex.code === 22);
         cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
             || ex.message === 'SecurityError: DOM Exception 18'

@@ -557,6 +557,9 @@
     width: 230px;
     margin: -20px auto 20px auto;
 }
+.not-available-user .main-pad, .temporary-na .main-pad, .na-some-reason .main-pad {
+    padding-bottom: 38px;
+}
 .megasync-close, .megasync-close-txt, .megasync-overlay .megasync-dropdown {
     display: none;
 }

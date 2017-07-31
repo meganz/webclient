@@ -428,15 +428,16 @@
 }
 .download.big-icon {
     position:absolute;
-    margin: -8px 0 0 1px;
+    top: 50%;
+    margin: -41px 0 0 1px;
 }
 .download.warning-block span {
     display: table-cell;
-    padding: 11px 10px 9px 93px;
+    padding: 11px 10px 11px 93px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    height: 64px;
+    height: 66px;
     vertical-align: middle;
 }
 .download.main-pad {

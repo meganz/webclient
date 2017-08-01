@@ -15,7 +15,7 @@ RTC.getBrowserVersion = getBrowserVersion;
 
 if (!RTCPeerConnection || !RTCPeerConnection.prototype.getStats
     || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
-        return;
+    return;
 }
 
 function prettyNum(v) {

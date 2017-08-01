@@ -72,7 +72,7 @@ RtcModule.prototype.logToServer = function(type, data) {
         });
     }
     req();
-}
+};
 
 RtcModule.prototype.setupLogger = function() {
     var loggerDebug = localStorage['webrtcDebug'] === "1";

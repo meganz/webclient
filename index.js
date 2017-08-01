@@ -1416,36 +1416,39 @@ function tooltiplogin() {
 
 function topmenuUI() {
 
+    var $topMenu = $('.top-menu-popup');
+    var $topHeader = $('.top-head');
+
     if (u_type === 0) {
-        $('.top-login-button').text(l[967]);
+        $topHeader.find('.top-login-button').text(l[967]);
     }
 
-    $('.top-icon.warning').addClass('hidden');
-    $('.top-menu-item.upgrade-your-account,.top-menu-item.backup').addClass('hidden');
-    $('.top-menu-item.start').removeClass('hidden');
-    $('.top-menu-item.fm').addClass('hidden');
-    $('.top-menu-item.logout').addClass('hidden');
-    $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
-    $('.top-menu-item.account').addClass('hidden');
-    $('.top-menu-item.refresh-item').addClass('hidden');
-    $('.activity-status-block .activity-status,.activity-status-block').hide();
-    $('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
-    $('.membership-status, .top-head .user-name, .top-icon.achievements').addClass('hidden');
+    $topMenu.find('.top-menu-item.upgrade-your-account,.top-menu-item.backup').addClass('hidden');
+    $topMenu.find('.top-menu-item.start').removeClass('hidden');
+    $topMenu.find('.top-menu-item.fm').addClass('hidden');
+    $topMenu.find('.top-menu-item.logout').addClass('hidden');
+    $topMenu.find('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
+    $topMenu.find('.top-menu-item.account').addClass('hidden');
+    $topMenu.find('.top-menu-item.refresh-item').addClass('hidden');
+    $topHeader.find('.top-icon.warning').addClass('hidden');
+    $topHeader.find('.activity-status-block .activity-status,.activity-status-block').hide();
+    $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
+    $topHeader.find('.membership-status, .top-head .user-name, .top-icon.achievements').addClass('hidden');
 
     if (fminitialized) {
-        $('.top-search-bl').removeClass('hidden');
+        $topHeader.find('.top-search-bl').removeClass('hidden');
     }
     else {
-        $('.top-search-bl').addClass('hidden');
+        $topHeader.find('.top-search-bl').addClass('hidden');
     }
 
     if (page === 'download') {
-        $('.top-menu-item.refresh-item').removeClass('hidden');
+        $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
     }
 
     var avatar = window.useravatar && useravatar.my;
     if (!avatar) {
-        $('.fm-avatar').hide();
+        $topHeader.find('.fm-avatar').hide();
     }
 
     // Show active item in main menu
@@ -1455,7 +1458,7 @@ function topmenuUI() {
     }
 
     // Get all menu items
-    var $topMenuItems = $('.top-menu-item');
+    var $topMenuItems = $topMenu.find('.top-menu-item');
 
     // Remove red bar from all menu items
     $topMenuItems.removeClass('active');
@@ -1490,35 +1493,35 @@ function topmenuUI() {
         name = name || u_attr.name;
 
         if (name) {
-            $('.top-head .user-name').text(name).show();
+            $topHeader.find('.user-name').text(name).show();
         }
     }
 
     // Show language in top menu
-    $('.top-menu-item.languages .right-el').text(lang);
+    $topMenu.find('.top-menu-item.languages .right-el').text(lang);
 
     // Show version in top menu
-    $('.top-mega-version').text('v. ' + M.getSiteVersion());
+    $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
 
     if (u_type) {
-        $('.top-menu-item.start').addClass('hidden');
-        $('.top-menu-item.fm').removeClass('hidden');
-        $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
-        $('.top-menu-item.account').removeClass('hidden');
-        $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+        $topMenu.find('.top-menu-item.start').addClass('hidden');
+        $topMenu.find('.top-menu-item.fm').removeClass('hidden');
+        $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
+        $topMenu.find('.top-menu-item.account').removeClass('hidden');
+        $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
-        $('.top-login-button').addClass('hidden');
-        $('.membership-status').removeClass('hidden');
-        $('.top-change-language').addClass('hidden');
-        $('.create-account-button').addClass('hidden');
-        $('.membership-status-block').removeClass('hidden');
-        $('.top-icon.notification').removeClass('hidden');
+        $topHeader.find('.top-login-button').addClass('hidden');
+        $topHeader.find('.membership-status').removeClass('hidden');
+        $topHeader.find('.top-change-language').addClass('hidden');
+        $topHeader.find('.create-account-button').addClass('hidden');
+        $topHeader.find('.membership-status-block').removeClass('hidden');
+        $topHeader.find('.top-icon.notification').removeClass('hidden');
 
         // Show the rocket icon if achievements are enabled
         if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
-                $('.top-icon.achievements').show();
+                $topHeader.find('.top-icon.achievements').show();
             });
         }
 
@@ -1541,30 +1544,26 @@ function topmenuUI() {
             }
 
             // Show the 'Upgrade your account' button in the main menu for all
-            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
-            $('.membership-icon-pad .membership-big-txt.plan-txt').text(purchasedPlan);
-            $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
-            $('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
-            $('.top-menu-item.account .right-el').text(purchasedPlan);
-            $('.membership-popup').addClass('pro-popup');
+            $topMenu.find('.top-menu-item.upgrade-your-account').removeClass('hidden');
+            $topMenu.find('.top-menu-item.account .right-el').text(purchasedPlan);
+            $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
         }
         else {
             // Show the free badge
-            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
-            $('.top-head .membership-icon').attr('class', 'membership-icon');
-            $('.top-menu-item.account .right-el').text('FREE');
-            $('.membership-status').attr('class', 'tiny-icon membership-status free');
-            $('.membership-popup').removeClass('pro-popup');
+            $topMenu.find('.top-menu-item.upgrade-your-account').removeClass('hidden');
+            $topMenu.find('.top-menu-item.account .right-el').text('FREE');
+            $topHeader.find('.membership-icon').attr('class', 'membership-icon');
+            $topHeader.find('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('body').removeClass('lite').addClass('free');
         }
 
         if (is_fm()) {
-            $('.top-menu-item.refresh-item').removeClass('hidden');
+            $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
         }
 
         // If the chat is disabled don't show the green status icon in the header
         if (!pfid && !megaChatIsDisabled) {
-            $('.activity-status-block, .activity-status-block .activity-status').show();
+            $topHeader.find('.activity-status-block, .activity-status-block .activity-status').show();
             if (megaChatIsReady) {
                 megaChat.renderMyStatus();
             }
@@ -1576,7 +1575,7 @@ function topmenuUI() {
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {
 
-            $('.top-menu-item.register').text(l[968]);
+            $topMenu.find('.top-menu-item.register').text(l[968]);
 
             // If they have purchased Pro but not activated yet, show a warning
             if (isNonActivatedAccount()) {
@@ -1589,21 +1588,21 @@ function topmenuUI() {
             }
         }
 
-        $('.top-menu-item.upgrade-your-account').addClass('hidden');
-        $('.membership-status-block').addClass('hidden');
-        $('.top-icon.notification').addClass('hidden');
-        $('.top-icon.achievements').addClass('hidden');
-        $('.create-account-button').removeClass('hidden');
+        $topMenu.find('.top-menu-item.upgrade-your-account').addClass('hidden');
+        $topHeader.find('.membership-status-block').addClass('hidden');
+        $topHeader.find('.top-icon.notification').addClass('hidden');
+        $topHeader.find('.top-icon.achievements').addClass('hidden');
+        $topHeader.find('.create-account-button').removeClass('hidden');
         $('.create-account-button').rebind('click', function () {
             loadSubPage('register');
         });
-        $('.top-login-button').show();
+        $topHeader.find('.top-login-button').show();
         $('.top-login-button').rebind('click', function () {
             if (u_type === 0) {
                 mLogout();
             }
             else {
-                var c = $('.dropdown.top-login-popup').attr('class');
+                var c = $topHeader.find('.dropdown.top-login-popup').attr('class');
                 if (c && c.indexOf('hidden') > -1) {
                     loginDialog();
                 }
@@ -1617,7 +1616,7 @@ function topmenuUI() {
         if (u_type === false) {
 
             // Get current language
-            var $topChangeLang = $('.top-change-language');
+            var $topChangeLang = $('.top-change-language', $topHeader);
             var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
 
             //TODO: Change translated values on short translated
@@ -1636,11 +1635,11 @@ function topmenuUI() {
             });
         }
 
-        $('.top-menu-item.register,.top-menu-item.login').removeClass('hidden');
+        $topMenu.find('.top-menu-item.register,.top-menu-item.login').removeClass('hidden');
 
         if (u_type === 0) {
-            $('.top-menu-item.login').addClass('hidden');
-            $('.top-menu-item.logout').removeClass('hidden');
+            $topMenu.find('.top-menu-item.login').addClass('hidden');
+            $topMenu.find('.top-menu-item.logout').removeClass('hidden');
         }
     }
 
@@ -1651,12 +1650,6 @@ function topmenuUI() {
         if (e) {
             c = $(e.target).attr('class');
         }
-        if (!e || ($(e.target).parents('.membership-popup').length == 0
-                && ((c && c.indexOf('membership-status') == -1) || !c))
-                || (c && c.indexOf('mem-button') > -1)) {
-            $('.membership-popup').addClass('hidden');
-            $('.membership-status-block').removeClass('active');
-        }
         if (!e || ($(e.target).parents('.top-menu-popup').length == 0
                 && !$(e.target).hasClass('top-menu-popup')
                 && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
@@ -1665,13 +1658,13 @@ function topmenuUI() {
         if (!e || ($(e.target).parents('.top-warning-popup').length == 0
                 && !$(e.target).hasClass('top-menu-popup')
                 && ((c && c.indexOf('top-icon warning') == -1) || !c))) {
-            $('.top-warning-popup').addClass('hidden');
-            $('.top-icon.warning').removeClass('active');
+            $topHeader.find('.top-warning-popup').addClass('hidden');
+            $topHeader.find('.top-icon.warning').removeClass('active');
         }
         if (!e || ($(e.target).parents('.top-user-status-popup').length == 0
                 && ((c && c.indexOf('activity-status') == -1 && c.indexOf('loading') == -1) || !c))) {
-            $('.top-user-status-popup').addClass('hidden');
-            $('.activity-status-block').removeClass('active');
+            $topHeader.find('.top-user-status-popup').addClass('hidden');
+            $topHeader.find('.activity-status-block').removeClass('active');
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
                 && ((c && c.indexOf('top-icon notification') == -1) || !c))) {
@@ -1682,7 +1675,7 @@ function topmenuUI() {
         }
         if (!e || ($(e.target).parents('.dropdown.top-login-popup').length == 0
                 && ((c && c.indexOf('top-login-button') == -1) || !c))) {
-            $('.dropdown.top-login-popup').addClass('hidden');
+            $topHeader.find('.dropdown.top-login-popup').addClass('hidden');
         }
         if ((!e || $(e.target).parents('.create-new-folder').length == 0)
                 && (!c || c.indexOf('fm-new-folder') == -1)) {
@@ -1709,7 +1702,7 @@ function topmenuUI() {
         }
     });
 
-    $('.top-icon.achievements').rebind('click', function() {
+    $topHeader.find('.top-icon.achievements').rebind('click', function() {
         mega.achievem.achievementsListDialog();
     });
 
@@ -1717,45 +1710,47 @@ function topmenuUI() {
         topMenu();
     });
 
-    $('.top-icon.close').rebind('click', function () {
+    $topMenu.find('.top-icon.close').rebind('click', function () {
         topMenu(1);
     });
 
-    $('.activity-status-block').rebind('click.topui', function (e) {
+    $topHeader.find('.activity-status-block').rebind('click.topui', function (e) {
         var $this = $(this);
         if ($this.attr('class').indexOf('active') == -1) {
             $this.addClass('active');
-            $('.top-user-status-popup').removeClass('hidden');
+            $topHeader.find('.top-user-status-popup').removeClass('hidden');
             topPopupAlign('.activity-status-block', '.top-user-status-popup', 40);
         }
         else {
             $this.removeClass('active');
-            $('.top-user-status-popup').addClass('hidden');
+            $topHeader.find('.top-user-status-popup').addClass('hidden');
         }
     });
-    $('.top-user-status-popup .dropdown-item').rebind('click.topui', function (e) {
-        if ($(this).attr('class').indexOf('active') == -1) {
-            $('.top-user-status-popup .dropdown-item').removeClass('active');
-            $(this).addClass('active');
-            $('.activity-status-block').find('.activity-status')
-                .attr('class', 'top ' + $(this).find('.activity-status').attr('class'));
-            $('.activity-status-block').removeClass('active');
+    $topHeader.find('.top-user-status-popup .dropdown-item')
+        .rebind('click.topui', function (e) {
+            if ($(this).attr('class').indexOf('active') == -1) {
+                $topHeader.find('.top-user-status-popup .dropdown-item')
+                    .removeClass('active');
+                $(this).addClass('active');
+                $topHeader.find('.activity-status-block .activity-status')
+                    .attr('class', 'top ' + $(this).find('.activity-status').attr('class'));
+                $topHeader.find('.activity-status-block').removeClass('active');
 
-            $('.top-user-status-popup').addClass('hidden');
+                $topHeader.find('.top-user-status-popup').addClass('hidden');
 
-            if (!megaChatIsReady && !megaChatIsDisabled) {
-                var presence = $(this).data("presence");
-                localStorage.megaChatPresence = presence;
-                localStorage.megaChatPresenceMtime = unixtime();
-
-                mega.initLoadReport();
-                loadfm();
-                $('.activity-status-block').addClass("fadeinout");
+                if (!megaChatIsReady && !megaChatIsDisabled) {
+                    var presence = $(this).data("presence");
+                    localStorage.megaChatPresence = presence;
+                    localStorage.megaChatPresenceMtime = unixtime();
+    
+                    mega.initLoadReport();
+                    loadfm();
+                    $topHeader.find('.activity-status-block').addClass("fadeinout");
+                }
             }
-        }
-    });
+        });
 
-    $('.top-menu-popup .top-menu-item').rebind('click', function () {
+    $topMenu.find('.top-menu-item').rebind('click', function () {
         var className = $(this).attr('class') || '';
 
         if (className.indexOf('submenu-item') > -1) {
@@ -1819,33 +1814,33 @@ function topmenuUI() {
         mobile.languageMenu.init();
     }
 
-    $('.top-search-bl').rebind('click', function () {
+    $topHeader.find('.top-search-bl').rebind('click', function () {
         $(this).addClass('active');
         $('.top-search-input').focus();
     });
 
-    $('.top-search-input').rebind('blur', function () {
+    $topHeader.find('.top-search-input').rebind('blur', function () {
         $(this).closest('.top-search-bl').removeClass('active');
         if ($(this).val() == '') {
-            $('.top-search-bl').removeClass('contains-value');
+            $topHeader.find('.top-search-bl').removeClass('contains-value');
         }
         else {
-            $('.top-search-bl').addClass('contains-value');
+            $topHeader.find('.top-search-bl').addClass('contains-value');
         }
     });
 
-    $('.top-clear-button').rebind('click', function () {
+    $topHeader.find('.top-clear-button').rebind('click', function () {
         if (folderlink) {
             var dn = $(M.viewmode ? '.file-block-scrolling .file-block-title' : 'table.grid-table.fm .tranfer-filetype-txt');
             var ct = M.viewmode ? 'a' : 'tr';
             dn.closest(ct).show();
             $(window).trigger('resize');
         }
-        $('.top-search-bl').removeClass('contains-value active');
-        $('.top-search-input').val('');
+        $topHeader.find('.top-search-bl').removeClass('contains-value active');
+        $topHeader.find('.top-search-input').val('');
     });
 
-    $('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
+    $topHeader.find('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
         if (e.keyCode == 13 || folderlink) {
 
             if (folderlink) {
@@ -1952,7 +1947,6 @@ function topmenuUI() {
         clearTimeout($.liTooltipTimer);
     });
 
-    var $topHeader = $('.top-head');
     $topHeader.find('.fm-avatar').rebind('click', function() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
@@ -2016,8 +2010,8 @@ function topmenuUI() {
     });
 
     if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
-        $('.top-search-bl').addClass('contains-value');
-        $('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
+        $topHeader.find('.top-search-bl').addClass('contains-value');
+        $topHeader.find('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
     }
 
     // Initialise the header icon for mobile

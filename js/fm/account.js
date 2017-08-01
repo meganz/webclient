@@ -853,7 +853,7 @@ function accountUI() {
             }
             else if ($('#account-password').val() !== ''
                     && $('#account-confirm-password').val() === $('#account-password').val()) {
-                msgDialog('warninga', l[135], l[6664]);
+                msgDialog('warninga', l[135], l[16664]);
                 $passwords.val('');
             }
             else {

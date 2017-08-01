@@ -48,14 +48,8 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 function isMobile() {
 
     // If extension, not applicable
-    if (is_chrome_firefox) {
+    if (is_extension) {
         return false;
-    }
-
-    // Useful for developing & testing the mobile site (this is below the is_chrome_firefox
-    // check above because the Firefox extension has not loaded localStorage yet and it breaks
-    if (localStorage.testMobileSite) {
-        return true;
     }
 
     var mobileStrings = [
@@ -508,6 +502,7 @@ var mega = {
 
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
+if (localStorage.testMobileSite) is_mobile = m = true;
 if (typeof history == 'undefined') hashLogic=true;
 
 var bootstaticpath = staticpath;

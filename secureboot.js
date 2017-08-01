@@ -48,14 +48,8 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 function isMobile() {
 
     // If extension, not applicable
-    if (is_chrome_firefox) {
+    if (is_extension) {
         return false;
-    }
-
-    // Useful for developing & testing the mobile site (this is below the is_chrome_firefox
-    // check above because the Firefox extension has not loaded localStorage yet and it breaks
-    if (localStorage.testMobileSite) {
-        return true;
     }
 
     var mobileStrings = [
@@ -508,6 +502,7 @@ var mega = {
 
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
+if (localStorage.testMobileSite) is_mobile = m = true;
 if (typeof history == 'undefined') hashLogic=true;
 
 var bootstaticpath = staticpath;
@@ -2090,13 +2085,6 @@ else if (!b_u) {
             'webrtcsdp_js': {f:'js/chat/webrtcSdp.js', n: 'webrtcsdp_js', j:1},
             'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
             'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
-            'strophelight_js': {f:'js/vendor/chat/strophe.light.js', n: 'strophelight_js', j:1},
-            'strophedisco_js': {f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1},
-            'strophemuc_js': {f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1},
-            'stropheroster_js': {f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1},
-            'wildemitter_js': {f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1},
-            'hark_js': {f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1},
-            'base32_js': {f:'js/vendor/chat/base32.js', n: 'base32_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},

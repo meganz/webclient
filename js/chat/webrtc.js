@@ -49,14 +49,14 @@ RtcModule.kSessSetupTimeout = 20000;
 
 RtcModule.prototype.logToServer = function(type, data) {
     if (typeof data !== 'object') {
-        data = {data: data};
+        data = { data: data };
     }
     data.client = RTC.browser;
     var wait = 500;
     var retryNo = 0;
     var self = this;
     function req() {
-        jQuery.ajax("https://stats.karere.mega.nz/msglog?aid="+base64urlencode(self.ownAnonId)+"&t="+type, {
+        jQuery.ajax("https://stats.karere.mega.nz/msglog?aid=" + base64urlencode(self.ownAnonId) + "&t=" + type, {
             type: 'POST',
             data: JSON.stringify(data),
             error: function(jqXHR, textStatus, errorThrown) {

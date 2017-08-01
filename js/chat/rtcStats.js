@@ -1,8 +1,7 @@
 (function() {
-if (!RTC || !RTCPeerConnection.prototype.getStats || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
+if (!RTC) {
     return;
 }
-
 function getBrowserVersion() {
     var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
     var ver = parseInt(ua.details.version);
@@ -13,6 +12,10 @@ function getBrowserVersion() {
 }
 
 RTC.getBrowserVersion = getBrowserVersion;
+
+if (!RTCPeerConnection || !RTCPeerConnection.prototype.getStats || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
+    return;
+}
 
 function prettyNum(v) {
     if (v > 1048576) {
@@ -113,7 +116,7 @@ function statItemToString(s, name, nest) {
     if (typeof nest === 'undefined') {
         nest = 0;
     }
-
+        
     var pad = nest ? Array(nest+1).join(' ') : '';
     var ret = name ? (pad+'=== '+name+' ===\n') : '';
     var objs = [];
@@ -298,7 +301,7 @@ Recorder.prototype.parseStat = function(period, res) {
 //			vstat.fpsSent = res.stat('googFrameRateOutput'); -- this should be for screen output
             r.width = width;
             r.height = stat('googFrameHeightReceived');
-
+          
 //			res.names().forEach(function(name)
 //			{ console.log('name=', name, 'value=', res.stat(name)); });
         } else if ((width = stat('googFrameWidthSent'))) {
@@ -331,7 +334,7 @@ Recorder.prototype.parseStat = function(period, res) {
         if (stats._hadConnItem) { //happens if peer is Firefox
                 return;
         }
-
+            
         stats._hadConnItem = true;
         if (commonStats.rly === undefined) {
             commonStats.rly = (res.stat('googLocalCandidateType') === 'relay')?1:0;
@@ -381,7 +384,7 @@ Recorder.prototype.getStats = function(cid) {
             console.error("Common stats property name overlaps with stats property name, not including");
           else
             stats[k] = cmn[k];
-
+   
     return stats;
 }
 

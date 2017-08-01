@@ -171,7 +171,6 @@ function ellipsis(text, location, maxCharacters) {
 }
 
 function megatitle(nperc) {
-	return;
     if (!nperc) {
         nperc = '';
     }

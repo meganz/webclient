@@ -53,10 +53,13 @@ var Chatd = function(userId, options) {
     self.identity = Chatd.pack32le((Math.random() * 0xffffffff) | 0) +
                     Chatd.pack16le((Math.random() * 0xffff) | 0) +
                     Chatd.pack16le(Date.now() & 0xffff);
-    localStorage.setItem('chatdIdentity', self.identity);
+
+    localStorage.setItem('chatdIdentity', base64urlencode(self.identity));
+
     self.logger.debug("Generated new client identity: 0x",
                     Chatd.dumpToHex(self.identity, 0, 0, true));
     //    } else {
+    //        self.identity = base64urldecode(self.identity);
     //        assert(self.identity.length === 8);
     //    }
 

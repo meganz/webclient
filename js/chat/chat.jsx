@@ -457,7 +457,7 @@ Chat.prototype.getRoomFromUrlHash = function(urlHash) {
         var foundRoom = null;
         urlHash = urlHash.replace("chat/g/", "");
         megaChat.chats.forEach(function(room) {
-            if (!foundRoom && room.chatId.split("@")[0] === urlHash) {
+            if (!foundRoom && room.chatId === urlHash) {
                 foundRoom = room;
             }
         });
@@ -748,8 +748,12 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
             return $promise;
         }
         roomId = array.filterNonMatching(userHandles, u_handle)[0];
+        if (!roomId) {
+            // found a chat where I'm the only user in?
+            $promise.reject();
+            return $promise;
+        }
         if (self.chats[roomId]) {
-//            self.chats[roomId].show();
             $promise.resolve(roomId, self.chats[roomId]);
             return [roomId, self.chats[roomId], $promise];
         }
@@ -876,39 +880,7 @@ Chat.prototype.hideAllChats = function() {
         }
     });
 };
-/**
- * Used to generate unique room JID for private (1on1) chats.
- *
- * @deprecated
- * @param jids {Array} of BARE jids
- * @returns {string}
- */
-Chat.prototype.generatePrivateRoomName = function(jids) {
-    console.error('Chat.prototype.generatePrivateRoomName', arguments);
-    var self = this;
-    var newJids = clone(jids);
-    newJids.sort();
-    var roomName = "prv";
-    $.each(newJids, function(k, jid) {
-        roomName = roomName + jid.split("@")[0];
-    });
 
-    roomName = base32.encode(asmCrypto.SHA256.bytes(roomName).subarray(0, 16));
-    return roomName;
-};
-
-/**
- * Used to generate unique room JID for group chats.
- *
- * @deprecated
- * @param chatId {String} of BARE jids
- * @returns {string}
- */
-Chat.prototype.generateGroupRoomName = function(chatId) {
-    var self = this;
-    console.error('Chat.prototype.generateGroupRoomName', arguments);
-    return chatId;
-};
 
 /**
  * Returns the currently opened room/chat

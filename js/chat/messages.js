@@ -267,7 +267,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     var loggerIsEnabled = localStorage['messagesBuffLogger'] === '1';
 
     self.logger = MegaLogger.getLogger(
-        "messagesBuff[" + chatRoom.roomId.split("@")[0] + "]",
+        "messagesBuff[" + chatRoom.roomId + "]",
         {
             minLogLevel: function() {
                 return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
@@ -280,7 +280,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     // self._parent = chatRoom;
 
-    var chatRoomId = chatRoom.roomId.split("@")[0];
+    var chatRoomId = chatRoom.roomId;
 
     chatRoom.rebind('onChatShown.mb', function() {
         // when the chat was first opened in the UI, try to retrieve more messages to fill the screen

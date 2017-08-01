@@ -355,7 +355,7 @@ var TypingArea = React.createClass({
             $(megaChat.plugins.persistedTypeArea.data).rebind(
                 'onChange.typingArea' + self.getUniqueId(),
                 function(e, k, v) {
-                    if (chatRoom.roomId.split("@")[0] == k) {
+                    if (chatRoom.roomId == k) {
                         self.setState({'typedMessage': v ? v : ""});
                         self.triggerOnUpdate(true);
                     }

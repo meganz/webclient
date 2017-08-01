@@ -435,7 +435,7 @@ React.makeElement = React['createElement'];
 	        var foundRoom = null;
 	        urlHash = urlHash.replace("chat/g/", "");
 	        megaChat.chats.forEach(function (room) {
-	            if (!foundRoom && room.chatId.split("@")[0] === urlHash) {
+	            if (!foundRoom && room.chatId === urlHash) {
 	                foundRoom = room;
 	            }
 	        });
@@ -632,8 +632,12 @@ React.makeElement = React['createElement'];
 	            return $promise;
 	        }
 	        roomId = array.filterNonMatching(userHandles, u_handle)[0];
-	        if (self.chats[roomId]) {
+	        if (!roomId) {
 
+	            $promise.reject();
+	            return $promise;
+	        }
+	        if (self.chats[roomId]) {
 	            $promise.resolve(roomId, self.chats[roomId]);
 	            return [roomId, self.chats[roomId], $promise];
 	        } else {}
@@ -714,25 +718,6 @@ React.makeElement = React['createElement'];
 	            chatRoom.hide();
 	        }
 	    });
-	};
-	Chat.prototype.generatePrivateRoomName = function (jids) {
-	    console.error('Chat.prototype.generatePrivateRoomName', arguments);
-	    var self = this;
-	    var newJids = clone(jids);
-	    newJids.sort();
-	    var roomName = "prv";
-	    $.each(newJids, function (k, jid) {
-	        roomName = roomName + jid.split("@")[0];
-	    });
-
-	    roomName = base32.encode(asmCrypto.SHA256.bytes(roomName).subarray(0, 16));
-	    return roomName;
-	};
-
-	Chat.prototype.generateGroupRoomName = function (chatId) {
-	    var self = this;
-	    console.error('Chat.prototype.generateGroupRoomName', arguments);
-	    return chatId;
 	};
 
 	Chat.prototype.getCurrentRoom = function () {
@@ -1112,7 +1097,7 @@ React.makeElement = React['createElement'];
 	            presenceClass = 'group';
 	            classString += ' groupchat';
 	        } else {
-	            return "unknown room type: " + chatRoom.roomId.split("@")[0];
+	            return "unknown room type: " + chatRoom.roomId;
 	        }
 
 	        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
@@ -1328,7 +1313,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            currConvsList.push(React.makeElement(ConversationsListItem, {
-	                key: chatRoom.roomId.split("@")[0],
+	                key: chatRoom.roomId,
 	                chatRoom: chatRoom,
 	                contact: contact,
 	                messages: chatRoom.messagesBuff,
@@ -6889,7 +6874,7 @@ React.makeElement = React['createElement'];
 	                });
 	            }
 	            $(megaChat.plugins.persistedTypeArea.data).rebind('onChange.typingArea' + self.getUniqueId(), function (e, k, v) {
-	                if (chatRoom.roomId.split("@")[0] == k) {
+	                if (chatRoom.roomId == k) {
 	                    self.setState({ 'typedMessage': v ? v : "" });
 	                    self.triggerOnUpdate(true);
 	                }
@@ -10018,7 +10003,7 @@ React.makeElement = React['createElement'];
 	            return "fm/chat/" + contact.u;
 	        }
 	    } else if (self.type === "group") {
-	        return "fm/chat/g/" + self.roomId.split("@")[0];
+	        return "fm/chat/g/" + self.roomId;
 	    } else {
 	        throw new Error("Can't get room url for unknown room type.");
 	    }

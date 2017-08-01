@@ -851,8 +851,9 @@ function accountUI() {
                     }
                 });
             }
-            else if ($('#account-password').val() !== '' && $('#account-confirm-password').val() === $('#account-password').val()) {
-                msgDialog('warninga', l[135], 'The newly entered password must be different from the old one.');//l[6664]
+            else if ($('#account-password').val() !== ''
+                    && $('#account-confirm-password').val() === $('#account-password').val()) {
+                msgDialog('warninga', l[135], l[6664]);
                 $passwords.val('');
             }
             else {

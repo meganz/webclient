@@ -85,7 +85,7 @@ RtcModule.prototype.setupLogger = function() {
         transport: function(level, args) {
             if (level === MegaLogger.LEVELS.ERROR || level === MegaLogger.LEVELS.CRITICAL) {
                 console.error.call(console, args);
-                self.logToServer('e',args.join(' '));
+                self.logToServer('e', args.join(' '));
                 return;
             }
             if (loggerDebug) {

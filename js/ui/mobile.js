@@ -97,18 +97,24 @@ var mobile = {
         var $checkboxInput = $checkboxWrapper.find('.checkbox');
 
         // On clicking the checkbox or label
-        $container.off('tap').on('tap', function() {
+        $container.off('tap').on('tap', function(e) {
 
-            // If checked already, uncheck it
-            if ($checkboxInput.is(':checked')) {
+            // If user taps on link, open Terms page
+            if (!$(e.target).is('a')) {
 
-                $checkboxWrapper.addClass('checkboxOff').removeClass('checkboxOn');
-                $checkboxInput.prop('checked', false);
+                // If checked already, uncheck it
+                if ($checkboxInput.is(':checked')) {
+                    $checkboxWrapper.addClass('checkboxOff').removeClass('checkboxOn');
+                    $checkboxInput.prop('checked', false);
+                }
+                else {
+                    // Otherwise check it
+                    $checkboxWrapper.removeClass('checkboxOff').addClass('checkboxOn');
+                    $checkboxInput.prop('checked', true);
+                }
             }
             else {
-                // Otherwise check it
-                $checkboxWrapper.removeClass('checkboxOff').addClass('checkboxOn');
-                $checkboxInput.prop('checked', true);
+                loadSubPage('terms');
             }
 
             // Prevent double clicks
@@ -121,22 +127,24 @@ var mobile = {
      */
     initHeaderMegaIcon: function() {
 
+        'use strict';
+
+        var $megaIcon = $('.mobile.fm-icon.mega');
+        var $otherPages = $('#fmholder > div');
+        var $cloudDrive = $('.mobile.file-manager-block');
+
         // On Mega icon click
-        $('.fm-icon.mega').off('tap').on('tap', function() {
+        $megaIcon.off('tap').on('tap', function() {
 
             // If logged in
             if (typeof u_attr !== 'undefined') {
 
-                // Store the current page
-                var currentPage = page;
+                // Hide other pages and show the Cloud Drive
+                $otherPages.addClass('hidden');
+                $cloudDrive.removeClass('hidden');
 
                 // Open the root cloud folder
                 loadSubPage('fm');
-
-                // If they were on the TOS page then the cloud doesn't reload for some reason so refresh
-                if (currentPage === 'terms') {
-                    window.location.reload();
-                }
             }
             else {
                 // Otherwise if not logged in, load the home page
@@ -209,6 +217,9 @@ mobile.cloud = {
             return false;
         }
 
+        // jQuery selectors
+        var $fileManager = $('.mobile.file-manager-block');
+
         // Render the file manager header, folders, files and footer
         this.renderHeader();
         this.renderFoldersAndFiles();
@@ -224,7 +235,7 @@ mobile.cloud = {
         loadingInitDialog.hide();
 
         // Show the file manager after everything is ready
-        $('.mobile.file-manager-block').removeClass('hidden');
+        $fileManager.removeClass('hidden');
 
         // Set viewmode to show thumbnails and render thumbnails after everything else because it can take longer
         M.viewmode = 1;
@@ -494,7 +505,7 @@ mobile.cloud = {
             }
 
             // Show the hamburger menu and initialise the upload button
-            mobile.menu.showAndInit('cloud-drive');
+            $menuIcon.removeClass('hidden');
             // mobile.upload.initUploadButton();         // ToDo: re-enable when finished
         }
     },
@@ -1395,7 +1406,7 @@ mobile.downloadOverlay = {
             };
 
             var redirectToStore = function() {
-                window.top.location = getStoreLink();
+                window.top.location = mobile.downloadOverlay.getStoreLink();
             };
 
             var redirect = function() {
@@ -1545,7 +1556,19 @@ mobile.downloadOverlay = {
         // Start download and show progress
         M.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
 
+            // Show the download completed so they can open the file
             mobile.downloadOverlay.showDownloadComplete(data, nodeHandle);
+        })
+        .fail(function(data) {
+
+            // If over bandwidth quota
+            if (data.target.status === 509) {
+                dlmanager.showOverQuotaDialog();
+            }
+            else {
+                // Show message 'An error occurred, please try again.'
+                mobile.messageOverlay.show(l[8982]);
+            }
         });
     },
 
@@ -1636,10 +1659,10 @@ mobile.downloadOverlay = {
      */
     checkSupportedFile: function(node) {
 
+        var $body = $('body');
         var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
         var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
         var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
-        var $body = $('body');
 
         // Reset state back to default if re-opening the dialog from a previously disabled state
         $openInBrowserButton.removeClass('disabled');
@@ -1701,7 +1724,7 @@ mobile.downloadOverlay = {
         var $openInBrowserButton = $('.mobile.dl-browser');
 
         // Change the link
-        $downloadOnAppStoreButton.attr('href', this.getStoreLink());
+        $downloadOnAppStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
 
         switch (ua.details.os) {
             case 'iPad':
@@ -1996,7 +2019,7 @@ mobile.messageOverlay = {
         $firstMessage.text(firstMessage);
 
         // If there is a second message, set that
-        if (typeof optionalSecondMessage !== 'undefined') {
+        if ((typeof optionalSecondMessage !== 'undefined') && optionalSecondMessage) {
             $optionalSecondMessage.text(optionalSecondMessage);
         }
 
@@ -2059,7 +2082,7 @@ mobile.signin = {
         // Init events
         this.initLoginButton();
         this.initEmailPasswordKeyupEvents();
-        
+
         // Initialise the Remember Me checkbox, top button tabs
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');
@@ -2119,6 +2142,9 @@ mobile.signin = {
                 return false;
             }
 
+            // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
+            $emailField.add($passwordField).blur();
+
             // Pass the details to the login flow
             mobile.signin.startLogin($signInButton, email, password, rememberMe);
 
@@ -2174,11 +2200,22 @@ mobile.signin = {
                     // Set the u_type e.g. 3 is fully registered user
                     u_type = result;
 
-                    // Logging to see how many people are signing into the mobile site
-                    api_req({ a: 'log', e: 99629, m: 'Completed login on mobile webclient' });
+                    // Try getting the plan number they selected on Pro page
+                    var planNum = localStorage.getItem('proPageContinuePlanNum');
 
-                    // Load the file manager
-                    loadSubPage('fm');
+                    // If they did come from the Pro page, continue to Pro page Step 2
+                    if (planNum !== null) {
+
+                        // Remove the flag as it's no longer needed
+                        localStorage.removeItem('proPageContinuePlanNum');
+
+                        // Continue to the Pro payment page
+                        loadSubPage('propay_' + planNum);
+                    }
+                    else {
+                        // Load the file manager
+                        loadSubPage('fm');
+                    }
                 }
                 else {
                     // Otherwise they used an incorrect email or password so show an error
@@ -2366,6 +2403,9 @@ mobile.register = {
                 return false;
             }
 
+            // Unfocus (blur) the input fields to prevent the cursor showing on iOS and also hide the keyboard
+            $firstNameField.add($lastNameField).add($emailField).add($passwordField).add($confirmPasswordField).blur();
+
             // Clear old errors from past form submissions
             $containerFields.removeClass('incorrect');
 
@@ -2484,17 +2524,31 @@ mobile.register = {
 
                     api_req(ops);
 
-                    // Show signup link dialog
-                    mobile.register.showConfirmEmailScreen(registrationVars);
+                    // Try getting the plan number they selected on Pro page
+                    var planNum = localStorage.getItem('proPageContinuePlanNum');
+
+                    // If they did come from the Pro page, continue to Pro page Step 2 and skip email confirmation
+                    if (planNum !== null) {
+
+                        // Remove the flag as it's no longer needed
+                        localStorage.removeItem('proPageContinuePlanNum');
+
+                        // Continue to the Pro payment page
+                        loadSubPage('propay_' + planNum);
+                    }
+                    else {
+                        // Otherwise show the signup email confirmation screen
+                        mobile.register.showConfirmEmailScreen(registrationVars);
+                    }
                 }
 
                 // Show an error if the email is already in use
                 else if (result === EEXIST) {
-                    mobile.messageOverlay.show(l[9000], result);       // Error. This email address is already in use.
+                    mobile.messageOverlay.show(l[9000]);    // Error. This email address is already in use.
                 }
                 else {
                     // Show an error
-                    mobile.messageOverlay.show(l[47], result);       // Oops, something went wrong.
+                    mobile.messageOverlay.show(l[47], result);      // Oops, something went wrong.
                 }
             }
         };
@@ -2668,173 +2722,6 @@ mobile.register = {
 
 
 /**
- * The main menu (hamburger icon in top right) which lets the user do various tasks
- */
-mobile.menu = {
-
-    /**
-     * Shows the menu icon and initialises the menu and its related options
-     * @param {String} currentScreen The screen the user is on e.g. 'home', 'login' etc which matches the class name of
-     *                               the menu button. This will have a red bar style applied to it on the left of the
-     *                               menu item to indicate this is the current page.
-     */
-    showAndInit: function(currentScreen) {
-
-        // Cache selectors
-        var $menuIcon = $('.mobile.fm-header .menu');
-        var $darkOverlay = $('.mobile.dark-overlay');
-        var $mainMenu = $('.mobile.main-menu');
-        var $closeIcon = $mainMenu.find('.fm-icon.close');
-
-        var $avatarNameBlock = $mainMenu.find('.avatar-name-block');
-        var $avatar = $avatarNameBlock.find('.main-avatar');
-        var $userName = $avatarNameBlock.find('.user-name');
-
-        var $menuButtons = $mainMenu.find('.menu-buttons');
-        var $loginMenuItem = $mainMenu.find('.menu-button.login');
-        var $registerMenuItem = $mainMenu.find('.menu-button.register');
-        var $cloudMenuItem = $mainMenu.find('.menu-button.cloud-drive');
-        var $homeMenuItem = $mainMenu.find('.menu-button.home');
-        var $termsMenuItem = $mainMenu.find('.menu-button.terms-of-service');
-        var $logoutMenuItem = $mainMenu.find('.menu-button.logout');
-
-        // Show the menu / hamburger icon
-        $menuIcon.removeClass('hidden');
-
-        // If they are logged in
-        if (typeof u_attr !== 'undefined') {
-
-            // Generate the avatar from the user handle
-            var avatar = useravatar.contact(u_handle, '', 'div');
-
-            // Show the user's avatar and name
-            $avatarNameBlock.removeClass('hidden');
-            $avatar.safeHTML(avatar);
-            $avatar.find('.avatar').addClass('small-rounded-avatar');
-            $userName.text(u_attr.name);
-
-            // Show buttons
-            $cloudMenuItem.removeClass('hidden');
-            $termsMenuItem.removeClass('hidden');
-            $logoutMenuItem.removeClass('hidden');
-        }
-        else {
-            // Otherwise show other buttons for not logged in user
-            $menuButtons.addClass('logged-out');
-            $loginMenuItem.removeClass('hidden');
-            $registerMenuItem.removeClass('hidden');
-            $homeMenuItem.removeClass('hidden');
-            $termsMenuItem.removeClass('hidden');
-        }
-
-        // Add a red bar style to the left of the menu item to indicate this is the current page
-        $menuButtons.removeClass('current');
-
-        // If in the cloud drive, add a red bar next to that button
-        if (currentScreen.indexOf('fm') > -1) {
-            $mainMenu.find('.menu-button.cloud-drive').addClass('current');
-        }
-        else {
-            // Otherwise if it exists, add a red bar to the button matching the current page
-            try {
-                $mainMenu.find('.menu-button.' + currentScreen).addClass('current');
-            }
-            catch (exception) { }
-        }
-
-        // On menu button click, show the menu
-        $menuIcon.off('tap').on('tap', function() {
-
-            $mainMenu.addClass('active');
-            $darkOverlay.removeClass('hidden').addClass('active');
-
-            return false;
-        });
-
-        // On tapping/clicking the dark overlay or menu's close button, close the menu
-        $darkOverlay.add($closeIcon).off('tap').on('tap', function() {
-
-            $mainMenu.removeClass('active');
-            $darkOverlay.addClass('hidden').removeClass('active');
-
-            return false;
-        });
-
-        // On the menu's Cloud Drive button, go to the root of the cloud drive
-        $cloudMenuItem.off('tap').on('tap', function() {
-
-            // Close the menu
-            $mainMenu.removeClass('active');
-            $darkOverlay.addClass('hidden').removeClass('active');
-
-            // Store the current page
-            var currentPage = page;
-
-            // Open the root cloud folder
-            loadSubPage('fm');
-
-            // If they were on the TOS page then the cloud doesn't reload for some reason so refresh
-            if (currentPage === 'terms') {
-                window.location.reload();
-            }
-
-            return false;
-        });
-
-        // On the menu's Logout button
-        $logoutMenuItem.off('tap').on('tap', function() {
-
-            // Close the menu
-            $mainMenu.removeClass('active');
-            $darkOverlay.addClass('hidden').removeClass('active');
-
-            // Log the user out and go back to the login page
-            M.logout();
-            loadSubPage('login');
-
-            // Show a toast notification
-            mobile.showToast('Logout successful');
-
-            return false;
-        });
-
-        // On a Login button tap/click go to the login page
-        $loginMenuItem.off('tap').on('tap', function() {
-
-            loadSubPage('login');
-            return false;
-        });
-
-        // On a Create Account button tap/click go to the register page
-        $registerMenuItem.off('tap').on('tap', function() {
-
-            loadSubPage('register');
-            return false;
-        });
-
-        // On a Terms of Service button tap/click go to the TOS page
-        $termsMenuItem.off('tap').on('tap', function() {
-
-            loadSubPage('terms');
-            return false;
-        });
-
-        // On the Home button tap/click go to the home page
-        $homeMenuItem.off('tap').on('tap', function() {
-
-            // Close the menu
-            $mainMenu.removeClass('active');
-            $darkOverlay.addClass('hidden').removeClass('active');
-
-            // Load the home/start page (if logged in this may just go back to cloud drive)
-            loadSubPage('start');
-            return false;
-        });
-    }
-};
-
-
-/**
  * The Terms of Service page
  */
 mobile.terms = {
@@ -2912,6 +2799,303 @@ mobile.upload = {
 
 
 /**
+ * The register/login prompt on the Pro page when they try to access step 2 without being logged in.
+ * This is the lightweight version of the showSignupPromptDialog function in proplan.js. When the user
+ * has completed login or registration they will be returned to the propay_x page they clicked on to
+ * continue with their purchase.
+ */
+mobile.proSignupPrompt = {
+
+    /** jQuery selector for the dialog */
+    $dialog: null,
+
+    /**
+     * Initialise the dialog and show it
+     */
+    init: function() {
+
+        // Cache the selector
+        this.$dialog = $('.mobile.loginrequired-dialog');
+
+        // Initialise the buttons
+        this.initCloseButton();
+        this.initRegisterButton();
+        this.initLoginButton();
+
+        // Show the dialog
+        this.$dialog.removeClass('hidden').addClass('overlay');
+    },
+
+    /**
+     * Initialise the Close icon in the top right of the dialog
+     */
+    initCloseButton: function() {
+
+        var $dialog = this.$dialog;
+        var $closeButton = $dialog.find('.fm-dialog-close');
+
+        // Add click/tap handler
+        $closeButton.off('tap').on('tap', function() {
+
+            // They don't want to continue with the Registration/Login so remove the flag
+            localStorage.removeItem('proPageContinuePlanNum');
+
+            // Hide the dialog
+            $dialog.addClass('hidden').removeClass('overlay');
+
+            // Prevent any additional clicks
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the Register button
+     */
+    initRegisterButton: function() {
+
+        var $this = this;
+        var $registerButton = $this.$dialog.find('.register');
+
+        // Add click/tap handler
+        $registerButton.off('tap').on('tap', function() {
+
+            // Set the plan number they selected into localStorage for use after Registration/Login
+            $this.setSelectedPlanNum();
+
+            // Hide the dialog
+            $this.$dialog.addClass('hidden').removeClass('overlay');
+
+            // Load the register page
+            loadSubPage('register');
+
+            // Prevent any additional clicks
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the Login button
+     */
+    initLoginButton: function() {
+
+        var $this = this;
+        var $loginButton = $this.$dialog.find('.login');
+
+        // Add click/tap handler
+        $loginButton.off('tap').on('tap', function() {
+
+            // Set the plan number they selected into localStorage for use after Registration/Login
+            $this.setSelectedPlanNum();
+
+            // Hide the dialog
+            $this.$dialog.addClass('hidden').removeClass('overlay');
+
+            // Load the login page
+            loadSubPage('login');
+
+            // Prevent any additional clicks
+            return false;
+        });
+    },
+
+    /**
+     * Sets the selected Pro plan number from what the user selected on the page into localStorage
+     */
+    setSelectedPlanNum: function() {
+
+        // Get the selected Pro card's data-payment attribute value
+        var selectedPlanNum = $('.reg-st3-membership-bl.selected').data('payment');
+
+        // Set the selected plan number so when they've completed Login and Registration they can proceed to pay
+        localStorage.setItem('proPageContinuePlanNum', selectedPlanNum);
+    }
+};
+
+
+/**
+ * Some additional functionality for the Pro pages
+ */
+mobile.propay = {
+
+    /**
+     * Extra initialisation code just for the mobile Pro payment page
+     */
+    init: function() {
+
+        var $stepTwo = $('.membership-step2');
+        var $contactUsButton = $stepTwo.find('.pro-bottom-button');
+        var $backButton = $stepTwo.find('.js-back-to-plans');
+
+        // Add click handler for the contact button
+        $contactUsButton.off('tap').on('tap', function() {
+            loadSubPage('contact');
+            return false;
+        });
+
+        // Add click handler to go back to the Pro page
+        $backButton.off('tap').on('tap', function() {
+            loadSubPage('pro');
+            return false;
+        });
+
+        // Show the page for mobile
+        $stepTwo.removeClass('hidden');
+    },
+
+    /**
+     * Filter the payment providers for mobile as only credit cards are available for now
+     * @param {Array} gatewayOptions All the payment providers
+     * @returns {Array} Returns a filtered list of the payment providers
+     */
+    filterPaymentProviderOptions: function(gatewayOptions) {
+
+        // Enabled payment providers for mobile so far are the credit card options
+        var mobileEnabledGateways = ['astropayVI', 'astropayMC', 'ecpVI', 'ecpMC', 'sabadellVI', 'sabadellMC'];
+
+        // Filter out anything else
+        var filteredGateways = gatewayOptions.filter(function(val) {
+            return (mobileEnabledGateways.indexOf(val.gatewayName) > -1);
+        });
+
+        return filteredGateways;
+    }
+};
+
+
+/**
+ * Initialise the menu options for changing language
+ */
+mobile.languageMenu = {
+
+    /**
+     * Initialise the options
+     */
+    init: function() {
+
+        'use strict';
+
+        // Main tier 1 languages that we support (based on usage analysis)
+        var tierOneLangCodes = [
+            'es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'ar',
+            'nl', 'hu', 'cn', 'jp', 'kr', 'ro', 'id', 'th', 'vi', 'pl'
+        ];
+
+        // Remove all the tier 1 languages and we have only the tier 2 languages remaining
+        var allLangCodes = Object.keys(ln);
+        var tierTwoLangCodes = allLangCodes.filter(function(langCode) {
+            return tierOneLangCodes.indexOf(langCode) < 0;
+        });
+
+        // Remove old menu items in case this was re-rendered
+        $('.top-submenu.language-items .top-menu-item').not('.language-template').remove();
+
+        // Generate the HTML for tier one and tier two languages (second param set to true shows beta icon)
+        this.renderLanguages(tierOneLangCodes, false);
+        this.renderLanguages(tierTwoLangCodes, true);
+
+        // Initialise the handler for
+        this.initLanguageSelectionHandler();
+    },
+
+    /**
+     * Create the language HTML from a list of language codes
+     * @param {Array} langCodes Array of language codes e.g. ['en', 'es', ...]
+     * @param {Boolean} tierTwo If this is a tier two / beta language
+     */
+    renderLanguages: function(langCodes, tierTwo) {
+
+        'use strict';
+
+        // Cache selectors
+        var $template = $('.top-menu-item.language-template').clone();
+        var $languageItemsContainer = $('.top-submenu.language-items');
+
+        // Remove the template class
+        $template.removeClass('language-template');
+
+        // Sort languages by ISO 639-1 two letter language code (which is reasonably ordered anyway)
+        langCodes.sort(function(codeA, codeB) {
+            return codeA.localeCompare(codeB);
+        });
+
+        var html = '';
+
+        // Make single array with code, native lang name, and english lang name
+        for (var i = 0, length = langCodes.length; i < length; i++) {
+
+            var langCode = langCodes[i];            // Two letter language code e.g. de
+            var nativeName = ln[langCode];          // Deutsch
+            var englishName = ln2[langCode];        // German
+
+            // Clone the template
+            var $langHtml = $template.clone();
+
+            // Update the template details
+            $langHtml.attr('data-lang-code', langCode);
+            $langHtml.attr('title', englishName);
+            $langHtml.find('.lang-name').text(nativeName);
+
+            // If they have already chosen a language show it as selected
+            if (langCode === lang) {
+                $langHtml.addClass('current');
+            }
+
+            // If the beta language, show the beta icon
+            if (tierTwo) {
+                $langHtml.addClass('beta');
+            }
+
+            // Build up the HTML to be rendered
+            html += $langHtml.prop('outerHTML');
+        }
+
+        // Render the HTML
+        $languageItemsContainer.append(html);
+    },
+
+    /**
+     * Initialise the Save button to set the language and reload the page
+     */
+    initLanguageSelectionHandler: function() {
+
+        'use strict';
+        
+        var $languageItems = $('.top-submenu.language-items .top-menu-item');
+
+        // Initialise the save button
+        $languageItems.off('click tap').on('tap', function() {
+
+            // Get the selected code
+            var selectedLangCode = $(this).data('lang-code');
+
+            // If not the currently selected language, change to the selected language
+            if (selectedLangCode !== lang) {
+
+                // Store the new language in localStorage to be used upon reload
+                localStorage.lang = selectedLangCode;
+
+                // Set a language user attribute on the API (This is a private but unencrypted user
+                // attribute so that the API can read it and send emails in the correct language)
+                if (typeof u_attr !== 'undefined') {
+                    mega.attr.set(
+                        'lang',
+                        selectedLangCode,       // E.g. en, es, pt
+                        -2,                     // Set to private private not encrypted
+                        true                    // Set to non-historic, this won't retain previous values on API server
+                    );
+                }
+
+                // Reload the site
+                document.location.reload();
+            }
+
+            return false;
+        });
+    }
+};
+
+
+/**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
 
@@ -2923,7 +3107,18 @@ mega.ui.tpp = {
 var notify = {
     init: function() {},
     notifyFromActionPacket: function() {},
-    countAndShowNewNotifications: function() {}
+    countAndShowNewNotifications: function() {},
+    closePopup: function() {}
+};
+
+var alarm = {
+    siteUpdate: {
+        init: function() {}
+    },
+    planExpired: {
+        lastPayment: null,
+        render: function() {}
+    }
 };
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
@@ -2931,6 +3126,20 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     // Call the mobile version
     mobile.messageOverlay.show(msg, submsg);
 }
+
+function fm_showoverlay() {
+
+    $('.fm-dialog-overlay').removeClass('hidden');
+    $('body').addClass('overlayed');
+}
+
+function fm_hideoverlay() {
+
+    $('.fm-dialog-overlay').addClass('hidden');
+    $('body').removeClass('overlayed');
+}
+
+mega.ui.showRegisterDialog = function() {};
 
 function removeUInode(nodeHandle, parentHandle) {
 
@@ -2940,7 +3149,7 @@ function removeUInode(nodeHandle, parentHandle) {
 
 // Not required for mobile
 function fmtopUI() {}
-function topmenuUI() {}
 function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
+function closeDialog() {}

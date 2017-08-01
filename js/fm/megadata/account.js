@@ -16,6 +16,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
     }
     else {
         var uqres = false;
+        var pstatus = u_attr.p;
         var mRootID = M.RootID;
 
         if (blockui) {
@@ -122,6 +123,12 @@ MegaData.prototype.accountData = function(cb, blockui) {
                     }
                 }
 
+                if (pstatus !== u_attr.p) {
+                    ctx.account.justUpgraded = Date.now();
+
+                    M.checkStorageQuota(2);
+                }
+
                 if (!u_attr.p && uqres) {
                     ctx.account.servbw_used = 0;
 
@@ -198,6 +205,10 @@ MegaData.prototype.accountData = function(cb, blockui) {
                     });
 
                 ctx.account.lastupdate = Date.now();
+
+                if (d) {
+                    console.log('stats', JSON.stringify(stats));
+                }
 
                 if (!ctx.account.bw) {
                     ctx.account.bw = 1024 * 1024 * 1024 * 1024 * 1024 * 10;

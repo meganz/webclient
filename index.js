@@ -33,7 +33,7 @@ var loggedout = false;
 var flhashchange = false;
 var folderLinkVisitLogged = false;
 var avatars = {};
-
+var mega_title = 'MEGA';
 
 
 
@@ -49,15 +49,9 @@ function startMega() {
     if (!hashLogic) {
         $(window).rebind('popstate.mega', function(event) {
 
-            var currentPage = page;
             var state = event.originalEvent.state || {};
 
             loadSubPage(state.subpage || state.fmpage || location.hash, event);
-
-            // If on mobile TOS page and logged in, then the cloud doesn't reload for some reason so reload
-            if (is_mobile && (currentPage === 'terms') && (typeof u_attr !== 'undefined')) {
-                window.location.reload();
-            }
         });
     }
 
@@ -70,17 +64,19 @@ function startMega() {
         return false;
     }
 
-    if (pages['dialogs']) {
-        $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
-        delete pages['dialogs'];
-    }
-    if (pages['onboarding']) {
-        $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
-        delete pages['onboarding'];
-    }
-    if (pages['chat']) {
-        $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
-        delete pages['chat'];
+    if (!is_mobile) {
+        if (pages['dialogs']) {
+            $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
+            delete pages['dialogs'];
+        }
+        if (pages['onboarding']) {
+            $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
+            delete pages['onboarding'];
+        }
+        if (pages['chat']) {
+            $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
+            delete pages['chat'];
+        }
     }
     jsl = [];
     if(typeof(mega_custom_boot_fn) === 'undefined') {
@@ -91,22 +87,35 @@ function startMega() {
 }
 
 function topMenu(close) {
+
     if (close) {
         $.topMenu = '';
         $('.top-icon.menu').removeClass('active');
         $('.top-menu-popup').addClass('hidden');
+
+        if (is_mobile) {
+            $('html').removeClass('overlayed');
+            $('.mobile.dark-overlay').addClass('hidden').removeClass('active');
+        }
         $(window).unbind('resize.topmenu');
     }
     else {
         $.topMenu = 'topmenu';
         $('.top-icon.menu').addClass('active');
         $('.top-menu-popup').removeClass('hidden');
-        topMenuScroll();
-        $(window).rebind('resize.topmenu', function (e) {
-            if ($('.top-icon.menu').hasClass('active')) {
-                topMenuScroll();
-            }
-        });
+
+        if (!is_mobile) {
+            topMenuScroll();
+            $(window).rebind('resize.topmenu', function() {
+                if ($('.top-icon.menu').hasClass('active')) {
+                    topMenuScroll();
+                }
+            });
+        }
+        else {
+            $('html').addClass('overlayed');
+            $('.mobile.dark-overlay').removeClass('hidden').addClass('active');
+        }
     }
 }
 
@@ -120,7 +129,9 @@ function topMenuScroll() {
 }
 
 function scrollMenu() {
-    $('.bottom-page.scroll-block, .old .fmholder').scroll(function() {
+    "use strict";
+
+    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function() {
         if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
             var $menu = $('.new-left-menu-block');
             var topPos = $(this).scrollTop();
@@ -151,7 +162,7 @@ function topPopupAlign(button, popup, topPos) {
             buttonTopPos;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('body').width();
+            pageWidth = $('.top-head').width();
             $popupArrow.removeAttr('style');
             popupRightPos = pageWidth
                 - $button.offset().left
@@ -237,6 +248,14 @@ function init_page() {
             return;
         }
         $.lastSeenFilelink = getSitePath();
+    }
+
+    // Set class if gbot
+    if (is_bot) {
+        $('html').addClass('gbot');
+    }
+    else {
+        $('html').removeClass('gbot');
     }
 
     if (!u_type) {
@@ -378,7 +397,7 @@ function init_page() {
     confirmcode = false;
     pwchangecode = false;
 
-    if (page.substr(0, 7) == 'confirm') {
+    if (page.substr(0, 7) === 'confirm') {
         confirmcode = page.replace("confirm", "");
         page = 'confirm';
     }
@@ -402,8 +421,8 @@ function init_page() {
         closeDialog();
     }
 
-    // Do not show this dialog while entering into the downloads page
-    if (page.substr(0, 1) !== '!' && localStorage.awaitingConfirmationAccount) {
+    // Do not show this dialog while entering into the downloads or Pro pages (so they can still choose plan and pay)
+    if ((page.substr(0, 1) !== '!') && (page.substr(0, 3) !== 'pro') && localStorage.awaitingConfirmationAccount) {
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
         // if visiting a #confirm link, or they confirmed it elsewhere.
@@ -481,9 +500,8 @@ function init_page() {
         }
 
         doRenderCorpPage();
-        bottompage.init();
-        scrollMenu();
         page = 'cpage';
+        bottompage.init();
     }
     else if (page.substr(0, 5) == 'page_') {
         var cpage = decodeURIComponent(page.substr(5, page.length - 2));
@@ -503,6 +521,7 @@ function init_page() {
 
         doRenderCMSPage();
         page = 'cpage';
+        bottompage.init();
         return;
     }
     else if (page.substr(0, 4) == 'blog' && page.length > 4 && page.length < 10) {
@@ -926,6 +945,15 @@ function init_page() {
             loadSubPage('disputenotice');
         });
     }
+    else if (page.substr(0, 6) === 'propay') {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+        }
+        else {
+            parsepage(pages['propay']);
+        }
+        pro.propay.init();
+    }
     else if (page.substr(0, 3) === 'pro') {
         var tmp = page.split('/uao=');
         if (tmp.length > 1) {
@@ -933,17 +961,18 @@ function init_page() {
             loadSubPage(tmp[0]);
             return;
         }
-        parsepage(pages['pro']);
-        init_pro();
+
+        parsepage(pages['proplan']);
+        pro.proplan.init();
     }
     else if (page.substr(0, 7) === 'payment') {
 
         // Load the Pro page in the background
-        parsepage(pages['pro']);
-        init_pro();
+        parsepage(pages['proplan']);
+        pro.proplan.init();
 
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
-        proPage.processReturnUrlFromProvider(page);
+        pro.proplan.processReturnUrlFromProvider(page);
     }
     else if (page == 'credits') {
         parsepage(pages['credits']);
@@ -1123,9 +1152,9 @@ function init_page() {
                 M.currentdirid = id;
             }
             if (is_mobile) {
-                parsepage(pages['mobile']);
+                $('#fmholder').safeHTML(translate(pages['mobile'].replace(/{staticpath}/g, staticpath)));
             }
-            else if (!is_mobile && $('#fmholder').html() === '') {
+            else if ($('#fmholder').html() === '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
 
@@ -1173,6 +1202,12 @@ function init_page() {
 
         $('#pageholder').hide();
         $('#startholder').hide();
+
+        // Prevent duplicate HTML content breaking things
+        if (is_mobile) {
+            $('#startholder').empty();
+        }
+
         if ($('#fmholder:visible').length == 0) {
             $('#fmholder').show();
             if (fminitialized && !is_mobile) {
@@ -1234,13 +1269,9 @@ function init_page() {
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
     }
-    if (!is_mobile) {
-        topmenuUI();
-    }
-    else {
-        // Initialise the mobile menu (ToDo: in future use desktop responsive main menu)
-        mobile.menu.showAndInit(page);
-    }
+
+    topmenuUI();
+
     loggedout = false;
     flhashchange = false;
 }
@@ -1362,9 +1393,6 @@ function tooltiplogin() {
                 passwordManager('#form_login_header');
                 u_type = r;
 
-                // Logging to see how many people are signing into the regular site
-                api_req({ a: 'log', e: 99630, m: 'Completed login on regular webclient' });
-
                 if (login_next) {
                     loadSubPage(login_next);
                 }
@@ -1394,6 +1422,8 @@ function topmenuUI() {
 
     $('.top-icon.warning').addClass('hidden');
     $('.top-menu-item.upgrade-your-account,.top-menu-item.backup').addClass('hidden');
+    $('.top-menu-item.start').removeClass('hidden');
+    $('.top-menu-item.fm').addClass('hidden');
     $('.top-menu-item.logout').addClass('hidden');
     $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
     $('.top-menu-item.account').addClass('hidden');
@@ -1423,15 +1453,25 @@ function topmenuUI() {
     if (section === 'fm') {
         section = page.split('/')[1];
     }
-    $('.top-menu-item').removeClass('active');
 
-    if (section) {
+    // Get all menu items
+    var $topMenuItems = $('.top-menu-item');
+
+    // Remove red bar from all menu items
+    $topMenuItems.removeClass('active');
+
+    // If in mobile Cloud Drive, show red bar
+    if (is_mobile && page.indexOf('fm') === 0) {
+        $topMenuItems.filter('.fm').addClass('active');
+    }
+    else if (section) {
         // just in case, a payment provider appended any ?returnurl vars
         section = section.split("?")[0];
         section = section.replace(/[^a-zA-Z\-\_]/g, "");
 
-        var $menuItem = $('.top-menu-item.' + section);
+        var $menuItem = $topMenuItems.filter('.' + section);
         $menuItem.addClass('active');
+
         if ($menuItem.parent('.top-submenu').length) {
             $menuItem.parent('.top-submenu').prev().addClass('expanded');
         }
@@ -1461,6 +1501,8 @@ function topmenuUI() {
     $('.top-mega-version').text('v. ' + M.getSiteVersion());
 
     if (u_type) {
+        $('.top-menu-item.start').addClass('hidden');
+        $('.top-menu-item.fm').removeClass('hidden');
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $('.top-menu-item.account').removeClass('hidden');
         $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
@@ -1473,17 +1515,19 @@ function topmenuUI() {
         $('.top-icon.notification').show();
 
         // Show the rocket icon if achievements are enabled
+        if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
                 $('.top-icon.achievements').show();
             });
+        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
 
             // Set the plan text
             var proNum = u_attr.p;
-            var purchasedPlan = getProPlan(proNum);
+            var purchasedPlan = pro.getProPlanName(proNum);
 
             // Set colour of plan and body class
             var cssClass;
@@ -1507,7 +1551,7 @@ function topmenuUI() {
         else {
             // Show the free badge
             $('.top-menu-item.upgrade-your-account').removeClass('hidden');
-            $('.membership-icon').attr('class', 'membership-icon');
+            $('.top-head .membership-icon').attr('class', 'membership-icon');
             $('.top-menu-item.account .right-el').text('FREE');
             $('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('.membership-popup').removeClass('pro-popup');
@@ -1598,7 +1642,6 @@ function topmenuUI() {
             $('.top-menu-item.login').addClass('hidden');
             $('.top-menu-item.logout').removeClass('hidden');
         }
-
     }
 
     $.hideTopMenu = function (e) {
@@ -1721,7 +1764,9 @@ function topmenuUI() {
             } else {
                 $(this).addClass('expanded');
             }
-            setTimeout(topMenuScroll,200);
+            if (!is_mobile) {
+                setTimeout(topMenuScroll, 200);
+            }
         }
         else {
             if ($('.light-overlay').is(':visible')) {
@@ -1735,7 +1780,7 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
                 'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'wp'
+                'sync', 'takedown', 'terms', 'wp', 'start', 'fm'
             ];
 
             for (var i = subPages.length; i--;) {
@@ -1759,7 +1804,7 @@ function topmenuUI() {
             else if (className.indexOf('refresh') > -1) {
                 M.reload();
             }
-            else if (className.indexOf('languages') > -1) {
+            else if (!is_mobile && className.indexOf('languages') > -1) {
                 langDialog.show();
             }
             else if (className.indexOf('logout') > -1) {
@@ -1768,6 +1813,11 @@ function topmenuUI() {
         }
         return false;
     });
+
+    // Initialise the language sub menu for mobile
+    if (is_mobile) {
+        mobile.languageMenu.init();
+    }
 
     $('.top-search-bl').rebind('click', function () {
         $(this).addClass('active');
@@ -1970,6 +2020,10 @@ function topmenuUI() {
         $('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
     }
 
+    // Initialise the header icon for mobile
+    if (is_mobile) {
+        mobile.initHeaderMegaIcon();
+    }
 
     // Initialise notification popup and tooltip
     if (typeof notify === 'object') {
@@ -2004,19 +2058,100 @@ function getTemplate(name) {
     return translate(''+pages[name]).replace(/{staticpath}/g, staticpath);
 }
 
+function pagemetadata()
+{
+	var mega_desc = false;
+
+	if (page == 'android')
+	{
+		mega_title = 'Android - MEGA';
+		mega_desc = 'The MEGA Android app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
+	}
+	else if (page == 'ios')
+	{
+		mega_title = 'iOS - MEGA';
+		mega_desc = 'The MEGA iOS app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
+	}
+	else if (page == 'wp')
+	{
+		mega_title = 'Windows Phone - MEGA';
+	}
+	else if (page == 'sync')
+	{
+		mega_title = 'MEGAsync - Download';
+		mega_desc = 'MEGAsync securely synchronizes data between your computer and your MEGA account. Available for Windows, Mac and Linux.';
+	}
+	else if (page == 'extensions')
+	{
+		mega_title = 'Browser Extensions - MEGA';
+	}
+	else if (page == 'bird')
+	{
+		mega_title = 'MEGAbird - Download';
+	}
+	else if (page == 'cmd')
+	{
+		mega_title = 'MEGAcmd - Download';
+		mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
+	}
+	else if (page == 'pro')
+	{
+		mega_title = 'Plans & pricing - MEGA';
+		mega_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. MEGA provides one the cheapest cloud storage deals on the Internet.';
+	}
+	else if (page == 'register')
+	{
+		mega_title = 'Register - MEGA';
+		mega_desc = 'Create your free MEGA account and get free 50 GB.';
+	}
+	else if (page == 'login')
+	{
+		mega_title = 'Login - MEGA';
+	}
+	else if (page == 'recovery')
+	{
+		mega_title = 'Recovery - MEGA';
+		mega_desc = 'Forgot your MEGA password? Start your recovery process here.';
+	}
+	else if (page == 'terms')
+	{
+		mega_title = 'Terms of Service - MEGA';
+	}
+	else if (page == 'privacy')
+	{
+		mega_title = 'Privacy Policy - MEGA';
+	}
+	else if (page == 'copyright')
+	{
+		mega_title = 'Copyright - MEGA';
+	}
+	else if (page == 'takedown')
+	{
+		mega_title = 'Takedown Guidance - MEGA';
+	}
+	else
+	{
+		mega_title = 'MEGA';
+	}
+	if (!mega_desc) mega_desc = 'We make secure cloud storage simple. Create an account and get 50 GB free on MEGA\'s end-to-end encrypted cloud collaboration platform today!';
+	$('meta[name=description]').remove();
+    $('head').append( '<meta name="description" content="' + mega_desc + '">');
+	document.title = mega_title;
+	megatitle();
+}
+
+
 function parsepage(pagehtml, pp) {
+	pagemetadata();
     $('body').removeClass('ads');
     $('#fmholder').hide();
     $('#pageholder').hide();
     $('#startholder').hide();
-    megatitle();
 
     pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-
-    $('body').addClass('bottom-pages');
 
     var top = parsetopmenu();
     var bmenu = pages['bottom'];
@@ -2032,7 +2167,7 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(bmenu2));
     pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pagesmenu));
 
-    var $container = is_mobile ? $('body') : $('#startholder');
+    var $container = $('#startholder');
     $container
         .safeHTML('<div class="nav-overlay"></div>' +
             translate(pages['transferwidget']) + pagehtml)
@@ -2042,8 +2177,12 @@ function parsepage(pagehtml, pp) {
         M.chrome110ZoomLevelNotification();
     });
 
+    $('body').addClass('bottom-pages');
+    $('body, html, .bottom-pages .fmholder').stop().animate({
+        scrollTop: 0
+    }, 0);
     bottompage.init();
-    $('.nw-bottom-block').addClass(lang);
+
     if (typeof M.initUIKeyEvents === 'function') {
         M.initUIKeyEvents();
     }
@@ -2052,17 +2191,17 @@ function parsepage(pagehtml, pp) {
 
 function parsetopmenu() {
     var top;
-    if (!is_mobile) {
-        top = pages['top'].replace(/{staticpath}/g, staticpath);
-        if (document.location.href.substr(0, 19) == 'chrome-extension://') {
-            top = top.replace(/\/#/g, '/' + urlrootfile + '#');
-        }
-        top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
+
+    if (is_mobile) {
+        top = pages['top-mobile'].replace(/{staticpath}/g, staticpath);
     }
-    /* TODO: import mobile top menu */
     else {
-        top = pages['top-mobile'];
+        top = pages['top'].replace(/{staticpath}/g, staticpath);
     }
+    if (document.location.href.substr(0, 19) === 'chrome-extension://') {
+        top = top.replace(/\/#/g, '/' + urlrootfile + '#');
+    }
+    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     top = translate(top);
     return top;
 }
@@ -2162,7 +2301,5 @@ window.onunload = function() {
 mBroadcaster.once('boot_done', function() {
     M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', {murSeed: 0x800F0002});
-    attribCache.syncNameTimer = {};
-    attribCache.uaPacketParser = uaPacketParser;
     attribCache.bitMapsManager = new MegaDataBitMapManager();
 });

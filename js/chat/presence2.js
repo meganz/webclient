@@ -359,11 +359,6 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             var presence = u[p + 1] & 0xf;
                             var isWebrtcFlag = u[p + 1] & 0x80;
 
-                            var userBin = base64urldecode(user);
-                            if (!this.up.peers[userBin]) {
-                                this.up.peers[userBin] = true;
-                            }
-
                             if (this.up.peerstatuscb) {
                                 this.up.peerstatuscb(
                                     user,
@@ -485,6 +480,9 @@ UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, 
             this.peers[u] = true;
             delta += u;
         }
+        else {
+            this.logger.warn("not sure how to handle addremovepeers(", peers, del, ");");
+        }
     }
 
     if (this.open) {
@@ -495,7 +493,7 @@ UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, 
 UserPresence.prototype.sendstring = function presence_sendstring(s) {
     if (!this.s || this.s.readyState !== 1) {
         console.error("Called UserPresence.sendstring when offline.");
-        return;
+        return false;
     }
 
     var u = new Uint8Array(s.length);
@@ -515,7 +513,15 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
         );
     }
 
-    this.s.send(u);
+    try {
+        this.s.send(u);
+    }
+    catch (e) {
+        if (d) {
+            console.warn("UserPresence.sendstring -> socket.send failed, because of exception: ", e);
+        }
+        return false;
+    }
 };
 
 // must be called with the binary representation of the userid delta

@@ -295,6 +295,11 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
             mega.ui.tpp.reset('ul');
         }
     }
+    else {
+        if (page !== 'download') {
+            mega.ui.tpp.statusPaused(ul_queue, 'ul');
+        }
+    }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
         dlmanager.isDownloading = false;
@@ -307,6 +312,11 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
 
         if (page !== 'download') {
             mega.ui.tpp.reset('dl');
+        }
+    }
+    else {
+        if (page !== 'download') {
+            mega.ui.tpp.statusPaused(dl_queue, 'dl');
         }
     }
 
@@ -1207,4 +1217,122 @@ MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
             M.showOverStorageQuota(perc, data.cstrg, data.mstrg);
         });
     }, timeout || 30000);
+};
+
+
+/**
+ * Check whether the provided object is a TypedArray
+ * @param {Object} obj The object to check
+ * @returns {Boolean}
+ */
+MegaUtils.prototype.isTypedArray = function(obj) {
+    return Object(obj).constructor.BYTES_PER_ELEMENT > 0;
+};
+
+
+/**
+ * Convert data to ArrayBuffer
+ * @param {*} data the data to convert
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.toArrayBuffer = function(data) {
+    var promise = new MegaPromise();
+
+    if (data instanceof Blob) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            promise.resolve(reader.result);
+        };
+        reader.onerror = function() {
+            promise.reject.apply(promise, arguments);
+        };
+        reader.readAsArrayBuffer(data);
+    }
+    else if (this.isTypedArray(data)) {
+        if (data.byteLength !== data.buffer.byteLength) {
+            promise.resolve(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
+        }
+        else {
+            promise.resolve(data.buffer);
+        }
+    }
+    else if (data instanceof ArrayBuffer) {
+        promise.resolve(data);
+    }
+    else {
+        var ab;
+
+        if (typeof data !== 'string') {
+            try {
+                data = JSON.stringify(data);
+            }
+            catch (_) {
+            }
+        }
+        data = String(data);
+
+        if (typeof TextEncoder !== 'undefined') {
+            ab = new TextEncoder().encode(data).buffer;
+        }
+        else {
+            data = to8(data);
+
+            ab = new ArrayBuffer(data.length);
+            var u8 = new Uint8Array(ab);
+
+            for (var i = data.length; i--;) {
+                u8[i] = data.charCodeAt(i);
+            }
+        }
+
+        promise.resolve(ab);
+    }
+
+    return promise;
+};
+
+/**
+ * Save files locally
+ * @param {*} data The data to save to disk
+ * @param {String} [filename] The file name
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.saveAs = function(data, filename) {
+    var promise = new MegaPromise();
+
+    if (!filename) {
+        filename = new Date().toISOString().replace(/\W/g, '') + '.txt';
+    }
+
+    var saveToDisk = function(data) {
+        var dl = {awaitingPromise: promise};
+        var io = new MemoryIO(Math.random().toString(36), dl);
+        io.begin = function() {
+            io.write(data, 0, function() {
+                io.download(filename, false);
+                promise.resolve();
+            });
+        };
+        try {
+            io.setCredentials(false, data.byteLength, filename);
+        }
+        catch (e) {
+            promise.reject(e);
+        }
+    };
+
+    if (this.isTypedArray(data)) {
+        saveToDisk(data);
+    }
+    else {
+        this.toArrayBuffer(data)
+            .done(function(ab) {
+                saveToDisk(new Uint8Array(ab));
+            })
+            .fail(function() {
+                promise.reject.apply(promise, arguments);
+            })
+    }
+
+    return promise;
 };

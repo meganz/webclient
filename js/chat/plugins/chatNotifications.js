@@ -35,9 +35,12 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
         .rebind('onRoomCreated.chatNotifications', function(e, megaRoom) {
             var resetChatNotificationCounters = function() {
                 if (megaRoom.isCurrentlyActive) {
-                    var uiElement = $('.conversation-panel[data-room-jid="' + megaRoom.roomJid.split("@")[0] + '"]');
+                    var uiElement = $('.conversation-panel[data-room-id="' + megaRoom.chatId + '"]');
 
-                    if (uiElement.find(".call-block").length > 0 && uiElement.find(".call-block.small-block").length === 0) {
+                    if (
+                        uiElement.find(".call-block").length > 0 &&
+                        uiElement.find(".call-block.small-block").length === 0
+                    ) {
                         return;
                     }
 
@@ -51,7 +54,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     if (lastSeen) {
                         megaRoom.messagesBuff.setLastSeen(lastSeen.messageId);
                     }
-                    self.notifications.resetCounterGroup(megaRoom.roomJid);
+                    self.notifications.resetCounterGroup(megaRoom.chatId);
                 }
             };
 
@@ -93,7 +96,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                             'incoming-chat-message',
                             {
                                 'sound': 'incoming_chat_message',
-                                'group': megaRoom.roomJid,
+                                'group': megaRoom.chatId,
                                 'incrementCounter': unreadFlag,
                                 'icon': icon,
                                 'anfFlag': 'chat_enabled',
@@ -123,7 +126,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                             'alert-info-message',
                             {
                                 'sound': 'alert_info_message',
-                                'group': megaRoom.roomJid,
+                                'group': megaRoom.chatId,
                                 'incrementCounter': true,
                                 'anfFlag': 'chat_enabled',
                                 'icon': icon,
@@ -165,15 +168,15 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                 .rebind('onChatIsFocused.chatNotifications', function(e) {
                     resetChatNotificationCounters();
                 })
-                .rebind('onOutgoingCall.chatNotifications', function(e, eventData, mediaOptions, callSession) {
-                    var sid = eventData.info && eventData.info.sid ? eventData.info.sid : eventData.sid;
+                .rebind('onOutgoingCall.chatNotifications', function(e, callManagerCall, mediaOptions) {
+                    var sid = callManagerCall.id;
                     var n = self.notifications.notify(
                         'outgoing-call',
                         {
                             'sound': 'incoming_voice_video_call',
                             'soundLoop': true,
                             'alwaysPlaySound': true,
-                            'group': megaRoom.roomJid,
+                            'group': megaRoom.chatId,
                             'incrementCounter': false,
                             'icon': avatars[u_handle],
                             'anfFlag': 'chat_enabled',
@@ -192,18 +195,18 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     });
 
                     var evtId = generateEventSuffixFromArguments("", "chatNotifStopSoundOut", rand(10000));
-                    var stopSound = function(e, session, oldState, newState) {
-                        if (session.sid == sid) {
+                    var stopSound = function(e, callManagerCall) {
+                        if (callManagerCall.id === sid) {
                             n.forceStopSound();
-                            callSession.unbind('StateChanged' + evtId);
+                            callManagerCall.unbind('StateChanged' + evtId);
                         }
                     };
 
-                    callSession.bind('StateChanged' + evtId, stopSound);
+                    callManagerCall.bind('StateChanged' + evtId, stopSound);
                 })
                 .rebind('CallTerminated.chatNotifications', function(e, origEvent, room) {
-                    self.notifications.resetCounterGroup(room.roomJid, "incoming-voice-video-call");
-                    var contact = room.megaChat.getContactFromJid(room.getParticipantsExceptMe()[0]);
+                    self.notifications.resetCounterGroup(room.chatId, "incoming-voice-video-call");
+                    var contact = M.u[room.getParticipantsExceptMe()[0]];
                     var avatarMeta = generateAvatarMeta(contact.u);
                     var icon = avatarMeta.avatarUrl;
 
@@ -211,7 +214,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                         'call-terminated',
                         {
                             'sound': 'hang_out',
-                            'group': room.roomJid,
+                            'group': room.chatId,
                             'incrementCounter': false,
                             'anfFlag': 'chat_enabled',
                             'icon': icon,
@@ -238,7 +241,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
              avatar,
              isVideoCall,
              sid,
-             callSession,
+             callManagerCall,
              dialogMessage
         ) {
 
@@ -248,7 +251,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     'sound': 'incoming_voice_video_call',
                     'soundLoop': true,
                     'alwaysPlaySound': true,
-                    'group': room.roomJid,
+                    'group': room.chatId,
                     'incrementCounter': true,
                     'anfFlag': 'chat_enabled',
                     'icon': avatar,
@@ -277,16 +280,16 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
             dialogMessage.addChangeListener(changeListener);
 
             var evtId = generateEventSuffixFromArguments("", "chatNotifStopSound", rand(10000));
-            var stopSound = function(e, session, oldState, newState) {
-                if (session.sid == sid) {
+            var stopSound = function(e, callManagerCall, oldState, newState) {
+                if (callManagerCall.id === sid) {
                     n.forceStopSound();
-                    callSession.unbind('StateChanged' + evtId);
+                    callManagerCall.unbind('StateChanged' + evtId);
                 }
             };
 
-            callSession.bind('StateChanged' + evtId, stopSound);
+            callManagerCall.bind('StateChanged' + evtId, stopSound);
         })
         .rebind('onCallAnswered.chatNotifications', function(e, room) {
-            self.notifications.resetCounterGroup(room.roomJid, "incoming-voice-video-call")
+            self.notifications.resetCounterGroup(room.chatId, "incoming-voice-video-call");
         });
 };

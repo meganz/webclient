@@ -3631,7 +3631,7 @@ function copyDialog() {
                 case 'conversations':
                     var $selectedConv = $('.copy-dialog .nw-conversations-item.selected');
                     closeDialog();
-                    megaChat.chats[$selectedConv.attr('data-room-jid') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
+                    megaChat.chats[$selectedConv.attr('data-room-id') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
                     break;
                 default:
                     break;
@@ -4340,10 +4340,9 @@ function _propertiesDialog(close) {
             var user = users[i];
             var userHandle = user.u || user.p;
             var hidden = i >= MAX_CONTACTS ? 'hidden' : '';
-            var status = M.onlineStatusClass(megaChatIsReady
-                && megaChat.karere.getPresence(megaChat.getJidFromNodeId(userHandle)));
+            var status = megaChatIsReady && megaChat.getPresenceAsCssClass(user.u);
 
-            shareUsersHtml += '<div class="properties-context-item ' + status[1] + ' ' + hidden
+            shareUsersHtml += '<div class="properties-context-item ' + (status ? status : '') + ' ' + hidden
                 + '" data-handle="' + escapeHTML(userHandle) + '">'
                 + '<div class="properties-contact-status"></div>'
                 + '<span>' + escapeHTML(M.getNameByHandle(userHandle)) + '</span>'
@@ -5327,9 +5326,7 @@ function fm_resize_handler(force) {
             'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
         });
 
-        if (mega.ui.tpp.isVisible()) {
-            $('.popup.transfer-widget:visible').width($('.fm-left-panel:visible').width() - 8);
-        }
+        $('.popup.transfer-widget').width($('.fm-left-panel:visible').width() - 9);
     }
 
     if (M.currentrootid === 'shares') {

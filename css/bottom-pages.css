@@ -16,13 +16,25 @@
 .red {
     color: #FF4D4A;
 }
-.bottom-page .mobile.fm-header {
-    display: block;
-    position: absolute;
-    width: 100%;
-    top: 0;
-    z-index: 10;
-    border: 0;
+body.bottom-pages .fmholder {
+    overflow: hidden;
+    overflow-y: auto;
+    position: relative;
+}
+body.bottom-pages.mobile .fmholder {
+    overflow: visible;
+}
+html.gbot {
+    overflow-y: scroll;
+}
+.gbot body.bottom-pages:not(.mobile) {
+    overflow: visible;
+}
+.gbot body.bottom-pages .fmholder {
+    overflow: visible;
+}
+.main-scroll-block {
+    overflow-x: hidden;
 }
 .absolute-pos {
     position: absolute;
@@ -33,8 +45,10 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.1);
-    position: absolute;
+    position: fixed;
     z-index: 1200;
+    top: 0;
+    bottom: 0;
 }
 .bottom-page .top-head {
     background-color: transparent;
@@ -98,16 +112,7 @@
 }
 .bottom-page.scroll-block {
     height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
     position: relative;
-}
-.mobile .bottom-page.scroll-block {
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-}
-.mobile .bottom-page.scroll-block.overlayed {
-    overflow: hidden;
 }
 .bottom-page.vertical-centered-bl {
     display: table;
@@ -194,7 +199,7 @@
     height: 26px;
     display: block;
     margin: 0 auto;
-    background-image: url(../images/mega/startpage-sprite.png);
+    background-image: url(../images/mega/startpage-sprite_v1.png);
     background-position: -110px 1px;
     background-repeat: no-repeat;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=64);
@@ -474,7 +479,7 @@
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite.png);
+    background-image: url(../images/mega/startpage-sprite_v1.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -494,7 +499,7 @@
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite.png);
+    background-image: url(../images/mega/startpage-sprite_v1.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -716,7 +721,7 @@
     margin: 14px auto 7px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite.png);
+    background-image: url(../images/mega/startpage-sprite_v1.png);
     background-position: -0px -73px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
@@ -1080,6 +1085,22 @@
 .megasync .megaapp-button-info {
     padding: 16px 0 61px 0;
 }
+.megaapp-button-info.linux-txt {
+    padding: 0 0 0 0;
+}
+.megaapp-button-info.disabled {
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
+.megaapp-button-info.disabled a {
+    cursor: default;
+}
+.megaapp-button-info .nautilus-lnk {
+    margin: 26px 5px -30px 0;
+    display: block;
+}
 .megasync .vertical-centered-bl .pages-nav.content-block {
     -webkit-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.05);
     -moz-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.05);
@@ -1096,13 +1117,15 @@
     padding: 21px 0 0 0;
     margin-left: 34.5%;
 }
-
 @media only screen and (max-height: 685px) {
 .linux.megasync .button.download-megasync {
     margin-top: 18px;
 }
 .linux .bottom-page.img.sync-top {
     max-width: 40%;
+}
+.megaapp-button-info .nautilus-lnk {
+    margin: 26px 5px -10px 0;
 }
 }
 /* end of MEGAsync */
@@ -1222,6 +1245,7 @@
     font-size: 14px;
     line-height: 22px;
     text-transform: uppercase;
+    min-height: 22px;
 }
 .bottom-page.big-header.top {
     padding-bottom: 29px;
@@ -1481,9 +1505,9 @@
     left: 0;
 }
 .bottom-page.img.android2 {
-    margin: 62px -8.6% 23px -12.8%;
-    max-width: 92%;
-    width: 933px;
+    margin: 62px -6% 23px -4.3%;
+    max-width: 95%;
+    width: 969px;
 }
 .bottom-page.img.android3 {
     margin: 35px 0 13px 0;
@@ -2072,11 +2096,7 @@
 
 
 /* Temoprary fixes */
-.old .fmholder {
-    overflow: hidden;
-    overflow-y: auto;
-    position: relative;
-}
+
 .old .top-head {
     background-color: transparent;
     position: absolute;

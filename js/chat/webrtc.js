@@ -1235,7 +1235,6 @@ Session.prototype._createRtcConn = function() {
         var player = self.mediaWaitPlayer = document.createElement('video');
         RTC.attachMediaStream(player, self.remoteStream);
         // self.waitForRemoteMedia();
-        self.logger.error("test message");
     };
     conn.onremovestream = function(event) {
         self.self.remoteStream = null;

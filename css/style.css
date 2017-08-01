@@ -8072,6 +8072,7 @@ color: white;
 }
 .fm-account-input.disabled input, .fm-account-input input[disabled] {
     color: #999999;
+    -webkit-text-fill-color: #999999;
 }
 .fm-account-input.disabled i {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
@@ -10942,6 +10943,7 @@ table {
     display: table-cell;
     vertical-align: middle;
     padding-right: 15px;
+    padding-bottom: 1px;
     width: 100%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;

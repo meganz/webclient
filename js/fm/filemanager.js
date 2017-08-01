@@ -667,6 +667,7 @@ FileManager.prototype.updFileManagerUI = function() {
     var newcontact = false;
     var newpath = false;
     var newshare = false;
+    var selnode;
 
     if (d) {
         console.time('rendernew');
@@ -685,6 +686,11 @@ FileManager.prototype.updFileManagerUI = function() {
         }
         if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
             UImain = true;
+
+            if ($.onRenderNewSelectNode === newNode.h) {
+                delete $.onRenderNewSelectNode;
+                selnode = newNode.h;
+            }
         }
         if (!newpath && document.getElementById('path_' + newNode.h)) {
             newpath = true;
@@ -716,6 +722,12 @@ FileManager.prototype.updFileManagerUI = function() {
                 M.sort();
                 M.renderMain(true);
                 // M.renderPath();
+                if (selnode) {
+                    Soon(function() {
+                        $.selected = [selnode];
+                        reselect(1);
+                    });
+                }
                 $.tresizer();
             }
 
@@ -1101,6 +1113,17 @@ FileManager.prototype.initContextUI = function() {
         ulmanager.abort(toabort);
         $.clearTransferPanel();
         fm_tfsupdate();
+
+        if (toabort.length) {
+            // FIXME: toabort is an array of transfers to abort, don't just pick the first element
+
+            var blk = String(toabort[0]).indexOf('ul_') !== -1 ? 'ul' : 'dl';
+            //               ^^^^^^^^^^
+
+            mega.ui.tpp.setTotal(-1, blk);
+            // mega.ui.tpp.setIndex(-1, blk);
+            mega.ui.tpp.updateIndexes(blk);
+        }
 
         onIdle(function() {
             // XXX: better way to stretch the scrollbar?

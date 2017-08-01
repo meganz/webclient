@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
+    http://www.w3.org/1999/xhtml http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd"
+    xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url> 
+    <loc>https://mega.nz/</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/?zh-cn"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/sync</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/sync"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/sync?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/sync?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/sync?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/sync?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/sync?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/sync?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/sync?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/sync?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/sync?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/sync?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/sync?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/sync?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/sync?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/sync?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/sync?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/ios</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/ios"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/ios?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/ios?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/ios?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/ios?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/ios?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/ios?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/ios?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/ios?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/ios?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/ios?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/ios?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/ios?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/ios?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/ios?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/ios?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/android</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/android"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/android?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/android?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/android?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/android?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/android?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/android?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/android?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/android?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/android?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/android?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/android?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/android?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/android?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/android?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/android?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/wp</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/wp"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/wp?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/wp?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/wp?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/wp?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/wp?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/wp?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/wp?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/wp?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/wp?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/wp?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/wp?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/wp?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/wp?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/wp?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/wp?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/login</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/login"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/login?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/login?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/login?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/login?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/login?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/login?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/login?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/login?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/login?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/login?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/login?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/login?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/login?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/login?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/login?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/register</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/register"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/register?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/register?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/register?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/register?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/register?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/register?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/register?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/register?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/register?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/register?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/register?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/register?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/register?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/register?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/register?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/about</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/about"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/about?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/about?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/about?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/about?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/about?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/about?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/about?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/about?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/about?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/about?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/about?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/about?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/about?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/about?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/about?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/pro</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/pro"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/pro?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/pro?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/pro?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/pro?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/pro?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/pro?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/pro?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/pro?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/pro?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/pro?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/pro?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/pro?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/pro?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/pro?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/pro?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/help</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/help"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/help?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/help?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/help?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/help?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/help?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/help?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/help?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/help?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/help?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/help?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/help?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/help?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/help?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/help?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/help?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/blog</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/blog"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/blog?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/blog?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/blog?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/blog?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/blog?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/blog?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/blog?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/blog?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/blog?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/blog?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/blog?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/blog?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/blog?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/blog?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/blog?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/extensions</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/extensions"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/extensions?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/extensions?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/extensions?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/extensions?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/extensions?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/extensions?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/extensions?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/extensions?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/extensions?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/extensions?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/extensions?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/extensions?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/extensions?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/extensions?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/extensions?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/bird</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/bird"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/bird?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/bird?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/bird?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/bird?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/bird?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/bird?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/bird?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/bird?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/bird?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/bird?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/bird?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/bird?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/bird?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/bird?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/bird?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/cmd</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/cmd"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/cmd?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/cmd?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/cmd?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/cmd?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/cmd?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/cmd?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/cmd?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/cmd?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/cmd?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/cmd?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/cmd?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/cmd?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/cmd?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/cmd?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/cmd?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/sourcecode</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/sourcecode"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/sourcecode?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/sourcecode?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/sourcecode?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/sourcecode?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/sourcecode?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/sourcecode?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/sourcecode?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/sourcecode?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/sourcecode?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/sourcecode?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/sourcecode?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/sourcecode?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/sourcecode?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/sourcecode?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/sourcecode?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/general</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/general"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/general?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/general?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/general?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/general?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/general?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/general?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/general?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/general?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/general?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/general?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/general?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/general?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/general?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/general?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/general?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/terms</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/terms"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/terms?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/terms?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/terms?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/terms?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/terms?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/terms?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/terms?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/terms?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/terms?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/terms?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/terms?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/terms?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/terms?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/terms?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/terms?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/privacy</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/privacy"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/privacy?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/privacy?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/privacy?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/privacy?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/privacy?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/privacy?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/privacy?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/privacy?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/privacy?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/privacy?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/privacy?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/privacy?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/privacy?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/privacy?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/privacy?zh"/>
+  </url>
+  <url> 
+    <loc>https://mega.nz/copyright</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/copyright"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/copyright?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/copyright?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/copyright?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/copyright?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/copyright?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/copyright?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/copyright?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/copyright?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/copyright?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/copyright?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/copyright?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/copyright?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/copyright?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/copyright?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/copyright?zh"/>	
+  </url>
+  <url> 
+    <loc>https://mega.nz/takedown</loc>
+	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/takedown"/>
+	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/takedown?es"/>
+	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/takedown?pt"/>
+	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/takedown?de"/>
+	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/takedown?nl"/>
+	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/takedown?ru"/>
+	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/takedown?fr"/>
+	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/takedown?vi"/>
+	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/takedown?ko"/>
+	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/takedown?it"/>
+	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/takedown?tr"/>
+	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/takedown?ja"/>
+	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/takedown?zh-tw"/>
+	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/takedown?zh-hk"/>
+	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/takedown?zh-sg"/>
+	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/takedown?zh"/>	
+  </url>
+</urlset>

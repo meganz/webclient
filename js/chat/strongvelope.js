@@ -336,7 +336,7 @@ var strongvelope = {};
         var signatureBytes = asmCrypto.string_to_bytes(signature);
         var keyBytes = asmCrypto.string_to_bytes(pubKey);
 
-        return nacl.sign.detached.verify(messageBytes, signatureBytes, keyBytes);
+        return backgroundNacl.sign.detached.verify(messageBytes, signatureBytes, keyBytes);
     };
 
 
@@ -725,66 +725,82 @@ var strongvelope = {};
      * @method
      * @param message {ChatdMessage}
      *     A message to extract keys from.
-     * @return {Object|Boolean}
-     *     An objects containing the parsed message and an object mapping a
-     *     keyId to a key. `false` on signature verification error.
+     * @return {MegaPromise}
+     *     An MegaPromise that would be resolved with objects containing the parsed message and an object mapping a
+     *     keyId to a key OR rejected with `false` on signature verification error.
      * @private
      */
     strongvelope.ProtocolHandler.prototype._parseAndExtractKeys = function(message) {
-
+        var self = this;
         var parsedMessage = ns._parseMessageContent(message.message);
         var result = { parsedMessage: parsedMessage, senderKeys: {}};
 
+
         if (parsedMessage === false) {
             logger.error('Can not parse the message content.');
-            return false;
+            return MegaPromise.reject(false);
         }
         else {
-            if ((parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1) &&
-                    (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
-                if (ns._verifyMessage(parsedMessage.signedContent,
-                                      parsedMessage.signature,
-                                      pubEd25519[message.userId])) {
-                    var isOwnMessage = (message.userId === this.ownHandle);
-                    var myIndex = parsedMessage.recipients.indexOf(this.ownHandle);
+            if (
+                parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1 &&
+                _KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0
+            ) {
+                var verifyPromise = ns._verifyMessage(
+                    parsedMessage.signedContent,
+                    parsedMessage.signature,
+                    pubEd25519[message.userId]
+                );
+                var proxyPromise = new MegaPromise();
+
+                verifyPromise.done(function() {
+                    var isOwnMessage = message.userId === self.ownHandle;
+                    var myIndex = parsedMessage.recipients.indexOf(self.ownHandle);
+
                     // If we sent the message, pick first recipient for getting the
                     // sender key (e. g. for history loading).
                     var keyIndex = isOwnMessage ? 0 : myIndex;
                     var otherHandle =
                         (isOwnMessage && (parsedMessage.keys[keyIndex].length < _RSA_ENCRYPTION_THRESHOLD))
-                                     ? parsedMessage.recipients[0]
-                                     : message.userId;
+                            ? parsedMessage.recipients[0]
+                            : message.userId;
+
                     if (keyIndex >= 0) {
                         // Decrypt message key(s).
                         var encryptedKey =
                             (isOwnMessage &&
-                            (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ? 
+                            (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ?
                                 parsedMessage.ownKey : parsedMessage.keys[keyIndex];
 
-                        var decryptedKeys = this._legacyDecryptKeysFor( encryptedKey,
-                                                                        parsedMessage.nonce,
-                                                                        otherHandle,
-                                                                        isOwnMessage);
+                        var decryptedKeys = self._legacyDecryptKeysFor(encryptedKey,
+                            parsedMessage.nonce,
+                            otherHandle,
+                            isOwnMessage);
+
                         // Update local sender key cache.
-                        if (!this.participantKeys[message.userId]) {
-                            this.participantKeys[message.userId] = {};
+                        if (!self.participantKeys[message.userId]) {
+                            self.participantKeys[message.userId] = {};
                         }
+
                         for (var i = 0; i < decryptedKeys.length; i++) {
                             result.senderKeys[parsedMessage.keyIds[i]] = decryptedKeys[i];
                         }
                     }
-                }
-                else {
+                    proxyPromise.resolve(result);
+                })
+                .fail(function(arg) {
                     logger.critical('Signature invalid for message from *** on ***');
                     logger.error('Signature invalid for message from '
                                  + message.userId + ' on ' + message.ts);
 
-                    return false;
-                }
+                    proxyPromise.reject(arg);
+                });
+
+                return proxyPromise;
             }
+
         }
 
-        return result;
+        return MegaPromise.resolve(result);
     };
 
 
@@ -795,48 +811,68 @@ var strongvelope = {};
      * @method
      * @param messages {Array.<ChatdMessage>}
      *     Array of (most recent) batch of chat message history.
-     * @return {Array.<Object>}
-     *     An array of all the parsed messages' content.
+     * @return {MegaPromise}
+     *     Resolved with: An array of all the parsed messages' content.
      * @private
      */
     strongvelope.ProtocolHandler.prototype._batchParseAndExtractKeys = function(messages) {
-
-        var extracted;
         var parsedMessages = [];
-        var parsedMessage;
-        var senderKeys;
-        var storedKey;
+
+        var self = this;
+
+        var proxyPromises = [];
 
         // Iterate over all messages to extract keys (if present).
         // TOGO: make sure the messages are ordered from latest to oldest.
-        for (var i = 0;i < messages.length; i++) {
+        messages.forEach(function(message, i) {
             // if the message is from chat API.
-
             if (messages[i].userId !== COMMANDER) {
+                var proxyPromise = new MegaPromise();
 
-                extracted = this._parseAndExtractKeys(messages[i]);
-                if (extracted) {
-                    parsedMessage = extracted.parsedMessage;
+                self._parseAndExtractKeys(message)
+                    .done(function(extracted) {
+                        var senderKeys;
+                        var storedKey;
+                        var parsedMessage = extracted.parsedMessage;
 
-                    parsedMessages.push(parsedMessage);
-                    senderKeys = extracted.senderKeys;
-                    for (var keyId in senderKeys) {
-                        if (senderKeys.hasOwnProperty(keyId)) {
-                            storedKey = this.participantKeys[messages[i].userId][keyId];
-                            if (storedKey && (storedKey !== senderKeys[keyId])) {
-                                // Bail out on inconsistent information.
-                                logger.critical("Mismatching statement on sender's previously sent key.");
+                        senderKeys = extracted.senderKeys;
+                        Object.keys(senderKeys).forEach(function(keyId) {
+                            if (self.participantKeys[message.userId]) {
+                                storedKey = self.participantKeys[message.userId][keyId];
+                                if (storedKey && storedKey !== senderKeys[keyId]) {
+                                    // Bail out on inconsistent information.
+                                    logger.critical("Mismatching statement on sender's previously sent key.");
 
-                                return false;
+                                    proxyPromise.reject();
+                                    return false;
+                                }
                             }
-                            this.participantKeys[messages[i].userId][keyId] = senderKeys[keyId];
-                        }
-                    }
-                }
-            }
-        }
+                            else {
+                                self.participantKeys[message.userId] = {};
+                            }
+                            self.participantKeys[message.userId][keyId] = senderKeys[keyId];
+                        });
 
-        return parsedMessages;
+                        parsedMessages.push(parsedMessage);
+                        proxyPromise.resolve(parsedMessage);
+                    })
+                    .fail(function() {
+                        proxyPromise.reject();
+                    });
+
+                proxyPromises.push(proxyPromise);
+            }
+        });
+
+        var returnedPromise = new MegaPromise();
+
+        MegaPromise.allDone(proxyPromises)
+            .always(function() {
+                returnedPromise.resolve(parsedMessages);
+            });
+
+
+        return returnedPromise;
     };
 
 
@@ -852,14 +888,12 @@ var strongvelope = {};
      * @method
      * @param messages {Array.<ChatdMessage>}
      *     Array of (most recent) batch of chat message history.
-     * @return {Boolean}
-     *     `true` on successful seeding, `false` on failure.
+     * @return {MegaPromise}
+     *     To be used for identifying when the .seed had finished.
      */
     strongvelope.ProtocolHandler.prototype.seed = function(messages) {
         // This is only needed for legacy messages.
-        this._batchParseAndExtractKeys(messages);
-
-        return true;
+        return this._batchParseAndExtractKeys(messages);
     };
 
     /**
@@ -1379,8 +1413,8 @@ var strongvelope = {};
      * @method
      * message {ChatdMessage}
      *     A management message from chat API.
-     * @returns {(StrongvelopeMessage|Boolean)}
-     *     The message content on success, `false` in case of errors.
+     * @returns {MegaPromise}
+     *     On success - (StrongvelopeMessage|Boolean), e.g. the message content, `false` in case of errors.
      */
     strongvelope.ProtocolHandler.prototype.handleManagementMessage = function(message, historicMessage) {
         historicMessage = (typeof historicMessage === 'undefined') ? false : historicMessage;
@@ -1408,7 +1442,7 @@ var strongvelope = {};
                     excludeParticipants: parsedMessage.excludeParticipants
                 };
                 if (historicMessage === true) {
-                    return result;
+                    return MegaPromise.resolve(result);
                 }
                 // Do group participant update.
                 parsedMessage.includeParticipants.forEach(function (item) {
@@ -1417,27 +1451,38 @@ var strongvelope = {};
                 parsedMessage.excludeParticipants.forEach(function (item) {
                     self.removeParticipant(item);
                 });
-                return result;
+                return MegaPromise.resolve(result);
             }
             else if (parsedMessage.type === MESSAGE_TYPES.TOPIC_CHANGE) {
                 var cleartext = this.decryptMessage(parsedMessage, parsedMessage.invitor, null);
-                if (cleartext === false) {
-                    return false;
-                }
-                var payload = ns._parsePayload(cleartext, parsedMessage.protocolVersion);
-                // Bail out if payload can not be parsed.
-                if (payload === false) {
-                    return false;
-                }
-                result = {
-                    sender: parsedMessage.invitor,
-                    type: parsedMessage.type,
-                    payload: payload.plaintext
-                };
-                return result;
+                var proxyPromise = new MegaPromise();
+                var decryptPromise = this.decryptMessage(parsedMessage, parsedMessage.invitor, null);
+                decryptPromise.fail(function(arg) {
+                    proxyPromise.reject(arg);
+                });
+                decryptPromise.done(function(cleartext) {
+                    if (cleartext === false) {
+                        proxyPromise.reject(false);
+                        return false;
+                    }
+                    var payload = ns._parsePayload(cleartext, parsedMessage.protocolVersion);
+                    // Bail out if payload can not be parsed.
+                    if (payload === false) {
+                        proxyPromise.reject(false);
+                        return false;
+                    }
+                    result = {
+                        sender: parsedMessage.invitor,
+                        type: parsedMessage.type,
+                        payload: payload.plaintext
+                    };
+                    proxyPromise.resolve(result);
+                });
+                return proxyPromise;
+
             }
         }
-        return false;
+        return MegaPromise.reject(false);
     };
 
 
@@ -1451,97 +1496,112 @@ var strongvelope = {};
      *     User handle of the message sender.
      * @param {Boolean} [historicMessage=false]
      *     Whether the message passed in for decryption is from the history.
-     * @returns {(StrongvelopeMessage|Boolean)}
-     *     The message content on success, `false` in case of errors.
+     * @returns {MegaPromise}
+     *     The MegaPromise that would be resolved with (StrongvelopeMessage|Boolean), e.g. message content on success,
+     *     and will fail with `false` in case of errors.
      */
     strongvelope.ProtocolHandler.prototype.legacyDecryptFrom = function(message,
             sender, historicMessage) { // jshint maxcomplexity: 11
+
+        var self = this;
 
         // if the message is from chat API
         if (sender === COMMANDER) {
             return this.handleManagementMessage({ userId: sender, message: message}, historicMessage);
         }
 
+        var proxyPromise = new MegaPromise();
+
         // Extract keys, and parse message in the same go.
-        var extractedContent = this._parseAndExtractKeys({ userId: sender, message: message});
-        if (extractedContent === false) {
+        var extractContentPromise = this._parseAndExtractKeys({ userId: sender, message: message});
+        extractContentPromise.fail(function() {
             logger.critical('Message signature invalid.');
+        });
 
-            return false;
-        }
+        extractContentPromise.done(function(extractedContent) {
+            var parsedMessage = extractedContent.parsedMessage;
+            var senderKeys = extractedContent.senderKeys;
 
-        var parsedMessage = extractedContent.parsedMessage;
-        var senderKeys = extractedContent.senderKeys;
+            // Bail out on parse error.
+            if (parsedMessage === false) {
+                logger.critical('Incoming message not usable.');
 
-        // Bail out on parse error.
-        if (parsedMessage === false) {
-            logger.critical('Incoming message not usable.');
-
-            return false;
-        }
-
-        // Verify protocol version.
-        if (parsedMessage.protocolVersion > PROTOCOL_VERSION) {
-            logger.critical('Message not compatible with current protocol version.');
-
-            return false;
-        }
-
-        // Get sender key.
-        var senderKey = this._getSenderKeyAndUpdateCache(sender, parsedMessage,
-                                                         senderKeys);
-
-        // Am I part of this chat?
-        // TODO: In future it should update participants based on chatd server's 
-        // requests rather than incoming messages.
-        if (parsedMessage.excludeParticipants.indexOf(this.ownHandle) >= 0) {
-            logger.info('I have been excluded from this chat, cannot read message.');
-            this.keyId = null;
-            this.otherParticipants.clear();
-            this.includeParticipants.clear();
-            this.excludeParticipants.clear();
-        }
-        else if ((parsedMessage.recipients.length > 0)
-                && (parsedMessage.recipients.indexOf(this.ownHandle) === -1)) {
-            logger.info('I am not participating in this chat, cannot read message.');
-        }
-
-        if (!senderKey) {
-            return false;
-        }
-
-        // Decrypt message payload.
-        var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
-                                                    senderKey,
-                                                    parsedMessage.nonce);
-        try {
-            cleartext = from8(cleartext);
-            // Bail out if decryption failed.
-            if (cleartext === false) {
+                proxyPromise.reject(false);
                 return false;
             }
 
-            var result = {
-                version: parsedMessage.protocolVersion,
-                sender: sender,
-                type: parsedMessage.type,
-                payload: cleartext,
-                includeParticipants: [],
-                excludeParticipants: []
-            };
+            // Verify protocol version.
+            if (parsedMessage.protocolVersion > PROTOCOL_VERSION) {
+                logger.critical('Message not compatible with current protocol version.');
 
-            return result;
-        }
-        catch (e) {
-            if (e instanceof URIError) {
-                logger.critical('Could not decrypt message, probably a wrong key/nonce.');
-
+                proxyPromise.reject(false);
                 return false;
             }
-            else {
-                throw e;
+
+            // Get sender key.
+            var senderKey = self._getSenderKeyAndUpdateCache(sender, parsedMessage,
+                senderKeys);
+
+            // Am I part of this chat?
+            // TODO: In future it should update participants based on chatd server's
+            // requests rather than incoming messages.
+            if (parsedMessage.excludeParticipants.indexOf(self.ownHandle) >= 0) {
+                logger.info('I have been excluded from this chat, cannot read message.');
+                self.keyId = null;
+                self.otherParticipants.clear();
+                self.includeParticipants.clear();
+                self.excludeParticipants.clear();
             }
-        }
+            else if (
+                parsedMessage.recipients.length > 0 &&
+                parsedMessage.recipients.indexOf(this.ownHandle) === -1
+            ) {
+                logger.info('I am not participating in this chat, cannot read message.');
+            }
+
+            if (!senderKey) {
+                proxyPromise.reject(false);
+                return false;
+            }
+
+            // Decrypt message payload.
+            var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
+                senderKey,
+                parsedMessage.nonce);
+            try {
+                cleartext = from8(cleartext);
+                // Bail out if decryption failed.
+                if (cleartext === false) {
+                    proxyPromise.reject(false);
+                    return false;
+                }
+
+                var result = {
+                    version: parsedMessage.protocolVersion,
+                    sender: sender,
+                    type: parsedMessage.type,
+                    payload: cleartext,
+                    includeParticipants: [],
+                    excludeParticipants: []
+                };
+
+                proxyPromise.resolve(result);
+            }
+            catch (e) {
+                if (e instanceof URIError) {
+                    logger.critical('Could not decrypt message, probably a wrong key/nonce.');
+
+                    proxyPromise.reject(e);
+                    return false;
+                }
+                else {
+                    proxyPromise.reject(e);
+                    throw e;
+                }
+            }
+        });
+
+        return proxyPromise;
     };
 
     strongvelope.ProtocolHandler.prototype.decryptMessage = function(parsedMessage,
@@ -1572,36 +1632,45 @@ var strongvelope = {};
             var keyidStr = a32_to_str([keyId]);
             if (!this.participantKeys[sender]) {
                 logger.critical('Message does not have a sender key for :' + sender);
-                return false;
+                return MegaPromise.reject(false);
             }
             senderKey = this.participantKeys[sender][keyidStr];
             if (!senderKey) {
                 logger.critical('Message does not have a sender key for :' + sender + ' with key ID:' + keyId);
-                return false;
+                return MegaPromise.reject(false);
             }
         }
 
         if (parsedMessage) {
-            if (ns._verifyMessage(String.fromCharCode(parsedMessage.protocolVersion) +
+            var proxyPromise = new MegaPromise();
+
+            var verifyPromise = ns._verifyMessage(String.fromCharCode(parsedMessage.protocolVersion) +
                                   String.fromCharCode(parsedMessage.type) + senderKey + parsedMessage.signedContent,
                                   parsedMessage.signature,
-                                  pubEd25519[sender]) === false) {
+                                  pubEd25519[sender]);
+
+            verifyPromise.fail(function() {
                 logger.critical('Signature invalid for message from *** on ***');
                 logger.error('Signature invalid for message from ' + sender);
+                proxyPromise.reject(false);
+            });
 
-                return false;
-            }
+            verifyPromise.done(function() {
+                // Decrypt message payload.
+                var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
+                    senderKey,
+                    parsedMessage.nonce);
+                // Bail out if decryption failed.
+                if (cleartext === false) {
+                    proxyPromise.reject(false);
+                }
+                proxyPromise.resolve(cleartext);
+            });
+            return proxyPromise;
         }
-
-        // Decrypt message payload.
-        var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
-                                                    senderKey,
-                                                    parsedMessage.nonce);
-        // Bail out if decryption failed.
-        if (cleartext === false) {
-            return false;
+        else {
+            return MegaPromise.reject(false);
         }
-        return cleartext;
     };
 
     /**
@@ -1616,8 +1685,8 @@ var strongvelope = {};
      *     The encryption key id of the message, and if it is null, it will seed the keys from the message itself.
      * @param {Boolean} [historicMessage=false]
      *     Whether the message passed in for decryption is from the history.
-     * @returns {(StrongvelopeMessage|Boolean)}
-     *     The message content on success, `false` in case of errors.
+     * @returns {MegaPromise}
+     *     On success - The message content (StrongvelopeMessage|Boolean) or `false` in case of errors/failure.
      */
     strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
             sender, keyId, historicMessage) { // jshint maxcomplexity: 11
@@ -1632,13 +1701,13 @@ var strongvelope = {};
         if (parsedMessage === false) {
             logger.critical('Incoming message not usable.');
 
-            return false;
+            return MegaPromise.reject(false);
         }
         // Verify protocol version.
         if (parsedMessage.protocolVersion > PROTOCOL_VERSION) {
             logger.critical('Message not compatible with current protocol version.');
 
-            return false;
+            return MegaPromise.reject(false);
         }
         sender = sender ? sender : parsedMessage.invitor;
 
@@ -1646,27 +1715,39 @@ var strongvelope = {};
         if (sender === COMMANDER || keyId === 0) {
             return this.handleManagementMessage({ userId: sender, message: message}, historicMessage);
         }
-        var cleartext = this.decryptMessage(parsedMessage, sender, keyId);
-        if (cleartext === false) {
-            return false;
-        }
-        var payload = ns._parsePayload(cleartext, parsedMessage.protocolVersion);
-        // Bail out if payload can not be parsed.
-        if (payload === false) {
-            return false;
-        }
-        var result = {
-            version: parsedMessage.protocolVersion,
-            sender: sender,
-            type: parsedMessage.type,
-            identity: payload.identity,
-            references: payload.references,
-            payload: payload.plaintext,
-            includeParticipants: [],
-            excludeParticipants: []
-        };
 
-        return result;
+        var proxyPromise = new MegaPromise();
+
+        var decryptPromise = this.decryptMessage(parsedMessage, sender, keyId);
+        decryptPromise.fail(function(arg) {
+            proxyPromise.reject(arg);
+        });
+        decryptPromise.done(function(cleartext) {
+            if (cleartext === false) {
+                proxyPromise.reject(false);
+                return;
+            }
+            var payload = ns._parsePayload(cleartext, parsedMessage.protocolVersion);
+            // Bail out if payload can not be parsed.
+            if (payload === false) {
+                proxyPromise.reject(false);
+                return;
+            }
+
+            var result = {
+                version: parsedMessage.protocolVersion,
+                sender: sender,
+                type: parsedMessage.type,
+                identity: payload.identity,
+                references: payload.references,
+                payload: payload.plaintext,
+                includeParticipants: [],
+                excludeParticipants: []
+            };
+            proxyPromise.resolve(result);
+        });
+
+        return proxyPromise;
     };
 
 
@@ -1687,20 +1768,41 @@ var strongvelope = {};
 
         historicMessages = (historicMessages === false) ? false : true;
 
+        var self = this;
+
         // Now attempt to decrypt all messages.
-        var decryptedMessages = [];
+        var decryptedMessages = {};
+        var waitingPromises = [];
 
         var message;
-        for (var i = 0; i < messages.length ;i++) {
+        messages.forEach(function(message, i) {
             message = messages[i];
+            var decryptPromise =  self.decryptFrom(
+                message.message,
+                message.userId,
+                message.keyid,
+                historicMessages
+            );
 
-            decryptedMessages.push(this.decryptFrom(message.message,
-                                                    message.userId,
-                                                    message.keyid,
-                                                    historicMessages));
-        }
+            decryptPromise.done(function(msg) {
+                decryptedMessages[i] = msg;
+            });
+            waitingPromises.push(decryptPromise);
+        });
 
-        return decryptedMessages;
+        var proxyPromise = new MegaPromise();
+        MegaPromise.allDone(waitingPromises)
+            .always(function() {
+                // ensure the order of the returned messages is the same as in `messages`
+                var result = [];
+                for (var i = 0; i < messages.length; i++) {
+                    result.push(decryptedMessages[i]);
+                }
+
+                proxyPromise.resolve(result);
+            });
+
+        return proxyPromise;
     };
 
     /**
@@ -1832,7 +1934,7 @@ var strongvelope = {};
 
         if (!this.participantKeys[this.ownHandle][tempkeyid]) {
             throw new Error('No cached chat key for given key id!');
-        }  
+        }
         this.participantKeys[this.ownHandle][newkeyid] = this.participantKeys[this.ownHandle][tempkeyid];
         this.keyId = newkeyid;
     };

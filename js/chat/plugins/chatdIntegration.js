@@ -1,3 +1,6 @@
+(function(scope) {
+"use strict";
+
 /**
  * Integrates chatd.js into chat.js as a standalone plugin
  *
@@ -74,7 +77,7 @@ var ChatdIntegration = function(megaChat) {
     megaChat.rebind("onDestroy.chatdInt", function(e) {
         self.chatd.destroyed = true;
     });
-    
+
     $(window).rebind('onChatdChatUpdatedActionPacket.chatdInt', function(e, actionPacket) {
         self.openChatFromApi(actionPacket, false);
     });
@@ -158,7 +161,7 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
                         return;
                     }
                     allPromises.push(
-                        self.openChatFromApi(actionPacket, true)
+                        self.openChatFromApi(actionPacket, true, true)
                     );
                 });
 
@@ -237,49 +240,31 @@ ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
 
     msgContents = chatdEventObj.message;
 
-    var messageObject;
-    if (!chatdEventObj.userId || chatdEventObj.userId === u_handle) {
-        var state = KarereEventObjects.OutgoingMessage.STATE.SENT;
+    var state;
 
-        /**
-         * toJid, fromJid, type, messageId, contents, meta, delay, state, roomJid, seen
-         *
-         * @type {KarereEventObjects.OutgoingMessage}
-         */
-        messageObject = new KarereEventObjects.OutgoingMessage(
-            /* toJid,  */ chatRoom.roomJid,
-            /* fromJid,  */ self.megaChat.getJidFromNodeId(chatdEventObj.userId),
-            /* type,  */ "groupchat",
-            /* messageId,  */ chatdEventObj.messageId,
-            /* contents, */ msgContents,
-            /* meta,  */ {},
-            /* delay,  */ chatdEventObj.ts,
-            /* state,  */ state,
-            /* roomJid, */ chatRoom.roomJid,
-            /* seen */ chatdEventObj.seen
-        );
+    if (!chatdEventObj.userId || chatdEventObj.userId === u_handle) {
+        state = Message.STATE.SENT;
     }
-    else {
-        /**
-         * toJid, fromJid, type, rawType, messageId, rawMessage, roomJid, meta, contents, elements, delay, seen
-         * @type {KarereEventObjects.IncomingMessage}
-         */
-        messageObject = new KarereEventObjects.IncomingMessage(
-            /* toJid,  */ chatRoom.roomJid,
-            /* fromJid,  */ self.megaChat.getJidFromNodeId(chatdEventObj.userId),
-            /* type,  */ "groupchat",
-            /* rawType, */ "groupchat",
-            /* messageId,  */ chatdEventObj.messageId,
-            /* rawMessage, */ undefined,
-            /* roomJid, */ chatRoom.roomJid,
-            /* meta,  */ {},
-            /* contents, */ msgContents,
-            /* elements, */ undefined,
-            /* delay,  */ chatdEventObj.ts,
-            /* seen */ chatdEventObj.seen
-        );
+    else if (chatdEventObj.seen) {
+        state = Message.STATE.SEEN;
     }
-    return messageObject;
+
+    return new Message(
+        chatRoom,
+        chatRoom.messagesBuff,
+        {
+
+            'userId': chatdEventObj.userId,
+            'messageId': chatdEventObj.messageId,
+            'message': false,
+            'textContents': msgContents,
+            'delay': chatdEventObj.ts,
+            'state': state,
+            'updated': false,
+            'deleted': false,
+            'revoked': false
+        }
+    );
 };
 
 ChatdIntegration._waitForProtocolHandler = function (chatRoom, cb) {
@@ -304,7 +289,7 @@ ChatdIntegration._waitForProtocolHandler = function (chatRoom, cb) {
     }
 };
 
-ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
+ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missingMcf) {
     var self = this;
 
     var masterPromise = new MegaPromise();
@@ -322,6 +307,17 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         'ct': actionPacket.ct ? actionPacket.ct : null
     };
 
+    // is isMcf and triggered by a missingMcf in the 'f' treecache, trigger an immediate store in the fmdb
+    if (isMcf && missingMcf && fmdb) {
+        fmdb.add('mcf', {
+            g: actionPacket.g,
+            id: actionPacket.id,
+            p: actionPacket.p,
+            ts: actionPacket.ts,
+            u: actionPacket.u
+        });
+    }
+
     loadingDialog.hide();
 
     if (actionPacket.active === 0) {
@@ -333,25 +329,17 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         // its ok, no participants mean inactive chat, that we woudl skip...for now...
         return masterPromise.reject();
     }
-    var chatJids = [];
+    var userHandles = [];
     Object.keys(chatParticipants).forEach(function(k) {
         var v = chatParticipants[k];
-        chatJids.push(
-            megaChat.getJidFromNodeId(v.u)
-        );
+        if (v.u) {
+            userHandles.push(v.u);
+        }
     });
 
-    var roomJid;
-    if (actionPacket.g !== 1) {
-        roomJid = self.megaChat.generatePrivateRoomName(chatJids);
-    }
-    else {
-        roomJid = self.megaChat.generateGroupRoomName(actionPacket.id);
-    }
-    roomJid += "@conference." + megaChat.options.xmppDomain;
+    var roomId = actionPacket.id;
 
-
-    var chatRoom = self.megaChat.chats[roomJid];
+    var chatRoom = self.megaChat.chats[roomId];
     var wasActive = chatRoom ? chatRoom.isCurrentlyActive : false;
 
     var finishProcess = function() {
@@ -360,10 +348,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         // if the found chatRoom is in LEAVING mode...then try to reinitialise it!
 
         if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
-            self._cachedHandlers[roomJid] = chatRoom.protocolHandler;
+            self._cachedHandlers[roomId] = chatRoom.protocolHandler;
             chatRoom.destroy(undefined, true);
             chatRoom = false;
-            
+
             if (actionPacket.url) {
                 Soon(finishProcess);
             }
@@ -389,7 +377,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         }
 
         // try to find the chat room again, it may had been opened while waiting for the mcurl api call...
-        chatRoom = self.megaChat.chats[roomJid];
+        chatRoom = self.megaChat.chats[roomId];
         if (!chatRoom) {
             // don't try to open a chat, if its not yet opened and the actionPacket consist of me leaving...
             if (actionPacket.n) {
@@ -405,7 +393,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             }
 
             var r = self.megaChat.openChat(
-                chatJids,
+                userHandles,
                 actionPacket.g === 1 ? "group" : "private",
                 actionPacket.id,
                 actionPacket.cs,
@@ -421,8 +409,8 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             }
             self.decryptTopic(chatRoom);
             // handler of the same room was cached before, then restore the keys.
-            if (self._cachedHandlers[roomJid]) {
-                chatRoom.protocolHandler.participantKeys = self._cachedHandlers[roomJid].participantKeys;
+            if (self._cachedHandlers[roomId]) {
+                chatRoom.protocolHandler.participantKeys = self._cachedHandlers[roomId].participantKeys;
             }
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
                 if (chatRoom.lastActivity === 0) {
@@ -444,6 +432,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
 
             if (!chatRoom.chatId) {
                 chatRoom.chatId = actionPacket.id;
+                chatRoom.chatIdBin = base64urldecode(actionPacket.id);
                 chatRoom.chatShard = actionPacket.cs;
                 chatRoom.chatdUrl = actionPacket.url;
             }
@@ -578,13 +567,13 @@ ChatdIntegration._waitUntilChatIdIsAvailable = function(fn) {
                                 masterPromise.linkDoneAndFailToResult(fn, self, args);
                             })
                             .fail(function() {
-                                self.logger.error("Failed to retrieve chatId for chatRoom: ", chatRoom.roomJid);
+                                self.logger.error("Failed to retrieve chatId for chatRoom: ", chatRoom.roomId);
                                 masterPromise.reject(arguments);
                             });
                     }
                 })
                 .fail(function() {
-                    self.logger.error("[2] Failed to retrieve chatId for chatRoom: ", chatRoom.roomJid);
+                    self.logger.error("[2] Failed to retrieve chatId for chatRoom: ", chatRoom.roomId);
                     masterPromise.reject(arguments);
                 });
         })
@@ -605,18 +594,18 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
         if (!chatRoom.chatId) {
             // already sent an API request?
             if (
-                self.waitingChatIdPromises[chatRoom.roomJid] &&
-                self.waitingChatIdPromises[chatRoom.roomJid].state() === 'pending'
+                self.waitingChatIdPromises[chatRoom.roomId] &&
+                self.waitingChatIdPromises[chatRoom.roomId].state() === 'pending'
             ) {
                 masterPromise.linkDoneAndFailTo(
-                    self.waitingChatIdPromises[chatRoom.roomJid]
+                    self.waitingChatIdPromises[chatRoom.roomId]
                 );
                 return masterPromise;
             }
 
             var userHashes = [];
-            chatRoom.getParticipantsExceptMe().forEach(function(v) {
-                var contact = self.megaChat.getContactFromJid(v);
+            chatRoom.getParticipantsExceptMe().forEach(function(userHandle) {
+                var contact = M.u[userHandle];
 
                 if (!contact) {
                     return;
@@ -647,28 +636,29 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
             if (userHashes.length === 0) {
                 return;
             }
-            self.waitingChatIdPromises[chatRoom.roomJid] = asyncApiReq({
+            self.waitingChatIdPromises[chatRoom.roomId] = asyncApiReq({
                 'a': 'mcc',
                 'g': chatRoom.type === "group" ? 1 : 0,
                 'u': userHashes,
                 'v': Chatd.VERSION
             })
                 .always(function() {
-                    delete self.waitingChatIdPromises[chatRoom.roomJid];
+                    delete self.waitingChatIdPromises[chatRoom.roomId];
                 })
                 .done(function(r) {
                     chatRoom.chatdUrl = r.url;
                     chatRoom.chatId = r.id;
+                    chatRoom.chatIdBin = base64urldecode(r.id);
                     chatRoom.chatShard = r.cs;
 
                     self.join(chatRoom);
                 })
                 .fail(function() {
-                    self.logger.error("Failed to retrieve chatd ID from API for room: ", chatRoom.roomJid);
+                    self.logger.error("Failed to retrieve chatd ID from API for room: ", chatRoom.roomId);
                 });
 
             return masterPromise.linkDoneAndFailTo(
-                self.waitingChatIdPromises[chatRoom.roomJid]
+                self.waitingChatIdPromises[chatRoom.roomId]
             );
         }
         else {
@@ -813,7 +803,13 @@ ChatdIntegration._ensureNamesAreLoaded = function(users) {
 
 
 ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
-    var textContents = message.getContents ? message.getContents() : message.textContents;
+    var textContents = message.textContents ? message.textContents : message.message;
+
+    // reset any flags for what was processed in this message, since it just changed (was edited, or
+    // decrypted).
+    message.processedBy = {};
+    message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
+    message.decrypted = true;
 
     if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
         if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
@@ -939,7 +935,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
 
-    var chatRoomId = chatRoom.roomJid.split("@")[0];
+    var chatRoomId = chatRoom.roomId.split("@")[0];
 
     chatRoom.rebind('typing.chatdInt', function() {
         self.broadcast(chatRoom, String.fromCharCode(1));
@@ -953,7 +949,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             return;
         }
 
-        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+        if (foundChatRoom.roomId === chatRoom.roomId) {
             foundChatRoom.trigger('onParticipantTyping', [eventData.userId, eventData.bCastCode]);
         }
     });
@@ -966,7 +962,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             return;
         }
 
-        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+        if (foundChatRoom.roomId === chatRoom.roomId) {
             if (chatRoom.state === ChatRoom.STATE.JOINING) {
                 chatRoom.setState(
                     ChatRoom.STATE.READY
@@ -983,11 +979,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             return;
         }
 
-        if (foundChatRoom.roomJid === chatRoom.roomJid) {
-            delete chatRoom.chatId;
-            delete chatRoom.chatShard;
-            delete chatRoom.chatdUrl;
-            
+        if (foundChatRoom.roomId === chatRoom.roomId) {
+            chatRoom.chatShard = null;
+            chatRoom.chatdUrl = null;
             if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
                 chatRoom.setState(
                     ChatRoom.STATE.JOINING,
@@ -1005,11 +999,11 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             return;
         }
 
-        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+        if (foundChatRoom.roomId === chatRoom.roomId) {
 
             if (chatRoom.membersLoaded === false) {
                 if (eventData.priv < 255) {
-                    function addParticipant() {
+                    var addParticipant = function addParticipant() {
                         // add group participant in strongvelope
                         chatRoom.protocolHandler.addParticipant(eventData.userId);
                         // also add to our list
@@ -1034,7 +1028,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 }
             }
             else if (eventData.priv === 255) {
-                function deleteParticipant() {
+                var deleteParticipant = function deleteParticipant() {
                     // remove group participant in strongvelope
                     chatRoom.protocolHandler.removeParticipant(eventData.userId);
                     // also remove from our list
@@ -1056,15 +1050,15 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             }
         }
     });
-    
+
     if (!chatRoom.messagesBuff) {
         chatRoom.pubCu25519KeyIsMissing = false;
 
         var waitingForPromises = [];
 
         // retrieve all other user's Cu25519 keys IF needed
-        chatRoom.getParticipants().forEach(function(jid) {
-            var contactHash = chatRoom.megaChat.getContactHashFromJid(jid);
+        chatRoom.getParticipants().forEach(function(userHandle) {
+            var contactHash = userHandle;
             if (contactHash && !pubCu25519[contactHash]) {
                 var keyRetrievalPromise = crypt.getPubCu25519(contactHash);
                 keyRetrievalPromise.fail(function(r) {
@@ -1100,18 +1094,19 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
-            chatRoom.messagesBuff.messages.forEach(function(v, k) {
-
+            chatRoom.messagesBuff.messagesBatchFromHistory.forEach(function(v, k) {
                 if (v.userId && !v.requiresManualRetry) {
-                    var msg = v.getContents ? v.getContents() : v.message;
+                    if (!v.textContents && v.message && !v.deleted) {
+                        var msg = v.message;
 
-                    chatRoom.notDecryptedBuffer[k] = {
-                        'message': msg,
-                        'userId': v.userId,
-                        'keyid': v.keyid,
-                        'ts': v.delay,
-                        'k': k
-                    };
+                        chatRoom.notDecryptedBuffer[k] = {
+                            'message': msg,
+                            'userId': v.userId,
+                            'keyid': v.keyid,
+                            'ts': v.delay,
+                            'k': k
+                        };
+                    }
                 }
             });
 
@@ -1132,79 +1127,98 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             });
 
             if (hist.length > 0) {
+                var _decryptSuccessCb = function(decryptedMsgs) {
+                    for (var i = decryptedMsgs.length - 1; i >= 0; i--) {
+                        var failedToDecrypt = false;
+                        var v = decryptedMsgs[i];
+                        var messageId = hist[i]['k'];
+                        var msgInstance = chatRoom.messagesBuff.messagesBatchFromHistory[messageId];
+                        if (v && msgInstance) {
+                            if (v.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+                                if (typeof v.payload === 'undefined' || v.payload === null) {
+                                    v.payload = "";
+                                }
+                                msgInstance.textContents = v.payload;
+                                if (v.identity && v.references) {
+                                    var mb = chatRoom.messagesBuff;
+                                    msgInstance.references = v.references;
+                                    msgInstance.msgIdentity = v.identity;
+                                    mb.messageOrders[v.identity] = msgInstance.orderValue;
+                                    if (mb.verifyMessageOrder(v.identity, v.references) === false) {
+                                        // potential message order tampering detected.
+                                        self.logger.critical("message order tampering detected: ", messageId);
+                                    }
+                                }
+                            }
+                            else if (v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
+                                if (msgInstance) {
+                                    msgInstance.meta = {
+                                        userId: v.sender,
+                                        included: v.includeParticipants,
+                                        excluded: v.excludeParticipants
+                                    };
+                                    ChatdIntegration._ensureNamesAreLoaded(v.excludeParticipants);
+                                    ChatdIntegration._ensureNamesAreLoaded(v.includeParticipants);
+                                    msgInstance.dialogType = "alterParticipants";
+                                }
+                            }
+                            else if (v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                                msgInstance.dialogType = 'truncated';
+                                msgInstance.userId = v.sender;
+                            }
+                            else if (v.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
+                                msgInstance.meta = {
+                                    userId: v.sender,
+                                    privilege: v.privilege.charCodeAt(0),
+                                    targetUserId: v.recipients
+                                };
+                                msgInstance.dialogType = "privilegeChange";
+                            }
+                            else if (v.type === strongvelope.MESSAGE_TYPES.TOPIC_CHANGE){
+                                msgInstance.meta = {
+                                    userId: v.sender,
+                                    topic: v.payload
+                                };
+                                msgInstance.dialogType = "topicChange";
+                            }
+                            else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
+                                // this is a system message
+                                msgInstance.protocol = true;
+                            }
+                            else {
+                                failedToDecrypt = true;
+                                self.logger.error("Could not decrypt: ", v);
+                            }
+
+                            delete chatRoom.notDecryptedBuffer[messageId];
+
+                            if (!failedToDecrypt) {
+                                self._parseMessage(chatRoom, msgInstance);
+                                chatRoom.messagesBuff.messages.push(msgInstance);
+                                chatRoom.messagesBuff.messagesBatchFromHistory.remove(messageId);
+                            }
+                        }
+                        else {
+                            delete chatRoom.notDecryptedBuffer[messageId];
+                            // chatRoom.messagesBuff.messagesBatchFromHistory.remove(messageId);
+                        }
+                    }
+
+                    chatRoom.trigger('onHistoryDecrypted');
+                };
+
                 var decryptMessages = function() {
                     try {
                         // .seed result is not used in here, since it returns false, even when some messages can be
                         // decrypted which in the current case (of tons of cached non encrypted txt msgs in chatd) is
                         // bad
-                        chatRoom.protocolHandler.seed(hist);
-                        var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
-                        for (var i = decryptedMsgs.length-1; i >= 0; i--) {
-                            var v = decryptedMsgs[i];
-                            var messageId = hist[i]['k'];
-                            if (v) {
-
-                                if (v.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
-                                    if (typeof(v.payload) === 'undefined' || v.payload === null) {
-                                        v.payload = "";
-                                    }
-                                    chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
-                                    if (v.identity && v.references) {
-                                        var mb = chatRoom.messagesBuff;
-                                        mb.messages[messageId].references = v.references;
-                                        mb.messages[messageId].msgIdentity = v.identity;
-                                        mb.messageOrders[v.identity] = mb.messages[messageId].orderValue;
-                                        if (mb.verifyMessageOrder(v.identity, v.references) === false) {
-                                            // potential message order tampering detected.
-                                            self.logger.critical("message order tampering detected: ", messageId);
-                                        }
-                                    }
-                                }
-                                else if (v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                                    if (chatRoom.messagesBuff.messages[messageId]) {
-                                        chatRoom.messagesBuff.messages[messageId].meta = {
-                                            userId: v.sender,
-                                            included: v.includeParticipants,
-                                            excluded: v.excludeParticipants
-                                        };
-                                        ChatdIntegration._ensureNamesAreLoaded(v.excludeParticipants);
-                                        ChatdIntegration._ensureNamesAreLoaded(v.includeParticipants);
-                                        chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
-                                    }
-                                }
-                                else if (v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                                    chatRoom.messagesBuff.messages[messageId].dialogType = 'truncated';
-                                    chatRoom.messagesBuff.messages[messageId].userId = v.sender;
-                                }
-                                else if (v.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
-                                    chatRoom.messagesBuff.messages[messageId].meta = {
-                                        userId: v.sender,
-                                        privilege: v.privilege.charCodeAt(0),
-                                        targetUserId: v.recipients
-                                    };
-                                    chatRoom.messagesBuff.messages[messageId].dialogType = "privilegeChange";
-                                }
-                                else if (v.type === strongvelope.MESSAGE_TYPES.TOPIC_CHANGE){
-                                    chatRoom.messagesBuff.messages[messageId].meta = {
-                                        userId: v.sender,
-                                        topic: v.payload
-                                    };
-                                    chatRoom.messagesBuff.messages[messageId].dialogType = "topicChange";
-                                }
-                                else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
-                                    // this is a system message
-                                    chatRoom.messagesBuff.messages[messageId].protocol = true;
-                                }
-                                else {
-                                    self.logger.error("Could not decrypt: ", v);
-                                }
-                                self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
-                                delete chatRoom.notDecryptedBuffer[messageId];
-                            }
-                            else {
-                                delete chatRoom.notDecryptedBuffer[messageId];
-                            }
-                        };
+                        chatRoom.protocolHandler.seed(hist).always(function() {
+                            chatRoom.protocolHandler.batchDecrypt(hist, true)
+                                .done(_decryptSuccessCb)
+                                .fail(function(e) {
+                                    self.logger.error("Failed to decrypt stuff via strongvelope, error: ", e);
+                                });
+                        });
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, uncaught exception: ", e);
                     }
@@ -1223,7 +1237,10 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     ChatdIntegration._ensureKeysAreLoaded(hist, invitors)
                         .always(decryptMessages);
                 }
-
+            }
+            else {
+                // no new messages retrieved
+                chatRoom.trigger('onHistoryDecrypted');
             }
         });
 
@@ -1309,66 +1326,81 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 var _runDecryption = function() {
                     try {
 
-                        var decrypted = chatRoom.protocolHandler.decryptFrom(
+                        chatRoom.protocolHandler.decryptFrom(
                             msgObject.message,
                             msgObject.userId,
                             msgObject.keyid,
                             false
-                        );
-                        if (decrypted) {
-                            if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
-                                if (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) {
-                                    decrypted.payload = "";
+                        ).done(function(decrypted) {
+                            if (decrypted) {
+                                var mb = chatRoom.messagesBuff;
+                                var msg = mb.messagesBatchFromHistory[msgObject.messageId];
+                                if (!msg) {
+                                    // may had been decrypted already, if also returned in a chat history in case of a
+                                    // reconnect
+                                    return;
                                 }
-                                chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
-                                if (decrypted.identity && decrypted.references) {
-                                    var mb = chatRoom.messagesBuff;
-                                    mb.messages[msgObject.messageId].references = decrypted.references;
-                                    mb.messages[msgObject.messageId].msgIdentity = decrypted.identity;
-                                    mb.messageOrders[decrypted.identity] = msgObject.orderValue;
-                                    if (mb.verifyMessageOrder(decrypted.identity, decrypted.references) === false) {
-                                        // potential message order tampering detected.
-                                        var l = self.logger;
-                                        l.critical("message order tampering detected: ", msgObject.messageId);
-                                    }
-                                }
-                            } else if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                                chatRoom.messagesBuff.messages[msgObject.messageId].meta = {
-                                    userId: decrypted.sender,
-                                    included: decrypted.includeParticipants,
-                                    excluded: decrypted.excludeParticipants
-                                };
-                                chatRoom.messagesBuff.messages[msgObject.messageId].dialogType = "alterParticipants";
-                            } else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                                var msg = chatRoom.messagesBuff.messages[msgObject.messageId];
-                                msg.dialogType = 'truncated';
-                                msg.userId = decrypted.sender;
-                            }
-                            else if (decrypted.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
-                                var msg = chatRoom.messagesBuff.messages[msgObject.messageId];
-                                msg.meta = {
-                                    userId: decrypted.sender,
-                                    privilege: decrypted.privilege.charCodeAt(0),
-                                    targetUserId: decrypted.recipients
-                                };
-                                msg.dialogType = "privilegeChange";
 
+                                if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+                                    if (typeof decrypted.payload === 'undefined' || decrypted.payload === null) {
+                                        decrypted.payload = "";
+                                    }
+                                    msg.textContents = decrypted.payload;
+
+                                    if (decrypted.identity && decrypted.references) {
+                                        msg.references = decrypted.references;
+                                        msg.msgIdentity = decrypted.identity;
+                                        mb.messageOrders[decrypted.identity] = msgObject.orderValue;
+                                        if (
+                                            mb.verifyMessageOrder(decrypted.identity, decrypted.references) === false
+                                        ) {
+                                            // potential message order tampering detected.
+                                            var l = self.logger;
+                                            l.critical("message order tampering detected: ", msgObject.messageId);
+                                        }
+                                    }
+                                } else if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
+                                    msg.meta = {
+                                        userId: decrypted.sender,
+                                        included: decrypted.includeParticipants,
+                                        excluded: decrypted.excludeParticipants
+                                    };
+                                    msg.dialogType = "alterParticipants";
+
+                                } else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                                    msg.dialogType = 'truncated';
+                                    msg.userId = decrypted.sender;
+                                }
+                                else if (decrypted.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
+                                    msg.meta = {
+                                        userId: decrypted.sender,
+                                        privilege: decrypted.privilege.charCodeAt(0),
+                                        targetUserId: decrypted.recipients
+                                    };
+                                    msg.dialogType = "privilegeChange";
+
+                                }
+                                else if (decrypted.type === strongvelope.MESSAGE_TYPES.TOPIC_CHANGE){
+                                    msg.meta = {
+                                        userId: decrypted.sender,
+                                        topic: decrypted.payload
+                                    };
+                                    msg.dialogType = "topicChange";
+                                }
+                                else if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED){
+                                    msg.protocol = true;
+                                }
+                                mb.messagesBatchFromHistory.remove(msg.messageId);
+                                if (msg.pendingMessageId) {
+                                    mb.messages.remove(msg.pendingMessageId);
+                                }
+                                mb.messages.push(msg);
+                                self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
+                            } else {
+                                self.logger.error('Unknown message type!');
                             }
-                            else if (decrypted.type === strongvelope.MESSAGE_TYPES.TOPIC_CHANGE){
-                                chatRoom.messagesBuff.messages[msgObject.messageId].meta = {
-                                    userId: decrypted.sender,
-                                    topic: decrypted.payload
-                                };
-                                chatRoom.messagesBuff.messages[msgObject.messageId].dialogType = "topicChange";
-                            }
-                            else if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED){
-                                chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
-                            }
-                            self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
-                        } else {
-                            self.logger.error('Unknown message type!');
-                        }
-                    } catch(e) {
+                        });
+                    } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, uncaught exception: ", e);
                     }
                 };
@@ -1428,7 +1460,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 self.logger.error(
                     "Failed to pre-load keys before initialising strongvelope. " +
                     "Can't initialise strongvelope for this chat: ",
-                    chatRoom.roomJid,
+                    chatRoom.roomId,
                     waitingForPromises
                 );
             });
@@ -1449,10 +1481,15 @@ ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
             );
             var _runTopicDecryption = function() {
                 try {
-                    var decryptedCT = chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
-                    if (decryptedCT) {
-                        chatRoom.topic = decryptedCT.payload;
-                    }
+                    chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct))
+                        .done(function(decryptedCT) {
+                            if (decryptedCT) {
+                                chatRoom.topic = decryptedCT.payload;
+                            }
+                        })
+                        .fail(function(e) {
+                            self.logger.error("Could not decrypt topic: ", e);
+                        });
                 } catch (e) {
                     self.logger.error("Could not decrypt topic: ", e);
                 }
@@ -1476,8 +1513,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
         'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.'
     );
 
-    self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomJid;
-    
+    self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomId;
     self.chatd.join(
         base64urldecode(chatRoom.chatId),
         chatRoom.chatShard,
@@ -1508,13 +1544,17 @@ ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
 
 ChatdIntegration.prototype.setRetention = function(chatRoom, time) {
     var self = this;
-    self.chatd.cmd(Chatd.Opcode.RETENTION, base64urldecode(chatRoom.chatId), Chatd.Const.UNDEFINED + pack32le(time));
+    self.chatd.cmd(
+        Chatd.Opcode.RETENTION,
+        base64urldecode(chatRoom.chatId),
+        Chatd.Const.UNDEFINED + Chatd.pack32le(time)
+    );
 };
 
 ChatdIntegration.prototype.sendNewKey = function(chatRoom, keyxid, keyBlob) {
     var self = this;
     var keylen = keyBlob.length;
-    var keybody = self.chatd.pack32le(keyxid) + self.chatd.pack32le(keylen) + keyBlob;
+    var keybody = Chatd.pack32le(keyxid) + Chatd.pack32le(keylen) + keyBlob;
     self.chatd.cmd(Chatd.Opcode.NEWKEY, base64urldecode(chatRoom.chatId), keybody);
 };
 
@@ -1524,7 +1564,8 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
     // resent until confirmation and then to the confirmed msgid)
     var self = this;
 
-    var messageContents = messageObject.getContents() ? messageObject.getContents() : "";
+    var messageContents = (messageObject.textContents ? messageObject.textContents : messageObject.message) || "";
+
     var tmpPromise = new MegaPromise();
 
     var promises = [];
@@ -1534,7 +1575,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
     }
     else {
         participants.forEach(function(v, k) {
-            participants[k] = megaChat.getNodeIdFromJid(v);
+            participants[k] = v;
         });
     }
 
@@ -1702,3 +1743,6 @@ ChatdIntegration.prototype.isLoading = function() {
     });
 
 makeObservable(ChatdIntegration);
+
+scope.ChatdIntegration = ChatdIntegration;
+})(window);

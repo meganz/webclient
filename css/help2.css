@@ -7,25 +7,6 @@
     padding-right: 0 !important;
     position: relative;
 }
-/* Scrollable Search 
-.search-section{
-	display: none;
-	position: fixed;
-	width: 100%;
-	top: 0px;
-	left: 0;
-	height: 240px;
-	/* Rectangle 2567: 
-	background-image: linear-gradient(0deg, rgba(250,250,250,0.88) 0%, #FAFAFA 10%);
-	z-index: 99;
-}*/
-/*
-.search-section .section-title{
-	margin-top: 130px;
-}
-*/
-/*Colins CSS changes*/
-/* fixed sidebar applied dynamtically with JS */
 .help-background-block {
     content:'';
     position: absolute;
@@ -740,9 +721,9 @@
     font-size: 14px;
     letter-spacing: 0.2px;
     line-height: 18px;
-    margin-bottom: 22px;
+    margin-bottom: 8px;
     margin-right: 12px;
-    padding-bottom: 22px;
+    padding-bottom: 0;
     position: relative;
     text-align: left;
 }
@@ -918,7 +899,7 @@
 #help2-main .support-section-header-clone {
     top: 50px;
     width: 100%;
-    position: fixed;
+    position: absolute;
     top: 60px;
     left: 0;
     right: 0;
@@ -933,6 +914,10 @@
     user-select: none;
     z-index: 999;
     margin-top: 2px;
+}
+#help2-main .support-section-header-clone.fixed {
+    top: 60px !important;
+    position: fixed;
 }
 #help2-main .support-section-header-clone .support-search-heading {
     color: #666;
@@ -1520,15 +1505,6 @@
     padding-right: 50px;
 }
 #help2-main .main-content-pad {
-    /*background-color: white;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-  margin-left: 310px;
-  padding-bottom: 0;
-  padding-left: 50px;
-  padding-right: 50px;*/
     padding-top: 10px;
     width: 614px;
     padding-bottom: 0;
@@ -1537,13 +1513,6 @@
     margin-top: 50px;
 }
 #help2-main .main-directory-pad {
-    /*background-color: white;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  padding-left: 50px;
-  padding-right: 50px;
-  bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);*/
     margin-left: 300px;
     padding-bottom: 0;
     padding-top: 10px;
@@ -2627,7 +2596,7 @@
 #help2-main .sidebar-menu-container {
     margin-top: 60px;
 }
-#help2-main .fixed {
+#help2-main .sidebar-menu-container.fixed {
     position: fixed;
     top: 30px !important;
     transition-duration: 0.5s;

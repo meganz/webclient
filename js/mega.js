@@ -883,20 +883,45 @@ scparser.$add('se', {
 
 scparser.$add('ua', {
     r: function(a) {
-        // user attributes
-        if (fminitialized) {
+        'use strict';
+
+        if (Array.isArray(a.ua)) {
             var attrs = a.ua;
             var actionPacketUserId = a.u;
 
-            for (var j in attrs) {
+            for (var j = 0; j < attrs.length; j++) {
                 var attributeName = attrs[j];
 
-                attribCache.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
+                mega.attr.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
             }
         }
     },
     l: function(a) {
-        mega.attr.handleUserAttributeActionPackets(a, loadavatars);
+        'use strict';
+
+        if (Array.isArray(a.ua)) {
+            var attrs = a.ua;
+            var actionPacketUserId = a.u;
+
+            for (var j = 0; j < attrs.length; j++) {
+                var version = a.v && a.v[j];
+                var attributeName = attrs[j];
+
+                // fill version if missing
+                if (version && !mega.attr._versions[actionPacketUserId + "_" + attributeName]) {
+                    mega.attr._versions[actionPacketUserId + "_" + attributeName] = version;
+                }
+
+                // handle avatar related action packets (e.g. avatar modified)
+                if (attributeName === '+a') {
+                    loadavatars.push(actionPacketUserId);
+                }
+                else if (attributeName === 'firstname' || attributeName === 'lastname') {
+                    // handle firstname/lastname attributes
+                    mega.attr.uaPacketParser(attributeName, actionPacketUserId, true, version);
+                }
+            }
+        }
     }
 });
 
@@ -1033,7 +1058,10 @@ scparser.$add('usc', function() {
 });
 
 scparser.$add('psts', function(a) {
-    proPage.processPaymentReceived(a);
+    if (!pfid && u_type) {
+        M.checkStorageQuota(2000);
+    }
+    pro.processPaymentReceived(a);
 });
 
 scparser.$add('mcc', function(a) {
@@ -2702,25 +2730,6 @@ function init_chat() {
     function __init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
-
-            // XXX: Prevent known Strophe exceptions...
-            ['_onIdle', '_connect'].forEach(function(fn) {
-                var proto = Strophe.Websocket.prototype;
-                var unsafeFn = '_unsafe' + fn;
-
-                if (!proto[unsafeFn]) {
-                    proto[unsafeFn] = proto[fn];
-                    proto[fn] = function() {
-                        try {
-                            this[unsafeFn].apply(this, arguments);
-                        }
-                        catch (ex) {
-                            console.error('Caught Strophe exception.', ex);
-                        }
-                    };
-                }
-                proto = undefined;
-            });
 
             var _chat = new Chat();
 

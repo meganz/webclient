@@ -51,7 +51,8 @@ Message.prototype.getState = function() {
         return Message.STATE.NULL;
     }
 
-    var lastSeenMessage = Message._mockupNonLoadedMessage(mb.lastSeen, mb.messages[mb.lastSeen], 0);
+    var foundMsg = mb.messages[mb.lastSeen] ? mb.messages[mb.lastSeen] : mb.messagesBatchFromHistory[mb.lastSeen];
+    var lastSeenMessage = Message._mockupNonLoadedMessage(mb.lastSeen, foundMsg, 0);
 
     if (self.userId === u_handle) {
         // can be NOT_SENT, SENT, DELIVERED and DELETED
@@ -223,19 +224,16 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd = chatdInt.chatd;
 
     self.messages = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc, this);
+    self.messagesBatchFromHistory = new MegaDataSortedMap("messageId", MessagesBuff.orderFunc);
+
+    // because on connect, chatd.js would request hist retrieval automatically, lets simply set a "lock"
+    self.isDecrypting = new MegaPromise();
 
     var origPush = self.messages.push;
     self.messages.push = function(msg) {
         if (msg.addChangeListener) {
             msg.addChangeListener(function() {
                 self.messages.reorder();
-            });
-        }
-        else if (msg instanceof KarereEventObjects.OutgoingMessage) {
-            $(msg).rebind("onChange.mbOnPush", function(msg, property, oldVal, newVal) {
-                if (property === "orderValue" || property === "delay") {
-                    self.messages.reorder();
-                }
             });
         }
         var res = origPush.call(this, msg);
@@ -269,7 +267,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     var loggerIsEnabled = localStorage['messagesBuffLogger'] === '1';
 
     self.logger = MegaLogger.getLogger(
-        "messagesBuff[" + chatRoom.roomJid.split("@")[0] + "]",
+        "messagesBuff[" + chatRoom.roomId.split("@")[0] + "]",
         {
             minLogLevel: function() {
                 return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
@@ -282,7 +280,48 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     // self._parent = chatRoom;
 
-    var chatRoomId = chatRoom.roomJid.split("@")[0];
+    var chatRoomId = chatRoom.roomId.split("@")[0];
+
+    chatRoom.rebind('onChatShown.mb', function() {
+        // when the chat was first opened in the UI, try to retrieve more messages to fill the screen
+        if (
+            self.haveMoreHistory() &&
+            (
+                self.messages.length === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL ||
+                self.messagesBatchFromHistory.length === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL
+            )
+        ) {
+            self.retrieveChatHistory(false);
+        }
+    });
+
+    chatRoom.rebind('onHistoryDecrypted.mb', function() {
+        if (chatRoom.messagesBuff.isDecrypting) {
+            chatRoom.messagesBuff.isDecrypting.resolve();
+        }
+
+
+
+        if (self.haveMoreHistory() && self.messages.length <= Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL) {
+            // if there are more messages in history, but there is no "renderable text message" (for the left tree
+            // pane), we will try to retrieve Chatd.MESSAGE_HISTORY_LOAD_COUNT more messages, so that it won't display
+            // an empty chat
+            if (self.getLatestTextMessage() === false) {
+                self.retrieveChatHistory(false);
+                return;
+            }
+
+            // if the # of unreads === initial load count of messages, this may mean there are more unread messages
+            // in the history, so retrieve all Chatd.MESSAGE_HISTORY_LOAD_COUNT messages
+            var totalUnreads = 0;
+            self.messages.forEach(function(msg) {
+                totalUnreads += msg.getState() === Message.STATE.NOT_SEEN ? 1 : 0;
+            });
+            if (totalUnreads === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL) {
+                self.retrieveChatHistory(false);
+            }
+        }
+    });
 
     self.chatd.rebind('onMessageLastSeen.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
@@ -292,7 +331,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             return;
         }
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.lastSeen = eventData.messageId;
             self.trackDataChange();
         }
@@ -305,7 +344,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             return;
         }
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             if (eventData.userId === u_handle) {
                 self.joined = true;
                 if (chatRoom.state === ChatRoom.STATE.JOINING) {
@@ -318,7 +357,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageConfirm.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.lastSent = eventData.messageId;
             self.trackDataChange();
         }
@@ -326,7 +365,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.chatd.rebind('onMessageLastReceived.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
             self.setLastReceived(eventData.messageId);
         }
     });
@@ -334,19 +373,20 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
+            var requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
             if (
                 typeof(self.expectedMessagesCount) === 'undefined' ||
-                self.expectedMessagesCount === 32
+                self.expectedMessagesCount === requestedMessagesCount
             ) {
                 // this is an empty/new chat.
                 self.expectedMessagesCount = 0;
                 self.retrievedAllMessages = true;
             }
             else if (
-                self.expectedMessagesCount === 32
+                self.expectedMessagesCount === requestedMessagesCount
             ) {
                 self.haveMessages = true;
                 self.retrievedAllMessages = true;
@@ -358,15 +398,23 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.retrievedAllMessages = false;
             }
 
+
+
+            delete self.expectedMessagesCount;
+            delete self.requestedMessagesCount;
+
+            $(self).trigger('onHistoryFinished');
+
             if (self.$msgsHistoryLoading && self.$msgsHistoryLoading.state() === 'pending') {
                 self.$msgsHistoryLoading.resolve();
             }
 
-            delete self.expectedMessagesCount;
-
-            $(self).trigger('onHistoryFinished');
-
             self.trackDataChange();
+
+            if (chatRoom.isCurrentlyActive && requestedMessagesCount === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL) {
+                // chat was active, when initial loading finished...request more messages
+                chatRoom.trigger('onChatShown.mb');
+            }
         }
     });
 
@@ -375,7 +423,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
             self.isRetrievingHistory = true;
             self.expectedMessagesCount = Math.abs(eventData.count);
             self.trackDataChange();
@@ -389,7 +437,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.logger.warn("Message not found for: ", e, eventData);
             return;
         }
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.haveMessages = true;
             self.trackDataChange();
             self.retrieveChatHistory(true);
@@ -399,10 +447,11 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageStore.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
             self.haveMessages = true;
 
-            var msgObject = new Message(chatRoom,
+            var msgObject = new Message(
+                chatRoom,
                 self,
                 {
                     'messageId': eventData.messageId,
@@ -423,14 +472,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.lastDeliveredMessageRetrieved = true;
             }
 
-            self.messages.push(msgObject);
-            if (eventData.pendingid) {
-                var foundMessage = self.getByInternalId(eventData.pendingid);
 
-                if (foundMessage) {
-                    self.messages.removeByKey(foundMessage.messageId);
-                }
-            }
             if (!eventData.isNew) {
                 self.expectedMessagesCount--;
                 if (eventData.userId !== u_handle) {
@@ -441,8 +483,21 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
                     }
                 }
+                self.messagesBatchFromHistory.push(msgObject);
             }
             else {
+                if (eventData.pendingid) {
+                    var foundMessage = self.getByInternalId(eventData.pendingid);
+
+                    if (foundMessage.textContents) {
+                        msgObject.textContents = foundMessage.textContents;
+                    }
+
+                    msgObject.pendingMessageId = foundMessage.messageId;
+                }
+
+                self.messagesBatchFromHistory.push(msgObject);
+
                 // if not from history
                 // mark as received if not sent by me
                 if (eventData.userId !== u_handle) {
@@ -461,7 +516,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             return;
         }
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.haveMessages = true;
 
             if (!self.messages[eventData.messageId]) {
@@ -483,7 +538,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (eventData.state === "EDITED" || eventData.state === "TRUNCATED") {
             var timestamp = chatRoom.messagesBuff.messages[eventData.messageId].delay ?
                 chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime();
-            
+
             var editedMessage = new Message(
                 chatRoom,
                 self,
@@ -500,66 +555,78 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             );
             var originalMessage = chatRoom.messagesBuff.messages[eventData.messageId];
 
+            var _decryptSuccessCb = function(decrypted) {
+                if (decrypted) {
+                    // if the edited payload is an empty string, it means the message has been deleted.
+                    if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+                        if (typeof decrypted.payload === 'undefined' || decrypted.payload === null) {
+                            decrypted.payload = "";
+                        }
+                        editedMessage.textContents = decrypted.payload;
+
+                        if (decrypted.identity && decrypted.references) {
+                            editedMessage.references = decrypted.references;
+                            editedMessage.msgIdentity = decrypted.identity;
+                            if (
+                                chatRoom.messagesBuff.verifyMessageOrder(
+                                    decrypted.identity,
+                                    decrypted.references
+                                ) === false) {
+                                // potential message order tampering detected.
+                                self.logger.error("message order tampering detected: ", eventData.messageId);
+                            }
+                        }
+                    }
+                    else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                        editedMessage.dialogType = 'truncated';
+                        editedMessage.userId = decrypted.sender;
+                        editedMessage.delay = unixtime();
+                        chatRoom.lastActivity = editedMessage.delay;
+                        chatRoom.didInteraction(editedMessage.userId, chatRoom.lastActivity);
+                    }
+
+                    chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
+                        chatRoom,
+                        editedMessage
+                    );
+
+                    chatRoom.messagesBuff.messages.replace(editedMessage.messageId, editedMessage);
+
+                    if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+                        var messageKeys = chatRoom.messagesBuff.messages.keys();
+
+                        for (var i = 0; i < messageKeys.length; i++) {
+                            var v = chatRoom.messagesBuff.messages[messageKeys[i]];
+
+                            if (v.orderValue < eventData.id) {
+                                // remove the messages with orderValue < eventData.id from message buffer.
+                                chatRoom.messagesBuff.messages.removeByKey(v.messageId);
+                            }
+                        }
+                    }
+                }
+                else {
+                    chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
+                    throw new Error('Message can not be decrypted!');
+                }
+            };
+
             var _runDecryption = function() {
-                try
-                {
-                    var decrypted = chatRoom.protocolHandler.decryptFrom(
+                try {
+                    chatRoom.protocolHandler.decryptFrom(
                         eventData.message,
                         eventData.userId,
                         eventData.keyid,
                         false
-                    );
-                    if (decrypted) {
-                        // if the edited payload is an empty string, it means the message has been deleted.
-                        if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
-                            if (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) {
-                                decrypted.payload = "";
-                            }
-                            editedMessage.textContents = decrypted.payload;
-
-                            if (decrypted.identity && decrypted.references) {
-                                editedMessage.references = decrypted.references;
-                                editedMessage.msgIdentity = decrypted.identity;
-                                if (chatRoom.messagesBuff.verifyMessageOrder(decrypted.identity, decrypted.references)
-                                    === false) {
-                                    // potential message order tampering detected.
-                                    self.logger.error("message order tampering detected: ", eventData.messageId);
-                                }
-                            }
-                        }
-                        else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                            editedMessage.dialogType = 'truncated';
-                            editedMessage.userId = decrypted.sender;
-                            editedMessage.delay = unixtime();
-                            chatRoom.lastActivity = editedMessage.delay;
-                            chatRoom.didInteraction(editedMessage.userId, chatRoom.lastActivity);
-                        }
-
-                        chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
-                            chatRoom,
-                            editedMessage
+                    )
+                    .done(_decryptSuccessCb)
+                    .fail(function(e) {
+                        self.logger.error(
+                            "Failed to decrypt stuff via strongvelope, " +
+                            "decryptFrom failed with error:", e
                         );
-                        
-                        chatRoom.messagesBuff.messages.replace(editedMessage.messageId, editedMessage);
-
-                        if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                            var messageKeys = chatRoom.messagesBuff.messages.keys();
-
-                            for (var i = 0; i < messageKeys.length; i++) {
-                                var v = chatRoom.messagesBuff.messages[messageKeys[i]];
-
-                                if (v.orderValue < eventData.id) {
-                                    // remove the messages with orderValue < eventData.id from message buffer.
-                                    chatRoom.messagesBuff.messages.removeByKey(v.messageId);
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
-                        throw new Error('Message can not be decrypted!');
-                    }
-                } catch(e) {
+                    });
+                } catch (e) {
                     self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                 }
             };
@@ -694,18 +761,23 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             if (foundMessage) {
                 self.removeMessageById(foundMessage.messageId);
             }
-            
-            var outgoingMessage = new KarereEventObjects.OutgoingMessage(
-                    chatRoom.megaChat.getJidFromNodeId(eventData.userId),
-                    chatRoom.megaChat.karere.getJid(),
-                    "groupchat",
-                    "mexp" + eventData.id,
-                    "",
-                    {},
-                    eventData.ts,
-                    Message.STATE.RESTOREDEXPIRED,
-                    chatRoom.roomJid
-                );
+
+            var outgoingMessage = new Message(
+                    chatRoom,
+                    self,
+                    {
+                    'userId': eventData.userId,
+                    'messageId': eventData.id,
+                    'message': eventData.message,
+                    'textContents': "",
+                    'delay':eventData.ts,
+                    'state':Message.STATE.RESTOREDEXPIRED,
+                    'updated': false,
+                    'deleted': false,
+                    'revoked': false
+                }
+            );
+
             outgoingMessage.internalId = eventData.id;
             outgoingMessage.orderValue = eventData.id;
             outgoingMessage.requiresManualRetry = true;
@@ -715,27 +787,28 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             var _runDecryption = function() {
                 try
                 {
-                    var decrypted = chatRoom.protocolHandler.decryptFrom(
+                    chatRoom.protocolHandler.decryptFrom(
                         eventData.message,
                         eventData.userId,
                         eventData.keyid,
                         false
-                    );
-                    if (decrypted) {
-                        // if the edited payload is an empty string, it means the message has been deleted.
-                        if (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) {
-                            decrypted.payload = "";
-                        }
-                        outgoingMessage.contents = decrypted.payload;
-                        chatRoom.messagesBuff.messages.push(outgoingMessage);
+                    ).done(function(decrypted) {
+                        if (decrypted) {
+                            // if the edited payload is an empty string, it means the message has been deleted.
+                            if (typeof decrypted.payload === 'undefined' || decrypted.payload === null) {
+                                decrypted.payload = "";
+                            }
+                            outgoingMessage.textContents = decrypted.payload;
+                            chatRoom.messagesBuff.messages.push(outgoingMessage);
 
-                        chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
-                            chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]
-                        );
-                    }
-                    else {
-                        throw new Error('Message can not be decrypted!');
-                    }
+                            chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
+                                chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]
+                            );
+                        }
+                        else {
+                            throw new Error('Message can not be decrypted!');
+                        }
+                    });
                 } catch(e) {
                     self.logger.error("Failed to decrypt stuff via strongvelope, because of uncaught exception: ", e);
                 }
@@ -758,7 +831,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
         chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.trackDataChange();
         }
     });
@@ -791,7 +864,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
         });
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.trackDataChange();
         }
     });
@@ -800,14 +873,14 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
         chatRoom.protocolHandler.setIncludeKey(true);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.trackDataChange();
         }
     });
 
     self.chatd.rebind('onMessageKeyRestore.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        var keyxid = eventData.keyid;
+        var keyxid = eventData.keyid || eventData.keyxid;
         var keys = eventData.keys;
 
         var seedKeys = function() {
@@ -815,7 +888,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         };
         ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.trackDataChange();
         }
     });
@@ -960,26 +1033,42 @@ MessagesBuff.prototype.messagesHistoryIsLoading = function() {
 MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
     var self = this;
 
+    var len = isInitialRetrivalCall ? Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL : Chatd.MESSAGE_HISTORY_LOAD_COUNT;
+
     if (self.messagesHistoryIsLoading()) {
         return self.$msgsHistoryLoading;
     }
+    else if (self.isDecrypting && self.isDecrypting.state() === 'pending') {
+        // if is decrypting, queue a retrieveChatHistory to be executed AFTER the decryption finishes
+        var proxyPromise = new MegaPromise();
+        self.isDecrypting.always(function() {
+            proxyPromise.linkDoneAndFailTo(
+                self.retrieveChatHistory(isInitialRetrivalCall)
+            );
+        });
+
+        return proxyPromise;
+    }
     else {
+        self.isDecrypting = new MegaPromise();
+
+        self.requestedMessagesCount = len;
         self.chatdIsProcessingHistory = true;
         if (!isInitialRetrivalCall) {
-            self._currentHistoryPointer -= 32;
+            self._currentHistoryPointer -= len;
         }
 
         self.$msgsHistoryLoading = new MegaPromise();
         self.chatdInt.retrieveHistory(
             self.chatRoom,
-            -32
+            len * -1
         );
 
         self.trackDataChange();
 
 
         var timeoutPromise = createTimeoutPromise(function() {
-            return self.$msgsHistoryLoading.state() !== 'pending'
+            return self.$msgsHistoryLoading.state() !== 'pending';
         }, 100, 10000)
             .always(function() {
                 self.chatdIsProcessingHistory = false;
@@ -994,7 +1083,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
         self.$msgsHistoryLoading.fail(function() {
             self.logger.error("HIST FAILED: ", arguments);
             if (!isInitialRetrivalCall) {
-                self._currentHistoryPointer += 32;
+                self._currentHistoryPointer += len;
             }
         });
 

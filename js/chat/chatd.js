@@ -44,7 +44,7 @@ var Chatd = function(userId, options) {
         handleMessage: function(shard, msg, len) {},
         onUserJoinLeave: function(chatid, userid, priv) {},
         onUserOffline: function(chatid, userid, clientid) {},
-        shutdown: function() {}
+        onShutdown: function() {}
     };
 
     // load persistent client id, or generate one if none was stored
@@ -476,7 +476,6 @@ Chatd.Shard.prototype.reconnect = function() {
         self.chatd.trigger('onClose', {
             shard: self
         });
-        self.chatd.rtcHandler.onDisconnect(self);
     };
 };
 
@@ -494,7 +493,6 @@ Chatd.Shard.prototype.disconnect = function() {
         self.chatd.trigger('onClose', {
             shard: self
         });
-        self.chatd.rtcHandler.onDisconnect(self);
 
         self.s.onclose = null;
         self.s.onerror = null;
@@ -1129,7 +1127,7 @@ Chatd.prototype.leave = function(chatId) {
 
 // gracefully terminate all connections/calls
 Chatd.prototype.shutdown = function() {
-    this.rtcHandler.shutdown();
+    this.rtcHandler.onShutdown();
 };
 
 // submit a new message to the chatId

@@ -1528,7 +1528,7 @@ Session.prototype.submitStats = function(termCode, errInfo) {
     } else { //no stats, but will still provide callId and duration
         stats = {
             cid: base64urlencode(this.sid),
-            bws: stats_getBrowserVersion()
+            bws: RTC.getBrowserVersion()
         };
 
         if (this._tsIceConn) {

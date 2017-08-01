@@ -1,4 +1,7 @@
-(function(scope) {
+(function() {
+if (!RTC) {
+    return;
+}
 function getBrowserVersion() {
     var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
     var ver = parseInt(ua.details.version);
@@ -7,8 +10,10 @@ function getBrowserVersion() {
     }
     return browser;
 }
-scope.stats_getBrowserVersion = getBrowserVersion;
-if (!RTC || !RTCPeerConnection || !RTCPeerConnection.prototype.getStats || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
+
+RTC.getBrowserVersion = getBrowserVersion;
+
+if (!RTCPeerConnection || !RTCPeerConnection.prototype.getStats || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
     return;
 }
 
@@ -391,4 +396,4 @@ RTC.Stats = {
     Recorder: Recorder,
     statItemToString: statItemToString
 };
-})(window);
+})();

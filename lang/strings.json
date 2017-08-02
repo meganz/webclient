@@ -15454,5 +15454,57 @@
     "16673": {
         "text": "Save the log file",
         "context": "The title of a dialog which is displayed when asking the user if they want to save the generated log file to an external location from the app."
+    },
+    "16861": {
+        "text": "Install the MEGA desktop client",
+        "context": "MEGAsync dialog promo text. The MEGA desktop client is a new more generic description for the MEGAsync product."
+    },
+    "16862": {
+        "text": "Enhance file transfer performance from your browser",
+        "context": "The MEGA desktop client allows people to transfer files from MEGA through their browser as a plugin"
+    },
+    "16863": {
+        "text": "Powerful synchronization tools",
+        "context": "Characteristic of the MEGA desktop client"
+    },
+    "16864": {
+        "text": "And much more",
+        "context": "MEGAsync dialog promo text"
+    },
+    "16865": {
+        "text": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
+        "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %1 is replaced with either \"your browser\" or the actual browser's brand. %2 *may* include a hint, just as \"(or use Chrome)\""
+    },
+    "16866": {
+        "text": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
+        "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %1 is replaced with either \"your browser\" or the actual browser's brand. %2 *may* include a hint, just as \"(or use Chrome)\""
+    },
+    "16867": {
+        "text": "your browser",
+        "context": "Sentence to be used on %1 under string \"Unfortunately, %1 has a limited buffer to decrypt data....\""
+    },
+    "16868": {
+        "text": "or use Chrome",
+        "context": "Sentence to be used on %2 under string \"Unfortunately, %1 has a limited buffer to decrypt data....%2\""
+    },
+    "16869": {
+        "text": "or exit from Incognito",
+        "context": "Sentence to be used on %2 under string \"Unfortunately, %1 has a limited buffer to decrypt data....%2\""
+    },
+    "16870": {
+        "text": "We recommend you install the [A]MEGA desktop app[\/A] to download large files.",
+        "context": "MEGAsync dialog promo text"
+    },
+    "16871": {
+        "text": "Out of HTML5 Offline Storage space",
+        "context": "dialog title shown when Chrome users run out of disk space"
+    },
+    "16872": {
+        "text": "File too big to be reliably handled in memory.",
+        "context": "message shown while downloading certain large files using an in-memory download method"
+    },
+    "16873": {
+        "text": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and further to come.",
+        "context": "MEGAsync dialog promo text"
     }
 }

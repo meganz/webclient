@@ -3862,5 +3862,18 @@
     "16670": "Error al compartir el enlace",
     "16671": "Descarga con la aplicaci\u00f3n de escritorio de MEGA para descargas m\u00e1s r\u00e1pidas.",
     "16672": "\u00bfDeseas guardar los logs en una ubicaci\u00f3n externa para usarlos m\u00e1s tarde?",
-    "16673": "Guardar logs"
+    "16673": "Guardar logs",
+    "16861": "Install the MEGA desktop client",
+    "16862": "Enhance file transfer performance from your browser",
+    "16863": "Powerful synchronization tools",
+    "16864": "And much more",
+    "16865": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16866": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16867": "your browser",
+    "16868": "or use Chrome",
+    "16869": "or exit from Incognito",
+    "16870": "We recommend you install the [A]MEGA desktop app[\/A] to download large files.",
+    "16871": "Out of HTML5 Offline Storage space",
+    "16872": "File too big to be reliably handled in memory.",
+    "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and further to come."
 }

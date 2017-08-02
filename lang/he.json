@@ -3862,5 +3862,18 @@
     "16670": "\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05e9\u05d9\u05ea\u05d5\u05e3 \u05e7\u05d9\u05e9\u05d5\u05e8",
     "16671": "\u05d4\u05d5\u05e8\u05d3 \u05e2\u05dd \u05d4\u05ea\u05db\u05e0\u05d4 \u05e9\u05dc MEGA \u05dc\u05d4\u05d5\u05e8\u05d3\u05d4 \u05de\u05d4\u05d9\u05e8\u05d4 \u05d9\u05d5\u05ea\u05e8.",
     "16672": "\u05d4\u05d0\u05dd \u05ea\u05e8\u05e6\u05d4 \u05dc\u05e9\u05de\u05d5\u05e8 \u05d0\u05ea \u05e7\u05d5\u05d1\u05e5 \u05d4\u05dc\u05d5\u05d2 \u05d1\u05de\u05d9\u05e7\u05d5\u05dd \u05d7\u05d9\u05e6\u05d5\u05e0\u05d9 \u05dc\u05e9\u05d9\u05de\u05d5\u05e9 \u05de\u05d0\u05d5\u05d7\u05e8 \u05d9\u05d5\u05ea\u05e8?",
-    "16673": "\u05e9\u05de\u05d5\u05e8 \u05e7\u05d5\u05d1\u05e5 \u05dc\u05d5\u05d2"
+    "16673": "\u05e9\u05de\u05d5\u05e8 \u05e7\u05d5\u05d1\u05e5 \u05dc\u05d5\u05d2",
+    "16861": "Install the MEGA desktop client",
+    "16862": "Enhance file transfer performance from your browser",
+    "16863": "Powerful synchronization tools",
+    "16864": "And much more",
+    "16865": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16866": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16867": "your browser",
+    "16868": "or use Chrome",
+    "16869": "or exit from Incognito",
+    "16870": "We recommend you install the [A]MEGA desktop app[\/A] to download large files.",
+    "16871": "Out of HTML5 Offline Storage space",
+    "16872": "File too big to be reliably handled in memory.",
+    "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and further to come."
 }

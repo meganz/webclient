@@ -2123,7 +2123,7 @@ React.makeElement = React['createElement'];
 	        else if (v === null && rv === null) {
 	            return false;
 	        }
-	        
+
 	        if (typeof v._dataChangeIndex !== "undefined") {
 	            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() +
 	                                "_" + idx;
@@ -7245,7 +7245,7 @@ React.makeElement = React['createElement'];
 	                e.target.classList.remove('emoji-loading');
 	                e.target.classList.add('emoji-loading-error');
 	            },
-	            src: staticpath + "images/mega/twemojis/2/72x72/" + filename + ".png?v=2"
+	            src: staticpath + "images/mega/twemojis/2_v2/72x72/" + filename + ".png"
 	        });
 	    },
 	    _generateEmojiElement: function _generateEmojiElement(emoji, cat) {

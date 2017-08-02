@@ -93,8 +93,8 @@ var DropdownEmojiSelector = React.createClass({
             }}
             src={
                 staticpath +
-                "images/mega/twemojis/2/72x72/" +
-                filename + ".png?v=2"
+                "images/mega/twemojis/2_v2/72x72/" +
+                filename + ".png"
             }
         />;
     },

@@ -107,7 +107,7 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
     messageContents = twemoji.parse(messageContents, {
         size: 72,
         callback: function(icon, options, variant) {
-            return staticpath + 'images/mega/twemojis/2/' + options.size + '/' + icon + options.ext + '?v=2';
+            return staticpath + 'images/mega/twemojis/2_v2/' + options.size + '/' + icon + options.ext;
         }
     });
 

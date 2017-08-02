@@ -355,11 +355,11 @@
     -khtml-opacity: 0.7;
     opacity: 0.7;
 }
-.download.error-text, .download.main-transfer-error {
+.download.error-text {
     padding: 13px 0 0 0;
     font-size: 14px;
 }
-.download.error-text span, .download.main-transfer-error span {
+.download.error-text span {
     font-size: 16px;
     line-height: 20px;
     color: #D90007;

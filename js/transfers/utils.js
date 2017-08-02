@@ -23,6 +23,7 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
         $('.download.main-transfer-error')
             .removeClass('hidden')
             .attr('title', status)
+            .find('span')
             .text(text);
 
         if (fatalError) {

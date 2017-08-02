@@ -1058,6 +1058,9 @@ scparser.$add('usc', function() {
 });
 
 scparser.$add('psts', function(a) {
+    if (!pfid && u_type) {
+        M.checkStorageQuota(2000);
+    }
     pro.processPaymentReceived(a);
 });
 
@@ -2727,25 +2730,6 @@ function init_chat() {
     function __init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
-
-            // XXX: Prevent known Strophe exceptions...
-            ['_onIdle', '_connect'].forEach(function(fn) {
-                var proto = Strophe.Websocket.prototype;
-                var unsafeFn = '_unsafe' + fn;
-
-                if (!proto[unsafeFn]) {
-                    proto[unsafeFn] = proto[fn];
-                    proto[fn] = function() {
-                        try {
-                            this[unsafeFn].apply(this, arguments);
-                        }
-                        catch (ex) {
-                            console.error('Caught Strophe exception.', ex);
-                        }
-                    };
-                }
-                proto = undefined;
-            });
 
             var _chat = new Chat();
 

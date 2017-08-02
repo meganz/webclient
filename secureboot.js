@@ -48,14 +48,8 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 function isMobile() {
 
     // If extension, not applicable
-    if (is_chrome_firefox) {
+    if (is_extension) {
         return false;
-    }
-
-    // Useful for developing & testing the mobile site (this is below the is_chrome_firefox
-    // check above because the Firefox extension has not loaded localStorage yet and it breaks
-    if (localStorage.testMobileSite) {
-        return true;
     }
 
     var mobileStrings = [
@@ -63,7 +57,7 @@ function isMobile() {
         'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'
     ];
 
-    for (var i in mobileStrings) {
+    for (var i = mobileStrings.length; i--;) {
         if (ua.indexOf(mobileStrings[i]) > 0) {
             return true;
         }
@@ -78,6 +72,14 @@ function getSitePath() {
     if (hashLogic || isPublicLink(hash)) {
         return '/' + hash;
     }
+
+    if (location.host === 'webcache.googleusercontent.com') {
+        var m = String(location.href).match(/mega\.nz\/([\w-]+)/);
+        if (m) {
+            return '/' + m[1];
+        }
+    }
+
     return document.location.pathname;
 }
 
@@ -508,6 +510,7 @@ var mega = {
 
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
+if (localStorage.testMobileSite) is_mobile = m = true;
 if (typeof history == 'undefined') hashLogic=true;
 
 var bootstaticpath = staticpath;
@@ -1865,12 +1868,16 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
 
-
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
-    jsl.push({f:'html/top.html', n: 'top', j:0});
-    // TODO: include mobile top menu js stuff
-    jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
+
+    if (is_mobile) {
+        jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
+    }
+    else {
+        jsl.push({f:'html/top.html', n: 'top', j:0});
+    }
+
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
@@ -1904,6 +1911,7 @@ else if (!b_u) {
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
     }
 
+    jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {
@@ -1982,14 +1990,8 @@ else if (!b_u) {
     if (is_extension) {
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
-    if (!is_mobile
-            && (
-                typeof Number.isNaN !== 'function' ||
-                typeof Set === 'undefined' ||
-                !Object.assign
-            )
-    ) {
 
+    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
 
@@ -2077,29 +2079,23 @@ else if (!b_u) {
             /* chat related js */
             'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
+            'appactivityhandler_js': {f:'js/appActivityHandler.js', n: 'appactivityhandler_js', j:1},
+            'keepalive_js': {f:'js/keepAlive.js', n: 'keepalive_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
             'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
             'ionsound_js': {f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1},
             'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},
             'strongvelope_js': {f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1},
-            'strophejingleadapt_js': {f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1},
+            'adapter_js': {f:'js/vendor/chat/adapter.js', n: 'adapter_js', j:1},
+            'megawebrtcadapt_js': {f:'js/chat/webrtcAdapter.js', n: 'megawebrtcadapt_js', j:1},
             'rtcstats_js': {f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1},
-            'rtcsession_js': {f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1},
-            'strophelight_js': {f:'js/vendor/chat/strophe.light.js', n: 'strophelight_js', j:1},
-            'strophedisco_js': {f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1},
-            'strophejingle_js': {f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1},
-            'strophejinglesess_js': {f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1},
-            'strophejinglesdp_js': {f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1},
-            'strophemuc_js': {f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1},
-            'stropheroster_js': {f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1},
-            'wildemitter_js': {f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1},
-            'hark_js': {f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1},
-            'base32_js': {f:'js/vendor/chat/base32.js', n: 'base32_js', j:1},
+            'webrtcsdp_js': {f:'js/chat/webrtcSdp.js', n: 'webrtcsdp_js', j:1},
+            'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
+            'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
-            'karerePing_js': {f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1},
             'callManager_js': {f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1},
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
@@ -2108,9 +2104,7 @@ else if (!b_u) {
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
             'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
-            'keo_js': {f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
-            'karere_js': {f:'js/chat/karere.js', n: 'karere_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}

@@ -15,7 +15,7 @@ var ContactsListItem = React.createClass({
             return null;
         }
 
-        classString += " " + this.props.megaChat.xmppPresenceToCssClass(
+        classString += " " + this.props.megaChat.userPresenceToCssClass(
             contact.presence
         );
 
@@ -79,7 +79,7 @@ var ContactPresence = React.createClass({
             return null;
         }
 
-        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).xmppPresenceToCssClass(contact.presence);
+        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).userPresenceToCssClass(contact.presence);
 
         return <div className={"user-card-presence " + pres + " " + this.props.className}></div>;
     }
@@ -200,7 +200,7 @@ var ContactCard = React.createClass({
         }
 
         var pres =
-            (this.props.megaChat ? this.props.megaChat : window.megaChat).xmppPresenceToCssClass(contact.presence);
+            (this.props.megaChat ? this.props.megaChat : window.megaChat).userPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
 
         var contextMenu;
@@ -354,8 +354,8 @@ var ContactPickerWidget = React.createClass({
                 return;
             }
 
-            var pres = self.props.megaChat.karere.getPresence(
-                self.props.megaChat.getJidFromNodeId(v.u)
+            var pres = self.props.megaChat.getPresence(
+                v.u
             );
 
             if (v.c != 1 || v.u == u_handle) {

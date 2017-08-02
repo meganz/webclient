@@ -142,6 +142,10 @@ mBroadcaster.once('startMega', function() {
             var known = ['1:setUserAvatar', '1:previewimg', '1:procfa'];
             // ^ think twice before whitelisting anything new here...
 
+            if (d) {
+                known.push('3:addScript');
+            }
+
             for (var uri in usages) {
                 var data = usages[uri];
 

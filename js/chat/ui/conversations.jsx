@@ -28,11 +28,11 @@ var ConversationsListItem = React.createClass({
 
         var megaChat = this.props.chatRoom.megaChat;
         var chatRoom = this.props.chatRoom;
-        if (!chatRoom || !chatRoom.roomJid) {
+        if (!chatRoom || !chatRoom.chatId) {
             return null;
         }
 
-        var roomShortJid = chatRoom.roomJid.split("@")[0];
+        var roomId = chatRoom.chatId;
 
         // selected
         if (chatRoom.isCurrentlyActive) {
@@ -40,13 +40,12 @@ var ConversationsListItem = React.createClass({
         }
 
 
-        var contactJid;
+        var contactId;
         var presenceClass;
         var id;
 
         if (chatRoom.type === "private") {
-            contactJid = chatRoom.getParticipantsExceptMe()[0];
-            var contact = chatRoom.megaChat.getContactFromJid(contactJid);
+            var contact = M.u[chatRoom.getParticipantsExceptMe()[0]];
 
 
             if (!contact) {
@@ -54,30 +53,18 @@ var ConversationsListItem = React.createClass({
             }
             id = 'conversation_' + htmlentities(contact.u);
 
-
-            var caps = megaChat.karere.getCapabilities(contactJid);
-            if (caps) {
-                Object.keys(caps).forEach(function (k) {
-                    var v = caps[k];
-                    if (v) {
-                        classString += " chat-capability-" + k;
-                    }
-                });
-            }
-
-
-            presenceClass = chatRoom.megaChat.xmppPresenceToCssClass(
+            presenceClass = chatRoom.megaChat.userPresenceToCssClass(
                 contact.presence
             );
         }
         else if (chatRoom.type === "group") {
-            contactJid = roomShortJid;
-            id = 'conversation_' + contactJid;
+            contactId = roomId;
+            id = 'conversation_' + contactId;
             presenceClass = 'group';
             classString += ' groupchat';
         }
         else {
-            return "unknown room type: " + chatRoom.roomJid.split("@")[0];
+            return "unknown room type: " + chatRoom.roomId.split("@")[0];
         }
 
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
@@ -161,8 +148,8 @@ var ConversationsListItem = React.createClass({
                 </div>;
         }
 
-        if (chatRoom.callSession && chatRoom.callSession.isActive() === true) {
-            var mediaOptions = chatRoom.callSession.getMediaOptions();
+        if (chatRoom.callManagerCall && chatRoom.callManagerCall.isActive() === true) {
+            var mediaOptions = chatRoom.callManagerCall.getMediaOptions();
 
             var mutedMicrophone = null;
             var activeCamera = null;
@@ -176,7 +163,9 @@ var ConversationsListItem = React.createClass({
             inCallDiv = <div className="call-duration">
                 {mutedMicrophone}
                 {activeCamera}
-                <span className="call-counter" data-room-jid={chatRoom.roomJid.split("@")[0]}>{secondsToTimeShort(chatRoom._currentCallCounter)}</span>
+                <span className="call-counter" data-room-id={chatRoom.chatId}>{
+                    secondsToTimeShort(chatRoom._currentCallCounter)
+                }</span>
             </div>;
 
             classString += " call-active";
@@ -184,7 +173,8 @@ var ConversationsListItem = React.createClass({
 
 
         return (
-            <li className={classString} id={id} data-room-jid={roomShortJid} data-jid={contactJid} onClick={this.props.onConversationClicked}>
+            <li className={classString} id={id} data-room-id={roomId} data-jid={contactId}
+                onClick={this.props.onConversationClicked}>
                 <div className="user-card-name conversation-name">
                     <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>
                     {
@@ -244,10 +234,11 @@ var ConversationsList = React.createClass({
             user = megaChat.getContactFromJid(user);
 
             if (user) {
-                currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.xmppPresenceToCssClass(user.presence);
-                currentCallingContactStatusProps['data-jid'] = room.roomJid;
+                currentCallingContactStatusProps.className += " " + user.u +
+                    " " + megaChat.userPresenceToCssClass(user.presence);
+                currentCallingContactStatusProps['data-jid'] = room.roomId;
 
-                if (room.roomJid == megaChat.currentlyOpenedChat) {
+                if (room.roomId == megaChat.currentlyOpenedChat) {
                     currentCallingContactStatusProps.className += " selected";
                 }
             }
@@ -268,10 +259,7 @@ var ConversationsList = React.createClass({
 
         sortedConversations.forEach((chatRoom) => {
             var contact;
-            if (
-                !chatRoom ||
-                !chatRoom.roomJid
-            ) {
+            if (!chatRoom || !chatRoom.roomId) {
                 return;
             }
 
@@ -280,7 +268,7 @@ var ConversationsList = React.createClass({
                 if (!contact) {
                     return;
                 }
-                contact = chatRoom.megaChat.getContactFromJid(contact);
+                contact = M.u[contact];
 
                 if (contact) {
                     if (!chatRoom.privateReadOnlyChat && contact.c === 0) {
@@ -300,7 +288,7 @@ var ConversationsList = React.createClass({
 
             currConvsList.push(
                 <ConversationsListItem
-                    key={chatRoom.roomJid.split("@")[0]}
+                    key={chatRoom.roomId.split("@")[0]}
                     chatRoom={chatRoom}
                     contact={contact}
                     messages={chatRoom.messagesBuff}
@@ -494,9 +482,9 @@ var ConversationsApp = React.createClass({
     render: function() {
         var self = this;
 
-        var presence = self.props.megaChat.karere.getMyPresence();
+        var presence = self.props.megaChat.getMyPresence();
 
-        var startChatIsDisabled = !presence || presence === "offline" || presence === "unavailable";
+        var startChatIsDisabled = !presence || presence === UserPresence.PRESENCE.OFFLINE;
 
 
         var leftPanelStyles = {};
@@ -540,7 +528,8 @@ var ConversationsApp = React.createClass({
 									getSitePath().indexOf("/chat") !== -1 ? " active" : ""
                                 )
                             }>
-                                <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />
+                                <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat}
+                                                   contacts={this.props.contacts} />
                             </div>
                         </PerfectScrollbar>
                     </div>

@@ -144,7 +144,7 @@
                 logger.info('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
             }
             if (size > MemoryIO.fileSizeLimit) {
-                dlFatalError(dl, Error('File too big to be reliably handled in memory.'));
+                dlFatalError(dl, Error(l[16872]));
                 if (!this.is_zip) {
                     ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
                 }

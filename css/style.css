@@ -8318,7 +8318,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     top: 0;
     left: 0;
     bottom:0;
-    
+
 }
 .fm-dialog-overlay.bitcoin-invoice-dialog-overlay, .fm-dialog-overlay.payment-dialog-overlay, .fm-dialog-overlay.voucher-dialog-overlay, .fm-dialog-overlay.dark-overlay {
     background: rgba(34,34,34,0.95);
@@ -8339,9 +8339,13 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog, .fm-dialog.network-testing {
+.fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.network-testing {
     min-width: 440px;
     margin: -77px 0 0 -220px;
+}
+.fm-dialog.dlkey-dialog {
+    min-width: 440px;
+    margin: -77px 0 0 -300px;
 }
 /* Decryption key dialog */
 .dlkey-dialog .wrapper, .fm-dialog.network-testing .wrapper {
@@ -14112,7 +14116,7 @@ a.contact-new-button:hover {
 .new-left-menu-block.floating {
     position:fixed;
     top: 46px !important;
-    
+
 }
 .new-right-content-block {
     margin-left: 241px;

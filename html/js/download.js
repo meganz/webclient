@@ -308,6 +308,7 @@ function dl_g(res) {
                 .fail(function() {
                     $('.download.error-text.message').text(l[7427]).removeClass('hidden');
                     $('.info-block .block-view-file-type').addClass(fileIcon({name:'unknown'}));
+                    $('.download.buttons-block, .download.checkbox-bl').addClass('hidden');
                     $('.file-info .download.info-txt').text('Unknown');
                 });
         }
@@ -418,11 +419,14 @@ function setMobileAppInfo() {
     }
 }
 
-function setBrowserWarningClasses(selector, $container) {
+function setBrowserWarningClasses(selector, $container, message) {
     var uad = ua.details || false;
     var $elm = $(selector, $container);
 
-    if (window.safari) {
+    if (message) {
+        $elm.addClass('warning');
+    }
+    else if (window.safari) {
         $elm.addClass('safari');
     }
     else if (window.chrome) {
@@ -441,11 +445,33 @@ function setBrowserWarningClasses(selector, $container) {
         $elm.addClass('edge');
     }
 
+    var setText = function(locale, $elm) {
+        var text = String(locale).replace('%1', uad.browser || l[16867]);
+
+        if (message) {
+            text = l[1676] + ': ' + message + '<br/>' + l[16870];
+        }
+
+        if ($elm.hasClass('chrome')) {
+            if (window.Incognito) {
+                text = text.replace('%2', '(' + l[16869] + ')')
+            }
+            else {
+                text = text.replace('%2', '');
+            }
+        }
+        else {
+            text = text.replace('%2', '(' + l[16868] + ')')
+        }
+
+        $elm.find('span').safeHTML(text);
+    };
+
     if ($container) {
-        $container.addClass('warning');
+        setText(l[16866], $container.addClass('warning'));
     }
     else {
-        $elm.addClass('visible');
+        setText(l[16865], $elm.addClass('visible'));
     }
 }
 
@@ -562,9 +588,8 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
     $('.download.scroll-block').removeClass('download-complete').addClass('downloading');
     if (kbps == 0) return;
-    $('.download.error-text').addClass('hidden');
+    $('.download.error-text, .download.main-transfer-error').addClass('hidden');
     $('.download.main-transfer-info').removeClass('hidden');
-    if ((typeof dl_limit_shown != 'undefined') && (dl_limit_shown < new Date().getTime()+20000) && (!m)) bwDialog.close();
     if (!dl_queue[dl_queue_num].starttime) dl_queue[dl_queue_num].starttime = new Date().getTime()-100;
 
     if (!m)

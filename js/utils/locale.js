@@ -356,7 +356,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[7945] = l[7945].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
     l[7996] = l[7996].replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
-    
+
     l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
@@ -440,7 +440,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[16393] = escapeHTML(l[16393])
         .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
-    
+
     l[16649] = l[16649].replace('%1', '<span class="amount">10.00</span>');
     l[16501] = l[16501].replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a class="red" target="_blank" href="https://mega.nz/help/client/android/'
@@ -463,16 +463,21 @@ mBroadcaster.once('startMega', function populate_l() {
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');
 
+    l[16865] = escapeHTML(l[16865]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
+    l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
+    l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
+    // l[] = escapeHTML(l[]).replace('', '');
+
     // carefully replace various strings to adhere to the new pro quotas:
     // note: in the future we should make such strings used variables.
-	l[16393] = l[16393].replace('4','8');	
-	l[16385] = l[16385].replace('4','8');	
+	l[16393] = l[16393].replace('4','8');
+	l[16385] = l[16385].replace('4','8');
 	l[16359] = l[16359].replace('4096','8192').replace('4','8');
-	l[16358] = l[16358].replace('4096','8192').replace('4','8');	
+	l[16358] = l[16358].replace('4096','8192').replace('4','8');
 	l[16316] = l[16316].replace('4096','8192').replace('4','8');
-	l[16315] = l[16315].replace('4096','8192').replace('4','8');	
+	l[16315] = l[16315].replace('4096','8192').replace('4','8');
 	l[16304] = l[16304].replace('4096','8192').replace('4','8');
-	l[1367] = l[1367].replace('4','8');	
+	l[1367] = l[1367].replace('4','8');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

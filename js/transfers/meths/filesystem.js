@@ -250,8 +250,8 @@
         }
     }
 
-    var WRITERR_DIAGTITLE = 'Out of HTML5 Offline Storage space',
-        chrome_write_error_msg = 0;
+    var WRITERR_DIAGTITLE = l[16871];
+    var chrome_write_error_msg = 0;
 
     function free_space(callback, ms) {
         /* error */

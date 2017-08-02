@@ -1324,6 +1324,7 @@ function fm_tfspause(gid, overquota) {
 
         if (page === 'download') {
             if (overquota === true) {
+                setTransferStatus(gid, l[1673]);
                 $('.download.file-info').addClass('overquota');
             }
             $('.download .pause-transfer span').text(l[9118]);

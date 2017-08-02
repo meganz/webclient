@@ -4,23 +4,37 @@
  * @param {String} status The status text
  * @param {Boolean} [ethrow] Throw the exception noted in `status`
  * @param {Number} [lock] Lock the DOM node in the transfers panel.
+ * @param {Boolean} [fatalError] Whther invoked from dlFatalEror()
  */
-function setTransferStatus(dl, status, ethrow, lock) {
+function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
+
     if (text.length > 48) {
         text = text.substr(0, 48) + "\u2026";
     }
+
+    if (ethrow) {
+        fatalError = true;
+    }
+
     if (page === 'download') {
-        $('.download.error-text').text(text);
-        $('.download.error-text').removeClass('hidden');
         $('.download.main-transfer-info').addClass('hidden');
+        $('.download.main-transfer-error')
+            .removeClass('hidden')
+            .attr('title', status)
+            .text(text);
+
+        if (fatalError) {
+            setBrowserWarningClasses('.download.warning-block', 0, status);
+        }
     }
     else {
-        $('.transfer-table #' + id + ' td:eq(5)')
+        $('.transfer-table #' + id + ' .transfer-status')
             .attr('title', status)
             .text(text);
     }
+
     if (lock) {
         var $tr = $('.transfer-table #' + id)
             .addClass('transfer-completed')
@@ -31,10 +45,11 @@ function setTransferStatus(dl, status, ethrow, lock) {
             $tr.remove();
         }
     }
-    if (d) {
-        console.error(status);
-    }
+
     if (ethrow) {
+        if (d) {
+            console.error(status);
+        }
         throw status;
     }
 }
@@ -81,7 +96,7 @@ function dlFatalError(dl, error, ethrow, lock) {
     });
 
     // Set transfer status and abort it
-    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true);
+    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true, true);
     dlmanager.abort(dl);
 }
 

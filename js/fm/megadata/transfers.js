@@ -669,10 +669,7 @@ MegaData.prototype.dlerror = function(dl, error) {
                     $('.download.file-info').addClass('overquota');
                 }
                 else {
-                    $('.download.error-text').text(errorstr);
-                    $('.download.error-text').removeClass('hidden');
                     $('.download.file-info').removeClass('overquota');
-                    $('.download.main-transfer-info').addClass('hidden');
                 }
             }
             else {
@@ -680,12 +677,12 @@ MegaData.prototype.dlerror = function(dl, error) {
 
                 $tr.addClass('transfer-error');
                 $tr.find('.eta, .speed').text('').addClass('unknown');
-                $tr.find('.transfer-status').text(errorstr);
 
                 if (error === EOVERQUOTA) {
                     $tr.find('.transfer-status').addClass('overquota');
                 }
             }
+            setTransferStatus(dl, errorstr);
         }
     }
 };

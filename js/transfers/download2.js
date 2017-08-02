@@ -887,6 +887,20 @@ var dlmanager = {
                 open(getAppBaseUrl() + '#pro');
             }
         };
+        var getMoreBonusesListener = function() {
+            closeDialog();
+
+            if (flags & dlmanager.LMT_ISREGISTERED) {
+                mega.achievem.achievementsListDialog(function() {
+                    if (dlmanager.onLimitedBandwidth) {
+                        dlmanager.onLimitedBandwidth();
+                    }
+                });
+            }
+            else {
+                dlmanager.showRegisterDialog4ach($dialog, flags);
+            }
+        };
 
         if (preWarning) {
             $('.msg-overquota', $dialog).addClass('hidden');
@@ -917,6 +931,28 @@ var dlmanager = {
 
             $('.upgrade', $dialog).rebind('click', onclick);
             $dialog.find('.reg-st3-membership-bl').rebind('click', onclick);
+
+            if (page === 'download') {
+                var $dtb = $('.download.transfer-buttons');
+
+                $('.create-account-button', $dtb).addClass('hidden').unbind('click');
+                $('.get-more-bonuses', $dtb).addClass('hidden').unbind('click');
+
+                if (flags & this.LMT_HASACHIEVEMENTS) {
+                    if (flags & this.LMT_ISREGISTERED) {
+                        $('.get-more-bonuses', $dtb)
+                            .removeClass('hidden')
+                            .rebind('click', getMoreBonusesListener);
+                    }
+                    else {
+                        $('.create-account-button', $dtb)
+                            .removeClass('hidden')
+                            .rebind('click', getMoreBonusesListener);
+                    }
+                }
+
+                $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
+            }
         }
 
         $('.bottom-tips a', $dialog).rebind('click', function() {
@@ -931,22 +967,8 @@ var dlmanager = {
 
         if (flags & this.LMT_HASACHIEVEMENTS) {
             $dialog.addClass('achievements');
-            $('.get-more-bonuses', $dialog).rebind('click', function() {
-                closeDialog();
-
-                if (flags & dlmanager.LMT_ISREGISTERED) {
-                    mega.achievem.achievementsListDialog(function() {
-                        if (dlmanager.onLimitedBandwidth) {
-                            dlmanager.onLimitedBandwidth();
-                        }
-                    });
-                }
-                else {
-                    dlmanager.showRegisterDialog4ach($dialog, flags);
-                }
-            });
-
             localStorage.gotOverquotaWithAchievements = 1;
+            $('.get-more-bonuses', $dialog).rebind('click', getMoreBonusesListener);
         }
     },
 
@@ -1068,12 +1090,6 @@ var dlmanager = {
         }
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
-
-        // Add close button handler
-        $dialog.find('.fm-dialog-close').rebind('click.limitedbandwidth', function() {
-            fm_hideoverlay();
-            $dialog.addClass('hidden');
-        });
 
         this._overquotaClickListeners($dialog, flags, res || true);
     },

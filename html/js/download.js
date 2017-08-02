@@ -424,7 +424,7 @@ function setBrowserWarningClasses(selector, $container, message) {
     var $elm = $(selector, $container);
 
     if (message) {
-        $elm.addClass('warning');
+        $elm.addClass('default-warning');
     }
     else if (window.safari) {
         $elm.addClass('safari');

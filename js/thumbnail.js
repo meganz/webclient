@@ -557,4 +557,4 @@ function benchmarkireq() {
 
 }
 
-var noThumbURI = staticpath + 'images/mega/no-img.png';alert(noThumbURI);
+var noThumbURI = staticpath + 'images/mega/no-img.png';

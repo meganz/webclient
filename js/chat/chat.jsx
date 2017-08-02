@@ -3,7 +3,7 @@ var ReactDOM = require("react-dom");
 var ConversationsUI = require("./ui/conversations.jsx");
 var ChatRoom = require('./chatRoom.jsx');
 
-var EMOJI_DATASET_VERSION = 1;
+var EMOJI_DATASET_VERSION = 2;
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';

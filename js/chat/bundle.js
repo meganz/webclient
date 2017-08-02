@@ -60,7 +60,7 @@ React.makeElement = React['createElement'];
 	var ConversationsUI = __webpack_require__(4);
 	var ChatRoom = __webpack_require__(26);
 
-	var EMOJI_DATASET_VERSION = 1;
+	var EMOJI_DATASET_VERSION = 2;
 
 	var chatui;
 	var webSocketsSupport = typeof WebSocket !== 'undefined';
@@ -2123,7 +2123,7 @@ React.makeElement = React['createElement'];
 	        else if (v === null && rv === null) {
 	            return false;
 	        }
-	        
+
 	        if (typeof v._dataChangeIndex !== "undefined") {
 	            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() +
 	                                "_" + idx;
@@ -7245,7 +7245,7 @@ React.makeElement = React['createElement'];
 	                e.target.classList.remove('emoji-loading');
 	                e.target.classList.add('emoji-loading-error');
 	            },
-	            src: staticpath + "images/mega/twemojis/2/72x72/" + filename + ".png"
+	            src: staticpath + "images/mega/twemojis/2_v2/72x72/" + filename + ".png"
 	        });
 	    },
 	    _generateEmojiElement: function _generateEmojiElement(emoji, cat) {

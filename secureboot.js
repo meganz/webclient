@@ -57,7 +57,7 @@ function isMobile() {
         'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'
     ];
 
-    for (var i in mobileStrings) {
+    for (var i = mobileStrings.length; i--;) {
         if (ua.indexOf(mobileStrings[i]) > 0) {
             return true;
         }
@@ -72,6 +72,14 @@ function getSitePath() {
     if (hashLogic || isPublicLink(hash)) {
         return '/' + hash;
     }
+
+    if (location.host === 'webcache.googleusercontent.com') {
+        var m = String(location.href).match(/mega\.nz\/([\w-]+)/);
+        if (m) {
+            return '/' + m[1];
+        }
+    }
+
     return document.location.pathname;
 }
 

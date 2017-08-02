@@ -458,6 +458,14 @@ FileManager.prototype.initFileManagerUI = function() {
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
         a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
 
+        // Cleanup for scrollable context menu
+        var cnt = $('#cm_scroll').contents();
+        $('#cm_scroll').replaceWith(cnt);// Remove .context-scrollable-block
+        a.removeClass('mega-height');
+        a.find('> .context-top-arrow').remove();
+        a.find('> .context-bottom-arrow').remove();
+        a.css({ 'height': 'auto' });// In case that window is enlarged
+
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
     };

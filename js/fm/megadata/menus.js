@@ -458,26 +458,29 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
     $contextMenu.find('.removelink-item span').text(removeLinkText);
 };
 
-
+/**
+ * @param {jQuery.Event} e jQuery event
+ * @param {Object} m Context menu jQuery object
+ */
 MegaData.prototype.adjustContextMenuPosition = function(e, m) {
     "use strict";
 
-    var mPos;// menu position
-    var mX = e.clientX, mY = e.clientY; // mouse cursor, returns the coordinates within the application's client area
-                                        // at which the event occurred (as opposed to the coordinates within the page)
+    // mouse cursor, returns the coordinates within the application's client area
+    // at which the event occurred (as opposed to the coordinates within the page)
+    var mX = e.clientX;
+    var mY = e.clientY;
 
-    if (e.type === 'click' && !e.calculatePosition) {
-        // clicked on file-settings-icon
-        var ico = {'x': e.currentTarget.context.clientWidth, 'y': e.currentTarget.context.clientHeight};
-        var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon
+    var mPos;// menu position
+    if (e.type === 'click' && !e.calculatePosition) {// Clicked on file-settings-icon
+        var ico = { 'x': e.currentTarget.context.clientWidth, 'y': e.currentTarget.context.clientHeight };
+        var icoPos = getHtmlElemPos(e.delegateTarget);// Get position of clicked file-settings-icon
         mPos = M.reCalcMenuPosition(m, icoPos.x, icoPos.y, ico);
     }
-    else {
-        // right click
+    else {// right click
         mPos = M.reCalcMenuPosition(m, mX, mY);
     }
 
-    m.css({'top': mPos.y, 'left': mPos.x});// set menu position
+    m.css({ 'top': mPos.y, 'left': mPos.x });// set menu position
 
     return true;
 };
@@ -543,7 +546,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
         var mP = m.closest('.dropdown.body.submenu');
         var pT = 0;
         var bT = 0;
-        var pE = 0;
+        var pE = { top: 0 };
 
         if (mP.length) {
             pE = mP.offset();
@@ -564,7 +567,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     var cor;// corner, check setBordersRadius for more info
     if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
         cor = 1;
-        dPos = {'x': x - 2, 'y': y + ico.y + 8};// position for right-bot
+        dPos = { 'x': x - 2, 'y': y + ico.y + 8 };// position for right-bot
 
         // draw to the left
         if (wMax > maxX) {
@@ -572,13 +575,23 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
             cor = 3;
         }
 
-        // draw to the top
-        if (hMax > (maxY - TOP_MARGIN)) {
-            dPos.y = y - cmH - 6;
-            if (dPos.y < TOP_MARGIN) {
-                dPos.y = TOP_MARGIN;
+        if (cmH + 24 >= wH) {// Handle small windows height
+            m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
+            m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
+            m.addClass('mega-height');
+            cmH = wH - TOP_MARGIN * 2;
+            m.css({ 'height': wH - TOP_MARGIN * 2 + 'px' });
+            m.on('mousemove', M.scrollMegaSubMenu);
+            dPos.y = wH - cmH;
+        }
+        else {
+            if (hMax > maxY - TOP_MARGIN) {
+                dPos.y = y - cmH - 6;
+                if (dPos.y < TOP_MARGIN) {
+                    dPos.y = TOP_MARGIN;
+                }
+                cor++;
             }
-            cor++;
         }
     }
     else if (ico === 'submenu') {// submenues
@@ -632,22 +645,34 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     }
     else {// right click
         cor = 0;
-        dPos = {'x': x, 'y': y};
+        dPos = { 'x': x, 'y': y };
+
+        if (cmH + 24 >= wH) {// Handle small windows height
+            m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
+            m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
+            m.addClass('mega-height');
+            cmH = wH - TOP_MARGIN * 2;
+            m.css({ 'height': wH - TOP_MARGIN * 2 + 'px' });
+            m.on('mousemove', M.scrollMegaSubMenu);
+            dPos.y = wH - cmH;
+        }
+        else {
+            if (hMax > maxY) {
+                dPos.y = wH - cmH - TOP_MARGIN;// align with bottom
+            }
+        }
+
         if (x < minX) {
             dPos.x = minX;// left side alignment
         }
         if (wMax > maxX) {
             dPos.x = maxX - cmW;// align with right side
         }
-
-        if (hMax > maxY) {
-            dPos.y = maxY - cmH;// align with bottom
-        }
     }
 
     M.setBordersRadius(m, cor);
 
-    return {'x': dPos.x, 'y': dPos.y};
+    return { 'x': dPos.x, 'y': dPos.y };
 };
 
 // corner position 0 means default
@@ -694,11 +719,15 @@ MegaData.prototype.setBordersRadius = function(m, c) {
 MegaData.prototype.scrollMegaSubMenu = function(e) {
     "use strict";
 
-    var ey = e.pageY;
-    var c = $(e.target).closest('.dropdown.body.submenu');
+    var c = $(e.target).closest('.dropdown.body.mega-height');
     var pNode = c.children(':first')[0];
 
+    if (typeof pNode === 'undefined') {
+        pNode = c[0];
+    }
+
     if (typeof pNode !== 'undefined') {
+        var ey = e.pageY;
         var h = pNode.offsetHeight;
         var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
         var pos = getHtmlElemPos(pNode, true);

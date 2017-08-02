@@ -3862,5 +3862,18 @@
     "16670": "Vi\u1ec7c chia s\u1ebb \u0111\u01b0\u1eddng li\u00ean k\u1ebft b\u1ecb l\u1ed7i",
     "16671": "C\u00e0i tr\u00ecnh MEGA tr\u00ean m\u00e1y t\u00ednh \u0111\u1ec3 c\u00f3 t\u1ed1c \u0111\u1ed9 t\u1ea3i nhanh h\u01a1n.",
     "16672": "B\u1ea1n c\u00f3 mu\u1ed1n l\u01b0u l\u1ea1i t\u1ec7p log n\u00e0y \u1edf ch\u1ed7 kh\u00e1c \u0111\u1ec3 s\u1eed d\u1ee5ng sau?",
-    "16673": "L\u01b0u l\u1ea1i t\u1ec7p log"
+    "16673": "L\u01b0u l\u1ea1i t\u1ec7p log",
+    "16861": "Install the MEGA desktop client",
+    "16862": "Enhance file transfer performance from your browser",
+    "16863": "Powerful synchronization tools",
+    "16864": "And much more",
+    "16865": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16866": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16867": "your browser",
+    "16868": "or use Chrome",
+    "16869": "or exit from Incognito",
+    "16870": "We recommend you install the [A]MEGA desktop app[\/A] to download large files.",
+    "16871": "Out of HTML5 Offline Storage space",
+    "16872": "File too big to be reliably handled in memory.",
+    "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and further to come."
 }

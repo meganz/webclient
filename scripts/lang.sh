@@ -1,14 +1,37 @@
 #!/bin/bash
+#
+# This script checks out the 'translations' branch, then fetches the latest translation strings from Babel and updates
+# the .json files in the /lang directory. Then it merges the 'translations' branch into your current branch.
+#
+# How to use:
+#
+# From inside your local webclient directory, run:
+# ./scripts/lang.sh
+#
+# After that you are free to push the changes to the remote.
+
 
 # Get the current branch
 currentBranch=$(git rev-parse --abbrev-ref HEAD)
 
-# Checkout the translations branch
-git checkout translations
-git reset --hard origin/translations
+# Checkout the local translations branch
+checkoutResult=$(git checkout translations)
 
-# Make sure it's up to date
-git pull
+# Check if the checkout succeeded
+if [ $? -eq 0 ]; then
+
+    # Clear any local changes and make sure it's up to date with the remote
+    git reset --hard origin/translations
+    git pull
+
+    echo "Updated translations branch with latest changes from origin/translations."
+else
+    # If the checkout failed, fetch the branch from the remote server and check it out locally
+    git fetch
+    git checkout -b translations origin/translations
+
+    echo "Created a new local translations branch based on the latest origin/translations."
+fi
 
 # Change to the lang directory
 cd $(dirname $BASH_SOURCE)/../lang

@@ -1927,7 +1927,7 @@ function api_getsid(ctx, user, passwordkey, hash) {
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
-    if (api_getsid.etoomany + 3600000 > Date.now()) {
+    if (api_getsid.etoomany + 3600000 > Date.now() || location.host === 'webcache.googleusercontent.com') {
         api_getsid.warning();
         return ctx.result(ctx, false);
     }

@@ -93,7 +93,6 @@
     margin: auto;
     font-size: 0;
     line-height: 0;
-    position: relative;
 }
 .viewer-image-bl img {
     max-width: -webkit-calc(100% - 342px);

@@ -1901,6 +1901,7 @@ else if (!b_u) {
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1,w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
+        jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});

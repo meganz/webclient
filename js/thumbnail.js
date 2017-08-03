@@ -1,3 +1,5 @@
+var noThumbURI = staticpath + 'images/mega/no-img.png';
+
 function createnodethumbnail(node, aes, id, imagedata, opt) {
     storedattr[id] = {};
     storedattr[id] = {
@@ -556,5 +558,3 @@ function benchmarkireq() {
     }
 
 }
-
-var noThumbURI = staticpath + 'images/mega/no-img.png';

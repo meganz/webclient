@@ -933,7 +933,7 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.import-item').rebind('click', function() {
         ASSERT(folderlink, 'Import needs to be used in folder links.');
 
-        fm_importflnodes($.selected);
+        M.importFolderLinkNodes($.selected);
     });
 
     $(c + '.newfolder-item').rebind('click', function() {
@@ -1133,7 +1133,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     if (localStorage.folderLinkImport) {
-        onIdle(fm_importflnodes);
+        onIdle(M.importFolderLinkNodes.bind(M));
     }
 };
 
@@ -2820,7 +2820,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
                     var c = '' + $(this).attr('class');
 
                     if (~c.indexOf('fm-import-to-cloudrive')) {
-                        fm_importflnodes([M.currentdirid]);
+                        M.importFolderLinkNodes([M.currentdirid]);
                     }
                     else if (~c.indexOf('fm-download-as-zip')) {
                         M.addDownload([M.currentdirid], true);

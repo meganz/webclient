@@ -5964,7 +5964,7 @@ th.grid-first-th {
     width: 82px;
     height: 84px;
     margin: -42px 0 0 -41px;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
     background-repeat: no-repeat;
     background-position: center 2px;
 }
@@ -6091,11 +6091,11 @@ th.grid-first-th {
     right: 2px;
     top: 13px;
 }
-.file-block.colour-label .shared-folder-info-block {
+.data-block-view.colour-label .shared-folder-info-block {
     padding-right: 18px;
     position: relative;
 }
-.file-block.colour-label .shared-folder-info-block::after {
+.data-block-view.colour-label .shared-folder-info-block::after {
     right: 6px;
     top: 24px;
 }
@@ -6103,7 +6103,7 @@ th.grid-first-th {
     padding-right: 12px;
     position: relative;
 }
-.file-block.colour-label .tranfer-filetype-txt {
+.data-block-view.colour-label .tranfer-filetype-txt {
     padding-right: 12px;
 }
 .colour-label .tranfer-filetype-txt::after {
@@ -6551,19 +6551,19 @@ table {
 }
 .block-view-file-type.folder {
     background-position: center -1553px;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
 }
 .block-view-file-type.folder-shared {
     background-position: center -1663px;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
 }
 .rubbish-bin .block-view-file-type.folder {
     background-position: center -1223px;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
 }
 .rubbish-bin .block-view-file-type.folder-shared {
     background-position: center -1323px;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
 }
 .block-view-file-type.flash {
     background-position: center -9866px;
@@ -7266,7 +7266,7 @@ table {
     display: none;
 }
 .fm-breadcrumbs.shared-with-me:first-child .right-arrow-bg, .fm-breadcrumbs.contacts:first-child .right-arrow-bg {
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
     background-repeat: no-repeat;
 }
 .fm-breadcrumbs.shared-with-me:first-child .right-arrow-bg {
@@ -15922,11 +15922,11 @@ a.ff-extension-button:hover {
 }
 .search-path-icon.folder {
     background-position: -9px -622px;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
 }
 .search-path-icon.shared-folder {
     background-position: -8px -502px;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
 }
 .search-path-icon.recycle-item {
     background-position: -1px -8035px;
@@ -15934,7 +15934,7 @@ a.ff-extension-button:hover {
 }
 .search-path-icon.contacts-item {
     background-position: -6px -935px;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
 }
 .search-path-icon.inbox-item {
     background-position: -3px -6717px;
@@ -16816,7 +16816,7 @@ span.incoming-call-name {
     margin: 8px 0 8px 44px;
 }
 .shared-folder-icon {
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
     background-position: -29px -130px;
     background-repeat: no-repeat;
     width: 40px;
@@ -16856,7 +16856,7 @@ span.incoming-call-name {
     padding-left: 31px;
     color: #999999;
     display: block;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
     background-position: -37px -244px;
     background-repeat: no-repeat;
 }
@@ -16892,7 +16892,7 @@ span.incoming-call-name {
     width: 100px;
     height: 90px;
     float: left;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
     background-repeat: no-repeat;
     background-position: center 3px;
     margin: 23px 0 0 20px;
@@ -17114,7 +17114,7 @@ span.incoming-call-name {
     font-size: 13px;
     color: #666666;
     padding-left: 28px;
-    background-image: url(../images/mega/shared-sprite_v6.svg);
+    background-image: url(../images/mega/shared-sprite_v7.svg);
     background-position: -10px -506px;
     background-repeat: no-repeat;
     margin: 17px 0 20px 25px;
@@ -19257,7 +19257,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     margin-left: -3px;
 }
 .credentials-warning-dialog .verifyCredentials .verify-contact-button span {
-    background-image: url("../images/mega/shared-sprite_v6.svg");
+    background-image: url("../images/mega/shared-sprite_v7.svg");
     background-position: -9px -739px;
     display: block;
     text-indent: 19px;

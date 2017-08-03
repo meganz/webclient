@@ -15455,6 +15455,10 @@
         "text": "Save the log file",
         "context": "The title of a dialog which is displayed when asking the user if they want to save the generated log file to an external location from the app."
     },
+    "16859": {
+        "text": "Some items could not be shared with MEGA",
+        "context": "A message to inform the user that there were unsupported assets in the share."
+    },
     "16861": {
         "text": "Install the MEGA desktop client",
         "context": "MEGAsync dialog promo text. The MEGA desktop client is a new more generic description for the MEGAsync product."

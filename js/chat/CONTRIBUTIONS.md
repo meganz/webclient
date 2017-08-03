@@ -1,24 +1,3 @@
-- Strophe.js - https://github.com/strophe/strophejs
-https://github.com/strophe/strophejs/blob/master/LICENSE.txt
-
-- Strophe.Jingle.* / ESTOS - https://github.com/ESTOS/strophe.jingle/
-https://github.com/ESTOS/strophe.jingle/blob/master/LICENSE
-
-- strophe.disco - https://github.com/metajack/strophejs-plugins/tree/master/disco
-License not specified, maybe its: https://github.com/metajack/strophejs-plugins/blob/master/LICENSE.txt
-
-- Strophe.muc -  https://github.com/metajack/strophejs-plugins/blob/master/muc/
-https://github.com/metajack/strophejs-plugins/blob/master/muc/LICENSE.txt
-
-- Strophe.roaster - https://github.com/metajack/strophejs-plugins/blob/master/roster/strophe.roster.js
-License not specified, maybe its: https://github.com/metajack/strophejs-plugins/blob/master/LICENSE.txt
-
-- hark - https://github.com/latentflip/hark
-MIT License
-
-- wildemitter - https://github.com/HenrikJoreteg/wildemitter
-MIT License
-
 - CryptoJS v3.1.2 - code.google.com/p/crypto-js/
 MIT License ? - http://code.google.com/p/crypto-js/wiki/License
 

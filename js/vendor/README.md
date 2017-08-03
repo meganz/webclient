@@ -153,20 +153,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > ```
 
 ---
-[chat/strophe.light.js]: Strophe.js is an XMPP library for JavaScript.
-
-> NB: This is the **light** version built as follow:
-> 
-> ```bash
-> git clone https://github.com/strophe/strophejs.git
-> cd strophejs
-> git checkout v1.2.8
-> npm install
-> make strophe.light.js
-> make check
-> ```
-
----
 [chat/adapter.js]: Shim to insulate apps from spec changes and prefix differences (WebRTC related polyfill)
 
 > NB: We had to fork the project and remove the UTF characters from twemoji.js, so we are using the repo:
@@ -178,15 +164,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > open adapter.js
 > search & replace any utf character with ""
 > ```
----
-
----
-[chat/base32.js]: A fork of agnoster/base32-js
-
-> NB: This is a fork of agnoster/base32-js, that supports custom alphabet
-> Forked location: https://github.com/meganz/base32-js
-
-
 
 ---
 [twemoji.noutf.js]: Twitter Emoji
@@ -233,6 +210,4 @@ Unless otherwise noted, they were released under a [MIT License].
 [react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
-[chat/strophe.light.js]: <https://github.com/strophe/strophejs>
-[chat/base32.js]: <https://github.com/lpetrov/base32-js>
 [chat/adapter.js]: <https://github.com/webrtc/adapter>

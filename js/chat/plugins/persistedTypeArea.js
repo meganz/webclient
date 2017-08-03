@@ -37,19 +37,19 @@ var PersistedTypeArea = function (megaChat) {
 
 PersistedTypeArea.prototype.updatePersistedTypedValue = function (chatRoom, value) {
     var self = this;
-    var k = chatRoom.roomId.split("@")[0];
+    var k = chatRoom.roomId;
     self._throttledUpdate(k, function () {
-        self.data.setItem(chatRoom.roomId.split("@")[0], value);
+        self.data.setItem(chatRoom.roomId, value);
     });
 };
 
 PersistedTypeArea.prototype.getPersistedTypedValue = function (chatRoom) {
-    return this.data.getItem(chatRoom.roomId.split("@")[0]);
+    return this.data.getItem(chatRoom.roomId);
 };
 
 PersistedTypeArea.prototype.removePersistedTypedValue = function (chatRoom) {
     var self = this;
-    var k = chatRoom.roomId.split("@")[0];
+    var k = chatRoom.roomId;
     self._throttledUpdate(k, function () {
         self.data.removeItem(k);
     });

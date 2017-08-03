@@ -172,7 +172,7 @@ Chatd.Const = {
 };
 
 Chatd.MAX_KEEPALIVE_DELAY = 45000;
-Chatd.KEEPALIVE_PING_INTERVAL = 25000;
+Chatd.KEEPALIVE_PING_INTERVAL = 20000;
 
 // 1 hour is agreed by everyone.
 Chatd.MESSAGE_EXPIRY = 60 * 60; // 60*60

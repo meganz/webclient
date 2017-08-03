@@ -30,7 +30,7 @@ RtcModule.NotSupportedError = function(message) {
     this.message = message;
     // Use V8's native method if available, otherwise fallback
     if ("captureStackTrace" in Error) {
-        Error.captureStackTrace(this, InvalidArgumentException);
+        Error.captureStackTrace(this, this.constructor);
     } else {
         this.stack = (new Error()).stack;
     }
@@ -47,17 +47,52 @@ RtcModule.kIncallPingInterval = 4000;
 RtcModule.kMediaGetTimeout = 20000;
 RtcModule.kSessSetupTimeout = 20000;
 
+RtcModule.prototype.logToServer = function(type, data) {
+    if (typeof data !== 'object') {
+        data = { data: data };
+    }
+    data.client = RTC.browser;
+    var wait = 500;
+    var retryNo = 0;
+    var self = this;
+    function req() {
+        jQuery.ajax("https://stats.karere.mega.nz/msglog?aid=" + base64urlencode(self.ownAnonId) + "&t=" + type, {
+            type: 'POST',
+            data: JSON.stringify(data),
+            error: function(jqXHR, textStatus, errorThrown) {
+                retryNo++;
+                if (retryNo < 20) {
+                    wait *= 2;
+                    setTimeout(function() {
+                        req();
+                    }, wait);
+                }
+            },
+            dataType: 'json'
+        });
+    }
+    req();
+};
+
 RtcModule.prototype.setupLogger = function() {
     var loggerDebug = localStorage['webrtcDebug'] === "1";
     var minLogLevel = loggerDebug ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN;
-
-    this._loggerOpts = {
+    var self = this;
+    self._loggerOpts = {
         minLogLevel: function() {
             return MegaLogger.LEVELS.DEBUG; // minLogLevel;
         },
         transport: function(level, args) {
-            var fn = "log";
-
+            if (level === MegaLogger.LEVELS.ERROR || level === MegaLogger.LEVELS.CRITICAL) {
+                console.error.call(console, args);
+                self.logToServer('e', args.join(' '));
+                return;
+            }
+            if (loggerDebug) {
+                console.error.apply(console, args);
+                return;
+            }
+            var fn;
             if (level === MegaLogger.LEVELS.DEBUG) {
                 fn = "debug";
             }
@@ -69,17 +104,13 @@ RtcModule.prototype.setupLogger = function() {
             }
             else if (level === MegaLogger.LEVELS.WARN) {
                 fn = "warn";
+            } else {
+                fn = "log";
             }
-            else if (level === MegaLogger.LEVELS.ERROR) {
-                fn = "error";
-            }
-            else if (level === MegaLogger.LEVELS.CRITICAL) {
-                fn = "error";
-            }
-            (loggerDebug ? console.error : console[fn]).apply(console, args);
+            console[fn].apply(console, args);
         }
     };
-    this.logger = new MegaLogger('webrtc', this._loggerOpts);
+    self.logger = new MegaLogger('webrtc', self._loggerOpts);
 };
 /*
    Globally configures the webRTC abstraction layer
@@ -355,7 +386,7 @@ RtcModule.prototype.onUserOffline = function(chatid, userid, clientid) {
         call._onUserOffline(userid, clientid);
     }
 };
-RtcModule.prototype.shutdown = function() {
+RtcModule.prototype.onShutdown = function() {
     this.logger.warn("Shutting down....");
     var calls = this.calls;
     for (var chatid in calls) {

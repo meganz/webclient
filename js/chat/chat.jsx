@@ -1208,7 +1208,7 @@ Chat.prototype.getEmojiDataSet = function(name) {
     }
     else {
         self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy(
-            $.getJSON(staticpath + "js/chat/emojidata/" + name + ".json?v=" + EMOJI_DATASET_VERSION)
+            $.getJSON(staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json")
         );
         self._emojiDataLoading[name].done(function(data) {
             self._emojiData[name] = data;

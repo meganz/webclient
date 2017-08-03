@@ -57,7 +57,7 @@
 .data-block-bg {
     height: 156px;
     width: 156px;
-    display: table-cell;
+    display: block;
     font-size: 0;
     overflow: hidden;
     -moz-border-radius: 2px;

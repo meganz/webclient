@@ -299,7 +299,7 @@
     line-height: 23px;
     padding: 0 5px;
 }
-.mouse-idle .viewer-top-bl, .mouse-idle .viewer-bottom-bl, .mouse-idle .viewer-mid-button {
+.mouse-idle.fullscreen .viewer-top-bl, .mouse-idle.fullscreen .viewer-bottom-bl, .mouse-idle.fullscreen .viewer-mid-button {
      filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;

@@ -4886,6 +4886,8 @@ function slideshow(id, close)
     var $overlay = $('.viewer-overlay');
     var timeout;
 
+    $overlay.removeClass('fullscreen mouse-idle');
+
     if (d)
         console.log('slideshow', id, close, slideshowid);
 
@@ -4897,7 +4899,6 @@ function slideshow(id, close)
             clearTimeout(timeout);
             $(document).fullScreen(false);
             $(document).unbind('mousemove.mediaviewer');
-            $overlay.removeClass('fullscreen mouse-idle');
         }
         for (var i in dl_queue)
         {

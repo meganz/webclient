@@ -444,4 +444,8 @@ body.pro:after {
     background-image: url(../images/mega/top-sprite_v2@2x.png);
     background-size: 38px auto;
 }
+.block-view-file-type, .dragger-icon, .export-icon, .new-download-file-icon, .share-folder-icon div, .transfer-filetype-icon, .medium-file-icon, .shared-folder-icon, .nw-fm-tree-folder::before, .shared-details-icon, .contact-share-notification::before, .search-path-icon.folder {
+    background-image: url(../images/mega/files-icons@2x.png);
+    background-size: 82px auto;
+}
 }

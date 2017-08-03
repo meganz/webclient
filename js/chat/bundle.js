@@ -8387,6 +8387,13 @@ React.makeElement = React['createElement'];
 	                                );
 	                            }
 	                            if (contact.u === u_handle) {
+	                                var revokeButton = null;
+	                                if (message.isEditable && message.isEditable()) {
+	                                    revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __(l[8909]),
+	                                        className: 'red', onClick: function onClick() {
+	                                            chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId ? message.internalId : message.orderValue, "");
+	                                        } });
+	                                }
 	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
@@ -8404,11 +8411,8 @@ React.makeElement = React['createElement'];
 	                                        previewButtons,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                            onClick: startDownload }),
-	                                        React.makeElement('hr', null),
-	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __(l[8909]), className: 'red',
-	                                            onClick: function onClick() {
-	                                                chatRoom.revokeAttachment(v);
-	                                            } })
+	                                        revokeButton ? React.makeElement('hr', null) : "",
+	                                        revokeButton
 	                                    )
 	                                );
 	                            } else {
@@ -10164,7 +10168,9 @@ React.makeElement = React['createElement'];
 	            proxyPromise.resolve([nodeId]);
 	        }).fail(function (r) {
 	            proxyPromise.reject(r);
-	        });waitingPromises.push(proxyPromise);
+	        });
+
+	        waitingPromises.push(proxyPromise);
 	    });
 
 	    $masterPromise.linkDoneAndFailTo(MegaPromise.allDone(waitingPromises));

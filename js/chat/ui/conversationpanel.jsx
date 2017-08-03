@@ -1332,22 +1332,23 @@ var ConversationPanel = React.createClass({
                                         v.internalId ? v.internalId : v.orderValue,
                                         messageContents
                                     );
-if (
+                                    if (
                                         v.getState &&
                                         v.getState() === Message.STATE.NOT_SENT &&
                                         !v.requiresManualRetry
-                                    ) {                                    if (v.textContents) {
-                                        v.textContents = messageContents;
-                                    }
-                                    if (v.emoticonShortcutsProcessed) {
-                                        v.emoticonShortcutsProcessed = false;
-                                    }
-                                    if (v.emoticonsProcessed) {
-                                        v.emoticonsProcessed = false;
-                                    }
-                                    if (v.messageHtml) {
-                                        delete v.messageHtml;
-                                    }
+                                    ) {
+                                        if (v.textContents) {
+                                            v.textContents = messageContents;
+                                        }
+                                        if (v.emoticonShortcutsProcessed) {
+                                            v.emoticonShortcutsProcessed = false;
+                                        }
+                                        if (v.emoticonsProcessed) {
+                                            v.emoticonsProcessed = false;
+                                        }
+                                        if (v.messageHtml) {
+                                            delete v.messageHtml;
+                                        }
 
 
                                         $(v).trigger(
@@ -1364,7 +1365,7 @@ if (
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;
                                 }
-                                else if(messageContents.length === 0) {
+                                else if (messageContents.length === 0) {
 
                                     self.setState({
                                         'confirmDeleteDialog': true,

@@ -134,11 +134,11 @@
     box-shadow: none;
     position: relative;
 }
-.contacts-blocks-scrolling .nw-contact-avatar::before {
+.contacts-blocks-scrolling .nw-contact-avatar::before, .nw-contact-block-avatar .avatar-wrapper::before {
     display: none;
     
 }
-.contacts-blocks-scrolling .avatar-wrapper img {
+.contacts-blocks-scrolling .avatar-wrapper img, .nw-contact-block-avatar .avatar-wrapper img {
     width: 156px;
     height: 156px;
     -webkit-box-shadow: none;

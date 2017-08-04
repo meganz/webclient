@@ -78,7 +78,7 @@ body, td, th {
     font-size: 13px;
     color: #333333;
     line-height: 15px;
-    font-family: 'source_sans_proregular';
+    font-family: 'source_sans_proregular', Arial;
 }
 body.dragging * {
     cursor: url(../images/mega/cursor1.png), auto !important

@@ -87,6 +87,11 @@
     vertical-align: middle;
     position: relative;
 }
+.data-block-view.medium .data-block-bg img {
+    height: 124px;
+    width: 124px;
+    vertical-align: top;
+}
 .data-block-view .thumb.video img {
     height: auto;
 }

@@ -45,8 +45,8 @@ a.shared-link.show-more {
     line-height: 0;
 }
 .shared-link.img-block img {
-	max-width: 100%;
-	max-height: 100%;
+	max-width: 156px;
+	max-height: 156px;
     vertical-align: middle;
     -moz-border-radius: 4px;
 	-webkit-border-radius: 4px;

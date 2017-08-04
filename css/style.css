@@ -1364,6 +1364,10 @@ input.radioOn, input.radioOff {
 .bottom-pages-dialog .bp-main p {
     padding: 19px 0 0 0;
 }
+.bottom-pages-dialog .jspContainer, .bottom-pages-dialog .jspContainer, .bottom-pages-dialog .jspPane {
+    max-width: 100%;
+    min-width: 100%;
+}
 .terms-top-txt {
     padding: 12px 12px 12px 12px;
     height: 300px;

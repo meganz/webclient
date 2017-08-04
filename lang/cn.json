@@ -3863,18 +3863,19 @@
     "16671": "\u4f7f\u7528MEGAsync\u684c\u9762\u5e94\u7528\u7a0b\u5e8f\u4e0b\u8f7d\u66f4\u5feb\u6377",
     "16672": "\u60a8\u662f\u5426\u8981\u5c06log\u6587\u4ef6\u4fdd\u5b58\u5728\u5176\u4ed6\u5916\u90e8\u5730\u5740\u4ee5\u4f9b\u65e5\u540e\u4f7f\u7528\uff1f",
     "16673": "\u4fdd\u5b58log\u6587\u4ef6",
-    "16859": "Some items could not be shared with MEGA",
+    "16859": "\u67d0\u4e9b\u9879\u76ee\u65e0\u6cd5\u5728MEGA\u4e0a\u5171\u4eab",
     "16861": "\u5b89\u88ddMEGA\u684c\u9762\u5ba2\u6236\u7aef",
     "16862": "\u589e\u5f3a\u4ece\u6d4f\u89c8\u5668\u4e0b\u8f7d\u6587\u4ef6\u65f6\u7684\u4f20\u8f93\u6027\u80fd",
     "16863": "\u5f3a\u5927\u7684\u540c\u6b65\u5de5\u5177",
     "16864": "\u4ee5\u53ca\u5176\u4ed6\u4f18\u5316\u529f\u80fd",
-    "16865": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
-    "16866": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16865": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16866": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16867": "\u60a8\u7684\u6d4f\u89c8\u5668",
     "16868": "\u6216\u4f7f\u7528Chrome",
     "16869": "\u6216\u5173\u95ed\u65e0\u75d5\u5f0f\u7a97\u53e3",
     "16870": "\u6211\u4eec\u5efa\u8bae\u60a8\u5b89\u88c5[A]MEGA\u684c\u9762\u5ba2\u6237\u7aef[\/A]\u6765\u4e0b\u8f7d\u8f83\u5927\u7684\u6587\u4ef6",
     "16871": "HTML5\u79bb\u7ebf\u5b58\u50a8\u7a7a\u95f4\u4e0d\u8db3",
     "16872": "\u60a8\u8981\u4e0b\u8f7d\u7684\u6587\u4ef6\u592a\u5927\uff0c\u5185\u5b58\u4e0d\u8db3\u3002",
-    "16873": "\u5b9e\u65f6\u6587\u4ef6\u7248\u672c\u7ba1\u7406\u3001\u6062\u590d\u8bef\u5220\u6587\u4ef6\u3001\u589e\u5f3a\u6587\u4ef6\u4f20\u8f93\u6027\u80fd\u3001\u6d4f\u89c8\u5668\u96c6\u6210\u4ee5\u53ca\u66f4\u591a\u4f18\u5316\u529f\u80fd\u3002"
+    "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and more.",
+    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2"
 }

@@ -645,7 +645,7 @@ var asmCryptoSha256Js = '!function(exports,global){function IllegalStateError(){
 
 function addScript(data) {
     "use strict";
-    return mCreateElement('script', {type: 'text/javascript', charset: 'utf-8'}, 'head', data);
+    return mCreateElement('script', {type: 'text/javascript'}, 'head', data);
 }
 
 function mCreateElement(aNode, aAttrs, aChildNodes, aTarget, aData) {
@@ -2254,7 +2254,7 @@ else if (!b_u) {
         };
 
         var createScriptTag = function(id, src) {
-            var elem = mCreateElement('script', {type: 'text/javascript', charset: 'utf-8'}, 'head');
+            var elem = mCreateElement('script', {type: 'text/javascript'}, 'head');
             elem.async = false;
             _queueWaitToBeLoaded(id, elem);
             elem.src = src;

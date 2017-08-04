@@ -2254,7 +2254,7 @@ else if (!b_u) {
         };
 
         var createScriptTag = function(id, src) {
-            var elem = mCreateElement('script', {type: 'text/javascript'}, 'head');
+            var elem = mCreateElement('script', {type: 'text/javascript', charset: 'utf-8'}, 'head');
             elem.async = false;
             _queueWaitToBeLoaded(id, elem);
             elem.src = src;

@@ -645,7 +645,7 @@ var asmCryptoSha256Js = '!function(exports,global){function IllegalStateError(){
 
 function addScript(data) {
     "use strict";
-    return mCreateElement('script', {type: 'text/javascript'}, 'head', data);
+    return mCreateElement('script', {type: 'text/javascript', charset: 'utf-8'}, 'head', data);
 }
 
 function mCreateElement(aNode, aAttrs, aChildNodes, aTarget, aData) {

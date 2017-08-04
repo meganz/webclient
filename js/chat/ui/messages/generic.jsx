@@ -408,8 +408,6 @@ var GenericConversationMessage = React.createClass({
                                     {dropdown}
 
                                     <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                         width="120"
-                                         height="120"
                                          onClick={startPreview}
                                     />
                                 </div>) :  preview);

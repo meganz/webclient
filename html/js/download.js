@@ -57,7 +57,7 @@ function dlinfo(ph,key,next)
     }
     else {
         // Fetch the file information and optionally the download URL
-        api_req({ a: 'g', p: ph, 'ad': showAd() }, { callback: dl_g });
+        api_req({a: 'g', p: ph, 'ad': showAd(), g: 1}, {callback: dl_g});
     }
 
     if (is_mobile) {
@@ -100,9 +100,10 @@ function dl_g(res) {
     fdl_queue_var = null;
 
     $('.widget-block').addClass('hidden');
+    $('.download.top-bar').addClass('hidden');
 
 
-    if (res === -1) {
+    if (res === ETOOMANY) {
         $('.download.scroll-block').addClass('not-available-user');
     }
     else if (typeof res === 'number' && res < 0) {
@@ -239,6 +240,7 @@ function dl_g(res) {
 
             fileSize = bytesToSize(res.s);
 
+            $('.download.top-bar').removeClass('hidden');
             $('.file-info .download.info-txt.filename, .download.bar-filename')
                 .text(filename).attr('title', filename);
             $('.file-info .download.info-txt.small-txt, .bar-cell .download.bar-filesize')
@@ -294,6 +296,19 @@ function dl_g(res) {
                         $('.mobile.error-txt.file-too-large').removeClass('hidden');
                     }
                 }
+            }
+
+            if (res.fa) {
+                // load thumbnail
+                api_getfileattr([{fa: res.fa, k: key}], 0, function(a, b, data) {
+                    if (data !== 0xDEAD) {
+                        data = mObjectURL([data.buffer || data], filemime(filename));
+
+                        if (data) {
+                            // todo
+                        }
+                    }
+                });
             }
         }
         else if (is_mobile) {
@@ -446,7 +461,7 @@ function setBrowserWarningClasses(selector, $container, message) {
     }
 
     var setText = function(locale, $elm) {
-        var text = String(locale).replace('%1', uad.browser || l[16867]);
+        var text = uad.browser ? String(locale).replace('%1', uad.browser) : l[16883];
 
         if (message) {
             text = l[1676] + ': ' + message + '<br/>' + l[16870];

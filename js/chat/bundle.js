@@ -939,7 +939,7 @@ React.makeElement = React['createElement'];
 	    } else if (self._emojiDataLoading[name]) {
 	        return self._emojiDataLoading[name];
 	    } else {
-	        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy($.getJSON(staticpath + "js/chat/emojidata/" + name + ".json?v=" + EMOJI_DATASET_VERSION));
+	        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy($.getJSON(staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json"));
 	        self._emojiDataLoading[name].done(function (data) {
 	            self._emojiData[name] = data;
 	            delete self._emojiDataLoading[name];

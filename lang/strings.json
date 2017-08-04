@@ -15476,11 +15476,11 @@
         "context": "MEGAsync dialog promo text"
     },
     "16865": {
-        "text": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
+        "text": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
         "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %1 is replaced with either \"your browser\" or the actual browser's brand. %2 *may* include a hint, just as \"(or use Chrome)\""
     },
     "16866": {
-        "text": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
+        "text": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
         "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %1 is replaced with either \"your browser\" or the actual browser's brand. %2 *may* include a hint, just as \"(or use Chrome)\""
     },
     "16867": {
@@ -15508,7 +15508,11 @@
         "context": "message shown while downloading certain large files using an in-memory download method"
     },
     "16873": {
-        "text": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and further to come.",
+        "text": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and more.",
         "context": "MEGAsync dialog promo text"
+    },
+    "16883": {
+        "text": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
+        "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %2 *may* include a hint, such as \"(or use Chrome)\""
     }
 }

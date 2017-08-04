@@ -3868,13 +3868,14 @@
     "16862": "Des performances de transfert de fichiers am\u00e9lior\u00e9es \u00e0 partir de votre navigateur",
     "16863": "Des outils de synchronisation puissants",
     "16864": "Et bien plus encore",
-    "16865": "Malheureusement, %1 offre une m\u00e9moire tampon limit\u00e9e pour d\u00e9chiffrer les donn\u00e9es dans votre navigateur et nous vous recommandons d'installer l'[A]appli pour ordinateur de MEGA[\/A]  pour t\u00e9l\u00e9charger des fichiers volumineux %2",
-    "16866": "Malheureusement, %1 offre une m\u00e9moire tampon limit\u00e9e pour d\u00e9chiffrer les donn\u00e9es dans le navigateur. Veuillez installer l'[A]appli pour ordinateur de MEGA[\/A] pour t\u00e9l\u00e9charger des fichiers volumineux %2",
+    "16865": "Malheureusement, la m\u00e9moire tampon de %1 est insuffisante pour d\u00e9chiffrer les donn\u00e9es dans le navigateur et nous vous recommandons d'installer l'[A]appli pour ordinateur de MEGA[\/A] afin de t\u00e9l\u00e9charger des fichiers volumineux %2",
+    "16866": "Malheureusement, la m\u00e9moire tampon de %1 est insuffisante pour d\u00e9chiffrer les donn\u00e9es dans le navigateur. Veuillez installer l'[A]appli pour ordinateur de MEGA[\/A] afin de t\u00e9l\u00e9charger des fichiers volumineux %2",
     "16867": "votre navigateur",
     "16868": "ou utilisez Chrome",
     "16869": "ou n'utilisez pas la navigation priv\u00e9e",
     "16870": "Nous vous recommandons d'installer l'[A]appli pour ordinateur de MEGA[\/A] pour t\u00e9l\u00e9charger des fichiers volumineux.",
     "16871": "L'espace de stockage HTML5 hors ligne est insuffisant",
     "16872": "Le fichier est trop volumineux pour \u00eatre trait\u00e9 en m\u00e9moire de mani\u00e8re fiable.",
-    "16873": "Versionnage des fichiers en temps r\u00e9el, protection des fichiers supprim\u00e9s, performances de transfert de fichiers am\u00e9lior\u00e9es, int\u00e9gration aux navigateurs et encore plus \u00e0 venir."
+    "16873": "Versionnage des fichiers en temps r\u00e9el, protection des fichiers supprim\u00e9s, am\u00e9lioration des performances lors du transfert de fichiers, int\u00e9gration aux navigateurs et plus.",
+    "16883": "Malheureusement, la m\u00e9moire tampon de votre navigateur est insuffisante pour d\u00e9chiffrer les donn\u00e9es. Veuillez installer l'[A]appli pour ordinateur de MEGA[\/A] afin de t\u00e9l\u00e9charger des fichiers volumineux %2"
 }

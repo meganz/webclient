@@ -5753,8 +5753,8 @@ React.makeElement = React['createElement'];
 	                            React.makeElement("img", { alt: "",
 	                                className: "thumbnail-placeholder " + node.h,
 	                                src: src,
-	                                width: "120",
-	                                height: "120"
+	                                width: "156",
+	                                height: "156"
 	                            })
 	                        )
 	                    )
@@ -8477,8 +8477,8 @@ React.makeElement = React['createElement'];
 	                                    ),
 	                                    dropdown,
 	                                    React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
-	                                        width: '120',
-	                                        height: '120',
+	                                        width: '156',
+	                                        height: '156',
 	                                        onClick: startPreview
 	                                    })
 	                                ) : preview;

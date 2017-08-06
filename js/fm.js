@@ -433,9 +433,8 @@ function showTransferToast(t_type, t_length, isPaused) {
         $('.transfer .toast-button').rebind('click', function()
         {
             $('.toast-notification').removeClass('visible second');
-            if (!$('.slideshow-dialog').hasClass('hidden')) {
-                $('.slideshow-dialog').addClass('hidden');
-                $('.slideshow-overlay').addClass('hidden');
+            if (!$('.viewer-overlay').hasClass('hidden')) {
+                $('.viewer-overlay').addClass('hidden');
             }
             // M.openFolder('transfers', true);
             $('.nw-fm-left-icon.transfers').click();
@@ -636,7 +635,7 @@ function sharedUInode(nodeHandle) {
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').addClass(icon);
 
         // Update right panel selected node with appropriate icon for block view
-        $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(icon);
+        $('#' + nodeHandle + '.data-block-view .block-view-file-type').addClass(icon);
     }
 
     // If no shares are available, remove share icon from left panel, right panel (list and block view)
@@ -649,7 +648,7 @@ function sharedUInode(nodeHandle) {
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').removeClass('folder-shared');
 
         // Right panel block view
-        $('#' + nodeHandle + '.file-block .block-view-file-type').removeClass('folder-shared');
+        $('#' + nodeHandle + '.data-block-view .block-view-file-type').removeClass('folder-shared');
     }
 
     // If no export link is available, remove export link from left and right panels (list and block view)
@@ -1724,7 +1723,7 @@ var SelectionManager = function($selectable) {
 
         var $selectables = $(
             [
-                ".file-block",
+                ".data-block-view",
                 "tr.ui-draggable",
                 "tr.ui-selectee",
                 ".contact-block-view.ui-draggable",
@@ -1754,7 +1753,7 @@ var SelectionManager = function($selectable) {
 
         var $selected = $(
             [
-                ".file-block",
+                ".data-block-view",
                 "tr.ui-draggable",
                 "tr.ui-selectee",
                 ".contact-block-view.ui-draggable"
@@ -3987,9 +3986,9 @@ function refreshDialogContent() {
     }
 }
 
-function createFolderDialog(close)
-{
+function createFolderDialog(close) {
     "use strict";
+
     $.dialog = 'createfolder';
     if (close) {
         $.dialog = false;
@@ -4153,8 +4152,7 @@ function megaSyncDialog() {
     clickURLs();
 }
 
-function firefoxDialog(close)
-{
+function firefoxDialog(close) {
     "use strict";
 
     if (close)
@@ -4796,387 +4794,6 @@ function bottomPageDialog(close, pp, hh) {
     $('.bp-body', $dialog).jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
     jScrollFade('.bp-body');
     clickURLs();
-}
-
-var previews = Object.create(null);
-var preqs = Object.create(null);
-var pfails = Object.create(null);
-var slideshowid;
-
-function slideshowsteps()
-{
-    var forward = [], backward = [], ii = [], ci;
-    // Loop through available items and extract images
-    for (var i in M.v) {
-        if (is_image(M.v[i]))
-        {
-            // is currently previewed item
-            if (M.v[i].h == slideshowid)
-                ci = i;
-            ii.push(i);
-        }
-    }
-
-    var len = ii.length;
-    // If there is at least 2 images
-    if (len > 1)
-    {
-        var n = ii.indexOf(ci);
-        switch (n)
-        {
-            // last
-            case len - 1:
-                forward.push(M.v[ii[0]].h);
-                backward.push(M.v[ii[n - 1]].h);
-                break;
-            // first
-            case 0:
-                forward.push(M.v[ii[n + 1]].h);
-                backward.push(M.v[ii[len - 1]].h);
-            case -1:
-                break;
-            default:
-                forward.push(M.v[ii[n + 1]].h);
-                backward.push(M.v[ii[n - 1]].h);
-        }
-    }
-    return {backward: backward, forward: forward};
-}
-
-function slideshow_next()
-{
-    var valid = true;
-    $.each(dl_queue || [], function(id, file) {
-        if (file.id == slideshowid) {
-            valid = false;
-            return false; /* break loop */
-        }
-    });
-    if (!valid)
-        return;
-    var steps = slideshowsteps();
-    if (steps.forward.length > 0)
-        slideshow(steps.forward[0]);
-}
-
-function slideshow_prev()
-{
-    var valid = true;
-    $.each(dl_queue || [], function(id, file) {
-        if (file.id == slideshowid) {
-            valid = false;
-            return false; /* break loop */
-        }
-    });
-    if (!valid)
-        return;
-    var steps = slideshowsteps();
-    if (steps.backward.length > 0)
-        slideshow(steps.backward[steps.backward.length - 1]);
-}
-
-function slideshow(id, close)
-{
-    if (d)
-        console.log('slideshow', id, close, slideshowid);
-
-    if (close)
-    {
-        slideshowid = false;
-        $('.slideshow-dialog').addClass('hidden');
-        $('.slideshow-overlay').addClass('hidden');
-        for (var i in dl_queue)
-        {
-            if (dl_queue[i] && dl_queue[i].id == id)
-            {
-                if (dl_queue[i].preview)
-                {
-                    dlmanager.abort(dl_queue[i]);
-                }
-                break;
-            }
-        }
-        return false;
-    }
-
-    var n = M.getNodeByHandle(id);
-    if (!n || !n.p || M.getNodeRoot(id) === 'shares' || folderlink)
-    {
-        $('.slideshow-getlink').hide();
-        $('.slideshow-line').hide();
-    }
-    else
-    {
-        $('.slideshow-line').show();
-        $('.slideshow-getlink').show().rebind('click', function() {
-
-            if (u_type === 0) {
-                ephemeralDialog(l[1005]);
-            }
-            else {
-                initCopyrightsDialog([slideshowid]);
-            }
-        });
-    }
-    $('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').rebind('click', function(e)
-    {
-        slideshow(id, 1);
-    });
-    if (!n)
-        return;
-
-    $('.slideshow-filename').text(n.name);
-    $('.slideshow-image').attr('src', '').width(0).height(0);
-    $('.slideshow-pending').removeClass('hidden');
-    $('.slideshow-progress').addClass('hidden');
-    $('.slideshow-error').addClass('hidden');
-    $('.slideshow-image-bl').addClass('hidden');
-    $('.slideshow-prev-button,.slideshow-next-button').removeClass('active');
-
-    slideshowid = id;
-    var steps = slideshowsteps();
-    if (steps.backward.length > 0)
-        $('.slideshow-prev-button').addClass('active');
-    if (steps.forward.length > 0)
-        $('.slideshow-next-button').addClass('active');
-    $('.slideshow-prev-button,.slideshow-next-button').rebind('click', function(e)
-    {
-        var c = $(this).attr('class');
-        if (c && c.indexOf('active') > -1)
-        {
-            var steps = slideshowsteps();
-            if (c.indexOf('prev') > -1 && steps.backward.length > 0)
-                slideshow_prev();
-            else if (c.indexOf('next') > -1 && steps.forward.length > 0)
-                slideshow_next();
-        }
-    });
-
-    $('.slideshow-download').rebind('click', function() {
-
-        for (var i in dl_queue) {
-            if (dl_queue[i] && dl_queue[i].id === slideshowid) {
-                dl_queue[i].preview = false;
-                openTransfersPanel();
-                return;
-            }
-        }
-
-        if (M.d[slideshowid]) {
-            M.addDownload([slideshowid]);
-        }
-        else {
-            M.addDownload([n]);
-        }
-    });
-
-    if (previews[id]) {
-        previewsrc(previews[id].src);
-        fetchnext();
-    }
-    else if (!preqs[id]) {
-        fetchsrc(id);
-    }
-
-    $('.slideshow-overlay').removeClass('hidden');
-    $('.slideshow-dialog').removeClass('hidden');
-}
-
-function fetchnext()
-{
-    var n = M.d[slideshowsteps().forward[0]];
-    if (!n || !n.fa)
-        return;
-    if (n.fa.indexOf(':1*') > -1 && !preqs[n.h] && !previews[n.h])
-        fetchsrc(n.h);
-}
-
-function fetchsrc(id)
-{
-    function eot(id, err)
-    {
-        delete preqs[id];
-        delete pfails[id];
-        M.addDownload([id], false, err ? -1 : true);
-    }
-    eot.timeout = 8500;
-
-    if (pfails[id])
-    { // for slideshow_next/prev
-        if (slideshowid == id)
-            return eot(id, 1);
-        delete pfails[id];
-    }
-
-    var n = M.getNodeByHandle(id);
-    if (!n) {
-        console.error('handle "%s" not found...', id);
-        return false;
-    }
-
-    preqs[id] = 1;
-    var treq = {};
-    treq[id] = {fa: n.fa, k: n.k};
-    api_getfileattr(treq, 1, function(ctx, id, uint8arr)
-    {
-        previewimg(id, uint8arr);
-        if (!n.fa || n.fa.indexOf(':0*') < 0) {
-            if (d) {
-                console.log('Thumbnail found missing on preview, creating...', id, n);
-            }
-            var aes = new sjcl.cipher.aes([
-                n.k[0] ^ n.k[4],
-                n.k[1] ^ n.k[5],
-                n.k[2] ^ n.k[6],
-                n.k[3] ^ n.k[7]]);
-            createnodethumbnail(n.h, aes, id, uint8arr);
-        }
-        if (id == slideshowid)
-            fetchnext();
-    }, eot);
-}
-
-function previewsrc(src)
-{
-    var img = new Image();
-    img.onload = function()
-    {
-        if (this.height > $(window).height() - 100)
-        {
-            var factor = this.height / ($(window).height() - 100);
-            this.height = $(window).height() - 100;
-            this.width = Math.round(this.width / factor);
-        }
-        var w = this.width, h = this.height;
-        if (w < 700)
-            w = 700;
-        if (h < 500)
-            h = 500;
-        $('.slideshow-image').attr('src', this.src);
-        $('.slideshow-dialog').css('margin-top', h / 2 * -1);
-        $('.slideshow-dialog').css('margin-left', w / 2 * -1);
-        $('.slideshow-image').width(this.width);
-        $('.slideshow-image').height(this.height);
-        $('.slideshow-dialog').width(w);
-        $('.slideshow-dialog').height(h);
-        $('.slideshow-image-bl').removeClass('hidden');
-        $('.slideshow-pending').addClass('hidden');
-        $('.slideshow-progress').addClass('hidden');
-    };
-    img.src = src;
-}
-
-function previewimg(id, uint8arr)
-{
-    try {
-        var blob = new Blob([uint8arr], {type: 'image/jpeg'});
-    } catch (err) {}
-    if (!blob || blob.size < 25)
-        blob = new Blob([uint8arr.buffer]);
-    previews[id] =
-        {
-            blob: blob,
-            src: myURL.createObjectURL(blob),
-            time: new Date().getTime()
-        };
-    if (id == slideshowid)
-    {
-        previewsrc(previews[id].src);
-    }
-    if (Object.keys(previews).length == 1)
-    {
-        $(window).unload(function()
-        {
-            for (var id in previews)
-            {
-                myURL.revokeObjectURL(previews[id].src);
-            }
-        });
-    }
-}
-
-
-function fm_importflnodes(nodes)
-{
-    "use strict";
-
-    var _import = function(data) {
-        $.mcImport = true;
-        $.selected = data[0];
-        $.onImportCopyNodes = data[1];
-
-        if (d) {
-            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes);
-        }
-        $('.dropdown-item.copy-item').click();
-    };
-
-    if (localStorage.folderLinkImport && !folderlink) {
-
-        if ($.onImportCopyNodes) {
-            _import($.onImportCopyNodes);
-        }
-        else {
-            var kv = StorageDB(u_handle);
-            var key = 'import.' + localStorage.folderLinkImport;
-
-            kv.get(key)
-                .done(function(data) {
-                    _import(data);
-                    kv.rem(key);
-                })
-                .fail(function(e) {
-                    if (d) {
-                        console.error(e);
-                    }
-                    msgDialog('warninga', l[135], l[47]);
-                });
-        }
-        nodes = null;
-        delete localStorage.folderLinkImport;
-    }
-
-    var sel = [].concat(nodes || []);
-    if (sel.length) {
-        var FLRootID = M.RootID;
-
-        mega.ui.showLoginRequiredDialog().done(function() {
-            loadingDialog.show();
-            localStorage.folderLinkImport = FLRootID;
-
-            M.getCopyNodes(sel)
-                .done(function(nodes) {
-                    var data = [sel, nodes];
-                    var fallback = function() {
-                        $.onImportCopyNodes = data;
-                        loadSubPage('fm');
-                    };
-
-                    if (nodes.length > 6000) {
-                        fallback();
-                    }
-                    else {
-                        StorageDB(u_handle)
-                            .set('import.' + FLRootID, data)
-                            .done(function() {
-
-                                loadSubPage('fm');
-                            })
-                            .fail(function(e) {
-                                if (d) {
-                                    console.warn('Cannot import using indexedDB...', e);
-                                }
-                                fallback();
-                            });
-                    }
-                });
-        }).fail(function(aError) {
-            // If no aError, it was canceled
-            if (aError) {
-                alert(aError);
-            }
-        });
-    }
 }
 
 function clipboardcopycomplete()

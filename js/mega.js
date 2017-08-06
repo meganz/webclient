@@ -3242,7 +3242,7 @@ function fm_thumbnail_render(n) {
         if (imgNode && (imgNode = imgNode.querySelector('img'))) {
             n.seen = 2;
             imgNode.setAttribute('src', thumbnails[n.h]);
-            imgNode.parentNode.classList.add('thumb');
+            imgNode.parentNode.parentNode.classList.add('thumb');
         }
     }
 }

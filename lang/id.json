@@ -3863,17 +3863,19 @@
     "16671": "Download menggunakan aplikasi desktop MEGA untuk download lebih cepat.",
     "16672": "Apakah Anda ingin menyimpan file log di lokasi eksternal untuk menggunakannya nanti?",
     "16673": "Save the log file",
+    "16859": "Some items could not be shared with MEGA",
     "16861": "Install the MEGA desktop client",
     "16862": "Enhance file transfer performance from your browser",
     "16863": "Powerful synchronization tools",
     "16864": "And much more",
-    "16865": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
-    "16866": "Unfortunately, %1 has a limited buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16865": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16866": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16867": "your browser",
     "16868": "or use Chrome",
     "16869": "or exit from Incognito",
     "16870": "We recommend you install the [A]MEGA desktop app[\/A] to download large files.",
     "16871": "Out of HTML5 Offline Storage space",
     "16872": "File too big to be reliably handled in memory.",
-    "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and further to come."
+    "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and more.",
+    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2"
 }

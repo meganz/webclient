@@ -935,7 +935,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
 
-    var chatRoomId = chatRoom.roomId.split("@")[0];
+    var chatRoomId = chatRoom.roomId;
 
     chatRoom.rebind('typing.chatdInt', function() {
         self.broadcast(chatRoom, String.fromCharCode(1));

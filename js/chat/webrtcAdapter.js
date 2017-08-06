@@ -270,5 +270,6 @@ catch (e) {
         console.warn("Error enabling webrtc support: " + e);
     }
 }
+
 scope.RTC = RTC;
 })(window);

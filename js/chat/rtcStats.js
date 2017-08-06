@@ -1,5 +1,6 @@
-(function() {
-if (!RTC || !RTCPeerConnection.prototype.getStats || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
+mBroadcaster.once('startMega', function() {
+if (!window.RTC || !window.RTCPeerConnection || !RTCPeerConnection.prototype.getStats
+        || (RTC.browser !== 'chrome' && RTC.browser !== 'opera')) {
     return;
 }
 
@@ -393,4 +394,4 @@ RTC.Stats = {
     Recorder: Recorder,
     statItemToString: statItemToString
 };
-})();
+});

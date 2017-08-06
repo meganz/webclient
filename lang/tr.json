@@ -3863,17 +3863,19 @@
     "16671": "Daha h\u0131zl\u0131 indirmeler i\u00e7in MEGA'n\u0131n masa\u00fcst\u00fc uygulamas\u0131 ile indirin.",
     "16672": "G\u00fcnl\u00fck dosyas\u0131n\u0131 daha sonra kullanmak i\u00e7in harici bir konuma kaydetmek ister misiniz?",
     "16673": "G\u00fcnl\u00fck dosyas\u0131n\u0131 kaydet",
+    "16859": "Baz\u0131 \u00f6\u011feler MEGA ile payla\u015f\u0131lamaz",
     "16861": "MEGA masa\u00fcst\u00fc istemcisini y\u00fckle",
     "16862": "Taray\u0131c\u0131n\u0131z\u0131n dosta aktarma performans\u0131n\u0131 artt\u0131r\u0131n",
     "16863": "G\u00fc\u00e7l\u00fc e\u015fleme ara\u00e7lar\u0131",
     "16864": "Ve daha bir\u00e7ok \u015fey",
-    "16865": "Ne yaz\u0131k ki, %1, taray\u0131c\u0131 i\u00e7erisinde \u015fifre \u00e7\u00f6z\u00fcmlemek i\u00e7in kullan\u0131lan arabelle\u011fi limitlemekte, b\u00fcy\u00fck dosyalar\u0131 indirmek i\u00e7in [A]MEGA masa\u00fcst\u00fc uygulamas\u0131n\u0131[\/A] kullanman\u0131z\u0131 tavsiye ederiz %2",
-    "16866": "Ne yaz\u0131k ki, %1, taray\u0131c\u0131 i\u00e7erisinde \u015fifre \u00e7\u00f6z\u00fcmlemek i\u00e7in kullan\u0131lan arabelle\u011fi limitlemekte, l\u00fctfen b\u00fcy\u00fck dosyalar\u0131 indirmek i\u00e7in [A]MEGA masa\u00fcst\u00fc uygulamas\u0131n\u0131[\/A] kullan\u0131n %2",
+    "16865": "Ne yaz\u0131k ki, %1 veriyi taray\u0131c\u0131da de\u015fifrelemek i\u00e7in yeterli \u00f6nbelle\u011fe sahip de\u011fil, b\u00fcy\u00fck dosyalar\u0131 indirmek i\u00e7in [A]MEGA masa\u00fcst\u00fc uygulamas\u0131[\/A]n\u0131 indirmenizi \u00f6neririz %2",
+    "16866": "Ne yaz\u0131k ki, %1 veriyi taray\u0131c\u0131da de\u015fifrelemek i\u00e7in yeterli \u00f6nbelle\u011fe sahip de\u011fil, l\u00fctfen b\u00fcy\u00fck dosyalar\u0131 indirmek i\u00e7in [A]MEGA masa\u00fcst\u00fc uygulamas\u0131[\/A]n\u0131 y\u00fckleyin %2",
     "16867": "taray\u0131c\u0131n\u0131z",
     "16868": "ya da Chrome kullan\u0131n",
     "16869": "ya da Gizli Sekme'den \u00e7\u0131k\u0131n",
     "16870": "B\u00fcy\u00fck dosyalar\u0131 indirmek i\u00e7in [A]MEGA masa\u00fcst\u00fc uygulamas\u0131[\/A] y\u00fcklemenizi \u00f6neririz.",
     "16871": "HTML5 \u00c7evrimd\u0131\u015f\u0131 Depolama alan\u0131 bitti",
     "16872": "Dosya bellekte hatas\u0131z bir \u015fekilde i\u015flenmek i\u00e7in \u00e7ok b\u00fcy\u00fck.",
-    "16873": "Ger\u00e7ek zamanl\u0131 dosya s\u00fcr\u00fcmleme, silinen dosya korumas\u0131, dosya aktarmalar\u0131nda geli\u015fmi\u015f performans, taray\u0131c\u0131 ile b\u00fct\u00fcnle\u015fme ve gelecekte daha fazlas\u0131."
+    "16873": "Ger\u00e7ek zamanl\u0131 s\u00fcr\u00fcmleyici, silinen dosya korumas\u0131, dosya aktarmalar\u0131nda geli\u015fmi\u015f performans, taray\u0131c\u0131 b\u00fct\u00fcnle\u015ftirmesi ve daha fazlas\u0131.",
+    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2"
 }

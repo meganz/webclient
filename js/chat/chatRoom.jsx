@@ -601,7 +601,7 @@ ChatRoom.prototype.getRoomUrl = function() {
         }
     }
     else if (self.type === "group") {
-            return "fm/chat/g/" + self.roomId.split("@")[0];
+            return "fm/chat/g/" + self.roomId;
     }
     else {
         throw new Error("Can't get room url for unknown room type.");

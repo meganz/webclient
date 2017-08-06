@@ -7,10 +7,6 @@ function is_rawimage(name, ext) {
 function is_image(name) {
     if (name) {
         if (typeof name === 'object') {
-            if (name.fa && ~name.fa.indexOf(':1*')) {
-                return true;
-            }
-
             name = name.name;
         }
         var ext = ('' + name).split('.').pop().toUpperCase();

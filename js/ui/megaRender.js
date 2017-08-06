@@ -27,12 +27,16 @@
             '</table>',
 
             // Icon view mode
-            '<a class="file-block">' +
-                '<span class="file-status-icon"></span>' +
-                '<span class="data-item-icon"></span>' +
-                '<span class="file-settings-icon"></span>' +
-                '<span class="file-icon-area">' +
+            '<a class="data-block-view">' +
+                '<span class="data-block-bg ">' +
+                    '<span class="file-status-icon indicator"></span>' +
+                    '<span class="data-item-icon indicator"></span>' +
                     '<span class="block-view-file-type"><img/></span>' +
+                    '<span class="file-settings-icon"></span>' +
+                    '<div class="video-thumb-detalis">' +
+                        '<i class="small-icon small-play-icon"></i>' +
+                        '<span>00:00</span>' +
+                    ' </div>' +
                 '</span>' +
                 '<span class="file-block-title"></span>' +
             '</a>'
@@ -71,12 +75,16 @@
             '</table>',
 
             // Icon view mode
-            '<a class="file-block folder">' +
-                '<span class="file-status-icon"></span>' +
-                '<span class="shared-folder-access"></span>' +
-                '<span class="file-settings-icon"></span>' +
-                '<span class="file-icon-area">' +
+            '<a class="data-block-view folder">' +
+                '<span class="data-block-bg">' +
+                    '<span class="file-status-icon indicator"></span>' +
+                    '<span class="shared-folder-access indicator"></span>' +
                     '<span class="block-view-file-type"></span>' +
+                    '<span class="file-settings-icon"></span>' +
+                    '<div class="video-thumb-detalis">' +
+                        '<i class="small-icon small-play-icon"></i>' +
+                        '<span>00:00</span>' +
+                    ' </div>' +
                 '</span>' +
                 '<span class="shared-folder-info-block">' +
                     '<span class="shared-folder-name"></span>' +
@@ -112,7 +120,7 @@
             '</table>',
 
             // Icon view mode
-            '<a class="file-block ustatus">' +
+            '<a class="data-block-view ustatus">' +
                 '<span class="file-settings-icon"></span>' +
                 '<span class="shared-folder-info-block">' +
                     '<span class="u-card-data">' +
@@ -148,12 +156,16 @@
             '</table>',
 
             // Icon view mode
-            '<a class="file-block folder">' +
-                '<span class="file-status-icon"></span>' +
-                '<span class="file-settings-icon"></span>' +
-                '<span class="shared-folder-access"></span>' +
-                '<span class="file-icon-area">' +
+            '<a class="data-block-view folder">' +
+                '<span class="data-block-bg">' +
+                    '<span class="file-status-icon indicator"></span>' +
+                    '<span class="shared-folder-access indicator"></span>' +
                     '<span class="block-view-file-type folder-shared"><img/></span>' +
+                    '<span class="file-settings-icon"></span>' +
+                    '<div class="video-thumb-detalis">' +
+                        '<i class="small-icon small-play-icon"></i>' +
+                        '<span>00:00</span>' +
+                    ' </div>' +
                 '</span>' +
                 '<span class="file-block-title"></span>' +
             '</a>'

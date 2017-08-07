@@ -12282,7 +12282,7 @@ h5.main-italic-header {
 .reg-success-icon, .payment-confirmation .icon {
     width: 200px;
     height: 192px;
-    background-image: url(../images/mega/register-big-sprite-v12.png);
+    background-image: url(../images/mega/register-big-sprite-v13.png);
     background-position: center -1021px;
     background-repeat: no-repeat;
     margin: 30px auto 4px auto;
@@ -12376,7 +12376,7 @@ h5.main-italic-header {
     transition: all 200ms ease-in-out;
     white-space: nowrap;
     cursor: pointer;
-    background-image: url(../images/mega/register-big-sprite-v12.png);
+    background-image: url(../images/mega/register-big-sprite-v13.png);
     background-position: 12px 7px;
 }
 .resend-email-button:hover {
@@ -20438,7 +20438,7 @@ body.pro:after {
     right: -1px;
 }
 .fm-dialog-close.small {
-    background-image: url(../images/mega/register-big-sprite-v12.png);
+    background-image: url(../images/mega/register-big-sprite-v13.png);
     background-position: -40px -130px;
 }
 .transfer-widget.left-arrow .dropdown-white-arrow {

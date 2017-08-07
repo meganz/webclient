@@ -1596,8 +1596,7 @@ li.token-input-token-invite .input-close {
     left: 0;
 }
 .megasync .toast-icon {
-    background-image: url(../images/mega/download-sprite-v7.png);
-    background-position: -6px -192px;
+    background-position: -85px -816px;
     background-repeat: no-repeat;
 }
 .megasync .toast-button {

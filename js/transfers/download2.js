@@ -902,6 +902,8 @@ var dlmanager = {
             }
         };
 
+        flags = flags !== undefined ? flags : this.lmtUserFlags;
+
         if (preWarning) {
             $('.msg-overquota', $dialog).addClass('hidden');
             $('.msg-prewarning', $dialog).removeClass('hidden');
@@ -912,15 +914,15 @@ var dlmanager = {
 
             $('.upgrade', $dialog).rebind('click', function() {
 
-                closeDialog();
+                // closeDialog();
 
-                if (preWarning > 1) {
-                    loadingDialog.show();
+                // if (preWarning > 1) {
+                //     loadingDialog.show();
                     open(getAppBaseUrl() + '#pro');
                     return false;
-                }
-
-                dlmanager.showRegisterDialog4ach($dialog, flags);
+                // }
+                //
+                // dlmanager.showRegisterDialog4ach($dialog, flags);
             });
         }
         else {
@@ -1087,6 +1089,8 @@ var dlmanager = {
             // /* 02 */ flags = this.LMT_HASACHIEVEMENTS;
             // /* 03 */ flags = 0;
             // /* 04 */ flags = this.LMT_ISREGISTERED;
+
+            this.lmtUserFlags = flags;
         }
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
@@ -1134,6 +1138,8 @@ var dlmanager = {
             // /* 08 */ flags = this.LMT_ISREGISTERED;
             // /* 09 */ flags = this.LMT_ISREGISTERED | this.LMT_ISPRO | this.LMT_HASACHIEVEMENTS;
             // /* 10 */ flags = this.LMT_ISREGISTERED | this.LMT_ISPRO;
+
+            this.lmtUserFlags = flags;
         }
 
         if (flags & this.LMT_ISPRO) {

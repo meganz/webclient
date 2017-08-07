@@ -302,13 +302,20 @@ function dl_g(res) {
                 // load thumbnail
                 api_getfileattr([{fa: res.fa, k: key}], 0, function(a, b, data) {
                     if (data !== 0xDEAD) {
-                        data = mObjectURL([data.buffer || data], filemime(filename));
+                        data = mObjectURL([data.buffer || data], 'image/jpeg');
 
                         if (data) {
                             var $infoBlock = $('.download.info-block');
                             $infoBlock.addClass('thumb');
-                            $infoBlock.find('.img-preview-button').removeClass('hidden');
                             $infoBlock.find('img').attr('src', data);
+
+                            if (is_image(filename)) {
+                                $infoBlock.find('.img-preview-button')
+                                    .removeClass('hidden')
+                                    .rebind('click', function() {
+                                        slideshow({h: dlpage_ph, fa: res.fa, k: key});
+                                    });
+                            }
                         }
                     }
                 });

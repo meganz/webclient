@@ -2393,7 +2393,9 @@ React.makeElement = React['createElement'];
 
 	        $elem.height('100%');
 
-	        var options = $.extend({}, {}, self.props.options);
+	        var options = $.extend({}, {
+	            'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection']
+	        }, self.props.options);
 
 	        Ps.initialize($elem[0], options);
 

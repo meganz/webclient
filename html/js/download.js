@@ -488,7 +488,8 @@ function setBrowserWarningClasses(selector, $container, message) {
     };
 
     if ($container && $elm) {
-        setText(l[16866], $elm.addClass('warning'));
+        setText(l[16866], $elm);
+        $container.addClass('warning');
     }
     else {
         setText(l[16865], $elm.addClass('visible'));

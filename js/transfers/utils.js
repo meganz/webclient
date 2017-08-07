@@ -64,27 +64,6 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
  */
 function dlFatalError(dl, error, ethrow, lock) {
     var awaitingPromise = dl.awaitingPromise;
-    var m = 'This issue should be resolved ';
-    if (ethrow === -0xDEADBEEF) {
-        ethrow = false;
-    }
-    else if (navigator.webkitGetUserMedia) {
-        m += 'exiting from Incognito mode.';
-        msgDialog('warninga', l[1676], m, error);
-    }
-    else if (navigator.msSaveOrOpenBlob) {
-        later(browserDialog);
-        m = l[1933];
-        msgDialog('warninga', l[1676], m, error);
-    }
-    else if (dlMethod === FlashIO) {
-        later(browserDialog);
-        m = l[1308];
-        msgDialog('warninga', l[1676], m, error);
-    }
-    else {
-        later(firefoxDialog);
-    }
 
     // Log the fatal error
     Soon(function() {

@@ -464,10 +464,10 @@ function setBrowserWarningClasses(selector, $container, message) {
         var text = uad.browser ? String(locale).replace('%1', uad.browser) : l[16883];
 
         if (message) {
-            text = l[1676] + ': ' + message + '<br/>' + l[16870];
+            text = l[1676] + ': ' + message + '<br/>' + l[16870] + ' %2';
         }
 
-        if ($elm.hasClass('chrome')) {
+        if (window.chrome) {
             if (window.Incognito) {
                 text = text.replace('%2', '(' + l[16869] + ')')
             }

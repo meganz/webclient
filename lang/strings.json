@@ -1787,6 +1787,10 @@
         "text": "Folder",
         "context": ""
     },
+    "1051": {
+        "text": "Never",
+        "context": ""
+    },
     "1057": {
         "text": "Confirm session removal",
         "context": ""
@@ -5538,6 +5542,10 @@
     "5908": {
         "text": "Enter an e-mail or contact",
         "context": ""
+    },
+    "5911": {
+        "text": "Add Contacts",
+        "context": "plural of Add Contact"
     },
     "5913": {
         "text": "You can easily add new contacts by email or import existing contacts from other services.",

@@ -766,12 +766,8 @@ var GenericConversationMessage = React.createClass({
                         }}
                     />;
                 }
-                else if(message.deleted) {
-                    messageDisplayBlock =  <div className="message text-block">
-                        <em>
-                            {__(l[8886])}
-                        </em>
-                    </div>;
+                else if (message.deleted) {
+                    return null;
                 }
                 else {
                     if (message.updated > 0) {

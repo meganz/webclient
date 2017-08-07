@@ -4,17 +4,6 @@ if (!window.RTC || !window.RTCPeerConnection || !RTCPeerConnection.prototype.get
     return;
 }
 
-function getBrowserVersion() {
-    var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
-    var ver = parseInt(ua.details.version);
-    if (!isNaN(ver)) {
-        browser += (':' + ver);
-    }
-    return browser;
-}
-
-RTC.getBrowserVersion = getBrowserVersion;
-
 function prettyNum(v) {
     if (v > 1048576) {
         return (v/1048576).toFixed(1)+'M';
@@ -374,7 +363,7 @@ Recorder.prototype.getStats = function(cid) {
         dur: Math.ceil((Date.now()-this._tsStart)/1000),
         sper: this._scanPeriod,
         samples: this.samples,
-        bws: getBrowserVersion()
+        bws: RTC.getBrowserVersion()
     }
     var cmn = this._commonStats;
     for (var k in cmn)

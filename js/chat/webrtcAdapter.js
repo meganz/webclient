@@ -129,6 +129,15 @@ function WebrtcApi() {
     }
 }
 
+WebrtcApi.prototype.getBrowserVersion = function getBrowserVersion() {
+    var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
+    var ver = parseInt(ua.details.version);
+    if (!isNaN(ver)) {
+        browser += (':' + ver);
+    }
+    return browser;
+};
+
 WebrtcApi.prototype.createUserMediaConstraints = function (um) {
     var constraints = {audio: false, video: false};
 

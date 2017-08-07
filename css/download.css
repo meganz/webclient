@@ -314,7 +314,6 @@
 .download.transfer-buttons {
     white-space: nowrap;
     padding: 9px 0 0 0;
-    display: none;
 }
 .transfer-buttons .default-white-button.inline, .transfer-buttons .default-grey-button.inline {
     margin: 0 8px 0 0;
@@ -592,6 +591,9 @@
     -webkit-border-radius: 2px;
     border-radius: 2px;
 }
+.download .default-white-button {
+    color: #777777;
+}
 .not-available-user .main-pad, .temporary-na .main-pad, .na-some-reason .main-pad {
     padding-bottom: 78px;
 }
@@ -601,10 +603,10 @@
 .downloading .megasync-close, .downloading .megasync-close-txt, .megasync-overlay.linux .megasync-dropdown, .thumb .download.thumb-block {
     display: block;
 }
-.downloading .download.buttons-block, .download-complete .download.buttons-block, .downloading .download.checkbox-bl, .downloading .download.bar-buttons, .download-complete .download.pause-button, .download-complete .download.bar-buttons, .download-complete .progress-cell.mid-pause, .download-complete .download.bar-buttons, .download-complete .download.checkbox-bl, .download-complete .download.speed-block, .download-complete .download.eta-block, .paused .download.eta-block i, .download-complete .download.progress-cell i {
+.downloading .download.buttons-block, .download-complete .download.buttons-block, .downloading .download.checkbox-bl, .downloading .download.bar-buttons, .download-complete .download.pause-button, .download-complete .download.bar-buttons, .download-complete .progress-cell.mid-pause, .download-complete .download.bar-buttons, .download-complete .download.checkbox-bl, .download-complete .download.speed-block, .download-complete .download.eta-block, .paused .download.eta-block i, .download-complete .download.progress-cell i, .default-white-button.pause-transfer.inline {
     display: none;
 }
-.downloading .download.transfer-buttons, .downloading .download.bar-transfer-info, .download-complete .download bar-transfer-info, .download-complete .complete-block {
+.downloading .default-white-button.pause-transfer.inline, .downloading .download.bar-transfer-info, .download-complete .download bar-transfer-info, .download-complete .complete-block {
     display: inline-block;
 }
 .downloading .download.progress-cell, .download-complete .download.progress-cell {

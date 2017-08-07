@@ -307,6 +307,7 @@ function dl_g(res) {
                         if (data) {
                             var $infoBlock = $('.download.info-block');
                             $infoBlock.addClass('thumb');
+                            $infoBlock.find('.img-preview-button').removeClass('hidden');
                             $infoBlock.find('img').attr('src', data);
                         }
                     }
@@ -388,8 +389,10 @@ function browserDownload() {
     }
     else*/
     {
-        $('.download.scroll-block').addClass('downloading');
-        $('.standalone-download-message').removeClass('hidden');
+        var $downloadPage = $('.download.scroll-block');
+        $downloadPage.addClass('downloading');
+        $downloadPage.find('.img-preview-button:visible').addClass('hidden');
+        $downloadPage.find('.standalone-download-message').removeClass('hidden');
 
         if (is_mobile) {
             $('body').addClass('downloading').find('.bar').width('1%');

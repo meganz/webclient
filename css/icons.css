@@ -1081,6 +1081,9 @@ i.icons-sprite {
     background-position: -28px -909px;
     width: 23px;
 }
+.semi-small-icon.icons-sprite.lens {
+    background-position: -179px -873px;
+}
 .download.big-icon {
     width: 74px;
     height: 74px;

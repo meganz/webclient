@@ -1830,7 +1830,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v1.png);
+    background-image: url(../images/mega/startpage-sprite_v2.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -2839,7 +2839,7 @@ div.checkboxOn, div.checkboxOff {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-repeat: no-repeat;
     background-position: right -8359px;
     -webkit-box-sizing: border-box;
@@ -3255,7 +3255,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v1.png);
+    background-image: url(../images/mega/startpage-sprite_v2.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;

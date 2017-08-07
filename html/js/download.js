@@ -305,7 +305,9 @@ function dl_g(res) {
                         data = mObjectURL([data.buffer || data], filemime(filename));
 
                         if (data) {
-                            // todo
+                            var $infoBlock = $('.download.info-block');
+                            $infoBlock.addClass('thumb');
+                            $infoBlock.find('img').attr('src', data);
                         }
                     }
                 });

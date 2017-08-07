@@ -93,6 +93,14 @@ function dl_g(res) {
     if (Object(fdl_queue_var).lastProgress) {
         dlprogress.apply(this, fdl_queue_var.lastProgress);
     }
+    if (Object(fdl_queue_var).ph) {
+        var gid = dlmanager.getGID(fdl_queue_var);
+
+        if (dlQueue.isPaused(gid)) {
+            fm_tfspause(gid);
+            $('.download .pause-transfer').addClass('active');
+        }
+    }
 
     megaAds.showAds($('#ads-block-frame'));
 

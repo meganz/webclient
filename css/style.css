@@ -20260,6 +20260,7 @@ body.pro:after {
     padding: 0;
     background-image: url(../images/mega/download-sprite-v7.png);
     background-position: left 1000px;
+    background-repeat: no-repeat;
     display: inline-block;
 }
 .megasync-table table span.tick {

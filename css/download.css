@@ -594,6 +594,9 @@
 .download .default-white-button {
     color: #777777;
 }
+.download .img-preview-button {
+    text-transform: lowercase;
+}
 .not-available-user .main-pad, .temporary-na .main-pad, .na-some-reason .main-pad {
     padding-bottom: 78px;
 }

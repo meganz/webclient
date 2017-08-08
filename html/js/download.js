@@ -57,7 +57,7 @@ function dlinfo(ph,key,next)
     }
     else {
         // Fetch the file information and optionally the download URL
-        api_req({a: 'g', p: ph, 'ad': showAd(), g: 1}, {callback: dl_g});
+        api_req({a: 'g', p: ph, 'ad': showAd(), g: 1}, {callback: tryCatch(dl_g)});
     }
 
     if (is_mobile) {
@@ -624,6 +624,8 @@ function importFile() {
 
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
+    var now = Date.now();
+
     Object(fdl_queue_var).lastProgress =
         [fileid, perc, bytesloaded, bytestotal, kbps, dl_queue_num];
 
@@ -631,7 +633,10 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     if (kbps == 0) return;
     $('.download.error-text, .download.main-transfer-error').addClass('hidden');
     $('.download.main-transfer-info').removeClass('hidden');
-    if (!dl_queue[dl_queue_num].starttime) dl_queue[dl_queue_num].starttime = new Date().getTime()-100;
+
+    if (dl_queue[dl_queue_num] && !dl_queue[dl_queue_num].starttime) {
+        dl_queue[dl_queue_num].starttime = now - 100;
+    }
 
     if (!m)
     {
@@ -672,8 +677,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         }
     }
 
-    if (fdl_starttime) var eltime = (new Date().getTime()-fdl_starttime)/1000;
-    else var eltime = (new Date().getTime()-dl_queue[dl_queue_num].starttime)/1000;
+    var eltime = (now - (fdl_starttime || Object(dl_queue[dl_queue_num]).starttime)) / 1000;
     if (eltime && bytesloaded)
     {
         var bps = kbps*1000;

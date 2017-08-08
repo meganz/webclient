@@ -125,7 +125,7 @@ function dl_g(res) {
     }
     else if (res.at)
     {
-        $('.download .pause-transfer').rebind('click', function(e) {
+        $('.download .pause-transfer').rebind('click', function() {
             if (!$(this).hasClass('active')) {
                 fm_tfspause('dl_' + fdl_queue_var.ph);
                 $('.download .pause-transfer').addClass('active');
@@ -346,7 +346,9 @@ function dl_g(res) {
                 });
         }
     }
-    else $('.download.scroll-block').addClass('na-some-reason');
+    else {
+        $('.download.scroll-block').addClass('na-some-reason');
+    }
 
     if (is_mobile) {
         $('.mobile.application-txt').safeHTML(l[8950]);
@@ -455,6 +457,8 @@ function setMobileAppInfo() {
 }
 
 function setBrowserWarningClasses(selector, $container, message) {
+    'use strict';
+
     var uad = ua.details || false;
     var $elm = $(selector, $container);
 
@@ -489,14 +493,14 @@ function setBrowserWarningClasses(selector, $container, message) {
 
         if (window.chrome) {
             if (window.Incognito) {
-                text = text.replace('%2', '(' + l[16869] + ')')
+                text = text.replace('%2', '(' + l[16869] + ')');
             }
             else {
                 text = text.replace('%2', '');
             }
         }
         else {
-            text = text.replace('%2', '(' + l[16868] + ')')
+            text = text.replace('%2', '(' + l[16868] + ')');
         }
 
         $elm.find('span').safeHTML(text);
@@ -513,6 +517,8 @@ function setBrowserWarningClasses(selector, $container, message) {
 
 // MEGAsync dialog If filesize is too big for downloading through browser
 function megasyncOverlay() {
+    'use strict';
+
     var $this = $('.megasync-overlay');
     var slidesNum = $('.megasync-controls div').length;
     var $body = $('body');
@@ -524,8 +530,7 @@ function megasyncOverlay() {
         setBrowserWarningClasses('.megasync-bottom-warning', $this);
     }
 
-    $('.big-button.download-megasync', $this).rebind('click', function(e)
-    {
+    $('.big-button.download-megasync', $this).rebind('click', function() {
         megasync.download(dlpage_ph, dlpage_key);
     });
 

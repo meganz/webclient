@@ -86,6 +86,8 @@ var dlmanager = {
      * @returns {MegaPromise}
      */
     getMaximumDownloadSize: function() {
+        'use strict';
+
         var promise = new MegaPromise();
 
         var max = function() {

@@ -192,7 +192,7 @@
             MemoryIO.fileSizeLimit = 600 * 1024 * 1024;
         }
         else {
-            MemoryIO.fileSizeLimit = (1024 * 1024 * 1024 * (1 + uad.is64bit));
+            MemoryIO.fileSizeLimit = 1024 * 1024 * 1024 * (1 + uad.is64bit);
         }
     });
 

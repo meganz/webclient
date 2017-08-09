@@ -155,7 +155,7 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [chat/adapter.js]: Shim to insulate apps from spec changes and prefix differences (WebRTC related polyfill)
 
-> NB: We had to fork the project and remove the UTF characters from twemoji.js, so we are using the repo:
+> NB: We had to fork the project and remove the UTF characters from adapter.js, so we are using the repo:
 > https://github.com/meganz/adapter
 > 
 > ```bash

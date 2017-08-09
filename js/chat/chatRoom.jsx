@@ -781,8 +781,8 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
         nodeids.forEach(function(nodeId) {
             promises.push(
                 asyncApiReq({'a': 'mcga', 'n': nodeId, 'u': uh, 'id': self.chatId, 'v': Chatd.VERSION})
-            )
-        })
+            );
+        });
     });
 
     return MegaPromise.allDone(promises);
@@ -815,8 +815,8 @@ ChatRoom.prototype.attachNodes = function(ids) {
         var proxyPromise = new MegaPromise();
 
         self._sendNodes(
-            [nodeId],
-            users
+                [nodeId],
+                users
             )
             .done(function () {
                 var nodesMeta = [];
@@ -839,13 +839,13 @@ ChatRoom.prototype.attachNodes = function(ids) {
                     JSON.stringify(nodesMeta)
                 );
 
-            proxyPromise.resolve(
-                [nodeId]
-            );
-        })
-        .fail(function(r) {
-            proxyPromise.reject(r);
-        });waitingPromises.push(proxyPromise);
+                proxyPromise.resolve([nodeId]);
+            })
+            .fail(function(r) {
+                proxyPromise.reject(r);
+            });
+
+        waitingPromises.push(proxyPromise);
     });
 
     $masterPromise.linkDoneAndFailTo(MegaPromise.allDone(waitingPromises));
@@ -880,63 +880,6 @@ ChatRoom.prototype.attachContacts = function(ids) {
     );
 };
 
-ChatRoom.prototype.revokeAttachment = function(node) {
-    var self = this;
-
-    assert(node, 'node is missing.');
-
-    var users = [];
-
-    $.each(self.getParticipantsExceptMe(), function(k, v) {
-        var contact = M.u[v];
-        if (contact && contact.u) {
-            users.push(
-                contact.u
-            );
-        }
-    });
-
-    loadingDialog.show();
-
-    var allPromises = [];
-
-    users.forEach(function(uh) {
-        allPromises.push(
-            asyncApiReq({
-                'a': 'mcra', 'n': node.h, 'u': uh, 'id': self.chatId,
-                'v': Chatd.VERSION
-            })
-        );
-    });
-    MegaPromise.allDone(allPromises)
-        .done(function(r) {
-            if (r && r[0] && r[0][0] && r[0][0] < 0) {
-                msgDialog(
-                    'warninga',
-                    __("Revoke attachment"),
-                    __("Could not revoke access to attachment, error code: %s.").replace("%s", r[0][0])
-                );
-            }
-            // 1b, 1b, JSON
-            self.sendMessage(
-                Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
-                Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT +
-                node.h
-            );
-        })
-        .always(function() {
-            loadingDialog.hide();
-        })
-        .fail(function(r) {
-            msgDialog(
-                'warninga',
-                __(l[8891]),
-                __(l[8893]).replace("%s", r)
-            );
-        });
-
-    return allPromises;
-};
 
 /**
  * Get message by Id

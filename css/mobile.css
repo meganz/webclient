@@ -3345,7 +3345,7 @@ div.checkboxOn, div.checkboxOff {
 
 /* Hide transfer widget on the ProPay page after getting an overquota error from the download page */
 .widget-block.active {
-	display: none;
+	display: none !important;
 }
 
 /* Only media queries after here */

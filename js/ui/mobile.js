@@ -3059,7 +3059,7 @@ mobile.languageMenu = {
     initLanguageSelectionHandler: function() {
 
         'use strict';
-        
+
         var $languageItems = $('.top-submenu.language-items .top-menu-item');
 
         // Initialise the save button
@@ -3101,7 +3101,14 @@ mobile.languageMenu = {
 
 mega.ui.tpp = {
     reset: function() {},
-    setTotalProgress: function() {}
+    setTotalProgress: function() {},
+    resume: function() {}
+};
+
+mega.achievem = {
+    enabled: function() {
+        return MegaPromise.reject();
+    }
 };
 
 var notify = {

@@ -195,7 +195,7 @@
         // just in case this was not properly disabled
         self._activityHandlingDisable();
 
-        $(window).rebind('mousemove.appActivityHandler', function() {
+        $(window).rebind('mousemove.appActivityHandler keypress.appActivityHandler', function() {
             if (self._lastMouseMove + APPACTIVITYHANDLER_MOUSEMOVE_THROTTLING < Date.now()) {
                 if (self.debugMode) {
                     self.logger.debug(
@@ -237,6 +237,7 @@
         }
 
         $(window).unbind('mousemove.appActivityHandler');
+        $(window).unbind('keypress.appActivityHandler');
     };
 
 

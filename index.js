@@ -1219,7 +1219,7 @@ function init_page() {
             }
         }
 
-        if (typeof fdl_queue_var !== 'undefined') {
+        if (!is_mobile && typeof fdl_queue_var !== 'undefined') {
             if (!$('.transfer-table tr#dl_' + Object(fdl_queue_var).ph).length) {
                 var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
                 if (fdl && fdl_queue_var.dlkey === dlpage_key) {

@@ -2393,7 +2393,9 @@ React.makeElement = React['createElement'];
 
 	        $elem.height('100%');
 
-	        var options = $.extend({}, {}, self.props.options);
+	        var options = $.extend({}, {
+	            'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection']
+	        }, self.props.options);
 
 	        Ps.initialize($elem[0], options);
 
@@ -4624,7 +4626,7 @@ React.makeElement = React['createElement'];
 	        self.props.chatRoom.messagesBuff.messages.forEach(function (v, k) {
 	            if (!v.protocol && v.revoked !== true) {
 	                var shouldRender = true;
-	                if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) {
+	                if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false || v.deleted === true) {
 	                    shouldRender = false;
 	                }
 
@@ -8387,6 +8389,14 @@ React.makeElement = React['createElement'];
 	                                );
 	                            }
 	                            if (contact.u === u_handle) {
+	                                var revokeButton = null;
+
+	                                if (message.isEditable && message.isEditable()) {
+	                                    revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __(l[8909]),
+	                                        className: 'red', onClick: function onClick() {
+	                                            chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId ? message.internalId : message.orderValue, "");
+	                                        } });
+	                                }
 	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
@@ -8404,11 +8414,8 @@ React.makeElement = React['createElement'];
 	                                        previewButtons,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                            onClick: startDownload }),
-	                                        React.makeElement('hr', null),
-	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __(l[8909]), className: 'red',
-	                                            onClick: function onClick() {
-	                                                chatRoom.revokeAttachment(v);
-	                                            } })
+	                                        revokeButton ? React.makeElement('hr', null) : "",
+	                                        revokeButton
 	                                    )
 	                                );
 	                            } else {
@@ -8856,15 +8863,7 @@ React.makeElement = React['createElement'];
 	                        }
 	                    });
 	                } else if (message.deleted) {
-	                    messageDisplayBlock = React.makeElement(
-	                        'div',
-	                        { className: 'message text-block' },
-	                        React.makeElement(
-	                            'em',
-	                            null,
-	                            __(l[8886])
-	                        )
-	                    );
+	                    return null;
 	                } else {
 	                    if (message.updated > 0) {
 	                        textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
@@ -10164,7 +10163,9 @@ React.makeElement = React['createElement'];
 	            proxyPromise.resolve([nodeId]);
 	        }).fail(function (r) {
 	            proxyPromise.reject(r);
-	        });waitingPromises.push(proxyPromise);
+	        });
+
+	        waitingPromises.push(proxyPromise);
 	    });
 
 	    $masterPromise.linkDoneAndFailTo(MegaPromise.allDone(waitingPromises));
@@ -10188,45 +10189,6 @@ React.makeElement = React['createElement'];
 	    });
 
 	    self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify(nodesMeta));
-	};
-
-	ChatRoom.prototype.revokeAttachment = function (node) {
-	    var self = this;
-
-	    assert(node, 'node is missing.');
-
-	    var users = [];
-
-	    $.each(self.getParticipantsExceptMe(), function (k, v) {
-	        var contact = M.u[v];
-	        if (contact && contact.u) {
-	            users.push(contact.u);
-	        }
-	    });
-
-	    loadingDialog.show();
-
-	    var allPromises = [];
-
-	    users.forEach(function (uh) {
-	        allPromises.push(asyncApiReq({
-	            'a': 'mcra', 'n': node.h, 'u': uh, 'id': self.chatId,
-	            'v': Chatd.VERSION
-	        }));
-	    });
-	    MegaPromise.allDone(allPromises).done(function (r) {
-	        if (r && r[0] && r[0][0] && r[0][0] < 0) {
-	            msgDialog('warninga', __("Revoke attachment"), __("Could not revoke access to attachment, error code: %s.").replace("%s", r[0][0]));
-	        }
-
-	        self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT + node.h);
-	    }).always(function () {
-	        loadingDialog.hide();
-	    }).fail(function (r) {
-	        msgDialog('warninga', __(l[8891]), __(l[8893]).replace("%s", r));
-	    });
-
-	    return allPromises;
 	};
 
 	ChatRoom.prototype.getMessageById = function (messageId) {

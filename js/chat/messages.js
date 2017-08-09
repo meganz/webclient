@@ -159,6 +159,10 @@ Message.prototype.getManagementMessageSummaryText = function() {
     }
 };
 
+Message.prototype.isEditable = function() {
+    return this.userId === u_handle && (unixtime() - this.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT;
+};
+
 /**
  * Simple interface/structure wrapper for inline dialogs
  * @param opts

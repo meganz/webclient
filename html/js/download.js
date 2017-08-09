@@ -6,7 +6,6 @@ var fdl_queue_var=false;
 var fileSize;
 var maxDownloadSize = Math.pow(2, 53);
 
-var MOBILE_MAXFILESIZE = 100 * (1024 * 1024);
 var MOBILE_FILETYPES = {
     "docx" : 'word',
     "jpeg" : 'image',
@@ -17,12 +16,6 @@ var MOBILE_FILETYPES = {
     "png"  : 'image',
     "xlsx" : 'word'
 };
-
-// If Chrome or Firefox on iOS, reduce the size to 1.3 MB
-if ((navigator.userAgent.match(/CriOS/i)) || (navigator.userAgent.match(/FxiOS/i))) {
-    MOBILE_MAXFILESIZE = 1.3 * (1024 * 1024);
-}
-
 
 function dlinfo(ph,key,next)
 {
@@ -163,13 +156,17 @@ function dl_g(res) {
             dlmanager.getMaximumDownloadSize().done(function(size) {
                 maxDownloadSize = size;
 
-                if (fdl_filesize > maxDownloadSize) {
+                if (is_extension) {
+                    uncheckMegaSyncDownload();
+                    $('.download.checkbox-bl').addClass('hidden');
+                }
+                else if (fdl_filesize > maxDownloadSize) {
                     checkMegaSyncDownload();
                 }
                 else if (localStorage.megaSyncDownloadUnchecked) {
                     uncheckMegaSyncDownload();
                 }
-                else {
+                else if (!is_mobile) {
                     megasync.isInstalled(function(err, is) {
                         if (!err && is) {
                             checkMegaSyncDownload();
@@ -275,6 +272,7 @@ function dl_g(res) {
 
             if (is_mobile) {
                 setMobileAppInfo();
+                $('.mobile.dl-browser, .mobile.dl-megaapp').removeClass('disabled');
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
@@ -291,7 +289,7 @@ function dl_g(res) {
                     src: staticpath + 'images/mobile/extensions/' + icon + '.png'
                 });
 
-                if (res.s > MOBILE_MAXFILESIZE || !supported) {
+                if (res.s > maxDownloadSize || !supported) {
                     $('body').addClass('wrong-file');
                     $('.mobile.dl-browser').addClass('disabled');
                     $('.mobile.dl-browser').unbind('click');

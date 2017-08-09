@@ -188,6 +188,14 @@
         if (localStorage.dlFileSizeLimit) {
             MemoryIO.fileSizeLimit = parseInt(localStorage.dlFileSizeLimit);
         }
+        else if (is_mobile) {
+            MemoryIO.fileSizeLimit = 100 * (1024 * 1024);
+
+            // If Chrome or Firefox on iOS, reduce the size to 1.3 MB
+            if (navigator.userAgent.match(/CriOS/i) || navigator.userAgent.match(/FxiOS/i)) {
+                MemoryIO.fileSizeLimit = 1.3 * (1024 * 1024);
+            }
+        }
         else if (uad.engine === 'Trident' || uad.browser === 'Edge') {
             MemoryIO.fileSizeLimit = 600 * 1024 * 1024;
         }

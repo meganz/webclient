@@ -552,9 +552,24 @@
          * @param {Array}  aClassNames An array of classes
          */
         addClasses: function(aDOMNode, aClassNames) {
-            // XXX: classList.add does support an array, but not in all browsers
-            var len = aClassNames.length;
+            var len;
+
+            // TODO: find what is causing the issue and remove then all this
+            if (d) {
+                len = aClassNames.length;
+
+                while (len--) {
+                    if (!aClassNames[len] || typeof aClassNames[len] !== 'string') {
+                        console.warn('Invalid classList', len, aClassNames[len], aClassNames[len - 1], aClassNames);
+                        break;
+                    }
+                }
+            }
+            aClassNames = aClassNames.filter(String);
+
+            len = aClassNames.length;
             while (len--) {
+                // XXX: classList.add does support an array, but not in all browsers
                 aDOMNode.classList.add(aClassNames[len]);
             }
         },

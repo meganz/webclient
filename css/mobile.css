@@ -3343,6 +3343,11 @@ div.checkboxOn, div.checkboxOff {
     margin: 20px 0 0 0;
 }
 
+/* Hide transfer widget on the ProPay page after getting an overquota error from the download page */
+.widget-block.active {
+	display: none;
+}
+
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {

@@ -477,7 +477,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
             if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) {
                 $overlay.find('.viewer-error').addClass('hidden');
                 $overlay.find('.viewer-pending').addClass('hidden');
-                
+
                 deg =  360 * perc / 100;
                 if (deg <= 180) {
                     $chart.find('.left-chart p').css('transform', 'rotate(' + deg + 'deg)');
@@ -531,8 +531,10 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
                 $('.widget-block').addClass('active');
             }
             else {
-                mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
-                mega.ui.tpp.updateBlock('dl');
+                if (mega.ui.tpp.isCached()) {
+                    mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
+                    mega.ui.tpp.updateBlock('dl');
+                }
             }
             delay('percent_megatitle', percent_megatitle, 50);
         }
@@ -1181,8 +1183,10 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             $tr.find('.speed').addClass('unknown').text('');
         }
 
-        mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
-        mega.ui.tpp.updateBlock('ul');
+        if (mega.ui.tpp.isCached()) {
+            mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
+            mega.ui.tpp.updateBlock('ul');
+        }
         delay('percent_megatitle', percent_megatitle, 50);
 
         if (page.substr(0, 2) !== 'fm') {

@@ -1121,7 +1121,6 @@ FileManager.prototype.initContextUI = function() {
             //               ^^^^^^^^^^
 
             mega.ui.tpp.setTotal(-1, blk);
-            // mega.ui.tpp.setIndex(-1, blk);
             mega.ui.tpp.updateIndexes(blk);
         }
 

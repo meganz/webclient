@@ -8,6 +8,8 @@ mega.ui.tpp = function () {
     var opts = {
         dlg: {
             $: {},
+            cached: false,
+            initialized: false,
             visible: false,
             enabled: true,
             dl: {
@@ -30,7 +32,8 @@ mega.ui.tpp = function () {
                 progress: 0,
                 bps: 0,
                 time: 0,// Start time in ms
-                curr: {}
+                curr: {},
+                fileName: ''
             },
             dl: {
                 index: 0,
@@ -38,9 +41,14 @@ mega.ui.tpp = function () {
                 progress: 0,
                 bps: 0,
                 time: 0,// Start time in ms
-                curr: {}
+                curr: {},
+                fileName: ''
             }
         }
+    };
+
+    var isCached = function isCached() {
+        return opts.dlg.cached;
     };
 
     /**
@@ -52,7 +60,7 @@ mega.ui.tpp = function () {
         var total = opts.queue[bl].total;
 
         if (value) {
-            if (value > 0 || value < 0 && total > 1) {
+            if (value > 0 || (value < 0 && total > 1)) {
                 opts.queue[bl].total += value;
             }
         }
@@ -129,7 +137,7 @@ mega.ui.tpp = function () {
         var visible = isVisible();
         var enabled = isEnabled();
 
-        if (enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
+        if (isCached() && enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
             opts.dlg.$.show(opts.duration);
             setStatus(true);
         }
@@ -142,7 +150,7 @@ mega.ui.tpp = function () {
         var $tppDlg = opts.dlg.$;
         var visible = isVisible();
 
-        if (!$.isEmptyObject($tppDlg) && visible) {
+        if (isCached() && !$.isEmptyObject($tppDlg) && visible) {
             $tppDlg.hide(opts.duration);
             setStatus(false);
         }
@@ -176,12 +184,16 @@ mega.ui.tpp = function () {
 
     /**
      * Get index of latest started dl/ul item from queue
-     * @param {String} block i.e. ['dl', 'ul']
+     * @param {String} blk i.e. ['dl', 'ul']
      */
-    var getIndex = function getIndex(block) {
-        var result = opts.queue[block].index;
+    var getIndex = function getIndex(blk) {
+        var result = opts.queue[blk].index;
 
         return result;
+    };
+
+    var getFileName = function getFileName(blk) {
+        return opts.queue[blk].fileName;
     };
 
     /**
@@ -206,19 +218,28 @@ mega.ui.tpp = function () {
     /**
      * Set index of latest started dl/ul item from queue
      * @param {Number} value Index of current dl/ul file
-     * @param {String} block i.e. ['dl', 'ul'] download or upload
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
-    var setIndex = function setIndex(value, block) {
-        var index = opts.queue[block].index;
-        var total = opts.queue[block].total;
+    var setIndex = function setIndex(value, blk) {
+        var index = opts.queue[blk].index;
+        var total = opts.queue[blk].total;
 
         if (value) {
-            if (value > 0 && index < total || value < 0 && index > 1) {
-                opts.queue[block].index += value;
+            if ((value > 0 && index < total) || (value < 0 && index > 1)) {
+                opts.queue[blk].index += value;
             }
         }
         else {
-            opts.queue[block].index = 0;
+            opts.queue[blk].index = 0;
+        }
+    };
+
+    var setFileName = function setFileName(queue, blk) {
+        if (blk === 'dl') {
+            opts.queue[blk].fileName = queue.zipname || queue.n || queue.name;
+        }
+        else {
+            opts.queue[blk].fileName = queue.name;
         }
     };
 
@@ -370,6 +391,29 @@ mega.ui.tpp = function () {
             return false;
         }
 
+        if (!opts.dlg[blk].initialized) {
+            setTotal(M.pendingTransfers, blk);
+            var total = getTotal(blk).toString();
+            setIndex(1, blk);
+            setTime(Date.now(), blk);
+            var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
+            setFileName(fdl.name, blk);
+            var name = getFileName(blk);
+            var type = ext[fileext(name)];
+            if (typeof type === 'undefined') {
+                type = ext['*'][0];// general
+            }
+
+            opts.dlg[blk].$.num.text(total);
+            opts.dlg[blk].$.name.text(name);
+            opts.dlg[blk].$.ibLeft.text(l[5528]);
+            opts.dlg[blk].$.tfi
+                .removeClass()
+                .addClass('transfer-filetype-icon ' + type + ' file');
+
+            opts.dlg[blk].initialized = true;
+        }
+
         var index = getIndex(blk);
         var len = getTotal(blk).toString();
         var perc = getProgress(blk).toString();
@@ -408,7 +452,7 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
     var _init = function _init(queue, blk) {
-        var name = '';
+        var name = getFileName(blk);
         var index = getIndex(blk).toString();
         var total = getTotal(blk).toString();
         var type = ext[fileext(name)];
@@ -416,13 +460,6 @@ mega.ui.tpp = function () {
 
         if (typeof type === 'undefined') {
             type = ext['*'][0];// general
-        }
-
-        if (blk === 'dl') {
-            name = queue.zipname || queue.n || queue.name;
-        }
-        else {
-            name = queue.name;
         }
 
         opts.dlg[blk].$.name.text(name);
@@ -435,10 +472,23 @@ mega.ui.tpp = function () {
         opts.dlg[blk].$.tfi
             .removeClass()
             .addClass('transfer-filetype-icon ' + type + ' file');
+
+        opts.dlg[blk].initialized = true;
     };
 
     /**
-     * Shows TPP as soon as file or folder is picked, instant initialization
+     * Called when switching from public link download with non completed dls
+     * @param {String} blk 'dl' or 'ul'
+     */
+    // var reInitialize = function reInitialize(blk) {
+    //     if (dl_queue.length) {
+    //     }
+
+    //     opts.dlg.initialized = true;
+    // };
+
+    /**
+     * Shows TPP as soon as file or folder is picked
      * @param {String} bl Download or upload block i.e. ['dl', 'ul']
      */
     var started = function started(bl) {
@@ -470,25 +520,29 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
     var start = function start(queue, blk) {
-        if (!getIndex(blk)) {
-            setIndex(1, blk);
-        }
-
-        if (getIndex(blk) === 1) {
-            _init(queue, blk);
-            showBlock(blk);
-            show();
+        if (isCached()) {
+            if (!getIndex(blk)) {
+                setIndex(1, blk);
+            }
+            if (getIndex(blk) === 1) {
+                // setFileName(queue, blk);
+                _init(queue, blk);
+                showBlock(blk);
+                show();
+            }
         }
     };
 
     var reset = function reset(blk) {
-        hideBlock(blk);
-        setTime(0, blk);
-        setIndex(0, blk);
-        setTotal(0, blk);
-        setTotalProgress(0, blk);
-        setTransfered(-1, 0, blk);
-        opts.dlg[blk].paused = [];
+        if (isCached()) {
+            setTime(0, blk);
+            setIndex(0, blk);
+            setTotal(0, blk);
+            setTotalProgress(0, blk);
+            setTransfered(-1, 0, blk);
+            hideBlock(blk);
+            opts.dlg[blk].paused = [];
+        }
     };
 
     mBroadcaster.addListener('fm:initialized', function() {
@@ -502,6 +556,7 @@ mega.ui.tpp = function () {
         else {
             setEnabled(fmconfig.tpp);
         }
+
         // Cache dialog
         opts.dlg.$ = $('.transfer-widget.popup');
         opts.dlg.dl.$ = opts.dlg.$.find('.download');
@@ -519,6 +574,9 @@ mega.ui.tpp = function () {
             opts.dlg[blk].$.ibLeft = opts.dlg[blk].$.find('.info-block.left .of');
             opts.dlg[blk].$.tfi = opts.dlg[blk].$.find('.transfer-filetype-icon');
         }
+
+        // Cached
+        opts.dlg.cached = true;
 
         // If ephemeral, then hide close button for ongoing transfers popup dialog
         if (isEph) {
@@ -552,6 +610,8 @@ mega.ui.tpp = function () {
     });
 
     return {
+        isCached: isCached,
+        // isInit: isInit,
         show: show,
         hide: hide,
         pause: pause,

@@ -396,8 +396,21 @@ mega.ui.tpp = function () {
             var total = getTotal(blk).toString();
             setIndex(1, blk);
             setTime(Date.now(), blk);
-            var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
-            setFileName(fdl.name, blk);
+
+            if (typeof fdl_queue_var !== 'undefined') {
+                var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
+                setFileName(fdl.name, blk);
+
+                var handle = fdl.h || fdl.dl_id;
+
+                var gid = 'dl_' + handle;
+                var isPaused = uldl_hold || dlQueue.isPaused(gid);
+
+                var pauseTxt = '';
+                if (isPaused) {
+                    pauseTxt = l[1651];
+                }
+            }
             var name = getFileName(blk);
             var type = ext[fileext(name)];
             if (typeof type === 'undefined') {
@@ -417,21 +430,29 @@ mega.ui.tpp = function () {
         var index = getIndex(blk);
         var len = getTotal(blk).toString();
         var perc = getProgress(blk).toString();
-        var avgSpeed = getAvgSpeed(blk);
         var speed;
 
-        speed = numOfBytes(avgSpeed, 1);
+        if (!isPaused) {
+            var avgSpeed = getAvgSpeed(blk);
+            speed = numOfBytes(avgSpeed, 1);
+            if (speed.size === 0) {
+                opts.dlg[blk].$.stxt.text('');
+                opts.dlg[blk].$.spd.text(l[1042]);
+            }
+            else {
+                opts.dlg[blk].$.stxt.text(speed.unit + '\u2215' + 's');
+                opts.dlg[blk].$.spd.text(speed.size);
+            }
+        }
+        else {
+            speed = pauseTxt;
+            opts.dlg[blk].$.stxt.text('');
+            opts.dlg[blk].$.spd.text(speed);
+        }
+
         opts.dlg[blk].$.prg.css('width', perc + '%');
         opts.dlg[blk].$.num.text(len);
         opts.dlg[blk].$.crr.text(index);
-        if (speed.size === 0) {
-            opts.dlg[blk].$.stxt.text('');
-            opts.dlg[blk].$.spd.text(l[1042]);
-        }
-        else {
-            opts.dlg[blk].$.stxt.text(speed.unit + '\u2215' + 's');
-            opts.dlg[blk].$.spd.text(speed.size);
-        }
     };
 
     /**

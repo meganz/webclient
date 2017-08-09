@@ -272,6 +272,7 @@ function dl_g(res) {
 
             if (is_mobile) {
                 setMobileAppInfo();
+                $('.mobile.dl-browser, .mobile.dl-megaapp').removeClass('disabled');
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {

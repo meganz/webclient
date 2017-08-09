@@ -3101,7 +3101,8 @@ mobile.languageMenu = {
 
 mega.ui.tpp = {
     reset: function() {},
-    setTotalProgress: function() {}
+    setTotalProgress: function() {},
+    resume: function() {}
 };
 
 mega.achievem = {

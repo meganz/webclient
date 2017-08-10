@@ -1505,6 +1505,7 @@ function topmenuUI() {
         $('.top-menu-item.fm').removeClass('hidden');
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $('.top-menu-item.account').removeClass('hidden');
+        $('.top-menu-item.upgrade-your-account').removeClass('hidden');
         $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
         $('.top-login-button').hide();
@@ -1540,8 +1541,7 @@ function topmenuUI() {
                 cssClass = 'pro' + proNum;
             }
 
-            // Show the 'Upgrade your account' button in the main menu for all
-            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
+            // Show the Pro badge
             $('.membership-icon-pad .membership-big-txt.plan-txt').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
             $('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
@@ -1550,7 +1550,6 @@ function topmenuUI() {
         }
         else {
             // Show the free badge
-            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
             $('.top-head .membership-icon').attr('class', 'membership-icon');
             $('.top-menu-item.account .right-el').text('FREE');
             $('.membership-status').attr('class', 'tiny-icon membership-status free');
@@ -1589,7 +1588,7 @@ function topmenuUI() {
             }
         }
 
-        $('.top-menu-item.upgrade-your-account').addClass('hidden');
+        $('.top-menu-item.upgrade-your-account.pro').removeClass('hidden');
         $('.membership-status-block').hide();
         $('.top-icon.notification').hide();
         $('.top-icon.achievements').hide();
@@ -1780,7 +1779,7 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
                 'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'wp', 'start', 'fm'
+                'sync', 'takedown', 'terms', 'wp', 'start'
             ];
 
             for (var i = subPages.length; i--;) {
@@ -1792,6 +1791,9 @@ function topmenuUI() {
 
             if (className.indexOf('upgrade-your-account') > -1) {
                 loadSubPage('pro');
+            }
+            else if (is_mobile && className.indexOf('fm') > -1) {
+                mobile.loadCloudDrivePage();
             }
             else if (subpage) {
                 loadSubPage(subpage);

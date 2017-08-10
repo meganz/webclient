@@ -1474,7 +1474,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
     }
 
     if (msg) {
-        self.logger.warn("Terminating due to:", msg);
+        self.logger.error("Terminating due to:", msg);
     }
     self._setState(SessState.kTerminating);
     self.terminatePromise = new Promise(function(resolve, reject) {

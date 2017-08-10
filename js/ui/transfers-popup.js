@@ -9,17 +9,18 @@ mega.ui.tpp = function () {
         dlg: {
             $: {},
             cached: false,
-            initialized: false,
             visible: false,
             enabled: true,
             dl: {
                 $: {},
                 class: '.download',
+                initialized: false,
                 paused: []// ids of paused dl items
             },
             ul: {
                 $: {},
                 class: '.upload',
+                initialized: false,
                 paused: []// ids of paused ul items
             }
         },
@@ -276,6 +277,10 @@ mega.ui.tpp = function () {
     var pause = function pause(id, blk) {
         console.log('tpp.pause');
 
+        if (!opts.dlg[blk].initialized) {
+            drawInit(blk);
+        }
+
         opts.dlg[blk].paused.push(id);
         opts.dlg[blk].$.stxt.text('');
         opts.dlg[blk].$.spd.text(l[1651]);
@@ -381,73 +386,64 @@ mega.ui.tpp = function () {
         return result;
     };
 
+    var drawInit = function drawInit(blk) {
+        var name = '';
+        var total = 0;
+        var index = 0;
+        var type = '';
+
+        setTotal(M.pendingTransfers, blk);
+        total = getTotal(blk).toString();
+        setIndex(1, blk);
+        index = getIndex(blk);
+        setTime(Date.now(), blk);
+        name = getFileName(blk);
+        type = ext[fileext(name)];
+
+        if (typeof type === 'undefined') {
+            type = ext['*'][0];// general
+        }
+
+        opts.dlg[blk].$.num.text(total);
+        opts.dlg[blk].$.name.text(name);
+        opts.dlg[blk].$.ibLeft.text(l[5528]);
+        opts.dlg[blk].$.crr.text(index);
+        opts.dlg[blk].$.tfi
+            .removeClass()
+            .addClass('transfer-filetype-icon ' + type + ' file');
+
+        opts.dlg[blk].initialized = true;
+    };
+
     /**
      * Updates progress bar of transfers popup diaog, with cumulative percentage for dl/ul
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
     var updateBlock = function updateBlock(blk) {
+
         if (!Object(opts.dlg[blk].$).prg) {
             console.error("FIXME: TypeError: Cannot read property 'css' of undefined");
             return false;
         }
 
         if (!opts.dlg[blk].initialized) {
-            setTotal(M.pendingTransfers, blk);
-            var total = getTotal(blk).toString();
-            setIndex(1, blk);
-            setTime(Date.now(), blk);
-
-            if (typeof fdl_queue_var !== 'undefined') {
-                var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
-                setFileName(fdl.name, blk);
-
-                var handle = fdl.h || fdl.dl_id;
-
-                var gid = 'dl_' + handle;
-                var isPaused = uldl_hold || dlQueue.isPaused(gid);
-
-                var pauseTxt = '';
-                if (isPaused) {
-                    pauseTxt = l[1651];
-                }
-            }
-            var name = getFileName(blk);
-            var type = ext[fileext(name)];
-            if (typeof type === 'undefined') {
-                type = ext['*'][0];// general
-            }
-
-            opts.dlg[blk].$.num.text(total);
-            opts.dlg[blk].$.name.text(name);
-            opts.dlg[blk].$.ibLeft.text(l[5528]);
-            opts.dlg[blk].$.tfi
-                .removeClass()
-                .addClass('transfer-filetype-icon ' + type + ' file');
-
-            opts.dlg[blk].initialized = true;
+            drawInit(blk);
         }
 
         var index = getIndex(blk);
         var len = getTotal(blk).toString();
         var perc = getProgress(blk).toString();
         var speed;
+        var avgSpeed = getAvgSpeed(blk);
 
-        if (!isPaused) {
-            var avgSpeed = getAvgSpeed(blk);
-            speed = numOfBytes(avgSpeed, 1);
-            if (speed.size === 0) {
-                opts.dlg[blk].$.stxt.text('');
-                opts.dlg[blk].$.spd.text(l[1042]);
-            }
-            else {
-                opts.dlg[blk].$.stxt.text(speed.unit + '\u2215' + 's');
-                opts.dlg[blk].$.spd.text(speed.size);
-            }
+        speed = numOfBytes(avgSpeed, 1);
+        if (speed.size === 0) {
+            opts.dlg[blk].$.stxt.text('');
+            opts.dlg[blk].$.spd.text(l[1042]);
         }
         else {
-            speed = pauseTxt;
-            opts.dlg[blk].$.stxt.text('');
-            opts.dlg[blk].$.spd.text(speed);
+            opts.dlg[blk].$.stxt.text(speed.unit + '\u2215' + 's');
+            opts.dlg[blk].$.spd.text(speed.size);
         }
 
         opts.dlg[blk].$.prg.css('width', perc + '%');

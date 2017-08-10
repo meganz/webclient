@@ -406,7 +406,15 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
         $('.transfer-clear-all-icon').removeClass('disabled');
 
         M.onFileManagerReady(function() {
+            // mega.ui.tpp.setTotal(1, 'dl');
             mega.ui.tpp.started('dl');
+            if (typeof fdl_queue_var !== 'undefined' && Object(fdl_queue_var).ph) {
+                var gid = dlmanager.getGID(fdl_queue_var);
+
+                if (dlQueue.isPaused(gid)) {
+                    mega.ui.tpp.pause(gid, 'dl');
+                }
+            }
         });
     }
 };

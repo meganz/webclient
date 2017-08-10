@@ -1625,7 +1625,7 @@ function tree_residue(fm, ctx) {
     "use strict";
 
     // store the residual f response for perusal once all workers signal that they're done
-    residualfm = fm[0];
+    residualfm = fm[0] || false;
 
     // request an "I am done" confirmation ({}) from all workers
     if (workers) {
@@ -2763,8 +2763,14 @@ function init_chat() {
 }
 
 function loadfm_callback(res) {
-    if (res[0] == '-') {
-        msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
+    'use strict';
+
+    if ((parseInt(res) | 0) < 0) {
+        loadingDialog.hide();
+        loadingInitDialog.hide();
+
+        // tell the user we were unable to retrieve the cloud drive contents, upon clicking OK redirect to /support
+        msgDialog('warninga', l[1311], l[16892], api_strerror(res), loadSubPage.bind(null, 'support'));
         return;
     }
 

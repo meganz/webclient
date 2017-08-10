@@ -3879,5 +3879,7 @@
     "16871": "Spazio di archiviazione offline di HTML5 terminato",
     "16872": "File troppo grande per poter essere maneggiato affidabilmente in memoria",
     "16873": "Versionamento dei file in tempo reale, protezione dei file eliminati, performance migliorata nei trasferimenti dei file, integrazione del browser e altro.",
-    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2"
+    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
 }

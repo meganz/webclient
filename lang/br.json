@@ -3879,5 +3879,7 @@
     "16871": "Falta de espa\u00e7o de armazenamento offline HTML5",
     "16872": "O arquivo \u00e9 grande demais para poder ser gerenciado na mem\u00f3ria.",
     "16873": "Controle de vers\u00f5es em tempo real, conserva\u00e7\u00e3o de dados eliminados, melhor rendimento nas transfer\u00eancias de arquivos, integra\u00e7\u00e3o com o navegador e muito mais.",
-    "16883": "Infelizmente, o seu navegador n\u00e3o tem uma capacidade de armazenamento suficiente para decodificar dados. Por favor, instale o [A]aplicativo do MEGA para desktop[\/A] para baixar arquivos grandes %2"
+    "16883": "Infelizmente, o seu navegador n\u00e3o tem uma capacidade de armazenamento suficiente para decodificar dados. Por favor, instale o [A]aplicativo do MEGA para desktop[\/A] para baixar arquivos grandes %2",
+    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
 }

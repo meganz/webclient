@@ -3879,5 +3879,7 @@
     "16871": "Geen HTML5 Offline Opslagruimte meer",
     "16872": "Bestand te groot om betrouwbaar behandeld te worden in het geheugen.",
     "16873": "Real-time bestandsversies, verwijderings-bescherming op bestanden, verbeterde prestatie bij bestandsoverdrachten, browser integratie en meer.",
-    "16883": "Helaas, uw browser heeft onvoldoende buffer om data te ontcijferen, installeer de [A]MEGA desktop applicatie[\/A] om grote bestanden te downloaden %2"
+    "16883": "Helaas, uw browser heeft onvoldoende buffer om data te ontcijferen, installeer de [A]MEGA desktop applicatie[\/A] om grote bestanden te downloaden %2",
+    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
 }

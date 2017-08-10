@@ -130,29 +130,40 @@ var mobile = {
         'use strict';
 
         var $megaIcon = $('.mobile.fm-icon.mega');
-        var $otherPages = $('#fmholder > div');
-        var $cloudDrive = $('.mobile.file-manager-block');
 
         // On Mega icon click
         $megaIcon.off('tap').on('tap', function() {
 
-            // If logged in
-            if (typeof u_attr !== 'undefined') {
-
-                // Hide other pages and show the Cloud Drive
-                $otherPages.addClass('hidden');
-                $cloudDrive.removeClass('hidden');
-
-                // Open the root cloud folder
-                loadSubPage('fm');
-            }
-            else {
-                // Otherwise if not logged in, load the home page
-                loadSubPage('start');
-            }
-
+            // Load the cloud drive or start page, if not logged in
+            mobile.loadCloudDrivePage();
             return false;
         });
+    },
+
+    /**
+     * Loads the cloud drive if the user is logged in otherwise loads the start page
+     */
+    loadCloudDrivePage: function() {
+
+        'use strict';
+
+        var $otherPages = $('#fmholder > div');
+        var $cloudDrive = $('.mobile.file-manager-block');
+
+        // If logged in
+        if (typeof u_attr !== 'undefined') {
+
+            // Hide other pages that may be showing and show the Cloud Drive
+            $otherPages.addClass('hidden');
+            $cloudDrive.removeClass('hidden');
+
+            // Open the root cloud folder
+            loadSubPage('fm');
+        }
+        else {
+            // Otherwise if not logged in, load the home page
+            loadSubPage('start');
+        }
     },
 
     /**

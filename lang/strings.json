@@ -15519,8 +15519,36 @@
         "text": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and more.",
         "context": "MEGAsync dialog promo text"
     },
+    "16882": {
+        "text": "Send Media",
+        "context": "A button label which allows capturing or uploading pictures or videos directly to the chat."
+    },
     "16883": {
         "text": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
         "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %2 *may* include a hint, such as \"(or use Chrome)\""
+    },
+    "16884": {
+        "text": "Save for Offline",
+        "context": "A list option shown on the details of a file or folder."
+    },
+    "16887": {
+        "text": "Saving the Recovery Key and keeping it in a secure location enables you to recover your account without data loss in the case of a lost password.",
+        "context": "Footer shown on the Settings \/ Security Options section that explains what it means to export the Recovery Key."
+    },
+    "16888": {
+        "text": "Saving the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.",
+        "context": "Advises the user to keep the user's recovery key safe."
+    },
+    "16889": {
+        "text": "Please enter your password to confirm that you want to cancel your account.",
+        "context": "An account closure message which is shown when the user clicks on the link in their email to confirm the closure of their account."
+    },
+    "16890": {
+        "text": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+        "context": "An error shown to Chrome users when their download cannot continue because they are running out of disk space."
+    },
+    "16891": {
+        "text": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
+        "context": "An error shown to Chrome users when their download cannot start because they are running out of disk space."
     }
 }

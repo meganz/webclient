@@ -1167,10 +1167,6 @@
         "text": "Shared Folder",
         "context": ""
     },
-    "819": {
-        "text": "starting",
-        "context": "Text indicating that a file transfer (up or download) is starting"
-    },
     "822": {
         "text": "Back",
         "context": "button"
@@ -1635,6 +1631,10 @@
         "text": "Folder",
         "context": ""
     },
+    "1051": {
+        "text": "Never",
+        "context": ""
+    },
     "1057": {
         "text": "Confirm session removal",
         "context": ""
@@ -1979,14 +1979,6 @@
         "text": "Download",
         "context": ""
     },
-    "1189": {
-        "text": "Import",
-        "context": ""
-    },
-    "1190": {
-        "text": "to your Cloud Drive",
-        "context": ""
-    },
     "1191": {
         "text": "The file you are trying to download is temporary unavailable.",
         "context": ""
@@ -2159,10 +2151,6 @@
         "text": "Older",
         "context": ""
     },
-    "1308": {
-        "text": "Download failed",
-        "context": ""
-    },
     "1309": {
         "text": "Upload failed",
         "context": ""
@@ -2206,6 +2194,10 @@
     "1356": {
         "text": "Feedback",
         "context": ""
+    },
+    "1364": {
+        "text": "Retry",
+        "context": "Button to retry a certain action"
     },
     "1367": {
         "text": "Get 50 GB for free, or sign up for one of our PRO packages and get up to 4 TB of encrypted storage starting at \u20ac8.33 per month.",
@@ -3059,6 +3051,10 @@
         "text": "Enter an e-mail or contact",
         "context": ""
     },
+    "5911": {
+        "text": "Add Contacts",
+        "context": "plural of Add Contact"
+    },
     "5913": {
         "text": "You can easily add new contacts by email or import existing contacts from other services.",
         "context": ""
@@ -3694,10 +3690,6 @@
     "7006": {
         "text": "Loading...",
         "context": "Label to show when an account detail request is waiting for the server response."
-    },
-    "7084": {
-        "text": "with MEGAsync",
-        "context": "\"Download\" with MEGAsync"
     },
     "7086": {
         "text": "Please select your Linux Distro",
@@ -4523,10 +4515,6 @@
         "text": "PRO LITE",
         "context": "Label to indicate that the current user has a PRO LITE account."
     },
-    "8425": {
-        "text": "through your browser",
-        "context": "Button label. Full text: Download through your browser. "
-    },
     "8426": {
         "text": "[S]MEGAsync:[\/S] Easy automated syncing between your computers and your MEGA cloud drive",
         "context": "MEGAsync application advantages. As short as possible please. Please leave [S] and [\/S] as it is."
@@ -4538,30 +4526,6 @@
     "8428": {
         "text": "Take advantage of 50 GB cloud storage with secure user-controlled end-to-end encryption and sign up for a FREE account or one of our [A]PRO plans[\/A].",
         "context": "MEGAsync application advantages. As short as possible please. Please leave [A] and [\/A] as it is."
-    },
-    "8429": {
-        "text": "Faster transfer speeds",
-        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
-    },
-    "8430": {
-        "text": "MEGAsync takes full advantage of MEGA's high-powered infrastructure and multi-connection transfers.",
-        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nFaster transfer speeds.\r\nMEGAsync takes full advantage of MEGA\u2019s high-powered infrastructure and multi-connection transfers."
-    },
-    "8431": {
-        "text": "Lean & mean resource usage",
-        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA\u2019s end-to-end encryption algorithms right down on your machine without relying on slower browsers."
-    },
-    "8432": {
-        "text": "Run MEGA's end-to-end encryption algorithms right down on your machine without relying on slower browsers.",
-        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nLean & mean resource usage.\r\nRun MEGA's end-to-end encryption algorithms right down on your machine without relying on slower browsers."
-    },
-    "8433": {
-        "text": "Unlimited file size",
-        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nUnlimited file size.\r\nWhile browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync."
-    },
-    "8434": {
-        "text": "While browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync.",
-        "context": "MEGAsync application advantages. As short as possible please.\r\n\r\nFull text:\r\nUnlimited file size.\r\nWhile browser technology can limit the file size of your transfers, you can be sure to download or upload any file with MEGAsync."
     },
     "8435": {
         "text": "The file cannot be sent as the target user is over their storage quota.",
@@ -4951,6 +4915,10 @@
         "text": "You have been successfully logged in.",
         "context": "A toast notification to tell the user that they have been logged in successfully."
     },
+    "8752": {
+        "text": "Import to {0}",
+        "context": "A Label for a dialog which is shown when a user is trying to import a MEGA link. Preserve the {0} code because it is for including the name of the destination folder at runtime."
+    },
     "8755": {
         "text": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider. If you paid with debit or credit card and you have not received your MEGA PRO account within a few hours, please contact us at support@mega.nz. If you paid with a bank transfer please allow 4-5 days for the payment to clear.",
         "context": "A message displayed on the payment success screen letting users know the expected timeframes for their account to be unlocked."
@@ -5339,10 +5307,6 @@
         "text": "Me",
         "context": "The title for my message in a chat. The message was sent from yourself."
     },
-    "8886": {
-        "text": "This message has been deleted.",
-        "context": "A log message in a chat to indicate that the message has been deleted by the user."
-    },
     "8887": {
         "text": "(edited)",
         "context": "A log message in a chat to indicate that the message has been edited by the user."
@@ -5359,17 +5323,9 @@
         "text": "Start Group Conversation",
         "context": "A button title. The button starts a group chat."
     },
-    "8891": {
-        "text": "Revoke Attachment",
-        "context": "A button title to revoke an attachment in a chat by revoking the access to the attachment so other participants in the chat can not access it. (It does not delete the attachment out of your cloud drive)"
-    },
     "8892": {
         "text": "Revoked access to attachment(s).",
         "context": "A summary message displaying in the chat list when the last message of the chat is somebody revoking an attachment (i.e. removing access to the attachment, it does not delete it from the owners cloud drive)"
-    },
-    "8893": {
-        "text": "Could not revoke access to the attachment. Error code: %s.",
-        "context": "A warning message of not being able to revoke access to a shared attachment. Please keep %s as it will be replaced by the reason at runtime."
     },
     "8894": {
         "text": "Attached: %s",
@@ -5642,6 +5598,14 @@
     "9108": {
         "text": "Select Location",
         "context": "A context menu item. This lets the user select the location where they would like to move the file or folder to."
+    },
+    "9112": {
+        "text": "Pause Transfer",
+        "context": "A label of a context menu option to pause the selected transfer."
+    },
+    "9118": {
+        "text": "Resume Transfer",
+        "context": "A label of a context menu option to resume the selected transfer."
     },
     "9129": {
         "text": "Transfer Manager",
@@ -6258,10 +6222,6 @@
     "16274": {
         "text": "View Image",
         "context": "The title of a button which allows the user to open the image in the media \/ image viewer."
-    },
-    "16275": {
-        "text": "Play Video",
-        "context": "The title of a button which allows the user to open the video in a media \/ video player."
     },
     "16277": {
         "text": "Create your free account and get %1 of complimentary storage space, valid for %2 days.",
@@ -7190,5 +7150,69 @@
     "16664": {
         "text": "The new password must be different from the old one.",
         "context": "A message on an error dialog which is shown when a user tries to change their account password but the new password is the same as the old one."
+    },
+    "16671": {
+        "text": "Download using the MEGA desktop app for faster downloads.",
+        "context": "A message about the MEGAsync application which allows the user to download files faster and more reliably."
+    },
+    "16861": {
+        "text": "Install the MEGA desktop client",
+        "context": "MEGAsync dialog promo text. The MEGA desktop client is a new more generic description for the MEGAsync product."
+    },
+    "16862": {
+        "text": "Enhance file transfer performance from your browser",
+        "context": "The MEGA desktop client allows people to transfer files from MEGA through their browser as a plugin"
+    },
+    "16863": {
+        "text": "Powerful synchronization tools",
+        "context": "Characteristic of the MEGA desktop client"
+    },
+    "16864": {
+        "text": "And much more",
+        "context": "MEGAsync dialog promo text"
+    },
+    "16865": {
+        "text": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
+        "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %1 is replaced with either \"your browser\" or the actual browser's brand. %2 *may* include a hint, just as \"(or use Chrome)\""
+    },
+    "16866": {
+        "text": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
+        "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %1 is replaced with either \"your browser\" or the actual browser's brand. %2 *may* include a hint, just as \"(or use Chrome)\""
+    },
+    "16868": {
+        "text": "or use Chrome",
+        "context": "Sentence to be used on %2 under string \"Unfortunately, %1 has a limited buffer to decrypt data....%2\""
+    },
+    "16869": {
+        "text": "or exit from Incognito",
+        "context": "Sentence to be used on %2 under string \"Unfortunately, %1 has a limited buffer to decrypt data....%2\""
+    },
+    "16870": {
+        "text": "We recommend you install the [A]MEGA desktop app[\/A] to download large files.",
+        "context": "MEGAsync dialog promo text"
+    },
+    "16871": {
+        "text": "Out of HTML5 Offline Storage space",
+        "context": "dialog title shown when Chrome users run out of disk space"
+    },
+    "16872": {
+        "text": "File too big to be reliably handled in memory.",
+        "context": "message shown while downloading certain large files using an in-memory download method"
+    },
+    "16873": {
+        "text": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and more.",
+        "context": "MEGAsync dialog promo text"
+    },
+    "16883": {
+        "text": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
+        "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %2 *may* include a hint, such as \"(or use Chrome)\""
+    },
+    "16890": {
+        "text": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+        "context": "An error shown to Chrome users when their download cannot continue because they are running out of disk space."
+    },
+    "16891": {
+        "text": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
+        "context": "An error shown to Chrome users when their download cannot start because they are running out of disk space."
     }
 }

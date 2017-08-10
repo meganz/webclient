@@ -3879,5 +3879,12 @@
     "16871": "HTML5-Offlinespeicherplatz ersch\u00f6pft",
     "16872": "Diese Datei kann von Ihrem Browser nicht im Speicher gehalten werden, da sie zu gro\u00df ist.",
     "16873": "Echtzeit-Dateiversionierung, Wiederherstellung versehentlich gel\u00f6schter Dateien, Browser-Integration und mehr.",
-    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2"
+    "16882": "Send Media",
+    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16884": "Save for Offline",
+    "16887": "Saving the Recovery Key and keeping it in a secure location enables you to recover your account without data loss in the case of a lost password.",
+    "16888": "Der Rettungsschl\u00fcssel erm\u00f6glicht Ihnen eine datenverlustfreie Passwort\u00e4nderung ohne Kenntnis des alten Passworts. Bitte bewahren Sie ihn an einer sicheren Stelle auf.",
+    "16889": "Bitte geben Sie zur Best\u00e4tigung der Accountschlie\u00dfung Ihr Passwort ein.",
+    "16890": "Der MEGA zugeteilte Browser-Speicher ist voll. Ihr Download wird automatisch fortgesetzt, sobald mehr Plattenplatz zur Verf\u00fcgung steht.",
+    "16891": "Der MEGA zugeteilte Browser-Speicher ist zu klein f\u00fcr einen Download dieser Gr\u00f6\u00dfe. Bitte sorgen Sie f\u00fcr mehr Plattenplatz."
 }

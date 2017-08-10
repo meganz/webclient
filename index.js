@@ -1508,6 +1508,7 @@ function topmenuUI() {
         $topMenu.find('.top-menu-item.fm').removeClass('hidden');
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $topMenu.find('.top-menu-item.account').removeClass('hidden');
+        $topMenu.find('.upgrade-your-account').removeClass('hidden');
         $topHeader.find('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
         $topHeader.find('.top-login-button').addClass('hidden');
@@ -1543,14 +1544,12 @@ function topmenuUI() {
                 cssClass = 'pro' + proNum;
             }
 
-            // Show the 'Upgrade your account' button in the main menu for all
-            $topMenu.find('.top-menu-item.upgrade-your-account').removeClass('hidden');
+            // Show the Pro badge
             $topMenu.find('.top-menu-item.account .right-el').text(purchasedPlan);
             $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
         }
         else {
             // Show the free badge
-            $topMenu.find('.top-menu-item.upgrade-your-account').removeClass('hidden');
             $topMenu.find('.top-menu-item.account .right-el').text('FREE');
             $topHeader.find('.membership-icon').attr('class', 'membership-icon');
             $topHeader.find('.membership-status').attr('class', 'tiny-icon membership-status free');
@@ -1588,11 +1587,12 @@ function topmenuUI() {
             }
         }
 
-        $topMenu.find('.top-menu-item.upgrade-your-account').addClass('hidden');
+        $topMenu.find('.top-menu-item.upgrade-your-account.pro').removeClass('hidden');
         $topHeader.find('.membership-status-block').addClass('hidden');
         $topHeader.find('.top-icon.notification').addClass('hidden');
         $topHeader.find('.top-icon.achievements').addClass('hidden');
         $topHeader.find('.create-account-button').removeClass('hidden');
+
         $('.create-account-button').rebind('click', function () {
             loadSubPage('register');
         });
@@ -1775,7 +1775,7 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
                 'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'wp', 'start', 'fm'
+                'sync', 'takedown', 'terms', 'wp', 'start'
             ];
 
             for (var i = subPages.length; i--;) {
@@ -1787,6 +1787,9 @@ function topmenuUI() {
 
             if (className.indexOf('upgrade-your-account') > -1) {
                 loadSubPage('pro');
+            }
+            else if (is_mobile && className.indexOf('fm') > -1) {
+                mobile.loadCloudDrivePage();
             }
             else if (subpage) {
                 loadSubPage(subpage);

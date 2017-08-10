@@ -107,9 +107,6 @@
                                 return reader.readAsDataURL(blob);
                             }
 
-                            // Store a log for statistics
-                            api_req({ a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient' });
-
                             // Redirect to object URL to download the file to the client
                             location.href = sblob;
                             return false;

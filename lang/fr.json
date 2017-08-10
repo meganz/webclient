@@ -3879,5 +3879,12 @@
     "16871": "L'espace de stockage HTML5 hors ligne est insuffisant",
     "16872": "Le fichier est trop volumineux pour \u00eatre trait\u00e9 en m\u00e9moire de mani\u00e8re fiable.",
     "16873": "Versionnage des fichiers en temps r\u00e9el, protection des fichiers supprim\u00e9s, am\u00e9lioration des performances lors du transfert de fichiers, int\u00e9gration aux navigateurs et plus.",
-    "16883": "Malheureusement, la m\u00e9moire tampon de votre navigateur est insuffisante pour d\u00e9chiffrer les donn\u00e9es. Veuillez installer l'[A]appli pour ordinateur de MEGA[\/A] afin de t\u00e9l\u00e9charger des fichiers volumineux %2"
+    "16882": "Send Media",
+    "16883": "Malheureusement, la m\u00e9moire tampon de votre navigateur est insuffisante pour d\u00e9chiffrer les donn\u00e9es. Veuillez installer l'[A]appli pour ordinateur de MEGA[\/A] afin de t\u00e9l\u00e9charger des fichiers volumineux %2",
+    "16884": "Save for Offline",
+    "16887": "Saving the Recovery Key and keeping it in a secure location enables you to recover your account without data loss in the case of a lost password.",
+    "16888": "Saving the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.",
+    "16889": "Please enter your password to confirm that you want to cancel your account.",
+    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
 }

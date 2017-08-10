@@ -115,21 +115,32 @@
         }
     }
 
+    function abortAndStartOver(dl, dl_id, e) {
+        dlFatalError(dl, e, false, 2);
+
+        onIdle(function() {
+            if (page !== 'download') {
+                M.addWebDownload([dl_id]);
+            }
+            else {
+                $.doFireDownload = true;
+                M.resetUploadDownload();
+                dlinfo(dlid, dlkey, false);
+            }
+        });
+    }
+
+    function canSwitchDownloadMethod(dl, dl_id) {
+        if (MemoryIO.usable() && dl.size < MemoryIO.fileSizeLimit) {
+            dlMethod = MemoryIO;
+            abortAndStartOver(dl, dl_id, Error(l[16871]));
+            return true;
+        }
+    }
+
     function onSecurityErrorSwitchMethod(dl, dl_id, e) {
         if (checkSecurityError(e)) {
-            dlFatalError(dl, e, -0xDEADBEEF, 2);
-
-            onIdle(function() {
-                if (page !== 'download') {
-                    M.addWebDownload([dl_id]);
-                }
-                else {
-                    $.doFireDownload = true;
-                    M.resetUploadDownload();
-                    dlinfo(dlid, dlkey, false);
-                }
-            });
-
+            abortAndStartOver(dl, dl_id, e);
             return true;
         }
 
@@ -299,6 +310,7 @@
         if (d) {
             console.log("Requesting disk space for %s (%d bytes)", bytesToSize(reqsize), reqsize);
         }
+        // return callback(0, {}, -1);
 
         queryUsageAndQuota(PERSISTENT, function onPQU(used, remaining) {
             if (d) {
@@ -479,16 +491,20 @@
                                         logger.debug('Transfer %s cancelled while freeing space', dl_id);
                                         return;
                                     }
-                                    if (++chrome_write_error_msg % 21 == 0
-                                            && !$.msgDialog) {
+                                    if (!(++chrome_write_error_msg % 21) && !$.msgDialog) {
                                         chrome_write_error_msg = 0;
+
+                                        // XXX: Hmm, not sure how weird this is if the user downloaded too many data..
+                                        if (canSwitchDownloadMethod(dl, dl_id)) {
+                                            return;
+                                        }
+
                                         msgDialog('warningb:' + l[103],
                                             WRITERR_DIAGTITLE,
-                                            'Your browser storage for MEGA is full. ' +
-                                            'Your download will continue automatically after you free up some space.',
+                                            l[16890],
                                             str_mtrunc(dl_filename), function(cancel) {
                                                 if (cancel) {
-                                                    dlFatalError(dl, WRITERR_DIAGTITLE, -0xDEADBEEF);
+                                                    dlFatalError(dl, WRITERR_DIAGTITLE, false);
                                                 }
                                             });
 
@@ -518,15 +534,19 @@
                 }
 
                 if (aFail === -1 && !isSecurityError(aEvent)) {
+
+                    if (canSwitchDownloadMethod(dl, dl_id)) {
+                        return;
+                    }
+
                     if (!$.msgDialog) {
                         srvlog('Out of HTML5 Offline Storage space (open)');
 
                         msgDialog('warningb:' + l[103], WRITERR_DIAGTITLE,
-                            'Your available browser storage for MEGA cannot ' +
-                            'handle this download size, please free up some disk space.',
+                            l[16891],
                             str_mtrunc(dl_filename), function(cancel) {
                                 if (cancel) {
-                                    dlFatalError(dl, WRITERR_DIAGTITLE, -0xDEADBEEF);
+                                    dlFatalError(dl, WRITERR_DIAGTITLE, false);
                                 }
                             });
                     }
@@ -726,6 +746,8 @@
 
     if (navigator.webkitGetUserMedia) {
         mBroadcaster.once('startMega', function __setup_fs() {
+            WRITERR_DIAGTITLE = l[16871];
+
             if (dlMethod === FileSystemAPI) {
                 if (window.requestFileSystem) {
                     window.requestFileSystem(0, 0x10000,

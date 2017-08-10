@@ -3284,15 +3284,19 @@ div.checkboxOn, div.checkboxOff {
     background-repeat: no-repeat;
     cursor: pointer;
     height: 40px;
-    margin: 13px 6px 0 0px;
+    margin: 13px 0 0 0;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-tap-highlight-color: transparent;
     position: absolute;
-    right: -11px;
+    right: 14px;
     top: -3px;
     width: 42px;
     z-index: 10;
 }
+.top-menu-popup .top-icon.close::before {
+    background: none;
+}
+
 /* Hide menu items which are not ready for mobile yet */
 .top-menu-content .not-mobile-ready {
     display: none;
@@ -3345,7 +3349,7 @@ div.checkboxOn, div.checkboxOff {
 
 /* Hide transfer widget on the ProPay page after getting an overquota error from the download page */
 .widget-block.active {
-	display: none !important;
+    display: none !important;
 }
 
 /* Only media queries after here */

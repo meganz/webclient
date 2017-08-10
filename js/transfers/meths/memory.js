@@ -107,9 +107,6 @@
                                 return reader.readAsDataURL(blob);
                             }
 
-                            // Store a log for statistics
-                            api_req({ a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient' });
-
                             // Redirect to object URL to download the file to the client
                             location.href = sblob;
                             return false;
@@ -144,7 +141,7 @@
                 logger.info('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
             }
             if (size > MemoryIO.fileSizeLimit) {
-                dlFatalError(dl, Error('File too big to be reliably handled in memory.'));
+                dlFatalError(dl, Error(l[16872]));
                 if (!this.is_zip) {
                     ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
                 }
@@ -179,11 +176,30 @@
     }
 
     MemoryIO.usable = function() {
-        MemoryIO.fileSizeLimit = localStorage.dlFileSizeLimit
-            || (1024 * 1024 * 1024 * (1 + browserdetails(ua).is64bit));
-
         return is_mobile || navigator.msSaveOrOpenBlob || hasDownloadAttr;
     };
+
+    mBroadcaster.once('startMega', function() {
+        var uad = ua.details || false;
+
+        if (localStorage.dlFileSizeLimit) {
+            MemoryIO.fileSizeLimit = parseInt(localStorage.dlFileSizeLimit);
+        }
+        else if (is_mobile) {
+            MemoryIO.fileSizeLimit = 100 * (1024 * 1024);
+
+            // If Chrome or Firefox on iOS, reduce the size to 1.3 MB
+            if (navigator.userAgent.match(/CriOS/i) || navigator.userAgent.match(/FxiOS/i)) {
+                MemoryIO.fileSizeLimit = 1.3 * (1024 * 1024);
+            }
+        }
+        else if (uad.engine === 'Trident' || uad.browser === 'Edge') {
+            MemoryIO.fileSizeLimit = 600 * 1024 * 1024;
+        }
+        else {
+            MemoryIO.fileSizeLimit = 1024 * 1024 * 1024 * (1 + uad.is64bit);
+        }
+    });
 
     scope.MemoryIO = MemoryIO;
 })(this);

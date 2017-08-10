@@ -69,7 +69,7 @@
     left: 15px;
     top: 50%;
     margin: -15px 0 0 0;
-    background-image: url(../images/mega/register-big-sprite-v12.png);
+    background-image: url(../images/mega/register-big-sprite-v13.png);
     background-position: -85px -860px;
 }
 .clipboard .toast-icon {
@@ -114,7 +114,7 @@
     cursor: pointer;
     width: 30px;
     height: 30px;
-    background-image: url(../images/mega/register-big-sprite-v12.png);
+    background-image: url(../images/mega/register-big-sprite-v13.png);
     background-position: 10px -130px;
     background-repeat: no-repeat;
     display: inline-block;

@@ -139,12 +139,8 @@ mBroadcaster.once('startMega', function() {
         var intv = 60000 / +d;
         setInterval(function() {
             var now = Date.now();
-            var known = ['1:setUserAvatar', '1:previewimg', '1:procfa'];
+            var known = ['1:setUserAvatar', '1:previewimg', '1:procfa', '2:procfa', '3:addScript'];
             // ^ think twice before whitelisting anything new here...
-
-            if (d) {
-                known.push('3:addScript');
-            }
 
             for (var uri in usages) {
                 var data = usages[uri];
@@ -155,7 +151,7 @@ mBroadcaster.once('startMega', function() {
                     for (var i = known.length; i--;) {
                         var k = known[i].split(':');
 
-                        if (data.stack[k[0]].indexOf(k[1]) !== -1) {
+                        if (String(data.stack[k[0]]).indexOf(k[1]) !== -1) {
                             warn = false;
                             break;
                         }

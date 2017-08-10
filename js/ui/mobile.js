@@ -3112,7 +3112,14 @@ mobile.languageMenu = {
 
 mega.ui.tpp = {
     reset: function() {},
-    setTotalProgress: function() {}
+    setTotalProgress: function() {},
+    resume: function() {}
+};
+
+mega.achievem = {
+    enabled: function() {
+        return MegaPromise.reject();
+    }
 };
 
 var notify = {

@@ -140,7 +140,7 @@ var slideshowid;
     function slideshow_favourite(n, $overlay) {
         var $favButton = $overlay.find('.viewer-button.favourite');
 
-        if (!n || folderlink) {
+        if (!n || !n.p || folderlink) {
             $favButton.addClass('hidden');
         }
         else {
@@ -174,21 +174,30 @@ var slideshowid;
     function slideshow_node(id, $overlay) {
         var n = M.getNodeByHandle(id);
 
-        if (!n || !n.p || M.getNodeRoot(id) === 'shares' || folderlink) {
-            $overlay.find('.viewer-button.getlink').addClass('hidden');
+        if (!n && typeof id === 'object') {
+            n = id;
         }
-        else {
-            $overlay.find('.viewer-button.getlink').removeClass('hidden').rebind('click', function() {
 
-                if (u_type === 0) {
-                    ephemeralDialog(l[1005]);
-                }
-                else {
-                    initCopyrightsDialog([slideshowid]);
-                }
-            });
+        if ($overlay) {
+            if (!n || !n.p || M.getNodeRoot(id) === 'shares' || folderlink) {
+                $overlay.find('.viewer-button.getlink').addClass('hidden');
+            }
+            else {
+                $overlay.find('.viewer-button.getlink')
+                    .removeClass('hidden')
+                    .rebind('click', function() {
+
+                        if (u_type === 0) {
+                            ephemeralDialog(l[1005]);
+                        }
+                        else {
+                            initCopyrightsDialog([slideshowid]);
+                        }
+                    });
+            }
         }
-        return n;
+
+        return n || false;
     }
 
     function slideshow(id, close) {
@@ -235,6 +244,7 @@ var slideshowid;
         if (!n) {
             return;
         }
+        slideshowid = n.h;
 
         $overlay.find('.viewer-filename').text(n.name);
         $overlay.find('.viewer-image-bl img').attr('src', '');
@@ -244,8 +254,6 @@ var slideshowid;
         $overlay.find('.viewer-image-bl').addClass('hidden');
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
         $overlay.find('.viewer-progress p').removeAttr('style');
-
-        slideshowid = id;
 
         var steps = slideshowsteps();
         if (steps.backward.length > 0) {
@@ -268,7 +276,8 @@ var slideshowid;
             }
         });
 
-        $overlay.find('.viewer-button.download').rebind('click', function() {
+        var $dlBut = $overlay.find('.viewer-button.download');
+        $dlBut.rebind('click', function() {
 
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === slideshowid) {
@@ -286,12 +295,19 @@ var slideshowid;
             }
         });
 
-        if (previews[id]) {
-            previewsrc(previews[id].src);
+        if (n.p) {
+            $dlBut.removeClass('hidden');
+        }
+        else {
+            $dlBut.addClass('hidden');
+        }
+
+        if (previews[n.h]) {
+            previewsrc(previews[n.h].src);
             fetchnext();
         }
-        else if (!preqs[id]) {
-            fetchsrc(id);
+        else if (!preqs[n.h]) {
+            fetchsrc(n);
         }
 
         $overlay.removeClass('hidden');
@@ -313,31 +329,31 @@ var slideshowid;
             delete pfails[id];
             M.addDownload([id], false, err ? -1 : true);
         }
-
         eot.timeout = 8500;
 
-        if (pfails[id]) {
-            // for slideshow_next/prev
-            if (slideshowid === id) {
-                return eot(id, 1);
-            }
-            delete pfails[id];
-        }
-
-        var n = M.getNodeByHandle(id);
+        var n = slideshow_node(id);
         if (!n) {
             console.error('handle "%s" not found...', id);
             return false;
         }
 
-        preqs[id] = 1;
-        var treq = {};
-        treq[id] = {fa: n.fa, k: n.k};
-        api_getfileattr(treq, 1, function(ctx, id, uint8arr) {
-            previewimg(id, uint8arr);
+        if (pfails[n.h]) {
+            // for slideshow_next/prev
+            if (slideshowid === n.h) {
+                return eot(n.h, 1);
+            }
+            delete pfails[n.h];
+        }
+
+        var treq = Object.create(null);
+        preqs[n.h] = 1;
+        treq[n.h] = {fa: n.fa, k: n.k};
+        api_getfileattr(treq, 1, function(ctx, h, uint8arr) {
+            previewimg(h, uint8arr);
+
             if (!n.fa || n.fa.indexOf(':0*') < 0) {
                 if (d) {
-                    console.log('Thumbnail found missing on preview, creating...', id, n);
+                    console.log('Thumbnail found missing on preview, creating...', h, n);
                 }
                 var aes = new sjcl.cipher.aes([
                     n.k[0] ^ n.k[4],
@@ -345,9 +361,9 @@ var slideshowid;
                     n.k[2] ^ n.k[6],
                     n.k[3] ^ n.k[7]
                 ]);
-                createnodethumbnail(n.h, aes, id, uint8arr);
+                createnodethumbnail(n.h, aes, h, uint8arr);
             }
-            if (id === slideshowid) {
+            if (h === slideshowid) {
                 fetchnext();
             }
         }, eot);

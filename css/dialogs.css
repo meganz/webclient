@@ -1268,3 +1268,338 @@ li.token-input-token-invite .input-close {
     margin: -8px 0 0 4px;
 }
 /* end of Dublicate conflict dialog */
+
+
+/* MegaSync dialog */
+.nw-dark-overlay.megasync-overlay {
+    background-color: rgba(0,0,0,0.1);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.nw-dark-overlay.megasync-overlay.downloading {
+    background-color: rgba(34,34,34,0.95);
+}
+.fm-dialog-close.big {
+    background-image: url(../images/mega/download-dialog.png);
+    background-position: -368px 7px;
+        filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+        right: 17px;
+    top: 17px;
+}
+.fm-dialog-close.big:hover {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+}
+.megasync-content.slider {
+    width: 768px;
+    margin: -256px 0 0 -384px;
+    background-color: white;
+    overflow: hidden;
+    position: absolute;
+    z-index: 1200;
+    background-color: white;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    left: 50%;
+    top: 50%;
+    display: block;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+}
+.warning .megasync-content.slider {
+    margin-top: -301px;
+}
+.megasync-content.slider::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+}
+.downloading .megasync-content.slider {
+    display: none;
+}
+.megasync-body {
+    padding: 31px 0px 0 0px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    min-height: inherit;
+    text-align: center;
+    position: relative;
+}
+.megasync-slider.main-block {
+    overflow: hidden;
+    position: relative;
+    min-height: 422px;
+}
+.slide1 .megasync-slider.body-block {
+    left: 0;
+}
+.slide2 .megasync-slider.body-block {
+    left: -768px;
+}
+.slide3 .megasync-slider.body-block {
+    left: -1536px;
+}
+.megasync-slider.body-block {
+    width: 2304px;
+    min-height: 422px;
+    position: relative;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.megasync-info-txt a {
+    cursor: pointer;
+}
+.megasync-slide {
+    width: 768px;
+    min-height: 422px;
+    float: left;
+    position: relative;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.slide1 .megasync-slide.slide1, .slide2 .megasync-slide.slide2, .slide3 .megasync-slide.slide3 {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.megasync-slide.slide2 {
+    text-align: left;
+}
+.megasync-img {
+    height: 423px;
+    position:relative;
+}
+.megasync-img::before {
+    content:'';
+    background-image: url(../images/mega/download-dialog.png);
+    background-position: center -175px;
+    background-repeat: no-repeat;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    height: 393px;
+}
+.megasync-img.img2::before {
+    background-position: center -621px;
+}
+.megasync-header {
+    height: 58px;
+    font-size: 24px;
+    line-height: 30px;
+    color: #666666;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 15px 25px 0 25px;
+    text-align: center;
+    font-family: 'montserrat', 'open_sans', sans-serif;
+}
+.megasync-text {
+    font-size: 16px;
+    line-height: 24px;
+    color: #777777;
+    text-align:center;
+    padding: 0;
+    height: 109px;
+    max-width: 584px;
+    margin: 0 auto;
+}
+.megasync-info-txt {
+    position: absolute;
+    width: 180px;
+    left: 410px;
+    top: 107px;
+    font-size: 14px;
+    line-height: 18px;
+    color: #777777;
+}
+.megasync-info-arrow {
+    width: 46px;
+    height: 45px;
+    background-image: url(../images/mega/download-sprite-v7.png);
+    background-position: -15px -2448px;
+    position: absolute;
+    left: 350px;
+    top: 207px;
+}
+.megasync-dark-logo {
+    height: 68px;
+    width: 258px;
+    color: #666666;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-image: url(../images/mega/download-sprite-v7.png);
+    background-position: -1px -1178px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    margin: -23px 0 0 23px;
+}
+.megasync-listing {
+    padding: 0 0 12px 82px;
+    position: relative;
+    text-align: left;
+    width: 482px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 11px 0 0 129px;
+}
+.megasync-icon {
+    width: 64px;
+    height: 64px;
+    left: 0;
+    position: absolute;
+    margin: 0 0 0 0;
+    background-image: url(../images/mega/download-sprite-v7.png);
+    background-position: 0 -2289px;
+}
+.megasync-icon.blink {
+    background-position: -92px -2289px;
+}
+.megasync-icon.infinity {
+    background-position: -172px -2289px;
+}
+.megasync-listing h3 {
+    font-size: 16px;
+    line-height: 20px;
+    color: #333333;
+    padding: 0 0 9px 0;
+    margin: 0 0 0 0;
+}
+.megasync-listing p {
+    font-size: 14px;
+    line-height: 18px;
+    color: #777777;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+}
+.megasync-slider-wrap {
+    position:relative;
+}
+.megasync-body .big-button {
+    min-width: 0;
+    position: relative;
+    vertical-align: top;
+}
+.megasync-buttons {
+    position: absolute;
+    width: 100%;
+    margin: -104px 0 0 0;
+}
+.megasync-bottom-warning {
+    -webkit-box-shadow: 0px -1px 0px 0px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px -1px 0px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px -1px 0px 0px rgba(0,0,0,0.1);
+    display: none;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0.5px;
+    color: #666666;
+    padding: 13px;
+    position:relative;
+    text-align: left;
+}
+.megasync-bottom-warning.visible, .warning .megasync-bottom-warning {
+    display: block;
+}
+.megasync-bottom-warning a {
+    color: #F0373B;
+}
+.megasync-bottom-warning span {
+    display: block;
+    padding: 11px 10px 9px 93px;
+}
+.megasync-features {
+    height: 423px;
+    font-size: 0;
+}
+.megasync-feature {
+    display: inline-block;
+    width: 30.5%;
+    padding: 0;
+}
+.megasync-feature-txt {
+    font-size: 16px;
+    line-height: 20px;
+    color: #666666;
+    font-family: 'montserrat', 'open_sans', sans-serif;
+    margin: -7px 0 0 0;
+}
+.megasync-controls {
+    bottom: 0;
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+    font-size: 0;
+}
+.megasync-controls div {
+    display: inline-block;
+    width: 60px;
+    height: 2px;
+    -moz-border-radius: 1px;
+    -webkit-border-radius: 1px;
+    border-radius: 1px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0 4px;
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.2);
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    position:relative;
+}
+.megasync-controls div.active {
+    background-color: #F0373A;
+}
+.megasync-controls div::before {
+    position:absolute;
+    height: 22px;
+    top: -10px;
+    content: '';
+    width: 100%;
+    left: 0;
+}
+.megasync .toast-icon {
+    background-position: -85px -816px;
+    background-repeat: no-repeat;
+}
+.megasync .toast-button {
+    display: none;
+}
+/* end of MegaSync dialog */

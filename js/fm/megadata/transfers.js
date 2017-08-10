@@ -677,15 +677,13 @@ MegaData.prototype.dlerror = function(dl, error) {
              */
             if (page === 'download') {
                 if (error === EOVERQUOTA) {
-                    $('.download-info.time-txt .text').text('');
-                    $('.download-info.speed-txt .text').text('');
-                    $('.download.pause-button').addClass('active');
-                    $('.download.info-block').addClass('overquota');
+                    $('.download.eta-block span').text('');
+                    $('.download.speed-block span').text('');
+                    $('.download .pause-transfer').addClass('active');
+                    $('.download.file-info').addClass('overquota');
                 }
                 else {
-                    $('.download.error-icon').text(errorstr);
-                    $('.download.error-icon').removeClass('hidden');
-                    $('.download.icons-block').addClass('hidden');
+                    $('.download.file-info').removeClass('overquota');
                 }
             }
             else {
@@ -693,12 +691,12 @@ MegaData.prototype.dlerror = function(dl, error) {
 
                 $tr.addClass('transfer-error');
                 $tr.find('.eta, .speed').text('').addClass('unknown');
-                $tr.find('.transfer-status').text(errorstr);
 
                 if (error === EOVERQUOTA) {
                     $tr.find('.transfer-status').addClass('overquota');
                 }
             }
+            setTransferStatus(dl, errorstr);
         }
     }
 };

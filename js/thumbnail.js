@@ -86,8 +86,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         // thumbnail:
         if (fa.indexOf(':0*') < 0) {
             var options = {
-                width: 156,
-                height: 156
+                width: 200,
+                height: 200
             };
 
             canvas = document.createElement('canvas');

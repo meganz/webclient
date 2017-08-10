@@ -408,6 +408,7 @@ function browserDownload() {
         $downloadPage.addClass('downloading');
         $downloadPage.find('.img-preview-button:visible').addClass('hidden');
         $downloadPage.find('.standalone-download-message').removeClass('hidden');
+        $('.download.warning-block').removeClass('visible');
 
         if (is_mobile) {
             $('body').addClass('downloading').find('.bar').width('1%');

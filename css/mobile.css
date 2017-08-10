@@ -837,18 +837,19 @@ ul, li {
     padding: 11px 40px 0 63px;
 }
 .mobile.fm-item-name {
-    font-size: 14px;
+    font-size: 15px;
     line-height: 18px;
-    color: #666666;
+    color: #333;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
 .mobile.fm-item-details {
-    font-size: 12px;
-    line-height: 15px;
-    color: #999999;
+    color: #aaa;
+    font-size: 13px;
+    letter-spacing: .1px;
+    line-height: 18px;
 }
 .mobile.fm-item-details span {
     padding-left: 35px;
@@ -3965,33 +3966,33 @@ div.checkboxOn, div.checkboxOff {
 
 /* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */
 @media only screen and (min-width: 400px) {
-    .mobile.membership-step2 .payment-options-list .payment-method {
+    body:not(.fr):not(.ru) .mobile.membership-step2 .payment-options-list .payment-method {
         float: left;
         width: 154px;
     }
-    .mobile.membership-step2 .provider-details .provider-name {
+    body:not(.fr):not(.ru) .mobile.membership-step2 .provider-details .provider-name {
         width: 97px;
     }
-    .mobile.membership-step2 .payment-duration {
+    body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration {
         display: inline-block;
         margin-bottom: 0;
         margin-top: 0;
         height: 80px;
         vertical-align: middle;
     }
-    .mobile.membership-step2 .payment-duration.template {
+    body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration.template {
         display: none;
     }
-    .mobile.membership-step2 .duration-options-list .payment-duration:last-child {
+    body:not(.fr):not(.ru) .mobile.membership-step2 .duration-options-list .payment-duration:last-child {
         margin-left: 70px;
     }
-    .mobile.membership-step2 .renewal-options-list .renewal-option {
+    body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option {
         display: inline-block;
     }
-    .mobile.membership-step2 .renewal-options-list .renewal-option:last-child {
+    body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option:last-child {
         margin-left: 110px;
     }
-    .mobile.membership-step2 .option-question.renewal {
+    body:not(.fr):not(.ru) .mobile.membership-step2 .option-question.renewal {
         margin-top: 30px;
     }
 }

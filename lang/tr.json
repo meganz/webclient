@@ -3879,5 +3879,7 @@
     "16871": "HTML5 \u00c7evrimd\u0131\u015f\u0131 Depolama alan\u0131 bitti",
     "16872": "Dosya bellekte hatas\u0131z bir \u015fekilde i\u015flenmek i\u00e7in \u00e7ok b\u00fcy\u00fck.",
     "16873": "Ger\u00e7ek zamanl\u0131 s\u00fcr\u00fcmleyici, silinen dosya korumas\u0131, dosya aktarmalar\u0131nda geli\u015fmi\u015f performans, taray\u0131c\u0131 b\u00fct\u00fcnle\u015ftirmesi ve daha fazlas\u0131.",
-    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2"
+    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
 }

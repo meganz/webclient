@@ -3879,5 +3879,7 @@
     "16871": "Limit dost\u0119pny w HTML5 Offlice Storage zosta\u0142 wykorzystany",
     "16872": "Plik jest za du\u017cy aby przechowywa\u0107 go w podr\u0119cznej pami\u0119ci.",
     "16873": "Wersjonowanie plik\u00f3w, ochrona przed skasowaniem, zwi\u0119kszona pr\u0119dko\u015b\u0107 przesy\u0142ania plik\u00f3w, integracja z przegl\u0105dark\u0105 i wi\u0119cej.",
-    "16883": "Niestety, Twoja przegl\u0105darka ma niewystarczaj\u0105ca ilo\u015b\u0107 pami\u0119ci do odszyfrowania danych, prosimy zainstalowa\u0107 [A]aplikacj\u0119 MEGA desktop[\/A] aby m\u00f3c pobiera\u0107 du\u017ce pliki %2"
+    "16883": "Niestety, Twoja przegl\u0105darka ma niewystarczaj\u0105ca ilo\u015b\u0107 pami\u0119ci do odszyfrowania danych, prosimy zainstalowa\u0107 [A]aplikacj\u0119 MEGA desktop[\/A] aby m\u00f3c pobiera\u0107 du\u017ce pliki %2",
+    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
 }

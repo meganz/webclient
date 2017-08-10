@@ -3879,5 +3879,7 @@
     "16871": "HTML5 \uc624\ud504\ub77c\uc778 \uc800\uc7a5 \uacf5\uac04 \ucd08\uacfc",
     "16872": "\ud30c\uc77c\uc774 \uba54\ubaa8\ub9ac\uc5d0\uc11c \uc548\uc815\uc801\uc73c\ub85c \ucc98\ub9ac\ub418\uae30\uc5d0 \ub108\ubb34 \ud07d\ub2c8\ub2e4.",
     "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and more.",
-    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2"
+    "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
 }

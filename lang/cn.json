@@ -3879,7 +3879,12 @@
     "16871": "\u8d85\u51faHTML5\u79bb\u7ebf\u50a8\u5b58\u7a7a\u95f4",
     "16872": "\u6587\u4ef6\u8fc7\u5927\uff0c\u65e0\u6cd5\u7a33\u5f53\u5730\u5728\u8bb0\u5fc6\u4f53\u4e2d\u5904\u7406\u3002",
     "16873": "\u5373\u65f6\u540c\u6b65\u6587\u4ef6\u7248\u672c\u3001\u4fdd\u62a4\u5220\u9664\u6587\u4ef6\u3001\u589e\u5f3a\u6587\u4ef6\u4f20\u8f93\u6027\u80fd\u4e0e\u6574\u5408\u6d4f\u89c8\u5668\u529f\u80fd\u7b49\u7279\u8272\u3002",
+    "16882": "Send Media",
     "16883": "\u4e0d\u5e78\u7684\u662f\uff0c\u60a8\u7684\u6d4f\u89c8\u5668\u6ca1\u6709\u8db3\u591f\u7684\u7f13\u51b2\u533a\u6765\u8fdb\u884c\u8d44\u6599\u5904\u7406\uff0c\u8bf7\u5b89\u88c5[A] MEGA\u684c\u9762\u5e94\u7528\u7a0b\u5e8f[\/A]\u4ee5\u4e0b\u8f7d\u5927\u578b\u6587\u4ef6%2",
+    "16884": "Save for Offline",
+    "16887": "Saving the Recovery Key and keeping it in a secure location enables you to recover your account without data loss in the case of a lost password.",
+    "16888": "Saving the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.",
+    "16889": "Please enter your password to confirm that you want to cancel your account.",
     "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
     "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
 }

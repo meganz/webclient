@@ -260,6 +260,35 @@ mega.ui.tpp = function () {
         }
     };
 
+    var drawInit = function drawInit(blk) {
+        var name = '';
+        var total = 0;
+        var index = 0;
+        var type = '';
+
+        setTotal(M.pendingTransfers, blk);
+        total = getTotal(blk).toString();
+        setIndex(1, blk);
+        index = getIndex(blk);
+        setTime(Date.now(), blk);
+        name = getFileName(blk);
+        type = ext[fileext(name)];
+
+        if (typeof type === 'undefined') {
+            type = ext['*'][0];// general
+        }
+
+        opts.dlg[blk].$.num.text(total);
+        opts.dlg[blk].$.name.text(name);
+        opts.dlg[blk].$.ibLeft.text(l[5528]);
+        opts.dlg[blk].$.crr.text(index);
+        opts.dlg[blk].$.tfi
+            .removeClass()
+            .addClass('transfer-filetype-icon ' + type + ' file');
+
+        opts.dlg[blk].initialized = true;
+    };
+
     /**
      * Set state to paused for given dl/ul
      * @param {String} id ul/dl item id
@@ -375,35 +404,6 @@ mega.ui.tpp = function () {
         result = Math.floor(speed / time);
 
         return result;
-    };
-
-    var drawInit = function drawInit(blk) {
-        var name = '';
-        var total = 0;
-        var index = 0;
-        var type = '';
-
-        setTotal(M.pendingTransfers, blk);
-        total = getTotal(blk).toString();
-        setIndex(1, blk);
-        index = getIndex(blk);
-        setTime(Date.now(), blk);
-        name = getFileName(blk);
-        type = ext[fileext(name)];
-
-        if (typeof type === 'undefined') {
-            type = ext['*'][0];// general
-        }
-
-        opts.dlg[blk].$.num.text(total);
-        opts.dlg[blk].$.name.text(name);
-        opts.dlg[blk].$.ibLeft.text(l[5528]);
-        opts.dlg[blk].$.crr.text(index);
-        opts.dlg[blk].$.tfi
-            .removeClass()
-            .addClass('transfer-filetype-icon ' + type + ' file');
-
-        opts.dlg[blk].initialized = true;
     };
 
     /**

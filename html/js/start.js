@@ -149,6 +149,7 @@ function start_achievements(res)
 var start_countdata = false;
 
 function start_counts() {
+	$('.bottom-page.white-block.counter').addClass('hidden');
 	if (start_countdata) return;
 	start_countdata=true;
 	start_APIcount();

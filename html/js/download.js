@@ -156,7 +156,7 @@ function dl_g(res) {
             dlmanager.getMaximumDownloadSize().done(function(size) {
                 maxDownloadSize = size;
 
-                if (is_extension) {
+                if (is_extension && !is_chrome_firefox) {
                     uncheckMegaSyncDownload();
                     $('.download.checkbox-bl').addClass('hidden');
                 }

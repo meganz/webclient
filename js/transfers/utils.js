@@ -72,7 +72,9 @@ function dlFatalError(dl, error, ethrow, lock) {
         }
         error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
 
-        srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+        if (error.indexOf(l[16871]) < 0 && error.indexOf(l[16872]) < 0) {
+            srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+        }
     });
 
     // Set transfer status and abort it

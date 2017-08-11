@@ -61,7 +61,7 @@ mega.ui.tpp = function () {
         var total = opts.queue[bl].total;
 
         if (value) {
-            if (value > 0 || (value < 0 && total > 1)) {
+            if (value > 0 || value < 0 && total > 1) {
                 opts.queue[bl].total += value;
             }
         }
@@ -226,21 +226,12 @@ mega.ui.tpp = function () {
         var total = opts.queue[blk].total;
 
         if (value) {
-            if ((value > 0 && index < total) || (value < 0 && index > 1)) {
+            if (value > 0 && index < total || value < 0 && index > 1) {
                 opts.queue[blk].index += value;
             }
         }
         else {
             opts.queue[blk].index = 0;
-        }
-    };
-
-    var setFileName = function setFileName(queue, blk) {
-        if (blk === 'dl') {
-            opts.queue[blk].fileName = queue.zipname || queue.n || queue.name;
-        }
-        else {
-            opts.queue[blk].fileName = queue.name;
         }
     };
 
@@ -542,7 +533,6 @@ mega.ui.tpp = function () {
                 setIndex(1, blk);
             }
             if (getIndex(blk) === 1) {
-                // setFileName(queue, blk);
                 _init(queue, blk);
                 showBlock(blk);
                 show();

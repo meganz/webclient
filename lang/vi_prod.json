@@ -1802,5 +1802,6 @@
     "16873": "L\u1eadp phi\u00ean b\u1ea3n th\u1eddi gian th\u1ef1c, t\u00ednh n\u0103ng b\u1ea3o l\u01b0u c\u00e1c d\u1eef li\u1ec7u b\u1ecb x\u00f3a, t\u0103ng c\u01b0\u1eddng hi\u1ec7u n\u0103ng truy\u1ec1n t\u1ea3i t\u1ec7p tin, t\u00edch h\u1ee3p v\u00e0o tr\u00ecnh duy\u1ec7t v\u00e0 nhi\u1ec1u h\u01a1n n\u1eefa.",
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
 }

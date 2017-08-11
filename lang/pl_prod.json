@@ -1792,7 +1792,7 @@
     "16862": "Zwi\u0119ksz wydajno\u015b\u0107 przesy\u0142ania plik\u00f3w w przegl\u0105darce",
     "16863": "Narz\u0119dzia do synchonizowania dysk\u00f3w",
     "16864": "I wi\u0119cej",
-    "16865": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, and we recommend you to install the [A]MEGA desktop app[\/A] to download large files %2",
+    "16865": "Niestety, %1 ma niewystarczaj\u0105c\u0105 ilo\u015b\u0107 pami\u0119ci do odszyfrowania danych w przegl\u0105darce, zainstaluj [A]aplikacje MEGA desktop[\/A] aby pobiera\u0107 wi\u0119ksze pliki %2",
     "16866": "Niestety, %1 ma niewystarczaj\u0105c\u0105 ilo\u015b\u0107 bufora do odszyfrowania danych w przegl\u0105darce, prosimy zainstalowa\u0107 [A]aplikacj\u0119 MEGA desktop[\/A] aby m\u00f3c pobiera\u0107 du\u017ce pliki %2",
     "16868": "lub u\u017cywa\u0107 Chrome",
     "16869": "lub wyj\u015b\u0107 z trybu prywatnego",
@@ -1801,6 +1801,7 @@
     "16872": "Plik jest za du\u017cy aby przechowywa\u0107 go w podr\u0119cznej pami\u0119ci.",
     "16873": "Wersjonowanie plik\u00f3w, ochrona przed skasowaniem, zwi\u0119kszona pr\u0119dko\u015b\u0107 przesy\u0142ania plik\u00f3w, integracja z przegl\u0105dark\u0105 i wi\u0119cej.",
     "16883": "Niestety, Twoja przegl\u0105darka ma niewystarczaj\u0105ca ilo\u015b\u0107 pami\u0119ci do odszyfrowania danych, prosimy zainstalowa\u0107 [A]aplikacj\u0119 MEGA desktop[\/A] aby m\u00f3c pobiera\u0107 du\u017ce pliki %2",
-    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
+    "16890": "Nie masz wystarczaj\u0105cej ilo\u015bci pami\u0119ci. Pobieranie plik\u00f3w zostanie wznowione gdy udost\u0119pnisz wi\u0119cej pami\u0119ci na dysku.",
+    "16891": "Dost\u0119pna powierzchnia dla MEGA nie pozwala na pobranie pliku. Zwolnij powierzchni\u0119 na dysku aby kontynuowa\u0107.",
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
 }

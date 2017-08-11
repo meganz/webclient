@@ -662,6 +662,7 @@ FileManager.prototype.updFileManagerUI = function() {
     "use strict";
 
     var treebuild = Object.create(null);
+    var parents = Object.create(null);
     var UImain = false;
     var UItree = false;
     var newcontact = false;
@@ -681,8 +682,14 @@ FileManager.prototype.updFileManagerUI = function() {
         if (newNode.su) {
             newshare = true;
         }
-        if (newNode.p && newNode.t) {
-            treebuild[newNode.p] = 1;
+        if (newNode.p) {
+            if (newNode.t) {
+                treebuild[newNode.p] = 1;
+            }
+
+            if (String(newNode.p).length === 8) {
+                parents[newNode.p] = 1;
+            }
         }
         if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
             UImain = true;
@@ -783,7 +790,20 @@ FileManager.prototype.updFileManagerUI = function() {
                     console.timeEnd('rendernew');
                 }
 
-                masterPromise.resolve();
+                var promises = [];
+
+                if ($.len(parents)) {
+                    parents = Object.keys(parents);
+
+                    for (var i = parents.length; i--;) {
+                        promises.push(checkParentNodeInconsistency(parents[i], 10));
+                    }
+                }
+
+                MegaPromise.allDone(promises)
+                    .always(function() {
+                        masterPromise.resolve();
+                    });
             });
         });
 

@@ -28,6 +28,8 @@
      * @private
      */
     var _openFolderCompletion = function(id, newHashLocation, first, promise) {
+        var pchk = null;
+
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
         this.currentrootid = this.getNodeRoot(id);
@@ -205,6 +207,8 @@
                     sc: array.pack(sc_history),
                     db: mega.fcv_db | 0
                 }, {}, pfid ? 1 : 0);
+
+                pchk = this.currentdirid;
             }
 
             Soon(function() {
@@ -250,8 +254,17 @@
         M.searchPath();
         M.treeSearchUI();
 
-        promise.resolve(id);
-        mBroadcaster.sendMessage('mega:openfolder');
+        if (!pchk) {
+            promise.resolve(id);
+            mBroadcaster.sendMessage('mega:openfolder');
+        }
+        else {
+            checkParentNodeInconsistency(pchk)
+                .always(function() {
+                    promise.resolve(id);
+                    mBroadcaster.sendMessage('mega:openfolder');
+                });
+        }
     };
 
     // ------------------------------------------------------------------------

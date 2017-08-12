@@ -73,7 +73,7 @@ function init_start() {
     }	
 	startCountRenderData = {'users':'','files':''};
 	if (is_mobile) {		
-		window.addEventListener('scroll', function() {
+		$(window).rebind('scroll.counter',function() {
 			if (page == 'start') {
 				$.lastScrollTime = Date.now();
 				if (!$.counts_started)
@@ -82,9 +82,12 @@ function init_start() {
 					start_counts();
 				}
 			}
-		});	
+		});
 	}
-	else {	
+	else {
+		$(window).rebind('resize.counter',function() {
+			$.lastScrollTime = Date.now();
+		});
 		$('#startholder').rebind('scroll.counter',function()
 		{
 			if (page == 'start' || page == 'download')
@@ -120,8 +123,6 @@ function init_start() {
 			}
 		}, 1000);
 	}
-		
-	
 }
 
 var start_countLimit = 0;
@@ -230,13 +231,13 @@ function start_countUpdate() {
 		startCountRenderData[type] = total;
 	}
 
-	// do not render the counter while scrolling, as some browsers have real difficulty with it
+	// do not render the counter while scrolling or resizing, as some browsers have real difficulty with it
 	// only render the counter every 2000ms if invisible
-	// only perform the visibility check shortly ater scrolling, as it's CPU intensive
+	// only perform the visibility check shortly ater scrolling or resizing, as it's CPU intensive
 
 	if ($.lastScrollTime+100 < Date.now()) {
 		if ($.lastScrollTime < Date.now()+200) {
-			if ($('.startpage.flip-wrapper.users').visible() || $('.startpage.flip-wrapper.files').visible()) $.counterVisible=true;
+			if ($('.startpage.flip-wrapper.users').visible() || $('.startpage.flip-wrapper.files').visible() || $('.bottom-page.big-icon.registered-users').visible()) $.counterVisible=true;
 			else $.counterVisible=false;
 		}
 		if ($.counterVisible || !$.lastCounterRender || $.lastCounterRender+2000 < Date.now()) {

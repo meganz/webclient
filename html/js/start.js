@@ -76,11 +76,7 @@ function init_start() {
 		$(window).rebind('scroll.counter',function() {
 			if (page == 'start') {
 				$.lastScrollTime = Date.now();
-				if (!$.counts_started)
-				{					
-					$.counts_started=true;
-					start_counts();
-				}
+				start_counts();
 			}
 		});
 	}
@@ -93,11 +89,7 @@ function init_start() {
 			if (page == 'start' || page == 'download')
 			{
 				$.lastScrollTime = Date.now();
-				if (!$.counts_started)
-				{
-					$.counts_started=true;
-					start_counts();
-				}
+				start_counts();
 			}
 		});
 	}
@@ -149,9 +141,9 @@ function start_achievements(res)
 
 var start_countdata = false;
 
-function start_counts() {
-	$('.bottom-page.white-block.counter').addClass('hidden');
+function start_counts() {	
 	if (start_countdata) return;
+	else $('.bottom-page.white-block.counter').addClass('hidden');
 	start_countdata=true;
 	start_APIcount();
 }

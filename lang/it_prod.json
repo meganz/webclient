@@ -1801,6 +1801,7 @@
     "16872": "File troppo grande per poter essere maneggiato affidabilmente in memoria",
     "16873": "Versionamento dei file in tempo reale, protezione dei file eliminati, performance migliorata nei trasferimenti dei file, integrazione del browser e altro.",
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
-    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
+    "16890": "Lo spazio di archiviazione del tuo browser \u00e8 pieno. Il tuo download continuer\u00e0 automaticamente quando libererai abbastanza spazio.",
+    "16891": "Il tuo spazio di archiviazione del browser disponibile per MEGA non pu\u00f2 gestire questa grandezza di download, per favore libera abbastanza spazio sul disco. ",
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
 }

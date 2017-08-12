@@ -7214,5 +7214,9 @@
     "16891": {
         "text": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
         "context": "An error shown to Chrome users when their download cannot start because they are running out of disk space."
+    },
+    "16892": {
+        "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+        "context": "A message which is shown when there was a server-side error retrieving the cloud drive contents."
     }
 }

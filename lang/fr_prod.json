@@ -1801,6 +1801,7 @@
     "16872": "Le fichier est trop volumineux pour \u00eatre trait\u00e9 en m\u00e9moire de mani\u00e8re fiable.",
     "16873": "Versionnage des fichiers en temps r\u00e9el, protection des fichiers supprim\u00e9s, am\u00e9lioration des performances lors du transfert de fichiers, int\u00e9gration aux navigateurs et plus.",
     "16883": "Malheureusement, la m\u00e9moire tampon de votre navigateur est insuffisante pour d\u00e9chiffrer les donn\u00e9es. Veuillez installer l'[A]appli pour ordinateur de MEGA[\/A] afin de t\u00e9l\u00e9charger des fichiers volumineux %2",
-    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
+    "16890": "L'espace de stockage de votre navigateur pour MEGA est satur\u00e9. Votre t\u00e9l\u00e9chargement continuera automatiquement apr\u00e8s que vous ayez lib\u00e9r\u00e9 de l'espace.",
+    "16891": "L'espace de stockage de votre navigateur disponible pour MEGA ne peut pas traiter un t\u00e9l\u00e9chargement de cette taille. Veuillez lib\u00e9rer de l'espace disque.",
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
 }

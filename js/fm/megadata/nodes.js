@@ -160,6 +160,7 @@ MegaData.prototype.delIndex = function(p, h) {
 
     if (this.c[p] && this.c[p][h]) {
         delete this.c[p][h];
+        M.cuts[p] = Date.now();
     }
     var a = 0;
     for (var i in this.c[p]) {
@@ -614,9 +615,11 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
 
                                 if (M.c[parent] && M.c[parent][h]) {
                                     delete M.c[parent][h];
+                                    M.cuts[parent] = Date.now();
                                 }
                                 if (typeof M.c[t] === 'undefined') {
                                     M.c[t] = Object.create(null);
+                                    M.ccts[t] = Date.now();
                                 }
                                 if (node.t) {
                                     (function _(h) {
@@ -636,6 +639,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                                     }
                                 }
                                 M.c[t][h] = 1;
+                                M.cuts[t] = Date.now();
                                 ufsc.delNode(h);
                                 node.p = t;
                                 ufsc.addNode(node);

@@ -13,6 +13,9 @@ function checkParentNodeInconsistency(h, u) {
     else if (!fmdb) {
         error = 'No fmdb.';
     }
+    else if (!mBroadcaster.crossTab.master) {
+        error = 'Not a master tab';
+    }
     else {
         fmdb.getbykey('f', 'h', ['p', [h]])
             .always(function(r) {
@@ -51,7 +54,7 @@ function checkParentNodeInconsistency(h, u) {
                     api_req({
                         a: 'fcv',
                         h: h,
-                        v: 2,
+                        v: 3,
                         c: l,
                         r: r.length,
                         cts: Date.now() - M.ccts[h],

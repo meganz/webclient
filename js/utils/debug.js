@@ -54,11 +54,7 @@ function checkParentNodeInconsistency(h, u) {
                     api_req({
                         a: 'fcv',
                         h: h,
-                        v: 3,
-                        c: l,
-                        r: r.length,
-                        cts: Date.now() - M.ccts[h],
-                        uts: Date.now() - M.cuts[h],
+                        v: 2,
                         sn: currsn,
                         fsn: mega.fcv_fsn,
                         eid: eid * (u || 1),

@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm13_';
+    var dbpfx = 'fm12_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -879,7 +879,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
             var t = pendingch[tid][table];
 
             // any updates pending for this table?
-            if (t && (t[t.h] && t[t.h].length || t[t.h-1] && t[t.h-1].length)) {
+            if (t && t[t.h] && t[t.h].length) {
                 // examine update actions in reverse chronological order
                 // FIXME: can stop the loop at t.t for non-transactional writes
                 for (var a = t.h; a >= 0; a--) {

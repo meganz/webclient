@@ -659,6 +659,16 @@ React.makeElement = React['createElement'];
 	                }));
 	                M.syncUsersFullname(contactHash);
 	                self.processNewUser(contactHash);
+	                asyncApiReq({
+	                    'a': 'uge',
+	                    'u': contactHash
+	                }).done(function (r) {
+	                    if (r && isString(r)) {
+	                        if (M.u[contactHash]) {
+	                            M.u[contactHash].m = r;
+	                        }
+	                    }
+	                });
 	            }
 	        });
 	    }
@@ -3315,6 +3325,41 @@ React.makeElement = React['createElement'];
 	                    key: "view", icon: "human-profile", label: __(l[8866]), onClick: function onClick() {
 	                        loadSubPage('fm/' + contact.u);
 	                    } }));
+	            } else if (contact.c === 0) {
+	                moreDropdowns.unshift(React.makeElement(DropdownsUI.DropdownItem, {
+	                    key: "view", icon: "human-profile", label: __(l[101]), onClick: function onClick() {
+	                        loadingDialog.show();
+
+	                        asyncApiReq({
+	                            'a': 'uge',
+	                            'u': contact.u
+	                        }).done(function (r) {
+	                            if (r) {
+	                                var exists = false;
+	                                Object.keys(M.opc).forEach(function (k) {
+	                                    if (!exists && M.opc[k].m === r) {
+	                                        exists = true;
+	                                        return false;
+	                                    }
+	                                });
+
+	                                if (exists) {
+	                                    closeDialog();
+	                                    msgDialog('warningb', '', l[7413]);
+	                                } else {
+	                                    M.inviteContact(M.u[u_handle].m, r);
+	                                    var title = l[150];
+
+	                                    var msg = l[5898].replace('[X]', r);
+
+	                                    closeDialog();
+	                                    msgDialog('info', title, msg);
+	                                }
+	                            }
+	                        }).always(function () {
+	                            loadingDialog.hide();
+	                        });
+	                    } }));
 	            }
 
 	            if (moreDropdowns.length > 0) {
@@ -3323,7 +3368,7 @@ React.makeElement = React['createElement'];
 	                    {
 	                        className: self.props.dropdownButtonClasses,
 	                        icon: self.props.dropdownIconClasses,
-	                        disabled: self.props.dropdownDisabled },
+	                        disabled: moreDropdowns.length === 0 || self.props.dropdownDisabled },
 	                    React.makeElement(
 	                        DropdownsUI.Dropdown,
 	                        { className: "contact-card-dropdown",
@@ -8015,10 +8060,14 @@ React.makeElement = React['createElement'];
 	                var dropdownIconClasses = "small-icon tiny-icon grey-down-arrow";
 
 	                if (room.type === "group" && room.members && myPresence !== 'offline') {
-	                    var removeParticipantButton = React.makeElement(DropdownsUI.DropdownItem, {
-	                        key: "remove", icon: "rounded-stop", label: __(l[8867]), onClick: function onClick() {
-	                            $(room).trigger('onRemoveUserRequest', [contactHash]);
-	                        } });
+	                    var removeParticipantButton = null;
+
+	                    if (room.iAmOperator() && contactHash !== u_handle) {
+	                        removeParticipantButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                            key: "remove", icon: "rounded-stop", label: __(l[8867]), onClick: function onClick() {
+	                                $(room).trigger('onRemoveUserRequest', [contactHash]);
+	                            } });
+	                    }
 
 	                    if (room.iAmOperator() || contactHash === u_handle) {
 
@@ -8068,7 +8117,7 @@ React.makeElement = React['createElement'];
 	                        dropdownIconClasses = "small-icon eye-icon";
 	                    } else {}
 
-	                    if (contactHash !== u_handle) {
+	                    if (contactHash !== u_handle && room.iAmOperator()) {
 	                        dropdowns.push(removeParticipantButton);
 	                    }
 	                }
@@ -8081,7 +8130,7 @@ React.makeElement = React['createElement'];
 	                    dropdownPositionMy: "right top",
 	                    dropdownPositionAt: "right bottom",
 	                    dropdowns: dropdowns,
-	                    dropdownDisabled: !room.iAmOperator() || contactHash === u_handle,
+	                    dropdownDisabled: contactHash === u_handle,
 	                    dropdownButtonClasses: room.type == "group" && myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button",
 	                    dropdownIconClasses: dropdownIconClasses,
 	                    style: {

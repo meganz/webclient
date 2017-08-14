@@ -1,6 +1,3 @@
-    else if (!mBroadcaster.crossTab.master) {
-        error = 'Not a master tab';
-    }
 /**
  * Simple wrapper function that will log all calls of `fnName`.
  * This function is intended to be used for dev/debugging/testing purposes only.

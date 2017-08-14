@@ -1536,10 +1536,8 @@ function emplacenode(node, noc) {
         if (!noc) {
             if (!M.c[node.p]) {
                 M.c[node.p] = Object.create(null);
-                M.ccts[node.p] = Date.now();
             }
             M.c[node.p][node.h] = node.t + 1;
-            M.cuts[node.p] = Date.now();
         }
 
         if (node.hash) {

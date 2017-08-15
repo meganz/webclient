@@ -3886,5 +3886,12 @@
     "16889": "Hesab\u0131n\u0131z\u0131 iptal etmek istedi\u011finizi do\u011frulamak i\u00e7in parolan\u0131z\u0131 girin.",
     "16890": "MEGA i\u00e7in taray\u0131c\u0131 depolama alan\u0131 dolu. Biraz yer a\u00e7t\u0131ktan sonra indirmeniz otomatik olarak devam edecektir.",
     "16891": "MEGA i\u00e7in kullanabilece\u011finiz taray\u0131c\u0131 deponuz bu indirme boyutunu idare edemiyor, l\u00fctfen biraz disk alan\u0131 bo\u015falt\u0131n.",
-    "16892": "\u00dczg\u00fcn\u00fcz, Bulut S\u00fcr\u00fcc\u00fcn\u00fcz\u00fcn i\u00e7eri\u011fini g\u00f6r\u00fcnt\u00fcleyemiyoruz."
+    "16892": "\u00dczg\u00fcn\u00fcz, Bulut S\u00fcr\u00fcc\u00fcn\u00fcz\u00fcn i\u00e7eri\u011fini g\u00f6r\u00fcnt\u00fcleyemiyoruz.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder"
 }

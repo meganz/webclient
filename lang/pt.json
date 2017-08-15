@@ -3886,5 +3886,12 @@
     "16889": "Please enter your password to confirm that you want to cancel your account.",
     "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
     "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
-    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder"
 }

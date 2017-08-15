@@ -3886,5 +3886,12 @@
     "16889": "Harap masukkan password Anda untuk mengonfirmasi bahwa Anda ingin membatalkan akun Anda.",
     "16890": "Penyimpanan browser Anda untuk MEGA sudah penuh. Download Anda akan berlanjut secara otomatis setelah Anda membebaskan beberapa ruang.",
     "16891": "Penyimpanan browser yang tersedia untuk MEGA tidak dapat menangani ukuran unduhan ini, harap kosongkan beberapa ruang disk.",
-    "16892": "Maaf, kami tidak dapat mengambil konten Cloud Drive."
+    "16892": "Maaf, kami tidak dapat mengambil konten Cloud Drive.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder"
 }

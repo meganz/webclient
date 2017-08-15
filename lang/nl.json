@@ -3886,5 +3886,12 @@
     "16889": "Voer a.u.b. uw wachtwoord in om de annulering van uw account te bevestigen.",
     "16890": "Uw browser opslag voor MEGA is vol. Uw download gaat automatisch verder nadat u wat opslag heeft vrijgemaakt.",
     "16891": "Uw beschikbare browser opslag voor MEGA kan deze download grote niet behandelen, maak a.u.b. wat schijf ruimte vrij.",
-    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder"
 }

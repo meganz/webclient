@@ -2769,7 +2769,7 @@ else if (!b_u) {
         var esid='';
         if (u_storage.sid) esid = u_storage.sid;
         dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-        dlxhr.send(JSON.stringify([{a: 'g', g: 1, p: page.substr(1, 8), 'ad': showAd(), 'esid': esid}]));
+        dlxhr.send(JSON.stringify([{a: 'g', p: page.substr(1, 8), 'ad': showAd(), 'esid': esid}]));
     }
 }
 

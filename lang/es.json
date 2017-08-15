@@ -2238,7 +2238,7 @@
     "7479": "Int\u00e9ntalo m\u00e1s tarde o cancela las descargas.",
     "7480": "Subir desde...",
     "7482": "Subida iniciada",
-    "7483": "Guardar en Offline",
+    "7483": "Guardar en Sin conexi\u00f3n",
     "7484": "Generando enlace...",
     "7485": "El enlace se ha eliminado correctamente",
     "7486": "1 fichero movido",
@@ -3879,12 +3879,12 @@
     "16871": "Has superado la cuota m\u00e1xima de almacenamiento offline en HTML5",
     "16872": "Archivo demasiado grande para la memoria disponible.",
     "16873": "Control de versiones en tiempo real, conservaci\u00f3n de datos eliminados, mejor rendimiento en las transferencias de archivos, integraci\u00f3n en el navegador y mucho m\u00e1s.",
-    "16882": "Send Media",
+    "16882": "Env\u00edar Fotos\/V\u00eddeos",
     "16883": "Lamentablemente tu navegador no tiene memoria suficiente para descifrar datos. Para descargar archivos grandes por favor instala la [A]aplicaci\u00f3n de escritorio[\/A] de MEGA %2",
-    "16884": "Save for Offline",
-    "16887": "Saving the Recovery Key and keeping it in a secure location enables you to recover your account without data loss in the case of a lost password.",
-    "16888": "Saving the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.",
-    "16889": "Please enter your password to confirm that you want to cancel your account.",
-    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
+    "16884": "Guardar en Sin conexi\u00f3n",
+    "16887": "Si guardas la Clave de recuperaci\u00f3n en un lugar seguro podr\u00e1s recuperar tu cuenta sin perder los datos en el caso de que no recuerdes tu contrase\u00f1a.",
+    "16889": "Introduce la contrase\u00f1a para confirmar que deseas cancelar tu cuenta.",
+    "16890": "La memoria disponible para MEGA en tu navegador est\u00e1 llena. La descarga continuar\u00e1 autom\u00e1ticamente en cuanto liberes espacio en el disco.",
+    "16891": "La memoria disponible para MEGA en tu navegador no es suficiente para esta descarga, por favor libera espacio en el disco.",
+    "16892": "No se ha podido recuperar el contenido de la secci\u00f3n Mi nube."
 }

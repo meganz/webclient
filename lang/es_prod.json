@@ -1801,6 +1801,7 @@
     "16872": "Archivo demasiado grande para la memoria disponible.",
     "16873": "Control de versiones en tiempo real, conservaci\u00f3n de datos eliminados, mejor rendimiento en las transferencias de archivos, integraci\u00f3n en el navegador y mucho m\u00e1s.",
     "16883": "Lamentablemente tu navegador no tiene memoria suficiente para descifrar datos. Para descargar archivos grandes por favor instala la [A]aplicaci\u00f3n de escritorio[\/A] de MEGA %2",
-    "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
+    "16890": "La memoria disponible para MEGA en tu navegador est\u00e1 llena. La descarga continuar\u00e1 autom\u00e1ticamente en cuanto liberes espacio en el disco.",
+    "16891": "La memoria disponible para MEGA en tu navegador no es suficiente para esta descarga, por favor libera espacio en el disco.",
+    "16892": "No se ha podido recuperar el contenido de la secci\u00f3n Mi nube."
 }

@@ -28,6 +28,8 @@
      * @private
      */
     var _openFolderCompletion = function(id, newHashLocation, first, promise) {
+        var pchk = null;
+
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
         this.currentrootid = this.getNodeRoot(id);
@@ -40,12 +42,12 @@
             if (d) {
                 console.log('d%s, c%s, t%s', $.len(this.d), $.len(this.c), $.len(this.tree));
                 console.log('RootID=%s, InboxID=%s, RubbishID=%s', this.RootID, this.InboxID, this.RubbishID);
-            }
 
-            fcv_watch[M.RootID] = 1;
-            fcv_watch[M.InboxID] = 1;
-            fcv_watch[M.RubbishID] = 1;
-            fcv_watch.shares = 1;
+                fcv_watch[M.RootID] = 1;
+                fcv_watch[M.InboxID] = 1;
+                fcv_watch[M.RubbishID] = 1;
+                fcv_watch.shares = 1;
+            }
         }
 
         if (d) {
@@ -179,32 +181,9 @@
             }
 
             if (fcv_watch[this.currentrootid]
-                    && this.currentdirid !== 'shares'
-                    && (is_extension || !(Date.now() % 10))) {
+                && this.currentdirid !== 'shares') {
 
-                var f = 0;
-                var t = 0;
-                var n = this.d[this.currentdirid] || false;
-
-                for (var i = this.v.length; i--;) {
-                    if (this.v[i].t) t++;
-                    else f++;
-                }
-
-                api_req({
-                    a: 'fcv',
-                    h: this.currentdirid,
-                    v: 2,
-                    f: f,
-                    d: t,
-                    td: n.td,
-                    tf: n.tf,
-                    tb: n.tb,
-                    sn: currsn,
-                    fsn: mega.fcv_fsn,
-                    sc: array.pack(sc_history),
-                    db: mega.fcv_db | 0
-                }, {}, pfid ? 1 : 0);
+                pchk = this.currentdirid;
             }
 
             Soon(function() {
@@ -250,8 +229,17 @@
         M.searchPath();
         M.treeSearchUI();
 
-        promise.resolve(id);
-        mBroadcaster.sendMessage('mega:openfolder');
+        if (!pchk) {
+            promise.resolve(id);
+            mBroadcaster.sendMessage('mega:openfolder');
+        }
+        else {
+            checkParentNodeInconsistency(pchk)
+                .always(function() {
+                    promise.resolve(id);
+                    mBroadcaster.sendMessage('mega:openfolder');
+                });
+        }
     };
 
     // ------------------------------------------------------------------------

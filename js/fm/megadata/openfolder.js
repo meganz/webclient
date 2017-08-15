@@ -1,6 +1,8 @@
 (function(global) {
     "use strict";
 
+    var fcv_watch = Object.create(null);
+
     // map handle to root name
     var maph = function(h) {
         if (h === M.RootID) {
@@ -26,6 +28,8 @@
      * @private
      */
     var _openFolderCompletion = function(id, newHashLocation, first, promise) {
+        var pchk = null;
+
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
         this.currentrootid = this.getNodeRoot(id);
@@ -38,6 +42,11 @@
             if (d) {
                 console.log('d%s, c%s, t%s', $.len(this.d), $.len(this.c), $.len(this.tree));
                 console.log('RootID=%s, InboxID=%s, RubbishID=%s', this.RootID, this.InboxID, this.RubbishID);
+
+                fcv_watch[M.RootID] = 1;
+                fcv_watch[M.InboxID] = 1;
+                fcv_watch[M.RubbishID] = 1;
+                fcv_watch.shares = 1;
             }
         }
 
@@ -171,6 +180,12 @@
                 console.timeEnd('time for rendering');
             }
 
+            if (fcv_watch[this.currentrootid]
+                && this.currentdirid !== 'shares') {
+
+                pchk = this.currentdirid;
+            }
+
             Soon(function() {
                 M.renderPath();
             });
@@ -214,8 +229,17 @@
         M.searchPath();
         M.treeSearchUI();
 
-        promise.resolve(id);
-        mBroadcaster.sendMessage('mega:openfolder');
+        if (!pchk) {
+            promise.resolve(id);
+            mBroadcaster.sendMessage('mega:openfolder');
+        }
+        else {
+            checkParentNodeInconsistency(pchk)
+                .always(function() {
+                    promise.resolve(id);
+                    mBroadcaster.sendMessage('mega:openfolder');
+                });
+        }
     };
 
     // ------------------------------------------------------------------------

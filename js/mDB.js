@@ -795,7 +795,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, lim
     var promise = new MegaPromise();
     var args = toArray.apply(null, arguments);
 
-    onIdle(function() {
+    onIdle(function onIdleGetByKey() {
         // XXX: Dexie.anyOf() is bugged when there are pending writes...
         //      dispatching this delayed should help to settle the transaction data
         promise.linkDoneAndFailTo(fmdb.getbykey1.apply(fmdb, args));
@@ -1519,6 +1519,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 else if (!M.c[parents[i]]) {
                     p.push(parents[i]);
                     tree_inflight[parents[i]] = promise;
+                    M.ccts[parents[i]] = Date.now();
                 }
             }
 
@@ -1526,11 +1527,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
             if ($.len(inflight)) {
                 masterPromise = MegaPromise.allDone(array.unique(obj_values(inflight)).concat(promise));
             }
-            // console.warn('fetchsubtree', arguments, p, inflight);
+            if (d > 1) console.warn('fetchsubtree', arguments, p, inflight);
 
-            // fetch children of all unfetched parents
-            fmdb.getbykey('f', 'h', ['p', p.concat()])
-                .always(function(r) {
+            var stack = M.getStack().split('\n').slice(1).map(String.trim);
+
+            var parser = function(r) {
                     // store fetched nodes
                     for (var i = p.length; i--;) {
                         delete tree_inflight[p[i]];
@@ -1564,6 +1565,33 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         }
                     }
                     promise.resolve();
+                };
+
+            // fetch children of all unfetched parents
+            fmdb.getbykey('f', 'h', ['p', p.concat()])
+                .always(function(r1) {
+                    if (1504400505102 > Date.now()) {
+                        return parser(r1);
+                    }
+
+                    onIdle(function() {
+                        fmdb.getbykey('f', 'h', ['p', p.concat()])
+                            .always(function(r2) {
+                                if (r2.length !== r1.length) {
+                                    console.error('Node count mismatch!', r1.length, r2.length, p, stack);
+
+                                    api_req({
+                                        a: 'fcv',
+                                        h: p.join(','),
+                                        v: 4,
+                                        r1: r1.length,
+                                        r2: r2.length,
+                                        s: stack
+                                    }, {}, pfid ? 1 : 0);
+                                }
+                                parser(r1);
+                            });
+                    });
                 });
 
             return masterPromise;

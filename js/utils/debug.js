@@ -22,7 +22,7 @@ function checkParentNodeInconsistency(h, u) {
     else {
         fmdb.getbykey('f', 'h', ['p', [h]])
             .always(function(r) {
-                var eid = 0;
+                var eid = 0, f1, f2;
                 var map = function(o) {
                     return Object.keys(o).sort().map(function(h) {
                         return String(h) + ':' + o[h];
@@ -42,8 +42,8 @@ function checkParentNodeInconsistency(h, u) {
                     r.map(function(n) {
                         q[n.h] = n.t + 1;
                     });
-                    var f1 = map(j);
-                    var f2 = map(q);
+                    f1 = map(j);
+                    f2 = map(q);
 
                     if (f1 !== f2) {
                         error = 'Hierarchy mismatch! ("' + f1 + '" Vs. "' + f2 + '")';
@@ -60,6 +60,8 @@ function checkParentNodeInconsistency(h, u) {
                         v: 4,
                         c: l,
                         r: r.length,
+                        fc: f1,
+                        fr: f2,
                         cts: Date.now() - M.ccts[h],
                         sn: currsn,
                         fsn: mega.fcv_fsn,

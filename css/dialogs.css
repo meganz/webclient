@@ -129,7 +129,7 @@
 
 /* Add From Cloud Dialog */
 .fm-dialog.add-from-cloud {
-    width: 644px;
+    width: 780px;
     margin: -247px 0 0 -322px;
 }
 .fm-dialog .fm-breadcrumbs-block {
@@ -159,6 +159,9 @@
 .fm-dialog-table.grid-table-header th:nth-child(3), .fm-dialog-table.grid-table td:nth-child(3) {
     width: 114px;
     background-image: none;
+}
+.fm-dialog-table.grid-table-header th:nth-child(4), .fm-dialog-table.grid-table td:nth-child(4) {
+    width: 136px;
 }
 .fm-dialog-grid-scroll {
     height: 312px !important;

@@ -1570,7 +1570,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
             // fetch children of all unfetched parents
             fmdb.getbykey('f', 'h', ['p', p.concat()])
                 .always(function(r1) {
-                    if (1504400505102 > Date.now()) {
+                    if (1504400505102 < Date.now()) {
                         return parser(r1);
                     }
 

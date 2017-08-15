@@ -3886,5 +3886,12 @@
     "16889": "Per favore, inserisci la tua password per confermare che vuoi eliminare il tuo account.",
     "16890": "Lo spazio di archiviazione del tuo browser \u00e8 pieno. Il tuo download continuer\u00e0 automaticamente quando libererai abbastanza spazio.",
     "16891": "Il tuo spazio di archiviazione del browser disponibile per MEGA non pu\u00f2 gestire questa grandezza di download, per favore libera abbastanza spazio sul disco. ",
-    "16892": "Scusa, non siamo stati capaci di recuperare i contenuti del tuo Cloud Drive."
+    "16892": "Scusa, non siamo stati capaci di recuperare i contenuti del tuo Cloud Drive.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder"
 }

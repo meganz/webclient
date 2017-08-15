@@ -3886,5 +3886,12 @@
     "16889": "Introduce la contrase\u00f1a para confirmar que deseas cancelar tu cuenta.",
     "16890": "La memoria disponible para MEGA en tu navegador est\u00e1 llena. La descarga continuar\u00e1 autom\u00e1ticamente en cuanto liberes espacio en el disco.",
     "16891": "La memoria disponible para MEGA en tu navegador no es suficiente para esta descarga, por favor libera espacio en el disco.",
-    "16892": "No se ha podido recuperar el contenido de la secci\u00f3n Mi nube."
+    "16892": "No se ha podido recuperar el contenido de la secci\u00f3n Mi nube.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder"
 }

@@ -3886,5 +3886,12 @@
     "16889": "Bitte geben Sie zur Best\u00e4tigung der Accountschlie\u00dfung Ihr Passwort ein.",
     "16890": "Der MEGA zugeteilte Browser-Speicher ist voll. Ihr Download wird automatisch fortgesetzt, sobald mehr Plattenplatz zur Verf\u00fcgung steht.",
     "16891": "Der MEGA zugeteilte Browser-Speicher ist zu klein f\u00fcr einen Download dieser Gr\u00f6\u00dfe. Bitte sorgen Sie f\u00fcr mehr Plattenplatz.",
-    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder"
 }

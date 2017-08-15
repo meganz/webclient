@@ -871,6 +871,7 @@ Call.prototype._fire = function(evName) {
     }
 };
 Call.prototype._startOrJoin = function(av, isJoin) {
+    assert(isJoin === this.isJoiner);
     var self = this;
     self._getLocalStream(av)
     .catch(function(err) {
@@ -1504,6 +1505,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
 Session.prototype.msgSessTerminateAck = function(packet) {
     if (this.state !== SessState.kTerminating) {
         this.logger.warn("Ignoring unexpected TERMINATE_ACK");
+        return;
     }
     assert(this.terminateAckCallback);
     var cb = this.terminateAckCallback;

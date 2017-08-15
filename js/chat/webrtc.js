@@ -370,7 +370,7 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin) {
         }, isGroup, isJoin, handler);
 
     self.calls[chatid] = call;
-    call._startOrJoin(av, isJoin);
+    call._startOrJoin(av);
     return call;
 };
 
@@ -870,8 +870,7 @@ Call.prototype._fire = function(evName) {
         logger.error("Event handler '" + evName + "' threw exception:\n" + e, "\n", e.stack);
     }
 };
-Call.prototype._startOrJoin = function(av, isJoin) {
-    assert(isJoin === this.isJoiner);
+Call.prototype._startOrJoin = function(av) {
     var self = this;
     self._getLocalStream(av)
     .catch(function(err) {
@@ -879,7 +878,7 @@ Call.prototype._startOrJoin = function(av, isJoin) {
         return err;
     })
     .then(function() {
-        if (isJoin) {
+        if (this.isJoiner) {
             self._join();
         } else {
             self._broadcastCallReq();
@@ -942,11 +941,12 @@ Call.prototype._join = function(userid) {
 
 Call.prototype.answer = function(av) {
     var self = this;
+    assert(self.isJoiner);
     if (self.state !== CallState.kRingIn) {
         self.logger.warn("answer: Not in kRingIn state, nothing to answer");
         return false;
     }
-    return self._startOrJoin(av, true);
+    return self._startOrJoin(av);
 };
 
 Call.prototype.hangup = function(reason) {

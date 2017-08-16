@@ -1010,8 +1010,8 @@
     background-position: 0 -1045px;
 }
 .semi-huge-icon.speedometer {
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: -102px -1407px;
-    background-repeat: no-repeat;
     width: 68px;
     height: 68px;
 }

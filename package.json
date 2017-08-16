@@ -32,6 +32,9 @@
   "license": "proprietary",
   "private": true,
   "readmeFilename": "README.md",
+  "engines": {
+        "node": "6.9.4"
+  },
   "dependencies": {
     "babel-core": "^6.3.15",
     "babel-loader": "^6.2.0",

@@ -968,6 +968,16 @@ var dlmanager = {
         if (flags & this.LMT_ISREGISTERED) {
             $dialog.addClass('registered');
         }
+        else {
+            $('.login', $dialog).rebind('click', function() {
+                    open(getAppBaseUrl() + '#login');
+                    return false;
+            });
+            $('.create-account', $dialog).rebind('click', function() {
+                    open(getAppBaseUrl() + '#register');
+                    return false;
+            });
+        }
 
         if (flags & this.LMT_HASACHIEVEMENTS) {
             $dialog.addClass('achievements');

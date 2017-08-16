@@ -308,7 +308,7 @@ body.pro:after {
     background-image: url(../images/mega/top-login-sprite_v7@2x.png);
     background-size: 48px auto;
 }
-.reg-success-icon, .reg-st3-save-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .toast-icon, .resend-email-button, .reg-st3-storage::before, .reg-st3-bandwidth::before, .pro-icon, .pro-bottom-info-header::before, .toast-close-button, .small-icon.green-arrow, .small-icon.blue-arrow, .fm-dialog-close.small {
+.reg-success-icon, .reg-st3-save-icon, .loginrequired-dialog .fm-notification-icon, .toast-icon, .resend-email-button, .reg-st3-storage::before, .reg-st3-bandwidth::before, .pro-icon, .pro-bottom-info-header::before, .toast-close-button, .small-icon.green-arrow, .small-icon.blue-arrow, .fm-dialog-close.small {
     background-image: url(../images/mega/register-big-sprite-v13@2x.png);
     background-size: 200px auto;
 }
@@ -432,8 +432,8 @@ body.pro:after {
     background-image: url(../images/mega/help2/welcome_icons@2x.png);
     background-size: 250px auto;
 }
-.huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon, .huge-icon.storage-icon, .semi-small-icon.rocket, .semi-huge-icon.green-tick, .semi-big-icon.blue-cloud, .semi-big-icon.green-speedometer, .achieved .account.progress-indicator, .achievement-complete::after, .big-104px-icon.speedometer, .big-icon.almost-full-storage {
-    background-image: url(../images/mega/account-sprite_v3@2x.png);
+.huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon, .huge-icon.storage-icon, .semi-small-icon.rocket, .semi-huge-icon.green-tick, .semi-big-icon.blue-cloud, .semi-big-icon.green-speedometer, .achieved .account.progress-indicator, .achievement-complete::after, .big-104px-icon.speedometer, .big-icon.almost-full-storage, .semi-huge-icon.speedometer, .semi-huge-icon.storage {
+    background-image: url(../images/mega/account-sprite_v4@2x.png);
     background-size: 172px auto;
 }
 .huge-icon.achievement {
@@ -453,7 +453,7 @@ body.pro:after {
     background-size: 768px auto;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v2@2x.png);
+    background-image: url(../images/mega/startpage-sprite_v4@2x.png);
     background-size: 267px auto;
 }
 }

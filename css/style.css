@@ -11444,7 +11444,7 @@ table {
     width: 52px;
     height: 52px;
     float: left;
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: -2px -464px;
     background-repeat: no-repeat;
     margin-left: -2px;
@@ -11537,7 +11537,7 @@ table {
     background-color: rgba(119,119,119,1);
 }
 .dropdown.transfer-icon {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-repeat: no-repeat;
     background-position: -3px -554px;
     width: 68px;
@@ -18376,7 +18376,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .loginrequired-dialog .fm-notification-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v4.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;
@@ -20608,7 +20608,7 @@ a.opensource-icon-txt.coming-soon {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v4.png);
     background-position: center -2173px;
     background-repeat: no-repeat;
     height: 210px;
@@ -21002,7 +21002,7 @@ div.camera-bottom-txt {
 .achieved .account.progress-indicator {
     border: 0;
     background-color: transparent;
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 0 -939px;
 }
 .account.progress-item.disabled {
@@ -21192,7 +21192,7 @@ div.camera-bottom-txt {
     height: 24px;
     right: 0;
     top: -7px;
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 0 -986px;
 }
 .achievements-cell.hidden {
@@ -21466,6 +21466,7 @@ div.camera-bottom-txt {
     position: relative;
     transform: rotate(-2.8deg);
     float: left;
+    overflow: hidden;
 }
 .account.chart.overlay {
     width: 92px;
@@ -21791,7 +21792,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 .bottom-info.icon {
     width: 66px;
     height: 66px;
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v4.png);
     background-position: 1px -1468px;
     background-repeat: no-repeat;
 }

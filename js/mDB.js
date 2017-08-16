@@ -689,7 +689,7 @@ FMDB.prototype.add = function fmdb_add(table, row) {
 
     if (this.crashed) return;
 
-    if (table === 'f' && row.s < -1 && --skjahskak > 0 && 1504400505102 > Date.now()) {
+    if (table === 'f' && row.s < -1 && row.p && --skjahskak > 0 && 1504400505102 > Date.now()) {
         api_req({
             a: 'fcv',
             h: row.h,

@@ -683,10 +683,23 @@ FMDB.prototype.restorenode = Object.freeze({
 // sn must be added last and effectively (mostly actually) "commits" the "transaction"
 // the next addition will then start a new "transaction"
 // (large writes will not execute as an IndexedDB transaction because IndexedDB can't)
+var skjahskak = 10;
 FMDB.prototype.add = function fmdb_add(table, row) {
     "use strict";
 
     if (this.crashed) return;
+
+    if (table === 'f' && row.s < -1 && row.p && --skjahskak > 0 && 1504400505102 > Date.now()) {
+        api_req({
+            a: 'fcv',
+            h: row.h,
+            p: row.p,
+            s: row.s,
+            v: 4,
+            db: 5,
+            cs: M.getStack().split('\n').slice(1).map(String.trim)
+        }, {}, pfid ? 1 : 0);
+    }
 
     if (row.d) {
         if (this.stripnode[table]) {

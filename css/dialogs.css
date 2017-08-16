@@ -344,7 +344,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(245,245,245,1
     display: table-cell;
     position:relative;
     vertical-align: middle;
-    height: 68px;
+    height: 104px;
 }
 .dialog.overquota-bott-buttons {
     width: 100px;

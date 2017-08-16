@@ -15550,5 +15550,33 @@
     "16892": {
         "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
         "context": "A message which is shown when there was a server-side error retrieving the cloud drive contents."
+    },
+    "16895": {
+        "text": "Do you remember your password?",
+        "context": "Used as a title in the \"Password reminder\" dialog, that pop ups to ensure that the user had exported his recovery key OR still remembers his password."
+    },
+    "16896": {
+        "text": "Your password",
+        "context": "Used as a placeholder in the \"Password reminder\" dialog, that pop ups to ensure that the user had exported his recovery key OR still remembers his password.\r\nThe user is supposed to enter his password in this field, to validate\/confirm he did not forgot it."
+    },
+    "16897": {
+        "text": "Password accepted",
+        "context": "Used as a message in the \"Password reminder\" dialog that is shown when the user enters his password, clicks confirm and his password is correct."
+    },
+    "16898": {
+        "text": "Wrong password, backup your Recovery Key as soon as possible!",
+        "context": "Used as a message in the \"Password reminder\" dialog that is shown when the user enters his password, clicks confirm and his password is incorrect."
+    },
+    "16899": {
+        "text": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+        "context": "Used as a message in the \"Password reminder\" dialog as a tip on why backing up the \"Recovery Key\" is important and vital for the user to not lose any data in case he\/she forgets his password."
+    },
+    "16900": {
+        "text": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+        "context": "Used as a message in the \"Password reminder\" dialog as a tip on why confirming the password and\/or exporting the recovery key is important and vital for the user to not lose any data."
+    },
+    "16901": {
+        "text": "Password Reminder",
+        "context": "Used as a tooltip for the \"Password Reminder\" icon in the top bar, that when clicked would ask the user to confirm his password or do a recovery key backup\/export."
     }
 }

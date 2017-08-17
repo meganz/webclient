@@ -3887,11 +3887,14 @@
     "16890": "Lo spazio di archiviazione del tuo browser \u00e8 pieno. Il tuo download continuer\u00e0 automaticamente quando libererai abbastanza spazio.",
     "16891": "Il tuo spazio di archiviazione del browser disponibile per MEGA non pu\u00f2 gestire questa grandezza di download, per favore libera abbastanza spazio sul disco. ",
     "16892": "Scusa, non siamo stati capaci di recuperare i contenuti del tuo Cloud Drive.",
-    "16895": "Do you remember your password?",
-    "16896": "Your password",
-    "16897": "Password accepted",
-    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
-    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
-    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
-    "16901": "Password Reminder"
+    "16895": "Ricordi la tua password?",
+    "16896": "La tua password",
+    "16897": "Password accettata",
+    "16898": "Password errata, fai un backup della tua Chiave di Recupero prima possibile!",
+    "16899": "Fare una copia della tua Chiave di Recupero ti permette di impostare una nuova password senza perdite di dati. Ti suggeriamo di copiarla adesso in una posizione sicura.",
+    "16900": "Per favore, testa la tua password qui sotto per assicurarti di ricordarla. Se perdi la tua password, perderai ogni accesso ai tuoi dati archiviati su MEGA. [A]Leggi di pi\u00f9[\/A].",
+    "16901": "Ricorda password",
+    "16902": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+    "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)",
+    "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)."
 }

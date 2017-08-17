@@ -449,6 +449,24 @@ function init_page() {
         }
     }
 
+    if (localStorage.beingAccountCancellation) {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            // todo
+        }
+        else {
+            // Insert placeholder page while waiting for user input
+            parsepage(pages['placeholder']);
+
+            msgDialog('warninga', l[6188], l[6189], '', function() {
+                loadSubPage('start');
+            });
+        }
+
+        delete localStorage.beingAccountCancellation;
+        return false;
+    }
+
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
         if (!blogsearch) {
@@ -1741,7 +1759,7 @@ function topmenuUI() {
                     var presence = $(this).data("presence");
                     localStorage.megaChatPresence = presence;
                     localStorage.megaChatPresenceMtime = unixtime();
-    
+
                     mega.initLoadReport();
                     loadfm();
                     $topHeader.find('.activity-status-block').addClass("fadeinout");

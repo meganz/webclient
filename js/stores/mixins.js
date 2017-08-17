@@ -162,7 +162,7 @@ var MegaRenderMixin = {
     },
     /**
      * Lightweight version of .isComponentVisible
-     * @returns {boolean}
+     * @returns {bool}
      */
     isComponentEventuallyVisible: function() {
         var domNode = this.findDOMNode();

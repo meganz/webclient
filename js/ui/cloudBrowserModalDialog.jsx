@@ -55,13 +55,9 @@ var BrowserEntries = React.createClass({
         if (!self.lastCursor || self.lastCursor !== self.state.cursor) {
             self.lastCursor = self.state.cursor;
             var tr = self.findDOMNode().querySelector('tr.node_' + self.lastCursor);
-            if (tr) {
-                if (tr.scrollIntoViewIfNeeded) {
-                    tr.scrollIntoViewIfNeeded();
-                }
-                else if (tr.scrollIntoView) {
-                    tr.scrollIntoView();
-                }
+            var $jsp = $(tr).parents('.jspScrollable').data('jsp');
+            if (tr && $jsp) {
+                $jsp.scrollToElement(tr, undefined, false);
             }
         }
     },
@@ -172,11 +168,9 @@ var BrowserEntries = React.createClass({
                     }
                 }
 
-                console.error('t1', targetIndex);
                 if (targetIndex < 0 || !self.props.entries[targetIndex]) {
                     targetIndex = Math.min(0, currentIndex);
                 }
-                console.error('t2', targetIndex);
 
 
                 if (
@@ -185,7 +179,6 @@ var BrowserEntries = React.createClass({
                 ) {
                     return;
                 }
-                console.error('cursor: ', self.props.entries[targetIndex].h);
 
                 var highlighted;
 
@@ -194,7 +187,6 @@ var BrowserEntries = React.createClass({
                     var lastIndex;
                     if (targetIndex < currentIndex) {
                         // up
-                        console.error('up');
                         firstIndex = targetIndex;
                         if (self.state.highlighted && self.state.highlighted.length > 0) {
                             // more items already selected..append to selection by altering last index
@@ -218,16 +210,11 @@ var BrowserEntries = React.createClass({
                             firstIndex = currentIndex;
                         }
 
-                        console.error('down');
-
                         lastIndex = targetIndex;
                     }
 
-                    console.error([firstIndex, lastIndex, currentIndex, targetIndex]);
-
                     highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
 
-                    console.error(highlighted);
                     self.setSelectedAndHighlighted(highlighted, self.props.entries[targetIndex].h);
                 }
                 else {
@@ -304,7 +291,7 @@ var BrowserEntries = React.createClass({
                 self.props.onAttachClicked(selectedNodes);
             }
             else {
-                console.error(keyCode);
+                // do nothing.
             }
 
             // reset the quick finding feature vars if this was not a "quick find", e.g. charTyped was left empty.
@@ -353,7 +340,6 @@ var BrowserEntries = React.createClass({
             }
             var highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
 
-            console.error(highlighted);
             self.setSelectedAndHighlighted(highlighted, node.h);
         }
         else if (e.ctrlKey || e.metaKey) {
@@ -387,7 +373,7 @@ var BrowserEntries = React.createClass({
             self.lastCharKeyIndex = -1;
 
             // expand folder
-            self.setState({'selected': [], 'highlighted': []});
+            self.setState({'selected': [], 'highlighted': [], 'cursor': false});
             self.props.onSelected([]);
             self.props.onHighlighted([]);
             self.props.onExpand(node);
@@ -469,8 +455,9 @@ var BrowserEntries = React.createClass({
             }
 
             items.push(
-                <tr
-                    className={"node_" + node.h + " " + (isFolder ? " folder" :"") + (isHighlighted ? " ui-selected" : "")}
+                <tr className={
+                        "node_" + node.h + " " + (isFolder ? " folder" :"") + (isHighlighted ? " ui-selected" : "")
+                    }
                     onClick={(e) => {
                         self.onEntryClick(e, node);
                     }}
@@ -678,13 +665,14 @@ var CloudBrowserDialog = React.createClass({
                     breadcrumbClasses += " has-next-button";
                 }
                 breadcrumb.unshift(
-                    <a className={"fm-breadcrumbs contains-directories " + breadcrumbClasses} key={p.h} onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        self.setState({'currentlyViewedEntry': p.h, 'selected': []});
-                        self.onSelected([]);
-                        self.onHighlighted([]);
-                    }}>
+                    <a className={"fm-breadcrumbs contains-directories " + breadcrumbClasses} key={p.h}
+                       onClick={(e) => {
+                           e.preventDefault();
+                           e.stopPropagation();
+                           self.setState({'currentlyViewedEntry': p.h, 'selected': []});
+                           self.onSelected([]);
+                           self.onHighlighted([]);
+                        }}>
                         <span className="right-arrow-bg invisible">
                             <span>{p.h === M.RootID ? __(l[164]) : p.name}</span>
                         </span>
@@ -702,59 +690,53 @@ var CloudBrowserDialog = React.createClass({
         var buttons = [];
 
         if (!folderIsHighlighted) {
-            buttons.push(
-                {
-                    "label": self.props.selectLabel,
-                    "key": "select",
-                    "className": "default-grey-button "
-                    + (self.state.selected.length === 0 ? "disabled" : null),
-                    "onClick": function(e) {
-                        if (self.state.selected.length > 0) {
-                            self.props.onSelected(self.state.selected);
-                            self.props.onAttachClicked();
-                        }
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                }
-            )
-        }
-        else if (folderIsHighlighted) {
-            buttons.push(
-                {
-                    "label": self.props.openLabel,
-                    "key": "select",
-                    "className": "default-grey-button",
-                    "onClick": function(e) {
-                        if (self.state.highlighted.length > 0) {
-                            self.setState({'currentlyViewedEntry':
-                                self.state.highlighted[0]
-                            });
-                            self.onSelected([]);
-                            self.onHighlighted([]);
-                            self.browserEntries.setState({
-                                'selected': [],
-                                'highlighted': []
-                            });
-                        }
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                }
-            )
-        }
-
-        buttons.push(
-            {
-                "label": self.props.cancelLabel,
-                "key": "cancel",
+            buttons.push({
+                "label": self.props.selectLabel,
+                "key": "select",
+                "className": "default-grey-button "
+                + (self.state.selected.length === 0 ? "disabled" : null),
                 "onClick": function(e) {
-                    self.props.onClose(self);
+                    if (self.state.selected.length > 0) {
+                        self.props.onSelected(self.state.selected);
+                        self.props.onAttachClicked();
+                    }
                     e.preventDefault();
                     e.stopPropagation();
                 }
+            });
+        }
+        else if (folderIsHighlighted) {
+            buttons.push({
+                "label": self.props.openLabel,
+                "key": "select",
+                "className": "default-grey-button",
+                "onClick": function(e) {
+                    if (self.state.highlighted.length > 0) {
+                        self.setState({'currentlyViewedEntry':
+                            self.state.highlighted[0]
+                        });
+                        self.onSelected([]);
+                        self.onHighlighted([]);
+                        self.browserEntries.setState({
+                            'selected': [],
+                            'highlighted': []
+                        });
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        }
+
+        buttons.push({
+            "label": self.props.cancelLabel,
+            "key": "cancel",
+            "onClick": function(e) {
+                self.props.onClose(self);
+                e.preventDefault();
+                e.stopPropagation();
             }
-        );
+        });
 
         return (
             <ModalDialogsUI.ModalDialog
@@ -776,9 +758,12 @@ var CloudBrowserDialog = React.createClass({
                     <tbody>
                     <tr>
                         <BrowserCol id="grid-header-star" sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
-                        <BrowserCol id="name" label={__(l[86])} sortBy={self.state.sortBy} onClick={self.toggleSortBy}/>
-                        <BrowserCol id="size" label={__(l[87])} sortBy={self.state.sortBy} onClick={self.toggleSortBy}/>
-                        <BrowserCol id="ts" label={__(l[16169])} sortBy={self.state.sortBy} onClick={self.toggleSortBy}/>
+                        <BrowserCol id="name" label={__(l[86])} sortBy={self.state.sortBy}
+                                    onClick={self.toggleSortBy}/>
+                        <BrowserCol id="size" label={__(l[87])} sortBy={self.state.sortBy}
+                                    onClick={self.toggleSortBy}/>
+                        <BrowserCol id="ts" label={__(l[16169])} sortBy={self.state.sortBy}
+                                    onClick={self.toggleSortBy}/>
                     </tr>
                     </tbody>
                 </table>

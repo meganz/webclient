@@ -1831,7 +1831,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v3.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -3256,7 +3256,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v3.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;

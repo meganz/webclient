@@ -11,10 +11,14 @@ function init_backup() {
             type: "text/plain;charset=utf-8"
         });
         saveAs(blob, 'MEGA-RECOVERYKEY.txt');
+
+        mBroadcaster.sendMessage('keyexported');
+
         if (!localStorage.recoverykey) {
             localStorage.recoverykey = 1;
             $('body').addClass('rk-saved');
         }
+
     });
 
     if (is_extension || M.execCommandUsable()) {
@@ -29,6 +33,9 @@ function init_backup() {
                 $('#backup_keyinput').select();
                 document.execCommand('copy');
             }
+
+            mBroadcaster.sendMessage('keyexported');
+
             if (!localStorage.recoverykey) {
                 localStorage.recoverykey = 1;
                 $('body').addClass('rk-saved');
@@ -49,6 +56,7 @@ function init_backup() {
         $('.backup-input-button').rebind('mouseover', function() {
             var obj = $('#clipboardswf_backup')[0];
             if (obj && typeof obj.setclipboardtext === 'function') {
+                mBroadcaster.sendMessage('keyexported');
                 obj.setclipboardtext(key);
             }
         });

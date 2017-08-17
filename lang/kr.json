@@ -3887,11 +3887,14 @@
     "16890": "MEGA\uc5d0\uc11c \uc0ac\uc6a9\ud560 \uc218 \uc788\ub294 \ube0c\ub77c\uc6b0\uc800 \uacf5\uac04\uc774 \uac00\ub4dd \ucc3c\uc2b5\ub2c8\ub2e4. \uacf5\uac04\uc744 \ube44\uc6b0\uba74 \ub2e4\uc6b4\ub85c\ub4dc\uac00 \uc790\ub3d9\uc73c\ub85c \uc7ac\uac1c\ub429\ub2c8\ub2e4.",
     "16891": "MEGA\uc5d0\uc11c \uc0ac\uc6a9\ud560 \uc218 \uc788\ub294 \ube0c\ub77c\uc6b0\uc800 \uc800\uc7a5 \uacf5\uac04\uc774 \uc774 \ub2e4\uc6b4\ub85c\ub4dc \ud06c\uae30\ub97c \ucc98\ub9ac\ud558\uae30\uc5d0 \ubd80\uc871\ud569\ub2c8\ub2e4, \ub514\uc2a4\ud06c \uacf5\uac04\uc744 \ube44\uc6cc\uc8fc\uc138\uc694.",
     "16892": "\uc8c4\uc1a1\ud569\ub2c8\ub2e4, \ud074\ub77c\uc6b0\ub4dc \ub4dc\ub77c\uc774\ube0c \ud56d\ubaa9\uc744 \ubc1b\uc544\uc62c \uc218 \uc5c6\uc5c8\uc2b5\ub2c8\ub2e4.",
-    "16895": "Do you remember your password?",
-    "16896": "Your password",
-    "16897": "Password accepted",
-    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
-    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
-    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
-    "16901": "Password Reminder"
+    "16895": "\ube44\ubc00\ubc88\ud638\uac00 \uae30\uc5b5\ub0ac\ub098\uc694?",
+    "16896": "\ub2f9\uc2e0\uc758 \ube44\ubc00\ubc88\ud638",
+    "16897": "\ube44\ubc00\ubc88\ud638 \ud655\uc778\ub428",
+    "16898": "\uc798\ubabb\ub41c \ube44\ubc00\ubc88\ud638\uc785\ub2c8\ub2e4, \uac00\ub2a5\ud55c \ube68\ub9ac \ubcf5\uad6c \ud0a4\ub97c \ubc31\uc5c5\ud558\uc138\uc694!",
+    "16899": "\ubcf5\uad6c \ud0a4\ub97c \ubc31\uc5c5\ud558\ub294 \uac83\uc740 \ub370\uc774\ud130 \uc190\uc2e4 \uc5c6\uc774 \uc0c8 \ube44\ubc00\ubc88\ud638\ub97c \uc124\uc815\ud558\ub294 \uac83\uc744 \uac00\ub2a5\ud558\uac8c \ud569\ub2c8\ub2e4. \uc548\uc804\ud55c \uc704\uce58\uc5d0 \uc9c0\uae08 \ubc31\uc5c5\ud560 \uac83\uc744 \uad8c\uc7a5\ud569\ub2c8\ub2e4.",
+    "16900": "\uc544\ub798\uc5d0 \ub2f9\uc2e0\uc758 \ube44\ubc00\ubc88\ud638\ub97c \uc2dc\ud5d8\ud574\ubcf4\uace0 \ud655\uc2e4\ud788 \uae30\uc5b5\ud558\uc138\uc694. \ube44\ubc00\ubc88\ud638\ub97c \uc78a\uc5b4\ubc84\ub9ac\uba74, \ub2f9\uc2e0\uc758 MEGA \ub370\uc774\ud130\uc5d0 \uc811\uadfc\uc744 \ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. [A]\ub354 \uc54c\uc544\ubcf4\uae30[\/A]",
+    "16901": "\ube44\ubc00\ubc88\ud638 \ub3c4\uc6b0\ubbf8",
+    "16902": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+    "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)",
+    "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)."
 }

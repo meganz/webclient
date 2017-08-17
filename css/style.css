@@ -15541,7 +15541,7 @@ a.ff-extension-button:hover {
 }
 .search-path-icon-span {
     background-position: 0 0px;
-    background-image: url(http://localhost:8089/images/mega/files-icons.png);
+    background-image: url(../images/mega/files-icons.png);
     background-repeat: no-repeat;
     width: 24px;
     height: 24px;
@@ -16759,7 +16759,7 @@ span.incoming-call-name {
     background-position: -10px -14751px;
     background-repeat: no-repeat;
     position: absolute;
-    left: 0; 
+    left: 0;
     top:0;
 }
 .contact-top-details .grid-url-arrow {

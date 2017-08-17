@@ -888,6 +888,8 @@ var dlmanager = {
             else {
                 open(getAppBaseUrl() + '#pro');
             }
+
+            api_req({a: 'log', e: 99640, m: 'on overquota pro-plans clicked'});
         };
         var getMoreBonusesListener = function() {
             closeDialog();
@@ -898,8 +900,12 @@ var dlmanager = {
                         dlmanager.onLimitedBandwidth();
                     }
                 });
+
+                api_req({a: 'log', e: 99641, m: 'on overquota get-more-bonuses clicked'});
             }
             else {
+                api_req({a: 'log', e: 99642, m: 'on overquota register-for-bonuses clicked'});
+
                 dlmanager.showRegisterDialog4ach($dialog, flags);
             }
         };
@@ -915,6 +921,7 @@ var dlmanager = {
                 .rebind('click', this.onLimitedBandwidth.bind(this));
 
             $('.upgrade', $dialog).rebind('click', function() {
+                api_req({a: 'log', e: 99643, m: 'on overquota pre-warning upgrade clicked'});
 
                 // closeDialog();
 
@@ -969,15 +976,39 @@ var dlmanager = {
             $dialog.addClass('registered');
         }
         else {
-            $('.login', $dialog).rebind('click', function() {
-                    open(getAppBaseUrl() + '#login');
-                    return false;
-            });
-            $('.create-account', $dialog).rebind('click', function() {
-                    open(getAppBaseUrl() + '#register');
-                    return false;
-            });
+            var $oqbbl = $('.overquota-bott-bl', $dialog);
+
+            var showOverQuotaRegisterDialog = function() {
+                closeDialog();
+                dlmanager.showOverQuotaRegisterDialog();
+            };
+
+            if (!u_wasloggedin()) {
+                api_req({a: 'log', e: 99646, m: 'on overquota not-logged-in'});
+                $('.default-big-button.login', $oqbbl).addClass('hidden');
+            }
+            else {
+                $('.default-big-button.login', $oqbbl).rebind('click', function() {
+                    api_req({a: 'log', e: 99644, m: 'on overquota login clicked'});
+                    closeDialog();
+
+                    mega.ui.showLoginRequiredDialog({
+                            minUserType: 3,
+                            skipInitialDialog: 1
+                        })
+                        .done(function() {
+                            api_req({a: 'log', e: 99645, m: 'on overquota logged in.'});
+                            closeDialog();
+                            topmenuUI();
+                            dlmanager._onQuotaRetry(true);
+                        })
+                        .fail(showOverQuotaRegisterDialog);
+                });
+            }
+
+            $('.default-big-button.create-account', $oqbbl).rebind('click', showOverQuotaRegisterDialog);
         }
+
 
         if (flags & this.LMT_HASACHIEVEMENTS) {
             $dialog.addClass('achievements');
@@ -1021,7 +1052,7 @@ var dlmanager = {
             return mega.ui.sendSignupLinkDialog(accountData);
         }
 
-        api_req({ a: 'log', e: 99613, m: 'efq' });
+        api_req({a: 'log', e: 99613, m: 'on overquota register dialog shown'});
 
         mega.ui.showRegisterDialog({
             title: l[17],
@@ -1030,10 +1061,14 @@ var dlmanager = {
             onAccountCreated: function(gotLoggedIn, accountData) {
                 if (gotLoggedIn) {
                     dlmanager._onQuotaRetry(true);
+
+                    api_req({a: 'log', e: 99649, m: 'on overquota logged-in through register dialog.'});
                 }
                 else {
                     localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
                     mega.ui.sendSignupLinkDialog(accountData);
+
+                    api_req({a: 'log', e: 99650, m: 'on overquota account created.'});
                 }
             }
         });
@@ -1045,9 +1080,14 @@ var dlmanager = {
      * @param {Number} [flags]     Limitation flags
      */
     showRegisterDialog4ach: function DM_showRegisterDialog($dialog, flags) {
+        'use strict';
+
+        api_req({a: 'log', e: 99647, m: 'on overquota register-for-achievements dialog shown'});
+
         if (flags & this.LMT_HASACHIEVEMENTS) {
             this.onOverquotaWithAchievements = true;
         }
+
         mega.ui.showRegisterDialog({
             onAccountCreated: function(gotLoggedIn, accountData) {
                 if (gotLoggedIn) {
@@ -1105,7 +1145,7 @@ var dlmanager = {
             this.lmtUserFlags = flags;
         }
 
-        api_req({ a: 'log', e: 99617, m: 'qbq' });
+        api_req({a: 'log', e: 99617, m: 'overquota pre-warning shown.'});
 
         this._overquotaClickListeners($dialog, flags, res || true);
     },
@@ -1201,6 +1241,28 @@ var dlmanager = {
             $dialog.addClass('exceeded').removeClass('hidden');
         }
 
+        if (flags & this.LMT_ISREGISTERED) {
+            if (!(flags & this.LMT_HASACHIEVEMENTS)) {
+                $dialog.addClass('hidden-bottom');
+            }
+        }
+        else {
+            var $pan = $('.not-logged.no-achievements', $dialog);
+
+            if ($pan.length && !$pan.hasClass('flag-pcset')) {
+                $pan.addClass('flag-pcset');
+
+                M.req('efqb').done(function(val) {
+                    if (!val) {
+                        $dialog.addClass('hidden-bottom');
+                    }
+                    else {
+                        $pan.text(String($pan.text()).replace('10%', val + '%'));
+                    }
+                });
+            }
+        }
+
         this._overquotaInfo();
 
         var doCloseModal = function closeModal() {
@@ -1218,6 +1280,8 @@ var dlmanager = {
         $overlay.rebind('click.quota', doCloseModal);
 
         this._overquotaClickListeners($dialog, flags);
+
+        api_req({a: 'log', e: 99648, m: 'on overquota dialog shown'});
     },
 
     getCurrentDownloads: function() {

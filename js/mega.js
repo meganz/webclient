@@ -3026,54 +3026,27 @@ function loadfm_done(mDBload) {
         mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = Date.now();
 
-        if (fmdb && loadfm.onDemandFolders && 0) {
-            // fetch second-level and tree nodes (to show the little arrows in the tree)
-            var folders = loadfm.onDemandFolders;
-            if (fmconfig.treenodes) {
-                folders = array.unique(folders.concat(Object.keys(fmconfig.treenodes)));
-            }
+        // are we actually on an #fm/* page?
+        if (page !== 'start' && is_fm() || $('.fm-main.default').is(":visible")) {
+            promise = M.initFileManager();
 
-            for (var i = folders.length; i--;) {
-                if (M.c[folders[i]]) {
-                    folders.splice(i, 1);
-                }
-            }
+            mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
 
-            if (folders.length) {
-                promise = new MegaPromise();
-                fmdb.getbykey('f', 'h', ['p', folders])
-                    .always(function(r) {
-                        for (var i = r.length; i--;) {
-                            emplacenode(r[i]);
-                        }
-                        promise.resolve();
-                    });
+            // load report - time to fm after last byte received
+            mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
+
+            // setup fm-notifications such as 'full' or 'almost-full' if needed.
+            if (!pfid && u_type) {
+                M.checkStorageQuota(50);
             }
         }
+        else {
+            mega.loadReport.ttfm = -1;
+            mega.loadReport.renderfm = -1;
+        }
 
-        promise.always(function() {
-            // are we actually on an #fm/* page?
-            if (page !== 'start' && is_fm() || $('.fm-main.default').is(":visible")) {
-                promise = M.initFileManager();
-
-                mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;
-                mega.loadReport.stepTimeStamp = Date.now();
-
-                // load report - time to fm after last byte received
-                mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
-
-                // setup fm-notifications such as 'full' or 'almost-full' if needed.
-                if (!pfid && u_type) {
-                    M.checkStorageQuota(50);
-                }
-            }
-            else {
-                mega.loadReport.ttfm = -1;
-                mega.loadReport.renderfm = -1;
-            }
-
-            promise.always(_completion);
-        });
+        promise.always(_completion);
     });
 }
 

@@ -156,11 +156,8 @@ function dl_g(res) {
             dlmanager.getMaximumDownloadSize().done(function(size) {
                 maxDownloadSize = size;
 
-                if (is_extension && !is_chrome_firefox) {
-                    uncheckMegaSyncDownload();
-                    $('.download.checkbox-bl').addClass('hidden');
-                }
-                else if (fdl_filesize > maxDownloadSize) {
+                
+                if (fdl_filesize > maxDownloadSize) {
                     checkMegaSyncDownload();
                 }
                 else if (localStorage.megaSyncDownloadUnchecked) {

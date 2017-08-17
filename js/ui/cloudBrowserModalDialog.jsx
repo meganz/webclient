@@ -44,45 +44,147 @@ var BrowserEntries = React.createClass({
             'selected': []
         }
     },
+    componentWillMount: function() {
+        this.lastCursor = false;
+        this.lastCharKeyPressed = false;
+        this.lastCharKeyIndex = -1;
+    },
+    componentDidUpdate: function() {
+        var self = this;
+
+        if (!self.lastCursor || self.lastCursor !== self.state.cursor) {
+            self.lastCursor = self.state.cursor;
+            var tr = self.findDOMNode().querySelector('tr.node_' + self.lastCursor);
+            if (tr) {
+                if (tr.scrollIntoViewIfNeeded) {
+                    tr.scrollIntoViewIfNeeded();
+                }
+                else if (tr.scrollIntoView) {
+                    tr.scrollIntoView();
+                }
+            }
+        }
+    },
     componentDidMount: function() {
         this.bindEvents();
     },
     componentWillUnmount: function() {
         this.unbindEvents();
     },
+    getNodesInIndexRange: function(firstIndex, lastIndex) {
+        var self = this;
+        return self.props.entries
+            .filter((node, index) => {
+                return index >= firstIndex && index <= lastIndex && (
+                    !self.props.folderSelectNotAllowed ? true : (node.t === 0)
+                );
+            })
+            .map((node) => { return node.h });
+    },
+    getIndexByNodeId: function(nodeId, notFoundValue) {
+        var self = this;
+        var foundIndex = typeof(notFoundValue) === 'undefined' ? -1 : notFoundValue;
+        self.props.entries.find(function (r, index) {
+            if (r.h === nodeId) {
+                foundIndex = index;
+                return true;
+            }
+        });
+        return foundIndex;
+    },
+    setSelectedAndHighlighted: function(highlighted, cursor) {
+        var self = this;
+
+        self.setState({'highlighted': highlighted, 'cursor': cursor});
+        self.props.onHighlighted(highlighted);
+
+        var selected = highlighted.filter(function(nodeId) {
+            var node = M.getNodeByHandle(nodeId);
+            return !self.props.folderSelectNotAllowed || (node && node.t === 0);
+        });
+
+        self.setState({'selected': selected});
+        self.props.onSelected(selected);
+    },
     bindEvents: function() {
         var self = this;
 
+        var KEY_A = 65;
         var KEY_UP = 38;
         var KEY_DOWN = 40;
         var KEY_ENTER = 13;
+        var KEY_BACKSPACE = 8;
+
 
         $(document.body).rebind('keydown.cloudBrowserModalDialog', function(e) {
+            window.asdf = self;
+
+            var charTyped = false;
             var keyCode = e.which || e.keyCode;
             var selectionIncludeShift = e.shiftKey;
 
-            // up/down
-            if (keyCode === KEY_UP || keyCode === KEY_DOWN) {
+            if (keyCode === KEY_A && (e.ctrlKey || e.metaKey)) {
+                // select all
+                var newCursor = false;
+
+                var highlighted = [];
+                if (self.props.entries && self.props.entries.length > 0) {
+                    var firstIndex = 0;
+                    var lastIndex = self.props.entries.length - 1;
+                    newCursor = self.props.entries[lastIndex].h;
+                    highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
+                }
+
+                self.setSelectedAndHighlighted(highlighted, newCursor);
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            else if (e.metaKey && keyCode === KEY_UP || keyCode === KEY_BACKSPACE) {
+                // back
+                var currentFolder = M.getNode(self.props.currentlyViewedEntry);
+                if (currentFolder.p) {
+                    self.expandFolder(currentFolder.p);
+                }
+            }
+            else if (!e.metaKey && (keyCode === KEY_UP || keyCode === KEY_DOWN)) {
+                // up/down
+                var dir = keyCode === KEY_UP ? -1 : 1;
+
                 var lastHighlighted = self.state.cursor || false;
                 if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
                     lastHighlighted = self.state.highlighted[self.state.highlighted.length - 1];
                 }
-                var currentIndex = 0;
 
-                self.props.entries.find(function (r, index) {
-                    if (r.h === lastHighlighted) {
-                        currentIndex = index;
-                        return true;
+                var currentIndex = self.getIndexByNodeId(lastHighlighted, -1);
+
+
+                var targetIndex = currentIndex + dir;
+                while(
+                        selectionIncludeShift &&
+                        self.props.folderSelectNotAllowed &&
+                        self.props.entries &&
+                        self.props.entries[targetIndex] &&
+                        self.props.entries[targetIndex].t === 1
+                    ) {
+                    targetIndex = targetIndex + dir;
+                    if (targetIndex < 0) {
+                        return;
                     }
-                }) || 0;
-
-
-                var targetIndex = currentIndex + (keyCode === KEY_UP ? -1 : 1);
-                if (targetIndex < 0 || !self.props.entries[targetIndex]) {
-                    targetIndex = currentIndex;
                 }
 
+                console.error('t1', targetIndex);
+                if (targetIndex < 0 || !self.props.entries[targetIndex]) {
+                    targetIndex = Math.min(0, currentIndex);
+                }
+                console.error('t2', targetIndex);
 
+
+                if (
+                    self.props.entries.length === 0 ||
+                    !self.props.entries[targetIndex]
+                ) {
+                    return;
+                }
                 console.error('cursor: ', self.props.entries[targetIndex].h);
 
                 var highlighted;
@@ -92,34 +194,75 @@ var BrowserEntries = React.createClass({
                     var lastIndex;
                     if (targetIndex < currentIndex) {
                         // up
+                        console.error('up');
                         firstIndex = targetIndex;
-                        lastIndex = currentIndex;
+                        if (self.state.highlighted && self.state.highlighted.length > 0) {
+                            // more items already selected..append to selection by altering last index
+                            lastIndex = self.getIndexByNodeId(
+                                self.state.highlighted[self.state.highlighted.length - 1],
+                                0
+                            );
+                        }
+                        else {
+                            lastIndex = currentIndex;
+                        }
                     }
                     else {
                         // down
-                        firstIndex = currentIndex;
+
+                        if (self.state.highlighted && self.state.highlighted.length > 0) {
+                            // more items already selected..append to selection by altering first index
+                            firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+                        }
+                        else {
+                            firstIndex = currentIndex;
+                        }
+
+                        console.error('down');
+
                         lastIndex = targetIndex;
                     }
 
                     console.error([firstIndex, lastIndex, currentIndex, targetIndex]);
 
-                    highlighted = self.props.entries
-                        .filter((n, index) => {
-                            return index >= firstIndex && index <= lastIndex;
-                        })
-                        .map((node) => { return node.h });
+                    highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
 
                     console.error(highlighted);
-                    self.setState({'highlighted': highlighted, cursor: self.props.entries[targetIndex].h});
-                    self.props.onHighlighted(highlighted);
+                    self.setSelectedAndHighlighted(highlighted, self.props.entries[targetIndex].h);
                 }
                 else {
                     highlighted = [self.props.entries[targetIndex].h];
-                    self.setState({'highlighted': highlighted, 'cursor': highlighted[0]});
-                    self.props.onHighlighted(highlighted);
+                    self.setSelectedAndHighlighted(highlighted, highlighted[0]);
                 }
             }
-            else if (keyCode === KEY_ENTER) {
+            else if (
+                (keyCode >= 48 && keyCode <= 57) ||
+                (keyCode >= 65 && keyCode <= 123) ||
+                keyCode > 255
+            ) {
+                charTyped = String.fromCharCode(keyCode).toLowerCase();
+
+                var foundMatchingNodes = self.props.entries.filter(function(node, index) {
+                    return node.name && node.name.substr(0, 1).toLowerCase() === charTyped;
+                });
+
+                if (self.lastCharKeyPressed === charTyped) {
+                    self.lastCharKeyIndex++;
+                }
+
+                self.lastCharKeyPressed = charTyped;
+
+                if (foundMatchingNodes.length > 0) {
+                    if (!foundMatchingNodes[self.lastCharKeyIndex]) {
+                        // start from the first entry
+                        self.lastCharKeyIndex = 0;
+                    }
+                    var foundNode = foundMatchingNodes[self.lastCharKeyIndex];
+
+                    self.setSelectedAndHighlighted([foundNode.h], foundNode.h);
+                }
+            }
+            else if (keyCode === KEY_ENTER || (e.metaKey && keyCode === KEY_DOWN)) {
                 var selectedNodes = [];
 
                 if (self.props.folderSelectNotAllowed === true) {
@@ -129,10 +272,28 @@ var BrowserEntries = React.createClass({
                             return entry.h === h;
                         });
 
-                        if (node && !node.t) {
+                        if (node && node.t === 0) {
                             selectedNodes.push(h);
                         }
                     });
+                    // if only folders were selected and no files..do open the cursor OR first folder selected
+                    if (selectedNodes.length === 0) {
+                        var cursorNode = self.state.cursor && M.getNodeByHandle(self.state.cursor);
+                        if (cursorNode.t === 1) {
+                            self.expandFolder(cursorNode.h);
+                            return;
+                        }
+                        else if (self.state.highlighted.length > 0) {
+                            // open/expand the first node, we know its a folder already.
+                            var firstNodeId = self.state.highlighted[0];
+                            self.expandFolder(firstNodeId);
+                            return;
+                        }
+                        else {
+                            // nothing selected, do nothing.
+                            return;
+                        }
+                    }
                 }
                 else {
                     selectedNodes = self.state.highlighted;
@@ -145,6 +306,12 @@ var BrowserEntries = React.createClass({
             else {
                 console.error(keyCode);
             }
+
+            // reset the quick finding feature vars if this was not a "quick find", e.g. charTyped was left empty.
+            if (!charTyped) {
+                self.lastCharKeyPressed = false;
+                self.lastCharKeyIndex = -1;
+            }
             // enter
         });
     },
@@ -152,24 +319,86 @@ var BrowserEntries = React.createClass({
         $(document.body).unbind('keydown.cloudBrowserModalDialog');
     },
     onEntryClick: function(e, node) {
+        var self = this;
+
+        self.lastCharKeyPressed = false;
+        self.lastCharKeyIndex = -1;
+
         e.stopPropagation();
         e.preventDefault();
 
-        this.setState({'highlighted': [node.h], 'cursor': false});
-        if (this.props.onHighlighted) {
-            this.props.onHighlighted([node.h]);
+        if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
+            self.setSelectedAndHighlighted([node.h], node.h);
         }
-        // If folder selected
-        if (this.props.folderSelectNotAllowed === true && node.t) {
-            this.setState({'selected': []});
-            this.props.onSelected([]);
-        } else {
-            this.setState({'selected': [node.h]});
-            this.props.onSelected([node.h]);
+        else if (e.shiftKey) {
+            // click + shift
+            var targetIndex = self.getIndexByNodeId(node.h, 0);
+            var firstIndex = 0;
+            if (self.state.highlighted && self.state.highlighted.length > 0) {
+                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+            }
+            var lastIndex = 0;
+            if (self.state.highlighted && self.state.highlighted.length > 0) {
+                lastIndex = self.getIndexByNodeId(
+                    self.state.highlighted[self.state.highlighted.length - 1],
+                    0
+                );
+            }
+
+            if (targetIndex < firstIndex) {
+                firstIndex = targetIndex;
+            }
+            if (targetIndex > lastIndex) {
+                lastIndex = targetIndex;
+            }
+            var highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
+
+            console.error(highlighted);
+            self.setSelectedAndHighlighted(highlighted, node.h);
+        }
+        else if (e.ctrlKey || e.metaKey) {
+            // ctrl or cmd/meta, e.g. add to selection
+            if (!self.state.highlighted || self.state.highlighted.indexOf(node.h) === -1) {
+                var highlighted = clone(self.state.highlighted || []);
+                if (self.props.folderSelectNotAllowed) {
+                    if (node.t === 1 && highlighted.length > 0) {
+                        return;
+                    }
+                    else if (
+                        highlighted.filter(function(nodeId) {
+                            var node = M.getNodeByHandle(nodeId);
+                            return node && node.t === 1
+                        }).length > 0) {
+                        // contains folders in selection
+                        highlighted = [];
+                    }
+                }
+                highlighted.push(node.h);
+                self.setSelectedAndHighlighted(highlighted, node.h);
+            }
+        }
+    },
+    expandFolder(nodeId) {
+        var self = this;
+        var node = M.getNodeByHandle(nodeId);
+        if (node) {
+            // reset quick search selection indexes
+            self.lastCharKeyPressed = false;
+            self.lastCharKeyIndex = -1;
+
+            // expand folder
+            self.setState({'selected': [], 'highlighted': []});
+            self.props.onSelected([]);
+            self.props.onHighlighted([]);
+            self.props.onExpand(node);
+            self.forceUpdate();
         }
     },
     onEntryDoubleClick: function(e, node) {
         var self = this;
+
+        self.lastCharKeyPressed = false;
+        self.lastCharKeyIndex = -1;
 
         e.stopPropagation();
         e.preventDefault();
@@ -241,7 +470,7 @@ var BrowserEntries = React.createClass({
 
             items.push(
                 <tr
-                    className={(isFolder ? " folder" :"") + (isHighlighted ? " ui-selected" : "")}
+                    className={"node_" + node.h + " " + (isFolder ? " folder" :"") + (isHighlighted ? " ui-selected" : "")}
                     onClick={(e) => {
                         self.onEntryClick(e, node);
                     }}
@@ -268,6 +497,9 @@ var BrowserEntries = React.createClass({
                                    selected={this.state.selected}
                                    highlighted={this.state.highlighted}
                                    entries={this.props.entries}
+                                   ref={(jsp) => {
+                                        self.jsp = jsp;
+                                   }}
                 >
                     <table className="grid-table fm-dialog-table">
                         <tbody>
@@ -553,6 +785,7 @@ var CloudBrowserDialog = React.createClass({
 
 
                 <BrowserEntries
+                    currentlyViewedEntry={self.state.currentlyViewedEntry}
                     entries={entries}
                     onExpand={(node) => {
                         self.onSelected([]);

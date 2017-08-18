@@ -171,7 +171,6 @@ function ellipsis(text, location, maxCharacters) {
 }
 
 function megatitle(nperc) {
-	return;
     if (!nperc) {
         nperc = '';
     }
@@ -809,28 +808,6 @@ function unixtimeToTimeString(timestamp) {
         + ":" + addZeroIfLenLessThen(date.getMinutes(), 2);
 }
 
-
-/**
- * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
- *
- * @param handle {string} mega user id
- * @returns {string} base32 formatted user id to be used when doing xmpp auth
- */
-function megaUserIdEncodeForXmpp(handle) {
-    var s = base64urldecode(handle);
-    return base32.encode(s);
-}
-
-/**
- * Simple method that will convert base32 strings -> Mega user ids
- *
- * @param handle {string} mega user id
- * @returns {string} base32 formatted user id to be used when doing xmpp auth
- */
-function megaJidToUserId(jid) {
-    var s = base32.decode(jid.split("@")[0]);
-    return base64urlencode(s).replace(/=/g, "");
-}
 
 /**
  * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)

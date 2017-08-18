@@ -90,6 +90,13 @@
 .tiny-icon.grey-plus-icon, .minimized .tiny-icon.grey-minus-icon {
     background-position: -51px -3609px;
 }
+.tiny-icon.green-tick, .tiny-icon.red-cross {
+    background-image: url(../images/mega/top-sprite_v3.png);
+    background-position: -12px -1437px;
+}
+.tiny-icon.red-cross {
+    background-position: -12px -1403px;
+}
 .small-icon.audio-call {
     background-position: -4px -38px;
 }
@@ -476,11 +483,11 @@
     background-position: center -2214px;
 }
 .tiny-icon.cog {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -17px -10463px;
 }
 .medium-icon.rocket {
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-position: -7px -16px;
 }
 .medium-icon.down-arrow {
@@ -488,8 +495,38 @@
     background-position: 0 -712px;
     width: 18px;
 }
+.medium-icon.icons-img {
+    background-image: url(../images/mega/icons-sprite_v5.png);
+}
+.medium-icon.icons-img.close {
+        background-position: -47px -687px;
+}
+.medium-icon.icons-img.chain {
+        background-position: -237px -129px;
+}
+.medium-icon.icons-img.arrow-in-circle {
+        background-position: -47px -631px;
+}
+.medium-icon.icons-img.heart {
+    background-position: -237px -495px;
+}
+.medium-icon.icons-img.broken-heart {
+    background-position: -237px -99px;
+}
+.medium-icon.icons-img.red-heart {
+    background-position: -111px -825px;
+}
+.medium-icon.icons-img.fullscreen {
+        background-position: -95px -580px;
+}
+.medium-icon.icons-img.lowscreen {
+        background-position: -141px -580px;
+}
+.medium-icon.icons-img.refresh {
+            background-position: -237px -347px;
+}
 .huge-white-icon.achievement {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     width: 72px;
     height: 72px;
 }
@@ -518,29 +555,29 @@
     background-position: -104px -353px;
 }
 .big-icon.cloud {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: 0px -10734px;
 }
 .big-icon.speedometer {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: 0px -10684px;
 }
 .semi-big-icon.cloud-up {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -7px -10390px;
 }
 .semi-big-icon.cloud-down {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -7px -10420px;
 }
 .medium-icon.cloud {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -11px -10817px;
     width: 24px;
     height: 24px;
 }
 .medium-icon.speedometer {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -11px -10851px;
     width: 24px;
     height: 24px;
@@ -549,55 +586,55 @@
     background-position: -3px -2971px;
 }
 .small-icon.grey-plus {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -14px -10991px;
 }
 .semi-small-icon.file {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -4px -11021px;
 }
 .semi-small-icon.folder {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -4px -11047px;
 }
 .semi-small-icon.left-arrow {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -29px -11019px;
 }
 .semi-small-icon.right-arrow {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -29px -11045px;
 }
 .semi-small-icon.rubbish {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -4px -11073px;
 }
 .semi-small-icon.rubbish-arrows {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -3px -11073px;
 }
 .semi-small-icon.linked {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -28px -11071px;
 }
 .semi-small-icon.star {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -4px -11097px;
 }
 .semi-small-icon.cloud {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -3px -11895px;
 }
 .semi-small-icon.down-arrow {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -29px -11895px;
 }
 .semi-small-icon.left-arrow-with-dot {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -2px -11916px;
 }
 .semi-small-icon.circle {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -3px -11937px;
 }
 .huge-icon.achievement {
@@ -631,37 +668,37 @@
     background-position: -2px -444px;
 }
 .semi-big-icon.cloud {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -9px -11163px;
 }
 .exceeded .semi-big-icon.cloud {
     background-position: -9px -11234px;
 }
 .semi-big-icon.speedometer {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -9px -11128px;
 }
 .exceeded .semi-big-icon.speedometer {
     background-position: -9px -11199px;
 }
 .semi-small-icon.tick {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -15px -11322px;
 }
 .semi-small-icon.dots {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -15px -11288px;
 }
 .semi-small-icon.rounded-arrow {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -15px -11363px;
 }
 .semi-small-icon.exclamation-point {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -15px -11404px;
 }
 .tiny-icon.membership-status {
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-position: -10px -979px;
     width: 16px;
 }
@@ -678,60 +715,72 @@
     background-position: -10px -1059px;
 }
 .semi-small-icon.grey-mega {
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-position: -10px -326px;
 }
 .semi-small-icon.yellow-triangle {
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-position: -10px -1266px;
 }
 .small-icon.dark-grey-plus {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -14px -11545px;
 }
 .small-icon.small-red-cross {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -14px -11624px;
 }
 .small-icon.file-upload {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -14px -11585px;
 }
 .small-icon.folder-upload {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -14px -11705px;
 }
 .small-icon.import-to-cloud {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -13px -4701px;
 }
 .small-icon.download-as-zip {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -13px -4733px;
 }
 .small-icon.pause-icon {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -14px -11505px;
 }
 .small-icon.play-icon {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -13px -11745px;
 }
 .small-icon.refresh-icon {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
     background-position: -14px -11665px;
 }
 .small-icon.green-arrow {
-    background-image: url(../images/mega/register-big-sprite-v12.png);
+    background-image: url(../images/mega/register-big-sprite-v13.png);
     background-position: 0px -56px;
 }
 .small-icon.blue-arrow {
-    background-image: url(../images/mega/register-big-sprite-v12.png);
+    background-image: url(../images/mega/register-big-sprite-v13.png);
     background-position: 0px -99px;
+}
+.small-icon.red-lens {
+    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-position: -192px -585px;
+}
+.small-icon.red-play {
+    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-position: -233px -585px;
+}
+.small-icon.small-play-icon {
+    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-position: -188px -634px;
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v4.png);
+    background-image: url(../images/mega/icons-sprite_v5.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -840,8 +889,15 @@
     height: 22px;
     margin: 0 13px 1px -1px;
 }
-.small-icon.context.cloud {
-    background-position: -102px -30px;
+.small-icon.context.cloud {}
+.dropdown-item:hover .small-icon.context.download-as-zip {
+    background-position: -141px -499px;
+}
+.dropdown-item:hover .small-icon.context.labels, .dropdown-item.opened .small-icon.context.labels {
+    background-position: -141px -99px;
+}
+.dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
+    background-position: -141px -138px;
 }
 .small-icon.context.folder-item {
     background-position: -100px -291px;
@@ -852,15 +908,6 @@
 /* hovers*/
 .dropdown-item:hover .small-icon.context.standart-download {
     background-position: -41px -499px;
-}
-.dropdown-item:hover .small-icon.context.download-as-zip {
-    background-position: -141px -499px;
-}
-.dropdown-item:hover .small-icon.context.labels, .dropdown-item.opened .small-icon.context.labels {
-    background-position: -141px -99px;
-}
-.dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
-    background-position: -141px -138px;
 }
 .dropdown-item:hover .small-icon.context.get-link {
     background-position: -240px -133px;
@@ -954,7 +1001,7 @@
 }
 /* End of Context menu icons */
 .huge-icon.storage-icon {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 20px -771px;
     background-repeat: no-repeat;
 }
@@ -962,23 +1009,38 @@
     background-position: 20px -651px;
 }
 .semi-small-icon.rocket {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: -156px -619px;
 }
 .semi-huge-icon.green-tick {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 0 -1045px;
 }
+.semi-huge-icon.speedometer {
+    background-image: url(../images/mega/account-sprite_v4.png);
+    background-position: -102px -1407px;
+    width: 68px;
+    height: 68px;
+}
+.semi-huge-icon.storage {
+    background-image: url(../images/mega/account-sprite_v4.png);
+    background-position: -2px -1406px;
+    width: 68px;
+    height: 68px;
+}
+.exceeded.achievements .semi-huge-icon.storage {
+    background-position: -2px -88px;
+}
 .semi-big-icon.blue-cloud {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: -100px -984px;
 }
 .semi-big-icon.green-speedometer {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: -100px -1032px;
 }
 .big-104px-icon.speedometer {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 2px -1269px;
 }
 .big-104px-icon.speedometer.almost-full {
@@ -988,11 +1050,86 @@
     background-position: -121px -790px;
     width: 52px;
     height: 52px;
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
 }
 .small-icon.clock {
-    background-image: url(../images/mega/icons-sprite_v4.png);
+    background-image: url(../images/mega/icons-sprite_v5.png);
     background-position: -79px -743px;
     width: 20px;
     height:22px;
+}
+
+
+i.icons-sprite {
+    background-image: url(../images/mega/icons-sprite_v5.png);
+}
+.medium-icon.icons-sprite.mega {
+    background-position: -49px -1004px;
+}
+.medium-icon.icons-sprite.big-mega, .big-button .medium-icon.icons-sprite.mega {
+        background-position: 2px -1006px;
+}
+.medium-icon.icons-sprite.download {
+        background-position: 0 -953px;
+}
+.small-icon.icons-sprite.dark-down-arrow {
+    background-position: 5px -870px;
+}
+.small-icon.icons-sprite.red-down-arrow {
+    background-position: -25px -870px;
+}
+.paused .small-icon.icons-sprite.red-down-arrow {
+    background-position: -55px -870px;
+}
+.small-icon.icons-sprite.mid-pause {
+    background-position: -86px -872px;
+}
+.small-icon.icons-sprite.mid-pause.active {
+    background-position: -146px -871px;
+}
+.semi-small-icon.icons-sprite.pause {
+    background-position: -117px -872px;
+}
+.active .semi-small-icon.icons-sprite.pause {
+    background-position: -146px -872px;
+}
+.semi-small-icon.icons-sprite.red-cross {
+    background-position: -71px -911px;
+}
+.semi-small-icon.icons-sprite.grey-down-arrow {
+    background-position: 4px -873px;
+}
+.semi-small-icon.icons-sprite.green-tick {
+    background-position: -28px -909px;
+    width: 23px;
+}
+.semi-small-icon.icons-sprite.lens {
+    background-position: -179px -873px;
+}
+.download.big-icon {
+    width: 74px;
+    height: 74px;
+    background-image: url(../images/mega/download-dialog.png);
+    background-position: -622px -81px;
+}
+.chrome .download.big-icon {
+    background-position: 2px -81px;
+}
+.safari .download.big-icon {
+    background-position: -282px -81px;
+}
+.ff .download.big-icon {
+    background-position: -412px -81px;
+}
+.edge .download.big-icon {
+    background-position: -412px -81px;
+}
+.opera .download.big-icon {
+    background-position: -82px -81px;
+}
+.ie .download.big-icon {
+    background-position: -522px -81px;
+}
+.default-warning .download.big-icon {
+    background-position: -708px -76px;
 }

@@ -40,6 +40,7 @@ var is_extension = is_chrome_firefox || is_electron || document.location.href.su
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
+var isWebkit = /webkit/.test(ua);
 
 /**
  * Check if the user is coming from a mobile device
@@ -48,14 +49,8 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 function isMobile() {
 
     // If extension, not applicable
-    if (is_chrome_firefox) {
+    if (is_extension) {
         return false;
-    }
-
-    // Useful for developing & testing the mobile site (this is below the is_chrome_firefox
-    // check above because the Firefox extension has not loaded localStorage yet and it breaks
-    if (localStorage.testMobileSite) {
-        return true;
     }
 
     var mobileStrings = [
@@ -63,7 +58,7 @@ function isMobile() {
         'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'
     ];
 
-    for (var i in mobileStrings) {
+    for (var i = mobileStrings.length; i--;) {
         if (ua.indexOf(mobileStrings[i]) > 0) {
             return true;
         }
@@ -78,6 +73,14 @@ function getSitePath() {
     if (hashLogic || isPublicLink(hash)) {
         return '/' + hash;
     }
+
+    if (location.host === 'webcache.googleusercontent.com') {
+        var m = String(location.href).match(/mega\.nz\/([\w-]+)/);
+        if (m) {
+            return '/' + m[1];
+        }
+    }
+
     return document.location.pathname;
 }
 
@@ -510,6 +513,7 @@ var mega = {
 
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
+if (localStorage.testMobileSite) is_mobile = m = true;
 if (typeof history == 'undefined') hashLogic=true;
 
 var bootstaticpath = staticpath;
@@ -1850,6 +1854,7 @@ else if (!b_u) {
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
+        jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
     } // !is_mobile
 
     // Transfers
@@ -1907,6 +1912,7 @@ else if (!b_u) {
         jsl.push({f: 'js/fm/dashboard.js', n: 'fmdashboard_js', j: 1, w: 5});
         jsl.push({f: 'js/fm/account.js', n: 'fm_account_js', j: 1});
         jsl.push({f: 'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j: 1});
+        jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f: 'js/ui/miniui.js', n: 'miniui_js', j: 1});
         jsl.push({f: 'html/key.html', n: 'key', j: 0});
         jsl.push({f: 'html/login.html', n: 'login', j: 0});
@@ -1914,6 +1920,7 @@ else if (!b_u) {
         jsl.push({f: 'html/top-login.html', n: 'top-login', j: 0});
         jsl.push({f: 'js/notify.js', n: 'notify_js', j: 1});
         jsl.push({f: 'js/popunda.js', n: 'popunda_js', j: 1});
+        jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f: 'css/user-card.css', n: 'user_card_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
     }
@@ -1925,6 +1932,7 @@ else if (!b_u) {
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2099,13 +2107,6 @@ else if (!b_u) {
             'webrtcsdp_js': {f:'js/chat/webrtcSdp.js', n: 'webrtcsdp_js', j:1},
             'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
             'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
-            'strophelight_js': {f:'js/vendor/chat/strophe.light.js', n: 'strophelight_js', j:1},
-            'strophedisco_js': {f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1},
-            'strophemuc_js': {f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1},
-            'stropheroster_js': {f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1},
-            'wildemitter_js': {f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1},
-            'hark_js': {f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1},
-            'base32_js': {f:'js/vendor/chat/base32.js', n: 'base32_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
@@ -2780,7 +2781,7 @@ else if (!b_u) {
         var esid='';
         if (u_storage.sid) esid = u_storage.sid;
         dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-        dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd(),'esid':esid }]));
+        dlxhr.send(JSON.stringify([{a: 'g', p: page.substr(1, 8), 'ad': showAd(), 'esid': esid}]));
     }
 }
 

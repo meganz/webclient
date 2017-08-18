@@ -586,6 +586,10 @@ TransferQueue.prototype.push = function(cl) {
             // Fire "Query bandwidth quota"
             api_req({a: 'qbq', s: size}, {
                 callback: function(res) {
+                    // 0 = User has sufficient quota
+                    // 1 = unregistered user, not enough quota
+                    // 2 = registered user, not enough quota
+                    // 3 = can't even get the first chunk
                     switch (res) {
                         case 1:
                         case 2:

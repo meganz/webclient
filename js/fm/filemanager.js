@@ -457,6 +457,14 @@ FileManager.prototype.initFileManagerUI = function() {
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
         a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
 
+        // Cleanup for scrollable context menu
+        var cnt = $('#cm_scroll').contents();
+        $('#cm_scroll').replaceWith(cnt);// Remove .context-scrollable-block
+        a.removeClass('mega-height');
+        a.find('> .context-top-arrow').remove();
+        a.find('> .context-bottom-arrow').remove();
+        a.css({ 'height': 'auto' });// In case that window is enlarged
+
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
     };
@@ -924,7 +932,7 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.import-item').rebind('click', function() {
         ASSERT(folderlink, 'Import needs to be used in folder links.');
 
-        fm_importflnodes($.selected);
+        M.importFolderLinkNodes($.selected);
     });
 
     $(c + '.newfolder-item').rebind('click', function() {
@@ -1007,7 +1015,7 @@ FileManager.prototype.initContextUI = function() {
         M.favourite($.selected, newFavState);
 
         if (M.viewmode) {
-            $('.file-block').removeClass('ui-selected');
+            $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         }
         else {
             $('.grid-table.fm tr').removeClass('ui-selected');
@@ -1106,14 +1114,11 @@ FileManager.prototype.initContextUI = function() {
         fm_tfsupdate();
 
         if (toabort.length) {
-            // FIXME: toabort is an array of transfers to abort, don't just pick the first element
-
-            var blk = String(toabort[0]).indexOf('ul_') !== -1 ? 'ul' : 'dl';
-            //               ^^^^^^^^^^
-
-            mega.ui.tpp.setTotal(-1, blk);
-            // mega.ui.tpp.setIndex(-1, blk);
-            mega.ui.tpp.updateIndexes(blk);
+            for (var i = toabort.length; i--;) {
+                var blk = String(toabort[i]).indexOf('ul_') !== -1 ? 'ul' : 'dl';
+                mega.ui.tpp.setTotal(-1, blk);
+                mega.ui.tpp.updateIndexes(blk);
+            }
         }
 
         onIdle(function() {
@@ -1124,7 +1129,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     if (localStorage.folderLinkImport) {
-        onIdle(fm_importflnodes);
+        onIdle(M.importFolderLinkNodes.bind(M));
     }
 };
 
@@ -1240,7 +1245,7 @@ FileManager.prototype.initUIKeyEvents = function() {
         var s = [];
         var tempSel;
         if (M.viewmode) {
-            tempSel = $('.file-block.ui-selected');
+            tempSel = $('.data-block-view.ui-selected');
         }
         else {
             tempSel = $('.grid-table tr.ui-selected');
@@ -1274,8 +1279,10 @@ FileManager.prototype.initUIKeyEvents = function() {
          * other day :)
          */
         if (!$.dialog && !slideshowid && M.viewmode == 1) {
-            var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
-            var total_rows = Math.ceil($('.file-block').size() / items_per_row);
+            var items_per_row = Math.floor(
+                $('.data-block-view').parent().outerWidth() / $('.data-block-view:first').outerWidth(true)
+             );
+            var total_rows = Math.ceil($('.data-block-view').size() / items_per_row);
 
             if (e.keyCode == 37) {
                 // left
@@ -1899,7 +1906,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     }
 
     $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e) {
-        $('.file-block').removeClass('ui-selected');
+        $(this).find('.data-block-view').removeClass('ui-selected');
         selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
         $.selected = [];
         $.hideTopMenu();
@@ -2049,14 +2056,14 @@ FileManager.prototype.addGridUI = function(refresh) {
     }
 
     $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
-        $('.file-block').removeClass('ui-selected');
+        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 6);
     });
 
     $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
-        $('.file-block').removeClass('ui-selected');
+        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 2);
@@ -2746,7 +2753,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
                     var c = '' + $(this).attr('class');
 
                     if (~c.indexOf('fm-import-to-cloudrive')) {
-                        fm_importflnodes([M.currentdirid]);
+                        M.importFolderLinkNodes([M.currentdirid]);
                     }
                     else if (~c.indexOf('fm-download-as-zip')) {
                         M.addDownload([M.currentdirid], true);

@@ -4,23 +4,38 @@
  * @param {String} status The status text
  * @param {Boolean} [ethrow] Throw the exception noted in `status`
  * @param {Number} [lock] Lock the DOM node in the transfers panel.
+ * @param {Boolean} [fatalError] Whther invoked from dlFatalEror()
  */
-function setTransferStatus(dl, status, ethrow, lock) {
+function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
-    if (text.length > 48) {
-        text = text.substr(0, 48) + "\u2026";
+
+    if (text.length > 56) {
+        text = text.substr(0, 56) + "\u2026";
     }
+
+    if (ethrow) {
+        fatalError = true;
+    }
+
     if (page === 'download') {
-        $('.download.error-icon').text(text);
-        $('.download.error-icon').removeClass('hidden');
-        $('.download.icons-block').addClass('hidden');
+        $('.download.main-transfer-info').addClass('hidden');
+        $('.download.main-transfer-error')
+            .removeClass('hidden')
+            .attr('title', status)
+            .find('span')
+            .text(text);
+
+        if (fatalError) {
+            setBrowserWarningClasses('.download.warning-block', 0, status);
+        }
     }
     else {
-        $('.transfer-table #' + id + ' td:eq(5)')
+        $('.transfer-table #' + id + ' .transfer-status')
             .attr('title', status)
             .text(text);
     }
+
     if (lock) {
         var $tr = $('.transfer-table #' + id)
             .addClass('transfer-completed')
@@ -31,10 +46,11 @@ function setTransferStatus(dl, status, ethrow, lock) {
             $tr.remove();
         }
     }
-    if (d) {
-        console.error(status);
-    }
+
     if (ethrow) {
+        if (d) {
+            console.error(status);
+        }
         throw status;
     }
 }
@@ -48,27 +64,6 @@ function setTransferStatus(dl, status, ethrow, lock) {
  */
 function dlFatalError(dl, error, ethrow, lock) {
     var awaitingPromise = dl.awaitingPromise;
-    var m = 'This issue should be resolved ';
-    if (ethrow === -0xDEADBEEF) {
-        ethrow = false;
-    }
-    else if (navigator.webkitGetUserMedia) {
-        m += 'exiting from Incognito mode.';
-        msgDialog('warninga', l[1676], m, error);
-    }
-    else if (navigator.msSaveOrOpenBlob) {
-        later(browserDialog);
-        m = l[1933];
-        msgDialog('warninga', l[1676], m, error);
-    }
-    else if (dlMethod === FlashIO) {
-        later(browserDialog);
-        m = l[1308];
-        msgDialog('warninga', l[1676], m, error);
-    }
-    else {
-        later(firefoxDialog);
-    }
 
     // Log the fatal error
     Soon(function() {
@@ -77,11 +72,13 @@ function dlFatalError(dl, error, ethrow, lock) {
         }
         error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
 
-        srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+        if (error.indexOf(l[16871]) < 0 && error.indexOf(l[16872]) < 0) {
+            srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+        }
     });
 
     // Set transfer status and abort it
-    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true);
+    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true, true);
     dlmanager.abort(dl);
 }
 

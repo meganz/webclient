@@ -774,9 +774,14 @@ function processEmailChangeActionPacket(ap) {
             else {
                 $elem.addClass('never');
             }
-            $elem.text(
-                time2last(ts)
-            );
+            if (time2last(ts)) {
+                $elem.text(
+                    time2last(ts)
+                );
+            }
+            else {
+                $elem.text(l[1051]);
+            }
 
             if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
                 // we need to resort
@@ -795,6 +800,7 @@ function processEmailChangeActionPacket(ap) {
 
 
             $elem.addClass('never');
+            $elem.text(l[1051]);
         };
 
         var $promise = new MegaPromise();

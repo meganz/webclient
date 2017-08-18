@@ -53,10 +53,13 @@ var Chatd = function(userId, options) {
     self.identity = Chatd.pack32le((Math.random() * 0xffffffff) | 0) +
                     Chatd.pack16le((Math.random() * 0xffff) | 0) +
                     Chatd.pack16le(Date.now() & 0xffff);
-    localStorage.setItem('chatdIdentity', self.identity);
+
+    localStorage.setItem('chatdIdentity', base64urlencode(self.identity));
+
     self.logger.debug("Generated new client identity: 0x",
                     Chatd.dumpToHex(self.identity, 0, 0, true));
     //    } else {
+    //        self.identity = base64urldecode(self.identity);
     //        assert(self.identity.length === 8);
     //    }
 
@@ -171,7 +174,7 @@ Chatd.Const = {
 };
 
 Chatd.MAX_KEEPALIVE_DELAY = 45000;
-Chatd.KEEPALIVE_PING_INTERVAL = 25000;
+Chatd.KEEPALIVE_PING_INTERVAL = 20000;
 
 // 1 hour is agreed by everyone.
 Chatd.MESSAGE_EXPIRY = 60 * 60; // 60*60
@@ -476,7 +479,6 @@ Chatd.Shard.prototype.reconnect = function() {
         self.chatd.trigger('onClose', {
             shard: self
         });
-        self.chatd.rtcHandler.onDisconnect(self);
     };
 };
 
@@ -494,7 +496,6 @@ Chatd.Shard.prototype.disconnect = function() {
         self.chatd.trigger('onClose', {
             shard: self
         });
-        self.chatd.rtcHandler.onDisconnect(self);
 
         self.s.onclose = null;
         self.s.onerror = null;
@@ -1129,7 +1130,7 @@ Chatd.prototype.leave = function(chatId) {
 
 // gracefully terminate all connections/calls
 Chatd.prototype.shutdown = function() {
-    this.rtcHandler.shutdown();
+    this.rtcHandler.onShutdown();
 };
 
 // submit a new message to the chatId

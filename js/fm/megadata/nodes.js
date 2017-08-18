@@ -868,7 +868,7 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
 
         // DOM update, left and right panel in 'Cloud Drive' tab
         $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newItemName);
-        $('#' + itemHandle + '.file-block .file-block-title').text(newItemName);
+        $('#' + itemHandle + '.data-block-view .file-block-title').text(newItemName);
 
         // DOM update, left and right panel in "Shared with me' tab
         $('#treea_' + itemHandle + ' span:nth-child(2)').text(newItemName);
@@ -994,7 +994,7 @@ MegaData.prototype.colourLabeling = function(handles, labelId) {
  */
 MegaData.prototype.favouriteDomUpdate = function(node, favState) {
     var $gridView = $('#' + node.h + ' .grid-status-icon');
-    var $blockView = $('#' + node.h + '.file-block .file-status-icon');
+    var $blockView = $('#' + node.h + '.data-block-view .file-status-icon');
 
     if (favState) {// Add favourite
         $gridView.addClass('star');
@@ -2089,4 +2089,90 @@ MegaData.prototype.disableDescendantFolders = function(id, pref) {
     }
 
     return true;
+};
+
+/**
+ * Import folderlink nodes
+ * @param {Array} nodes The array of nodes to import
+ */
+MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes) {
+    "use strict";
+
+    var _import = function(data) {
+        $.mcImport = true;
+        $.selected = data[0];
+        $.onImportCopyNodes = data[1];
+
+        if (d) {
+            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes);
+        }
+        $('.dropdown-item.copy-item').click();
+    };
+
+    if (localStorage.folderLinkImport && !folderlink) {
+
+        if ($.onImportCopyNodes) {
+            _import($.onImportCopyNodes);
+        }
+        else {
+            var kv = StorageDB(u_handle);
+            var key = 'import.' + localStorage.folderLinkImport;
+
+            kv.get(key)
+                .done(function(data) {
+                    _import(data);
+                    kv.rem(key);
+                })
+                .fail(function(e) {
+                    if (d) {
+                        console.error(e);
+                    }
+                    msgDialog('warninga', l[135], l[47]);
+                });
+        }
+        nodes = null;
+        delete localStorage.folderLinkImport;
+    }
+
+    var sel = [].concat(nodes || []);
+    if (sel.length) {
+        var FLRootID = M.RootID;
+
+        mega.ui.showLoginRequiredDialog().done(function() {
+            loadingDialog.show();
+            localStorage.folderLinkImport = FLRootID;
+
+            M.getCopyNodes(sel)
+                .done(function(nodes) {
+                    var data = [sel, nodes];
+                    var fallback = function() {
+                        $.onImportCopyNodes = data;
+                        loadSubPage('fm');
+                    };
+
+                    if (nodes.length > 6000) {
+                        fallback();
+                    }
+                    else {
+                        StorageDB(u_handle)
+                            .set('import.' + FLRootID, data)
+                            .done(function() {
+
+                                loadSubPage('fm');
+                            })
+                            .fail(function(e) {
+                                if (d) {
+                                    console.warn('Cannot import using indexedDB...', e);
+                                }
+                                fallback();
+                            });
+                    }
+                });
+        }).fail(function(aError) {
+            // If no aError, it was canceled
+            if (aError) {
+                alert(aError);
+            }
+        });
+    }
 };

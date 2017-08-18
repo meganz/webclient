@@ -661,6 +661,9 @@ function accountUI() {
         var $cancelButton = $saveBlock.find('.fm-account-cancel');
         var $saveButton = $saveBlock.find('.fm-account-save');
 
+        $('#account-new-password').val('');
+        $('#account-confirm-password').val('');
+
         // Reset change email fields after change
         $newEmail.val('');
         $emailInfoMessage.addClass('hidden');
@@ -738,31 +741,47 @@ function accountUI() {
         $saveButton.rebind('click', function() {
             $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            u_attr.firstname = $('#account-firstname').val().trim();
-            u_attr.lastname = $('#account-lastname').val().trim();
-            u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
-            u_attr.birthmonth = $('.default-select.month .default-dropdown-item.active').attr('data-value');
-            u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
-            u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
-
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
             $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
-            api_req({
-                a: 'up',
-                firstname: base64urlencode(to8(u_attr.firstname)),
-                lastname: base64urlencode(to8(u_attr.lastname)),
-                birthday: base64urlencode(u_attr.birthday),
-                birthmonth: base64urlencode(u_attr.birthmonth),
-                birthyear: base64urlencode(u_attr.birthyear),
-                country: base64urlencode(u_attr.country)
-            }, {
-                callback: function(res) {
-                    if (res === u_handle) {
-                        $('.user-name').text(u_attr.name);
+            var firstName = String($('#account-firstname').val().trim());
+            var lastName = String($('#account-lastname').val().trim());
+            var bDay = String($('.default-select.day .default-dropdown-item.active').attr('data-value'));
+            var bMonth = String($('.default-select.month .default-dropdown-item.active').attr('data-value'));
+            var bYear = String($('.default-select.year .default-dropdown-item.active').attr('data-value'));
+            var country = String($('.default-select.country .default-dropdown-item.active').attr('data-value'));
+
+            // If any of user attributes is changed then update them
+            if (u_attr.firstname !== firstName
+                    || u_attr.lastname !== lastName
+                    || u_attr.birthday !== bDay
+                    || u_attr.birthmonth !== bMonth
+                    || u_attr.birthyear !== bYear
+                    || u_attr.country !== country) {
+                u_attr.firstname = firstName;
+                u_attr.lastname = lastName;
+                u_attr.birthday = bDay;
+                u_attr.birthmonth = bMonth;
+                u_attr.birthyear = bYear;
+                u_attr.country = country;
+
+                api_req({
+                    a: 'up',
+                    firstname: base64urlencode(to8(u_attr.firstname)),
+                    lastname: base64urlencode(to8(u_attr.lastname)),
+                    birthday: base64urlencode(u_attr.birthday),
+                    birthmonth: base64urlencode(u_attr.birthmonth),
+                    birthyear: base64urlencode(u_attr.birthyear),
+                    country: base64urlencode(u_attr.country)
+                }, {
+                    callback: function(res) {
+                        if (res === u_handle) {
+                            $('.user-name').text(u_attr.name);
+                            showToast('settings', l[7698]);
+                        }
                     }
-                }
-            });
+                });
+            }
 
             var pws = zxcvbn($('#account-new-password').val());
 
@@ -788,7 +807,7 @@ function accountUI() {
                 });
             }
             else if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
-                msgDialog('warninga', 'Error', l[715], false, function() {
+                msgDialog('warninga', l[135], l[715], false, function() {
                     $('#account-new-password').val('');
                     $('#account-confirm-password').val('');
                     $('#account-new-password').focus();
@@ -797,7 +816,7 @@ function accountUI() {
             else if ($('#account-password').val() !== ''
                 && $('#account-confirm-password').val() !== '' && $('#account-new-password').val() !== '' && (pws.score === 0 || pws.entropy < 16)) {
 
-                msgDialog('warninga', 'Error', l[1129], false, function() {
+                msgDialog('warninga', l[135], l[1129], false, function() {
                     $('#account-new-password').val('');
                     $('#account-confirm-password').val('');
                     $('#account-new-password').focus();
@@ -821,17 +840,21 @@ function accountUI() {
                         }
                         else if (typeof res == 'number' && res < 0) { // something went wrong
                             $passwords.val('');
-                            msgDialog('warninga', 'Error', l[6972]);
+                            msgDialog('warninga', l[135], l[6972]);
                         }
                         else { // success
-                            msgDialog('info', l[726], l[725], false, function() {
-                               	var pw_aes = new sjcl.cipher.aes(prepare_key_pw($('#account-confirm-password').val()));
-                            	u_attr.k = a32_to_base64(encrypt_key(pw_aes, u_k));
-                                $passwords.val('');
-                            });
+                            showToast('settings', l[725]);
+                            var pw_aes = new sjcl.cipher.aes(prepare_key_pw($('#account-confirm-password').val()));
+                            u_attr.k = a32_to_base64(encrypt_key(pw_aes, u_k));
+                            $passwords.val('');
                         }
                     }
                 });
+            }
+            else if ($('#account-password').val() !== ''
+                    && $('#account-confirm-password').val() === $('#account-password').val()) {
+                msgDialog('warninga', l[135], l[16664]);
+                $passwords.val('');
             }
             else {
                 $passwords.val('');
@@ -848,7 +871,7 @@ function accountUI() {
                 // Request change of email
                 // e => new email address
                 // i => requesti (Always has the global variable requesti (last request ID))
-                api_req({a: 'se', aa: 'a', e: email, i: requesti}, {
+                api_req({ a: 'se', aa: 'a', e: email, i: requesti }, {
                     callback: function(res) {
 
                         loadingDialog.hide();
@@ -871,9 +894,9 @@ function accountUI() {
             }
 
             $('.fm-account-save-block').addClass('hidden');
-            showToast('settings', l[7698]);
             accountUI();
         });
+
         $('#current-email').val(u_attr.email);
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
@@ -1334,11 +1357,11 @@ function accountUI() {
                     proceed = true;
                 }
             if (!proceed) {
-                msgDialog('warninga', 'Error', 'Please select the voucher type.');
+                msgDialog('warninga', l[135], 'Please select the voucher type.');
                 return false;
             }
             if (!voucheramount) {
-                msgDialog('warninga', 'Error', 'Please enter a valid voucher amount.');
+                msgDialog('warninga', l[135], 'Please enter a valid voucher amount.');
                 return false;
             }
             if (vouchertype === '19.99') {

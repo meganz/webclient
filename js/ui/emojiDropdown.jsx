@@ -93,7 +93,7 @@ var DropdownEmojiSelector = React.createClass({
             }}
             src={
                 staticpath +
-                "images/mega/twemojis/2/72x72/" +
+                "images/mega/twemojis/2_v2/72x72/" +
                 filename + ".png"
             }
         />;
@@ -346,7 +346,7 @@ var DropdownEmojiSelector = React.createClass({
         if (!self.data_categoriesWithCustomOrder) {
             return;
         }
-        
+
         if (scrollPositionY === false) {
             scrollPositionY = self.scrollableArea.getScrollPositionY();
         }

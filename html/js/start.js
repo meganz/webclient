@@ -70,13 +70,30 @@ function init_start() {
     }
     else if (page === 'download') {
         $('.widget-block').hide();
-    }
-
+    }	
 	startCountRenderData = {'users':'','files':''};
-    start_counts();
-
+	if (is_mobile) {		
+		$(window).rebind('scroll.counter',function() {
+			if (page == 'start') {
+				$.lastScrollTime = Date.now();
+				start_counts();
+			}
+		});
+	}
+	else {
+		$(window).rebind('resize.counter',function() {
+			$.lastScrollTime = Date.now();
+		});
+		$('#startholder').rebind('scroll.counter',function()
+		{
+			if (page == 'start' || page == 'download')
+			{
+				$.lastScrollTime = Date.now();
+				start_counts();
+			}
+		});
+	}
 	$('.bottom-page.top-header').text($('.bottom-page.top-header').text().replace('[A]','').replace('[/A]',''));
-
 	if (achieve_data) {
 		start_achievements(achieve_data);
 	}
@@ -89,7 +106,6 @@ function init_start() {
 			}
 		});
 	}
-
 	if (getCleanSitePath() === 'mobile') {
 		setTimeout(function() {
 			var offset = $(".bottom-page.bott-pad.mobile").offset();
@@ -99,14 +115,9 @@ function init_start() {
 			}
 		}, 1000);
 	}
-		
-	$('.bottom-page.scroll-block.startpage').rebind('scroll.limitcounter',function() {
-		if (page == 'start') start_countLimit = Date.now();
-	});
 }
 
 var start_countLimit = 0;
-
 
 function start_achievements(res)
 {
@@ -130,8 +141,9 @@ function start_achievements(res)
 
 var start_countdata = false;
 
-function start_counts() {
+function start_counts() {	
 	if (start_countdata) return;
+	else $('.bottom-page.white-block.counter').addClass('hidden');
 	start_countdata=true;
 	start_APIcount();
 }
@@ -141,11 +153,12 @@ function start_APIcount() {
 	if (start_APIcount_inflight) return;
 	start_APIcount_inflight=true;
 	api_req({"a":"dailystats"}, {
-		callback: function(res) {
+		callback: function(res) {			
+			$('.bottom-page.white-block.counter').removeClass('hidden');
 			start_APIcountdata=res;
 			start_APIcountdata.timestamp = Date.now();
 			start_APIcount_inflight=false;
-			if (!start_countUpdate_inflight && page == 'start') start_countUpdate();
+			if (!start_countUpdate_inflight && (page == 'start' || page == 'download')) start_countUpdate();
 		}
 	});
 }
@@ -155,14 +168,12 @@ startCountRenderData = {};
 
 var RandomFactorTimestamp = 0;
 var start_Lcd = {};
+var countUpdateInterval = 30;
 
 function start_countUpdate() {
-	
-	
-	
 	if (!start_countUpdate_inflight) startCountRenderData = {'users':'','files':''};
 	start_countUpdate_inflight=true;
-	if (page !== 'start') {
+	if (page != 'start' && page != 'download') {
 		start_countdata=false;
 		start_countUpdate_inflight=false;
 		return false;
@@ -175,7 +186,7 @@ function start_countUpdate() {
 	var usersFactor = 1;
 	if (start_Lcd.timestamp+10 < Date.now()) {
 		var rate = (Date.now() - start_Lcd.timestamp) / 86400000;
-		if (start_APIcountdata.timestamp > start_Lcd.ts+5000 && start_APIcountdata.timestamp+5000 > Date.now()) {
+		if (start_APIcountdata.timestamp > start_Lcd.ts+30000 && start_APIcountdata.timestamp+30000 > Date.now()) {
 			if (start_Lcd.users > start_APIcountdata.confirmedusers.total) usersFactor = 0.3;
 			else if (start_Lcd.users < start_APIcountdata.confirmedusers.total) usersFactor = 2;
 			if (start_Lcd.files > start_APIcountdata.files.total) filesFactor = 0.3;
@@ -185,10 +196,12 @@ function start_countUpdate() {
 			filesFactor = 1;
 			usersFactor = 1;
 		}
+		
 		if (RandomFactorTimestamp+500 < Date.now()) {
 			filesFactor *= Math.random()*.1-.05;
 			RandomFactorTimestamp = Date.now();
-		}
+		}		
+		
 		start_Lcd.users += rate * usersFactor * start_APIcountdata.confirmedusers.dailydelta;
 		start_Lcd.files += rate * filesFactor * start_APIcountdata.files.dailydelta;
 		start_Lcd.timestamp = Date.now();
@@ -209,30 +222,23 @@ function start_countUpdate() {
 		}
 		startCountRenderData[type] = total;
 	}
-	renderCounts(String(Math.round(start_Lcd.users)),'users');
-	renderCounts(String(Math.round(start_Lcd.files)),'files');
-	var t=30;
-	
-	if (start_countLimit+100 > Date.now()) t=500;
-	setTimeout(start_countUpdate,t);
-	if (start_APIcountdata.timestamp+5000 < Date.now()) start_APIcount();
-}
-/*
-function bottompageScroll() {
-    $('.bottom-page.top-bl').height($('body').height());
-    $('.bottom-page.scroll-block').jScrollPane({
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true
-    });
-    jScrollFade('.bottom-page.scroll-block');
+
+	// do not render the counter while scrolling or resizing, as some browsers have real difficulty with it
+	// only render the counter every 2000ms if invisible
+	// only perform the visibility check shortly ater scrolling or resizing, as it's CPU intensive
+
+	if ($.lastScrollTime+100 < Date.now()) {
+		if ($.lastScrollTime < Date.now()+200) {
+			if ($('.startpage.flip-wrapper.users').visible() || $('.startpage.flip-wrapper.files').visible() || $('.bottom-page.big-icon.registered-users').visible()) $.counterVisible=true;
+			else $.counterVisible=false;
+		}
+		if ($.counterVisible || !$.lastCounterRender || $.lastCounterRender+2000 < Date.now()) {
+			renderCounts(String(Math.round(start_Lcd.users)),'users');
+			renderCounts(String(Math.round(start_Lcd.files)),'files');			
+			$.lastCounterRender=Date.now();
+		}
+	}	
+	setTimeout(start_countUpdate,30);
+	if (start_APIcountdata.timestamp+30000 < Date.now()) start_APIcount();
 }
 
-function initBottompageScroll() {
-    setTimeout(bottompageScroll, 300);
-
-    $(window).rebind('resize.bottompage', function(e) {
-        bottompageScroll()
-    });
-}
-*/

@@ -64,7 +64,7 @@ var ConversationsListItem = React.createClass({
             classString += ' groupchat';
         }
         else {
-            return "unknown room type: " + chatRoom.roomId.split("@")[0];
+            return "unknown room type: " + chatRoom.roomId;
         }
 
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
@@ -288,7 +288,7 @@ var ConversationsList = React.createClass({
 
             currConvsList.push(
                 <ConversationsListItem
-                    key={chatRoom.roomId.split("@")[0]}
+                    key={chatRoom.roomId}
                     chatRoom={chatRoom}
                     contact={contact}
                     messages={chatRoom.messagesBuff}

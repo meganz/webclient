@@ -1625,7 +1625,7 @@ function tree_residue(fm, ctx) {
     "use strict";
 
     // store the residual f response for perusal once all workers signal that they're done
-    residualfm = fm[0];
+    residualfm = fm[0] || false;
 
     // request an "I am done" confirmation ({}) from all workers
     if (workers) {
@@ -2731,25 +2731,6 @@ function init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
 
-            // XXX: Prevent known Strophe exceptions...
-            ['_onIdle', '_connect'].forEach(function(fn) {
-                var proto = Strophe.Websocket.prototype;
-                var unsafeFn = '_unsafe' + fn;
-
-                if (!proto[unsafeFn]) {
-                    proto[unsafeFn] = proto[fn];
-                    proto[fn] = function() {
-                        try {
-                            this[unsafeFn].apply(this, arguments);
-                        }
-                        catch (ex) {
-                            console.error('Caught Strophe exception.', ex);
-                        }
-                    };
-                }
-                proto = undefined;
-            });
-
             var _chat = new Chat();
 
             // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)
@@ -2782,8 +2763,14 @@ function init_chat() {
 }
 
 function loadfm_callback(res) {
-    if (res[0] == '-') {
-        msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
+    'use strict';
+
+    if ((parseInt(res) | 0) < 0) {
+        loadingDialog.hide();
+        loadingInitDialog.hide();
+
+        // tell the user we were unable to retrieve the cloud drive contents, upon clicking OK redirect to /support
+        msgDialog('warninga', l[1311], l[16892], api_strerror(res), loadSubPage.bind(null, 'support'));
         return;
     }
 
@@ -3039,54 +3026,27 @@ function loadfm_done(mDBload) {
         mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = Date.now();
 
-        if (fmdb && loadfm.onDemandFolders && 0) {
-            // fetch second-level and tree nodes (to show the little arrows in the tree)
-            var folders = loadfm.onDemandFolders;
-            if (fmconfig.treenodes) {
-                folders = array.unique(folders.concat(Object.keys(fmconfig.treenodes)));
-            }
+        // are we actually on an #fm/* page?
+        if (page !== 'start' && is_fm() || $('.fm-main.default').is(":visible")) {
+            promise = M.initFileManager();
 
-            for (var i = folders.length; i--;) {
-                if (M.c[folders[i]]) {
-                    folders.splice(i, 1);
-                }
-            }
+            mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
 
-            if (folders.length) {
-                promise = new MegaPromise();
-                fmdb.getbykey('f', 'h', ['p', folders])
-                    .always(function(r) {
-                        for (var i = r.length; i--;) {
-                            emplacenode(r[i]);
-                        }
-                        promise.resolve();
-                    });
+            // load report - time to fm after last byte received
+            mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
+
+            // setup fm-notifications such as 'full' or 'almost-full' if needed.
+            if (!pfid && u_type) {
+                M.checkStorageQuota(50);
             }
         }
+        else {
+            mega.loadReport.ttfm = -1;
+            mega.loadReport.renderfm = -1;
+        }
 
-        promise.always(function() {
-            // are we actually on an #fm/* page?
-            if (page !== 'start' && is_fm() || $('.fm-main.default').is(":visible")) {
-                promise = M.initFileManager();
-
-                mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;
-                mega.loadReport.stepTimeStamp = Date.now();
-
-                // load report - time to fm after last byte received
-                mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
-
-                // setup fm-notifications such as 'full' or 'almost-full' if needed.
-                if (!pfid && u_type) {
-                    M.checkStorageQuota(50);
-                }
-            }
-            else {
-                mega.loadReport.ttfm = -1;
-                mega.loadReport.renderfm = -1;
-            }
-
-            promise.always(_completion);
-        });
+        promise.always(_completion);
     });
 }
 
@@ -3261,7 +3221,7 @@ function fm_thumbnail_render(n) {
         if (imgNode && (imgNode = imgNode.querySelector('img'))) {
             n.seen = 2;
             imgNode.setAttribute('src', thumbnails[n.h]);
-            imgNode.parentNode.classList.add('thumb');
+            imgNode.parentNode.parentNode.classList.add('thumb');
         }
     }
 }

@@ -327,6 +327,18 @@ var GenericConversationMessage = React.createClass({
                                 </span>
                             }
                             if (contact.u === u_handle) {
+                                var revokeButton = null;
+
+                                if (message.isEditable && message.isEditable()) {
+                                    revokeButton = <DropdownsUI.DropdownItem icon="red-cross" label={__(l[8909])}
+                                                className="red" onClick={() => {
+                                                    chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
+                                                        chatRoom,
+                                                        message.internalId ? message.internalId : message.orderValue,
+                                                    ""
+                                                    );
+                                              }} />
+                                }
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
                                     icon="tiny-icon grey-down-arrow">
@@ -341,12 +353,9 @@ var GenericConversationMessage = React.createClass({
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
 
-                                        <hr />
+                                        {revokeButton ? <hr /> : ""}
+                                        {revokeButton}
 
-                                        <DropdownsUI.DropdownItem icon="red-cross" label={__(l[8909])} className="red"
-                                                                  onClick={() => {
-                                                chatRoom.revokeAttachment(v);
-                                            }}/>
                                     </DropdownsUI.Dropdown>
                                 </ButtonsUI.Button>;
                             }
@@ -408,8 +417,8 @@ var GenericConversationMessage = React.createClass({
                                     {dropdown}
 
                                     <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                         width="120"
-                                         height="120"
+                                         width="156"
+                                         height="156"
                                          onClick={startPreview}
                                     />
                                 </div>) :  preview);
@@ -757,12 +766,8 @@ var GenericConversationMessage = React.createClass({
                         }}
                     />;
                 }
-                else if(message.deleted) {
-                    messageDisplayBlock =  <div className="message text-block">
-                        <em>
-                            {__(l[8886])}
-                        </em>
-                    </div>;
+                else if (message.deleted) {
+                    return null;
                 }
                 else {
                     if (message.updated > 0) {

@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm12_';
+    var dbpfx = 'fm14_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -785,6 +785,26 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 // (dirty reads are supported by scanning the pending writes after the IndexedDB read completes)
 // anyof and where are mutually exclusive, FIXME: add post-anyof where filtering?
 FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, limit) {
+    'use strict';
+
+    if (!window.chrome || !anyof || !Object.keys(this.pending[0]).length) {
+        return this.getbykey1.apply(this, arguments);
+    }
+
+    var fmdb = this;
+    var promise = new MegaPromise();
+    var args = toArray.apply(null, arguments);
+
+    onIdle(function() {
+        // XXX: Dexie.anyOf() is bugged when there are pending writes...
+        //      dispatching this delayed should help to settle the transaction data
+        promise.linkDoneAndFailTo(fmdb.getbykey1.apply(fmdb, args));
+    });
+
+    return promise;
+};
+// @private
+FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, limit) {
     "use strict";
 
     if (!this.up() || anyof && !anyof[1].length) {
@@ -812,7 +832,12 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, lim
             anyof[1][i] = ab_to_base64(this.strcrypt(anyof[1][i]));
         }
 
-        t = t.where(anyof[0]).anyOf(anyof[1]);
+        if (anyof[1].length > 1) {
+            t = t.where(anyof[0]).anyOf(anyof[1]);
+        }
+        else {
+            t = t.where(anyof[0]).equals(anyof[1][0]);
+        }
     }
     else {
         for (var k = where.length; k--; ) {
@@ -854,7 +879,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, lim
             var t = pendingch[tid][table];
 
             // any updates pending for this table?
-            if (t && t[t.h] && t[t.h].length) {
+            if (t && (t[t.h] && t[t.h].length || t[t.h-1] && t[t.h-1].length)) {
                 // examine update actions in reverse chronological order
                 // FIXME: can stop the loop at t.t for non-transactional writes
                 for (var a = t.h; a >= 0; a--) {

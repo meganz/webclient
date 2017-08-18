@@ -38,6 +38,8 @@
 
         <a class="fm-avatar"></a>
 
+        <div class="top-icon pass-reminder hidden"><div class="dark-tooltip top">[$16901]</div></div>
+
         <div class="top-chat-notification hidden"><span class="notification-num" style="display: none;">0</span></div>
 
         <div class="top-buttons">
@@ -148,72 +150,6 @@
             </div>
         </div>
 
-        <div class="top-menu-popup hidden">
-            <div class="top-icon close"></div>
-            <div class="top-menu-scroll">
-                <div class="top-menu-content">
-                    <div class="top-menu-item account"><span class="right-el">[$435]</span><span>[$187]</span></div>
-                    <div class="top-menu-item upgrade-your-account">[$433]</div>
-                    <div class="top-menu-item backup"><span class="right-el"><i class="semi-small-icon yellow-triangle"></i></span><span>[$8921]</span></div>
-                    <div class="top-menu-item refresh-item">[$85]</div>
-                    <div class="top-menu-item logout">[$967]</div>
-                    <div class="top-menu-item login">[$171]</div>
-                    <div class="top-menu-item register">[$968]</div>
-                    <div class="top-menu-divider"></div>
-
-                    <div class="top-menu-item blog blogarticle">[$389]</div>
-                    <div class="top-menu-item help">[$384]</div>
-                    <div class="top-menu-item support">[$516]</div>
-                    <div class="top-menu-item upgrade-your-account pro">[$16111]</div>
-                    <div class="top-menu-item resellers">[$391]</div>
-                    <div class="top-menu-item languages"><span class="right-el">EN</span><span>[$670]</span></div>
-                    <div class="top-menu-divider"></div>
-
-                    <div class="top-menu-item about">[$16112]</div>
-                    <div class="top-menu-item privacycompany">[$16113]</div>
-                    <div class="top-menu-item contact">[$399]</div>
-                    <div class="top-menu-item feedback">[$1356]</div>
-                    <div class="top-menu-divider"></div>
-
-                    <div class="top-menu-item submenu-item">[$961]</div>
-                    <div class="top-submenu">
-						<div class="top-menu-item ios">[$16538]</div>
-                        <div class="top-menu-item android">[$16539]</div>						
-						<div class="top-menu-item wp">[$16540]</div>
-                        <div class="top-menu-item sync">[$956]</div>
-                        <div class="top-menu-item extensions">[$16603]</div>
-                        <div class="top-menu-item megabird">MEGAbird</div>
-                        <div class="top-menu-item cmd">MEGAcmd</div>
-                    </div>
-
-                    <div class="top-menu-item submenu-item">[$392]</div>
-                    <div class="top-submenu">
-                        <div class="top-menu-item sourcecode">[$7411]</div>
-                        <div class="top-menu-item sdk">[$962]</div>
-                        <div class="top-menu-item doc">[$963]</div>
-                    </div>
-
-                    <div class="top-menu-item submenu-item">[$16114]</div>
-                    <div class="top-submenu">
-                        <div class="top-menu-item terms">[$385]</div>
-                        <div class="top-menu-item privacy">[$386]</div>
-                        <div class="top-menu-item copyright">[$387]</div>
-                        <div class="top-menu-item takedown">[$966]</div>
-                        <div class="top-menu-item general">[$1712]</div>
-                    </div>
-
-                    <div class="top-social-bl">
-                        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button"></a>
-                        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>
-                    </div>
-
-                    <div class="top-mega-version">
-                        v. dev
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="dropdown body popup dropdown-arrow notification-popup empty hidden">
             <i class="dropdown-white-arrow"></i>
             <div class="notification-header">
@@ -304,5 +240,125 @@
             </div>
         </div>
 
+        <div class="dropdown body popup dropdown-arrow pass-reminder hidden">
+            <i class="dropdown-white-arrow"></i>
+            <div class="fm-dialog-close"></div>
+            <div class="nw-fm-dialog-title big">[$16895]</div>
+            <div class="dropdown content-block">
+                <div class="bottom-page big-icon pass-reminder centered"></div>
+                <div class="pass-reminder info-txt">
+                    <!-- l[16900] -->
+                </div>
+                <div class="dialog input-wrapper ">
+                    <!-- Please add 'wrong' class is password is incorrect !-->
+                    <div class="dialog big-input-bg">
+                        <input type="password" value="" name="test-pass1" id="test-pass" placeholder="[$16896]" autocomplete="off">
+                    </div>
+                    <div class="dialog input-button">
+                        <div class="default-white-button semi-big grey-txt confirm-password button-prd-confirm">
+                            [$6080]
+                        </div>
+                    </div>
+                </div>
+                <div class="pass-reminder result-block">
+                    <!-- Please remove 'hidden' class is password is correct !-->
+                    <div class="pass-reminder result-txt accepted hidden">
+                        <i class="tiny-icon green-tick"></i>
+                        [$16897]
+                    </div>
+                    <!-- Please remove 'hidden' class is password is wrong !-->
+                    <div class="pass-reminder result-txt wrong hidden">
+                        <i class="tiny-icon red-cross"></i>
+                        [$16898]
+                    </div>
+                </div>
+                <div class="pass-reminder light info-txt">
+                    [$16899]
+                </div>
+                <div class="pass-reminder big-buttons">
+                    <div class="default-big-button grey-gradient button-without-outline inline button-prd-backup">
+                        <span>[$8859]</span>
+                    </div>
+                    <div class="default-big-button button-without-outline inline button-prd-skip">
+                        <span>[$1379]</span>
+                    </div>
+                </div>
+
+                <div class="centered-checkbox dialog-bottom">
+                    <div class="checkdiv checkboxOff">
+                        <input type="checkbox" name="pass-recovery-checkbox" id="pass-recovery-checkbox" class="checkboxOff">
+                    </div>
+                    <label for="pass-recovery-checkbox" class="radio-txt medium">[$229]</label>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="top-menu-popup hidden">
+    <div class="top-icon close"></div>
+    <div class="top-menu-scroll">
+        <div class="top-menu-content">
+            <div class="top-menu-item account"><span class="right-el">[$435]</span><span>[$187]</span></div>
+            <div class="top-menu-item upgrade-your-account">[$433]</div>
+            <div class="top-menu-item backup"><span class="right-el"><i class="semi-small-icon yellow-triangle"></i></span><span>[$8921]</span></div>
+            <div class="top-menu-item refresh-item">[$85]</div>
+            <div class="top-menu-item logout">[$967]</div>
+            <div class="top-menu-item login">[$171]</div>
+            <div class="top-menu-item register">[$968]</div>
+            <div class="top-menu-divider"></div>
+
+            <div class="top-menu-item blog blogarticle">[$389]</div>
+            <div class="top-menu-item help">[$384]</div>
+            <div class="top-menu-item support">[$516]</div>
+            <div class="top-menu-item upgrade-your-account pro">[$16111]</div>
+            <div class="top-menu-item resellers">[$391]</div>
+            <div class="top-menu-item languages"><span class="right-el">EN</span><span>[$670]</span></div>
+            <div class="top-menu-divider"></div>
+
+            <div class="top-menu-item about">[$16112]</div>
+            <div class="top-menu-item privacycompany">[$16113]</div>
+            <div class="top-menu-item contact">[$399]</div>
+            <div class="top-menu-item feedback">[$1356]</div>
+            <div class="top-menu-divider"></div>
+
+            <div class="top-menu-item submenu-item">[$961]</div>
+            <div class="top-submenu">
+                <div class="top-menu-item ios">[$16538]</div>
+                <div class="top-menu-item android">[$16539]</div>
+                <div class="top-menu-item wp">[$16540]</div>
+                <div class="top-menu-item sync">[$956]</div>
+                <div class="top-menu-item extensions">[$16603]</div>
+                <div class="top-menu-item megabird">MEGAbird</div>
+                <div class="top-menu-item cmd">MEGAcmd</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">[$392]</div>
+            <div class="top-submenu">
+                <div class="top-menu-item sourcecode">[$7411]</div>
+                <div class="top-menu-item sdk">[$962]</div>
+                <div class="top-menu-item doc">[$963]</div>
+            </div>
+
+            <div class="top-menu-item submenu-item">[$16114]</div>
+            <div class="top-submenu">
+                <div class="top-menu-item terms">[$385]</div>
+                <div class="top-menu-item privacy">[$386]</div>
+                <div class="top-menu-item copyright">[$387]</div>
+                <div class="top-menu-item takedown">[$966]</div>
+                <div class="top-menu-item general">[$1712]</div>
+            </div>
+
+            <div class="top-social-bl">
+                <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button"></a>
+                <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>
+            </div>
+
+            <div class="top-mega-version">
+                v. dev
+            </div>
+        </div>
     </div>
 </div>

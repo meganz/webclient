@@ -1,6 +1,5 @@
 <div class="dark-overlay hidden"></div>
 <div class="light-overlay hidden"></div>
-<div class="slideshow-overlay hidden"></div>
 
 <div class="loading-spinner hidden">
     <div class="main-loader"></div>
@@ -197,7 +196,7 @@
 <div class="fm-dialog dlkey-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$1026]</div>
-        <div class="fm-dialog-close"></div>
+        <!--div class="fm-dialog-close"></div-->
         <div class="clear"></div>
     </div>
     <div class="fm-dialog-body">
@@ -942,57 +941,6 @@
         </div>
         <div class="clear"></div>
     </div>
-</div>
-
-<div class="slideshow-dialog hidden" style="width:700px; height:500px;">
-    <div class="slideshow-top-bar">
-        <div class="slideshow-filename">filename.jpg</div>
-        <div class="slideshow-icon close-slideshow"></div>
-        <div class="slideshow-image-buttons">
-            <div class="slideshow-icon slideshow-line"></div>
-            <div class="slideshow-icon slideshow-getlink">
-                [$59]
-            </div>
-            <div class="slideshow-icon slideshow-line"></div>
-            <div class="slideshow-icon slideshow-download">
-                <span>[$58]</span>
-            </div>
-            <div class="clear"></div>
-        </div>
-        <div class="clear"></div>
-    </div>
-    <div class="slideshow-prev-button">
-        <div class="slideshow-prev-icon"></div>
-    </div>
-    <div class="slideshow-next-button active">
-        <div class="slideshow-next-icon"></div>
-    </div>
-    <div class="slideshow-image-bl">
-        <img alt="" class="slideshow-image" />
-    </div>
-
-    <div class="slideshow-pending hidden"></div>
-
-    <div class="slideshow-error hidden">
-        <div class="slideshow-error-icon"></div>
-        <div class="slideshow-error-header">
-            [$135]
-        </div>
-        <div class="slideshow-error-txt">
-        </div>
-        <div class="slideshow-error-buttons">
-            <div class="slideshow-error-button slideshow-refresh">
-                [$85]
-            </div>
-            <div class="slideshow-error-button slideshow-error-close">
-                [$1898]
-            </div>
-        </div>
-    </div>
-    <div class="slideshow-progress percents-78 hidden">
-        <div class="slideshow-progress-icon"></div>
-    </div>
-
 </div>
 
 <div class="create-new-folder dropdown body popup dropdown-arrow hidden">
@@ -1906,6 +1854,7 @@
     </div>
 </div>
 
+<!-- Please add "warning" classname !-->
 <div class="nw-dark-overlay megasync-overlay hidden">
     <div class="megasync-close"></div>
     <div class="megasync-close-txt">[$6951]</div>
@@ -1976,70 +1925,89 @@
     </div>
     <div class="megasync-content slider slide1">
         <div class="fm-dialog-header">
-            <div class="fm-dialog-close"></div>
+            <div class="fm-dialog-close big"></div>
             <div class="clear"></div>
         </div>
         <div class="megasync-body">
-        <div class="megasync-slider main-block">
-            <div class="megasync-slider body-block">
+            <div class="megasync-slider main-block">
+                <div class="megasync-slider-wrap">
+                    <div class="megasync-slider body-block">
 
-                <div class="megasync-slide slide1">
-                    <div class="megasync-header">
-                        [$8426]
+                        <div class="megasync-slide slide1">
+                            <div class="megasync-header">
+                                [$16861]
+                            </div>
+                            <div class="megasync-img img1">
+                                <div class="megasync-text">
+                                    [$16862]
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="megasync-slide slide2">
+                            <div class="megasync-header">
+                                [$16863]
+                            </div>
+                            <div class="megasync-img img2">
+                                <div class="megasync-text">
+                                    [$16582]
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="megasync-slide slide3">
+                            <div class="megasync-header">
+                                [$16864]
+                            </div>
+                            <div class="megasync-features">
+                                <div class="megasync-text">
+                                    [$16873]
+                                </div>
+                                <div class="megasync-feature">
+                                    <div class="bottom-page big-icon folders"></div>
+                                    <div class="megasync-feature-txt">
+                                        [$16585]
+                                    </div>
+                                </div>
+                                <div class="megasync-feature">
+                                    <div class="bottom-page big-icon arrows"></div>
+                                    <div class="megasync-feature-txt">
+                                        [$16587]
+                                    </div>
+                                </div>
+                                <div class="megasync-feature">
+                                    <div class="bottom-page big-icon up-down"></div>
+                                    <div class="megasync-feature-txt">
+                                        Browser accelerator
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="clear"></div>
                     </div>
-                    <div class="megasync-img1"></div>
+
+                    <div class="megasync-slider button prev"></div>
+                    <div class="megasync-slider button next"></div>
+
+                    <div class="megasync-controls">
+                        <div class="active" data-slidernum="1"></div>
+                        <div data-slidernum="2"></div>
+                        <div data-slidernum="3"></div>
+                    </div>
+                    <div class="megasync-buttons">
+                        <div class="download big-button red download-megasync transition">
+                            [$1913]
+                        </div>
+                    </div>
                 </div>
-
-                <div class="megasync-slide slide2">
-                    <div class="megasync-header">
-                        [$8427]
-                    </div>
-                    <div class="megasync-img2"></div>
-                    <div class="megasync-info-txt">
-                        [$8428]
-                    </div>
-                    <div class="megasync-info-arrow"></div>
-                </div>
-
-                <div class="megasync-slide slide3">
-                    <div class="megasync-header">
-                        <div class="megasync-dark-logo"></div>
-                    </div>
-                    <div class="megasync-listing">
-                        <i class="megasync-icon"></i>
-                        <h3>[$8429]</h3>
-                        <p>[$8430]</p>
-                    </div>
-                    <div class="megasync-listing">
-                        <i class="megasync-icon blink"></i>
-                        <h3>[$8431]</h3>
-                        <p>[$8432]</p>
-                    </div>
-                    <div class="megasync-listing">
-                        <i class="megasync-icon infinity"></i>
-                        <h3>[$8433]</h3>
-                        <p>[$8434]</p>
-                    </div>
-                </div>
-                <div class="clear"></div>
+                <!-- Please add "waring" classname to ".megasync-overlay" !-->
+                <!-- Please add "ff"/"safari"/"opera"/"edge"/"ie" classname !-->
+                <div class="megasync-bottom-warning">
+                    <i class="download big-icon"></i>
+                    <span>[$16865]</span>
+                 </div>
             </div>
-
-            <div class="megasync-slider button prev"></div>
-
-            <div class="megasync-slider button next"></div>
-
-            <div class="megasync-controls">
-                <div class="active" data-slidernum="1"></div>
-                <div data-slidernum="2"></div>
-                <div data-slidernum="3"></div>
-            </div>
-
-            </div>
-
-            <div class="megasync-button download">
-                Download now
-            </div>
-
         </div>
     </div>
 </div>
@@ -2428,6 +2396,7 @@
 
         <i class="big-104px-icon speedometer almost-full dialog-top-icon"></i>
         <i class="big-104px-icon speedometer full dialog-top-icon"></i>
+        <i class="semi-huge-icon speedometer full dialog-top-icon"></i>
 
         <p class="dialog p-after-icon msg-overquota">[$120]</p>
         <p class="dialog p-after-icon msg-prewarning">
@@ -2519,7 +2488,9 @@
             <div class="dialog transfer-plans">
                 <div class="reg-st3-membership-bl pro4 selected" data-payment="4">
                     <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">[$6234]</div>
+                        <div class="reg-st3-bott-title title">
+                            <div class="membership-icon tiny"></div>[$6234]
+                        </div>
                         <div class="membership-gray-block">
                             <div class="reg-st3-bott-title price"><span class="num">4<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
                         </div>
@@ -2539,7 +2510,10 @@
                 </div>
                 <div class="reg-st3-membership-bl pro1" data-payment="1">
                     <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">[$5819]</div>
+                        <div class="reg-st3-bott-title title">
+                            <div class="membership-icon tiny"></div>
+                            [$5819]
+                        </div>
                         <div class="membership-gray-block">
                             <div class="reg-st3-bott-title price"><span class="num">9<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
                         </div>
@@ -2559,7 +2533,10 @@
                 </div>
                 <div class="reg-st3-membership-bl pro2" data-payment="2">
                     <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">[$6125]</div>
+                        <div class="reg-st3-bott-title title">
+                            <div class="membership-icon tiny"></div>
+                            [$6125]
+                        </div>
                         <div class="membership-gray-block">
                             <div class="reg-st3-bott-title price"><span class="num">19<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
                         </div>
@@ -2579,7 +2556,10 @@
                 </div>
                 <div class="reg-st3-membership-bl pro3" data-payment="3">
                     <div class="membership-pad-bl">
-                        <div class="reg-st3-bott-title title">[$6126]</div>
+                        <div class="reg-st3-bott-title title">
+                            <div class="membership-icon tiny"></div>
+                            [$6126]
+                        </div>
                         <div class="membership-gray-block">
                             <div class="reg-st3-bott-title price"><span class="num">29<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
                         </div>
@@ -2609,6 +2589,35 @@
             <a>[$16354]</a>
         </div>
 
+    </div>
+    <div class="dialog overquota-bott-bl">
+        <div class="dialog overquota-bott-txt">
+            <i class="semi-huge-icon storage"></i>
+            <span class="not-logged no-achievements">
+                [$16902]
+            </span>
+            <span class="not-logged achievements">
+                [$16903]
+            </span>
+            <span class="logged achievements">
+                [$16904]
+            </span>
+        </div>
+        <div class="dialog overquota-bott-buttons">
+            <!-- [$6826] - Login !-->
+            <div class="default-big-button button-without-outline login">
+                <span>[$193]</span>
+            </div>
+            <!-- [$16309] - Get more bonuses !-->
+            <!-- [$16352] - Register for bonuses !-->
+            <div class="default-big-button button-without-outline grey-gradient get-more-bonuses">
+                <span class="registered">[$16309]</span>
+                <span class="not-registered">[$16352]</span>
+            </div>
+            <div class="default-big-button button-without-outline grey-gradient create-account">
+                <span>[$1108]</span>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -3508,3 +3517,76 @@
         <div class="payment-result-button">[$6690]</div>
     </div>
 </div>
+
+<div class="viewer-overlay hidden">
+    <div class="viewer-body">
+        <div class="viewer-top-bl">
+            <div class="viewer-filename"></div>
+            <div class="viewer-button right close">
+                <i class="medium-icon icons-img close"></i>
+            </div>
+            <div class="viewer-button right getlink">
+                <i class="medium-icon icons-img chain"></i>
+            </div>
+            <div class="viewer-button right download">
+                <i class="medium-icon icons-img arrow-in-circle"></i>
+            </div>
+            <div class="viewer-button right favourite">
+                <i class="medium-icon icons-img heart"></i>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="viewer-image-bl hidden">
+            <img alt="" />
+        </div>
+
+        <div class="viewer-pending hidden">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+
+        <div class="viewer-error hidden">
+            <div class="viewer-error-header">
+                [$135]
+            </div>
+            <div class="viewer-error-txt">
+            </div>
+            <div class="viewer-error-buttons">
+                <div class="viewer-button viewer-refresh">
+                    <i class="medium-icon icons-img refresh"></i>
+                    [$85]
+                </div>
+                <div class="viewer-button viewer-error-close">
+                    <i class="medium-icon icons-img close"></i>
+                    [$1898]
+                </div>
+            </div>
+        </div>
+
+        <div class="viewer-progress hidden">
+            <ul>
+                <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+                <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+            </ul>
+        </div>
+
+        <div class="viewer-mid-button prev"></div>
+        <div class="viewer-mid-button next"></div>
+
+        <div class="viewer-bottom-bl">
+            <div class="viewer-images-num hidden">
+                <span class="first">0</span>
+                [$5528]
+                <span class="last">0</span>
+            </div>
+            <div class="viewer-button right fullscreen">
+                <i class="medium-icon icons-img fullscreen"></i>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+
+

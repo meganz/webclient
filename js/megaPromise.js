@@ -290,6 +290,24 @@ MegaPromise.prototype.wait = function(callback) {
 };
 
 /**
+ * Alias of .wait
+ *
+ * @returns {MegaPromise}
+ */
+MegaPromise.prototype.finally = MegaPromise.prototype.wait;
+
+/**
+ * Invoke promise fulfilment through try/catch and reject it if there's some exception...
+ * @param {Function} resolve
+ * @param {Function} reject
+ * @returns {MegaPromise}
+ */
+MegaPromise.prototype.tryCatch = function(resolve, reject) {
+    'use strict';
+    return this.done(tryCatch(resolve, reject)).fail(reject);
+};
+
+/**
  * Alias of .always
  *
  * @returns {MegaPromise}
@@ -426,6 +444,7 @@ MegaPromise.prototype.dumpToConsole = function(msg) {
 
     return self;
 };
+MegaPromise.prototype.dump = MegaPromise.prototype.dumpToConsole;
 
 /**
  * Implementation of Promise.all/$.when, with a little bit more flexible way of handling different type of promises

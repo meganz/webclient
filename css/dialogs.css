@@ -231,6 +231,9 @@
 .dialog-top-icon {
     margin: 26px 0 17px 0;
 }
+.dialog-top-icon.semi-huge-icon {
+    margin: 15px 0 2px 0;
+}
 .dialog.header-before-icon {
     font-size: 20px;
     line-height: 25px;
@@ -277,33 +280,118 @@
 /* End of Limited available bandwidth dialog */
 
 /* Transfer quota exceeded dialog */
-.fm-dialog.limited-bandwidth-dialog.exceeded:not(.achievements):not(.pro) {
-    min-width: 964px;
-    margin: -326px 0 0 -482px;
+.fm-dialog.limited-bandwidth-dialog.exceeded:not(.pro) {
+    width: 964px;
+    margin: -358px 0 0 -482px;
+}
+.logged .fm-dialog.limited-bandwidth-dialog.exceeded:not(.pro):not(.achievements), .hidden-bottom.fm-dialog.limited-bandwidth-dialog.exceeded {
+    margin-top: -321px;
 }
 .fm-dialog.limited-bandwidth-dialog.exceeded.pro.slider {
     margin-top: -282px;
 }
-.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider {
+.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider,
+.semi-huge-icon.speedometer.full {
     display: none;
 }
-.exceeded:not(.achievements):not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.achievements):not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, .slider .dialog.pro-exceeded-slider {
+.exceeded:not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, .slider .dialog.pro-exceeded-slider {
     display: block;
 }
-.exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro {
+.exceeded:not(.pro) .semi-huge-iconspeedometer, .exceeded:not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro,
+.logged .exceeded:not(.pro):not(.achievements) .big-104px-icon.full, .logged .exceeded.achievements:not(.pro) .semi-huge-icon.speedometer.full, .not-logged .exceeded:not(.pro) .semi-huge-icon.speedometer.full {
     display: inline-block;
+}
+.not-logged .exceeded:not(.pro):not(.hidden-bottom) .fm-dialog-body.centered-content, .logged .exceeded.achievements:not(.pro):not(.hidden-bottom) .fm-dialog-body.centered-content {
+    background: rgb(255,255,255);
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmNWY1ZjUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(245,245,245,1) 100%);
+background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(245,245,245,1) 100%);
+background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(245,245,245,1) 100%);
+    -webkit-border-top-left-radius: 8px;
+    -moz-border-radius-topleft: 8px;
+    border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-radius-topright: 8px;
+    border-top-right-radius: 8px;
 }
 .dialog.transfer-overquota-txt {
     font-size: 14px;
     line-height: 25px;
     color: #666666;
-    padding: 17px 0 22px 0;
+    padding: 8px 0 22px 0;
 }
 .dialog.transfer-overquota-txt span {
     font-size: 20px;
     color: #333333;
     border-bottom: 2px solid #FF333A;
     padding: 0 2px;
+}
+.dialog.overquota-bottom-bl {
+    display: none;
+    
+}
+.dialog.overquota-bott-bl {
+    display: none;
+}
+.not-logged .exceeded:not(.pro) .dialog.overquota-bott-bl, .logged .exceeded.achievements:not(.pro) .dialog.overquota-bott-bl {
+    display: table;
+    width: 100%;
+    -webkit-box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+    box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
+}
+.dialog.overquota-bott-txt, .dialog.overquota-bott-buttons {
+    display: table-cell;
+    position:relative;
+    vertical-align: middle;
+    height: 104px;
+}
+.dialog.overquota-bott-buttons {
+    width: 100px;
+    white-space: nowrap;
+    text-align: right;
+    padding-right: 20px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.dialog.overquota-bott-txt i {
+    position:absolute;
+    left: 18px;
+    top: 50%;
+    margin: -34px 0 0 0;
+}
+.dialog.overquota-bott-txt span {
+    display:none;
+    font-size: 14px;
+    line-height: 24px;
+    color: #666666;
+    padding: 28px 17px 28px 108px;
+}
+.not-logged .exceeded:not(.achievements) span.not-logged.no-achievements {
+    display: block;
+}
+.not-logged .exceeded.achievements span.not-logged.achievements {
+    display: block;
+}
+.logged .exceeded.achievements span.logged.achievements {
+    display: block;
+}
+.overquota-bott-buttons .default-big-button {
+    display: none;
+    margin-left: 9px;
+}
+.not-logged .exceeded:not(.achievements) .overquota-bott-buttons .default-big-button.create-account, .not-logged .exceeded .overquota-bott-buttons .default-big-button.login, .exceeded.achievements .overquota-bott-buttons .default-big-button.get-more-bonuses {
+    display: inline-block;
+}
+.logged .exceeded.achievements .overquota-bott-buttons .default-big-button .not-registered {
+    display: none;
+}
+.logged .exceeded.achievements .overquota-bott-buttons .default-big-button .registered {
+    display: block;
+}
+.hidden-bottom .dialog.overquota-bott-bl, .dialog.overquota-bott-bl.hidden, .overquota-bott-buttons .default-big-button.hidden {
+    display: none !important;
 }
 .dialog.transfer-overquota-txt span.countdown {
     margin: 0 5px;
@@ -312,15 +400,16 @@
     color: #777777;
     border: 0;
 }
-.exceeded:not(.achievements):not(.pro) .dialog.p-after-icon {
+.exceeded:not(.pro) .dialog.p-after-icon {
     max-width: none;
 }
 .dialog.transfer-plans {
-    padding: 16px 0 0 0;
+    padding: 8px 0 0 0;
 }
 .fm-dialog .reg-st3-bott-title {
     font-size: 16px;
     padding: 16px 10px;
+    text-transform: uppercase;
 }
 .fm-dialog .reg-st3-bott-title.price {
     font-size: 40px;
@@ -334,13 +423,13 @@
     margin-top: -1px;
 }
 .fm-dialog .reg-st3-storage, .fm-dialog .reg-st3-bandwidth {
-    padding: 20px 24px 0 24px;
+    padding: 21px 24px 0 24px;
 }
 .fm-dialog .reg-st3-mid-txt {
-    line-height: 17px;
+    line-height: 19px;
 }
 .fm-dialog .reg-st3-bandwidth {
-    padding-bottom: 17px;
+    padding: 19px 24px 19px 24px;
 }
 .dialog.pro-exceeded-txt {
     font-size: 14px;

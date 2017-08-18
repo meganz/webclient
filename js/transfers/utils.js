@@ -10,8 +10,8 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
 
-    if (text.length > 48) {
-        text = text.substr(0, 48) + "\u2026";
+    if (text.length > 56) {
+        text = text.substr(0, 56) + "\u2026";
     }
 
     if (ethrow) {

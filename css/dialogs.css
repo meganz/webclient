@@ -1603,3 +1603,144 @@ li.token-input-token-invite .input-close {
     display: none;
 }
 /* end of MegaSync dialog */
+
+/* Password remider */
+.dropdown.body.pass-reminder {
+    width: 560px;
+}
+.dropdown.body.fm-dialog.pass-reminder {
+    margin: -299px 0 0 -233px;
+}
+.dropdown.content-block {
+    position: relative;
+    padding: 12px 48px 12px 48px;
+}
+.nw-fm-dialog-title.big {
+    font-size: 20px;
+    color: #666666;
+}
+.pass-reminder .bottom-page.big-icon {
+    margin: 23px auto 0 auto;
+    display: block;
+}
+.pass-reminder.info-txt {
+    font-size: 14px;
+    line-height: 24px;
+    text-align: center;
+    color: #666666;
+    padding: 23px 0 32px 0;
+}
+.pass-reminder.light.info-txt {
+    color: #999999;
+    line-height: 18px;
+    padding: 6px 0 16px 0;
+}
+.pass-reminder.info-txt a {
+    color: #d90007;
+}
+.dialog.input-wrapper {
+    display: table;
+    width: 100%;
+    font-size: 0;
+    line-height: 0;
+    margin-bottom: 4px;
+}
+.dialog.big-input-bg {
+    display: table-cell;
+    height: 36px;
+    background-color: #FAFAFA;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.15);
+    padding: 8px 12px 0 12px;
+    vertical-align: top;
+}
+.dialog.big-input-bg input {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+    font-size: 14px;
+    line-height: 18px;
+    color: #777777;
+    vertical-align: top;
+    background-color: #FAFAFA;
+    -webkit-text-security: disc;
+}
+.dialog.big-input-bg input:-webkit-autofill, .dialog.big-input-bg input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 50px #FAFAFA inset;
+    -webkit-text-fill-color: #777777;
+}
+.wrong .dialog.big-input-bg {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(217,0,7,0.4);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(217,0,7,0.4);
+    box-shadow: 0px 0px 0px 1px rgba(217,0,7,0.4);
+}
+.wrong .dialog.big-input-bg input {
+    color: #D90007;
+}
+.wrong .button-prd-backup.grey-gradient span {
+    background: rgb(255,102,107);
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmNjY2YiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlYzUyNTciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top, rgba(255,102,107,1) 0%, rgba(236,82,87,1) 100%);
+background: -webkit-linear-gradient(top, rgba(255,102,107,1) 0%,rgba(236,82,87,1) 100%);
+background: linear-gradient(to bottom, rgba(255,102,107,1) 0%,rgba(236,82,87,1) 100%);
+}
+.wrong .button-prd-backup.grey-gradient span::before {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(236,82,87,1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(236,82,87,1);
+    box-shadow: 0px 0px 0px 1px rgba(236,82,87,1);
+}
+.dialog.big-input-bg input::-webkit-input-placeholder {
+    color:#777777;
+}
+.dialog.big-input-bg input:-moz-placeholder {
+    color:#777777;
+    opacity: 1;
+}
+.dialog.big-input-bg input::-moz-placeholder {
+    color:#777777;
+    opacity: 1;
+}
+.dialog.big-input-bg input:-ms-input-placeholder {
+    color:#777777;
+}
+.dialog.input-button {
+    display: table-cell;
+    width: 96px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-left: 12px;
+    vertical-align: top;
+}
+.pass-reminder.big-buttons {
+    text-align: center;
+    padding: 0 0 15px 0;
+}
+.pass-reminder.result-block {
+    margin: 8px 0 0 0;
+    min-height: 16px;
+}
+.pass-reminder.result-txt {
+    font-size: 12px;
+    line-height: 15px;
+    color:#31B500;
+    padding: 0 0 0 12px;
+}
+.pass-reminder.result-txt.wrong {
+    color:#D90007;
+}
+.pass-reminder.result-txt i {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 5px 0 0;
+    
+}
+/* end of Password remider */

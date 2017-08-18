@@ -1290,6 +1290,7 @@ function init_page() {
 
     topmenuUI();
 
+
     loggedout = false;
     flhashchange = false;
 }
@@ -1659,6 +1660,7 @@ function topmenuUI() {
             $topMenu.find('.top-menu-item.login').addClass('hidden');
             $topMenu.find('.top-menu-item.logout').removeClass('hidden');
         }
+
     }
 
     $.hideTopMenu = function (e) {
@@ -2043,6 +2045,12 @@ function topmenuUI() {
     // Initialise notification popup and tooltip
     if (typeof notify === 'object') {
         notify.init();
+    }
+
+    if (!is_mobile && u_type === 3) {
+        if (mega.ui.passwordReminderDialog) {
+            mega.ui.passwordReminderDialog.onTopmenuReinit();
+        }
     }
 }
 

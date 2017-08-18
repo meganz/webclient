@@ -129,6 +129,9 @@
     box-sizing: border-box;
     white-space: nowrap;
 }
+.default-white-button::first-letter {
+    text-transform: uppercase;
+}
 .default-grey-button {
     color: white;
     background: rgb(170,170,170);
@@ -464,6 +467,10 @@
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
 }
+.default-big-button.inline {
+    display: inline-block;
+    margin: 0 6px;
+}
 .default-big-button.grey-gradient {
     color: white;
 }
@@ -529,6 +536,9 @@
 .default-huge-button i {
     margin: 19px 20px 0 0;
     vertical-align: top;
+}
+.default-white-button.grey-txt {
+    color: #777777;
 }
 .default-white-button.small-square-button {
     width: 24px;

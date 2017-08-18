@@ -778,6 +778,7 @@
     "5931": "Kattintson [A]ide[\/A] a t\u00e1rhelyhaszn\u00e1lat megtekint\u00e9s\u00e9hez.",
     "6001": "Rossz jelsz\u00f3",
     "6078": "MEGA",
+    "6080": "meger\u0151s\u00edt\u00e9s",
     "6089": "Nincsenek \u00e1tvitelek",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1306,6 +1307,7 @@
     "8853": "There was a problem decoding your private RSA key, please contact support@mega.nz for further assistance.",
     "8854": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them because it is not part of this account cancellation process.",
     "8855": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
+    "8859": "Backup Recovery Key",
     "8866": "View Profile",
     "8867": "Remove Participant",
     "8868": "Set Permission:",
@@ -1803,5 +1805,15 @@
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
     "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
-    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder",
+    "16902": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+    "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)",
+    "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)."
 }

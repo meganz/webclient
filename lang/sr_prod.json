@@ -778,6 +778,7 @@
     "5931": "Click [A]here[\/A] to view your storage usage.",
     "6001": "\u041f\u043e\u0433\u0440\u0435\u0448\u043d\u0430 \u043b\u043e\u0437\u0438\u043d\u043a\u0430",
     "6078": "MEGA",
+    "6080": "\u043f\u043e\u0442\u0440\u0432\u0440\u0434\u0438",
     "6089": "\u041d\u0435\u043c\u0430 \u043f\u0440\u0435\u043d\u043e\u0441\u0430",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1306,6 +1307,7 @@
     "8853": "\u0414\u043e\u0448\u043b\u043e \u0458\u0435 \u0434\u043e \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0430 \u043f\u0440\u0438\u043b\u0438\u043a\u043e\u043c \u0434\u0435\u043a\u043e\u0434\u0438\u0440\u0430\u045a\u0430 \u0412\u0430\u0448\u0435\u0433 \u043f\u0440\u0438\u0432\u0430\u0442\u043d\u043e\u0433 RSA \u043a\u0459\u0443\u0447\u0430, \u043c\u043e\u043b\u0438\u043c\u043e \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u0438\u0440\u0430\u0458\u0442\u0435 support@mega.nz \u0437\u0430 \u0434\u0430\u0459\u0443 \u0430\u0441\u0438\u0441\u0442\u0435\u043d\u0446\u0438\u0458\u0443.",
     "8854": "\u0410\u043a\u043e \u0441\u0442\u0435 \u0441\u0435 \u043f\u0440\u0435\u0442\u0445\u043e\u0434\u043d\u043e \u043f\u0440\u0435\u0442\u043f\u043b\u0430\u0442\u0438\u043b\u0438 \u043d\u0430 PRO \u043f\u043b\u0430\u043d \u043f\u0440\u0435\u043a\u043e Google Play \u0438\u043b\u0438 Apple iTunes, \u043c\u043e\u043b\u0438\u043c\u043e \u0440\u0443\u0447\u043d\u043e \u043f\u0440\u0435\u043a\u0438\u043d\u0438\u0442\u0435 \u043f\u0440\u0435\u0442\u043f\u043b\u0430\u0442\u0443 \u0441\u0430 \u045a\u0438\u043c\u0430 \u0458\u0435\u0440 \u0442\u043e \u043d\u0438\u0458\u0435 \u0434\u0435\u043e \u043e\u0432\u043e\u0433 \u043f\u0440\u043e\u0446\u0435\u0441\u0430 \u0443\u043a\u0438\u0434\u0430\u045a\u0430 \u043d\u0430\u043b\u043e\u0433\u0430.",
     "8855": "\u041f\u0440\u0435\u0432\u0438\u0448\u0435 \u043f\u0443\u0442\u0430 \u0441\u0442\u0435 \u043f\u0440\u043e\u0431\u0430\u043b\u0438 \u0434\u0430 \u0441\u0435 \u043f\u0440\u0438\u0458\u0430\u0432\u0438\u0442\u0435. [BR]\u041c\u043e\u043b\u0438\u043c\u043e \u0441\u0430\u0447\u0435\u043a\u0430\u0458\u0442\u0435 \u0434\u043e  %1 \u0438 \u043f\u043e\u043a\u0443\u0448\u0430\u0458\u0442\u0435 \u043f\u043e\u043d\u043e\u0432\u043e.",
+    "8859": "\u041a\u0459\u0443\u0447 \u0437\u0430 \u043f\u043e\u0432\u0440\u0430\u045b\u0430\u0458 \u0431\u0435\u043a\u0430\u043f\u0430",
     "8866": "\u041f\u043e\u0433\u043b\u0435\u0434\u0430\u0458 \u041f\u0440\u043e\u0444\u0438\u043b",
     "8867": "\u0423\u043a\u043b\u043e\u043d\u0438 \u0423\u0447\u0435\u0441\u043d\u0438\u043a\u0430",
     "8868": "\u0421\u0435\u0442\u0443\u0458 \u0434\u043e\u0437\u0432\u043e\u043b\u0435:",
@@ -1803,5 +1805,15 @@
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
     "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
-    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder",
+    "16902": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+    "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)",
+    "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)."
 }

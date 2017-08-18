@@ -3115,6 +3115,10 @@
         "text": "MEGA",
         "context": ""
     },
+    "6080": {
+        "text": "confirm",
+        "context": ""
+    },
     "6089": {
         "text": "No transfers",
         "context": ""
@@ -5227,6 +5231,10 @@
         "text": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
         "context": "An error message which is shown when a user tries to log into the site too many times. Please leave the [BR] tag which will be replaced with a line break at run time. The %1 placeholder will be replaced with the time e.g. 14:37 which is when the user can try logging in again."
     },
+    "8859": {
+        "text": "Backup Recovery Key",
+        "context": "The is a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key."
+    },
     "8866": {
         "text": "View Profile",
         "context": "A title of button to view a member\u2019s profile in chat."
@@ -7218,5 +7226,45 @@
     "16892": {
         "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
         "context": "A message which is shown when there was a server-side error retrieving the cloud drive contents."
+    },
+    "16895": {
+        "text": "Do you remember your password?",
+        "context": "Used as a title in the \"Password reminder\" dialog, that pop ups to ensure that the user had exported his recovery key OR still remembers his password."
+    },
+    "16896": {
+        "text": "Your password",
+        "context": "Used as a placeholder in the \"Password reminder\" dialog, that pop ups to ensure that the user had exported his recovery key OR still remembers his password.\r\nThe user is supposed to enter his password in this field, to validate\/confirm he did not forgot it."
+    },
+    "16897": {
+        "text": "Password accepted",
+        "context": "Used as a message in the \"Password reminder\" dialog that is shown when the user enters his password, clicks confirm and his password is correct."
+    },
+    "16898": {
+        "text": "Wrong password, backup your Recovery Key as soon as possible!",
+        "context": "Used as a message in the \"Password reminder\" dialog that is shown when the user enters his password, clicks confirm and his password is incorrect."
+    },
+    "16899": {
+        "text": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+        "context": "Used as a message in the \"Password reminder\" dialog as a tip on why backing up the \"Recovery Key\" is important and vital for the user to not lose any data in case he\/she forgets his password."
+    },
+    "16900": {
+        "text": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+        "context": "Used as a message in the \"Password reminder\" dialog as a tip on why confirming the password and\/or exporting the recovery key is important and vital for the user to not lose any data."
+    },
+    "16901": {
+        "text": "Password Reminder",
+        "context": "The tooltip when the user hovers over the key icon as visible in the screenshot. It is effectively a title for a dialog that tells the user to remember their password.\r\n\r\nUsed as a tooltip for the \"Password Reminder\" icon in the top bar, that when clicked would ask the user to confirm his password or do a recovery key backup\/export."
+    },
+    "16902": {
+        "text": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+        "context": "Message shown at the bottom when users run into an IP quota limitation without an account, informing them that they can get more if they create an account. Please make sure you keep \"10%\" together without spaces, as it can be replaced dynamically by the system."
+    },
+    "16903": {
+        "text": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)",
+        "context": "If the user is not logged in and in a market where we operate the achievement program and the user runs into a transfer limitation, this message is shown to inform the user that he can create an account to get free quota by achieving (albeit with a couple of days activation delay)."
+    },
+    "16904": {
+        "text": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
+        "context": "If the user is logged in with an achievement account while running into a transfer limitation, we show this message to remind the user that he can achieve to get more transfer quota for free."
     }
 }

@@ -778,6 +778,7 @@
     "5931": "Cliquer [A]ici[\/A] vous visualiser l'utilisation de votre espace de stockage.",
     "6001": "Mot de passe erron\u00e9",
     "6078": "MEGA",
+    "6080": "confirmer",
     "6089": "Aucun transfert",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1306,6 +1307,7 @@
     "8853": "Un probl\u00e8me est survenu lors du d\u00e9chiffrement de votre cl\u00e9 priv\u00e9e RSA. Veuillez contacter support@mega.nz afin d'obtenir de l'assistance.",
     "8854": "Si vous vous \u00eates abonn\u00e9 auparavant \u00e0 une offre PRO gr\u00e2ce \u00e0 Google Play ou iTunes d'Apple, veuillez annuler vos abonnements manuellement avec ces applis, car cela ne fait pas partie de ce processus d'annulation de compte.",
     "8855": "Vous avez tent\u00e9 de vous connecter trop de fois.[BR]Veuillez attendre jusqu'\u00e0 %1 et ressayer.",
+    "8859": "Sauvegarder la cl\u00e9 de r\u00e9cup\u00e9ration",
     "8866": "Voir le profil",
     "8867": "Supprimer le participant",
     "8868": "D\u00e9finir les droits :",
@@ -1803,5 +1805,15 @@
     "16883": "Malheureusement, la m\u00e9moire tampon de votre navigateur est insuffisante pour d\u00e9chiffrer les donn\u00e9es. Veuillez installer l'[A]appli pour ordinateur de MEGA[\/A] afin de t\u00e9l\u00e9charger des fichiers volumineux %2",
     "16890": "L'espace de stockage de votre navigateur pour MEGA est satur\u00e9. Votre t\u00e9l\u00e9chargement continuera automatiquement apr\u00e8s que vous ayez lib\u00e9r\u00e9 de l'espace.",
     "16891": "L'espace de stockage de votre navigateur disponible pour MEGA ne peut pas traiter un t\u00e9l\u00e9chargement de cette taille. Veuillez lib\u00e9rer de l'espace disque.",
-    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents."
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder",
+    "16902": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+    "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)",
+    "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)."
 }

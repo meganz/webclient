@@ -39,7 +39,16 @@ var uiPlaceholders = function($scope) {
         });
 };
 
-var uiCheckboxes = function($scope, saveState, stateChangeCb) {
+/**
+ * uiCheckboxes
+ *
+ * @param $scope {String|jQuery}
+ * @param [saveState] {String} Optional, pass undefined to disable localStorage persisting of this checkbox's value
+ * @param [stateChangeCb] {Function} Optional callback, that would be called when the checkbox's state is changed
+ * @param [initialState] {Boolean} Optional, pass true to initialize as checked
+ * @returns {jQuery}
+ */
+var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
     $('.radio-txt', $scope).each(function() {
         var $label = $(this);
         var $cbxElement = $label.prev('.checkboxOn, .checkboxOff');
@@ -83,6 +92,14 @@ var uiCheckboxes = function($scope, saveState, stateChangeCb) {
             }
             return false;
         };
+
+        if (initialState === true) {
+            if (!$cbxElement.hasClass('checkboxOn')) {
+                $cbxElement
+                    .removeClass('checkboxOff')
+                    .addClass('checkboxOn');
+            }
+        }
 
         $label.rebind('click.uiCheckboxes', _onToggle);
         $cbxElement.rebind('click.uiCheckboxes', _onToggle);

@@ -477,7 +477,7 @@ mBroadcaster.once('startMega', function populate_l() {
 	l[16358] = l[16358].replace('4096','8192').replace('4','8');
 	l[16316] = l[16316].replace('4096','8192').replace('4','8');
 	l[16315] = l[16315].replace('4096','8192').replace('4','8');
-	l[16304] = l[16304].replace('4096','8192').replace('4','8');
+	l[16304] = l[16304].replace('8','16').replace('4096','8192').replace('4','8');
 	l[1367] = l[1367].replace('4','8');
 
     var common = [

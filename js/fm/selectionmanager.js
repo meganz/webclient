@@ -215,7 +215,7 @@ var SelectionManager = function($selectable, resume) {
         });
 
         var items_per_row = Math.floor(
-            $('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true)
+            $('.data-block-view').parent().outerWidth() / $('.data-block-view:first').outerWidth(true)
         );
 
         var current = this.get_currently_selected("first");

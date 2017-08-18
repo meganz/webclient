@@ -1010,8 +1010,8 @@
                         var megaListContainer;
 
                         if (this.viewmode) {
-                            megaListOptions['itemWidth'] = 128 + 12 /* 12 = margin-left */;
-                            megaListOptions['itemHeight'] = 152 + 12 /* 12 = margin-top */;
+                            megaListOptions['itemWidth'] = 156 + 2 + 2 + 12 /* 12 = margin-left */;
+                            megaListOptions['itemHeight'] = 184 + 2 + 2 + 12 /* 12 = margin-top */;
                             megaListContainer = this.container;
                         }
                         else {

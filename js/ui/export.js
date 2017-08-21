@@ -2018,7 +2018,7 @@ var exportExpiry = {
             $('.own-data', $nodeId).addClass('linked');
 
             // Add link-icon to grid view
-            if ($nodeId.hasClass('file-block')) {
+            if ($nodeId.hasClass('data-block-view')) {
                 $nodeId.addClass('linked');
             }
         }
@@ -2040,7 +2040,7 @@ var exportExpiry = {
         $('#' + nodeId).removeClass('linked').find('.own-data').removeClass('linked');
 
         // Remove link icon from grid view
-        $('#' + nodeId + '.file-block').removeClass('linked');
+        $('#' + nodeId + '.data-block-view').removeClass('linked');
 
         // Remove link icon from left panel
         $('#treeli_' + nodeId + ' span').removeClass('linked');
@@ -2080,7 +2080,7 @@ var exportExpiry = {
         $('.grid-table.fm #' + nodeId).addClass('taken-down');
 
         // Add taken-down to block view
-        $('#' + nodeId + '.file-block').addClass('taken-down');
+        $('#' + nodeId + '.data-block-view').addClass('taken-down');
 
         // Add taken-down to left panel
         $('#treea_' + nodeId).addClass('taken-down');
@@ -2096,7 +2096,7 @@ var exportExpiry = {
             }
 
             $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
-            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
+            $('#' + nodeId + '.data-block-view').attr('title', titleTooltip);
         }
         else {// Item is file
 
@@ -2108,7 +2108,7 @@ var exportExpiry = {
             }
 
             $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
-            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
+            $('#' + nodeId + '.data-block-view').attr('title', titleTooltip);
         }
     };
 
@@ -2122,14 +2122,14 @@ var exportExpiry = {
         $('.grid-table.fm #' + nodeId).removeClass('taken-down');
 
         // Add taken-down to block view
-        $('#' + nodeId + '.file-block').removeClass('taken-down');
+        $('#' + nodeId + '.data-block-view').removeClass('taken-down');
 
         // Add taken-down to left panel
         $('#treea_' + nodeId).removeClass('taken-down');
 
         // Remove title, mouse popup
         $('.grid-table.fm #' + nodeId).attr('title', '');
-        $('#' + nodeId + '.file-block').attr('title', '');
+        $('#' + nodeId + '.data-block-view').attr('title', '');
     };
 
     // export

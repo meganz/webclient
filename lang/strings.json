@@ -6325,7 +6325,7 @@
     },
     "6121": {
         "text": "About",
-        "context": "A label for any About button, link, text or title."
+        "context": "Label for the title of the \"About\" section where show the app version, the SDK version, etc. - (String as short as possible)."
     },
     "6122": {
         "text": "We want to special thank the following companies\/people for making this app possible:",
@@ -15590,5 +15590,9 @@
     "16904": {
         "text": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
         "context": "If the user is logged in with an achievement account while running into a transfer limitation, we show this message to remind the user that he can achieve to get more transfer quota for free."
+    },
+    "16927": {
+        "text": "This action can not be completed as it would take you over your current storage limit",
+        "context": "Error message shown to user when a copy\/import operation would take them over their storage limit."
     }
 }

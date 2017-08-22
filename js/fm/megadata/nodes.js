@@ -416,8 +416,25 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
                     // 4. Store those nodes the user want to replace
                     tree.todel = todel.length && todel;
 
-                    // 5. Provide the final tree back to copyNodes() and continue
-                    M.copyNodes(cn, t, del, promise, tree);
+                    // 4b. count the size to copy
+                    var cpOpSize = 0;
+                    for (var i = tree.length; i--;) {
+                        if (!tree[i].t) {
+                            cpOpSize += M.d[tree[i].h] && M.d[tree[i].h].s || 0;
+                        }
+                    }
+
+                    // 4c. check if the op is going overquota
+                    M.checkGoingOverStorageQuota(cpOpSize)
+                        .fail(function() {
+                            if (promise) {
+                                promise.reject(EGOINGOVERQUOTA);
+                            }
+                        })
+                        .done(function() {
+                            // 5. Provide the final tree back to copyNodes() and continue
+                            M.copyNodes(cn, t, del, promise, tree);
+                        });
                 });
 
             return promise;
@@ -522,10 +539,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
                 if (promise) {
                     return promise.reject(res);
                 }
-                if (res == EOVERQUOTA) {
-                    return M.showOverStorageQuota(100);
-                }
-                return msgDialog('warninga', l[135], l[47], api_strerror(res));
+                return M.ulerror(null, res);
             }
 
             if (ctx.del) {

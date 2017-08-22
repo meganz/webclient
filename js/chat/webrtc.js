@@ -878,7 +878,7 @@ Call.prototype._startOrJoin = function(av) {
         return err;
     })
     .then(function() {
-        if (this.isJoiner) {
+        if (self.isJoiner) {
             self._join();
         } else {
             self._broadcastCallReq();

@@ -996,17 +996,11 @@ Call.prototype.hangup = function(reason) {
     this._destroy(term, true);
 };
 
-Call.prototype.hangupAllCalls = function() {
-    var calls = this.calls;
-    for (var id in calls) {
-        calls[id].hangup();
-    }
-};
-
 Call.prototype._onUserOffline = function(userid, clientid) {
-    if (this.state === CallState.kRingIn) {
-        this._destroy(Term.kCallReqCancel, false);
-        return;
+    if (this.state === CallState.kRingIn && userid === this._callerInfo.userid
+        && clientid === this._callerInfo.clientid) {
+            this._destroy(Term.kCallReqCancel, false);
+            return;
     }
     for (var sid in this.sessions) {
         var sess = this.sessions[sid];

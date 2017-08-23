@@ -104,6 +104,9 @@ var alarm = {
             alarm.hideAllWarningPopups();
             alarm.initWarningIconButton($button, $dialog);
             alarm.showWarningPopup($button, $dialog);
+
+            // Hide TPP
+            mega.ui.tpp.hide();
         },
 
         /**

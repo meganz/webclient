@@ -97,6 +97,10 @@ var alarm = {
             var $button = $('.top-icon.warning.over-quota');
             var $dialog = $('.top-warning-popup.over-quota');
 
+            // Hide TPP
+            mega.ui.tpp.hide();
+            mega.ui.tpp.reset('ul');
+
             // Add button click handler
             this.initUpgradeButton($dialog);
 
@@ -104,9 +108,6 @@ var alarm = {
             alarm.hideAllWarningPopups();
             alarm.initWarningIconButton($button, $dialog);
             alarm.showWarningPopup($button, $dialog);
-
-            // Hide TPP
-            mega.ui.tpp.hide();
         },
 
         /**

@@ -1,4 +1,6 @@
 (function(scope, $) {
+    var isFirefox = navigator.userAgent.indexOf("Firefox") > -1;
+
     /**
      * Internal/private helper method for doing 'assert's.
      *
@@ -64,7 +66,7 @@
                 targetElement.insertBefore(newElement, targetElement.firstChild);
             }
             else {
-                targetElement.append(newElement);
+                targetElement.appendChild(newElement);
             }
         }
     };
@@ -228,6 +230,48 @@
         return "megalist" + this.listId;
     };
 
+
+    MegaList.prototype._actualOnScrollCode = function(e) {
+        var self = this;
+        if (self.options.enableUserScrollEvent) {
+            self.trigger('onUserScroll', e);
+        }
+        self._onScroll(e);
+    };
+
+    MegaList.prototype.throttledOnScroll = function(e) {
+        var wait = isFirefox ? 30 : 5;
+        var self = this;
+        if (!self._lastThrottledOnScroll) {
+            self._lastThrottledOnScroll = Date.now();
+        }
+
+        if ((self._lastThrottledOnScroll + wait - Date.now()) < 0) {
+            if (
+                self._lastScrollPosY !== e.target.scrollTop &&
+                self._isUserScroll === true &&
+                self.listContainer === e.target
+            ) {
+                self._lastScrollPosY = e.target.scrollTop;
+
+                if (isFirefox) {
+                    if (self._lastOnScrollTimer) {
+                        clearTimeout(self._lastOnScrollTimer);
+                    }
+
+                    self._lastOnScrollTimer = setTimeout(function() {
+                        self._actualOnScrollCode(e);
+                    }, 0);
+                }
+                else {
+                    self._actualOnScrollCode(e);
+                }
+
+            }
+            self._lastThrottledOnScroll = Date.now();
+        }
+    };
+
     /**
      * Internal method that would be called when the MegaList renders to the DOM UI and is responsible for binding
      * the DOM events.
@@ -240,19 +284,7 @@
             self.resized();
         });
 
-        $(document).bind('ps-scroll-y.ps' + this._generateEventNamespace(), function(e) {
-            if (
-                self._lastScrollPosY !== e.target.scrollTop &&
-                self._isUserScroll === true &&
-                self.listContainer === e.target
-            ) {
-                self._lastScrollPosY = e.target.scrollTop;
-                if (self.options.enableUserScrollEvent) {
-                    self.trigger('onUserScroll', e);
-                }
-                self._onScroll(e);
-            }
-        });
+        $(document).bind('ps-scroll-y.ps' + this._generateEventNamespace(), self.throttledOnScroll.bind(self));
     };
 
     /**
@@ -891,13 +923,13 @@
             var visibleF = calculated['visibleFirstItemNum'];
             calculated['visibleFirstItemNum'] = Math.max(
                 0,
-                visibleF - (Math.min(visibleF % perPage, 1)) - Math.max(visibleF % perPage, 1) * perPage
+                ((((visibleF - visibleF % perPage) / perPage) - 1) - this.options.batchPages) * perPage
             );
 
             var visibleL = calculated['visibleLastItemNum'];
             calculated['visibleLastItemNum'] = Math.min(
                 this.items.length,
-                visibleL - (Math.min(visibleL % perPage, 1)) + Math.min(visibleL % perPage, 1) * perPage
+                ((((visibleL - visibleL % perPage) / perPage) + 1) + this.options.batchPages) * perPage
             );
         }
     };
@@ -939,13 +971,7 @@
     MegaList.prototype._applyDOMChanges = function() {
         this._recalculate();
 
-        // prevent DOM updates and repaints by "detaching" the content DOM node
-        // var parentNode = this.content.parentNode;
-        // parentNode.removeChild(this.content);
 
-        // console.error("applyDOM", this.items.length);
-
-        console.time('s1');
         var first = this._calculated['visibleFirstItemNum'];
         var last = this._calculated['visibleLastItemNum'];
 
@@ -958,9 +984,7 @@
             }
         }
 
-        console.timeEnd('s1');
 
-        console.time('s2');
         // remove items after the last visible item
         for(var i = last; i<this.items.length; i++) {
             var id = this.items[i];
@@ -969,9 +993,7 @@
                 delete this._currentlyRendered[id];
             }
         }
-        console.timeEnd('s2');
 
-        console.time('s3');
         var prependQueue = [];
         var appendQueue = [];
 
@@ -1039,31 +1061,17 @@
             }
         }
 
-
-        console.timeEnd('s3');
-
-        console.time('s4');
         if (this.options.renderAdapter._itemsRepositioned) {
             this.options.renderAdapter._itemsRepositioned();
         }
-        console.timeEnd('s4');
 
-        console.time('s4.1');
-        // parentNode.appendChild(this.content);
-
-        console.timeEnd('s4.1');
-        console.time('s5');
         this._isUserScroll = false;
         this.scrollUpdate();
         this._isUserScroll = true;
 
-        console.timeEnd('s5');
-
-        console.time('s6');
         if (this.options.onContentUpdated) {
             this.options.onContentUpdated();
         }
-        console.timeEnd('s6');
     };
 
     /**

@@ -995,10 +995,13 @@
 
                 if (DYNLIST_ENABLED) {
                     if (!aUpdate || !this.megaList) {
+                        var isFF = window.navigator.userAgent.indexOf("Firefox") > -1;
+
                         var megaListOptions = {
                             'itemRenderFunction': fm_megalist_node_render,
                             'preserveOrderInDOM': true,
-                            'extraRows': 1,
+                            'extraRows': isFF ? 10 : 4,
+                            'batchPages': isFF ? 1 : 0,
                             'onContentUpdated': function () {
                                 fm_throttled_refresh(self.viewmode);
                             },

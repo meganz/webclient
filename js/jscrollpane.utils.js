@@ -60,7 +60,7 @@ function initAccountScroll(scroll) {
 }
 
 function initGridScrolling() {
-    $('.grid-scrolling-table')
+    $('.grid-scrolling-table:visible')
         .filter(":not(.megaList,.megaListContainer)")
         .jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
 
@@ -73,7 +73,7 @@ function initSelectScrolling(scrollBlock) {
 }
 
 function initFileblocksScrolling() {
-    $('.file-block-scrolling')
+    $('.file-block-scrolling:visible')
         .filter(":not(.megaList)")
         .jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
 

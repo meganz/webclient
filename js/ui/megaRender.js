@@ -1002,6 +1002,7 @@
                             'preserveOrderInDOM': true,
                             'extraRows': isFF ? 10 : 4,
                             'batchPages': isFF ? 1 : 0,
+                            'appendOnly': isFF,
                             'onContentUpdated': function () {
                                 fm_throttled_refresh(self.viewmode);
                             },

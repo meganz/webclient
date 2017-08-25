@@ -22548,11 +22548,12 @@ table.speed-table {
 .megaList.ps-container > .ps-scrollbar-y-rail, .megaList.ps-container:hover > .ps-scrollbar-y-rail {
     background-color: transparent !important;
     opacity: 1;
+    right: 0px !important;
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y,
 .megaList.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y{
     background-color: rgb(102, 102, 102) !important;
-    width: 6px;
+    width: 8px;
     opacity: 0.2;
     -webkit-transition: opacity 100ms ease-in-out;
     -moz-transition: opacity 100ms ease-in-out;

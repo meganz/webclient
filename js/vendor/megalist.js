@@ -104,6 +104,14 @@
         'appendTo': false,
 
         /**
+         * If set to `true` MegaList would dynamically append, but never remove any nodes.
+         * This is useful for browsers which have issues doing DOM ops and mess up the actual overall user experience
+         * in sites using the MegaList for showing stuff, that later on would be cleared when the user changes the page
+         * (e.g. file managers, when the user goes to a different folder, the DOM is cleared out).
+         */
+        'appendOnly': false,
+
+        /**
          * Optional feature to insert items before/after their previous nodes, instead of always appending them
          * to the bottom of the container.
          *
@@ -345,7 +353,7 @@
         itemIdsArray.forEach(function(itemId) {
             var itemIndex = self.items.indexOf(itemId);
             if (itemIndex > -1) {
-                if (self.isRendered(itemId)) {
+                if (self.isRendered(itemId) && self.options.appendOnly !== true) {
                     requiresRerender = true;
                     DOMUtils.removeNode(self._currentlyRendered[itemId]);
                     delete self._currentlyRendered[itemId];
@@ -883,15 +891,20 @@
                 ) * calculated['itemsPerRow'];
         }
         if (!calculated['visibleFirstItemNum']) {
-            calculated['visibleFirstItemNum'] = Math.floor(
-                Math.floor(calculated['scrollTop'] / this.options.itemHeight) * calculated['itemsPerRow']
-            );
-
-            if (calculated['visibleFirstItemNum'] > 0) {
-                calculated['visibleFirstItemNum'] = Math.max(
-                    0,
-                    calculated['visibleFirstItemNum'] - (this.options.extraRows * calculated['itemsPerRow'])
+            if (this.options.appendOnly !== true) {
+                calculated['visibleFirstItemNum'] = Math.floor(
+                    Math.floor(calculated['scrollTop'] / this.options.itemHeight) * calculated['itemsPerRow']
                 );
+
+                if (calculated['visibleFirstItemNum'] > 0) {
+                    calculated['visibleFirstItemNum'] = Math.max(
+                        0,
+                        calculated['visibleFirstItemNum'] - (this.options.extraRows * calculated['itemsPerRow'])
+                    );
+                }
+            }
+            else {
+                calculated['visibleFirstItemNum'] = 0;
             }
         }
 
@@ -972,25 +985,31 @@
         this._recalculate();
 
 
+        var contentWasUpdated = false;
+
         var first = this._calculated['visibleFirstItemNum'];
         var last = this._calculated['visibleLastItemNum'];
 
         // remove items before the first visible item
-        for(var i = 0; i<first; i++) {
-            var id = this.items[i];
-            if (this._currentlyRendered[id]) {
-                DOMUtils.removeNode(this._currentlyRendered[id]);
-                delete this._currentlyRendered[id];
+        if (this.options.appendOnly !== true) {
+            for (var i = 0; i < first; i++) {
+                var id = this.items[i];
+                if (this._currentlyRendered[id]) {
+                    contentWasUpdated = true;
+                    DOMUtils.removeNode(this._currentlyRendered[id]);
+                    delete this._currentlyRendered[id];
+                }
             }
-        }
 
 
-        // remove items after the last visible item
-        for(var i = last; i<this.items.length; i++) {
-            var id = this.items[i];
-            if (this._currentlyRendered[id]) {
-                DOMUtils.removeNode(this._currentlyRendered[id]);
-                delete this._currentlyRendered[id];
+            // remove items after the last visible item
+            for (var i = last; i < this.items.length; i++) {
+                var id = this.items[i];
+                if (this._currentlyRendered[id]) {
+                    contentWasUpdated = true;
+                    DOMUtils.removeNode(this._currentlyRendered[id]);
+                    delete this._currentlyRendered[id];
+                }
             }
         }
 
@@ -1001,6 +1020,8 @@
         for(var i = first; i < last; i++) {
             var id = this.items[i];
             if (!this._currentlyRendered[id]) {
+                contentWasUpdated = true;
+
                 var renderedNode = this.options.itemRenderFunction(id);
 
                 if (this.options.renderAdapter._repositionRenderedItem) {
@@ -1032,8 +1053,7 @@
                             else  {
                                 // no previous, render first
                                 // DOMUtils.prepend(renderedNode, this.content);
-
-                                prependQueue.push(renderedNode);
+                                appendQueue.push(renderedNode);
                             }
                         }
                     }
@@ -1061,16 +1081,18 @@
             }
         }
 
-        if (this.options.renderAdapter._itemsRepositioned) {
-            this.options.renderAdapter._itemsRepositioned();
-        }
+        if (contentWasUpdated === true) {
+            if (this.options.renderAdapter._itemsRepositioned) {
+                this.options.renderAdapter._itemsRepositioned();
+            }
 
-        this._isUserScroll = false;
-        this.scrollUpdate();
-        this._isUserScroll = true;
+            this._isUserScroll = false;
+            this.scrollUpdate();
+            this._isUserScroll = true;
 
-        if (this.options.onContentUpdated) {
-            this.options.onContentUpdated();
+            if (this.options.onContentUpdated) {
+                this.options.onContentUpdated();
+            }
         }
     };
 
@@ -1124,17 +1146,19 @@
         // IF initially the folder was empty, megaList may not had been rendered...so, lets check
         var requiresRerender = false;
 
-        r.removed.forEach(function(itemId) {
-            var itemIndex = self.items.indexOf(itemId);
-            if (itemIndex > -1) {
-                if (self.isRendered(itemId)) {
-                    requiresRerender = true;
-                    DOMUtils.removeNode(self._currentlyRendered[itemId]);
-                    delete self._currentlyRendered[itemId];
+        if (self.options.appendOnly !== true) {
+            r.removed.forEach(function (itemId) {
+                var itemIndex = self.items.indexOf(itemId);
+                if (itemIndex > -1) {
+                    if (self.isRendered(itemId)) {
+                        requiresRerender = true;
+                        DOMUtils.removeNode(self._currentlyRendered[itemId]);
+                        delete self._currentlyRendered[itemId];
+                    }
+                    self.items.splice(itemIndex, 1);
                 }
-                self.items.splice(itemIndex, 1);
-            }
-        });
+            });
+        }
 
         r.added.forEach(function(itemId) {
             var itemIndex = self.items.indexOf(itemId);
@@ -1338,8 +1362,10 @@
         var megaList = self.megaList;
         var calculated = megaList._calculated;
 
-        var prepusherHeight = calculated['visibleFirstItemNum'] * megaList.options.itemHeight;
-        self.prePusherDOMNode.style.height = prepusherHeight + "px";
+        if (this.megaList.options.appendOnly !== true) {
+            var prepusherHeight = calculated['visibleFirstItemNum'] * megaList.options.itemHeight;
+            self.prePusherDOMNode.style.height = prepusherHeight + "px";
+        }
 
         var postpusherHeight = (megaList.items.length - calculated['visibleLastItemNum']) * megaList.options.itemHeight;
         self.postPusherDOMNode.style.height = postpusherHeight + "px";

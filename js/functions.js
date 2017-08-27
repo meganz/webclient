@@ -1709,7 +1709,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 
                     if (inRub) {
                         $('.grid-table.fm#' + handle).remove();
-                        $('.file-block#' + handle).remove();
+                        $('.data-block-view#' + handle).remove();
                     }
                 });
 

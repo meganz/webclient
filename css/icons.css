@@ -889,7 +889,9 @@
     height: 22px;
     margin: 0 13px 1px -1px;
 }
-.small-icon.context.cloud {}
+.small-icon.context.cloud {
+    background-position: -102px -30px;
+}
 .dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
 }

@@ -8,7 +8,7 @@
     var SHOW_AFTER_LASTSKIP = 3 * 30 * 24 * 60 * 60;
     var SHOW_AFTER_ACCOUNT_AGE = 7 * 24 * 60 * 60;
     var SHOW_AFTER_LASTSUCCESS = 3 * 30 * 24 * 60 * 60;
-    var RECHECK_INTERVAL = 60 * 60;
+    var RECHECK_INTERVAL = 15 * 60;
 
     if (DEBUG) {
         SHOW_AFTER_LASTLOGIN = 15;
@@ -368,7 +368,17 @@
             unixtime() - self.passwordReminderAttribute.lastLogin > SHOW_AFTER_LASTLOGIN
         ) {
             self.showIcon();
+
+            // skip recheck in case:
+            // - there is a visible .dropdown
+            // - the user had a textarea, input or select field focused
+            // - there is a visible/active dialog
+            var skipShowingDialog = $(
+                'textarea:focus, input:focus, select:focus, .dropdown:visible, .fm-dialog:visible'
+            ).length > 0;
+
             if (
+                !skipShowingDialog &&
                 is_fm() &&
                 !pfid &&
                 (
@@ -512,6 +522,11 @@
     scope.mega.ui.passwordReminderDialog = passwordReminderDialog;
 
     mBroadcaster.once('login', function() {
+        // cancel page can trigger a login event, which should NOT trigger PRD attribute update.
+        if (window.location.toString().indexOf("/cancel") > -1) {
+            return;
+        }
+
         // since u_type is not available yet, assuming that 'login' would only be triggered by a normal user login
         // e.g. u_type === 3
         passwordReminderDialog.passwordReminderAttribute.lastLogin = unixtime();

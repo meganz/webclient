@@ -1341,6 +1341,9 @@ input.radioOn, input.radioOff {
     opacity: 0;
     width: 18px;
     height: 18px;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
 }
 .bp-main {
     color: #595959;

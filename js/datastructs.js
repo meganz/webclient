@@ -221,7 +221,7 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
 
 
     obj._getDataChangeEventName = function() {
-        return 'change_' + this._dataChangeTrackedId;
+        return 'datastructs:change_' + this._dataChangeTrackedId;
     };
 
     if (implementChangeListener === true) {

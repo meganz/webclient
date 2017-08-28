@@ -732,12 +732,31 @@ function mObjectURL(data, type)
     return blob && URL.createObjectURL(blob);
 }
 
-Object.defineProperty(this, 'mBroadcaster', {
-    writable: false,
-    value: {
-    _topics : {},
+/**
+ * Events broadcaster
+ * @name mBroadcaster
+ * @global
+ */
+(function(s, o) {
+    'use strict';
+    Object.defineProperty(s, 'mBroadcaster', {
+        value: o,
+        writable: false
+    });
+})(self, {
+    // @private
+    _topics: Object.create(null),
 
+    /**
+     * Add broadcast event listener.
+     * @param {String} topic A string representing the event type to listen for.
+     * @param {Object|Function} options Event options or function to invoke.
+     * @returns {String} The ID identifying the event
+     * @memberOf mBroadcaster
+     */
     addListener: function mBroadcaster_addListener(topic, options) {
+        'use strict';
+
         if (typeof options === 'function') {
             options = {
                 callback : options
@@ -753,11 +772,11 @@ Object.defineProperty(this, 'mBroadcaster', {
             return false;
         }
 
-        if (!this._topics.hasOwnProperty(topic)) {
-            this._topics[topic] = {};
+        if (!this._topics[topic]) {
+            this._topics[topic] = Object.create(null);
         }
 
-        var id = Math.random().toString(26);
+        var id = makeUUID();
         this._topics[topic][id] = options;
 
         //if (d) console.log('Adding broadcast listener', topic, id, options);
@@ -765,8 +784,33 @@ Object.defineProperty(this, 'mBroadcaster', {
         return id;
     },
 
+    /**
+     * Remove all broadcast events for an specific topic.
+     * @param {String} topic The string representing the event type we were listening for.
+     * @returns {Boolean} Whether the event was found.
+     * @memberOf mBroadcaster
+     */
+    removeListeners: function mBroadcaster_removeListeners(topic) {
+        'use strict';
+
+        if (this._topics[topic]) {
+            delete this._topics[topic];
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * Remove an specific event based on the ID given by addListener()
+     * @param {String} token The ID identifying the event.
+     * @param {EventListener} [listener] Optional DOM event listener.
+     * @returns {Boolean} Whether the event was found.
+     * @memberOf mBroadcaster
+     */
     removeListener: function mBroadcaster_removeListenr(token, listener) {
-        if (d) console.log('Removing broadcast listener', token);
+        'use strict';
+
+        // if (d) console.log('Removing broadcast listener', token);
 
         if (listener) {
             // Remove an EventListener interface.
@@ -795,8 +839,16 @@ Object.defineProperty(this, 'mBroadcaster', {
         return false;
     },
 
+    /**
+     * Send a broadcast event
+     * @param {String} topic A string representing the event type to notify.
+     * @returns {Boolean} Whether anyone were listening.
+     * @memberOf mBroadcaster
+     */
     sendMessage: function mBroadcaster_sendMessage(topic) {
-        if (this._topics.hasOwnProperty(topic)) {
+        'use strict';
+
+        if (this._topics[topic]) {
             var idr  = [];
             var args = toArray.apply(null, arguments);
             args.shift();
@@ -818,9 +870,9 @@ Object.defineProperty(this, 'mBroadcaster', {
                     idr.push(id);
             }
             if (idr.length) {
-                idr.forEach(function(id) {
-                    this.removeListener(id);
-                }.bind(this));
+                for (var i = idr.length; i--;) {
+                    this.removeListener(idr[i]);
+                }
             }
 
             return true;
@@ -829,7 +881,15 @@ Object.defineProperty(this, 'mBroadcaster', {
         return false;
     },
 
+    /**
+     * Wrapper around addListener() that will listen for the event just once.
+     * @param {String} topic A string representing the event type to listen for.
+     * @param {Function} callback The function to invoke
+     * @memberOf mBroadcaster
+     */
     once: function mBroadcaster_once(topic, callback) {
+        'use strict';
+
         this.addListener(topic, {
             once : true,
             callback : callback
@@ -1024,7 +1084,7 @@ Object.defineProperty(this, 'mBroadcaster', {
             delete localStorage[ev.key];
         }
     }
-}});
+});
 
 if (!is_karma) {
     Object.freeze(mBroadcaster);
@@ -2843,3 +2903,11 @@ var onIdle = window.requestIdleCallback || function(handler) {
             });
         }, 1);
     };
+
+function makeUUID(a) {
+    'use strict';
+
+    return a
+        ? (a ^ Math.random() * 16 >> a / 4).toString(16)
+        : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, makeUUID);
+}

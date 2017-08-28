@@ -7512,7 +7512,7 @@
         "context": "Label to let the user add a new excluded file name. Keep colon."
     },
     "7055": {
-        "text": "The new excluded file names will be taken into account\nwhen the application starts again.",
+        "text": "The new excluded file names will be taken into account when the application starts again.",
         "context": ""
     },
     "7056": {
@@ -7540,7 +7540,7 @@
         "context": "Message displayed when an error occurs exporting the master key to a file."
     },
     "7068": {
-        "text": "The new excluded file names will be taken into account\nwhen the application starts again",
+        "text": "The new excluded file names will be taken into account when the application starts again",
         "context": "Message displayed to inform the user that the new file name exclusion changes will be applied on next startup."
     },
     "7069": {
@@ -15463,6 +15463,178 @@
         "text": "Save the log file",
         "context": "The title of a dialog which is displayed when asking the user if they want to save the generated log file to an external location from the app."
     },
+    "16674": {
+        "text": "MEGAchat SDK version",
+        "context": "Title of the label where the MEGAchat SDK version is shown"
+    },
+    "16675": {
+        "text": "The folder is shared with %1$d contact. Remove share?",
+        "context": "Confirmation before removing the outgoing shares of a folder. Do not modify\/replace\/translate the %1$d variable as it will be dynamically replaced with the number of contacts being shared to."
+    },
+    "16676": {
+        "text": "The folder is shared with %1$d contacts. Remove all shares?",
+        "context": "Confirmation before removing the outgoing shares of a folder. Do not modify\/replace\/translate the %1$d variable as it will be dynamically replaced with the number of contacts being shared to."
+    },
+    "16677": {
+        "text": "Your account have been suspended due to Terms of Service violations. Please contact to support@mega.co.nz",
+        "context": "Error message when trying to login and the account is suspended."
+    },
+    "16678": {
+        "text": "Too many failed attempts to login, please wait for an hour.",
+        "context": "Error message when to many attempts to login."
+    },
+    "16679": {
+        "text": "This account has not been validated yet. Please, check your email.",
+        "context": "Error message when trying to login to an account not validated."
+    },
+    "16680": {
+        "text": "The file link has been removed because of a ToS\/AUP violation.",
+        "context": "Error message shown when opening a file link which has been removed due to ToS\/AUP violation.\r\nToS stands for Terms of Service. AUP stands for Acceptable Use Policy."
+    },
+    "16681": {
+        "text": "Awaiting email confirmation",
+        "context": "Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email."
+    },
+    "16682": {
+        "text": "item",
+        "context": "Singular of items which contains a folder. 1 item"
+    },
+    "16683": {
+        "text": "items",
+        "context": "Plural of items which contains a folder. 2 items"
+    },
+    "16684": {
+        "text": "The associated user account has been terminated due to multiple violations of our Terms of Service.",
+        "context": "Error message shown when opening a file or folder link for which the owner account has been removed due to ToS\/AUP violation."
+    },
+    "16685": {
+        "text": "The provided decryption key for the folder link is invalid.",
+        "context": "Error message shown after loading a folder link with an invalid decryption key, so that the folder can not be successfully decrypted\/viewed\/opened."
+    },
+    "16686": {
+        "text": "My credentials",
+        "context": "Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts"
+    },
+    "16687": {
+        "text": "Chat BETA",
+        "context": "Item of the navigation title for the chat section. The Chat is in a BETA phase of development."
+    },
+    "16689": {
+        "text": "Archive",
+        "context": "Title of the archived chats tab."
+    },
+    "16690": {
+        "text": "No conversations",
+        "context": "Message shown when the user has no archived chats"
+    },
+    "16691": {
+        "text": "Enable chat",
+        "context": "Message shown when the user needs to enable the chat feature."
+    },
+    "16692": {
+        "text": "Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.",
+        "context": "Message shown when the user has no recent chats, encouraging them to invite their friends and start chatting."
+    },
+    "16694": {
+        "text": "h",
+        "context": "Initial of the word hour to show the duration of a video or audio call"
+    },
+    "16695": {
+        "text": "m",
+        "context": "Initial of the word minute to show the duration of a video or audio call"
+    },
+    "16696": {
+        "text": "s",
+        "context": "Initial of the word second to show the duration of a video or audio call"
+    },
+    "16697": {
+        "text": "%d selected",
+        "context": "Title shown when multiselection is enable in chat tabs, and the user has more than one item selected."
+    },
+    "16698": {
+        "text": "The contact %s will be removed from the shared folder.",
+        "context": "Message to confirm if the user wants to delete a contact from a shared folder. Please leave the %s placeholder as it is as it will be replaced by the contact's name."
+    },
+    "16699": {
+        "text": "%d contacts will be removed from the shared folder.",
+        "context": "Message to confirm if the user wants to delete a multiple contacts from a shared folder. The %d variable will be replaced by the number of contacts to be removed."
+    },
+    "16700": {
+        "text": "%d contacts removed correctly from the shared folder",
+        "context": "success message when removing a contact from a shared folder. %d will be replaced with the number of contacts removed."
+    },
+    "16701": {
+        "text": "and %d contacts were not successfully removed",
+        "context": "additional failure message when removing contacts from a shared folder where some of the contacts were not able to be removed. %d will be replaced with the number of contacts."
+    },
+    "16702": {
+        "text": "Loading contacts from the phone...",
+        "context": "Message shown while the contact list from the device is being read and then shown to the user"
+    },
+    "16703": {
+        "text": "%d invite requests sent successfully.",
+        "context": "success message when reinviting multiple contacts. The %d placeholder will be replaced by the number of invite requests that were sent."
+    },
+    "16704": {
+        "text": "%1$d invite requests successfully sent but %2$d requests were not sent.",
+        "context": "error message when reinviting multiple contacts. The %1$d and %2$d placeholders should not be translated or changed, as they will be replaced by the number of invites sent or not sent."
+    },
+    "16705": {
+        "text": "%1s (Me)",
+        "context": "Word next to own user's message in chat screen. %1s should not be translated or changed as it will be replaced dynamically by the code."
+    },
+    "16707": {
+        "text": "Type a message",
+        "context": "Hint shown in the field to write a message in the chat screen, prompting the user to write a message in this field."
+    },
+    "16708": {
+        "text": "Unmute",
+        "context": "button label to turn the microphone back on so the user can speak."
+    },
+    "16709": {
+        "text": "Chat notifications",
+        "context": "Title of the section to enable notifications in the Contact Properties screen"
+    },
+    "16710": {
+        "text": "Message sound",
+        "context": "Title of the section to choose the sound of incoming messages in the Contact Properties screen"
+    },
+    "16711": {
+        "text": "Clear chat",
+        "context": "Title of the section to clear the chat content in the Contact Properties screen"
+    },
+    "16712": {
+        "text": "Share contact",
+        "context": "Title of the section to share the contact in the Contact Properties screen"
+    },
+    "16713": {
+        "text": "Call ringtone",
+        "context": "Title of the screen to select the ringtone of the calls"
+    },
+    "16714": {
+        "text": "Notification sound",
+        "context": "Title of the screen to select the sound of the notifications"
+    },
+    "16715": {
+        "text": "After cleared, neither %s nor you will be able to see messages of this chat.",
+        "context": "Text of the confirmation dialog to clear the chat history. The %s placeholder should not be translated or changed as it will be replaced by the name of the contact you are chatting with, who will be affected by this chat-clearing."
+    },
+    "16716": {
+        "text": "The history of the chat has been cleared",
+        "context": "Message show when the history of a chat has been successfully deleted"
+    },
+    "16717": {
+        "text": "Error. The history of the chat has not been cleared correctly",
+        "context": "Message show when the history of a chat hasn't been successfully deleted"
+    },
+    "16718": {
+        "text": "Add participants",
+        "context": "Menu item to add participants to a chat"
+    },
+    "16719": {
+        "text": "Remove participant",
+        "context": "Menu item to remove a participant from a chat"
+    },
     "16859": {
         "text": "Some items could not be shared with MEGA",
         "context": "A message to inform the user that there were unsupported assets in the share."
@@ -15551,6 +15723,14 @@
         "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
         "context": "A message which is shown when there was a server-side error retrieving the cloud drive contents."
     },
+    "16893": {
+        "text": "You will need to restart MEGA after changing the language",
+        "context": "An alert message which is shown when the user is about to change the language of the app."
+    },
+    "16894": {
+        "text": "Language changed. Tap to restart.",
+        "context": "A message which is shown in a notification to make it easy for the user to restart the app after the language is changed."
+    },
     "16895": {
         "text": "Do you remember your password?",
         "context": "Used as a title in the \"Password reminder\" dialog, that pop ups to ensure that the user had exported his recovery key OR still remembers his password."
@@ -15591,8 +15771,80 @@
         "text": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
         "context": "If the user is logged in with an achievement account while running into a transfer limitation, we show this message to remind the user that he can achieve to get more transfer quota for free."
     },
+    "16905": {
+        "text": "Disabling this security check could allow your communications to be intercepted. Your data would be still inaccessible for attackers due to our end-to-end encryption, but they could blindly move your files and folders in MEGA, delete them or deny you access to your account.",
+        "context": "Information for the user about the consequences of disabling a security check of MEGAsync"
+    },
+    "16906": {
+        "text": "View previous versions",
+        "context": "Finder context menu option to view previous versions of a file within your MEGA account through the web browser."
+    },
+    "16909": {
+        "text": "There was a problem installing the update. Please try again later or download the last version from:\r\nhttps:\/\/mega.co.nz\/#sync",
+        "context": "A notification message which is launched when a problem occurs during the installation of an update."
+    },
+    "16910": {
+        "text": "Unable to get the filesystem. Please, try again. If the problem persists please contact bug@mega.co.nz.",
+        "context": "A message which is displayed when an error occurs while fetching nodes from the server."
+    },
+    "16912": {
+        "text": "Error: Invalid destination folder. The download has been canceled.",
+        "context": "A notification message which is shown when an error occurs while downloading a file to a invalid destination folder."
+    },
+    "16913": {
+        "text": "Our SSL key can't be verified. You could be affected by a man-in-the-middle attack or your antivirus software could be intercepting your communications and causing this problem. Please disable it and try again.",
+        "context": "A notification message which is shown when SSL checks fails."
+    },
+    "16915": {
+        "text": "The link cannot be generated because the file is in an incoming shared folder or in your Rubbish Bin.",
+        "context": "A notification error message which is shown while generating a public link of a file from an incoming shared folder or from the rubbish bin."
+    },
+    "16916": {
+        "text": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
+        "context": "A confirmation message which is displayed when a user tries to upload a file to a synced folder which already contains it. Please keep the (%1) code because it will be filled with name of the file."
+    },
+    "16917": {
+        "text": "You need Full access rights to be able to sync the selected folder.",
+        "context": "An error message which is shown when a user is trying sync a non compatible folder."
+    },
+    "16919": {
+        "text": "Export Key",
+        "context": "A button label to export the Recovery Key of the current user."
+    },
+    "16920": {
+        "text": "Export Recovery Key",
+        "context": "A dialog title to export the Recovery Key for the current user."
+    },
+    "16921": {
+        "text": "Always keep physical control of your Recovery Key (e.g. on a client device, external storage, or print).",
+        "context": "A label to inform the user to keep physical control of the Recovery Key."
+    },
+    "16922": {
+        "text": "You have to accept our Terms of Service",
+        "context": "A label which is displayed when the user has not checked the agreement for the Terms of Service."
+    },
+    "16923": {
+        "text": "When you finish this assistant, you will be able to sync additional folders using the settings dialog",
+        "context": "A label which is shown when the initial setup wizard is at the final stage. This informs the user about the possibility of adding new synchronizations through the settings dialog."
+    },
     "16927": {
         "text": "This action can not be completed as it would take you over your current storage limit",
         "context": "Error message shown to user when a copy\/import operation would take them over their storage limit."
+    },
+    "17076": {
+        "text": "The process is taking longer than expected. Please wait...",
+        "context": "A message shown in the app when logging in and the user does not receive a server response. This means that it may take some time until the user logs in."
+    },
+    "17077": {
+        "text": "Saving the Recovery Key and keeping it in a secure location enables you to recover your account in the case of a lost password without data loss.",
+        "context": "The footer message shown on the Settings \/ Security Options section that explains what it means to export the Recovery Key."
+    },
+    "17078": {
+        "text": "View and edit profile",
+        "context": "A title shown on the My Account section that describes a place where the user can view and edit their profile."
+    },
+    "17080": {
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
+        "context": "Paragraph 5 of the general description of MEGA shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
     }
 }

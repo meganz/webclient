@@ -154,16 +154,25 @@ function dl_g(res) {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
                 $('#megaapp-download').prop('checked', true);
                 $('.download.big-button.download-file span').text(l[58]);
+                $('.download.big-button.download-file i').removeClass('save resume');
             };
             var uncheckMegaSyncDownload = function() {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
                 $('#megaapp-download').prop('checked', false);
                 var $but = $('.download.big-button.download-file span');
                 if (resumeInfo) {
-                    $but.text(resumeInfo.size === fdl_filesize ? l[776] : l[1649]);
+                    if (resumeInfo.size === fdl_filesize) {
+                        $but.text(l[776]);
+                        $('.download.big-button.download-file i').removeClass('resume').addClass('save');
+                    }
+                    else {
+                        $but.text(l[1649]);
+                        $('.download.big-button.download-file i').removeClass('save').addClass('resume');
+                    }
                 }
                 else {
                     $but.text(l[58]);
+                    $('.download.big-button.download-file i').removeClass('save resume');
                 }
             };
             $('.download.big-button.download-file span').text(l[58]);
@@ -191,9 +200,7 @@ function dl_g(res) {
                                 $('.download.state-text.save').removeClass('hidden');
                                 $('.download.transfer-buttons a').addClass('hidden');
                                 $('.download.big-button.download-file span').text(l[776]);
-                                $('.download.big-button.download-file i')
-                                    .removeClass('resume')
-                                    .addClass('save');
+                                $('.download.big-button.download-file i').removeClass('resume').addClass('save');
 
                                 /*var download = fdl_queue_var;
 
@@ -218,9 +225,7 @@ function dl_g(res) {
                                 $('.download.state-text.save').addClass('hidden');
                                 $('.download.state-text.resume').removeClass('hidden');
                                 $('.download.big-button.download-file span').text(l[1649]);
-                                $('.download.big-button.download-file i')
-                                    .removeClass('save')
-                                    .addClass('resume');
+                                $('.download.big-button.download-file i').removeClass('save').addClass('resume');
                             }
                             else {
                                 resumeInfo = null;

@@ -2126,10 +2126,29 @@ mBroadcaster.once('startMega', function() {
                         }
 
                         if (entries.length) {
-                            if (d) {
-                                dlmanager.logger.info('Resuming transfers...', entries);
-                            }
-                            M.addDownload(entries);
+                            var $dialog = $('.fm-dialog.resume-transfer');
+
+                            $('.fm-dialog-close, .cancel', $dialog).rebind('click', function() {
+                                fm_hideoverlay();
+                                $dialog.addClass('hidden');
+
+                                for (var i = entries.length; i--;) {
+                                    M.delPersistentData(prefix + entries[i]);
+                                }
+                            });
+
+                            $('.big-button.red', $dialog).rebind('click', function() {
+                                if (d) {
+                                    dlmanager.logger.info('Resuming transfers...', entries);
+                                }
+                                fm_hideoverlay();
+                                M.addDownload(entries);
+                                $dialog.addClass('hidden');
+                            });
+
+                            fm_showoverlay();
+                            $.dialog = 'resume-transfer';
+                            $dialog.removeClass('hidden');
                         }
                     });
             });

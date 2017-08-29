@@ -916,6 +916,7 @@ function mObjectURL(data, type)
                             + (this.master ? 'MASTER':'SLAVE'));
 
                         console.log(String(ua));
+                        console.log(buildVersion);
                         console.log(browserdetails(ua).prod + u_handle);
                     }
                     cb(this.master);

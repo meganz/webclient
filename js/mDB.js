@@ -104,11 +104,26 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     fmdb.inval_ready = false;
 
     // Notify completion invoking the provided callback
-    var resolve = function(res) {
+    var resolve = function(sn, error) {
         fmdb.opening = false;
 
         if (typeof result === 'function') {
-            result(res);
+            if (error) {
+                fmdb.crashed = true;
+                fmdb.logger.warn('Marking DB as crashed.', error);
+
+                if (fmdb.db) {
+                    onIdle(function() {
+                        fmdb.db.delete();
+                        fmdb.db = false;
+                    });
+                }
+
+                // force no-treecache gettree
+                localStorage.force = 1;
+            }
+
+            result(sn);
 
             // prevent this from being called twice..
             result = null;
@@ -116,10 +131,8 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     };
 
     // Catch errors, mark DB as crashed, and move forward without indexedDB support
-    var onErrorCatch = function(e) {
-        fmdb.logger.error("IndexedDB or crypto layer unavailable, disabling", e);
-        fmdb.crashed = true;
-        resolve(false);
+    var reject = function(e) {
+        resolve(false, e || EFAILED);
     };
 
     // Database opening logic
@@ -139,8 +152,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     fmdb.logger.warn('Opening the database timed out.');
                 }
 
-                fmdb.crashed = true;
-                resolve(false);
+                reject(ETEMPUNAVAIL);
             }
         }, 9000);
 
@@ -161,6 +173,10 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         fmdb.tables = Object.keys(dbSchema);
 
         fmdb.db.open().then(function() {
+            if (fmdb.crashed) {
+                // Opening timed out.
+                return;
+            }
             fmdb.get('_sn').always(function(r) {
                 if (!wipe && r[0] && r[0].length === 11) {
                     if (d) {
@@ -179,29 +195,16 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     fmdb.db.delete().then(function() {
                         fmdb.db.open().then(function() {
                             resolve(false);
-                        }).catch(function(e) {
-                            fmdb.crashed = true;
-                            fmdb.logger.error(e);
-                            resolve(false);
-                        });
-                    }).catch(function(e) {
-                        fmdb.crashed = true;
-                        fmdb.logger.error(e);
-                        resolve(false);
-                    });
+                        }).catch(reject);
+                    }).catch(reject);
                 }
             });
         }).catch(Dexie.MissingAPIError, function(e) {
-            fmdb.crashed = true;
             fmdb.logger.error("IndexedDB unavailable", e);
-            resolve(false);
-        }).catch(function(e) {
-            fmdb.crashed = true;
-            fmdb.logger.error(e);
-            resolve(false);
-        });
+            reject(e);
+        }).catch(reject);
     };
-    openDataBase = tryCatch(openDataBase, onErrorCatch);
+    openDataBase = tryCatch(openDataBase, reject);
 
     // Enumerate databases and collect those not prefixed with 'dbpfx' (which is the current format)
     var collectDataBaseNames = function() {

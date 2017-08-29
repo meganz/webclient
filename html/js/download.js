@@ -187,9 +187,13 @@ function dl_g(res) {
                                 dlprogress(-0xbadf, perc, resumeInfo.byteOffset, fdl_filesize);
 
                                 $('.progress-resume').removeClass('hidden');
-                                $('.download-state-text').removeClass('hidden');
+                                $('.download.state-text.resume').addClass('hidden');
+                                $('.download.state-text.save').removeClass('hidden');
                                 $('.download.transfer-buttons a').addClass('hidden');
                                 $('.download.big-button.download-file span').text(l[776]);
+                                $('.download.big-button.download-file i')
+                                    .removeClass('resume')
+                                    .addClass('save');
 
                                 /*var download = fdl_queue_var;
 
@@ -211,7 +215,12 @@ function dl_g(res) {
                                     onIdle(browserDownload);
                                 }
                                 $('.progress-resume').removeClass('hidden');
+                                $('.download.state-text.save').addClass('hidden');
+                                $('.download.state-text.resume').removeClass('hidden');
                                 $('.download.big-button.download-file span').text(l[1649]);
+                                $('.download.big-button.download-file i')
+                                    .removeClass('save')
+                                    .addClass('resume');
                             }
                             else {
                                 resumeInfo = null;
@@ -463,6 +472,7 @@ function browserDownload() {
     {
         var $downloadPage = $('.download.scroll-block');
         $downloadPage.addClass('downloading');
+        $downloadPage.find('.download.state-text').addClass('hidden');
         $downloadPage.find('.img-preview-button:visible').addClass('hidden');
         $downloadPage.find('.standalone-download-message').removeClass('hidden');
         $downloadPage.find('.download.speed-block .light-txt').text(l[1042] + '\u2026');
@@ -696,6 +706,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     }
     $('.download.error-text, .download.main-transfer-error').addClass('hidden');
     $('.download.main-transfer-info').removeClass('hidden');
+    $('.download.state-text').addClass('hidden');
 
     if (dl_queue[dl_queue_num] && !dl_queue[dl_queue_num].starttime) {
         dl_queue[dl_queue_num].starttime = now - 100;

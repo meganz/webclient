@@ -1833,3 +1833,28 @@ background: linear-gradient(to bottom, rgba(255,102,107,1) 0%,rgba(236,82,87,1) 
     
 }
 /* end of Password remider */
+
+/* Resume-transfer dialog*/
+.fm-dialog.resume-transfer {
+    width: 520px;
+    margin: -133px 0 0 -260px;
+}
+.dialog.resume-transfer.body {
+    padding: 30px 46px 46px 46px;
+}
+.dialog.resume-transfer.text {
+    text-align: center;
+    padding: 0 0 0 0;
+    font-size: 14px;
+    line-height: 24px;
+    color: #777777;
+}
+.dialog.resume-transfer.buttons {
+    white-space: nowrap;
+    padding: 35px 1px 1px 1px;
+}
+.fm-dialog-header.big-pad {
+    margin: 7px 0 0 0;
+    position: relative;
+}
+/* end of Resume-transfer dialog*/

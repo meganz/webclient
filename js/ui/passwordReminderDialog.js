@@ -346,6 +346,11 @@
             return;
         }
 
+        // skip any re-checks in case this is the 'cancel' page
+        if (window.location.toString().indexOf("/cancel") > -1) {
+            return;
+        }
+
 
         // console.error([
         //     "checks",
@@ -522,6 +527,11 @@
     scope.mega.ui.passwordReminderDialog = passwordReminderDialog;
 
     mBroadcaster.once('login', function() {
+        // cancel page can trigger a login event, which should NOT trigger PRD attribute update.
+        if (window.location.toString().indexOf("/cancel") > -1) {
+            return;
+        }
+
         // since u_type is not available yet, assuming that 'login' would only be triggered by a normal user login
         // e.g. u_type === 3
         passwordReminderDialog.passwordReminderAttribute.lastLogin = unixtime();

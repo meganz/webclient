@@ -433,6 +433,7 @@
 
             if (this.container.nodeName === 'TABLE') {
                 var tbody = this.container.querySelector('tbody');
+
                 if (tbody) {
                     this.container = tbody;
                 }
@@ -995,7 +996,7 @@
 
                 if (DYNLIST_ENABLED) {
                     if (!aUpdate || !this.megaList) {
-                        var isFF = window.navigator.userAgent.indexOf("Firefox") > -1;
+                        var isFF = ua.details.engine === "Gecko";
 
                         var megaListOptions = {
                             'itemRenderFunction': fm_megalist_node_render,
@@ -1004,7 +1005,7 @@
                             'batchPages': isFF ? 1 : 0,
                             'appendOnly': isFF,
                             'onContentUpdated': function () {
-                                fm_throttled_refresh(self.viewmode);
+                                M.rmSetupUIDelayed();
                             },
                             'perfectScrollOptions': {
                                 'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
@@ -1021,7 +1022,7 @@
                         else {
                             megaListOptions['itemWidth'] = false;
                             megaListOptions['itemHeight'] = 24;
-                            megaListOptions['appendTo'] = 'table';
+                            megaListOptions['appendTo'] = 'tbody';
                             megaListOptions['renderAdapter'] = new MegaList.RENDER_ADAPTERS.Table();
                             megaListContainer = this.container.parentNode.parentNode;
                         }
@@ -1116,16 +1117,27 @@
             'cloud-drive': function(aUpdate, aNodeList, aUserData) {
                 if (DYNLIST_ENABLED) {
                     if (!aUpdate) {
-                        if (this.viewmode) {
-                            var container = document.querySelector('.fm-blocks-view.fm.fm');
-                            this.addClasses(document.querySelector('.files-grid-view.fm'), ["hidden"]);
-                        }
-                        else {
-                            var container = document.querySelector('.files-grid-view.fm');
-                            this.addClasses(document.querySelector('.fm-blocks-view.fm.fm'), ["hidden"]);
-                        }
+                        var container = document.querySelector(viewModeContainers[this.section][this.viewmode]);
+                        this.addClasses(
+                            document.querySelector(viewModeContainers[this.section][0 + !this.viewmode]),
+                            ["hidden"]
+                        );
+
                         this.addClasses(container, ['megaListContainer']);
-                        this.removeClasses(container, ["hidden"]);
+
+                        // because, viewModeContainers is not perfectly structured as before (e.g.
+                        // container != the actual container that holds the list, we try to guess/find the node, which
+                        // requires showing
+                        if (container.classList.contains("hidden")) {
+                            this.removeClasses(container, ["hidden"]);
+                        }
+                        else if (container.parentNode.classList.contains("hidden")) {
+                            this.removeClasses(container.parentNode, ["hidden"]);
+                        }
+                        else if (container.parentNode.parentNode.classList.contains("hidden")) {
+                            this.removeClasses(container.parentNode.parentNode, ["hidden"]);
+                        }
+
 
                         var ids = [];
                         aNodeList.forEach(function(v) {

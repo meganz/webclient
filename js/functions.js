@@ -2449,13 +2449,6 @@ Hash.prototype = Object.create(null, {
     }
 });
 
-function array_diff(old_arr, new_arr) {
-    return {
-        'removed': old_arr.filter(function(v) { return new_arr.indexOf(v) < 0; }),
-        'added': new_arr.filter(function(v) { return old_arr.indexOf(v) < 0; }),
-    };
-};
-
 
 /**
  * A function, which would be called on every DOM update (or scroll). This func would implement

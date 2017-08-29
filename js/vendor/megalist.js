@@ -26,7 +26,10 @@
      * @param node
      */
     DOMUtils.removeNode = function(node) {
-        node.parentNode.removeChild(node);
+        if (node.parentNode) {
+            node.parentNode.removeChild(node);
+        }
+        // else - parentNode is already removed.
     };
 
     /**
@@ -40,12 +43,12 @@
         var parent = targetElement.parentNode;
 
         // if the parents lastchild is the targetElement...
-        if (parent.lastChild == targetElement) {
+        if (parent.lastElementChild == targetElement) {
             // add the newElement after the target element.
             parent.appendChild(newElement);
         } else {
             // else the target has siblings, insert the new element between the target and it's next sibling.
-            parent.insertBefore(newElement, targetElement.nextSibling);
+            parent.insertBefore(newElement, targetElement.nextElementSibling);
         }
     };
 
@@ -62,8 +65,8 @@
             targetElement.prepend(newElement)
         }
         else {
-            if (targetElement.firstChild) {
-                targetElement.insertBefore(newElement, targetElement.firstChild);
+            if (targetElement.firstElementChild) {
+                targetElement.insertBefore(newElement, targetElement.firstElementChild);
             }
             else {
                 targetElement.appendChild(newElement);
@@ -472,7 +475,10 @@
      * Same as jQuery(megaListInstance).trigger(...);
      */
     MegaList.prototype.trigger = function () {
-        $(this).trigger.apply($(this), arguments);
+        if (!this.$megaList) {
+            this.$megaList = $(this);
+        }
+        this.$megaList.trigger.apply(this.$megaList, arguments);
     };
 
 
@@ -1141,7 +1147,7 @@
      */
     MegaList.prototype.syncItemsFromArray = function(idsArray) {
         var self = this;
-        var r = array_diff(this.items, idsArray);
+        var r = array.diff(this.items, idsArray);
 
         // IF initially the folder was empty, megaList may not had been rendered...so, lets check
         var requiresRerender = false;

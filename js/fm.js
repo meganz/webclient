@@ -1366,8 +1366,9 @@ function FMShortcuts() {
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
 
-        if (!is_fm())
+        if (!is_fm()) {
             return true;
+        }
 
         e = e || window.event;
 
@@ -1400,21 +1401,22 @@ function FMShortcuts() {
                 'op': charTyped == "c" ? 'copy' : 'cut',
                 'src': items
             };
+
             return false; // stop prop.
         } else if (charTyped == "v" && (e.ctrlKey || e.metaKey)) {
             if (!current_operation) {
                 return false; // stop prop.
             }
 
+            var handles = [];
             $.each(current_operation.src, function(k, v) {
-                if (current_operation.op == "copy") {
-                    M.copyNodes([v], M.currentdirid);
-                } else if (current_operation.op == "cut") {
-                    M.moveNodes([v], M.currentdirid);
-                }
+                handles.push(v);
             });
 
-            if (current_operation.op == "cut") {
+            if (current_operation.op == "copy") {
+                M.copyNodes(handles, M.currentdirid);
+            } else if (current_operation.op == "cut") {
+                M.moveNodes(handles, M.currentdirid);
                 current_operation = null;
             }
 

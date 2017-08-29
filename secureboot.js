@@ -318,7 +318,6 @@ if (!b_u) try
         delete localStorage['$!--foo'];
     }
     catch (ex) {
-        console.error("!!!!", ex);
 
         storageQuotaError = (ex.code === 22);
         cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
@@ -1159,9 +1158,6 @@ function siteLoadError(error, filename) {
 
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
 
-    if (d) {
-        console.error(error, filename);
-    }
 
     contenterror = 1;
     alert(message.join("\n\n"));
@@ -1903,25 +1899,25 @@ else if (!b_u) {
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
     if (!is_mobile) {
-        jsl.push({f: 'css/style.css', n: 'style_css', j: 2, w: 30, c: 1, d: 1, cache: 1});
-        jsl.push({f: 'js/vendor/megalist.js', n: 'megalist_js', j: 1, w: 5});
-        jsl.push({f: 'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j: 1, w: 1});
-        jsl.push({f: 'js/fm/selectionmanager.js', n: 'fm_selectionmanager_js', j: 1, w: 1});
-        jsl.push({f: 'js/fm.js', n: 'fm_js', j: 1, w: 12});
-        jsl.push({f: 'js/fm/achievements.js', n: 'achievements_js', j: 1, w: 5});
-        jsl.push({f: 'js/fm/dashboard.js', n: 'fmdashboard_js', j: 1, w: 5});
-        jsl.push({f: 'js/fm/account.js', n: 'fm_account_js', j: 1});
-        jsl.push({f: 'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j: 1});
+        jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
+        jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
+        jsl.push({f:'js/fm/selectionmanager.js', n: 'fm_selectionmanager_js', j:1, w:1});
+        jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
+        jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
+        jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
+        jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
-        jsl.push({f: 'js/ui/miniui.js', n: 'miniui_js', j: 1});
-        jsl.push({f: 'html/key.html', n: 'key', j: 0});
-        jsl.push({f: 'html/login.html', n: 'login', j: 0});
-        jsl.push({f: 'html/fm.html', n: 'fm', j: 0, w: 3});
-        jsl.push({f: 'html/top-login.html', n: 'top-login', j: 0});
-        jsl.push({f: 'js/notify.js', n: 'notify_js', j: 1});
-        jsl.push({f: 'js/popunda.js', n: 'popunda_js', j: 1});
+        jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
+        jsl.push({f:'html/key.html', n: 'key', j:0});
+        jsl.push({f:'html/login.html', n: 'login', j:0});
+        jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
+        jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
+        jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
+        jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
         jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f: 'css/user-card.css', n: 'user_card_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
     }
 

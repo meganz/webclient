@@ -1243,27 +1243,24 @@ FileManager.prototype.initUIKeyEvents = function() {
 
         var sl = false;
         var s = [];
-        var tempSel;
-        if (M.viewmode) {
-            tempSel = $('.data-block-view.ui-selected');
-        }
-        else {
-            tempSel = $('.grid-table tr.ui-selected');
-        }
+
         var selPanel = $('.fm-transfers-block tr.ui-selected');
 
         if (selectionManager && selectionManager.selected_list && selectionManager.selected_list.length > 0) {
-            selectionManager.selected_list.forEach(function (nodeId) {
-                s.push(nodeId);
-            });
+            s = clone(selectionManager.selected_list);
         }
         else {
             $.selected = [];
-            tempSel.each(function (i, e) {
-                var id = $(e).attr('id');
-                s.push(id);
-                $.selected.push(id);
-            });
+
+            var tempSel;
+            if (M.viewmode) {
+                tempSel = $('.data-block-view.ui-selected');
+            }
+            else {
+                tempSel = $('.grid-table tr.ui-selected');
+            }
+
+            $.selected = s = tempSel.attrs('id');
         }
 
         if (M.chat) {
@@ -2157,6 +2154,17 @@ FileManager.prototype.addGridUIDelayed = function(refresh) {
     }, 20);
 };
 
+/**
+ * A function, which would be called on every DOM update (or scroll). This func would implement
+ * throttling, so that we won't update the UI components too often.
+ *
+ */
+FileManager.prototype.rmSetupUIDelayed = function() {
+    delay('rmSetupUI', function() {
+        M.rmSetupUI(false, true);
+    }, 75);
+};
+
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
 
@@ -2302,7 +2310,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
         var s = e.shiftKey;
         if (e.shiftKey) {
-            selectionManager.shift_select_to($(this).attr('id'));
+            selectionManager.shift_select_to($(this).attr('id'), false, true);
         }
         else if (e.ctrlKey == false && e.metaKey == false)
         {

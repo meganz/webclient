@@ -132,6 +132,9 @@ html.gbot {
     position: relative;
     height: 100%;
 }
+.bottom-page.table-cell.col-2, .bottom-page.table-cell.col-3 {
+    height: auto;
+}
 .bottom-page.vertical-centered-cell {
     vertical-align: middle;
 }
@@ -1547,6 +1550,9 @@ html.gbot {
 .medium-txt.small-lineheight.info {
     padding-bottom: 80px;
 }
+.top-bl .bottom-page.table.changed-order .order2, .bottom-page.table.changed-order .order2 {
+    display: none;
+}
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .download-megasync-dialog .icon, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow {
@@ -1805,20 +1811,14 @@ html.gbot {
 .img-description .bottom-page.big-header, .bottom-page.big-header.mid-pad {
     padding: 5px 0 37px 0;
 }
-.bottom-page.table.changed-order {
-    display: -webkit-box;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    flex-direction: column;
+.bottom-page.table.changed-order .order1 {
+    display: none;
 }
-.changed-order .bottom-page.left-cell {
-    order: 2;
+.bottom-page.table.changed-order .order2 {
+    display: block;
 }
-.changed-order .bottom-page.right-cell {
-    order: 1;
+.bottom-page.table.changed-order .left-cell, .bottom-page.table.changed-order .right-cell {
+    height: auto;
 }
 .bottom-page.img.ios3, .bottom-page.img.android3 {
     padding: 0;
@@ -1917,24 +1917,18 @@ html.gbot {
 }
 
 @media only screen and (max-width: 783px) {
-.top-bl .bottom-page.table.changed-order {
-    display: -webkit-box;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    flex-direction: column;
+.top-bl .bottom-page.table.changed-order .order1 {
+    display: none;
+}
+.top-bl .bottom-page.table.changed-order .order2 {
+    display: block;
+}
+.top-bl .bottom-page.table.changed-order.left-cell {
+    height: auto;
 }
 .top-bl .bottom-page.table {
     text-align: center;
     height: auto;
-}
-.top-bl .changed-order .bottom-page.left-cell {
-    order: 1;
-}
-.top-bl .changed-order .bottom-page.left-cell:first-child {
-    order: 2;
 }
 .top-bl .bottom-page.left-cell {
     width: 100%;
@@ -2095,7 +2089,7 @@ html.gbot {
 }
 }
 
-@media only screen and (max-height: 570px) {
+@media only screen and (max-height: 640px) {
 .img.browsers-top, .bottom-page.img.sync-top, .bottom-page.img.sync-top, .mobile .megasync .bottom-page.img.sync-top {
     max-width: 80%;
     padding-bottom: 29px;

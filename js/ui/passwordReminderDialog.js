@@ -346,6 +346,11 @@
             return;
         }
 
+        // skip any re-checks in case this is the 'cancel' page
+        if (window.location.toString().indexOf("/cancel") > -1) {
+            return;
+        }
+
 
         // console.error([
         //     "checks",

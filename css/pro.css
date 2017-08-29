@@ -646,6 +646,7 @@ div.pro-feature-icon {
     margin: 0 0 0 -1px;
     display: block;
     padding: 0;
+    background-repeat: no-repeat;
 }
 .pro-feature-icon.bandwidth {
     background-position: 1px -1481px;

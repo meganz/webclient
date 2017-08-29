@@ -293,6 +293,16 @@ function init_page() {
         $('body').addClass('rtl');
     }
 
+    if (is_mobile && is_android) {
+        var $html = $('html');
+
+        $html.height(window.innerHeight);
+
+        $(window).rebind('resize.htmlheight', function() {
+            $html.height(window.innerHeight);
+        });
+    }
+
     // If on the plugin page, show the page with the relevant extension for their current browser
     if (page == 'plugin') {
         page = (window.chrome) ? 'chrome' : 'firefox';

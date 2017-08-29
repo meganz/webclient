@@ -2833,6 +2833,8 @@ function tryCatch(fn, onerror)
 }
 
 var onIdle = window.requestIdleCallback || function(handler) {
+    "use strict";
+
     var startTime = Date.now();
 
     return setTimeout(function() {

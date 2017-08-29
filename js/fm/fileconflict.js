@@ -6,10 +6,11 @@
          * @param {Array} files An array of files to check for conflicts
          * @param {String} target The target node handle
          * @param {String} op Operation, one of copy, move, or upload
+         * @param {Number} [defaultAction] The optional default action to perform
          * @returns {MegaPromise} Resolves with a non-conflicting array
          * @memberof fileconflict
          */
-        check: function(files, target, op) {
+        check: function(files, target, op, defaultAction) {
             var noFileConflicts = !!localStorage.noFileConflicts;
             var promise = new MegaPromise();
             var conflicts = [];
@@ -82,11 +83,18 @@
 
                         result.push(file);
 
-                        if (action === 1) {
+                        if (action === ns.REPLACE) {
                             file._replaces = node.h;
                         }
                     }
                 };
+
+                switch (defaultAction) {
+                    case ns.REPLACE:
+                    case ns.DONTCOPY:
+                    case ns.KEEPBOTH:
+                        repeat = defaultAction;
+                }
 
                 (function _prompt(a) {
                     var file = a.pop();
@@ -99,12 +107,12 @@
                             var name = file.name;
 
                             switch (repeat) {
-                                case 2:
+                                case ns.DONTCOPY:
                                     break;
-                                case 3:
+                                case ns.KEEPBOTH:
                                     name = self.findNewName(name, target);
                                 /* fallthrough */
-                                case 1:
+                                case ns.REPLACE:
                                     save(file, name, repeat, node);
                                     break;
                             }
@@ -198,17 +206,17 @@
             };
 
             $a1.rebind('click', function() {
-                done(file, $('.file-name', this).text(), 1);
+                done(file, $('.file-name', this).text(), ns.REPLACE);
             });
             $a2.rebind('click', function() {
-                done(null, 0, 2);
+                done(null, 0, ns.DONTCOPY);
             });
             $a3.rebind('click', function() {
-                done(file, $('.file-name', this).text(), 3);
+                done(file, $('.file-name', this).text(), ns.KEEPBOTH);
             });
 
             $('.skip-button', $dialog).rebind('click', function() {
-                done(null, 0, 2);
+                done(null, 0, ns.DONTCOPY);
             });
             $('.cancel-button, .fm-dialog-close', $dialog).rebind('click', function() {
                 done(-0xBADF);
@@ -322,10 +330,13 @@
                     return q;
                 }
             }
-        }
+        },
+
+        REPLACE: 1,
+        DONTCOPY: 2,
+        KEEPBOTH: 3
     };
 
     Object.defineProperty(global, 'fileconflict', {value: ns});
-    ns = undefined;
 
 })(this);

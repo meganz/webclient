@@ -60,6 +60,9 @@ function FMDB(plainname, schema, channelmap) {
     // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
     this.cantransact = -1;
 
+    // Backoff to throttle bulkPut & bulkDel operations.
+    this.bulkBackoff = 300;
+
     // initialise additional channels
     for (var i in this.channelmap) {
         i = this.channelmap[i];
@@ -558,14 +561,30 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                         // in non-transactional loop back when the browser is idle so that we'll
                         // prevent unnecessarily hanging the main thread and short writes...
                         if (!fmdb.commit) {
-                            setTimeout(dispatchputs, loadfm.loaded ? 20 : 2600);
+                            if (loadfm.loaded) {
+                                onIdle(dispatchputs);
+                            }
+                            else {
+                                fmdb.bulkBackoff = Math.min(1e4, fmdb.bulkBackoff << 1);
+                                setTimeout(dispatchputs, fmdb.bulkBackoff);
+                            }
                             return;
                         }
                     }
 
                     // loop back to write more pending data (or to commit the transaction)
                     fmdb.inflight = false;
+                    fmdb.bulkBackoff = 300;
                     dispatchputs();
+                }).catch(Dexie.BulkError, function(e) {
+                    // TODO: retry instead?
+
+                    fmdb.state = -1;
+                    fmdb.inflight = false;
+                    fmdb.invalidate();
+
+                    fmdb.logger.error('Bulk operation error, %s records failed. '
+                        + 'Marking DB as crashed.', e.failures.length, e);
                 });
 
                 // we don't send more than one transaction (looking at you, Microsoft!)

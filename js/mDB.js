@@ -1422,8 +1422,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
             }
             // has the parent been fetched yet?
             else if (!M.d[parent]) {
-                this.node([parent])
-                    .unpack(function(r) {
+                fmdb.getbykey('f', 'h', ['h', [parent]])
+                    .always(function(r) {
+                        if (r.length > 1) {
+                            console.error('Unexpected number of result for node ' + parent, r.length, r);
+                        }
                         for (var i = r.length; i--;) {
                             // providing a 'true' flag so that the node isn't added to M.c,
                             // otherwise crawling back to the parent won't work properly.
@@ -1447,6 +1450,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
                             dbfetch.get(parent, promise);
                         }
                         else {
+                            console.error('Failed to load folder ' + parent);
+                            api_req({a: 'log', e: 99667, m: 'Failed to fill M.c for a folder node..'});
                             promise.reject(EACCESS);
                         }
                     });

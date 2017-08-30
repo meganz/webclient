@@ -1355,7 +1355,9 @@ var dlmanager = {
             onDialogClosed: function() {
                 if ($dialog) {
                     fm_showoverlay();
-                    $dialog.removeClass('hidden');
+                    $dialog.removeClass('hidden')
+                        .find('.fm-dialog-close')
+                        .rebind('click.quota', closeDialog);
                 }
                 delete dlmanager.onOverquotaWithAchievements;
             }

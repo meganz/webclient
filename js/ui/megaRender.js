@@ -999,7 +999,7 @@
                         var isFF = ua.details.engine === "Gecko";
 
                         var megaListOptions = {
-                            'itemRenderFunction': fm_megalist_node_render,
+                            'itemRenderFunction': M.megaListRenderNode,
                             'preserveOrderInDOM': true,
                             'extraRows': isFF ? 10 : 4,
                             'batchPages': isFF ? 1 : 0,

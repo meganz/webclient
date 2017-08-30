@@ -2154,16 +2154,6 @@ FileManager.prototype.addGridUIDelayed = function(refresh) {
     }, 20);
 };
 
-/**
- * A function, which would be called on every DOM update (or scroll). This func would implement
- * throttling, so that we won't update the UI components too often.
- *
- */
-FileManager.prototype.rmSetupUIDelayed = function() {
-    delay('rmSetupUI', function() {
-        M.rmSetupUI(false, true);
-    }, 75);
-};
 
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";

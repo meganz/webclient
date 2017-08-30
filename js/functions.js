@@ -2448,39 +2448,3 @@ Hash.prototype = Object.create(null, {
         }
     }
 });
-
-
-/**
- * A function, which would be called on every DOM update (or scroll). This func would implement
- * throttling, so that we won't update the UI components too often.
- *
- */
-function fm_throttled_refresh() {
-    delay('fm_throttled_refresh', function() {
-        M.rmSetupUI(false, true);
-    }, 75);
-}
-
-function fm_megalist_node_render(aHandle) {
-    var megaRender = M.megaRender;
-    if (!megaRender) {
-        return;
-    }
-    megaRender.numInsertedDOMNodes++;
-
-    var node = megaRender.getDOMNode(aHandle, M.d[aHandle]);
-
-    if (selectionManager && selectionManager.selected_list) {
-        if (selectionManager.selected_list.indexOf(aHandle) > -1) {
-            node.classList.add('ui-selected');
-        }
-        else {
-            node.classList.remove('ui-selected');
-        }
-        node.classList.remove('ui-selectee');
-    }
-
-    M.d[aHandle].seen = true;
-
-    return node;
-}

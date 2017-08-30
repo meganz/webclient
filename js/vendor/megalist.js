@@ -1,5 +1,6 @@
 (function(scope, $) {
     var isFirefox = navigator.userAgent.indexOf("Firefox") > -1;
+    var isIE = navigator.userAgent.indexOf('Edge/') > -1 || navigator.userAgent.indexOf('Trident/') > -1;
 
     /**
      * Internal/private helper method for doing 'assert's.
@@ -970,7 +971,12 @@
         if (this._wasRendered || forced) {
             this._recalculate();
             if (oldContentHeight != this._calculated['contentHeight']) {
-                this.content.style.height = this._calculated['contentHeight'] + "px";
+                if (this.content.tagName === "TBODY" && isIE) {
+                    this.content.parentNode.style.height = this._calculated['contentHeight'] + "px";
+                }
+                else {
+                    this.content.style.height = this._calculated['contentHeight'] + "px";
+                }
             }
 
             // scrolled out of the viewport if the last item in the list was removed? scroll back a little bit...
@@ -1380,8 +1386,15 @@
     MegaList.RENDER_ADAPTERS.Table.prototype._rendered = function() {
         var megaList = this.megaList;
         assert(megaList.$content, 'megaList.$content is not ready.');
-        megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
-        Ps.update(this.megaList.listContainer);
+
+        if (megaList.content.tagName === "TBODY" && isIE) {
+            megaList.content.parentNode.style.height = megaList._calculated['contentHeight'] + "px";
+        }
+        else {
+            megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
+        }
+
+        Ps.update(megaList.listContainer);
     };
 
     MegaList.RENDER_ADAPTERS.Table.DEFAULTS = {};

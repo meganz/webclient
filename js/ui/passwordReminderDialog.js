@@ -1,11 +1,12 @@
 (function(scope) {
     "use strict";
 
-    var DEBUG = false;
+    var DEBUG = true;
 
     // all values are in seconds.
     var SHOW_AFTER_LASTLOGIN = 14 * 24 * 60 * 60;
     var SHOW_AFTER_LASTSKIP = 3 * 30 * 24 * 60 * 60;
+    var SHOW_AFTER_LASTSKIP_LOGOUT = 3 * 30 * 24 * 60 * 60;
     var SHOW_AFTER_ACCOUNT_AGE = 7 * 24 * 60 * 60;
     var SHOW_AFTER_LASTSUCCESS = 3 * 30 * 24 * 60 * 60;
     var RECHECK_INTERVAL = 15 * 60;
@@ -13,6 +14,7 @@
     if (DEBUG) {
         SHOW_AFTER_LASTLOGIN = 15;
         SHOW_AFTER_LASTSKIP = 30;
+        SHOW_AFTER_LASTSKIP_LOGOUT = 5;
         SHOW_AFTER_LASTSUCCESS = 45;
         SHOW_AFTER_ACCOUNT_AGE = 1 * 24 * 60 * 60;
         RECHECK_INTERVAL = 15;
@@ -86,7 +88,12 @@
         }
 
         // Save via mega.attr
-        this.save();
+        this.savingPromise = this.save();
+
+        var self = this;
+        self.savingPromise.always(function() {
+            delete self.savingPromise;
+        });
     };
 
     PasswordReminderAttribute.prototype.hasBeenMerged = function() {
@@ -105,14 +112,23 @@
         return vals.join(":");
     };
 
-    PasswordReminderAttribute.prototype.save = SoonFc(function() {
-        mega.attr.set(
-            "prd",
-            this.toString(),
-            -2,
-            true
-        );
-    }, 500);
+    PasswordReminderAttribute.prototype.save = function() {
+        var proxyPromise = new MegaPromise();
+        var self = this;
+
+        delay('pra_save', function() {
+            proxyPromise.linkDoneAndFailTo(
+                mega.attr.set(
+                    "prd",
+                    self.toString(),
+                    -2,
+                    true
+                )
+            );
+        }, 500);
+
+        return proxyPromise;
+    };
 
     PasswordReminderAttribute.prototype.loadFromAttribute = function() {
         var self = this;
@@ -203,8 +219,8 @@
             }
         });
 
-        $(this.dialog.querySelector('.fm-dialog-close')).rebind('click.prd', function(e) {
-            self.hideDialog();
+        $(self.dialog.querySelector('.fm-dialog-close')).rebind('click.prd', function(e) {
+            self.onSkipClicked();
             return false;
         });
 
@@ -274,6 +290,31 @@
         }
 
         this.hide();
+
+        this.onLogoutDialogUserAction();
+    };
+
+    PasswordReminderDialog.prototype.onLogoutDialogUserAction = function() {
+        var self = this;
+
+        if (self.passwordReminderAttribute.savingPromise) {
+            if (self._dialogActionPromise && self._dialogActionPromise.state() === 'pending') {
+                loadingDialog.show();
+                self._dialogActionPromise.always(function() {
+                    loadingDialog.hide();
+                });
+            }
+            self.passwordReminderAttribute.savingPromise.always(function() {
+                if (self._dialogActionPromise && self._dialogActionPromise.state() === 'pending') {
+                    self._dialogActionPromise.resolve();
+                }
+            });
+        }
+        else {
+            if (self._dialogActionPromise && self._dialogActionPromise.state() === 'pending') {
+                self._dialogActionPromise.resolve();
+            }
+        }
     };
 
     PasswordReminderDialog.prototype.onKeyExported = function() {
@@ -282,6 +323,10 @@
 
     PasswordReminderDialog.prototype.onBackupClicked = function(element, evt) {
         this.hide();
+
+        if (this._dialogActionPromise && this._dialogActionPromise.state() === 'pending') {
+            this._dialogActionPromise.reject();
+        }
 
         if (this.passwordField) {
             // clear the password field, so that if it was filled in the dialog would hide
@@ -507,6 +552,9 @@
     };
 
     PasswordReminderDialog.prototype.hide = function() {
+        if (this.dialogShown) {
+            return this.hideDialog();
+        }
         if (!this.isShown) {
             return;
         }
@@ -523,6 +571,11 @@
     };
 
     PasswordReminderDialog.prototype.onGenericClick = function(e) {
+        if (this.dialogShown) {
+            // in case this is the dialog shown (not the popup), don't hide it when the user clicks on the overlay
+            return;
+        }
+
         if (
             $(e.target).parents('.pass-reminder').size() === 0 &&
             !$(e.target).is('.pass-reminder')
@@ -542,11 +595,12 @@
         $(this.topIcon).unbind('click.prd');
     };
 
-    PasswordReminderDialog.prototype.showDialog = function() {
+    PasswordReminderDialog.prototype.showDialog = function(promise) {
         if (this.dialogShown) {
             return;
         }
 
+        $.dialog = "prd";
         this.dialogShown = true;
 
         this._initInternals();
@@ -555,6 +609,19 @@
 
         this.dialog.classList.remove('hidden');
         this.dialog.classList.add('fm-dialog');
+
+        var skipButton = this.dialog.querySelector('.button-prd-skip');
+        var backupButton = this.dialog.querySelector('.button-prd-backup');
+
+        if (backupButton) {
+            backupButton.classList.remove('grey-gradient');
+        }
+        if (skipButton) {
+            skipButton.classList.add('grey-gradient');
+        }
+        if (promise) {
+            this._dialogActionPromise = promise;
+        }
 
         this.repositionDialog();
     };
@@ -567,10 +634,86 @@
         this.dialog.classList.add('hidden');
         this.dialog.classList.remove('fm-dialog');
 
+        var skipButton = this.dialog.querySelector('.button-prd-skip');
+        var backupButton = this.dialog.querySelector('.button-prd-backup');
+
+        if (backupButton) {
+            backupButton.classList.add('grey-gradient');
+        }
+        if (skipButton) {
+            skipButton.classList.remove('grey-gradient');
+        }
+
         this.resetUI();
 
         $(window).unbind('resize.prd');
         $(document.body).unbind('mousedown.prd');
+    };
+
+    PasswordReminderDialog.prototype.recheckLogoutDialog = function() {
+        var self = this;
+        if (!u_handle) {
+            // user is in the middle of a logout...
+            return MegaPromise.resolve();
+        }
+
+        // skip any re-checks in case this is the 'cancel' page
+        if (window.location.toString().indexOf("/cancel") > -1) {
+            return MegaPromise.resolve();
+        }
+
+        var returnedPromise = new MegaPromise();
+
+
+        // console.error([
+        //     "checks",
+        //     self.passwordReminderAttribute.toString(),
+        //     !self.passwordReminderAttribute.masterKeyExported,
+        //     !self.passwordReminderAttribute.dontShowAgain,
+        //     unixtime() - u_attr.since > SHOW_AFTER_ACCOUNT_AGE,
+        //     unixtime() - self.passwordReminderAttribute.lastSuccess > SHOW_AFTER_LASTSUCCESS,
+        //     unixtime() - self.passwordReminderAttribute.lastLogin > SHOW_AFTER_LASTLOGIN
+        // ]);
+
+        // Intentionally copying the logic from .recheck, so that we can alter it for the logout action
+
+        // account is older then > SHOW_AFTER_ACCOUNT_AGE and lastLogin > SHOW_AFTER_LASTLOGIN
+        if (
+            u_type === 3 &&
+            !self.passwordReminderAttribute.masterKeyExported &&
+            !self.passwordReminderAttribute.dontShowAgain &&
+            unixtime() - u_attr.since > SHOW_AFTER_ACCOUNT_AGE &&
+            unixtime() - self.passwordReminderAttribute.lastSuccess > SHOW_AFTER_LASTSUCCESS &&
+            unixtime() - self.passwordReminderAttribute.lastLogin > SHOW_AFTER_LASTLOGIN
+        ) {
+            // skip recheck in case:
+            // - there is a visible .dropdown
+            // - the user had a textarea, input or select field focused
+            // - there is a visible/active dialog
+            var skipShowingDialog = $(
+                'textarea:focus, input:focus, select:focus, .dropdown:visible, .fm-dialog:visible'
+            ).length > 0;
+
+            if (
+                !skipShowingDialog &&
+                is_fm() &&
+                !pfid &&
+                (
+                    !self.passwordReminderAttribute.lastSkipped ||
+                    unixtime() - self.passwordReminderAttribute.lastSkipped > SHOW_AFTER_LASTSKIP_LOGOUT
+                )
+            ) {
+                self.showDialog(returnedPromise);
+            }
+            else {
+                returnedPromise.resolve();
+            }
+        }
+        else {
+            returnedPromise.resolve();
+        }
+
+        return returnedPromise;
     };
 
     var passwordReminderDialog = new PasswordReminderDialog();

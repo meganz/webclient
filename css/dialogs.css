@@ -1831,7 +1831,10 @@ background: linear-gradient(to bottom, rgba(255,102,107,1) 0%,rgba(236,82,87,1) 
     vertical-align: top;
     margin: 0 5px 0 0;
 }
-.pass-reminder .default-white-button:first-letter {
+.pass-reminder .default-white-button span {
+    display: block;
+}
+.pass-reminder .default-white-button span:first-letter {
     text-transform: uppercase !important;
 }
 /* end of Password remider */

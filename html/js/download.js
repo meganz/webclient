@@ -85,8 +85,10 @@ function dl_g(res) {
         megaAds.popAd = false;
     }
 
+    var isPageRefresh = false;
     if (Object(fdl_queue_var).lastProgress) {
         dlprogress.apply(this, fdl_queue_var.lastProgress);
+        isPageRefresh = true;
     }
     if (Object(fdl_queue_var).ph) {
         var gid = dlmanager.getGID(fdl_queue_var);
@@ -192,7 +194,12 @@ function dl_g(res) {
                             var perc = Math.floor(resumeInfo.byteOffset * 100 / fdl_filesize);
                             resumeInfo.size = size;
 
-                            if (size === fdl_filesize) {
+                            if (isPageRefresh) {
+                                if (d) {
+                                    console.log('on-page-refresh');
+                                }
+                            }
+                            else if (size === fdl_filesize) {
                                 dlprogress(-0xbadf, perc, resumeInfo.byteOffset, fdl_filesize);
 
                                 $('.progress-resume').removeClass('hidden');

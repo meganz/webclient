@@ -21,6 +21,14 @@ var bottompage = {
         }
         else {
             $('body').addClass('mobile');
+
+            if (is_android) {
+                bottompage.topBlockHeight();
+
+                $(window).off('orientationchange').on('orientationchange', function() {
+                    bottompage.topBlockHeight();
+                });
+            }
         } 
     },
 
@@ -166,5 +174,16 @@ var bottompage = {
                 $topHeader.removeClass('floating activated').removeAttr('style');
             }
         });
+    },
+
+    topBlockHeight: function() {
+        "use strict";
+
+        var $topBlock = $('.bottom-page.top-bl');
+        var topBlockHeight = $topBlock.parent().height();
+
+        if ($topBlock.length > -1) {
+            $topBlock.height(topBlockHeight);
+        }
     }
 };

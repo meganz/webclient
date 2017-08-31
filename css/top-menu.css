@@ -36,7 +36,7 @@
     right: -256px;
     display: block;
 }
-.mobile .top-menu-popup.hidden {
+.mobile.top-menu-popup.hidden {
     display: block !important;
     width: 0;
 }

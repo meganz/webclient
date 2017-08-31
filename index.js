@@ -283,6 +283,16 @@ function init_page() {
         $('body').addClass('rtl');
     }
 
+    if (is_mobile && is_android) {
+        var $html = $('html');
+
+        $html.height(window.innerHeight);
+
+        $(window).rebind('resize.htmlheight', function() {
+            $html.height(window.innerHeight);
+        });
+    }
+
     // If on the plugin page, show the page with the relevant extension for their current browser
     if (page == 'plugin') {
         page = (window.chrome) ? 'chrome' : 'firefox';
@@ -1112,7 +1122,7 @@ function init_page() {
         return false;
     }
 
-    else if (is_fm()) {
+    else if (is_fm()) {		
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
@@ -1257,6 +1267,7 @@ function init_page() {
         if (megaChatIsDisabled) {
             $(document.body).addClass("megaChatDisabled");
         }
+		pagemetadata();
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout) {
@@ -2231,6 +2242,7 @@ function parsetopmenu() {
 
 function loadSubPage(tpage, event)
 {
+	pagemetadata();
     tpage = getCleanSitePath(tpage);
 
     if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {

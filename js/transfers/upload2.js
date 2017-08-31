@@ -693,6 +693,9 @@ var ulmanager = {
     ulDeDuplicate: function UM_ul_deduplicate(File, identical, mNode) {
         var n;
         var uq = File.ul;
+
+        fmconfig.ul_skipIdentical = false;
+
         if (identical && fmconfig.ul_skipIdentical) {
             n = identical;
         }

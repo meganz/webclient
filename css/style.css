@@ -5652,6 +5652,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     text-overflow: ellipsis;
     position: relative;
 }
+
+/* ellipsis hack, so that we don't need to set "table-layout: fixed" */
+.fm-right-files-block td span.tranfer-filetype-txt:before,
+.fm-transfers-block td span.tranfer-filetype-txt:before {
+    content: '&nbsp;';
+    visibility: hidden;
+    width: 12px;
+    display: inline-block;
+}
+
+.fm-right-files-block td span.tranfer-filetype-txt,
+.fm-transfers-block td span.tranfer-filetype-txt {
+    position: absolute;
+    left: 0;
+    right: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* end of ellipsis hack */
+
 .fm-account-reseller .grid-table.vouchers {
     table-layout: auto;
 }

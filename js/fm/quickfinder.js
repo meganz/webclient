@@ -84,7 +84,7 @@ var QuickFinder = function(searchable_elements, containers) {
                     nameStr = v.m;
                 }
 
-                if (nameStr[0].toLowerCase() === charTyped) {
+                if (nameStr && nameStr[0] && nameStr[0].toLowerCase() === charTyped) {
                     return true;
                 }
             });

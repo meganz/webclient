@@ -1228,12 +1228,14 @@ MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
     'use strict';
 
     var promise = new MegaPromise();
-    loadingDialog.show();
+    loadingDialog.pshow();
 
     M.req({a: 'uq', strg: 1, qc: 1})
+        .always(function() {
+            loadingDialog.phide();
+        })
         .fail(promise.reject.bind(promise))
         .done(function(data) {
-            loadingDialog.hide();
 
             if (opSize === -1) {
                 opSize = data.mstrg;

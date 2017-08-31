@@ -1,4 +1,13 @@
 (function _fileconflict(global) {
+    'use strict';
+
+    var keepBothState = Object.create(null);
+    var saveKeepBothState = function(target, node, name) {
+        if (!keepBothState[target]) {
+            keepBothState[target] = Object.create(null);
+        }
+        keepBothState[target][name] = node;
+    };
 
     var ns = {
         /**
@@ -69,6 +78,7 @@
             }
 
             var resolve = function() {
+                keepBothState = Object.create(null);
                 result.fileConflictChecked = true;
                 promise.resolve(result);
             };
@@ -86,6 +96,7 @@
                             file._replaces = node.h;
                         }
                     }
+                    saveKeepBothState(target, node, name);
                 };
 
                 (function _prompt(a) {
@@ -288,6 +299,10 @@
          */
         getNodeByName: function(target, name, matchSingle) {
             var res;
+
+            if (keepBothState[target] && keepBothState[target][name]) {
+                return keepBothState[target][name];
+            }
 
             for (var h in M.c[target]) {
                 var n = M.d[h] || false;

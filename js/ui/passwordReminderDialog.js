@@ -190,6 +190,8 @@
     PasswordReminderDialog.prototype.bindEvents = function() {
         var self = this;
 
+        $(window).rebind('resize.prd', self.repositionDialog.bind(self));
+
         $(this.dialog.querySelectorAll('.default-white-button, .default-big-button')).rebind('click.prd', function(e) {
             self.onButtonClicked(this, e);
         });
@@ -201,6 +203,10 @@
             }
         });
 
+        $(this.dialog.querySelector('.fm-dialog-close')).rebind('click.prd', function(e) {
+            self.hideDialog();
+            return false;
+        });
 
         uiCheckboxes(
             $(this.dialog.querySelector('.content-block')),
@@ -424,14 +430,11 @@
         }
     };
 
-    PasswordReminderDialog.prototype.show = function() {
-        if (this.isShown) {
-            return;
-        }
-        this.isShown = true;
+    PasswordReminderDialog.prototype._initInternals = function() {
         this.dialog = document.querySelector('.dropdown.body.pass-reminder');
         assert(this.dialog, 'this.dialog not found');
         this.passwordField = this.dialog.querySelector('input#test-pass');
+        this.passwordField.value = "";
 
         this.wrongLabel = this.dialog.querySelector('.pass-reminder.wrong');
         this.correctLabel = this.dialog.querySelector('.pass-reminder.accepted');
@@ -440,10 +443,14 @@
 
         if (this.firstText) {
             var link = "https://mega.nz/help/client/webclient/accounts-pro-accounts/"
-                     + "i-have-forgotten-my-password-can-i-reset-it-576c763f886688e6028b4582";
+                + "i-have-forgotten-my-password-can-i-reset-it-576c763f886688e6028b4582";
 
             $(this.firstText).html(
-                escapeHTML(l[16900])
+                escapeHTML(
+                    this.isShown ? l[16900] : "Before you logout, please test your password below to ensure you " +
+                        "remember it. If you have lost your password, by logging out you will lose access to your " +
+                        "MEGA data. [A]Learn More[/A]."
+                )
                     .replace('[A]', '<a \n' +
                         'href="' + link + '" target="_blank" class="red">')
                     .replace('[/A]', '</a>')
@@ -452,13 +459,21 @@
         this.resetUI();
 
         this.bindEvents();
+    };
+
+    PasswordReminderDialog.prototype.show = function() {
+        if (this.isShown) {
+            return;
+        }
+        this.isShown = true;
+
+        this._initInternals();
 
         assert(this.topIcon, 'topIcon not defined.');
         assert(this.dialog, 'dialog not defined.');
 
         this.dialog.classList.remove('hidden');
 
-        $(window).rebind('resize.prd', this.repositionDialog.bind(this));
         $(document.body).bind('mousedown.prd', this.onGenericClick.bind(this));
         this.repositionDialog();
     };
@@ -483,6 +498,11 @@
     PasswordReminderDialog.prototype.repositionDialog = function() {
         if (this.isShown) {
             topPopupAlign('.top-icon.pass-reminder', '.dropdown.pass-reminder', 40);
+        }
+        if (this.dialogShown) {
+            // center position
+            this.dialog.style.left = ((document.body.clientWidth - this.dialog.clientWidth) / 2) + "px";
+            this.dialog.style.top = ((document.body.clientHeight - this.dialog.clientHeight) / 2) + "px";
         }
     };
 
@@ -522,6 +542,36 @@
         $(this.topIcon).unbind('click.prd');
     };
 
+    PasswordReminderDialog.prototype.showDialog = function() {
+        if (this.dialogShown) {
+            return;
+        }
+
+        this.dialogShown = true;
+
+        this._initInternals();
+
+        fm_showoverlay();
+
+        this.dialog.classList.remove('hidden');
+        this.dialog.classList.add('fm-dialog');
+
+        this.repositionDialog();
+    };
+
+    PasswordReminderDialog.prototype.hideDialog = function() {
+        this.dialogShown = false;
+
+        fm_hideoverlay();
+
+        this.dialog.classList.add('hidden');
+        this.dialog.classList.remove('fm-dialog');
+
+        this.resetUI();
+
+        $(window).unbind('resize.prd');
+        $(document.body).unbind('mousedown.prd');
+    };
 
     var passwordReminderDialog = new PasswordReminderDialog();
     scope.mega.ui.passwordReminderDialog = passwordReminderDialog;

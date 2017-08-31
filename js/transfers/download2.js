@@ -1497,7 +1497,7 @@ var dlmanager = {
                 $dialog.addClass('hidden-bottom');
             }
         }
-        else {
+        else if (!(flags & this.LMT_HASACHIEVEMENTS)) {
             var $pan = $('.not-logged.no-achievements', $dialog);
 
             if ($pan.length && !$pan.hasClass('flag-pcset')) {

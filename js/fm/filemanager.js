@@ -60,9 +60,25 @@ FileManager.prototype.initFileManager = function() {
 
 /**
  * Invoke callback once the fm has been initialized
+ * @param {Boolean} [ifMaster] Invoke callback if running under a master tab
  * @param {Function} callback The function to invoke
  */
-FileManager.prototype.onFileManagerReady = function(callback) {
+FileManager.prototype.onFileManagerReady = function(ifMaster, callback) {
+    'use strict';
+
+    if (typeof ifMaster === 'function') {
+        callback = ifMaster;
+        ifMaster = false;
+    }
+
+    callback = (function(callback) {
+        return function() {
+            if (!ifMaster || mBroadcaster.crossTab.master) {
+                callback();
+            }
+        };
+    })(callback);
+
     if (fminitialized) {
         onIdle(callback);
     }

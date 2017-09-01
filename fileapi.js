@@ -452,15 +452,18 @@ function mozClearStartupCache() {
 				f = s;
 				s = t;
 			}
-
-			var q = Services.prompt.confirmEx(scope,
-				'MEGA '+(mozMEGAExtensionVersion||'')+' :: Out of disk space',
-				'Your drive is running out of disk space. '+
-				'Would you like to choose another downloads folder?',1027,'','','',null,{value:!1});
-
-			if (!q) mozAskDownloadsFolder();
-
 			var fld = mozGetDownloadsFolder();
+
+			if (fld && fld.diskSpaceAvailable - 1e8 < s) {
+				var q = Services.prompt.confirmEx(scope,
+					'MEGA '+(mozMEGAExtensionVersion||'')+' :: Out of disk space',
+					'Your drive is running out of disk space. '+
+					'Would you like to choose another downloads folder?',1027,'','','',null,{value:!1});
+
+				if (!q) mozAskDownloadsFolder();
+
+				fld = mozGetDownloadsFolder();
+			}
 			if (d) console.log('requestQuota',fld && fld.diskSpaceAvailable);
 
 			f(fld && fld.diskSpaceAvailable || 0);

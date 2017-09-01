@@ -119,7 +119,7 @@
         dlFatalError(dl, e, false, 2);
 
         onIdle(function() {
-            if (page !== 'download') {
+            if (dl_id !== dl.ph) {
                 M.addWebDownload([dl_id]);
             }
             else {
@@ -443,10 +443,22 @@
 
                 fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {
                     fileEntry.createWriter(function(fileWriter) {
+                        var resumeOffset = dl.byteOffset || 0;
+
                         if (d) {
                             logger.info('File "mega/' + dl_id + '" created');
                         }
                         dl_fw = fileWriter;
+
+                        var beginDownload = function() {
+                            if (that.begin) {
+                                that.begin(null, resumeOffset);
+                            }
+                            else if (d) {
+                                logger.error("No 'begin' function, this must be aborted...", dl);
+                            }
+                            that = false;
+                        };
 
                         dl_fw.onerror = function(ev) {
                             /* onwriteend() will take care of it */
@@ -463,16 +475,10 @@
 
                         dl_fw.onwriteend = function() {
                             if (that) {
-                                ASSERT(dl_fw.readyState === dl_fw.DONE,
-                                    'Error truncating file!');
+                                ASSERT(dl_fw.readyState === dl_fw.DONE, 'Error truncating file!');
+
                                 if (dl_fw.readyState === dl_fw.DONE) {
-                                    if (that.begin) {
-                                        that.begin();
-                                    }
-                                    else if (d) {
-                                        logger.error("No 'begin' function, this must be aborted...", dl);
-                                    }
-                                    that = null;
+                                    beginDownload();
                                 }
                                 return;
                             }
@@ -516,6 +522,18 @@
                             }
                         };
                         zfileEntry = fileEntry;
+
+                        if (resumeOffset) {
+                            if (resumeOffset === dl_fw.length) {
+                                dl_fw.seek(resumeOffset);
+                                onIdle(beginDownload);
+                                return;
+                            }
+
+                            console.warn('Cannot resume, byteOffset mismatch %s-%s', resumeOffset, dl_fw.length);
+                        }
+
+                        resumeOffset = 0;
                         dl_fw.truncate(0);
                     },
                     errorHandler.bind(that, 'createWriter'));
@@ -738,6 +756,8 @@
             // Try to free space before starting the download.
             free_space(this.fsInitOp.bind(this), 50);
         };
+
+        this.hasResumeSupport = !is_chrome_firefox;
     };
 
     if (window.d) {

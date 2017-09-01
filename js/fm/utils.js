@@ -1,5 +1,6 @@
 function MegaUtils() {
     this.logger = new MegaLogger('MegaUtils');
+    this.fscache = Object.create(null);
 
     if (typeof Intl !== 'undefined' && Intl.Collator) {
         this.collator = new Intl.Collator('co', {numeric: true});
@@ -504,8 +505,18 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
  * M.clearFileSystemStorage().always(console.debug.bind(console));
  */
 MegaUtils.prototype.clearFileSystemStorage = function megaUtilsClearFileSystemStorage() {
-    function _done(status) {
+    'use strict';
+
+    var timer;
+    var _done = function _done(status) {
+        clearTimeout(timer);
+
         if (promise) {
+            if (d) {
+                console.timeEnd('fscleaning');
+                console.log('FileSystem cleaning finished.', status);
+            }
+
             if (status !== 0x7ffe) {
                 promise.reject(status);
             }
@@ -514,30 +525,66 @@ MegaUtils.prototype.clearFileSystemStorage = function megaUtilsClearFileSystemSt
             }
             promise = undefined;
         }
-    }
+    };
 
     if (is_chrome_firefox || !window.requestFileSystem) {
         return MegaPromise.resolve();
     }
 
-    setTimeout(function() {
+    if (d) {
+        console.time('fscleaning');
+    }
+
+    timer = setTimeout(function() {
+        if (d) {
+            console.warn('FileSystem cleaning timedout...');
+        }
         _done();
     }, 4000);
 
     var promise = new MegaPromise();
 
     (function _clear(storagetype) {
+        if (d) {
+            console.log('Cleaning FileSystem storage...', storagetype);
+        }
         function onInitFs(fs) {
             var dirReader = fs.root.createReader();
-            dirReader.readEntries(function(entries) {
-                for (var i = 0, entry; entry = entries[i]; ++i) {
-                    if (entry.isDirectory && entry.name === 'mega') {
-                        console.debug('Cleaning storage...', entry);
-                        entry.removeRecursively(_next.bind(null, 0x7ffe), _next);
-                        break;
+            (function _readEntries(e) {
+                dirReader.readEntries(function(entries) {
+                    if (!entries.length) {
+                        _next(e || 0x7ffe);
                     }
-                }
-            });
+                    else {
+                        (function _iterate(e) {
+                            var entry = entries.pop();
+
+                            if (!entry) {
+                                _readEntries(e);
+                            }
+                            else {
+                                if (d > 1) {
+                                    console.debug('Got FileEntry %s', entry.name, entry);
+                                }
+
+                                if (String(entry.name).endsWith('mega')) {
+                                    var fn = entry.isDirectory ? 'removeRecursively' : 'remove';
+
+                                    console.debug('Cleaning FileEntry %s...', entry.name, entry);
+
+                                    entry[fn](_iterate, function(e) {
+                                        console.warn('Failed to remove FileEntry %s', entry.name, entry, e);
+                                        _iterate(e);
+                                    });
+                                }
+                                else {
+                                    _iterate();
+                                }
+                            }
+                        })();
+                    }
+                });
+            })();
         }
 
         function _next(status) {
@@ -1226,7 +1273,10 @@ MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
  * @returns {Boolean}
  */
 MegaUtils.prototype.isTypedArray = function(obj) {
-    return Object(obj).constructor.BYTES_PER_ELEMENT > 0;
+    'use strict';
+
+    obj = Object(obj).constructor;
+    return obj && obj.BYTES_PER_ELEMENT > 0;
 };
 
 
@@ -1236,17 +1286,12 @@ MegaUtils.prototype.isTypedArray = function(obj) {
  * @returns {MegaPromise}
  */
 MegaUtils.prototype.toArrayBuffer = function(data) {
+    'use strict';
+
     var promise = new MegaPromise();
 
     if (data instanceof Blob) {
-        var reader = new FileReader();
-        reader.onload = function() {
-            promise.resolve(reader.result);
-        };
-        reader.onerror = function() {
-            promise.reject.apply(promise, arguments);
-        };
-        reader.readAsArrayBuffer(data);
+        promise = this.readBlob(data);
     }
     else if (this.isTypedArray(data)) {
         if (data.byteLength !== data.buffer.byteLength) {
@@ -1298,6 +1343,8 @@ MegaUtils.prototype.toArrayBuffer = function(data) {
  * @returns {MegaPromise}
  */
 MegaUtils.prototype.saveAs = function(data, filename) {
+    'use strict';
+
     var promise = new MegaPromise();
 
     if (!filename) {
@@ -1332,6 +1379,489 @@ MegaUtils.prototype.saveAs = function(data, filename) {
             .fail(function() {
                 promise.reject.apply(promise, arguments);
             })
+    }
+
+    return promise;
+};
+
+/**
+ * Read a Blob
+ * @param {Blob|File} blob The blob to read
+ * @param {String} [meth] The FileReader method to use, defaults to readAsArrayBuffer
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.readBlob = function(blob, meth) {
+    'use strict';
+
+    var reader = new FileReader();
+    var promise = new MegaPromise();
+
+    reader.onload = function() {
+        promise.resolve(this.result);
+    };
+    reader.onerror = function() {
+        promise.reject.apply(promise, arguments);
+    };
+    reader[meth || 'readAsArrayBuffer'](blob);
+
+    return promise;
+};
+
+/**
+ * Read a FileSystem's FileEntry
+ * @param {FileEntry} entry the.file.entry
+ * @param {String} [meth] The FileReader method to use, defaults to readAsArrayBuffer
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.readFileEntry = function(entry, meth) {
+    'use strict';
+
+    var promise = new MegaPromise();
+    var reject = promise.reject.bind(promise);
+
+    if (String(entry) === '[object FileEntry]') {
+        entry.file(function(file) {
+            promise.linkDoneAndFailTo(M.readBlob(file, meth));
+        }, reject);
+    }
+    else {
+        reject(EACCESS);
+    }
+
+    return promise;
+};
+
+/**
+ * Helper function to quickly perform an IndexedDB (Dexie) operation
+ * @param {String} name The database name
+ * @param {Object} schema The database schema, Dexie-style
+ * @param {MegaPromise} promise A promise to signal rejections
+ * @param {Function} callback A function to invoke the required operation
+ */
+MegaUtils.prototype.onDexieDB = function(name, schema, promise, callback) {
+    'use strict';
+
+    var db = new Dexie(name);
+    db.version(1).stores(schema);
+    db.open().then(function() {
+        callback(db)
+            .catch(function(e) {
+                promise.reject(e);
+            })
+            .finally(function() {
+                db.close();
+            });
+    }).catch(function(e) {
+        promise.reject(e);
+        db.close();
+    });
+};
+
+/**
+ * Wrapper around M.onDexieDB() for the persistent storage functions.
+ * @param {MegaPromise} promise A promise to signal rejections
+ * @param {Function} callback A function to invoke the required operation
+ */
+MegaUtils.prototype.onPersistentDB = function(promise, callback) {
+    'use strict';
+
+    this.onDexieDB('$ps', {kv: '&k'}, promise, callback);
+};
+
+// Get FileSystem storage ignoring polyfills.
+Object.defineProperty(MegaUtils.prototype, 'requestFileSystem', {
+    get: function() {
+        'use strict';
+
+        if (!is_chrome_firefox) {
+            var requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
+
+            if (typeof requestFileSystem === 'function') {
+                return requestFileSystem.bind(window);
+            }
+        }
+    }
+});
+
+/**
+ * Get access to persistent FileSystem storage
+ * @param {Boolean} [writeMode] Whether we want write access
+ * @param {String|Number} [token] A token to store reusable fs instances
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.getFileSystemAccess = function(writeMode, token) {
+    'use strict';
+
+    var self = this;
+    var promise = new MegaPromise();
+
+    if (Object(this.fscache[token]).ts + 7e6 > Date.now()) {
+        promise.resolve(this.fscache[token].fs);
+    }
+    else if (navigator.webkitPersistentStorage && M.requestFileSystem) {
+        var reject = promise.reject.bind(promise);
+        var resolve = function(fs) {
+            if (token) {
+                self.fscache[token] = {ts: Date.now(), fs: fs};
+            }
+            promise.resolve(fs);
+        };
+        var request = function(quota) {
+            M.requestFileSystem(1, quota, resolve, reject);
+        };
+
+        delete this.fscache[token];
+        navigator.webkitPersistentStorage.queryUsageAndQuota(function(used, remaining) {
+            if (remaining) {
+                request(remaining);
+            }
+            else if (writeMode) {
+                navigator.webkitPersistentStorage.requestQuota(1e10, request, reject);
+            }
+            else {
+                reject(EBLOCKED);
+            }
+        }, reject);
+    }
+    else {
+        promise.reject(ENOENT);
+    }
+
+    return promise;
+};
+
+/**
+ * Get access to an entry in persistent FileSystem storage
+ * @param {String} filename The filename under data will be stored
+ * @param {Boolean} [create] Whether the file(s) should be created
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.getFileSystemEntry = function(filename, create) {
+    'use strict';
+
+    var promise = new MegaPromise();
+    var reject = promise.reject.bind(promise);
+
+    create = create || false;
+
+    this.getFileSystemAccess(create, seqno)
+        .tryCatch(function(fs) {
+            if (String(filename).indexOf('/') < 0) {
+                filename += '.mega';
+            }
+            fs.root.getFile(filename, {create: create},
+                function(entry) {
+                    promise.resolve(entry, fs);
+                }, reject);
+        }, reject);
+
+    return promise;
+};
+
+/**
+ * Retrieve metadata for a filesystem entry
+ * @param {FileEntry|String} entry A FileEntry instance or filename
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.getFileEntryMetadata = function(entry) {
+    'use strict';
+
+    var promise = new MegaPromise();
+    var reject = promise.reject.bind(promise);
+    var getMetadata = function(entry) {
+        entry.getMetadata(promise.resolve.bind(promise), reject);
+    };
+
+    if (String(entry) === '[object FileEntry]') {
+        getMetadata(entry);
+    }
+    else {
+        this.getFileSystemEntry(entry).tryCatch(getMetadata, reject);
+    }
+
+    return promise;
+
+};
+
+/**
+ * Retrieve all *root* entries in the FileSystem storage.
+ * @param {String} [aPrefix] Returns entries matching with this prefix
+ * @param {Boolean} [aMetaData] Whether metadata should be retrieved as well, default to true
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.getFileSystemEntries = function(aPrefix, aMetaData) {
+    'use strict';
+
+    var promise = new MegaPromise();
+    var reject = promise.reject.bind(promise);
+
+    this.getFileSystemAccess(false, seqno)
+        .tryCatch(function(fs) {
+            var entries = [];
+            var reader = fs.root.createReader();
+
+            var resolve = function() {
+                var mega = Object.create(null);
+
+                for (var i = entries.length; i--;) {
+                    var name = String(entries[i].name);
+
+                    if (entries[i].isFile && name.substr(-5) === '.mega') {
+                        mega[name.substr(0, name.length - 5)] = entries[i];
+                    }
+                }
+                promise.resolve(mega, entries, fs);
+            };
+
+            var getMetadata = function(idx) {
+                var next = function() {
+                    onIdle(getMetadata.bind(this, ++idx));
+                };
+
+                if (idx === entries.length) {
+                    resolve();
+                }
+                else if (entries[idx].isFile) {
+                    entries[idx].getMetadata(function(metadata) {
+                        entries[idx].date = metadata.modificationTime;
+                        entries[idx].size = metadata.size;
+                        next();
+                    }, next);
+                }
+                else {
+                    next();
+                }
+            };
+
+            (function _readEntries() {
+                reader.readEntries(function(result) {
+                    if (result.length) {
+                        if (aPrefix) {
+                            for (var i = result.length; i--;) {
+                                if (String(result[i].name).startsWith(aPrefix)) {
+                                    entries.push(result[i]);
+                                }
+                            }
+                        }
+                        else {
+                            entries = entries.concat(result);
+                        }
+                        _readEntries();
+                    }
+                    else if (aMetaData !== false) {
+                        getMetadata(0);
+                    }
+                    else {
+                        resolve();
+                    }
+                }, reject);
+            })();
+
+        }, reject);
+
+    return promise;
+};
+
+/**
+ * Retrieve data saved into persistent storage
+ * @param {String} k The key identifying the data
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.getPersistentData = function(k) {
+    'use strict';
+
+    var self = this;
+    var promise = new MegaPromise();
+
+    if (M.requestFileSystem) {
+        var tmpPromise = this.getFileSystemEntry(k);
+
+        tmpPromise.done(function(entry) {
+            tmpPromise = self.readFileEntry(entry, 'readAsText');
+
+            tmpPromise.done(function(data) {
+                try {
+                    return promise.resolve(JSON.parse(data));
+                }
+                catch (_) {
+                }
+
+                promise.resolve(data);
+            });
+
+            promise.linkFailTo(tmpPromise);
+        });
+
+        promise.linkFailTo(tmpPromise);
+    }
+    else {
+        this.onPersistentDB(promise, function(db) {
+            return db.kv.get(k).then(function(store) {
+                promise.resolve(store.v);
+            });
+        });
+    }
+
+    return promise;
+};
+
+/**
+ * Save data into persistent storage
+ * @param {String} k The key identifying the data to store
+ * @param {*} v The value/data to store
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.setPersistentData = function(k, v) {
+    'use strict';
+
+    var promise = new MegaPromise();
+
+    if (M.requestFileSystem) {
+        var tmpPromise = this.getFileSystemEntry(k, true);
+
+        tmpPromise.done(function(entry) {
+            entry.createWriter(function(writer) {
+
+                writer.onwriteend = function() {
+                    if (writer.readyState !== writer.DONE) {
+                        return promise.reject(EACCESS);
+                    }
+
+                    writer.onwriteend = function() {
+                        promise.resolve();
+                    };
+
+                    tmpPromise = M.toArrayBuffer(v)
+                        .tryCatch(function(ab) {
+                            writer.write(new Blob([ab]));
+                        }, writer.onerror.bind(writer));
+                };
+
+                writer.onerror = function(e) {
+                    promise.reject(e);
+                };
+
+                writer.truncate(0);
+
+            }, function(e) {
+                promise.reject(e);
+            });
+        });
+
+        promise.linkFailTo(tmpPromise);
+    }
+    else {
+        this.onPersistentDB(promise, function(db) {
+            return db.kv.put({k: k, v: v}).then(function() {
+                promise.resolve();
+            });
+        });
+    }
+
+    return promise;
+};
+
+/**
+ * Remove previously stored persistent data
+ * @param {String} k The key identifying the data
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.delPersistentData = function(k) {
+    'use strict';
+
+    var promise = new MegaPromise();
+
+    if (M.requestFileSystem) {
+        var tmpPromise = this.getFileSystemEntry(k);
+
+        tmpPromise.done(function(entry) {
+            entry.remove(promise.resolve.bind(promise), promise.reject.bind(promise));
+        });
+
+        promise.linkFailTo(tmpPromise);
+    }
+    else {
+        this.onPersistentDB(promise, function(db) {
+            return db.kv.delete(k).then(function() {
+                promise.resolve();
+            });
+        });
+    }
+
+    return promise;
+};
+
+/**
+ * Enumerates all persistent data entries
+ * @param {String} [aPrefix] Returns entries matching with this prefix
+ * @param {Boolean} [aReadContents] Whether the contents must be read as well
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.getPersistentDataEntries = function(aPrefix, aReadContents) {
+    'use strict';
+
+    var promise = new MegaPromise();
+
+    if (M.requestFileSystem) {
+        this.getFileSystemEntries(aPrefix, false)
+            .fail(function() {
+                promise.reject.apply(promise, arguments);
+            })
+            .done(function(result) {
+                var entries = Object.keys(result);
+
+                if (!aReadContents) {
+                    return promise.resolve(entries);
+                }
+
+                (function _readEntries(idx) {
+                    var next = function() {
+                        onIdle(_readEntries.bind(this, ++idx));
+                    };
+
+                    if (idx === entries.length) {
+                        promise.resolve(result);
+                    }
+                    else {
+                        M.readFileEntry(result[entries[idx]], 'readAsText')
+                            .fail(next)
+                            .done(function(data) {
+                                try {
+                                    result[entries[idx]] = JSON.parse(data);
+                                }
+                                catch (_) {
+                                    result[entries[idx]] = data;
+                                }
+
+                                next();
+                            });
+                    }
+                })(0);
+            });
+    }
+    else {
+        this.onPersistentDB(promise, function(db) {
+            var dbc = db.kv;
+
+            if (aPrefix) {
+                dbc = dbc.where('k').startsWith(aPrefix);
+            }
+            else {
+                dbc = dbc.toCollection();
+            }
+
+            return dbc[aReadContents ? 'toArray' : 'keys']()
+                .then(function(entries) {
+                    if (!aReadContents) {
+                        return promise.resolve(entries);
+                    }
+                    var result = Object.create(null);
+                    for (var i = entries.length; i--;) {
+                        result[entries[i].k] = entries[i].v;
+                    }
+                    promise.resolve(result);
+                });
+        });
     }
 
     return promise;

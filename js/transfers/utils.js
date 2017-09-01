@@ -72,13 +72,13 @@ function dlFatalError(dl, error, ethrow, lock) {
         }
         error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
 
-        if (error.indexOf(l[16871]) < 0 && error.indexOf(l[16872]) < 0) {
+        if (error.indexOf(l[16871]) < 0 && error.indexOf(l[16872]) < 0 && error.indexOf(l[1668]) < 0) {
             srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
         }
     });
 
     // Set transfer status and abort it
-    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true, true);
+    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true, String(error).indexOf(l[1668]) < 0);
     dlmanager.abort(dl);
 }
 

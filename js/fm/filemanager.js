@@ -1298,10 +1298,12 @@ FileManager.prototype.initUIKeyEvents = function() {
          * other day :)
          */
         if (!$.dialog && !slideshowid && M.viewmode == 1) {
+            var $container = $('.data-block-view:visible').parent();
             var items_per_row = Math.floor(
-                $('.data-block-view').parent().outerWidth() / $('.data-block-view:first').outerWidth(true)
-             );
-            var total_rows = Math.ceil($('.data-block-view').size() / items_per_row);
+                $container.outerWidth() / $('.data-block-view:visible:first').outerWidth(true)
+            );
+
+            var total_rows = Math.ceil(M.v.length / items_per_row);
 
             if (e.keyCode == 37) {
                 // left

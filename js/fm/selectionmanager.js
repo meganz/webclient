@@ -282,7 +282,7 @@ var SelectionManager = function($selectable, resume) {
 
 
         var items_per_row = Math.floor(
-            $('.data-block-view').parent().outerWidth() / $('.data-block-view:first').outerWidth(true)
+            $('.data-block-view:visible').parent().outerWidth() / $('.data-block-view:visible:first').outerWidth(true)
         );
 
 

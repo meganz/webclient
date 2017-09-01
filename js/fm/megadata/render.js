@@ -93,8 +93,14 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         }
         target.addClass('ui-selected');
 
-        selectionManager.clear_selection();
-        selectionManager.set_currently_selected(target.attr('id'));
+        if ($.selected.length === 0) {
+            // selection is already been made
+            selectionManager.clear_selection();
+            selectionManager.set_currently_selected(target.attr('id'));
+        }
+        else {
+            selectionManager.add_to_selection(target.attr('id'));
+        }
 
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
@@ -120,8 +126,14 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         e.stopPropagation(); // do not treat it as a regular click on the file
         e.currentTarget = target;
 
-        selectionManager.clear_selection();
-        selectionManager.set_currently_selected(target.attr('id'));
+        if ($.selected.length === 0) {
+            // selection is already been made
+            selectionManager.clear_selection();
+            selectionManager.set_currently_selected(target.attr('id'));
+        }
+        else {
+            selectionManager.add_to_selection(target.attr('id'));
+        }
 
         M.searchPath();
         if (!$(this).hasClass('active')) {

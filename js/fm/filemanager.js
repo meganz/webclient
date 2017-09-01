@@ -1298,13 +1298,6 @@ FileManager.prototype.initUIKeyEvents = function() {
          * other day :)
          */
         if (!$.dialog && !slideshowid && M.viewmode == 1) {
-            var $container = $('.data-block-view:visible').parent();
-            var items_per_row = Math.floor(
-                $container.outerWidth() / $('.data-block-view:visible:first').outerWidth(true)
-            );
-
-            var total_rows = Math.ceil(M.v.length / items_per_row);
-
             if (e.keyCode == 37) {
                 // left
                 selectionManager.select_prev(e.shiftKey, true);

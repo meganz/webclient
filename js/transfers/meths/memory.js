@@ -182,7 +182,10 @@
     mBroadcaster.once('startMega', function() {
         var uad = ua.details || false;
 
-        if (localStorage.dlFileSizeLimit) {
+        if (!MemoryIO.usable()) {
+            MemoryIO.fileSizeLimit = 0;
+        }
+        else if (localStorage.dlFileSizeLimit) {
             MemoryIO.fileSizeLimit = parseInt(localStorage.dlFileSizeLimit);
         }
         else if (is_mobile) {

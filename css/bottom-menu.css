@@ -158,13 +158,16 @@
     padding: 10px 43px 23px 43px;
     text-align: center;
 }
-.mobile .bottom-menu.column:first-child, .mobile .bottom-menu.copyrights {
+.mobile .bottom-menu.column:first-child {
     padding-bottom: 0;
     padding-left: 0;
     margin-left: 0;
     margin-right: 0;
     margin-top: 0;
     text-align: center;
+}
+.mobile .bottom-menu.copyrights {
+    text-align:center;
 }
 .mobile .bottom-menu.company-info strong {
     display: block;

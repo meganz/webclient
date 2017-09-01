@@ -1,0 +1,52 @@
+.megaList-content > * {
+    position: absolute;
+}
+.megaListContainer tr {
+    width: 100%;
+}
+.megaListContainer {
+    background-attachment: local;
+    /*background-image: none !important;*/
+}
+.fm-account-main .grid-table tr.megaLisItem:nth-child(even) td {
+    /*background-color: rgba(250,250,250,1);*/
+    background-color: transparent;
+}
+.fm-account-main .grid-table tr.megaLisItem:nth-child(odd) td {
+    /*background-color: white;*/
+    background-color: transparent;
+}
+.grid-table .megaListItem td {
+    background-color: transparent !important;
+}
+.grid-table .megaListItem:hover td {
+    background-color: rgba(247,247,247,1) !important;
+}
+.grid-table .megaListItem.ui-selected td {
+    background-color: rgba(233,233,233,1) !important;
+}
+
+/*.megaListContainer tr:nth-child(even) {*/
+    /*background-color: rgb(255, 255, 255);*/
+/*}*/
+/*.megaListContainer tr:nth-child(odd) {*/
+    /*background-color: rgb(250, 250, 250);*/
+/*}*/
+.ps-scrollbar-x-rail, .ps-scrollbar-y-rail {
+    z-index: 120;
+}
+.megaList .ps-scrollbar-y-rail {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-right: 2px;
+}
+.megaListContainer.shared-folder-content .file-block-scrolling {
+    margin-right: 10px;
+}
+.megaListContainer.shared-folder-content .file-block-scrolling .ps-scrollbar-y-rail {
+    right: 14px !important;
+}
+.megaListContainer.shared-folder-content .megaList-content {
+    margin-left: -8px;
+    margin-top: -8px;
+}

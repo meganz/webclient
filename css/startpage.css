@@ -427,9 +427,6 @@
 .mobile .startpage.buttons-block {
     padding: 49px 0 11px 0;
 }
-}
-
-@media only screen and (max-height: 570px) {
 .mobile .startpage.buttons-block {
     padding: 36px 0 45px 0;
 }

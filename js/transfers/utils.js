@@ -131,8 +131,8 @@ Speedometer.prototype.progress = function(p) {
 };
 
 // compute final MAC from block MACs
-function condenseMacs(macs, key) {
-    var i, aes, mac = [0, 0, 0, 0];
+function condenseMacs(macs, key, initialMac) {
+    var i, aes, mac = initialMac || [0, 0, 0, 0];
 
     aes = new sjcl.cipher.aes([key[0], key[1], key[2], key[3]]);
 

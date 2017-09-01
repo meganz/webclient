@@ -109,7 +109,9 @@
             }
 
             // https://code.google.com/p/chromium/issues/detail?id=375297
-            MemoryIO.fileSizeLimit = 496 * 1024 * 1024;
+            if (!window.chrome || parseInt(ua.details.version) < 58) {
+                MemoryIO.fileSizeLimit = 496 * 1024 * 1024;
+            }
 
             return true;
         }
@@ -130,8 +132,13 @@
         });
     }
 
-    function canSwitchDownloadMethod(dl, dl_id) {
+    function canSwitchDownloadMethod(dl, dl_id, entry) {
         if (MemoryIO.usable() && dl.size < MemoryIO.fileSizeLimit) {
+            if (entry && Object(dl.resumeInfo).byteOffset) {
+                var tid = dlmanager.getResumeInfoTag(dl);
+                dlmanager.resumeInfoCache[tid] = Object.assign(dl.resumeInfo, {entry: entry});
+                dl.io.keepFileOnAbort = true;
+            }
             dlMethod = MemoryIO;
             abortAndStartOver(dl, dl_id, Error(l[16871]));
             return true;
@@ -148,7 +155,7 @@
     }
 
     function clearit(storagetype, t, callback) {
-        var tsec = t || 3600;
+        var tsec = t || 172800;
 
         function errorHandler2(e) {
             if (d) {
@@ -500,8 +507,7 @@
                                     if (!(++chrome_write_error_msg % 21) && !$.msgDialog) {
                                         chrome_write_error_msg = 0;
 
-                                        // XXX: Hmm, not sure how weird this is if the user downloaded too many data..
-                                        if (canSwitchDownloadMethod(dl, dl_id)) {
+                                        if (canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
                                             return;
                                         }
 
@@ -553,7 +559,7 @@
 
                 if (aFail === -1 && !isSecurityError(aEvent)) {
 
-                    if (canSwitchDownloadMethod(dl, dl_id)) {
+                    if (canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
                         return;
                     }
 
@@ -586,7 +592,9 @@
                     dl_createtmpfile,
                     function(e) {
                         if (!onSecurityErrorSwitchMethod(dl, dl_id, e)) {
-                            errorHandler.call(this, 'RequestFileSystem', e);
+                            if (!canSwitchDownloadMethod(dl, dl_id)) {
+                                errorHandler.call(this, 'RequestFileSystem', e);
+                            }
                         }
                     }.bind(this)
                 );
@@ -606,7 +614,7 @@
                 if (is_chrome_firefox) {
                     dl_fw.close(err);
                 }
-                else if (err) {
+                else if (err && !this.keepFileOnAbort) {
                     try {
                         var onWriteEnd = (function(writer, entry) {
                             return function() {
@@ -675,6 +683,8 @@
             } /* notify writer */
         }
 
+        var testSwitchOver = localStorage.fsTestSwitchOver || 0;
+
         this.write = function(buffer, position, done) {
             if (dl_writing || position != dl_fw.position) {
                 throw new Error([position, buffer.length, position + buffer.length, dl_fw.position]);
@@ -690,6 +700,11 @@
             if (d) {
                 logger.info("Write " + buffer.length + " bytes at " + position + "/" + dl_fw.position);
             }
+
+            if (testSwitchOver && position > 0x1000000 && canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
+                return;
+            }
+
             try {
                 dl_fw.write(new Blob([buffer]));
             }
@@ -757,6 +772,7 @@
             free_space(this.fsInitOp.bind(this), 50);
         };
 
+        this.keepFileOnAbort = false;
         this.hasResumeSupport = !is_chrome_firefox;
     };
 

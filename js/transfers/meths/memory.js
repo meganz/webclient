@@ -64,7 +64,7 @@
             }
             offset += (have_ab ? buffer : buffer.buffer).length;
             buffer = null;
-            Soon(done);
+            onIdle(done);
         };
 
         this.download = function(name, path) {
@@ -154,10 +154,16 @@
 
         this.abort = function() {
             if (dblob) {
-                if (msie && !this.completed) {
+                if (!this.completed) {
                     try {
-                        // XXX: how to force freeing up the blob memory?
-                        dblob = dblob.getBlob();
+                        if (msie) {
+                            dblob.getBlob().msClose();
+                        }
+                        else {
+                            for (var i = dblob.length; i--;) {
+                                dblob[i].close();
+                            }
+                        }
                     }
                     catch (e) {}
                 }

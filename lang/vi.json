@@ -4239,6 +4239,6 @@
     "17082": "T\u1ec7p tin \u0111\u00e3 truy\u1ec1n xong. Xin ti\u1ebfn h\u00e0nh l\u01b0u l\u1ea1i.",
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have resumable pending transfers. Would you like to resume them?",
+    "17085": "You have partially downloaded transfers. Would you like to resume them?",
     "17086": "Open folder"
 }

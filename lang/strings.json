@@ -16960,7 +16960,7 @@
         "context": "A message shown to PRO users when they go over quota when downloading."
     },
     "17085": {
-        "text": "You have resumable pending transfers. Would you like to resume them?",
+        "text": "You have partially downloaded transfers. Would you like to resume them?",
         "context": "A message shown when there are resumable downloads in the file manager."
     },
     "17086": {

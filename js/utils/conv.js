@@ -180,7 +180,19 @@
     };
 
 
-
+    /**
+     * Compare to arrays and return a diff ({'removed': [...], 'added': [...]}) object
+     *
+     * @param {Array} old_arr
+     * @param {Array} new_arr
+     * @returns {{removed, added}}
+     */
+    array.diff = function(old_arr, new_arr) {
+        return {
+            'removed': old_arr.filter(function(v) { return new_arr.indexOf(v) < 0; }),
+            'added': new_arr.filter(function(v) { return old_arr.indexOf(v) < 0; }),
+        };
+    };
 
 
     /**

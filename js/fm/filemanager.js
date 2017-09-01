@@ -393,7 +393,6 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
-        M.cacheselect();
 
         if ($(this).hasClass('listing-view')) {
             if (fmconfig.uiviewmode) {
@@ -1242,14 +1241,27 @@ FileManager.prototype.initUIKeyEvents = function() {
             return false;
         }
 
-        var sl = false, s;
-        if (M.viewmode) {
-            s = $('.data-block-view.ui-selected');
+        var sl = false;
+        var s = [];
+
+        var selPanel = $('.fm-transfers-block tr.ui-selected');
+
+        if (selectionManager && selectionManager.selected_list && selectionManager.selected_list.length > 0) {
+            s = clone(selectionManager.selected_list);
         }
         else {
-            s = $('.grid-table tr.ui-selected');
+            $.selected = [];
+
+            var tempSel;
+            if (M.viewmode) {
+                tempSel = $('.data-block-view.ui-selected');
+            }
+            else {
+                tempSel = $('.grid-table tr.ui-selected');
+            }
+
+            $.selected = s = tempSel.attrs('id');
         }
-        var selPanel = $('.fm-transfers-block tr.ui-selected');
 
         if (M.chat) {
             return true;
@@ -1271,124 +1283,52 @@ FileManager.prototype.initUIKeyEvents = function() {
 
             if (e.keyCode == 37) {
                 // left
-                var current = selectionManager.get_currently_selected("first");
-                // clear old selection if no shiftKey
-                if (!e.shiftKey) {
-                    s.removeClass("ui-selected");
-                }
-                var $target_element = null;
-                if (current.length > 0 && current.prev('.data-block-view').length > 0) {
-                    $target_element = current.prev('.data-block-view');
-                }
-                else {
-                    $target_element = $('.data-block-view:last');
-                }
-                if ($target_element) {
-                    $target_element.addClass('ui-selected');
-                    selectionManager.set_currently_selected($target_element);
-                }
+                selectionManager.select_prev(e.shiftKey, true);
             }
             else if (e.keyCode == 39) {
-
                 // right
-                var current = selectionManager.get_currently_selected("last");
-                if (!e.shiftKey) {
-                    s.removeClass("ui-selected");
-                }
-                var $target_element = null;
-                var next = current.next('.data-block-view');
-
-                // clear old selection if no shiftKey
-                if (next.length > 0) {
-                    $target_element = next;
-                }
-                else {
-                    $target_element = $('.data-block-view:first');
-                }
-                if ($target_element) {
-                    $target_element.addClass('ui-selected');
-                    selectionManager.set_currently_selected($target_element);
-                }
+                selectionManager.select_next(e.shiftKey, true);
             }
 
             // up & down
             else if (e.keyCode == 38 || e.keyCode == 40) {
-                var current = selectionManager.get_currently_selected("first"),
-                    current_idx = $.elementInArray(current, $('.fm-blocks-view .data-block-view')) + 1;
-
-                if (!e.shiftKey) {
-                    s.removeClass("ui-selected");
+                if (e.keyCode === 38) {
+                    selectionManager.select_grid_up(e.shiftKey, true);
+                }
+                else {
+                    selectionManager.select_grid_down(e.shiftKey, true);
                 }
 
-                var current_row = Math.ceil(current_idx / items_per_row),
-                    current_col = current_idx % items_per_row,
-                    target_row;
-
-                if (e.keyCode == 38) { // up
-                    // handle the case when the users presses ^ and the current row is the first row
-                    target_row = current_row == 1 ? total_rows : current_row - 1;
-                }
-                else if (e.keyCode == 40) { // down
-                    // handle the case when the users presses DOWN and the current row is the last row
-                    target_row = current_row == total_rows ? 1 : current_row + 1;
-                }
-
-                // calc the index of the target element
-                var target_element_num = ((target_row - 1) * items_per_row) + (current_col - 1),
-                    $target = $('.data-block-view:eq(' + target_element_num + ')');
-
-                $target.addClass("ui-selected");
-                selectionManager.set_currently_selected($target);
             }
         }
 
-        if ((e.keyCode == 38) && (s.length > 0) && ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) && !$.dialog) {
-
-            // up in grid
-            if (e.shiftKey) {
-                $(e).addClass('ui-selected');
-            }
-            if ($(s[0]).prev().length > 0) {
-                if (!e.shiftKey) {
-                    $('.grid-table tr').removeClass('ui-selected');
-                }
-                $(s[0]).prev().addClass('ui-selected');
-                sl = $(s[0]).prev();
-
-                quickFinder.disable_if_active();
-            }
+        if (
+            e.keyCode == 38 &&
+            s.length > 0 &&
+            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            !$.dialog
+        ) {
+            // up in grid/table
+            selectionManager.select_prev(e.shiftKey, true);
+            quickFinder.disable_if_active();
         }
-        else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 && !$.dialog) {
-
-            // down in grid
-            if (e.shiftKey) {
-                $(e).addClass('ui-selected');
-            }
-            if ($(s[s.length - 1]).next().length > 0) {
-                if (!e.shiftKey) {
-                    $('.grid-table tr').removeClass('ui-selected');
-                }
-                $(s[s.length - 1]).next().addClass('ui-selected');
-                sl = $(s[0]).next();
-
-                quickFinder.disable_if_active();
-            }
+        else if (
+            e.keyCode == 40 &&
+            s.length > 0 &&
+            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            !$.dialog
+        ) {
+            // down in grid/table
+            selectionManager.select_next(e.shiftKey, true);
+            quickFinder.disable_if_active();
         }
-        else if ((e.keyCode === 46) && (s.length > 0)
-            && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
+        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
+            // delete
             fmremove();
         }
         else if ((e.keyCode === 46) && (selPanel.length > 0)
             && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            var selected = [];
-            selPanel.each(function() {
-                selected.push($(this).attr('id'));
-            });
-            msgDialog('confirmation', l[1003], "Cancel " + selected.length + " transferences?", false, function(e) {
+            msgDialog('confirmation', l[1003], "Cancel " + s.length + " transferences?", false, function(e) {
 
                 // we should encapsule the click handler
                 // to call a function rather than use this hacking
@@ -1397,17 +1337,15 @@ FileManager.prototype.initUIKeyEvents = function() {
                 }
             });
         }
-        else if (e.keyCode == 13
+        else if (
+            e.keyCode == 13
             && s.length > 0
             && !$.dialog
             && !$.msgDialog
             && !$('.fm-new-folder').hasClass('active')
-            && !$('.top-search-bl').hasClass('active')) {
+            && !$('.top-search-bl').hasClass('active')
+        ) {
 
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
             if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];
                 if (n && n.t) {
@@ -1422,7 +1360,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
         else if ((e.keyCode === 13) && ($.dialog === 'share')) {
-
             var share = new mega.Share();
             share.updateNodeShares();
         }
@@ -1464,15 +1401,14 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
         else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
             renameDialog();
         }
         else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
-            $('.grid-table.fm tr').addClass('ui-selected');
-            $('.fm-blocks-view .data-block-view').addClass('ui-selected');
+            if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+                return;
+            }
+            // ctrl+a/cmd+a - select all
+            selectionManager.select_all();
         }
         else if (e.keyCode == 37 && slideshowid) {
             slideshow_prev();
@@ -1490,8 +1426,14 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
 
         if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {
+            // if something is selected, scroll to that item
             var jsp = $($.selectddUIgrid).data('jsp');
-            jsp.scrollToElement(sl);
+            if (jsp) {
+                jsp.scrollToElement(sl);
+            }
+            else if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
+                M.megaRender.megaList.scrollToItem(sl.data('id'));
+            }
         }
 
         M.searchPath();
@@ -1901,12 +1843,12 @@ FileManager.prototype.addNotificationsUI = function(close) {
  * Depending the viewmode this fires either addIconUI or addGridUI, plus addTreeUI
  * @param {Boolean} aNoTreeUpdate Omit the call to addTreeUI
  */
-FileManager.prototype.addViewUI = function(aNoTreeUpdate) {
+FileManager.prototype.addViewUI = function(aNoTreeUpdate, refresh) {
     if (this.viewmode) {
-        this.addIconUI();
+        this.addIconUI(undefined, refresh);
     }
     else {
-        this.addGridUI();
+        this.addGridUI(refresh);
     }
 
     if (!aNoTreeUpdate) {
@@ -1914,7 +1856,7 @@ FileManager.prototype.addViewUI = function(aNoTreeUpdate) {
     }
 };
 
-FileManager.prototype.addIconUI = function(aQuiet) {
+FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     "use strict";
     if (d) {
         console.time('iconUI');
@@ -1984,13 +1926,13 @@ FileManager.prototype.addIconUI = function(aQuiet) {
         $.selectddUIgrid = '.file-block-scrolling';
         $.selectddUIitem = 'a';
     }
-    this.addSelectDragDropUI();
+    this.addSelectDragDropUI(refresh);
     if (d) {
         console.timeEnd('iconUI');
     }
 };
 
-FileManager.prototype.addGridUI = function() {
+FileManager.prototype.addGridUI = function(refresh) {
     "use strict";
 
     if (this.chat) {
@@ -2005,11 +1947,20 @@ FileManager.prototype.addGridUI = function() {
     $('.fm-files-view-icon.block-view').removeClass('active');
 
     $.gridHeader = function() {
-        $('.grid-table tr:first-child td:visible').each(function(i, e) {
-            var headerColumn = $('.grid-table-header th').get(i);
-            $(headerColumn).width(Math.floor($(e).width()));
+        var headerColumn = '';
+        var $firstChildTd = $('.grid-table tr:first-child td:visible');
+        if ($firstChildTd.size() === 0) {
+            // if the first <tr> does not contain any TDs, pick the next one
+            // this can happen when MegaList's prepusher (empty <TR/> is first)
+            $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
+        }
+
+        $firstChildTd.each(function(i, e) {
+            headerColumn = $('.grid-table-header th').get(i);
+            $(headerColumn).width($(e).width());
         });
     };
+
 
     $.detailsGridHeader = function() {
         $('.contact-details-view .grid-table tr:first-child td').each(function(i, e) {
@@ -2190,20 +2141,21 @@ FileManager.prototype.addGridUI = function() {
     }
 
     $.selectddUIitem = 'tr';
-    this.addSelectDragDropUIDelayed();
+    this.addSelectDragDropUIDelayed(refresh);
 
     if (d) {
         console.timeEnd('gridUI');
     }
 };
 
-FileManager.prototype.addGridUIDelayed = function() {
+FileManager.prototype.addGridUIDelayed = function(refresh) {
     delay('GridUI', function() {
-        M.addGridUI();
+        M.addGridUI(refresh);
     }, 20);
 };
 
-FileManager.prototype.addSelectDragDropUI = function() {
+
+FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
 
     if (this.currentdirid && this.currentdirid.substr(0, 7) === 'account') {
@@ -2248,15 +2200,14 @@ FileManager.prototype.addSelectDragDropUI = function() {
             $.gridDragging = true;
             $('body').addClass('dragging');
             if (!$(this).hasClass('ui-selected')) {
-                $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-                $(this).addClass('ui-selected');
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected($(this).attr('id'));
             }
-            var s = $($.selectddUIgrid + ' .ui-selected'), max = ($(window).height() - 96) / 24, html = [];
-            $.selected = [];
-            s.each(function(i, e) {
-                var id = $(e).attr('id'), n = M.d[id];
+            var max = ($(window).height() - 96) / 24;
+            var html = [];
+            $.selected.forEach(function(id, i) {
+                var n = M.d[id];
                 if (n) {
-                    $.selected.push(id);
                     if (max > i) {
                         html.push(
                             '<div class="transfer-filetype-icon '
@@ -2267,8 +2218,8 @@ FileManager.prototype.addSelectDragDropUI = function() {
                     }
                 }
             });
-            if (s.length > max) {
-                $('.dragger-files-number').text(s.length);
+            if ($.selected.length > max) {
+                $('.dragger-files-number').text($.selected.length);
                 $('.dragger-files-number').show();
             }
             $('#draghelper .dragger-content').html(html.join(""));
@@ -2328,24 +2279,16 @@ FileManager.prototype.addSelectDragDropUI = function() {
         }
     });
 
-    /**
-     * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
-     * events.
-     *
-     * @type {SelectionManager}
-     */
 
-    if (!window.fmShortcuts) {
-        window.fmShortcuts = new FMShortcuts();
-    }
-    selectionManager = new SelectionManager($ddUIgrid);
+
 
     $ddUIitem.rebind('contextmenu', function(e) {
         if ($(this).attr('class').indexOf('ui-selected') == -1) {
             $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
             $(this).addClass('ui-selected');
+            selectionManager.clear_selection();
+            selectionManager.set_currently_selected($(this).attr('id'));
         }
-        M.cacheselect();
         M.searchPath();
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 1);
@@ -2355,44 +2298,32 @@ FileManager.prototype.addSelectDragDropUI = function() {
         if ($.gridDragging) {
             return false;
         }
-        var s = e.shiftKey && $($.selectddUIgrid + ' .ui-selected');
-        if (s && s.length > 0) {
-            var start = s[0];
-            var end = this;
-            if ($.gridLastSelected && $($.gridLastSelected).attr('class').indexOf('ui-selected') > -1) {
-                start = $.gridLastSelected;
-            }
-            else {
-                $.gridLastSelected = this;
-            }
-            if ($(start).index() > $(end).index()) {
-                end = start;
-                start = this;
-            }
-            $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-            $([start, end]).addClass('ui-selected');
-            $(start).nextUntil($(end)).each(function(i, e) {
-                $(e).addClass('ui-selected');
-            });
-
-            selectionManager.set_currently_selected($(this));
+        var s = e.shiftKey;
+        if (e.shiftKey) {
+            selectionManager.shift_select_to($(this).attr('id'), false, true);
         }
-        else if (e.ctrlKey == false && e.metaKey == false) {
+        else if (e.ctrlKey == false && e.metaKey == false)
+        {
             $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
             $(this).addClass('ui-selected');
             $.gridLastSelected = this;
-            selectionManager.set_currently_selected($(this));
+            selectionManager.clear_selection();
+            selectionManager.add_to_selection($(this).attr('id'));
         }
-        else {
+        else
+        {
             if ($(this).hasClass("ui-selected")) {
                 $(this).removeClass("ui-selected");
+                selectionManager.remove_from_selection($(this).attr('id'));
             }
-            else {
+            else
+            {
                 $(this).addClass("ui-selected");
                 $.gridLastSelected = this;
-                selectionManager.set_currently_selected($(this));
+                selectionManager.add_to_selection($(this).attr('id'));
             }
         }
+
         M.searchPath();
         $.hideContextMenu(e);
         if ($.hideTopMenu) {
@@ -2426,7 +2357,10 @@ FileManager.prototype.addSelectDragDropUI = function() {
         }
         delete $.rmInitJSP;
     }
-    $.tresizer();
+    if (!refresh) {
+        $.tresizer();
+    }
+
     if (d) {
         console.timeEnd('selectddUI');
     }
@@ -2434,9 +2368,9 @@ FileManager.prototype.addSelectDragDropUI = function() {
     $ddUIitem = $ddUIgrid = undefined;
 };
 
-FileManager.prototype.addSelectDragDropUIDelayed = function() {
+FileManager.prototype.addSelectDragDropUIDelayed = function(refresh) {
     delay('selectddUI', function() {
-        M.addSelectDragDropUI();
+        M.addSelectDragDropUI(refresh);
     });
 };
 

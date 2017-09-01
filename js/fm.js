@@ -577,7 +577,7 @@ function addNewContact($addButton) {
  * sharedUInode
  *
  * Handle shared/export link icons in Cloud Drive
- * @param {String} nodeHandle, selected node id
+ * @param {String} nodeHandle selected node id
  */
 function sharedUInode(nodeHandle) {
 
@@ -1354,20 +1354,21 @@ function avatarDialog(close)
     });
 }
 
+
 /**
  * Really simple shortcut logic for select all, copy, paste, delete
  *
  * @constructor
  */
 function FMShortcuts() {
-    "use strict";
 
     var current_operation = null;
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
 
-        if (!is_fm())
+        if (!is_fm()) {
             return true;
+        }
 
         e = e || window.event;
 
@@ -1381,22 +1382,26 @@ function FMShortcuts() {
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
             if (typeof selectionManager != 'undefined' && selectionManager) {
+                if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+                    return;
+                }
                 selectionManager.select_all();
             }
             return false; // stop prop.
         } else if (
             (charTyped == "c" || charTyped == "x") &&
             (e.ctrlKey || e.metaKey)
-            ) {
-            var $items = selectionManager.get_selected();
-            if ($items.size() == 0) {
+        ) {
+            var items = selectionManager.get_selected();
+            if (items.length == 0) {
                 return; // dont do anything.
             }
 
             current_operation = {
                 'op': charTyped == "c" ? 'copy' : 'cut',
-                'src': $items
+                'src': items
             };
+
             return false; // stop prop.
         } else if (charTyped == "v" && (e.ctrlKey || e.metaKey)) {
             if (!current_operation) {
@@ -1405,34 +1410,30 @@ function FMShortcuts() {
 
             var handles = [];
             $.each(current_operation.src, function(k, v) {
-                handles.push($(v).attr('id'));
+                handles.push(v);
             });
 
-            if (current_operation.op === "copy") {
+            if (current_operation.op == "copy") {
                 M.copyNodes(handles, M.currentdirid);
-            }
-            else if (current_operation.op === "cut") {
-                current_operation = null;
+            } else if (current_operation.op == "cut") {
                 M.moveNodes(handles, M.currentdirid);
+                current_operation = null;
             }
 
             return false; // stop prop.
         } else if (charCode == 8) {
-            var $items = selectionManager.get_selected();
-            if ($items.size() === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
+            var items = selectionManager.get_selected();
+            if (items.length == 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
-            $.selected = [];
-            $items.each(function() {
-                $.selected.push($(this).attr('id'));
-            });
+            $.selected = items;
 
             fmremove();
 
             // force remove, no confirmation
             if (e.ctrlKey || e.metaKey) {
-                $('#msgDialog:visible default-white-button.confirm').trigger('click');
+                $('#msgDialog:visible .fm-dialog-button.confirm').trigger('click');
             }
 
             return false;
@@ -1441,375 +1442,7 @@ function FMShortcuts() {
     });
 }
 
-/**
- * Simple way for searching for nodes by their first letter.
- *
- * PS: This is meant to be somehow reusable.
- *
- * @param searchable_elements selector/elements a list/selector of elements which should be searched for the user
- * specified key press character
- * @param containers selector/elements a list/selector of containers to which the input field will be centered (the code
- * will dynamically detect and pick the :visible container)
- *
- * @returns {*}
- * @constructor
- */
-var QuickFinder = function(searchable_elements, containers) {
-    "use strict";
 
-    var self = this;
-    var DEBUG = false;
-
-    self._is_active = false; // defined as a prop of this. so that when in debug mode it can be easily accessed from
-    // out of this scope
-
-    var last_key = null;
-    var next_idx = 0;
-
-    // hide on page change
-    if (QuickFinder._pageChangeListenerId) {
-        mBroadcaster.removeListener(QuickFinder._pageChangeListenerId);
-    }
-    QuickFinder._pageChangeListenerId = mBroadcaster.addListener('pagechange', function () {
-        if (self.is_active()) {
-            self.deactivate();
-        }
-    });
-
-    $(window).rebind('keypress.quickFinder', function(e) {
-
-        e = e || window.event;
-        // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
-        // contact field)
-        if ($(e.target).is("input, textarea, select") || $.dialog)
-            return;
-
-        var charCode = e.which || e.keyCode; // ff
-
-        if (
-            (charCode >= 48 && charCode <= 57) ||
-            (charCode >= 65 && charCode <= 123) ||
-            charCode > 255
-            ) {
-            var charTyped = String.fromCharCode(charCode);
-
-            // get the currently visible container
-            var $container = $(containers).filter(":visible");
-            if ($container.size() == 0) {
-                // no active container, this means that we are receiving events for a page, for which we should not
-                // do anything....
-                return;
-            }
-
-            self._is_active = true;
-
-            $(self).trigger("activated");
-
-            var $found = $(searchable_elements).filter(":visible:istartswith('" + charTyped + "')");
-
-            if (
-                /* repeat key press, but show start from the first element */
-                    (last_key != null && ($found.size() - 1) <= next_idx)
-                    ||
-                    /* repeat key press is not active, should reset the target idx to always select the first element */
-                        (last_key == null)
-                        ) {
-                    next_idx = 0;
-                    last_key = null;
-                } else if (last_key == charTyped) {
-                    next_idx++;
-                } else if (last_key != charTyped) {
-                    next_idx = 0;
-                }
-                last_key = charTyped;
-
-                $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
-
-                var $target_elm = $($found[next_idx]);
-
-                $target_elm.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
-
-                var $jsp = $target_elm.getParentJScrollPane();
-                if ($jsp) {
-                    var $scrolled_elm = $target_elm.parent("a");
-
-                    if ($scrolled_elm.size() == 0) { // not in icon view, its a list view, search for a tr
-                        $scrolled_elm = $target_elm.parents('tr:first');
-                    }
-                    $jsp.scrollToElement($scrolled_elm);
-                }
-
-                $(self).trigger('search');
-
-                if ($target_elm && $target_elm.size() > 0) {
-                    // ^^ DONT stop prop. if there are no found elements.
-                    return false;
-                }
-            }
-            else if (charCode >= 33 && charCode <= 36)
-            {
-                var e = '.files-grid-view.fm';
-                if (M.viewmode == 1)
-                    e = '.fm-blocks-view.fm';
-
-                if ($(e + ':visible').length)
-                {
-                    e = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
-                    var jsp = e.data('jsp');
-
-                    if (jsp)
-                    {
-                        switch (charCode)
-                        {
-                            case 33: /* Page Up   */
-                                jsp.scrollByY(-e.height(), !0);
-                                break;
-                            case 34: /* Page Down */
-                                jsp.scrollByY(e.height(), !0);
-                                break;
-                            case 35: /* End       */
-                                jsp.scrollToBottom(!0);
-                                break;
-                            case 36: /* Home      */
-                                jsp.scrollToY(0, !0);
-                                break;
-                        }
-                    }
-                }
-            }
-        });
-
-    // hide the search field when the user had clicked somewhere in the document
-    $(document.body).delegate('> *', 'mousedown', function(e) {
-        if (!is_fm()) {
-            return;
-        }
-        if (self.is_active()) {
-            self.deactivate();
-            return false;
-        }
-    });
-
-    // use events as a way to communicate with this from the outside world.
-    self.deactivate = function() {
-        self._is_active = false;
-        $(self).trigger("deactivated");
-    };
-
-    self.is_active = function() {
-        return self._is_active;
-    };
-
-    self.disable_if_active = function() {
-        if (self.is_active()) {
-            self.deactivate();
-        }
-    };
-
-    return this;
-};
-
-var quickFinder = new QuickFinder(
-    '.tranfer-filetype-txt, .file-block-title, td span.contacts-username',
-    '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table'
-    );
-
-/**
- * This should take care of flagging the LAST selected item in those cases:
- *
- *  - jQ UI $.selectable's multi selection using drag area (integrated using jQ UI $.selectable's Events)
- *
- *  - Single click selection (integrated by assumption that the .get_currently_selected will also try to cover this case
- *  when there is only one .ui-selected...this is how no other code had to be changed :))
- *
- *  - Left/right/up/down keys (integrated by using the .set_currently_selected and .get_currently_selected public
- *  methods)
- *
- * @param $selectable
- * @returns {*}
- * @constructor
- */
-var SelectionManager = function($selectable) {
-    "use strict";
-
-    var self = this;
-    $selectable.unbind('selectableselecting');
-    $selectable.unbind('selectableselected');
-    $selectable.unbind('selectableunselecting');
-    $selectable.unbind('selectableunselected');
-
-    /**
-     * Store all selected items in an _ordered_ array.
-     *
-     * @type {Array}
-     */
-    var selected_list = [];
-
-    /**
-     * Helper func to clear old reset state from other icons.
-     */
-    this.clear = function() {
-        $('.currently-selected', $selectable).removeClass('currently-selected');
-    };
-
-    this.clear(); // remove ANY old .currently-selected values.
-
-    /**
-     * The idea of this method is to _validate_ and return the .currently-selected element.
-     *
-     * @param first_or_last string ("first" or "last") by default will return the first selected element if there is
-     * not .currently-selected
-     *
-     * @returns {*|jQuery|HTMLElement}
-     */
-    this.get_currently_selected = function(first_or_last) {
-        if (!first_or_last) {
-            first_or_last = "first";
-        }
-
-        var $currently_selected = $('.currently-selected', $selectable);
-
-        if ($currently_selected.size() == 0) { // NO .currently-selected
-            return $('.ui-selected:' + first_or_last, $selectable);
-        } else if (!$currently_selected.is(".ui-selected")) { // validate that the currently selected is actually selected.
-            // if not, try to get the first_or_last .ui-selected item
-            var selected_elms = $('.ui-selected:' + first_or_last, $selectable);
-            return selected_elms;
-        } else { // everything is ok, we should return the .currently-selected
-            return $currently_selected;
-        }
-    };
-
-    /**
-     * Used from the shortcut keys code.
-     *
-     * @param element
-     */
-    this.set_currently_selected = function($element) {
-
-        self.clear();
-        $element.addClass("currently-selected");
-        quickFinder.disable_if_active();
-
-        // Do .scrollIntoView if the parent or parent -> parent DOM Element is a JSP.
-        {
-            var $jsp = $element.getParentJScrollPane();
-            if ($jsp) {
-                $jsp.scrollToElement($element);
-            }
-        }
-    };
-
-    /**
-     * Simple helper func, for selecting all elements in the current view.
-     */
-    this.select_all = function() {
-        $(window).trigger('dynlist.flush');
-        var $selectable_containers = $(
-            [
-                ".fm-transfers-block",
-                ".fm-blocks-view.fm",
-                ".fm-blocks-view.contacts-view",
-                ".files-grid-view.fm",
-                ".files-grid-view.contacts-view",
-                ".contacts-grid-view",
-                ".fm-contacts-blocks-view",
-                ".files-grid-view.contact-details-view",
-                ".shared-grid-view",
-                ".shared-blocks-view",
-                ".shared-details-block"
-            ].join(",")
-            ).filter(":visible");
-
-        var $selectables = $(
-            [
-                ".data-block-view",
-                "tr.ui-draggable",
-                "tr.ui-selectee",
-                ".contact-block-view.ui-draggable",
-                ".transfer-table tr"
-            ].join(","),
-            $selectable_containers
-            ).filter(":visible");
-
-        $selectables.addClass("ui-selected");
-    };
-
-    /**
-     * Use this to get ALL (multiple!) selected items in the currently visible view/grid.
-     */
-    this.get_selected = function() {
-        var $selectable_containers = $(
-            [
-                ".fm-blocks-view.fm",
-                ".fm-blocks-view.contacts-view",
-                ".files-grid-view.fm",
-                ".files-grid-view.contacts-view",
-                ".contacts-grid-view",
-                ".fm-contacts-blocks-view",
-                ".files-grid-view.contact-details-view"
-            ].join(",")
-            ).filter(":visible");
-
-        var $selected = $(
-            [
-                ".data-block-view",
-                "tr.ui-draggable",
-                "tr.ui-selectee",
-                ".contact-block-view.ui-draggable"
-            ].join(","),
-            $selectable_containers
-            ).filter(":visible.ui-selected");
-
-        return $selected;
-    };
-
-    /**
-     * Push the last selected item to the end of the selected_list array.
-     */
-    $selectable.bind('selectableselecting', function(e, data) {
-        var $selected = $(data.selecting);
-        selected_list.push(
-            $selected
-            );
-    });
-
-    /**
-     * Remove any unselected element from the selected_list array.
-     */
-    $selectable.bind('selectableunselecting', function(e, data) {
-        var $unselected = $(data.unselecting);
-        var idx = $.elementInArray($unselected, selected_list);
-
-        if (idx > -1) {
-            delete selected_list[idx];
-        }
-    });
-
-    /**
-     * After the user finished selecting the icons, flag the last selected one as .currently-selecting
-     */
-    $selectable.bind('selectablestop', function(e, data) {
-
-        self.clear();
-
-        // remove `undefined` from the list
-        selected_list = $.map(selected_list, function(n, i) {
-            if (n !== undefined) {
-                return n;
-            }
-        });
-
-        // add the .currently-selected
-        if (selected_list.length > 0) {
-            $(selected_list[selected_list.length - 1]).addClass('currently-selected');
-        }
-        selected_list = []; // reset the state of the last selected items for the next selectablestart
-    });
-    return this;
-};
-
-var selectionManager;
 
 function getDDhelper()
 {
@@ -4859,7 +4492,7 @@ function fm_resize_handler(force) {
         $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
             ' .contacts-grid-view .contacts-grid-scrolling-table')
             .css({
-                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
+                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth() - 46 /* margins of icons */
             });
 
         initTreeScroll();
@@ -4961,6 +4594,7 @@ function fm_resize_handler(force) {
         console.timeEnd('fm_resize_handler');
     }
 }
+
 
 function sharedFolderUI() {
     "use strict";

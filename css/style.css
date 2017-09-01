@@ -5655,6 +5655,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     text-overflow: ellipsis;
     position: relative;
 }
+
+/* ellipsis hack, so that we don't need to set "table-layout: fixed" */
+.fm-right-files-block td span.tranfer-filetype-txt:before,
+.fm-transfers-block td span.tranfer-filetype-txt:before {
+    content: '&nbsp;';
+    visibility: hidden;
+    width: 12px;
+    display: inline-block;
+}
+
+.fm-right-files-block td span.tranfer-filetype-txt,
+.fm-transfers-block td span.tranfer-filetype-txt {
+    position: absolute;
+    left: 0;
+    right: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* end of ellipsis hack */
+
 .fm-account-reseller .grid-table.vouchers {
     table-layout: auto;
 }
@@ -5975,6 +5997,10 @@ th.grid-first-th {
     content: '';
     height: 12px;
 }
+.file-block-scrolling .megaList-content {
+    margin-bottom: 12px;
+}
+
 .fm-blocks-view.shared-view .file-icon-area, .shared-blocks-view .file-icon-area, .fm-blocks-view.contacts-view .file-icon-area, .contacts-blocks-view .file-icon-area {
     width: 160px;
     height: 160px;
@@ -6237,7 +6263,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .grid-table {
     width: 100%;
-    table-layout: fixed;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
     color: #666666;
@@ -8336,7 +8361,7 @@ color: white;
     color: white;
     font-size: 11px;
     line-height: 13px;
-    display: none !important;
+    display: none;
 }
 .u-dfn {
     margin: -9px 0 0 39px;
@@ -22544,13 +22569,16 @@ table.speed-table {
 .perfectScrollbarContainer {
     position: relative;
 }
-.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail, .perfectScrollbarContainer.ps-container:hover > .ps-scrollbar-y-rail {
+.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail, .perfectScrollbarContainer.ps-container:hover > .ps-scrollbar-y-rail,
+.megaList.ps-container > .ps-scrollbar-y-rail, .megaList.ps-container:hover > .ps-scrollbar-y-rail {
     background-color: transparent !important;
     opacity: 1;
+    right: 0px !important;
 }
-.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y,
+.megaList.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y{
     background-color: rgb(102, 102, 102) !important;
-    width: 6px;
+    width: 8px;
     opacity: 0.2;
     -webkit-transition: opacity 100ms ease-in-out;
     -moz-transition: opacity 100ms ease-in-out;
@@ -22559,14 +22587,15 @@ table.speed-table {
     transition: opacity 100ms ease-in-out;
     cursor: pointer;
 }
-.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
+.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y,
+.megaList.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
     opacity: 0.5 !important;
     background-color: rgb(102, 102, 102) !important;
 }
 body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-start-conversation, body.megaChatDisabled .nw-contact-name .button.start-chat-button {
     display: none;
 }
-.ps-container > .ps-scrollbar-y-rail {
+.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail {
     right: 2px !important;
 }
 .bp-main .jspPane {

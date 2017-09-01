@@ -1056,7 +1056,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
     var paths = Object.create(null);
 
     if (onChat) {
-        onChat = 'My chat files/' + (M.getNameByHandle(target.substr(5)) || target.substr(5));
+        // onChat = 'My chat files/' + (M.getNameByHandle(target.substr(5)) || target.substr(5));
+        onChat = 'My chat files';
         paths[onChat] = null;
     }
     else {
@@ -1083,13 +1084,13 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
         }
 
         M.createFolder(target, safePath, new MegaPromise())
-            .always(function(target) {
-                if (typeof target === 'number') {
+            .always(function(_target) {
+                if (typeof _target === 'number') {
                     ulmanager.logger.warn('Unable to create folder "%s" on target "%s"',
-                        path, target, api_strerror(target));
+                        path, target, api_strerror(_target));
                 }
                 else {
-                    paths[path] = target;
+                    paths[path] = _target;
                 }
 
                 promise.resolve();
@@ -1137,13 +1138,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
                         target = M.currentdirid;
                     }
 
-                    if (onChat) {
-                        // Ignore the fileconflict dialog altogether while on the chat
-                        startUpload(u);
-                    }
-                    else {
-                        fileconflict.check(u, target, 'upload').done(startUpload);
-                    }
+                    fileconflict
+                        .check(u, onChat ? u[0].target : target, 'upload', onChat ? fileconflict.KEEPBOTH : 0)
+                        .done(startUpload);
                 });
         });
 };

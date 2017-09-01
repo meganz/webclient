@@ -4239,6 +4239,6 @@
     "17082": "Trasferimento completato. Per favore, salva il tuo file.",
     "17083": "L'app universale di MEGA per Windows \u00e8 al momento sotto sviluppo. Puoi ottenere la versione beta [A]qui[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have resumable pending transfers. Would you like to resume them?",
+    "17085": "You have partially downloaded transfers. Would you like to resume them?",
     "17086": "Open folder"
 }

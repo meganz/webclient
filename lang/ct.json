@@ -4239,6 +4239,6 @@
     "17082": "\u50b3\u8f38\u5b8c\u6210\u3002\u8acb\u5132\u5b58\u60a8\u7684\u6a94\u6848\u3002",
     "17083": "MEGA\u7684\u901a\u7528Windows\u61c9\u7528\u7a0b\u5f0f\u76ee\u524d\u6b63\u5728\u958b\u767c\u4e2d\u3002\u60a8\u53ef\u4ee5[A]\u7531\u6b64\u53d6\u5f97[\/A]\u6e2c\u8a66\u7248\u3002",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have resumable pending transfers. Would you like to resume them?",
+    "17085": "You have partially downloaded transfers. Would you like to resume them?",
     "17086": "Open folder"
 }

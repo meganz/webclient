@@ -4239,6 +4239,6 @@
     "17082": "\u041f\u0435\u0440\u0435\u0434\u0430\u0447\u0430 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u0430. \u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u0441\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u0435 \u0444\u0430\u0439\u043b.",
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have resumable pending transfers. Would you like to resume them?",
+    "17085": "You have partially downloaded transfers. Would you like to resume them?",
     "17086": "Open folder"
 }

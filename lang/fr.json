@@ -4239,6 +4239,6 @@
     "17082": "Le transfert est termin\u00e9. Veuillez enregistrer votre fichier.",
     "17083": "L'appli Windows universelle de MEGA est en cours de d\u00e9veloppement. Vous pouvez obtenir la version b\u00eata de l'appli [A]ici[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have resumable pending transfers. Would you like to resume them?",
+    "17085": "You have partially downloaded transfers. Would you like to resume them?",
     "17086": "Open folder"
 }

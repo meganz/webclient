@@ -1266,6 +1266,44 @@ MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
     }, timeout || 30000);
 };
 
+/**
+ * Check whether an operation could take the user over their storage quota
+ * @param {Number} opSize The size needed by the operation
+ * @returns {MegaPromise}
+ */
+MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
+    'use strict';
+
+    var promise = new MegaPromise();
+    loadingDialog.pshow();
+
+    M.req({a: 'uq', strg: 1, qc: 1})
+        .always(function() {
+            loadingDialog.phide();
+        })
+        .fail(promise.reject.bind(promise))
+        .done(function(data) {
+
+            if (opSize === -1) {
+                opSize = data.mstrg;
+            }
+
+            if (opSize > data.mstrg - data.cstrg) {
+                var perc = Math.floor(data.cstrg / data.mstrg * 100);
+                var options = {custom: 1, title: l[882], body: l[16927]};
+
+                M.showOverStorageQuota(perc, data.cstrg, data.mstrg, options)
+                    .always(function() {
+                        promise.reject();
+                    });
+            }
+            else {
+                promise.resolve();
+            }
+        });
+
+    return promise;
+};
 
 /**
  * Check whether the provided object is a TypedArray

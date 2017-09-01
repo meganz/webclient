@@ -2832,6 +2832,11 @@ function closeDialog() {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }
 
+    if (typeof $.dialog === 'function') {
+        onIdle($.dialog);
+        $.dialog = null;
+    }
+
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         fm_hideoverlay();
         $('.fm-dialog.registration-page-success').addClass('hidden').removeClass('special');

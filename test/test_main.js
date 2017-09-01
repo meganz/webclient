@@ -41,9 +41,10 @@ describe("Initialization Unit Tests", function() {
 
         mBroadcaster.sendMessage('boot_done');
         mBroadcaster.sendMessage('startMega');
+        mBroadcaster.sendMessage('startMega:desktop');
 
         _hideDebug();
-        expect(console.log.callCount).to.be.at.least(1);
+        // expect(console.log.callCount).to.be.at.least(1);
         expect(console.error.callCount).to.eql(0);
 
         var iDBState = 'OK';

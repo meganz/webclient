@@ -892,6 +892,7 @@ var EBLOCKED = -16;
 var EOVERQUOTA = -17;
 var ETEMPUNAVAIL = -18;
 var ETOOMANYCONNECTIONS = -19;
+var EGOINGOVERQUOTA = -24;
 
 // custom errors
 var ETOOERR = -400;
@@ -3690,6 +3691,8 @@ function api_strerror(errno) {
         return "Temporarily not available";
     case ETOOMANYCONNECTIONS:
         return "Connection overflow";
+    case EGOINGOVERQUOTA:
+        return "Not enough quota";
     default:
         break;
     }

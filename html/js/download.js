@@ -690,12 +690,7 @@ function importFile() {
                 $.onRenderNewSelectNode = r.f[0].h;
             }
             else {
-                console.error(r, api_strerror(r));
-
-                // if over quota show a special warning dialog
-                if (r === EOVERQUOTA) {
-                    alarm.overQuota.render();
-                }
+                M.ulerror(null, r);
             }
         }
     });

@@ -2906,10 +2906,19 @@ FileManager.prototype.onSectionUIOpen = function(id) {
  * @param {Number} perc percent
  * @param {Number} [cstrg] Current storage usage
  * @param {Number} [mstrg] Maximum storage.
+ * @param {Object} [options] Additional options
  */
-FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
+FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, options) {
+    'use strict';
+
+    var promise = new MegaPromise();
     var prevState = $('.fm-main').is('.almost-full, .full');
     $('.fm-main').removeClass('almost-full full');
+
+    if (this.showOverStorageQuotaPromise) {
+        promise = this.showOverStorageQuotaPromise;
+    }
+    this.showOverStorageQuotaPromise = promise;
 
     if (Object(u_attr).p) {
         // update texts with "for free accounts" sentences removed.
@@ -2928,16 +2937,28 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
             .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()) + ' ' + l[16314]);
     }
 
-    if (perc > 90) {
+    if (perc > 90 || Object(options).custom) {
         var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('full almost-full');
 
         if (perc > 99) {
             $('.fm-main').addClass('fm-notification full');
-            $strgdlg.addClass('full');
+            $strgdlg.addClass('full')
+                .find('.fm-dialog-body.full')
+                .find('.fm-dialog-title')
+                .text(Object(options).title || l[16302])
+                .end()
+                .find('.body-header')
+                .safeHTML(Object(options).body || l[16360]);
         }
         else {
             $('.fm-main').addClass('fm-notification almost-full');
-            $strgdlg.addClass('almost-full');
+            $strgdlg.addClass('almost-full')
+                .find('.fm-dialog-body.almost-full')
+                .find('.fm-dialog-title')
+                .text(Object(options).title || l[16311])
+                .end()
+                .find('.body-header')
+                .safeHTML(Object(options).body || l[16312]);
 
             // Storage chart and info
             var strQuotaLimit = bytesToSize(mstrg, 0).split(' ');
@@ -2961,11 +2982,19 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
             $('.chart.data .perc-txt', $strgdlg).text(perc + '%');
         }
 
+        var closeDialog = function() {
+            $.dialog = null;
+            window.closeDialog();
+
+            promise.resolve();
+            delete M.showOverStorageQuotaPromise;
+        };
+        $.dialog = closeDialog;
+
         $('.button', $strgdlg).rebind('click', function() {
             var $this = $(this);
 
-            fm_hideoverlay();
-            $strgdlg.addClass('hidden');
+            closeDialog();
 
             if ($this.hasClass('choose-plan')) {
                 loadSubPage('pro');
@@ -2976,10 +3005,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
 
             return false;
         });
-        $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', function() {
-            fm_hideoverlay();
-            $strgdlg.addClass('hidden');
-        });
+        $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', closeDialog);
 
         $('.fm-notification-block .fm-notification-close')
             .rebind('click', function() {
@@ -2998,16 +3024,26 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
             });
 
         clickURLs();
-        $('a.gotorub').attr('href', '/fm/' + M.RubbishID);
+        $('a.gotorub').attr('href', '/fm/' + M.RubbishID)
+            .rebind('click', function() {
+                closeDialog();
+                loadSubPage('fm/' + M.RubbishID);
+                return false;
+            });
 
         if (Object(u_attr).p) {
             $('.choose-plan', $strgdlg).text(l[16386]);
         }
 
         // if another dialog wasn't opened previously
-        if (!prevState) {
+        if (!prevState || Object(options).custom) {
             fm_showoverlay();
             $strgdlg.removeClass('hidden');
         }
+        else {
+            promise.reject();
+        }
     }
+
+    return promise;
 };

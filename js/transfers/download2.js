@@ -58,6 +58,7 @@ var dlmanager = {
     isDownloading: false,
     dlZipID: 0,
     gotHSTS: false,
+    resumeInfoTag: 'dlmr!',
     logger: MegaLogger.getLogger('dlmanager'),
 
     /**
@@ -81,6 +82,225 @@ var dlmanager = {
             });
     },
 
+    getResumeInfo: function(dl, callback) {
+        'use strict';
+
+        if (!dl) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+
+        if (typeof dl === 'string') {
+            dl = {ph: dl};
+        }
+
+        if (d) {
+            this.logger.debug('getResumeInfo', this.getResumeInfoTag(dl), dl);
+        }
+
+        var promise = M.getPersistentData(this.getResumeInfoTag(dl));
+
+        if (typeof callback === 'function') {
+            promise.tryCatch(callback, callback.bind(null, false));
+        }
+
+        return promise;
+    },
+
+    remResumeInfo: function(dl) {
+        'use strict';
+
+        if (!dl) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+
+        if (typeof dl === 'string') {
+            dl = {ph: dl};
+        }
+
+        if (d) {
+            this.logger.debug('remResumeInfo', this.getResumeInfoTag(dl), dl);
+        }
+
+        return M.delPersistentData(this.getResumeInfoTag(dl));
+    },
+
+    setResumeInfo: function(dl, byteOffset) {
+        'use strict';
+
+        if (!dl || !dl.resumeInfo || !dl.hasResumeSupport) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+
+        dl.resumeInfo.mac = dl.mac;
+        dl.resumeInfo.byteOffset = byteOffset;
+
+        if (d) {
+            this.logger.debug('setResumeInfo', this.getResumeInfoTag(dl), dl.resumeInfo, dl);
+        }
+
+        return M.setPersistentData(this.getResumeInfoTag(dl), dl.resumeInfo);
+    },
+
+    // @private
+    getResumeInfoTag: function(dl) {
+        'use strict';
+
+        return this.resumeInfoTag + (dl.ph ? dl.ph : u_handle + dl.id);
+    },
+
+    /**
+     * For a resumable download, check the filesize on disk
+     * @param {String} handle Node handle
+     * @param {String} filename The filename..
+     * @returns {MegaPromise}
+     */
+    getFileSizeOnDisk: function(handle, filename) {
+        'use strict';
+
+        var promise = new MegaPromise();
+        var reject = promise.reject.bind(promise, null);
+
+        if (dlMethod === FileSystemAPI) {
+            M.getFileEntryMetadata('mega/' + handle)
+                .fail(reject)
+                .done(function(metadata) {
+                    promise.resolve(metadata.size);
+                });
+        }
+        else if (is_chrome_firefox && typeof OS !== 'undefined') {
+            try {
+                var root = mozGetDownloadsFolder();
+
+                OS.File.stat(OS.Path.join(root.path, filename))
+                    .then(function(info) {
+                        promise.resolve(info.size);
+                    }, reject);
+            }
+            catch (ex) {
+                reject(ex);
+            }
+        }
+        else {
+            reject(EACCESS);
+        }
+
+        return promise;
+    },
+
+    /**
+     * Initialize download
+     * @param {ClassFile} file The class file instance
+     * @param {Object} gres The API reply to the `g` request
+     * @param {Object} resumeInfo Resumable info, if any
+     * @returns {MegaPromise}
+     */
+    initDownload: function(file, gres, resumeInfo) {
+        'use strict';
+
+        if (!(file instanceof ClassFile)) {
+            return MegaPromise.reject(EARGS);
+        }
+        if (!file.dl || !Object(file.dl.io).setCredentials) {
+            return MegaPromise.reject(EACCESS);
+        }
+        if (!gres || typeof gres !== 'object' || file.dl.size !== gres.s) {
+            return MegaPromise.reject(EFAILED);
+        }
+        var dl = file.dl;
+        var promise = new MegaPromise();
+
+        var dl_urls = [];
+        var dl_chunks = [];
+        var dl_chunksizes = {};
+        var dl_filesize = dl.size;
+        var byteOffset = resumeInfo.byteOffset || 0;
+
+        var p = 0;
+        var pp = 0;
+        for (var i = 1; i <= 8 && p < dl_filesize - i * 131072; i++) {
+            dl_chunksizes[p] = i * 131072;
+            dl_chunks.push(p);
+            pp = p;
+            p += dl_chunksizes[p];
+        }
+
+        var chunksize = dl_filesize / dlQueue._limit / 2;
+        if (chunksize > dlmanager.dlMaxChunkSize) {
+            chunksize = dlmanager.dlMaxChunkSize;
+        }
+        else if (chunksize <= 1048576) {
+            chunksize = 1048576;
+        }
+        else {
+            chunksize = 1048576 * Math.floor(chunksize / 1048576);
+        }
+
+        /**
+        var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1));
+        while (p < dl_filesize) {
+            dl_chunksizes[p] = p > reserved ? 1048576 : chunksize;
+            dl_chunks.push(p);
+            pp = p;
+            p += dl_chunksizes[p];
+        }
+        /**/
+        while (p < dl_filesize) {
+            var length = Math.floor((dl_filesize - p) / 1048576 + 1) * 1048576;
+            if (length > chunksize) {
+                length = chunksize;
+            }
+            dl_chunksizes[p] = length;
+            dl_chunks.push(p);
+            pp = p;
+            p += length;
+        }
+        /**/
+
+        if (!(dl_chunksizes[pp] = dl_filesize - pp)) {
+            delete dl_chunksizes[pp];
+            delete dl_chunks[dl_chunks.length - 1];
+        }
+
+        for (var j = dl_chunks.length; j--;) {
+            if (dl_chunks[j] !== undefined) {
+                var offset = dl_chunks[j];
+
+                dl_urls.push({
+                    url: gres.g + '/' + offset + '-' + (offset + dl_chunksizes[offset] - 1),
+                    size: dl_chunksizes[offset],
+                    offset: offset
+                });
+            }
+        }
+
+        if (resumeInfo && typeof resumeInfo !== 'object') {
+            dlmanager.logger.warn('Invalid resumeInfo entry.', resumeInfo, file);
+            resumeInfo = false;
+        }
+
+        dl.url = gres.g;
+        dl.urls = dl_urls;
+        dl.mac = resumeInfo.mac || [0, 0, 0, 0];
+        dl.resumeInfo = resumeInfo || Object.create(null);
+        dl.byteOffset = dl.resumeInfo.byteOffset = byteOffset;
+
+        var result = {
+            chunks: dl_chunks,
+            offsets: dl_chunksizes
+        };
+
+        try {
+            dl.io.setCredentials(dl.url, dl.size, dl.n, dl_chunks, dl_chunksizes, resumeInfo);
+            promise.resolve(result);
+        }
+        catch (ex) {
+            setTransferStatus(dl, ex);
+            promise.reject(ex);
+        }
+
+        return promise;
+    },
+
     /**
      * Browser query on maximum downloadable file size
      * @returns {MegaPromise}
@@ -102,7 +322,7 @@ var dlmanager = {
                     max();
                 }
                 else {
-                    promise.resolve(remaining);
+                    promise.resolve(Math.max(remaining, MemoryIO.fileSizeLimit));
                 }
             };
 
@@ -564,18 +784,31 @@ var dlmanager = {
     },
 
     checkLostChunks: function DM_checkLostChunks(file) {
+        'use strict';
+
+        var mac;
         var dl_key = file.key;
 
-        var t = Object.keys(file.macs).map(Number)
-            .sort(function(a, b) {
-                return a - b;
-            })
-            .map(function(v) {
-                return file.macs[v];
-            });
+        if (file.hasResumeSupport) {
+            mac = file.mac;
+        }
+        else {
+            var t = Object.keys(file.macs)
+                .map(Number)
+                .sort(function(a, b) {
+                    return a - b;
+                })
+                .map(function(v) {
+                    return file.macs[v];
+                });
 
-        var mac = condenseMacs(t, [dl_key[0] ^ dl_key[4], dl_key[1]
-            ^ dl_key[5], dl_key[2] ^ dl_key[6], dl_key[3] ^ dl_key[7]]);
+            mac = condenseMacs(t, [
+                dl_key[0] ^ dl_key[4],
+                dl_key[1] ^ dl_key[5],
+                dl_key[2] ^ dl_key[6],
+                dl_key[3] ^ dl_key[7]
+            ]);
+        }
 
         if (have_ab && (dl_key[6] !== (mac[0] ^ mac[1]) || dl_key[7] !== (mac[2] ^ mac[3]))) {
             return false;
@@ -624,6 +857,7 @@ var dlmanager = {
                 }
                 return finish_write(task, done);
             }
+            var logger = dl.writer && dl.writer.logger || dlmanager.logger;
 
             // As of Firefox 37, this method will neuter the array buffer.
             var abLen = task.data.byteLength;
@@ -631,6 +865,7 @@ var dlmanager = {
 
             var ready = function _onWriterReady() {
                 dl.writer.pos += abLen;
+
                 if (dl.data) {
                     new Uint8Array(
                         dl.data,
@@ -639,14 +874,31 @@ var dlmanager = {
                     ).set(abDup || task.data);
                 }
 
-                return finish_write(task, done);
+                if (dl.hasResumeSupport) {
+                    if (d > 1) {
+                        logger.debug('Condense MACs @ offset %s-%s', task.offset, dl.writer.pos, Object.keys(dl.macs));
+                    }
+
+                    for (var pos = task.offset; dl.macs[pos] && pos < dl.writer.pos; pos += 1048576) {
+                        dl.mac[0] ^= dl.macs[pos][0];
+                        dl.mac[1] ^= dl.macs[pos][1];
+                        dl.mac[2] ^= dl.macs[pos][2];
+                        dl.mac[3] ^= dl.macs[pos][3];
+                        dl.mac = dl.aes.encrypt(dl.mac);
+                        delete dl.macs[pos];
+                    }
+                }
+
+                dlmanager.setResumeInfo(dl, dl.writer.pos)
+                    .finally(function() {
+                        finish_write(task, done);
+                    });
             };
 
             try {
                 dl.io.write(task.data, task.offset, ready);
             }
             catch (ex) {
-                var logger = dl.writer && dl.writer.logger || dlmanager.logger;
                 logger.error(ex);
                 dlFatalError(dl, ex);
             }
@@ -665,13 +917,13 @@ var dlmanager = {
     },
 
     mGetXR: function DM_getxr() {
-        /* jshint -W074 */
-        return {
+        'use strict';
+
+        return Object.assign(Object.create(null), {
             update: function(b) {
-                var t;
                 var ts = Date.now();
                 if (b < 0) {
-                    this.tb = {};
+                    this.tb = Object.create(null);
                     this.st = 0;
                     return 0;
                 }
@@ -679,15 +931,12 @@ var dlmanager = {
                     this.tb[ts] = this.tb[ts] ? this.tb[ts] + b : b;
                 }
                 b = 0;
-                for (t in this.tb) {
-                    if (this.tb.hasOwnProperty(t)) {
-                        t = parseInt(t);
-                        if (t < ts - this.window) {
-                            delete this.tb[t];
-                        }
-                        else {
-                            b += this.tb[t];
-                        }
+                for (var t in this.tb) {
+                    if (t < ts - this.window) {
+                        delete this.tb[t];
+                    }
+                    else {
+                        b += this.tb[t];
                     }
                 }
                 if (!b) {
@@ -709,10 +958,10 @@ var dlmanager = {
                 return b / ts;
             },
 
-            tb: {},
             st: 0,
-            window: 60000
-        };
+            window: 60000,
+            tb: Object.create(null)
+        });
     },
 
     _quotaPushBack: {},
@@ -1106,7 +1355,9 @@ var dlmanager = {
             onDialogClosed: function() {
                 if ($dialog) {
                     fm_showoverlay();
-                    $dialog.removeClass('hidden');
+                    $dialog.removeClass('hidden')
+                        .find('.fm-dialog-close')
+                        .rebind('click.quota', closeDialog);
                 }
                 delete dlmanager.onOverquotaWithAchievements;
             }
@@ -1246,7 +1497,7 @@ var dlmanager = {
                 $dialog.addClass('hidden-bottom');
             }
         }
-        else {
+        else if (!(flags & this.LMT_HASACHIEVEMENTS)) {
             var $pan = $('.not-logged.no-achievements', $dialog);
 
             if ($pan.length && !$pan.hasClass('flag-pcset')) {
@@ -1764,79 +2015,6 @@ dlQueue.validateTask = function(pzTask) {
 function DownloadQueue() {}
 inherits(DownloadQueue, Array);
 
-DownloadQueue.prototype.getUrls = function(dl_chunks, dl_chunksizes, url) {
-    var dl_urls = [];
-    $.each(dl_chunks, function(key, pos) {
-        dl_urls.push({
-            url: url + '/' + pos + '-' + (pos + dl_chunksizes[pos] - 1),
-            size: dl_chunksizes[pos],
-            offset: pos
-        });
-    });
-
-    return dl_urls;
-}
-
-DownloadQueue.prototype.splitFile = function(dl_filesize) {
-    var dl_chunks = [];
-    var dl_chunksizes = {};
-
-    var p = 0;
-    var pp = 0;
-    for (var i = 1; i <= 8 && p < dl_filesize - i * 131072; i++) {
-        dl_chunksizes[p] = i * 131072;
-        dl_chunks.push(p);
-        pp = p;
-        p += dl_chunksizes[p];
-    }
-
-    var chunksize = dl_filesize / dlQueue._limit / 2;
-    if (chunksize > dlmanager.dlMaxChunkSize) {
-        chunksize = dlmanager.dlMaxChunkSize;
-    }
-    else if (chunksize <= 1048576) {
-        chunksize = 1048576;
-    }
-    else {
-        chunksize = 1048576 * Math.floor(chunksize / 1048576);
-    }
-
-    /**
-    var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1));
-    while (p < dl_filesize) {
-        dl_chunksizes[p] = p > reserved ? 1048576 : chunksize;
-        dl_chunks.push(p);
-        pp = p;
-        p += dl_chunksizes[p];
-    }
-    /**/
-    while (p < dl_filesize) {
-        var length = Math.floor((dl_filesize - p) / 1048576 + 1) * 1048576;
-        if (length > chunksize) {
-            length = chunksize;
-        }
-        dl_chunksizes[p] = length;
-        dl_chunks.push(p);
-        pp = p;
-        p += length;
-    }
-    /**/
-
-    if (!(dl_chunksizes[pp] = dl_filesize - pp)) {
-        delete dl_chunksizes[pp];
-        delete dl_chunks[dl_chunks.length - 1];
-    }
-
-    dl_chunks = {
-            chunks: dl_chunks,
-            offsets: dl_chunksizes
-        };
-    if (d) {
-        dlmanager.logger.info('dl_chunks', chunksize, dl_chunks);
-    }
-    return dl_chunks;
-}
-
 DownloadQueue.prototype.push = function() {
     var pos = Array.prototype.push.apply(this, arguments);
     var id = pos - 1;
@@ -1844,8 +2022,6 @@ DownloadQueue.prototype.push = function() {
     var dl_id = dl.ph || dl.id;
     var dl_key = dl.key;
     var dlIO;
-    var dl_keyNonce = JSON.stringify([dl_key[0] ^ dl_key[4], dl_key[1]
-            ^ dl_key[5], dl_key[2] ^ dl_key[6], dl_key[3] ^ dl_key[7], dl_key[4], dl_key[5]]);
 
     if (dl.zipid) {
         if (!Zips[dl.zipid]) {
@@ -1854,7 +2030,7 @@ DownloadQueue.prototype.push = function() {
         dlIO = Zips[dl.zipid].addEntryFile(dl);
     }
     else {
-        if (dl.preview || (window.Incognito === 0xC120E && dl.size < 400 * 1024 * 1024)) {
+        if (dl.preview || Math.min(MemoryIO.fileSizeLimit, 90 * 1048576) > dl.size) {
             dlIO = new MemoryIO(dl_id, dl);
         }
         else {
@@ -1862,18 +2038,22 @@ DownloadQueue.prototype.push = function() {
         }
     }
 
-    if (!use_workers) {
-        dl.aes = new sjcl.cipher.aes([dl_key[0] ^ dl_key[4], dl_key[1]
-            ^ dl_key[5], dl_key[2] ^ dl_key[6], dl_key[3] ^ dl_key[7]]);
-    }
-
-    /* In case it failed and it was manually cancelled and retried */
-    // dlmanager.release("id:" + dl_id);
+    dl.aes = new sjcl.cipher.aes([
+        dl_key[0] ^ dl_key[4],
+        dl_key[1] ^ dl_key[5],
+        dl_key[2] ^ dl_key[6],
+        dl_key[3] ^ dl_key[7]
+    ]);
+    dl.nonce = JSON.stringify([
+        dl_key[0] ^ dl_key[4],
+        dl_key[1] ^ dl_key[5],
+        dl_key[2] ^ dl_key[6],
+        dl_key[3] ^ dl_key[7], dl_key[4], dl_key[5]
+    ]);
 
     dl.pos = id; // download position in the queue
     dl.dl_id = dl_id; // download id
     dl.io = dlIO;
-    dl.nonce = dl_keyNonce;
     // Use IO object to keep in track of progress
     // and speed
     dl.io.progress = 0;
@@ -1887,9 +2067,9 @@ DownloadQueue.prototype.push = function() {
     else {
         dl.writer = dlIO;
     }
+    Object.defineProperty(dl, 'hasResumeSupport', {value: dl.io.hasResumeSupport});
 
-    dl.macs = {};
-    dl.urls = [];
+    dl.macs = Object.create(null);
 
     dlQueue.push(new ClassFile(dl));
 
@@ -1925,3 +2105,54 @@ if (is_mobile) {
     dlmanager.dlMaxChunkSize = 4 * 1048576;
     dlMethod = MemoryIO;
 }
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    M.onFileManagerReady(true, function() {
+        var prefix = dlmanager.resumeInfoTag + u_handle;
+
+        // automatically resume transfers on fm initialization
+        M.getPersistentDataEntries(prefix)
+            .done(function(entries) {
+                entries = entries.map(function(entry) {
+                    return entry.substr(prefix.length);
+                });
+
+                dbfetch.geta(entries)
+                    .always(function() {
+                        for (var i = entries.length; i--;) {
+                            if (!M.d[entries[i]]) {
+                                entries.splice(i, 1);
+                            }
+                        }
+
+                        if (entries.length) {
+                            var $dialog = $('.fm-dialog.resume-transfer');
+
+                            $('.fm-dialog-close, .cancel', $dialog).rebind('click', function() {
+                                fm_hideoverlay();
+                                $dialog.addClass('hidden');
+
+                                for (var i = entries.length; i--;) {
+                                    M.delPersistentData(prefix + entries[i]);
+                                }
+                            });
+
+                            $('.big-button.red', $dialog).rebind('click', function() {
+                                if (d) {
+                                    dlmanager.logger.info('Resuming transfers...', entries);
+                                }
+                                fm_hideoverlay();
+                                M.addDownload(entries);
+                                $dialog.addClass('hidden');
+                            });
+
+                            fm_showoverlay();
+                            $.dialog = 'resume-transfer';
+                            $dialog.removeClass('hidden');
+                        }
+                    });
+            });
+    });
+});

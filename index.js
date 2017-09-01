@@ -1132,7 +1132,7 @@ function init_page() {
         return false;
     }
 
-    else if (is_fm()) {
+    else if (is_fm()) {		
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
@@ -1277,6 +1277,7 @@ function init_page() {
         if (megaChatIsDisabled) {
             $(document.body).addClass("megaChatDisabled");
         }
+		pagemetadata();
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout) {
@@ -2251,6 +2252,7 @@ function parsetopmenu() {
 
 function loadSubPage(tpage, event)
 {
+	pagemetadata();
     tpage = getCleanSitePath(tpage);
 
     if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {

@@ -496,7 +496,7 @@
     width: 18px;
 }
 .medium-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v7.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -767,20 +767,20 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v7.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v7.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v7.png);
     background-position: -188px -634px;
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v7.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1055,7 +1055,7 @@
     background-image: url(../images/mega/account-sprite_v4.png);
 }
 .small-icon.clock {
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v7.png);
     background-position: -79px -743px;
     width: 20px;
     height:22px;
@@ -1063,16 +1063,22 @@
 
 
 i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v7.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
 }
 .medium-icon.icons-sprite.big-mega, .big-button .medium-icon.icons-sprite.mega {
-        background-position: 2px -1006px;
+    background-position: 2px -1006px;
 }
 .medium-icon.icons-sprite.download {
-        background-position: 0 -953px;
+    background-position: 0 -953px;
+}
+.medium-icon.icons-sprite.download.resume {
+    background-position: -55px -953px;
+}
+.medium-icon.icons-sprite.download.save {
+    background-position: -106px -953px;
 }
 .small-icon.icons-sprite.dark-down-arrow {
     background-position: 5px -870px;
@@ -1102,7 +1108,7 @@ i.icons-sprite {
     background-position: 4px -873px;
 }
 .semi-small-icon.icons-sprite.green-tick {
-    background-position: -28px -909px;
+    background-position: -28px -910px;
     width: 23px;
 }
 .semi-small-icon.icons-sprite.lens {

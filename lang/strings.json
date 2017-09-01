@@ -7512,7 +7512,7 @@
         "context": "Label to let the user add a new excluded file name. Keep colon."
     },
     "7055": {
-        "text": "The new excluded file names will be taken into account\nwhen the application starts again.",
+        "text": "The new excluded file names will be taken into account when the application starts again.",
         "context": ""
     },
     "7056": {
@@ -7540,7 +7540,7 @@
         "context": "Message displayed when an error occurs exporting the master key to a file."
     },
     "7068": {
-        "text": "The new excluded file names will be taken into account\nwhen the application starts again",
+        "text": "The new excluded file names will be taken into account when the application starts again",
         "context": "Message displayed to inform the user that the new file name exclusion changes will be applied on next startup."
     },
     "7069": {
@@ -15463,6 +15463,694 @@
         "text": "Save the log file",
         "context": "The title of a dialog which is displayed when asking the user if they want to save the generated log file to an external location from the app."
     },
+    "16674": {
+        "text": "MEGAchat SDK version",
+        "context": "Title of the label where the MEGAchat SDK version is shown"
+    },
+    "16675": {
+        "text": "The folder is shared with %1$d contact. Remove share?",
+        "context": "Confirmation before removing the outgoing shares of a folder. Do not modify\/replace\/translate the %1$d variable as it will be dynamically replaced with the number of contacts being shared to."
+    },
+    "16676": {
+        "text": "The folder is shared with %1$d contacts. Remove all shares?",
+        "context": "Confirmation before removing the outgoing shares of a folder. Do not modify\/replace\/translate the %1$d variable as it will be dynamically replaced with the number of contacts being shared to."
+    },
+    "16677": {
+        "text": "Your account has been suspended due to Terms of Service violations. Please contact support@mega.nz",
+        "context": "Error message when trying to login and the account is suspended. It's the error that appears when the user is trying to login into an account that is suspended. Like the screenshot, but in the screenshot the message just shows an invalid password error"
+    },
+    "16678": {
+        "text": "Too many failed attempts to login, please wait for an hour.",
+        "context": "Error message when to many attempts to login."
+    },
+    "16679": {
+        "text": "This account has not been validated yet. Please, check your email.",
+        "context": "Error message when trying to login to an account not validated."
+    },
+    "16680": {
+        "text": "The file link has been removed because of a ToS\/AUP violation.",
+        "context": "Error message shown when opening a file link which has been removed due to ToS\/AUP violation.\r\nToS stands for Terms of Service. AUP stands for Acceptable Use Policy."
+    },
+    "16681": {
+        "text": "Awaiting email confirmation",
+        "context": "Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email."
+    },
+    "16682": {
+        "text": "item",
+        "context": "Singular of items which contains a folder. 1 item"
+    },
+    "16683": {
+        "text": "items",
+        "context": "Plural of items which contains a folder. 2 items"
+    },
+    "16684": {
+        "text": "The associated user account has been terminated due to multiple violations of our Terms of Service.",
+        "context": "Error message shown when opening a file or folder link for which the owner account has been removed due to ToS\/AUP violation."
+    },
+    "16685": {
+        "text": "The provided decryption key for the folder link is invalid.",
+        "context": "Error message shown after loading a folder link with an invalid decryption key, so that the folder can not be successfully decrypted\/viewed\/opened."
+    },
+    "16686": {
+        "text": "My credentials",
+        "context": "Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts"
+    },
+    "16687": {
+        "text": "Chat BETA",
+        "context": "Item of the navigation title for the chat section. The Chat is in a BETA phase of development."
+    },
+    "16689": {
+        "text": "Archive",
+        "context": "Title of the archived chats tab."
+    },
+    "16690": {
+        "text": "No conversations",
+        "context": "Message shown when the user has no archived chats"
+    },
+    "16691": {
+        "text": "Enable chat",
+        "context": "Message shown when the user needs to enable the chat feature."
+    },
+    "16692": {
+        "text": "Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.",
+        "context": "Message shown when the user has no recent chats, encouraging them to invite their friends and start chatting."
+    },
+    "16693": {
+        "text": "Enable Chat[A]and enjoy our encrypted platform with privacy and security.",
+        "context": "Message shown when the user has no recent chats. Please do not translate or change the [A] tag which will be replaced by a newline\/break dynamically by the code."
+    },
+    "16694": {
+        "text": "h",
+        "context": "Initial of the word hour to show the duration of a video or audio call"
+    },
+    "16695": {
+        "text": "m",
+        "context": "Initial of the word minute to show the duration of a video or audio call"
+    },
+    "16696": {
+        "text": "s",
+        "context": "Initial of the word second to show the duration of a video or audio call"
+    },
+    "16697": {
+        "text": "%d selected",
+        "context": "Title shown when multiselection is enable in chat tabs, and the user has more than one item selected."
+    },
+    "16698": {
+        "text": "The contact %s will be removed from the shared folder.",
+        "context": "Message to confirm if the user wants to delete a contact from a shared folder. Please leave the %s placeholder as it is as it will be replaced by the contact's name."
+    },
+    "16699": {
+        "text": "%d contacts will be removed from the shared folder.",
+        "context": "Message to confirm if the user wants to delete a multiple contacts from a shared folder. The %d variable will be replaced by the number of contacts to be removed."
+    },
+    "16700": {
+        "text": "%d contacts removed correctly from the shared folder",
+        "context": "success message when removing a contact from a shared folder. %d will be replaced with the number of contacts removed."
+    },
+    "16701": {
+        "text": "and %d contacts were not successfully removed",
+        "context": "additional failure message when removing contacts from a shared folder where some of the contacts were not able to be removed. %d will be replaced with the number of contacts."
+    },
+    "16702": {
+        "text": "Loading contacts from the phone...",
+        "context": "Message shown while the contact list from the device is being read and then shown to the user"
+    },
+    "16703": {
+        "text": "%d invite requests sent successfully.",
+        "context": "success message when reinviting multiple contacts. The %d placeholder will be replaced by the number of invite requests that were sent."
+    },
+    "16704": {
+        "text": "%1$d invite requests successfully sent but %2$d requests were not sent.",
+        "context": "error message when reinviting multiple contacts. The %1$d and %2$d placeholders should not be translated or changed, as they will be replaced by the number of invites sent or not sent."
+    },
+    "16705": {
+        "text": "%1s (Me)",
+        "context": "Word next to own user's message in chat screen. %1s should not be translated or changed as it will be replaced dynamically by the code."
+    },
+    "16707": {
+        "text": "Type a message",
+        "context": "Hint shown in the field to write a message in the chat screen, prompting the user to write a message in this field."
+    },
+    "16708": {
+        "text": "Unmute",
+        "context": "button label to turn the microphone back on so the user can speak."
+    },
+    "16709": {
+        "text": "Chat notifications",
+        "context": "Title of the section to enable notifications in the Contact Properties screen"
+    },
+    "16710": {
+        "text": "Message sound",
+        "context": "Title of the section to choose the sound of incoming messages in the Contact Properties screen"
+    },
+    "16711": {
+        "text": "Clear chat",
+        "context": "Title of the section to clear the chat content in the Contact Properties screen"
+    },
+    "16712": {
+        "text": "Share contact",
+        "context": "Title of the section to share the contact in the Contact Properties screen"
+    },
+    "16713": {
+        "text": "Call ringtone",
+        "context": "Title of the screen to select the ringtone of the calls"
+    },
+    "16714": {
+        "text": "Notification sound",
+        "context": "Title of the screen to select the sound of the notifications"
+    },
+    "16715": {
+        "text": "After cleared, neither %s nor you will be able to see messages of this chat.",
+        "context": "Text of the confirmation dialog to clear the chat history. The %s placeholder should not be translated or changed as it will be replaced by the name of the contact you are chatting with, who will be affected by this chat-clearing."
+    },
+    "16716": {
+        "text": "The history of the chat has been cleared",
+        "context": "Message show when the history of a chat has been successfully deleted"
+    },
+    "16717": {
+        "text": "Error. The history of the chat has not been cleared correctly",
+        "context": "Message show when the history of a chat hasn't been successfully deleted"
+    },
+    "16718": {
+        "text": "Add participants",
+        "context": "Menu item to add participants to a chat"
+    },
+    "16719": {
+        "text": "Remove participant",
+        "context": "Menu item to remove a participant from a chat"
+    },
+    "16720": {
+        "text": "Protects your chat with end-to-end (user controlled) encryption, providing essential safety assurances:",
+        "context": "Message about MEGA when there are no message in the chat screen. This message is followed by some of the safety assurances that mega provides."
+    },
+    "16721": {
+        "text": "The system ensures that the data received is truly from the specified sender, and its content has not been manipulated during transit.",
+        "context": "Message about MEGA when there are no message in the chat screen. It highlights that Mega can verify that a message was actually sent by a specific individual (because they have cryptographically signed the message), and can detect if the message was modified or manipulated."
+    },
+    "16722": {
+        "text": "Only the author and intended recipients are able to decipher and read the content.",
+        "context": "Message about MEGA when there are no message in the chat screen"
+    },
+    "16723": {
+        "text": "Authenticity",
+        "context": "Message about MEGA when there are no message in the chat screen"
+    },
+    "16724": {
+        "text": "Confidentiality",
+        "context": "Message about MEGA when there are no message in the chat screen"
+    },
+    "16725": {
+        "text": "This link is not related to this account. Please, log in with the correct account.",
+        "context": "Error message shown when opening a cancel link with an account that not corresponds to the link"
+    },
+    "16726": {
+        "text": "This cancel link has expired, please try again.",
+        "context": "Message when the user tries to open a cancel link and it has expired"
+    },
+    "16727": {
+        "text": "No results were found",
+        "context": "Text shown after searching and no results found"
+    },
+    "16728": {
+        "text": "Chat history was cleared",
+        "context": "Text shown when the chat history was cleared by me"
+    },
+    "16731": {
+        "text": "Remove messages?",
+        "context": "Confirmation before deleting messages"
+    },
+    "16732": {
+        "text": "Remove message?",
+        "context": "Confirmation before deleting one message"
+    },
+    "16733": {
+        "text": "Group chat",
+        "context": "Label for the sliding panel of a group chat"
+    },
+    "16734": {
+        "text": "Group info",
+        "context": "Label for the option of the sliding panel to show the info of a chat group"
+    },
+    "16735": {
+        "text": "Edit profile",
+        "context": "Label for the option of the sliding panel to edit the profile"
+    },
+    "16736": {
+        "text": "Leave chat",
+        "context": "Title of the section to leave a group content in the Contact Properties screen"
+    },
+    "16737": {
+        "text": "Remove %s from this chat?",
+        "context": "confirmation message before removing a contact from a chat. Please do not change or translate the %s placeholder as it will be replaced by a contact name."
+    },
+    "16738": {
+        "text": "Change title",
+        "context": "Option in menu to change title of a chat group."
+    },
+    "16739": {
+        "text": "If you leave, you will no longer have access to read or send messages.",
+        "context": "confirmation message before leaving a group chat"
+    },
+    "16740": {
+        "text": "Leave group chat?",
+        "context": "title confirmation message before leaving a group chat"
+    },
+    "16741": {
+        "text": "All messages and media in this conversation will be cleared.",
+        "context": "Text of the confirmation dialog to clear a group chat history"
+    },
+    "16742": {
+        "text": "Clear history?",
+        "context": "Title of the confirmation dialog to clear a group chat history"
+    },
+    "16743": {
+        "text": "The participant is already included in this group chat",
+        "context": "Message show when a participant hasn't been successfully invited to a group chat"
+    },
+    "16744": {
+        "text": "%d participants were correctly invited",
+        "context": "success message when inviting multiple contacts to a group chat. Please do not change or translate the %d placeholder as it will be replaced by the number of participants invited."
+    },
+    "16745": {
+        "text": "%1$d participants were successfully invited but %2$d participants were not invited.",
+        "context": "error message when inviting multiple contacts to a group chat.  Please do not modify the %1$d and %2$d placeholder variables as they will be automatically replaced with the number of participants."
+    },
+    "16751": {
+        "text": "Message not sent. Tap for options",
+        "context": "chat message alert when the message have to been manually"
+    },
+    "16752": {
+        "text": "Error. Your status has not been changed",
+        "context": "message shown when the status of the user coudn't be changed"
+    },
+    "16753": {
+        "text": "An error occurred when leaving the chat",
+        "context": "message shown when a user couldn't leave chat"
+    },
+    "16754": {
+        "text": "An error occurred when creating the chat",
+        "context": "message shown when a chat has not been created"
+    },
+    "16755": {
+        "text": "Vibration",
+        "context": "settings of the chat to choose the status"
+    },
+    "16756": {
+        "text": "This message has been deleted by %1$s",
+        "context": "Text shown when a message has been deleted in the chat. Please do not translate the %1$s placeholder."
+    },
+    "16757": {
+        "text": "Chat history cleared by %1$s",
+        "context": "Text shown when the chat history was cleared by someone. Please do not translate or change the %1$s placeholder as it will be dynamically replaced by the contact's name."
+    },
+    "16758": {
+        "text": "%1$s was changed to %2$s by %3$s",
+        "context": "chat message when the permissions for a user has been changed. Please do not change the placeholders as they will be dynamically changed. %1$s will be replaced by a contact name, %2$s will be replaced by a permission, and %3$s will be replaced by a contact name."
+    },
+    "16759": {
+        "text": "%1$s was added to this group chat by invitation from %2$s",
+        "context": "chat message when a participant was added to a group chat. Please do not translate or change the %1$s or %2$s placeholders as they will be replaced by contact names dynamically."
+    },
+    "16760": {
+        "text": "%1$s was removed from group chat by %2$s",
+        "context": "chat message when a participant was removed from a group chat. Please do not translate or change the %1$s or %2$s placeholders as they will be replaced by contact names dynamically."
+    },
+    "16761": {
+        "text": "%1$s changed the group chat name to \"%2$s\"",
+        "context": "Message shown when a participant change the title of a group chat. Please do not translate or change the %1$s or %2$s placeholders as they will be replaced by text dynamically."
+    },
+    "16762": {
+        "text": "%1$s left the group chat",
+        "context": "chat message when a participant left a group chat. Please do not translate or change the %1$s placeholder as it will be replaced by a contact name dynamically."
+    },
+    "16763": {
+        "text": "Copied to the clipboard",
+        "context": "success alert when the user copy some messages to the clipboard"
+    },
+    "16764": {
+        "text": "Chat Error!",
+        "context": "Title of the error dialog when opening a chat"
+    },
+    "16765": {
+        "text": "The chat could not be opened correctly",
+        "context": "Message of the error dialog when opening a chat"
+    },
+    "16766": {
+        "text": "Choose contact",
+        "context": "Menu option to add a contact to your contact list."
+    },
+    "16767": {
+        "text": "%1$d contact",
+        "context": "referring to a contact in the contact list of the user. Please do not translate or change the %1$d placeholder as it will be replaced by a number."
+    },
+    "16768": {
+        "text": "%1$d contacts",
+        "context": "Title of the contact list. Please do not translate or change the %1$d placeholder as it will be replaced by a number."
+    },
+    "16769": {
+        "text": "Error sharing the folder. Please, try again.",
+        "context": "Message shown when the folder sharing process fails"
+    },
+    "16770": {
+        "text": "Incoming shares",
+        "context": "title of the section that shows all the incoming shared items"
+    },
+    "16771": {
+        "text": "All data associated with the selected contact will be permanently lost.",
+        "context": "Singular version, warning about the loss of shared data with this user if they are removed."
+    },
+    "16772": {
+        "text": "All data associated with the selected contacts will be permanently lost.",
+        "context": "Plural version, warning about the loss of shared data with these users if they are removed."
+    },
+    "16776": {
+        "text": "not available",
+        "context": "Label in section the storage tab in My Account Section when no info info is received"
+    },
+    "16778": {
+        "text": "Remove from Save for offline?",
+        "context": "confirmation message before removing a something for the Save for offline section"
+    },
+    "16779": {
+        "text": "Chat is disabled and it cannot be enabled without a connection.",
+        "context": "Text of chat section when the app has no connection"
+    },
+    "16780": {
+        "text": "Set status",
+        "context": "Label for the option of action menu to change the chat status"
+    },
+    "16781": {
+        "text": "Invitation accepted",
+        "context": "Accepted request invitacion alert"
+    },
+    "16782": {
+        "text": "Invitation declined",
+        "context": "Declined request invitacion alert"
+    },
+    "16783": {
+        "text": "Invitation ignored",
+        "context": "Ignored request invitacion alert"
+    },
+    "16784": {
+        "text": "Message unrecognizable",
+        "context": "Content of a normal message that cannot be recognized"
+    },
+    "16785": {
+        "text": "Show me away after an inactivity of",
+        "context": "Subtitle of the settings section to configure the autoaway of chat presence"
+    },
+    "16786": {
+        "text": "%1d minutes",
+        "context": "Value in the settings section of the autoaway chat presence. Please do not modify the %1d placeholder"
+    },
+    "16787": {
+        "text": "Status persistence",
+        "context": "Title of the settings section to configure the status persistence of chat presence"
+    },
+    "16788": {
+        "text": "Maintain my chosen status appearance even when I have no connected devices",
+        "context": "Subtitle of the settings section to configure the status persistence of chat presence. Lets you remain 'away' even if you are not connected and would normally be 'offline', for example."
+    },
+    "16789": {
+        "text": "Set time limit",
+        "context": "Title of the dialog to set the value of the auto away preference"
+    },
+    "16790": {
+        "text": "Set",
+        "context": "Button to set a value"
+    },
+    "16791": {
+        "text": "Logs can contain information related to your account",
+        "context": "Dialog to confirm the action of enabling logs"
+    },
+    "16792": {
+        "text": "Network connection recovered. Connect to MEGA?",
+        "context": "Dialog to confirm the reconnect action"
+    },
+    "16793": {
+        "text": "Loading status\u2026",
+        "context": "Message shown meanwhile the app is waiting for a the chat status"
+    },
+    "16794": {
+        "text": "This message cannot be edited",
+        "context": "Error when a message cannot be edited"
+    },
+    "16795": {
+        "text": "%1$d of %2$d file",
+        "context": "Singular, please do not change the placeholders as they will be replaced by numbers. e.g. 1 of 1 file."
+    },
+    "16796": {
+        "text": "%1$d of %2$d files",
+        "context": "Plural, please do not change the placeholders as they will be replaced by numbers. e.g. 1 of 3 files."
+    },
+    "16797": {
+        "text": "View",
+        "context": "Label of the modal bottom sheet to Transfer Manager section"
+    },
+    "16798": {
+        "text": "Resume all transfers",
+        "context": "Label of the modal bottom sheet to resume all transfers"
+    },
+    "16799": {
+        "text": "Pause transfer?",
+        "context": "Dialog to confirm the action of pausing one transfer"
+    },
+    "16800": {
+        "text": "Resume transfer?",
+        "context": "Dialog to confirm the action of restarting one transfer"
+    },
+    "16801": {
+        "text": "Clear completed transfers?",
+        "context": "Dialog to confirm before removing completed transfers"
+    },
+    "16802": {
+        "text": "In progress",
+        "context": "Title of the tab section for transfers in progress"
+    },
+    "16803": {
+        "text": "Paused transfers",
+        "context": "Title of the panel where the progress of the transfers is shown"
+    },
+    "16804": {
+        "text": "Uploading %1$d of %2$d file",
+        "context": "Singular, please do not change the placeholders as they will be replaced by numbers. e.g. 1 of 1 file."
+    },
+    "16805": {
+        "text": "Uploading %1$d of %2$d files",
+        "context": "Plural, please do not change the placeholders as they will be replaced by numbers. e.g. 1 of 3 files."
+    },
+    "16806": {
+        "text": "Uploaded %1$d file",
+        "context": "Singular, please do not change the placeholder as it will be replaced by a number. E.g. Uploaded 1 file"
+    },
+    "16807": {
+        "text": "Uploaded %1$d files",
+        "context": "Plural, please do not change the placeholder as it will be replaced by a number. E.g. Uploaded 2 files"
+    },
+    "16808": {
+        "text": "%1$d file not uploaded",
+        "context": "Singular, please do not change the placeholder as it will be replaced by a number. E.g. 1 file not uploaded"
+    },
+    "16809": {
+        "text": "%1$d files not uploaded",
+        "context": "Plural, please do not change the placeholder as it will be replaced by a number. E.g. 2 files not uploaded"
+    },
+    "16810": {
+        "text": "Downloaded %1$d file",
+        "context": "Singular, please do not change the placeholder as it will be replaced by a number. E.g. Downloaded 1 file"
+    },
+    "16811": {
+        "text": "Downloaded %1$d files",
+        "context": "Plural, please do not change the placeholder as it will be replaced by a number. E.g. Downloaded 2 files"
+    },
+    "16812": {
+        "text": "%1$d file not downloaded",
+        "context": "Singular, please do not change the placeholder as it will be replaced by a number. E.g.1 file not downloaded"
+    },
+    "16813": {
+        "text": "%1$d files not downloaded",
+        "context": "Plural, please do not change the placeholder as it will be replaced by a number. E.g. 2 files not downloaded"
+    },
+    "16814": {
+        "text": "Downloading %1$d of %2$d file",
+        "context": "Singular, please do not change the placeholders as they will be replaced by a number. E.g. Downloading 1 of 1 file"
+    },
+    "16815": {
+        "text": "Downloading %1$d of %2$d files",
+        "context": "Plural, please do not change the placeholders as they will be replaced by a number. E.g. Downloading 1 of 3 files"
+    },
+    "16816": {
+        "text": "Your queued transfer exceeds the current transfer quota available for your IP address and may therefore be interrupted.",
+        "context": "Text of the alert when the transfer quota is depleted"
+    },
+    "16817": {
+        "text": "%1$d file",
+        "context": "Singular of file. 1 file"
+    },
+    "16818": {
+        "text": "%1$d files",
+        "context": "Plural of file. 2 files"
+    },
+    "16819": {
+        "text": "View files",
+        "context": "Menu option"
+    },
+    "16820": {
+        "text": "Add to Cloud drive",
+        "context": "Menu option"
+    },
+    "16821": {
+        "text": "View contacts",
+        "context": "Menu option"
+    },
+    "16822": {
+        "text": "Succesfully added to Cloud drive",
+        "context": "Menu option"
+    },
+    "16823": {
+        "text": "Error. Not added to Cloud drive",
+        "context": "Menu option"
+    },
+    "16824": {
+        "text": "Connecting\u2026",
+        "context": "Label in login screen to inform about the chat initialization proccess"
+    },
+    "16825": {
+        "text": "%s was already invited. Consult your pending requests.",
+        "context": "message when trying to invite a contact with a pending request. Please do not modify the %s placeholder as it will be replaced by a contact name."
+    },
+    "16826": {
+        "text": "If you have misspelled your email address, correct it and click 'Resend'",
+        "context": "Hint text explaining that you can change the email and resend the create account link to the new email address"
+    },
+    "16827": {
+        "text": "Email sent",
+        "context": "Text shown after the confirmation email has been sent to the new email address"
+    },
+    "16828": {
+        "text": "You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, email, link to, transmit or otherwise make available any files, data or content that infringes any copyright or other proprietary rights of any person or entity.",
+        "context": "text_copyright_alert_second_paragraph"
+    },
+    "16829": {
+        "text": "Disagree",
+        "context": "text of the Disagree button"
+    },
+    "16830": {
+        "text": "Show info",
+        "context": "Hint how to cancel the download"
+    },
+    "16831": {
+        "text": "Link removal failed. Try again later.",
+        "context": "error message"
+    },
+    "16832": {
+        "text": "Link action failed. Try again later.",
+        "context": "error message"
+    },
+    "16833": {
+        "text": "Files attached",
+        "context": "title of the screen to see the details of several node attachments"
+    },
+    "16834": {
+        "text": "Contacts attached",
+        "context": "title of the screen to see the details of several contact attachments"
+    },
+    "16835": {
+        "text": "The user is not a contact",
+        "context": ""
+    },
+    "16836": {
+        "text": "Profile picture updated",
+        "context": "Message when an user avatar has been changed successfully"
+    },
+    "16837": {
+        "text": "Error when changing the profile picture",
+        "context": "Message when an error ocurred when changing an user avatar"
+    },
+    "16838": {
+        "text": "Profile picture deleted",
+        "context": "Message when an user avatar has been deleted successfully"
+    },
+    "16839": {
+        "text": "Error when deleting the profile picture",
+        "context": "Message when an error ocurred when deleting an user avatar"
+    },
+    "16840": {
+        "text": "Participant added",
+        "context": "Message show when a participant has been successfully invited to a group chat"
+    },
+    "16841": {
+        "text": "Error. Participant not added",
+        "context": "Message show when a participant hasn't been successfully invited to a group chat"
+    },
+    "16842": {
+        "text": "Participant removed",
+        "context": "Message show when a participant has been successfully removed from a group chat"
+    },
+    "16843": {
+        "text": "Error. Participant not removed",
+        "context": "Message show when a participant hasn't been successfully removed from a group chat"
+    },
+    "16844": {
+        "text": "No files selected",
+        "context": ""
+    },
+    "16845": {
+        "text": "From Cloud drive",
+        "context": ""
+    },
+    "16846": {
+        "text": "From device",
+        "context": ""
+    },
+    "16847": {
+        "text": "Error. Not sent.",
+        "context": ""
+    },
+    "16848": {
+        "text": "%d files already downloaded.",
+        "context": "When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded. Please do not modify the %d placeholder, it will be replaced by a number."
+    },
+    "16849": {
+        "text": "%d files pending.",
+        "context": "When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files pending. Please do not modify the %d placeholder, it will be replaced by a number."
+    },
+    "16850": {
+        "text": "No options available, you have selected yourself",
+        "context": ""
+    },
+    "16851": {
+        "text": "Remove attachment?",
+        "context": "Confirmation before deleting one attachment"
+    },
+    "16852": {
+        "text": "View files (%1d deleted)",
+        "context": "Menu option, please do not modify the %1d placeholder as it will be replaced by a number."
+    },
+    "16853": {
+        "text": "Error. The file has not been sent",
+        "context": "Error message when the attachment cannot be sent"
+    },
+    "16854": {
+        "text": "Error. The attachment has not been removed",
+        "context": "Error message when the attachment cannot be revoked"
+    },
+    "16855": {
+        "text": "Set up automatic uploads",
+        "context": "settings option"
+    },
+    "16856": {
+        "text": "Silent",
+        "context": "settings option for chat notification"
+    },
+    "16857": {
+        "text": "messages",
+        "context": "messages string in chat notification"
+    },
+    "16858": {
+        "text": "New contact request",
+        "context": "title of contact request notification"
+    },
     "16859": {
         "text": "Some items could not be shared with MEGA",
         "context": "A message to inform the user that there were unsupported assets in the share."
@@ -15551,6 +16239,14 @@
         "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
         "context": "A message which is shown when there was a server-side error retrieving the cloud drive contents."
     },
+    "16893": {
+        "text": "You will need to restart MEGA after changing the language",
+        "context": "An alert message which is shown when the user is about to change the language of the app."
+    },
+    "16894": {
+        "text": "Language changed. Tap to restart.",
+        "context": "A message which is shown in a notification to make it easy for the user to restart the app after the language is changed."
+    },
     "16895": {
         "text": "Do you remember your password?",
         "context": "Used as a title in the \"Password reminder\" dialog, that pop ups to ensure that the user had exported his recovery key OR still remembers his password."
@@ -15591,8 +16287,684 @@
         "text": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
         "context": "If the user is logged in with an achievement account while running into a transfer limitation, we show this message to remind the user that he can achieve to get more transfer quota for free."
     },
+    "16905": {
+        "text": "Disabling this security check could allow your communications to be intercepted. Your data would be still inaccessible for attackers due to our end-to-end encryption, but they could blindly move your files and folders in MEGA, delete them or deny you access to your account.",
+        "context": "Information for the user about the consequences of disabling a security check of MEGAsync"
+    },
+    "16906": {
+        "text": "View previous versions",
+        "context": "Finder context menu option to view previous versions of a file within your MEGA account through the web browser."
+    },
+    "16908": {
+        "text": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
+        "context": "Label to encourage users about the advantages of create an account and benefits of PRO plans"
+    },
+    "16909": {
+        "text": "There was a problem installing the update. Please try again later or download the last version from:\r\nhttps:\/\/mega.co.nz\/#sync",
+        "context": "A notification message which is launched when a problem occurs during the installation of an update."
+    },
+    "16910": {
+        "text": "Unable to get the filesystem. Please, try again. If the problem persists please contact bug@mega.co.nz.",
+        "context": "A message which is displayed when an error occurs while fetching nodes from the server. It takes place once the user is logging in, and all his data is being fetched from the server."
+    },
+    "16912": {
+        "text": "Error: Invalid destination folder. The download has been canceled.",
+        "context": "A notification message which is shown when an error occurs while downloading a file to a invalid destination folder."
+    },
+    "16913": {
+        "text": "Our SSL key can't be verified. You could be affected by a man-in-the-middle attack or your antivirus software could be intercepting your communications and causing this problem. Please disable it and try again.",
+        "context": "A notification message which is shown when SSL checks fails."
+    },
+    "16915": {
+        "text": "The link cannot be generated because the file is in an incoming shared folder or in your Rubbish Bin.",
+        "context": "A notification error message which is shown while generating a public link of a file from an incoming shared folder or from the rubbish bin."
+    },
+    "16916": {
+        "text": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
+        "context": "A confirmation message which is displayed when a user tries to upload a file to a synced folder which already contains it. Please keep the (%1) code because it will be filled with name of the file."
+    },
+    "16917": {
+        "text": "You need Full access rights to be able to sync the selected folder.",
+        "context": "An error message which is shown when a user is trying sync a non compatible folder."
+    },
+    "16919": {
+        "text": "Export Key",
+        "context": "A button label to export the Recovery Key of the current user."
+    },
+    "16920": {
+        "text": "Export Recovery Key",
+        "context": "A dialog title to export the Recovery Key for the current user."
+    },
+    "16921": {
+        "text": "Always keep physical control of your Recovery Key (e.g. on a client device, external storage, or print).",
+        "context": "A label to inform the user to keep physical control of the Recovery Key."
+    },
+    "16922": {
+        "text": "You have to accept our Terms of Service",
+        "context": "A label which is displayed when the user has not checked the agreement for the Terms of Service."
+    },
+    "16923": {
+        "text": "When you finish this assistant, you will be able to sync additional folders using the settings dialog",
+        "context": "A label which is shown when the initial setup wizard is at the final stage. This informs the user about the possibility of adding new synchronizations through the settings dialog."
+    },
+    "16924": {
+        "text": "Free transfer quota exceeded",
+        "context": "Label to indicate the user that his free bandwidth\/transfer is exceeded. He should upgrade to a PRO plan or wait the specified time to get new free transfer quota"
+    },
+    "16925": {
+        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to PRO[\/A], which will give you your own transfer package and also ample extra storage space.",
+        "context": "Explanation shown to the user when he exceeds all his free transfer quota and needs to upgrade to circumvent the limit."
+    },
+    "16926": {
+        "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free.",
+        "context": "Label to indicate the user that should to upgrade or wait the specific time in order to continue with his transfers"
+    },
     "16927": {
         "text": "This action can not be completed as it would take you over your current storage limit",
         "context": "Error message shown to user when a copy\/import operation would take them over their storage limit."
+    },
+    "16928": {
+        "text": "Importing",
+        "context": "state while importing the file"
+    },
+    "16929": {
+        "text": "No file or folder selected",
+        "context": "when any file or folder is selected"
+    },
+    "16930": {
+        "text": "The secondary media folder does not exist, please choose a new folder",
+        "context": "Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist"
+    },
+    "16931": {
+        "text": "No external storage detected",
+        "context": "when no external card exists"
+    },
+    "16932": {
+        "text": "This folder is read only. You do not have permission to upload",
+        "context": "On clicking menu item upload in a incoming shared folder read only"
+    },
+    "16933": {
+        "text": "You are removing the previously exported Recovery Key file",
+        "context": "confirmation message before removing the previously downloaded MasterKey file"
+    },
+    "16934": {
+        "text": "Backup Recovery Key",
+        "context": "Menu item to let the user export the MasterKey"
+    },
+    "16935": {
+        "text": "Remove Recovery Key",
+        "context": "Menu item to let the user remove the MasterKey (previously downloaded)"
+    },
+    "16936": {
+        "text": "The Recovery Key file has been removed",
+        "context": "success message when the MasterKey file has been removed"
+    },
+    "16937": {
+        "text": "We were unable to cancel your subscription. Please contact support@mega.nz for assistance",
+        "context": "error message when the subscription has not been canceled successfully"
+    },
+    "16938": {
+        "text": "%s will be downloaded.",
+        "context": "Alert text before download. Please do not modify the %s placeholder as it will be replaced by a file name."
+    },
+    "16939": {
+        "text": "There is no app to open the file %s. Do you want to continue with the download?",
+        "context": "Alert text before download. Please do not change the %s placeholder as it will be replaced by a file name."
+    },
+    "16940": {
+        "text": "Confirm password",
+        "context": "label shown in the confirmation of the password when creating an account"
+    },
+    "16941": {
+        "text": "No network connection",
+        "context": "when the user tries to log in to MEGA without a network connection"
+    },
+    "16942": {
+        "text": "Please log in to share with MEGA",
+        "context": "when the user tries to share something to MEGA without being logged"
+    },
+    "16943": {
+        "text": "MEGA Space",
+        "context": ""
+    },
+    "16944": {
+        "text": "MEGA Speed",
+        "context": ""
+    },
+    "16945": {
+        "text": "MEGA Privacy",
+        "context": ""
+    },
+    "16946": {
+        "text": "MEGA Access",
+        "context": ""
+    },
+    "16947": {
+        "text": "Please enter your name",
+        "context": "Warning dialog"
+    },
+    "16948": {
+        "text": "Delete this transfer?",
+        "context": ""
+    },
+    "16949": {
+        "text": "Delete all transfers?",
+        "context": ""
+    },
+    "16950": {
+        "text": "Media uploads",
+        "context": "title of the screen where the secondary media images are uploaded"
+    },
+    "16951": {
+        "text": "\u00a0SENT REQUESTS\u00a0",
+        "context": "Title of the sent requests tab. Capital letters"
+    },
+    "16952": {
+        "text": "Camera uploads",
+        "context": "title of the screen where the camera images are uploaded"
+    },
+    "16953": {
+        "text": "No files in your Cloud drive",
+        "context": "message when there are no files in the Cloud drive"
+    },
+    "16954": {
+        "text": "Inbox Empty",
+        "context": "Text that indicates that Inbox is empty"
+    },
+    "16956": {
+        "text": "Add new contacts using the button below",
+        "context": "Adding new relationships (contacts) using the actions."
+    },
+    "16957": {
+        "text": "Add a new contact to share",
+        "context": "Add new contacts before sharing."
+    },
+    "16958": {
+        "text": "Touch to cancel",
+        "context": "Hint how to cancel the download"
+    },
+    "16959": {
+        "text": "View transfers",
+        "context": "Hint how to cancel the download"
+    },
+    "16960": {
+        "text": "Most devices can't download files greater than 4GB. Your download will probably fail",
+        "context": "Warning message"
+    },
+    "16961": {
+        "text": "Remove share",
+        "context": "Item menu option upon right click on one or multiple files."
+    },
+    "16962": {
+        "text": "This link will not be publicly available anymore.",
+        "context": "Warning that appears prior to remove a link of a file."
+    },
+    "16963": {
+        "text": "Preparing file",
+        "context": "while file provider is downloading a file"
+    },
+    "16964": {
+        "text": "Creating folder",
+        "context": "status dialog when performing the action"
+    },
+    "16965": {
+        "text": "All items inside your rubbish bin will be deleted.",
+        "context": "Ask for confirmation before removing all the elements of the rubbish bin"
+    },
+    "16966": {
+        "text": "Request correctly sent to %s. The status can be consulted in the Sent Requests tab.",
+        "context": "success message when sending a contact request. Please do not modify the %s placeholder."
+    },
+    "16967": {
+        "text": "%s is already a contact",
+        "context": "message when trying to create a invite a contact already that is already added. Please do not modify the %s placeholder."
+    },
+    "16968": {
+        "text": "You do not have permission to send this file",
+        "context": "message when trying to send a file without full access"
+    },
+    "16969": {
+        "text": "Please choose a destination folder",
+        "context": "message that appears when a user tries to move\/copy\/upload a file but doesn't choose a destination folder"
+    },
+    "16970": {
+        "text": "%d items were not moved successfully",
+        "context": "success message when moving a node. Please do not modify the %d placeholder."
+    },
+    "16971": {
+        "text": "Moved to the rubbish bin successfully",
+        "context": "success message when moving a node"
+    },
+    "16972": {
+        "text": "%d items moved to the rubbish bin successfully",
+        "context": "success message when moving a node. Please do not modify the %d placeholder."
+    },
+    "16973": {
+        "text": "and %d items were not sent successfully",
+        "context": "success message when moving a node. Please do not modify the %d placeholder. This sentence follows an earlier message."
+    },
+    "16975": {
+        "text": "Error. %d process of removing shares is not completed",
+        "context": "error message when sharing a folder. Please do not modify the %d placeholder."
+    },
+    "16976": {
+        "text": "%d items are not removed successfully",
+        "context": "error message when moving a node. Please do not modify the %d placeholder."
+    },
+    "16978": {
+        "text": "File sent to %d contacts successfully",
+        "context": "success message when sending multiple files. Please do not modify the %d placeholder."
+    },
+    "16979": {
+        "text": "File was not sent to %d contacts",
+        "context": "error message when sending multiple files. Please do not modify the %d placeholder."
+    },
+    "16980": {
+        "text": "%d files sent successfully",
+        "context": "success message when sending multiple files. Please do not modify the %d placeholder."
+    },
+    "16981": {
+        "text": "%d files failed to send",
+        "context": "error message when sending multiple files. Please do not modify the %d placeholder."
+    },
+    "16982": {
+        "text": "%d items copied successfully",
+        "context": "success message when sending multiple files. Please do not modify the %d placeholder."
+    },
+    "16983": {
+        "text": "%d items were not copied",
+        "context": "error message when sending multiple files. Please do not modify the %d placeholder."
+    },
+    "16984": {
+        "text": "%d contacts removed successfully",
+        "context": "success message when removing several contacts. Please do not modify the %d placeholder."
+    },
+    "16985": {
+        "text": "%d contacts were not removed",
+        "context": "error message when removing several contacts. Please do not modify the %d placeholder."
+    },
+    "16986": {
+        "text": "File can not be shared with %d contacts",
+        "context": "error message when sharing a file with multiple contacts. Please do not modify the %d placeholder."
+    },
+    "16987": {
+        "text": "%d folders shared successfully",
+        "context": "success message when sharing multiple files. Please do not modify the %d placeholder."
+    },
+    "16988": {
+        "text": "%d folders were not shared",
+        "context": "error message when sharing multiple files. Please do not modify the %d placeholder."
+    },
+    "16989": {
+        "text": "Select just one file",
+        "context": "option available for just one file"
+    },
+    "16990": {
+        "text": "Rubbish bin emptied successfully",
+        "context": "success message when emptying the RB"
+    },
+    "16991": {
+        "text": "Error. The rubbish bin has not be emptied",
+        "context": "error message when emptying the RB"
+    },
+    "16992": {
+        "text": "You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help you change your mind",
+        "context": "dialog cancel subscriptions"
+    },
+    "16993": {
+        "text": "Type feedback here",
+        "context": "hint cancel subscriptions dialog"
+    },
+    "16995": {
+        "text": "Please enter the decryption key for the link",
+        "context": "Message of the alert to introduce the decryption key"
+    },
+    "16996": {
+        "text": "Image viewer",
+        "context": "title of the image gallery"
+    },
+    "16997": {
+        "text": "Last session",
+        "context": "when did the last session happen"
+    },
+    "16998": {
+        "text": "Connections",
+        "context": "header for the social connections, showing the number of contacts the user has"
+    },
+    "16999": {
+        "text": "Current password",
+        "context": "when changing the password, the first edittext is to enter the current password"
+    },
+    "17000": {
+        "text": "New password",
+        "context": "when changing the password"
+    },
+    "17001": {
+        "text": "Google Wallet (subscription)",
+        "context": "one of the payment methods"
+    },
+    "17002": {
+        "text": "* recurring subscription can be cancelled anytime before the renewal date",
+        "context": "the meaning of the asterisk in monthly* and annually* payment"
+    },
+    "17003": {
+        "text": "The preview has not been downloaded yet. Please wait",
+        "context": "before sharing an image, the preview has to be downloaded"
+    },
+    "17004": {
+        "text": "Please, log out before creating the account",
+        "context": "alert when clicking a newsignup link being logged"
+    },
+    "17005": {
+        "text": "Delete all transfers",
+        "context": "menu item"
+    },
+    "17006": {
+        "text": "Do you want to cancel Camera uploads?",
+        "context": "confirmation question for cancelling the camera uploads"
+    },
+    "17007": {
+        "text": "Camera uploads complete",
+        "context": "notification camera uploads complete"
+    },
+    "17008": {
+        "text": "Calculating",
+        "context": "Calculating Size of files in offline or cache folders"
+    },
+    "17009": {
+        "text": "Internal storage",
+        "context": "internal storage option"
+    },
+    "17010": {
+        "text": "External storage",
+        "context": "external storage option"
+    },
+    "17011": {
+        "text": "Import from device",
+        "context": "import from phone option"
+    },
+    "17012": {
+        "text": "Enable Camera Uploads",
+        "context": "settings option"
+    },
+    "17013": {
+        "text": "Turn on Camera Uploads",
+        "context": "settings option"
+    },
+    "17014": {
+        "text": "Disable Camera Uploads",
+        "context": "settings option"
+    },
+    "17015": {
+        "text": "Enable Secondary Media uploads",
+        "context": "The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization."
+    },
+    "17016": {
+        "text": "Disable Secondary Media uploads",
+        "context": "The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won't be running anymore. This is the text that appears in the settings option to disable the second synchronization."
+    },
+    "17017": {
+        "text": "MEGA Camera Uploads folder",
+        "context": "The location of where the user photos or videos are stored in MEGA."
+    },
+    "17018": {
+        "text": "MEGA Secondary folder",
+        "context": "The location of where the user photos or videos of the secondary sync are stored in MEGA."
+    },
+    "17019": {
+        "text": "Your local files will be deleted and you will be logged out after 10 failed attempts",
+        "context": "error message when not typing the pin code correctly"
+    },
+    "17020": {
+        "text": "Wrong PIN code, please try again. You have %2d attempts left",
+        "context": "error message when not typing the pin code correctly. Please do not modify the %2d placeholder as it will be replaced by a number."
+    },
+    "17021": {
+        "text": "All your local data will be deleted and you will be logged out in %1d seconds",
+        "context": "text of the screen after 10 attemps with a wrong PIN. Please do not modify the %1d placeholder as it will be replaced by a number."
+    },
+    "17022": {
+        "text": "Account Type",
+        "context": "title of the My Account screen"
+    },
+    "17023": {
+        "text": "Date",
+        "context": "category in sort by action"
+    },
+    "17024": {
+        "text": "The operation failed. Your credit card has not been charged",
+        "context": "Message shown when the payment of an upgrade has not been correct"
+    },
+    "17025": {
+        "text": "The credit card information was not correct. The credit card will not be charged",
+        "context": "Message shown when the credit card information is not correct"
+    },
+    "17026": {
+        "text": "4 digit PIN",
+        "context": "PIN with 4 digits"
+    },
+    "17027": {
+        "text": "6 digit PIN",
+        "context": "PIN with 6 digits"
+    },
+    "17028": {
+        "text": "Lite Account",
+        "context": "Label in My Account section to show user account type"
+    },
+    "17029": {
+        "text": "PRO I Account",
+        "context": "Label in My Account section to show user account type"
+    },
+    "17030": {
+        "text": "PRO II Account",
+        "context": "Label in My Account section to show user account type"
+    },
+    "17031": {
+        "text": "PRO III Account",
+        "context": "Label in My Account section to show user account type"
+    },
+    "17032": {
+        "text": "Backup your Recovery Key",
+        "context": "Title of the screen to backup the master key"
+    },
+    "17033": {
+        "text": "Your password unlocks your Recovery Key",
+        "context": "Subtitle of the screen to backup the master key"
+    },
+    "17034": {
+        "text": "Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your master key can no longer be decrypted, and you can no longer decrypt your data.",
+        "context": "First paragraph of the screen to backup the master key"
+    },
+    "17035": {
+        "text": "Copy the Recovery Key to clipboard or save it as text file",
+        "context": "Sentence to inform the user the available actions in the screen to backup the master key"
+    },
+    "17036": {
+        "text": "The Recovery Key has been successfully copied",
+        "context": "Alert message when the master key has been successfully copied to the ClipBoard"
+    },
+    "17037": {
+        "text": "If you have a backup of your Recovery Key, you can reset your password by selecting YES. No data will be lost.",
+        "context": "First paragraph of the screen when the password has been forgotten"
+    },
+    "17038": {
+        "text": "You can still export your Recovery Key now if you have an active MEGA session in another browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
+        "context": "Second paragraph of the screen when the password has been forgotten"
+    },
+    "17039": {
+        "text": "Do you have a backup of your Recovery Key?",
+        "context": "Sentence to ask to the user if he has the master key in the screen when the password has been forgotten"
+    },
+    "17040": {
+        "text": "Please enter your email address below. You will receive a recovery link that will allow you to submit your Recovery Key and reset your password.",
+        "context": "Text of the alert message to ask for the link to reset the pass with the MK"
+    },
+    "17041": {
+        "text": "Your Recovery Key goes here",
+        "context": "Hint of the text when the user can write his master key"
+    },
+    "17042": {
+        "text": "Please enter your Recovery Key below",
+        "context": "Text of the dialog to write MK after opening the recovery link"
+    },
+    "17043": {
+        "text": "Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a backup of your Recovery Key.",
+        "context": "First paragraph of the screen to park an account"
+    },
+    "17044": {
+        "text": "Please enter your email address below. You will receive a recovery link that will allow you to park your account.",
+        "context": "Text of the dialog message to ask for the link to park the account"
+    },
+    "17045": {
+        "text": "This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. If you recall your parked account's password, please contact support@mega.nz",
+        "context": "Text shown in the last alert dialog to park an account"
+    },
+    "17046": {
+        "text": "Your Recovery Key will be used to reset your password. Please, enter your new password.",
+        "context": "Text of the alert after opening the recovery link to reset pass being logged."
+    },
+    "17047": {
+        "text": "You will receive a recovery link that will allow you to reset your password.",
+        "context": "Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass"
+    },
+    "17050": {
+        "text": "The key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
+        "context": "Alert when the user introduces his MK to reset pass incorrectly"
+    },
+    "17051": {
+        "text": "Invalid Recovery Key",
+        "context": "Title of the alert when the user introduces his MK to reset pass incorrectly"
+    },
+    "17052": {
+        "text": "Getting info\u2026",
+        "context": "Message shown meanwhile the app is waiting for a request"
+    },
+    "17053": {
+        "text": "Delete your profile picture?",
+        "context": "Confirmation before deleting the avatar of the user's profile"
+    },
+    "17054": {
+        "text": "Do you want to remove the invitation request to %s?",
+        "context": "confirmation message before removing a contact request. Please do not modify the %s placeholder, it will be replaced by a contact name."
+    },
+    "17055": {
+        "text": "Do you want to remove these %d invitation requests?",
+        "context": "confirmation message before removing mutiple contact request. Please do not modify the %d placeholder, it will be replaced by a number."
+    },
+    "17056": {
+        "text": "%d request replies sent.",
+        "context": "success message when replying to multiple received request. Please do not modify the %d placeholder, it will be replaced by a number."
+    },
+    "17057": {
+        "text": "%1$d request replies successfully sent but %2$d were not sent.",
+        "context": "error message when replying to multiple received request. Please do not modify the %1$d or %2$d placeholders, they will be replaced by a number."
+    },
+    "17058": {
+        "text": "Invalid email and\/or password. Please try again.",
+        "context": "Error message when the credentials to login are incorrect."
+    },
+    "17059": {
+        "text": "Chat BETA [A](%1$d)[\/A]",
+        "context": "Item of the navigation title for the chat section when there is any unread message. Please do not modify the %1$d placeholder as it will be replaced by a number."
+    },
+    "17060": {
+        "text": "[A]This message has been deleted by [\/A][B]%1$s[\/B]",
+        "context": "Text shown when a message has been deleted in the chat. Please do not modify the %1$s placeholder as it will be replaced by a string."
+    },
+    "17061": {
+        "text": "[A]%1$s[\/A][B] was changed to [\/B][C]%2$s[\/C][D] by [\/D][E]%3$s[\/E]",
+        "context": "chat message when the permissions for a user has been changed. Please do not modify the %1$s etc placeholders as they will be replaced by permissions or names. E.g. \"Bob was changed to read-only by Fred\""
+    },
+    "17062": {
+        "text": "[A]%1$s[\/A][B] joined the group chat by invitation from [\/B][C]%2$s[\/C]",
+        "context": "chat message when a participant was added to a group chat. Please do not modify the %1$s placeholders as they will be replaced by contact names."
+    },
+    "17063": {
+        "text": "[A]%1$s[\/A][B] was removed from group chat by [\/B][C]%2$s[\/C]",
+        "context": "chat message when a participant was removed from a group chat. Please do not modify the %1$s placeholders as they will be replaced by contact names."
+    },
+    "17064": {
+        "text": "[A]%1$s[\/A][B] changed the group chat name to [\/B][C]\"%2$s\"[\/C]",
+        "context": "Message shown when a participant change the title of a group chat. Please do not modify the %1$s placeholders as they will be replaced by names."
+    },
+    "17065": {
+        "text": "[A]%1$s[\/A][B] left the group chat[\/B]",
+        "context": "chat message when a participant left a group chat. Please do not modify the %1$s placeholders as it will be replaced by a contact name."
+    },
+    "17066": {
+        "text": "%1$s [A]of %2$s[\/A]",
+        "context": "String to show the transfer quota and the used space in My Account section. Please do not modify the placeholders, the only word to translate here is 'of'. E.g. 20 of 50."
+    },
+    "17067": {
+        "text": "Total size: %1$s",
+        "context": "label for the total file size of multiple files and\/or folders (no need to put the colon punctuation in the translation). Please do not modify the %1$s placeholder."
+    },
+    "17068": {
+        "text": "An error occurred when changing the name",
+        "context": "Message when an error ocurred when changing an user attribute"
+    },
+    "17069": {
+        "text": "Your name has been correctly updated",
+        "context": "Message when an user attribute has been changed successfully"
+    },
+    "17070": {
+        "text": "View files (%1$d deleted)",
+        "context": "Menu option. Please do not modify the %1$d placeholder."
+    },
+    "17071": {
+        "text": "Clear chat history",
+        "context": "Title of the section to clear the chat content in the Contact Properties screen"
+    },
+    "17072": {
+        "text": "[A]%1$s[\/A][B] cleared the chat history[\/B]",
+        "context": "Text shown when the chat history was cleared by someone. Please do not modify the %1$s placeholder as it will be replaced by a name."
+    },
+    "17073": {
+        "text": "%1$d unread chats",
+        "context": "messages string in chat notification. Please do not modify the %1$d placeholder as it will be replaced by a number."
+    },
+    "17074": {
+        "text": "Changing permissions",
+        "context": "Item menu option upon clicking on one or multiple files."
+    },
+    "17075": {
+        "text": "Removing contact from shared folder",
+        "context": "Item menu option upon clicking on one or multiple files."
+    },
+    "17076": {
+        "text": "The process is taking longer than expected. Please wait...",
+        "context": "A message shown in the app when logging in and the user does not receive a server response. This means that it may take some time until the user logs in."
+    },
+    "17077": {
+        "text": "Saving the Recovery Key and keeping it in a secure location enables you to recover your account in the case of a lost password without data loss.",
+        "context": "The footer message shown on the Settings \/ Security Options section that explains what it means to export the Recovery Key."
+    },
+    "17078": {
+        "text": "View and edit profile",
+        "context": "A title shown on the My Account section that describes a place where the user can view and edit their profile."
+    },
+    "17081": {
+        "text": "Incomplete transfer, do you want to resume it?",
+        "context": "User is able to resume download is transfer wasn't complete before"
+    },
+    "17082": {
+        "text": "Completed transfer. Please save your file.",
+        "context": "If file was downloaded before user is able to save it immedialety"
+    },
+    "17083": {
+        "text": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
+        "context": "Explains, that new application for desktop and mobile Win devices is developed and ready for testing."
+    },
+    "17084": {
+        "text": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
+        "context": "A message shown to PRO users when they go over quota when downloading."
+    },
+    "17085": {
+        "text": "You have resumable pending transfers. Would you like to resume them?",
+        "context": "A message shown when there are resumable downloads in the file manager."
+    },
+    "17086": {
+        "text": "Open folder",
+        "context": "The label text for a button which opens a folder in the cloud drive."
     }
 }

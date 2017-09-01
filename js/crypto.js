@@ -719,7 +719,7 @@ var crypt = (function () {
         prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
         newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
 
-        // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
+        // Show warning dialog if it hasn't been locally overriden (as needed by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
         if (localStorage.hideCryptoWarningDialogs !== '1') {
             var showDialog = function() {

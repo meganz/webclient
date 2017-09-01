@@ -127,6 +127,10 @@
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.10);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.10);
 }
+.download.big-button.inline {
+    display: inline-block;
+    float: none;
+}
 .download.mid-button i {
     margin: 2px -4px 0 0;
     vertical-align: top;
@@ -322,9 +326,6 @@
 .transfer-buttons .default-white-button.small i {
     margin: 3px 1px 1px -7px;
 }
-.download.in-progress {
-    padding: 36px 0 0 0;
-}
 .download.main-transfer-info {
     padding: 13px 0 0 0;
 }
@@ -354,20 +355,30 @@
     -khtml-opacity: 0.7;
     opacity: 0.7;
 }
-.download.error-text {
-    padding: 13px 0 0 0;
+.download.error-text, .download.state-text {
+    padding: 12px 0 0 0;
     font-size: 14px;
 }
 .download.error-text span {
     font-size: 16px;
     line-height: 20px;
-    color: #D90007;
+    color: #333333;
     display: inline-block;
     vertical-align: top;
 }
-.download.error-text i {
+.download.error-text i, .download.state-text i {
     vertical-align: top;
     margin: 0px 5px 0 -4px;
+}
+.download.state-text {
+    margin: 0 0 -20px 0;
+    font-size: 16px;
+    line-height: 20px;
+    color: #333333;
+}
+.download.state-text span {
+    display: inline-block;
+    vertical-align: top;
 }
 .download.warning-block {
     display: table;
@@ -442,7 +453,7 @@
 .download.main-pad {
     display: table;
     width: 420px;
-    height: 308px;
+    height: 318px;
     position: relative;
     margin: 0 auto;
     text-align: left;
@@ -473,7 +484,7 @@
 .download.progress-block {
     height: 4px;
     background-color: rgba(0,0,0,0.1);
-    margin: 0 0 0 0;
+    margin: 36px 0 0 0;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;

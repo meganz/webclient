@@ -45,44 +45,54 @@ pages['placeholder'] = '<div class="bottom-page scroll-block">' +
         '<div class="main-mid-pad new-bottom-pages"></div>' +
     '</div>';
 
-function startMega() {
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
     if (!hashLogic) {
         $(window).rebind('popstate.mega', function(event) {
-
             var state = event.originalEvent.state || {};
 
             loadSubPage(state.subpage || state.fmpage || location.hash, event);
         });
     }
+});
 
+mBroadcaster.once('startMega:desktop', function() {
+    'use strict';
+
+    if (pages['dialogs']) {
+        $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
+        delete pages['dialogs'];
+    }
+    if (pages['onboarding']) {
+        $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
+        delete pages['onboarding'];
+    }
+    if (pages['chat']) {
+        $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
+        delete pages['chat'];
+    }
+});
+
+function startMega() {
     mBroadcaster.sendMessage('startMega');
 
-    if (silent_loading) {
-        jsl = [];
-        onIdle(silent_loading);
-        silent_loading = false;
-        return false;
+    if (is_mobile) {
+        mBroadcaster.sendMessage('startMega:mobile');
+        mBroadcaster.removeListeners('startMega:desktop');
+    }
+    else {
+        mBroadcaster.sendMessage('startMega:desktop');
+        mBroadcaster.removeListeners('startMega:mobile');
     }
 
-    if (!is_mobile) {
-        if (pages['dialogs']) {
-            $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
-            delete pages['dialogs'];
-        }
-        if (pages['onboarding']) {
-            $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
-            delete pages['onboarding'];
-        }
-        if (pages['chat']) {
-            $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
-            delete pages['chat'];
-        }
-    }
     jsl = [];
-    if(typeof(mega_custom_boot_fn) === 'undefined') {
+    if (silent_loading) {
+        onIdle(silent_loading);
+        silent_loading = false;
+    }
+    else {
         init_page();
-    } else {
-        mega_custom_boot_fn();
     }
 }
 
@@ -1122,7 +1132,7 @@ function init_page() {
         return false;
     }
 
-    else if (is_fm()) {
+    else if (is_fm()) {		
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
@@ -1267,6 +1277,7 @@ function init_page() {
         if (megaChatIsDisabled) {
             $(document.body).addClass("megaChatDisabled");
         }
+		pagemetadata();
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout) {
@@ -2241,6 +2252,7 @@ function parsetopmenu() {
 
 function loadSubPage(tpage, event)
 {
+	pagemetadata();
     tpage = getCleanSitePath(tpage);
 
     if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {

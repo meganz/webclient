@@ -1902,11 +1902,17 @@ function dbfetchfm() {
             fmdb.get('mk').always(function get_mk(r) {
                 crypto_missingkeysfromdb(r);
 
+                mega.loadReport.pn1 = Date.now() - mega.loadReport.stepTimeStamp;
+
                 fmdb.get('u').always(function get_u(r) {
                     process_u(r, true);
 
+                    mega.loadReport.pn2 = Date.now() - mega.loadReport.stepTimeStamp;
+
                     fmdb.get('s').always(function get_s(r) {
                         var promises = [];
+
+                        mega.loadReport.pn3 = Date.now() - mega.loadReport.stepTimeStamp;
 
                         for (i = r.length; i--;) {
                             if (r[i].su) {
@@ -1921,6 +1927,8 @@ function dbfetchfm() {
                                 promises.push(M.nodeShare(r[i].h, r[i], true));
                             }
                         }
+
+                        mega.loadReport.pn4 = Date.now() - mega.loadReport.stepTimeStamp;
 
                         var tables = {
                             opc: processOPC,
@@ -1949,6 +1957,7 @@ function dbfetchfm() {
                             });
                             promises.push(promise);
                         });
+                        mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
 
                         MegaPromise.allDone(promises).wait(function dbfetchfm_done() {
 
@@ -3002,6 +3011,8 @@ function loadfm_done(mDBload) {
                     r.ttlb | 0, // time to last byte
                     r.ttfm | 0, // time to fm since ttlb
                     u_type === 3 ? (mBroadcaster.crossTab.master ? 1 : 0) : -1, // master, or slave tab?
+                    r.pn1, r.pn2, r.pn3, r.pn4, r.pn5, // procNodes steps
+                    Object.keys(M.tree || {}).length, // total tree nodes
                 ];
 
                 if (d) {

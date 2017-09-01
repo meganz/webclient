@@ -319,6 +319,7 @@ if (!b_u) try
         delete localStorage['$!--foo'];
     }
     catch (ex) {
+
         storageQuotaError = (ex.code === 22);
         cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
             || ex.message === 'SecurityError: DOM Exception 18'
@@ -733,12 +734,31 @@ function mObjectURL(data, type)
     return blob && URL.createObjectURL(blob);
 }
 
-Object.defineProperty(this, 'mBroadcaster', {
-    writable: false,
-    value: {
-    _topics : {},
+/**
+ * Events broadcaster
+ * @name mBroadcaster
+ * @global
+ */
+(function(s, o) {
+    'use strict';
+    Object.defineProperty(s, 'mBroadcaster', {
+        value: o,
+        writable: false
+    });
+})(self, {
+    // @private
+    _topics: Object.create(null),
 
+    /**
+     * Add broadcast event listener.
+     * @param {String} topic A string representing the event type to listen for.
+     * @param {Object|Function} options Event options or function to invoke.
+     * @returns {String} The ID identifying the event
+     * @memberOf mBroadcaster
+     */
     addListener: function mBroadcaster_addListener(topic, options) {
+        'use strict';
+
         if (typeof options === 'function') {
             options = {
                 callback : options
@@ -754,11 +774,11 @@ Object.defineProperty(this, 'mBroadcaster', {
             return false;
         }
 
-        if (!this._topics.hasOwnProperty(topic)) {
-            this._topics[topic] = {};
+        if (!this._topics[topic]) {
+            this._topics[topic] = Object.create(null);
         }
 
-        var id = Math.random().toString(26);
+        var id = makeUUID();
         this._topics[topic][id] = options;
 
         //if (d) console.log('Adding broadcast listener', topic, id, options);
@@ -766,8 +786,33 @@ Object.defineProperty(this, 'mBroadcaster', {
         return id;
     },
 
+    /**
+     * Remove all broadcast events for an specific topic.
+     * @param {String} topic The string representing the event type we were listening for.
+     * @returns {Boolean} Whether the event was found.
+     * @memberOf mBroadcaster
+     */
+    removeListeners: function mBroadcaster_removeListeners(topic) {
+        'use strict';
+
+        if (this._topics[topic]) {
+            delete this._topics[topic];
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * Remove an specific event based on the ID given by addListener()
+     * @param {String} token The ID identifying the event.
+     * @param {EventListener} [listener] Optional DOM event listener.
+     * @returns {Boolean} Whether the event was found.
+     * @memberOf mBroadcaster
+     */
     removeListener: function mBroadcaster_removeListenr(token, listener) {
-        if (d) console.log('Removing broadcast listener', token);
+        'use strict';
+
+        // if (d) console.log('Removing broadcast listener', token);
 
         if (listener) {
             // Remove an EventListener interface.
@@ -796,8 +841,16 @@ Object.defineProperty(this, 'mBroadcaster', {
         return false;
     },
 
+    /**
+     * Send a broadcast event
+     * @param {String} topic A string representing the event type to notify.
+     * @returns {Boolean} Whether anyone were listening.
+     * @memberOf mBroadcaster
+     */
     sendMessage: function mBroadcaster_sendMessage(topic) {
-        if (this._topics.hasOwnProperty(topic)) {
+        'use strict';
+
+        if (this._topics[topic]) {
             var idr  = [];
             var args = toArray.apply(null, arguments);
             args.shift();
@@ -819,9 +872,9 @@ Object.defineProperty(this, 'mBroadcaster', {
                     idr.push(id);
             }
             if (idr.length) {
-                idr.forEach(function(id) {
-                    this.removeListener(id);
-                }.bind(this));
+                for (var i = idr.length; i--;) {
+                    this.removeListener(idr[i]);
+                }
             }
 
             return true;
@@ -830,7 +883,15 @@ Object.defineProperty(this, 'mBroadcaster', {
         return false;
     },
 
+    /**
+     * Wrapper around addListener() that will listen for the event just once.
+     * @param {String} topic A string representing the event type to listen for.
+     * @param {Function} callback The function to invoke
+     * @memberOf mBroadcaster
+     */
     once: function mBroadcaster_once(topic, callback) {
+        'use strict';
+
         this.addListener(topic, {
             once : true,
             callback : callback
@@ -857,6 +918,7 @@ Object.defineProperty(this, 'mBroadcaster', {
                             + (this.master ? 'MASTER':'SLAVE'));
 
                         console.log(String(ua));
+                        console.log(buildVersion);
                         console.log(browserdetails(ua).prod + u_handle);
                     }
                     cb(this.master);
@@ -1025,7 +1087,7 @@ Object.defineProperty(this, 'mBroadcaster', {
             delete localStorage[ev.key];
         }
     }
-}});
+});
 
 if (!is_karma) {
     Object.freeze(mBroadcaster);
@@ -1157,6 +1219,7 @@ function siteLoadError(error, filename) {
                 + "extensions and reload your browser. If that doesn't help, contact support@mega.nz");
 
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
+
 
     contenterror = 1;
     alert(message.join("\n\n"));
@@ -1898,26 +1961,31 @@ else if (!b_u) {
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
     if (!is_mobile) {
-        jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
-        jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
-        jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j: 1, w: 5});
-        jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1,w:5});
+        jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
+        jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
+        jsl.push({f:'js/fm/selectionmanager.js', n: 'fm_selectionmanager_js', j:1, w:1});
+        jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
+        jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
+        jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
-        jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
+        jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
         jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5, c:1, d:1, cache:1});
+        jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
     }
 
     jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1925,7 +1993,6 @@ else if (!b_u) {
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1977,7 +2044,6 @@ else if (!b_u) {
     // Load files common to all mobile pages
     if (is_mobile) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/ui/mobile.js', n: 'mobile_js', j: 1, w: 1});
@@ -2833,16 +2899,22 @@ function tryCatch(fn, onerror)
 }
 
 var onIdle = window.requestIdleCallback || function(handler) {
-    "use strict";
+        var startTime = Date.now();
 
-    var startTime = Date.now();
+        return setTimeout(function() {
+            handler({
+                didTimeout: false,
+                timeRemaining: function() {
+                    return Math.max(0, 50.0 - (Date.now() - startTime));
+                }
+            });
+        }, 1);
+    };
 
-    return setTimeout(function() {
-        handler({
-            didTimeout: false,
-            timeRemaining: function() {
-                return Math.max(0, 50.0 - (Date.now() - startTime));
-            }
-        });
-    }, 1);
-};
+function makeUUID(a) {
+    'use strict';
+
+    return a
+        ? (a ^ Math.random() * 16 >> a / 4).toString(16)
+        : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, makeUUID);
+}

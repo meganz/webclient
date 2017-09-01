@@ -2831,10 +2831,6 @@
         "text": "Rubbish bin",
         "context": "\"Trash\" or \"recycle bin\""
     },
-    "5760": {
-        "text": "Error uploading asset",
-        "context": "there was a problem uploading the file to MEGA"
-    },
     "5775": {
         "text": "Used",
         "context": "Title for \"Used\" MEGA space."
@@ -3106,6 +3102,10 @@
     "5931": {
         "text": "Click [A]here[\/A] to view your storage usage.",
         "context": "The placeholder \"[A]\" and \"[\/A]\" are important. They will be converted into a link. "
+    },
+    "5945": {
+        "text": "Failed to download file. Please try again. [{0}]",
+        "context": "Message of the dialog displayed when the process\/request to download a node failed.\nPreserve the [{0}] code because is for include the error code or the error message in runtime."
     },
     "6001": {
         "text": "Wrong password",
@@ -3526,6 +3526,10 @@
     "6889": {
         "text": "Setting up Bitcoin transaction...",
         "context": ""
+    },
+    "6909": {
+        "text": "Manage link",
+        "context": "Item menu option upon right click on one or multiple files."
     },
     "6941": {
         "text": "(non-recurring)",
@@ -6615,6 +6619,10 @@
         "text": "Unlocked bonuses:",
         "context": "Header of block with achievements bonuses."
     },
+    "16448": {
+        "text": "Resume Transfers",
+        "context": "A label of an option to resume all paused transfers."
+    },
     "16471": {
         "text": "The provided key is invalid.\r\n",
         "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is the error message shown when the decryption key entered is not correct."
@@ -7266,5 +7274,29 @@
     "16904": {
         "text": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
         "context": "If the user is logged in with an achievement account while running into a transfer limitation, we show this message to remind the user that he can achieve to get more transfer quota for free."
+    },
+    "16927": {
+        "text": "This action can not be completed as it would take you over your current storage limit",
+        "context": "Error message shown to user when a copy\/import operation would take them over their storage limit."
+    },
+    "17081": {
+        "text": "Incomplete transfer, do you want to resume it?",
+        "context": "User is able to resume download is transfer wasn't complete before"
+    },
+    "17082": {
+        "text": "Completed transfer. Please save your file.",
+        "context": "If file was downloaded before user is able to save it immedialety"
+    },
+    "17084": {
+        "text": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
+        "context": "A message shown to PRO users when they go over quota when downloading."
+    },
+    "17085": {
+        "text": "You have partially downloaded transfers. Would you like to resume them?",
+        "context": "A message shown when there are resumable downloads in the file manager."
+    },
+    "17086": {
+        "text": "Open folder",
+        "context": "The label text for a button which opens a folder in the cloud drive."
     }
 }

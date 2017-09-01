@@ -92,6 +92,10 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
             target.parent().find('tr').removeClass('ui-selected');
         }
         target.addClass('ui-selected');
+
+        selectionManager.clear_selection();
+        selectionManager.set_currently_selected(target.attr('id'));
+
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
         e.currentTarget = target;
@@ -115,6 +119,10 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
         e.currentTarget = target;
+
+        selectionManager.clear_selection();
+        selectionManager.set_currently_selected(target.attr('id'));
+
         M.searchPath();
         if (!$(this).hasClass('active')) {
             $(this).addClass('active');

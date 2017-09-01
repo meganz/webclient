@@ -330,6 +330,12 @@ FileManager.prototype.initFileManagerUI = function() {
 
 
         if ((a === 'drop') && dd) {
+            if (t && M.d[t]) {
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected(t);
+            }
+
+
             if (dd === 'nw-fm-left-icon') {
                 // do nothing
             }

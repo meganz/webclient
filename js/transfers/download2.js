@@ -59,6 +59,7 @@ var dlmanager = {
     dlZipID: 0,
     gotHSTS: false,
     resumeInfoTag: 'dlmr!',
+    resumeInfoCache: Object.create(null),
     logger: MegaLogger.getLogger('dlmanager'),
 
     /**
@@ -92,12 +93,20 @@ var dlmanager = {
         if (typeof dl === 'string') {
             dl = {ph: dl};
         }
+        var promise;
+        var tag = this.getResumeInfoTag(dl);
 
         if (d) {
-            this.logger.debug('getResumeInfo', this.getResumeInfoTag(dl), dl);
+            this.logger.debug('getResumeInfo', tag, dl);
         }
 
-        var promise = M.getPersistentData(this.getResumeInfoTag(dl));
+        if (this.resumeInfoCache[tag]) {
+            this.resumeInfoCache[tag].tag = tag;
+            promise = MegaPromise.resolve(this.resumeInfoCache[tag]);
+        }
+        else {
+            promise = M.getPersistentData(tag);
+        }
 
         if (typeof callback === 'function') {
             promise.tryCatch(callback, callback.bind(null, false));
@@ -289,13 +298,37 @@ var dlmanager = {
             offsets: dl_chunksizes
         };
 
-        try {
-            dl.io.setCredentials(dl.url, dl.size, dl.n, dl_chunks, dl_chunksizes, resumeInfo);
-            promise.resolve(result);
+        var startDownload = function() {
+            try {
+                dl.io.setCredentials(dl.url, dl.size, dl.n, dl_chunks, dl_chunksizes, resumeInfo);
+                promise.resolve(result);
+            }
+            catch (ex) {
+                setTransferStatus(dl, ex);
+                promise.reject(ex);
+            }
+        };
+
+        if (resumeInfo.entry) {
+            delete dlmanager.resumeInfoCache[resumeInfo.tag];
+
+            M.readFileEntry(resumeInfo.entry)
+                .done(function(ab) {
+                    if (ab instanceof ArrayBuffer && ab.byteLength === dl.byteOffset) {
+                        dl.pzBufferStateChange = ab;
+                    }
+                    else {
+                        console.warn('Invalid pzBufferStateChange...', ab, dl.byteOffset);
+                    }
+                })
+                .finally(function() {
+                    onIdle(startDownload);
+                    resumeInfo.entry.remove(function() {});
+                    delete resumeInfo.entry;
+                });
         }
-        catch (ex) {
-            setTransferStatus(dl, ex);
-            promise.reject(ex);
+        else {
+            startDownload();
         }
 
         return promise;
@@ -807,7 +840,7 @@ var dlmanager = {
                 dl_key[1] ^ dl_key[5],
                 dl_key[2] ^ dl_key[6],
                 dl_key[3] ^ dl_key[7]
-            ]);
+            ], file.mac);
         }
 
         if (have_ab && (dl_key[6] !== (mac[0] ^ mac[1]) || dl_key[7] !== (mac[2] ^ mac[3]))) {
@@ -836,6 +869,7 @@ var dlmanager = {
     },
 
     dlWriter: function DM_dl_writer(dl, is_ready) {
+        'use strict';
 
         function finish_write(task, done) {
             task.data = undefined;
@@ -847,6 +881,16 @@ var dlmanager = {
             if (dl.ready) {
                 // tell the download scheduler we're done.
                 dl.ready();
+            }
+        }
+
+        function safeWrite(data, offset, callback) {
+            try {
+                dl.io.write(data, offset, callback);
+            }
+            catch (ex) {
+                console.error(ex);
+                dlFatalError(dl, ex);
             }
         }
 
@@ -895,12 +939,16 @@ var dlmanager = {
                     });
             };
 
-            try {
-                dl.io.write(task.data, task.offset, ready);
+            var writeTaskChunk = function() {
+                safeWrite(task.data, task.offset, ready);
+            };
+
+            if (dl.pzBufferStateChange) {
+                safeWrite(dl.pzBufferStateChange, 0, writeTaskChunk);
+                delete dl.pzBufferStateChange;
             }
-            catch (ex) {
-                logger.error(ex);
-                dlFatalError(dl, ex);
+            else {
+                writeTaskChunk();
             }
 
         }, 1, 'download-writer');

@@ -177,6 +177,16 @@ function dl_g(res) {
                     $('.download.big-button.download-file i').removeClass('save resume');
                 }
             };
+            var onDownloadReady = function() {
+                dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
+
+                $('.progress-resume').removeClass('hidden');
+                $('.download.state-text.resume').addClass('hidden');
+                $('.download.state-text.save').removeClass('hidden');
+                $('.download.transfer-buttons a').addClass('hidden');
+                $('.download.big-button.download-file span').text(l[776]);
+                $('.download.big-button.download-file i').removeClass('resume').addClass('save');
+            };
             $('.download.big-button.download-file span').text(l[58]);
 
             dlmanager.getMaximumDownloadSize().done(function(size) {
@@ -200,27 +210,7 @@ function dl_g(res) {
                                 }
                             }
                             else if (size === fdl_filesize) {
-                                dlprogress(-0xbadf, perc, resumeInfo.byteOffset, fdl_filesize);
-
-                                $('.progress-resume').removeClass('hidden');
-                                $('.download.state-text.resume').addClass('hidden');
-                                $('.download.state-text.save').removeClass('hidden');
-                                $('.download.transfer-buttons a').addClass('hidden');
-                                $('.download.big-button.download-file span').text(l[776]);
-                                $('.download.big-button.download-file i').removeClass('resume').addClass('save');
-
-                                /*var download = fdl_queue_var;
-
-                                dlcomplete(dlpage_ph);
-
-                                $('.retry-transfer')
-                                    .removeClass('hidden')
-                                    .rebind('click', function() {
-                                        fdl_queue_var = download;
-                                        $(this).addClass('hidden');
-                                        browserDownload();
-                                    })
-                                    .find('span').text(l[241]);*/
+                                onDownloadReady();
                             }
                             else if (size === resumeInfo.byteOffset) {
                                 dlprogress(-0xbadf, perc, resumeInfo.byteOffset, fdl_filesize);
@@ -291,8 +281,44 @@ function dl_g(res) {
                         });
                     }
                     else {
-                        $(this).unbind('click');
-                        browserDownload();
+                        var $this = $(this);
+                        $this.unbind('click');
+
+                        watchdog.query('dling')
+                            .always(function(res) {
+                                var proceed = true;
+
+                                if (Array.isArray(res)) {
+                                    res = Array.prototype.concat.apply([], res);
+                                    proceed = res.indexOf(dlmanager.getGID({ph: dlpage_ph})) < 0;
+                                }
+
+                                if (proceed) {
+                                    dlmanager.getFileSizeOnDisk(dlpage_ph, filename)
+                                        .always(function(size) {
+                                            if (size === fdl_filesize) {
+                                                // another tab finished the download
+                                                onDownloadReady();
+
+                                                // rebind the save button
+                                                $this.rebind('click', browserDownload);
+                                            }
+                                            else {
+                                                browserDownload();
+                                            }
+                                        });
+                                }
+                                else {
+                                    $('.download.state-text.resume').addClass('hidden');
+                                    $('.progress-resume').addClass('hidden');
+                                    $('.download.scroll-block')
+                                        .removeClass('download-complete')
+                                        .addClass('downloading');
+
+                                    // another tab is downloading this
+                                    setTransferStatus(0, l[18]);
+                                }
+                            });
                         return false;
                     }
                 });

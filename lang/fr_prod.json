@@ -1292,7 +1292,7 @@
     "8819": "Vous avez d\u00e9j\u00e0 d\u00e9pos\u00e9 un contre-avis au sujet de ce lien.",
     "8820": "Le compte MEGA fourni ne correspond pas au propri\u00e9taire du lien.",
     "8833": "Pour repousser cette limite, vous pouvez cr\u00e9er un compte. Non seulement cela augmentera consid\u00e9rablement votre quota de transfert, mais vous obtiendrez aussi 50 Go de stockage nuagique s\u00e9curis\u00e9 - [B]gratuitement[\/B].",
-    "8834": "Votre t\u00e9l\u00e9chargement n'a pas pu continuer, car cela vous ferait d\u00e9passer la quantit\u00e9 actuelle de transfert gratuit allou\u00e9e \u00e0 votre adresse IP.",
+    "8834": "Votre t\u00e9l\u00e9chargement n'a pas pu se poursuivre, car cela vous ferait d\u00e9passer la quantit\u00e9 actuelle gratuite de transfert allou\u00e9e \u00e0 votre adresse IP.",
     "8839": "Cl\u00e9 de r\u00e9cup\u00e9ration",
     "8840": "Le dialogue en ligne MEGAchat a \u00e9t\u00e9 mise \u00e0 niveau et doit \u00eatre relanc\u00e9e. Voulez-vous recharger la page maintenant afin de passer \u00e0 la derni\u00e8re version?",
     "8841": "Le dialogue en ligne MEGAchat a \u00e9t\u00e9 mise \u00e0 niveau et ne sera maintenant prise en charge que par notre nouvelle version de MEGA. Veuillez mettre vos modules compl\u00e9mentaires et extensions \u00e0 jour afin de continuer \u00e0 utiliser le dialogue en ligne MEGAchat.",
@@ -1821,7 +1821,8 @@
     "16927": "Cette action ne peut pas \u00eatre men\u00e9e \u00e0 bien, car elle vous ferait d\u00e9passer votre limite de stockage actuelle",
     "17081": "Le transfert n'est pas termin\u00e9, souhaitez-vous le reprendre\u2009?",
     "17082": "Le transfert est termin\u00e9. Veuillez enregistrer votre fichier.",
-    "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17083": "L'appli Windows universelle de MEGA est en cours de d\u00e9veloppement. Vous pouvez obtenir la version b\u00eata de l'appli [A]ici[\/A].",
+    "17084": "Votre t\u00e9l\u00e9chargement ne peut pas se poursuivre, car cela vous ferait d\u00e9passer le quota de transfert actuel allou\u00e9 \u00e0 votre adresse IP.",
+    "17085": "Vous avez t\u00e9l\u00e9charg\u00e9 des transferts partiellement. Souhaitez-vous les reprendre\u2009?",
+    "17086": "Ouvrir un dossier"
 }

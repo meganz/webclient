@@ -344,7 +344,7 @@
     "931": "m\u00eas",
     "932": "ano",
     "939": "Nome do banco",
-    "949": "Inbox",
+    "949": "Caixa de entrada",
     "950": "Contatos",
     "954": "Cr\u00e9ditos",
     "955": "Aplicativos m\u00f3veis",
@@ -422,8 +422,8 @@
     "1093": "Nunca digite sua senha em um aparelho que voc\u00ea n\u00e3o confia totalmente. Tamb\u00e9m n\u00e3o entre na sua conta em um computador p\u00fablico.",
     "1094": "Para melhorar a seguran\u00e7a, instale o nosso [A]plugin para navegadores[\/A] e carregue o MEGA direto do seu computador.",
     "1095": "Crie sua conta [A]gr\u00e1tis[\/A]",
-    "1096": "Primeiro nome",
-    "1097": "\u00daltimo nome",
+    "1096": "Nome",
+    "1097": "Sobrenome",
     "1098": "Primeiro ou \u00faltimo nome \u00e9 inv\u00e1lido.",
     "1099": "Por favor, digite seu primeiro e \u00faltimo nome.",
     "1100": "Endere\u00e7o de e-mail inv\u00e1lido.",
@@ -1821,7 +1821,8 @@
     "16927": "Esta a\u00e7\u00e3o n\u00e3o pode ser conclu\u00edda, pois ultrapassaria o seu limite de armazenamento atual.",
     "17081": "Transfer\u00eancia incompleta. Por favor, salve o seu arquivo.",
     "17082": "Transfer\u00eancia conclu\u00edda. Por favor, salve o seu arquivo.",
-    "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17083": "O app MEGA Universal para Windows ainda est\u00e1 sendo desenvolvido. Voc\u00ea pode obter a vers\u00e3o beta do aplicativo [A]aqui[\/A].",
+    "17084": "O seu download n\u00e3o pode continuar, pois isso superaria a cota de transfer\u00eancia atual da sua conta.",
+    "17085": "Voc\u00ea fez o download parcial de algumas transfer\u00eancias. Voc\u00ea gostaria de conclui-las?",
+    "17086": "Abrir pasta"
 }

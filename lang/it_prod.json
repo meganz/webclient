@@ -1821,7 +1821,8 @@
     "16927": "Questa azione non pu\u00f2 essere completata in quanto ti farebbe superare il limite del tuo spazio di archiviazione",
     "17081": "Trasferimento incompleto, vuoi riprenderlo?",
     "17082": "Trasferimento completato. Per favore, salva il tuo file.",
-    "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17083": "L'app universale di MEGA per Windows \u00e8 al momento sotto sviluppo. Puoi ottenere la versione beta [A]qui[\/A].",
+    "17084": "Il tuo download non \u00e8 stato processato in quanto ti porterebbe oltre il limite della tua banda di trasferimento disponibile per il tuo account.",
+    "17085": "Hai dei trasferimenti scaricati parzialmente. Vuoi riprenderli?",
+    "17086": "Apri cartella"
 }

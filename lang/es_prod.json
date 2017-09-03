@@ -1639,7 +1639,7 @@
     "16383": "Totalmente [S]Equipado[\/S]",
     "16384": "Generosa [S]cuota de transferencia[\/S]",
     "16385": "A partir de de 200 GB de almacenamiento hasta 4 TB. Si necesitas algo a medida para tus necesidades, prueba un [S]plan personalizado[\/S].",
-    "16386": "Hazte PRO",
+    "16386": "Ampl\u00eda tu cuenta PRO",
     "16387": "Mostrar siempre el estado seleccionado, incluso cuando me desconecte.",
     "16388": "Cambia los ajustes para conceder un porcentaje de tu cuota de transferencia a los usuarios que descargan.",
     "16389": "En l\u00ednea, %1, pero cambiar mi estado a Ausente (amarillo) tras %2 minuto(s) de inactividad.",
@@ -1821,6 +1821,7 @@
     "16927": "This action can not be completed as it would take you over your current storage limit",
     "17081": "Incomplete transfer, do you want to resume it?",
     "17082": "Completed transfer. Please save your file.",
+    "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
     "17086": "Open folder"

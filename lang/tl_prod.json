@@ -1780,7 +1780,7 @@
     "16638": "Millions of people trust MEGA to store billions of files using our state of the art infrastructure. Join them and protect your data using one of the Internet's most secure cloud and communication providers.",
     "16639": "Bilang ng rehistradong gumagamit",
     "16640": "Bilang ng nakatabing files",
-    "16641": "No one shall be subjected to arbitrary interference with his privacy, family, home or correspondence[\u2026].",
+    "16641": "Walang sinuman ang maglalagay sa arbitrary inteference ng kanyang privacy, pamily, bahay o ka-correspondence[\u2026].",
     "16642": "Ang lahat ay may right na maprotektuhan ng batas laban sa ganang pakikialam [\u2026].",
     "16643": "Windows Mobile",
     "16644": "Patakaran sa Serbisyo",
@@ -1821,6 +1821,7 @@
     "16927": "This action can not be completed as it would take you over your current storage limit",
     "17081": "Incomplete transfer, do you want to resume it?",
     "17082": "Completed transfer. Please save your file.",
+    "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
     "17086": "Open folder"

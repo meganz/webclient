@@ -1821,6 +1821,7 @@
     "16927": "\u05e4\u05e2\u05d5\u05dc\u05d4 \u05d6\u05d5 \u05dc\u05d0 \u05d0\u05e4\u05e9\u05e8\u05d9\u05ea \u05de\u05db\u05d9\u05d5\u05d5\u05df \u05d5\u05d4\u05d9\u05d0 \u05ea\u05d2\u05e8\u05d5\u05dd \u05dc\u05d4\u05e2\u05d1\u05e8\u05ea \u05de\u05db\u05e1\u05ea \u05d4\u05e9\u05d8\u05d7 \u05e9\u05dc\u05da",
     "17081": "Incomplete transfer, do you want to resume it?",
     "17082": "Completed transfer. Please save your file.",
+    "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
     "17086": "Open folder"

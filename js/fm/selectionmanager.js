@@ -17,10 +17,6 @@
 var SelectionManager = function($selectable, resume) {
     var self = this;
 
-    $selectable.unbind('selectableselecting');
-    $selectable.unbind('selectableselected');
-    $selectable.unbind('selectableunselecting');
-    $selectable.unbind('selectableunselected');
 
     /**
      * Store all selected items in an _ordered_ array.
@@ -282,7 +278,7 @@ var SelectionManager = function($selectable, resume) {
 
 
         var items_per_row = Math.floor(
-            $('.data-block-view').parent().outerWidth() / $('.data-block-view:first').outerWidth(true)
+            $('.data-block-view:visible').parent().outerWidth() / $('.data-block-view:visible:first').outerWidth(true)
         );
 
 
@@ -381,27 +377,37 @@ var SelectionManager = function($selectable, resume) {
         return this.selected_list;
     };
 
-    /**
-     * Push the last selected item to the end of the selected_list array.
-     */
-    $selectable.bind('selectableselecting', function(e, data) {
-        var $selected = $(data.selecting);
-        var id = $selected.attr('id');
-        if (id) {
-            self.add_to_selection(id);
-        }
+
+    $('.fm-right-files-block').undelegate('.ui-selectable', 'selectablecreate.sm');
+
+    $('.fm-right-files-block').delegate('.ui-selectable', 'selectablecreate.sm', function(e) {
+        var $jqSelectable = $(e.target);
+
+        /**
+         * Push the last selected item to the end of the selected_list array.
+         */
+        $jqSelectable.bind('selectableselecting', function (e, data) {
+            var $selected = $(data.selecting);
+            var id = $selected.attr('id');
+            if (id) {
+                self.add_to_selection(id);
+            }
+        });
+
+        /**
+         * Remove any unselected element from the selected_list array.
+         */
+        $jqSelectable.bind('selectableunselecting', function (e, data) {
+            var $unselected = $(data.unselecting);
+            var unselectedId = $unselected.attr('id');
+            if (unselectedId) {
+                self.remove_from_selection(unselectedId);
+            }
+        });
+
     });
 
-    /**
-     * Remove any unselected element from the selected_list array.
-     */
-    $selectable.bind('selectableunselecting', function(e, data) {
-        var $unselected = $(data.unselecting);
-        var unselectedId = $unselected.attr('id');
-        if (unselectedId) {
-            self.remove_from_selection(unselectedId);
-        }
-    });
+
 
 
     if (localStorage.selectionManagerDebug) {

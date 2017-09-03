@@ -335,7 +335,7 @@
             if (!id) {
                 id = this.RootID;
             }
-            else if (fmdb && (!this.d[id] || (this.d[id].t && !this.c[id]))) {
+            else if (fmdb && (!this.d[id] || (this.d[id].t /*&& !this.c[id]*/))) {
                 fetchdbnodes = true;
             }
         }

@@ -1742,7 +1742,6 @@ function worker_procmsg(ev) {
                 }
             }
 
-            ufsc.save();
             loadfm_callback(residualfm);
             residualfm = false;
         }
@@ -2884,6 +2883,10 @@ function loadfm_callback(res) {
         mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = Date.now();
+
+        // Time to save the ufs-size-cache, from which M.tree nodes will be created and being
+        // those dependant on in-memory-nodes from the initial load to set flags such SHARED.
+        ufsc.save();
 
         // retrieve initial batch of action packets, if any
         // we'll then complete the process using loadfm_done

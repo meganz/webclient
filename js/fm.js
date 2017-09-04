@@ -3651,9 +3651,6 @@ function createFolderDialog(close) {
     });
 
     $('.create-folder-dialog input').rebind('blur', function() {
-        if ($('.create-folder-dialog input').val() === '') {
-            $('.create-folder-dialog input').val(l[157]);
-        }
         $('.create-folder-dialog').removeClass('focused');
     });
 
@@ -3680,7 +3677,7 @@ function createFolderDialog(close) {
     $('.create-folder-dialog .fm-dialog-close, .create-folder-dialog .create-folder-button-cancel').rebind('click', function() {
         createFolderDialog(1);
         $('.fm-dialog').removeClass('arrange-to-back');
-        $('.create-folder-dialog input').val(l[157]);
+        $('.create-folder-dialog input').val('');
     });
 
     $('.fm-dialog-input-clear').rebind('click', function() {

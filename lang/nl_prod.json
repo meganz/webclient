@@ -953,7 +953,7 @@
     "7151": "Heeft het contactgegevens verzoek ingetrokken",
     "7152": "Zwaar",
     "7153": "Licht",
-    "7154": "U kunt dit tabblad sluiten, uw download wordt beheerd vanuit een ander tabblad waar u uw file manager open hebt staan.",
+    "7154": "U kunt dit tabblad sluiten, uw download wordt beheert vanuit een ander tabblad waar u uw bestandsbeheerder open hebt staan.",
     "7156": "U kunt ook betalen via de Google Play Store, Apple App Store of Android mobiele carrier billing bij het gebruik van onze[A]MEGA apps[\/A].",
     "7157": "Sluit alle overige browservensters\/tabbladen waarop MEGA is geopend voordat u verder gaat.",
     "7160": "Gebruik Voucher",
@@ -1714,7 +1714,7 @@
     "16569": "Naadloos Bestanden Delen",
     "16570": "Gunstig direct bestanden delen binnen een chat vanaf uw MEGA account of vanaf uw apparaat opslag.",
     "16571": "Geschiedenis Behoud Beheer",
-    "16572": "Met MEGAchat beheerd u uw chat geschiedenis en kunt u die verwijderen wanneer u wilt.",
+    "16572": "Met MEGAchat beheert u uw chat geschiedenis en kunt u die verwijderen wanneer u wilt.",
     "16573": "De MEGA Android Applicatie",
     "16574": "Onze Android applicatie zet de cloud binnen uw handbereik",
     "16575": "Krijg toegang en stream uw bestanden op uw telefoon of tablet, upload en synchroniseer foto's en video's, of communiceer veilig door onze eind-tot-eind gecodeerde chat te gebruiken.",
@@ -1819,9 +1819,10 @@
     "16903": "Of maak een account om deel te nemen aan ons beloningsprogramma, waar u gratis opslag & overdracht tegoed kunt verdienen wanneer u MEGA applicaties installeert of vrienden uitnodigt bij MEGA (activatie kan enkele dagen duren).",
     "16904": "Of neem deel aan in ons beloningsprogramma, waar u gratis opslag & overdracht tegoed kunt verdienen als u MEGA applicaties installeert of vrienden uitnodigt bij MEGA (activatie kan enkele dagen duren).",
     "16927": "Deze actie kan niet worden voltooid omdat het u over de huidige opslaglimiet brengt. ",
-    "17081": "Incomplete transfer, do you want to resume it?",
-    "17082": "Completed transfer. Please save your file.",
-    "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17081": "Incomplete overdracht, wilt u het hervatten?",
+    "17082": "Voltooide overdracht. Uw bestand opslaan",
+    "17083": "De MEGA Universele Windows Applicatie wordt momenteel ontwikkeld. U kunt de beta versie van de applicatie [A]hier[\/A] krijgen.",
+    "17084": "Uw download kon niet doorgaan omdat het u over de huidige overdrachtstegoed brengt van uw account.",
+    "17085": "U heeft deels overdrachten gedownload. Wilt u ze hervatten?",
+    "17086": "Open map"
 }

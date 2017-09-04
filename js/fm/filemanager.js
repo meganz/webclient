@@ -330,6 +330,12 @@ FileManager.prototype.initFileManagerUI = function() {
 
 
         if ((a === 'drop') && dd) {
+            if (t && M.d[t]) {
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected(t);
+            }
+
+
             if (dd === 'nw-fm-left-icon') {
                 // do nothing
             }
@@ -1292,11 +1298,6 @@ FileManager.prototype.initUIKeyEvents = function() {
          * other day :)
          */
         if (!$.dialog && !slideshowid && M.viewmode == 1) {
-            var items_per_row = Math.floor(
-                $('.data-block-view').parent().outerWidth() / $('.data-block-view:first').outerWidth(true)
-             );
-            var total_rows = Math.ceil($('.data-block-view').size() / items_per_row);
-
             if (e.keyCode == 37) {
                 // left
                 selectionManager.select_prev(e.shiftKey, true);

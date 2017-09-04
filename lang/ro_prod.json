@@ -1821,6 +1821,7 @@
     "16927": "Aceast\u0103 ac\u0163iune nu poate fi finalizat\u0103, deoarece \u00ee\u0163i va dep\u0103\u015fi limita actual\u0103 de stocare",
     "17081": "Incomplete transfer, do you want to resume it?",
     "17082": "Completed transfer. Please save your file.",
+    "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
     "17086": "Open folder"

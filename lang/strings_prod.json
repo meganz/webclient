@@ -7287,6 +7287,10 @@
         "text": "Completed transfer. Please save your file.",
         "context": "If file was downloaded before user is able to save it immedialety"
     },
+    "17083": {
+        "text": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
+        "context": "Explains, that new application for desktop and mobile Win devices is developed and ready for testing."
+    },
     "17084": {
         "text": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
         "context": "A message shown to PRO users when they go over quota when downloading."

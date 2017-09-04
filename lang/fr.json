@@ -1906,7 +1906,7 @@
     "7090": "Utilisation des ressources :",
     "7093": "Taille du fichier :",
     "7094": "ILLIMIT\u00c9E",
-    "7098": "Votre t\u00e9l\u00e9chargement n'a pas pu continuer, car cela vous ferait d\u00e9passer la quantit\u00e9 actuelle gratuite de transfert allou\u00e9e \u00e0 votre adresse IP. Cette limite est dynamique et d\u00e9pend de la quantit\u00e9 de bande passante inutilis\u00e9e dont nous disposons.",
+    "7098": "Votre t\u00e9l\u00e9chargement n'a pas se poursuivre, car cela vous ferait d\u00e9passer la quantit\u00e9 actuelle gratuite de transfert allou\u00e9e \u00e0 votre adresse IP. Cette limite est dynamique et d\u00e9pend de la quantit\u00e9 de bande passante inutilis\u00e9e dont nous disposons.",
     "7099": "Votre adresse IP a utilis\u00e9 %1 de transfert de donn\u00e9es dans les 6 derni\u00e8res heures, ce qui vous a fait d\u00e9passer votre limite actuelle. Pour supprimer cette limite, vous pouvez [A]passer \u00e0 un compte PRO[\/A] qui vous donnera votre propre quota de transfert et un espace de stockage augment\u00e9.",
     "7100": "Veuillez passer \u00e0 un compte PRO pour continuer imm\u00e9diatement ou attendez %1 pour continuer gratuitement.",
     "7101": "Reprendre les transferts",
@@ -3005,7 +3005,7 @@
     "8831": "Copie...",
     "8832": "Statistiques m\u00e9moire",
     "8833": "Pour repousser cette limite, vous pouvez cr\u00e9er un compte. Non seulement cela augmentera consid\u00e9rablement votre quota de transfert, mais vous obtiendrez aussi 50 Go de stockage nuagique s\u00e9curis\u00e9 - [B]gratuitement[\/B].",
-    "8834": "Votre t\u00e9l\u00e9chargement n'a pas pu continuer, car cela vous ferait d\u00e9passer la quantit\u00e9 actuelle de transfert gratuit allou\u00e9e \u00e0 votre adresse IP.",
+    "8834": "Votre t\u00e9l\u00e9chargement n'a pas pu se poursuivre, car cela vous ferait d\u00e9passer la quantit\u00e9 actuelle gratuite de transfert allou\u00e9e \u00e0 votre adresse IP.",
     "8835": "\u00c9chec de copie de la cl\u00e9 de r\u00e9cup\u00e9ration dans le presse-papiers. Veuillez ressayer.",
     "8836": "La cl\u00e9 de r\u00e9cup\u00e9ration a \u00e9t\u00e9 copi\u00e9e dans le presse-papiers",
     "8837": "Cl\u00e9 de r\u00e9cup\u00e9ration copi\u00e9e",
@@ -4238,7 +4238,7 @@
     "17081": "Le transfert n'est pas termin\u00e9, souhaitez-vous le reprendre\u2009?",
     "17082": "Le transfert est termin\u00e9. Veuillez enregistrer votre fichier.",
     "17083": "L'appli Windows universelle de MEGA est en cours de d\u00e9veloppement. Vous pouvez obtenir la version b\u00eata de l'appli [A]ici[\/A].",
-    "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17084": "Votre t\u00e9l\u00e9chargement ne peut pas se poursuivre, car cela vous ferait d\u00e9passer le quota de transfert actuel allou\u00e9 \u00e0 votre adresse IP.",
+    "17085": "Vous avez t\u00e9l\u00e9charg\u00e9 des transferts partiellement. Souhaitez-vous les reprendre\u2009?",
+    "17086": "Ouvrir un dossier"
 }

@@ -515,6 +515,12 @@ ClassFile.prototype.run = function(task_done) {
                 $('#' + dlmanager.getGID(this.dl) + ' .tranfer-filetype-txt').text(newName);
             }
 
+            if (this.dl.pzBufferStateChange) {
+                api_req({a: 'log', e: 99654, m: 'download resume from method switchover'});
+
+                resumeOffset = this.dl.pzBufferStateChange.byteLength;
+            }
+
             if (this.dl.byteOffset && resumeOffset !== this.dl.byteOffset) {
                 if (d) {
                     dlmanager.logger.info(this + ' cannot resume at offset %s, %s given',

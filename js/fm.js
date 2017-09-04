@@ -2751,6 +2751,7 @@ function initShareDialog() {
         $('.share-dialog-permissions.active').removeClass('active');
 
         e.stopPropagation();
+        return false;
     });
 
     //Pending info block

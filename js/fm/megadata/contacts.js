@@ -701,7 +701,7 @@ MegaData.prototype.delIPC = function(id) {
  */
 MegaData.prototype.addPS = function(ps, ignoreDB) {
     if (!this.ps[ps.h]) {
-        this.ps[ps.h] = {};
+        this.ps[ps.h] = Object.create(null);
     }
     this.ps[ps.h][ps.p] = ps;
 

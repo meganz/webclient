@@ -99,7 +99,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm15b_';
+    var dbpfx = 'fm15c_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -1461,12 +1461,12 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     });
             }
             // have the children been fetched yet?
-            else if (M.d[parent].t && (!M.c[parent] || !fmdb.crashed)) {
+            else if (M.d[parent].t && !M.c[parent]) {
                 // no: do so now.
                 this.tree([parent], 0, new MegaPromise())
                     .always(function() {
                         if (M.d[parent] && M.c[parent]) {
-                            dbfetch.get(M.d[parent].p, promise);
+                            dbfetch.get(parent, promise);
                         }
                         else {
                             console.error('Failed to load folder ' + parent);
@@ -1543,7 +1543,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 if (tree_inflight[parents[i]]) {
                     inflight[parents[i]] = tree_inflight[parents[i]];
                 }
-                else if (!M.c[parents[i]] || !fmdb.crashed) {
+                else if (!M.c[parents[i]]) {
                     p.push(parents[i]);
                     tree_inflight[parents[i]] = promise;
                 }
@@ -1558,13 +1558,9 @@ Object.defineProperty(self, 'dbfetch', (function() {
             // fetch children of all unfetched parents
             fmdb.getbykey('f', 'h', ['p', p.concat()])
                 .always(function(r) {
-                    var oldTree = Object.create(null);
-
                     // store fetched nodes
                     for (var i = p.length; i--;) {
                         delete tree_inflight[p[i]];
-
-                        oldTree[p[i]] = M.c[p[i]];
 
                         // M.c should be set when *all direct* children have
                         // been fetched from the DB (even if there are none)
@@ -1572,27 +1568,6 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     }
                     for (var i = r.length; i--;) {
                         emplacenode(r[i]);
-                    }
-
-                    var sify = function(o) {
-                        return JSON.stringify(Object.keys(o).sort());
-                    };
-
-                    for (var i = p.length; i--;) {
-                        // expires on Dec 12 2017
-                        if (oldTree[p[i]] && 1513108079448 > Date.now()) {
-                            if (sify(oldTree[p[i]]) !== sify(M.c[p[i]])) {
-                                api_req({
-                                    a: 'fcv',
-                                    h: p[i],
-                                    v: 6,
-                                    old: oldTree[p[i]],
-                                    new: M.c[p[i]],
-                                    db: 6,
-                                    cs: M.getStack().split('\n').slice(1).map(String.trim)
-                                }, {}, pfid ? 1 : 0);
-                            }
-                        }
                     }
 
                     if (level--) {

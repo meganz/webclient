@@ -232,7 +232,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             if (folders[idx].su || Object(M.c.shares[curItemHandle]).su) {
                 sharedfolder = ' inbound-share';
             }
-            else if (folders[idx].t & M.IS_SHARED) {
+            else if (folders[idx].t & M.IS_SHARED || M.ps[folders[idx].h]) {
                 sharedfolder = ' shared-folder';
             }
             else {

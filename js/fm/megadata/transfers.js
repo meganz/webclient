@@ -553,7 +553,9 @@ MegaData.prototype.dlcomplete = function(dl) {
     var id = dl.id, z = dl.zipid;
     var $overlay = $('.viewer-overlay');
 
-    dlmanager.remResumeInfo(dl).dump();
+    if (dl.hasResumeSupport) {
+        dlmanager.remResumeInfo(dl).dump();
+    }
 
     if (slideshowid == id && !previews[slideshowid]) {
         $overlay.find('.viewer-pending').addClass('hidden');

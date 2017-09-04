@@ -99,7 +99,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm15_';
+    var dbpfx = 'fm15b_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -1461,7 +1461,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     });
             }
             // have the children been fetched yet?
-            else if (M.d[parent].t /*&& !M.c[parent]*/) {
+            else if (M.d[parent].t && (!M.c[parent] || !fmdb.crashed)) {
                 // no: do so now.
                 this.tree([parent], 0, new MegaPromise())
                     .always(function() {
@@ -1543,7 +1543,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 if (tree_inflight[parents[i]]) {
                     inflight[parents[i]] = tree_inflight[parents[i]];
                 }
-                else /*if (!M.c[parents[i]])*/ {
+                else if (!M.c[parents[i]] || !fmdb.crashed) {
                     p.push(parents[i]);
                     tree_inflight[parents[i]] = promise;
                 }

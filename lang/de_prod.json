@@ -1819,10 +1819,10 @@
     "16903": "Oder melden Sie sich an und nutzen Sie unser Bonusprogramm: Kostenloser Extra-Speicherplatz und -Transfervolumen f\u00fcr die Installation unserer Apps oder f\u00fcr das Werben neuer Nutzer (die Aktivierung der Boni kann mehrere Tage in Anspruch nehmen).",
     "16904": "Oder nutzen Sie unser Bonusprogramm: Kostenloser Extra-Speicherplatz und -Transfervolumen f\u00fcr die Installation unserer Apps oder f\u00fcr das Werben neuer Nutzer (die Aktivierung der Boni kann mehrere Tage in Anspruch nehmen).",
     "16927": "Ihr verf\u00fcgbarer Speicherplatz reicht nicht aus",
-    "17081": "Incomplete transfer, do you want to resume it?",
-    "17082": "Completed transfer. Please save your file.",
-    "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
-    "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17081": "Unterbrochener Transfer - wollen Sie Ihn fortsetzen?",
+    "17082": "Transfer abgeschlossen. Bitte speichern Sie die Datei.",
+    "17083": "Die MEGA-App f\u00fcr die Universal Windows Platform befindet sich noch in der Entwicklungsphase. Sie k\u00f6nnen die aktuelle Betaversion [A]hier[\/A] herunterladen.",
+    "17084": "Die Gr\u00f6\u00dfe des Transfers sprengt Ihr verf\u00fcgbares Transfervolumen.",
+    "17085": "Unterbrochene Transfers fortsetzen?",
+    "17086": "Ordner \u00f6ffnen"
 }

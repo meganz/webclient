@@ -7997,7 +7997,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 32px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
-    border-radius: 4px;
+    border-radius: 5px;
     position: relative;
     -webkit-transition: box-shadow 200ms ease-in-out;
     -moz-transition: box-shadow 200ms ease-in-out;
@@ -8230,10 +8230,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #333333;
 }
 .fm-account-input input:-webkit-autofill {
- -webkit-box-shadow: 0 0 0 50px #f1f1f1 inset;
- -moz-border-radius: 4px;
- -webkit-border-radius: 4px;
- border-radius: 4px;
+ -webkit-box-shadow: 0 0 0 50px #fafafa inset;
+ -moz-border-radius: 5px;
+ -webkit-border-radius: 5px;
+ border-radius: 5px;
 }
 .fm-account-change-email {
     font-size: 12px;

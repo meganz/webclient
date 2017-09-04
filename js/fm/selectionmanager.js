@@ -29,17 +29,41 @@ var SelectionManager = function($selectable, resume) {
     this.last_selected = null;
 
     /**
+     * This method should be called, so that a brand new jQuery query would be called each time, to guarantee that
+     * the currently cached $selectable is the one attached to the DOM.
+     * This is caused by the deleteScroll called in some sections (contacts, shared) right after the MegaRender init
+     * finishes. Which makes its MegaRender.container to be the cached node which was just removed from the DOM.
+     *
+     * @returns {*}
+     * @private
+     */
+    this._ensure_selectable_is_available = function() {
+        var targetScope = $selectable && $selectable[0];
+        if (!targetScope || !targetScope.parentNode) {
+            // because MegaRender is providing a DOM node, which later on is being removed, we can't cache
+            // the $selectable in this case, so lets try to use $.selectddUIgrid and do a brand new jq Sizzle query
+            $selectable = $($.selectddUIgrid + ":visible");
+        }
+        return $selectable;
+    };
+
+    /**
      * Helper func to clear old reset state from other icons.
      */
     this.clear_last_selected = function() {
         if (this.last_selected) {
+            $selectable = this._ensure_selectable_is_available();
+
             $('.currently-selected', $selectable).removeClass('currently-selected');
 
             this.last_selected = null;
         }
     };
 
+
     this.clear_selection = function() {
+        $selectable = this._ensure_selectable_is_available();
+
         this.selected_list.forEach(function(nodeId) {
             $('#' + nodeId, $selectable)
                 .removeClass('ui-selected');
@@ -104,6 +128,7 @@ var SelectionManager = function($selectable, resume) {
         }
 
         if (scrollTo && !$.isArray(nodeId)) {
+            $selectable = this._ensure_selectable_is_available();
             var $element = $('#' + this.last_selected, $selectable);
             $element.addClass("currently-selected");
             // Do .scrollIntoView if the parent or parent -> parent DOM Element is a JSP.
@@ -124,6 +149,7 @@ var SelectionManager = function($selectable, resume) {
     this.add_to_selection = function(nodeId, scrollTo, alreadySorted) {
         if (this.selected_list.indexOf(nodeId) === -1) {
             this.selected_list.push(nodeId);
+            $selectable = this._ensure_selectable_is_available();
             $('#' + nodeId, $selectable).addClass('ui-selected');
             this.set_currently_selected(nodeId, scrollTo);
 
@@ -156,6 +182,8 @@ var SelectionManager = function($selectable, resume) {
         var foundIndex = this.selected_list.indexOf(nodeId);
 
         if (foundIndex > -1) {
+            $selectable = this._ensure_selectable_is_available();
+
             this.selected_list.splice(foundIndex, 1);
             $('#' + nodeId, $selectable).removeClass('ui-selected');
             if (this.last_selected === nodeId) {
@@ -221,7 +249,7 @@ var SelectionManager = function($selectable, resume) {
                         // modify selection
                         this.clear_selection();
                         this.set_currently_selected(firstItemId, false);
-                        this.shift_select_to(nextId, scrollTo);
+                        this.shift_select_to(nextId, scrollTo, false, false);
                     }
                     else {
                         this.add_to_selection(nextId, scrollTo);
@@ -254,7 +282,7 @@ var SelectionManager = function($selectable, resume) {
                         // modify selection
                         this.clear_selection();
                         this.set_currently_selected(fromFirstItemId, false);
-                        this.shift_select_to(lastItemId, scrollTo);
+                        this.shift_select_to(lastItemId, scrollTo, false, false);
                         this.last_selected = fromFirstItemId;
                     }
                     else {
@@ -282,7 +310,7 @@ var SelectionManager = function($selectable, resume) {
         );
 
 
-        var current = this.selected_list[this.selected_list.length - 1];
+        var current = this.get_currently_selected("first");
         var current_idx = currentViewIds.indexOf(current);
 
 
@@ -311,7 +339,7 @@ var SelectionManager = function($selectable, resume) {
         }
         if (target_element_num >= 0) {
             if (shiftKey) {
-                this.shift_select_to(currentViewIds[target_element_num], scrollTo);
+                this.shift_select_to(currentViewIds[target_element_num], scrollTo, false, false);
             }
             else {
                 this.clear_selection();
@@ -334,7 +362,7 @@ var SelectionManager = function($selectable, resume) {
     };
 
 
-    this.shift_select_to = function(lastId, scrollTo, isMouseClick) {
+    this.shift_select_to = function(lastId, scrollTo, isMouseClick, clear) {
         assert(lastId, 'missing lastId for selectionManager.shift_select_to');
 
         var currentViewIds = [];
@@ -347,7 +375,9 @@ var SelectionManager = function($selectable, resume) {
         var last_idx = currentViewIds.indexOf(lastId);
         var last_selected = this.last_selected;
 
-        this.clear_selection();
+        if (clear) {
+            this.clear_selection();
+        }
 
         if (current_idx !== -1 && last_idx !== -1) {
             if (last_idx > current_idx) {
@@ -421,6 +451,7 @@ var SelectionManager = function($selectable, resume) {
                 };
             }
         });
+        $selectable = this._ensure_selectable_is_available();
         this.$selectable = $selectable;
     }
 

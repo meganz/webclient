@@ -2553,6 +2553,11 @@ function processPS(pendingShares, ignoreDB) {
                     'r':shareRights,
                     'ts':timeStamp
                 }, ignoreDB);
+
+                if (M.d[nodeHandle] && M.d[nodeHandle].t) {
+                    // Update M.IS_SHARED flag
+                    ufsc.addTreeNode(M.d[nodeHandle]);
+                }
             }
 
             if (fminitialized) {

@@ -6558,10 +6558,11 @@ table {
 }
 .rename-input-bl .transfer-filetype-icon.folder, .rename-input-bl .transfer-filetype-icon.folder-shared {
     background-image: url(../images/mega/dialogs-sprite_v12.svg);
-    background-position: 3px -1890px;
+    background-position: -9px -1894px;
+    background-size: auto;
 }
-.focused .rename-input-bl .transfer-filetype-icon.folder {
-    background-position: 3px -1930px;
+.focused .rename-input-bl .transfer-filetype-icon.folder, .focused .rename-input-bl .transfer-filetype-icon.folder-shared {
+    background-position: -9px -1934px;
 }
 .transfer-filetype-icon.flash, .search-path-icon-span.flash {
     background-position: -61px -1317px;

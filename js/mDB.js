@@ -1473,7 +1473,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 this.tree([parent], 0, new MegaPromise())
                     .always(function() {
                         if (M.d[parent] && M.c[parent]) {
-                            dbfetch.get(parent, promise);
+                            dbfetch.get(M.d[parent].p, promise);
                         }
                         else {
                             console.error('Failed to load folder ' + parent);

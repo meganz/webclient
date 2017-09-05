@@ -2697,6 +2697,10 @@ function initShareDialog() {
                 perm = sharedPermissionLevel(newPermLevel[0]);
 
                 if (!shares || !shares[id] || shares[id].r !== perm) {
+                    if (M.opc[id]) {
+                        // it's a pending contact, provide back the email
+                        id = M.opc[id].m || id;
+                    }
                     $.changedPermissions.push({ u: id, r: perm });
                 }
             }

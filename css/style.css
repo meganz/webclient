@@ -6561,9 +6561,6 @@ table {
     background-position: -9px -1894px;
     background-size: auto;
 }
-.focused .rename-input-bl .transfer-filetype-icon.folder, .focused .rename-input-bl .transfer-filetype-icon.folder-shared {
-    background-position: -9px -1934px;
-}
 .transfer-filetype-icon.flash, .search-path-icon-span.flash {
     background-position: -61px -1317px;
 }
@@ -7993,12 +7990,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .create-folder-input-bl, .add-user-popup-input-bl, .fm-account-input, .rename-input-bl {
     float: left;
     width: 235px;
-    background-color: rgba(0,0,0,0.05);
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.07);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.07);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.07);
+    background-color: rgba(0,0,0,0.02);
     height: 32px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
     position: relative;
+    -webkit-transition: box-shadow 200ms ease-in-out;
+    -moz-transition: box-shadow 200ms ease-in-out;
+    -o-transition: box-shadow 200ms ease-in-out;
+    -ms-transition: box-shadow 200ms ease-in-out;
+    transition: box-shadow 200ms ease-in-out;
 }
 .fm-account-input::before {
     content: '';
@@ -8040,7 +8045,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin-top: 0;
     font-size: 13px;
     height: 31px;
-    color: #666666;
+    color: #333333;
     padding: 0 10px 0 42px;
     margin: 0;
     background-image: url(../images/mega/dialogs-sprite_v12.svg);
@@ -8048,21 +8053,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-repeat: no-repeat;
     background-color: transparent;
     border: 0;
+    -webkit-transition: color 200ms ease-in-out;
+    -moz-transition: color 200ms ease-in-out;
+    -o-transition: color 200ms ease-in-out;
+    -ms-transition: color 200ms ease-in-out;
+    transition: color 200ms ease-in-out;
 }
-.active .fm-account-input {
-    background-color: rgba(0,0,0,0.2);
+.active .fm-account-input, .fm-account-input.focused {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
 }
 .error .fm-account-input {
-    background-color: rgba(217,0,7,0.5);
-}
-.active .fm-account-input input, .error .fm-account-input input {
-    color: white;
+    color: #D90007;
 }
 .add-user-notification, .share-message, .cancel-textarea-bl {
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
-    background-color: rgba(0,0,0,0.05);
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.07);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.07);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.07);
+    background-color: rgba(0,0,0,0.02);
     height: 50px;
     background-image: url(../images/mega/dialogs-sprite_v12.svg);
     background-position: -3px -3527px;
@@ -8072,6 +8084,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     margin-top: 12px;
+    -webkit-transition: box-shadow 200ms ease-in-out;
+    -moz-transition: box-shadow 200ms ease-in-out;
+    -o-transition: box-shadow 200ms ease-in-out;
+    -ms-transition: box-shadow 200ms ease-in-out;
+    transition: box-shadow 200ms ease-in-out;
 }
 .cancel-textarea-bl {
     height: 86px;
@@ -8108,9 +8125,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     border: 0;
     padding: 0;
     background-color: transparent;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 18px;
-    color: #999999;
+    color: #777777;
     width: 100%;
     margin: 0;
     height: 39px;
@@ -8123,6 +8140,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     font-family: 'source_sans_proregular', Arial;
     overflow: hidden;
     min-height: 39px;
+        
 }
 .cancel-textarea {
     height: 126px;
@@ -8159,13 +8177,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #333333;
     color: white;
 }
-.add-user-notification.active .add-user-nt-scrolling textarea, .share-message.active textarea {
-    color: white;
-}
-.add-user-notification.active, .share-message.active {
-    background-position: -3px -3597px;
-    background-color: rgba(0,0,0,0.2);
-}
 .rename-input-bl input {
     background-image: none;
 }
@@ -8174,15 +8185,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: white;
 }
 .create-folder-input-bl input::-moz-selection, .fm-account-input input::-moz-selection, .rename-input-bl input::-moz-selection {
-background: rgba(0,0,0,0.3);
-color: white;
-}
-.focused .create-folder-input-bl, .focused .fm-account-input, .focused .rename-input-bl {
-    background-color: rgba(0,0,0,0.2);
-}
-.focused .create-folder-input-bl input, .focused .rename-input-bl input {
+    background: rgba(0,0,0,0.3);
     color: white;
-    background-position: 3px -1930px;
+}
+.focused .create-folder-input-bl, .focused .fm-account-input, .focused .rename-input-bl, .add-user-notification.focused, .share-message.focused {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+}
+.error .create-folder-input-bl, .error .fm-account-input, .error .rename-input-bl {
+    color: #D90007;
 }
 .rename-input-bl .transfer-filetype-icon {
     width: 24px;
@@ -8202,8 +8214,8 @@ color: white;
     opacity: 1;
 }
 .fm-account-input.disabled input, .fm-account-input input[disabled] {
-    color: #999999;
-    -webkit-text-fill-color: #999999;
+    color: #777777;
+    -webkit-text-fill-color: #777777;
 }
 .fm-account-input.disabled i {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
@@ -8223,10 +8235,10 @@ color: white;
     color: #333333;
 }
 .fm-account-input input:-webkit-autofill {
- -webkit-box-shadow: 0 0 0 50px #f1f1f1 inset;
- -moz-border-radius: 4px;
- -webkit-border-radius: 4px;
- border-radius: 4px;
+ -webkit-box-shadow: 0 0 0 50px #fafafa inset;
+ -moz-border-radius: 5px;
+ -webkit-border-radius: 5px;
+ border-radius: 5px;
 }
 .fm-account-change-email {
     font-size: 12px;
@@ -16995,9 +17007,17 @@ ul.token-input-list-mega {
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
-    background-color: rgba(0,0,0,0.05);
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.07);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.07);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.07);
+    background-color: rgba(0,0,0,0.02);
     max-height: 144px;
     min-height: 32px;
+    -webkit-transition: box-shadow 200ms ease-in-out;
+    -moz-transition: box-shadow 200ms ease-in-out;
+    -o-transition: box-shadow 200ms ease-in-out;
+    -ms-transition: box-shadow 200ms ease-in-out;
+    transition: box-shadow 200ms ease-in-out;
 }
 .multiple-input-warning {
     height: 32px;
@@ -17033,32 +17053,37 @@ ul.token-input-list-mega li input, .multiple-input input {
     min-width: 100%;
     padding: 0;
     background-color: transparent;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 18px;
     margin: 0;
     padding: 7px 3px 3px 3px;
     -webkit-appearance: caret;
     font-family: 'source_sans_proregular', Arial;
+    -webkit-transition: color 200ms ease-in-out;
+    -moz-transition: color 200ms ease-in-out;
+    -o-transition: color 200ms ease-in-out;
+    -ms-transition: color 200ms ease-in-out;
+    transition: color 200ms ease-in-out;
 }
 input#token-input- {
-    color: #999999;
+    color: #333333;
 }
 input#token-input-:focus {
-    color: #EEEEEE;
+    color: #333333;
 }
 li.token-input-token-mega {
     overflow: hidden;
-    height: 20px;
+    height: 22px;
     line-height: 19px;
-    margin: 6px 3px 2px 3px;
+    margin: 5px 3px 1px 3px;
     padding: 0 20px 0 24px;
     background-color: white;
     cursor: default;
     font-size: 13px;
-    color: #999999;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
+    color: #333;
+    border-radius: 1px;
+    -moz-border-radius: 1px;
+    -webkit-border-radius: 2px;
     float: left;
     white-space: nowrap;
     position: relative;
@@ -17068,8 +17093,17 @@ li.token-input-token-mega {
     box-sizing: border-box;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    overflow: hidden;
+    /* overflow: visible; */
     white-space: nowrap;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+}
+.token-input-token-mega .verified_icon {
+    display: none !important;
 }
 li.token-input-token-mega.no-avatar {
     padding: 0 20px 0 10px;
@@ -17123,33 +17157,47 @@ li.token-input-input-token-mega:first-child {
 .active li.token-input-input-token-mega:first-child {
     min-width: none;
 }
-.multiple-input input::-webkit-input-placeholder, .create-folder-input-bl input::-webkit-input-placeholder{
-color: #999999 !important;
+.multiple-input input::-webkit-input-placeholder, .create-folder-input-bl input::-webkit-input-placeholder, .add-user-notification textarea::-webkit-input-placeholder {
+color: #777777 !important;
 }
-.multiple-input input:-moz-placeholder, .create-folder-input-bl input:-moz-placeholder {
-color: #999999 !important;
+.multiple-input input:-moz-placeholder, .create-folder-input-bl input:-moz-placeholder, .add-user-notification textarea:-moz-placeholder {
+color: #777777 !important;
  opacity: 1;
 }
-.multiple-input input::-moz-placeholder, .create-folder-input-bl input::-moz-placeholder {
-color: #999999 !important;
+.multiple-input input::-moz-placeholder, .create-folder-input-bl input::-moz-placeholder, .add-user-notification textarea::-moz-placeholder {
+color: #777777 !important;
  opacity: 1;
 }
-.multiple-input input:-ms-input-placeholder, .create-folder-input-bl input:-ms-input-placeholder {
-color: #999999 !important;
+.multiple-input input:-ms-input-placeholder, .create-folder-input-bl input:-ms-input-placeholder, .add-user-notification textarea:-ms-input-placeholder {
+color: #777777 !important;
 }
-.active .multiple-input input::-webkit-input-placeholder, .focused .create-folder-input-bl input::-webkit-input-placeholder, .error .multiple-input input::-webkit-input-placeholder {
-color: rgba(255,255,255,0.9) !important;
+.active .multiple-input input::-webkit-input-placeholder, .focused .create-folder-input-bl input::-webkit-input-placeholder, .add-user-notification.focused textarea::-webkit-input-placeholder {
+color: rgba(119,119,119,0.2) !important;
 }
-.active .multiple-input input:-moz-placeholder, .focused .create-folder-input-bl input:-moz-placeholder, .error .multiple-input input:-moz-placeholder {
-color: rgba(255,255,255,0.9) !important;
+.active .multiple-input input:-moz-placeholder, .focused .create-folder-input-bl input:-moz-placeholder, .add-user-notification.focused textarea:-moz-placeholder {
+color: rgba(119,119,119,0.2) !important;
  opacity: 1;
 }
-.active .multiple-input input::-moz-placeholder, .focused .create-folder-input-bl input::-moz-placeholder, .error .multiple-input input::-moz-placeholder {
-color: rgba(255,255,255,0.9) !important;
+.active .multiple-input input::-moz-placeholder, .focused .create-folder-input-bl input::-moz-placeholder, .add-user-notification.focused textarea::-moz-placeholder {
+color: rgba(119,119,119,0.2) !important;
  opacity: 1;
 }
-.active .multiple-input input:-ms-input-placeholder, .focused .create-folder-input-bl input:-ms-input-placeholder, .error .multiple-input input:-ms-input-placeholder {
-color: rgba(255,255,255,0.9) !important;
+.active .multiple-input input:-ms-input-placeholder, .focused .create-folder-input-bl input:-ms-input-placeholder, .add-user-notification.focused textarea:-ms-input-placeholder {
+color: rgba(119,119,119,0.2) !important;
+}
+.error .multiple-input input::-webkit-input-placeholder, .error .create-folder-input-bl input::-webkit-input-placeholder {
+color: #D90007 !important;
+}
+.error .multiple-input input:-moz-placeholder, .error .create-folder-input-bl input:-moz-placeholder {
+color: #D90007 !important;
+ opacity: 1;
+}
+.error .multiple-input input::-moz-placeholder, .error .create-folder-input-bl input::-moz-placeholder {
+color: #D90007 !important;
+ opacity: 1;
+}
+.error .multiple-input input:-ms-input-placeholder, .error .create-folder-input-bl input:-ms-input-placeholder {
+color: #D90007 !important;
 }
 div.token-input-dropdown-mega {
     position: absolute;
@@ -17395,17 +17443,15 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background-position: -81px -84px;
     background-repeat: no-repeat;
 }
-.active .share-dialog-icon, .active .add-user-icon, .error .share-dialog-icon, .error .add-user-icon {
-    background-position: -81px -314px;
-}
 .active .multiple-input {
-    background-color: rgba(0,0,0,0.2);
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
 }
-.error .multiple-input {
-    background-color: rgba(217,0,7,0.5);
+.error .multiple-input input {
+    color: #D90007;
 }
 .active ul.token-input-list-mega li input, .multiple-input:hover ul.token-input-list-mega li input {
-    color: white;
     min-width: none;
 }
 .import-contacts-link {
@@ -20899,6 +20945,12 @@ div.camera-bottom-txt {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
+.account.data-block.disabled {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+    -moz-opacity: 0.6;
+    -khtml-opacity: 0.6;
+    opacity: 0.6;
 }
 .data-block.storage-data .chart-warning, .data-block.storage-data .account.buttons {
     display: none;

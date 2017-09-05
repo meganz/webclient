@@ -4240,5 +4240,7 @@
     "17083": "Die MEGA-App f\u00fcr die Universal Windows Platform befindet sich noch in der Entwicklungsphase. Sie k\u00f6nnen die aktuelle Betaversion [A]hier[\/A] herunterladen.",
     "17084": "Die Gr\u00f6\u00dfe des Transfers sprengt Ihr verf\u00fcgbares Transfervolumen.",
     "17085": "Unterbrochene Transfers fortsetzen?",
-    "17086": "Ordner \u00f6ffnen"
+    "17086": "Ordner \u00f6ffnen",
+    "17087": "The process is taking longer than expected. Please wait...",
+    "17088": "You will need to restart MEGA after changing the language"
 }

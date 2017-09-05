@@ -4237,8 +4237,10 @@
     "17078": "\ud504\ub85c\ud544 \ubcf4\uae30\/\uc218\uc815",
     "17081": "\uc644\ub8cc\ub418\uc9c0 \uc54a\uc740 \uc804\uc1a1, \uc7ac\uac1c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
     "17082": "\uc804\uc1a1\uc774 \uc644\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \ud30c\uc77c\uc744 \uc800\uc7a5\ud558\uc138\uc694.",
-    "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
-    "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17083": "MEGA Universal Windows App\uc740 \uac1c\ubc1c\uc911\uc785\ub2c8\ub2e4. \uc571\uc758 \ubca0\ud0c0 \ubc84\uc804\uc744 [A]\uc5ec\uae30[\/A]\uc5d0\uc11c \ubc1b\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
+    "17084": "\uacc4\uc815\uc758 \ud604\uc7ac \uc804\uc1a1 \ud560\ub2f9\ub7c9\uc744 \ucd08\uacfc\ud560 \uc218 \uc788\uc5b4\uc11c \ub2e4\uc6b4\ub85c\ub4dc\ub97c \uc9c4\ud589\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.",
+    "17085": "\uc77c\ubd80\ub9cc \ub2e4\uc6b4\ub85c\ub4dc\ub41c \uc804\uc1a1\uc774 \uc788\uc2b5\ub2c8\ub2e4. \uc7ac\uac1c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
+    "17086": "\ud3f4\ub354 \uc5f4\uae30",
+    "17087": "The process is taking longer than expected. Please wait...",
+    "17088": "You will need to restart MEGA after changing the language"
 }

@@ -4240,5 +4240,7 @@
     "17083": "MEGA\u30e6\u30cb\u30d0\u30fc\u30b5\u30ebWindows\u30a2\u30d7\u30ea\u306f\u73fe\u5728\u958b\u767a\u4e2d\u3067\u3059\u3002\u30a2\u30d7\u30ea\u306e\u30d9\u30fc\u30bf\u7248\u3092[A]\u3053\u3061\u3089\u3067[\/A]\u5165\u624b\u3067\u304d\u307e\u3059\u3002",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17086": "Open folder",
+    "17087": "The process is taking longer than expected. Please wait...",
+    "17088": "You will need to restart MEGA after changing the language"
 }

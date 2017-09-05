@@ -16966,5 +16966,13 @@
     "17086": {
         "text": "Open folder",
         "context": "The label text for a button which opens a folder in the cloud drive."
+    },
+    "17087": {
+        "text": "The process is taking longer than expected. Please wait...",
+        "context": "A message which is shown when the user opens the app and while it is logging in they don't receive a server response quickly. Thus means that it may take some time until they log in."
+    },
+    "17088": {
+        "text": "You will need to restart MEGA after changing the language",
+        "context": "An alert message text which is shown when the user is about to change the language of the app."
     }
 }

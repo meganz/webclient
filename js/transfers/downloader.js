@@ -84,7 +84,7 @@ function ClassChunk(task) {
     this.Progress.speed = this.Progress.speed || 1;
     this.Progress.size = this.Progress.size || (this.dl.zipid ? Zips[this.dl.zipid].size : this.io.size);
     this.Progress.dl_lastprogress = this.Progress.dl_lastprogress || 0;
-    this.Progress.dl_prevprogress = this.Progress.dl_prevprogress || 0;
+    this.Progress.dl_prevprogress = this.Progress.dl_prevprogress || this.dl.byteOffset || 0;
     this.Progress.data[this.xid] = [0, task.size];
     this[this.gid] = !0;
 }
@@ -158,6 +158,10 @@ ClassChunk.prototype.updateProgress = function(force) {
         if (_data.hasOwnProperty(i)) {
             _progress += _data[i][0];
         }
+    }
+
+    if (this.dl.byteOffset) {
+        _progress += this.dl.byteOffset;
     }
 
     this.dl.onDownloadProgress(
@@ -482,7 +486,7 @@ ClassFile.prototype.run = function(task_done) {
         }
     }.bind(this);
 
-    this.dl.io.begin = function(newName) {
+    this.dl.io.begin = function(newName, resumeOffset) {
         /* jshint -W074 */
         var tasks = [];
 
@@ -497,11 +501,10 @@ ClassFile.prototype.run = function(task_done) {
             }
         }
         else {
-            if (d) {
-                dlmanager.logger.info(this + ' Adding %d tasks...', (this.dl.urls || []).length);
-            }
 
             if (newName) {
+                newName = M.getSafeName(newName);
+
                 if (this.dl.zipid) {
                     this.dl.zipname = newName;
                 }
@@ -512,23 +515,55 @@ ClassFile.prototype.run = function(task_done) {
                 $('#' + dlmanager.getGID(this.dl) + ' .tranfer-filetype-txt').text(newName);
             }
 
-            if (this.dl.urls) {
-                for (var key in this.dl.urls) {
-                    if (this.dl.urls.hasOwnProperty(key)) {
-                        var url = this.dl.urls[key];
+            if (this.dl.pzBufferStateChange) {
+                api_req({a: 'log', e: 99654, m: 'download resume from method switchover'});
 
-                        tasks.push(new ClassChunk({
-                            url: url.url,
-                            size: url.size,
-                            offset: url.offset,
-                            download: this.dl,
-                            chunk_id: key,
-                            zipid: this.dl.zipid,
-                            id: this.dl.id,
-                            file: this
-                        }));
-                    }
+                resumeOffset = this.dl.pzBufferStateChange.byteLength;
+            }
+
+            if (this.dl.byteOffset && resumeOffset !== this.dl.byteOffset) {
+                if (d) {
+                    dlmanager.logger.info(this + ' cannot resume at offset %s, %s given',
+                        this.dl.byteOffset, resumeOffset);
                 }
+
+                this.dl.mac = this.dl.resumeInfo.mac = [0, 0, 0, 0];
+                this.dl.byteOffset = this.dl.resumeInfo.byteOffset = 0;
+
+                api_req({a: 'log', e: 99651, m: 'download resume attempt failed'});
+            }
+            else if (resumeOffset) {
+                this.dl.urls = this.dl.urls.filter(function(u) {
+                    return u.offset >= resumeOffset;
+                });
+
+                this.dl.writer.pos = resumeOffset;
+
+                if (this.dl.urls.length) {
+                    api_req({a: 'log', e: 99652, m: 'download resume'});
+                }
+                else {
+                    api_req({a: 'log', e: 99653, m: 'download resume for completed file'});
+                }
+            }
+
+            if (d) {
+                dlmanager.logger.info(this + ' Adding %d tasks...', this.dl.urls.length);
+            }
+
+            for (var i = this.dl.urls.length; i--;) {
+                var url = this.dl.urls[i];
+
+                tasks.push(new ClassChunk({
+                    url: url.url,
+                    size: url.size,
+                    offset: url.offset,
+                    download: this.dl,
+                    chunk_id: i,
+                    zipid: this.dl.zipid,
+                    id: this.dl.id,
+                    file: this
+                }));
             }
 
             if ((this.emptyFile = (tasks.length === 0)) && this.dl.zipid) {
@@ -575,6 +610,16 @@ ClassFile.prototype.run = function(task_done) {
             }
             return false;
         }.bind(this);
+
+        var onError = function(error) {
+            if (error && task_done) {
+                // release worker
+                dlmanager.fetchingFile = 0;
+                Soon(task_done);
+                task_done = null;
+            }
+            return error;
+        };
 
         if (cancelOnInit()) {
             error = true;
@@ -624,21 +669,32 @@ ClassFile.prototype.run = function(task_done) {
             }
         }
         else {
-            var info = dl_queue.splitFile(res.s);
-            this.dl.url = res.g;
-            this.dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g);
-            try {
-                return this.dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
-            }
-            catch (e) {
-                setTransferStatus(this.dl, e, true);
-            }
+            var file = this;
+
+            dlmanager.getResumeInfo(this.dl, function(resumeInfo) {
+                dlmanager.initDownload(file, res, resumeInfo)
+                    .fail(function(error) {
+                        if (d) {
+                            dlmanager.logger.error('initDownload error', error);
+                        }
+                        dlFatalError(file.dl, escapeHTML(l[5945]).replace('{0}', error));
+                        cancelOnInit(true);
+                        onError(error);
+                    })
+                    .done(function(info) {
+                        if (!onError(cancelOnInit())) {
+                            if (d) {
+                                dlmanager.logger.debug('initDownload succeed', info, resumeInfo);
+                            }
+                        }
+                    });
+            });
         }
-        if (error && task_done) {
-            dlmanager.fetchingFile = 0;
-            Soon(task_done); /* release worker */
-            task_done = null;
+
+        if (error) {
+            onError(error);
         }
+
     }.bind(this));
 };
 

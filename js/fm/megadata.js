@@ -140,13 +140,13 @@ function MegaData() {
         var dummy = function() {
             return MegaPromise.resolve();
         };
-        this.checkStorageQuota = dummy;
-        this.showOverStorageQuota = dummy;
-        this.initUIKeyEvents = dummy;
-        this.abortTransfers = dummy;
-        this.searchPath = dummy;
+        this['check' + 'StorageQuota'] = dummy;
+        this['show' + 'OverStorageQuota'] = dummy;
+        this['init' + 'UIKeyEvents'] = dummy;
+        this['abort' + 'Transfers'] = dummy;
+        this['search' + 'Path'] = dummy;
 
-        this.renderMain = function(aUpdate) {
+        this['render' + 'Main'] = function(aUpdate) {
             if (aUpdate) {
                 mobile.cloud.renderUpdate();
             }

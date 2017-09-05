@@ -702,7 +702,6 @@ ul, li {
     height: 40px;
     background: url(../images/mobile/mobile-sprite_v7.png);
     background-repeat: no-repeat;
-    margin: 13px 6px 0 7px;
     cursor: pointer;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-tap-highlight-color: transparent;
@@ -715,23 +714,29 @@ ul, li {
 }
 .mobile.fm-icon.mega {
     background-position: -93px -1076px;
+}
+.mobile.fm-header .fm-icon.mega {
     width: 32px;
     height: 32px;
     margin: 18px auto 0 auto;
 }
-.mobile.fm-icon.mega.left {
+.mobile.fm-header .fm-icon.mega.left {
     margin-left: 10px;
 }
 .mobile.fm-icon.upload {
     background-position: -130px -1240px;
-    cursor: default;
 }
 .mobile.fm-icon.cloud {
     background-position: -200px -1138px;
+}
+.mobile.fm-header .fm-icon.cloud {
     cursor: default;
+    margin: 13px 6px 0 7px;
 }
 .mobile.fm-icon.menu {
     background-position: -1px -1138px;
+}
+.mobile.fm-header .fm-icon.menu {
     margin: 12px 6px 0 7px;
 }
 .mobile.fm-icon.plus {
@@ -740,15 +745,39 @@ ul, li {
 .mobile.fm-icon.back {
     background-position: -35px -1138px;
 }
+.mobile.fm-header .fm-icon.back {
+    margin: 13px 6px 0 7px;
+}
 .mobile.fm-icon.close {
-    background-position: -76px -1138px;
-    position: absolute;
-    right: 0;
+    background-position: -76px -1139px;
 }
 .mobile.fm-icon.link {
-    background-position: -204px -1072px;
-    margin: 8px 0 0 0;
+    background-position: -201px -1072px;
+}
+.mobile.fm-item .fm-icon.link {
+    margin-top: 8px;
     width: 36px;
+}
+.mobile.fm-icon.manage-link {
+    background-position: 0px -1708px;
+}
+.mobile.fm-icon.open-context-menu {
+    background-position: -197px -1661px;
+    height: 100%;
+    margin: 0;
+    width: 40px;
+}
+.mobile.fm-icon.preview {
+    background-position: -202px -1789px;
+}
+.mobile.fm-icon.open-folder {
+    background-position: -201px -1750px;
+}
+.mobile.fm-icon.download {
+    background-position: -51px -1626px;
+}
+.mobile.fm-icon.delete {
+    background-position: -151px -1828px;
 }
 .mobile.fm-dialog-close {
     background: url(../images/mobile/mobile-sprite_v7.png);
@@ -760,7 +789,7 @@ ul, li {
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-tap-highlight-color: transparent;
     position: absolute;
-    right: 0;
+    left: 0;
     top: 0;
     width: 42px;
     z-index: 10;
@@ -794,8 +823,10 @@ ul, li {
 }
 .mobile.fm-item-img {
     float: left;
-    margin: 10px 0 0 12px;
+    margin: 0 0 0 12px;
     text-align: center;
+    position: relative;
+    height: 56px;
 }
 .mobile.fm-item-img.folder {
     margin: 7px 0 0 10px;
@@ -805,6 +836,14 @@ ul, li {
 }
 .mobile.fm-item-img img {
     width: 32px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    position:absolute
 }
 .mobile.fm-item-img.folder img {
     width: 36px;
@@ -835,10 +874,10 @@ ul, li {
     line-height: 18px;
 }
 .mobile.fm-item-details span {
-    padding-left: 35px;
-}
-.mobile.fm-item-details span:first-child {
     padding: 0;
+}
+.mobile.fm-item-details .date {
+    padding-left: 8px;
 }
 .mobile.fm-item-links {
     padding: 18px 0 0 0;
@@ -3371,6 +3410,221 @@ div.checkboxOn, div.checkboxOff {
     display: none !important;
 }
 
+/* Previews and slideshow */
+.mobile.slideshow-image-previewer {
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+.mobile.slideshow-image-previewer .content-row {
+    display: table-row;
+}
+.mobile.slideshow-image-previewer .content-cell {
+    background: rgba(0, 0, 0, 0.94);
+    height: 100%;
+    text-align: left;
+    vertical-align: middle;
+}
+.mobile.slideshow-header {
+    background-color: #fff;
+    left: 0;
+    position: fixed;
+    text-align: left;
+    top: 0;
+    right: 0;
+    z-index: 1;
+}
+.mobile.slideshow-header .mobile.fm-dialog-close {
+    position: static;
+    display: inline-block;
+    margin: 12px 5px 13px 12px;
+    left: 0;
+    top: 0;
+    right: 0;
+    vertical-align: middle;
+}
+.mobile.slideshow-text-right-block {
+    display: inline-block;
+    vertical-align: middle;
+}
+.mobile.slideshow-file-name {
+    color: #222;
+    display: inline-block;
+    font-size: 20px;
+    line-height: 25px;
+    margin: 0;
+    max-width: 233px;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.mobile.slideshow-file-number-and-total {
+    line-height: 25px;
+    color: #a7a7a7;
+}
+.mobile.slideshow-wrapper {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.mobile.slides img {
+    max-height: 100%;
+    max-width: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+.mobile.slide-show-navigation {
+    width: 100%;
+    height: 100%;
+}
+.mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow {
+    background-color: rgba(0, 0, 0, 0.6);
+    height: 37px;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    width: 36px;
+    margin-top: -18px;
+    background-image: url(../images/mobile/mobile-sprite_v7.png);
+    background-position: -148px -1897px;
+    background-repeat: no-repeat;
+    z-index: 10;
+}
+.mobile.slide-show-navigation .slideshow-forward-arrow {
+    left: auto;
+    right: 0;
+    background-position: -205px -1897px;
+}
+.mobile.slideshow-image-previewer .content-row.third {
+    background-color: #fff;
+    display: table-row;
+}
+.mobile.slideshow-buttons {
+    background-color: #fff;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    padding: 0 10px;
+    position: fixed;
+    right: 0;
+    z-index: 1;
+}
+.mobile.left-buttons {
+    display: inline-block;
+    float: left;
+}
+.mobile.right-buttons {
+    display: inline-block;
+    float: right;
+}
+.mobile.slideshow-buttons .fm-icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: 60px;
+    height: 60px;
+}
+.mobile.slideshow-buttons .fm-icon.delete-button {
+    background-position: -143px -1820px;
+}
+.mobile.slideshow-buttons .fm-icon.download-button {
+    background-position: -42px -1616px;
+}
+.mobile.slideshow-buttons .fm-icon.manage-link-button {
+    background-position: 9px -1698px;
+}
+.mobile.slides {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    -webkit-transition: left 200ms ease-in-out;
+    -moz-transition: left 200ms ease-in-out;
+    -o-transition: left 200ms ease-in-out;
+    -ms-transition: left 200ms ease-in-out;
+    transition: left 200ms ease-in-out;
+    background: rgba(0, 0, 0, 1);
+}
+.mobile.slides.left {
+    left: -100%;
+}
+.mobile.slides.mid {
+    left: 0;
+}
+.mobile.slides.right {
+    left: 100%;
+}
+/* Cloud drive context menu */
+.fmholder {
+    overflow: hidden;
+}
+.mobile.context-menu-container.hidden {
+    display: block !important;
+    bottom: -100%;
+    overflow: hidden;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.mobile.context-menu-container {
+    background: #fff;
+    bottom: 0;
+    left: 0;
+    padding-bottom: 10px;
+    position: fixed;
+    right: 0;
+    z-index: 1010;
+    -webkit-box-shadow: 0px 0px 14px 2px rgba(0,0,0,0.06);
+    -moz-box-shadow: 0px 0px 14px 2px rgba(0,0,0,0.06);
+    box-shadow: 0px 0px 14px 2px rgba(0,0,0,0.06);
+    -webkit-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.mobile.context-menu-container.folder {
+    border-top: 1px solid #eee;
+}
+.mobile.context-menu-container .context-menu-item {
+    color: #939DA3;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 20px;
+    margin-top: 10px;
+    vertical-align: middle;
+}
+.mobile.context-menu-container .context-menu-item.delete-button {
+    color: #ff0000;
+}
+.mobile.context-menu-container .fm-icon {
+    display: inline-block;
+    margin-right: 26px;
+    vertical-align: middle;
+    margin: 0 8px 0 8px;
+}
+.mobile.context-menu-container .item-info {
+    padding-bottom: 9px;
+}
+.mobile.context-menu-container .fm-item-info {
+    padding-top: 11px;
+}
+.mobile.context-menu-container .light-grey-bar {
+    background-color: #eee;
+    height: 1px;
+    margin-left: 62px;
+}
+
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {
@@ -4022,7 +4276,7 @@ div.checkboxOn, div.checkboxOff {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.download-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.top-link, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close {
+    .mobile.logo, .mobile.download-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.top-link, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow {
         background-image: url(../images/mobile/mobile-sprite_v7@2x.png);
         background-size: 280px auto;
     }

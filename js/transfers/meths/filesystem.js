@@ -109,7 +109,9 @@
             }
 
             // https://code.google.com/p/chromium/issues/detail?id=375297
-            MemoryIO.fileSizeLimit = 496 * 1024 * 1024;
+            if (!window.chrome || parseInt(ua.details.version) < 58) {
+                MemoryIO.fileSizeLimit = 496 * 1024 * 1024;
+            }
 
             return true;
         }
@@ -119,7 +121,7 @@
         dlFatalError(dl, e, false, 2);
 
         onIdle(function() {
-            if (page !== 'download') {
+            if (dl_id !== dl.ph) {
                 M.addWebDownload([dl_id]);
             }
             else {
@@ -130,8 +132,13 @@
         });
     }
 
-    function canSwitchDownloadMethod(dl, dl_id) {
+    function canSwitchDownloadMethod(dl, dl_id, entry) {
         if (MemoryIO.usable() && dl.size < MemoryIO.fileSizeLimit) {
+            if (entry && Object(dl.resumeInfo).byteOffset) {
+                var tid = dlmanager.getResumeInfoTag(dl);
+                dlmanager.resumeInfoCache[tid] = Object.assign(dl.resumeInfo, {entry: entry});
+                dl.io.keepFileOnAbort = true;
+            }
             dlMethod = MemoryIO;
             abortAndStartOver(dl, dl_id, Error(l[16871]));
             return true;
@@ -148,7 +155,7 @@
     }
 
     function clearit(storagetype, t, callback) {
-        var tsec = t || 3600;
+        var tsec = t || 172800;
 
         function errorHandler2(e) {
             if (d) {
@@ -443,10 +450,22 @@
 
                 fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {
                     fileEntry.createWriter(function(fileWriter) {
+                        var resumeOffset = dl.byteOffset || 0;
+
                         if (d) {
                             logger.info('File "mega/' + dl_id + '" created');
                         }
                         dl_fw = fileWriter;
+
+                        var beginDownload = function() {
+                            if (that.begin) {
+                                that.begin(null, resumeOffset);
+                            }
+                            else if (d) {
+                                logger.error("No 'begin' function, this must be aborted...", dl);
+                            }
+                            that = false;
+                        };
 
                         dl_fw.onerror = function(ev) {
                             /* onwriteend() will take care of it */
@@ -463,16 +482,10 @@
 
                         dl_fw.onwriteend = function() {
                             if (that) {
-                                ASSERT(dl_fw.readyState === dl_fw.DONE,
-                                    'Error truncating file!');
+                                ASSERT(dl_fw.readyState === dl_fw.DONE, 'Error truncating file!');
+
                                 if (dl_fw.readyState === dl_fw.DONE) {
-                                    if (that.begin) {
-                                        that.begin();
-                                    }
-                                    else if (d) {
-                                        logger.error("No 'begin' function, this must be aborted...", dl);
-                                    }
-                                    that = null;
+                                    beginDownload();
                                 }
                                 return;
                             }
@@ -494,8 +507,7 @@
                                     if (!(++chrome_write_error_msg % 21) && !$.msgDialog) {
                                         chrome_write_error_msg = 0;
 
-                                        // XXX: Hmm, not sure how weird this is if the user downloaded too many data..
-                                        if (canSwitchDownloadMethod(dl, dl_id)) {
+                                        if (canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
                                             return;
                                         }
 
@@ -516,6 +528,18 @@
                             }
                         };
                         zfileEntry = fileEntry;
+
+                        if (resumeOffset) {
+                            if (resumeOffset === dl_fw.length) {
+                                dl_fw.seek(resumeOffset);
+                                onIdle(beginDownload);
+                                return;
+                            }
+
+                            console.warn('Cannot resume, byteOffset mismatch %s-%s', resumeOffset, dl_fw.length);
+                        }
+
+                        resumeOffset = 0;
                         dl_fw.truncate(0);
                     },
                     errorHandler.bind(that, 'createWriter'));
@@ -535,7 +559,7 @@
 
                 if (aFail === -1 && !isSecurityError(aEvent)) {
 
-                    if (canSwitchDownloadMethod(dl, dl_id)) {
+                    if (canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
                         return;
                     }
 
@@ -568,7 +592,9 @@
                     dl_createtmpfile,
                     function(e) {
                         if (!onSecurityErrorSwitchMethod(dl, dl_id, e)) {
-                            errorHandler.call(this, 'RequestFileSystem', e);
+                            if (!canSwitchDownloadMethod(dl, dl_id)) {
+                                errorHandler.call(this, 'RequestFileSystem', e);
+                            }
                         }
                     }.bind(this)
                 );
@@ -588,7 +614,7 @@
                 if (is_chrome_firefox) {
                     dl_fw.close(err);
                 }
-                else if (err) {
+                else if (err && !this.keepFileOnAbort) {
                     try {
                         var onWriteEnd = (function(writer, entry) {
                             return function() {
@@ -657,6 +683,8 @@
             } /* notify writer */
         }
 
+        var testSwitchOver = localStorage.fsTestSwitchOver || 0;
+
         this.write = function(buffer, position, done) {
             if (dl_writing || position != dl_fw.position) {
                 throw new Error([position, buffer.length, position + buffer.length, dl_fw.position]);
@@ -672,6 +700,11 @@
             if (d) {
                 logger.info("Write " + buffer.length + " bytes at " + position + "/" + dl_fw.position);
             }
+
+            if (testSwitchOver && position > 0x1000000 && canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
+                return;
+            }
+
             try {
                 dl_fw.write(new Blob([buffer]));
             }
@@ -738,6 +771,9 @@
             // Try to free space before starting the download.
             free_space(this.fsInitOp.bind(this), 50);
         };
+
+        this.keepFileOnAbort = false;
+        this.hasResumeSupport = !is_chrome_firefox;
     };
 
     if (window.d) {

@@ -441,10 +441,10 @@ var ulmanager = {
             }
 
             // If the response is that the user is over quota
-            if (res === EOVERQUOTA) {
+            if (res === EOVERQUOTA || res === EGOINGOVERQUOTA) {
 
                 // Show a warning popup
-                alarm.overQuota.render();
+                M.ulerror(ul_queue[ctx.reqindex], res);
 
                 // Return early so it does not retry automatically and spam the API server with requests
                 return false;
@@ -456,6 +456,13 @@ var ulmanager = {
             if (typeof res === 'object') {
                 if (typeof res.p === "string" && res.p.length > 0) {
                     ul_queue[ctx.reqindex].posturl = res.p;
+
+                    if (ul_queue[ctx.reqindex].readyToStart) {
+                        if (ctx.reqindex !== File.ul.pos) {
+                            ulmanager.ulUpload(ul_queue[ctx.reqindex].readyToStart);
+                        }
+                        delete ul_queue[ctx.reqindex].readyToStart;
+                    }
                 }
             }
 
@@ -489,6 +496,13 @@ var ulmanager = {
             if (!isQueueActive(cfile)) {
                 continue;
             }
+            if (cfile.uReqFired) {
+                if (i === File.file.pos) {
+                    cfile.readyToStart = File;
+                }
+                continue;
+            }
+            cfile.uReqFired = Date.now();
             api_req({
                 a: 'u',
                 v: 2,
@@ -612,6 +626,8 @@ var ulmanager = {
     },
 
     ulCompletePending2: function UM_ul_completepending2(res, ctx) {
+        'use strict';
+
         if (d) {
             ulmanager.logger.info("ul_completepending2", res, ctx);
         }
@@ -654,24 +670,18 @@ var ulmanager = {
             onSuccess();
         }
         else {
-            var fileName = htmlentities(ctx.file.name);
-            later(M.resetUploadDownload);
-            Soon(function() {
+            var ul = ul_queue[ctx.ul_queue_num];
 
-                // If over quota show a special warning popup
-                if (res === EOVERQUOTA) {
-                    alarm.overQuota.render();
-                }
-                else {
-                    // Otherwise show 'Upload failed - Error uploading asset [filename]'
-                    msgDialog('warninga', l[1309], l[5760] + ' ' + fileName);
-                }
+            onIdle(function() {
+                M.ulerror(ul, res);
             });
-            if (res !== EOVERQUOTA) {
+
+            if (res !== EOVERQUOTA && res !== EGOINGOVERQUOTA) {
                 srvlog('Unexpected upload completion server response (' + res
                     + ' @ ' + hostname(ctx.file.posturl) + ')');
             }
         }
+
         if (ctx.file.owner) {
             ctx.file.owner.destroy();
         }
@@ -683,6 +693,9 @@ var ulmanager = {
     ulDeDuplicate: function UM_ul_deduplicate(File, identical, mNode) {
         var n;
         var uq = File.ul;
+
+        fmconfig.ul_skipIdentical = false;
+
         if (identical && fmconfig.ul_skipIdentical) {
             n = identical;
         }

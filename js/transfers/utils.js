@@ -72,13 +72,13 @@ function dlFatalError(dl, error, ethrow, lock) {
         }
         error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
 
-        if (error.indexOf(l[16871]) < 0 && error.indexOf(l[16872]) < 0) {
+        if (error.indexOf(l[16871]) < 0 && error.indexOf(l[16872]) < 0 && error.indexOf(l[1668]) < 0) {
             srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
         }
     });
 
     // Set transfer status and abort it
-    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true, true);
+    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true, String(error).indexOf(l[1668]) < 0);
     dlmanager.abort(dl);
 }
 
@@ -131,12 +131,13 @@ Speedometer.prototype.progress = function(p) {
 };
 
 // compute final MAC from block MACs
-function condenseMacs(macs, key) {
-    var i, aes, mac = [0, 0, 0, 0];
+function condenseMacs(macs, key, initialMac) {
+    'use strict';
 
-    aes = new sjcl.cipher.aes([key[0], key[1], key[2], key[3]]);
+    var mac = initialMac || [0, 0, 0, 0];
+    var aes = new sjcl.cipher.aes([key[0], key[1], key[2], key[3]]);
 
-    for (i = 0; i < macs.length; i++) {
+    for (var i = 0; i < macs.length; i++) {
         mac[0] ^= macs[i][0];
         mac[1] ^= macs[i][1];
         mac[2] ^= macs[i][2];

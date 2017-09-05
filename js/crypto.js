@@ -719,7 +719,7 @@ var crypt = (function () {
         prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
         newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
 
-        // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
+        // Show warning dialog if it hasn't been locally overriden (as needed by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
         if (localStorage.hideCryptoWarningDialogs !== '1') {
             var showDialog = function() {
@@ -892,6 +892,7 @@ var EBLOCKED = -16;
 var EOVERQUOTA = -17;
 var ETEMPUNAVAIL = -18;
 var ETOOMANYCONNECTIONS = -19;
+var EGOINGOVERQUOTA = -24;
 
 // custom errors
 var ETOOERR = -400;
@@ -1768,6 +1769,8 @@ function waitsc() {
     waitxhr.send();
 }
 mBroadcaster.once('startMega', function() {
+    'use strict';
+
     window.addEventListener('online', function(ev) {
         if (d) {
             console.info(ev);
@@ -1776,6 +1779,27 @@ mBroadcaster.once('startMega', function() {
 
         if (waiturl) {
             waitsc();
+        }
+    });
+
+    var invisibleTime;
+    document.addEventListener('visibilitychange', function(ev) {
+        if (d) {
+            console.info(ev, document.hidden);
+        }
+
+        if (document.hidden) {
+            invisibleTime = Date.now();
+        }
+        else {
+            invisibleTime = Date.now() - invisibleTime;
+
+            if (mega.loadReport && !mega.loadReport.sent) {
+                if (!mega.loadReport.invisibleTime) {
+                    mega.loadReport.invisibleTime = 0;
+                }
+                mega.loadReport.invisibleTime += invisibleTime;
+            }
         }
     });
 });
@@ -2322,8 +2346,12 @@ function api_setshare1(ctx, params) {
             req.s[i].u = req.s[i].m;
         }
 
-        if (d && M.opc[req.s[i].u]) {
-            logger.debug(req.s[i].u + ' is an outgoing pending contact...');
+        if (M.opc[req.s[i].u]) {
+            if (d) {
+                logger.warn(req.s[i].u + ' is an outgoing pending contact, fixing to email...', M.opc[req.s[i].u].m);
+            }
+            // the caller incorrectly passed a handle for a pending contact, so fixup..
+            req.s[i].u = M.opc[req.s[i].u].m;
         }
     }
 
@@ -3690,6 +3718,8 @@ function api_strerror(errno) {
         return "Temporarily not available";
     case ETOOMANYCONNECTIONS:
         return "Connection overflow";
+    case EGOINGOVERQUOTA:
+        return "Not enough quota";
     default:
         break;
     }

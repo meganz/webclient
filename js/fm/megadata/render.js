@@ -18,6 +18,9 @@ MegaData.prototype.renderMain = function(aUpdate) {
     }
 
     if (!aUpdate) {
+        if (this.megaRender) {
+            this.megaRender.destroy();
+        }
         this.megaRender = new MegaRender(this.viewmode);
     }
 
@@ -66,20 +69,15 @@ MegaData.prototype.renderMain = function(aUpdate) {
  * Helper for M.renderMain
  * @param {Boolean} u Whether we're just updating the list
  */
-MegaData.prototype.rmSetupUI = function(u) {
+MegaData.prototype.rmSetupUI = function(u, refresh) {
     if (this.viewmode === 1) {
-        if (this.v.length > 0) {
-            var o = $('.fm-blocks-view.fm .file-block-scrolling');
-            o.find('div.clear').remove();
-            o.append('<div class="clear"></div>');
-        }
-        M.addIconUI(u);
+        M.addIconUI(u, refresh);
         if (!u) {
             fm_thumbnails();
         }
     }
     else {
-        M.addGridUIDelayed();
+        M.addGridUIDelayed(refresh);
     }
     Soon(fmtopUI);
 
@@ -94,10 +92,19 @@ MegaData.prototype.rmSetupUI = function(u) {
             target.parent().find('tr').removeClass('ui-selected');
         }
         target.addClass('ui-selected');
+
+        if ($.selected.length === 0) {
+            // selection is already been made
+            selectionManager.clear_selection();
+            selectionManager.set_currently_selected(target.attr('id'));
+        }
+        else {
+            selectionManager.add_to_selection(target.attr('id'));
+        }
+
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
         e.currentTarget = target;
-        M.cacheselect();
         M.searchPath();
         if (!$(this).hasClass('active')) {
             M.contextMenuUI(e, 1);
@@ -118,7 +125,16 @@ MegaData.prototype.rmSetupUI = function(u) {
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
         e.currentTarget = target;
-        M.cacheselect();
+
+        if ($.selected.length === 0) {
+            // selection is already been made
+            selectionManager.clear_selection();
+            selectionManager.set_currently_selected(target.attr('id'));
+        }
+        else {
+            selectionManager.add_to_selection(target.attr('id'));
+        }
+
         M.searchPath();
         if (!$(this).hasClass('active')) {
             $(this).addClass('active');
@@ -253,14 +269,6 @@ MegaData.prototype.renderTree = function() {
     return promise;
 };
 
-MegaData.prototype.cacheselect = function() {
-    $.selected = [];
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o) {
-        if ($(o).hasClass('ui-selected')) {
-            $.selected.push($(o).attr('id'));
-        }
-    });
-};
 
 MegaData.prototype.pathLength = function() {
     var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
@@ -567,4 +575,40 @@ MegaData.prototype.searchPath = function() {
     }
 
     $('.fm-blocks-view, .files-grid-view').removeClass('search');
+};
+
+/**
+ * A function, which would be called on every DOM update (or scroll). This func would implement
+ * throttling, so that we won't update the UI components too often.
+ *
+ */
+MegaData.prototype.rmSetupUIDelayed = function() {
+    delay('rmSetupUI', function() {
+        M.rmSetupUI(false, true);
+    }, 75);
+};
+
+
+MegaData.prototype.megaListRenderNode = function(aHandle) {
+    var megaRender = M.megaRender;
+    if (!megaRender) {
+        return;
+    }
+    megaRender.numInsertedDOMNodes++;
+
+    var node = megaRender.getDOMNode(aHandle, M.d[aHandle]);
+
+    if (selectionManager && selectionManager.selected_list) {
+        if (selectionManager.selected_list.indexOf(aHandle) > -1) {
+            node.classList.add('ui-selected');
+        }
+        else {
+            node.classList.remove('ui-selected');
+        }
+        node.classList.remove('ui-selectee');
+    }
+
+    M.d[aHandle].seen = true;
+
+    return node;
 };

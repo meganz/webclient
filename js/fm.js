@@ -845,12 +845,11 @@ function contactAddDialog() {
     }
 
     $('.add-user-notification textarea').rebind('focus.add-user-n', function() {
-        var $this = $(this);
-        $this.parent().addClass('active');
+        $('.add-user-notification').addClass('focused');
     });
 
     $('.add-user-notification textarea').rebind('blur.add-user-n', function() {
-        $('.add-user-notification').removeClass('active');
+        $('.add-user-notification').removeClass('focused');
     });
 
     if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {

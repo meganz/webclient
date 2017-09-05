@@ -99,7 +99,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm15c_';
+    var dbpfx = 'fm15d_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -644,6 +644,11 @@ FMDB.prototype.stripnode = Object.freeze({
         delete f.t;
         delete f.s;
 
+        if (f.shares) {
+            t.shares = f.shares;
+            delete f.shares; // will be populated from the s table
+        }
+
         if (f.p) {
             t.p = f.p;
             delete f.p;
@@ -676,7 +681,9 @@ FMDB.prototype.restorenode = Object.freeze({
             f.t = 0;
             f.s = parseFloat(index.s);
         }
-        if (!f.ar && f.k && typeof f.k == 'object') f.ar = {};
+        if (!f.ar && f.k && typeof f.k == 'object') {
+            f.ar = Object.create(null);
+        }
     },
 
     ph : function(ph, index) {

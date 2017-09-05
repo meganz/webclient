@@ -1248,6 +1248,10 @@ MegaData.prototype.ulerror = function(ul, error) {
     if (ul) {
         this.ulfinalize(ul, api_strerror(error));
 
+        // Hide TPP
+        mega.ui.tpp.hide();
+        mega.ui.tpp.reset('ul');
+
         if (ul.owner) {
             ul.owner.destroy();
         }

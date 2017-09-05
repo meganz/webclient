@@ -1706,7 +1706,7 @@ MegaData.prototype.nodeShare = function(h, s, ignoreDB) {
 
     if (this.d[h]) {
         if (typeof this.d[h].shares === 'undefined') {
-            this.d[h].shares = Hash('Shares');
+            this.d[h].shares = Object.create(null);
         }
         this.d[h].shares[s.u] = s;
 

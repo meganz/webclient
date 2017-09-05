@@ -1921,7 +1921,8 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
 
     $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e) {
         $(this).find('.data-block-view').removeClass('ui-selected');
-        selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
+        // is this required? don't we have a support for a multi-selection context menu?
+        selectionManager.clear_selection();
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 2);
@@ -2317,7 +2318,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
         var s = e.shiftKey;
         if (e.shiftKey) {
-            selectionManager.shift_select_to($(this).attr('id'), false, true);
+            selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }
         else if (e.ctrlKey == false && e.metaKey == false)
         {

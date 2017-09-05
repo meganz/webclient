@@ -17157,32 +17157,32 @@ li.token-input-input-token-mega:first-child {
 .active li.token-input-input-token-mega:first-child {
     min-width: none;
 }
-.multiple-input input::-webkit-input-placeholder, .create-folder-input-bl input::-webkit-input-placeholder{
+.multiple-input input::-webkit-input-placeholder, .create-folder-input-bl input::-webkit-input-placeholder, .add-user-notification textarea::-webkit-input-placeholder {
 color: #777777 !important;
 }
-.multiple-input input:-moz-placeholder, .create-folder-input-bl input:-moz-placeholder {
-color: #777777 !important;
- opacity: 1;
-}
-.multiple-input input::-moz-placeholder, .create-folder-input-bl input::-moz-placeholder {
+.multiple-input input:-moz-placeholder, .create-folder-input-bl input:-moz-placeholder, .add-user-notification textarea:-moz-placeholder {
 color: #777777 !important;
  opacity: 1;
 }
-.multiple-input input:-ms-input-placeholder, .create-folder-input-bl input:-ms-input-placeholder {
+.multiple-input input::-moz-placeholder, .create-folder-input-bl input::-moz-placeholder, .add-user-notification textarea::-moz-placeholder {
+color: #777777 !important;
+ opacity: 1;
+}
+.multiple-input input:-ms-input-placeholder, .create-folder-input-bl input:-ms-input-placeholder, .add-user-notification textarea:-ms-input-placeholder {
 color: #777777 !important;
 }
-.active .multiple-input input::-webkit-input-placeholder, .focused .create-folder-input-bl input::-webkit-input-placeholder {
+.active .multiple-input input::-webkit-input-placeholder, .focused .create-folder-input-bl input::-webkit-input-placeholder, .add-user-notification.focused textarea::-webkit-input-placeholder {
 color: rgba(119,119,119,0.2) !important;
 }
-.active .multiple-input input:-moz-placeholder, .focused .create-folder-input-bl input:-moz-placeholder {
-color: rgba(119,119,119,0.2) !important;
- opacity: 1;
-}
-.active .multiple-input input::-moz-placeholder, .focused .create-folder-input-bl input::-moz-placeholder {
+.active .multiple-input input:-moz-placeholder, .focused .create-folder-input-bl input:-moz-placeholder, .add-user-notification.focused textarea:-moz-placeholder {
 color: rgba(119,119,119,0.2) !important;
  opacity: 1;
 }
-.active .multiple-input input:-ms-input-placeholder, .focused .create-folder-input-bl input:-ms-input-placeholder {
+.active .multiple-input input::-moz-placeholder, .focused .create-folder-input-bl input::-moz-placeholder, .add-user-notification.focused textarea::-moz-placeholder {
+color: rgba(119,119,119,0.2) !important;
+ opacity: 1;
+}
+.active .multiple-input input:-ms-input-placeholder, .focused .create-folder-input-bl input:-ms-input-placeholder, .add-user-notification.focused textarea:-ms-input-placeholder {
 color: rgba(119,119,119,0.2) !important;
 }
 .error .multiple-input input::-webkit-input-placeholder, .error .create-folder-input-bl input::-webkit-input-placeholder {

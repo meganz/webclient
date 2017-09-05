@@ -516,7 +516,13 @@ function addContactToFolderShare() {
  */
 function addNewContact($addButton) {
 
-    var mailNum, msg, title, email, emailText, $mails;
+    var mailNum;
+    var msg;
+    var title;
+    var email;
+    var emailText;
+    var $mails;
+    var $textarea = $('.add-user-textarea textarea');
 
     // Add button is enabled
     if (!$addButton.is('.disabled') && $addButton.is('.add')) {
@@ -528,7 +534,11 @@ function addNewContact($addButton) {
         else {
 
             // Custom text message
-            emailText = $('.add-user-textarea textarea').val();
+            emailText = $textarea.val();
+            
+            if (emailText === '') {
+                emailText = $textarea.attr('placeholder');
+            }
 
             // List of email address planned for addition
             $mails = $('.token-input-list-mega .token-input-token-mega');
@@ -2780,7 +2790,7 @@ function initShareDialog() {
     $('.share-message textarea').rebind('focus', function() {
 
         var $this = $(this);
-        $('.share-message').addClass('active');
+        $('.share-message').addClass('focused');
 
         if ($this.val() === l[6853]) {
 
@@ -2799,7 +2809,7 @@ function initShareDialog() {
     });
 
     $('.share-message textarea').rebind('blur', function() {
-        $('.share-message').removeClass('active');
+        $('.share-message').removeClass('focused');
     });
 }
 

@@ -1179,7 +1179,7 @@ FileManager.prototype.createFolderUI = function() {
         else {
             b1.removeClass('active filled-input');
             d1.addClass('hidden');
-            $('.fm-new-folder input').val(l[157]);
+            $('.fm-new-folder input').val('');
         }
         $.hideContextMenu();
     });
@@ -1193,7 +1193,7 @@ FileManager.prototype.createFolderUI = function() {
         $('.fm-new-folder').removeClass('active');
         $('.create-new-folder').addClass('hidden');
         $('.create-new-folder').removeClass('filled-input');
-        $('.create-new-folder input').val(l[157]);
+        $('.create-new-folder input').val('');
     });
 
     $('.create-folder-size-icon.full-size').rebind('click', function() {
@@ -1209,7 +1209,7 @@ FileManager.prototype.createFolderUI = function() {
         $('.create-new-folder').addClass('hidden');
         $('.fm-new-folder').removeClass('active');
         createFolderDialog(0);
-        $('.create-new-folder input').val(l[157]);
+        $('.create-new-folder input').val('');
     });
 
     $('.create-folder-size-icon.short-size').rebind('click', function() {
@@ -1226,7 +1226,7 @@ FileManager.prototype.createFolderUI = function() {
         topPopupAlign('.link-button.fm-new-folder', '.add-user-popup');
 
         createFolderDialog(1);
-        $('.create-folder-dialog input').val(l[157]);
+        $('.create-folder-dialog input').val('');
         $('.create-new-folder input').focus();
     });
 
@@ -1248,9 +1248,6 @@ FileManager.prototype.createFolderUI = function() {
     });
 
     $('.create-new-folder input').rebind('blur.create-new-f', function() {
-        if ($('.create-new-folder input').val() === '') {
-            $('.create-new-folder input').val(l[157]);
-        }
         $('.create-new-folder').removeClass('focused');
     });
 };
@@ -1832,15 +1829,19 @@ FileManager.prototype.addContactUI = function() {
 FileManager.prototype.addCreateFolderUI = function() {
     "use strict";
 
-    if ($('.create-new-folder input').val() === '') {
-        $('.create-new-folder input').animate({backgroundColor: "#d22000"}, 150, function() {
-            $('.create-new-folder input').animate({backgroundColor: "white"}, 350, function() {
-                $('.create-new-folder input').focus();
-            });
-        });
+    var $inputWrapper = $('.create-folder-pad');
+    var $input = $('.create-new-folder input');
+
+    if ($input.val() === '') {
+        $inputWrapper.addClass('error');
+
+        setTimeout(function() {
+            $inputWrapper.removeClass('error');
+            $input.focus();
+        }, 200);
     }
     else {
-        this.createFolder(this.currentdirid, $('.create-new-folder input').val());
+        this.createFolder(this.currentdirid, $input.val());
     }
 };
 

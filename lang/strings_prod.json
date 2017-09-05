@@ -2303,6 +2303,10 @@
         "text": "Cancel",
         "context": "Dialog button to cancel the operation"
     },
+    "1607": {
+        "text": "%1 of %2",
+        "context": "Label to indicate the current amount of account usage.over the total actual plan.  Keep %1 and %2 codes."
+    },
     "1624": {
         "text": "Downloading",
         "context": ""

@@ -326,6 +326,9 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
         db.on('blocked', next);
 
         db.delete().then(function() {
+            // Remove the DB name from localStorage so that our getDatabaseNames polyfill doesn't keep returning them
+            delete localStorage['_$mdb$' + db.name];
+
             fmdb.logger.log("Deleted IndexedDB " + db.name);
         }).catch(function(err){
             fmdb.logger.error("Unable to delete IndexedDB " + db.name, err);
@@ -1473,7 +1476,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 this.tree([parent], 0, new MegaPromise())
                     .always(function() {
                         if (M.d[parent] && M.c[parent]) {
-                            dbfetch.get(parent, promise);
+                            dbfetch.get(M.d[parent].p, promise);
                         }
                         else {
                             console.error('Failed to load folder ' + parent);

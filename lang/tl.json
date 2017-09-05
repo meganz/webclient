@@ -3830,7 +3830,7 @@
     "16633": "Libreng [X] kada invite",
     "16634": "I-access at i-stream ang inyong files sa smartphone o tablet mo. Mag-upload o mag-sync ng photos at videos. Secure na end-to-end encrypted chat sa inyong contacts.",
     "16635": "Easy automated synchronisation between your computer and MEGA allows you to access and work with your data securely across different locations and devices.",
-    "16636": "In addition to regular browser access, we offer browser extensions for Chrome and Firefox for enhanced security, improved file transfer performance and reduced loading times.",
+    "16636": "Kasama sa regular browser access, nagbibigay din kami ng browser extensions para sa Chrome at Firefox para sa pinatibay na security, pinabisang file transfer performance at pinabilis na loading time.",
     "16637": "Simulan ngayon ang pagiging secure. Samahan kami ngayon!",
     "16638": "Millions of people trust MEGA to store billions of files using our state of the art infrastructure. Join them and protect your data using one of the Internet's most secure cloud and communication providers.",
     "16639": "Bilang ng rehistradong gumagamit",
@@ -4240,5 +4240,7 @@
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17086": "Buksan ang folder",
+    "17087": "The process is taking longer than expected. Please wait...",
+    "17088": "Kinakailangan mag-restart ng MEGA pagkatapos magbago ng wika"
 }

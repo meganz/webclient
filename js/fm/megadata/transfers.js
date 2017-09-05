@@ -672,6 +672,10 @@ MegaData.prototype.dlerror = function(dl, error) {
             break;
     }
 
+    // Hide TPP
+    mega.ui.tpp.hide();
+    mega.ui.tpp.reset('dl');
+
     if (window.slideshowid == dl.id && !previews[slideshowid]) {
         $overlay.find('.viewer-image-bl').addClass('hidden');
         $overlay.find('.viewer-pending').addClass('hidden');

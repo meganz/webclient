@@ -1272,9 +1272,8 @@ FileManager.prototype.initUIKeyEvents = function() {
             s = clone(selectionManager.selected_list);
         }
         else {
-            $.selected = [];
-
             var tempSel;
+
             if (M.viewmode) {
                 tempSel = $('.data-block-view.ui-selected');
             }
@@ -1282,7 +1281,7 @@ FileManager.prototype.initUIKeyEvents = function() {
                 tempSel = $('.grid-table tr.ui-selected');
             }
 
-            $.selected = s = tempSel.attrs('id');
+            s = tempSel.attrs('id');
         }
 
         if (M.chat) {
@@ -1362,6 +1361,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             && !$('.fm-new-folder').hasClass('active')
             && !$('.top-search-bl').hasClass('active')
         ) {
+            $.selected = s;
 
             if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];

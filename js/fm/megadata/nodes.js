@@ -1158,8 +1158,17 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
  */
 MegaData.prototype.getCopyNodes = function fm_getcopynodes(handles, hadd, names) {
     var promise = new MegaPromise();
+    var hs = handles.concat(hadd || []);
 
-    dbfetch.coll(handles.concat(hadd || []))
+    for (var i = hs.length; i--;) {
+        var h = hs[i];
+
+        if (M.d[h] && !M.d[h].t) {
+            hs.splice(i, 1);
+        }
+    }
+
+    dbfetch.coll(hs)
         .wait(function() {
             var sync = function(names, handles) {
                 var result = M.getCopyNodesSync(handles, names);

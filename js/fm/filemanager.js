@@ -1830,7 +1830,7 @@ FileManager.prototype.addCreateFolderUI = function() {
     "use strict";
 
     var $inputWrapper = $('.create-folder-pad');
-    var $input = $inputWrapper.find('input');
+    var $input = $('.create-new-folder input');
 
     if ($input.val() === '') {
         $inputWrapper.addClass('error');

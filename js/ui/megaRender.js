@@ -1131,10 +1131,13 @@
                         if (container.classList.contains("hidden")) {
                             this.removeClasses(container, ["hidden"]);
                         }
-                        else if (container.parentNode.classList.contains("hidden")) {
+                        if (container.parentNode.classList.contains("hidden")) {
                             this.removeClasses(container.parentNode, ["hidden"]);
                         }
-                        else if (container.parentNode.parentNode.classList.contains("hidden")) {
+                        if (container.parentNode.parentNode.classList.contains("hidden")) {
+                            this.removeClasses(container.parentNode.parentNode, ["hidden"]);
+                        }
+                        if (container.parentNode.parentNode.parentNode.classList.contains("hidden")) {
                             this.removeClasses(container.parentNode.parentNode, ["hidden"]);
                         }
 

@@ -86,11 +86,23 @@ MegaData.prototype.menuItems = function menuItems() {
     "use strict";
 
     var promise = new MegaPromise();
+    var nodes = ($.selected || []).concat();
 
-    dbfetch.geta($.selected || [])
-        .always(function() {
-            promise.resolve(M.menuItemsSync());
-        });
+    for (var i = nodes.length; i--;) {
+        if (M.d[nodes[i]]) {
+            nodes.splice(i, 1);
+        }
+    }
+
+    if (nodes.length) {
+        dbfetch.geta(nodes)
+            .always(function() {
+                promise.resolve(M.menuItemsSync());
+            });
+    }
+    else {
+        promise.resolve(M.menuItemsSync());
+    }
 
     return promise;
 };

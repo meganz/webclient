@@ -1254,7 +1254,7 @@ function execsc() {
     } while (Date.now()-tick < 200);
 
     if (d) console.log("Processed " + tickcount + " SC commands in the past 200 ms");
-    setTimeout(execsc, 1);
+    onIdle(execsc);
 }
 
 // a node was updated significantly: write to DB and redraw
@@ -2110,6 +2110,12 @@ function ddtype(ids, toid, alt) {
  * @returns {doShare.$promise|MegaPromise}
  */
 function doShare(nodeId, targets, dontShowShareDialog) {
+    'use strict';
+
+    if (!nodeId || !targets || !targets.length) {
+        console.error('Invalid parameters for doShare()', nodeId, targets);
+        return MegaPromise.reject(EARGS);
+    }
 
     var masterPromise = new MegaPromise();
     var logger = MegaLogger.getLogger('doShare');
@@ -2148,11 +2154,27 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                             setLastInteractionWith(user, "0:" + unixtime());
                         }
                         else {
-                            logger.warn('Invalid user (%s[%s]): c=%s',
-                                user,
-                                users[k].u,
-                                M.u[user] ? String(M.u[user].c) : 'unknown!',
-                                M.u[user], users[k]);
+                            var isPendingContact = false;
+
+                            if (users[k].m) {
+                                for (var pid in M.opc) {
+                                    if (M.opc[pid].m === users[k].m) {
+                                        isPendingContact = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!isPendingContact) {
+                                logger.warn('Invalid user (%s[%s]): c=%s',
+                                    user,
+                                    users[k].u,
+                                    M.u[user] ? String(M.u[user].c) : 'unknown!',
+                                    M.u[user], users[k]);
+                            }
+                            else {
+                                logger.debug('Finished share action with pending contact.', JSON.stringify(users[k]));
+                            }
                         }
                     }
                 }
@@ -2206,7 +2228,8 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                     // 'u' is returned user handle, 'r' is access right
                     var usersWithHandle = [];
 
-                    if (M.u[userHandle] && M.u[userHandle].c !== 0) {
+                    // M.u[].c might be 0 for invisible/removed, or undefined for pending contact
+                    if (M.u[userHandle] && M.u[userHandle].c) {
                         usersWithHandle.push({ 'r': ctx.shareAccessRightsLevel, 'u': userHandle });
                     }
                     else {
@@ -3016,6 +3039,7 @@ function loadfm_done(mDBload) {
                     u_type === 3 ? (mBroadcaster.crossTab.master ? 1 : 0) : -1, // master, or slave tab?
                     r.pn1, r.pn2, r.pn3, r.pn4, r.pn5, // procNodes steps
                     Object.keys(M.tree || {}).length, // total tree nodes
+                    r.invisibleTime | 0, // time spent as background tab
                 ];
 
                 if (d) {

@@ -2898,6 +2898,22 @@ function tryCatch(fn, onerror)
     return fn.foo;
 }
 
+// setImmediate polyfill for Dexie...
+if (!window.setImmediate && window.requestIdleCallback) {
+    window.setImmediate = function _setImmediate(callback) {
+        'use strict';
+
+        // XXX: nothing from the code depends on the args
+        return window.requestIdleCallback(callback);
+    };
+
+    window.clearImmediate = function _clearImmediate(pid) {
+        'use strict';
+
+        window.cancelIdleCallback(pid);
+    };
+}
+
 var onIdle = window.requestIdleCallback || function(handler) {
         var startTime = Date.now();
 

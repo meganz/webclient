@@ -1133,8 +1133,9 @@ mobile.deleteOverlay = {
     /**
      * Initialise the overlay
      * @param {String} nodeHandle A public or regular node handle
+     * @param {Function} successCallback A callback function to be run if the item is deleted
      */
-    show: function(nodeHandle) {
+    show: function(nodeHandle, successCallback) {
 
         // Store selectors as they are re-used
         this.$overlay = $('#mobile-ui-delete');
@@ -1155,7 +1156,7 @@ mobile.deleteOverlay = {
         this.$overlay.find('.filetype-img').attr('src', fileIconPath);
 
         // Set the name, size. icon and initialise the download buttons
-        this.initDeleteButton(nodeHandle);
+        this.initDeleteButton(nodeHandle, successCallback);
         this.initCancelAndCloseButtons();
 
         // Disable scrolling of the file manager in the background to fix a bug on iOS Safari and show the overlay
@@ -1166,14 +1167,20 @@ mobile.deleteOverlay = {
     /**
      * Initialise the Delete button on the file download overlay
      * @param {String} nodeHandle The node handle for this folder/file
+     * @param {Function} successCallback A callback function to be run if the item is deleted
      */
-    initDeleteButton: function(nodeHandle) {
+    initDeleteButton: function(nodeHandle, successCallback) {
 
         this.$overlay.find('.first.delete').off('tap').on('tap', function() {
 
             // Delete the file
             $.selected = [nodeHandle];
             fmremove();
+
+            // Run the callback function on successful deletion
+            if (typeof successCallback !== 'undefined') {
+                successCallback();
+            }
 
             // Prevent default anchor link behaviour
             return false;
@@ -3284,8 +3291,11 @@ mobile.slideshow = {
     /** Store of previously fetched preview images */
     previews: {},
 
-    /** List of node handles for images that are in the current view */
-    imagesInCurrentView: [],
+    /** Array of node handles for images that are in the current view */
+    imagesInCurrentViewArray: [],
+
+    /** Associative array of node handles for images that are in the current view and the corresponding image number */
+    imagesInCurrentViewMap: {},
 
     /** The node handle of the current image being displayed */
     currentImageHandle: null,
@@ -3451,17 +3461,24 @@ mobile.slideshow = {
 
         // Cache selectors
         var $fileName = mobile.slideshow.$overlay.find('.slideshow-file-name');
+        var $currentFileNumAndTotal = mobile.slideshow.$overlay.find('.slideshow-file-number-and-total');
         var $image = mobile.slideshow.$overlay.find('.mobile.slides.' + slideClass + ' img');
 
-        // Get the node and image datas
+        // Get the node and image data
         var node = M.getNodeByHandle(nodeHandle);
         var imageSource = mobile.slideshow.previews[nodeHandle].src;
+
+        // Get the current slide number and how many images total in this folder e.g. '5 of 30'
+        var currentSlideNum = mobile.slideshow.imagesInCurrentViewMap[nodeHandle];
+        var numberOfImagesInView = mobile.slideshow.imagesInCurrentViewArray.length;
+        var currentFileNumAndTotalText = l[1607].replace('%1', currentSlideNum).replace('%2', numberOfImagesInView);
 
         // Set as the current slideshow image
         mobile.slideshow.currentImageHandle = nodeHandle;
 
         // Set file name and image src
         $fileName.text(node.name);
+        $currentFileNumAndTotal.text(currentFileNumAndTotalText);
         $image.attr('src', imageSource);
 
         // Change slide
@@ -3483,18 +3500,23 @@ mobile.slideshow = {
 
         'use strict';
 
-        // Reset array
-        mobile.slideshow.imagesInCurrentView = [];
+        // Reset array and associative array
+        mobile.slideshow.imagesInCurrentViewArray = [];
+        mobile.slideshow.imagesInCurrentViewMap = {};
 
         // Loop through folder & file nodes in the current directory
-        for (var i = 0; i < M.v.length; i++) {
+        for (var i = 0, imageNumber = 1; i < M.v.length; i++) {
 
             var node = M.v[i];
             var nodeHandle = node.h;
 
-            // If the node is an image, add it to the list
+            // If the node is an image, add it to the array and map
             if (is_image(node)) {
-                mobile.slideshow.imagesInCurrentView.push(nodeHandle);
+                mobile.slideshow.imagesInCurrentViewArray.push(nodeHandle);
+                mobile.slideshow.imagesInCurrentViewMap[nodeHandle] = imageNumber;
+
+                // Update the number of the image which is displayed later
+                imageNumber += 1;
             }
         }
     },
@@ -3509,7 +3531,7 @@ mobile.slideshow = {
         var $navButtons = mobile.slideshow.$overlay.find('.slide-show-navigation');
 
         // If there is more than one image, show the back and forward arrows
-        if (mobile.slideshow.imagesInCurrentView.length > 1) {
+        if (mobile.slideshow.imagesInCurrentViewArray.length > 1) {
             $navButtons.removeClass('hidden');
         }
         else {
@@ -3561,12 +3583,12 @@ mobile.slideshow = {
         'use strict';
 
         var currentImageIndex = 0;
-        var numOfImages = mobile.slideshow.imagesInCurrentView.length;
+        var numOfImages = mobile.slideshow.imagesInCurrentViewArray.length;
 
         // Loop through the images in the current view
         for (var i = 0; i < numOfImages; i++) {
 
-            var nodeHandle = mobile.slideshow.imagesInCurrentView[i];
+            var nodeHandle = mobile.slideshow.imagesInCurrentViewArray[i];
 
             // If the current image is found, mark that index
             if (nodeHandle === mobile.slideshow.currentImageHandle) {
@@ -3584,7 +3606,7 @@ mobile.slideshow = {
         }
 
         // Return the handle of the next image to be displayed
-        return mobile.slideshow.imagesInCurrentView[nextImageIndex];
+        return mobile.slideshow.imagesInCurrentViewArray[nextImageIndex];
     },
 
     /**
@@ -3630,12 +3652,12 @@ mobile.slideshow = {
         'use strict';
 
         var currentImageIndex = 0;
-        var numOfImages = mobile.slideshow.imagesInCurrentView.length;
+        var numOfImages = mobile.slideshow.imagesInCurrentViewArray.length;
 
         // Loop through the images in the current view
         for (var i = 0; i < numOfImages; i++) {
 
-            var nodeHandle = mobile.slideshow.imagesInCurrentView[i];
+            var nodeHandle = mobile.slideshow.imagesInCurrentViewArray[i];
 
             // If the current image is found, mark that index
             if (nodeHandle === mobile.slideshow.currentImageHandle) {
@@ -3653,7 +3675,7 @@ mobile.slideshow = {
         }
 
         // Return the handle of the next image to be displayed
-        return mobile.slideshow.imagesInCurrentView[nextImageIndex];
+        return mobile.slideshow.imagesInCurrentViewArray[nextImageIndex];
     },
 
     /**
@@ -3742,7 +3764,13 @@ mobile.slideshow = {
         $deleteButton.off('tap').on('tap', function() {
 
             // Show the folder/file delete overlay
-            mobile.deleteOverlay.show(nodeHandle);
+            mobile.deleteOverlay.show(nodeHandle, function() {
+
+                // After successful delete, hide the preview slideshow
+                mobile.slideshow.$overlay.addClass('hidden');
+            });
+
+            // Prevent double tap
             return false;
         });
     },

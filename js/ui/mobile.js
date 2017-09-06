@@ -453,7 +453,7 @@ mobile.cloud = {
         $openInAppButton.off('tap').on('tap', function() {
 
             // Open the folder in the app
-            mobile.downloadOverlay.redirectToApp($(this));
+            mobile.downloadOverlay.redirectToApp($(this), M.currentdirid);
             return false;
         });
     },

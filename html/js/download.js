@@ -149,6 +149,7 @@ function dl_g(res) {
         if (fdl_file)
         {
             var resumeInfo;
+            var gotCompletedFile = false;
             var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
 
@@ -210,6 +211,7 @@ function dl_g(res) {
                                 }
                             }
                             else if (size === fdl_filesize) {
+                                gotCompletedFile = true;
                                 onDownloadReady();
                             }
                             else if (size === resumeInfo.byteOffset) {
@@ -280,6 +282,9 @@ function dl_g(res) {
                             }
                         });
                     }
+                    else if (gotCompletedFile) {
+                        browserDownload();
+                    }
                     else {
                         var $this = $(this);
                         $this.unbind('click');
@@ -319,8 +324,9 @@ function dl_g(res) {
                                     setTransferStatus(0, l[18]);
                                 }
                             });
-                        return false;
                     }
+
+                    return false;
                 });
 
             $('.mid-button.to-clouddrive, .big-button.to-clouddrive').rebind('click', start_import);

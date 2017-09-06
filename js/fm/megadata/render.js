@@ -128,13 +128,13 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
 
         if (this.currentrootid === 'shares') {
 
-            function prepareShareMenuHandler(e) {
+            var prepareShareMenuHandler = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.currentTarget = $('#treea_' + M.currentdirid);
                 e.calculatePosition = true;
                 $.selected = [M.currentdirid];
-            }
+            };
 
             $('.shared-details-info-block .grid-url-arrow').rebind('click', function(e) {
                 prepareShareMenuHandler(e);

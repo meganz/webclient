@@ -535,7 +535,7 @@ function addNewContact($addButton) {
 
             // Custom text message
             emailText = $textarea.val();
-            
+
             if (emailText === '') {
                 emailText = $textarea.attr('placeholder');
             }
@@ -1281,18 +1281,18 @@ function handleResetSuccessDialogs(dialog, txt, dlgString) {
     $.dialog = dlgString;
 }
 
-function avatarDialog(close)
-{
-    if (close)
-    {
-        $.dialog = false;
-        $('.avatar-dialog').addClass('hidden');
-        fm_hideoverlay();
+function avatarDialog(close) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.avatar-dialog');
+
+    if (close) {
+        closeDialog();
         return true;
     }
-    $.dialog = 'avatar';
-    $('.fm-dialog.avatar-dialog').removeClass('hidden');
-    fm_showoverlay();
+
+    M.safeShowDialog('avatar', $dialog);
+
     $('.avatar-body').safeHTML(
         '<div id="avatarcrop">' +
             '<div class="image-upload-and-crop-container">' +
@@ -1486,16 +1486,14 @@ function renameDialog() {
     "use strict";
 
     if ($.selected.length > 0) {
-        $.dialog = 'rename';
-        $('.rename-dialog').removeClass('hidden');
-        $('.rename-dialog').addClass('active');
-        fm_showoverlay();
+        var $dialog = $('.fm-dialog.rename-dialog');
 
-        $('.rename-dialog .fm-dialog-close, .rename-dialog-button.cancel').rebind('click', function() {
-            $.dialog = false;
-            $('.rename-dialog').addClass('hidden');
-            fm_hideoverlay();
+        M.safeShowDialog('rename', function() {
+            fm_showoverlay();
+            $dialog.removeClass('hidden').addClass('active');
         });
+
+        $('.fm-dialog-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
 
         $('.rename-dialog-button.rename').rebind('click', function() {
             if ($('.rename-dialog').hasClass('active')) {
@@ -1511,15 +1509,18 @@ function renameDialog() {
             $('.rename-dialog .fm-dialog-title').text(l[426]);
         }
 
-        $('.rename-dialog input').val(n.name);
-        var ext = fileext(n.name);
+        var $input = $('input', $dialog);
+        $input.val(n.name);
+
         $('.rename-dialog .transfer-filetype-icon').attr('class', 'transfer-filetype-icon ' + fileIcon(n));
+
+        var ext = fileext(n.name);
         if (!n.t && ext.length > 0) {
-            $('.rename-dialog input')[0].selectionStart = 0;
-            $('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
+            $input[0].selectionStart = 0;
+            $input[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
         }
 
-        $('.rename-dialog input').rebind('focus', function() {
+        $input.rebind('focus', function() {
             var selEnd;
             $(this).closest('.rename-dialog').addClass('focused');
             var d = $(this).val().lastIndexOf('.');
@@ -1533,13 +1534,12 @@ function renameDialog() {
             $(this)[0].selectionEnd = selEnd;
         });
 
-        $('.rename-dialog input').rebind('blur', function() {
+        $input.rebind('blur', function() {
             $(this).closest('.rename-dialog').removeClass('focused');
         });
 
-        $('.rename-dialog input').unbind('click keydown keyup keypress');
-        $('.rename-dialog input').focus();
-        $('.rename-dialog input').bind('click keydown keyup keypress', function(e) {
+        $input.focus();
+        $input.rebind('click keydown keyup keypress', function() {
             var n = M.d[$.selected[0]],
                 ext = fileext(n.name);
             if ($(this).val() == '' || (!n.t && ext.length > 0 && $(this).val() == '.' + ext)) {
@@ -2924,6 +2924,8 @@ function closeDialog() {
 
     delete $.dialog;
     delete $.mcImport;
+
+    mBroadcaster.sendMessage('closedialog');
 }
 
 function copyDialog() {
@@ -3722,18 +3724,17 @@ function createFolderDialog(close) {
     $('.create-folder-dialog').removeClass('active');
 }
 
-function chromeDialog(close)
-{
-    if (close)
-    {
-        $.dialog = false;
-        fm_hideoverlay();
-        $('.fm-dialog.chrome-dialog').addClass('hidden');
+function chromeDialog(close) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.chrome-dialog');
+
+    if (close) {
+        closeDialog();
         return true;
     }
-    fm_showoverlay();
-    $('.fm-dialog.chrome-dialog').removeClass('hidden');
-    $.dialog = 'chrome';
+    M.safeShowDialog('chrome', $dialog);
+
     $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').rebind('click', function()
     {
         chromeDialog(1);
@@ -3767,14 +3768,10 @@ function megaSyncDialog() {
     var $dialog = $('.fm-dialog.download-megasync-dialog');
 
     // Show the dialog and overlay
-    $dialog.removeClass('hidden');
-    fm_showoverlay();
+    M.safeShowDialog('download-megasync-dialog', $dialog);
 
     // Add close button handler
-    $dialog.find('.fm-dialog-close, .close-button').rebind('click', function() {
-        $dialog.addClass('hidden');
-        fm_hideoverlay();
-    });
+    $dialog.find('.fm-dialog-close, .close-button').rebind('click', closeDialog);
 
     // Add checkbox handling
     $dialog.find('#megasync-checkbox').rebind('click', function() {
@@ -3848,16 +3845,20 @@ function firefoxDialog(close) {
 }
 
 function browserDialog(close) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.browsers-dialog');
+
     if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $('.fm-dialog.browsers-dialog').addClass('hidden');
+        closeDialog();
         return true;
     }
-    $.browserDialog = 1;
-    $.dialog = 'browser';
-    fm_showoverlay();
-    $('.fm-dialog.browsers-dialog').removeClass('hidden');
+
+    M.safeShowDialog('browser', function() {
+        fm_showoverlay();
+        $dialog.removeClass('hidden');
+        $.browserDialog = 1;
+    });
 
     $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').rebind('click', function() {
         browserDialog(1);
@@ -4013,10 +4014,8 @@ function _propertiesDialog(close) {
     $(document).unbind('MegaCloseDialog.Properties');
 
     if (close) {
-        $.dialog = false;
         delete $.propertiesDialog;
-        fm_hideoverlay();
-        pd.addClass('hidden');
+        closeDialog();
         $('.contact-list-icon').removeClass('active');
         $('.properties-context-menu').fadeOut(200);
         $.hideContextMenu();
@@ -4027,10 +4026,13 @@ function _propertiesDialog(close) {
         return true;
     }
 
-    $.propertiesDialog = $.dialog = 'properties';
-    fm_showoverlay();
+    M.safeShowDialog('properties', function() {
+        fm_showoverlay();
+        pd.removeClass('hidden');
+        $.propertiesDialog = 'properties';
+    });
 
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me');
+    pd.removeClass('multiple folders-only two-elements shared shared-with-me');
     pd.removeClass('read-only read-and-write full-access taken-down undecryptable');
     $('.properties-elements-counter span').text('');
 
@@ -4770,26 +4772,23 @@ function fingerprintDialog(userid) {
         return;
     }
 
+    var $dialog = $('.fingerprint-dialog');
     var closeFngrPrntDialog = function() {
-        fm_hideoverlay();
-        $this.addClass('hidden');
-        $('.fm-dialog-close').unbind('click');
+        closeDialog();
+        $('.fm-dialog-close', $dialog).unbind('click');
         $('.dialog-approve-button').unbind('click');
         $('.dialog-skip-button').unbind('click');
-        $this = null;
     };
 
-    var $this = $('.fingerprint-dialog');
+    $dialog.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
 
-    $this.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
-
-    $this.find('.contact-details-user-name')
+    $dialog.find('.contact-details-user-name')
         .text(M.getNameByHandle(user.u)) // escape HTML things
         .end()
         .find('.contact-details-email')
         .text(user.m); // escape HTML things
 
-    $this.find('.fingerprint-txt').empty();
+    $dialog.find('.fingerprint-txt').empty();
     userFingerprint(u_handle, function(fprint) {
         var target = $('.fingerprint-bott-txt .fingerprint-txt');
         fprint.forEach(function(v) {
@@ -4799,7 +4798,7 @@ function fingerprintDialog(userid) {
 
     userFingerprint(user, function(fprint) {
         var offset = 0;
-        $this.find('.fingerprint-code .fingerprint-txt').each(function() {
+        $dialog.find('.fingerprint-code .fingerprint-txt').each(function() {
             var that = $(this);
             fprint.slice(offset, offset + 5).forEach(function(v) {
                 $('<span>').text(v).appendTo(that);
@@ -4808,7 +4807,7 @@ function fingerprintDialog(userid) {
         });
     });
 
-    $('.fm-dialog-close').rebind('click', function() {
+    $('.fm-dialog-close', $dialog).rebind('click', function() {
         closeFngrPrntDialog();
     });
 
@@ -4845,12 +4844,14 @@ function fingerprintDialog(userid) {
         closeFngrPrntDialog();
     });
 
-    $this.removeClass('hidden')
-        .css({
-            'margin-top': '-' + $this.height() / 2 + 'px',
-            'margin-left': '-' + $this.width() / 2 + 'px'
-        });
-    fm_showoverlay();
+    M.safeShowDialog('fingerprint-dialog', function() {
+        $dialog.removeClass('hidden')
+            .css({
+                'margin-top': '-' + $dialog.height() / 2 + 'px',
+                'margin-left': '-' + $dialog.width() / 2 + 'px'
+            });
+        fm_showoverlay();
+    });
 }
 
 /**

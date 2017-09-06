@@ -3040,8 +3040,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
         // if another dialog wasn't opened previously
         if (!prevState || Object(options).custom) {
-            fm_showoverlay();
-            $strgdlg.removeClass('hidden');
+            M.safeShowDialog('over-storage-quota', $strgdlg);
         }
         else {
             promise.reject();
@@ -3050,3 +3049,68 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
     return promise;
 };
+
+(function(global) {
+    'use strict';
+
+    var _cdialogq = Object.create(null);
+
+    var _openDialog = function(name, dsp) {
+        onIdle(function() {
+            if (typeof $.dialog === 'string') {
+                _cdialogq[name] = dsp;
+            }
+            else {
+                dsp();
+            }
+        });
+    };
+
+    mBroadcaster.addListener('closedialog', function() {
+        var name = Object.keys(_cdialogq).shift();
+
+        if (name) {
+            _openDialog(name, _cdialogq[name]);
+            delete _cdialogq[name];
+        }
+    });
+
+    if (d) {
+        global._cdialogq = _cdialogq;
+    }
+
+    /**
+     * Prevent dispatching several dialogs in top on each other
+     * @param {String} dialogName The dialog name to set on $.dialog
+     * @param {Function|Object} dispatcher The dispatcher, either a jQuery's node/selector or a function
+     */
+    FileManager.prototype.safeShowDialog = function(dialogName, dispatcher) {
+
+        dispatcher = (function(name, dsp) {
+            return tryCatch(function() {
+                if (d) {
+                    console.warn('Dispatching queued dialog.', name);
+                }
+                if (typeof dsp === 'function') {
+                    dsp();
+                }
+                else {
+                    var $dialog = $(dsp);
+
+                    if (!$dialog.hasClass('fm-dialog')) {
+                        throw new Error('Unexpected dialog type...');
+                    }
+
+                    fm_showoverlay();
+                    $dialog.removeClass('hidden');
+                }
+                $.dialog = String(name);
+            }, function(ex) {
+                // There was an exception dispatching the above code, move to the next queued dialog...
+                mBroadcaster.sendMessage('closedialog', ex);
+            });
+        })(dialogName, dispatcher);
+
+        _openDialog(dialogName, dispatcher);
+    };
+})(self);

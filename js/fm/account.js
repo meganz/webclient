@@ -236,6 +236,19 @@ function accountUI() {
             $('.account.plan-info-row.bandwidth').hide();
         }
 
+        // Bind Inpust Focus/Blur events
+        $('.fm-account-input input').rebind('focus', function() {
+            var $wrapper = $(this).parent();
+
+            if (!$wrapper.hasClass('disabled')) {
+                $wrapper.addClass('focused');
+            }
+        });
+
+        $('.fm-account-input input').rebind('blur', function() {
+            $(this).parent().removeClass('focused');
+        });
+
         // Upgrade Account Button
         $('.default-white-button.upgrade-to-pro').rebind('click', function() {
             loadSubPage('pro');

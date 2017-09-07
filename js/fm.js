@@ -516,7 +516,13 @@ function addContactToFolderShare() {
  */
 function addNewContact($addButton) {
 
-    var mailNum, msg, title, email, emailText, $mails;
+    var mailNum;
+    var msg;
+    var title;
+    var email;
+    var emailText;
+    var $mails;
+    var $textarea = $('.add-user-textarea textarea');
 
     // Add button is enabled
     if (!$addButton.is('.disabled') && $addButton.is('.add')) {
@@ -528,7 +534,11 @@ function addNewContact($addButton) {
         else {
 
             // Custom text message
-            emailText = $('.add-user-textarea textarea').val();
+            emailText = $textarea.val();
+            
+            if (emailText === '') {
+                emailText = $textarea.attr('placeholder');
+            }
 
             // List of email address planned for addition
             $mails = $('.token-input-list-mega .token-input-token-mega');
@@ -845,12 +855,11 @@ function contactAddDialog() {
     }
 
     $('.add-user-notification textarea').rebind('focus.add-user-n', function() {
-        var $this = $(this);
-        $this.parent().addClass('active');
+        $('.add-user-notification').addClass('focused');
     });
 
     $('.add-user-notification textarea').rebind('blur.add-user-n', function() {
-        $('.add-user-notification').removeClass('active');
+        $('.add-user-notification').removeClass('focused');
     });
 
     if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
@@ -2697,6 +2706,10 @@ function initShareDialog() {
                 perm = sharedPermissionLevel(newPermLevel[0]);
 
                 if (!shares || !shares[id] || shares[id].r !== perm) {
+                    if (M.opc[id]) {
+                        // it's a pending contact, provide back the email
+                        id = M.opc[id].m || id;
+                    }
                     $.changedPermissions.push({ u: id, r: perm });
                 }
             }
@@ -2777,7 +2790,7 @@ function initShareDialog() {
     $('.share-message textarea').rebind('focus', function() {
 
         var $this = $(this);
-        $('.share-message').addClass('active');
+        $('.share-message').addClass('focused');
 
         if ($this.val() === l[6853]) {
 
@@ -2796,7 +2809,7 @@ function initShareDialog() {
     });
 
     $('.share-message textarea').rebind('blur', function() {
-        $('.share-message').removeClass('active');
+        $('.share-message').removeClass('focused');
     });
 }
 
@@ -3651,9 +3664,6 @@ function createFolderDialog(close) {
     });
 
     $('.create-folder-dialog input').rebind('blur', function() {
-        if ($('.create-folder-dialog input').val() === '') {
-            $('.create-folder-dialog input').val(l[157]);
-        }
         $('.create-folder-dialog').removeClass('focused');
     });
 
@@ -3680,7 +3690,7 @@ function createFolderDialog(close) {
     $('.create-folder-dialog .fm-dialog-close, .create-folder-dialog .create-folder-button-cancel').rebind('click', function() {
         createFolderDialog(1);
         $('.fm-dialog').removeClass('arrange-to-back');
-        $('.create-folder-dialog input').val(l[157]);
+        $('.create-folder-dialog input').val('');
     });
 
     $('.fm-dialog-input-clear').rebind('click', function() {

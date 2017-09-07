@@ -1179,7 +1179,7 @@ FileManager.prototype.createFolderUI = function() {
         else {
             b1.removeClass('active filled-input');
             d1.addClass('hidden');
-            $('.fm-new-folder input').val(l[157]);
+            $('.fm-new-folder input').val('');
         }
         $.hideContextMenu();
     });
@@ -1193,7 +1193,7 @@ FileManager.prototype.createFolderUI = function() {
         $('.fm-new-folder').removeClass('active');
         $('.create-new-folder').addClass('hidden');
         $('.create-new-folder').removeClass('filled-input');
-        $('.create-new-folder input').val(l[157]);
+        $('.create-new-folder input').val('');
     });
 
     $('.create-folder-size-icon.full-size').rebind('click', function() {
@@ -1209,7 +1209,7 @@ FileManager.prototype.createFolderUI = function() {
         $('.create-new-folder').addClass('hidden');
         $('.fm-new-folder').removeClass('active');
         createFolderDialog(0);
-        $('.create-new-folder input').val(l[157]);
+        $('.create-new-folder input').val('');
     });
 
     $('.create-folder-size-icon.short-size').rebind('click', function() {
@@ -1226,7 +1226,7 @@ FileManager.prototype.createFolderUI = function() {
         topPopupAlign('.link-button.fm-new-folder', '.add-user-popup');
 
         createFolderDialog(1);
-        $('.create-folder-dialog input').val(l[157]);
+        $('.create-folder-dialog input').val('');
         $('.create-new-folder input').focus();
     });
 
@@ -1248,9 +1248,6 @@ FileManager.prototype.createFolderUI = function() {
     });
 
     $('.create-new-folder input').rebind('blur.create-new-f', function() {
-        if ($('.create-new-folder input').val() === '') {
-            $('.create-new-folder input').val(l[157]);
-        }
         $('.create-new-folder').removeClass('focused');
     });
 };
@@ -1272,9 +1269,8 @@ FileManager.prototype.initUIKeyEvents = function() {
             s = clone(selectionManager.selected_list);
         }
         else {
-            $.selected = [];
-
             var tempSel;
+
             if (M.viewmode) {
                 tempSel = $('.data-block-view.ui-selected');
             }
@@ -1282,7 +1278,7 @@ FileManager.prototype.initUIKeyEvents = function() {
                 tempSel = $('.grid-table tr.ui-selected');
             }
 
-            $.selected = s = tempSel.attrs('id');
+            s = tempSel.attrs('id');
         }
 
         if (M.chat) {
@@ -1362,6 +1358,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             && !$('.fm-new-folder').hasClass('active')
             && !$('.top-search-bl').hasClass('active')
         ) {
+            $.selected = s;
 
             if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];
@@ -1832,15 +1829,19 @@ FileManager.prototype.addContactUI = function() {
 FileManager.prototype.addCreateFolderUI = function() {
     "use strict";
 
-    if ($('.create-new-folder input').val() === '') {
-        $('.create-new-folder input').animate({backgroundColor: "#d22000"}, 150, function() {
-            $('.create-new-folder input').animate({backgroundColor: "white"}, 350, function() {
-                $('.create-new-folder input').focus();
-            });
-        });
+    var $inputWrapper = $('.create-folder-pad');
+    var $input = $('.create-new-folder input');
+
+    if ($input.val() === '') {
+        $inputWrapper.addClass('error');
+
+        setTimeout(function() {
+            $inputWrapper.removeClass('error');
+            $input.focus();
+        }, 200);
     }
     else {
-        this.createFolder(this.currentdirid, $('.create-new-folder input').val());
+        this.createFolder(this.currentdirid, $input.val());
     }
 };
 
@@ -1921,7 +1922,8 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
 
     $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e) {
         $(this).find('.data-block-view').removeClass('ui-selected');
-        selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
+        // is this required? don't we have a support for a multi-selection context menu?
+        selectionManager.clear_selection();
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 2);
@@ -2317,7 +2319,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
         var s = e.shiftKey;
         if (e.shiftKey) {
-            selectionManager.shift_select_to($(this).attr('id'), false, true);
+            selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }
         else if (e.ctrlKey == false && e.metaKey == false)
         {

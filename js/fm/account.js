@@ -1177,12 +1177,12 @@ function accountUI() {
             if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
                 $this.switchClass('checkboxOn', 'checkboxOff');
                 $this.parent().switchClass('checkboxOn', 'checkboxOff');
-                mega.config.setn('tpp', false);
+                mega.config.setn('tpp', 0);
             }
             else {
                 $this.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
                 $this.parent().switchClass('checkboxOff', 'checkboxOn');
-                mega.config.setn('tpp', true);
+                mega.config.setn('tpp', 1);
             }
 
         });

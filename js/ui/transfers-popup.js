@@ -272,6 +272,11 @@ mega.ui.tpp = function () {
         index = getIndex(blk);
         setTime(Date.now(), blk);
         name = getFileName(blk);
+
+        // Situation when switching from paused import file to clouddrive
+        if (name === '' && blk === 'dl') {
+            name = Object(fdl_queue_var).name;
+        }
         type = ext[fileext(name)];
 
         if (typeof type === 'undefined') {
@@ -559,6 +564,7 @@ mega.ui.tpp = function () {
         // Check if tpp used before, if not force usage
         if (typeof fmconfig.tpp === 'undefined' || isEph) {
             mega.config.set('tpp', true);
+            setEnabled(1);
         }
         else {
             setEnabled(fmconfig.tpp);
@@ -585,24 +591,17 @@ mega.ui.tpp = function () {
         // Cached
         opts.dlg.cached = true;
 
-        // If ephemeral, then hide close button for ongoing transfers popup dialog
-        if (isEph) {
-            $('.transfer-widget.popup .fm-dialog-close.small').addClass('hidden');
-        }
-        else {
-
-            // Close button, Ongoing Transfers Popup Dialog
-            $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
-                opts.dlg.$.hide(opts.duration);
-            });
-        }
+        // Close button, Ongoing Transfers Popup Dialog
+        $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
+            opts.dlg.$.hide(opts.duration);
+        });
     });
 
     mBroadcaster.addListener('fmconfig:tpp', function(value) {
 
         setEnabled(value);
         if (isEphemeral()) {
-            setEnabled(true);
+            setEnabled(1);
         }
         var visible = isVisible();
 

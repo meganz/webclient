@@ -211,8 +211,7 @@
             $('.file-name', $a3).text(this.findNewName(file.name, target));
 
             var done = function(file, name, action) {
-                fm_hideoverlay();
-                $dialog.addClass('hidden');
+                closeDialog();
                 promise.resolve(file, name, action, $('#duplicates-checkbox').attr('checked'));
             };
 
@@ -247,8 +246,7 @@
             }
 
             uiCheckboxes($dialog);
-            $dialog.removeClass('hidden');
-            fm_showoverlay();
+            M.safeShowDialog('fileconflict-dialog', $dialog);
 
             return promise;
         },

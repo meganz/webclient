@@ -4243,5 +4243,7 @@
     "17086": "Ouvrir un dossier",
     "17087": "Le processus prend plus de temps que pr\u00e9vu. Veuillez patienter...",
     "17088": "Vous devrez red\u00e9marrer MEGA apr\u00e8s avoir changer la langue",
-    "17089": "Before you close your account, we would like to know why you are leaving us..."
+    "17089": "Avant que vous fermiez votre compte, nous aimerions savoir pourquoi vous nous quittez...",
+    "17090": "Votre t\u00e9l\u00e9chargement en attente d\u00e9passe le quota de transfert actuel disponible de votre adresse IP et pourrait par cons\u00e9quent \u00eatre interrompu. Veuillez envisager d'acheter un compte PRO afin de grandement augmenter votre quota de transfert.",
+    "17091": "Continuer le t\u00e9l\u00e9chargement"
 }

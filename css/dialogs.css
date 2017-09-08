@@ -478,7 +478,7 @@
 .not-logged .exceeded:not(.pro) .dialog.overquota-bott-bl, .logged .exceeded.achievements:not(.pro) .dialog.overquota-bott-bl, 
 .not-logged .fm-dialog:not(.exceeded) .dialog.overquota-bott-bl, .logged .fm-dialog:not(.exceeded).achievements .dialog.overquota-bott-bl {
     display: table;
-    width: 100%,
+    width: 100%;
     -webkit-box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
     -moz-box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
     box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);

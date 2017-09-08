@@ -575,6 +575,7 @@
     "1595": "Importuj do mojego MEGA dysku",
     "1596": "OK",
     "1597": "Anuluj",
+    "1607": "%1 z %2",
     "1624": "Pobieranie",
     "1626": "MEGAsync",
     "1647": "Wstrzymaj",
@@ -1818,11 +1819,11 @@
     "16902": "lub utw\u00f3rz nowe bezp\u0142atn konto na MEGA. Zarejestrowani u\u017cytkownicy otrzymuj\u0105 dodatkowe 10% na transfer plik\u00f3w.",
     "16903": "lub utw\u00f3rz konto aby skorzysta\u0107 z dodatkowych nagr\u00f3d, dzi\u0119ki kt\u00f3rym mo\u017cesz otrzyma\u0107 dodatkow\u0105 powierzchni\u0119 lub transfer za darmo, kiedy zainstalujesz jedn\u0105 z naszych MEGA aplikacji lub zaprosisz znajomych do MEGA (aktywacja mo\u017ce potrwa\u0107 do kilku dni).",
     "16904": "lub we\u017a udzia\u0142 a naszym programie nagr\u00f3d, gdzie mo\u017cesz otrzyma\u0107 dodatkow\u0105 powierzchni\u0119 lub transfer za darmo, kiedy zainstalujesz jedn\u0105 z naszych MEGA aplikacji lub zaprosisz znajomych do MEGA (aktywacja mo\u017ce potrwa\u0107 do kilku dni).",
-    "16927": "This action can not be completed as it would take you over your current storage limit",
-    "17081": "Incomplete transfer, do you want to resume it?",
-    "17082": "Completed transfer. Please save your file.",
-    "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
-    "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "16927": "Ta operacja nie zostanie zako\u0144czona prawid\u0142owo, poniewa\u017c przekroczy dost\u0119pny limit pami\u0119ci na Twoim koncie.",
+    "17081": "Transfer niekompletny, czy chcesz wznowi\u0107?",
+    "17082": "Transfer zako\u0144czony. Zapisz swoj plik.",
+    "17083": "MEGA Universal Windows App jest aktualnie w trakcie prac. Mo\u017cesz pobra\u0107\u00a0wersj\u0119 beta [A]tutaj[\/A].",
+    "17084": "Pobieranie plik\u00f3w nie mo\u017ce by\u0107 kontynuowane, poniewa\u017c zostanie przekroczony dost\u0119pny limit na Twoim koncie.",
+    "17085": "Niekt\u00f3re transfery nie zosta\u0142y zako\u0144czone. Czy chcesz je wznowi\u0107?",
+    "17086": "Otw\u00f3rz katalog"
 }

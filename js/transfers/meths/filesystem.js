@@ -194,6 +194,10 @@
                                         console.log('temp file removed',
                                             file.name, bytesToSize(metadata.size));
                                     }
+
+                                    dlmanager.remResumeInfo({ph: file.name});
+                                    dlmanager.remResumeInfo({id: file.name});
+
                                     if (++del == entries.length && callback) {
                                         callback(totalsize);
                                     }
@@ -411,6 +415,8 @@
         }
     }
 
+    var nosplog = true;
+
     window.FileSystemAPI = function fsIO(dl_id, dl) {
         var
             dl_fw,
@@ -507,6 +513,11 @@
                                     if (!(++chrome_write_error_msg % 21) && !$.msgDialog) {
                                         chrome_write_error_msg = 0;
 
+                                        if (nosplog) {
+                                            nosplog = false;
+                                            api_req({a: 'log', e: 99657, m: 'Out of HTML5 Offline Storage space.'});
+                                        }
+
                                         if (canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
                                             return;
                                         }
@@ -519,8 +530,6 @@
                                                     dlFatalError(dl, WRITERR_DIAGTITLE, false);
                                                 }
                                             });
-
-                                        srvlog('Out of HTML5 Offline Storage space (write)');
                                     }
                                     failed = true;
                                     dl_ack_write();
@@ -558,14 +567,16 @@
                 }
 
                 if (aFail === -1 && !isSecurityError(aEvent)) {
+                    if (nosplog) {
+                        nosplog = false;
+                        api_req({a: 'log', e: 99658, m: 'Out of HTML5 Offline Storage space (open)'});
+                    }
 
                     if (canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
                         return;
                     }
 
                     if (!$.msgDialog) {
-                        srvlog('Out of HTML5 Offline Storage space (open)');
-
                         msgDialog('warningb:' + l[103], WRITERR_DIAGTITLE,
                             l[16891],
                             str_mtrunc(dl_filename), function(cancel) {

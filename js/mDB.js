@@ -99,7 +99,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm15c_';
+    var dbpfx = 'fm15d_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -326,6 +326,9 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
         db.on('blocked', next);
 
         db.delete().then(function() {
+            // Remove the DB name from localStorage so that our getDatabaseNames polyfill doesn't keep returning them
+            delete localStorage['_$mdb$' + db.name];
+
             fmdb.logger.log("Deleted IndexedDB " + db.name);
         }).catch(function(err){
             fmdb.logger.error("Unable to delete IndexedDB " + db.name, err);
@@ -644,6 +647,11 @@ FMDB.prototype.stripnode = Object.freeze({
         delete f.t;
         delete f.s;
 
+        if (f.shares) {
+            t.shares = f.shares;
+            delete f.shares; // will be populated from the s table
+        }
+
         if (f.p) {
             t.p = f.p;
             delete f.p;
@@ -676,7 +684,9 @@ FMDB.prototype.restorenode = Object.freeze({
             f.t = 0;
             f.s = parseFloat(index.s);
         }
-        if (!f.ar && f.k && typeof f.k == 'object') f.ar = {};
+        if (!f.ar && f.k && typeof f.k == 'object') {
+            f.ar = Object.create(null);
+        }
     },
 
     ph : function(ph, index) {
@@ -1466,7 +1476,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 this.tree([parent], 0, new MegaPromise())
                     .always(function() {
                         if (M.d[parent] && M.c[parent]) {
-                            dbfetch.get(parent, promise);
+                            dbfetch.get(M.d[parent].p, promise);
                         }
                         else {
                             console.error('Failed to load folder ' + parent);

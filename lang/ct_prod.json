@@ -575,6 +575,7 @@
     "1595": "\u532f\u5165\u81f3\u6211\u7684\u96f2\u7aef\u786c\u789f",
     "1596": "OK",
     "1597": "\u53d6\u6d88",
+    "1607": "%1 \/ %2",
     "1624": "\u4e0b\u8f09\u4e2d",
     "1626": "MEGAsync",
     "1647": "\u66ab\u505c",
@@ -1822,7 +1823,7 @@
     "17081": "\u50b3\u8f38\u672a\u5b8c\u6210\uff0c\u8acb\u554f\u60a8\u60f3\u8981\u7e7c\u7e8c\u50b3\u8f38\u55ce\uff1f",
     "17082": "\u50b3\u8f38\u5b8c\u6210\u3002\u8acb\u5132\u5b58\u60a8\u7684\u6a94\u6848\u3002",
     "17083": "MEGA\u7684\u901a\u7528Windows\u61c9\u7528\u7a0b\u5f0f\u76ee\u524d\u6b63\u5728\u958b\u767c\u4e2d\u3002\u60a8\u53ef\u4ee5[A]\u7531\u6b64\u53d6\u5f97[\/A]\u6e2c\u8a66\u7248\u3002",
-    "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
-    "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17084": "\u60a8\u7684\u4e0b\u8f09\u7121\u6cd5\u7e7c\u7e8c\uff0c\u56e0\u70ba\u6b64\u64cd\u4f5c\u5c07\u8d85\u51fa\u60a8\u5e33\u6236\u4e4b\u50b3\u8f38\u914d\u984d\u9650\u984d\u3002",
+    "17085": "\u60a8\u5df2\u4e0b\u8f09\u90e8\u5206\u50b3\u8f38\u3002\u8acb\u554f\u60a8\u60f3\u7e7c\u7e8c\u4e0b\u8f09\u4f5c\u696d\u55ce\uff1f",
+    "17086": "\u958b\u555f\u8cc7\u6599\u593e"
 }

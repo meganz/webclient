@@ -376,6 +376,8 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (uldl_hold) {
             fm_tfspause('zip_' + z);
         }
+
+        api_req({a: 'log', e: 99655, m: 'ZipIO Download started.'});
     }
 
     if (!preview) {
@@ -565,6 +567,8 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     if (z) {
         id = 'zip_' + z;
+
+        api_req({a: 'log', e: 99656, m: 'ZipIO Download completed.'});
     }
     else {
         id = 'dl_' + id;
@@ -1131,6 +1135,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
 
     makeDirPromise
         .done(function() {
+            var targets = Object.create(null);
 
             for (var i = u.length; i--;) {
                 var file = u[i];
@@ -1141,13 +1146,16 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
                 else if (paths[file.path]) {
                     file.target = paths[file.path];
                 }
-            }
 
-            dbfetch.get(target)
+                targets[file.target] = 1;
+            }
+            targets[target] = 1;
+
+            dbfetch.geta(Object.keys(targets))
                 .always(function(r) {
                     loadingDialog.hide();
 
-                    if (!M.c[target] && String(target).length !== 11) {
+                    if (!M.c[target] && String(target).length !== 11 && !onChat) {
                         if (d) {
                             ulmanager.logger.warn("Error dbfetch'ing target %s", target, r);
                         }

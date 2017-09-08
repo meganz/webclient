@@ -222,8 +222,8 @@
 .fm-dialog.limited-bandwidth-dialog.achievements {
     margin-top: -348px;
 }
-.fm-dialog.limited-bandwidth-dialog.hidden-bottom {
-    margin: -271px 0 0 -362px;
+.fm-dialog.limited-bandwidth-dialog.hidden-bottom, .logged .fm-dialog.limited-bandwidth-dialog:not(.achievements) {
+    margin-top: -271px;
 }
 .limited-bandwidth-dialog .registered, .limited-bandwidth-dialog.registered .not-registered, .limited-bandwidth-dialog .dialog.big-buttons-block .get-more-bonuses {
     display: none;
@@ -452,7 +452,7 @@
     -moz-border-radius-topright: 8px;
     border-top-right-radius: 8px;
 }
-.fm-dialog.hidden-bottom.hidden-bottom .fm-dialog-body.centered-content  {
+.fm-dialog.hidden-bottom .fm-dialog-body.centered-content, .logged .fm-dialog:not(.exceeded):not(.achievements) .fm-dialog-body.centered-content  {
     -webkit-border-botom-left-radus: 8px;
     -moz-border-radius-bottomleft: 8px;
     border-bottom-left-radius: 8px;

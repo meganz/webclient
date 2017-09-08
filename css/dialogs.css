@@ -216,7 +216,7 @@
 
 /* Limited available bandwidth dialog */
 .fm-dialog.limited-bandwidth-dialog {
-    min-width: 724px;
+    width: 724px;
     margin: -323px 0 0 -362px;
 }
 .fm-dialog.limited-bandwidth-dialog.hidden-bottom {
@@ -511,26 +511,26 @@
     color: #666666;
     padding: 28px 17px 28px 108px;
 }
-.not-logged .exceeded:not(.achievements) span.not-logged.no-achievements {
+.not-logged .limited-bandwidth-dialog:not(.achievements) span.not-logged.no-achievements {
     display: block;
 }
-.not-logged .exceeded.achievements span.not-logged.achievements {
+.not-logged .limited-bandwidth-dialog.achievements span.not-logged.achievements {
     display: block;
 }
-.logged .exceeded.achievements span.logged.achievements {
+.logged .limited-bandwidth-dialog.achievements span.logged.achievements {
     display: block;
 }
 .overquota-bott-buttons .default-big-button {
     display: none;
     margin-left: 9px;
 }
-.not-logged .exceeded:not(.achievements) .overquota-bott-buttons .default-big-button.create-account, .not-logged .exceeded .overquota-bott-buttons .default-big-button.login, .exceeded.achievements .overquota-bott-buttons .default-big-button.get-more-bonuses {
+.not-logged .limited-bandwidth-dialog:not(.achievements) .overquota-bott-buttons .default-big-button.create-account, .not-logged .exceeded .overquota-bott-buttons .default-big-button.login, .limited-bandwidth-dialog.achievements .overquota-bott-buttons .default-big-button.get-more-bonuses {
     display: inline-block;
 }
-.logged .exceeded.achievements .overquota-bott-buttons .default-big-button .not-registered {
+.logged .limited-bandwidth-dialog.achievements .overquota-bott-buttons .default-big-button .not-registered {
     display: none;
 }
-.logged .exceeded.achievements .overquota-bott-buttons .default-big-button .registered {
+.logged .limited-bandwidth-dialog.achievements .overquota-bott-buttons .default-big-button .registered {
     display: block;
 }
 .hidden-bottom .dialog.overquota-bott-bl, .dialog.overquota-bott-bl.hidden, .overquota-bott-buttons .default-big-button.hidden {

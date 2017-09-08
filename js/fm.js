@@ -1995,7 +1995,7 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     else {
         $('.fm-dialog.copy-dialog .share-dialog-permissions').addClass('hidden');
         $('.copy-dialog-button').removeClass('hidden');
-        $('.copy-operation-txt').text(l[63]);
+        $('.copy-operation-txt').text(buttonLabel === l[236] ? l[236] : l[63]);
     }
 
     $('.' + dialogPrefix + '-dialog .nw-fm-tree-item').removeClass('expanded active opened selected');
@@ -2856,7 +2856,7 @@ function closeDialog() {
         $('.fm-dialog.registration-page-success').addClass('hidden').removeClass('special');
     }
 
-    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
+    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true || $.dialog === 'download-pre-warning') {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
     }

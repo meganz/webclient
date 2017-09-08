@@ -4,6 +4,7 @@ var dl_import=false;
 var dl_attr;
 var fdl_queue_var=false;
 var fileSize;
+var dlResumeInfo;
 var maxDownloadSize = Math.pow(2, 53);
 
 var MOBILE_FILETYPES = {
@@ -148,8 +149,6 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
-            var resumeInfo;
-            var gotCompletedFile = false;
             var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
 
@@ -163,8 +162,8 @@ function dl_g(res) {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
                 $('#megaapp-download').prop('checked', false);
                 var $but = $('.download.big-button.download-file span');
-                if (resumeInfo) {
-                    if (resumeInfo.size === fdl_filesize) {
+                if (dlResumeInfo) {
+                    if (dlResumeInfo.byteLength === fdl_filesize) {
                         $but.text(l[776]);
                         $('.download.big-button.download-file i').removeClass('resume').addClass('save');
                     }
@@ -196,14 +195,14 @@ function dl_g(res) {
                 var sizeOnDisk = dlmanager.getFileSizeOnDisk(dlpage_ph, filename);
 
                 dlmanager.getResumeInfo(dlpage_ph, function(aResumeInfo) {
-                    resumeInfo = aResumeInfo;
+                    dlResumeInfo = aResumeInfo;
 
-                    if (resumeInfo) {
-                        maxDownloadSize += resumeInfo.byteOffset;
+                    if (dlResumeInfo) {
+                        maxDownloadSize += dlResumeInfo.byteOffset;
 
                         sizeOnDisk.always(function(size) {
-                            var perc = Math.floor(resumeInfo.byteOffset * 100 / fdl_filesize);
-                            resumeInfo.size = size;
+                            var perc = Math.floor(dlResumeInfo.byteOffset * 100 / fdl_filesize);
+                            dlResumeInfo.byteLength = size;
 
                             if (isPageRefresh) {
                                 if (d) {
@@ -211,11 +210,10 @@ function dl_g(res) {
                                 }
                             }
                             else if (size === fdl_filesize) {
-                                gotCompletedFile = true;
                                 onDownloadReady();
                             }
-                            else if (size === resumeInfo.byteOffset) {
-                                dlprogress(-0xbadf, perc, resumeInfo.byteOffset, fdl_filesize);
+                            else if (size === dlResumeInfo.byteOffset) {
+                                dlprogress(-0xbadf, perc, dlResumeInfo.byteOffset, fdl_filesize);
 
                                 if (perc > 60) {
                                     onIdle(browserDownload);
@@ -227,7 +225,8 @@ function dl_g(res) {
                                 $('.download.big-button.download-file i').removeClass('save').addClass('resume');
                             }
                             else {
-                                resumeInfo = null;
+                                dlResumeInfo = false;
+                                dlmanager.remResumeInfo(dlpage_ph);
                             }
                         });
                     }
@@ -282,12 +281,10 @@ function dl_g(res) {
                             }
                         });
                     }
-                    else if (gotCompletedFile) {
+                    else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
                         browserDownload();
                     }
                     else {
-                        var $this = $(this);
-                        $this.unbind('click');
 
                         watchdog.query('dling')
                             .always(function(res) {
@@ -304,9 +301,6 @@ function dl_g(res) {
                                             if (size === fdl_filesize) {
                                                 // another tab finished the download
                                                 onDownloadReady();
-
-                                                // rebind the save button
-                                                $this.rebind('click', browserDownload);
                                             }
                                             else {
                                                 browserDownload();
@@ -530,6 +524,10 @@ function browserDownload() {
 
         if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
             dlmanager.isDownloading = true;
+
+            if (dlResumeInfo) {
+                fdl_queue_var.byteOffset = dlResumeInfo.byteLength;
+            }
             dl_queue.push(fdl_queue_var);
         }
         $.dlhash = getSitePath();

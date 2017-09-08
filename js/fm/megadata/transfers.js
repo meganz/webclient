@@ -376,6 +376,8 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (uldl_hold) {
             fm_tfspause('zip_' + z);
         }
+
+        api_req({a: 'log', e: 99655, m: 'ZipIO Download started.'});
     }
 
     if (!preview) {
@@ -565,6 +567,8 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     if (z) {
         id = 'zip_' + z;
+
+        api_req({a: 'log', e: 99656, m: 'ZipIO Download completed.'});
     }
     else {
         id = 'dl_' + id;

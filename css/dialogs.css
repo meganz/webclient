@@ -219,6 +219,9 @@
     width: 724px;
     margin: -323px 0 0 -362px;
 }
+.fm-dialog.limited-bandwidth-dialog.achievements {
+    margin-top: -348px;
+}
 .fm-dialog.limited-bandwidth-dialog.hidden-bottom {
     margin: -271px 0 0 -362px;
 }

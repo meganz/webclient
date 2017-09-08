@@ -222,8 +222,8 @@
 .fm-dialog.limited-bandwidth-dialog.achievements {
     margin-top: -348px;
 }
-.fm-dialog.limited-bandwidth-dialog.hidden-bottom {
-    margin: -271px 0 0 -362px;
+.fm-dialog.limited-bandwidth-dialog.hidden-bottom, .logged .fm-dialog.limited-bandwidth-dialog:not(.achievements) {
+    margin-top: -271px;
 }
 .limited-bandwidth-dialog .registered, .limited-bandwidth-dialog.registered .not-registered, .limited-bandwidth-dialog .dialog.big-buttons-block .get-more-bonuses {
     display: none;

@@ -740,6 +740,10 @@ var dlmanager = {
             date = data[dl_id];
         }
 
+        if (typeof dlpage_ph === 'string' && dlpage_ph === dl_id) {
+            date = Date.now();
+        }
+
         return date;
     },
 
@@ -1193,13 +1197,10 @@ var dlmanager = {
 
         var self = this;
         var closeDialog = function() {
-            window.closeDialog();
-
             if ($.dialog === 'download-pre-warning') {
-                $.dialog = false;
-                fm_hideoverlay();
-                $dialog.addClass('hidden');
+                $.dialog = 'was-pre-warning';
             }
+            window.closeDialog();
         };
         var onclick = function onProClicked() {
             self.onOverQuotaProClicked = true;
@@ -1454,6 +1455,9 @@ var dlmanager = {
                 $('.continue, .continue-download', $dialog).unbind('click');
                 $('.upgrade, .reg-st3-membership-bl', $dialog).unbind('click');
                 $('.get-more-bonuses', $dialog).unbind('click');
+                if ($.dialog === 'download-pre-warning') {
+                    $.dialog = false;
+                }
                 closeDialog();
                 Soon(callback);
                 callback = $dialog = undefined;

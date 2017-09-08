@@ -2073,6 +2073,10 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
+        if (selectionManager) {
+            selectionManager.clear_selection();
+        }
+
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 6);
@@ -2080,6 +2084,9 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
+        if (selectionManager) {
+            selectionManager.clear_selection();
+        }
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 2);

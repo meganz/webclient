@@ -576,8 +576,10 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
 
     var node = megaRender.getDOMNode(aHandle, M.d[aHandle]);
 
-    if (selectionManager && selectionManager.selected_list) {
-        if (selectionManager.selected_list.indexOf(aHandle) > -1) {
+    var selList = selectionManager && selectionManager.selected_list ? selectionManager.selected_list : $.selected;
+
+    if (selList && selList.length) {
+        if (selList.indexOf(aHandle) > -1) {
             node.classList.add('ui-selected');
         }
         else {

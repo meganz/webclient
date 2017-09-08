@@ -500,7 +500,11 @@ scparser.$add('c', {
                 if ($.selected && ($.selected[0] === userHandle)) {
 
                     // was selected
+                    if (selectionManager) {
+                        selectionManager.clear_selection();
+                    }
                     $.selected = [];
+
                     if ($('.dropdown.body.files-menu').is(":visible")) {
                         $.hideContextMenu();
                     }

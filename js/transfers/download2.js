@@ -595,6 +595,7 @@ var dlmanager = {
     },
 
     dlGetUrl: function DM_dlGetUrl(dl, callback) {
+        'use strict';
 
         if (dl.byteOffset && dl.byteOffset === dl.size) {
             // Completed download.

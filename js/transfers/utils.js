@@ -63,6 +63,8 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
  * @param {Number} [lock] Lock the DOM node in the transfers panel.
  */
 function dlFatalError(dl, error, ethrow, lock) {
+    'use strict';
+
     var awaitingPromise = dl && dl.awaitingPromise;
 
     // Log the fatal error

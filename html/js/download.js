@@ -215,9 +215,6 @@ function dl_g(res) {
                             else if (size === dlResumeInfo.byteOffset) {
                                 dlprogress(-0xbadf, perc, dlResumeInfo.byteOffset, fdl_filesize);
 
-                                if (perc > 60) {
-                                    onIdle(browserDownload);
-                                }
                                 $('.progress-resume').removeClass('hidden');
                                 $('.download.state-text.save').addClass('hidden');
                                 $('.download.state-text.resume').removeClass('hidden');

@@ -22584,9 +22584,9 @@ table.speed-table {
     right: 0px !important;
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y,
-.megaList.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y{
+.megaList.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
     background-color: rgb(102, 102, 102) !important;
-    width: 8px;
+    width: 6px;
     opacity: 0.2;
     -webkit-transition: opacity 100ms ease-in-out;
     -moz-transition: opacity 100ms ease-in-out;
@@ -22594,6 +22594,17 @@ table.speed-table {
     -ms-transition: opacity 100ms ease-in-out;
     transition: opacity 100ms ease-in-out;
     cursor: pointer;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    right: 2px;
+}
+div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    height: 6px;
+    bottom: 2px;
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y,
 .megaList.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
@@ -22604,7 +22615,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: none;
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail {
-    right: 2px !important;
+    right: 0px !important;
 }
 .bp-main .jspPane {
     min-width: auto;

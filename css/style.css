@@ -5886,6 +5886,8 @@ th.grid-first-th {
 .own-data .data-item-icon {
     left: 3px;
     top: 2px;
+    position: absolute;
+    height: 20px;
 }
 .linked .data-item-icon, .taken-down.linked .data-item-icon, .undecryptable.nw-fm-tree-item .data-item-icon {
     display: block;

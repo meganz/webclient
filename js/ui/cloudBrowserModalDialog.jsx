@@ -7,7 +7,7 @@ var ModalDialogsUI = require('./modalDialogs.jsx');
 
 var BrowserCol = React.createClass({
     mixins: [MegaRenderMixin],
-    getDefaultProps() {
+    getDefaultProps: function() {
         return {
             'hideable': true
         }
@@ -33,7 +33,7 @@ var BrowserCol = React.createClass({
 });
 var BrowserEntries = React.createClass({
     mixins: [MegaRenderMixin],
-    getDefaultProps() {
+    getDefaultProps: function() {
         return {
             'hideable': true
         }
@@ -91,6 +91,26 @@ var BrowserEntries = React.createClass({
     setSelectedAndHighlighted: function(highlighted, cursor) {
         var self = this;
 
+        // highlighted requires to be sorted!
+        var currentViewOrderMap = {};
+        self.props.entries.forEach(function (v, k) {
+            currentViewOrderMap[v.h] = k;
+        });
+
+        highlighted.sort(function (a, b) {
+            var aa = currentViewOrderMap[a];
+            var bb = currentViewOrderMap[b];
+            if (aa < bb) {
+                return -1;
+            }
+            if (aa > bb) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+
         self.setState({'highlighted': highlighted, 'cursor': cursor});
         self.props.onHighlighted(highlighted);
 
@@ -98,6 +118,7 @@ var BrowserEntries = React.createClass({
             var node = M.getNodeByHandle(nodeId);
             return !self.props.folderSelectNotAllowed || (node && node.t === 0);
         });
+
 
         self.setState({'selected': selected});
         self.props.onSelected(selected);
@@ -113,8 +134,6 @@ var BrowserEntries = React.createClass({
 
 
         $(document.body).rebind('keydown.cloudBrowserModalDialog', function(e) {
-            window.asdf = self;
-
             var charTyped = false;
             var keyCode = e.which || e.keyCode;
             var selectionIncludeShift = e.shiftKey;
@@ -155,6 +174,7 @@ var BrowserEntries = React.createClass({
 
 
                 var targetIndex = currentIndex + dir;
+
                 while(
                         selectionIncludeShift &&
                         self.props.folderSelectNotAllowed &&
@@ -165,6 +185,16 @@ var BrowserEntries = React.createClass({
                     targetIndex = targetIndex + dir;
                     if (targetIndex < 0) {
                         return;
+                    }
+                }
+
+                if (targetIndex >= self.props.entries.length) {
+                    if (selectionIncludeShift) {
+                        // shift + select down after the last item in the list was selected? do nothing.
+                        return;
+                    }
+                    else {
+                        targetIndex = self.props.entries.length - 1;
                     }
                 }
 
@@ -187,30 +217,54 @@ var BrowserEntries = React.createClass({
                     var lastIndex;
                     if (targetIndex < currentIndex) {
                         // up
-                        firstIndex = targetIndex;
                         if (self.state.highlighted && self.state.highlighted.length > 0) {
                             // more items already selected..append to selection by altering last index
-                            lastIndex = self.getIndexByNodeId(
-                                self.state.highlighted[self.state.highlighted.length - 1],
-                                0
-                            );
+                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+                                // target is already selected, shrink selection
+                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+                                lastIndex = self.getIndexByNodeId(
+                                    self.state.highlighted[self.state.highlighted.length - 2],
+                                    self.state.highlighted.length - 2
+                                );
+                            }
+                            else {
+                                firstIndex = targetIndex;
+                                lastIndex = self.getIndexByNodeId(
+                                    self.state.highlighted[self.state.highlighted.length - 1],
+                                    -1
+                                );
+                            }
                         }
                         else {
+                            firstIndex = targetIndex;
                             lastIndex = currentIndex;
                         }
                     }
                     else {
                         // down
-
                         if (self.state.highlighted && self.state.highlighted.length > 0) {
-                            // more items already selected..append to selection by altering first index
-                            firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+                            // more items are already selected, alter current selection only
+                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+                                // target is already selected, shrink selection
+                                firstIndex = self.getIndexByNodeId(self.state.highlighted[1], 1);
+                                lastIndex = self.getIndexByNodeId(
+                                    self.state.highlighted[self.state.highlighted.length - 1],
+                                    self.state.highlighted.length - 1
+                                );
+                            }
+                            else {
+                                // more items already selected..append to selection by altering first index
+                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+                                lastIndex = targetIndex;
+
+                            }
                         }
                         else {
                             firstIndex = currentIndex;
+                            lastIndex = targetIndex;
+
                         }
 
-                        lastIndex = targetIndex;
                     }
 
                     highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
@@ -391,7 +445,7 @@ var BrowserEntries = React.createClass({
 
         if (node.t) {
             // expand folder
-            self.setState({'selected': [], 'highlighted': []});
+            self.setState({'selected': [], 'highlighted': [], 'cursor': false});
             self.props.onSelected([]);
             self.props.onHighlighted([]);
             self.props.onExpand(node);

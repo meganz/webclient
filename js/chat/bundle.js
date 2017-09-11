@@ -6078,7 +6078,6 @@ React.makeElement = React['createElement'];
 	            'hideable': true
 	        };
 	    },
-
 	    render: function render() {
 	        var self = this;
 
@@ -6111,7 +6110,6 @@ React.makeElement = React['createElement'];
 	            'hideable': true
 	        };
 	    },
-
 	    getInitialState: function getInitialState() {
 	        return {
 	            'highlighted': [],
@@ -6163,6 +6161,24 @@ React.makeElement = React['createElement'];
 	    setSelectedAndHighlighted: function setSelectedAndHighlighted(highlighted, cursor) {
 	        var self = this;
 
+	        var currentViewOrderMap = {};
+	        self.props.entries.forEach(function (v, k) {
+	            currentViewOrderMap[v.h] = k;
+	        });
+
+	        highlighted.sort(function (a, b) {
+	            var aa = currentViewOrderMap[a];
+	            var bb = currentViewOrderMap[b];
+	            if (aa < bb) {
+	                return -1;
+	            }
+	            if (aa > bb) {
+	                return 1;
+	            }
+
+	            return 0;
+	        });
+
 	        self.setState({ 'highlighted': highlighted, 'cursor': cursor });
 	        self.props.onHighlighted(highlighted);
 
@@ -6184,8 +6200,6 @@ React.makeElement = React['createElement'];
 	        var KEY_BACKSPACE = 8;
 
 	        $(document.body).rebind('keydown.cloudBrowserModalDialog', function (e) {
-	            window.asdf = self;
-
 	            var charTyped = false;
 	            var keyCode = e.which || e.keyCode;
 	            var selectionIncludeShift = e.shiftKey;
@@ -6223,10 +6237,20 @@ React.makeElement = React['createElement'];
 	                var currentIndex = self.getIndexByNodeId(lastHighlighted, -1);
 
 	                var targetIndex = currentIndex + dir;
+
 	                while (selectionIncludeShift && self.props.folderSelectNotAllowed && self.props.entries && self.props.entries[targetIndex] && self.props.entries[targetIndex].t === 1) {
 	                    targetIndex = targetIndex + dir;
 	                    if (targetIndex < 0) {
 	                        return;
+	                    }
+	                }
+
+	                if (targetIndex >= self.props.entries.length) {
+	                    if (selectionIncludeShift) {
+
+	                        return;
+	                    } else {
+	                        targetIndex = self.props.entries.length - 1;
 	                    }
 	                }
 
@@ -6245,23 +6269,37 @@ React.makeElement = React['createElement'];
 	                    var lastIndex;
 	                    if (targetIndex < currentIndex) {
 
-	                        firstIndex = targetIndex;
 	                        if (self.state.highlighted && self.state.highlighted.length > 0) {
 
-	                            lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], 0);
+	                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+
+	                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+	                                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 2], self.state.highlighted.length - 2);
+	                            } else {
+	                                firstIndex = targetIndex;
+	                                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], -1);
+	                            }
 	                        } else {
+	                            firstIndex = targetIndex;
 	                            lastIndex = currentIndex;
 	                        }
 	                    } else {
 
 	                        if (self.state.highlighted && self.state.highlighted.length > 0) {
 
-	                            firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+	                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+
+	                                firstIndex = self.getIndexByNodeId(self.state.highlighted[1], 1);
+	                                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], self.state.highlighted.length - 1);
+	                            } else {
+
+	                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+	                                lastIndex = targetIndex;
+	                            }
 	                        } else {
 	                            firstIndex = currentIndex;
+	                            lastIndex = targetIndex;
 	                        }
-
-	                        lastIndex = targetIndex;
 	                    }
 
 	                    highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
@@ -6420,7 +6458,7 @@ React.makeElement = React['createElement'];
 
 	        if (node.t) {
 
-	            self.setState({ 'selected': [], 'highlighted': [] });
+	            self.setState({ 'selected': [], 'highlighted': [], 'cursor': false });
 	            self.props.onSelected([]);
 	            self.props.onHighlighted([]);
 	            self.props.onExpand(node);

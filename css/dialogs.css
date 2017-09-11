@@ -1696,6 +1696,7 @@ li.token-input-token-invite .input-close {
 /* Password remider */
 .dropdown.body.pass-reminder {
     width: 560px;
+    z-index: 1120;
 }
 .dropdown.body.fm-dialog.pass-reminder {
     margin: 0;

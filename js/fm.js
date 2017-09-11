@@ -535,7 +535,7 @@ function addNewContact($addButton) {
 
             // Custom text message
             emailText = $textarea.val();
-            
+
             if (emailText === '') {
                 emailText = $textarea.attr('placeholder');
             }
@@ -1375,7 +1375,12 @@ function FMShortcuts() {
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
 
-        if (!is_fm()) {
+        if (
+            !is_fm() ||
+            !selectionManager ||
+            window.location.toString().indexOf('fm/account') !== -1 ||
+            window.location.toString().indexOf('fm/transfers') !== -1
+        ) {
             return true;
         }
 

@@ -194,6 +194,16 @@ var SelectionManager = function($selectable, resume) {
     };
 
     this.add_to_selection = function(nodeId, scrollTo, alreadySorted) {
+        if (!isString(nodeId)) {
+            if (nodeId && nodeId.h) {
+                noedId = nodeId.h;
+            }
+            else if (d) {
+                console.error(".add_to_selection received a non-string as nodeId");
+                return;
+            }
+        }
+
         if (this.selected_list.indexOf(nodeId) === -1) {
             this.selected_list.push(nodeId);
             $selectable = this._ensure_selectable_is_available();

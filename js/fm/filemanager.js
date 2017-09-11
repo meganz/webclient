@@ -331,8 +331,13 @@ FileManager.prototype.initFileManagerUI = function() {
 
         if ((a === 'drop') && dd) {
             if (t && M.d[t]) {
-                selectionManager.clear_selection();
-                selectionManager.set_currently_selected(t);
+                if (selectionManager) {
+                    selectionManager.clear_selection();
+                    selectionManager.set_currently_selected(t);
+                }
+                else {
+                    $.selected = [t];
+                }
             }
 
 
@@ -1260,6 +1265,14 @@ FileManager.prototype.initUIKeyEvents = function() {
             return false;
         }
 
+        var is_transfers_or_accounts = (
+            window.location.toString().indexOf('fm/account') !== -1 ||
+            window.location.toString().indexOf('fm/transfers') !== -1
+        );
+
+        // selection manager may not be available on empty folders.
+        var is_selection_manager_available = !!selectionManager;
+
         var sl = false;
         var s = [];
 
@@ -1293,7 +1306,13 @@ FileManager.prototype.initUIKeyEvents = function() {
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
          * other day :)
          */
-        if (!$.dialog && !slideshowid && M.viewmode == 1) {
+        if (
+            is_selection_manager_available &&
+            !is_transfers_or_accounts &&
+            !$.dialog &&
+            !slideshowid &&
+            M.viewmode == 1
+        ) {
             if (e.keyCode == 37) {
                 // left
                 selectionManager.select_prev(e.shiftKey, true);
@@ -1316,6 +1335,8 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
 
         if (
+            is_selection_manager_available &&
+            !is_transfers_or_accounts &&
             e.keyCode == 38 &&
             s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
@@ -1326,6 +1347,8 @@ FileManager.prototype.initUIKeyEvents = function() {
             quickFinder.disable_if_active();
         }
         else if (
+            is_selection_manager_available &&
+            !is_transfers_or_accounts &&
             e.keyCode == 40 &&
             s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
@@ -1335,12 +1358,22 @@ FileManager.prototype.initUIKeyEvents = function() {
             selectionManager.select_next(e.shiftKey, true);
             quickFinder.disable_if_active();
         }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
+        else if (
+            !is_transfers_or_accounts &&
+            e.keyCode == 46 &&
+            s.length > 0 &&
+            !$.dialog &&
+            M.getNodeRights(M.currentdirid) > 1
+        ) {
             // delete
             fmremove();
         }
-        else if ((e.keyCode === 46) && (selPanel.length > 0)
-            && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
+        else if (
+            (e.keyCode === 46) &&
+            (selPanel.length > 0) &&
+            !$.dialog &&
+            M.getNodeRights(M.currentdirid) > 1
+        ) {
             msgDialog('confirmation', l[1003], "Cancel " + s.length + " transferences?", false, function(e) {
 
                 // we should encapsule the click handler
@@ -1351,6 +1384,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             });
         }
         else if (
+            !is_transfers_or_accounts &&
             e.keyCode == 13
             && s.length > 0
             && !$.dialog
@@ -1414,11 +1448,21 @@ FileManager.prototype.initUIKeyEvents = function() {
                 $.warningCallback(true);
             }
         }
-        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
+        else if (
+            !is_transfers_or_accounts &&
+            (e.keyCode === 113 /* F2 */) &&
+            (s.length > 0) &&
+            !$.dialog && M.getNodeRights(M.currentdirid) > 1
+        ) {
             renameDialog();
         }
-        else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
-            if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+        else if (
+            is_selection_manager_available &&
+            e.keyCode == 65 &&
+            e.ctrlKey &&
+            !$.dialog
+        ) {
+            if (is_transfers_or_accounts || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return;
             }
             // ctrl+a/cmd+a - select all

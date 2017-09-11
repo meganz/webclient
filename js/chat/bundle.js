@@ -6492,7 +6492,8 @@ React.makeElement = React['createElement'];
 
 	            var icon = React.makeElement(
 	                "span",
-	                { className: "transfer-filetype-icon " + fileIcon(node) },
+	                {
+	                    className: "transfer-filetype-icon " + (isFolder ? " folder " : "") + fileIcon(node) },
 	                " "
 	            );
 

@@ -478,7 +478,8 @@ var BrowserEntries = React.createClass({
 
             var tooltipElement = null;
 
-            var icon = <span className={"transfer-filetype-icon " + fileIcon(node)}> </span>;
+            var icon = <span
+                className={"transfer-filetype-icon " + (isFolder ? " folder " : "") + fileIcon(node)}> </span>;
 
             if (fileIcon(node) === "graphic" && node.fa) {
                 var src = thumbnails[node.h];

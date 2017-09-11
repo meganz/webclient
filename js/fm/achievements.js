@@ -435,24 +435,28 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
     maf = ach = undefined;
 
     // Show dialog
-    M.safeShowDialog('achievements', $dialog);
+    M.safeShowDialog('achievements', function() {
+        $dialog.removeClass('hidden');
 
-    // Init scroll
-    $contentBlock = $dialog.find('.achievements-list');
+        // Init scroll
+        $contentBlock = $dialog.find('.achievements-list');
 
-    if ($dialog.outerHeight() > bodyHeight) {
-        $scrollBlock.css('max-height', bodyHeight - 60);
-        $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    }
-    else if ($contentBlock.outerHeight() > 666) {
-        $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    }
-    else {
-        deleteScrollPanel($scrollBlock, 'jsp');
-    }
+        if ($dialog.outerHeight() > bodyHeight) {
+            $scrollBlock.css('max-height', bodyHeight - 60);
+            $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+        }
+        else if ($contentBlock.outerHeight() > 666) {
+            $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+        }
+        else {
+            deleteScrollPanel($scrollBlock, 'jsp');
+        }
 
-    // Dialog aligment
-    $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
+        // Dialog aligment
+        $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
+
+        return $dialog;
+    });
 };
 
 /**

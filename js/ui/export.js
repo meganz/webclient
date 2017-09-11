@@ -1358,6 +1358,8 @@ var exportExpiry = {
                     $('.file-link-info').select();
                 });
             }, 300);
+
+            return $linksDialog;
         });
 
         // Setup toast notification

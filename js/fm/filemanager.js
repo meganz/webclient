@@ -933,22 +933,31 @@ FileManager.prototype.initContextUI = function() {
 
     // Move Dialog
     $(c + '.advanced-item, ' + c + '.move-item').rebind('click', function() {
+        M.safeShowDialog('move', function() {
+            var $dialog = $('.fm-dialog.move-dialog');
 
-        $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-        $.mcselected = M.RootID;
-        $('.move-dialog').removeClass('hidden');
-        handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
-        M.disableCircularTargets('#mctreea_');
-        fm_showoverlay();
+            $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
+            $.mcselected = M.RootID;
+
+            $dialog.removeClass('hidden');
+            handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
+            M.disableCircularTargets('#mctreea_');
+
+            return $dialog;
+        });
     });
 
     $(c + '.copy-item').rebind('click', function() {
+        M.safeShowDialog('copy', function() {
+            var $dialog = $('.fm-dialog.copy-dialog');
 
-        $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
-        $.mcselected = M.RootID;
-        $('.copy-dialog').removeClass('hidden');
-        handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
-        fm_showoverlay();
+            $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
+            $.mcselected = M.RootID;
+            $dialog.removeClass('hidden');
+            handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
+
+            return $dialog;
+        });
     });
 
     $(c + '.import-item').rebind('click', function() {
@@ -1797,14 +1806,18 @@ FileManager.prototype.addContactUI = function() {
         });
 
         $('.fm-share-folders').rebind('click', function() {
-            $('.copy-dialog').removeClass('hidden');
+            M.safeShowDialog('copy', function() {
+                var $dialog = $('.fm-dialog.copy-dialog');
+                $dialog.removeClass('hidden');
 
-            $.copyDialog = 'copy';
-            $.mcselected = undefined;
-            $.copyToShare = true;
+                $.copyDialog = 'copy';
+                $.mcselected = undefined;
+                $.copyToShare = true;
 
-            handleDialogContent('cloud-drive', 'ul', true, 'copy', l[1344]);
-            fm_showoverlay();
+                handleDialogContent('cloud-drive', 'ul', true, 'copy', l[1344]);
+
+                return $dialog;
+            });
         });
 
         // Remove contact button on contacts page
@@ -3055,14 +3068,25 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
     var _cdialogq = Object.create(null);
 
+    // Define what dialogs can be opened from other dialogs
+    var diagInheritance = {
+        properties: ['links', 'rename', 'copyrights', 'copy', 'move'],
+        copy: ['createfolder'],
+        move: ['createfolder']
+    };
+
     var _openDialog = function(name, dsp) {
         onIdle(function() {
             if (typeof $.dialog === 'string') {
-                _cdialogq[name] = dsp;
+
+                // There are a few dialogs that can be opened from others, deal it.
+                if (!diagInheritance[$.dialog] || diagInheritance[$.dialog].indexOf(name) < 0) {
+                    _cdialogq[name] = dsp;
+                    return;
+                }
             }
-            else {
-                dsp();
-            }
+
+            dsp();
         });
     };
 
@@ -3088,21 +3112,30 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
         dispatcher = (function(name, dsp) {
             return tryCatch(function() {
+                var $dialog;
+
                 if (d) {
                     console.warn('Dispatching queued dialog.', name);
                 }
+
                 if (typeof dsp === 'function') {
-                    dsp();
+                    $dialog = dsp();
                 }
                 else {
-                    var $dialog = $(dsp);
+                    $dialog = $(dsp);
+                }
 
+                if ($dialog) {
                     if (!$dialog.hasClass('fm-dialog')) {
                         throw new Error('Unexpected dialog type...');
                     }
 
+                    // arrange to back any non-controlled dialogs,
+                    // this class will be removed on the next closeDialog()
+                    $('.fm-dialog').addClass('arrange-to-back');
+
                     fm_showoverlay();
-                    $dialog.removeClass('hidden');
+                    $dialog.removeClass('hidden arrange-to-back');
                 }
                 $.dialog = String(name);
             }, function(ex) {

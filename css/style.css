@@ -5799,7 +5799,7 @@ th.grid-first-th {
 .grid-table.vouchers td:first-child {
     padding-left: 12px;
 }
-.grid-status-icon, .file-status-icon, .contact-status-icon, .data-item-icon {
+.grid-status-icon, .file-status-icon.star, .contact-status-icon, .linked .data-item-icon {
     height: 24px;
     width: 25px;
     display: block;
@@ -5811,22 +5811,19 @@ th.grid-first-th {
 .grid-status-icon {
     background-position: -8px -4882px;
 }
-.file-status-icon {
-    background-position: -13px -4884px;
-}
 .file-status-icon.star {
     background-position: -13px -4790px;
 }
 .data-block-view .file-status-icon.star {
-    background-position: -13px -4792px;
+    background-position: -9px -4790px;
 }
 .video .file-status-icon {
     background-position: -13px -4994px;
 }
 .data-block-view .video .file-status-icon.star {
-    background-position: -13px -5022px;
+    background-position: -9px -5020px;
 }
-.data-block-view .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .data-item-icon {
+.contact-status-icon, .properties-body .file-status-icon, .nw-fm-tree-item .data-item-icon {
     position: absolute;
     left: 2px;
     top: 2px;
@@ -5834,19 +5831,23 @@ th.grid-first-th {
     z-index: 10;
     width: 20px;
 }
-.data-item-icon {
+.nw-fm-tree-item .data-item-icon {
+    top: 2px;
+    right: 9px;
     left: auto;
-    right: 2px;
-    display: none;
 }
-.data-block-bg.thumb .file-status-icon:not(.star) {
-    display: none;
+.data-block-view .file-status-icon.star, .data-block-view.linked .data-item-icon {
+    float: left;
+    width: 28px;
 }
 .linked .data-item-icon {
     background-position: -13px -4824px;
 }
+.data-block-view.linked .data-item-icon {
+    background-position: -9px -4822px;
+}
 .linked .video .data-item-icon {
-    background-position: -13px -5054px;
+    background-position: -9px -5052px;
 }
 .nw-fm-tree-item.selected.linked .data-item-icon, .nw-fm-tree-item.dragover.linked .data-item-icon, .nw-fm-tree-item.linked:hover .data-item-icon {
     background-position: -13px -4964px;
@@ -5858,7 +5859,7 @@ th.grid-first-th {
     background-position: -8px -4934px;
 }
 .taken-down .file-status-icon, .taken-down .file-status-icon.star {
-    background-position: -13px -4936px;
+    background-position: -9px -4934px;
 }
 .undecryptable.nw-fm-tree-item .data-item-icon {
     background-position: -15px -2639px;
@@ -5868,7 +5869,7 @@ th.grid-first-th {
     background-position: -9px -2637px;
 }
 .undecryptable .file-status-icon, .undecryptable .file-status-icon.star {
-    background-position: -14px -2639px;
+    background-position: -10px -2637px;
 }
 .grid-table .taken-down td, .taken-down .file-block-title, .taken-down .nw-fm-tree-folder, .taken-down .tranfer-filetype-txt, .taken-down .propreties-dark-txt {
     color: #D90007;

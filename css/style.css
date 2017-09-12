@@ -5799,7 +5799,7 @@ th.grid-first-th {
 .grid-table.vouchers td:first-child {
     padding-left: 12px;
 }
-.grid-status-icon, .file-status-icon.star, .contact-status-icon, .linked .data-item-icon, .taken-down .file-status-icon, .undecryptable .data-item-icon {
+.grid-status-icon, .file-status-icon.star, .contact-status-icon, .linked .data-item-icon, .taken-down .file-status-icon, .undecryptable .file-status-icon {
     height: 24px;
     width: 25px;
     display: block;

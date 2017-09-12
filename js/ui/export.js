@@ -1321,9 +1321,7 @@ var exportExpiry = {
         deleteScrollPanel(scroll, 'jsp');
 
         if (close) {
-            $.dialog = false;
-            fm_hideoverlay();
-            $linksDialog.addClass('hidden');
+            closeDialog();
             $('.export-links-warning').addClass('hidden');
             if (window.onCopyEventHandler) {
                 document.removeEventListener('copy', window.onCopyEventHandler, false);
@@ -1331,8 +1329,6 @@ var exportExpiry = {
             }
             return true;
         }
-
-        $.dialog = 'links';
 
         $linksDialog.addClass('file-keys-view');
 
@@ -1347,21 +1343,24 @@ var exportExpiry = {
         $linkButtons.removeClass('selected');
         $linksDialog.find('.link-handle-and-key').addClass('selected');
 
-        fm_showoverlay();
+        M.safeShowDialog('links', function() {
+            fm_showoverlay();
+            $linksDialog.removeClass('hidden');
+            $('.export-links-warning').removeClass('hidden');
 
-        $linksDialog.removeClass('hidden');
-        $('.export-links-warning').removeClass('hidden');
+            $(scroll).jScrollPane({showArrows: true, arrowSize: 5});
+            jScrollFade(scroll);
 
-        $(scroll).jScrollPane({ showArrows: true, arrowSize: 5 });
-        jScrollFade(scroll);
+            $linksDialog.css('margin-top', $linksDialog.outerHeight() / 2 * -1);
 
-        $linksDialog.css('margin-top', ($linksDialog.outerHeight() / 2) * -1);
+            setTimeout(function() {
+                $('.file-link-info').rebind('click', function() {
+                    $('.file-link-info').select();
+                });
+            }, 300);
 
-        setTimeout(function() {
-            $('.file-link-info').rebind('click', function() {
-                $('.file-link-info').select();
-            });
-        }, 300);
+            return $linksDialog;
+        });
 
         // Setup toast notification
         toastTxt = l[7654];

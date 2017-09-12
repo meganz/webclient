@@ -535,7 +535,7 @@ function addNewContact($addButton) {
 
             // Custom text message
             emailText = $textarea.val();
-            
+
             if (emailText === '') {
                 emailText = $textarea.attr('placeholder');
             }
@@ -1281,18 +1281,18 @@ function handleResetSuccessDialogs(dialog, txt, dlgString) {
     $.dialog = dlgString;
 }
 
-function avatarDialog(close)
-{
-    if (close)
-    {
-        $.dialog = false;
-        $('.avatar-dialog').addClass('hidden');
-        fm_hideoverlay();
+function avatarDialog(close) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.avatar-dialog');
+
+    if (close) {
+        closeDialog();
         return true;
     }
-    $.dialog = 'avatar';
-    $('.fm-dialog.avatar-dialog').removeClass('hidden');
-    fm_showoverlay();
+
+    M.safeShowDialog('avatar', $dialog);
+
     $('.avatar-body').safeHTML(
         '<div id="avatarcrop">' +
             '<div class="image-upload-and-crop-container">' +
@@ -1486,42 +1486,45 @@ function renameDialog() {
     "use strict";
 
     if ($.selected.length > 0) {
-        $.dialog = 'rename';
-        $('.rename-dialog').removeClass('hidden');
-        $('.rename-dialog').addClass('active');
-        fm_showoverlay();
+        var n = M.d[$.selected[0]] || false;
+        var ext = fileext(n.name);
+        var $dialog = $('.fm-dialog.rename-dialog');
+        var $input = $('input', $dialog);
 
-        $('.rename-dialog .fm-dialog-close, .rename-dialog-button.cancel').rebind('click', function() {
-            $.dialog = false;
-            $('.rename-dialog').addClass('hidden');
-            fm_hideoverlay();
+        M.safeShowDialog('rename', function() {
+            $dialog.removeClass('hidden').addClass('active');
+            $input.focus();
+            return $dialog;
         });
 
+        $('.fm-dialog-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
+
         $('.rename-dialog-button.rename').rebind('click', function() {
-            if ($('.rename-dialog').hasClass('active')) {
-                doRename();
+            if ($dialog.hasClass('active')) {
+                var value = $input.val();
+
+                if (value && n.name && value !== n.name) {
+                    M.rename(n.h, value);
+                }
+
+                closeDialog();
             }
         });
 
-        var n = M.d[$.selected[0]];
-        if (n.t) {
-            $('.rename-dialog .fm-dialog-title').text(l[425]);
-        }
-        else {
-            $('.rename-dialog .fm-dialog-title').text(l[426]);
-        }
+        $('.fm-dialog-title', $dialog).text(n.t ? l[425] : l[426]);
+        $input.val(n.name);
 
-        $('.rename-dialog input').val(n.name);
-        var ext = fileext(n.name);
-        $('.rename-dialog .transfer-filetype-icon').attr('class', 'transfer-filetype-icon ' + fileIcon(n));
+        $('.transfer-filetype-icon', $dialog)
+            .attr('class', 'transfer-filetype-icon ' + fileIcon(n));
+
         if (!n.t && ext.length > 0) {
-            $('.rename-dialog input')[0].selectionStart = 0;
-            $('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
+            $input[0].selectionStart = 0;
+            $input[0].selectionEnd = $input.val().length - ext.length - 1;
         }
 
-        $('.rename-dialog input').rebind('focus', function() {
+        $input.rebind('focus', function() {
             var selEnd;
-            $(this).closest('.rename-dialog').addClass('focused');
+            $dialog.addClass('focused');
             var d = $(this).val().lastIndexOf('.');
             if (d > -1) {
                 selEnd = d;
@@ -1533,20 +1536,18 @@ function renameDialog() {
             $(this)[0].selectionEnd = selEnd;
         });
 
-        $('.rename-dialog input').rebind('blur', function() {
-            $(this).closest('.rename-dialog').removeClass('focused');
+        $input.rebind('blur', function() {
+            $dialog.removeClass('focused');
         });
 
-        $('.rename-dialog input').unbind('click keydown keyup keypress');
-        $('.rename-dialog input').focus();
-        $('.rename-dialog input').bind('click keydown keyup keypress', function(e) {
-            var n = M.d[$.selected[0]],
-                ext = fileext(n.name);
-            if ($(this).val() == '' || (!n.t && ext.length > 0 && $(this).val() == '.' + ext)) {
-                $('.rename-dialog').removeClass('active');
+        $input.rebind('click keydown keyup keypress', function() {
+            var value = $(this).val();
+
+            if (!value || (!n.t && ext.length > 0 && value === '.' + ext)) {
+                $dialog.removeClass('active');
             }
             else {
-                $('.rename-dialog').addClass('active');
+                $dialog.addClass('active');
             }
             /*if (!n.t && ext.length > 0) {
                 if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {
@@ -1562,30 +1563,6 @@ function renameDialog() {
                 }
             }*/
         });
-    }
-}
-
-/* @type {function} doRename
- *
- * On context menu rename
- */
-function doRename() {
-    "use strict";
-
-    var itemName = $('.rename-dialog input').val();
-    var handle = $.selected[0];
-    var nodeData = M.d[handle];
-
-    if (itemName !== '') {
-        if (nodeData) {
-            if (nodeData && (itemName !== nodeData.name)) {
-                M.rename(handle, itemName);
-            }
-        }
-
-        $.dialog = false;
-        $('.rename-dialog').addClass('hidden');
-        fm_hideoverlay();
     }
 }
 
@@ -1995,7 +1972,7 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     else {
         $('.fm-dialog.copy-dialog .share-dialog-permissions').addClass('hidden');
         $('.copy-dialog-button').removeClass('hidden');
-        $('.copy-operation-txt').text(l[63]);
+        $('.copy-operation-txt').text(buttonLabel === l[236] ? l[236] : l[63]);
     }
 
     $('.' + dialogPrefix + '-dialog .nw-fm-tree-item').removeClass('expanded active opened selected');
@@ -2454,15 +2431,24 @@ function initShareDialogMultiInputPlugin() {
  * @param {Array} nodesToProcess Array of strings, node ids
  */
 function initCopyrightsDialog(nodesToProcess) {
+    'use strict';
 
     $.itemExport = nodesToProcess;
+
+    var openGetLinkDialog = function() {
+        var exportLink = new mega.Share.ExportLink({
+            'showExportLinkDialog': true,
+            'updateUI': true,
+            'nodesToProcess': nodesToProcess
+        });
+        exportLink.getExportLink();
+    };
+
     // If they've already agreed to the copyright warning this session
     if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
 
         // Go straight to Get Link dialog
-        var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
-        exportLink.getExportLink();
-
+        openGetLinkDialog();
         return false;
     }
 
@@ -2470,32 +2456,27 @@ function initCopyrightsDialog(nodesToProcess) {
     var $copyrightDialog = $('.copyrights-dialog');
 
     // Otherwise show the copyright warning dialog
-    fm_showoverlay();
-    $.copyrightsDialog = 'copyrights';
-    $copyrightDialog.show();
+    M.safeShowDialog('copyrights', function() {
+        $.copyrightsDialog = 'copyrights';
+        return $copyrightDialog;
+    });
 
     // Init click handler for 'I agree' / 'I disagree' buttons
     $copyrightDialog.find('.default-white-button').rebind('click', function() {
+        closeDialog();
 
         // User disagrees with copyright warning
-        if ($(this).hasClass('cancel')) {
-            closeDialog();
-        }
-        else {
+        if (!$(this).hasClass('cancel')) {
             // User agrees, store flag in localStorage so they don't see it again for this session
             localStorage.setItem('agreedToCopyrightWarning', '1');
 
             // Go straight to Get Link dialog
-            closeDialog();
-            var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
-            exportLink.getExportLink();
+            openGetLinkDialog();
         }
     });
 
     // Init click handler for 'Close' button
-    $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
-        closeDialog();
-    });
+    $copyrightDialog.find('.fm-dialog-close').rebind('click', closeDialog);
 }
 
 function initShareDialog() {
@@ -2856,7 +2837,7 @@ function closeDialog() {
         $('.fm-dialog.registration-page-success').addClass('hidden').removeClass('special');
     }
 
-    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
+    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true || $.dialog === 'download-pre-warning') {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
     }
@@ -2874,20 +2855,18 @@ function closeDialog() {
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
     else if (($.dialog === 'slideshow') && $.copyrightsDialog) {
-        $('.copyrights-dialog').hide();
+        $('.copyrights-dialog').addClass('hidden');
 
         delete $.copyrightsDialog;
     }
     else {
         if ($.dialog === 'properties') {
-            propertiesDialog(1);
+            propertiesDialog(2);
         }
         else {
             fm_hideoverlay();
         }
-        if (!$.propertiesDialog) {
-            $('.fm-dialog').addClass('hidden');
-        }
+        $('.fm-dialog' + ($.propertiesDialog ? ':not(.properties-dialog)' : '')).addClass('hidden');
         $('.dialog-content-block').empty();
 
         // add contact popup
@@ -2907,7 +2886,7 @@ function closeDialog() {
         closeImportContactNotification('.share-dialog');
         closeImportContactNotification('.add-user-popup');
 
-        $('.copyrights-dialog').hide();
+        $('.copyrights-dialog').addClass('hidden');
         $('.export-link-dropdown').hide();
 
         delete $.copyDialog;
@@ -2924,6 +2903,21 @@ function closeDialog() {
 
     delete $.dialog;
     delete $.mcImport;
+
+    if ($.propertiesDialog) {
+        // if the dialog was close from the properties dialog
+        $.dialog = $.propertiesDialog;
+    }
+
+    if ($.copyDialog || $.moveDialog) {
+        // the createfolder dialog was closed
+        $.dialog = $.copyDialog || $.moveDialog;
+
+        $('.fm-dialog').addClass('arrange-to-back');
+        $('.fm-dialog.' + $.dialog + '-dialog').removeClass('arrange-to-back');
+    }
+
+    mBroadcaster.sendMessage('closedialog');
 }
 
 function copyDialog() {
@@ -3641,42 +3635,40 @@ function refreshDialogContent() {
 function createFolderDialog(close) {
     "use strict";
 
-    $.dialog = 'createfolder';
+    var $dialog = $('.fm-dialog.create-folder-dialog');
+    var $input = $('input', $dialog);
+
     if (close) {
-        $.dialog = false;
         if ($.cftarget) {
             delete $.cftarget;
         }
-        if (!($.copyDialog || $.moveDialog)) {
-            fm_hideoverlay();
-        }
-        $('.fm-dialog').removeClass('arrange-to-back');
-        $('.fm-dialog.create-folder-dialog').addClass('hidden');
-
+        $input.val('');
+        closeDialog();
         return true;
     }
 
-    $('.create-folder-dialog input').rebind('focus', function() {
+
+    $input.rebind('focus', function() {
         if ($(this).val() === l[157]) {
-            $('.create-folder-dialog input').val('');
+            $input.val('');
         }
-        $('.create-folder-dialog').addClass('focused');
+        $dialog.addClass('focused');
     });
 
-    $('.create-folder-dialog input').rebind('blur', function() {
-        $('.create-folder-dialog').removeClass('focused');
+    $input.rebind('blur', function() {
+        $dialog.removeClass('focused');
     });
 
-    $('.create-folder-dialog input').rebind('keyup', function() {
-        if ($('.create-folder-dialog input').val() === '' || $('.create-folder-dialog input').val() === l[157]) {
-            $('.create-folder-dialog').removeClass('active');
+    $input.rebind('keyup', function() {
+        if ($input.val() === '' || $input.val() === l[157]) {
+            $dialog.removeClass('active');
         }
         else {
-            $('.create-folder-dialog').addClass('active');
+            $dialog.addClass('active');
         }
     });
 
-    $('.create-folder-dialog input').rebind('keypress', function(e) {
+    $input.rebind('keypress', function(e) {
 
         if (e.which === 13 && $(this).val() !== '') {
             if (!$.cftarget) {
@@ -3687,20 +3679,15 @@ function createFolderDialog(close) {
         }
     });
 
-    $('.create-folder-dialog .fm-dialog-close, .create-folder-dialog .create-folder-button-cancel').rebind('click', function() {
-        createFolderDialog(1);
-        $('.fm-dialog').removeClass('arrange-to-back');
-        $('.create-folder-dialog input').val('');
-    });
+    $('.fm-dialog-close, .create-folder-button-cancel', $dialog).rebind('click', createFolderDialog);
 
     $('.fm-dialog-input-clear').rebind('click', function() {
-        $('.create-folder-dialog input').val('');
-        $('.create-folder-dialog').removeClass('active');
+        $input.val('');
+        $dialog.removeClass('active');
     });
 
     $('.fm-dialog-new-folder-button').rebind('click', function() {
-
-        var v = $('.create-folder-dialog input').val();
+        var v = $input.val();
 
         if (v === '' || v === l[157]) {
             alert(l[1024]);
@@ -3712,28 +3699,28 @@ function createFolderDialog(close) {
             M.createFolder($.cftarget, v);
             createFolderDialog(1);
         }
-        $('.create-folder-dialog input').val('');
+        $input.val('');
     });
 
-    fm_showoverlay();
-
-    $('.fm-dialog.create-folder-dialog').removeClass('hidden');
-    $('.create-folder-input-bl input').focus();
-    $('.create-folder-dialog').removeClass('active');
+    M.safeShowDialog('createfolder', function() {
+        $dialog.removeClass('hidden');
+        $('.create-folder-input-bl input').focus();
+        $dialog.removeClass('active');
+        return $dialog;
+    });
 }
 
-function chromeDialog(close)
-{
-    if (close)
-    {
-        $.dialog = false;
-        fm_hideoverlay();
-        $('.fm-dialog.chrome-dialog').addClass('hidden');
+function chromeDialog(close) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.chrome-dialog');
+
+    if (close) {
+        closeDialog();
         return true;
     }
-    fm_showoverlay();
-    $('.fm-dialog.chrome-dialog').removeClass('hidden');
-    $.dialog = 'chrome';
+    M.safeShowDialog('chrome', $dialog);
+
     $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').rebind('click', function()
     {
         chromeDialog(1);
@@ -3767,14 +3754,10 @@ function megaSyncDialog() {
     var $dialog = $('.fm-dialog.download-megasync-dialog');
 
     // Show the dialog and overlay
-    $dialog.removeClass('hidden');
-    fm_showoverlay();
+    M.safeShowDialog('download-megasync-dialog', $dialog);
 
     // Add close button handler
-    $dialog.find('.fm-dialog-close, .close-button').rebind('click', function() {
-        $dialog.addClass('hidden');
-        fm_hideoverlay();
-    });
+    $dialog.find('.fm-dialog-close, .close-button').rebind('click', closeDialog);
 
     // Add checkbox handling
     $dialog.find('#megasync-checkbox').rebind('click', function() {
@@ -3848,16 +3831,19 @@ function firefoxDialog(close) {
 }
 
 function browserDialog(close) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.browsers-dialog');
+
     if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $('.fm-dialog.browsers-dialog').addClass('hidden');
+        closeDialog();
         return true;
     }
-    $.browserDialog = 1;
-    $.dialog = 'browser';
-    fm_showoverlay();
-    $('.fm-dialog.browsers-dialog').removeClass('hidden');
+
+    M.safeShowDialog('browser', function() {
+        $.browserDialog = 1;
+        return $dialog;
+    });
 
     $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').rebind('click', function() {
         browserDialog(1);
@@ -3944,7 +3930,7 @@ function propertiesDialog(close) {
     "use strict";
 
     if (close) {
-        _propertiesDialog(1);
+        _propertiesDialog(close);
     }
     else {
         var shares = [];
@@ -3970,6 +3956,8 @@ function propertiesDialog(close) {
 function _propertiesDialog(close) {
     "use strict";
 
+    var $dialog = $('.fm-dialog.properties-dialog');
+
     /**
      * fillPropertiesContactList, Handles node properties/info dialog contact list content
      *
@@ -3979,7 +3967,7 @@ function _propertiesDialog(close) {
 
         var MAX_CONTACTS = 5;
         var shareUsersHtml = '';
-        var $shareUsers = pd.find('.properties-body .properties-context-menu')
+        var $shareUsers = $dialog.find('.properties-body .properties-context-menu')
                         .empty()
                         .append('<div class="properties-context-arrow"></div>');
 
@@ -4007,16 +3995,17 @@ function _propertiesDialog(close) {
         }
     };// END of fillPropertiesContactList function
 
-    var pd = $('.fm-dialog.properties-dialog');
-
     $(document).unbind('MegaNodeRename.Properties');
     $(document).unbind('MegaCloseDialog.Properties');
 
     if (close) {
-        $.dialog = false;
         delete $.propertiesDialog;
-        fm_hideoverlay();
-        pd.addClass('hidden');
+        if (close !== 2) {
+            closeDialog();
+        }
+        else {
+            fm_hideoverlay();
+        }
         $('.contact-list-icon').removeClass('active');
         $('.properties-context-menu').fadeOut(200);
         $.hideContextMenu();
@@ -4027,11 +4016,8 @@ function _propertiesDialog(close) {
         return true;
     }
 
-    $.propertiesDialog = $.dialog = 'properties';
-    fm_showoverlay();
-
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me');
-    pd.removeClass('read-only read-and-write full-access taken-down undecryptable');
+    $dialog.removeClass('multiple folders-only two-elements shared shared-with-me');
+    $dialog.removeClass('read-only read-and-write full-access taken-down undecryptable');
     $('.properties-elements-counter span').text('');
 
     var users = null;
@@ -4058,6 +4044,11 @@ function _propertiesDialog(close) {
         return propertiesDialog(1);
     }
 
+    M.safeShowDialog('properties', function() {
+        $.propertiesDialog = 'properties';
+        return $dialog;
+    });
+
     var exportLink = new mega.Share.ExportLink({});
     var isTakenDown = exportLink.isTakenDown($.selected);
     var isUndecrypted = missingkeys[$.selected[0].h];
@@ -4065,11 +4056,11 @@ function _propertiesDialog(close) {
 
     if (isTakenDown || isUndecrypted) {
         if (isTakenDown) {
-            pd.addClass('taken-down');
+            $dialog.addClass('taken-down');
             notificationText = l[7703] + '\n';
         }
         if (isUndecrypted) {
-            pd.addClass('undecryptable');
+            $dialog.addClass('undecryptable');
 
             if ($.selected[0].t) {// folder
                 notificationText += l[8595];
@@ -4084,10 +4075,10 @@ function _propertiesDialog(close) {
     var star = '';
     if (n.fav)
         star = ' star';
-    pd.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
+    $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
 
     if (fileIcon(n).indexOf('shared') > -1) {
-        pd.addClass('shared');
+        $dialog.addClass('shared');
     }
 
     if (typeof n.r === "number") {
@@ -4099,7 +4090,7 @@ function _propertiesDialog(close) {
         else if (n.r === 2) {
             zclass = "full-access";
         }
-        pd.addClass('shared shared-with-me ' + zclass);
+        $dialog.addClass('shared shared-with-me ' + zclass);
     }
 
     var p = {}, user = Object(M.d[n.su || n.p]);
@@ -4152,7 +4143,7 @@ function _propertiesDialog(close) {
         if (foldercnt) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
-            if (pd.hasClass('shared')) {
+            if ($dialog.hasClass('shared')) {
                 users = M.getSharingUsers($.selected, true);
 
                 // In case that user doesn't share with other
@@ -4170,7 +4161,7 @@ function _propertiesDialog(close) {
                     fillPropertiesContactList(users);
                 }
             }
-            if (pd.hasClass('shared-with-me')) {
+            if ($dialog.hasClass('shared-with-me')) {
                 p.t3 = l[64];
                 var rights = l[55];
                 if (n.r == 1) {
@@ -4190,7 +4181,7 @@ function _propertiesDialog(close) {
     }
     else
     {
-        pd.addClass('multiple folders-only');
+        $dialog.addClass('multiple folders-only');
         p.t1 = '';
         p.t2 = '<b>' + fm_contains(filecnt, foldercnt) + '</b>';
         p.t3 = l[894] + ':';
@@ -4236,13 +4227,13 @@ function _propertiesDialog(close) {
         propertiesDialog(1);
     });
 
-    pd.find('.file-settings-icon').rebind('click context', function(e) {
+    $dialog.find('.file-settings-icon').rebind('click context', function(e) {
         if (!$(this).hasClass('active')) {
             e.preventDefault();
             e.stopPropagation();
             $(this).addClass('active');
-            $('.fm-dialog').addClass('arrange-to-front');
-            $('.properties-dialog').addClass('arrange-to-back');
+            // $('.fm-dialog').addClass('arrange-to-front');
+            // $('.properties-dialog').addClass('arrange-to-back');
             $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $('#' + n.h);
             e.calculatePosition = true;
@@ -4254,11 +4245,11 @@ function _propertiesDialog(close) {
     });
     $(document).bind('MegaNodeRename.Properties', function(e, h, name) {
         if (n.h === h) {
-            pd.find('.properties-name-block .propreties-dark-txt').text(name);
+            $dialog.find('.properties-name-block .propreties-dark-txt').text(name);
         }
     });
     var __fsi_close = function() {
-        pd.find('.file-settings-icon').removeClass('active');
+        $dialog.find('.file-settings-icon').removeClass('active');
         $('.dropdown.body').removeClass('arrange-to-front');
         $('.properties-dialog').removeClass('arrange-to-back');
         $('.fm-dialog').removeClass('arrange-to-front');
@@ -4270,7 +4261,7 @@ function _propertiesDialog(close) {
         $('.properties-txt-pad .contact-list-icon').hide();
     }
 
-    if (pd.hasClass('shared')) {
+    if ($dialog.hasClass('shared')) {
         $('.contact-list-icon').rebind('click', function() {
             if (!$(this).hasClass('active')) {
                 $(this).addClass('active');
@@ -4325,12 +4316,13 @@ function _propertiesDialog(close) {
         });
     }
 
-    if ((filecnt + foldercnt) == 1)
+    if (filecnt + foldercnt === 1) {
         $('.properties-file-icon').html('<div class="' + fileIcon(n) + '"></div>');
-    else
-    {
-        if ((filecnt + foldercnt) == 2)
-            pd.addClass('two-elements');
+    }
+    else {
+        if (filecnt + foldercnt === 2) {
+            $dialog.addClass('two-elements');
+        }
         $('.properties-elements-counter span').text(filecnt + foldercnt);
         var a = 0;
         $('.properties-file-icon').html('');
@@ -4340,8 +4332,9 @@ function _propertiesDialog(close) {
 
             if (a <= 3)
             {
-                if (ico.indexOf('folder') === -1)
-                    pd.removeClass('folders-only');
+                if (ico.indexOf('folder') === -1) {
+                    $dialog.removeClass('folders-only');
+                }
                 $('.properties-file-icon').prepend('<div class="' + ico + '"></div>');
                 a++;
             }
@@ -4770,26 +4763,23 @@ function fingerprintDialog(userid) {
         return;
     }
 
+    var $dialog = $('.fingerprint-dialog');
     var closeFngrPrntDialog = function() {
-        fm_hideoverlay();
-        $this.addClass('hidden');
-        $('.fm-dialog-close').unbind('click');
+        closeDialog();
+        $('.fm-dialog-close', $dialog).unbind('click');
         $('.dialog-approve-button').unbind('click');
         $('.dialog-skip-button').unbind('click');
-        $this = null;
     };
 
-    var $this = $('.fingerprint-dialog');
+    $dialog.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
 
-    $this.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
-
-    $this.find('.contact-details-user-name')
+    $dialog.find('.contact-details-user-name')
         .text(M.getNameByHandle(user.u)) // escape HTML things
         .end()
         .find('.contact-details-email')
         .text(user.m); // escape HTML things
 
-    $this.find('.fingerprint-txt').empty();
+    $dialog.find('.fingerprint-txt').empty();
     userFingerprint(u_handle, function(fprint) {
         var target = $('.fingerprint-bott-txt .fingerprint-txt');
         fprint.forEach(function(v) {
@@ -4799,7 +4789,7 @@ function fingerprintDialog(userid) {
 
     userFingerprint(user, function(fprint) {
         var offset = 0;
-        $this.find('.fingerprint-code .fingerprint-txt').each(function() {
+        $dialog.find('.fingerprint-code .fingerprint-txt').each(function() {
             var that = $(this);
             fprint.slice(offset, offset + 5).forEach(function(v) {
                 $('<span>').text(v).appendTo(that);
@@ -4808,7 +4798,7 @@ function fingerprintDialog(userid) {
         });
     });
 
-    $('.fm-dialog-close').rebind('click', function() {
+    $('.fm-dialog-close', $dialog).rebind('click', function() {
         closeFngrPrntDialog();
     });
 
@@ -4845,12 +4835,14 @@ function fingerprintDialog(userid) {
         closeFngrPrntDialog();
     });
 
-    $this.removeClass('hidden')
-        .css({
-            'margin-top': '-' + $this.height() / 2 + 'px',
-            'margin-left': '-' + $this.width() / 2 + 'px'
-        });
-    fm_showoverlay();
+    M.safeShowDialog('fingerprint-dialog', function() {
+        $dialog.removeClass('hidden')
+            .css({
+                'margin-top': '-' + $dialog.height() / 2 + 'px',
+                'margin-left': '-' + $dialog.width() / 2 + 'px'
+            });
+        return $dialog;
+    });
 }
 
 /**

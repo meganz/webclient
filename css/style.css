@@ -8146,7 +8146,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     font-family: 'source_sans_proregular', Arial;
     overflow: hidden;
     min-height: 39px;
-        
+
 }
 .cancel-textarea {
     height: 126px;
@@ -8573,9 +8573,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-dialog.arrange-to-back, div.overlay.arrange-to-back {
     z-index: 900;
-}
-.fm-dialog.properties-dialog.arrange-to-back {
-    z-index: 1101; /* fm-dialog-overlay's zindex+1 */
 }
 .arrange-to-front, .dropdown.context.arrange-to-front {
     z-index: 1300;

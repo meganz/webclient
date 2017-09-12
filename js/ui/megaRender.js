@@ -30,8 +30,10 @@
             // Icon view mode
             '<a class="data-block-view">' +
                 '<span class="data-block-bg ">' +
-                    '<span class="file-status-icon indicator"></span>' +
-                    '<span class="data-item-icon indicator"></span>' +
+                    '<span class="data-block-indicators">' +
+                        '<span class="file-status-icon indicator"></span>' +
+                        '<span class="data-item-icon indicator"></span>' +
+                    '</span>' +
                     '<span class="block-view-file-type"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-detalis">' +
@@ -78,8 +80,10 @@
             // Icon view mode
             '<a class="data-block-view folder">' +
                 '<span class="data-block-bg">' +
-                    '<span class="file-status-icon indicator"></span>' +
-                    '<span class="shared-folder-access indicator"></span>' +
+                    '<span class="data-block-indicators">' +
+                       '<span class="file-status-icon indicator"></span>' +
+                       '<span class="shared-folder-access indicator"></span>' +
+                    '</span>' +
                     '<span class="block-view-file-type"></span>' +
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-detalis">' +
@@ -159,8 +163,10 @@
             // Icon view mode
             '<a class="data-block-view folder">' +
                 '<span class="data-block-bg">' +
-                    '<span class="file-status-icon indicator"></span>' +
-                    '<span class="shared-folder-access indicator"></span>' +
+                    '<span class="data-block-indicators">' +
+                       '<span class="file-status-icon indicator"></span>' +
+                       '<span class="shared-folder-access indicator"></span>' +
+                    '</span>' +
                     '<span class="block-view-file-type folder-shared"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-detalis">' +

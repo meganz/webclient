@@ -1486,42 +1486,45 @@ function renameDialog() {
     "use strict";
 
     if ($.selected.length > 0) {
+        var n = M.d[$.selected[0]] || false;
+        var ext = fileext(n.name);
         var $dialog = $('.fm-dialog.rename-dialog');
+        var $input = $('input', $dialog);
 
         M.safeShowDialog('rename', function() {
-            return $dialog.addClass('active');
+            $dialog.removeClass('hidden').addClass('active');
+            $input.focus();
+            return $dialog;
         });
 
         $('.fm-dialog-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
 
         $('.rename-dialog-button.rename').rebind('click', function() {
-            if ($('.rename-dialog').hasClass('active')) {
-                doRename();
+            if ($dialog.hasClass('active')) {
+                var value = $input.val();
+
+                if (value && n.name && value !== n.name) {
+                    M.rename(n.h, value);
+                }
+
+                closeDialog();
             }
         });
 
-        var n = M.d[$.selected[0]];
-        if (n.t) {
-            $('.rename-dialog .fm-dialog-title').text(l[425]);
-        }
-        else {
-            $('.rename-dialog .fm-dialog-title').text(l[426]);
-        }
-
-        var $input = $('input', $dialog);
+        $('.fm-dialog-title', $dialog).text(n.t ? l[425] : l[426]);
         $input.val(n.name);
 
-        $('.rename-dialog .transfer-filetype-icon').attr('class', 'transfer-filetype-icon ' + fileIcon(n));
+        $('.transfer-filetype-icon', $dialog)
+            .attr('class', 'transfer-filetype-icon ' + fileIcon(n));
 
-        var ext = fileext(n.name);
         if (!n.t && ext.length > 0) {
             $input[0].selectionStart = 0;
-            $input[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
+            $input[0].selectionEnd = $input.val().length - ext.length - 1;
         }
 
         $input.rebind('focus', function() {
             var selEnd;
-            $(this).closest('.rename-dialog').addClass('focused');
+            $dialog.addClass('focused');
             var d = $(this).val().lastIndexOf('.');
             if (d > -1) {
                 selEnd = d;
@@ -1534,18 +1537,17 @@ function renameDialog() {
         });
 
         $input.rebind('blur', function() {
-            $(this).closest('.rename-dialog').removeClass('focused');
+            $dialog.removeClass('focused');
         });
 
-        $input.focus();
         $input.rebind('click keydown keyup keypress', function() {
-            var n = M.d[$.selected[0]],
-                ext = fileext(n.name);
-            if ($(this).val() == '' || (!n.t && ext.length > 0 && $(this).val() == '.' + ext)) {
-                $('.rename-dialog').removeClass('active');
+            var value = $(this).val();
+
+            if (!value || (!n.t && ext.length > 0 && value === '.' + ext)) {
+                $dialog.removeClass('active');
             }
             else {
-                $('.rename-dialog').addClass('active');
+                $dialog.addClass('active');
             }
             /*if (!n.t && ext.length > 0) {
                 if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {
@@ -1561,30 +1563,6 @@ function renameDialog() {
                 }
             }*/
         });
-    }
-}
-
-/* @type {function} doRename
- *
- * On context menu rename
- */
-function doRename() {
-    "use strict";
-
-    var itemName = $('.rename-dialog input').val();
-    var handle = $.selected[0];
-    var nodeData = M.d[handle];
-
-    if (itemName !== '') {
-        if (nodeData) {
-            if (nodeData && (itemName !== nodeData.name)) {
-                M.rename(handle, itemName);
-            }
-        }
-
-        $.dialog = false;
-        $('.rename-dialog').addClass('hidden');
-        fm_hideoverlay();
     }
 }
 

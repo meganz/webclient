@@ -1390,7 +1390,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             addNewContact($('.add-user-popup-button.add'));
         }
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
-            doRename();
+            $('.rename-dialog-button.rename').trigger('click');
         }
 
         // If the Esc key is pressed while the payment address dialog is visible, close it

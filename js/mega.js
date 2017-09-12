@@ -3019,7 +3019,10 @@ function loadfm_done(mDBload) {
                 mega.loadReport.sent = true;
 
                 var r = mega.loadReport;
+                var tick = Date.now() - r.aliveTimeStamp;
+
                 r.totalTimeSpent = Date.now() - mega.loadReport.startTime;
+
                 r = [
                     r.mode, // 1: DB, 2: API
                     r.recvNodes, r.procNodes, r.procAPs,
@@ -3049,9 +3052,12 @@ function loadfm_done(mDBload) {
                 ];
 
                 if (d) {
-                    console.debug('loadReport', r);
+                    console.debug('loadReport', r, tick, document.hidden);
                 }
-                api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+
+                if (!(tick > 2100) && !document.hidden) {
+                    api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+                }
             }
 
             if (mDBload) {

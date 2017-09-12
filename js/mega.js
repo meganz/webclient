@@ -1755,11 +1755,6 @@ function worker_procmsg(ev) {
 var fmdb;
 var ufsc;
 
-mBroadcaster.once('startMega', function() {
-    // Initialize ufs size cache
-    ufsc = new UFSSizeCache();
-});
-
 function loadfm(force) {
     "use strict";
 
@@ -1830,6 +1825,9 @@ function fetchfm(sn) {
     // we always intially fetch historical actionpactions
     // before showing the filemanager
     initialscfetch = true;
+
+    // Initialize ufs size cache
+    ufsc = new UFSSizeCache();
 
     var promise;
     if (is_mobile) {

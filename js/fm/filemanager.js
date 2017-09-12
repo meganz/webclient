@@ -1151,7 +1151,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     if (localStorage.folderLinkImport) {
-        onIdle(M.importFolderLinkNodes.bind(M));
+        onIdle(M.importFolderLinkNodes.bind(M, false));
     }
 };
 

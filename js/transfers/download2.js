@@ -621,7 +621,13 @@ var dlmanager = {
             req.n = dl.id;
         }
 
-        api_req(req, ctx, dl.nauth ? 1 : 0);
+        if (folderlink || !dl.nauth) {
+            api_req(req, ctx, dl.nauth ? 1 : 0);
+        }
+        else {
+            req.enp = dl.nauth;
+            api_req(req, ctx);
+        }
     },
 
     dlGetUrlDone: function DM_dlGetUrlDone(res, ctx) {

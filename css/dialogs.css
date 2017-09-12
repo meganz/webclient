@@ -1714,14 +1714,23 @@ li.token-input-token-invite .input-close {
 }
 
 .fm-dialog.pass-reminder .dark-dialog-bottom {
-    background-color: rgb(238, 238, 238);
-    padding: 14px;
-    border-bottom-right-radius: 8px;
+    background-color: white;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-border-bottom-left-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
     border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-right-radius: 8px;
+    padding: 0 8px 12px 12px;
+    border-top: 1px solid rgba(0,0,0,0.1);
 }
 .fm-dialog.pass-reminder .dark-dialog-bottom .big-buttons {
-    padding: 0;
+    padding: 12px 0 0 0;
     text-align: right;
+    float: right;
 }
 .fm-dialog.pass-reminder .dark-dialog-bottom .default-big-button,
 .fm-dialog.pass-reminder .dark-dialog-bottom .default-big-button span {
@@ -1731,8 +1740,13 @@ li.token-input-token-invite .input-close {
 
 .fm-dialog.pass-reminder .centered-checkbox.dialog-bottom {
     float: left;
-    width: 140px;
-    margin-top: -47px;
+    text-align: left;
+    margin-top: 1px;
+    padding-bottom: 8px;
+    clear: none;
+}
+.fm-dialog.pass-reminder .centered-checkbox .checkboxOff, .fm-dialog.pass-reminder .centered-checkbox .checkboxOn {
+    margin: 20px 12px 0 7px;
 }
 .nw-fm-dialog-title.big {
     font-size: 20px;

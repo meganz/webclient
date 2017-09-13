@@ -33,7 +33,7 @@ var exportPassword = {
     // List of algorithms
     algorithms: [
         {
-            // For unit testing with low rounds
+            // Algorithm (0) for unit testing with low rounds
             name: 'PBKDF2',                     // Name for the Web Crypto primary PBKDF algorithm
             hash: 'SHA-512',                    // Hash algorithm for the Web Crypto primary PBKDF algorithm
             failsafeName: 'PBKDF2_HMAC_SHA512', // Name for the asmCrypto failsafe PBKDF algorithm
@@ -45,7 +45,19 @@ var exportPassword = {
             iterations: 1000                    // Number of iterations to run
         },
         {
-            // Current algorithm
+            // Old algorithm (1) which used incorrect parameter order: HMAC(password, data)
+            name: 'PBKDF2',
+            hash: 'SHA-512',
+            failsafeName: 'PBKDF2_HMAC_SHA512',
+            macName: 'HMAC_SHA256',
+            saltLength: 256,
+            macKeyLength: 256,
+            macLength: 256,
+            derivedKeyLength: 512,
+            iterations: 100000
+        },
+        {
+            // Current algorithm (2)
             name: 'PBKDF2',
             hash: 'SHA-512',
             failsafeName: 'PBKDF2_HMAC_SHA512',
@@ -60,13 +72,13 @@ var exportPassword = {
     ],
 
     // The current algorithm in use for production
-    currentAlgorithm: 1,    // A 1 byte
+    currentAlgorithm: 1,    // 1 byte (0x01) ToDo: Update to 2 when the apps have decryption support for algorithm 2
 
     /**
      * Constants for folder or file type
      */
-    LINK_TYPE_FOLDER: 0,    // A 0 Byte
-    LINK_TYPE_FILE: 1,      // A 1 Byte
+    LINK_TYPE_FOLDER: 0,    // 1 byte (0x00)
+    LINK_TYPE_FILE: 1,      // 1 byte (0x01)
 
 
     /**
@@ -524,7 +536,15 @@ var exportPassword = {
 
             // Create the MAC of the data
             var macAlgorithm = exportPassword.algorithms[algorithm].macName;
-            var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToAuthenticateBytes);
+
+            // If using the old algorithm (1), use parameter order: HMAC(password, data)
+            if (algorithm === 1) {
+                var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToAuthenticateBytes);
+            }
+            else {
+                // Otherwise for newer links (algorithm >= 2) use the correct parameter order: HMAC(data, password)
+                var macBytes = asmCrypto[macAlgorithm].bytes(dataToAuthenticateBytes, macKeyBytes);
+            }
 
             // Create buffer for the data to be converted to Base64
             var numOfBytes = dataToAuthenticateBytes.length + macBytes.length;
@@ -750,7 +770,15 @@ var exportPassword = {
                 // Compute the MAC over the data to verify
                 var dataToVerifyBytes = decodedBytes.subarray(0, macStartOffset);
                 var macAlgorithm = exportPassword.algorithms[algorithm].macName;
-                var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToVerifyBytes);
+
+                // If the link was created with an old algorithm (1) which used parameter order: HMAC(password, data)
+                if (algorithm === 1) {
+                    var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToVerifyBytes);
+                }
+                else {
+                    // Otherwise for newer links (algorithm >= 2) use the correct parameter order: HMAC(data, password)
+                    var macBytes = asmCrypto[macAlgorithm].bytes(dataToVerifyBytes, macKeyBytes);
+                }
 
                 // Convert the string to hex for simple string comparison
                 var macString = asmCrypto.bytes_to_hex(macBytes);
@@ -1293,9 +1321,7 @@ var exportExpiry = {
         deleteScrollPanel(scroll, 'jsp');
 
         if (close) {
-            $.dialog = false;
-            fm_hideoverlay();
-            $linksDialog.addClass('hidden');
+            closeDialog();
             $('.export-links-warning').addClass('hidden');
             if (window.onCopyEventHandler) {
                 document.removeEventListener('copy', window.onCopyEventHandler, false);
@@ -1303,8 +1329,6 @@ var exportExpiry = {
             }
             return true;
         }
-
-        $.dialog = 'links';
 
         $linksDialog.addClass('file-keys-view');
 
@@ -1319,21 +1343,24 @@ var exportExpiry = {
         $linkButtons.removeClass('selected');
         $linksDialog.find('.link-handle-and-key').addClass('selected');
 
-        fm_showoverlay();
+        M.safeShowDialog('links', function() {
+            fm_showoverlay();
+            $linksDialog.removeClass('hidden');
+            $('.export-links-warning').removeClass('hidden');
 
-        $linksDialog.removeClass('hidden');
-        $('.export-links-warning').removeClass('hidden');
+            $(scroll).jScrollPane({showArrows: true, arrowSize: 5});
+            jScrollFade(scroll);
 
-        $(scroll).jScrollPane({ showArrows: true, arrowSize: 5 });
-        jScrollFade(scroll);
+            $linksDialog.css('margin-top', $linksDialog.outerHeight() / 2 * -1);
 
-        $linksDialog.css('margin-top', ($linksDialog.outerHeight() / 2) * -1);
+            setTimeout(function() {
+                $('.file-link-info').rebind('click', function() {
+                    $('.file-link-info').select();
+                });
+            }, 300);
 
-        setTimeout(function() {
-            $('.file-link-info').rebind('click', function() {
-                $('.file-link-info').select();
-            });
-        }, 300);
+            return $linksDialog;
+        });
 
         // Setup toast notification
         toastTxt = l[7654];

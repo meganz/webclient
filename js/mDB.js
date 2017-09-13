@@ -60,9 +60,6 @@ function FMDB(plainname, schema, channelmap) {
     // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
     this.cantransact = -1;
 
-    // Backoff to throttle bulkPut & bulkDel operations.
-    this.bulkBackoff = 300;
-
     // initialise additional channels
     for (var i in this.channelmap) {
         i = this.channelmap[i];
@@ -326,6 +323,9 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
         db.on('blocked', next);
 
         db.delete().then(function() {
+            // Remove the DB name from localStorage so that our getDatabaseNames polyfill doesn't keep returning them
+            delete localStorage['_$mdb$' + db.name];
+
             fmdb.logger.log("Deleted IndexedDB " + db.name);
         }).catch(function(err){
             fmdb.logger.error("Unable to delete IndexedDB " + db.name, err);
@@ -565,8 +565,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                                 onIdle(dispatchputs);
                             }
                             else {
-                                fmdb.bulkBackoff = Math.min(1e4, fmdb.bulkBackoff << 1);
-                                setTimeout(dispatchputs, fmdb.bulkBackoff);
+                                setTimeout(dispatchputs, 2600);
                             }
                             return;
                         }
@@ -574,7 +573,6 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                     // loop back to write more pending data (or to commit the transaction)
                     fmdb.inflight = false;
-                    fmdb.bulkBackoff = 300;
                     dispatchputs();
                 }).catch(Dexie.BulkError, function(e) {
                     // TODO: retry instead?
@@ -1473,7 +1471,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 this.tree([parent], 0, new MegaPromise())
                     .always(function() {
                         if (M.d[parent] && M.c[parent]) {
-                            dbfetch.get(parent, promise);
+                            dbfetch.get(M.d[parent].p, promise);
                         }
                         else {
                             console.error('Failed to load folder ' + parent);

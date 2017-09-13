@@ -453,7 +453,7 @@ mobile.cloud = {
         $openInAppButton.off('tap').on('tap', function() {
 
             // Open the folder in the app
-            mobile.downloadOverlay.redirectToApp($(this));
+            mobile.downloadOverlay.redirectToApp($(this), M.currentdirid);
             return false;
         });
     },
@@ -2126,7 +2126,15 @@ mobile.decryptionPasswordOverlay = {
             // Compute the MAC over the data to verify
             var dataToVerifyBytes = decodedBytes.subarray(0, macStartOffset);
             var macAlgorithm = exportPassword.algorithms[algorithm].macName;
-            var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToVerifyBytes);
+
+            // If the link was created with an old algorithm (1) which used parameter order: HMAC(password, data)
+            if (algorithm === 1) {
+                var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToVerifyBytes);
+            }
+            else {
+                // Otherwise for newer links (algorithm >= 2) use the correct parameter order: HMAC(data, password)
+                var macBytes = asmCrypto[macAlgorithm].bytes(dataToVerifyBytes, macKeyBytes);
+            }
 
             // Convert the string to hex for simple string comparison
             var macString = asmCrypto.bytes_to_hex(macBytes);

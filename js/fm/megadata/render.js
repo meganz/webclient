@@ -70,6 +70,8 @@ MegaData.prototype.renderMain = function(aUpdate) {
  * @param {Boolean} u Whether we're just updating the list
  */
 MegaData.prototype.rmSetupUI = function(u, refresh) {
+    'use strict';
+
     if (this.viewmode === 1) {
         M.addIconUI(u, refresh);
         if (!u) {
@@ -86,77 +88,53 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         delete this.onRenderFinished;
     }
 
-    $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(e) {
-        var target = $(this).closest('tr');
+    var cmIconHandler = function _cmIconHandler(listView, elm, ev) {
+        var target = listView ? $(this).closest('tr') : $(this).parents('.data-block-view');
+
         if (!target.hasClass('ui-selected')) {
-            target.parent().find('tr').removeClass('ui-selected');
+            target.parent().find(elm).removeClass('ui-selected');
+            selectionManager.clear_selection();
         }
         target.addClass('ui-selected');
 
-        if ($.selected.length === 0) {
-            // selection is already been made
-            selectionManager.clear_selection();
-            selectionManager.set_currently_selected(target.attr('id'));
-        }
-        else {
-            selectionManager.add_to_selection(target.attr('id'));
-        }
+        selectionManager.add_to_selection(target.attr('id'));
 
-        e.preventDefault();
-        e.stopPropagation(); // do not treat it as a regular click on the file
-        e.currentTarget = target;
+        ev.preventDefault();
+        ev.stopPropagation(); // do not treat it as a regular click on the file
+        ev.currentTarget = target;
+
         M.searchPath();
+
         if (!$(this).hasClass('active')) {
-            M.contextMenuUI(e, 1);
+            M.contextMenuUI(ev, 1);
             $(this).addClass('active');
         }
         else {
             $.hideContextMenu();
             $(this).removeClass('active');
         }
+
+        return false;
+    };
+
+    $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(ev) {
+        return cmIconHandler.call(this, true, 'tr', ev);
     });
-
-    $('.data-block-view .file-settings-icon').rebind('click', function(e) {
-        var target = $(this).parents('.data-block-view');
-        if (target.attr('class').indexOf('ui-selected') == -1) {
-            target.parent().find('a').removeClass('ui-selected');
-        }
-        target.addClass('ui-selected');
-        e.preventDefault();
-        e.stopPropagation(); // do not treat it as a regular click on the file
-        e.currentTarget = target;
-
-        if ($.selected.length === 0) {
-            // selection is already been made
-            selectionManager.clear_selection();
-            selectionManager.set_currently_selected(target.attr('id'));
-        }
-        else {
-            selectionManager.add_to_selection(target.attr('id'));
-        }
-
-        M.searchPath();
-        if (!$(this).hasClass('active')) {
-            $(this).addClass('active');
-            M.contextMenuUI(e, 1);
-        }
-        else {
-            $(this).removeClass('active');
-            $.hideContextMenu();
-        }
+    $('.data-block-view .file-settings-icon').rebind('click', function(ev) {
+        return cmIconHandler.call(this, false, 'a', ev);
     });
 
     if (!u) {
 
         if (this.currentrootid === 'shares') {
 
-            function prepareShareMenuHandler(e) {
+            var prepareShareMenuHandler = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.currentTarget = $('#treea_' + M.currentdirid);
                 e.calculatePosition = true;
                 $.selected = [M.currentdirid];
-            }
+            };
 
             $('.shared-details-info-block .grid-url-arrow').rebind('click', function(e) {
                 prepareShareMenuHandler(e);
@@ -187,13 +165,16 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
             });
 
             $('.shared-details-info-block .fm-share-copy').rebind('click', function(e) {
-                $.copyDialog = 'copy'; // this is used like identifier when key with key code 27 is pressed
-                $.mcselected = M.RootID;
-                $('.copy-dialog .dialog-copy-button').addClass('active');
-                $('.copy-dialog').removeClass('hidden');
-                handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
-                $('.fm-dialog-overlay').removeClass('hidden');
-                $('body').addClass('overlayed');
+                M.safeShowDialog('copy', function() {
+                    var $dialog = $('.fm-dialog.copy-dialog');
+
+                    $.copyDialog = 'copy'; // this is used like identifier when key with key code 27 is pressed
+                    $.mcselected = M.RootID;
+                    $('.copy-dialog .dialog-copy-button').addClass('active');
+                    $dialog.removeClass('hidden');
+                    handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
+                    return $dialog;
+                });
             });
 
             // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button

@@ -249,14 +249,10 @@ mega.achievem.achievementDialog = function achievementDialog(title, close) {
     var headerTxt, descriptionTxt, storageSpace, transferQuota, monthNumber;
     var $dialog = $('.fm-dialog.achievement-dialog')
     if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $dialog.addClass('hidden');
+        closeDialog();
         return true;
     }
-    $.dialog = 'achievement';
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
+    M.safeShowDialog('achievement', $dialog);
 
     $('.achievement-dialog .button.continue,.achievement-dialog .fm-dialog-close').rebind('click', function() {
         mega.achievem.achievementDialog(title, 1);
@@ -310,9 +306,6 @@ mega.achievem.achievementDialog = function achievementDialog(title, close) {
             monthNumber = 2;
             break;
     }
-    if (!descriptionTxt) {
-        descriptionTxt = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
-    }
     $dialog.find('.fm-dialog-title').text(headerTxt);
     $dialog.find('.storage .reward-txt span').text(storageSpace);
     if (transferQuota) {
@@ -347,16 +340,13 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
         });
         return true;
     }
-    $.dialog = 'achievements';
 
     $dialog.find('.fm-dialog-close')
         .rebind('click', function() {
             if (onDialogClosed) {
                 Soon(onDialogClosed);
             }
-            $.dialog = false;
-            fm_hideoverlay();
-            $dialog.addClass('hidden');
+            closeDialog();
             return false;
         });
 
@@ -445,25 +435,28 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
     maf = ach = undefined;
 
     // Show dialog
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
+    M.safeShowDialog('achievements', function() {
+        $dialog.removeClass('hidden');
 
-    // Init scroll
-    $contentBlock = $dialog.find('.achievements-list');
+        // Init scroll
+        $contentBlock = $dialog.find('.achievements-list');
 
-    if ($dialog.outerHeight() > bodyHeight) {
-        $scrollBlock.css('max-height', bodyHeight - 60);
-        $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    }
-    else if ($contentBlock.outerHeight() > 666) {
-        $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    }
-    else {
-        deleteScrollPanel($scrollBlock, 'jsp');
-    }
+        if ($dialog.outerHeight() > bodyHeight) {
+            $scrollBlock.css('max-height', bodyHeight - 60);
+            $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+        }
+        else if ($contentBlock.outerHeight() > 666) {
+            $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+        }
+        else {
+            deleteScrollPanel($scrollBlock, 'jsp');
+        }
 
-    // Dialog aligment
-    $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
+        // Dialog aligment
+        $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
+
+        return $dialog;
+    });
 };
 
 /**
@@ -474,12 +467,9 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     var $dialog = $('.fm-dialog.invite-dialog');
 
     if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $dialog.addClass('hidden');
+        closeDialog();
         return true;
     }
-    $.dialog = 'invite-friend';
 
     $dialog.find('.fm-dialog-close').rebind('click', mega.achievem.inviteFriendDialog);
 
@@ -508,8 +498,7 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     $('.button.status', $dialog).addClass('hidden');
 
     // Show dialog
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
+    M.safeShowDialog('invite-friend', $dialog);
 
     // Remove unfinished user inputs
     $('#token-input-ach-invite-dialog-input', $dialog).val('');
@@ -734,12 +723,9 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     var $scrollBlock = $dialog.find('.table-scroll');
 
     if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $dialog.addClass('hidden');
+        closeDialog();
         return true;
     }
-    $.dialog = 'invitations';
     var $table = $scrollBlock.find('.table');
 
     if (!invitationStatusDialog.$tmpl) {
@@ -911,8 +897,7 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     }
 
     // Show dialog
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
+    M.safeShowDialog('invitations', $dialog);
 
     // Init scroll
     var $contentBlock = $dialog.find('.table-bg');

@@ -5,7 +5,7 @@
 
     // all values are in seconds.
     var SHOW_AFTER_LASTLOGIN = 14 * 24 * 60 * 60;
-    var SHOW_AFTER_LASTSKIP = 1 * 30 * 24 * 60 * 60;
+    var SHOW_AFTER_LASTSKIP = 3 * 30 * 24 * 60 * 60;
     var SHOW_AFTER_LASTSKIP_LOGOUT = 1 * 30 * 24 * 60 * 60;
     var SHOW_AFTER_ACCOUNT_AGE = 7 * 24 * 60 * 60;
     var SHOW_AFTER_LASTSUCCESS = 3 * 30 * 24 * 60 * 60;

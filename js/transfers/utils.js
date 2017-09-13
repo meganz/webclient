@@ -63,7 +63,9 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
  * @param {Number} [lock] Lock the DOM node in the transfers panel.
  */
 function dlFatalError(dl, error, ethrow, lock) {
-    var awaitingPromise = dl.awaitingPromise;
+    'use strict';
+
+    var awaitingPromise = dl && dl.awaitingPromise;
 
     // Log the fatal error
     Soon(function() {
@@ -73,6 +75,9 @@ function dlFatalError(dl, error, ethrow, lock) {
         error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
 
         if (error.indexOf(l[16871]) < 0 && error.indexOf(l[16872]) < 0 && error.indexOf(l[1668]) < 0) {
+            if (error.indexOf(l[5945]) > -1) {
+                error = error.substr(l[5945].length).trim();
+            }
             srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
         }
     });

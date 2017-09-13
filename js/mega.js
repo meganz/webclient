@@ -1171,9 +1171,10 @@ scparser.$finalize = function() {
                 delay('thumbnails', fm_thumbnails, 3200);
             }
 
+            /* er, why was this here?
             if ($.dialog === 'properties') {
                 propertiesDialog();
-            }
+            }*/
 
             if (scsharesuiupd) {
                 onIdle(function() {
@@ -1755,11 +1756,6 @@ function worker_procmsg(ev) {
 var fmdb;
 var ufsc;
 
-mBroadcaster.once('startMega', function() {
-    // Initialize ufs size cache
-    ufsc = new UFSSizeCache();
-});
-
 function loadfm(force) {
     "use strict";
 
@@ -1830,6 +1826,9 @@ function fetchfm(sn) {
     // we always intially fetch historical actionpactions
     // before showing the filemanager
     initialscfetch = true;
+
+    // Initialize ufs size cache
+    ufsc = new UFSSizeCache();
 
     var promise;
     if (is_mobile) {
@@ -2553,6 +2552,11 @@ function processPS(pendingShares, ignoreDB) {
                     'r':shareRights,
                     'ts':timeStamp
                 }, ignoreDB);
+
+                if (M.d[nodeHandle] && M.d[nodeHandle].t) {
+                    // Update M.IS_SHARED flag
+                    ufsc.addTreeNode(M.d[nodeHandle]);
+                }
             }
 
             if (fminitialized) {
@@ -3013,7 +3017,10 @@ function loadfm_done(mDBload) {
                 mega.loadReport.sent = true;
 
                 var r = mega.loadReport;
+                var tick = Date.now() - r.aliveTimeStamp;
+
                 r.totalTimeSpent = Date.now() - mega.loadReport.startTime;
+
                 r = [
                     r.mode, // 1: DB, 2: API
                     r.recvNodes, r.procNodes, r.procAPs,
@@ -3043,9 +3050,12 @@ function loadfm_done(mDBload) {
                 ];
 
                 if (d) {
-                    console.debug('loadReport', r);
+                    console.debug('loadReport', r, tick, document.hidden);
                 }
-                api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+
+                if (!(tick > 2100) && !document.hidden) {
+                    api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+                }
             }
 
             if (mDBload) {

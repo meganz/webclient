@@ -249,6 +249,8 @@ UFSSizeCache.prototype.delNode = function(h, ignoreDB) {
 
         if (d) {
             console.debug('ufsc.del', h, td, tf, tb);
+
+            if (!td && td !== 0) debugger;
         }
 
         while ((n = M.d[n.p])) {

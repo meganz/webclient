@@ -219,7 +219,7 @@
             }
         });
 
-        $(self.dialog.querySelector('.fm-dialog-close')).rebind('click.prd', function(e) {
+        $(self.dialog.querySelector('.fm-dialog-close')).rebind('click.prd', function() {
             self.onSkipClicked();
             return false;
         });
@@ -546,8 +546,8 @@
         }
         if (this.dialogShown) {
             // center position
-            this.dialog.style.left = ((document.body.clientWidth - this.dialog.clientWidth) / 2) + "px";
-            this.dialog.style.top = ((document.body.clientHeight - this.dialog.clientHeight) / 2) + "px";
+            this.dialog.style.left = (document.body.clientWidth - this.dialog.clientWidth) / 2 + "px";
+            this.dialog.style.top = (document.body.clientHeight - this.dialog.clientHeight) / 2 + "px";
         }
     };
 

@@ -1535,9 +1535,11 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
  * Perform a normal logout
  *
  * @param {Function} aCallback optional
- * @param {boolean} force optional
+ * @param {Bool} force optional
  */
 function mLogout(aCallback, force) {
+    "use strict";
+
     if (!force && mega.ui.passwordReminderDialog) {
         var passwordReminderLogout = mega.ui.passwordReminderDialog.recheckLogoutDialog();
 

@@ -172,7 +172,8 @@ function topPopupAlign(button, popup, topPos) {
             buttonTopPos;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('.top-head').width();
+            pageWidth = $('body').width();
+            $popup.removeAttr('style');
             $popupArrow.removeAttr('style');
             popupRightPos = pageWidth
                 - $button.offset().left

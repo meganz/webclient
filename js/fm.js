@@ -2850,6 +2850,11 @@ function closeDialog() {
         $('.fm-dialog.password-dialog').addClass('hidden');
     }
 
+    if ($.dialog === 'prd') {
+        // PasswordReminderDialog manages its own states, so don't do anything.
+        return;
+    }
+
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');

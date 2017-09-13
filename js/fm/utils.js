@@ -34,6 +34,8 @@ MegaApi.prototype.prod = function(aSave) {
 };
 
 MegaApi.prototype.req = function(params) {
+    'use strict';
+
     var promise = new MegaPromise();
 
     if (typeof params === 'string') {
@@ -41,14 +43,14 @@ MegaApi.prototype.req = function(params) {
     }
 
     api_req(params, {
-        callback: function(res) {
+        callback: tryCatch(function(res) {
             if (typeof res === 'number' && res < 0) {
                 promise.reject.apply(promise, arguments);
             }
             else {
                 promise.resolve.apply(promise, arguments);
             }
-        }
+        }, promise.reject.bind(promise, EFAILED))
     });
 
     return promise;

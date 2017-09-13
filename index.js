@@ -1132,7 +1132,7 @@ function init_page() {
         return false;
     }
 
-    else if (is_fm()) {		
+    else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
@@ -2340,6 +2340,11 @@ window.onbeforeunload = function () {
 
 window.onunload = function() {
     mBroadcaster.crossTab.leave();
+
+    if (typeof dlpage_ph === 'string') {
+        // Clear the download activity flag navigating away on the downloads page.
+        dlmanager.dlClearActiveTransfer(dlpage_ph);
+    }
 };
 
 mBroadcaster.once('boot_done', function() {

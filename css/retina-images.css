@@ -12,7 +12,7 @@ body.pro:after {
     background-size: 200px auto;
 }
 .astropay-payment-reminder .mega-payment-icon {
-    background-image: url("../images/mega/bitcoin-v7@2x.png");
+    background-image: url('../images/mega/bitcoin-v7@2x.png');
 }
 .provider-icon {
     background-image: url(../images/mega/payment-provider-icons-v3@2x.png);
@@ -304,7 +304,7 @@ body.pro:after {
     background-image: url(../images/mega/download-sprite-v7@2x.png);
     background-size: 257px auto;
 }
-.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before, .dropdown-item.do-sort.selected i {
+.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before, .dropdown-item.do-sort.selected i, .fm-dialog:not(exceeded) .pro-plan-descr::after {
     background-image: url(../images/mega/top-login-sprite_v7@2x.png);
     background-size: 48px auto;
 }
@@ -453,7 +453,7 @@ body.pro:after {
     background-size: 768px auto;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v4@2x.png);
+    background-image: url(../images/mega/startpage-sprite_v5@2x.png);
     background-size: 267px auto;
 }
 }

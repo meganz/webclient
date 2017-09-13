@@ -312,21 +312,21 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             $tr.remove();
         }
         dl_queue.push({
+            size: n.s,
+            nauth: n_h,
             id: n.h,
             key: n.k,
             n: n.name,
             t: n.mtime || n.ts,
+            zipid: z,
+            zipname: zipname,
+            preview: preview,
             p: path,
-            size: n.s,
-            nauth: n_h,
             onDownloadProgress: this.dlprogress.bind(this),
             onDownloadComplete: this.dlcomplete.bind(this),
             onBeforeDownloadComplete: this.dlbeforecomplete.bind(this),
             onDownloadError: this.dlerror.bind(this),
-            onDownloadStart: this.dlstart.bind(this),
-            zipid: z,
-            zipname: zipname,
-            preview: preview
+            onDownloadStart: this.dlstart.bind(this)
         });
         added++;
         zipsize += n.s;
@@ -376,6 +376,8 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (uldl_hold) {
             fm_tfspause('zip_' + z);
         }
+
+        api_req({a: 'log', e: 99655, m: 'ZipIO Download started.'});
     }
 
     if (!preview) {
@@ -565,6 +567,8 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     if (z) {
         id = 'zip_' + z;
+
+        api_req({a: 'log', e: 99656, m: 'ZipIO Download completed.'});
     }
     else {
         id = 'dl_' + id;

@@ -3879,7 +3879,7 @@ function fm_hideoverlay() {
     $('body').removeClass('overlayed');
 }
 
-mega.ui.showRegisterDialog = function() {};
+mega.ui['show' + 'RegisterDialog'] = function() {};
 
 function removeUInode(nodeHandle, parentHandle) {
 

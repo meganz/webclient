@@ -4,6 +4,19 @@
     /*jshint -W074*/
     // ^ zxcvbn stuff..
 
+    function closeRegisterDialog($dialog, isUserTriggered) {
+        closeDialog();
+        $(window).unbind('resize.proregdialog');
+        $('.fm-dialog-overlay').unbind('click.proDialog');
+        $('.fm-dialog-close', $dialog).unbind('click.proDialog');
+
+        if (isUserTriggered && options.onDialogClosed) {
+            options.onDialogClosed($dialog);
+        }
+
+        options = {};
+    }
+
     function doProRegister($dialog) {
         var hideOverlay = function() {
             loadingDialog.hide();
@@ -25,8 +38,10 @@
         var registeraccount = function() {
             var rv = {};
             var done = function(login) {
+                var onAccountCreated = options.onAccountCreated;
+
                 hideOverlay();
-                $('.pro-register-dialog').addClass('hidden');
+                closeRegisterDialog($dialog);
                 $('.fm-dialog.registration-page-success').unbind('click');
 
                 if (login) {
@@ -37,8 +52,8 @@
                 }
                 Soon(topmenuUI);
 
-                if (options.onAccountCreated) {
-                    options.onAccountCreated(login, rv);
+                if (typeof onAccountCreated === 'function') {
+                    onAccountCreated(login, rv);
                 }
                 else {
                     // $('.fm-dialog.registration-page-success').removeClass('hidden');
@@ -221,35 +236,9 @@
 
 
     function showRegisterDialog(opts) {
-        $.dialog = 'pro-register-dialog';
-
-        var $dialog = $('.pro-register-dialog');
-        $dialog
-            .removeClass('hidden')
-            .addClass('active');
-
-        $('.pro-register-scroll').removeAttr('style');
-        deleteScrollPanel('.pro-register-scroll', 'jsp');
-
-        fm_showoverlay();
-
-        options = Object(opts);
-
-        $('.fm-dialog-title', $dialog)
-            .text(options.title || l[5840]);
-
-        if (options.body) {
-            $('.fm-dialog-body', $dialog)
-                .removeClass('hidden')
-                .safeHTML(options.body);
-        }
-        else {
-            $('.fm-dialog-body', $dialog)
-                .addClass('hidden');
-        }
+        var $dialog = $('.fm-dialog.pro-register-dialog');
 
         var dialogBodyScroll = function() {
-            var jsp;
             var bodyHeight = $('body').height();
             var $scrollBlock =  $('.pro-register-scroll');
             var scrollBlockHeight = $scrollBlock.height();
@@ -278,23 +267,32 @@
             });
         };
 
-        var closeRegisterDialog = function() {
-            closeDialog();
-            $(window).unbind('resize.proregdialog');
-
-            if (options.onDialogClosed) {
-                options.onDialogClosed($dialog);
-            }
-        };
-
-        dialogBodyScroll();
-        reposition();
-
-        $(window).rebind('resize.proregdialog', function() {
-            Soon(function() {
+        var redraw = function() {
+            onIdle(function() {
                 dialogBodyScroll();
                 reposition();
             });
+        };
+
+        M.safeShowDialog('pro-register-dialog', function() {
+            options = Object(opts);
+
+            $('.fm-dialog-title', $dialog).text(options.title || l[5840]);
+
+            if (options.body) {
+                $('.fm-dialog-body', $dialog).removeClass('hidden').safeHTML(options.body);
+            }
+            else {
+                $('.fm-dialog-body', $dialog).addClass('hidden');
+            }
+            $dialog.removeClass('hidden').addClass('active');
+
+            redraw();
+            $('.pro-register-scroll').removeAttr('style');
+            $(window).rebind('resize.proregdialog', redraw);
+            deleteScrollPanel('.pro-register-scroll', 'jsp');
+
+            return $dialog;
         });
 
         $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
@@ -305,12 +303,14 @@
         // controls
         $('.fm-dialog-close', $dialog)
             .rebind('click.proDialog', function() {
-                closeRegisterDialog();
+                closeRegisterDialog($dialog, true);
+                return false;
             });
 
         $('.fm-dialog-overlay')
             .rebind('click.proDialog', function() {
-                closeRegisterDialog();
+                closeRegisterDialog($dialog, true);
+                return false;
             });
 
         $('#register-email', $dialog)

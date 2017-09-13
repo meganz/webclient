@@ -212,10 +212,14 @@ Object.defineProperty(mega, 'achievem', {
  * @returns {MegaPromise}
  */
 mega.achievem.enabled = function achievementsEnabled() {
+    'use strict';
+
+    var self = this;
     var promise = new MegaPromise();
+    var status = 'ach' + u_type + u_handle;
+
     var notify = function(res) {
-        achievementsEnabled.status = res;
-        achievementsEnabled.pending = null;
+        self.achStatus[status] = res | 0;
 
         if ((res | 0) > 0) {
             return promise.resolve();
@@ -223,22 +227,23 @@ mega.achievem.enabled = function achievementsEnabled() {
         promise.reject();
     };
 
-    if (achievementsEnabled.status) {
-        notify(achievementsEnabled.status);
+    if (typeof this.achStatus[status] === 'number') {
+        notify(this.achStatus[status]);
     }
     else if (u_type && u_attr !== undefined) {
         notify(u_attr.flags && u_attr.flags.ach);
     }
-    else if (achievementsEnabled.pending) {
-        promise = achievementsEnabled.pending;
+    else if (this.achStatus[status] instanceof MegaPromise) {
+        promise = this.achStatus[status];
     }
     else {
-        achievementsEnabled.pending = promise;
+        this.achStatus[status] = promise;
         M.req('ach').always(notify);
     }
 
     return promise;
 };
+mega.achievem.achStatus = Object.create(null);
 
 /**
  * Show achievement dialog
@@ -482,10 +487,6 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
 
     $('.info-body p:first', $dialog).safeHTML(l[16317].replace('[S]', '<strong>').replace('[/S]', '</strong>'));
 
-    if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
-        mega.achievem.initInviteDialogMultiInputPlugin();
-    }
-
     // Remove all previously added emails
     $('.fm-dialog.invite-dialog .share-added-contact.token-input-token-invite').remove();
 
@@ -498,7 +499,17 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     $('.button.status', $dialog).addClass('hidden');
 
     // Show dialog
-    M.safeShowDialog('invite-friend', $dialog);
+    M.safeShowDialog('invite-friend', function() {
+        'use strict';
+
+        $dialog.removeClass('hidden');
+
+        if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
+            mega.achievem.initInviteDialogMultiInputPlugin();
+        }
+
+        return $dialog;
+    });
 
     // Remove unfinished user inputs
     $('#token-input-ach-invite-dialog-input', $dialog).val('');

@@ -674,6 +674,7 @@ function accountUI() {
         var $cancelButton = $saveBlock.find('.fm-account-cancel');
         var $saveButton = $saveBlock.find('.fm-account-save');
 
+        $('#account-password').val('');
         $('#account-new-password').val('');
         $('#account-confirm-password').val('');
 

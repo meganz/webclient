@@ -1095,7 +1095,7 @@ function api_setsid(sid) {
 
                     if (!dlmanager.isOverFreeQuota) {
                         dlmanager.uqFastTrack = 1;
-                        dlmanager._overquotaInfo();
+                        delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
                     }
                 }
 

@@ -487,10 +487,6 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
 
     $('.info-body p:first', $dialog).safeHTML(l[16317].replace('[S]', '<strong>').replace('[/S]', '</strong>'));
 
-    if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
-        mega.achievem.initInviteDialogMultiInputPlugin();
-    }
-
     // Remove all previously added emails
     $('.fm-dialog.invite-dialog .share-added-contact.token-input-token-invite').remove();
 
@@ -503,7 +499,17 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     $('.button.status', $dialog).addClass('hidden');
 
     // Show dialog
-    M.safeShowDialog('invite-friend', $dialog);
+    M.safeShowDialog('invite-friend', function() {
+        'use strict';
+
+        $dialog.removeClass('hidden');
+
+        if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
+            mega.achievem.initInviteDialogMultiInputPlugin();
+        }
+
+        return $dialog;
+    });
 
     // Remove unfinished user inputs
     $('#token-input-ach-invite-dialog-input', $dialog).val('');

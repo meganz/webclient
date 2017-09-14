@@ -3076,6 +3076,10 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
     };
 
     var _openDialog = function(name, dsp) {
+        if (d) {
+            console.log('safeShowDialog::_openDialog', name, typeof dsp, $.dialog);
+        }
+
         onIdle(function() {
             if (typeof $.dialog === 'string') {
 

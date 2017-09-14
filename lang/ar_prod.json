@@ -1823,9 +1823,9 @@
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder",
-    "17089": "Before you close your account, we would like to know why you are leaving us...",
-    "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
-    "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17086": "\u0641\u062a\u062d \u0627\u0644\u0645\u062c\u0644\u062f",
+    "17089": "\u0642\u0628\u0644 \u0625\u063a\u0644\u0627\u0642 \u062d\u0633\u0627\u0628\u0643\u060c \u0646\u0648\u062f \u0623\u0646 \u0646\u0639\u0631\u0641 \u0633\u0628\u0628 \u0645\u063a\u0627\u062f\u0631\u062a\u0643 \u0644\u0646\u0627 ...",
+    "17090": "\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u062a\u062d\u0648\u064a\u0644 \u0627\u0644\u0645\u0635\u0641\u0648\u0641\u0629 \u062a\u062c\u0627\u0648\u0632\u062a \u062d\u0635\u0635 \u0627\u0644\u0646\u0642\u0644 \u0627\u0644\u0645\u062a\u0648\u0641\u0631\u0629 \u0644\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0622\u064a \u0628\u064a \u0627\u0644\u062e\u0627\u0635 \u0628\u0643 IP \u0648\u0628\u0627\u0644\u062a\u0627\u0644\u064a \u064a\u0645\u0643\u0646 \u0623\u0646 \u064a\u062d\u0635\u0644 \u0627\u0646\u0642\u0637\u0627\u0639. \u0627\u0644\u0631\u062c\u0627\u0621 \u0627\u0644\u0648\u0636\u0639 \u0641\u064a \u0639\u064a\u0646 \u0627\u0644\u0627\u0639\u062a\u0628\u0627\u0631 \u0634\u0631\u0627\u0621 \u062e\u0637\u0629 PRO \u0644\u0632\u064a\u0627\u062f\u0629 \u062d\u0635\u0635 \u0627\u0644\u0646\u0642\u0644 \u0644\u062f\u064a\u0643",
+    "17091": "\u0627\u0633\u062a\u0645\u0631\u0627\u0631 \u0627\u0644\u062a\u062d\u0645\u064a\u0644 ",
+    "17092": "\u0647\u0644 \u0623\u0646\u062a \u0645\u062a\u0623\u0643\u062f \u0645\u0646 \u0625\u0644\u063a\u0627\u0621 \u0639\u0645\u0644\u064a\u0627\u062a \u0646\u0642\u0644 \u0647\u0630\u0647 \u0627\u0644\u0645\u0644\u0641\u0627\u062a %1\u061f"
 }

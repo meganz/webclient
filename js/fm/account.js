@@ -1171,7 +1171,7 @@ function accountUI() {
             $cbTpp.parent().switchClass('checkboxOn', 'checkboxOff');
         }
 
-         $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
+        $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
             var $this = $(this);
 
             if (fmconfig.tpp || typeof fmconfig.tpp === 'undefined') {
@@ -1184,7 +1184,6 @@ function accountUI() {
                 $this.parent().switchClass('checkboxOff', 'checkboxOn');
                 mega.config.setn('tpp', 1);
             }
-
         });
 
         $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');

@@ -1,7 +1,7 @@
 (function(scope) {
     "use strict";
 
-    var DEBUG = true;
+    var DEBUG = false;
 
     // all values are in seconds.
     var SHOW_AFTER_LASTLOGIN = 14 * 24 * 60 * 60;

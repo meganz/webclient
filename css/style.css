@@ -6150,7 +6150,7 @@ th.grid-first-th {
     padding-right: 12px;
 }
 .colour-label .tranfer-filetype-txt::after {
-    right: 2px;
+    right: 12px;
     top: 8px;
 }
 .grid-url-arrow, .file-settings-icon, .clear-transfer-icon {

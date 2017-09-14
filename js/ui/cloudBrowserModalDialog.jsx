@@ -550,7 +550,19 @@ var BrowserEntries = React.createClass({
                     </table>
                 </utils.JScrollPane>
             );
-        } else {
+        } else if (self.props.isLoading) {
+            return (
+                <div className="dialog-empty-block dialog-fm folder">
+                    <div className="dialog-empty-pad">
+                        <div className="dialog-empty-icon"></div>
+                        <div className="dialog-empty-header">
+                            {__(l[5533])}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        else {
             return (
                 <div className="dialog-empty-block dialog-fm folder">
                     <div className="dialog-empty-pad">
@@ -626,9 +638,10 @@ var CloudBrowserDialog = React.createClass({
             var handle = this.state.currentlyViewedEntry;
             if (!M.d[handle] || (M.d[handle].t && !M.c[handle])) {
                 var self = this;
-
+                self.setState({'isLoading': true});
                 dbfetch.get(handle)
                     .always(function() {
+                        self.setState({'isLoading': false});
                         self.setState({entries: self.getEntries()});
                     });
                 return;
@@ -692,7 +705,6 @@ var CloudBrowserDialog = React.createClass({
     render: function() {
         var self = this;
 
-        // TODO: @lp show a 'loading' in place of the "empty folder" placeholder while dbfetch'ing nodes
         var entries = self.state.entries || self.getEntries();
 
         var classes = "add-from-cloud " + self.props.className;
@@ -825,6 +837,7 @@ var CloudBrowserDialog = React.createClass({
 
 
                 <BrowserEntries
+                    isLoading={self.state.isLoading}
                     currentlyViewedEntry={self.state.currentlyViewedEntry}
                     entries={entries}
                     onExpand={(node) => {

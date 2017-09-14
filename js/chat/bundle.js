@@ -6593,6 +6593,21 @@ React.makeElement = React['createElement'];
 	                    )
 	                )
 	            );
+	        } else if (self.props.isLoading) {
+	            return React.makeElement(
+	                "div",
+	                { className: "dialog-empty-block dialog-fm folder" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "dialog-empty-pad" },
+	                    React.makeElement("div", { className: "dialog-empty-icon" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dialog-empty-header" },
+	                        __(l[5533])
+	                    )
+	                )
+	            );
 	        } else {
 	            return React.makeElement(
 	                "div",
@@ -6672,8 +6687,9 @@ React.makeElement = React['createElement'];
 	            var handle = this.state.currentlyViewedEntry;
 	            if (!M.d[handle] || M.d[handle].t && !M.c[handle]) {
 	                var self = this;
-
+	                self.setState({ 'isLoading': true });
 	                dbfetch.get(handle).always(function () {
+	                    self.setState({ 'isLoading': false });
 	                    self.setState({ entries: self.getEntries() });
 	                });
 	                return;
@@ -6877,6 +6893,7 @@ React.makeElement = React['createElement'];
 	                )
 	            ),
 	            React.makeElement(BrowserEntries, {
+	                isLoading: self.state.isLoading,
 	                currentlyViewedEntry: self.state.currentlyViewedEntry,
 	                entries: entries,
 	                onExpand: function onExpand(node) {

@@ -5663,6 +5663,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     left: 0;
     white-space: nowrap;
     overflow: hidden;
+    -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     width: 100%;
     padding-left: 38px;
@@ -6144,7 +6145,6 @@ th.grid-first-th {
 }
 .colour-label .tranfer-filetype-txt {
     padding-right: 12px;
-    position: relative;
 }
 .data-block-view.colour-label .tranfer-filetype-txt {
     padding-right: 12px;

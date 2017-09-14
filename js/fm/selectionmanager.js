@@ -500,9 +500,7 @@ var SelectionManager = function($selectable, resume) {
 
         // ensure the current 'resume' selection list is matching the current M.v
         $.selected.forEach(function(nodeId) {
-            if (M.v.filter(function(nodeObj) {
-                    return SelectionManager.dynamicNodeIdRetriever(nodeObj) === nodeId;
-                }).length === 0) {
+            if (!M.c[M.currentdirid] || !M.c[M.currentdirid][nodeId]) {
                 self.remove_from_selection(nodeId);
             }
         });

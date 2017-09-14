@@ -330,17 +330,6 @@ FileManager.prototype.initFileManagerUI = function() {
 
 
         if ((a === 'drop') && dd) {
-            if (t && M.d[t]) {
-                if (selectionManager) {
-                    selectionManager.clear_selection();
-                    selectionManager.set_currently_selected(t);
-                }
-                else {
-                    $.selected = [t];
-                }
-            }
-
-
             if (dd === 'nw-fm-left-icon') {
                 // do nothing
             }
@@ -1266,8 +1255,7 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
 
         var is_transfers_or_accounts = (
-            window.location.toString().indexOf('fm/account') !== -1 ||
-            window.location.toString().indexOf('fm/transfers') !== -1
+            M.currentdirid && (M.currentdirid.substr(0, 7) === 'account' || M.currentdirid === 'transfers')
         );
 
         // selection manager may not be available on empty folders.
@@ -1368,12 +1356,8 @@ FileManager.prototype.initUIKeyEvents = function() {
             // delete
             fmremove();
         }
-        else if (
-            (e.keyCode === 46) &&
-            (selPanel.length > 0) &&
-            !$.dialog &&
-            M.getNodeRights(M.currentdirid) > 1
-        ) {
+        else if ((e.keyCode === 46) && (selPanel.length > 0)
+            && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
             msgDialog('confirmation', l[1003], "Cancel " + s.length + " transferences?", false, function(e) {
 
                 // we should encapsule the click handler

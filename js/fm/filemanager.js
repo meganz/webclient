@@ -1294,7 +1294,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             return true;
         }
 
-        if (!is_fm() && (page !== 'login') && (page.substr(0, 3) !== 'pro')) {
+        if (!is_fm() && (page !== 'login') && (page !== 'download') && (page.substr(0, 3) !== 'pro')) {
             return true;
         }
 

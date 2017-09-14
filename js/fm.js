@@ -391,7 +391,7 @@ function openTransfersPanel()
 }
 
 function showTransferToast(t_type, t_length, isPaused) {
-    if ((M.currentdirid !== 'transfers') && (fmconfig.tpp === false)) {
+    if (M.currentdirid !== 'transfers' && fmconfig.tpp == 0) {
         var $toast;
         var $second_toast;
         var timer = 0;

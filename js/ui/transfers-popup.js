@@ -164,9 +164,9 @@ mega.ui.tpp = function () {
     var showBlock = function showBlock(block) {
         var $item = opts.dlg[block].$;
 
-        if ($item.is(':hidden')) {
+        if (isCached() && $item.is(':hidden')) {
             $item.removeClass('hidden');
-            setStatus(true);
+            // setStatus(true);
         }
     };
 
@@ -490,22 +490,11 @@ mega.ui.tpp = function () {
     };
 
     /**
-     * Called when switching from public link download with non completed dls
-     * @param {String} blk 'dl' or 'ul'
-     */
-    // var reInitialize = function reInitialize(blk) {
-    //     if (dl_queue.length) {
-    //     }
-
-    //     opts.dlg.initialized = true;
-    // };
-
-    /**
      * Shows TPP as soon as file or folder is picked
      * @param {String} bl Download or upload block i.e. ['dl', 'ul']
      */
     var started = function started(bl) {
-        if (!getIndex(bl)) {
+        if (!getIndex(bl) && isEnabled()) {
             resetBlock(bl);
             showBlock(bl);
             opts.dlg.$.show(opts.duration);
@@ -563,7 +552,7 @@ mega.ui.tpp = function () {
 
         // Check if tpp used before, if not force usage
         if (typeof fmconfig.tpp === 'undefined' || isEph) {
-            mega.config.set('tpp', true);
+            mega.config.set('tpp', 1);
             setEnabled(1);
         }
         else {
@@ -605,19 +594,17 @@ mega.ui.tpp = function () {
         }
         var visible = isVisible();
 
-        if (!$.isEmptyObject(opts.dlg.$)) {
-            if (!value && visible) {
-                hide();
-            }
-            else if (value && !visible) {
-                show();
-            }
+        if (!value && visible) {
+            hide();
+        }
+        else if (value && !visible) {
+            show();
         }
     });
 
     return {
         isCached: isCached,
-        // isInit: isInit,
+        isEnabled: isEnabled,
         show: show,
         hide: hide,
         pause: pause,

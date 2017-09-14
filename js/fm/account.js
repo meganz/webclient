@@ -1171,10 +1171,10 @@ function accountUI() {
             $cbTpp.parent().switchClass('checkboxOn', 'checkboxOff');
         }
 
-        $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
+         $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
             var $this = $(this);
 
-            if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
+            if (fmconfig.tpp || typeof fmconfig.tpp === 'undefined') {
                 $this.switchClass('checkboxOn', 'checkboxOff');
                 $this.parent().switchClass('checkboxOn', 'checkboxOff');
                 mega.config.setn('tpp', 0);

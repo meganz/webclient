@@ -541,7 +541,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
                 $('.widget-block').addClass('active');
             }
             else {
-                if (mega.ui.tpp.isCached()) {
+                if (mega.ui.tpp.isCached() && mega.ui.tpp.isEnabled()) {
                     mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
                     mega.ui.tpp.updateBlock('dl');
                 }
@@ -1216,7 +1216,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             $tr.find('.speed').addClass('unknown').text('');
         }
 
-        if (mega.ui.tpp.isCached()) {
+        if (mega.ui.tpp.isCached() && mega.ui.tpp.isEnabled()) {
             mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
             mega.ui.tpp.updateBlock('ul');
         }

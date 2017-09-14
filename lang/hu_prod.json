@@ -851,8 +851,6 @@
     "6832": "A m\u0171velet befejez\u00e9s\u00e9vel el fogod veszteni az \u00f6sszes felt\u00f6lt\u00f6tt megoszt\u00e1st \u00e9s kapcsolataid",
     "6834": "F\u00e1jlok k\u00fcld\u00e9se",
     "6841": "Sajn\u00e1lattal l\u00e1tjuk t\u00e1voz\u00e1s\u00e1t",
-    "6842": "FI\u00f3kod le lett z\u00e1rva",
-    "6843": "\u00e1m miel\u0151tt t\u00e1vozna, tudni szeretn\u00e9nk mi\u00e9rt hagy itt benn\u00fcnket",
     "6844": "K\u00e9rj\u00fck v\u00e1lasszon egyet",
     "6845": "M\u00e1r nem haszn\u00e1lom a fi\u00f3komat",
     "6846": "Kedvenc b\u00f6ng\u00e9sz\u0151m technol\u00f3giailag nem kompatibilis \u00e9s nem akarok v\u00e1ltani",
@@ -1825,5 +1823,9 @@
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17086": "Open folder",
+    "17089": "Before you close your account, we would like to know why you are leaving us...",
+    "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+    "17091": "Continue Download",
+    "17092": "Are you sure you want to cancel these %1 file transfers?"
 }

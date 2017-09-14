@@ -851,8 +851,6 @@
     "6832": "Dokon\u010den\u00edm t\u00e9to akce ztrat\u00edte p\u0159\u00edstup ke v\u0161em sv\u00fdm nahran\u00fdm dat\u016fm, sd\u00edlen\u00edm a kontakt\u016fm.",
     "6834": "Odeslat soubory",
     "6841": "Je n\u00e1m l\u00edto, \u017ee odch\u00e1z\u00edte",
-    "6842": "V\u00e1\u0161 \u00fa\u010det je nyn\u00ed uzav\u0159en",
-    "6843": "ale ne\u017e odejdete, r\u00e1di bychom v\u011bd\u011bli, pro\u010d n\u00e1s opou\u0161t\u00edte",
     "6844": "Vyberte jednu mo\u017enost",
     "6845": "Sv\u016fj \u00fa\u010det ji\u017e nepou\u017e\u00edv\u00e1m",
     "6846": "M\u016fj obl\u00edben\u00fd prohl\u00ed\u017ee\u010d nen\u00ed technologicky kompatibiln\u00ed a j\u00e1 ho nechci m\u011bnit",
@@ -1825,5 +1823,9 @@
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17086": "Open folder",
+    "17089": "Before you close your account, we would like to know why you are leaving us...",
+    "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+    "17091": "Continue Download",
+    "17092": "Are you sure you want to cancel these %1 file transfers?"
 }

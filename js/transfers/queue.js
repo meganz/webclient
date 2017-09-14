@@ -544,7 +544,7 @@ TransferQueue.prototype.push = function(cl) {
         }
     };
 
-    if (localStorage.ignoreLimitedBandwidth) {
+    if (localStorage.ignoreLimitedBandwidth || Object(u_attr).p || cl.dl.byteOffset === cl.dl.size) {
         showToast();
         dlmanager.setUserFlags();
         return MegaQueue.prototype.push.apply(this, arguments);
@@ -578,7 +578,7 @@ TransferQueue.prototype.push = function(cl) {
             }
 
             // this will include currently-downloading and the ClassFiles in hold atm.
-            size += dlmanager.getCurrentDownloadsSize();
+            size += dlmanager.getCurrentDownloadsSize(true);
 
             // Set user flags, registered, pro, achievements
             dlmanager.setUserFlags();

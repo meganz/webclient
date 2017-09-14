@@ -851,8 +851,6 @@
     "6832": "Completando questa azione si perde l'accesso a tutte le condivisioni di dati e contatti caricati",
     "6834": "Invia files",
     "6841": "Siamo spiacenti di vederti andare",
-    "6842": "Il tuo account \u00e8 stato chiuso",
-    "6843": "ma prima di andare ci piacerebbe sapere perch\u00e9 ci sta lasciando",
     "6844": "Scegli",
     "6845": "Non utilizzo pi\u00f9 il mio account",
     "6846": "Il mio browser preferito non \u00e8 tecnologicamente compatibile e non voglio cambiare",
@@ -1825,5 +1823,9 @@
     "17083": "L'app universale di MEGA per Windows \u00e8 al momento sotto sviluppo. Puoi ottenere la versione beta [A]qui[\/A].",
     "17084": "Il tuo download non \u00e8 stato processato in quanto ti porterebbe oltre il limite della tua banda di trasferimento disponibile per il tuo account.",
     "17085": "Hai dei trasferimenti scaricati parzialmente. Vuoi riprenderli?",
-    "17086": "Apri cartella"
+    "17086": "Apri cartella",
+    "17089": "Prima che chiudi il tuo account, ci piacerebbe conoscere i motivi per cui ci lasci...",
+    "17090": "I tuoi download messi in cosa superano la banda di trasferimento disponibile per il tuo indirizzo IP e potrebbero essere interrotti. Per favore, tieni presente che acquistando un account PRO aumenteresti di molto la tua banda di trasferimento.",
+    "17091": "Continua download",
+    "17092": "Sei sicuro di voler annullare questi %1 trasferimenti di file?"
 }

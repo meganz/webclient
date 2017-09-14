@@ -165,13 +165,16 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
             });
 
             $('.shared-details-info-block .fm-share-copy').rebind('click', function(e) {
-                $.copyDialog = 'copy'; // this is used like identifier when key with key code 27 is pressed
-                $.mcselected = M.RootID;
-                $('.copy-dialog .dialog-copy-button').addClass('active');
-                $('.copy-dialog').removeClass('hidden');
-                handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
-                $('.fm-dialog-overlay').removeClass('hidden');
-                $('body').addClass('overlayed');
+                M.safeShowDialog('copy', function() {
+                    var $dialog = $('.fm-dialog.copy-dialog');
+
+                    $.copyDialog = 'copy'; // this is used like identifier when key with key code 27 is pressed
+                    $.mcselected = M.RootID;
+                    $('.copy-dialog .dialog-copy-button').addClass('active');
+                    $dialog.removeClass('hidden');
+                    handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
+                    return $dialog;
+                });
             });
 
             // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button

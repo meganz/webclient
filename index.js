@@ -172,7 +172,8 @@ function topPopupAlign(button, popup, topPos) {
             buttonTopPos;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('.top-head').width();
+            pageWidth = $('body').width();
+            $popup.removeAttr('style');
             $popupArrow.removeAttr('style');
             popupRightPos = pageWidth
                 - $button.offset().left
@@ -1132,7 +1133,7 @@ function init_page() {
         return false;
     }
 
-    else if (is_fm()) {		
+    else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
@@ -1559,12 +1560,13 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').removeClass('hidden');
 
         // Show the rocket icon if achievements are enabled
-        if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
                 $topHeader.find('.top-icon.achievements').removeClass('hidden');
+            })
+            .fail(function() {
+                $topHeader.find('.top-icon.achievements').addClass('hidden');
             });
-        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -2340,6 +2342,11 @@ window.onbeforeunload = function () {
 
 window.onunload = function() {
     mBroadcaster.crossTab.leave();
+
+    if (typeof dlpage_ph === 'string') {
+        // Clear the download activity flag navigating away on the downloads page.
+        dlmanager.dlClearActiveTransfer(dlpage_ph);
+    }
 };
 
 mBroadcaster.once('boot_done', function() {

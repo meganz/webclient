@@ -15823,6 +15823,18 @@
         "text": "All data associated with the selected contacts will be permanently lost.",
         "context": "Plural version, warning about the loss of shared data with these users if they are removed."
     },
+    "16773": {
+        "text": "%1$s [A]is typing...[\/A]",
+        "context": "Singular, a hint that appears when one user is typing in a chat. Please do not translate or modify the tags or placeholders."
+    },
+    "16774": {
+        "text": "%1$s [A]are typing...[\/A]",
+        "context": "Plural, a hint that appears when two users are typing in a group chat at the same time. The parameter will be the concatenation of both user names. Please do not translate or modify the tags or placeholders."
+    },
+    "16775": {
+        "text": "%1$s [A]and more are typing...[\/A]",
+        "context": "text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing... The parameter will be the concatenation of the first two user names. Please do not translate or modify the tags or placeholders."
+    },
     "16776": {
         "text": "not available",
         "context": "Label in section the storage tab in My Account Section when no info info is received"
@@ -16471,6 +16483,10 @@
         "text": "Inbox Empty",
         "context": "Text that indicates that Inbox is empty"
     },
+    "16955": {
+        "text": "Incoming shares with",
+        "context": "title of the screen where the folders are shown with the contact owner of those folders. Please view screenshot for context."
+    },
     "16956": {
         "text": "Add new contacts using the button below",
         "context": "Adding new relationships (contacts) using the actions."
@@ -16543,6 +16559,10 @@
         "text": "and %d items were not sent successfully",
         "context": "success message when moving a node. Please do not modify the %d placeholder. This sentence follows an earlier message."
     },
+    "16974": {
+        "text": "Error. %d shares were not completed",
+        "context": "error message when sharing a folder. Please do not modify the %d placeholder, it will be replaced by the number of shares that were not completed."
+    },
     "16975": {
         "text": "Error. %d process of removing shares is not completed",
         "context": "error message when sharing a folder. Please do not modify the %d placeholder."
@@ -16550,6 +16570,10 @@
     "16976": {
         "text": "%d items are not removed successfully",
         "context": "error message when moving a node. Please do not modify the %d placeholder."
+    },
+    "16977": {
+        "text": "%d folders were not left successfully",
+        "context": "error message when leaving a shared folder. Please do not modify the %d placeholder."
     },
     "16978": {
         "text": "File sent to %d contacts successfully",
@@ -16614,6 +16638,10 @@
     "16993": {
         "text": "Type feedback here",
         "context": "hint cancel subscriptions dialog"
+    },
+    "16994": {
+        "text": "Your subscription has not been cancelled. Please provide a reason for your cancellation",
+        "context": "provide a reason to cancel subscriptions dialog, if the user tried to cancel without providing a reason. This alerts them that they did not successfully cancel yet and must give a reason."
     },
     "16995": {
         "text": "Please enter the decryption key for the link",
@@ -16827,6 +16855,14 @@
         "text": "You will receive a recovery link that will allow you to reset your password.",
         "context": "Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass"
     },
+    "17048": {
+        "text": "Improve your cloud capacity![A]Get more space & transfer quota with a PRO account!",
+        "context": "Message to promote PRO accounts"
+    },
+    "17049": {
+        "text": "The Recovery Key has been backed up into: %1s.[A]While the file remains in this path, you will find it at the Saved for Offline Section.[A]Note: It will be deleted if you log out, please store it in a safe place.",
+        "context": "success message when the MasterKey file has been downloaded\r\n"
+    },
     "17050": {
         "text": "The key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
         "context": "Alert when the user introduces his MK to reset pass incorrectly"
@@ -16978,5 +17014,17 @@
     "17089": {
         "text": "Before you close your account, we would like to know why you are leaving us...",
         "context": "A message on the account cancellation dialog before a list of options the user can select to explain why they want to cancel their account."
+    },
+    "17090": {
+        "text": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+        "context": "Informs user that transfer quota will be exceeded soon and user should buy PRO account."
+    },
+    "17091": {
+        "text": "Continue Download",
+        "context": "Button label. Allows user to continue download if it was paused."
+    },
+    "17092": {
+        "text": "Are you sure you want to cancel these %1 file transfers?",
+        "context": "A message shown to the user when they attempt to cancel a bunch of selected transfers. Please leave the %1 placeholder which will be replaced with the number of file transfers."
     }
 }

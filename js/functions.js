@@ -1535,8 +1535,22 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
  * Perform a normal logout
  *
  * @param {Function} aCallback optional
+ * @param {Bool} force optional
  */
-function mLogout(aCallback) {
+function mLogout(aCallback, force) {
+    "use strict";
+
+    if (!force && mega.ui.passwordReminderDialog) {
+        var passwordReminderLogout = mega.ui.passwordReminderDialog.recheckLogoutDialog();
+
+        passwordReminderLogout
+            .done(function() {
+                mLogout(aCallback, true);
+            });
+
+        return;
+    }
+
     var cnt = 0;
     if (M.c[M.RootID] && u_type === 0) {
         for (var i in M.c[M.RootID]) {

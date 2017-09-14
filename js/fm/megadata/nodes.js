@@ -433,6 +433,24 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         }
         return promise;
     }
+
+    if (tree.opSize) {
+        loadingDialog.phide();
+
+        M.checkGoingOverStorageQuota(tree.opSize)
+            .fail(function() {
+                if (promise) {
+                    promise.reject(EGOINGOVERQUOTA);
+                }
+            })
+            .done(function() {
+                // Not going overquota, provide the final tree back to copyNodes() and continue
+                M.copyNodes(cn, t, del, promise, tree);
+            });
+
+        delete tree.opSize;
+        return promise;
+    }
     todel = tree.todel;
 
     var a = tree;
@@ -522,10 +540,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
                 if (promise) {
                     return promise.reject(res);
                 }
-                if (res == EOVERQUOTA) {
-                    return M.showOverStorageQuota(100);
-                }
-                return msgDialog('warninga', l[135], l[47], api_strerror(res));
+                return M.ulerror(null, res);
             }
 
             if (ctx.del) {
@@ -1143,8 +1158,17 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
  */
 MegaData.prototype.getCopyNodes = function fm_getcopynodes(handles, hadd, names) {
     var promise = new MegaPromise();
+    var hs = handles.concat(hadd || []);
 
-    dbfetch.coll(handles.concat(hadd || []))
+    for (var i = hs.length; i--;) {
+        var h = hs[i];
+
+        if (M.d[h] && !M.d[h].t) {
+            hs.splice(i, 1);
+        }
+    }
+
+    dbfetch.coll(hs)
         .wait(function() {
             var sync = function(names, handles) {
                 var result = M.getCopyNodesSync(handles, names);
@@ -1174,6 +1198,7 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
     var a = [];
     var r = [];
     var i, j;
+    var opSize = 0;
 
     // add all subtrees under handles[], including the roots
     for (i = 0; i < handles.length; i++) {
@@ -1221,8 +1246,15 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
             }
         }
 
+        // count total size
+        if (!n.t) {
+            opSize += n.s || 0;
+        }
+
         a.push(nn);
     }
+
+    a.opSize = opSize;
 
     return a;
 };
@@ -1683,7 +1715,7 @@ MegaData.prototype.nodeShare = function(h, s, ignoreDB) {
 
     if (this.d[h]) {
         if (typeof this.d[h].shares === 'undefined') {
-            this.d[h].shares = Hash('Shares');
+            this.d[h].shares = Object.create(null);
         }
         this.d[h].shares[s.u] = s;
 
@@ -2102,9 +2134,10 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
         $.mcImport = true;
         $.selected = data[0];
         $.onImportCopyNodes = data[1];
+        $.onImportCopyNodes.opSize = data[2];
 
         if (d) {
-            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes);
+            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
         }
         $('.dropdown-item.copy-item').click();
     };
@@ -2144,7 +2177,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 
             M.getCopyNodes(sel)
                 .done(function(nodes) {
-                    var data = [sel, nodes];
+                    var data = [sel, nodes, nodes.opSize];
                     var fallback = function() {
                         $.onImportCopyNodes = data;
                         loadSubPage('fm');

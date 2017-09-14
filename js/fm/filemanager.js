@@ -60,9 +60,25 @@ FileManager.prototype.initFileManager = function() {
 
 /**
  * Invoke callback once the fm has been initialized
+ * @param {Boolean} [ifMaster] Invoke callback if running under a master tab
  * @param {Function} callback The function to invoke
  */
-FileManager.prototype.onFileManagerReady = function(callback) {
+FileManager.prototype.onFileManagerReady = function(ifMaster, callback) {
+    'use strict';
+
+    if (typeof ifMaster === 'function') {
+        callback = ifMaster;
+        ifMaster = false;
+    }
+
+    callback = (function(callback) {
+        return function() {
+            if (!ifMaster || mBroadcaster.crossTab.master) {
+                callback();
+            }
+        };
+    })(callback);
+
     if (fminitialized) {
         onIdle(callback);
     }
@@ -314,6 +330,12 @@ FileManager.prototype.initFileManagerUI = function() {
 
 
         if ((a === 'drop') && dd) {
+            if (t && M.d[t]) {
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected(t);
+            }
+
+
             if (dd === 'nw-fm-left-icon') {
                 // do nothing
             }
@@ -393,7 +415,6 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
-        M.cacheselect();
 
         if ($(this).hasClass('listing-view')) {
             if (fmconfig.uiviewmode) {
@@ -662,7 +683,6 @@ FileManager.prototype.updFileManagerUI = function() {
     "use strict";
 
     var treebuild = Object.create(null);
-    var parents = Object.create(null);
     var UImain = false;
     var UItree = false;
     var newcontact = false;
@@ -682,12 +702,8 @@ FileManager.prototype.updFileManagerUI = function() {
         if (newNode.su) {
             newshare = true;
         }
-        if (newNode.p) {
-            if (newNode.t) {
-                treebuild[newNode.p] = 1;
-            }
-
-            parents[newNode.p] = 1;
+        if (newNode.p && newNode.t) {
+            treebuild[newNode.p] = 1;
         }
         if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
             UImain = true;
@@ -788,20 +804,7 @@ FileManager.prototype.updFileManagerUI = function() {
                     console.timeEnd('rendernew');
                 }
 
-                var promises = [];
-
-                if ($.len(parents)) {
-                    parents = Object.keys(parents);
-
-                    for (var i = parents.length; i--;) {
-                        promises.push(checkParentNodeInconsistency(parents[i], 10));
-                    }
-                }
-
-                MegaPromise.allDone(promises)
-                    .always(function() {
-                        masterPromise.resolve();
-                    });
+                masterPromise.resolve();
             });
         });
 
@@ -930,22 +933,31 @@ FileManager.prototype.initContextUI = function() {
 
     // Move Dialog
     $(c + '.advanced-item, ' + c + '.move-item').rebind('click', function() {
+        M.safeShowDialog('move', function() {
+            var $dialog = $('.fm-dialog.move-dialog');
 
-        $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-        $.mcselected = M.RootID;
-        $('.move-dialog').removeClass('hidden');
-        handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
-        M.disableCircularTargets('#mctreea_');
-        fm_showoverlay();
+            $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
+            $.mcselected = M.RootID;
+
+            $dialog.removeClass('hidden');
+            handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
+            M.disableCircularTargets('#mctreea_');
+
+            return $dialog;
+        });
     });
 
     $(c + '.copy-item').rebind('click', function() {
+        M.safeShowDialog('copy', function() {
+            var $dialog = $('.fm-dialog.copy-dialog');
 
-        $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
-        $.mcselected = M.RootID;
-        $('.copy-dialog').removeClass('hidden');
-        handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
-        fm_showoverlay();
+            $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
+            $.mcselected = M.RootID;
+            $dialog.removeClass('hidden');
+            handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
+
+            return $dialog;
+        });
     });
 
     $(c + '.import-item').rebind('click', function() {
@@ -1133,14 +1145,11 @@ FileManager.prototype.initContextUI = function() {
         fm_tfsupdate();
 
         if (toabort.length) {
-            // FIXME: toabort is an array of transfers to abort, don't just pick the first element
-
-            var blk = String(toabort[0]).indexOf('ul_') !== -1 ? 'ul' : 'dl';
-            //               ^^^^^^^^^^
-
-            mega.ui.tpp.setTotal(-1, blk);
-            // mega.ui.tpp.setIndex(-1, blk);
-            mega.ui.tpp.updateIndexes(blk);
+            for (var i = toabort.length; i--;) {
+                var blk = String(toabort[i]).indexOf('ul_') !== -1 ? 'ul' : 'dl';
+                mega.ui.tpp.setTotal(-1, blk);
+                mega.ui.tpp.updateIndexes(blk);
+            }
         }
 
         onIdle(function() {
@@ -1151,7 +1160,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     if (localStorage.folderLinkImport) {
-        onIdle(M.importFolderLinkNodes.bind(M));
+        onIdle(M.importFolderLinkNodes.bind(M, false));
     }
 };
 
@@ -1179,7 +1188,7 @@ FileManager.prototype.createFolderUI = function() {
         else {
             b1.removeClass('active filled-input');
             d1.addClass('hidden');
-            $('.fm-new-folder input').val(l[157]);
+            $('.fm-new-folder input').val('');
         }
         $.hideContextMenu();
     });
@@ -1193,7 +1202,7 @@ FileManager.prototype.createFolderUI = function() {
         $('.fm-new-folder').removeClass('active');
         $('.create-new-folder').addClass('hidden');
         $('.create-new-folder').removeClass('filled-input');
-        $('.create-new-folder input').val(l[157]);
+        $('.create-new-folder input').val('');
     });
 
     $('.create-folder-size-icon.full-size').rebind('click', function() {
@@ -1209,7 +1218,7 @@ FileManager.prototype.createFolderUI = function() {
         $('.create-new-folder').addClass('hidden');
         $('.fm-new-folder').removeClass('active');
         createFolderDialog(0);
-        $('.create-new-folder input').val(l[157]);
+        $('.create-new-folder input').val('');
     });
 
     $('.create-folder-size-icon.short-size').rebind('click', function() {
@@ -1226,7 +1235,7 @@ FileManager.prototype.createFolderUI = function() {
         topPopupAlign('.link-button.fm-new-folder', '.add-user-popup');
 
         createFolderDialog(1);
-        $('.create-folder-dialog input').val(l[157]);
+        $('.create-folder-dialog input').val('');
         $('.create-new-folder input').focus();
     });
 
@@ -1248,9 +1257,6 @@ FileManager.prototype.createFolderUI = function() {
     });
 
     $('.create-new-folder input').rebind('blur.create-new-f', function() {
-        if ($('.create-new-folder input').val() === '') {
-            $('.create-new-folder input').val(l[157]);
-        }
         $('.create-new-folder').removeClass('focused');
     });
 };
@@ -1263,14 +1269,26 @@ FileManager.prototype.initUIKeyEvents = function() {
             return false;
         }
 
-        var sl = false, s;
-        if (M.viewmode) {
-            s = $('.data-block-view.ui-selected');
+        var sl = false;
+        var s = [];
+
+        var selPanel = $('.fm-transfers-block tr.ui-selected');
+
+        if (selectionManager && selectionManager.selected_list && selectionManager.selected_list.length > 0) {
+            s = clone(selectionManager.selected_list);
         }
         else {
-            s = $('.grid-table tr.ui-selected');
+            var tempSel;
+
+            if (M.viewmode) {
+                tempSel = $('.data-block-view.ui-selected');
+            }
+            else {
+                tempSel = $('.grid-table tr.ui-selected');
+            }
+
+            s = tempSel.attrs('id');
         }
-        var selPanel = $('.fm-transfers-block tr.ui-selected');
 
         if (M.chat) {
             return true;
@@ -1285,131 +1303,54 @@ FileManager.prototype.initUIKeyEvents = function() {
          * other day :)
          */
         if (!$.dialog && !slideshowid && M.viewmode == 1) {
-            var items_per_row = Math.floor(
-                $('.data-block-view').parent().outerWidth() / $('.data-block-view:first').outerWidth(true)
-             );
-            var total_rows = Math.ceil($('.data-block-view').size() / items_per_row);
-
             if (e.keyCode == 37) {
                 // left
-                var current = selectionManager.get_currently_selected("first");
-                // clear old selection if no shiftKey
-                if (!e.shiftKey) {
-                    s.removeClass("ui-selected");
-                }
-                var $target_element = null;
-                if (current.length > 0 && current.prev('.data-block-view').length > 0) {
-                    $target_element = current.prev('.data-block-view');
-                }
-                else {
-                    $target_element = $('.data-block-view:last');
-                }
-                if ($target_element) {
-                    $target_element.addClass('ui-selected');
-                    selectionManager.set_currently_selected($target_element);
-                }
+                selectionManager.select_prev(e.shiftKey, true);
             }
             else if (e.keyCode == 39) {
-
                 // right
-                var current = selectionManager.get_currently_selected("last");
-                if (!e.shiftKey) {
-                    s.removeClass("ui-selected");
-                }
-                var $target_element = null;
-                var next = current.next('.data-block-view');
-
-                // clear old selection if no shiftKey
-                if (next.length > 0) {
-                    $target_element = next;
-                }
-                else {
-                    $target_element = $('.data-block-view:first');
-                }
-                if ($target_element) {
-                    $target_element.addClass('ui-selected');
-                    selectionManager.set_currently_selected($target_element);
-                }
+                selectionManager.select_next(e.shiftKey, true);
             }
 
             // up & down
             else if (e.keyCode == 38 || e.keyCode == 40) {
-                var current = selectionManager.get_currently_selected("first"),
-                    current_idx = $.elementInArray(current, $('.fm-blocks-view .data-block-view')) + 1;
-
-                if (!e.shiftKey) {
-                    s.removeClass("ui-selected");
+                if (e.keyCode === 38) {
+                    selectionManager.select_grid_up(e.shiftKey, true);
+                }
+                else {
+                    selectionManager.select_grid_down(e.shiftKey, true);
                 }
 
-                var current_row = Math.ceil(current_idx / items_per_row),
-                    current_col = current_idx % items_per_row,
-                    target_row;
-
-                if (e.keyCode == 38) { // up
-                    // handle the case when the users presses ^ and the current row is the first row
-                    target_row = current_row == 1 ? total_rows : current_row - 1;
-                }
-                else if (e.keyCode == 40) { // down
-                    // handle the case when the users presses DOWN and the current row is the last row
-                    target_row = current_row == total_rows ? 1 : current_row + 1;
-                }
-
-                // calc the index of the target element
-                var target_element_num = ((target_row - 1) * items_per_row) + (current_col - 1),
-                    $target = $('.data-block-view:eq(' + target_element_num + ')');
-
-                $target.addClass("ui-selected");
-                selectionManager.set_currently_selected($target);
             }
         }
 
-        if ((e.keyCode == 38) && (s.length > 0) && ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) && !$.dialog) {
-
-            // up in grid
-            if (e.shiftKey) {
-                $(e).addClass('ui-selected');
-            }
-            if ($(s[0]).prev().length > 0) {
-                if (!e.shiftKey) {
-                    $('.grid-table tr').removeClass('ui-selected');
-                }
-                $(s[0]).prev().addClass('ui-selected');
-                sl = $(s[0]).prev();
-
-                quickFinder.disable_if_active();
-            }
+        if (
+            e.keyCode == 38 &&
+            s.length > 0 &&
+            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            !$.dialog
+        ) {
+            // up in grid/table
+            selectionManager.select_prev(e.shiftKey, true);
+            quickFinder.disable_if_active();
         }
-        else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 && !$.dialog) {
-
-            // down in grid
-            if (e.shiftKey) {
-                $(e).addClass('ui-selected');
-            }
-            if ($(s[s.length - 1]).next().length > 0) {
-                if (!e.shiftKey) {
-                    $('.grid-table tr').removeClass('ui-selected');
-                }
-                $(s[s.length - 1]).next().addClass('ui-selected');
-                sl = $(s[0]).next();
-
-                quickFinder.disable_if_active();
-            }
+        else if (
+            e.keyCode == 40 &&
+            s.length > 0 &&
+            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            !$.dialog
+        ) {
+            // down in grid/table
+            selectionManager.select_next(e.shiftKey, true);
+            quickFinder.disable_if_active();
         }
-        else if ((e.keyCode === 46) && (s.length > 0)
-            && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
+        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
+            // delete
             fmremove();
         }
         else if ((e.keyCode === 46) && (selPanel.length > 0)
             && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            var selected = [];
-            selPanel.each(function() {
-                selected.push($(this).attr('id'));
-            });
-            msgDialog('confirmation', l[1003], "Cancel " + selected.length + " transferences?", false, function(e) {
+            msgDialog('confirmation', l[1003], l[17092].replace('%1', s.length), false, function(e) {
 
                 // we should encapsule the click handler
                 // to call a function rather than use this hacking
@@ -1418,17 +1359,16 @@ FileManager.prototype.initUIKeyEvents = function() {
                 }
             });
         }
-        else if (e.keyCode == 13
+        else if (
+            e.keyCode == 13
             && s.length > 0
             && !$.dialog
             && !$.msgDialog
             && !$('.fm-new-folder').hasClass('active')
-            && !$('.top-search-bl').hasClass('active')) {
+            && !$('.top-search-bl').hasClass('active')
+        ) {
+            $.selected = s;
 
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
             if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];
                 if (n && n.t) {
@@ -1443,7 +1383,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
         else if ((e.keyCode === 13) && ($.dialog === 'share')) {
-
             var share = new mega.Share();
             share.updateNodeShares();
         }
@@ -1451,7 +1390,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             addNewContact($('.add-user-popup-button.add'));
         }
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
-            doRename();
+            $('.rename-dialog-button.rename').trigger('click');
         }
 
         // If the Esc key is pressed while the payment address dialog is visible, close it
@@ -1485,15 +1424,14 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
         else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
             renameDialog();
         }
         else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
-            $('.grid-table.fm tr').addClass('ui-selected');
-            $('.fm-blocks-view .data-block-view').addClass('ui-selected');
+            if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+                return;
+            }
+            // ctrl+a/cmd+a - select all
+            selectionManager.select_all();
         }
         else if (e.keyCode == 37 && slideshowid) {
             slideshow_prev();
@@ -1511,8 +1449,14 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
 
         if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {
+            // if something is selected, scroll to that item
             var jsp = $($.selectddUIgrid).data('jsp');
-            jsp.scrollToElement(sl);
+            if (jsp) {
+                jsp.scrollToElement(sl);
+            }
+            else if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
+                M.megaRender.megaList.scrollToItem(sl.data('id'));
+            }
         }
 
         M.searchPath();
@@ -1862,14 +1806,18 @@ FileManager.prototype.addContactUI = function() {
         });
 
         $('.fm-share-folders').rebind('click', function() {
-            $('.copy-dialog').removeClass('hidden');
+            M.safeShowDialog('copy', function() {
+                var $dialog = $('.fm-dialog.copy-dialog');
+                $dialog.removeClass('hidden');
 
-            $.copyDialog = 'copy';
-            $.mcselected = undefined;
-            $.copyToShare = true;
+                $.copyDialog = 'copy';
+                $.mcselected = undefined;
+                $.copyToShare = true;
 
-            handleDialogContent('cloud-drive', 'ul', true, 'copy', l[1344]);
-            fm_showoverlay();
+                handleDialogContent('cloud-drive', 'ul', true, 'copy', l[1344]);
+
+                return $dialog;
+            });
         });
 
         // Remove contact button on contacts page
@@ -1894,15 +1842,19 @@ FileManager.prototype.addContactUI = function() {
 FileManager.prototype.addCreateFolderUI = function() {
     "use strict";
 
-    if ($('.create-new-folder input').val() === '') {
-        $('.create-new-folder input').animate({backgroundColor: "#d22000"}, 150, function() {
-            $('.create-new-folder input').animate({backgroundColor: "white"}, 350, function() {
-                $('.create-new-folder input').focus();
-            });
-        });
+    var $inputWrapper = $('.create-folder-pad');
+    var $input = $('.create-new-folder input');
+
+    if ($input.val() === '') {
+        $inputWrapper.addClass('error');
+
+        setTimeout(function() {
+            $inputWrapper.removeClass('error');
+            $input.focus();
+        }, 200);
     }
     else {
-        this.createFolder(this.currentdirid, $('.create-new-folder input').val());
+        this.createFolder(this.currentdirid, $input.val());
     }
 };
 
@@ -1922,12 +1874,12 @@ FileManager.prototype.addNotificationsUI = function(close) {
  * Depending the viewmode this fires either addIconUI or addGridUI, plus addTreeUI
  * @param {Boolean} aNoTreeUpdate Omit the call to addTreeUI
  */
-FileManager.prototype.addViewUI = function(aNoTreeUpdate) {
+FileManager.prototype.addViewUI = function(aNoTreeUpdate, refresh) {
     if (this.viewmode) {
-        this.addIconUI();
+        this.addIconUI(undefined, refresh);
     }
     else {
-        this.addGridUI();
+        this.addGridUI(refresh);
     }
 
     if (!aNoTreeUpdate) {
@@ -1935,7 +1887,7 @@ FileManager.prototype.addViewUI = function(aNoTreeUpdate) {
     }
 };
 
-FileManager.prototype.addIconUI = function(aQuiet) {
+FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     "use strict";
     if (d) {
         console.time('iconUI');
@@ -1983,7 +1935,8 @@ FileManager.prototype.addIconUI = function(aQuiet) {
 
     $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e) {
         $(this).find('.data-block-view').removeClass('ui-selected');
-        selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
+        // is this required? don't we have a support for a multi-selection context menu?
+        selectionManager.clear_selection();
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 2);
@@ -2005,13 +1958,13 @@ FileManager.prototype.addIconUI = function(aQuiet) {
         $.selectddUIgrid = '.file-block-scrolling';
         $.selectddUIitem = 'a';
     }
-    this.addSelectDragDropUI();
+    this.addSelectDragDropUI(refresh);
     if (d) {
         console.timeEnd('iconUI');
     }
 };
 
-FileManager.prototype.addGridUI = function() {
+FileManager.prototype.addGridUI = function(refresh) {
     "use strict";
 
     if (this.chat) {
@@ -2026,11 +1979,20 @@ FileManager.prototype.addGridUI = function() {
     $('.fm-files-view-icon.block-view').removeClass('active');
 
     $.gridHeader = function() {
-        $('.grid-table tr:first-child td:visible').each(function(i, e) {
-            var headerColumn = $('.grid-table-header th').get(i);
-            $(headerColumn).width(Math.floor($(e).width()));
+        var headerColumn = '';
+        var $firstChildTd = $('.grid-table tr:first-child td:visible');
+        if ($firstChildTd.size() === 0) {
+            // if the first <tr> does not contain any TDs, pick the next one
+            // this can happen when MegaList's prepusher (empty <TR/> is first)
+            $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
+        }
+
+        $firstChildTd.each(function(i, e) {
+            headerColumn = $('.grid-table-header th').get(i);
+            $(headerColumn).width($(e).width());
         });
     };
+
 
     $.detailsGridHeader = function() {
         $('.contact-details-view .grid-table tr:first-child td').each(function(i, e) {
@@ -2211,20 +2173,21 @@ FileManager.prototype.addGridUI = function() {
     }
 
     $.selectddUIitem = 'tr';
-    this.addSelectDragDropUIDelayed();
+    this.addSelectDragDropUIDelayed(refresh);
 
     if (d) {
         console.timeEnd('gridUI');
     }
 };
 
-FileManager.prototype.addGridUIDelayed = function() {
+FileManager.prototype.addGridUIDelayed = function(refresh) {
     delay('GridUI', function() {
-        M.addGridUI();
+        M.addGridUI(refresh);
     }, 20);
 };
 
-FileManager.prototype.addSelectDragDropUI = function() {
+
+FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
 
     if (this.currentdirid && this.currentdirid.substr(0, 7) === 'account') {
@@ -2269,15 +2232,14 @@ FileManager.prototype.addSelectDragDropUI = function() {
             $.gridDragging = true;
             $('body').addClass('dragging');
             if (!$(this).hasClass('ui-selected')) {
-                $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-                $(this).addClass('ui-selected');
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected($(this).attr('id'));
             }
-            var s = $($.selectddUIgrid + ' .ui-selected'), max = ($(window).height() - 96) / 24, html = [];
-            $.selected = [];
-            s.each(function(i, e) {
-                var id = $(e).attr('id'), n = M.d[id];
+            var max = ($(window).height() - 96) / 24;
+            var html = [];
+            $.selected.forEach(function(id, i) {
+                var n = M.d[id];
                 if (n) {
-                    $.selected.push(id);
                     if (max > i) {
                         html.push(
                             '<div class="transfer-filetype-icon '
@@ -2288,8 +2250,8 @@ FileManager.prototype.addSelectDragDropUI = function() {
                     }
                 }
             });
-            if (s.length > max) {
-                $('.dragger-files-number').text(s.length);
+            if ($.selected.length > max) {
+                $('.dragger-files-number').text($.selected.length);
                 $('.dragger-files-number').show();
             }
             $('#draghelper .dragger-content').html(html.join(""));
@@ -2349,24 +2311,16 @@ FileManager.prototype.addSelectDragDropUI = function() {
         }
     });
 
-    /**
-     * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
-     * events.
-     *
-     * @type {SelectionManager}
-     */
 
-    if (!window.fmShortcuts) {
-        window.fmShortcuts = new FMShortcuts();
-    }
-    selectionManager = new SelectionManager($ddUIgrid);
+
 
     $ddUIitem.rebind('contextmenu', function(e) {
         if ($(this).attr('class').indexOf('ui-selected') == -1) {
             $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
             $(this).addClass('ui-selected');
+            selectionManager.clear_selection();
+            selectionManager.set_currently_selected($(this).attr('id'));
         }
-        M.cacheselect();
         M.searchPath();
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 1);
@@ -2376,44 +2330,32 @@ FileManager.prototype.addSelectDragDropUI = function() {
         if ($.gridDragging) {
             return false;
         }
-        var s = e.shiftKey && $($.selectddUIgrid + ' .ui-selected');
-        if (s && s.length > 0) {
-            var start = s[0];
-            var end = this;
-            if ($.gridLastSelected && $($.gridLastSelected).attr('class').indexOf('ui-selected') > -1) {
-                start = $.gridLastSelected;
-            }
-            else {
-                $.gridLastSelected = this;
-            }
-            if ($(start).index() > $(end).index()) {
-                end = start;
-                start = this;
-            }
-            $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-            $([start, end]).addClass('ui-selected');
-            $(start).nextUntil($(end)).each(function(i, e) {
-                $(e).addClass('ui-selected');
-            });
-
-            selectionManager.set_currently_selected($(this));
+        var s = e.shiftKey;
+        if (e.shiftKey) {
+            selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }
-        else if (e.ctrlKey == false && e.metaKey == false) {
+        else if (e.ctrlKey == false && e.metaKey == false)
+        {
             $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
             $(this).addClass('ui-selected');
             $.gridLastSelected = this;
-            selectionManager.set_currently_selected($(this));
+            selectionManager.clear_selection();
+            selectionManager.add_to_selection($(this).attr('id'));
         }
-        else {
+        else
+        {
             if ($(this).hasClass("ui-selected")) {
                 $(this).removeClass("ui-selected");
+                selectionManager.remove_from_selection($(this).attr('id'));
             }
-            else {
+            else
+            {
                 $(this).addClass("ui-selected");
                 $.gridLastSelected = this;
-                selectionManager.set_currently_selected($(this));
+                selectionManager.add_to_selection($(this).attr('id'));
             }
         }
+
         M.searchPath();
         $.hideContextMenu(e);
         if ($.hideTopMenu) {
@@ -2447,7 +2389,10 @@ FileManager.prototype.addSelectDragDropUI = function() {
         }
         delete $.rmInitJSP;
     }
-    $.tresizer();
+    if (!refresh) {
+        $.tresizer();
+    }
+
     if (d) {
         console.timeEnd('selectddUI');
     }
@@ -2455,9 +2400,9 @@ FileManager.prototype.addSelectDragDropUI = function() {
     $ddUIitem = $ddUIgrid = undefined;
 };
 
-FileManager.prototype.addSelectDragDropUIDelayed = function() {
+FileManager.prototype.addSelectDragDropUIDelayed = function(refresh) {
     delay('selectddUI', function() {
-        M.addSelectDragDropUI();
+        M.addSelectDragDropUI(refresh);
     });
 };
 
@@ -2977,10 +2922,19 @@ FileManager.prototype.onSectionUIOpen = function(id) {
  * @param {Number} perc percent
  * @param {Number} [cstrg] Current storage usage
  * @param {Number} [mstrg] Maximum storage.
+ * @param {Object} [options] Additional options
  */
-FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
+FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, options) {
+    'use strict';
+
+    var promise = new MegaPromise();
     var prevState = $('.fm-main').is('.almost-full, .full');
     $('.fm-main').removeClass('almost-full full');
+
+    if (this.showOverStorageQuotaPromise) {
+        promise = this.showOverStorageQuotaPromise;
+    }
+    this.showOverStorageQuotaPromise = promise;
 
     if (Object(u_attr).p) {
         // update texts with "for free accounts" sentences removed.
@@ -2999,16 +2953,28 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
             .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()) + ' ' + l[16314]);
     }
 
-    if (perc > 90) {
+    if (perc > 90 || Object(options).custom) {
         var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('full almost-full');
 
         if (perc > 99) {
             $('.fm-main').addClass('fm-notification full');
-            $strgdlg.addClass('full');
+            $strgdlg.addClass('full')
+                .find('.fm-dialog-body.full')
+                .find('.fm-dialog-title')
+                .text(Object(options).title || l[16302])
+                .end()
+                .find('.body-header')
+                .safeHTML(Object(options).body || l[16360]);
         }
         else {
             $('.fm-main').addClass('fm-notification almost-full');
-            $strgdlg.addClass('almost-full');
+            $strgdlg.addClass('almost-full')
+                .find('.fm-dialog-body.almost-full')
+                .find('.fm-dialog-title')
+                .text(Object(options).title || l[16311])
+                .end()
+                .find('.body-header')
+                .safeHTML(Object(options).body || l[16312]);
 
             // Storage chart and info
             var strQuotaLimit = bytesToSize(mstrg, 0).split(' ');
@@ -3032,11 +2998,19 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
             $('.chart.data .perc-txt', $strgdlg).text(perc + '%');
         }
 
+        var closeDialog = function() {
+            $.dialog = null;
+            window.closeDialog();
+
+            promise.resolve();
+            delete M.showOverStorageQuotaPromise;
+        };
+        $.dialog = closeDialog;
+
         $('.button', $strgdlg).rebind('click', function() {
             var $this = $(this);
 
-            fm_hideoverlay();
-            $strgdlg.addClass('hidden');
+            closeDialog();
 
             if ($this.hasClass('choose-plan')) {
                 loadSubPage('pro');
@@ -3047,10 +3021,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
 
             return false;
         });
-        $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', function() {
-            fm_hideoverlay();
-            $strgdlg.addClass('hidden');
-        });
+        $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', closeDialog);
 
         $('.fm-notification-block .fm-notification-close')
             .rebind('click', function() {
@@ -3069,16 +3040,114 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg) {
             });
 
         clickURLs();
-        $('a.gotorub').attr('href', '/fm/' + M.RubbishID);
+        $('a.gotorub').attr('href', '/fm/' + M.RubbishID)
+            .rebind('click', function() {
+                closeDialog();
+                loadSubPage('fm/' + M.RubbishID);
+                return false;
+            });
 
         if (Object(u_attr).p) {
             $('.choose-plan', $strgdlg).text(l[16386]);
         }
 
         // if another dialog wasn't opened previously
-        if (!prevState) {
-            fm_showoverlay();
-            $strgdlg.removeClass('hidden');
+        if (!prevState || Object(options).custom) {
+            M.safeShowDialog('over-storage-quota', $strgdlg);
+        }
+        else {
+            promise.reject();
         }
     }
+
+    return promise;
 };
+
+(function(global) {
+    'use strict';
+
+    var _cdialogq = Object.create(null);
+
+    // Define what dialogs can be opened from other dialogs
+    var diagInheritance = {
+        properties: ['links', 'rename', 'copyrights', 'copy', 'move'],
+        copy: ['createfolder'],
+        move: ['createfolder']
+    };
+
+    var _openDialog = function(name, dsp) {
+        if (d) {
+            console.log('safeShowDialog::_openDialog', name, typeof dsp, $.dialog);
+        }
+
+        onIdle(function() {
+            if (typeof $.dialog === 'string') {
+
+                // There are a few dialogs that can be opened from others, deal it.
+                if (!diagInheritance[$.dialog] || diagInheritance[$.dialog].indexOf(name) < 0) {
+                    _cdialogq[name] = dsp;
+                    return;
+                }
+            }
+
+            dsp();
+        });
+    };
+
+    mBroadcaster.addListener('closedialog', function() {
+        var name = Object.keys(_cdialogq).shift();
+
+        if (name) {
+            _openDialog(name, _cdialogq[name]);
+            delete _cdialogq[name];
+        }
+    });
+
+    if (d) {
+        global._cdialogq = _cdialogq;
+    }
+
+    /**
+     * Prevent dispatching several dialogs in top on each other
+     * @param {String} dialogName The dialog name to set on $.dialog
+     * @param {Function|Object} dispatcher The dispatcher, either a jQuery's node/selector or a function
+     */
+    FileManager.prototype.safeShowDialog = function(dialogName, dispatcher) {
+
+        dispatcher = (function(name, dsp) {
+            return tryCatch(function() {
+                var $dialog;
+
+                if (d) {
+                    console.warn('Dispatching queued dialog.', name);
+                }
+
+                if (typeof dsp === 'function') {
+                    $dialog = dsp();
+                }
+                else {
+                    $dialog = $(dsp);
+                }
+
+                if ($dialog) {
+                    if (!$dialog.hasClass('fm-dialog')) {
+                        throw new Error('Unexpected dialog type...');
+                    }
+
+                    // arrange to back any non-controlled dialogs,
+                    // this class will be removed on the next closeDialog()
+                    $('.fm-dialog').addClass('arrange-to-back');
+
+                    fm_showoverlay();
+                    $dialog.removeClass('hidden arrange-to-back');
+                }
+                $.dialog = String(name);
+            }, function(ex) {
+                // There was an exception dispatching the above code, move to the next queued dialog...
+                mBroadcaster.sendMessage('closedialog', ex);
+            });
+        })(dialogName, dispatcher);
+
+        _openDialog(dialogName, dispatcher);
+    };
+})(self);

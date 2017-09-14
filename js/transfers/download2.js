@@ -58,6 +58,8 @@ var dlmanager = {
     isDownloading: false,
     dlZipID: 0,
     gotHSTS: false,
+    resumeInfoTag: 'dlmr!',
+    resumeInfoCache: Object.create(null),
     logger: MegaLogger.getLogger('dlmanager'),
 
     /**
@@ -81,6 +83,257 @@ var dlmanager = {
             });
     },
 
+    getResumeInfo: function(dl, callback) {
+        'use strict';
+
+        if (!dl) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+
+        if (typeof dl === 'string') {
+            dl = {ph: dl};
+        }
+        var promise;
+        var tag = this.getResumeInfoTag(dl);
+
+        if (d) {
+            this.logger.debug('getResumeInfo', tag, dl);
+        }
+
+        if (this.resumeInfoCache[tag]) {
+            this.resumeInfoCache[tag].tag = tag;
+            promise = MegaPromise.resolve(this.resumeInfoCache[tag]);
+        }
+        else {
+            promise = M.getPersistentData(tag);
+        }
+
+        if (typeof callback === 'function') {
+            promise.tryCatch(callback, callback.bind(null, false));
+        }
+
+        return promise;
+    },
+
+    remResumeInfo: function(dl) {
+        'use strict';
+
+        if (!dl) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+
+        if (typeof dl === 'string') {
+            dl = {ph: dl};
+        }
+
+        if (d) {
+            this.logger.debug('remResumeInfo', this.getResumeInfoTag(dl), dl);
+        }
+
+        return M.delPersistentData(this.getResumeInfoTag(dl));
+    },
+
+    setResumeInfo: function(dl, byteOffset) {
+        'use strict';
+
+        if (!dl || !dl.resumeInfo || !dl.hasResumeSupport) {
+            return MegaPromise.reject(EINCOMPLETE);
+        }
+
+        dl.resumeInfo.mac = dl.mac;
+        dl.resumeInfo.byteOffset = byteOffset;
+
+        if (d) {
+            this.logger.debug('setResumeInfo', this.getResumeInfoTag(dl), dl.resumeInfo, dl);
+        }
+
+        return M.setPersistentData(this.getResumeInfoTag(dl), dl.resumeInfo);
+    },
+
+    // @private
+    getResumeInfoTag: function(dl) {
+        'use strict';
+
+        return this.resumeInfoTag + (dl.ph ? dl.ph : u_handle + dl.id);
+    },
+
+    /**
+     * For a resumable download, check the filesize on disk
+     * @param {String} handle Node handle
+     * @param {String} filename The filename..
+     * @returns {MegaPromise}
+     */
+    getFileSizeOnDisk: function(handle, filename) {
+        'use strict';
+
+        var promise = new MegaPromise();
+        var reject = promise.reject.bind(promise, null);
+
+        if (dlMethod === FileSystemAPI) {
+            M.getFileEntryMetadata('mega/' + handle)
+                .fail(reject)
+                .done(function(metadata) {
+                    promise.resolve(metadata.size);
+                });
+        }
+        else if (is_chrome_firefox && typeof OS !== 'undefined') {
+            try {
+                var root = mozGetDownloadsFolder();
+
+                OS.File.stat(OS.Path.join(root.path, filename))
+                    .then(function(info) {
+                        promise.resolve(info.size);
+                    }, reject);
+            }
+            catch (ex) {
+                reject(ex);
+            }
+        }
+        else {
+            reject(EACCESS);
+        }
+
+        return promise;
+    },
+
+    /**
+     * Initialize download
+     * @param {ClassFile} file The class file instance
+     * @param {Object} gres The API reply to the `g` request
+     * @param {Object} resumeInfo Resumable info, if any
+     * @returns {MegaPromise}
+     */
+    initDownload: function(file, gres, resumeInfo) {
+        'use strict';
+
+        if (!(file instanceof ClassFile)) {
+            return MegaPromise.reject(EARGS);
+        }
+        if (!file.dl || !Object(file.dl.io).setCredentials) {
+            return MegaPromise.reject(EACCESS);
+        }
+        if (!gres || typeof gres !== 'object' || file.dl.size !== gres.s) {
+            return MegaPromise.reject(EFAILED);
+        }
+        var dl = file.dl;
+        var promise = new MegaPromise();
+
+        var dl_urls = [];
+        var dl_chunks = [];
+        var dl_chunksizes = {};
+        var dl_filesize = dl.size;
+        var byteOffset = resumeInfo.byteOffset || 0;
+
+        var p = 0;
+        var pp = 0;
+        for (var i = 1; i <= 8 && p < dl_filesize - i * 131072; i++) {
+            dl_chunksizes[p] = i * 131072;
+            dl_chunks.push(p);
+            pp = p;
+            p += dl_chunksizes[p];
+        }
+
+        var chunksize = dl_filesize / dlQueue._limit / 2;
+        if (chunksize > dlmanager.dlMaxChunkSize) {
+            chunksize = dlmanager.dlMaxChunkSize;
+        }
+        else if (chunksize <= 1048576) {
+            chunksize = 1048576;
+        }
+        else {
+            chunksize = 1048576 * Math.floor(chunksize / 1048576);
+        }
+
+        /**
+        var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1));
+        while (p < dl_filesize) {
+            dl_chunksizes[p] = p > reserved ? 1048576 : chunksize;
+            dl_chunks.push(p);
+            pp = p;
+            p += dl_chunksizes[p];
+        }
+        /**/
+        while (p < dl_filesize) {
+            var length = Math.floor((dl_filesize - p) / 1048576 + 1) * 1048576;
+            if (length > chunksize) {
+                length = chunksize;
+            }
+            dl_chunksizes[p] = length;
+            dl_chunks.push(p);
+            pp = p;
+            p += length;
+        }
+        /**/
+
+        if (!(dl_chunksizes[pp] = dl_filesize - pp)) {
+            delete dl_chunksizes[pp];
+            delete dl_chunks[dl_chunks.length - 1];
+        }
+
+        for (var j = dl_chunks.length; j--;) {
+            if (dl_chunks[j] !== undefined) {
+                var offset = dl_chunks[j];
+
+                dl_urls.push({
+                    url: gres.g + '/' + offset + '-' + (offset + dl_chunksizes[offset] - 1),
+                    size: dl_chunksizes[offset],
+                    offset: offset
+                });
+            }
+        }
+
+        if (resumeInfo && typeof resumeInfo !== 'object') {
+            dlmanager.logger.warn('Invalid resumeInfo entry.', resumeInfo, file);
+            resumeInfo = false;
+        }
+
+        dl.url = gres.g;
+        dl.urls = dl_urls;
+        dl.mac = resumeInfo.mac || [0, 0, 0, 0];
+        dl.resumeInfo = resumeInfo || Object.create(null);
+        dl.byteOffset = dl.resumeInfo.byteOffset = byteOffset;
+
+        var result = {
+            chunks: dl_chunks,
+            offsets: dl_chunksizes
+        };
+
+        var startDownload = function() {
+            try {
+                dl.io.setCredentials(dl.url, dl.size, dl.n, dl_chunks, dl_chunksizes, resumeInfo);
+                promise.resolve(result);
+            }
+            catch (ex) {
+                setTransferStatus(dl, ex);
+                promise.reject(ex);
+            }
+        };
+
+        if (resumeInfo.entry) {
+            delete dlmanager.resumeInfoCache[resumeInfo.tag];
+
+            M.readFileEntry(resumeInfo.entry)
+                .done(function(ab) {
+                    if (ab instanceof ArrayBuffer && ab.byteLength === dl.byteOffset) {
+                        dl.pzBufferStateChange = ab;
+                    }
+                    else {
+                        console.warn('Invalid pzBufferStateChange...', ab, dl.byteOffset);
+                    }
+                })
+                .finally(function() {
+                    onIdle(startDownload);
+                    resumeInfo.entry.remove(function() {});
+                    delete resumeInfo.entry;
+                });
+        }
+        else {
+            startDownload();
+        }
+
+        return promise;
+    },
+
     /**
      * Browser query on maximum downloadable file size
      * @returns {MegaPromise}
@@ -102,7 +355,7 @@ var dlmanager = {
                     max();
                 }
                 else {
-                    promise.resolve(remaining);
+                    promise.resolve(Math.max(remaining, MemoryIO.fileSizeLimit));
                 }
             };
 
@@ -254,7 +507,7 @@ var dlmanager = {
             if (typeof gid === 'object') {
                 gid = this.getGID(gid);
             }
-            else if (gid[0] === 'u') {
+            else if (!gid || gid[0] === 'u') {
                 return;
             }
 
@@ -265,6 +518,10 @@ var dlmanager = {
 
                 if (gid === this.getGID(dl)) {
                     if (!dl.cancelled) {
+                        if (dl.hasResumeSupport) {
+                            dlmanager.remResumeInfo(dl).dump();
+                        }
+
                         try {
                             /* jshint -W073 */
                             if (typeof dl.io.abort === "function") {
@@ -337,26 +594,40 @@ var dlmanager = {
         }
     },
 
-    dlGetUrl: function DM_dlGetUrl(object, callback) {
+    dlGetUrl: function DM_dlGetUrl(dl, callback) {
+        'use strict';
+
+        if (dl.byteOffset && dl.byteOffset === dl.size) {
+            // Completed download.
+            return callback(false, {s: dl.size, g: 'https://localhost.save-file.mega.nz/dl/1234'});
+        }
+
         var req = {
             a: 'g',
             g: 1,
             ssl: use_ssl
         };
-
-        if (object.ph) {
-            req.p = object.ph;
-        }
-        else if (object.id) {
-            req.n = object.id;
-        }
-
-        api_req(req, {
-            object: object,
+        var ctx = {
+            object: dl,
             next: callback,
-            dl_key: object.key,
+            dl_key: dl.key,
             callback: this.dlGetUrlDone.bind(this)
-        }, object.nauth ? 1 : 0);
+        };
+
+        if (dl.ph) {
+            req.p = dl.ph;
+        }
+        else if (dl.id) {
+            req.n = dl.id;
+        }
+
+        if (folderlink || !dl.nauth) {
+            api_req(req, ctx, dl.nauth ? 1 : 0);
+        }
+        else {
+            req.enp = dl.nauth;
+            api_req(req, ctx);
+        }
     },
 
     dlGetUrlDone: function DM_dlGetUrlDone(res, ctx) {
@@ -476,6 +747,10 @@ var dlmanager = {
             date = data[dl_id];
         }
 
+        if (typeof dlpage_ph === 'string' && dlpage_ph === dl_id) {
+            date = Date.now();
+        }
+
         return date;
     },
 
@@ -564,18 +839,31 @@ var dlmanager = {
     },
 
     checkLostChunks: function DM_checkLostChunks(file) {
+        'use strict';
+
+        var mac;
         var dl_key = file.key;
 
-        var t = Object.keys(file.macs).map(Number)
-            .sort(function(a, b) {
-                return a - b;
-            })
-            .map(function(v) {
-                return file.macs[v];
-            });
+        if (file.hasResumeSupport) {
+            mac = file.mac;
+        }
+        else {
+            var t = Object.keys(file.macs)
+                .map(Number)
+                .sort(function(a, b) {
+                    return a - b;
+                })
+                .map(function(v) {
+                    return file.macs[v];
+                });
 
-        var mac = condenseMacs(t, [dl_key[0] ^ dl_key[4], dl_key[1]
-            ^ dl_key[5], dl_key[2] ^ dl_key[6], dl_key[3] ^ dl_key[7]]);
+            mac = condenseMacs(t, [
+                dl_key[0] ^ dl_key[4],
+                dl_key[1] ^ dl_key[5],
+                dl_key[2] ^ dl_key[6],
+                dl_key[3] ^ dl_key[7]
+            ], file.mac);
+        }
 
         if (have_ab && (dl_key[6] !== (mac[0] ^ mac[1]) || dl_key[7] !== (mac[2] ^ mac[3]))) {
             return false;
@@ -603,6 +891,7 @@ var dlmanager = {
     },
 
     dlWriter: function DM_dl_writer(dl, is_ready) {
+        'use strict';
 
         function finish_write(task, done) {
             task.data = undefined;
@@ -617,6 +906,20 @@ var dlmanager = {
             }
         }
 
+        function safeWrite(data, offset, callback) {
+            var abort = function swa(ex) {
+                console.error(ex);
+                dlFatalError(dl, ex);
+            };
+
+            try {
+                dl.io.write(data, offset, tryCatch(callback, abort));
+            }
+            catch (ex) {
+                abort(ex);
+            }
+        }
+
         dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
             if (!task.data.byteLength || dl.cancelled) {
                 if (d) {
@@ -624,6 +927,7 @@ var dlmanager = {
                 }
                 return finish_write(task, done);
             }
+            var logger = dl.writer && dl.writer.logger || dlmanager.logger;
 
             // As of Firefox 37, this method will neuter the array buffer.
             var abLen = task.data.byteLength;
@@ -631,6 +935,7 @@ var dlmanager = {
 
             var ready = function _onWriterReady() {
                 dl.writer.pos += abLen;
+
                 if (dl.data) {
                     new Uint8Array(
                         dl.data,
@@ -639,16 +944,37 @@ var dlmanager = {
                     ).set(abDup || task.data);
                 }
 
-                return finish_write(task, done);
+                if (dl.hasResumeSupport) {
+                    if (d > 1) {
+                        logger.debug('Condense MACs @ offset %s-%s', task.offset, dl.writer.pos, Object.keys(dl.macs));
+                    }
+
+                    for (var pos = task.offset; dl.macs[pos] && pos < dl.writer.pos; pos += 1048576) {
+                        dl.mac[0] ^= dl.macs[pos][0];
+                        dl.mac[1] ^= dl.macs[pos][1];
+                        dl.mac[2] ^= dl.macs[pos][2];
+                        dl.mac[3] ^= dl.macs[pos][3];
+                        dl.mac = dl.aes.encrypt(dl.mac);
+                        delete dl.macs[pos];
+                    }
+                }
+
+                dlmanager.setResumeInfo(dl, dl.writer.pos)
+                    .finally(function() {
+                        finish_write(task, done);
+                    });
             };
 
-            try {
-                dl.io.write(task.data, task.offset, ready);
+            var writeTaskChunk = function() {
+                safeWrite(task.data, task.offset, ready);
+            };
+
+            if (dl.pzBufferStateChange) {
+                safeWrite(dl.pzBufferStateChange, 0, writeTaskChunk);
+                delete dl.pzBufferStateChange;
             }
-            catch (ex) {
-                var logger = dl.writer && dl.writer.logger || dlmanager.logger;
-                logger.error(ex);
-                dlFatalError(dl, ex);
+            else {
+                writeTaskChunk();
             }
 
         }, 1, 'download-writer');
@@ -665,13 +991,13 @@ var dlmanager = {
     },
 
     mGetXR: function DM_getxr() {
-        /* jshint -W074 */
-        return {
+        'use strict';
+
+        return Object.assign(Object.create(null), {
             update: function(b) {
-                var t;
                 var ts = Date.now();
                 if (b < 0) {
-                    this.tb = {};
+                    this.tb = Object.create(null);
                     this.st = 0;
                     return 0;
                 }
@@ -679,15 +1005,12 @@ var dlmanager = {
                     this.tb[ts] = this.tb[ts] ? this.tb[ts] + b : b;
                 }
                 b = 0;
-                for (t in this.tb) {
-                    if (this.tb.hasOwnProperty(t)) {
-                        t = parseInt(t);
-                        if (t < ts - this.window) {
-                            delete this.tb[t];
-                        }
-                        else {
-                            b += this.tb[t];
-                        }
+                for (var t in this.tb) {
+                    if (t < ts - this.window) {
+                        delete this.tb[t];
+                    }
+                    else {
+                        b += this.tb[t];
                     }
                 }
                 if (!b) {
@@ -709,10 +1032,10 @@ var dlmanager = {
                 return b / ts;
             },
 
-            tb: {},
             st: 0,
-            window: 60000
-        };
+            window: 60000,
+            tb: Object.create(null)
+        });
     },
 
     _quotaPushBack: {},
@@ -725,15 +1048,15 @@ var dlmanager = {
         var ids = dlmanager.getCurrentDownloads();
         // $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
 
+        if (d) {
+            this.logger.debug('_onQuotaRetry', getNewUrl, ids, this._dlQuotaListener.length, this._dlQuotaListener);
+        }
+
         if (this.onOverquotaWithAchievements) {
             closeDialog();
             topmenuUI();
 
-            mega.achievem.achievementsListDialog(function() {
-                if (dlmanager.onLimitedBandwidth) {
-                    dlmanager.onLimitedBandwidth();
-                }
-            });
+            dlmanager._achievementsListDialog();
             delete this.onOverquotaWithAchievements;
             return;
         }
@@ -757,8 +1080,6 @@ var dlmanager = {
                 .removeClass('overquota')
                 .text(l[7227]);
         }
-
-        this.logger.debug('_onQuotaRetry', ids, this._dlQuotaListener.length, this._dlQuotaListener);
 
         for (var i = 0; i < this._dlQuotaListener.length; ++i) {
             if (typeof this._dlQuotaListener[i] === "function") {
@@ -801,6 +1122,42 @@ var dlmanager = {
         else {
             tasks.forEach(this.dlQueuePushBack);
             ids.forEach(fm_tfsresume);
+        }
+    },
+
+    _achievementsListDialog: function($dialog) {
+        'use strict';
+
+        if (d) {
+            this.logger.info('_achievementsListDialog', this.onOverquotaWithAchievements, $dialog);
+        }
+
+        mega.achievem.achievementsListDialog(function() {
+            dlmanager._onOverquotaDispatchRetry($dialog);
+        });
+    },
+
+    _onOverquotaDispatchRetry: function($dialog) {
+        'use strict';
+
+        this.setUserFlags();
+
+        if (d) {
+            this.logger.info('_onOverquotaDispatchRetry', this.lmtUserFlags, $dialog);
+        }
+
+        if (this.onLimitedBandwidth) {
+            // pre-warning dialog
+            this.onLimitedBandwidth();
+        }
+        else {
+            // from overquota dialog
+            this._onQuotaRetry(true);
+        }
+
+        if ($dialog) {
+            // update transfers buttons on the download page...
+            this._overquotaClickListeners($dialog);
         }
     },
 
@@ -877,7 +1234,15 @@ var dlmanager = {
     },
 
     _overquotaClickListeners: function($dialog, flags, preWarning) {
+        'use strict';
+
         var self = this;
+        var closeDialog = function() {
+            if ($.dialog === 'download-pre-warning') {
+                $.dialog = 'was-pre-warning';
+            }
+            window.closeDialog();
+        };
         var onclick = function onProClicked() {
             self.onOverQuotaProClicked = true;
             delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
@@ -888,18 +1253,20 @@ var dlmanager = {
             else {
                 open(getAppBaseUrl() + '#pro');
             }
+
+            api_req({a: 'log', e: 99640, m: 'on overquota pro-plans clicked'});
         };
         var getMoreBonusesListener = function() {
             closeDialog();
 
             if (flags & dlmanager.LMT_ISREGISTERED) {
-                mega.achievem.achievementsListDialog(function() {
-                    if (dlmanager.onLimitedBandwidth) {
-                        dlmanager.onLimitedBandwidth();
-                    }
-                });
+                dlmanager._achievementsListDialog($dialog);
+
+                api_req({a: 'log', e: 99641, m: 'on overquota get-more-bonuses clicked'});
             }
             else {
+                api_req({a: 'log', e: 99642, m: 'on overquota register-for-bonuses clicked'});
+
                 dlmanager.showRegisterDialog4ach($dialog, flags);
             }
         };
@@ -910,11 +1277,12 @@ var dlmanager = {
             $('.msg-overquota', $dialog).addClass('hidden');
             $('.msg-prewarning', $dialog).removeClass('hidden');
 
-            $('.continue', $dialog)
+            $('.continue, .continue-download', $dialog)
                 .removeAttr('style')
                 .rebind('click', this.onLimitedBandwidth.bind(this));
 
             $('.upgrade', $dialog).rebind('click', function() {
+                api_req({a: 'log', e: 99643, m: 'on overquota pre-warning upgrade clicked'});
 
                 // closeDialog();
 
@@ -925,6 +1293,11 @@ var dlmanager = {
                 // }
                 //
                 // dlmanager.showRegisterDialog4ach($dialog, flags);
+            });
+
+            $('.reg-st3-membership-bl', $dialog).rebind('click', function() {
+                open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
+                return false;
             });
         }
         else {
@@ -968,6 +1341,40 @@ var dlmanager = {
         if (flags & this.LMT_ISREGISTERED) {
             $dialog.addClass('registered');
         }
+        else {
+            var $oqbbl = $('.overquota-bott-bl', $dialog);
+
+            var showOverQuotaRegisterDialog = function() {
+                closeDialog();
+                dlmanager.showOverQuotaRegisterDialog();
+            };
+
+            if (!u_wasloggedin()) {
+                api_req({a: 'log', e: 99646, m: 'on overquota not-logged-in'});
+                $('.default-big-button.login', $oqbbl).addClass('hidden');
+            }
+            else {
+                $('.default-big-button.login', $oqbbl).rebind('click', function() {
+                    api_req({a: 'log', e: 99644, m: 'on overquota login clicked'});
+                    closeDialog();
+
+                    mega.ui.showLoginRequiredDialog({
+                            minUserType: 3,
+                            skipInitialDialog: 1
+                        })
+                        .done(function() {
+                            api_req({a: 'log', e: 99645, m: 'on overquota logged into account.'});
+                            closeDialog();
+                            topmenuUI();
+                            dlmanager._onQuotaRetry(true);
+                        })
+                        .fail(showOverQuotaRegisterDialog);
+                });
+            }
+
+            $('.default-big-button.create-account', $oqbbl).rebind('click', showOverQuotaRegisterDialog);
+        }
+
 
         if (flags & this.LMT_HASACHIEVEMENTS) {
             $dialog.addClass('achievements');
@@ -1011,7 +1418,7 @@ var dlmanager = {
             return mega.ui.sendSignupLinkDialog(accountData);
         }
 
-        api_req({ a: 'log', e: 99613, m: 'efq' });
+        api_req({a: 'log', e: 99613, m: 'on overquota register dialog shown'});
 
         mega.ui.showRegisterDialog({
             title: l[17],
@@ -1019,11 +1426,16 @@ var dlmanager = {
 
             onAccountCreated: function(gotLoggedIn, accountData) {
                 if (gotLoggedIn) {
-                    dlmanager._onQuotaRetry(true);
+                    // dlmanager._onQuotaRetry(true);
+                    dlmanager._onOverquotaDispatchRetry();
+
+                    api_req({a: 'log', e: 99649, m: 'on overquota logged-in through register dialog.'});
                 }
                 else {
                     localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
                     mega.ui.sendSignupLinkDialog(accountData);
+
+                    api_req({a: 'log', e: 99650, m: 'on overquota account created.'});
                 }
             }
         });
@@ -1035,18 +1447,18 @@ var dlmanager = {
      * @param {Number} [flags]     Limitation flags
      */
     showRegisterDialog4ach: function DM_showRegisterDialog($dialog, flags) {
+        'use strict';
+
+        api_req({a: 'log', e: 99647, m: 'on overquota register-for-achievements dialog shown'});
+
         if (flags & this.LMT_HASACHIEVEMENTS) {
             this.onOverquotaWithAchievements = true;
         }
+
         mega.ui.showRegisterDialog({
             onAccountCreated: function(gotLoggedIn, accountData) {
                 if (gotLoggedIn) {
-                    if (dlmanager.onLimitedBandwidth) {
-                        dlmanager.onLimitedBandwidth();
-                    }
-                    else {
-                        console.error('This should not be reached..');
-                    }
+                    dlmanager._onOverquotaDispatchRetry($dialog);
                 }
                 else {
                     localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
@@ -1056,7 +1468,9 @@ var dlmanager = {
             onDialogClosed: function() {
                 if ($dialog) {
                     fm_showoverlay();
-                    $dialog.removeClass('hidden');
+                    $dialog.removeClass('hidden')
+                        .find('.fm-dialog-close')
+                        .rebind('click.quota', closeDialog);
                 }
                 delete dlmanager.onOverquotaWithAchievements;
             }
@@ -1071,17 +1485,18 @@ var dlmanager = {
             if (callback) {
                 $dialog.removeClass('registered achievements exceeded pro slider');
                 $('.bottom-tips a', $dialog).unbind('click');
-                $('.continue', $dialog).unbind('click');
-                $('.upgrade', $dialog).unbind('click');
+                $('.continue, .continue-download', $dialog).unbind('click');
+                $('.upgrade, .reg-st3-membership-bl', $dialog).unbind('click');
                 $('.get-more-bonuses', $dialog).unbind('click');
+                if ($.dialog === 'download-pre-warning') {
+                    $.dialog = false;
+                }
+                closeDialog();
                 Soon(callback);
                 callback = $dialog = undefined;
             }
             delete this.onLimitedBandwidth;
         };
-
-        fm_showoverlay();
-        uiCheckboxes($dialog, 'ignoreLimitedBandwidth').removeClass('hidden');
 
         flags = flags !== undefined ? flags : this.lmtUserFlags;
 
@@ -1095,14 +1510,32 @@ var dlmanager = {
             this.lmtUserFlags = flags;
         }
 
-        api_req({ a: 'log', e: 99617, m: 'qbq' });
+        api_req({a: 'log', e: 99617, m: 'overquota pre-warning shown.'});
 
+        uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
         this._overquotaClickListeners($dialog, flags, res || true);
+
+        M.safeShowDialog('download-pre-warning', $dialog);
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask, flags) {
+        'use strict';
 
-        if (this.efq) {
+        flags = flags !== undefined ? flags : this.lmtUserFlags;
+
+        if (d) {
+            // as per ticket 6446
+            // /* 05 */ flags = this.LMT_ISREGISTERED | this.LMT_HASACHIEVEMENTS;
+            // /* 06 */ flags = this.LMT_HASACHIEVEMENTS;
+            // /* 07 */ flags = 0;
+            // /* 08 */ flags = this.LMT_ISREGISTERED;
+            // /* 09 */ flags = this.LMT_ISREGISTERED | this.LMT_ISPRO | this.LMT_HASACHIEVEMENTS;
+            // /* 10 */ flags = this.LMT_ISREGISTERED | this.LMT_ISPRO;
+
+            this.lmtUserFlags = flags;
+        }
+
+        if (this.efq && !(flags & this.LMT_ISREGISTERED)) {
             return this.showOverQuotaRegisterDialog(dlTask);
         }
         loadingDialog.hide();
@@ -1129,20 +1562,6 @@ var dlmanager = {
             .find('.transfer-overquota-txt')
             .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
             .end();
-
-        flags = flags !== undefined ? flags : this.lmtUserFlags;
-
-        if (d) {
-            // as per ticket 6446
-            // /* 05 */ flags = this.LMT_ISREGISTERED | this.LMT_HASACHIEVEMENTS;
-            // /* 06 */ flags = this.LMT_HASACHIEVEMENTS;
-            // /* 07 */ flags = 0;
-            // /* 08 */ flags = this.LMT_ISREGISTERED;
-            // /* 09 */ flags = this.LMT_ISREGISTERED | this.LMT_ISPRO | this.LMT_HASACHIEVEMENTS;
-            // /* 10 */ flags = this.LMT_ISREGISTERED | this.LMT_ISPRO;
-
-            this.lmtUserFlags = flags;
-        }
 
         if (flags & this.LMT_ISPRO) {
             $dialog.addClass('pro');
@@ -1191,6 +1610,28 @@ var dlmanager = {
             $dialog.addClass('exceeded').removeClass('hidden');
         }
 
+        if (flags & this.LMT_ISREGISTERED) {
+            if (!(flags & this.LMT_HASACHIEVEMENTS)) {
+                $dialog.addClass('hidden-bottom');
+            }
+        }
+        else if (!(flags & this.LMT_HASACHIEVEMENTS)) {
+            var $pan = $('.not-logged.no-achievements', $dialog);
+
+            if ($pan.length && !$pan.hasClass('flag-pcset')) {
+                $pan.addClass('flag-pcset');
+
+                M.req('efqb').done(function(val) {
+                    if (!val) {
+                        $dialog.addClass('hidden-bottom');
+                    }
+                    else {
+                        $pan.text(String($pan.text()).replace('10%', val + '%'));
+                    }
+                });
+            }
+        }
+
         this._overquotaInfo();
 
         var doCloseModal = function closeModal() {
@@ -1208,19 +1649,29 @@ var dlmanager = {
         $overlay.rebind('click.quota', doCloseModal);
 
         this._overquotaClickListeners($dialog, flags);
+
+        api_req({a: 'log', e: 99648, m: 'on overquota dialog shown'});
     },
 
     getCurrentDownloads: function() {
         return array.unique(dl_queue.filter(isQueueActive).map(dlmanager.getGID));
     },
 
-    getCurrentDownloadsSize: function() {
+    getCurrentDownloadsSize: function(sri) {
         var size = 0;
 
         dl_queue
             .filter(isQueueActive)
             .map(function(dl) {
                 size += dl.size;
+
+                if (sri) {
+                    // Subtract resume info
+
+                    if (dl.byteOffset) {
+                        size -= dl.byteOffset;
+                    }
+                }
             });
 
         return size;
@@ -1690,79 +2141,6 @@ dlQueue.validateTask = function(pzTask) {
 function DownloadQueue() {}
 inherits(DownloadQueue, Array);
 
-DownloadQueue.prototype.getUrls = function(dl_chunks, dl_chunksizes, url) {
-    var dl_urls = [];
-    $.each(dl_chunks, function(key, pos) {
-        dl_urls.push({
-            url: url + '/' + pos + '-' + (pos + dl_chunksizes[pos] - 1),
-            size: dl_chunksizes[pos],
-            offset: pos
-        });
-    });
-
-    return dl_urls;
-}
-
-DownloadQueue.prototype.splitFile = function(dl_filesize) {
-    var dl_chunks = [];
-    var dl_chunksizes = {};
-
-    var p = 0;
-    var pp = 0;
-    for (var i = 1; i <= 8 && p < dl_filesize - i * 131072; i++) {
-        dl_chunksizes[p] = i * 131072;
-        dl_chunks.push(p);
-        pp = p;
-        p += dl_chunksizes[p];
-    }
-
-    var chunksize = dl_filesize / dlQueue._limit / 2;
-    if (chunksize > dlmanager.dlMaxChunkSize) {
-        chunksize = dlmanager.dlMaxChunkSize;
-    }
-    else if (chunksize <= 1048576) {
-        chunksize = 1048576;
-    }
-    else {
-        chunksize = 1048576 * Math.floor(chunksize / 1048576);
-    }
-
-    /**
-    var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1));
-    while (p < dl_filesize) {
-        dl_chunksizes[p] = p > reserved ? 1048576 : chunksize;
-        dl_chunks.push(p);
-        pp = p;
-        p += dl_chunksizes[p];
-    }
-    /**/
-    while (p < dl_filesize) {
-        var length = Math.floor((dl_filesize - p) / 1048576 + 1) * 1048576;
-        if (length > chunksize) {
-            length = chunksize;
-        }
-        dl_chunksizes[p] = length;
-        dl_chunks.push(p);
-        pp = p;
-        p += length;
-    }
-    /**/
-
-    if (!(dl_chunksizes[pp] = dl_filesize - pp)) {
-        delete dl_chunksizes[pp];
-        delete dl_chunks[dl_chunks.length - 1];
-    }
-
-    dl_chunks = {
-            chunks: dl_chunks,
-            offsets: dl_chunksizes
-        };
-    if (d) {
-        dlmanager.logger.info('dl_chunks', chunksize, dl_chunks);
-    }
-    return dl_chunks;
-}
-
 DownloadQueue.prototype.push = function() {
     var pos = Array.prototype.push.apply(this, arguments);
     var id = pos - 1;
@@ -1770,8 +2148,6 @@ DownloadQueue.prototype.push = function() {
     var dl_id = dl.ph || dl.id;
     var dl_key = dl.key;
     var dlIO;
-    var dl_keyNonce = JSON.stringify([dl_key[0] ^ dl_key[4], dl_key[1]
-            ^ dl_key[5], dl_key[2] ^ dl_key[6], dl_key[3] ^ dl_key[7], dl_key[4], dl_key[5]]);
 
     if (dl.zipid) {
         if (!Zips[dl.zipid]) {
@@ -1780,7 +2156,7 @@ DownloadQueue.prototype.push = function() {
         dlIO = Zips[dl.zipid].addEntryFile(dl);
     }
     else {
-        if (dl.preview || (window.Incognito === 0xC120E && dl.size < 400 * 1024 * 1024)) {
+        if (dl.preview || Math.min(MemoryIO.fileSizeLimit, 90 * 1048576) > dl.size) {
             dlIO = new MemoryIO(dl_id, dl);
         }
         else {
@@ -1788,18 +2164,22 @@ DownloadQueue.prototype.push = function() {
         }
     }
 
-    if (!use_workers) {
-        dl.aes = new sjcl.cipher.aes([dl_key[0] ^ dl_key[4], dl_key[1]
-            ^ dl_key[5], dl_key[2] ^ dl_key[6], dl_key[3] ^ dl_key[7]]);
-    }
-
-    /* In case it failed and it was manually cancelled and retried */
-    // dlmanager.release("id:" + dl_id);
+    dl.aes = new sjcl.cipher.aes([
+        dl_key[0] ^ dl_key[4],
+        dl_key[1] ^ dl_key[5],
+        dl_key[2] ^ dl_key[6],
+        dl_key[3] ^ dl_key[7]
+    ]);
+    dl.nonce = JSON.stringify([
+        dl_key[0] ^ dl_key[4],
+        dl_key[1] ^ dl_key[5],
+        dl_key[2] ^ dl_key[6],
+        dl_key[3] ^ dl_key[7], dl_key[4], dl_key[5]
+    ]);
 
     dl.pos = id; // download position in the queue
     dl.dl_id = dl_id; // download id
     dl.io = dlIO;
-    dl.nonce = dl_keyNonce;
     // Use IO object to keep in track of progress
     // and speed
     dl.io.progress = 0;
@@ -1813,9 +2193,9 @@ DownloadQueue.prototype.push = function() {
     else {
         dl.writer = dlIO;
     }
+    Object.defineProperty(dl, 'hasResumeSupport', {value: dl.io.hasResumeSupport});
 
-    dl.macs = {};
-    dl.urls = [];
+    dl.macs = Object.create(null);
 
     dlQueue.push(new ClassFile(dl));
 
@@ -1851,3 +2231,51 @@ if (is_mobile) {
     dlmanager.dlMaxChunkSize = 4 * 1048576;
     dlMethod = MemoryIO;
 }
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    M.onFileManagerReady(true, function() {
+        var prefix = dlmanager.resumeInfoTag + u_handle;
+
+        // automatically resume transfers on fm initialization
+        M.getPersistentDataEntries(prefix)
+            .done(function(entries) {
+                entries = entries.map(function(entry) {
+                    return entry.substr(prefix.length);
+                });
+
+                dbfetch.geta(entries)
+                    .always(function() {
+                        for (var i = entries.length; i--;) {
+                            if (!M.d[entries[i]]) {
+                                entries.splice(i, 1);
+                            }
+                        }
+
+                        if (entries.length) {
+                            var $dialog = $('.fm-dialog.resume-transfer');
+
+                            $('.fm-dialog-close, .cancel', $dialog).rebind('click', function() {
+                                closeDialog();
+
+                                for (var i = entries.length; i--;) {
+                                    M.delPersistentData(prefix + entries[i]);
+                                }
+                            });
+
+                            $('.big-button.red', $dialog).rebind('click', function() {
+                                if (d) {
+                                    dlmanager.logger.info('Resuming transfers...', entries);
+                                }
+
+                                closeDialog();
+                                M.addDownload(entries);
+                            });
+
+                            M.safeShowDialog('resume-transfer', $dialog);
+                        }
+                    });
+            });
+    });
+});

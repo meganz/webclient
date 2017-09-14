@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm14_';
+    var dbpfx = 'fm15d_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -104,11 +104,26 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     fmdb.inval_ready = false;
 
     // Notify completion invoking the provided callback
-    var resolve = function(res) {
+    var resolve = function(sn, error) {
         fmdb.opening = false;
 
         if (typeof result === 'function') {
-            result(res);
+            if (error) {
+                fmdb.crashed = true;
+                fmdb.logger.warn('Marking DB as crashed.', error);
+
+                if (fmdb.db) {
+                    onIdle(function() {
+                        fmdb.db.delete();
+                        fmdb.db = false;
+                    });
+                }
+
+                // force no-treecache gettree
+                localStorage.force = 1;
+            }
+
+            result(sn);
 
             // prevent this from being called twice..
             result = null;
@@ -116,10 +131,8 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     };
 
     // Catch errors, mark DB as crashed, and move forward without indexedDB support
-    var onErrorCatch = function(e) {
-        fmdb.logger.error("IndexedDB or crypto layer unavailable, disabling", e);
-        fmdb.crashed = true;
-        resolve(false);
+    var reject = function(e) {
+        resolve(false, e || EFAILED);
     };
 
     // Database opening logic
@@ -139,8 +152,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     fmdb.logger.warn('Opening the database timed out.');
                 }
 
-                fmdb.crashed = true;
-                resolve(false);
+                reject(ETEMPUNAVAIL);
             }
         }, 9000);
 
@@ -161,6 +173,10 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         fmdb.tables = Object.keys(dbSchema);
 
         fmdb.db.open().then(function() {
+            if (fmdb.crashed) {
+                // Opening timed out.
+                return;
+            }
             fmdb.get('_sn').always(function(r) {
                 if (!wipe && r[0] && r[0].length === 11) {
                     if (d) {
@@ -179,29 +195,16 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     fmdb.db.delete().then(function() {
                         fmdb.db.open().then(function() {
                             resolve(false);
-                        }).catch(function(e) {
-                            fmdb.crashed = true;
-                            fmdb.logger.error(e);
-                            resolve(false);
-                        });
-                    }).catch(function(e) {
-                        fmdb.crashed = true;
-                        fmdb.logger.error(e);
-                        resolve(false);
-                    });
+                        }).catch(reject);
+                    }).catch(reject);
                 }
             });
         }).catch(Dexie.MissingAPIError, function(e) {
-            fmdb.crashed = true;
             fmdb.logger.error("IndexedDB unavailable", e);
-            resolve(false);
-        }).catch(function(e) {
-            fmdb.crashed = true;
-            fmdb.logger.error(e);
-            resolve(false);
-        });
+            reject(e);
+        }).catch(reject);
     };
-    openDataBase = tryCatch(openDataBase, onErrorCatch);
+    openDataBase = tryCatch(openDataBase, reject);
 
     // Enumerate databases and collect those not prefixed with 'dbpfx' (which is the current format)
     var collectDataBaseNames = function() {
@@ -320,6 +323,9 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
         db.on('blocked', next);
 
         db.delete().then(function() {
+            // Remove the DB name from localStorage so that our getDatabaseNames polyfill doesn't keep returning them
+            delete localStorage['_$mdb$' + db.name];
+
             fmdb.logger.log("Deleted IndexedDB " + db.name);
         }).catch(function(err){
             fmdb.logger.error("Unable to delete IndexedDB " + db.name, err);
@@ -555,7 +561,12 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                         // in non-transactional loop back when the browser is idle so that we'll
                         // prevent unnecessarily hanging the main thread and short writes...
                         if (!fmdb.commit) {
-                            setTimeout(dispatchputs, loadfm.loaded ? 20 : 2600);
+                            if (loadfm.loaded) {
+                                onIdle(dispatchputs);
+                            }
+                            else {
+                                setTimeout(dispatchputs, 2600);
+                            }
                             return;
                         }
                     }
@@ -563,6 +574,15 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     // loop back to write more pending data (or to commit the transaction)
                     fmdb.inflight = false;
                     dispatchputs();
+                }).catch(Dexie.BulkError, function(e) {
+                    // TODO: retry instead?
+
+                    fmdb.state = -1;
+                    fmdb.inflight = false;
+                    fmdb.invalidate();
+
+                    fmdb.logger.error('Bulk operation error, %s records failed. '
+                        + 'Marking DB as crashed.', e.failures.length, e);
                 });
 
                 // we don't send more than one transaction (looking at you, Microsoft!)
@@ -622,6 +642,11 @@ FMDB.prototype.stripnode = Object.freeze({
         delete f.t;
         delete f.s;
 
+        if (f.shares) {
+            t.shares = f.shares;
+            delete f.shares; // will be populated from the s table
+        }
+
         if (f.p) {
             t.p = f.p;
             delete f.p;
@@ -654,7 +679,9 @@ FMDB.prototype.restorenode = Object.freeze({
             f.t = 0;
             f.s = parseFloat(index.s);
         }
-        if (!f.ar && f.k && typeof f.k == 'object') f.ar = {};
+        if (!f.ar && f.k && typeof f.k == 'object') {
+            f.ar = Object.create(null);
+        }
     },
 
     ph : function(ph, index) {
@@ -683,23 +710,10 @@ FMDB.prototype.restorenode = Object.freeze({
 // sn must be added last and effectively (mostly actually) "commits" the "transaction"
 // the next addition will then start a new "transaction"
 // (large writes will not execute as an IndexedDB transaction because IndexedDB can't)
-var skjahskak = 10;
 FMDB.prototype.add = function fmdb_add(table, row) {
     "use strict";
 
     if (this.crashed) return;
-
-    if (table === 'f' && row.s < -1 && row.p && --skjahskak > 0 && 1504400505102 > Date.now()) {
-        api_req({
-            a: 'fcv',
-            h: row.h,
-            p: row.p,
-            s: row.s,
-            v: 4,
-            db: 5,
-            cs: M.getStack().split('\n').slice(1).map(String.trim)
-        }, {}, pfid ? 1 : 0);
-    }
 
     if (row.d) {
         if (this.stripnode[table]) {
@@ -808,7 +822,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, lim
     var promise = new MegaPromise();
     var args = toArray.apply(null, arguments);
 
-    onIdle(function onIdleGetByKey() {
+    onIdle(function() {
         // XXX: Dexie.anyOf() is bugged when there are pending writes...
         //      dispatching this delayed should help to settle the transaction data
         promise.linkDoneAndFailTo(fmdb.getbykey1.apply(fmdb, args));
@@ -1432,8 +1446,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
             }
             // has the parent been fetched yet?
             else if (!M.d[parent]) {
-                this.node([parent])
-                    .unpack(function(r) {
+                fmdb.getbykey('f', 'h', ['h', [parent]])
+                    .always(function(r) {
+                        if (r.length > 1) {
+                            console.error('Unexpected number of result for node ' + parent, r.length, r);
+                        }
                         for (var i = r.length; i--;) {
                             // providing a 'true' flag so that the node isn't added to M.c,
                             // otherwise crawling back to the parent won't work properly.
@@ -1454,9 +1471,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 this.tree([parent], 0, new MegaPromise())
                     .always(function() {
                         if (M.d[parent] && M.c[parent]) {
-                            dbfetch.get(parent, promise);
+                            dbfetch.get(M.d[parent].p, promise);
                         }
                         else {
+                            console.error('Failed to load folder ' + parent);
+                            api_req({a: 'log', e: 99667, m: 'Failed to fill M.c for a folder node..'});
                             promise.reject(EACCESS);
                         }
                     });
@@ -1532,7 +1551,6 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 else if (!M.c[parents[i]]) {
                     p.push(parents[i]);
                     tree_inflight[parents[i]] = promise;
-                    M.ccts[parents[i]] = Date.now();
                 }
             }
 
@@ -1540,11 +1558,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
             if ($.len(inflight)) {
                 masterPromise = MegaPromise.allDone(array.unique(obj_values(inflight)).concat(promise));
             }
-            if (d > 1) console.warn('fetchsubtree', arguments, p, inflight);
+            // console.warn('fetchsubtree', arguments, p, inflight);
 
-            var stack = M.getStack().split('\n').slice(1).map(String.trim);
-
-            var parser = function(r) {
+            // fetch children of all unfetched parents
+            fmdb.getbykey('f', 'h', ['p', p.concat()])
+                .always(function(r) {
                     // store fetched nodes
                     for (var i = p.length; i--;) {
                         delete tree_inflight[p[i]];
@@ -1578,33 +1596,6 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         }
                     }
                     promise.resolve();
-                };
-
-            // fetch children of all unfetched parents
-            fmdb.getbykey('f', 'h', ['p', p.concat()])
-                .always(function(r1) {
-                    if (1504400505102 < Date.now()) {
-                        return parser(r1);
-                    }
-
-                    onIdle(function() {
-                        fmdb.getbykey('f', 'h', ['p', p.concat()])
-                            .always(function(r2) {
-                                if (r2.length !== r1.length) {
-                                    console.error('Node count mismatch!', r1.length, r2.length, p, stack);
-
-                                    api_req({
-                                        a: 'fcv',
-                                        h: p.join(','),
-                                        v: 4,
-                                        r1: r1.length,
-                                        r2: r2.length,
-                                        s: stack
-                                    }, {}, pfid ? 1 : 0);
-                                }
-                                parser(r1);
-                            });
-                    });
                 });
 
             return masterPromise;

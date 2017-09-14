@@ -312,21 +312,21 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             $tr.remove();
         }
         dl_queue.push({
+            size: n.s,
+            nauth: n_h,
             id: n.h,
             key: n.k,
             n: n.name,
             t: n.mtime || n.ts,
+            zipid: z,
+            zipname: zipname,
+            preview: preview,
             p: path,
-            size: n.s,
-            nauth: n_h,
             onDownloadProgress: this.dlprogress.bind(this),
             onDownloadComplete: this.dlcomplete.bind(this),
             onBeforeDownloadComplete: this.dlbeforecomplete.bind(this),
             onDownloadError: this.dlerror.bind(this),
-            onDownloadStart: this.dlstart.bind(this),
-            zipid: z,
-            zipname: zipname,
-            preview: preview
+            onDownloadStart: this.dlstart.bind(this)
         });
         added++;
         zipsize += n.s;
@@ -376,6 +376,8 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (uldl_hold) {
             fm_tfspause('zip_' + z);
         }
+
+        api_req({a: 'log', e: 99655, m: 'ZipIO Download started.'});
     }
 
     if (!preview) {
@@ -406,7 +408,15 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
         $('.transfer-clear-all-icon').removeClass('disabled');
 
         M.onFileManagerReady(function() {
+            // mega.ui.tpp.setTotal(1, 'dl');
             mega.ui.tpp.started('dl');
+            if (typeof fdl_queue_var !== 'undefined' && Object(fdl_queue_var).ph) {
+                var gid = dlmanager.getGID(fdl_queue_var);
+
+                if (dlQueue.isPaused(gid)) {
+                    mega.ui.tpp.pause(gid, 'dl');
+                }
+            }
         });
     }
 };
@@ -477,7 +487,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
             if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) {
                 $overlay.find('.viewer-error').addClass('hidden');
                 $overlay.find('.viewer-pending').addClass('hidden');
-                
+
                 deg =  360 * perc / 100;
                 if (deg <= 180) {
                     $chart.find('.left-chart p').css('transform', 'rotate(' + deg + 'deg)');
@@ -531,8 +541,10 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
                 $('.widget-block').addClass('active');
             }
             else {
-                mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
-                mega.ui.tpp.updateBlock('dl');
+                if (mega.ui.tpp.isCached()) {
+                    mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
+                    mega.ui.tpp.updateBlock('dl');
+                }
             }
             delay('percent_megatitle', percent_megatitle, 50);
         }
@@ -543,6 +555,10 @@ MegaData.prototype.dlcomplete = function(dl) {
     var id = dl.id, z = dl.zipid;
     var $overlay = $('.viewer-overlay');
 
+    if (dl.hasResumeSupport) {
+        dlmanager.remResumeInfo(dl).dump();
+    }
+
     if (slideshowid == id && !previews[slideshowid]) {
         $overlay.find('.viewer-pending').addClass('hidden');
         $overlay.find('.viewer-error').addClass('hidden');
@@ -551,6 +567,8 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     if (z) {
         id = 'zip_' + z;
+
+        api_req({a: 'log', e: 99656, m: 'ZipIO Download completed.'});
     }
     else {
         id = 'dl_' + id;
@@ -1046,7 +1064,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
     var paths = Object.create(null);
 
     if (onChat) {
-        onChat = 'My chat files/' + (M.getNameByHandle(target.substr(5)) || target.substr(5));
+        // onChat = 'My chat files/' + (M.getNameByHandle(target.substr(5)) || target.substr(5));
+        onChat = 'My chat files';
         paths[onChat] = null;
     }
     else {
@@ -1073,13 +1092,13 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
         }
 
         M.createFolder(target, safePath, new MegaPromise())
-            .always(function(target) {
-                if (typeof target === 'number') {
+            .always(function(_target) {
+                if (typeof _target === 'number') {
                     ulmanager.logger.warn('Unable to create folder "%s" on target "%s"',
-                        path, target, api_strerror(target));
+                        path, target, api_strerror(_target));
                 }
                 else {
-                    paths[path] = target;
+                    paths[path] = _target;
                 }
 
                 promise.resolve();
@@ -1089,21 +1108,34 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
     };
 
     var makeDirPromise = new MegaPromise();
-    loadingDialog.show();
 
-    (function _md(paths) {
-        var path = paths.pop();
+    var makeDirProc = function() {
+        loadingDialog.show();
 
-        if (path) {
-            makeDir(path, target).done(_md.bind(null, paths))
-        }
-        else {
-            makeDirPromise.resolve();
-        }
-    })(Object.keys(paths));
+        (function _md(paths) {
+            var path = paths.pop();
+
+            if (path) {
+                makeDir(path, target).done(_md.bind(null, paths));
+            }
+            else {
+                makeDirPromise.resolve();
+            }
+        })(Object.keys(paths));
+    };
+
+    var ulOpSize = 0; // how much bytes we're going to upload
+
+    for (var j = u.length; j--;) {
+        ulOpSize += u[j].size;
+    }
+
+    // makeDirProc();
+    M.checkGoingOverStorageQuota(ulOpSize).done(makeDirProc);
 
     makeDirPromise
         .done(function() {
+            var targets = Object.create(null);
 
             for (var i = u.length; i--;) {
                 var file = u[i];
@@ -1114,26 +1146,25 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
                 else if (paths[file.path]) {
                     file.target = paths[file.path];
                 }
-            }
 
-            dbfetch.get(target)
+                targets[file.target] = 1;
+            }
+            targets[target] = 1;
+
+            dbfetch.geta(Object.keys(targets))
                 .always(function(r) {
                     loadingDialog.hide();
 
-                    if (!M.c[target] && String(target).length !== 11) {
+                    if (!M.c[target] && String(target).length !== 11 && !onChat) {
                         if (d) {
                             ulmanager.logger.warn("Error dbfetch'ing target %s", target, r);
                         }
                         target = M.currentdirid;
                     }
 
-                    if (onChat) {
-                        // Ignore the fileconflict dialog altogether while on the chat
-                        startUpload(u);
-                    }
-                    else {
-                        fileconflict.check(u, target, 'upload').done(startUpload);
-                    }
+                    fileconflict
+                        .check(u, onChat ? u[0].target : target, 'upload', onChat ? fileconflict.KEEPBOTH : 0)
+                        .done(startUpload);
                 });
         });
 };
@@ -1181,8 +1212,10 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             $tr.find('.speed').addClass('unknown').text('');
         }
 
-        mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
-        mega.ui.tpp.updateBlock('ul');
+        if (mega.ui.tpp.isCached()) {
+            mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
+            mega.ui.tpp.updateBlock('ul');
+        }
         delay('percent_megatitle', percent_megatitle, 50);
 
         if (page.substr(0, 2) !== 'fm') {
@@ -1196,9 +1229,49 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
     }
 };
 
+// Handle upload error
+MegaData.prototype.ulerror = function(ul, error) {
+    'use strict';
+
+    if (d) {
+        console.error('Upload error', ul, error, api_strerror(error));
+    }
+    var overquota = true;
+
+    if (error === EOVERQUOTA) {
+        ulQueue.pause();
+        M.showOverStorageQuota(100, 1, 2, {custom: 1});
+    }
+    else if (error === EGOINGOVERQUOTA) {
+        M.checkGoingOverStorageQuota(-1);
+    }
+    else {
+        overquota = false;
+    }
+
+    if (ul) {
+        this.ulfinalize(ul, api_strerror(error));
+
+        if (ul.owner) {
+            ul.owner.destroy();
+        }
+        else {
+            oDestroy(ul);
+        }
+
+        if (error === EOVERQUOTA) {
+            mega.ui.tpp.hide();
+            ulmanager.abort(null);
+            $("tr[id^='ul_'] .transfer-status").text(l[1010]);
+        }
+    }
+    else if (!overquota) {
+        msgDialog('warninga', l[135], l[47], api_strerror(error));
+    }
+};
+
 MegaData.prototype.ulcomplete = function(ul, h, k) {
     var id = ul.id;
-    var $tr = $('#ul_' + id);
 
     if ($.ulBunch && $.ulBunch[ul.chatid]) {
         var ub = $.ulBunch[ul.chatid], p;
@@ -1233,24 +1306,18 @@ MegaData.prototype.ulcomplete = function(ul, h, k) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
     }
 
-    /*this.mobile_ul_completed = true;
-     for (var i in this.mobileuploads)
-     {
-     if (id == this.mobileuploads[i].id)
-     this.mobileuploads[i].done = 1;
-     if (!this.mobileuploads[i].done)
-     this.mobile_ul_completed = false;
-     }
-     if (this.mobile_ul_completed)
-     {
-     $('.upload-status-txt').text(l[1418]);
-     $('#mobileuploadtime').addClass('complete');
-     $('#uploadpopbtn').text(l[726]);
-     $('#mobileupload_header').text(l[1418]);
-     }*/
+    this.ulfinalize(ul, ul.skipfile ? l[1668] : l[1418]);
+};
+
+MegaData.prototype.ulfinalize = function(ul, status) {
+    'use strict';
+
+    var id = ul.id;
+    var $tr = $('#ul_' + id);
+
     $tr.removeClass('transfer-started').addClass('transfer-completed');
     $tr.find('.left-c p, .right-c p').css('transform', 'rotate(180deg)');
-    $tr.find('.transfer-status').text(ul.skipfile ? l[1668] : l[1418]);
+    $tr.find('.transfer-status').text(status);
     $tr.find('.eta, .speed').text('').removeClass('unknown');
 
     ul_queue[ul.pos] = Object.freeze({});

@@ -88,7 +88,7 @@
                 t.css('background-color', 'rgba(222,222,10,0.3)');
             }
             else if (M.viewmode) {
-                if (t.hasClass('file-block folder')) {
+                if (t.hasClass('data-block-view folder')) {
                     t.addClass('ui-selected');
                 }
             }
@@ -239,7 +239,7 @@
             targetid = target.attr('id').split('_').pop();
         }
         else if (M.viewmode) {
-            if (target.hasClass('file-block folder')) {
+            if (target.hasClass('data-block-view folder')) {
                 targetid = target.attr('id');
             }
         }
@@ -286,11 +286,11 @@
                 targetid = null;
 
                 if (M.viewmode) {
-                    if (target.parent().hasClass('file-block ustatus')) {
+                    if (target.parent().hasClass('data-block-view ustatus')) {
                         target = target.parent();
                     }
 
-                    if (target.hasClass('file-block ustatus')) {
+                    if (target.hasClass('data-block-view ustatus')) {
                         targetid = target.attr('id');
                     }
                 }

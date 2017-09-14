@@ -353,8 +353,8 @@ def inspectcss(file, ln, line, result):
     indent = ' ' * (len(file)+len(str(ln))+3)
 
     # check potentially invalid url()s
-    match = re.search(r'url\([\'"]?/?images/mega', line)
-    if match:
+    match = re.search(r'url\([^)]+images/mega/', line)
+    if match and not re.search(r'url\([\'"]?\.\./images/mega/', line):
         fatal += 1
         result.append('{}:{}: {}\n{}^ Potentially invalid url()'
             .format(file, ln, line, indent))
@@ -380,6 +380,12 @@ def inspectjs(file, ln, line, result):
             elif event != 'click':
                 result.append('{}:{}: {}\n{}^ It is recommended to use'
                     ' a namespace. '.format(file, ln, line, indent))
+
+    match = re.search(r'\$\.dialog\s*=[^=]', line)
+    if match:
+        result.append('{}:{}: {}\n{}^ Overwritting $.dialog is discouraged, handling of '
+                    'new dialogs\n{}  should be achieved through M.safeShowDialog(), see MR!1419'
+                    .format(file, ln, line, indent, indent))
 
     return fatal
 

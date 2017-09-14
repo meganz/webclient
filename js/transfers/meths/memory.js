@@ -64,7 +64,7 @@
             }
             offset += (have_ab ? buffer : buffer.buffer).length;
             buffer = null;
-            Soon(done);
+            onIdle(done);
         };
 
         this.download = function(name, path) {
@@ -154,10 +154,16 @@
 
         this.abort = function() {
             if (dblob) {
-                if (msie && !this.completed) {
+                if (!this.completed) {
                     try {
-                        // XXX: how to force freeing up the blob memory?
-                        dblob = dblob.getBlob();
+                        if (msie) {
+                            dblob.getBlob().msClose();
+                        }
+                        else {
+                            for (var i = dblob.length; i--;) {
+                                dblob[i].close();
+                            }
+                        }
                     }
                     catch (e) {}
                 }
@@ -182,7 +188,10 @@
     mBroadcaster.once('startMega', function() {
         var uad = ua.details || false;
 
-        if (localStorage.dlFileSizeLimit) {
+        if (!MemoryIO.usable()) {
+            MemoryIO.fileSizeLimit = 0;
+        }
+        else if (localStorage.dlFileSizeLimit) {
             MemoryIO.fileSizeLimit = parseInt(localStorage.dlFileSizeLimit);
         }
         else if (is_mobile) {

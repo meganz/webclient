@@ -120,7 +120,7 @@ var attribCache = false;
 
                 // Otherwise if a non-encrypted private attribute, base64 decode the data
                 else if (attribute.charAt(0) === '^') {
-                    res = base64urldecode(value);
+                    res = base64urldecode(res);
                 }
 
                 if (d > 1 || is_karma) {
@@ -927,6 +927,10 @@ var attribCache = false;
             crypt.getPubEd25519(userHandle);
         };
         uaPacketParserHandler['*!fmconfig'] = function() { mega.config.fetch(); };
+
+        uaPacketParserHandler['^!prd'] = function() {
+            mBroadcaster.sendMessage('attr:passwordReminderDialog');
+        };
 
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;

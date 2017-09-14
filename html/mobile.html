@@ -147,6 +147,7 @@
                     <div class="mobile fm-item-img">
                         <img alt="" src="{staticpath}images/mobile/extensions/folder.png" />
                     </div>
+                    <div class="mobile fm-icon open-context-menu right hidden"></div>
                     <div class="mobile fm-icon link right hidden"></div>
                     <div class="mobile fm-item-info">
                         <div class="mobile fm-item-name"></div>
@@ -176,11 +177,12 @@
                     <div class="mobile fm-item-img">
                         <img alt="" src="{staticpath}images/mobile/extensions/image.png" />
                     </div>
+                    <div class="mobile fm-icon open-context-menu right hidden"></div>
                     <div class="mobile fm-icon link right hidden"></div>
                     <div class="mobile fm-item-info">
                         <div class="mobile fm-item-name"></div>
                         <div class="mobile fm-item-details">
-                            <span class="file-size"></span><span class="date"></span>
+                            <span class="file-size"></span>,<span class="date"></span>
                         </div>
                     </div>
                     <div class="mobile fm-item-links">
@@ -213,8 +215,112 @@
             </div>
         </div>
     </div>
+
+    <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
         <div class="mobile fm-bottom"></div>
+    </div>
+
+
+</div>
+
+
+<!-- Folder context menu with extra options -->
+<div class="mobile context-menu-container folder hidden">
+    <div class="item-info"></div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item open-folder">
+        <div class="mobile fm-icon open-folder"></div>
+        <span class="mobile text">[$17086]</span>
+    </div>
+    <div class="context-menu-item link-button">
+        <div class="mobile fm-icon manage-link"></div>
+        <span class="mobile text">[$6909]</span>
+    </div>
+    <div class="context-menu-item delete-button">
+        <div class="mobile fm-icon delete"></div>
+        <span class="mobile text">[$1730]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item close-button">
+        <div class="mobile fm-icon close"></div>
+        <span class="mobile text">[$148]</span>
+    </div>
+</div>
+
+
+<!-- File context menu with extra options -->
+<div class="mobile context-menu-container file hidden">
+    <div class="item-info"></div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item preview-file-button">
+        <!-- Only shown for image file types -->
+        <div class="mobile fm-icon preview"></div>
+        <span class="mobile text">[$1899]</span>
+    </div>
+    <div class="context-menu-item download-file-button">
+        <div class="mobile fm-icon download"></div>
+        <span class="mobile text">[$58]</span>
+    </div>
+    <div class="context-menu-item link-button">
+        <div class="mobile fm-icon manage-link"></div>
+        <span class="mobile text">[$6909]</span>
+    </div>
+    <div class="context-menu-item delete-button">
+        <div class="mobile fm-icon delete"></div>
+        <span class="mobile text">[$1730]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item close-button">
+        <div class="mobile fm-icon close"></div>
+        <span class="mobile text">[$148]</span>
+    </div>
+</div>
+
+
+<!-- Photo preview overlay !-->
+<div class="mobile main-block slideshow-image-previewer hidden">
+    <div class="mobile slideshow-header">
+        <div class="mobile fm-dialog-close"></div>
+        <div class="mobile slideshow-text-right-block">
+            <div class="mobile slideshow-file-name"></div>
+            <div class="mobile slideshow-file-number-and-total"></div>
+        </div>
+    </div>
+    <div class="mobile content-row">
+        <div class="mobile content-cell">
+            <div class="mobile slideshow-wrapper">
+                <div class="mobile slide-show-navigation">
+                    <div class="mobile viewer-pending">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                    </div>
+                    <div class="mobile slideshow-back-arrow"></div>
+                    <div class="mobile slideshow-forward-arrow"></div>
+                </div>
+                <div class="mobile slides-bl">
+                    <div class="mobile slides left">
+                        <img alt="" />
+                    </div>
+                    <div class="mobile slides mid">
+                        <img alt="" />
+                    </div>
+                    <div class="mobile slides right">
+                        <img alt="" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mobile slideshow-buttons">
+        <div class="mobile left-buttons">
+            <div class="mobile fm-icon delete delete-button"></div>
+        </div>
+        <div class="mobile right-buttons">
+            <div class="mobile fm-icon download download-button"></div>
+            <div class="mobile fm-icon manage-link manage-link-button"></div>
+        </div>
     </div>
 </div>
 
@@ -619,7 +725,7 @@
                     <i class="mobile icon red-back"></i>
                     Back to plans
                 </div>
-                <div class="mobile page-title">[$6975]</div>                
+                <div class="mobile page-title">[$6975]</div>
                 <div class="mobile payment-options-container">
                     <div class="mobile payment-options">
                         <div class="mobile membership-icon"></div>

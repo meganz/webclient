@@ -1535,8 +1535,22 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
  * Perform a normal logout
  *
  * @param {Function} aCallback optional
+ * @param {Bool} force optional
  */
-function mLogout(aCallback) {
+function mLogout(aCallback, force) {
+    "use strict";
+
+    if (!force && mega.ui.passwordReminderDialog) {
+        var passwordReminderLogout = mega.ui.passwordReminderDialog.recheckLogoutDialog();
+
+        passwordReminderLogout
+            .done(function() {
+                mLogout(aCallback, true);
+            });
+
+        return;
+    }
+
     var cnt = 0;
     if (M.c[M.RootID] && u_type === 0) {
         for (var i in M.c[M.RootID]) {
@@ -1703,18 +1717,13 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
             if (handles.length) {
                 var inRub = (M.RubbishID === M.currentrootid);
 
-                if (inRub) {
-                    // Flush cached nodes
-                    $(window).trigger('dynlist.flush');
-                }
-
                 handles.map(function(handle) {
                     M.delNode(handle, true);    // must not update DB pre-API
                     api_req({a: 'd', n: handle/*, i: requesti*/});
 
                     if (inRub) {
                         $('.grid-table.fm#' + handle).remove();
-                        $('.file-block#' + handle).remove();
+                        $('.data-block-view#' + handle).remove();
                     }
                 });
 

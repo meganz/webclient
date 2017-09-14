@@ -516,7 +516,13 @@ function addContactToFolderShare() {
  */
 function addNewContact($addButton) {
 
-    var mailNum, msg, title, email, emailText, $mails;
+    var mailNum;
+    var msg;
+    var title;
+    var email;
+    var emailText;
+    var $mails;
+    var $textarea = $('.add-user-textarea textarea');
 
     // Add button is enabled
     if (!$addButton.is('.disabled') && $addButton.is('.add')) {
@@ -528,7 +534,11 @@ function addNewContact($addButton) {
         else {
 
             // Custom text message
-            emailText = $('.add-user-textarea textarea').val();
+            emailText = $textarea.val();
+
+            if (emailText === '') {
+                emailText = $textarea.attr('placeholder');
+            }
 
             // List of email address planned for addition
             $mails = $('.token-input-list-mega .token-input-token-mega');
@@ -577,7 +587,7 @@ function addNewContact($addButton) {
  * sharedUInode
  *
  * Handle shared/export link icons in Cloud Drive
- * @param {String} nodeHandle, selected node id
+ * @param {String} nodeHandle selected node id
  */
 function sharedUInode(nodeHandle) {
 
@@ -845,12 +855,11 @@ function contactAddDialog() {
     }
 
     $('.add-user-notification textarea').rebind('focus.add-user-n', function() {
-        var $this = $(this);
-        $this.parent().addClass('active');
+        $('.add-user-notification').addClass('focused');
     });
 
     $('.add-user-notification textarea').rebind('blur.add-user-n', function() {
-        $('.add-user-notification').removeClass('active');
+        $('.add-user-notification').removeClass('focused');
     });
 
     if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
@@ -1272,18 +1281,18 @@ function handleResetSuccessDialogs(dialog, txt, dlgString) {
     $.dialog = dlgString;
 }
 
-function avatarDialog(close)
-{
-    if (close)
-    {
-        $.dialog = false;
-        $('.avatar-dialog').addClass('hidden');
-        fm_hideoverlay();
+function avatarDialog(close) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.avatar-dialog');
+
+    if (close) {
+        closeDialog();
         return true;
     }
-    $.dialog = 'avatar';
-    $('.fm-dialog.avatar-dialog').removeClass('hidden');
-    fm_showoverlay();
+
+    M.safeShowDialog('avatar', $dialog);
+
     $('.avatar-body').safeHTML(
         '<div id="avatarcrop">' +
             '<div class="image-upload-and-crop-container">' +
@@ -1354,20 +1363,21 @@ function avatarDialog(close)
     });
 }
 
+
 /**
  * Really simple shortcut logic for select all, copy, paste, delete
  *
  * @constructor
  */
 function FMShortcuts() {
-    "use strict";
 
     var current_operation = null;
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
 
-        if (!is_fm())
+        if (!is_fm()) {
             return true;
+        }
 
         e = e || window.event;
 
@@ -1381,22 +1391,26 @@ function FMShortcuts() {
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
             if (typeof selectionManager != 'undefined' && selectionManager) {
+                if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+                    return;
+                }
                 selectionManager.select_all();
             }
             return false; // stop prop.
         } else if (
             (charTyped == "c" || charTyped == "x") &&
             (e.ctrlKey || e.metaKey)
-            ) {
-            var $items = selectionManager.get_selected();
-            if ($items.size() == 0) {
+        ) {
+            var items = selectionManager.get_selected();
+            if (items.length == 0) {
                 return; // dont do anything.
             }
 
             current_operation = {
                 'op': charTyped == "c" ? 'copy' : 'cut',
-                'src': $items
+                'src': items
             };
+
             return false; // stop prop.
         } else if (charTyped == "v" && (e.ctrlKey || e.metaKey)) {
             if (!current_operation) {
@@ -1405,34 +1419,30 @@ function FMShortcuts() {
 
             var handles = [];
             $.each(current_operation.src, function(k, v) {
-                handles.push($(v).attr('id'));
+                handles.push(v);
             });
 
-            if (current_operation.op === "copy") {
+            if (current_operation.op == "copy") {
                 M.copyNodes(handles, M.currentdirid);
-            }
-            else if (current_operation.op === "cut") {
-                current_operation = null;
+            } else if (current_operation.op == "cut") {
                 M.moveNodes(handles, M.currentdirid);
+                current_operation = null;
             }
 
             return false; // stop prop.
         } else if (charCode == 8) {
-            var $items = selectionManager.get_selected();
-            if ($items.size() === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
+            var items = selectionManager.get_selected();
+            if (items.length == 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
-            $.selected = [];
-            $items.each(function() {
-                $.selected.push($(this).attr('id'));
-            });
+            $.selected = items;
 
             fmremove();
 
             // force remove, no confirmation
             if (e.ctrlKey || e.metaKey) {
-                $('#msgDialog:visible default-white-button.confirm').trigger('click');
+                $('#msgDialog:visible .fm-dialog-button.confirm').trigger('click');
             }
 
             return false;
@@ -1441,375 +1451,7 @@ function FMShortcuts() {
     });
 }
 
-/**
- * Simple way for searching for nodes by their first letter.
- *
- * PS: This is meant to be somehow reusable.
- *
- * @param searchable_elements selector/elements a list/selector of elements which should be searched for the user
- * specified key press character
- * @param containers selector/elements a list/selector of containers to which the input field will be centered (the code
- * will dynamically detect and pick the :visible container)
- *
- * @returns {*}
- * @constructor
- */
-var QuickFinder = function(searchable_elements, containers) {
-    "use strict";
 
-    var self = this;
-    var DEBUG = false;
-
-    self._is_active = false; // defined as a prop of this. so that when in debug mode it can be easily accessed from
-    // out of this scope
-
-    var last_key = null;
-    var next_idx = 0;
-
-    // hide on page change
-    if (QuickFinder._pageChangeListenerId) {
-        mBroadcaster.removeListener(QuickFinder._pageChangeListenerId);
-    }
-    QuickFinder._pageChangeListenerId = mBroadcaster.addListener('pagechange', function () {
-        if (self.is_active()) {
-            self.deactivate();
-        }
-    });
-
-    $(window).rebind('keypress.quickFinder', function(e) {
-
-        e = e || window.event;
-        // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
-        // contact field)
-        if ($(e.target).is("input, textarea, select") || $.dialog)
-            return;
-
-        var charCode = e.which || e.keyCode; // ff
-
-        if (
-            (charCode >= 48 && charCode <= 57) ||
-            (charCode >= 65 && charCode <= 123) ||
-            charCode > 255
-            ) {
-            var charTyped = String.fromCharCode(charCode);
-
-            // get the currently visible container
-            var $container = $(containers).filter(":visible");
-            if ($container.size() == 0) {
-                // no active container, this means that we are receiving events for a page, for which we should not
-                // do anything....
-                return;
-            }
-
-            self._is_active = true;
-
-            $(self).trigger("activated");
-
-            var $found = $(searchable_elements).filter(":visible:istartswith('" + charTyped + "')");
-
-            if (
-                /* repeat key press, but show start from the first element */
-                    (last_key != null && ($found.size() - 1) <= next_idx)
-                    ||
-                    /* repeat key press is not active, should reset the target idx to always select the first element */
-                        (last_key == null)
-                        ) {
-                    next_idx = 0;
-                    last_key = null;
-                } else if (last_key == charTyped) {
-                    next_idx++;
-                } else if (last_key != charTyped) {
-                    next_idx = 0;
-                }
-                last_key = charTyped;
-
-                $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
-
-                var $target_elm = $($found[next_idx]);
-
-                $target_elm.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
-
-                var $jsp = $target_elm.getParentJScrollPane();
-                if ($jsp) {
-                    var $scrolled_elm = $target_elm.parent("a");
-
-                    if ($scrolled_elm.size() == 0) { // not in icon view, its a list view, search for a tr
-                        $scrolled_elm = $target_elm.parents('tr:first');
-                    }
-                    $jsp.scrollToElement($scrolled_elm);
-                }
-
-                $(self).trigger('search');
-
-                if ($target_elm && $target_elm.size() > 0) {
-                    // ^^ DONT stop prop. if there are no found elements.
-                    return false;
-                }
-            }
-            else if (charCode >= 33 && charCode <= 36)
-            {
-                var e = '.files-grid-view.fm';
-                if (M.viewmode == 1)
-                    e = '.fm-blocks-view.fm';
-
-                if ($(e + ':visible').length)
-                {
-                    e = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
-                    var jsp = e.data('jsp');
-
-                    if (jsp)
-                    {
-                        switch (charCode)
-                        {
-                            case 33: /* Page Up   */
-                                jsp.scrollByY(-e.height(), !0);
-                                break;
-                            case 34: /* Page Down */
-                                jsp.scrollByY(e.height(), !0);
-                                break;
-                            case 35: /* End       */
-                                jsp.scrollToBottom(!0);
-                                break;
-                            case 36: /* Home      */
-                                jsp.scrollToY(0, !0);
-                                break;
-                        }
-                    }
-                }
-            }
-        });
-
-    // hide the search field when the user had clicked somewhere in the document
-    $(document.body).delegate('> *', 'mousedown', function(e) {
-        if (!is_fm()) {
-            return;
-        }
-        if (self.is_active()) {
-            self.deactivate();
-            return false;
-        }
-    });
-
-    // use events as a way to communicate with this from the outside world.
-    self.deactivate = function() {
-        self._is_active = false;
-        $(self).trigger("deactivated");
-    };
-
-    self.is_active = function() {
-        return self._is_active;
-    };
-
-    self.disable_if_active = function() {
-        if (self.is_active()) {
-            self.deactivate();
-        }
-    };
-
-    return this;
-};
-
-var quickFinder = new QuickFinder(
-    '.tranfer-filetype-txt, .file-block-title, td span.contacts-username',
-    '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table'
-    );
-
-/**
- * This should take care of flagging the LAST selected item in those cases:
- *
- *  - jQ UI $.selectable's multi selection using drag area (integrated using jQ UI $.selectable's Events)
- *
- *  - Single click selection (integrated by assumption that the .get_currently_selected will also try to cover this case
- *  when there is only one .ui-selected...this is how no other code had to be changed :))
- *
- *  - Left/right/up/down keys (integrated by using the .set_currently_selected and .get_currently_selected public
- *  methods)
- *
- * @param $selectable
- * @returns {*}
- * @constructor
- */
-var SelectionManager = function($selectable) {
-    "use strict";
-
-    var self = this;
-    $selectable.unbind('selectableselecting');
-    $selectable.unbind('selectableselected');
-    $selectable.unbind('selectableunselecting');
-    $selectable.unbind('selectableunselected');
-
-    /**
-     * Store all selected items in an _ordered_ array.
-     *
-     * @type {Array}
-     */
-    var selected_list = [];
-
-    /**
-     * Helper func to clear old reset state from other icons.
-     */
-    this.clear = function() {
-        $('.currently-selected', $selectable).removeClass('currently-selected');
-    };
-
-    this.clear(); // remove ANY old .currently-selected values.
-
-    /**
-     * The idea of this method is to _validate_ and return the .currently-selected element.
-     *
-     * @param first_or_last string ("first" or "last") by default will return the first selected element if there is
-     * not .currently-selected
-     *
-     * @returns {*|jQuery|HTMLElement}
-     */
-    this.get_currently_selected = function(first_or_last) {
-        if (!first_or_last) {
-            first_or_last = "first";
-        }
-
-        var $currently_selected = $('.currently-selected', $selectable);
-
-        if ($currently_selected.size() == 0) { // NO .currently-selected
-            return $('.ui-selected:' + first_or_last, $selectable);
-        } else if (!$currently_selected.is(".ui-selected")) { // validate that the currently selected is actually selected.
-            // if not, try to get the first_or_last .ui-selected item
-            var selected_elms = $('.ui-selected:' + first_or_last, $selectable);
-            return selected_elms;
-        } else { // everything is ok, we should return the .currently-selected
-            return $currently_selected;
-        }
-    };
-
-    /**
-     * Used from the shortcut keys code.
-     *
-     * @param element
-     */
-    this.set_currently_selected = function($element) {
-
-        self.clear();
-        $element.addClass("currently-selected");
-        quickFinder.disable_if_active();
-
-        // Do .scrollIntoView if the parent or parent -> parent DOM Element is a JSP.
-        {
-            var $jsp = $element.getParentJScrollPane();
-            if ($jsp) {
-                $jsp.scrollToElement($element);
-            }
-        }
-    };
-
-    /**
-     * Simple helper func, for selecting all elements in the current view.
-     */
-    this.select_all = function() {
-        $(window).trigger('dynlist.flush');
-        var $selectable_containers = $(
-            [
-                ".fm-transfers-block",
-                ".fm-blocks-view.fm",
-                ".fm-blocks-view.contacts-view",
-                ".files-grid-view.fm",
-                ".files-grid-view.contacts-view",
-                ".contacts-grid-view",
-                ".fm-contacts-blocks-view",
-                ".files-grid-view.contact-details-view",
-                ".shared-grid-view",
-                ".shared-blocks-view",
-                ".shared-details-block"
-            ].join(",")
-            ).filter(":visible");
-
-        var $selectables = $(
-            [
-                ".data-block-view",
-                "tr.ui-draggable",
-                "tr.ui-selectee",
-                ".contact-block-view.ui-draggable",
-                ".transfer-table tr"
-            ].join(","),
-            $selectable_containers
-            ).filter(":visible");
-
-        $selectables.addClass("ui-selected");
-    };
-
-    /**
-     * Use this to get ALL (multiple!) selected items in the currently visible view/grid.
-     */
-    this.get_selected = function() {
-        var $selectable_containers = $(
-            [
-                ".fm-blocks-view.fm",
-                ".fm-blocks-view.contacts-view",
-                ".files-grid-view.fm",
-                ".files-grid-view.contacts-view",
-                ".contacts-grid-view",
-                ".fm-contacts-blocks-view",
-                ".files-grid-view.contact-details-view"
-            ].join(",")
-            ).filter(":visible");
-
-        var $selected = $(
-            [
-                ".data-block-view",
-                "tr.ui-draggable",
-                "tr.ui-selectee",
-                ".contact-block-view.ui-draggable"
-            ].join(","),
-            $selectable_containers
-            ).filter(":visible.ui-selected");
-
-        return $selected;
-    };
-
-    /**
-     * Push the last selected item to the end of the selected_list array.
-     */
-    $selectable.bind('selectableselecting', function(e, data) {
-        var $selected = $(data.selecting);
-        selected_list.push(
-            $selected
-            );
-    });
-
-    /**
-     * Remove any unselected element from the selected_list array.
-     */
-    $selectable.bind('selectableunselecting', function(e, data) {
-        var $unselected = $(data.unselecting);
-        var idx = $.elementInArray($unselected, selected_list);
-
-        if (idx > -1) {
-            delete selected_list[idx];
-        }
-    });
-
-    /**
-     * After the user finished selecting the icons, flag the last selected one as .currently-selecting
-     */
-    $selectable.bind('selectablestop', function(e, data) {
-
-        self.clear();
-
-        // remove `undefined` from the list
-        selected_list = $.map(selected_list, function(n, i) {
-            if (n !== undefined) {
-                return n;
-            }
-        });
-
-        // add the .currently-selected
-        if (selected_list.length > 0) {
-            $(selected_list[selected_list.length - 1]).addClass('currently-selected');
-        }
-        selected_list = []; // reset the state of the last selected items for the next selectablestart
-    });
-    return this;
-};
-
-var selectionManager;
 
 function getDDhelper()
 {
@@ -1844,42 +1486,45 @@ function renameDialog() {
     "use strict";
 
     if ($.selected.length > 0) {
-        $.dialog = 'rename';
-        $('.rename-dialog').removeClass('hidden');
-        $('.rename-dialog').addClass('active');
-        fm_showoverlay();
+        var n = M.d[$.selected[0]] || false;
+        var ext = fileext(n.name);
+        var $dialog = $('.fm-dialog.rename-dialog');
+        var $input = $('input', $dialog);
 
-        $('.rename-dialog .fm-dialog-close, .rename-dialog-button.cancel').rebind('click', function() {
-            $.dialog = false;
-            $('.rename-dialog').addClass('hidden');
-            fm_hideoverlay();
+        M.safeShowDialog('rename', function() {
+            $dialog.removeClass('hidden').addClass('active');
+            $input.focus();
+            return $dialog;
         });
 
+        $('.fm-dialog-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
+
         $('.rename-dialog-button.rename').rebind('click', function() {
-            if ($('.rename-dialog').hasClass('active')) {
-                doRename();
+            if ($dialog.hasClass('active')) {
+                var value = $input.val();
+
+                if (value && n.name && value !== n.name) {
+                    M.rename(n.h, value);
+                }
+
+                closeDialog();
             }
         });
 
-        var n = M.d[$.selected[0]];
-        if (n.t) {
-            $('.rename-dialog .fm-dialog-title').text(l[425]);
-        }
-        else {
-            $('.rename-dialog .fm-dialog-title').text(l[426]);
-        }
+        $('.fm-dialog-title', $dialog).text(n.t ? l[425] : l[426]);
+        $input.val(n.name);
 
-        $('.rename-dialog input').val(n.name);
-        var ext = fileext(n.name);
-        $('.rename-dialog .transfer-filetype-icon').attr('class', 'transfer-filetype-icon ' + fileIcon(n));
+        $('.transfer-filetype-icon', $dialog)
+            .attr('class', 'transfer-filetype-icon ' + fileIcon(n));
+
         if (!n.t && ext.length > 0) {
-            $('.rename-dialog input')[0].selectionStart = 0;
-            $('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
+            $input[0].selectionStart = 0;
+            $input[0].selectionEnd = $input.val().length - ext.length - 1;
         }
 
-        $('.rename-dialog input').rebind('focus', function() {
+        $input.rebind('focus', function() {
             var selEnd;
-            $(this).closest('.rename-dialog').addClass('focused');
+            $dialog.addClass('focused');
             var d = $(this).val().lastIndexOf('.');
             if (d > -1) {
                 selEnd = d;
@@ -1891,20 +1536,18 @@ function renameDialog() {
             $(this)[0].selectionEnd = selEnd;
         });
 
-        $('.rename-dialog input').rebind('blur', function() {
-            $(this).closest('.rename-dialog').removeClass('focused');
+        $input.rebind('blur', function() {
+            $dialog.removeClass('focused');
         });
 
-        $('.rename-dialog input').unbind('click keydown keyup keypress');
-        $('.rename-dialog input').focus();
-        $('.rename-dialog input').bind('click keydown keyup keypress', function(e) {
-            var n = M.d[$.selected[0]],
-                ext = fileext(n.name);
-            if ($(this).val() == '' || (!n.t && ext.length > 0 && $(this).val() == '.' + ext)) {
-                $('.rename-dialog').removeClass('active');
+        $input.rebind('click keydown keyup keypress', function() {
+            var value = $(this).val();
+
+            if (!value || (!n.t && ext.length > 0 && value === '.' + ext)) {
+                $dialog.removeClass('active');
             }
             else {
-                $('.rename-dialog').addClass('active');
+                $dialog.addClass('active');
             }
             /*if (!n.t && ext.length > 0) {
                 if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {
@@ -1920,30 +1563,6 @@ function renameDialog() {
                 }
             }*/
         });
-    }
-}
-
-/* @type {function} doRename
- *
- * On context menu rename
- */
-function doRename() {
-    "use strict";
-
-    var itemName = $('.rename-dialog input').val();
-    var handle = $.selected[0];
-    var nodeData = M.d[handle];
-
-    if (itemName !== '') {
-        if (nodeData) {
-            if (nodeData && (itemName !== nodeData.name)) {
-                M.rename(handle, itemName);
-            }
-        }
-
-        $.dialog = false;
-        $('.rename-dialog').addClass('hidden');
-        fm_hideoverlay();
     }
 }
 
@@ -2353,7 +1972,7 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     else {
         $('.fm-dialog.copy-dialog .share-dialog-permissions').addClass('hidden');
         $('.copy-dialog-button').removeClass('hidden');
-        $('.copy-operation-txt').text(l[63]);
+        $('.copy-operation-txt').text(buttonLabel === l[236] ? l[236] : l[63]);
     }
 
     $('.' + dialogPrefix + '-dialog .nw-fm-tree-item').removeClass('expanded active opened selected');
@@ -2812,15 +2431,24 @@ function initShareDialogMultiInputPlugin() {
  * @param {Array} nodesToProcess Array of strings, node ids
  */
 function initCopyrightsDialog(nodesToProcess) {
+    'use strict';
 
     $.itemExport = nodesToProcess;
+
+    var openGetLinkDialog = function() {
+        var exportLink = new mega.Share.ExportLink({
+            'showExportLinkDialog': true,
+            'updateUI': true,
+            'nodesToProcess': nodesToProcess
+        });
+        exportLink.getExportLink();
+    };
+
     // If they've already agreed to the copyright warning this session
     if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
 
         // Go straight to Get Link dialog
-        var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
-        exportLink.getExportLink();
-
+        openGetLinkDialog();
         return false;
     }
 
@@ -2828,32 +2456,27 @@ function initCopyrightsDialog(nodesToProcess) {
     var $copyrightDialog = $('.copyrights-dialog');
 
     // Otherwise show the copyright warning dialog
-    fm_showoverlay();
-    $.copyrightsDialog = 'copyrights';
-    $copyrightDialog.show();
+    M.safeShowDialog('copyrights', function() {
+        $.copyrightsDialog = 'copyrights';
+        return $copyrightDialog;
+    });
 
     // Init click handler for 'I agree' / 'I disagree' buttons
     $copyrightDialog.find('.default-white-button').rebind('click', function() {
+        closeDialog();
 
         // User disagrees with copyright warning
-        if ($(this).hasClass('cancel')) {
-            closeDialog();
-        }
-        else {
+        if (!$(this).hasClass('cancel')) {
             // User agrees, store flag in localStorage so they don't see it again for this session
             localStorage.setItem('agreedToCopyrightWarning', '1');
 
             // Go straight to Get Link dialog
-            closeDialog();
-            var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
-            exportLink.getExportLink();
+            openGetLinkDialog();
         }
     });
 
     // Init click handler for 'Close' button
-    $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
-        closeDialog();
-    });
+    $copyrightDialog.find('.fm-dialog-close').rebind('click', closeDialog);
 }
 
 function initShareDialog() {
@@ -3064,6 +2687,10 @@ function initShareDialog() {
                 perm = sharedPermissionLevel(newPermLevel[0]);
 
                 if (!shares || !shares[id] || shares[id].r !== perm) {
+                    if (M.opc[id]) {
+                        // it's a pending contact, provide back the email
+                        id = M.opc[id].m || id;
+                    }
                     $.changedPermissions.push({ u: id, r: perm });
                 }
             }
@@ -3118,6 +2745,7 @@ function initShareDialog() {
         $('.share-dialog-permissions.active').removeClass('active');
 
         e.stopPropagation();
+        return false;
     });
 
     //Pending info block
@@ -3143,7 +2771,7 @@ function initShareDialog() {
     $('.share-message textarea').rebind('focus', function() {
 
         var $this = $(this);
-        $('.share-message').addClass('active');
+        $('.share-message').addClass('focused');
 
         if ($this.val() === l[6853]) {
 
@@ -3162,7 +2790,7 @@ function initShareDialog() {
     });
 
     $('.share-message textarea').rebind('blur', function() {
-        $('.share-message').removeClass('active');
+        $('.share-message').removeClass('focused');
     });
 }
 
@@ -3199,12 +2827,17 @@ function closeDialog() {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }
 
+    if (typeof $.dialog === 'function') {
+        onIdle($.dialog);
+        $.dialog = null;
+    }
+
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         fm_hideoverlay();
         $('.fm-dialog.registration-page-success').addClass('hidden').removeClass('special');
     }
 
-    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
+    if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true || $.dialog === 'download-pre-warning') {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
     }
@@ -3217,25 +2850,28 @@ function closeDialog() {
         $('.fm-dialog.password-dialog').addClass('hidden');
     }
 
+    if ($.dialog === 'prd') {
+        // PasswordReminderDialog manages its own states, so don't do anything.
+        return;
+    }
+
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
     else if (($.dialog === 'slideshow') && $.copyrightsDialog) {
-        $('.copyrights-dialog').hide();
+        $('.copyrights-dialog').addClass('hidden');
 
         delete $.copyrightsDialog;
     }
     else {
         if ($.dialog === 'properties') {
-            propertiesDialog(1);
+            propertiesDialog(2);
         }
         else {
             fm_hideoverlay();
         }
-        if (!$.propertiesDialog) {
-            $('.fm-dialog').addClass('hidden');
-        }
+        $('.fm-dialog' + ($.propertiesDialog ? ':not(.properties-dialog)' : '')).addClass('hidden');
         $('.dialog-content-block').empty();
 
         // add contact popup
@@ -3255,7 +2891,7 @@ function closeDialog() {
         closeImportContactNotification('.share-dialog');
         closeImportContactNotification('.add-user-popup');
 
-        $('.copyrights-dialog').hide();
+        $('.copyrights-dialog').addClass('hidden');
         $('.export-link-dropdown').hide();
 
         delete $.copyDialog;
@@ -3272,6 +2908,21 @@ function closeDialog() {
 
     delete $.dialog;
     delete $.mcImport;
+
+    if ($.propertiesDialog) {
+        // if the dialog was close from the properties dialog
+        $.dialog = $.propertiesDialog;
+    }
+
+    if ($.copyDialog || $.moveDialog) {
+        // the createfolder dialog was closed
+        $.dialog = $.copyDialog || $.moveDialog;
+
+        $('.fm-dialog').addClass('arrange-to-back');
+        $('.fm-dialog.' + $.dialog + '-dialog').removeClass('arrange-to-back');
+    }
+
+    mBroadcaster.sendMessage('closedialog');
 }
 
 function copyDialog() {
@@ -3989,45 +3640,40 @@ function refreshDialogContent() {
 function createFolderDialog(close) {
     "use strict";
 
-    $.dialog = 'createfolder';
+    var $dialog = $('.fm-dialog.create-folder-dialog');
+    var $input = $('input', $dialog);
+
     if (close) {
-        $.dialog = false;
         if ($.cftarget) {
             delete $.cftarget;
         }
-        if (!($.copyDialog || $.moveDialog)) {
-            fm_hideoverlay();
-        }
-        $('.fm-dialog').removeClass('arrange-to-back');
-        $('.fm-dialog.create-folder-dialog').addClass('hidden');
-
+        $input.val('');
+        closeDialog();
         return true;
     }
 
-    $('.create-folder-dialog input').rebind('focus', function() {
+
+    $input.rebind('focus', function() {
         if ($(this).val() === l[157]) {
-            $('.create-folder-dialog input').val('');
+            $input.val('');
         }
-        $('.create-folder-dialog').addClass('focused');
+        $dialog.addClass('focused');
     });
 
-    $('.create-folder-dialog input').rebind('blur', function() {
-        if ($('.create-folder-dialog input').val() === '') {
-            $('.create-folder-dialog input').val(l[157]);
-        }
-        $('.create-folder-dialog').removeClass('focused');
+    $input.rebind('blur', function() {
+        $dialog.removeClass('focused');
     });
 
-    $('.create-folder-dialog input').rebind('keyup', function() {
-        if ($('.create-folder-dialog input').val() === '' || $('.create-folder-dialog input').val() === l[157]) {
-            $('.create-folder-dialog').removeClass('active');
+    $input.rebind('keyup', function() {
+        if ($input.val() === '' || $input.val() === l[157]) {
+            $dialog.removeClass('active');
         }
         else {
-            $('.create-folder-dialog').addClass('active');
+            $dialog.addClass('active');
         }
     });
 
-    $('.create-folder-dialog input').rebind('keypress', function(e) {
+    $input.rebind('keypress', function(e) {
 
         if (e.which === 13 && $(this).val() !== '') {
             if (!$.cftarget) {
@@ -4038,20 +3684,15 @@ function createFolderDialog(close) {
         }
     });
 
-    $('.create-folder-dialog .fm-dialog-close, .create-folder-dialog .create-folder-button-cancel').rebind('click', function() {
-        createFolderDialog(1);
-        $('.fm-dialog').removeClass('arrange-to-back');
-        $('.create-folder-dialog input').val(l[157]);
-    });
+    $('.fm-dialog-close, .create-folder-button-cancel', $dialog).rebind('click', createFolderDialog);
 
     $('.fm-dialog-input-clear').rebind('click', function() {
-        $('.create-folder-dialog input').val('');
-        $('.create-folder-dialog').removeClass('active');
+        $input.val('');
+        $dialog.removeClass('active');
     });
 
     $('.fm-dialog-new-folder-button').rebind('click', function() {
-
-        var v = $('.create-folder-dialog input').val();
+        var v = $input.val();
 
         if (v === '' || v === l[157]) {
             alert(l[1024]);
@@ -4063,28 +3704,28 @@ function createFolderDialog(close) {
             M.createFolder($.cftarget, v);
             createFolderDialog(1);
         }
-        $('.create-folder-dialog input').val('');
+        $input.val('');
     });
 
-    fm_showoverlay();
-
-    $('.fm-dialog.create-folder-dialog').removeClass('hidden');
-    $('.create-folder-input-bl input').focus();
-    $('.create-folder-dialog').removeClass('active');
+    M.safeShowDialog('createfolder', function() {
+        $dialog.removeClass('hidden');
+        $('.create-folder-input-bl input').focus();
+        $dialog.removeClass('active');
+        return $dialog;
+    });
 }
 
-function chromeDialog(close)
-{
-    if (close)
-    {
-        $.dialog = false;
-        fm_hideoverlay();
-        $('.fm-dialog.chrome-dialog').addClass('hidden');
+function chromeDialog(close) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.chrome-dialog');
+
+    if (close) {
+        closeDialog();
         return true;
     }
-    fm_showoverlay();
-    $('.fm-dialog.chrome-dialog').removeClass('hidden');
-    $.dialog = 'chrome';
+    M.safeShowDialog('chrome', $dialog);
+
     $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').rebind('click', function()
     {
         chromeDialog(1);
@@ -4118,14 +3759,10 @@ function megaSyncDialog() {
     var $dialog = $('.fm-dialog.download-megasync-dialog');
 
     // Show the dialog and overlay
-    $dialog.removeClass('hidden');
-    fm_showoverlay();
+    M.safeShowDialog('download-megasync-dialog', $dialog);
 
     // Add close button handler
-    $dialog.find('.fm-dialog-close, .close-button').rebind('click', function() {
-        $dialog.addClass('hidden');
-        fm_hideoverlay();
-    });
+    $dialog.find('.fm-dialog-close, .close-button').rebind('click', closeDialog);
 
     // Add checkbox handling
     $dialog.find('#megasync-checkbox').rebind('click', function() {
@@ -4199,16 +3836,19 @@ function firefoxDialog(close) {
 }
 
 function browserDialog(close) {
+    'use strict';
+
+    var $dialog = $('.fm-dialog.browsers-dialog');
+
     if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $('.fm-dialog.browsers-dialog').addClass('hidden');
+        closeDialog();
         return true;
     }
-    $.browserDialog = 1;
-    $.dialog = 'browser';
-    fm_showoverlay();
-    $('.fm-dialog.browsers-dialog').removeClass('hidden');
+
+    M.safeShowDialog('browser', function() {
+        $.browserDialog = 1;
+        return $dialog;
+    });
 
     $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').rebind('click', function() {
         browserDialog(1);
@@ -4295,7 +3935,7 @@ function propertiesDialog(close) {
     "use strict";
 
     if (close) {
-        _propertiesDialog(1);
+        _propertiesDialog(close);
     }
     else {
         var shares = [];
@@ -4321,6 +3961,8 @@ function propertiesDialog(close) {
 function _propertiesDialog(close) {
     "use strict";
 
+    var $dialog = $('.fm-dialog.properties-dialog');
+
     /**
      * fillPropertiesContactList, Handles node properties/info dialog contact list content
      *
@@ -4330,7 +3972,7 @@ function _propertiesDialog(close) {
 
         var MAX_CONTACTS = 5;
         var shareUsersHtml = '';
-        var $shareUsers = pd.find('.properties-body .properties-context-menu')
+        var $shareUsers = $dialog.find('.properties-body .properties-context-menu')
                         .empty()
                         .append('<div class="properties-context-arrow"></div>');
 
@@ -4358,16 +4000,17 @@ function _propertiesDialog(close) {
         }
     };// END of fillPropertiesContactList function
 
-    var pd = $('.fm-dialog.properties-dialog');
-
     $(document).unbind('MegaNodeRename.Properties');
     $(document).unbind('MegaCloseDialog.Properties');
 
     if (close) {
-        $.dialog = false;
         delete $.propertiesDialog;
-        fm_hideoverlay();
-        pd.addClass('hidden');
+        if (close !== 2) {
+            closeDialog();
+        }
+        else {
+            fm_hideoverlay();
+        }
         $('.contact-list-icon').removeClass('active');
         $('.properties-context-menu').fadeOut(200);
         $.hideContextMenu();
@@ -4378,11 +4021,8 @@ function _propertiesDialog(close) {
         return true;
     }
 
-    $.propertiesDialog = $.dialog = 'properties';
-    fm_showoverlay();
-
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me');
-    pd.removeClass('read-only read-and-write full-access taken-down undecryptable');
+    $dialog.removeClass('multiple folders-only two-elements shared shared-with-me');
+    $dialog.removeClass('read-only read-and-write full-access taken-down undecryptable');
     $('.properties-elements-counter span').text('');
 
     var users = null;
@@ -4409,6 +4049,11 @@ function _propertiesDialog(close) {
         return propertiesDialog(1);
     }
 
+    M.safeShowDialog('properties', function() {
+        $.propertiesDialog = 'properties';
+        return $dialog;
+    });
+
     var exportLink = new mega.Share.ExportLink({});
     var isTakenDown = exportLink.isTakenDown($.selected);
     var isUndecrypted = missingkeys[$.selected[0].h];
@@ -4416,11 +4061,11 @@ function _propertiesDialog(close) {
 
     if (isTakenDown || isUndecrypted) {
         if (isTakenDown) {
-            pd.addClass('taken-down');
+            $dialog.addClass('taken-down');
             notificationText = l[7703] + '\n';
         }
         if (isUndecrypted) {
-            pd.addClass('undecryptable');
+            $dialog.addClass('undecryptable');
 
             if ($.selected[0].t) {// folder
                 notificationText += l[8595];
@@ -4435,10 +4080,10 @@ function _propertiesDialog(close) {
     var star = '';
     if (n.fav)
         star = ' star';
-    pd.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
+    $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
 
     if (fileIcon(n).indexOf('shared') > -1) {
-        pd.addClass('shared');
+        $dialog.addClass('shared');
     }
 
     if (typeof n.r === "number") {
@@ -4450,7 +4095,7 @@ function _propertiesDialog(close) {
         else if (n.r === 2) {
             zclass = "full-access";
         }
-        pd.addClass('shared shared-with-me ' + zclass);
+        $dialog.addClass('shared shared-with-me ' + zclass);
     }
 
     var p = {}, user = Object(M.d[n.su || n.p]);
@@ -4503,7 +4148,7 @@ function _propertiesDialog(close) {
         if (foldercnt) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
-            if (pd.hasClass('shared')) {
+            if ($dialog.hasClass('shared')) {
                 users = M.getSharingUsers($.selected, true);
 
                 // In case that user doesn't share with other
@@ -4521,7 +4166,7 @@ function _propertiesDialog(close) {
                     fillPropertiesContactList(users);
                 }
             }
-            if (pd.hasClass('shared-with-me')) {
+            if ($dialog.hasClass('shared-with-me')) {
                 p.t3 = l[64];
                 var rights = l[55];
                 if (n.r == 1) {
@@ -4541,7 +4186,7 @@ function _propertiesDialog(close) {
     }
     else
     {
-        pd.addClass('multiple folders-only');
+        $dialog.addClass('multiple folders-only');
         p.t1 = '';
         p.t2 = '<b>' + fm_contains(filecnt, foldercnt) + '</b>';
         p.t3 = l[894] + ':';
@@ -4587,13 +4232,13 @@ function _propertiesDialog(close) {
         propertiesDialog(1);
     });
 
-    pd.find('.file-settings-icon').rebind('click context', function(e) {
+    $dialog.find('.file-settings-icon').rebind('click context', function(e) {
         if (!$(this).hasClass('active')) {
             e.preventDefault();
             e.stopPropagation();
             $(this).addClass('active');
-            $('.fm-dialog').addClass('arrange-to-front');
-            $('.properties-dialog').addClass('arrange-to-back');
+            // $('.fm-dialog').addClass('arrange-to-front');
+            // $('.properties-dialog').addClass('arrange-to-back');
             $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $('#' + n.h);
             e.calculatePosition = true;
@@ -4605,11 +4250,11 @@ function _propertiesDialog(close) {
     });
     $(document).bind('MegaNodeRename.Properties', function(e, h, name) {
         if (n.h === h) {
-            pd.find('.properties-name-block .propreties-dark-txt').text(name);
+            $dialog.find('.properties-name-block .propreties-dark-txt').text(name);
         }
     });
     var __fsi_close = function() {
-        pd.find('.file-settings-icon').removeClass('active');
+        $dialog.find('.file-settings-icon').removeClass('active');
         $('.dropdown.body').removeClass('arrange-to-front');
         $('.properties-dialog').removeClass('arrange-to-back');
         $('.fm-dialog').removeClass('arrange-to-front');
@@ -4621,7 +4266,7 @@ function _propertiesDialog(close) {
         $('.properties-txt-pad .contact-list-icon').hide();
     }
 
-    if (pd.hasClass('shared')) {
+    if ($dialog.hasClass('shared')) {
         $('.contact-list-icon').rebind('click', function() {
             if (!$(this).hasClass('active')) {
                 $(this).addClass('active');
@@ -4676,12 +4321,13 @@ function _propertiesDialog(close) {
         });
     }
 
-    if ((filecnt + foldercnt) == 1)
+    if (filecnt + foldercnt === 1) {
         $('.properties-file-icon').html('<div class="' + fileIcon(n) + '"></div>');
-    else
-    {
-        if ((filecnt + foldercnt) == 2)
-            pd.addClass('two-elements');
+    }
+    else {
+        if (filecnt + foldercnt === 2) {
+            $dialog.addClass('two-elements');
+        }
         $('.properties-elements-counter span').text(filecnt + foldercnt);
         var a = 0;
         $('.properties-file-icon').html('');
@@ -4691,8 +4337,9 @@ function _propertiesDialog(close) {
 
             if (a <= 3)
             {
-                if (ico.indexOf('folder') === -1)
-                    pd.removeClass('folders-only');
+                if (ico.indexOf('folder') === -1) {
+                    $dialog.removeClass('folders-only');
+                }
                 $('.properties-file-icon').prepend('<div class="' + ico + '"></div>');
                 a++;
             }
@@ -4859,7 +4506,7 @@ function fm_resize_handler(force) {
         $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
             ' .contacts-grid-view .contacts-grid-scrolling-table')
             .css({
-                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
+                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth() - 46 /* margins of icons */
             });
 
         initTreeScroll();
@@ -4961,6 +4608,7 @@ function fm_resize_handler(force) {
         console.timeEnd('fm_resize_handler');
     }
 }
+
 
 function sharedFolderUI() {
     "use strict";
@@ -5120,26 +4768,23 @@ function fingerprintDialog(userid) {
         return;
     }
 
+    var $dialog = $('.fingerprint-dialog');
     var closeFngrPrntDialog = function() {
-        fm_hideoverlay();
-        $this.addClass('hidden');
-        $('.fm-dialog-close').unbind('click');
+        closeDialog();
+        $('.fm-dialog-close', $dialog).unbind('click');
         $('.dialog-approve-button').unbind('click');
         $('.dialog-skip-button').unbind('click');
-        $this = null;
     };
 
-    var $this = $('.fingerprint-dialog');
+    $dialog.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
 
-    $this.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
-
-    $this.find('.contact-details-user-name')
+    $dialog.find('.contact-details-user-name')
         .text(M.getNameByHandle(user.u)) // escape HTML things
         .end()
         .find('.contact-details-email')
         .text(user.m); // escape HTML things
 
-    $this.find('.fingerprint-txt').empty();
+    $dialog.find('.fingerprint-txt').empty();
     userFingerprint(u_handle, function(fprint) {
         var target = $('.fingerprint-bott-txt .fingerprint-txt');
         fprint.forEach(function(v) {
@@ -5149,7 +4794,7 @@ function fingerprintDialog(userid) {
 
     userFingerprint(user, function(fprint) {
         var offset = 0;
-        $this.find('.fingerprint-code .fingerprint-txt').each(function() {
+        $dialog.find('.fingerprint-code .fingerprint-txt').each(function() {
             var that = $(this);
             fprint.slice(offset, offset + 5).forEach(function(v) {
                 $('<span>').text(v).appendTo(that);
@@ -5158,7 +4803,7 @@ function fingerprintDialog(userid) {
         });
     });
 
-    $('.fm-dialog-close').rebind('click', function() {
+    $('.fm-dialog-close', $dialog).rebind('click', function() {
         closeFngrPrntDialog();
     });
 
@@ -5195,12 +4840,14 @@ function fingerprintDialog(userid) {
         closeFngrPrntDialog();
     });
 
-    $this.removeClass('hidden')
-        .css({
-            'margin-top': '-' + $this.height() / 2 + 'px',
-            'margin-left': '-' + $this.width() / 2 + 'px'
-        });
-    fm_showoverlay();
+    M.safeShowDialog('fingerprint-dialog', function() {
+        $dialog.removeClass('hidden')
+            .css({
+                'margin-top': '-' + $dialog.height() / 2 + 'px',
+                'margin-left': '-' + $dialog.width() / 2 + 'px'
+            });
+        return $dialog;
+    });
 }
 
 /**

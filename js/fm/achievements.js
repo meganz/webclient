@@ -212,10 +212,14 @@ Object.defineProperty(mega, 'achievem', {
  * @returns {MegaPromise}
  */
 mega.achievem.enabled = function achievementsEnabled() {
+    'use strict';
+
+    var self = this;
     var promise = new MegaPromise();
+    var status = 'ach' + u_type + u_handle;
+
     var notify = function(res) {
-        achievementsEnabled.status = res;
-        achievementsEnabled.pending = null;
+        self.achStatus[status] = res | 0;
 
         if ((res | 0) > 0) {
             return promise.resolve();
@@ -223,22 +227,23 @@ mega.achievem.enabled = function achievementsEnabled() {
         promise.reject();
     };
 
-    if (achievementsEnabled.status) {
-        notify(achievementsEnabled.status);
+    if (typeof this.achStatus[status] === 'number') {
+        notify(this.achStatus[status]);
     }
     else if (u_type && u_attr !== undefined) {
         notify(u_attr.flags && u_attr.flags.ach);
     }
-    else if (achievementsEnabled.pending) {
-        promise = achievementsEnabled.pending;
+    else if (this.achStatus[status] instanceof MegaPromise) {
+        promise = this.achStatus[status];
     }
     else {
-        achievementsEnabled.pending = promise;
+        this.achStatus[status] = promise;
         M.req('ach').always(notify);
     }
 
     return promise;
 };
+mega.achievem.achStatus = Object.create(null);
 
 /**
  * Show achievement dialog

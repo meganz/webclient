@@ -1560,12 +1560,13 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').removeClass('hidden');
 
         // Show the rocket icon if achievements are enabled
-        if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
                 $topHeader.find('.top-icon.achievements').removeClass('hidden');
+            })
+            .fail(function() {
+                $topHeader.find('.top-icon.achievements').addClass('hidden');
             });
-        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {

@@ -851,8 +851,6 @@
     "6832": "Complet\u00e2nd aceast\u0103 ac\u0163iune vei pierde accesul la toate partaj\u0103rile de date \u00eenc\u0103rcate \u015fi contacte",
     "6834": "Trimite fi\u015fiere",
     "6841": "Ne pare r\u0103u c\u0103 ne p\u0103r\u0103se\u015fti",
-    "6842": "Contul t\u0103u a fost acum \u00eenchis",
-    "6843": "dar \u00eenainte de a pleca ne-ar pl\u0103cea s\u0103 \u015ftim de ce ne p\u0103r\u0103se\u015fti",
     "6844": "Te rug\u0103m s\u0103 selectezi unul",
     "6845": "Nu \u00eemi mai folosesc contul",
     "6846": "Browserul favorit nu este compatibil tehnologic \u015fi nu vreau s\u0103 \u00eel schimb",
@@ -1825,5 +1823,9 @@
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17086": "Open folder",
+    "17089": "Before you close your account, we would like to know why you are leaving us...",
+    "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+    "17091": "Continue Download",
+    "17092": "Are you sure you want to cancel these %1 file transfers?"
 }

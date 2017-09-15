@@ -2871,7 +2871,9 @@ function closeDialog() {
         else {
             fm_hideoverlay();
         }
-        $('.fm-dialog' + ($.propertiesDialog ? ':not(.properties-dialog)' : '')).addClass('hidden');
+        $('.fm-dialog' + ($.propertiesDialog ? ':not(.properties-dialog)' : ''))
+            .trigger('dialog-closed')
+            .addClass('hidden');
         $('.dialog-content-block').empty();
 
         // add contact popup

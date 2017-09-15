@@ -344,7 +344,7 @@ var GenericConversationMessage = React.createClass({
                                 var revokeButton = null;
 
                                 getLinkButton = <span key="getLinkButton">
-                                    <DropdownsUI.DropdownItem icon="chain" label={__(l[59])} onClick={getLink}/>
+                                    <DropdownsUI.DropdownItem icon="icons-sprite chain" label={__(l[59])} onClick={getLink}/>
                                 </span>;
 
                                 if (message.isEditable && message.isEditable()) {

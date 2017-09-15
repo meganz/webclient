@@ -1167,6 +1167,36 @@ FileManager.prototype.initContextUI = function() {
 FileManager.prototype.createFolderUI = function() {
     "use strict";
 
+    var doCreateFolder = function() {
+        var $inputWrapper = $('.create-folder-pad');
+        var $input = $('.create-new-folder input');
+
+        if ($input.val() === '') {
+            $inputWrapper.addClass('error');
+
+            setTimeout(function() {
+                $inputWrapper.removeClass('error');
+                $input.focus();
+            }, 200);
+        }
+        else {
+            loadingDialog.pshow();
+            M.createFolder(M.currentdirid, $input.val(), new MegaPromise())
+                .done(function(h) {
+                    if (d) {
+                        console.log('Created new folder %s->%s.', M.currentdirid, h);
+                    }
+                    loadingDialog.phide();
+                })
+                .fail(function(error) {
+                    loadingDialog.phide();
+                    msgDialog('warninga', l[135], l[47], api_strerror(error));
+                });
+        }
+
+        return false;
+    };
+
     $('.fm-new-folder').rebind('click', function(e) {
 
         var c = $('.fm-new-folder').attr('class'),
@@ -1193,10 +1223,7 @@ FileManager.prototype.createFolderUI = function() {
         $.hideContextMenu();
     });
 
-    $('.create-folder-button').rebind('click', function(e) {
-        M.addCreateFolderUI(e);
-        return false;
-    });
+    $('.create-folder-button').rebind('click', doCreateFolder);
 
     $('.create-folder-button-cancel').rebind('click', function() {
         $('.fm-new-folder').removeClass('active');
@@ -1245,7 +1272,7 @@ FileManager.prototype.createFolderUI = function() {
             $('.create-new-folder').removeClass('filled-input');
         }
         if (e.which == 13) {
-            M.addCreateFolderUI(e);
+            doCreateFolder();
         }
     });
 
@@ -1836,25 +1863,6 @@ FileManager.prototype.addContactUI = function() {
         }
 
         $('.nw-contact-item#contact_' + u_h).addClass('selected');
-    }
-};
-
-FileManager.prototype.addCreateFolderUI = function() {
-    "use strict";
-
-    var $inputWrapper = $('.create-folder-pad');
-    var $input = $('.create-new-folder input');
-
-    if ($input.val() === '') {
-        $inputWrapper.addClass('error');
-
-        setTimeout(function() {
-            $inputWrapper.removeClass('error');
-            $input.focus();
-        }, 200);
-    }
-    else {
-        this.createFolder(this.currentdirid, $input.val());
     }
 };
 

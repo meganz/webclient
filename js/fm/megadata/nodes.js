@@ -124,19 +124,11 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
     this.d[n.h] = n;
 
     if (fminitialized) {
+        newnodes.push(n);
 
         // Handle Inbox/RubbishBin UI changes
-        if (!is_mobile) {
-            delay('fmtopUI', fmtopUI);
-        }
-        else {
-            mobile.cloud.countAndUpdateSubFolderTotals();
-        }
-
-        newnodes.push(n);
+        delay(fmtopUI);
     }
-
-    // $(window).trigger("megaNodeAdded", [n]);
 };
 
 MegaData.prototype.delHash = function(n) {
@@ -805,19 +797,13 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
 
 MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
     if (n.h && n.h.length == 8) {
-        if (fmdb) {
-            fmdb.add('f', {
-                h: n.h,
-                p: n.p,
-                s: n.s >= 0 ? n.s : -n.t,
-                c: n.hash || '',
-                d: n
-            });
+        if (n.t && n.td === undefined) {
+            // Either this is a newly created folder or it comes from a fresh gettree
+            n.td = 0;
+            n.tf = 0;
+            n.tb = 0;
         }
-
-        if (n.t) {
-            ufsc.addTreeNode(n);
-        }
+        ufsc.addToDB(n);
 
         if (this.nn && n.name) {
             this.nn[n.h] = n.name;
@@ -1513,31 +1499,48 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
         }
 
         if (!ulparams) {
-            loadingDialog.show();
+            loadingDialog.pshow();
         }
+        var hideOverlay = function() {
+            if (!ulparams) {
+                loadingDialog.phide();
+            }
+        };
 
         api_req(req, {
             callback: function(res) {
-                if (typeof res !== 'number') {
+                if (d) {
+                    console.log('Create folder result...', res);
+                }
+                if (res && typeof res === 'object') {
+                    // Let's be paranoid ensuring we got a proper result
+                    // since this could trash the whole ufs-size-cache..
+                    var n = Array.isArray(res.f) && res.f[0];
+
+                    if (typeof n !== 'object' || typeof n.h !== 'string' || n.h.length !== 8) {
+                        hideOverlay();
+                        return reject(EINTERNAL);
+                    }
+
                     $('.fm-new-folder').removeClass('active');
                     $('.create-new-folder').addClass('hidden');
                     $('.create-new-folder input').val('');
                     newnodes = [];
 
                     // this is only safe once sn enforcement has been deployed
-                    M.addNode(res.f[0]);
-                    ufsc.addNode(res.f[0]);
+                    M.addNode(n);
+                    ufsc.addNode(n);
 
                     M.updFileManagerUI()
                         .always(function() {
                             refreshDialogContent();
-                            loadingDialog.hide();
+                            hideOverlay();
 
-                            resolve(res.f[0].h);
+                            resolve(n.h);
                         });
                 }
                 else {
-                    loadingDialog.hide();
+                    hideOverlay();
                     reject(res);
                 }
             }

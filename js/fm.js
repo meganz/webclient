@@ -3652,6 +3652,24 @@ function createFolderDialog(close) {
         return true;
     }
 
+    var doCreateFolder = function(v) {
+        var target = $.cftarget = $.cftarget || M.currentdirid;
+
+        loadingDialog.pshow();
+        M.createFolder(target, v, new MegaPromise())
+            .done(function(h) {
+                if (d) {
+                    console.log('Created new folder %s->%s', target, h);
+                }
+                loadingDialog.phide();
+                createFolderDialog(1);
+            })
+            .fail(function(error) {
+                loadingDialog.phide();
+                msgDialog('warninga', l[135], l[47], api_strerror(error));
+            });
+    };
+
 
     $input.rebind('focus', function() {
         if ($(this).val() === l[157]) {
@@ -3676,11 +3694,7 @@ function createFolderDialog(close) {
     $input.rebind('keypress', function(e) {
 
         if (e.which === 13 && $(this).val() !== '') {
-            if (!$.cftarget) {
-                $.cftarget = M.currentdirid;
-            }
-            M.createFolder($.cftarget, $(this).val());
-            createFolderDialog(1);
+            doCreateFolder($(this).val());
         }
     });
 
@@ -3698,11 +3712,7 @@ function createFolderDialog(close) {
             alert(l[1024]);
         }
         else {
-            if (!$.cftarget) {
-                $.cftarget = M.currentdirid;
-            }
-            M.createFolder($.cftarget, v);
-            createFolderDialog(1);
+            doCreateFolder(v);
         }
         $input.val('');
     });

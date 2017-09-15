@@ -3887,8 +3887,14 @@ function removeUInode(nodeHandle, parentHandle) {
     mobile.cloud.renderDelete(nodeHandle, parentHandle);
 }
 
+function fmtopUI() {
+    'use strict';
+
+    // Call the mobile version
+    mobile.cloud.countAndUpdateSubFolderTotals();
+}
+
 // Not required for mobile
-function fmtopUI() {}
 function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}

@@ -8407,7 +8407,7 @@ React.makeElement = React['createElement'];
 	                                getLinkButton = React.makeElement(
 	                                    'span',
 	                                    { key: 'getLinkButton' },
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'chain', label: __(l[59]), onClick: getLink })
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'icons-sprite chain', label: __(l[59]), onClick: getLink })
 	                                );
 
 	                                if (message.isEditable && message.isEditable()) {

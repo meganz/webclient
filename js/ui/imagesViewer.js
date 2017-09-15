@@ -140,7 +140,7 @@ var slideshowid;
     function slideshow_favourite(n, $overlay) {
         var $favButton = $overlay.find('.viewer-button.favourite');
 
-        if (!n || !n.p || folderlink || M.chat) {
+        if (!n || !n.p || folderlink) {
             $favButton.addClass('hidden');
         }
         else {
@@ -179,7 +179,7 @@ var slideshowid;
         }
 
         if ($overlay) {
-            if (!n || !n.p || M.getNodeRoot(id) === 'shares' || folderlink || M.chat) {
+            if (!n || !n.p || M.getNodeRoot(id) === 'shares' || folderlink) {
                 $overlay.find('.viewer-button.getlink').addClass('hidden');
             }
             else {
@@ -295,7 +295,7 @@ var slideshowid;
             }
         });
 
-        if (n.p || M.chat) {
+        if (n.p) {
             $dlBut.removeClass('hidden');
         }
         else {

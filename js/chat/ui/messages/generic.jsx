@@ -296,6 +296,19 @@ var GenericConversationMessage = React.createClass({
                             });
                         };
 
+                        var getLink = function(e) {
+                            if (u_type === 0) {
+                                ephemeralDialog(l[1005]);
+                            }
+                            else {
+                                initCopyrightsDialog([v.h]);
+                            }
+                            if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        };
+
                         var startPreview = function(e) {
                             assert(M.chat, 'Not in chat.');
                             M.v = chatRoom.images.values();
@@ -310,7 +323,7 @@ var GenericConversationMessage = React.createClass({
                         var icon = fileIcon(v);
 
                         var dropdown = null;
-                        var previewButtons = null;
+                        var previewButtons = [];
 
                         if (!attachmentMetaInfo.revoked) {
                             if (v.fa && (icon === "graphic" || icon === "image")) {
@@ -320,15 +333,20 @@ var GenericConversationMessage = React.createClass({
                                     v.delay = message.delay;
                                     chatRoom.images.push(v);
                                 }
-                                previewButtons = <span>
+                                previewButtons.push(<span key="previewButton">
                                     <DropdownsUI.DropdownItem icon="search-icon" label={__(l[1899])}
                                                               onClick={startPreview}/>
                                     <hr/>
-                                </span>
+                                </span>);
                             }
                             if (contact.u === u_handle) {
                                 var revokeButton = null;
 
+                                //medium-icon icons-img chain l[59]
+                                previewButtons.push(
+                                    <span key="getLinkButton"><DropdownsUI.DropdownItem icon="chain" label={__(l[59])}
+                                                                     onClick={getLink}/></span>
+                                )
                                 if (message.isEditable && message.isEditable()) {
                                     revokeButton = <DropdownsUI.DropdownItem icon="red-cross" label={__(l[8909])}
                                                 className="red" onClick={() => {

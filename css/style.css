@@ -4177,6 +4177,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-position: -50px -14831px;
     margin: 0;
 }
+.transfer-filetype-icon.folder-shared {
+    margin: 0;
+}
 .rubbish-bin .nw-fm-tree-folder::before, .rubbish-bin .transfer-filetype-icon.folder, .rubbish-bin .search-path-icon-span.folder {
     background-position: -10px -14831px;
 }

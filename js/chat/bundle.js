@@ -8382,7 +8382,8 @@ React.makeElement = React['createElement'];
 	                        var icon = fileIcon(v);
 
 	                        var dropdown = null;
-	                        var previewButtons = [];
+	                        var previewButton = null;
+	                        var getLinkButton = null;
 
 	                        if (!attachmentMetaInfo.revoked) {
 	                            if (v.fa && (icon === "graphic" || icon === "image")) {
@@ -8392,23 +8393,23 @@ React.makeElement = React['createElement'];
 	                                    v.delay = message.delay;
 	                                    chatRoom.images.push(v);
 	                                }
-	                                previewButtons.push(React.makeElement(
+	                                previewButton = React.makeElement(
 	                                    'span',
 	                                    { key: 'previewButton' },
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: __(l[1899]),
 	                                        onClick: startPreview }),
 	                                    React.makeElement('hr', null)
-	                                ));
+	                                );
 	                            }
 	                            if (contact.u === u_handle) {
 	                                var revokeButton = null;
 
-	                                previewButtons.push(React.makeElement(
+	                                getLinkButton = React.makeElement(
 	                                    'span',
 	                                    { key: 'getLinkButton' },
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'chain', label: __(l[59]),
-	                                        onClick: getLink })
-	                                ));
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'chain', label: __(l[59]), onClick: getLink })
+	                                );
+
 	                                if (message.isEditable && message.isEditable()) {
 	                                    revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __(l[8909]),
 	                                        className: 'red', onClick: function onClick() {
@@ -8429,9 +8430,10 @@ React.makeElement = React['createElement'];
 	                                            positionAt: 'right bottom',
 	                                            horizOffset: 4
 	                                        },
-	                                        previewButtons,
+	                                        previewButton,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                            onClick: startDownload }),
+	                                        getLinkButton,
 	                                        revokeButton ? React.makeElement('hr', null) : "",
 	                                        revokeButton
 	                                    )
@@ -8447,7 +8449,7 @@ React.makeElement = React['createElement'];
 	                                        {
 	                                            className: 'attachments-dropdown'
 	                                        },
-	                                        previewButtons,
+	                                        previewButton,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                            onClick: startDownload }),
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[8005]),

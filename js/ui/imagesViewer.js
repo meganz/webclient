@@ -233,13 +233,13 @@ var slideshowid;
 
         // Bind keydown events
         $document.rebind('keydown.slideshow', function(e) {
-            if (e.keyCode == 37 && slideshowid) {
+            if (e.keyCode === 37 && slideshowid) {
                 slideshow_prev();
             }
-            else if (e.keyCode == 39 && slideshowid) {
+            else if (e.keyCode === 39 && slideshowid) {
                 slideshow_next();
             }
-            else if (e.keyCode == 27 && slideshowid && !$document.fullScreen()) {
+            else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
                 slideshow(slideshowid, true);
             }
         });

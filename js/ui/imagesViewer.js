@@ -191,7 +191,7 @@ var slideshowid;
                             ephemeralDialog(l[1005]);
                         }
                         else {
-                            initCopyrightsDialog([slideshowid]);
+                            mega.Share.initCopyrightsDialog([slideshowid]);
                         }
                     });
             }
@@ -282,7 +282,7 @@ var slideshowid;
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                     dl_queue[i].preview = false;
-                    openTransfersPanel();
+                    M.openTransfersPanel();
                     return;
                 }
             }

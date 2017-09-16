@@ -328,7 +328,7 @@
 
             var lSel = aListSelector;
 
-            hideEmptyGrids();
+            M.hideEmptyGrids();
             $.tresizer();
 
             if (!aUpdate) {

@@ -1299,9 +1299,9 @@ function accountUI() {
                 $('.fm-account-overlay').fadeIn(100);
                 $this.addClass('active');
                 $('.fm-voucher-popup').removeClass('hidden');
-                voucherCentering($this);
+                accountUI.voucherCentering($this);
                 $(window).rebind('resize.voucher', function(e) {
-                    voucherCentering($this);
+                    accountUI.voucherCentering($this);
                 });
 
                 $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button').rebind('click.closeDialog', function() {
@@ -2328,5 +2328,24 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                 $(this).val(presenceInt.userPresence.autoawaytimeout / 60);
             })
             .val(lastValidNumber);
+    }
+};
+
+accountUI.voucherCentering = function voucherCentering($button) {
+    'use strict';
+
+    var $popupBlock = $('.fm-voucher-popup');
+    var popupHeight = $popupBlock.outerHeight();
+
+    $popupBlock.css({
+        'top': $button.offset().top - popupHeight - 10,
+        'right': $('body').outerWidth() - $button.outerWidth() - $button.offset().left
+    });
+
+    if ($button.offset().top + 10 > popupHeight) {
+        $popupBlock.css('top', $button.offset().top - popupHeight - 10);
+    }
+    else {
+        $popupBlock.css('top', $button.offset().top + $button.outerHeight() + 10);
     }
 };

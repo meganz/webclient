@@ -1533,7 +1533,9 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
 
                     M.updFileManagerUI()
                         .always(function() {
-                            refreshDialogContent();
+                            if ($.copyDialog || $.moveDialog) {
+                                refreshDialogContent();
+                            }
                             hideOverlay();
 
                             resolve(n.h);

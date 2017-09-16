@@ -405,8 +405,6 @@ FileManager.prototype.initFileManagerUI = function() {
     M.treeSearchUI();
     M.initTreePanelSorting();
     M.initContextUI();
-    copyDialog();
-    moveDialog();
     initShareDialog();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
@@ -887,7 +885,7 @@ FileManager.prototype.initContextUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            initCopyrightsDialog($.selected);
+            mega.Share.initCopyrightsDialog($.selected);
         }
     });
 
@@ -907,58 +905,49 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
-
-        var $shareDialog = $('.share-dialog');
-
         if (u_type === 0) {
-            ephemeralDialog(l[1006]);
+            return ephemeralDialog(l[1006]);
         }
-        else {
-            // this is used like identifier when key with key code 27 is pressed
-            $.dialog = 'share';
+        var $dialog = $('.fm-dialog.share-dialog');
+
+        M.safeShowDialog('share', function() {
             $.hideContextMenu();
             clearScrollPanel('.share-dialog');
 
             // Show the share dialog
-            $shareDialog.removeClass('hidden');
+            $dialog.removeClass('hidden');
 
             // Hide the optional message by default.
             // This gets enabled if user want to share
-            $shareDialog.find('.share-message').hide();
+            $dialog.find('.share-message').hide();
 
-            fm_showoverlay();
-            handleShareDialogContent();
-        }
+            fillShareDialogWithContent();
+
+            // Taking care about share dialog button 'Done'/share and scroll
+            shareDialogContentCheck();
+
+            // Maintain drop down list updated
+            updateDialogDropDownList('.share-multiple-input');
+
+            $('.share-dialog-icon.permissions-icon')
+                .removeClass('active full-access read-and-write')
+                .safeHTML('<span></span>' + l[55])
+                .addClass('read-only');
+
+            // Update dialog title text
+            $('.fm-dialog-title', $dialog).text(l[5631] + ' "' + M.d[$.selected].name + '"');
+            $('.multiple-input .token-input-token-mega', $dialog).remove();
+            dialogPositioning($dialog);
+            $('.token-input-input-token-mega input', $dialog).focus();
+
+            return $dialog;
+        });
     });
 
     // Move Dialog
-    $(c + '.advanced-item, ' + c + '.move-item').rebind('click', function() {
-        M.safeShowDialog('move', function() {
-            var $dialog = $('.fm-dialog.move-dialog');
+    $(c + '.advanced-item, ' + c + '.move-item').rebind('click', openMoveDialog);
 
-            $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-            $.mcselected = M.RootID;
-
-            $dialog.removeClass('hidden');
-            handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
-            M.disableCircularTargets('#mctreea_');
-
-            return $dialog;
-        });
-    });
-
-    $(c + '.copy-item').rebind('click', function() {
-        M.safeShowDialog('copy', function() {
-            var $dialog = $('.fm-dialog.copy-dialog');
-
-            $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
-            $.mcselected = M.RootID;
-            $dialog.removeClass('hidden');
-            handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
-
-            return $dialog;
-        });
-    });
+    $(c + '.copy-item').rebind('click', openCopyDialog);
 
     $(c + '.import-item').rebind('click', function() {
         ASSERT(folderlink, 'Import needs to be used in folder links.');
@@ -1493,6 +1482,111 @@ FileManager.prototype.initUIKeyEvents = function() {
 FileManager.prototype.addTransferPanelUI = function() {
     "use strict";
 
+    var transferPanelContextMenu = function(target) {
+        var file;
+        var tclear;
+
+        $('.dropdown.body.files-menu .dropdown-item').hide();
+        var menuitems = $('.dropdown.body.files-menu .dropdown-item');
+
+        menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear')
+            .show();
+
+        tclear = menuitems.filter('.transfer-clear').contents().last().get(0) || {};
+        tclear.textContent = l[103];
+
+        if (target === null && (target = $('.transfer-table tr.ui-selected')).length > 1) {
+            var ids = target.attrs('id');
+            var finished = 0;
+            var paused = 0;
+            var started = false;
+
+            ids.forEach(function(id) {
+                file = GlobalProgress[id];
+                if (!file) {
+                    finished++;
+                }
+                else {
+                    if (file.paused) {
+                        paused++;
+                    }
+                    if (file.started) {
+                        started = true;
+                    }
+                }
+            });
+
+            if (finished === ids.length) {
+                menuitems.hide()
+                    .filter('.transfer-clear')
+                    .show();
+                tclear.textContent = l[7218];
+            }
+            else {
+                if (started) {
+                    menuitems.filter('.move-up,.move-down').hide();
+                }
+                if (paused === ids.length) {
+                    menuitems.filter('.transfer-pause').hide();
+                }
+
+                var prev = target.first().prev();
+                var next = target.last().next();
+
+                if (prev.length === 0 || !prev.hasClass('transfer-queued')) {
+                    menuitems.filter('.move-up').hide();
+                }
+                if (next.length === 0) {
+                    menuitems.filter('.move-down').hide();
+                }
+            }
+        }
+        else if (!(file = GlobalProgress[$(target).attr('id')])) {
+            /* no file, it is a finished operation */
+            menuitems.hide()
+                .filter('.transfer-clear')
+                .show();
+            tclear.textContent = l[7218];
+        }
+        else {
+            if (file.started) {
+                menuitems.filter('.move-up,.move-down').hide();
+            }
+            if (file.paused) {
+                menuitems.filter('.transfer-pause').hide();
+            }
+            else {
+                menuitems.filter('.transfer-play').hide();
+            }
+
+            if (!target.prev().length || !target.prev().hasClass('transfer-queued')) {
+                menuitems.filter('.move-up').hide();
+            }
+            if (target.next().length === 0) {
+                menuitems.filter('.move-down').hide();
+            }
+        }
+
+        // XXX: Hide context-menu's menu-up/down items for now to check if that's the
+        // origin of some problems, users can still use the new d&d logic to move transfers
+        menuitems.filter('.move-up,.move-down').hide();
+
+        if (d && target.length === 1 && target.eq(0).attr('id').match(/^dl_/)) {
+            menuitems.filter('.network-diagnostic').show();
+        }
+
+
+        var parent = menuitems.parent();
+        parent
+            .children('hr').hide().end()
+            .children('hr.pause').show().end();
+
+        if (parent.height() < 56) {
+            parent.find('hr.pause').hide();
+        }
+    };
+
+
     $.transferHeader = function(tfse) {
         tfse = tfse || M.getTransferElements();
         var domTableEmptyTxt = tfse.domTableEmptyTxt;
@@ -1832,20 +1926,7 @@ FileManager.prototype.addContactUI = function() {
             showAuthenticityCredentials(user);
         });
 
-        $('.fm-share-folders').rebind('click', function() {
-            M.safeShowDialog('copy', function() {
-                var $dialog = $('.fm-dialog.copy-dialog');
-                $dialog.removeClass('hidden');
-
-                $.copyDialog = 'copy';
-                $.mcselected = undefined;
-                $.copyToShare = true;
-
-                handleDialogContent('cloud-drive', 'ul', true, 'copy', l[1344]);
-
-                return $dialog;
-            });
-        });
+        $('.fm-share-folders').rebind('click', openCopyShareDialog);
 
         // Remove contact button on contacts page
         $('.fm-remove-contact').rebind('click', function() {
@@ -2194,6 +2275,24 @@ FileManager.prototype.addGridUIDelayed = function(refresh) {
     }, 20);
 };
 
+FileManager.prototype.getDDhelper = function getDDhelper() {
+    'use strict';
+
+    var id = '#fmholder';
+    if (page === 'start') {
+        id = '#startholder';
+    }
+    $('.dragger-block').remove();
+    $(id).append(
+        '<div class="dragger-block drag" id="draghelper">' +
+        '<div class="dragger-content"></div>' +
+        '<div class="dragger-files-number">1</div>' +
+        '</div>'
+    );
+    $('.dragger-block').show();
+    $('.dragger-files-number').hide();
+    return $('.dragger-block')[0];
+};
 
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
@@ -2284,7 +2383,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         cursorAt: {right: 90, bottom: 56},
         helper: function(e, ui) {
             $(this).draggable("option", "containment", [72, 42, $(window).width(), $(window).height()]);
-            return getDDhelper();
+            return M.getDDhelper();
         },
         stop: function(event) {
             if (d) {
@@ -2434,7 +2533,7 @@ FileManager.prototype.addTreeUI = function() {
             cursorAt: {right: 88, bottom: 58},
             helper: function(e, ui) {
                 $(this).draggable("option", "containment", [72, 42, $(window).width(), $(window).height()]);
-                return getDDhelper();
+                return M.getDDhelper();
             },
             start: function(e, ui) {
                 $.treeDragging = true;

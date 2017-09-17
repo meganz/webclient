@@ -2103,29 +2103,20 @@ MegaData.prototype.disableCircularTargets = function disableCircularTargets(pref
  * @param {String} pref, id prefix i.e. { #fi_, #mctreea_ }
  */
 MegaData.prototype.disableDescendantFolders = function(id, pref) {
-    var folders = [];
-    for (var i in this.c[id]) {
-        if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
-            folders.push(this.d[i]);
-        }
-    }
-    for (var i in folders) {
-        var sub = false;
-        var fid = folders[i].h;
+    'use strict';
 
-        for (var h in this.c[fid]) {
-            if (this.d[h] && this.d[h].t) {
-                sub = true;
-                break;
+    if (this.tree[id]) {
+        var folders = Object.values(this.tree[id]);
+
+        for (var i = folders.length; i--;) {
+            var h = folders[i].h;
+
+            if (this.tree[h]) {
+                this.disableDescendantFolders(h, pref);
             }
-        }
-        $(pref + fid).addClass('disabled');
-        if (sub) {
-            this.disableDescendantFolders(fid, pref);
+            $(pref + h).addClass('disabled');
         }
     }
-
-    return true;
 };
 
 /**

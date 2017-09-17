@@ -853,10 +853,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     var safeMoveNodes = function() {
-        if (!$(this).is('.disabled')) {
+        if (!$(this).hasClass('disabled')) {
             $.hideContextMenu();
             M.safeMoveNodes(String($(this).attr('id')).replace('fi_', ''));
         }
+        return false;
     };
     $(c + '.cloud-item').rebind('click', safeMoveNodes);
 

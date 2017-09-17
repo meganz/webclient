@@ -4080,7 +4080,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-color: rgba(217,0,7,0.5);
     color: white;
 }
-.nw-fm-tree-item.disabled, .nw-conversations-item.disabled {
+.nw-fm-tree-item.disabled, .dropdown-item.disabled, .nw-conversations-item.disabled {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;

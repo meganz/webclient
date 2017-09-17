@@ -586,7 +586,8 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
     if (!quiet) {
         loadingDialog.pshow();
     }
-    dbfetch.coll(n.concat(t))
+
+    this.collectNodes(n, t)
         .always(function() {
             newnodes = [];
             var todel = [];
@@ -754,7 +755,7 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
 
     nodes = nodes || $.selected || [];
 
-    dbfetch.coll(nodes.concat(target))
+    this.collectNodes(nodes, target)
         .always(function() {
             var copy = [];
             var move = [];
@@ -1133,6 +1134,61 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
 };
 
 /**
+ * Collect nodes recursively, as needed for a copy/move operation.
+ * @param {String|Array} handles The node handles to retrieve recursively.
+ * @param {String|Array} [targets] Optional target(s) these nodes will be moved into.
+ * @returns {MegaPromise}
+ */
+MegaData.prototype.collectNodes = function(handles, targets) {
+    'use strict';
+
+    var promise = new MegaPromise();
+    var promises = [];
+
+    if (targets) {
+        if (!Array.isArray(targets)) {
+            targets = [targets];
+        }
+        targets = targets.concat();
+
+        for (var t = targets.length; t--;) {
+            if (M.c[targets[t]]) {
+                targets.splice(t, 1);
+            }
+        }
+
+        if (targets.length) {
+            promises.push(dbfetch.geta(targets));
+        }
+    }
+
+    if (!Array.isArray(handles)) {
+        handles = [handles];
+    }
+    handles = handles.concat();
+
+    for (var i = handles.length; i--;) {
+        var h = handles[i];
+
+        if (M.d[h] && !M.d[h].t) {
+            handles.splice(i, 1);
+        }
+    }
+
+    if (handles.length) {
+        promise.push(dbfetch.coll(handles));
+    }
+
+    if (d) {
+        console.log('collectNodes', handles, targets);
+    }
+
+    promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
+
+    return promise;
+};
+
+/**
  * Get all clean (decrypted) subtrees under cn
  * FIXME: return total number of nodes omitted because of decryption issues
  *
@@ -1144,18 +1200,9 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
  */
 MegaData.prototype.getCopyNodes = function fm_getcopynodes(handles, hadd, names) {
     var promise = new MegaPromise();
-    var hs = handles.concat(hadd || []);
 
-    for (var i = hs.length; i--;) {
-        var h = hs[i];
-
-        if (M.d[h] && !M.d[h].t) {
-            hs.splice(i, 1);
-        }
-    }
-
-    dbfetch.coll(hs)
-        .wait(function() {
+    this.collectNodes(handles, hadd)
+        .finally(function() {
             var sync = function(names, handles) {
                 var result = M.getCopyNodesSync(handles, names);
                 promise.resolve(result);

@@ -2907,7 +2907,7 @@ if (!window.setImmediate && window.requestIdleCallback) {
         'use strict';
 
         // XXX: nothing from the code depends on the args
-        return window.requestIdleCallback(callback);
+        return window.requestIdleCallback(callback, {timeout: 20});
     };
 
     window.clearImmediate = function _clearImmediate(pid) {
@@ -2917,7 +2917,7 @@ if (!window.setImmediate && window.requestIdleCallback) {
     };
 }
 
-var onIdle = window.requestIdleCallback || function(handler) {
+var onIdle = function(handler) {
         var startTime = Date.now();
 
         return setTimeout(function() {
@@ -2929,6 +2929,14 @@ var onIdle = window.requestIdleCallback || function(handler) {
             });
         }, 1);
     };
+
+if (window.requestIdleCallback) {
+    onIdle = function onIdle(callback) {
+        'use strict';
+
+        return window.requestIdleCallback(callback, {timeout: 20});
+    };
+}
 
 function makeUUID(a) {
     'use strict';

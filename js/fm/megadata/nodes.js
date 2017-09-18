@@ -69,7 +69,9 @@
         }
 
         // remove ufssizecache records
-        ufsc.delNode(h, ignoreDB);
+        if (h.length === 8) {
+            ufsc.delNode(h, ignoreDB);
+        }
 
         // node deletion traversal
         this.delNodeIterator(h, delInShareQ);

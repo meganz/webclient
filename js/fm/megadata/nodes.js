@@ -69,7 +69,9 @@
         }
 
         // remove ufssizecache records
-        ufsc.delNode(h, ignoreDB);
+        if (h.length === 8) {
+            ufsc.delNode(h, ignoreDB);
+        }
 
         // node deletion traversal
         this.delNodeIterator(h, delInShareQ);
@@ -124,19 +126,11 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
     this.d[n.h] = n;
 
     if (fminitialized) {
+        newnodes.push(n);
 
         // Handle Inbox/RubbishBin UI changes
-        if (!is_mobile) {
-            delay('fmtopUI', fmtopUI);
-        }
-        else {
-            mobile.cloud.countAndUpdateSubFolderTotals();
-        }
-
-        newnodes.push(n);
+        delay(fmtopUI);
     }
-
-    // $(window).trigger("megaNodeAdded", [n]);
 };
 
 MegaData.prototype.delHash = function(n) {
@@ -594,7 +588,8 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
     if (!quiet) {
         loadingDialog.pshow();
     }
-    dbfetch.coll(n.concat(t))
+
+    this.collectNodes(n, t)
         .always(function() {
             newnodes = [];
             var todel = [];
@@ -762,7 +757,7 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
 
     nodes = nodes || $.selected || [];
 
-    dbfetch.coll(nodes.concat(target))
+    this.collectNodes(nodes, target)
         .always(function() {
             var copy = [];
             var move = [];
@@ -805,19 +800,13 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
 
 MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
     if (n.h && n.h.length == 8) {
-        if (fmdb) {
-            fmdb.add('f', {
-                h: n.h,
-                p: n.p,
-                s: n.s >= 0 ? n.s : -n.t,
-                c: n.hash || '',
-                d: n
-            });
+        if (n.t && n.td === undefined) {
+            // Either this is a newly created folder or it comes from a fresh gettree
+            n.td = 0;
+            n.tf = 0;
+            n.tb = 0;
         }
-
-        if (n.t) {
-            ufsc.addTreeNode(n);
-        }
+        ufsc.addToDB(n);
 
         if (this.nn && n.name) {
             this.nn[n.h] = n.name;
@@ -1147,6 +1136,61 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
 };
 
 /**
+ * Collect nodes recursively, as needed for a copy/move operation.
+ * @param {String|Array} handles The node handles to retrieve recursively.
+ * @param {String|Array} [targets] Optional target(s) these nodes will be moved into.
+ * @returns {MegaPromise}
+ */
+MegaData.prototype.collectNodes = function(handles, targets) {
+    'use strict';
+
+    var promise = new MegaPromise();
+    var promises = [];
+
+    if (targets) {
+        if (!Array.isArray(targets)) {
+            targets = [targets];
+        }
+        targets = targets.concat();
+
+        for (var t = targets.length; t--;) {
+            if (M.c[targets[t]]) {
+                targets.splice(t, 1);
+            }
+        }
+
+        if (targets.length) {
+            promises.push(dbfetch.geta(targets));
+        }
+    }
+
+    if (!Array.isArray(handles)) {
+        handles = [handles];
+    }
+    handles = handles.concat();
+
+    for (var i = handles.length; i--;) {
+        var h = handles[i];
+
+        if (M.d[h] && !M.d[h].t) {
+            handles.splice(i, 1);
+        }
+    }
+
+    if (handles.length) {
+        promises.push(dbfetch.coll(handles));
+    }
+
+    if (d) {
+        console.log('collectNodes', handles, targets);
+    }
+
+    promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
+
+    return promise;
+};
+
+/**
  * Get all clean (decrypted) subtrees under cn
  * FIXME: return total number of nodes omitted because of decryption issues
  *
@@ -1158,18 +1202,9 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
  */
 MegaData.prototype.getCopyNodes = function fm_getcopynodes(handles, hadd, names) {
     var promise = new MegaPromise();
-    var hs = handles.concat(hadd || []);
 
-    for (var i = hs.length; i--;) {
-        var h = hs[i];
-
-        if (M.d[h] && !M.d[h].t) {
-            hs.splice(i, 1);
-        }
-    }
-
-    dbfetch.coll(hs)
-        .wait(function() {
+    this.collectNodes(handles, hadd)
+        .finally(function() {
             var sync = function(names, handles) {
                 var result = M.getCopyNodesSync(handles, names);
                 promise.resolve(result);
@@ -1513,31 +1548,50 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
         }
 
         if (!ulparams) {
-            loadingDialog.show();
+            loadingDialog.pshow();
         }
+        var hideOverlay = function() {
+            if (!ulparams) {
+                loadingDialog.phide();
+            }
+        };
 
         api_req(req, {
             callback: function(res) {
-                if (typeof res !== 'number') {
+                if (d) {
+                    console.log('Create folder result...', res);
+                }
+                if (res && typeof res === 'object') {
+                    // Let's be paranoid ensuring we got a proper result
+                    // since this could trash the whole ufs-size-cache..
+                    var n = Array.isArray(res.f) && res.f[0];
+
+                    if (typeof n !== 'object' || typeof n.h !== 'string' || n.h.length !== 8) {
+                        hideOverlay();
+                        return reject(EINTERNAL);
+                    }
+
                     $('.fm-new-folder').removeClass('active');
                     $('.create-new-folder').addClass('hidden');
                     $('.create-new-folder input').val('');
                     newnodes = [];
 
                     // this is only safe once sn enforcement has been deployed
-                    M.addNode(res.f[0]);
-                    ufsc.addNode(res.f[0]);
+                    M.addNode(n);
+                    ufsc.addNode(n);
 
                     M.updFileManagerUI()
                         .always(function() {
-                            refreshDialogContent();
-                            loadingDialog.hide();
+                            if ($.copyDialog || $.moveDialog) {
+                                refreshDialogContent();
+                            }
+                            hideOverlay();
 
-                            resolve(res.f[0].h);
+                            resolve(n.h);
                         });
                 }
                 else {
-                    loadingDialog.hide();
+                    hideOverlay();
                     reject(res);
                 }
             }
@@ -2098,29 +2152,20 @@ MegaData.prototype.disableCircularTargets = function disableCircularTargets(pref
  * @param {String} pref, id prefix i.e. { #fi_, #mctreea_ }
  */
 MegaData.prototype.disableDescendantFolders = function(id, pref) {
-    var folders = [];
-    for (var i in this.c[id]) {
-        if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
-            folders.push(this.d[i]);
-        }
-    }
-    for (var i in folders) {
-        var sub = false;
-        var fid = folders[i].h;
+    'use strict';
 
-        for (var h in this.c[fid]) {
-            if (this.d[h] && this.d[h].t) {
-                sub = true;
-                break;
+    if (this.tree[id]) {
+        var folders = Object.values(this.tree[id]);
+
+        for (var i = folders.length; i--;) {
+            var h = folders[i].h;
+
+            if (this.tree[h]) {
+                this.disableDescendantFolders(h, pref);
             }
-        }
-        $(pref + fid).addClass('disabled');
-        if (sub) {
-            this.disableDescendantFolders(fid, pref);
+            $(pref + h).addClass('disabled');
         }
     }
-
-    return true;
 };
 
 /**

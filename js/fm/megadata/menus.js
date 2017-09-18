@@ -74,6 +74,8 @@
 
                 $('#csb_' + id).append(html);
             }
+
+            M.disableCircularTargets('#fi_');
         }
     };
 })(this);

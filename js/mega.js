@@ -1961,7 +1961,7 @@ function dbfetchfm() {
                         });
                         mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
 
-                        MegaPromise.allDone(promises).wait(function dbfetchfm_done() {
+                        MegaPromise.allDone(promises).always(function dbfetchfm_done() {
 
                             mega.loadReport.mode = 1;
                             mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;

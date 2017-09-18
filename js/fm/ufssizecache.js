@@ -199,11 +199,6 @@ UFSSizeCache.prototype.addNode = function(n, ignoreDB) {
         td = (n.td || 0) + 1;
         tf = (n.tf || 0);
         tb = (n.tb || 0);
-
-        if (!ignoreDB) {
-            // if a new folder was created, save it to db
-            this.addToDB(n);
-        }
     }
     else {
         td = 0;

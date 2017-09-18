@@ -39,7 +39,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
         }
         // XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
-        hideEmptyGrids();
+        M.hideEmptyGrids();
 
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
@@ -1041,7 +1041,7 @@ Chat.prototype.renderListing = function() {
 
     self.hideAllChats();
 
-    hideEmptyGrids();
+    M.hideEmptyGrids();
 
     //$('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
     //$('.fm-tree-panel > .nw-tree-panel-header').hide();

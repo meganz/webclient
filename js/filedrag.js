@@ -193,7 +193,7 @@
                         uldl_hold = false;
 
                         if (ul_queue.length > 0) {
-                            showTransferToast('u', ul_queue.length);
+                            M.showTransferToast('u', ul_queue.length);
                         }
                     });
                 }

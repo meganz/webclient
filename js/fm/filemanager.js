@@ -144,8 +144,11 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
         else {
-            // grid dragged:
-            if ($.selected && $.selected.length > 0) {
+            if ($.dragSelected && $.dragSelected.length > 0) {
+                ids = $.dragSelected;
+            }
+            else if ($.selected && $.selected.length > 0) {
+                // grid dragged:
                 ids = $.selected;
             }
         }
@@ -1262,6 +1265,12 @@ FileManager.prototype.initUIKeyEvents = function() {
         if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
         }
+        if ($(e.target).filter("input,textarea,select").is(":focus")) {
+            // when the user is typing in the "New folder dialog", if the current viewMode is grid/icons view, then
+            // left/right navigation in the input field may cause the selection manager to trigger selection changes.
+            // Note: I expected that the dialog would set $.dialog, but it doesn't.
+            return true;
+        }
 
         var is_transfers_or_accounts = (
             M.currentdirid && (M.currentdirid.substr(0, 7) === 'account' || M.currentdirid === 'transfers')
@@ -1964,7 +1973,9 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e) {
         $(this).find('.data-block-view').removeClass('ui-selected');
         // is this required? don't we have a support for a multi-selection context menu?
-        selectionManager.clear_selection();
+        if (selectionManager) {
+            selectionManager.clear_selection();
+        }
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 2);
@@ -2293,6 +2304,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $.draggerHeight = $('#draghelper .dragger-content').outerHeight();
             $.draggerWidth = $('#draghelper .dragger-content').outerWidth();
             $.draggerOrigin = M.currentdirid;
+            $.dragSelected = clone($.selected);
         },
         drag: function(e, ui) {
             if (ui.position.top + $.draggerHeight - 28 > $(window).height()) {
@@ -2330,6 +2342,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                     M.onTreeUIOpen(M.currentdirid, false, true);
                 }
             }, 200);
+            delete $.dragSelected;
         }
     });
 

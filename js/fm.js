@@ -1391,6 +1391,7 @@ function FMShortcuts() {
         if ($(e.target).is("input, textarea, select") || $.dialog) {
             return;
         }
+
         var charCode = e.which || e.keyCode; // ff
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 

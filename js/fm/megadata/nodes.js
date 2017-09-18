@@ -1176,7 +1176,7 @@ MegaData.prototype.collectNodes = function(handles, targets) {
     }
 
     if (handles.length) {
-        promise.push(dbfetch.coll(handles));
+        promises.push(dbfetch.coll(handles));
     }
 
     if (d) {

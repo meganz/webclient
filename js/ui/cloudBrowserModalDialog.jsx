@@ -416,6 +416,24 @@ var BrowserEntries = React.createClass({
                 highlighted.push(node.h);
                 self.setSelectedAndHighlighted(highlighted, node.h);
             }
+            else if (self.state.highlighted && self.state.highlighted.indexOf(node.h) !== -1) {
+                var highlighted = clone(self.state.highlighted || []);
+                if (self.props.folderSelectNotAllowed) {
+                    if (node.t === 1) {
+                        return;
+                    }
+                    else if (
+                        highlighted.filter(function(nodeId) {
+                            var node = M.getNodeByHandle(nodeId);
+                            return node && node.t === 1
+                        }).length > 0) {
+                        // contains folders in selection
+                        highlighted = [];
+                    }
+                }
+                array.remove(highlighted, node.h);
+                self.setSelectedAndHighlighted(highlighted, highlighted.length == 0 ? false : highlighted[0]);
+            }
         }
     },
     expandFolder(nodeId) {

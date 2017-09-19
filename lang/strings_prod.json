@@ -2791,9 +2791,21 @@
         "text": "Outgoing Shares",
         "context": "Folders that have been shared by the user to other MEGA users"
     },
+    "5545": {
+        "text": "Create new folder",
+        "context": "Menu item"
+    },
     "5549": {
         "text": "Upgrade account",
         "context": "Button title which triggers the action to upgrade your MEGA account level"
+    },
+    "5552": {
+        "text": "Thumbnail view",
+        "context": "Menu item to change from list view to grid view"
+    },
+    "5553": {
+        "text": "List view",
+        "context": "Menu item to change from grid view to list view"
     },
     "5557": {
         "text": "file",

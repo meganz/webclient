@@ -81,6 +81,8 @@ var dlmanager = {
             .done(function() {
                 dlmanager.lmtUserFlags |= dlmanager.LMT_HASACHIEVEMENTS;
             });
+
+        // dlmanager.lmtUserFlags |= dlmanager.LMT_HASACHIEVEMENTS;
     },
 
     getResumeInfo: function(dl, callback) {
@@ -639,7 +641,10 @@ var dlmanager = {
         }
         else if (typeof res === 'object') {
             if (res.efq) {
-                dlmanager.efq = true;
+                // dlmanager.efq = true;
+                if (d) {
+                    console.info('Ignoring EFQ flag...', res);
+                }
             }
             else {
                 delete dlmanager.efq;
@@ -1048,15 +1053,15 @@ var dlmanager = {
         var ids = dlmanager.getCurrentDownloads();
         // $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
 
+        if (d) {
+            this.logger.debug('_onQuotaRetry', getNewUrl, ids, this._dlQuotaListener.length, this._dlQuotaListener);
+        }
+
         if (this.onOverquotaWithAchievements) {
             closeDialog();
             topmenuUI();
 
-            mega.achievem.achievementsListDialog(function() {
-                if (dlmanager.onLimitedBandwidth) {
-                    dlmanager.onLimitedBandwidth();
-                }
-            });
+            dlmanager._achievementsListDialog();
             delete this.onOverquotaWithAchievements;
             return;
         }
@@ -1080,8 +1085,6 @@ var dlmanager = {
                 .removeClass('overquota')
                 .text(l[7227]);
         }
-
-        this.logger.debug('_onQuotaRetry', ids, this._dlQuotaListener.length, this._dlQuotaListener);
 
         for (var i = 0; i < this._dlQuotaListener.length; ++i) {
             if (typeof this._dlQuotaListener[i] === "function") {
@@ -1124,6 +1127,42 @@ var dlmanager = {
         else {
             tasks.forEach(this.dlQueuePushBack);
             ids.forEach(fm_tfsresume);
+        }
+    },
+
+    _achievementsListDialog: function($dialog) {
+        'use strict';
+
+        if (d) {
+            this.logger.info('_achievementsListDialog', this.onOverquotaWithAchievements, $dialog);
+        }
+
+        mega.achievem.achievementsListDialog(function() {
+            dlmanager._onOverquotaDispatchRetry($dialog);
+        });
+    },
+
+    _onOverquotaDispatchRetry: function($dialog) {
+        'use strict';
+
+        this.setUserFlags();
+
+        if (d) {
+            this.logger.info('_onOverquotaDispatchRetry', this.lmtUserFlags, $dialog);
+        }
+
+        if (this.onLimitedBandwidth) {
+            // pre-warning dialog
+            this.onLimitedBandwidth();
+        }
+        else {
+            // from overquota dialog
+            this._onQuotaRetry(true);
+        }
+
+        if ($dialog) {
+            // update transfers buttons on the download page...
+            this._overquotaClickListeners($dialog);
         }
     },
 
@@ -1226,11 +1265,7 @@ var dlmanager = {
             closeDialog();
 
             if (flags & dlmanager.LMT_ISREGISTERED) {
-                mega.achievem.achievementsListDialog(function() {
-                    if (dlmanager.onLimitedBandwidth) {
-                        dlmanager.onLimitedBandwidth();
-                    }
-                });
+                dlmanager._achievementsListDialog($dialog);
 
                 api_req({a: 'log', e: 99641, m: 'on overquota get-more-bonuses clicked'});
             }
@@ -1319,12 +1354,12 @@ var dlmanager = {
                 dlmanager.showOverQuotaRegisterDialog();
             };
 
-            if (!u_wasloggedin()) {
-                api_req({a: 'log', e: 99646, m: 'on overquota not-logged-in'});
+            if (preWarning && !u_wasloggedin()) {
+                api_req({a: 'log', e: 99646, m: 'on pre-warning not-logged-in'});
                 $('.default-big-button.login', $oqbbl).addClass('hidden');
             }
             else {
-                $('.default-big-button.login', $oqbbl).rebind('click', function() {
+                $('.default-big-button.login', $oqbbl).removeClass('hidden').rebind('click', function() {
                     api_req({a: 'log', e: 99644, m: 'on overquota login clicked'});
                     closeDialog();
 
@@ -1396,7 +1431,8 @@ var dlmanager = {
 
             onAccountCreated: function(gotLoggedIn, accountData) {
                 if (gotLoggedIn) {
-                    dlmanager._onQuotaRetry(true);
+                    // dlmanager._onQuotaRetry(true);
+                    dlmanager._onOverquotaDispatchRetry();
 
                     api_req({a: 'log', e: 99649, m: 'on overquota logged-in through register dialog.'});
                 }
@@ -1427,12 +1463,7 @@ var dlmanager = {
         mega.ui.showRegisterDialog({
             onAccountCreated: function(gotLoggedIn, accountData) {
                 if (gotLoggedIn) {
-                    if (dlmanager.onLimitedBandwidth) {
-                        dlmanager.onLimitedBandwidth();
-                    }
-                    else {
-                        console.error('This should not be reached..');
-                    }
+                    dlmanager._onOverquotaDispatchRetry($dialog);
                 }
                 else {
                     localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
@@ -1493,34 +1524,7 @@ var dlmanager = {
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask, flags) {
-
-        if (this.efq) {
-            return this.showOverQuotaRegisterDialog(dlTask);
-        }
-        loadingDialog.hide();
-
-        var $dialog = $('.limited-bandwidth-dialog');
-        var $button = $dialog.find('.fm-dialog-close');
-        var $overlay = $('.fm-dialog-overlay');
-
-        this._setOverQuotaState(dlTask);
-
-        if ($dialog.is(':visible')) {
-            this.logger.info('showOverQuotaDialog', 'visible already.');
-            return;
-        }
-
-        if ($('.fm-dialog.achievements-list-dialog').is(':visible')) {
-            this.logger.info('showOverQuotaDialog', 'Achievements dialog visible.');
-            return;
-        }
-
-        fm_showoverlay();
-        $dialog
-            .removeClass('registered achievements exceeded pro slider')
-            .find('.transfer-overquota-txt')
-            .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
-            .end();
+        'use strict';
 
         flags = flags !== undefined ? flags : this.lmtUserFlags;
 
@@ -1536,10 +1540,37 @@ var dlmanager = {
             this.lmtUserFlags = flags;
         }
 
+        if (this.efq && !(flags & this.LMT_ISREGISTERED)) {
+            return this.showOverQuotaRegisterDialog(dlTask);
+        }
+        loadingDialog.hide();
+
+        var asyncTaskID = false;
+        var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+
+        this._setOverQuotaState(dlTask);
+
+        if ($dialog.is(':visible')) {
+            this.logger.info('showOverQuotaDialog', 'visible already.');
+            return;
+        }
+
+        if ($('.fm-dialog.achievements-list-dialog').is(':visible')) {
+            this.logger.info('showOverQuotaDialog', 'Achievements dialog visible.');
+            return;
+        }
+
+        $dialog
+            .removeClass('registered achievements exceeded pro slider')
+            .find('.transfer-overquota-txt')
+            .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
+            .end();
+
         if (flags & this.LMT_ISPRO) {
             $dialog.addClass('pro');
 
-            loadingDialog.show();
+            asyncTaskID = 'mOverQuota.' + makeUUID();
+
             if (M.account) {
                 // Force data retrieval from API
                 M.account.lastupdate = 0;
@@ -1575,12 +1606,9 @@ var dlmanager = {
                     });
                 }
 
-                loadingDialog.hide();
-                $dialog.addClass('exceeded').removeClass('hidden');
+                mBroadcaster.sendMessage(asyncTaskID);
+                asyncTaskID = null;
             });
-        }
-        else {
-            $dialog.addClass('exceeded').removeClass('hidden');
         }
 
         if (flags & this.LMT_ISREGISTERED) {
@@ -1605,25 +1633,40 @@ var dlmanager = {
             }
         }
 
-        this._overquotaInfo();
 
         var doCloseModal = function closeModal() {
             clearInterval(dlmanager._overQuotaTimeLeftTick);
-            $dialog.addClass('hidden');
-            $button.unbind('click.quota');
-            $overlay.unbind('click.quota');
-            if ($.dialog !== 'achievements') {
-                fm_hideoverlay();
-            }
+            $('.fm-dialog-overlay').unbind('click.dloverq');
+            $dialog.unbind('dialog-closed');
+            closeDialog();
             return false;
         };
 
-        $button.rebind('click.quota', doCloseModal);
-        $overlay.rebind('click.quota', doCloseModal);
+        M.safeShowDialog('download-overquota', function() {
+            dlmanager._overquotaInfo();
 
-        this._overquotaClickListeners($dialog, flags);
+            $('.fm-dialog-overlay').rebind('click.dloverq', doCloseModal);
 
-        api_req({a: 'log', e: 99648, m: 'on overquota dialog shown'});
+            $dialog
+                .addClass('exceeded')
+                .removeClass('hidden')
+                .rebind('dialog-closed', doCloseModal)
+                .find('.fm-dialog-close')
+                .rebind('click.quota', doCloseModal);
+
+            dlmanager._overquotaClickListeners($dialog, flags);
+
+            api_req({a: 'log', e: 99648, m: 'on overquota dialog shown'});
+
+            if (asyncTaskID) {
+                loadingDialog.show();
+                mBroadcaster.once(asyncTaskID, function() {
+                    loadingDialog.hide();
+                });
+            }
+
+            return $dialog;
+        });
     },
 
     getCurrentDownloads: function() {

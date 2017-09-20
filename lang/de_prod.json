@@ -697,7 +697,10 @@
     "5533": "Laden...",
     "5542": "An Sie freigegebene Ordner",
     "5543": "Ausgehende Freigaben",
+    "5545": "Neuen Ordner erstellen ",
     "5549": "Accountupgrade",
+    "5552": "Thumbnail-Ansicht",
+    "5553": "Listenansicht",
     "5557": "Upload",
     "5561": "Ordner",
     "5565": "Download",
@@ -851,8 +854,6 @@
     "6832": "Wenn Sie fortfahren, verlieren Sie den Zugriff auf alle Uploads, Daten, Ordnerfreigaben und Kontakte.",
     "6834": "Dateien senden",
     "6841": "Es tut uns leid, dass Sie sich gegen eine weitere Nutzung Ihres Accounts entschieden haben.",
-    "6842": "Ihr Account wurde geschlossen",
-    "6843": "aber bevor Sie uns den R\u00fccken kehren, w\u00fcrden wir gerne mehr \u00fcber Ihre Gr\u00fcnde erfahren",
     "6844": "Bitte w\u00e4hlen Sie",
     "6845": "Ich nutze meinen Account nicht mehr",
     "6846": "Mein bevorzugter Browser ist nicht kompatibel, und ich will nicht wechseln",
@@ -1825,5 +1826,9 @@
     "17083": "Die MEGA-App f\u00fcr die Universal Windows Platform befindet sich noch in der Entwicklungsphase. Sie k\u00f6nnen die aktuelle Betaversion [A]hier[\/A] herunterladen.",
     "17084": "Die Gr\u00f6\u00dfe des Transfers sprengt Ihr verf\u00fcgbares Transfervolumen.",
     "17085": "Unterbrochene Transfers fortsetzen?",
-    "17086": "Ordner \u00f6ffnen"
+    "17086": "Ordner \u00f6ffnen",
+    "17089": "Wir w\u00fcrden gerne mehr \u00fcber den Grund Ihrer Accountschlie\u00dfung erfahren...",
+    "17090": "Ihr Download \u00fcberschreitet das aktuell verf\u00fcgbare Volumenkontingent f\u00fcr Ihre IP-Adresse und k\u00f6nnte daher unterbrochen werden. Mit einem PRO-Account k\u00f6nnen Sie Ihr verf\u00fcgbares Transfervolumen massiv erh\u00f6hen:",
+    "17091": "Download fortsetzen",
+    "17092": "Wollen Sie diese %1 Transfers wirklich stornieren?"
 }

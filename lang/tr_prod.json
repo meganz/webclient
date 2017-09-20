@@ -697,7 +697,10 @@
     "5533": "Y\u00fckleniyor...",
     "5542": "Gelen Payla\u015f\u0131mlar",
     "5543": "Giden Payla\u015f\u0131mlar",
+    "5545": "Yeni klas\u00f6r olu\u015ftur",
     "5549": "Hesab\u0131 y\u00fckselt",
+    "5552": "K\u00fc\u00e7\u00fck resim g\u00f6r\u00fcn\u00fcm\u00fc",
+    "5553": "Liste g\u00f6r\u00fcn\u00fcm\u00fc",
     "5557": "dosya",
     "5561": "klas\u00f6r",
     "5565": "indir",
@@ -851,8 +854,6 @@
     "6832": "Bu i\u015flemi tamamlayarak t\u00fcm y\u00fcklenen veri payla\u015f\u0131mlar\u0131 ve rehber eri\u015fimini kaybedeceksiniz",
     "6834": "Dosyalar\u0131 g\u00f6nder",
     "6841": "Gitti\u011finizi g\u00f6rmekten \u00f6t\u00fcr\u00fc \u00fczg\u00fcn\u00fcz",
-    "6842": "Hesab\u0131n\u0131z kapat\u0131ld\u0131",
-    "6843": "ayr\u0131lmadan \u00f6nce ayr\u0131lmak istemenizin nedenini bilmek isteriz",
     "6844": "L\u00fctfen birini se\u00e7in",
     "6845": "Art\u0131k hesab\u0131m\u0131 kullanm\u0131yorum",
     "6846": "En sevdi\u011fim taray\u0131c\u0131 teknolojik olarak uyumlu de\u011fil ve de\u011fi\u015ftirmek istemiyorum",
@@ -1825,5 +1826,9 @@
     "17083": "\u00c7ok Ama\u00e7l\u0131 MEGA Windows Uygulamas\u0131 \u015fu anda geli\u015fme a\u015famas\u0131nda. Uygulaman\u0131n beta s\u00fcr\u00fcm\u00fcn\u00fc [A]burada[\/A] bulabilirsiniz.",
     "17084": "\u0130ndirmeniz hesab\u0131n\u0131z i\u00e7in ayr\u0131lan aktarma kotas\u0131n\u0131 a\u015faca\u011f\u0131 i\u00e7in devam edemez.",
     "17085": "Yar\u0131m kalm\u0131\u015f aktarmalar\u0131n\u0131z var. Devam ettirmek ister misiniz?",
-    "17086": "Klas\u00f6r\u00fc a\u00e7"
+    "17086": "Klas\u00f6r\u00fc a\u00e7",
+    "17089": "Hesab\u0131n\u0131z\u0131 kapatmadan \u00f6nce, nedenini \u00f6\u011frenmek istiyoruz...",
+    "17090": "S\u0131raya al\u0131nan indirme, IP adresi i\u00e7in izin verilen aktarma kotas\u0131n\u0131 a\u015f\u0131yor ve bu nedenle kesilebilir. Transfer kotan\u0131z\u0131 \u00f6nemli \u00f6l\u00e7\u00fcde y\u00fckseltmek i\u00e7in l\u00fctfen bir PRO hesab\u0131 sat\u0131n almay\u0131 d\u00fc\u015f\u00fcn\u00fcn.",
+    "17091": "\u0130ndirmeye Devam Et",
+    "17092": "%1 dosya aktarmas\u0131n\u0131 iptal etmek istedi\u011finizden emin misiniz?"
 }

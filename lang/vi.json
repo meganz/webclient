@@ -4255,5 +4255,10 @@
     "17089": "Tr\u01b0\u1edbc khi ti\u1ebfn h\u00e0nh \u0111\u00f3ng t\u00e0i kho\u1ea3n, xin h\u00e3y cho ch\u00fang t\u00f4i bi\u1ebft l\u00fd do qu\u00fd kh\u00e1ch mu\u1ed1n ng\u01b0ng s\u1eed d\u1ee5ng d\u1ecbch v\u1ee5...",
     "17090": "M\u1ee5c b\u1ea1n mu\u1ed1n t\u1ea3i xu\u1ed1ng s\u1ebd l\u00e0m qu\u00e1 t\u1ea3i b\u0103ng th\u00f4ng b\u1ea1n hi\u1ec7n \u0111ang c\u00f3 cho truy\u1ec1n t\u1ea3i \u1edf \u0111\u1ecba ch\u1ec9 IP n\u00e0y, n\u1ebfu ti\u1ebfp t\u1ee5c th\u1ef1c hi\u1ec7n c\u00e1c phi\u00ean t\u1ea3i c\u00f3 th\u1ec3 s\u1ebd b\u1ecb gi\u00e1n \u0111o\u1ea1n. Xin xem x\u00e9t v\u00e0 c\u00e2n nh\u1eafc n\u00e2ng t\u00e0i kho\u1ea3n l\u00ean h\u1ea1ng PRO \u0111\u1ec3 t\u0103ng c\u01b0\u1eddng m\u1ee9c b\u0103ng th\u00f4ng.",
     "17091": "V\u1eabn Ti\u1ebfp T\u1ee5c T\u1ea3i Xu\u1ed1ng",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "B\u1ea1n c\u00f3 ch\u1eafc mu\u1ed1n h\u1ee7y b\u1ecf %1 phi\u00ean truy\u1ec1n t\u1ea3i n\u00e0y kh\u00f4ng?",
+    "17093": "Upload and update",
+    "17094": "Upload and rename",
+    "17095": "Copy and rename",
+    "17096": "Move and rename",
+    "17097": "The file will be updated with version history: [A]Learn more[\/A]"
 }

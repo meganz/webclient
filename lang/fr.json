@@ -4255,5 +4255,10 @@
     "17089": "Avant que vous fermiez votre compte, nous aimerions savoir pourquoi vous nous quittez...",
     "17090": "Votre t\u00e9l\u00e9chargement en attente d\u00e9passe le quota de transfert actuel disponible de votre adresse IP et pourrait par cons\u00e9quent \u00eatre interrompu. Veuillez envisager d'acheter un compte PRO afin de grandement augmenter votre quota de transfert.",
     "17091": "Continuer le t\u00e9l\u00e9chargement",
-    "17092": "Voulez-vous vraiment annuler ces %1 transferts de fichier\u2009?"
+    "17092": "Voulez-vous vraiment annuler ces %1 transferts de fichier\u2009?",
+    "17093": "T\u00e9l\u00e9verser et mettre \u00e0 jour",
+    "17094": "T\u00e9l\u00e9verser et renommer",
+    "17095": "Copier et renommer",
+    "17096": "D\u00e9placer et renommer",
+    "17097": "Le fichier sera mis \u00e0 jour avec un historique de version : [A]En apprendre davantage[\/A]"
 }

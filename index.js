@@ -1545,6 +1545,8 @@ function topmenuUI() {
     $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
 
     if (u_type) {
+        $('body').removeClass('not-logged').addClass('logged');
+
         $topMenu.find('.top-menu-item.start').addClass('hidden');
         $topMenu.find('.top-menu-item.fm').removeClass('hidden');
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
@@ -1560,12 +1562,13 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').removeClass('hidden');
 
         // Show the rocket icon if achievements are enabled
-        if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
                 $topHeader.find('.top-icon.achievements').removeClass('hidden');
+            })
+            .fail(function() {
+                $topHeader.find('.top-icon.achievements').addClass('hidden');
             });
-        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1612,7 +1615,10 @@ function topmenuUI() {
         alarm.planExpired.render();
     }
     else {
-        if (u_type === 0 && !confirmok && page !== 'key') {
+        if (u_type !== 0) {
+            $('body').removeClass('logged').addClass('not-logged');
+        }
+        else if (!confirmok && page !== 'key') {
 
             $topMenu.find('.top-menu-item.register').text(l[968]);
 

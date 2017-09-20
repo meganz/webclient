@@ -697,7 +697,10 @@
     "5533": "\u05d8\u05d5\u05e2\u05df...",
     "5542": "\u05e9\u05d9\u05ea\u05d5\u05e4\u05d9\u05dd \u05e0\u05db\u05e0\u05e1\u05d9\u05dd",
     "5543": "\u05e9\u05d9\u05ea\u05d5\u05e4\u05d9\u05dd \u05d9\u05d5\u05e6\u05d0\u05d9\u05dd",
+    "5545": "\u05e6\u05d5\u05e8 \u05ea\u05d9\u05e7\u05d9\u05d9\u05d4 \u05d7\u05d3\u05e9\u05d4",
     "5549": "\u05e9\u05d3\u05e8\u05d2 \u05d7\u05e9\u05d1\u05d5\u05df",
+    "5552": "\u05e6\u05e4\u05d9\u05d9\u05d4 \u05d1\u05ea\u05de\u05d5\u05e0\u05d5\u05ea \u05de\u05d6\u05e2\u05e8\u05d9\u05d5\u05ea",
+    "5553": "\u05e6\u05e4\u05d9\u05d9\u05d4 \u05db\u05e8\u05e9\u05d9\u05de\u05d4",
     "5557": "\u05e7\u05d5\u05d1\u05e5",
     "5561": "\u05ea\u05d9\u05e7\u05d9\u05d9\u05d4",
     "5565": "\u05d4\u05d5\u05e8\u05d3",
@@ -851,8 +854,6 @@
     "6832": "\u05d1\u05d4\u05e9\u05dc\u05de\u05ea \u05e4\u05e2\u05d5\u05dc\u05d4 \u05d6\u05d5 \u05ea\u05d0\u05d1\u05d3 \u05d0\u05ea \u05db\u05dc \u05d4\u05de\u05d9\u05d3\u05e2 \u05d5\u05d0\u05e0\u05e9\u05d9 \u05d4\u05e7\u05e9\u05e8 \u05e9\u05dc\u05da",
     "6834": "\u05e9\u05dc\u05d7 \u05e7\u05d1\u05e6\u05d9\u05dd",
     "6841": "\u05d0\u05e0\u05d5 \u05de\u05e6\u05d8\u05e2\u05e8\u05d9\u05dd \u05dc\u05e8\u05d0\u05d5\u05ea \u05d0\u05d5\u05ea\u05da \u05e2\u05d5\u05d6\u05d1",
-    "6842": "\u05d4\u05d7\u05e9\u05d1\u05d5\u05df \u05e9\u05dc\u05da \u05e0\u05e1\u05d2\u05e8",
-    "6843": "\u05d0\u05da \u05dc\u05e4\u05e0\u05d9 \u05e9\u05ea\u05e2\u05d6\u05d5\u05d1 \u05e0\u05e9\u05de\u05d7 \u05dc\u05d3\u05e2\u05ea \u05de\u05d4 \u05d4\u05e1\u05d9\u05d1\u05d4",
     "6844": "\u05d0\u05e0\u05d0 \u05d1\u05d7\u05e8 \u05d0\u05d7\u05ea",
     "6845": "\u05d0\u05e0\u05d9 \u05dc\u05d0 \u05de\u05e9\u05ea\u05de\u05e9 \u05d1\u05d7\u05e9\u05d1\u05d5\u05df \u05e9\u05dc\u05d9 \u05d9\u05d5\u05ea\u05e8",
     "6846": "\u05d4\u05d3\u05e4\u05d3\u05e4\u05df \u05d4\u05d0\u05d4\u05d5\u05d1 \u05e2\u05dc\u05d9\u05d9 \u05d0\u05d9\u05e0\u05e0\u05d5 \u05e0\u05ea\u05de\u05da \u05d5\u05d0\u05e0\u05d9 \u05dc\u05d0 \u05e8\u05d5\u05e6\u05d4 \u05dc\u05e2\u05d6\u05d5\u05d1",
@@ -1825,5 +1826,9 @@
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17086": "Open folder",
+    "17089": "Before you close your account, we would like to know why you are leaving us...",
+    "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+    "17091": "Continue Download",
+    "17092": "Are you sure you want to cancel these %1 file transfers?"
 }

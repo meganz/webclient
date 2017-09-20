@@ -697,7 +697,10 @@
     "5533": "A carregar\u2026",
     "5542": "Partilhas Recebidas",
     "5543": "Partilhas a Enviar",
+    "5545": "Criar nova pasta",
     "5549": "Fazer upgrade da conta",
+    "5552": "Vista de miniaturas",
+    "5553": "Ver em Lista",
     "5557": "ficheiro",
     "5561": "pasta",
     "5565": "transferir",
@@ -851,8 +854,6 @@
     "6832": "Ao completar esta ac\u00e7\u00e3o perder\u00e1 acesso a todos os seus dados, incluindo contactos e partilhas",
     "6834": "Enviar ficheiros",
     "6841": "Estamos tristes que se v\u00e1 embora",
-    "6842": "A sua conta foi encerrada",
-    "6843": "mas antes de sair gostar\u00edamos de saber porque nos quer deixar",
     "6844": "Por favor seleccione um",
     "6845": "J\u00e1 n\u00e3o uso a minha conta",
     "6846": "O meu navegador favorito n\u00e3o \u00e9 compat\u00edvel tecnologicamente e n\u00e3o quero mudar",
@@ -1825,5 +1826,9 @@
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17086": "Open folder",
+    "17089": "Before you close your account, we would like to know why you are leaving us...",
+    "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+    "17091": "Continue Download",
+    "17092": "Are you sure you want to cancel these %1 file transfers?"
 }

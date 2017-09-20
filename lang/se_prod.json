@@ -697,7 +697,10 @@
     "5533": "Laddar...",
     "5542": "Inkommande delningar",
     "5543": "Utg\u00e5ende delningar",
+    "5545": "Skapa ny mapp",
     "5549": "Uppgradera konto",
+    "5552": "Miniatyrvy",
+    "5553": "Listvy",
     "5557": "Fil",
     "5561": "Mapp",
     "5565": "ladda ned",
@@ -851,8 +854,6 @@
     "6832": "Genom att fylla i denna \u00e5tg\u00e4rd kommer du att f\u00f6rlora tillg\u00e5ng till alla dina uppladdade uppgifter aktier och kontakter",
     "6834": "Skicka filer",
     "6841": "Vi \u00e4r ledsna att se dig l\u00e4mna oss",
-    "6842": "Ditt konto har nu avslutats",
-    "6843": "men innan du l\u00e4mnar vi g\u00e4rna veta varf\u00f6r du l\u00e4mnar oss",
     "6844": "Var v\u00e4nligt och v\u00e4lj en",
     "6845": "Jag anv\u00e4nder inte mitt konto l\u00e4ngre",
     "6846": "Min favorit webbl\u00e4sare \u00e4r inte tekniskt kompatibla och jag vill inte \u00e4ndra",
@@ -1825,5 +1826,9 @@
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
     "17084": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
     "17085": "You have partially downloaded transfers. Would you like to resume them?",
-    "17086": "Open folder"
+    "17086": "Open folder",
+    "17089": "Before you close your account, we would like to know why you are leaving us...",
+    "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+    "17091": "Continue Download",
+    "17092": "Are you sure you want to cancel these %1 file transfers?"
 }

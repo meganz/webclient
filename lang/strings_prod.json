@@ -2791,9 +2791,21 @@
         "text": "Outgoing Shares",
         "context": "Folders that have been shared by the user to other MEGA users"
     },
+    "5545": {
+        "text": "Create new folder",
+        "context": "Menu item"
+    },
     "5549": {
         "text": "Upgrade account",
         "context": "Button title which triggers the action to upgrade your MEGA account level"
+    },
+    "5552": {
+        "text": "Thumbnail view",
+        "context": "Menu item to change from list view to grid view"
+    },
+    "5553": {
+        "text": "List view",
+        "context": "Menu item to change from grid view to list view"
     },
     "5557": {
         "text": "file",
@@ -3405,14 +3417,6 @@
     },
     "6841": {
         "text": "We're sorry to see you go",
-        "context": ""
-    },
-    "6842": {
-        "text": "Your account has now been closed",
-        "context": ""
-    },
-    "6843": {
-        "text": "but before you leave we would love to know why you are leaving us",
         "context": ""
     },
     "6844": {
@@ -7306,5 +7310,21 @@
     "17086": {
         "text": "Open folder",
         "context": "The label text for a button which opens a folder in the cloud drive."
+    },
+    "17089": {
+        "text": "Before you close your account, we would like to know why you are leaving us...",
+        "context": "A message on the account cancellation dialog before a list of options the user can select to explain why they want to cancel their account."
+    },
+    "17090": {
+        "text": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+        "context": "Informs user that transfer quota will be exceeded soon and user should buy PRO account."
+    },
+    "17091": {
+        "text": "Continue Download",
+        "context": "Button label. Allows user to continue download if it was paused."
+    },
+    "17092": {
+        "text": "Are you sure you want to cancel these %1 file transfers?",
+        "context": "A message shown to the user when they attempt to cancel a bunch of selected transfers. Please leave the %1 placeholder which will be replaced with the number of file transfers."
     }
 }

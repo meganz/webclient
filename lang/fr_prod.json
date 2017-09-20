@@ -697,7 +697,10 @@
     "5533": "Chargement...",
     "5542": "Partages entrants",
     "5543": "Partages sortants",
+    "5545": "Cr\u00e9er un nouveau dossier",
     "5549": "Surclasser le compte",
+    "5552": "Vue en imagettes",
+    "5553": "Vue en liste",
     "5557": "fichier",
     "5561": "dossier",
     "5565": "t\u00e9l\u00e9chargement",
@@ -851,8 +854,6 @@
     "6832": "En effectuant cette action, vous perdrez l'acc\u00e8s \u00e0 toutes vos donn\u00e9es, incluant les contacts et les partages entrants.",
     "6834": "Envoyer des fichiers",
     "6841": "Nous sommes d\u00e9sol\u00e9s de vous voir partir",
-    "6842": "Votre compte est maintenant ferm\u00e9",
-    "6843": "mais avant que vous ne partiez, nous aimerions savoir pourquoi vous nous quittez",
     "6844": "Veuillez en s\u00e9lectionner une",
     "6845": "Je n'utilise plus mon compte",
     "6846": "Mon navigateur favori n'est pas technologiquement compatible et je ne veux pas le changer",
@@ -1825,5 +1826,9 @@
     "17083": "L'appli Windows universelle de MEGA est en cours de d\u00e9veloppement. Vous pouvez obtenir la version b\u00eata de l'appli [A]ici[\/A].",
     "17084": "Votre t\u00e9l\u00e9chargement ne peut pas se poursuivre, car cela vous ferait d\u00e9passer le quota de transfert actuel allou\u00e9 \u00e0 votre adresse IP.",
     "17085": "Vous avez t\u00e9l\u00e9charg\u00e9 des transferts partiellement. Souhaitez-vous les reprendre\u2009?",
-    "17086": "Ouvrir un dossier"
+    "17086": "Ouvrir un dossier",
+    "17089": "Avant que vous fermiez votre compte, nous aimerions savoir pourquoi vous nous quittez...",
+    "17090": "Votre t\u00e9l\u00e9chargement en attente d\u00e9passe le quota de transfert actuel disponible de votre adresse IP et pourrait par cons\u00e9quent \u00eatre interrompu. Veuillez envisager d'acheter un compte PRO afin de grandement augmenter votre quota de transfert.",
+    "17091": "Continuer le t\u00e9l\u00e9chargement",
+    "17092": "Voulez-vous vraiment annuler ces %1 transferts de fichier\u2009?"
 }

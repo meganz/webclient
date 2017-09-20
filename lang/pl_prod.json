@@ -697,7 +697,10 @@
     "5533": "Trwa \u0142adowanie...",
     "5542": "Udost\u0119pnienia",
     "5543": "Udost\u0119pnienia",
+    "5545": "Utw\u00f3rz nowy katalog",
     "5549": "Zmie\u0144 konto",
+    "5552": "Podgl\u0105d zdj\u0119cia",
+    "5553": "Widok listy",
     "5557": "pliki",
     "5561": "katalog",
     "5565": "pobranie",
@@ -851,8 +854,6 @@
     "6832": "Kontynuuj\u0105c t\u0105 akcj\u0119 utracisz wszystkie wgrane dane i kontakty ",
     "6834": "Wy\u015blij pliki",
     "6841": "Przykro nam \u017ce rezygnujesz z MEGA",
-    "6842": "Twoje konto zosta\u0142o zamkni\u0119te",
-    "6843": "ale zanim nasz opu\u015bcisz, chcieliby\u015bmy si\u0119 dowiedzie\u0107 o przyczynach tej decyzji",
     "6844": "Wybierz",
     "6845": "Nie u\u017cywam ju\u017c swojego konta",
     "6846": "Moja ulubiona przegl\u0105darka nie jest kompatybilna i nie chc\u0119 z tego powodu jej zmienia\u0107",
@@ -1825,5 +1826,9 @@
     "17083": "MEGA Universal Windows App jest aktualnie w trakcie prac. Mo\u017cesz pobra\u0107\u00a0wersj\u0119 beta [A]tutaj[\/A].",
     "17084": "Pobieranie plik\u00f3w nie mo\u017ce by\u0107 kontynuowane, poniewa\u017c zostanie przekroczony dost\u0119pny limit na Twoim koncie.",
     "17085": "Niekt\u00f3re transfery nie zosta\u0142y zako\u0144czone. Czy chcesz je wznowi\u0107?",
-    "17086": "Otw\u00f3rz katalog"
+    "17086": "Otw\u00f3rz katalog",
+    "17089": "Przed zamkni\u0119ciem swojego konta, chcieliby\u015bmy si\u0119 dowiedzie\u0107 dlaczego na opuszczasz...",
+    "17090": "Zakolejkowane pobierania przekraczaj\u0105 dost\u0119pny limit przypisany do Twojego adresu IP i mog\u0105 zosta\u0107 wstrzymane. Zalecany zakup jednego z kont PRO aby pozby\u0107 si\u0119 podobnych ogranicze\u0144 w przysz\u0142o\u015bci.",
+    "17091": "Kontynuuj pobieranie",
+    "17092": "Czy na pewno chcesz anulowa\u0107 te %1 transfery plikow?"
 }

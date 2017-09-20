@@ -1,4 +1,5 @@
 function dashboardUI() {
+    "use strict";
 
     // Prevent ephemeral session to access dashboard via url
     if (u_type === 0) {

@@ -923,6 +923,7 @@ function contactAddDialog() {
 
         // Show
         else {
+            $('.add-user-popup .add-user-textarea textarea').val(l[5878]);
             $('.add-user-popup .import-contacts-dialog').fadeOut(0);
             $('.import-contacts-link').removeClass('active');
             clearScrollPanel('.add-user-popup');

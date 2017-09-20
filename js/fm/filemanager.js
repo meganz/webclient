@@ -605,7 +605,7 @@ FileManager.prototype.initFileManagerUI = function() {
                     ephemeralDialog(l[7687]);
                 }
                 else {
-                    ephemeralDialog('The dashboard page is for registered users only.');// l[]
+                    ephemeralDialog('This page is for registered users only.');// l[17146]
                 }
             }
             else if ($(this).hasClass('dashboard')) {

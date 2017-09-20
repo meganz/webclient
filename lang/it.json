@@ -4255,5 +4255,10 @@
     "17089": "Prima che chiudi il tuo account, ci piacerebbe conoscere i motivi per cui ci lasci...",
     "17090": "I tuoi download messi in cosa superano la banda di trasferimento disponibile per il tuo indirizzo IP e potrebbero essere interrotti. Per favore, tieni presente che acquistando un account PRO aumenteresti di molto la tua banda di trasferimento.",
     "17091": "Continua download",
-    "17092": "Sei sicuro di voler annullare questi %1 trasferimenti di file?"
+    "17092": "Sei sicuro di voler annullare questi %1 trasferimenti di file?",
+    "17093": "Upload and update",
+    "17094": "Upload and rename",
+    "17095": "Copy and rename",
+    "17096": "Move and rename",
+    "17097": "The file will be updated with version history: [A]Learn more[\/A]"
 }

@@ -39,7 +39,7 @@ $speical_ids = array('5875', '5876', '1626', '1086', '1088', '1929', '955', '193
 
 foreach (fetchFiles("js/", "*.js", "*.html", "html/") as $file) {
     $content = file_get_contents($file);
-    preg_match_all("@\Wl\[(\d+)\]|\[\\$(\d+)\]@", $content, $numbers);
+    preg_match_all("@\Wl\[(\d+)\]|\[\\$(\d+)(\.dqq)?\]@", $content, $numbers);
 
     if (!empty($numbers[0])) {
         $ids = array_merge($ids, array_filter(array_merge($numbers[1], $numbers[2])));

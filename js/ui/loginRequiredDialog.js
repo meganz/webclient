@@ -76,19 +76,17 @@
     }
 
     function showLoginDialog(aPromise) {
-        $.dialog = 'pro-login-dialog';
+        var $dialog = $('.fm-dialog.pro-login-dialog');
 
-        var $dialog = $('.pro-login-dialog');
-        $dialog
-            .removeClass('hidden')
-            .addClass('active');
+        M.safeShowDialog('pro-login-dialog', function() {
+            $dialog.removeClass('hidden').addClass('active');
 
-        $('.fm-dialog-overlay').removeClass("hidden");
-        $('body').addClass("overlayed");
+            $dialog.css({
+                'margin-left': -1 * ($dialog.outerWidth() / 2),
+                'margin-top': -1 * ($dialog.outerHeight() / 2)
+            });
 
-        $dialog.css({
-            'margin-left': -1 * ($dialog.outerWidth() / 2),
-            'margin-top': -1 * ($dialog.outerHeight() / 2)
+            return $dialog.css('zoom', '1.2');
         });
 
         $('.top-login-input-block').removeClass('incorrect');

@@ -161,7 +161,7 @@ var sc_history = [];                     // array holding the history of action-
 function sc_fqueue(handle, packet) {
     "use strict";
 
-    if (handle && !M.d[handle]) {
+    if (handle && !M.c[handle]) {
         if (scwaitnodes[packet.scqi]) {
             scwaitnodes[packet.scqi]++;
         }

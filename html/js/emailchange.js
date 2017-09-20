@@ -142,7 +142,7 @@ var emailchange = (function() {
                     M.currentdirid = null;
                     M.account = null;
                     loadSubPage('fm/account/email-and-pass');
-                    showToast('settings', l[7698]);     // You have successfully changed your profile
+                    showToast('settings', l[7698]);// You have successfully changed your profile
                 });
             }
         });

@@ -2073,7 +2073,7 @@ var exportExpiry = {
         var $node = $('#' + nodeId);
         if ($node.length === 0) {
             // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
-            if (M.megaRender.hasDOMNode(nodeId)) {
+            if (M.megaRender && M.megaRender.hasDOMNode(nodeId)) {
                 $node = $(M.megaRender.getDOMNode(nodeId, M.d[nodeId]));
             }
         }

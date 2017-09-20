@@ -869,6 +869,11 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             }
         }
 
+
+        // allow distributed notifications to 3rd party (mainly UI) components
+        // using mBroadcaster
+        mBroadcaster.sendMessage("nodeUpdated_" + n.h);
+
     }
 };
 

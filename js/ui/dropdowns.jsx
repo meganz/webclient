@@ -19,6 +19,9 @@ var Dropdown = React.createClass({
     },
     specificShouldComponentUpdate: function(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
+            if (this.props.onBeforeActiveChange) {
+                this.props.onBeforeActiveChange(nextProps.active);
+            }
             return true;
         }
         else if (this.props.focused != nextProps.focused) {
@@ -202,11 +205,11 @@ var DropdownContactsSelector = React.createClass({
     render: function() {
         var self = this;
 
-        return <Dropdown className={"popup contacts-search " + this.props.className} 
-                         active={this.props.active} 
-                         closeDropdown={this.props.closeDropdown} 
+        return <Dropdown className={"popup contacts-search " + this.props.className}
+                         active={this.props.active}
+                         closeDropdown={this.props.closeDropdown}
                          ref="dropdown"
-                         positionMy={this.props.positionMy} 
+                         positionMy={this.props.positionMy}
                          positionAt={this.props.positionAt}
                 >
                 <ContactsUI.ContactPickerWidget

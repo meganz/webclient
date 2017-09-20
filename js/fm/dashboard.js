@@ -2,8 +2,8 @@ function dashboardUI() {
 
     // Prevent ephemeral session to access dashboard via url
     if (u_type === 0) {
-        msgDialog('confirmation', l[998], 'Dashboard is for registered users only.'
-             + ' ' + l[999], l[1000], function(e) {// l[17126]
+        msgDialog('confirmation', l[998], 'The dashboard page is for registered users only.'
+             + ' ' + l[999], l[1000], function(e) {// l[]
             if (e) {
                 loadSubPage('register');
                 return false;

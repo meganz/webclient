@@ -3,7 +3,8 @@ function accountUI() {
 
     // Prevent ephemeral session to access account settings via url
     if (u_type === 0) {
-        msgDialog('confirmation', l[998], l[7687] + ' ' + l[999], l[1000], function(e) {
+        msgDialog('confirmation', l[998], 'The settings page is for registered users only.'// l[]
+            + ' ' + l[999], l[1000], function(e) {
             if (e) {
                 loadSubPage('register');
                 return false;

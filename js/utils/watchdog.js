@@ -77,7 +77,7 @@ var watchdog = Object.freeze({
             }
             tmpData['reply'] = token;
 
-            Soon(function() {
+            onIdle(function() {
                 self.notify('Q!' + what, tmpData);
             });
 
@@ -244,6 +244,10 @@ var watchdog = Object.freeze({
 
                         case 'dling':
                             value = dlmanager.getCurrentDownloads();
+                            break;
+
+                        case 'qbqdata':
+                            value = dlmanager.getQBQData();
                             break;
                     }
 

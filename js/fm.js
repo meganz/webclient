@@ -2872,7 +2872,9 @@ function closeDialog() {
         else {
             fm_hideoverlay();
         }
-        $('.fm-dialog' + ($.propertiesDialog ? ':not(.properties-dialog)' : '')).addClass('hidden');
+        $('.fm-dialog' + ($.propertiesDialog ? ':not(.properties-dialog)' : ''))
+            .trigger('dialog-closed')
+            .addClass('hidden');
         $('.dialog-content-block').empty();
 
         // add contact popup
@@ -3983,8 +3985,8 @@ function _propertiesDialog(close) {
             var hidden = i >= MAX_CONTACTS ? 'hidden' : '';
             var status = megaChatIsReady && megaChat.getPresenceAsCssClass(user.u);
 
-            shareUsersHtml += '<div class="properties-context-item ' + (status ? status : '') + ' ' + hidden
-                + '" data-handle="' + escapeHTML(userHandle) + '">'
+            shareUsersHtml += '<div class="properties-context-item ustatus ' + escapeHTML(userHandle)
+                + ' ' + (status ? status : '') + ' ' + hidden + '">'
                 + '<div class="properties-contact-status"></div>'
                 + '<span>' + escapeHTML(M.getNameByHandle(userHandle)) + '</span>'
                 + '</div>';

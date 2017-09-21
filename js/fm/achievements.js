@@ -328,11 +328,6 @@ mega.achievem.achievementDialog = function achievementDialog(title, close) {
  * @param {Function} [onDialogClosed] function to invoke when the [x] is clicked
  */
 mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogClosed) {
-    var $dialog = $('.fm-dialog.achievements-list-dialog');
-    var $scrollBlock = $dialog.find('.achievements-scroll');
-    var bodyHeight = $('body').height();
-    var $contentBlock;
-
     if (!M.maf) {
         loadingDialog.show();
 
@@ -342,14 +337,18 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
             if (M.maf) {
                 achievementsListDialog(onDialogClosed);
             }
+            else if (onDialogClosed) {
+                onIdle(onDialogClosed);
+            }
         });
         return true;
     }
+    var $dialog = $('.fm-dialog.achievements-list-dialog');
 
     $dialog.find('.fm-dialog-close')
         .rebind('click', function() {
             if (onDialogClosed) {
-                Soon(onDialogClosed);
+                onIdle(onDialogClosed);
             }
             closeDialog();
             return false;
@@ -444,7 +443,9 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
         $dialog.removeClass('hidden');
 
         // Init scroll
-        $contentBlock = $dialog.find('.achievements-list');
+        var $contentBlock = $dialog.find('.achievements-list');
+        var $scrollBlock = $dialog.find('.achievements-scroll');
+        var bodyHeight = $('body').height();
 
         if ($dialog.outerHeight() > bodyHeight) {
             $scrollBlock.css('max-height', bodyHeight - 60);

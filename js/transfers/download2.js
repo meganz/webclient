@@ -81,6 +81,8 @@ var dlmanager = {
             .done(function() {
                 dlmanager.lmtUserFlags |= dlmanager.LMT_HASACHIEVEMENTS;
             });
+
+        // dlmanager.lmtUserFlags |= dlmanager.LMT_HASACHIEVEMENTS;
     },
 
     getResumeInfo: function(dl, callback) {
@@ -639,7 +641,10 @@ var dlmanager = {
         }
         else if (typeof res === 'object') {
             if (res.efq) {
-                dlmanager.efq = true;
+                // dlmanager.efq = true;
+                if (d) {
+                    console.info('Ignoring EFQ flag...', res);
+                }
             }
             else {
                 delete dlmanager.efq;
@@ -1349,12 +1354,12 @@ var dlmanager = {
                 dlmanager.showOverQuotaRegisterDialog();
             };
 
-            if (!u_wasloggedin()) {
-                api_req({a: 'log', e: 99646, m: 'on overquota not-logged-in'});
+            if (preWarning && !u_wasloggedin()) {
+                api_req({a: 'log', e: 99646, m: 'on pre-warning not-logged-in'});
                 $('.default-big-button.login', $oqbbl).addClass('hidden');
             }
             else {
-                $('.default-big-button.login', $oqbbl).rebind('click', function() {
+                $('.default-big-button.login', $oqbbl).removeClass('hidden').rebind('click', function() {
                     api_req({a: 'log', e: 99644, m: 'on overquota login clicked'});
                     closeDialog();
 
@@ -1540,9 +1545,8 @@ var dlmanager = {
         }
         loadingDialog.hide();
 
-        var $dialog = $('.limited-bandwidth-dialog');
-        var $button = $dialog.find('.fm-dialog-close');
-        var $overlay = $('.fm-dialog-overlay');
+        var asyncTaskID = false;
+        var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
 
         this._setOverQuotaState(dlTask);
 
@@ -1556,7 +1560,6 @@ var dlmanager = {
             return;
         }
 
-        fm_showoverlay();
         $dialog
             .removeClass('registered achievements exceeded pro slider')
             .find('.transfer-overquota-txt')
@@ -1566,7 +1569,8 @@ var dlmanager = {
         if (flags & this.LMT_ISPRO) {
             $dialog.addClass('pro');
 
-            loadingDialog.show();
+            asyncTaskID = 'mOverQuota.' + makeUUID();
+
             if (M.account) {
                 // Force data retrieval from API
                 M.account.lastupdate = 0;
@@ -1602,12 +1606,9 @@ var dlmanager = {
                     });
                 }
 
-                loadingDialog.hide();
-                $dialog.addClass('exceeded').removeClass('hidden');
+                mBroadcaster.sendMessage(asyncTaskID);
+                asyncTaskID = null;
             });
-        }
-        else {
-            $dialog.addClass('exceeded').removeClass('hidden');
         }
 
         if (flags & this.LMT_ISREGISTERED) {
@@ -1632,25 +1633,40 @@ var dlmanager = {
             }
         }
 
-        this._overquotaInfo();
 
         var doCloseModal = function closeModal() {
             clearInterval(dlmanager._overQuotaTimeLeftTick);
-            $dialog.addClass('hidden');
-            $button.unbind('click.quota');
-            $overlay.unbind('click.quota');
-            if ($.dialog !== 'achievements') {
-                fm_hideoverlay();
-            }
+            $('.fm-dialog-overlay').unbind('click.dloverq');
+            $dialog.unbind('dialog-closed');
+            closeDialog();
             return false;
         };
 
-        $button.rebind('click.quota', doCloseModal);
-        $overlay.rebind('click.quota', doCloseModal);
+        M.safeShowDialog('download-overquota', function() {
+            dlmanager._overquotaInfo();
 
-        this._overquotaClickListeners($dialog, flags);
+            $('.fm-dialog-overlay').rebind('click.dloverq', doCloseModal);
 
-        api_req({a: 'log', e: 99648, m: 'on overquota dialog shown'});
+            $dialog
+                .addClass('exceeded')
+                .removeClass('hidden')
+                .rebind('dialog-closed', doCloseModal)
+                .find('.fm-dialog-close')
+                .rebind('click.quota', doCloseModal);
+
+            dlmanager._overquotaClickListeners($dialog, flags);
+
+            api_req({a: 'log', e: 99648, m: 'on overquota dialog shown'});
+
+            if (asyncTaskID) {
+                loadingDialog.show();
+                mBroadcaster.once(asyncTaskID, function() {
+                    loadingDialog.hide();
+                });
+            }
+
+            return $dialog;
+        });
     },
 
     getCurrentDownloads: function() {

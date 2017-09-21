@@ -697,7 +697,10 @@
     "5533": "\ub85c\ub529\uc911...",
     "5542": "\ub4e4\uc5b4\uc624\ub294 \uacf5\uc720",
     "5543": "\ub098\uac00\ub294 \uacf5\uc720",
+    "5545": "\uc0c8 \ud3f4\ub354 \uc0dd\uc131",
     "5549": "\uacc4\uc815 \uc5c5\uadf8\ub808\uc774\ub4dc",
+    "5552": "\uc378\ub124\uc77c \ubcf4\uae30",
+    "5553": "\ubaa9\ub85d \ubcf4\uae30",
     "5557": "\ud30c\uc77c",
     "5561": "\ud3f4\ub354",
     "5565": "\ub2e4\uc6b4\ub85c\ub4dc",
@@ -1824,8 +1827,8 @@
     "17084": "\uacc4\uc815\uc758 \ud604\uc7ac \uc804\uc1a1 \ud560\ub2f9\ub7c9\uc744 \ucd08\uacfc\ud560 \uc218 \uc788\uc5b4\uc11c \ub2e4\uc6b4\ub85c\ub4dc\ub97c \uc9c4\ud589\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.",
     "17085": "\uc77c\ubd80\ub9cc \ub2e4\uc6b4\ub85c\ub4dc\ub41c \uc804\uc1a1\uc774 \uc788\uc2b5\ub2c8\ub2e4. \uc7ac\uac1c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
     "17086": "\ud3f4\ub354 \uc5f4\uae30",
-    "17089": "Before you close your account, we would like to know why you are leaving us...",
-    "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
-    "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17089": "\uacc4\uc815\uc744 \ub2eb\uae30 \uc804\uc5d0, \uc65c \uc6b0\ub9ac\ub97c \ub5a0\ub098\uc2dc\ub294\uc9c0 \uc54c\uace0 \uc2f6\uc2b5\ub2c8\ub2e4...",
+    "17090": "\uc608\uc57d\ub41c \ub2e4\uc6b4\ub85c\ub4dc\uac00 \ud604\uc7ac IP\uc5d0 \ud560\ub2f9\ub41c \uc804\uc1a1\ub7c9\uc744 \ucd08\uacfc\ud558\uc5ec \uc911\ub2e8\ub420 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \uc804\uc1a1 \ud560\ub2f9\ub7c9\uc744 \ucd94\uac00\ud558\ub824\uba74 PRO \uacc4\uc815 \uad6c\ub9e4\ub97c \uace0\ub824\ud558\uc138\uc694.",
+    "17091": "\ub2e4\uc6b4\ub85c\ub4dc \uc7ac\uac1c",
+    "17092": "\uc774 %1\uac1c\uc758 \ud30c\uc77c \uc804\uc1a1\uc744 \ucde8\uc18c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?"
 }

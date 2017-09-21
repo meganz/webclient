@@ -4255,5 +4255,10 @@
     "17089": "Przed zamkni\u0119ciem swojego konta, chcieliby\u015bmy si\u0119 dowiedzie\u0107 dlaczego na opuszczasz...",
     "17090": "Zakolejkowane pobierania przekraczaj\u0105 dost\u0119pny limit przypisany do Twojego adresu IP i mog\u0105 zosta\u0107 wstrzymane. Zalecany zakup jednego z kont PRO aby pozby\u0107 si\u0119 podobnych ogranicze\u0144 w przysz\u0142o\u015bci.",
     "17091": "Kontynuuj pobieranie",
-    "17092": "Czy na pewno chcesz anulowa\u0107 te %1 transfery plikow?"
+    "17092": "Czy na pewno chcesz anulowa\u0107 te %1 transfery plikow?",
+    "17093": "Upload and update",
+    "17094": "Upload and rename",
+    "17095": "Copy and rename",
+    "17096": "Move and rename",
+    "17097": "The file will be updated with version history: [A]Learn more[\/A]"
 }

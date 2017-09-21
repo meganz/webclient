@@ -483,6 +483,8 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
     if (bt) {
         // $.transferprogress[id] = Math.floor(bl/bt*100);
         $.transferprogress[id] = [bl, bt, bps];
+        dl_queue[dl_queue_num].loaded = bl;
+
         if (!uldl_hold) {
             if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) {
                 $overlay.find('.viewer-error').addClass('hidden');

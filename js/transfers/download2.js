@@ -1693,6 +1693,31 @@ var dlmanager = {
         return size;
     },
 
+    getQBQData: function() {
+        'use strict';
+
+        var q = {p: [], n: [], s: 0};
+
+        dl_queue
+            .filter(isQueueActive)
+            .map(function(dl) {
+                if (!dl.loaded || dl.size - dl.loaded) {
+                    if (dl.ph) {
+                        q.p.push(dl.ph);
+                    }
+                    else {
+                        q.n.push(dl.id);
+                    }
+
+                    if (dl.loaded) {
+                        q.s += dl.loaded;
+                    }
+                }
+            });
+
+        return q;
+    },
+
     /**
      * Check whether MEGAsync is running.
      *

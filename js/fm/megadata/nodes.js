@@ -1381,6 +1381,10 @@ MegaData.prototype.getNodeRoot = function(id) {
 MegaData.prototype.isCircular = function(h1, h2) {
     "use strict";
 
+    if (this.d[h1] && this.d[h1].p === h2) {
+        return true;
+    }
+
     for (; ;) {
         if (h1 === h2) {
             return true;

@@ -1183,7 +1183,7 @@ function accountUI() {
         });
 
         var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
-        if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
+        if (fmconfig.tpp) {
 
             $cbTpp.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
             $cbTpp.parent().switchClass('checkboxOff', 'checkboxOn');
@@ -1196,17 +1196,16 @@ function accountUI() {
         $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
             var $this = $(this);
 
-            if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
+            if (fmconfig.tpp) {
                 $this.switchClass('checkboxOn', 'checkboxOff');
                 $this.parent().switchClass('checkboxOn', 'checkboxOff');
-                mega.config.setn('tpp', false);
+                mega.config.setn('tpp', 0);
             }
             else {
                 $this.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
                 $this.parent().switchClass('checkboxOff', 'checkboxOn');
-                mega.config.setn('tpp', true);
+                mega.config.setn('tpp', 1);
             }
-
         });
 
         $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');

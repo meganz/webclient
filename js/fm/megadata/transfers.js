@@ -543,7 +543,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
                 $('.widget-block').addClass('active');
             }
             else {
-                if (mega.ui.tpp.isCached()) {
+                if (mega.ui.tpp.isCached() && mega.ui.tpp.isEnabled()) {
                     mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
                     mega.ui.tpp.updateBlock('dl');
                 }
@@ -677,6 +677,10 @@ MegaData.prototype.dlerror = function(dl, error) {
             errorstr = l[x = 233];
             break;
     }
+
+    // Hide TPP
+    mega.ui.tpp.hide();
+    mega.ui.tpp.reset('dl');
 
     if (window.slideshowid == dl.id && !previews[slideshowid]) {
         $overlay.find('.viewer-image-bl').addClass('hidden');
@@ -1214,7 +1218,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             $tr.find('.speed').addClass('unknown').text('');
         }
 
-        if (mega.ui.tpp.isCached()) {
+        if (mega.ui.tpp.isCached() && mega.ui.tpp.isEnabled()) {
             mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
             mega.ui.tpp.updateBlock('ul');
         }
@@ -1253,6 +1257,10 @@ MegaData.prototype.ulerror = function(ul, error) {
 
     if (ul) {
         this.ulfinalize(ul, api_strerror(error));
+
+        // Hide TPP
+        mega.ui.tpp.hide();
+        mega.ui.tpp.reset('ul');
 
         if (ul.owner) {
             ul.owner.destroy();

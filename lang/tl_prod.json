@@ -926,6 +926,7 @@
     "7004": "Maraming salamant sa inyong feedback.",
     "7005": "Ilagay ng dahilan sa ibaba",
     "7006": "Nag-loload...",
+    "7039": "Huwag mo na akong tanungin ulit",
     "7086": "Piliin ang inyong Linux Distro",
     "7087": "Web Browser",
     "7088": "Bilis ng Paglilipat:",
@@ -1079,9 +1080,6 @@
     "7747": "Pagkatapos nito, pumunta sa inyong email inbox at ikumpirm ang pagbabago ng email.",
     "7869": "Ang email address ay rehistrado na. Pumili na lang ng bagong alternatibong address para magpatuloy.",
     "7872": "Ang pag-access sa anumang binahaging folders sa iyon na napili [X] ay mawawala.",
-    "7873": "Ma-idadownload mo ang extension (v%1) sa ibaba.",
-    "7874": "Out of date na yata ang iyong kasalukuyang extension (v%1). Pupwede mong idownload ang pinakabago sa ibaba (v%2).",
-    "7875": "Ang iyong extension (v%1) ay ang pinakabago.",
     "7879": "Ang access sa folders na binahagi ni [X] ay tinanggal.",
     "7880": "Tinanggal ang access sa folder.",
     "7881": "Maraming Salamat! Isa sa aming tagasuporta ang sasagot sa inyong katanungan sa lalong madaling panahon",
@@ -1830,5 +1828,6 @@
     "17089": "Bago mo isara ang iyong account, gusto naming malaman ang dahilan nito\u2026",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Ipagpatuloy ang Download",
-    "17092": "Gusto mo bang i-cancel ang %1 na file transfer?"
+    "17092": "Gusto mo bang i-cancel ang %1 na file transfer?",
+    "17146": "This page is for registered users only."
 }

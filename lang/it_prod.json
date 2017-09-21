@@ -926,6 +926,7 @@
     "7004": "Grazie per il tuo feedback",
     "7005": "Inserisci la ragione",
     "7006": "Caricamento...",
+    "7039": "Non chiedermelo di nuovo",
     "7086": "Seleziona la tua Distro per Linux",
     "7087": "Browser Web",
     "7088": "Velocit\u00e0 di Trasferimento:",
@@ -1079,9 +1080,6 @@
     "7747": "Seguandolo, per favore vai nell'inbox del tuo indirizzo email e conferma questo cambio di email.",
     "7869": "Questo indirizzo email \u00e8 gi\u00e0 usato. Per favore, scegline un altro per continuare.",
     "7872": "L'accesso a qualsiasi cartella condivisa con te dal\/i selezionato\/i [X] sar\u00e0 persa.",
-    "7873": "Puoi scaricare l'estensione (v %1) sotto.",
-    "7874": "Sembra che la tua estensione corrente (v %1) sia vecchia. Puoi scaricare l'ultima versione (v %2) sotto.",
-    "7875": "La tua estensione (v %1) \u00e8 aggiornata.",
     "7879": "L'accesso alle cartelle condivise da [X] \u00e8 stato rimosso.",
     "7880": "L'accesso alle cartelle \u00e8 stato rimosso.",
     "7881": "Grazie! Uno dei nostri addetti al supporto ti risponder\u00e0 il pi\u00f9 presto possibile.",
@@ -1830,5 +1828,6 @@
     "17089": "Prima che chiudi il tuo account, ci piacerebbe conoscere i motivi per cui ci lasci...",
     "17090": "I tuoi download messi in cosa superano la banda di trasferimento disponibile per il tuo indirizzo IP e potrebbero essere interrotti. Per favore, tieni presente che acquistando un account PRO aumenteresti di molto la tua banda di trasferimento.",
     "17091": "Continua download",
-    "17092": "Sei sicuro di voler annullare questi %1 trasferimenti di file?"
+    "17092": "Sei sicuro di voler annullare questi %1 trasferimenti di file?",
+    "17146": "This page is for registered users only."
 }

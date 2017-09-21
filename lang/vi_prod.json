@@ -926,6 +926,7 @@
     "7004": "C\u00e1m \u01a1n l\u1eddi ph\u1ea3n h\u1ed3i c\u1ee7a qu\u00fd kh\u00e1ch.",
     "7005": "Xin nh\u1eadp l\u00fd do \u1edf b\u00ean d\u01b0\u1edbi",
     "7006": "\u0110ang t\u1ea3i...",
+    "7039": "Kh\u00f4ng h\u1ecfi l\u1ea1i n\u1eefa",
     "7086": "Xin ch\u1ecdn lo\u1ea1i Linux Distro",
     "7087": "Tr\u00ecnh Duy\u1ec7t Web",
     "7088": "T\u1ed1c \u0110\u1ed9 Truy\u1ec1n:",
@@ -1079,9 +1080,6 @@
     "7747": "Ti\u1ebfp theo \u0111\u00f3, xin v\u00e0o h\u1ed9p th\u01b0 email c\u1ee7a b\u1ea1n \u0111\u1ec3 x\u00e1c minh vi\u1ec7c thay \u0111\u1ed5i \u0111\u1ecba ch\u1ec9 email.",
     "7869": "\u0110\u00e3 c\u00f3 m\u1ed9t t\u00e0i kho\u1ea3n \u0111\u0103ng k\u00fd v\u1edbi \u0111\u1ecba ch\u1ec9 email n\u00e0y. Xin ch\u1ecdn m\u1ed9t \u0111\u1ecba ch\u1ec9 email kh\u00e1c \u0111\u1ec3 ti\u1ebfp t\u1ee5c.",
     "7872": "Quy\u1ec1n truy c\u1eadp t\u1edbi c\u00e1c th\u01b0 m\u1ee5c \u0111\u01b0\u1ee3c chia s\u1ebb cho b\u1ea1n t\u1eeb t\u00ean [X] v\u1eeba ch\u1ecdn s\u1ebd b\u1ecb m\u1ea5t.",
-    "7873": "T\u1ea3i v\u1ec1 tr\u00ecnh c\u1eafm (ph\u1ea7n b\u1ed5 tr\u1ee3) (phi\u00ean b\u1ea3n v%1) \u1edf d\u01b0\u1edbi \u0111\u00e2y.",
-    "7874": "C\u00f3 v\u1ebb nh\u01b0 tr\u00ecnh c\u1eafm b\u1ed5 tr\u1ee3 b\u1ea1n \u0111ang d\u00f9ng (v%1) \u0111\u00e3 c\u0169. B\u1ea1n c\u00f3 th\u1ec3 t\u1ea3i v\u1ec1 b\u1ea3n m\u1edbi nh\u1ea5t (v%2) \u1edf d\u01b0\u1edbi \u0111\u00e2y.",
-    "7875": "Ph\u1ea7n b\u1ed5 tr\u1ee3 (v%1) \u0111ang d\u00f9ng l\u00e0 phi\u00ean b\u1ea3n m\u1edbi nh\u1ea5t.",
     "7879": "Quy\u1ec1n truy c\u1eadp t\u1edbi c\u00e1c th\u01b0 m\u1ee5c \u0111\u01b0\u1ee3c chia s\u1ebb t\u1eeb [X] \u0111\u00e3 b\u1ecb x\u00f3a.",
     "7880": "Quy\u1ec1n truy c\u1eadp t\u1edbi th\u01b0 m\u1ee5c \u0111\u00e3 b\u1ecb x\u00f3a.",
     "7881": "Xin c\u1ea3m \u01a1n! M\u1ed9t ng\u01b0\u1eddi trong \u0111\u1ed9i ng\u0169 t\u01b0 v\u1ea5n s\u1ebd tr\u1ea3 l\u1eddi th\u1eafc m\u1eafc c\u1ee7a qu\u00fd kh\u00e1ch trong th\u1eddi gian s\u1edbm nh\u1ea5t c\u00f3 th\u1ec3.",
@@ -1830,5 +1828,6 @@
     "17089": "Tr\u01b0\u1edbc khi ti\u1ebfn h\u00e0nh \u0111\u00f3ng t\u00e0i kho\u1ea3n, xin h\u00e3y cho ch\u00fang t\u00f4i bi\u1ebft l\u00fd do qu\u00fd kh\u00e1ch mu\u1ed1n ng\u01b0ng s\u1eed d\u1ee5ng d\u1ecbch v\u1ee5...",
     "17090": "M\u1ee5c b\u1ea1n mu\u1ed1n t\u1ea3i xu\u1ed1ng s\u1ebd l\u00e0m qu\u00e1 t\u1ea3i b\u0103ng th\u00f4ng b\u1ea1n hi\u1ec7n \u0111ang c\u00f3 cho truy\u1ec1n t\u1ea3i \u1edf \u0111\u1ecba ch\u1ec9 IP n\u00e0y, n\u1ebfu ti\u1ebfp t\u1ee5c th\u1ef1c hi\u1ec7n c\u00e1c phi\u00ean t\u1ea3i c\u00f3 th\u1ec3 s\u1ebd b\u1ecb gi\u00e1n \u0111o\u1ea1n. Xin xem x\u00e9t v\u00e0 c\u00e2n nh\u1eafc n\u00e2ng t\u00e0i kho\u1ea3n l\u00ean h\u1ea1ng PRO \u0111\u1ec3 t\u0103ng c\u01b0\u1eddng m\u1ee9c b\u0103ng th\u00f4ng.",
     "17091": "V\u1eabn Ti\u1ebfp T\u1ee5c T\u1ea3i Xu\u1ed1ng",
-    "17092": "B\u1ea1n c\u00f3 ch\u1eafc mu\u1ed1n h\u1ee7y b\u1ecf %1 phi\u00ean truy\u1ec1n t\u1ea3i n\u00e0y kh\u00f4ng?"
+    "17092": "B\u1ea1n c\u00f3 ch\u1eafc mu\u1ed1n h\u1ee7y b\u1ecf %1 phi\u00ean truy\u1ec1n t\u1ea3i n\u00e0y kh\u00f4ng?",
+    "17146": "This page is for registered users only."
 }

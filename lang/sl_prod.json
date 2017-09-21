@@ -926,6 +926,7 @@
     "7004": "Hvala za povratne informacije.",
     "7005": "Prosim, spodaj vpi\u0161ite razlog",
     "7006": "Nalagam...",
+    "7039": "Ne vpra\u0161aj me ponovno",
     "7086": "Prosim izberite Linux distribucijo",
     "7087": "Web brskalnik",
     "7088": "Hitrost prenosa:",
@@ -1079,9 +1080,6 @@
     "7747": "Po tem, pojdite prosim v svoj e-po\u0161tni predal in potrdite spremembo e-po\u0161tnega naslova.",
     "7869": "Ta e-po\u0161tni naslov je \u017ee bil registriran. Prosim, izberite drug e-po\u0161tni naslov za nadaljevanje.",
     "7872": "Dostop do vseh map, deljenih z vami s strani izbranih [X], bo izgubljen.",
-    "7873": "Spodaj lahko prevzamete dodatek (v%1).",
-    "7874": "Kot ka\u017ee, je va\u0161 trenutni dodatek (v%1) \u017ee zastarel. Spodaj lahko prevzamete zadnjo verzijo (v%2).",
-    "7875": "Va\u0161 dodatek (v%1) je zadnje verzije.",
     "7879": "Dostop do map, deljenih s strani [X], je bil umaknjen.",
     "7880": "Dostop do map je bil umaknjen",
     "7881": "Najlep\u0161a hvala! Nekdo od na\u0161ih podpornikov bo odgovoril na va\u0161o poizvedbo v najkraj\u0161em mo\u017enem \u010dasu.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

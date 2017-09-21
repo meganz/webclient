@@ -926,6 +926,7 @@
     "7004": "Dzi\u0119kujemy za Twoje zg\u0142oszenie.",
     "7005": "Wpisz sw\u00f3j pow\u00f3d poni\u017cej:",
     "7006": "Pobieranie danych...",
+    "7039": "Nie pytaj ponownie",
     "7086": "Wybierz wersj\u0119 Linuxa",
     "7087": "Przegl\u0105datka",
     "7088": "Szybko\u015b\u0107:",
@@ -1079,9 +1080,6 @@
     "7747": "Nast\u0119pnie, przejd\u017a do swojej skrzynki odbiorczej i potwierd\u017a zmian\u0119.",
     "7869": "Adres email zosta\u0142 ju\u017c zarejestrowany. Prosz\u0119 u\u017cy\u0107 innego adresu email aby kontynuowa\u0107.",
     "7872": "Dost\u0119p do udost\u0119pnionych katalog\u00f3w dla wybranych kontakt\u00f3w [X] zostanie utracony.",
-    "7873": "Poni\u017cej mo\u017cesz pobra\u0107 nowe rozszerzenie (v%1).",
-    "7874": "Wygl\u0105da na to, \u017ce Twoje rozszerzenie (v%1) jest nieaktualne. Mo\u017cesz pobra\u0107 najnowsz\u0105 wersj\u0119 (v%2) poni\u017cej.",
-    "7875": "Twoje rozszerzenie (v%1) jest aktualne.",
     "7879": "Dost\u0119p do katalog\u00f3w udost\u0119pniony przez [X] zosta\u0142 usuni\u0119ty.",
     "7880": "Dost\u0119p do katalog\u00f3w zosta\u0142\u00a0usuni\u0119ty",
     "7881": "Dzi\u0119kujemy. Nasi konsultacji postaraj\u0105 si\u0119\u00a0odpowiedzie\u0107 na zapytania jak najszybciej.",
@@ -1830,5 +1828,6 @@
     "17089": "Przed zamkni\u0119ciem swojego konta, chcieliby\u015bmy si\u0119 dowiedzie\u0107 dlaczego na opuszczasz...",
     "17090": "Zakolejkowane pobierania przekraczaj\u0105 dost\u0119pny limit przypisany do Twojego adresu IP i mog\u0105 zosta\u0107 wstrzymane. Zalecany zakup jednego z kont PRO aby pozby\u0107 si\u0119 podobnych ogranicze\u0144 w przysz\u0142o\u015bci.",
     "17091": "Kontynuuj pobieranie",
-    "17092": "Czy na pewno chcesz anulowa\u0107 te %1 transfery plikow?"
+    "17092": "Czy na pewno chcesz anulowa\u0107 te %1 transfery plikow?",
+    "17146": "This page is for registered users only."
 }

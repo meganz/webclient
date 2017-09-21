@@ -926,6 +926,7 @@
     "7004": "Kiitos palautteestasi.",
     "7005": "Ole hyv\u00e4 ja kerro miksi",
     "7006": "Ladataan...",
+    "7039": "\u00c4l\u00e4 kysy uudelleen",
     "7086": "Ole hyv\u00e4 ja valitse Linux-jakelusi",
     "7087": "Web-selain",
     "7088": "Siirtonopeus:",
@@ -1079,9 +1080,6 @@
     "7747": "T\u00e4m\u00e4n j\u00e4lkeen mene s\u00e4hk\u00f6postiisi ja vahvista t\u00e4m\u00e4 s\u00e4hk\u00f6postiosoitteen muutos.",
     "7869": "T\u00e4m\u00e4 s\u00e4hk\u00f6postiosoite on jo rekister\u00f6ity. Ole hyv\u00e4 ja valitse vaihtoehtoinen s\u00e4hk\u00f6postiosoite jatkaaksesi.",
     "7872": "P\u00e4\u00e4sy jokaiseen [X] sinun kanssa jakamiin kansioihin menetet\u00e4\u00e4n.",
-    "7873": "Voit ladata laajennuksen (v%1) alta.",
-    "7874": "Nykyinen laajennuksesi (v%1) n\u00e4ytt\u00e4isi olevan vanhentunut. Voit ladata viimeisimm\u00e4n laajennuksen (v%2) alta.",
-    "7875": "Laajennuksesi (v%1) on ajan tasalla.",
     "7879": "P\u00e4\u00e4sy k\u00e4ytt\u00e4j\u00e4n [X] jakamiin kansioihin poistettiin.",
     "7880": "P\u00e4\u00e4sy kansioihin poistettiin.",
     "7881": "Kiitos! Yksi tukihenkil\u00f6ist\u00e4mme vastaa tiedusteluusi mahdollisimman pian.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

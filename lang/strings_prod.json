@@ -1496,7 +1496,7 @@
         "context": ""
     },
     "999": {
-        "text": "Would you like to upgrade your temporary session to a free account now?",
+        "text": "Would you like to upgrade your temporary session to a FREE account now?",
         "context": "Ephemeral session refers to the current session the user has on MEGA which is of temporary nature"
     },
     "1000": {
@@ -3707,6 +3707,10 @@
         "text": "Loading...",
         "context": "Label to show when an account detail request is waiting for the server response."
     },
+    "7039": {
+        "text": "Do not ask me again",
+        "context": ""
+    },
     "7086": {
         "text": "Please select your Linux Distro",
         "context": ""
@@ -4318,18 +4322,6 @@
     "7872": {
         "text": "Access to any folders shared with you by selected [X] will be lost.",
         "context": "This is shown on a confirmation message dialog when removing one or more contacts. The placeholder [X] will be replaced with \"contact\" or \"contacts\" depending on how many contacts are being removed."
-    },
-    "7873": {
-        "text": "You can download the extension (v%1) below.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user they can download a specific version of the extension further down the page. The placeholder %1 will be replaced with the version of the extension e.g. \"3.2.8\". So the text would read \"You can download the extension (v3.2.8) below.\""
-    },
-    "7874": {
-        "text": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is not the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.7\". The placeholder %2 will be replaced with the newest version available for download e.g. \"3.2.8\". So the text would read \"It looks like your current extension (v3.2.7) is out of date. You can download the latest (v3.2.8) below.\""
-    },
-    "7875": {
-        "text": "Your extension (v%1) is up to date.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.8\". So the text would read \"Your extension (v3.2.8) is up to date.\""
     },
     "7879": {
         "text": "Access to folders shared by [X] was removed.",
@@ -7326,5 +7318,9 @@
     "17092": {
         "text": "Are you sure you want to cancel these %1 file transfers?",
         "context": "A message shown to the user when they attempt to cancel a bunch of selected transfers. Please leave the %1 placeholder which will be replaced with the number of file transfers."
+    },
+    "17146": {
+        "text": "This page is for registered users only.",
+        "context": "A dialog message when user is trying to access the page from an ephemeral session which is allowed for registered users only."
     }
 }

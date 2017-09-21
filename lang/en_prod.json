@@ -373,7 +373,7 @@
     "996": "Choose country",
     "997": "Adding contacts is only for registered users.",
     "998": "Please create your free account",
-    "999": "Would you like to upgrade your temporary session to a free account now?",
+    "999": "Would you like to upgrade your temporary session to a FREE account now?",
     "1000": "Avoid losing access. Free registration is highly recommended!",
     "1001": "Remove contact",
     "1002": "Are you sure you want to remove [X] from your contact-list?",
@@ -926,6 +926,7 @@
     "7004": "Thank you for your feedback.",
     "7005": "Please enter the reason below",
     "7006": "Loading...",
+    "7039": "Do not ask me again",
     "7086": "Please select your Linux Distro",
     "7087": "Web Browser",
     "7088": "Transfer Speed:",
@@ -1079,9 +1080,6 @@
     "7747": "Following that, please go to your email inbox and confirm this email change.",
     "7869": "This email address has already been registered. Please choose an alternative email address to proceed.",
     "7872": "Access to any folders shared with you by selected [X] will be lost.",
-    "7873": "You can download the extension (v%1) below.",
-    "7874": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-    "7875": "Your extension (v%1) is up to date.",
     "7879": "Access to folders shared by [X] was removed.",
     "7880": "Access to folders was removed.",
     "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

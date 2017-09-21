@@ -926,6 +926,7 @@
     "7004": "Terima kasih untuk feedback anda.",
     "7005": "Harap masukan alasan dibawah ini",
     "7006": "Memuat...",
+    "7039": "Jangan tanya saya lagi",
     "7086": "Harap pilih Linux Distro anda",
     "7087": "Web Browser",
     "7088": "Kecepatan transfer:",
@@ -1079,9 +1080,6 @@
     "7747": "Berikutnya, harap pergi ke inbox email anda dan konfirmasi perubahan email ini.",
     "7869": "Alamat email ini telah terdaftar. Harap pilih alternatif alamat email untuk melanjutkan.",
     "7872": "Akses ke seluruh folder yang dibagikan dengan anda oleh [X] akan hilang.",
-    "7873": "Anda dapat mendownload extension (v%1) di bawah ini.",
-    "7874": "Sepertinya extension anda (v%1) sudah terlalu lama. Anda dapat mendownload yang terbaru (v%2) di bawah ini.",
-    "7875": "Extension anda (v%1) sudah terbaru.",
     "7879": "Akses ke folder yang dibagikan oleh [X] telah dihapus.",
     "7880": "Akses ke folder telah dihapus.",
     "7881": "Terima kasih! Salah satu konsultan support kami akan menjawab pertanyaan anda secepat mungkin.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

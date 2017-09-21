@@ -926,6 +926,7 @@
     "7004": "Gracias por tus comentarios.",
     "7005": "Por favor, introduce el motivo a continuaci\u00f3n",
     "7006": "Cargando...",
+    "7039": "No preguntar otra vez",
     "7086": "Selecciona tu distribuci\u00f3n Linux",
     "7087": "Navegador",
     "7088": "Velocidad de transferencia",
@@ -1079,9 +1080,6 @@
     "7747": "A continuaci\u00f3n, ve a tu bandeja de entrada y confirma el cambio de correo.",
     "7869": "Este correo electr\u00f3nico ya est\u00e1 registrado. Por favor, elige un correo alternativo para proceder.",
     "7872": "Perder\u00e1s el acceso a las carpetas compartidas contigo por este\/estos [X]. ",
-    "7873": "Puedes descargar la extensi\u00f3n (v%1) a continuaci\u00f3n.",
-    "7874": "Parece que tu extensi\u00f3n actual (v%1) est\u00e1 obsoleta. Puedes descargar la \u00faltima (v%2) a continuaci\u00f3n.",
-    "7875": "Tu extensi\u00f3n (v%1) est\u00e1 actualizada.",
     "7879": "El acceso a las carpetas compartidas por [X] ha sido eliminado.",
     "7880": "El acceso a la carpeta ha sido eliminado.",
     "7881": "\u00a1Gracias! Uno de nuestro t\u00e9cnicos de soporte responder\u00e1 a tu consulta tan pronto como sea posible.",
@@ -1830,5 +1828,6 @@
     "17089": "Antes de eliminar tu cuenta, nos gustar\u00eda saber por qu\u00e9 nos dejas...",
     "17090": "La descarga en cola supera la cuota de transferencia disponible para tu direcci\u00f3n IP y por lo tanto podr\u00eda interrumpirse. Compra una cuenta PRO para aumentar considerablemente tu cuota de transferencia.",
     "17091": "Continuar con la descarga",
-    "17092": "\u00bfEst\u00e1s seguro de querer cancelar estas %1 transferencias de archivos?"
+    "17092": "\u00bfEst\u00e1s seguro de querer cancelar estas %1 transferencias de archivos?",
+    "17146": "This page is for registered users only."
 }

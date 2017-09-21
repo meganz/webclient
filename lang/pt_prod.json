@@ -926,6 +926,7 @@
     "7004": "Obrigado pela sua opini\u00e3o.",
     "7005": "Por favor indique a raz\u00e3o abaixo",
     "7006": "Carregando...",
+    "7039": "N\u00e3o voltar a perguntar",
     "7086": "Por favor seleccione a sua distribui\u00e7\u00e3o de Linux",
     "7087": "Navegador",
     "7088": "Velocidade de transfer\u00eancia:",
@@ -1079,9 +1080,6 @@
     "7747": "Em seguida, por favor verifique a caixa de entrada do seu email e confirme esta mudan\u00e7a de email.",
     "7869": "Este endere\u00e7o de email j\u00e1 foi registado. Por favor escolha um endere\u00e7o de email alternativo para prosseguir.",
     "7872": "O acesso a quaisquer pastas partilhadas consigo com [X] seleccionados ser\u00e1 perdido.",
-    "7873": "Pode fazer a descarga do extra (v%1) abaixo.",
-    "7874": "A sua extens\u00e3o actual (v%1) parece estar desactualizada. Pode descarregar a \u00faltima (v%2) abaixo.",
-    "7875": "O seu extra (v%1) est\u00e1 actualizado.",
     "7879": "O acesso \u00e0s pastas partilhadas por [X] foi removido.",
     "7880": "O acesso \u00e0s pastas foi removido.",
     "7881": "Obrigado! Um dos nossos consultores de apoio ir\u00e3o responder \u00e0 sua quest\u00e3o assim que poss\u00edvel.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

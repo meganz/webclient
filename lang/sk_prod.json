@@ -926,6 +926,7 @@
     "7004": "Dakujeme za va\u0161u reakciu.",
     "7005": "Pros\u00edm, ni\u017e\u0161ie zadajte d\u00f4vod",
     "7006": "Na\u010d\u00edtavanie...",
+    "7039": "U\u017e sa ma nep\u00fdta\u0165",
     "7086": "Pros\u00edm vyberte si va\u0161u Linuxov\u00fa distrib\u00faciu",
     "7087": "Webov\u00fd prehliada\u010d",
     "7088": "R\u00fdchlos\u0165 prenosu:",
@@ -1079,9 +1080,6 @@
     "7747": "N\u00e1sledne na to, pros\u00edm cho\u010fte do svojej emailovej schr\u00e1nky a potvr\u010fte t\u00fato zmenu emailu.",
     "7869": "T\u00e1to emailov\u00e1 adresa u\u017e bola zaregistrovan\u00e1. Pros\u00edm, pre pokra\u010dovanie si vyberte in\u00fa emailov\u00fa adresu.",
     "7872": "Pr\u00edstup ku ak\u00fdmko\u013evek prie\u010dinkom zdie\u013ean\u00fdm s vami pou\u017e\u00edvate\u013eom [X] bude straten\u00fd.",
-    "7873": "Roz\u0161\u00edrenie (v%1) si m\u00f4\u017eete stiahnu\u0165 ni\u017e\u0161ie.",
-    "7874": "Vyzer\u00e1 to tak, \u017ee va\u0161e roz\u0161\u00edrenie (v%1) nie je aktu\u00e1lne. Najnov\u0161ie (v%2) si m\u00f4\u017eete stiahnu\u0165 ni\u017e\u0161ie.",
-    "7875": "Va\u0161e roz\u0161\u00edrenie (v%1) je aktu\u00e1lne.",
     "7879": "Pr\u00edstup do prie\u010dinkov zdie\u013ean\u00fdch pou\u017e\u00edvate\u013eom [X] bol odstr\u00e1nen\u00fd.",
     "7880": "Pr\u00edstup k prie\u010dinku bol odstr\u00e1nen\u00fd",
     "7881": "\u010eakujeme! Jeden z konzultantov na\u0161ej podpory bude na v\u00e1\u0161 dotaz reagova\u0165 hne\u010f ako to bude mo\u017en\u00e9.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

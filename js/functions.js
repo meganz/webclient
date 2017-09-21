@@ -2162,8 +2162,57 @@ if (typeof sjcl !== 'undefined') {
         return result;
     };
 
+    /**
+     * addContactToFolderShare
+     *
+     * Add verified email addresses to folder shares.
+     */
+    Share.prototype.addContactToFolderShare = function addContactToFolderShare() {
+
+        var promise = MegaPromise.resolve();
+        var targets = [];
+        var $shareDialog = $('.share-dialog');
+        var $newContacts;
+        var permissionLevel;
+        var iconPermLvl;
+        var permissionClass;
+        var selectedNode;
+
+        // Share button enabled
+        if ($.dialog === 'share' && !$shareDialog.find('.dialog-share-button').is('.disabled')) {
+
+            selectedNode = $.selected[0];
+            $newContacts = $shareDialog.find('.token-input-list-mega .token-input-token-mega');
+
+            // Is there a new contacts planned for addition to share
+            if ($newContacts.length) {
+
+                // Determin current group permission level
+                iconPermLvl = $shareDialog.find('.permissions-icon')[0];
+                permissionClass = checkMultiInputPermission($(iconPermLvl));
+                permissionLevel = sharedPermissionLevel(permissionClass[0]);
+
+                // Add new planned contact to list
+                $.each($newContacts, function(ind, val) {
+                    targets.push({u: $(val).contents().eq(1).text(), r: permissionLevel});
+                });
+            }
+
+            closeDialog();
+            $('.export-links-warning').addClass('hidden');
+
+            // Add new contacts to folder share
+            if (targets.length > 0) {
+                promise = doShare(selectedNode, targets, true);
+            }
+        }
+
+        return promise;
+    };
+
     Share.prototype.updateNodeShares = function() {
 
+        var self = this;
         var promise = new MegaPromise();
 
         loadingDialog.show();
@@ -2174,7 +2223,7 @@ if (typeof sjcl !== 'undefined') {
                 if (Object($.changedPermissions).length > 0) {
                     promises.push(doShare($.selected[0], $.changedPermissions, true));
                 }
-                promises.push(addContactToFolderShare());
+                promises.push(self.addContactToFolderShare());
 
                 MegaPromise.allDone(promises)
                     .always(function() {

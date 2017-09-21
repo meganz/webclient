@@ -539,7 +539,7 @@ TransferQueue.prototype.push = function(cl) {
     var self = this;
     var showToast = function() {
         if (M.addDownloadToast) {
-            showTransferToast.apply(window, M.addDownloadToast);
+            M.showTransferToast.apply(M, M.addDownloadToast);
             M.addDownloadToast = null;
         }
     };

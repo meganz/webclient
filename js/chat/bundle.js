@@ -94,7 +94,7 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 
-	        hideEmptyGrids();
+	        M.hideEmptyGrids();
 
 	        $('.fm-files-view-icon').addClass('hidden');
 	        $('.fm-blocks-view').addClass('hidden');
@@ -816,7 +816,7 @@ React.makeElement = React['createElement'];
 
 	    self.hideAllChats();
 
-	    hideEmptyGrids();
+	    M.hideEmptyGrids();
 
 	    $('.files-grid-view').addClass('hidden');
 	    $('.fm-blocks-view').addClass('hidden');

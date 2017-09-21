@@ -1911,6 +1911,7 @@ else if (!b_u) {
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
+        jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
         jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
     } // !is_mobile
@@ -1969,7 +1970,9 @@ else if (!b_u) {
         jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
+        jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
         jsl.push({f:'html/key.html', n: 'key', j:0});
@@ -2904,7 +2907,7 @@ if (!window.setImmediate && window.requestIdleCallback) {
         'use strict';
 
         // XXX: nothing from the code depends on the args
-        return window.requestIdleCallback(callback);
+        return window.requestIdleCallback(callback, {timeout: 20});
     };
 
     window.clearImmediate = function _clearImmediate(pid) {
@@ -2914,7 +2917,7 @@ if (!window.setImmediate && window.requestIdleCallback) {
     };
 }
 
-var onIdle = window.requestIdleCallback || function(handler) {
+var onIdle = function(handler) {
         var startTime = Date.now();
 
         return setTimeout(function() {
@@ -2926,6 +2929,14 @@ var onIdle = window.requestIdleCallback || function(handler) {
             });
         }, 1);
     };
+
+if (window.requestIdleCallback) {
+    onIdle = function onIdle(callback) {
+        'use strict';
+
+        return window.requestIdleCallback(callback, {timeout: 20});
+    };
+}
 
 function makeUUID(a) {
     'use strict';

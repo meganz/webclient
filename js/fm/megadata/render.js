@@ -164,18 +164,7 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
                 }
             });
 
-            $('.shared-details-info-block .fm-share-copy').rebind('click', function(e) {
-                M.safeShowDialog('copy', function() {
-                    var $dialog = $('.fm-dialog.copy-dialog');
-
-                    $.copyDialog = 'copy'; // this is used like identifier when key with key code 27 is pressed
-                    $.mcselected = M.RootID;
-                    $('.copy-dialog .dialog-copy-button').addClass('active');
-                    $dialog.removeClass('hidden');
-                    handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
-                    return $dialog;
-                });
-            });
+            $('.shared-details-info-block .fm-share-copy').rebind('click', openCopyDialog);
 
             // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
             $('.shared-details-info-block .fm-leave-share').rebind('click', function(e) {
@@ -558,6 +547,14 @@ MegaData.prototype.searchPath = function() {
     $('.fm-blocks-view, .files-grid-view').removeClass('search');
 };
 
+MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
+    'use strict';
+
+    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-invalid-folder').addClass('hidden');
+    $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
+    $('.fm-empty-pad.fm-empty-sharef').remove();
+};
+
 /**
  * A function, which would be called on every DOM update (or scroll). This func would implement
  * throttling, so that we won't update the UI components too often.
@@ -579,8 +576,10 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
 
     var node = megaRender.getDOMNode(aHandle, M.d[aHandle]);
 
-    if (selectionManager && selectionManager.selected_list) {
-        if (selectionManager.selected_list.indexOf(aHandle) > -1) {
+    var selList = selectionManager && selectionManager.selected_list ? selectionManager.selected_list : $.selected;
+
+    if (selList && selList.length) {
+        if (selList.indexOf(aHandle) > -1) {
             node.classList.add('ui-selected');
         }
         else {
@@ -589,7 +588,14 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         node.classList.remove('ui-selectee');
     }
 
-    M.d[aHandle].seen = true;
+    if (M.d[aHandle]) {
+        M.d[aHandle].seen = true;
+    }
+    else {
+        if (d) {
+            console.error("megaListRenderNode was called with aHandle:", aHandle, "which was not found in M.d");
+        }
+    }
 
     return node;
 };

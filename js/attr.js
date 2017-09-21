@@ -834,39 +834,6 @@ var attribCache = false;
     var uaPacketParserHandler = Object.create(null);
 
     /**
-     * Updated the local version cache IF the action packet contains a version
-     *
-     * @param actionPacketUserId
-     * @param attributeName
-     * @param actionPacketVersion
-     */
-    ns.handleVersionFromActionPacket = function (actionPacketUserId, attributeName, actionPacketVersion) {
-        if (
-            actionPacketVersion &&
-            !mega.attr._versions[actionPacketUserId + "_" + attributeName]
-        ) {
-            logger.debug("Got new version from ap: ", actionPacketUserId + "_" + attributeName, actionPacketVersion);
-            mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
-        }
-    };
-
-    /**
-     * Process action-packet for attribute updates.
-     *
-     * @param actionPacketUserId
-     * @param attributeName
-     * @param actionPacketVersion
-     */
-    ns.handleVersionFromActionPacket = function (actionPacketUserId, attributeName, actionPacketVersion) {
-        if (
-            actionPacketVersion &&
-            !mega.attr._versions[actionPacketUserId + "_" + attributeName]
-        ) {
-            mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
-        }
-    };
-
-    /**
      * Process action-packet for attribute updates.
      *
      * @param {String}  attrName          Attribute name

@@ -16857,11 +16857,11 @@
     },
     "17048": {
         "text": "Improve your cloud capacity![A]Get more space & transfer quota with a PRO account!",
-        "context": "Message to promote PRO accounts"
+        "context": "Message to promote PRO accounts. [A] will be a newline break."
     },
     "17049": {
         "text": "The Recovery Key has been backed up into: %1s.[A]While the file remains in this path, you will find it at the Saved for Offline Section.[A]Note: It will be deleted if you log out, please store it in a safe place.",
-        "context": "success message when the MasterKey file has been downloaded\r\n"
+        "context": "success message when the Recovery Key file has been downloaded\r\n[A] will be newline breaks."
     },
     "17050": {
         "text": "The key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
@@ -17026,5 +17026,25 @@
     "17092": {
         "text": "Are you sure you want to cancel these %1 file transfers?",
         "context": "A message shown to the user when they attempt to cancel a bunch of selected transfers. Please leave the %1 placeholder which will be replaced with the number of file transfers."
+    },
+    "17093": {
+        "text": "Upload and update",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user update the file in the destination folder with generating a new version with the file he is uploading.\r\n"
+    },
+    "17094": {
+        "text": "Upload and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is uploading to avoid filename conflict.\r\n"
+    },
+    "17095": {
+        "text": "Copy and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is copying to avoid filename conflict.\r\n"
+    },
+    "17096": {
+        "text": "Move and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is moving to avoid filename conflict.\r\n"
+    },
+    "17097": {
+        "text": "The file will be updated with version history: [A]Learn more[\/A]",
+        "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
     }
 }

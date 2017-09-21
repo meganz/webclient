@@ -3955,8 +3955,8 @@
     "16770": "\u05e9\u05d9\u05ea\u05d5\u05e4\u05d9\u05dd \u05e0\u05db\u05e0\u05e1\u05d9\u05dd",
     "16771": "\u05db\u05dc \u05d4\u05de\u05d9\u05d3\u05e2 \u05d4\u05e7\u05e9\u05d5\u05e8 \u05dc\u05d0\u05d5\u05ea\u05d5 \u05d0\u05d9\u05e9 \u05e7\u05e9\u05e8 \u05d9\u05d9\u05d0\u05d1\u05d3.",
     "16772": "\u05db\u05dc \u05d4\u05de\u05d9\u05d3\u05e2 \u05d4\u05e7\u05e9\u05d5\u05e8 \u05dc\u05d0\u05d5\u05ea\u05dd \u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8 \u05d9\u05d9\u05d0\u05d1\u05d3.",
-    "16773": "%1$s [A]is typing...[\/A]",
-    "16774": "%1$s [A]are typing...[\/A]",
+    "16773": "%1$s [A]\u05de\u05e7\u05dc\u05d9\u05d3...[\/A]",
+    "16774": "%1$s [A]\u05de\u05e7\u05dc\u05d9\u05d3\u05d9\u05dd...[\/A]",
     "16775": "%1$s [A]and more are typing...[\/A]",
     "16776": "\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0",
     "16778": "\u05dc\u05d4\u05e1\u05d9\u05e8 \u05de\u05e9\u05de\u05d9\u05e8\u05d4 \u05d1\u05de\u05e6\u05d1 \u05dc\u05d0 \u05de\u05e7\u05d5\u05d5\u05df?",
@@ -4255,5 +4255,10 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17093": "Upload and update",
+    "17094": "Upload and rename",
+    "17095": "Copy and rename",
+    "17096": "Move and rename",
+    "17097": "The file will be updated with version history: [A]Learn more[\/A]"
 }

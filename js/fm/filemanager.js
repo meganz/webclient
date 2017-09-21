@@ -1321,7 +1321,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             return true;
         }
 
-        if (!is_fm() && (page !== 'login') && (page.substr(0, 3) !== 'pro')) {
+        if (!is_fm() && page !== 'login' && page.substr(0, 3) !== 'pro') {
             return true;
         }
 
@@ -1486,15 +1486,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
             // ctrl+a/cmd+a - select all
             selectionManager.select_all();
-        }
-        else if (e.keyCode == 37 && slideshowid) {
-            slideshow_prev();
-        }
-        else if (e.keyCode == 39 && slideshowid) {
-            slideshow_next();
-        }
-        else if (e.keyCode == 27 && slideshowid) {
-            slideshow(slideshowid, true);
         }
         else if (e.keyCode == 27) {
             if ($.hideTopMenu) {

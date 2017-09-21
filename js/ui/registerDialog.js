@@ -50,7 +50,7 @@
                         $('.fm-avatar img').attr('src', useravatar.mine());
                     });
                 }
-                Soon(topmenuUI);
+                onIdle(topmenuUI);
 
                 if (typeof onAccountCreated === 'function') {
                     onAccountCreated(login, rv);

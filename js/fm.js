@@ -2078,7 +2078,7 @@ function closeImportContactNotification(c) {
     $(c + ' input#token-input-').blur();
 }
 
-function closeDialog() {
+function closeDialog(ev) {
     "use strict";
 
     if (d) {
@@ -2158,7 +2158,10 @@ function closeDialog() {
         delete $.moveDialog;
         delete $.copyToShare;
         delete $.copyrightsDialog;
-        delete $.onImportCopyNodes;
+
+        if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button')) {
+            delete $.onImportCopyNodes;
+        }
     }
     $('.fm-dialog').removeClass('arrange-to-back');
 

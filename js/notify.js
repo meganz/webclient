@@ -77,6 +77,7 @@ var notify = {
                 if (notifications) {
                     for (var i = 0; i < notifications.length; i++) {
 
+                        // Check that the user has enabled notifications of this type or skip it
                         if (notify.isUnwantedNotification(notifications[i])) {
                             continue;
                         }
@@ -119,12 +120,26 @@ var notify = {
             return false;
         }
 
-        var notification = actionPacket;                // The action packet
-        var id = makeid(10);                            // Make random ID
-        var type = notification.a;                      // Type of notification e.g. share
-        var currentTime = unixtime();                   // Get the current timestamps in seconds
-        var seen = false;                               // New notification, so mark as unread
-        var userHandle = notification.u || notification.ou;// User handle e.g. new share from this user
+        var notification = actionPacket;                    // The action packet
+        var id = makeid(10);                                // Make random ID
+        var type = notification.a;                          // Type of notification e.g. share
+        var currentTime = unixtime();                       // Get the current timestamps in seconds
+        var seen = false;                                   // New notification, so mark as unread
+        var userHandle = notification.u || notification.ou; // User handle e.g. new share from this user
+
+        // Update store of user emails that it knows about if a contact request was recently accepted
+        notify.addUserEmails();
+
+        // If the user handle is not known to the local state we need to fetch the email from the API. This happens in
+        // some sharing scenarios where a user is part of a share then another user adds files to the share but they
+        // are not contacts with that other user so the local state has no information about them and would display a
+        // broken notification if the email is not known.
+        if (typeof notify.userEmails[userHandle] === 'undefined') {
+
+            // Once the email is fetched it will re-call the notifyFromActionPacket function with the same actionPacket
+            notify.fetchUserEmailFromApi(userHandle, actionPacket);
+            return false;
+        }
 
         // Add notifications to start of the list
         notify.notifications.unshift({
@@ -137,9 +152,6 @@ var notify = {
             userHandle: userHandle
         });
 
-        // Update store of user emails that it knows about if a contact request was recently accepted
-        notify.addUserEmails();
-
         // Show the new notification icon
         notify.countAndShowNewNotifications();
 
@@ -147,6 +159,35 @@ var notify = {
         if (!notify.$popup.hasClass('hidden')) {
             notify.renderNotifications();
         }
+    },
+
+    /**
+     * Fetches the user's email address from the API based on the user handle
+     * @param {String} userHandle The user handle to fetch the email address for e.g. 555wupYjkMU
+     * @param {Object} actionPacket An action packet which will be resent to the notifyFromActionPacket function after
+     *                              the user's email has been returned. An example 'put' action packet for testing is:
+     *                              {"a":"put","n":"U8oHEL7Q","u":"555wupYjkMU","f":[{"h":"F5QQSDJR","t":0}]}
+     */
+    fetchUserEmailFromApi: function(userHandle, actionPacket) {
+
+        'use strict';
+
+        // Make User Get Email (uge) request to get the user's email address from the user handle
+        api_req({ a: 'uge', 'u': userHandle }, {
+            callback: function(result) {
+
+                // Exit if there was an API error
+                if (typeof result === 'number' && result < 0) {
+                    return false;
+                }
+
+                // Update the local state with the user's email
+                notify.userEmails[userHandle] = result;
+
+                // Re-call the notify function with the action packet now that the email has been stored
+                notify.notifyFromActionPacket(actionPacket);
+            }
+        });
     },
 
     /**
@@ -354,7 +395,7 @@ var notify = {
     /**
      * Populates the user emails into a list which can be looked up later for incoming
      * notifications where there is no known contact handle e.g. pending shares/contacts
-     * @param {Array} pendingContactUsers The
+     * @param {Array} pendingContactUsers An array of objects (with user handle and email) for the pending contacts
      */
     addUserEmails: function(pendingContactUsers) {
 

@@ -85,7 +85,7 @@
     var setDialogButtonState = function($btn) {
         $btn = $($btn);
 
-        if (!getNonCircularNodes().length) {
+        if (!getNonCircularNodes().length && !$.onImportCopyNodes) {
             $btn.addClass('disabled');
         }
         else {
@@ -700,6 +700,7 @@
                 megaChat.chats[id].attachNodes($.selected);
             }
 
+            delete $.onImportCopyNodes;
             return false;
         });
 

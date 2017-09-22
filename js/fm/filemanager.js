@@ -101,8 +101,8 @@ FileManager.prototype.initFileManagerUI = function() {
         loadSubPage('register');
     });
 
-    $('.fm-dialog-overlay').rebind('click.fm', function() {
-        closeDialog();
+    $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
+        closeDialog(ev);
         $.hideContextMenu();
 
         // For ephemeral session redirect to 'fm' page

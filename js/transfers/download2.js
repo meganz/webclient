@@ -641,10 +641,7 @@ var dlmanager = {
         }
         else if (typeof res === 'object') {
             if (res.efq) {
-                // dlmanager.efq = true;
-                if (d) {
-                    console.info('Ignoring EFQ flag...', res);
-                }
+                dlmanager.efq = true;
             }
             else {
                 delete dlmanager.efq;
@@ -1380,6 +1377,24 @@ var dlmanager = {
             $('.default-big-button.create-account', $oqbbl).rebind('click', showOverQuotaRegisterDialog);
         }
 
+        $dialog.addClass('hidden-bottom');
+        if (flags & this.LMT_HASACHIEVEMENTS || $dialog.hasClass('gotEFQb')) {
+            $dialog.removeClass('hidden-bottom');
+        }
+        else if (!(flags & this.LMT_ISREGISTERED)) {
+            var $pan = $('.not-logged.no-achievements', $dialog);
+
+            if ($pan.length && !$pan.hasClass('flag-pcset')) {
+                $pan.addClass('flag-pcset');
+
+                M.req('efqb').done(function(val) {
+                    if (val) {
+                        $dialog.removeClass('hidden-bottom').addClass('gotEFQb');
+                        $pan.text(String($pan.text()).replace('10%', val + '%'));
+                    }
+                });
+            }
+        }
 
         if (flags & this.LMT_HASACHIEVEMENTS) {
             $dialog.addClass('achievements');
@@ -1611,39 +1626,16 @@ var dlmanager = {
             });
         }
 
-        if (flags & this.LMT_ISREGISTERED) {
-            if (!(flags & this.LMT_HASACHIEVEMENTS)) {
-                $dialog.addClass('hidden-bottom');
-            }
-        }
-        else if (!(flags & this.LMT_HASACHIEVEMENTS)) {
-            var $pan = $('.not-logged.no-achievements', $dialog);
-
-            if ($pan.length && !$pan.hasClass('flag-pcset')) {
-                $pan.addClass('flag-pcset');
-
-                M.req('efqb').done(function(val) {
-                    if (!val) {
-                        $dialog.addClass('hidden-bottom');
-                    }
-                    else {
-                        $pan.text(String($pan.text()).replace('10%', val + '%'));
-                    }
-                });
-            }
-        }
-
-
-        var doCloseModal = function closeModal() {
-            clearInterval(dlmanager._overQuotaTimeLeftTick);
-            $('.fm-dialog-overlay').unbind('click.dloverq');
-            $dialog.unbind('dialog-closed');
-            closeDialog();
-            return false;
-        };
-
         M.safeShowDialog('download-overquota', function() {
+            var doCloseModal = function closeModal() {
+                clearInterval(dlmanager._overQuotaTimeLeftTick);
+                $('.fm-dialog-overlay').unbind('click.dloverq');
+                $dialog.unbind('dialog-closed');
+                closeDialog();
+                return false;
+            };
             dlmanager._overquotaInfo();
+            dlmanager._overquotaClickListeners($dialog, flags);
 
             $('.fm-dialog-overlay').rebind('click.dloverq', doCloseModal);
 
@@ -1653,8 +1645,6 @@ var dlmanager = {
                 .rebind('dialog-closed', doCloseModal)
                 .find('.fm-dialog-close')
                 .rebind('click.quota', doCloseModal);
-
-            dlmanager._overquotaClickListeners($dialog, flags);
 
             api_req({a: 'log', e: 99648, m: 'on overquota dialog shown'});
 

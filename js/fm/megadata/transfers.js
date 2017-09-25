@@ -1283,11 +1283,12 @@ MegaData.prototype.ulerror = function(ul, error) {
         mBroadcaster.sendMessage('upload:error', id, error);
 
         if (error === EOVERQUOTA) {
-            ul_queue.filter(isQueueActive)
-                .forEach(function(ul) {
-                    mBroadcaster.sendMessage('upload:error', ul.id, error);
-                });
-
+            if (mBroadcaster.hasListener('upload:error')) {
+                ul_queue.filter(isQueueActive)
+                    .forEach(function(ul) {
+                        mBroadcaster.sendMessage('upload:error', ul.id, error);
+                    });
+            }
             mega.ui.tpp.hide();
             ulmanager.abort(null);
             $("tr[id^='ul_'] .transfer-status").text(l[1010]);

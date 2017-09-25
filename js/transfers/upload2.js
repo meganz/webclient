@@ -412,6 +412,10 @@ var ulmanager = {
         if (file.faid) {
             req.n[0].fa = api_getfa(file.faid);
         }
+        if (file.ddfa) {
+            // fa from deduplication
+            req.n[0].fa = file.ddfa;
+        }
 
         if (target) {
             var sn = M.getShareNodesSync(target);
@@ -749,7 +753,7 @@ var ulmanager = {
                 else {
                     File.file.filekey = ctx.n.k;
                     File.file.response = ctx.n.h;
-                    File.file.faid = ctx.n.fa;
+                    File.file.ddfa = ctx.n.fa;
                     File.file.path = ctx.uq.path;
                     File.file.name = ctx.uq.name;
                     // File.file.done_starting();

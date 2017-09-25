@@ -1627,9 +1627,11 @@
     "6140": "account",
     "6141": "riconoscimenti",
     "6142": "Chiedi sempre per la posizione del download",
+    "6143": "cache",
     "6144": "annulla tutto",
     "6145": "cattura",
     "6146": "pulisci trasferimenti",
+    "6147": "cancella cache",
     "6148": "annulla selezione",
     "6149": "appunti",
     "6151": "Esporta chiave master",
@@ -4296,5 +4298,14 @@
     "17095": "Copia e rinomina",
     "17096": "Sposta e rinomina",
     "17097": "Il file verr\u00e0 aggiornato con un resoconto delle versioni: [A]Di pi\u00f9[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "Questa pagina \u00e8 disponibile solamente per gli utenti registrati.",
+    "17147": "Elimina tutte le versioni precedenti",
+    "17148": "Versioni correnti",
+    "17149": "Versione corrente",
+    "17150": "Versioni",
+    "17151": "[X] versioni",
+    "17152": "1 versione",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

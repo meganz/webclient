@@ -1627,9 +1627,11 @@
     "6140": "\u05d7\u05e9\u05d1\u05d5\u05df",
     "6141": "\u05ea\u05d5\u05d3\u05d5\u05ea",
     "6142": "\u05e9\u05d0\u05dc \u05ea\u05de\u05d9\u05d3 \u05dc\u05de\u05d9\u05e7\u05d5\u05dd \u05d4\u05d4\u05d5\u05e8\u05d3\u05d4",
+    "6143": "\u05d6\u05db\u05e8\u05d5\u05df \u05de\u05d8\u05de\u05d5\u05df",
     "6144": "\u05d1\u05d8\u05dc \u05d4\u05db\u05dc",
     "6145": "\u05e6\u05dc\u05dd",
     "6146": "\u05e0\u05e7\u05d4 \u05d4\u05e2\u05d1\u05e8\u05d5\u05ea",
+    "6147": "\u05e0\u05e7\u05d4 \u05d6\u05db\u05e8\u05d5\u05df \u05de\u05d8\u05de\u05d5\u05df",
     "6148": "\u05e0\u05e7\u05d4 \u05d1\u05d7\u05d9\u05e8\u05d4",
     "6149": "\u05dc\u05d5\u05d7 \u05d4\u05e2\u05ea\u05e7\u05d5\u05ea",
     "6151": "\u05d9\u05d9\u05e6\u05d0 \u05de\u05e4\u05ea\u05d7 \u05de\u05e1\u05d8\u05e8",
@@ -4296,5 +4298,14 @@
     "17095": "Copy and rename",
     "17096": "Move and rename",
     "17097": "The file will be updated with version history: [A]Learn more[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "This page is for registered users only.",
+    "17147": "Clear previous versions",
+    "17148": "Current Versions",
+    "17149": "Current Version",
+    "17150": "Versions",
+    "17151": "[X] versions",
+    "17152": "1 version",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

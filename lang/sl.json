@@ -1627,9 +1627,11 @@
     "6140": "ra\u010dun",
     "6141": "zahvale",
     "6142": "Vedno vpra\u0161aj za lokacijo prevzemanja",
+    "6143": "predpomnilnik",
     "6144": "prekli\u010di vse",
     "6145": "zajemi",
     "6146": "po\u010disti prenose",
+    "6147": "izbri\u0161i predpomnilnik",
     "6148": "po\u010disti izbiro",
     "6149": "odlo\u017ei\u0161\u010de",
     "6151": "Izvozi glavni klju\u010d",
@@ -4296,5 +4298,14 @@
     "17095": "Copy and rename",
     "17096": "Move and rename",
     "17097": "The file will be updated with version history: [A]Learn more[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "This page is for registered users only.",
+    "17147": "Clear previous versions",
+    "17148": "Current Versions",
+    "17149": "Current Version",
+    "17150": "Versions",
+    "17151": "[X] versions",
+    "17152": "1 version",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

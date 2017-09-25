@@ -1627,9 +1627,11 @@
     "6140": "k\u00e4ytt\u00e4j\u00e4tili",
     "6141": "kiitokset",
     "6142": "Kysy aina lataussijaintia",
+    "6143": "v\u00e4limuisti",
     "6144": "keskeyt\u00e4 kaikki",
     "6145": "kaappaus",
     "6146": "puhdista siirrot",
+    "6147": "tyhjenn\u00e4 v\u00e4limuisti",
     "6148": "tyhjenn\u00e4 valinnat",
     "6149": "leikep\u00f6yt\u00e4",
     "6151": "Vie is\u00e4nt\u00e4avain",
@@ -4296,5 +4298,14 @@
     "17095": "Copy and rename",
     "17096": "Move and rename",
     "17097": "The file will be updated with version history: [A]Learn more[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "This page is for registered users only.",
+    "17147": "Clear previous versions",
+    "17148": "Current Versions",
+    "17149": "Current Version",
+    "17150": "Versions",
+    "17151": "[X] versions",
+    "17152": "1 version",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

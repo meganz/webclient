@@ -1627,9 +1627,11 @@
     "6140": "compte",
     "6141": "remerciements",
     "6142": "Toujours demander l'emplacement des t\u00e9l\u00e9chargements",
+    "6143": "cache",
     "6144": "tout annuler",
     "6145": "prendre une photo",
     "6146": "nettoyer les transferts",
+    "6147": "nettoyer le cache",
     "6148": "annuler la s\u00e9lection",
     "6149": "presse-papiers",
     "6151": "Exporter la cl\u00e9 ma\u00eetresse",
@@ -4296,5 +4298,14 @@
     "17095": "Copier et renommer",
     "17096": "D\u00e9placer et renommer",
     "17097": "Le fichier sera mis \u00e0 jour avec un historique de version : [A]En apprendre davantage[\/A]",
-    "17146": "Cette page n'est que pour les utilisateurs inscrits."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "Cette page n'est que pour les utilisateurs inscrits.",
+    "17147": "Effacer les versions pr\u00e9c\u00e9dentes",
+    "17148": "Versions actuelles ",
+    "17149": "Version actuelle ",
+    "17150": "Versions ",
+    "17151": "[X] versions",
+    "17152": "1 version",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

@@ -1627,9 +1627,11 @@
     "6140": "cont",
     "6141": "confirm\u0103ri",
     "6142": "\u00centreab\u0103 mereu pentru loca\u0163ia de desc\u0103rcare",
+    "6143": "cache",
     "6144": "anuleaz\u0103 toate",
     "6145": "captureaz\u0103",
     "6146": "cur\u0103\u0163\u0103 transferurile",
+    "6147": "\u015fterge cache-ul",
     "6148": "\u015fterge selec\u0163ia",
     "6149": "clipboard",
     "6151": "Export\u0103 cheia principal\u0103",
@@ -4296,5 +4298,14 @@
     "17095": "Copy and rename",
     "17096": "Move and rename",
     "17097": "The file will be updated with version history: [A]Learn more[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "This page is for registered users only.",
+    "17147": "Clear previous versions",
+    "17148": "Current Versions",
+    "17149": "Current Version",
+    "17150": "Versions",
+    "17151": "[X] versions",
+    "17152": "1 version",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

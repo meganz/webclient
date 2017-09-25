@@ -1627,9 +1627,11 @@
     "6140": "konto",
     "6141": "podzi\u0119kowania",
     "6142": "Zawsze pytaj o lokalizacj\u0119 do zapisania pliku",
+    "6143": "cache",
     "6144": "anuluj wszystko",
     "6145": "zr\u00f3b",
     "6146": "wyczy\u015b\u0107 list\u0119",
+    "6147": "wyczy\u015b\u0107 cache",
     "6148": "wyczy\u0107 zaznaczone",
     "6149": "schowek",
     "6151": "Eksportuj masterkey",
@@ -4296,5 +4298,14 @@
     "17095": "Skopiuj i zmie\u0144 nazw\u0119",
     "17096": "Przenie\u015b i zmie\u0144\u00a0nazw\u0119",
     "17097": "Historia pliku zostanie zaktualizowana: [A]Dowiedz si\u0119 wi\u0119cej[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "Strona tylko dla zarejestrowanych u\u017cytkownik\u00f3w.",
+    "17147": "Usu\u0144 poprzednie wersje",
+    "17148": "Aktualna wersje",
+    "17149": "Aktualna wersja",
+    "17150": "Wersje",
+    "17151": "[X] wersji",
+    "17152": "1 wersja",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

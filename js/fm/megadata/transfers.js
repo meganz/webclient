@@ -397,7 +397,7 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
     if (!isZIP || zipSize) {
         this.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
     }
-    openTransfersPanel();
+    M.openTransfersPanel();
     initGridScrolling();
     initFileblocksScrolling();
     initTreeScroll();
@@ -483,6 +483,8 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
     if (bt) {
         // $.transferprogress[id] = Math.floor(bl/bt*100);
         $.transferprogress[id] = [bl, bt, bps];
+        dl_queue[dl_queue_num].loaded = bl;
+
         if (!uldl_hold) {
             if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) {
                 $overlay.find('.viewer-error').addClass('hidden');
@@ -541,7 +543,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
                 $('.widget-block').addClass('active');
             }
             else {
-                if (mega.ui.tpp.isCached()) {
+                if (mega.ui.tpp.isCached() && mega.ui.tpp.isEnabled()) {
                     mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
                     mega.ui.tpp.updateBlock('dl');
                 }
@@ -675,6 +677,10 @@ MegaData.prototype.dlerror = function(dl, error) {
             errorstr = l[x = 233];
             break;
     }
+
+    // Hide TPP
+    mega.ui.tpp.hide();
+    mega.ui.tpp.reset('dl');
 
     if (window.slideshowid == dl.id && !previews[slideshowid]) {
         $overlay.find('.viewer-image-bl').addClass('hidden');
@@ -1043,8 +1049,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
             uldl_hold = true;
         }
         else {
-            showTransferToast('u', added);
-            openTransfersPanel();
+            M.showTransferToast('u', added);
+            M.openTransfersPanel();
             delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
 
@@ -1212,7 +1218,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             $tr.find('.speed').addClass('unknown').text('');
         }
 
-        if (mega.ui.tpp.isCached()) {
+        if (mega.ui.tpp.isCached() && mega.ui.tpp.isEnabled()) {
             mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
             mega.ui.tpp.updateBlock('ul');
         }
@@ -1251,6 +1257,10 @@ MegaData.prototype.ulerror = function(ul, error) {
 
     if (ul) {
         this.ulfinalize(ul, api_strerror(error));
+
+        // Hide TPP
+        mega.ui.tpp.hide();
+        mega.ui.tpp.reset('ul');
 
         if (ul.owner) {
             ul.owner.destroy();
@@ -1372,6 +1382,252 @@ MegaData.prototype.ulstart = function(ul) {
     mega.ui.tpp.start(ul, 'ul');
 };
 
+MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
+    'use strict';
+
+    $.tresizer();
+    $('.nw-fm-left-icon.transfers').addClass('transfering');
+    // Start the new transfer right away even if the queue is paused?
+    // XXX: Remove fm_tfspause calls at M.addDownload/addUpload to enable this
+    /*if (uldl_hold) {
+        uldl_hold = false;
+        dlQueue.resume();
+        ulQueue.resume();
+        $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
+        $('.nw-fm-left-icon.transfers').removeClass('paused');
+    }*/
+    // $(window).trigger('resize'); // this will call initTreeScroll();
+
+    if ($('table.transfer-table tr').length > 1) {
+        $('.transfer-clear-all-icon').removeClass('hidden');
+    }
+
+    if (!$.mSortableT) {
+        $.mSortableT = $('.transfer-table tbody');
+        $.mSortableT.sortable({
+            delay: 200,
+            revert: 100,
+            start: function() {
+                $('body').addClass('dndc-sort');
+            },
+            helper: function(ev, tr) {
+                if (!tr.hasClass('ui-selected')) {
+                    tr.addClass('ui-selected');
+                }
+                this.order = fm_tfsorderupd();
+                var $selected = tr.parent().children('.ui-selected').clone();
+                tr.data('multidrag', $selected).siblings('.ui-selected').hide();
+                var $helper = $('<tr/>');
+                return $helper.append($selected);
+            },
+            stop: function(ev, ui) {
+                var cancel = false;
+                $('body').removeClass('dndc-sort');
+
+                var $selected = ui.item.data('multidrag');
+                ui.item.after($selected).remove();
+                $('.transfer-table tr.ui-selected:not(:visible)').remove();
+                $.transferHeader(); // rebind cloned trs
+
+                // var $tr = $(ui.item[0]);
+                // var id = String($tr.attr('id'));
+                // var $next = $tr.next();
+
+                /*if ($selected.hasClass('started')) {
+                    cancel = true;
+                }
+                else {
+                    var $prev = $tr.prev();
+                    var pid = $prev.attr('id');
+                    var nid = $next.attr('id');
+
+                    cancel = ((id[0] === 'u' && nid && nid[0] !== 'u')
+                            || (id[0] !== 'u' && pid && pid[0] === 'u'));
+                }*/
+                if (cancel) {
+                    $.mSortableT.sortable('cancel');
+                }
+                else {
+                    var order = fm_tfsorderupd();
+
+                    if (JSON.stringify(order) !== JSON.stringify(this.order)) {
+                        var mDL = {
+                            pos: 0,
+                            etmp: [],
+                            oQueue: [],
+                            pQueue: {},
+                            mQueue: dlQueue,
+                            m_queue: dl_queue,
+                            prop: 'dl'
+                        };
+                        var mUL = {
+                            pos: 0,
+                            etmp: [],
+                            oQueue: [],
+                            pQueue: {},
+                            mQueue: ulQueue,
+                            m_queue: ul_queue,
+                            prop: 'ul'
+                        };
+                        var id;
+                        var dst;
+                        var i = 0;
+                        var len = Object.keys(order).length / 2;
+
+                        [dl_queue, ul_queue].forEach(function(queue) {
+                            var t_queue = queue.filter(isQueueActive);
+                            if (t_queue.length !== queue.length) {
+                                var m = t_queue.length;
+                                var i = 0;
+                                while (i < m) {
+                                    (queue[i] = t_queue[i]).pos = i;
+                                    ++i;
+                                }
+                                queue.length = i;
+                                while (queue[i]) {
+                                    delete queue[i++];
+                                }
+                            }
+                        });
+
+                        while (len > i) {
+                            id = M.t[i++];
+
+                            dst = id[0] === 'u' ? mUL : mDL;
+                            var mQ = dst.mQueue.slurp(id);
+                            // for (var x in mQ) {
+                            // if (mQ.hasOwnProperty(x)) {
+                            // var entry = mQ[x][0][dst.prop];
+                            // if (dst.etmp.indexOf(entry) === -1) {
+                            // (dst.m_queue[dst.pos] = entry).pos = dst.pos;
+                            // dst.etmp.push(entry);
+                            // dst.pos++;
+                            // }
+                            // }
+                            // }
+                            dst.oQueue = dst.oQueue.concat(mQ);
+
+                            if (dst.mQueue._qpaused.hasOwnProperty(id)) {
+                                dst.pQueue[id] = dst.mQueue._qpaused[id];
+                            }
+                        }
+
+                        dlQueue._queue = mDL.oQueue;
+                        ulQueue._queue = mUL.oQueue;
+                        dlQueue._qpaused = mDL.pQueue;
+                        ulQueue._qpaused = mUL.pQueue;
+
+                        // Check for transfers moved before any started one
+                        var $prev = $('.transfer-table tr.transfer-started')
+                            .first()
+                            .prevAll()
+                            .not('.transfer-paused');
+                        // XXX: we rely on the speed field being non-numeric
+                        if ($prev.length && !$prev.find('.speed').text().replace(/\D/g, '')) {
+                            var ids = $('.transfer-table tr:not(.transfer-paused)').attrs('id');
+                            ids.forEach(fm_tfspause);
+                            if (dlQueue._queue.length || ulQueue._queue.length) {
+                                dlmanager.logger.error('The move operation should have cleared the queues.');
+                            }
+                            ids.forEach(fm_tfsresume);
+                            i = 0;
+                            mDL.pQueue = {};
+                            mUL.pQueue = {};
+                            while (len > i) {
+                                id = M.t[i++];
+                                dst = id[0] === 'u' ? mUL : mDL;
+                                if (dst.mQueue._qpaused.hasOwnProperty(id)) {
+                                    dst.pQueue[id] = dst.mQueue._qpaused[id];
+                                }
+                            }
+                            dlQueue._qpaused = mDL.pQueue;
+                            ulQueue._qpaused = mUL.pQueue;
+                        }
+                    }
+                }
+
+                $('.transfer-table tr.ui-selected').removeClass('ui-selected');
+            }
+        });
+    }
+};
+
+MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_length, isPaused) {
+    'use strict';
+
+    if (M.currentdirid !== 'transfers' && fmconfig.tpp === false) {
+        var $toast;
+        var $second_toast;
+        var timer = 0;
+        var nt_txt;
+
+        if (t_type !== 'u') {
+            $toast = $('.toast-notification.download');
+            $second_toast = $('.toast-notification.upload');
+            if (t_length > 1) {
+                nt_txt = l[12481].replace('%1', t_length);
+            }
+            else {
+                nt_txt = l[7222];
+            }
+        }
+        else {
+            $toast = $('.toast-notification.upload');
+            $second_toast = $('.toast-notification.download');
+            if (t_length > 1) {
+                nt_txt = l[12480].replace('%1', t_length);
+            }
+            else {
+                nt_txt = l[7223];
+            }
+        }
+        if (uldl_hold || isPaused) {
+            nt_txt += '<b> (' + l[1651] + ') </b>';
+        }
+
+        $toast.find('.toast-col:first-child span').safeHTML(nt_txt);
+
+        if ($second_toast.hasClass('visible')) {
+            $second_toast.addClass('second');
+        }
+
+        clearTimeout(timer);
+        $toast.removeClass('second hidden').addClass('visible');
+        timer = setTimeout(function() {
+            M.hideTransferToast($toast);
+        }, 5000);
+
+        $('.transfer .toast-button').rebind('click', function() {
+            $('.toast-notification').removeClass('visible second');
+            if (!$('.viewer-overlay').hasClass('hidden')) {
+                $('.viewer-overlay').addClass('hidden');
+            }
+            // M.openFolder('transfers', true);
+            $('.nw-fm-left-icon.transfers').click();
+        });
+
+        $('.toast-close-button', $toast).rebind('click', function() {
+            $(this).closest('.toast-notification').removeClass('visible');
+            $('.toast-notification').removeClass('second');
+        });
+
+        $toast.rebind('mouseover', function() {
+            clearTimeout(timer);
+        });
+        $toast.rebind('mouseout', function() {
+            timer = setTimeout(function() {
+                M.hideTransferToast($toast);
+            }, 5000);
+        });
+    }
+};
+
+MegaData.prototype.hideTransferToast = function hideTransferToast($toast) {
+    'use strict';
+
+    $toast.removeClass('visible');
+    $('.toast-notification').removeClass('second');
+};
 
 function onUploadError(ul, errorstr, reason, xhr) {
     var hn = hostname(ul.posturl);

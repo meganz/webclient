@@ -926,6 +926,7 @@
     "7004": "Tack f\u00f6r din feedback.",
     "7005": "Var v\u00e4nlig och ange anledningen nedanf\u00f6r",
     "7006": "Laddar...",
+    "7039": "Fr\u00e5ga mig inte igen",
     "7086": "V\u00e4lj din Linux Distro",
     "7087": "Webbl\u00e4sare",
     "7088": "\u00d6verf\u00f6ringshastighet:",
@@ -1079,9 +1080,6 @@
     "7747": "Efter det var v\u00e4nlig och g\u00e5 till din inkorg och verifiera detta byte av E-mail.",
     "7869": "Denna E-mail adress har redan blivit registrerad, var v\u00e4nlig v\u00e4lj en annan E-mail adress f\u00f6r att forts\u00e4tta. ",
     "7872": "\u00c5tkomst till alla mappar delade av dig med [X] kommer att upph\u00f6ra.",
-    "7873": "Du kan ladda ner till\u00e4gget (v%1) nedan.",
-    "7874": "Det verkar som om ditt nuvarande till\u00e4gg (v%1) \u00e4r f\u00f6r\u00e5ldrat. Du kan ladda ned den senaste versionen (v%2) nedan.",
-    "7875": "Ditt till\u00e4gg (v%1) \u00e4r senaste versionen",
     "7879": "\u00c5tkomst till mappar delade av [X] \u00e4r borttaget.",
     "7880": "\u00c5tkomst till mappar borttagen",
     "7881": "Tack! En av v\u00e5ra kundr\u00e5dgivare kommer s\u00e5 snart det \u00e4r m\u00f6jligt att besvara din fr\u00e5ga.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

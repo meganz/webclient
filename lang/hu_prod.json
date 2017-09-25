@@ -926,6 +926,7 @@
     "7004": "K\u00f6sz\u00f6nj\u00fck a visszajelz\u00e9st.",
     "7005": "K\u00e9rj\u00fck alul indokolja meg",
     "7006": "Bet\u00f6lt\u00e9s...",
+    "7039": "Ne k\u00e9rdezze t\u00f6bbsz\u00f6r",
     "7086": "K\u00e9rlek v\u00e1laszd ki Linux Disztr\u00f3d",
     "7087": "B\u00f6ng\u00e9sz\u0151",
     "7088": "\u00c1tviteli Sebess\u00e9g:",
@@ -1079,9 +1080,6 @@
     "7747": "Ezt k\u00f6vet\u0151en k\u00e9rj\u00fck n\u00e9zze \u00e1t email-je bej\u00f6v\u0151 \u00fczeneteit, \u00e9s er\u0151s\u00edtse meg ezt az email-cser\u00e9t.",
     "7869": "Ez az email c\u00edm m\u00e1r regisztr\u00e1lva van. A folytat\u00e1shoz k\u00e9rj\u00fck v\u00e1lasszon egy m\u00e1sikat.",
     "7872": "A kijel\u00f6lt [X] \u00e1ltal, \u00d6nnel megosztott minden mappa hozz\u00e1f\u00e9r\u00e9se elv\u00e9sz.",
-    "7873": "Al\u00e1bb let\u00f6ltheti a kieg\u00e9sz\u00edt\u0151t (v%1).",
-    "7874": "\u00dagy n\u00e9z ki az \u00d6n jelenlegi kieg\u00e9sz\u00edt\u0151je (v%1) elavult. Al\u00e1bb let\u00f6ltheti a legfrissebbet (v%2).",
-    "7875": "Az \u00d6n kieg\u00e9sz\u00edt\u0151je (v%1) napra k\u00e9sz.",
     "7879": "A(z) [X] \u00e1ltal megosztott mapp\u00e1khoz val\u00f3 hozz\u00e1f\u00e9r\u00e9s t\u00f6r\u00f6lve.",
     "7880": "A mapp\u00e1khoz val\u00f3 hozz\u00e1f\u00e9r\u00e9s t\u00f6r\u00f6lve.",
     "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

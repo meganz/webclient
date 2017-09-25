@@ -443,6 +443,14 @@
         "text": "Downloading",
         "context": "Title header on the download page while the file is downloading."
     },
+    "366": {
+        "text": "Copyright warning",
+        "context": ""
+    },
+    "367": {
+        "text": "MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.",
+        "context": ""
+    },
     "368": {
         "text": "Caution:",
         "context": ""
@@ -1644,7 +1652,7 @@
         "context": ""
     },
     "999": {
-        "text": "Would you like to upgrade your temporary session to a free account now?",
+        "text": "Would you like to upgrade your temporary session to a FREE account now?",
         "context": "Ephemeral session refers to the current session the user has on MEGA which is of temporary nature"
     },
     "1000": {
@@ -3507,6 +3515,82 @@
         "text": "You are currently logged in. Would you like to log out and register a new account?",
         "context": "Confirmation message, that we show when the user clicks an invite link to register a new account while the user is logged in."
     },
+    "1825": {
+        "text": "What is MEGAsync?",
+        "context": ""
+    },
+    "1827": {
+        "text": "How do I install MEGAsync?",
+        "context": ""
+    },
+    "1829": {
+        "text": "Can I use MEGAsync on multiple computers?",
+        "context": ""
+    },
+    "1831": {
+        "text": "How can I monitor the sync status of my local files and folders?",
+        "context": ""
+    },
+    "1833": {
+        "text": "MEGAsync stores my login credentials to perform autologin. Isn't that a security concern?",
+        "context": ""
+    },
+    "1839": {
+        "text": "Does MEGAsync perform explicit file versioning?",
+        "context": "e.g. when a user updates a file (a partial write operation), the user would have the ability to go back in time and reverse the operation, which is currently not supported by MEGA"
+    },
+    "1840": {
+        "text": "No. However, you can access overwritten files in the respective debris folders until they are purged.",
+        "context": ""
+    },
+    "1841": {
+        "text": "Does MEGAsync support modifying existing files?",
+        "context": ""
+    },
+    "1845": {
+        "text": "Are there any restrictions with regards to filenames?",
+        "context": ""
+    },
+    "1849": {
+        "text": "How can I make sure that I always have the latest version of MEGAsync?",
+        "context": ""
+    },
+    "1851": {
+        "text": "Will MEGAsync use peer-to-peer transfers to achieve faster syncing between computers in the same local area network?",
+        "context": ""
+    },
+    "1852": {
+        "text": "No. The current incarnation of MEGAsync always syncs via MEGA's cloud infrastructure.",
+        "context": ""
+    },
+    "1853": {
+        "text": "What happens if conflicting concurrent actions are performed on clients synced to the same cloud location?",
+        "context": ""
+    },
+    "1854": {
+        "text": "The current version of MEGAsync does not resolve such clashes in a deterministic manner. Avoid them if possible.",
+        "context": ""
+    },
+    "1856": {
+        "text": "No. Do not expect these to be replicated to the cloud.",
+        "context": ""
+    },
+    "1857": {
+        "text": "Does MEGAsync support syncing the same local folder to different remote locations or the same remote folder to different local locations?",
+        "context": ""
+    },
+    "1858": {
+        "text": "No, unless you want to run multiple MEGAsync processes in parallel, which is not recommended. As a general rule, each filesystem item must only be visible to MEGAsync once, so avoid syncing subfolders of synced folders or placing multiple links to the same filesystem item in a local synced folder.",
+        "context": "Whether you can sync one local folder to multiple remote folders, which is not possible. Each local folder can only be synced to one remote folder"
+    },
+    "1859": {
+        "text": "Where can I find your iOS app?",
+        "context": ""
+    },
+    "1861": {
+        "text": "Where can I find your Android app?",
+        "context": ""
+    },
     "1864": {
         "text": "Error report",
         "context": ""
@@ -3561,6 +3645,10 @@
     },
     "1885": {
         "text": "%1 folders weren't uploaded because they are extremely large. We do this check to prevent the uploading of entire boot volumes, which is inefficient and dangerous.",
+        "context": ""
+    },
+    "1886": {
+        "text": "I am trying to rename a local folder in Explorer, but the name of the corresponding folder in my cloud drive stays the same, no matter what I do.",
         "context": ""
     },
     "1888": {
@@ -3910,6 +3998,10 @@
     "1993": {
         "text": "or [A]create an account[\/A]",
         "context": "New link on the login page, to make it easier for users without an account to find the registration page if they ever end up on the login page."
+    },
+    "1995": {
+        "text": "I just remembered the password of my old account after performing a password reset. How do I get my data back?",
+        "context": "Help section question"
     },
     "2001": {
         "text": "Do you want to upload your files to a new session?",
@@ -5451,6 +5543,14 @@
         "text": "Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!",
         "context": "This string is shown inside the Add Contact dialog and sent to a user in an email."
     },
+    "5881": {
+        "text": "Press Releases",
+        "context": ""
+    },
+    "5882": {
+        "text": "Shareholder Reports",
+        "context": ""
+    },
     "5884": {
         "text": "End call ...\r\n",
         "context": "end a phonecall"
@@ -6411,10 +6511,6 @@
         "text": "Always ask for download location",
         "context": ""
     },
-    "6143": {
-        "text": "cache",
-        "context": ""
-    },
     "6144": {
         "text": "cancel all",
         "context": ""
@@ -6425,10 +6521,6 @@
     },
     "6146": {
         "text": "clean up transfers",
-        "context": ""
-    },
-    "6147": {
-        "text": "clear cache",
         "context": ""
     },
     "6148": {
@@ -6677,6 +6769,18 @@
     },
     "6240": {
         "text": "Windows Phone App",
+        "context": ""
+    },
+    "6243": {
+        "text": "Where do my downloads go?",
+        "context": ""
+    },
+    "6260": {
+        "text": "Audio & Video setup",
+        "context": ""
+    },
+    "6277": {
+        "text": "How do I register for an account?",
         "context": ""
     },
     "6690": {
@@ -12975,6 +13079,38 @@
         "text": "You can add multiple people at once with e-mail addresses separated by commas",
         "context": "Invite dialog default info text, below input box and above Send button."
     },
+    "9094": {
+        "text": "Frequently Asked Questions",
+        "context": "A title for the commonly asked questions in the Help section of the site."
+    },
+    "9095": {
+        "text": "How can we help you today?",
+        "context": "A title for the main page of the Help section of the site. A casual question about how Mega can help the user"
+    },
+    "9096": {
+        "text": "Support Centre",
+        "context": "A button for going back to the Support Centre, the main page of the Help section of the site."
+    },
+    "9098": {
+        "text": "We can't find what you are after",
+        "context": "A message which is displayed when the search query does not return any results"
+    },
+    "9099": {
+        "text": "Please try your search again or contact our support team directly",
+        "context": "A message which is displayed when the search query does not return any results."
+    },
+    "9100": {
+        "text": "Email Support",
+        "context": "A button to contact MEGA support via email."
+    },
+    "9101": {
+        "text": "If you can't find what you are looking for, please contact our support team for direct assistance.",
+        "context": "A message for the Get Support section informing the user to contact MEGA support if they can't find the help they need."
+    },
+    "9102": {
+        "text": "Go Back",
+        "context": "A button in the Help section to take the user back to a previous screen on the website."
+    },
     "9103": {
         "text": "Copy the link below to share the article.",
         "context": "Body for dialog with a link to share an article of our help section"
@@ -12982,6 +13118,10 @@
     "9104": {
         "text": "Share the Article",
         "context": "Title for dialog"
+    },
+    "9105": {
+        "text": "Enter your search here...",
+        "context": "The placeholder text in the search field of the help section."
     },
     "9106": {
         "text": "Email %1 for assistance.",
@@ -17046,5 +17186,9 @@
     "17097": {
         "text": "The file will be updated with version history: [A]Learn more[\/A]",
         "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
+    },
+    "17146": {
+        "text": "This page is for registered users only.",
+        "context": "A dialog message when user is trying to access the page from an ephemeral session which is allowed for registered users only."
     }
 }

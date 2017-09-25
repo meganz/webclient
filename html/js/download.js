@@ -742,8 +742,11 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     $('.download.main-transfer-info').removeClass('hidden');
     $('.download.state-text').addClass('hidden');
 
-    if (dl_queue[dl_queue_num] && !dl_queue[dl_queue_num].starttime) {
-        dl_queue[dl_queue_num].starttime = now - 100;
+    if (dl_queue[dl_queue_num]) {
+        if (!dl_queue[dl_queue_num].starttime) {
+            dl_queue[dl_queue_num].starttime = now - 100;
+        }
+        dl_queue[dl_queue_num].loaded = bytesloaded;
     }
 
     if (!m)

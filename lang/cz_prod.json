@@ -926,6 +926,7 @@
     "7004": "D\u011bkujeme v\u00e1m za va\u0161i zp\u011btnou vazbu.",
     "7005": "N\u00ed\u017ee zadejte d\u016fvod",
     "7006": "Na\u010d\u00edt\u00e1n\u00ed...",
+    "7039": "Neptat se m\u011b znovu",
     "7086": "Vyberte svou distribuci Linuxu",
     "7087": "Webov\u00fd prohl\u00ed\u017ee\u010d",
     "7088": "Rychlost p\u0159enosu:",
@@ -1079,9 +1080,6 @@
     "7747": "Abyste tak u\u010dinili, p\u0159ejd\u011bte do doru\u010den\u00e9 po\u0161ty sv\u00e9 e-mailov\u00e9 schr\u00e1nky a potvr\u010fte tuto zm\u011bnu e-mailu.",
     "7869": "Tato e-mailov\u00e1 adresa ji\u017e byla zaregistrov\u00e1na. Pro pokra\u010dov\u00e1n\u00ed zvolte alternativn\u00ed e-mailovou adresu.",
     "7872": "Ztrat\u00edte p\u0159\u00edstup ke v\u0161em slo\u017ek\u00e1m sd\u00edlen\u00fdmi s v\u00e1mi vybran\u00fdm [X].",
-    "7873": "N\u00ed\u017ee m\u016f\u017eete st\u00e1hnout roz\u0161\u00ed\u0159en\u00ed (v%1).",
-    "7874": "Vypad\u00e1 to, \u017ee va\u0161e aktu\u00e1ln\u00ed roz\u0161\u00ed\u0159en\u00ed (v%1) je zastaral\u00e9. N\u00ed\u017ee m\u016f\u017eete st\u00e1hnout nejnov\u011bj\u0161\u00ed (v%2).",
-    "7875": "Va\u0161e roz\u0161\u00ed\u0159en\u00ed (v%1) je aktu\u00e1ln\u00ed.",
     "7879": "P\u0159\u00edstup k slo\u017ek\u00e1m sd\u00edlen\u00fdch od [X] byl odebr\u00e1n",
     "7880": "P\u0159\u00edstup k slo\u017ek\u00e1m byl odebr\u00e1n.",
     "7881": "D\u011bkujeme! Jeden z na\u0161ich konzultant\u016f podpory odpov\u00ed na v\u00e1\u0161 dotaz co nejd\u0159\u00edve.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

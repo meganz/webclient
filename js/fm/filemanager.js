@@ -101,9 +101,17 @@ FileManager.prototype.initFileManagerUI = function() {
         loadSubPage('register');
     });
 
-    $('.fm-dialog-overlay').rebind('click.fm', function() {
-        closeDialog();
+    $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
+        closeDialog(ev);
         $.hideContextMenu();
+
+        // For ephemeral session redirect to 'fm' page
+        // if user clicks overlay instead Yes/No or close icon 'x'
+        // One situation when this is used, is when ephemeral user
+        //  trying to access settings directly via url
+        if (u_type === 0) {
+            loadSubPage('fm');
+        }
     });
     if (folderlink) {
         $('.fm-main').addClass('active-folder-link');
@@ -144,8 +152,11 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
         else {
-            // grid dragged:
-            if ($.selected && $.selected.length > 0) {
+            if ($.dragSelected && $.dragSelected.length > 0) {
+                ids = $.dragSelected;
+            }
+            else if ($.selected && $.selected.length > 0) {
+                // grid dragged:
                 ids = $.selected;
             }
         }
@@ -330,12 +341,6 @@ FileManager.prototype.initFileManagerUI = function() {
 
 
         if ((a === 'drop') && dd) {
-            if (t && M.d[t]) {
-                selectionManager.clear_selection();
-                selectionManager.set_currently_selected(t);
-            }
-
-
             if (dd === 'nw-fm-left-icon') {
                 // do nothing
             }
@@ -405,8 +410,6 @@ FileManager.prototype.initFileManagerUI = function() {
     M.treeSearchUI();
     M.initTreePanelSorting();
     M.initContextUI();
-    copyDialog();
-    moveDialog();
     initShareDialog();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
@@ -593,7 +596,13 @@ FileManager.prototype.initFileManagerUI = function() {
 
         if ($(this).hasClass('account') || $(this).hasClass('dashboard')) {
             if (u_type === 0) {
-                ephemeralDialog(l[7687]);
+                if ($(this).hasClass('account')) {
+                    ephemeralDialog(l[7687]);
+                }
+                else {
+                    // Show message 'This page is for registered users only'
+                    ephemeralDialog(l[17146]);
+                }
             }
             else if ($(this).hasClass('dashboard')) {
                 loadSubPage('fm/dashboard');
@@ -855,10 +864,11 @@ FileManager.prototype.initContextUI = function() {
     });
 
     var safeMoveNodes = function() {
-        if (!$(this).is('.disabled')) {
+        if (!$(this).hasClass('disabled')) {
             $.hideContextMenu();
             M.safeMoveNodes(String($(this).attr('id')).replace('fi_', ''));
         }
+        return false;
     };
     $(c + '.cloud-item').rebind('click', safeMoveNodes);
 
@@ -887,7 +897,7 @@ FileManager.prototype.initContextUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            initCopyrightsDialog($.selected);
+            mega.Share.initCopyrightsDialog($.selected);
         }
     });
 
@@ -907,58 +917,49 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
-
-        var $shareDialog = $('.share-dialog');
-
         if (u_type === 0) {
-            ephemeralDialog(l[1006]);
+            return ephemeralDialog(l[1006]);
         }
-        else {
-            // this is used like identifier when key with key code 27 is pressed
-            $.dialog = 'share';
+        var $dialog = $('.fm-dialog.share-dialog');
+
+        M.safeShowDialog('share', function() {
             $.hideContextMenu();
             clearScrollPanel('.share-dialog');
 
             // Show the share dialog
-            $shareDialog.removeClass('hidden');
+            $dialog.removeClass('hidden');
 
             // Hide the optional message by default.
             // This gets enabled if user want to share
-            $shareDialog.find('.share-message').hide();
+            $dialog.find('.share-message').hide();
 
-            fm_showoverlay();
-            handleShareDialogContent();
-        }
+            fillShareDialogWithContent();
+
+            // Taking care about share dialog button 'Done'/share and scroll
+            shareDialogContentCheck();
+
+            // Maintain drop down list updated
+            updateDialogDropDownList('.share-multiple-input');
+
+            $('.share-dialog-icon.permissions-icon')
+                .removeClass('active full-access read-and-write')
+                .safeHTML('<span></span>' + l[55])
+                .addClass('read-only');
+
+            // Update dialog title text
+            $('.fm-dialog-title', $dialog).text(l[5631] + ' "' + M.d[$.selected].name + '"');
+            $('.multiple-input .token-input-token-mega', $dialog).remove();
+            dialogPositioning($dialog);
+            $('.token-input-input-token-mega input', $dialog).focus();
+
+            return $dialog;
+        });
     });
 
     // Move Dialog
-    $(c + '.advanced-item, ' + c + '.move-item').rebind('click', function() {
-        M.safeShowDialog('move', function() {
-            var $dialog = $('.fm-dialog.move-dialog');
+    $(c + '.advanced-item, ' + c + '.move-item').rebind('click', openMoveDialog);
 
-            $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-            $.mcselected = M.RootID;
-
-            $dialog.removeClass('hidden');
-            handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
-            M.disableCircularTargets('#mctreea_');
-
-            return $dialog;
-        });
-    });
-
-    $(c + '.copy-item').rebind('click', function() {
-        M.safeShowDialog('copy', function() {
-            var $dialog = $('.fm-dialog.copy-dialog');
-
-            $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
-            $.mcselected = M.RootID;
-            $dialog.removeClass('hidden');
-            handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
-
-            return $dialog;
-        });
-    });
+    $(c + '.copy-item').rebind('click', openCopyDialog);
 
     $(c + '.import-item').rebind('click', function() {
         ASSERT(folderlink, 'Import needs to be used in folder links.');
@@ -1167,6 +1168,36 @@ FileManager.prototype.initContextUI = function() {
 FileManager.prototype.createFolderUI = function() {
     "use strict";
 
+    var doCreateFolder = function() {
+        var $inputWrapper = $('.create-folder-pad');
+        var $input = $('.create-new-folder input');
+
+        if ($input.val() === '') {
+            $inputWrapper.addClass('error');
+
+            setTimeout(function() {
+                $inputWrapper.removeClass('error');
+                $input.focus();
+            }, 200);
+        }
+        else {
+            loadingDialog.pshow();
+            M.createFolder(M.currentdirid, $input.val(), new MegaPromise())
+                .done(function(h) {
+                    if (d) {
+                        console.log('Created new folder %s->%s.', M.currentdirid, h);
+                    }
+                    loadingDialog.phide();
+                })
+                .fail(function(error) {
+                    loadingDialog.phide();
+                    msgDialog('warninga', l[135], l[47], api_strerror(error));
+                });
+        }
+
+        return false;
+    };
+
     $('.fm-new-folder').rebind('click', function(e) {
 
         var c = $('.fm-new-folder').attr('class'),
@@ -1193,10 +1224,7 @@ FileManager.prototype.createFolderUI = function() {
         $.hideContextMenu();
     });
 
-    $('.create-folder-button').rebind('click', function(e) {
-        M.addCreateFolderUI(e);
-        return false;
-    });
+    $('.create-folder-button').rebind('click', doCreateFolder);
 
     $('.create-folder-button-cancel').rebind('click', function() {
         $('.fm-new-folder').removeClass('active');
@@ -1245,7 +1273,7 @@ FileManager.prototype.createFolderUI = function() {
             $('.create-new-folder').removeClass('filled-input');
         }
         if (e.which == 13) {
-            M.addCreateFolderUI(e);
+            doCreateFolder();
         }
     });
 
@@ -1268,6 +1296,19 @@ FileManager.prototype.initUIKeyEvents = function() {
         if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
         }
+        if ($(e.target).filter("input,textarea,select").is(":focus")) {
+            // when the user is typing in the "New folder dialog", if the current viewMode is grid/icons view, then
+            // left/right navigation in the input field may cause the selection manager to trigger selection changes.
+            // Note: I expected that the dialog would set $.dialog, but it doesn't.
+            return true;
+        }
+
+        var is_transfers_or_accounts = (
+            M.currentdirid && (M.currentdirid.substr(0, 7) === 'account' || M.currentdirid === 'transfers')
+        );
+
+        // selection manager may not be available on empty folders.
+        var is_selection_manager_available = !!selectionManager;
 
         var sl = false;
         var s = [];
@@ -1302,7 +1343,13 @@ FileManager.prototype.initUIKeyEvents = function() {
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
          * other day :)
          */
-        if (!$.dialog && !slideshowid && M.viewmode == 1) {
+        if (
+            is_selection_manager_available &&
+            !is_transfers_or_accounts &&
+            !$.dialog &&
+            !slideshowid &&
+            M.viewmode == 1
+        ) {
             if (e.keyCode == 37) {
                 // left
                 selectionManager.select_prev(e.shiftKey, true);
@@ -1325,6 +1372,8 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
 
         if (
+            is_selection_manager_available &&
+            !is_transfers_or_accounts &&
             e.keyCode == 38 &&
             s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
@@ -1335,6 +1384,8 @@ FileManager.prototype.initUIKeyEvents = function() {
             quickFinder.disable_if_active();
         }
         else if (
+            is_selection_manager_available &&
+            !is_transfers_or_accounts &&
             e.keyCode == 40 &&
             s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
@@ -1344,7 +1395,13 @@ FileManager.prototype.initUIKeyEvents = function() {
             selectionManager.select_next(e.shiftKey, true);
             quickFinder.disable_if_active();
         }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
+        else if (
+            !is_transfers_or_accounts &&
+            e.keyCode == 46 &&
+            s.length > 0 &&
+            !$.dialog &&
+            M.getNodeRights(M.currentdirid) > 1
+        ) {
             // delete
             fmremove();
         }
@@ -1360,6 +1417,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             });
         }
         else if (
+            !is_transfers_or_accounts &&
             e.keyCode == 13
             && s.length > 0
             && !$.dialog
@@ -1423,11 +1481,21 @@ FileManager.prototype.initUIKeyEvents = function() {
                 $.warningCallback(true);
             }
         }
-        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
+        else if (
+            !is_transfers_or_accounts &&
+            (e.keyCode === 113 /* F2 */) &&
+            (s.length > 0) &&
+            !$.dialog && M.getNodeRights(M.currentdirid) > 1
+        ) {
             renameDialog();
         }
-        else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
-            if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+        else if (
+            is_selection_manager_available &&
+            e.keyCode == 65 &&
+            e.ctrlKey &&
+            !$.dialog
+        ) {
+            if (is_transfers_or_accounts || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return;
             }
             // ctrl+a/cmd+a - select all
@@ -1456,6 +1524,111 @@ FileManager.prototype.initUIKeyEvents = function() {
 
 FileManager.prototype.addTransferPanelUI = function() {
     "use strict";
+
+    var transferPanelContextMenu = function(target) {
+        var file;
+        var tclear;
+
+        $('.dropdown.body.files-menu .dropdown-item').hide();
+        var menuitems = $('.dropdown.body.files-menu .dropdown-item');
+
+        menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear')
+            .show();
+
+        tclear = menuitems.filter('.transfer-clear').contents().last().get(0) || {};
+        tclear.textContent = l[103];
+
+        if (target === null && (target = $('.transfer-table tr.ui-selected')).length > 1) {
+            var ids = target.attrs('id');
+            var finished = 0;
+            var paused = 0;
+            var started = false;
+
+            ids.forEach(function(id) {
+                file = GlobalProgress[id];
+                if (!file) {
+                    finished++;
+                }
+                else {
+                    if (file.paused) {
+                        paused++;
+                    }
+                    if (file.started) {
+                        started = true;
+                    }
+                }
+            });
+
+            if (finished === ids.length) {
+                menuitems.hide()
+                    .filter('.transfer-clear')
+                    .show();
+                tclear.textContent = l[7218];
+            }
+            else {
+                if (started) {
+                    menuitems.filter('.move-up,.move-down').hide();
+                }
+                if (paused === ids.length) {
+                    menuitems.filter('.transfer-pause').hide();
+                }
+
+                var prev = target.first().prev();
+                var next = target.last().next();
+
+                if (prev.length === 0 || !prev.hasClass('transfer-queued')) {
+                    menuitems.filter('.move-up').hide();
+                }
+                if (next.length === 0) {
+                    menuitems.filter('.move-down').hide();
+                }
+            }
+        }
+        else if (!(file = GlobalProgress[$(target).attr('id')])) {
+            /* no file, it is a finished operation */
+            menuitems.hide()
+                .filter('.transfer-clear')
+                .show();
+            tclear.textContent = l[7218];
+        }
+        else {
+            if (file.started) {
+                menuitems.filter('.move-up,.move-down').hide();
+            }
+            if (file.paused) {
+                menuitems.filter('.transfer-pause').hide();
+            }
+            else {
+                menuitems.filter('.transfer-play').hide();
+            }
+
+            if (!target.prev().length || !target.prev().hasClass('transfer-queued')) {
+                menuitems.filter('.move-up').hide();
+            }
+            if (target.next().length === 0) {
+                menuitems.filter('.move-down').hide();
+            }
+        }
+
+        // XXX: Hide context-menu's menu-up/down items for now to check if that's the
+        // origin of some problems, users can still use the new d&d logic to move transfers
+        menuitems.filter('.move-up,.move-down').hide();
+
+        if (d && target.length === 1 && target.eq(0).attr('id').match(/^dl_/)) {
+            menuitems.filter('.network-diagnostic').show();
+        }
+
+
+        var parent = menuitems.parent();
+        parent
+            .children('hr').hide().end()
+            .children('hr.pause').show().end();
+
+        if (parent.height() < 56) {
+            parent.find('hr.pause').hide();
+        }
+    };
+
 
     $.transferHeader = function(tfse) {
         tfse = tfse || M.getTransferElements();
@@ -1796,20 +1969,7 @@ FileManager.prototype.addContactUI = function() {
             showAuthenticityCredentials(user);
         });
 
-        $('.fm-share-folders').rebind('click', function() {
-            M.safeShowDialog('copy', function() {
-                var $dialog = $('.fm-dialog.copy-dialog');
-                $dialog.removeClass('hidden');
-
-                $.copyDialog = 'copy';
-                $.mcselected = undefined;
-                $.copyToShare = true;
-
-                handleDialogContent('cloud-drive', 'ul', true, 'copy', l[1344]);
-
-                return $dialog;
-            });
-        });
+        $('.fm-share-folders').rebind('click', openCopyShareDialog);
 
         // Remove contact button on contacts page
         $('.fm-remove-contact').rebind('click', function() {
@@ -1827,25 +1987,6 @@ FileManager.prototype.addContactUI = function() {
         }
 
         $('.nw-contact-item#contact_' + u_h).addClass('selected');
-    }
-};
-
-FileManager.prototype.addCreateFolderUI = function() {
-    "use strict";
-
-    var $inputWrapper = $('.create-folder-pad');
-    var $input = $('.create-new-folder input');
-
-    if ($input.val() === '') {
-        $inputWrapper.addClass('error');
-
-        setTimeout(function() {
-            $inputWrapper.removeClass('error');
-            $input.focus();
-        }, 200);
-    }
-    else {
-        this.createFolder(this.currentdirid, $input.val());
     }
 };
 
@@ -1924,10 +2065,12 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e) {
+    $('.fm-blocks-view, .shared-blocks-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $(this).find('.data-block-view').removeClass('ui-selected');
         // is this required? don't we have a support for a multi-selection context menu?
-        selectionManager.clear_selection();
+        if (selectionManager) {
+            selectionManager.clear_selection();
+        }
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 2);
@@ -2077,6 +2220,10 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
+        if (selectionManager) {
+            selectionManager.clear_selection();
+        }
+
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 6);
@@ -2084,6 +2231,9 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
+        if (selectionManager) {
+            selectionManager.clear_selection();
+        }
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 2);
@@ -2177,6 +2327,24 @@ FileManager.prototype.addGridUIDelayed = function(refresh) {
     }, 20);
 };
 
+FileManager.prototype.getDDhelper = function getDDhelper() {
+    'use strict';
+
+    var id = '#fmholder';
+    if (page === 'start') {
+        id = '#startholder';
+    }
+    $('.dragger-block').remove();
+    $(id).append(
+        '<div class="dragger-block drag" id="draghelper">' +
+        '<div class="dragger-content"></div>' +
+        '<div class="dragger-files-number">1</div>' +
+        '</div>'
+    );
+    $('.dragger-block').show();
+    $('.dragger-files-number').hide();
+    return $('.dragger-block')[0];
+};
 
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
@@ -2249,6 +2417,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $.draggerHeight = $('#draghelper .dragger-content').outerHeight();
             $.draggerWidth = $('#draghelper .dragger-content').outerWidth();
             $.draggerOrigin = M.currentdirid;
+            $.dragSelected = clone($.selected);
         },
         drag: function(e, ui) {
             if (ui.position.top + $.draggerHeight - 28 > $(window).height()) {
@@ -2267,7 +2436,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         cursorAt: {right: 90, bottom: 56},
         helper: function(e, ui) {
             $(this).draggable("option", "containment", [72, 42, $(window).width(), $(window).height()]);
-            return getDDhelper();
+            return M.getDDhelper();
         },
         stop: function(event) {
             if (d) {
@@ -2286,6 +2455,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                     M.onTreeUIOpen(M.currentdirid, false, true);
                 }
             }, 200);
+            delete $.dragSelected;
         }
     });
 
@@ -2417,7 +2587,7 @@ FileManager.prototype.addTreeUI = function() {
             cursorAt: {right: 88, bottom: 58},
             helper: function(e, ui) {
                 $(this).draggable("option", "containment", [72, 42, $(window).width(), $(window).height()]);
-                return getDDhelper();
+                return M.getDDhelper();
             },
             start: function(e, ui) {
                 $.treeDragging = true;

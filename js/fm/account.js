@@ -1,4 +1,19 @@
 function accountUI() {
+    "use strict";
+
+    // Prevent ephemeral session to access account settings via url
+    if (u_type === 0) {
+        msgDialog('confirmation', l[998], l[17146]
+            + ' ' + l[999], l[1000], function(e) {
+            if (e) {
+                loadSubPage('register');
+                return false;
+            }
+            loadSubPage('fm');
+        });
+
+        return false;
+    }
 
     $('.fm-account-notifications').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
@@ -1168,7 +1183,7 @@ function accountUI() {
         });
 
         var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
-        if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
+        if (fmconfig.tpp) {
 
             $cbTpp.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
             $cbTpp.parent().switchClass('checkboxOff', 'checkboxOn');
@@ -1181,17 +1196,16 @@ function accountUI() {
         $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
             var $this = $(this);
 
-            if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
+            if (fmconfig.tpp) {
                 $this.switchClass('checkboxOn', 'checkboxOff');
                 $this.parent().switchClass('checkboxOn', 'checkboxOff');
-                mega.config.setn('tpp', false);
+                mega.config.setn('tpp', 0);
             }
             else {
                 $this.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
                 $this.parent().switchClass('checkboxOff', 'checkboxOn');
-                mega.config.setn('tpp', true);
+                mega.config.setn('tpp', 1);
             }
-
         });
 
         $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');
@@ -1306,9 +1320,9 @@ function accountUI() {
                 $('.fm-account-overlay').fadeIn(100);
                 $this.addClass('active');
                 $('.fm-voucher-popup').removeClass('hidden');
-                voucherCentering($this);
+                accountUI.voucherCentering($this);
                 $(window).rebind('resize.voucher', function(e) {
-                    voucherCentering($this);
+                    accountUI.voucherCentering($this);
                 });
 
                 $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button').rebind('click.closeDialog', function() {
@@ -2336,5 +2350,24 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                 $(this).val(presenceInt.userPresence.autoawaytimeout / 60);
             })
             .val(lastValidNumber);
+    }
+};
+
+accountUI.voucherCentering = function voucherCentering($button) {
+    'use strict';
+
+    var $popupBlock = $('.fm-voucher-popup');
+    var popupHeight = $popupBlock.outerHeight();
+
+    $popupBlock.css({
+        'top': $button.offset().top - popupHeight - 10,
+        'right': $('body').outerWidth() - $button.outerWidth() - $button.offset().left
+    });
+
+    if ($button.offset().top + 10 > popupHeight) {
+        $popupBlock.css('top', $button.offset().top - popupHeight - 10);
+    }
+    else {
+        $popupBlock.css('top', $button.offset().top + $button.outerHeight() + 10);
     }
 };

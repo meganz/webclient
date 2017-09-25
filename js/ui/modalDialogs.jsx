@@ -309,7 +309,7 @@ var ConfirmDialog = React.createClass({
                                 }
                             }}
                             >
-                            {l['7039']}
+                            {l[7039]}
                             </Forms.Checkbox>
                     </div>
                 </ExtraFooterElement>

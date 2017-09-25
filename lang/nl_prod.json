@@ -926,6 +926,7 @@
     "7004": "Bedankt voor uw feedback.",
     "7005": "Gelieve hieronder de reden invoeren",
     "7006": "Laden...",
+    "7039": "Vraag het mij niet opnieuw",
     "7086": "Selecteer uw Linux distro",
     "7087": "Webbrowser",
     "7088": "Transfer Snelheid:",
@@ -1079,9 +1080,6 @@
     "7747": "Daarna, ga alstublieft naar uw e-mail inbox en bevestig de verandering van uw e-mailadres.",
     "7869": "Dit e-mailadres is al geregistreerd. Kies alstublieft een alternatief e-mailadres om door te gaan.",
     "7872": "Toegang tot alle mappen met u gedeeld door geselecteerde [X] zullen verloren gaan.",
-    "7873": "U kunt de extensie (v%1) hieronder downloaden.",
-    "7874": "Het lijkt erop dat uw huidige versie (v%1) verouderd is. U kunt de nieuwste (v%2) hieronder downloaden.",
-    "7875": "Uw toestel (v%1) is up-to-date.",
     "7879": "Toegang tot de mappen gedeeld door [X] werd verwijderd.",
     "7880": "Toegang tot mappen werd verwijderd.",
     "7881": "Dank u! Een van onze ondersteuningsconsultants zal zo snel mogelijk reageren op uw vraag.",
@@ -1830,5 +1828,6 @@
     "17089": "Voordat u uw account annuleert, willen we graag weten waarom u ons verlaat...",
     "17090": "Uw wachtende download overschrijdt de huidige overdracht tegoed die beschikbaar is voor uw IP adres en kan daarom worden onderbroken. Overweeg het kopen van een PRO account om uw overdracht tegoed degelijk te verhogen.",
     "17091": "Download Voortzetten",
-    "17092": "Weet u zeker dat u deze %1 bestandsoverdrachten wilt annuleren?"
+    "17092": "Weet u zeker dat u deze %1 bestandsoverdrachten wilt annuleren?",
+    "17146": "This page is for registered users only."
 }

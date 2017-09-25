@@ -926,6 +926,7 @@
     "7004": "\u0627\u0632 \u0628\u0627\u0632\u062e\u0648\u0631\u062f\u062a\u0627\u0646 \u0645\u062a\u0634\u06a9\u0631\u06cc\u0645.",
     "7005": "\u0644\u0637\u0641\u0627 \u062f\u0644\u06cc\u0644 \u0631\u0627 \u062f\u0631 \u0632\u06cc\u0631 \u0648\u0627\u0631\u062f \u06a9\u0646\u06cc\u062f:",
     "7006": "\u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc ...",
+    "7039": "\u0627\u0632 \u0645\u0646 \u062f\u06cc\u06af\u0631 \u0633\u0648\u0627\u0644 \u0646\u06a9\u0646",
     "7086": "\u0644\u0637\u0641\u0627 linux distro \u062e\u0648\u062f \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f",
     "7087": "\u0645\u0631\u0648\u0631\u06af\u0631 \u0648\u0628",
     "7088": "\u0633\u0631\u0639\u062a \u0627\u0646\u062a\u0642\u0627\u0644:",
@@ -1079,9 +1080,6 @@
     "7747": "\u062f\u0631 \u0627\u062f\u0627\u0645\u0647 \u0628\u0647 \u0627\u06cc\u0645\u06cc\u0644 \u062e\u0648\u062f \u0645\u062f\u0627\u062c\u0639\u0647 \u06a9\u0631\u062f\u0647 \u0648 \u062a\u063a\u06cc\u06cc\u0631 \u0627\u06cc\u0645\u06cc\u0644 \u0631\u0627 \u062a\u0623\u06cc\u06cc\u062f \u06a9\u0646\u06cc\u062f.",
     "7869": "This email address has already been registered. Please choose an alternative email address to proceed.",
     "7872": "Access to any folders shared with you by selected [X] will be lost.",
-    "7873": "You can download the extension (v%1) below.",
-    "7874": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-    "7875": "Your extension (v%1) is up to date.",
     "7879": "Access to folders shared by [X] was removed.",
     "7880": "Access to folders was removed.",
     "7881": "Thank you! One of our support consultants will respond to your enquiry as soon as possible.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

@@ -328,7 +328,7 @@
 
             var lSel = aListSelector;
 
-            hideEmptyGrids();
+            M.hideEmptyGrids();
             $.tresizer();
 
             if (!aUpdate) {
@@ -1087,6 +1087,11 @@
 
 
                 if (!aUpdate) {
+                    if (window.selectionManager) {
+                        window.selectionManager.destroy();
+                        Object.freeze(window.selectionManager);
+                    }
+
                     /**
                      * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
                      * reattach to its events.
@@ -1185,6 +1190,9 @@
             // megaList can be undefined/empty if the current folder had no nodes in it.
             if (DYNLIST_ENABLED && this.megaList) {
                 this.megaList.destroy();
+                if (window.selectionManager) {
+                    window.selectionManager.destroy();
+                }
                 window.selectionManager = false;
             }
         },

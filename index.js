@@ -1205,7 +1205,7 @@ function init_page() {
         }
         else {
             if (ul_queue.length > 0) {
-                openTransfersPanel();
+                M.openTransfersPanel();
             }
 
             if (u_type === 0 && !u_attr.terms) {
@@ -1219,7 +1219,7 @@ function init_page() {
                     ulQueue.resume();
                     uldl_hold = false;
                     if (ul_queue.length > 0) {
-                        showTransferToast('u', ul_queue.length);
+                        M.showTransferToast('u', ul_queue.length);
                     }
                 };
 

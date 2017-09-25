@@ -926,6 +926,7 @@
     "7004": "\u00ce\u0163i mul\u0163umim pentru feedback.",
     "7005": "Te rug\u0103m s\u0103 introduci motivul mai jos",
     "7006": "Se \u00eencarc\u0103...",
+    "7039": "Nu m\u0103 \u00eentreba din nou",
     "7086": "Te rug\u0103m s\u0103 selectezi distribu\u0163ia de Linux",
     "7087": "Browser web",
     "7088": "Vitez\u0103 de transfer:",
@@ -1079,9 +1080,6 @@
     "7747": "Ca urmare a acesteia, te rug\u0103m s\u0103 accesezi e-mailul \u015fi s\u0103 confirmi aceast\u0103 schimbare de e-mail.",
     "7869": "Aceast\u0103 adres\u0103 de e-mail a fost \u00eenregistrat\u0103 deja. Te rug\u0103m s\u0103 alegi o adres\u0103 de e-mail alternativ\u0103 pentru a continua.",
     "7872": "Accesul la orice folder partajat cu tine prin acel(e) [X] selectat(e) va fi pierdut.",
-    "7873": "Po\u0163i desc\u0103rca extensia (v%1) de mai jos.",
-    "7874": "Se pare c\u0103 extensia actual\u0103 (v%1) este \u00eenvechit\u0103. Po\u0163i desc\u0103rca cea mai nou\u0103 (v%2) de mai jos.",
-    "7875": "Extensia ta (v%1) este la zi.",
     "7879": "Accesul la foldere partajat de [X] a fost eliminat.",
     "7880": "Accesul la foldere a fost eliminat.",
     "7881": "Mul\u0163umim! Unul dintre consultan\u0163ii no\u015ftri pentru asisten\u0163\u0103 \u00ee\u0163i va r\u0103spunde cererii c\u00e2t mai cur\u00e2nd posibil.",
@@ -1830,5 +1828,6 @@
     "17089": "Before you close your account, we would like to know why you are leaving us...",
     "17090": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
     "17091": "Continue Download",
-    "17092": "Are you sure you want to cancel these %1 file transfers?"
+    "17092": "Are you sure you want to cancel these %1 file transfers?",
+    "17146": "This page is for registered users only."
 }

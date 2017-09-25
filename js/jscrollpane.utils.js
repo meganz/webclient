@@ -205,6 +205,9 @@ function reselect(n) {
     $('.ui-selected').removeClass('ui-selected');
 
     if (!Array.isArray($.selected)) {
+        if (selectionManager) {
+            selectionManager.clear_selection();
+        }
         $.selected = [];
     }
     var ids = $.selected.map(function(h) {

@@ -166,7 +166,7 @@ mega.ui.tpp = function () {
 
         if (isCached() && $item.is(':hidden')) {
             $item.removeClass('hidden');
-            // setStatus(true);
+            setStatus(true);
         }
     };
 

@@ -1627,9 +1627,11 @@
     "6140": "\u00fa\u010det",
     "6141": "po\u010fakovania",
     "6142": "V\u017edy sa p\u00fdta\u0165 na cie\u013e s\u0165ahovania",
+    "6143": "vyrovn\u00e1vacia pam\u00e4\u0165",
     "6144": "zru\u0161i\u0165 v\u0161etko",
     "6145": "zachyti\u0165",
     "6146": "vy\u010disti\u0165 prenosy",
+    "6147": "vy\u010disti\u0165 do\u010dasn\u00fa pam\u00e4\u0165",
     "6148": "zru\u0161i\u0165 ozna\u010denie",
     "6149": "schr\u00e1nka",
     "6151": "Exportova\u0165 masterk\u013e\u00fa\u010d",
@@ -4296,5 +4298,14 @@
     "17095": "Copy and rename",
     "17096": "Move and rename",
     "17097": "The file will be updated with version history: [A]Learn more[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "This page is for registered users only.",
+    "17147": "Clear previous versions",
+    "17148": "Current Versions",
+    "17149": "Current Version",
+    "17150": "Versions",
+    "17151": "[X] versions",
+    "17152": "1 version",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

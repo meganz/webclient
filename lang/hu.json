@@ -1627,9 +1627,11 @@
     "6140": "fi\u00f3k",
     "6141": "elismer\u00e9sek",
     "6142": "Mindig k\u00e9rdezzen r\u00e1 a let\u00f6lt\u00e9s hely\u00e9re",
+    "6143": "gyors\u00edt\u00f3t\u00e1r",
     "6144": "\u00f6sszes megszak\u00edt\u00e1sa",
     "6145": "r\u00f6gz\u00edt\u00e9s",
     "6146": "\u00e1tvitelek t\u00f6rl\u00e9se",
+    "6147": "gyors\u00edt\u00f3t\u00e1r t\u00f6rl\u00e9se",
     "6148": "kiv\u00e1laszt\u00e1s t\u00f6rl\u00e9se",
     "6149": "v\u00e1g\u00f3lap",
     "6151": "Masterkulcs export\u00e1l\u00e1sa",
@@ -4296,5 +4298,14 @@
     "17095": "Copy and rename",
     "17096": "Move and rename",
     "17097": "The file will be updated with version history: [A]Learn more[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "This page is for registered users only.",
+    "17147": "Clear previous versions",
+    "17148": "Current Versions",
+    "17149": "Current Version",
+    "17150": "Versions",
+    "17151": "[X] versions",
+    "17152": "1 version",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

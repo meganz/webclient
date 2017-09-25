@@ -1627,9 +1627,11 @@
     "6140": "account",
     "6141": "acknowledgements",
     "6142": "Laging tanungin kung saan ang download location",
+    "6143": "cache",
     "6144": "Itigil lahat",
     "6145": "kuhain",
     "6146": "linisin ang transfers o mga paglilipat",
+    "6147": "burahin ang cache",
     "6148": "burahin ang napili",
     "6149": "clipboard",
     "6151": "I-export ang masterkey",
@@ -4296,5 +4298,14 @@
     "17095": "Copy and rename",
     "17096": "Move and rename",
     "17097": "The file will be updated with version history: [A]Learn more[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "This page is for registered users only.",
+    "17147": "Clear previous versions",
+    "17148": "Current Versions",
+    "17149": "Current Version",
+    "17150": "Versions",
+    "17151": "[X] versions",
+    "17152": "1 version",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

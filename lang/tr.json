@@ -1627,9 +1627,11 @@
     "6140": "hesap",
     "6141": "te\u015fekk\u00fcr",
     "6142": "\u0130ndirme konumunu her zaman sor",
+    "6143": "\u00f6nbellek",
     "6144": "t\u00fcm\u00fcn\u00fc iptal et",
     "6145": "g\u00f6r\u00fcnt\u00fc yakala",
     "6146": "aktarmalar\u0131 temizle",
+    "6147": "\u00f6nbelle\u011fi temizle",
     "6148": "se\u00e7imi temizle",
     "6149": "pano",
     "6151": "Ana anahtar\u0131 d\u0131\u015fa aktar",
@@ -4296,5 +4298,14 @@
     "17095": "Kopyala ve yeniden isimlendir",
     "17096": "Ta\u015f\u0131 ve yeniden isimlendir",
     "17097": "Dosya s\u00fcr\u00fcm ge\u00e7mi\u015fiyle g\u00fcncellenecek: [A]Dahas\u0131n\u0131 \u00f6\u011frenin[\/A]",
-    "17146": "Bu sayfa kay\u0131tl\u0131 kullan\u0131c\u0131lar i\u00e7indir."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "Bu sayfa kay\u0131tl\u0131 kullan\u0131c\u0131lar i\u00e7indir.",
+    "17147": "\u00d6nceki s\u00fcr\u00fcmleri temizle",
+    "17148": "Ge\u00e7erli S\u00fcr\u00fcmler",
+    "17149": "Ge\u00e7erli S\u00fcr\u00fcm",
+    "17150": "S\u00fcr\u00fcmler",
+    "17151": "[X] s\u00fcr\u00fcmler",
+    "17152": "1 s\u00fcr\u00fcm",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

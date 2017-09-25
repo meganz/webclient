@@ -1627,9 +1627,11 @@
     "6140": "\u0430\u043a\u0430\u0443\u043d\u0442",
     "6141": "\u043f\u043e\u0442\u0432\u044a\u0440\u0436\u0434\u0435\u043d\u0438\u044f",
     "6142": "\u0412\u0438\u043d\u0430\u0433\u0438 \u043f\u0438\u0442\u0430\u0439 \u0437\u0430 \u0434\u0438\u0440\u0435\u043a\u0442\u043e\u0440\u044f \u0437\u0430 \u0441\u0432\u0430\u043b\u044f\u043d\u0435",
+    "6143": "\u043a\u0435\u0448",
     "6144": "\u043e\u0442\u043c\u0435\u043d\u0438 \u0432\u0441\u0438\u0447\u043a\u043e",
     "6145": "\u0437\u0430\u0441\u043d\u0435\u043c\u0430\u043d\u0435",
     "6146": "\u0438\u0437\u0447\u0438\u0441\u0442\u0438 \u0442\u0440\u0430\u043d\u0441\u0444\u0435\u0440\u0438",
+    "6147": "\u0438\u0437\u0447\u0438\u0441\u0442\u0438 \u043a\u0435\u0448",
     "6148": "\u0438\u0437\u0447\u0438\u0441\u0442\u0438 \u0438\u0437\u0431\u0440\u0430\u043d\u043e\u0442\u043e",
     "6149": "\u043a\u043b\u0438\u043f\u0431\u043e\u0440\u0434",
     "6151": "\u0415\u043a\u0441\u043f\u043e\u0440\u0442\u0438\u0440\u0430\u0439 masterkey",
@@ -4296,5 +4298,14 @@
     "17095": "Copy and rename",
     "17096": "Move and rename",
     "17097": "The file will be updated with version history: [A]Learn more[\/A]",
-    "17146": "This page is for registered users only."
+    "17126": "The dashboard is for registered users only.",
+    "17146": "This page is for registered users only.",
+    "17147": "Clear previous versions",
+    "17148": "Current Versions",
+    "17149": "Current Version",
+    "17150": "Versions",
+    "17151": "[X] versions",
+    "17152": "1 version",
+    "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
 }

@@ -6511,6 +6511,10 @@
         "text": "Always ask for download location",
         "context": ""
     },
+    "6143": {
+        "text": "Cache",
+        "context": "A label for any Cache button, link, text, title, etc. Cache mean cache memory."
+    },
     "6144": {
         "text": "cancel all",
         "context": ""
@@ -6522,6 +6526,10 @@
     "6146": {
         "text": "clean up transfers",
         "context": ""
+    },
+    "6147": {
+        "text": "Clear cache",
+        "context": "A label for any Clear cache button, link, text, title, etc."
     },
     "6148": {
         "text": "clear selection",
@@ -17187,8 +17195,44 @@
         "text": "The file will be updated with version history: [A]Learn more[\/A]",
         "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
     },
+    "17126": {
+        "text": "The dashboard is for registered users only.",
+        "context": "A dialog message saying it is forbidden for an ephemeral user to access the dashboard."
+    },
     "17146": {
         "text": "This page is for registered users only.",
         "context": "A dialog message when user is trying to access the page from an ephemeral session which is allowed for registered users only."
+    },
+    "17147": {
+        "text": "Clear previous versions",
+        "context": "Title of button to delete all previous versions of a file"
+    },
+    "17148": {
+        "text": "Current Versions",
+        "context": "Title of section to display information of all current versions of files."
+    },
+    "17149": {
+        "text": "Current Version",
+        "context": "Title of section to display information of the current version of a file."
+    },
+    "17150": {
+        "text": "Versions",
+        "context": "Title of section to display number of all historical versions of files."
+    },
+    "17151": {
+        "text": "[X] versions",
+        "context": "Message to display the number of historical versions of files. Please keep [X] as it will be replaced at the runtime."
+    },
+    "17152": {
+        "text": "1 version",
+        "context": "Version message when files only have 1 historical version."
+    },
+    "17153": {
+        "text": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+        "context": "A warning message for deleting the whole version history of multiple files."
+    },
+    "17154": {
+        "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
+        "context": "A warning message for deleting the whole version history of one file."
     }
 }

@@ -119,6 +119,9 @@ var ulmanager = {
             FUs.map(function(o) {
                 var ul = o[0];
                 var idx = o[1];
+
+                mBroadcaster.sendMessage('upload:abort', ul.file.id, -0xDEADBEEF);
+
                 if (ul) {
                     ul.destroy();
                 }
@@ -597,7 +600,7 @@ var ulmanager = {
             });
         }
 
-        onUploadStart(file);
+        M.ulstart(file);
         file.done_starting();
     },
 
@@ -638,7 +641,7 @@ var ulmanager = {
             }
             if (ul_queue[ctx.ul_queue_num]) {
                 ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = h || ctx.target;
-                onUploadSuccess(ul_queue[ctx.ul_queue_num], h || false, ctx.faid);
+                M.ulcomplete(ul_queue[ctx.ul_queue_num], h || false, ctx.faid);
             }
             if (ctx.file._replaces) {
                 M.moveNodes([ctx.file._replaces], M.RubbishID, true);
@@ -738,7 +741,7 @@ var ulmanager = {
                 else if (ctx.skipfile) {
                     uq.skipfile = true;
                     ulmanager.ulIDToNode[ulmanager.getGID(uq)] = ctx.n.h;
-                    onUploadSuccess(uq);
+                    M.ulcomplete(uq);
                     File.file.ul_failed = false;
                     File.file.retries = 0;
                     File.file.done_starting();
@@ -905,7 +908,7 @@ ChunkUpload.prototype.updateprogress = function() {
     }
     this.file.progressevents = (this.file.progressevents || 0) + 1;
 
-    onUploadProgress(
+    M.ulprogress(
             this.file,
             Math.floor(tp / this.file.size * 100),
             tp,

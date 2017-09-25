@@ -977,12 +977,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
     }
 
     if ((onChat = (String(this.currentdirid).substr(0, 4) === 'chat'))) {
-        if (!$.ulBunch) {
-            $.ulBunch = Object.create(null);
-        }
-        if (!$.ulBunch[this.currentdirid]) {
-            $.ulBunch[this.currentdirid] = Object.create(null);
-        }
         target = this.currentdirid;
     }
 
@@ -1034,7 +1028,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
 
             if (onChat) {
                 f.chatid = target;
-                $.ulBunch[f.chatid][ul_id] = 1;
             }
         }
         if (!added) {
@@ -1062,6 +1055,23 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
 
             M.onFileManagerReady(function() {
                 mega.ui.tpp.started('ul');
+
+                if (mBroadcaster.hasListener('upload:start')) {
+                    var data = Object.create(null);
+
+                    for (var i = u.length; i--;) {
+                        var f = u[i];
+
+                        data[f.id] = {
+                            size: f.size,
+                            name: f.name,
+                            chat: f.chatid,
+                            isim: is_image(f.name)
+                        };
+                    }
+
+                    mBroadcaster.sendMessage('upload:start', data);
+                }
             });
         }
     }.bind(this);
@@ -1256,6 +1266,8 @@ MegaData.prototype.ulerror = function(ul, error) {
     }
 
     if (ul) {
+        var id = ul.id;
+
         this.ulfinalize(ul, api_strerror(error));
 
         // Hide TPP
@@ -1268,8 +1280,14 @@ MegaData.prototype.ulerror = function(ul, error) {
         else {
             oDestroy(ul);
         }
+        mBroadcaster.sendMessage('upload:error', id, error);
 
         if (error === EOVERQUOTA) {
+            ul_queue.filter(isQueueActive)
+                .forEach(function(ul) {
+                    mBroadcaster.sendMessage('upload:error', ul.id, error);
+                });
+
             mega.ui.tpp.hide();
             ulmanager.abort(null);
             $("tr[id^='ul_'] .transfer-status").text(l[1010]);
@@ -1280,37 +1298,10 @@ MegaData.prototype.ulerror = function(ul, error) {
     }
 };
 
-MegaData.prototype.ulcomplete = function(ul, h, k) {
-    var id = ul.id;
+MegaData.prototype.ulcomplete = function(ul, h, faid) {
+    'use strict';
 
-    if ($.ulBunch && $.ulBunch[ul.chatid]) {
-        var ub = $.ulBunch[ul.chatid], p;
-        ub[id] = h || -0xBADF;
-
-        for (var i in ub) {
-            if (ub[i] === 1) {
-                p = true;
-                break;
-            }
-        }
-
-        if (!p) {
-            var ul_target = ul.chatid;
-            ub = Object.values(ub)
-                .filter(function(m) {
-                    return m !== -0xBADF;
-                });
-            onIdle(function() {
-                if (ub.length) {
-                    $(document).trigger('megaulcomplete', [ul_target, ub]);
-                }
-                delete $.ulBunch[ul_target];
-                if (!$.len($.ulBunch)) {
-                    delete $.ulBunch;
-                }
-            });
-        }
-    }
+    mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid);
 
     if (ul.skipfile) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
@@ -1629,45 +1620,18 @@ MegaData.prototype.hideTransferToast = function hideTransferToast($toast) {
     $('.toast-notification').removeClass('second');
 };
 
+// report a transient upload error
 function onUploadError(ul, errorstr, reason, xhr) {
-    var hn = hostname(ul.posturl);
-
-    /*if (!d && (!xhr || xhr.readyState < 2 || xhr.status)) {
-     var details = [
-     browserdetails(ua).name,
-     String(reason)
-     ];
-     if (xhr || reason === 'peer-err') {
-     if (xhr && xhr.readyState > 1) {
-     details.push(xhr.status);
-     }
-     details.push(hn);
-     }
-     if (details[1].indexOf('mtimeout') == -1 && -1 == details[1].indexOf('BRFS [l:Unk]')) {
-     srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
-     }
-     }*/
+    'use strict';
 
     if (d) {
-        ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
+        ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hostname(ul.posturl));
     }
 
     $('.transfer-table #ul_' + ul.id).addClass('transfer-error');
     $('.transfer-table #ul_' + ul.id + ' .transfer-status').text(errorstr);
 }
 
-function addupload(u) {
-    M.addUpload(u);
-}
-function onUploadStart(id) {
-    M.ulstart(id);
-}
-function onUploadProgress(id, p, bl, bt, speed) {
-    M.ulprogress(id, p, bl, bt, speed);
-}
-function onUploadSuccess(id, bl, bt) {
-    M.ulcomplete(id, bl, bt);
-}
 
 function fm_chromebar(height) {
     if (window.navigator.userAgent.toLowerCase().indexOf('mac') >= 0 || localStorage.chromeDialog == 1) {

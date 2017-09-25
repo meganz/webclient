@@ -787,6 +787,16 @@ function mObjectURL(data, type)
     },
 
     /**
+     * Check whether someone is listening for an event
+     * @param {String} topic A string representing the event type we may be listening for.
+     * @returns {Boolean}
+     */
+    hasListener: function mBroadcaster_hasListener(topic) {
+        'use strict';
+        return Boolean(this._topics[topic]);
+    },
+
+    /**
      * Remove all broadcast events for an specific topic.
      * @param {String} topic The string representing the event type we were listening for.
      * @returns {Boolean} Whether the event was found.

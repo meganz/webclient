@@ -217,8 +217,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
     // Selection of first child level ONLY of .dropdown-item in .dropdown.body
     var menuCMI = '.dropdown.body.files-menu .dropdown-section > .dropdown-item';
-    var currNodeClass = $(e.currentTarget).attr('class');
-    var id = $(e.currentTarget).attr('id');
 
     // is contextmenu disabled
     if (localStorage.contextmenu) {
@@ -310,7 +308,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // Hide all menu-items
         $(menuCMI).hide();
 
-        id = $(e.currentTarget).attr('id');
+        var id = $(e.currentTarget).attr('id');
+        var currNodeClass = $(e.currentTarget).attr('class');
 
         if (id) {
 

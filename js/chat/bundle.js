@@ -393,18 +393,6 @@ React.makeElement = React['createElement'];
 	        }
 	    });
 
-	    $(document).rebind('megaulcomplete.megaChat', function (e, ul_target, uploads) {
-	        if (ul_target.indexOf("chat/") > -1) {
-	            var chatRoom = megaChat.getRoomFromUrlHash(ul_target);
-
-	            if (!chatRoom) {
-	                return;
-	            }
-
-	            chatRoom.attachNodes(uploads);
-	        }
-	    });
-
 	    $(document.body).delegate('.tooltip-trigger', 'mouseover.notsentindicator', function () {
 	        var $this = $(this),
 	            $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
@@ -422,6 +410,22 @@ React.makeElement = React['createElement'];
 
 	        var $notification = $('.tooltip');
 	        $notification.addClass('hidden').removeAttr('style');
+	    });
+
+	    mBroadcaster.addListener('upload:start', function (data) {
+	        if (d) {
+	            MegaLogger.getLogger('onUploadEvent').debug('upload:start', data);
+	        }
+
+	        for (var k in data) {
+	            if (data[k].chat) {
+	                var roomId = data[k].chat.split("/")[1];
+	                if (self.chats[roomId]) {
+	                    self.chats[roomId].onUploadStart(data);
+	                    break;
+	                }
+	            }
+	        }
 	    });
 
 	    self.trigger("onInit");
@@ -4266,7 +4270,7 @@ React.makeElement = React['createElement'];
 	    },
 
 	    uploadFromComputer: function uploadFromComputer() {
-	        $('#fileselect1').trigger('click');
+	        this.props.chatRoom.uploadFromComputer();
 	    },
 	    refreshUI: function refreshUI() {
 	        var self = this;
@@ -10551,6 +10555,141 @@ React.makeElement = React['createElement'];
 	    $masterPromise.linkDoneAndFailTo(MegaPromise.allDone(waitingPromises));
 
 	    return $masterPromise;
+	};
+
+	ChatRoom.prototype.lookupPendingUpload = function (faid, handle) {
+	    if (!this.pendingUploads) {
+	        return;
+	    }
+	    assert(faid || handle, 'lookupPendingUpload is missing both faid and handle args.');
+
+	    for (var uid in this.pendingUploads) {
+	        if (faid && this.pendingUploads[uid].faid === faid || handle && this.pendingUploads[uid].h === handle) {
+	            return uid;
+	        }
+	    }
+	};
+
+	ChatRoom.prototype.onUploadError = function (uid, error) {
+
+	    if (d) {
+	        var logger = MegaLogger.getLogger('onUploadEvent[' + this.roomId + ']');
+	        logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error);
+	    }
+
+	    var ul = this.pendingUploads ? this.pendingUploads[uid] : null;
+
+	    if (ul) {
+	        delete this.pendingUploads[uid];
+	        if (Object.keys(this.pendingUploads).length === 0) {
+	            this.clearUploadListeners();
+	        }
+	    }
+	};
+
+	ChatRoom.prototype.onUploadStart = function (data) {
+	    var self = this;
+	    if (!self.pendingUploads) {
+	        self.pendingUploads = Object.create(null);
+	    }
+
+	    Object.assign(self.pendingUploads, data);
+
+	    if (!self.uploadListeners) {
+	        self.uploadListeners = [];
+	    }
+
+	    if (self.uploadListeners.length === 0) {
+	        var logger = d && MegaLogger.getLogger('onUploadEvent[' + self.roomId + ']');
+
+	        self.uploadListeners.push(mBroadcaster.addListener('upload:completion', function (uid, handle, faid, chat) {
+	            if (!chat) {
+	                return;
+	            }
+	            if (chat.indexOf(self.roomId) === -1) {
+	                if (d) {
+	                    logger.debug('ignoring upload:completion that is unrelated to this chat.');
+	                }
+	            }
+
+	            var n = M.d[handle];
+	            var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+
+	            if (d) {
+	                logger.debug('upload:completion', uid, handle, faid, ul, n);
+	            }
+
+	            if (!ul || !n) {
+
+	                logger.error('Invalid state error...');
+	            } else if (!n.fa && ul.isim) {
+
+	                ul.faid = faid;
+	                ul.h = handle;
+	            } else {
+
+	                delete self.pendingUploads[uid];
+	                self.onUploadComplete([handle]);
+	            }
+	        }));
+
+	        self.uploadListeners.push(mBroadcaster.addListener('upload:error', self.onUploadError.bind(self)));
+	        self.uploadListeners.push(mBroadcaster.addListener('upload:abort', self.onUploadError.bind(self)));
+
+	        self.uploadListeners.push(mBroadcaster.addListener('fa:error', function (faid, error, onStorage) {
+	            var uid = self.lookupPendingUpload(faid);
+	            var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+
+	            if (d) {
+	                logger.debug('fa:error', faid, error, onStorage, uid, ul);
+	            }
+
+	            delete self.pendingUploads[uid];
+
+	            if (ul && ul.faid) {
+	                var n = M.d[handle];
+	                if (n) {
+	                    self.onUploadComplete([handle]);
+	                }
+	            }
+	        }));
+
+	        self.uploadListeners.push(mBroadcaster.addListener('fa:ready', function (handle, fa) {
+	            var uid = self.lookupPendingUpload(false, handle);
+	            var ul = self.pendingUploads[uid];
+	            var n = M.d[handle];
+
+	            if (d) {
+	                logger.debug('fa:ready', handle, fa, uid, ul, n);
+	            }
+
+	            delete self.pendingUploads[uid];
+
+	            if (n) {
+	                self.onUploadComplete([handle]);
+	            }
+	        }));
+	    }
+	};
+
+	ChatRoom.prototype.onUploadComplete = function (uploads) {
+	    this.attachNodes(uploads);
+
+	    this.clearUploadListeners();
+	};
+
+	ChatRoom.prototype.clearUploadListeners = function () {
+	    if (!this.pendingUploads || Object.keys(this.pendingUploads).length === 0) {
+	        for (var i = 0; i < this.uploadListeners.length; i++) {
+	            var listenerId = this.uploadListeners[i];
+	            mBroadcaster.removeListener(listenerId);
+	        }
+	        this.uploadListeners = [];
+	    }
+	};
+
+	ChatRoom.prototype.uploadFromComputer = function () {
+	    $('#fileselect1').trigger('click');
 	};
 
 	ChatRoom.prototype.attachContacts = function (ids) {

@@ -3023,7 +3023,7 @@ function api_faretry(ctx, error, host) {
         }, ctx.faRetryI);
     }
 
-    mBroadcaster.sendMessage('pfa:error', ctx.id, false, EFAILED);
+    mBroadcaster.sendMessage('fa:error', ctx.id, error, ctx.p);
     srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 

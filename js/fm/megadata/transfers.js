@@ -1301,7 +1301,7 @@ MegaData.prototype.ulerror = function(ul, error) {
 MegaData.prototype.ulcomplete = function(ul, h, faid) {
     'use strict';
 
-    mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid);
+    mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid, ul.chatid);
 
     if (ul.skipfile) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');

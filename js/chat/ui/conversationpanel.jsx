@@ -739,7 +739,7 @@ var ConversationPanel = React.createClass({
     },
 
     uploadFromComputer: function() {
-        $('#fileselect1').trigger('click')
+        this.props.chatRoom.uploadFromComputer();
     },
     refreshUI: function() {
         var self = this;

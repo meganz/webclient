@@ -93,12 +93,17 @@ var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
             return false;
         };
 
+        $label.unbind('click.uiCheckboxes');
+        $cbxElement.unbind('click.uiCheckboxes');
+        $input.unbind('change.uiCheckboxes');
+
         if (initialState === true) {
-            if (!$cbxElement.hasClass('checkboxOn')) {
-                $cbxElement
-                    .removeClass('checkboxOff')
-                    .addClass('checkboxOn');
-            }
+            $input.attr('checked', true);
+            $cbxElement.removeClass('checkboxOff').addClass('checkboxOn');
+        }
+        else {
+            $input.removeAttr('checked');
+            $cbxElement.removeClass('checkboxOn').addClass('checkboxOff');
         }
 
         $label.rebind('click.uiCheckboxes', _onToggle);

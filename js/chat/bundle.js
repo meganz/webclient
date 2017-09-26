@@ -8501,6 +8501,8 @@ React.makeElement = React['createElement'];
 
 	var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
 
+	var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
+
 	var GenericConversationMessage = React.createClass({
 	    displayName: 'GenericConversationMessage',
 
@@ -8553,11 +8555,31 @@ React.makeElement = React['createElement'];
 	            });
 	        });
 	    },
+	    componentDidMount: function componentDidMount() {
+	        var self = this;
+	        var $node = $(self.findDOMNode());
+	        $node.delegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut', function (e) {
+	            if (e.target.classList.contains('button')) {
+
+	                return;
+	            }
+
+	            var $block = $(e.target).parents('.message.shared-block');
+	            if ($('.block-view.medium.thumb', $block).size() === 0) {
+
+	                Soon(function () {
+
+	                    $('.button.default-white-button.tiny-button', $block).trigger('click');
+	                });
+	            }
+	        });
+	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;
 	        var $node = $(self.findDOMNode());
 	        $node.unbind('onEditRequest.genericMessage');
 	        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
+	        $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
 	    },
 	    doDelete: function doDelete(e, msg) {
 	        e.preventDefault(e);

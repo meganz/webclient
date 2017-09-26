@@ -8,6 +8,8 @@ var TypingAreaUI = require('./../typingArea.jsx');
 /* 1h as confirmed by Mathias */
 var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
+var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
+
 var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],
     getInitialState: function() {
@@ -60,11 +62,35 @@ var GenericConversationMessage = React.createClass({
             });
         });
     },
+    componentDidMount: function() {
+        var self = this;
+        var $node = $(self.findDOMNode());
+        $node.delegate(
+            CLICKABLE_ATTACHMENT_CLASSES,
+            'click.dropdownShortcut',
+            function(e){
+                if (e.target.classList.contains('button')) {
+                    // prevent recursion
+                    return;
+                }
+
+                var $block = $(e.target).parents('.message.shared-block');
+                if ($('.block-view.medium.thumb', $block).size() === 0) {
+                    // if its not a 'media' (image)
+                    Soon(function() {
+                        // a delay is needed, otherwise React would receive the same click event and close the dropdown
+                        // even before displaying it in the UI.
+                        $('.button.default-white-button.tiny-button', $block).trigger('click');
+                    });
+                }
+            });
+    },
     componentWillUnmount: function() {
         var self = this;
         var $node = $(self.findDOMNode());
         $node.unbind('onEditRequest.genericMessage');
         $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
+        $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
     },
     doDelete: function(e, msg) {
         e.preventDefault(e);

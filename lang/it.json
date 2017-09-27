@@ -4307,5 +4307,6 @@
     "17151": "[X] versioni",
     "17152": "1 versione",
     "17153": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
-    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted."
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
+    "17155": "Total size taken up by file versions:"
 }

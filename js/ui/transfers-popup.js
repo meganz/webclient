@@ -274,7 +274,7 @@ mega.ui.tpp = function () {
         name = getFileName(blk);
 
         // Situation when switching from paused import file to clouddrive
-        if (name === '' && blk === 'dl' && fdl_queue_var) {
+        if (name === '' && blk === 'dl' && typeof fdl_queue_var !== 'undefined') {
             name = Object(fdl_queue_var).name;
         }
         type = ext[fileext(name)];

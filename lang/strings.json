@@ -17234,5 +17234,9 @@
     "17154": {
         "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
         "context": "A warning message for deleting the whole version history of one file."
+    },
+    "17155": {
+        "text": "Total size taken up by file versions:",
+        "context": "A title message in the user's account settings for showing the storage used for file versions."
     }
 }

@@ -9,25 +9,24 @@
  */
 var notify = {
 
-    // The current notifications
+    /** The current notifications **/
     notifications: [],
 
-    // Number of notifications to fetch in the 'c=100' API request.
-    // This is reduced to 50 for fast rendering.
+    /** Number of notifications to fetch in the 'c=100' API request. This is reduced to 50 for fast rendering. */
     numOfNotifications: 50,
 
-    // Locally cached emails and pending contact emails
+    /** Locally cached emails and pending contact emails */
     userEmails: {},
 
-    // jQuery objects for faster lookup
+    /** jQuery objects for faster lookup */
     $popup: null,
     $popupIcon: null,
     $popupNum: null,
 
-    // A flag for if the initial loading of notifications is complete
+    /** A flag for if the initial loading of notifications is complete */
     initialLoadComplete: false,
 
-    // A list of already rendered pending contact request IDs (multiple can exist with reminders)
+    /** A list of already rendered pending contact request IDs (multiple can exist with reminders) */
     renderedContactRequests: [],
 
     /**
@@ -120,12 +119,16 @@ var notify = {
             return false;
         }
 
-        var notification = actionPacket;                    // The action packet
-        var id = makeid(10);                                // Make random ID
-        var type = notification.a;                          // Type of notification e.g. share
-        var currentTime = unixtime();                       // Get the current timestamps in seconds
-        var seen = false;                                   // New notification, so mark as unread
-        var userHandle = notification.u || notification.ou; // User handle e.g. new share from this user
+        // Construct the notification object
+        var newNotification = {
+            data: actionPacket,                             // The action packet
+            id: makeid(10),                                 // Make random ID
+            seen: false,                                    // New notification, so mark as unread
+            timeDelta: 0,                                   // Time since notification was sent
+            timestamp: unixtime(),                          // Get the current timestamps in seconds
+            type: actionPacket.a,                           // Type of notification e.g. share
+            userHandle: actionPacket.u || actionPacket.ou   // User handle e.g. new share from this user
+        };
 
         // Update store of user emails that it knows about if a contact request was recently accepted
         notify.addUserEmails();
@@ -134,23 +137,15 @@ var notify = {
         // some sharing scenarios where a user is part of a share then another user adds files to the share but they
         // are not contacts with that other user so the local state has no information about them and would display a
         // broken notification if the email is not known.
-        if (typeof notify.userEmails[userHandle] === 'undefined') {
+        if (newNotification.type === 'put' && typeof notify.userEmails[newNotification.userHandle] === 'undefined') {
 
             // Once the email is fetched it will re-call the notifyFromActionPacket function with the same actionPacket
-            notify.fetchUserEmailFromApi(userHandle, actionPacket);
+            notify.fetchUserEmailFromApi(newNotification.userHandle, actionPacket);
             return false;
         }
 
-        // Add notifications to start of the list
-        notify.notifications.unshift({
-            data: notification,                         // The full notification object
-            id: id,
-            seen: seen,
-            timeDelta: 0,
-            timestamp: currentTime,
-            type: type,
-            userHandle: userHandle
-        });
+        // Combines the current new notification with the previous one if it meets certain criteria
+        notify.combineNewNotificationWithPrevious(newNotification);
 
         // Show the new notification icon
         notify.countAndShowNewNotifications();
@@ -259,6 +254,79 @@ var notify = {
                 break;
         }
         return false;
+    },
+
+    /**
+     * For incoming action packets, this combines the current new notification with the previous one if it meets
+     * certain criteria. To be combined:
+     * - There must be a previous notification to actually combine with
+     * - It must be a new folder/file added to a share
+     * - The user must be the same (same user handle)
+     * - The previous notification must be less than 5 minutes old, and
+     * - The new notification must be added to the same folder as the previous one.
+     * An example put node:
+     * {"a":"put","n":"U8oHEL7Q","u":"555wupYjkMU","f":[{"h":"F5QQSDJR","t":0}]}
+     * @param {Object} currentNotification The current notification object
+     */
+    combineNewNotificationWithPrevious: function(currentNotification) {
+
+        'use strict';
+
+        // If there are no previous notifications, nothing can be combined,
+        // so add it to start of the list without modification and exit
+        if (notify.notifications.length === 0) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // Get the previous notification (list is already sorted by most recent at the top)
+        var previousNotification = notify.notifications[0];
+
+        // If the new notification or the previous notification is not a new folder/file (put) notification, then they
+        // can't be combined (need to be the same), so add it to start of the list without modification and exit
+        if (currentNotification.type !== 'put' || previousNotification.type !== 'put') {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // If the current notification is not from the same user it cannot be combined
+        // so add it to start of the list without modification and exit
+        if (previousNotification.userHandle !== currentNotification.userHandle) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // If time difference is older than 5 minutes it's a separate event and not worth combining,
+        // so add it to start of the list without modification and exit
+        if (previousNotification.timestamp - currentNotification.timestamp > 300) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // Get details about the current notification
+        var currentNotificationParentHandle = currentNotification.data.n;
+        var currentNotificationNodes = currentNotification.data.f;
+
+        // Get details about the previous notification
+        var previousNotificationParentHandle = previousNotification.data.n;
+        var previousNotificationNodes = previousNotification.data.f;
+
+        // If parent folders are not the same, they cannot be combined, so
+        // add it to start of the list without modification and exit
+        if (currentNotificationParentHandle !== previousNotificationParentHandle) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // Combine the folder/file nodes from the current notification to the previous one
+        var combinedNotificationNodes = previousNotificationNodes.concat(currentNotificationNodes);
+
+        // Replace the current notification's nodes with the combined nodes
+        currentNotification.data.f = combinedNotificationNodes;
+
+        // Remove the previous notification and add the current notification with combined nodes from the previous
+        notify.notifications.shift();
+        notify.notifications.unshift(currentNotification);
     },
 
     /**

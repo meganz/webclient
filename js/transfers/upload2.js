@@ -120,9 +120,10 @@ var ulmanager = {
                 var ul = o[0];
                 var idx = o[1];
 
-                mBroadcaster.sendMessage('upload:abort', ul.file.id, -0xDEADBEEF);
-
                 if (ul) {
+                    if (ul.file) {
+                        mBroadcaster.sendMessage('upload:abort', ul.file.id, -0xDEADBEEF);
+                    }
                     ul.destroy();
                 }
                 ul_queue[idx] = Object.freeze({});

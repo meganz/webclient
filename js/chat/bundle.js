@@ -419,7 +419,7 @@ React.makeElement = React['createElement'];
 
 	        for (var k in data) {
 	            if (data[k].chat) {
-	                var roomId = data[k].chat.split("/")[1];
+	                var roomId = data[k].chat.replace("g/", "").split("/")[1];
 	                if (self.chats[roomId]) {
 	                    self.chats[roomId].onUploadStart(data);
 	                    break;
@@ -10628,7 +10628,7 @@ React.makeElement = React['createElement'];
 	            if (!chat) {
 	                return;
 	            }
-	            if (chat.indexOf(self.roomId) === -1) {
+	            if (chat.indexOf("/" + self.roomId) === -1) {
 	                if (d) {
 	                    logger.debug('ignoring upload:completion that is unrelated to this chat.');
 	                }

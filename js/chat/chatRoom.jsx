@@ -912,7 +912,7 @@ ChatRoom.prototype.onUploadStart = function(data) {
                 if (!chat) {
                     return;
                 }
-                if (chat.indexOf(self.roomId) === -1) {
+                if (chat.indexOf("/" + self.roomId) === -1) {
                     if (d) {
                         logger.debug('ignoring upload:completion that is unrelated to this chat.');
                     }

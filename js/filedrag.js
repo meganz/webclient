@@ -133,7 +133,7 @@
 
     function pushUpload() {
         if (!--dir_inflight && $.dostart) {
-            addupload(filedrag_u);
+            M.addUpload(filedrag_u);
             filedrag_u = [];
             if (page === 'start') {
                 start_upload();
@@ -378,7 +378,7 @@
                     u.push(f);
                 }
             }
-            addupload(u);
+            M.addUpload(u);
             if (page == 'start') {
                 start_upload();
             }

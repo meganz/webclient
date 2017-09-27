@@ -3023,6 +3023,7 @@ function api_faretry(ctx, error, host) {
         }, ctx.faRetryI);
     }
 
+    mBroadcaster.sendMessage('fa:error', ctx.id, error, ctx.p);
     srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 
@@ -3275,19 +3276,26 @@ function api_getfa(id) {
 }
 
 function api_attachfileattr(node, id) {
+    'use strict';
+
     var fa = api_getfa(id);
 
     storedattr[id].target = node;
 
     if (fa) {
-        api_req({ a: 'pfa', n: node, fa: fa }, {
-            callback: function(res) {
+        M.req({a: 'pfa', n: node, fa: fa})
+            .fail(function(res) {
                 if (res === EACCESS) {
                     api_pfaerror(node);
                 }
-            }
-        });
+                mBroadcaster.sendMessage('pfa:error', id, node, res);
+            })
+            .done(function() {
+                mBroadcaster.sendMessage('pfa:complete', id, node, fa);
+            });
     }
+
+    return fa;
 }
 
 /** handle ufa/pfa EACCESS error */

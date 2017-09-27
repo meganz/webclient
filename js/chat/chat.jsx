@@ -410,19 +410,6 @@ Chat.prototype.init = function() {
         }
     });
 
-
-    $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {
-        if (ul_target.indexOf("chat/") > -1) {
-            var chatRoom = megaChat.getRoomFromUrlHash(ul_target);
-
-            if (!chatRoom) {
-                return;
-            }
-
-            chatRoom.attachNodes(uploads);
-        }
-    });
-
     $(document.body).delegate('.tooltip-trigger', 'mouseover.notsentindicator', function() {
         var $this = $(this),
             $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
@@ -444,6 +431,23 @@ Chat.prototype.init = function() {
         // hide all tooltips
         var $notification = $('.tooltip');
         $notification.addClass('hidden').removeAttr('style');
+    });
+
+
+    mBroadcaster.addListener('upload:start', function(data) {
+        if (d) {
+            MegaLogger.getLogger('onUploadEvent').debug('upload:start', data);
+        }
+
+        for (var k in data) {
+            if (data[k].chat) {
+                var roomId = data[k].chat.split("/")[1];
+                if (self.chats[roomId]) {
+                    self.chats[roomId].onUploadStart(data);
+                    break;
+                }
+            }
+        }
     });
 
     self.trigger("onInit");

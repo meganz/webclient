@@ -138,8 +138,16 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 items['.sh4r1ng-item'] = 1;
             }
         }
-        else if (is_image(selNode)) {
-            items['.preview-item'] = 1;
+        else {
+            if ((selNode.tvf > 0) && !folderlink) {
+                items['.properties-versions'] = 1;
+                if (M.getNodeRights(selNode.h) > 1) {
+                    items['.clearprevious-versions'] = 1;
+                }
+            }
+            if (is_image(selNode)) {
+                items['.preview-item'] = 1;
+            }
         }
 
         if (M.getNodeRights(selNode.h) > 1) {
@@ -197,6 +205,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.copy-item'];
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
         items['.import-item'] = 1;
     }
 

@@ -1583,8 +1583,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
                             for (var h in M.c[parents[i]]) {
                                 handles.push(h);
 
-                                // FIXME: with file versioning, files can have children, too!
-                                if (M.d[h].t) {
+                                // with file versioning, files can have children, too!
+                                if (M.d[h].t || M.d[h].tvf) {
                                     p.push(h);
                                 }
                             }
@@ -1724,7 +1724,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     var folders = [];
                     for (var i = handles.length; i--;) {
                         var h = handles[i];
-                        if (M.d[h] && M.d[h].t) {
+                        if (M.d[h] && (M.d[h].t || M.d[h].tf)) {
                             folders.push(h);
                         }
                     }

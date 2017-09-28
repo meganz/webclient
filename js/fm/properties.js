@@ -76,10 +76,18 @@
         var size = 0;
         var sfilecnt = 0;
         var sfoldercnt = 0;
+        var vsize = 0;
+        var svfilecnt = 0;
         var n;
+        var versioningFlag = false;
 
         for (var i = $.selected.length; i--;) {
             n = $.selected[i];
+            if (n.tvf) {
+                $dialog.addClass('versioning');
+                versioningFlag = true;
+            }
+
             if (!n) {
                 console.error('propertiesDialog: invalid node', $.selected[i]);
             }
@@ -88,10 +96,14 @@
                 sfilecnt += n.tf;
                 sfoldercnt += n.td;
                 foldercnt++;
+                vsize += n.tvb;
+                svfilecnt += n.tvf;
             }
             else {
                 filecnt++;
                 size += n.s;
+                vsize += (n.tvb) ? n.tvb : 0;
+                svfilecnt += (n.tvf) ? n.tvf : 0;
             }
         }
         if (!n) {
@@ -191,15 +203,22 @@
                 p.t2 = htmlentities(l[8649]);
             }
 
-            p.t4 = bytesToSize(size);
+            p.t4 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
             p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
-            p.t8 = p.t9 ? l[896] + ':' : '';
-            p.t10 = '';
-            p.t11 = '';
+            p.t8 = p.t9 ? (l[896] + ':') : '';
+            p.t12 = ' second';
+            p.t13 = l[17150] + ':';
+            p.t14 = (svfilecnt === 1) ? l[17152] : l[17151].replace("[X]", svfilecnt);
+            p.t15 = l[17149] + ':';
+            p.t16 = bytesToSize(size);
+            p.t17 = ' second';
+            p.t18 = l[16474] + ':';
+            p.t19 = bytesToSize(vsize);
 
             if (foldercnt) {
                 p.t6 = l[897] + ':';
                 p.t7 = fm_contains(sfilecnt, sfoldercnt);
+                p.t15 = l[17148] + ':';
                 if ($dialog.hasClass('shared')) {
                     users = M.getSharingUsers($.selected, true);
 
@@ -236,16 +255,27 @@
                     p.t11 = fm_contains(sfilecnt, sfoldercnt);
                 }
             }
+            if (filecnt && versioningFlag) {
+                p.t14 = '<a href ="#" id = "previousversions" class="red" >'  + p.t14 + '</a>';
+            }
         }
         else {
             $dialog.addClass('multiple folders-only');
             p.t1 = '';
             p.t2 = '<b>' + fm_contains(filecnt, foldercnt) + '</b>';
             p.t3 = l[894] + ':';
-            p.t4 = bytesToSize(size);
+            p.t4 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
             p.t5 = ' second';
             p.t8 = l[93] + ':';
             p.t9 = l[1025];
+            p.t12 = '';
+            p.t13 = l[17150] + ':';
+            p.t14 = (svfilecnt === 1) ? l[17152] : l[17151].replace("[X]", svfilecnt);
+            p.t15 = l[17148] + ':';
+            p.t16 = bytesToSize(size);
+            p.t17 = '';
+            p.t18 = l[16474] + ':';
+            p.t19 = bytesToSize(vsize);
 
             users = M.getSharingUsers($.selected, true);
             if (users.length) {
@@ -253,24 +283,39 @@
             }
         }
 
+        var vhtml = versioningFlag
+            ?
+            '<div class="properties-float-bl' + p.t12 + '"><span class="properties-small-gray">' + p.t13 + '</span>'
+            + '<span class="propreties-dark-txt">' + p.t14 + '</span></div>'
+            + '<div class="properties-float-bl"><span class="properties-small-gray">' + p.t15 + '</span>'
+            + '<span class="propreties-dark-txt">' + p.t16 + '</span></div>'
+            + '<div class="properties-float-bl' + p.t17 + '"><span class="properties-small-gray">' + p.t18 + '</span>'
+            + '<span class="propreties-dark-txt">' + p.t19 + '</span></div>'
+            : '';
+        var singlenodeinfohtml  = (((filecnt + foldercnt) === 1) || (versioningFlag === false))
+            ?
+            '<div class="properties-float-bl' + p.t5 + '"><span class="properties-small-gray">' + p.t6 + '</span>'
+            + '<span class="propreties-dark-txt">' + p.t7 + '</span></div>'
+            : '';
+        var shareinfohtml = (typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined')
+            ? ''
+            : '<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
+            + '<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
+
         var html = '<div class="properties-small-gray">' + p.t1 + '</div>'
             + '<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
             + ' <span class="file-settings-icon"><span></span></span></div>'
             + '<div><div class="properties-float-bl"><span class="properties-small-gray">' + p.t3 + '</span>'
             + '<span class="propreties-dark-txt">' + p.t4 + '</span></div>'
-            + '<div class="properties-float-bl' + p.t5 + '"><span class="properties-small-gray">' + p.t6 + '</span>'
-            + '<span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl">'
-            + '<div class="properties-small-gray">' + p.t8 + '</div>'
-            + '<div class="propreties-dark-txt contact-list">' + p.t9
+            + vhtml
+            + singlenodeinfohtml
+            + '<div class="properties-float-bl">'
+            + '<div class="properties-small-gray">' + p.t8
+            + '</div><div class="propreties-dark-txt contact-list">' + p.t9
             + '<div class="contact-list-icon"></div></div></div>'
-            + '<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
-            + '<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
-        $('.properties-txt-pad').html(html);
+            + shareinfohtml;
 
-        if (typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined') {
-            $('.properties-small-gray.t10').addClass('hidden');
-            $('.propreties-dark-txt.t11').addClass('hidden');
-        }
+        $('.properties-txt-pad').html(html);
 
         $('.properties-body', $dialog).rebind('click', function() {
 
@@ -280,6 +325,12 @@
                 $fsi.click();
             }
         });
+
+        if ((filecnt === 1) && (foldercnt === 0)) {
+            $('#previousversions').rebind('click', function(ev) {
+                fileversioning.fileVersioningDialog(n.h);
+            });
+        }
 
         $('.fm-dialog-close', $dialog).rebind('click', _propertiesDialog);
 

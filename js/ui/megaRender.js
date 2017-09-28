@@ -20,8 +20,11 @@
                     '<td width="100" class="size"></td>' +
                     '<td width="130" class="type"></td>' +
                     '<td width="120" class="time"></td>' +
-                    '<td width="62" class="grid-url-field own-data">' +
+                    '<td width="90" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="small-icon icons-sprite grey-clock"></i>' +
+                        '</span>' +
                         '<span class="data-item-icon"></span>' +
                     '</td>' +
                 '</tr>' +
@@ -32,6 +35,9 @@
                 '<span class="data-block-bg ">' +
                     '<span class="data-block-indicators">' +
                         '<span class="file-status-icon indicator"></span>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="small-icon icons-sprite grey-clock"></i>' +
+                        '</span>' +
                         '<span class="data-item-icon indicator"></span>' +
                     '</span>' +
                     '<span class="block-view-file-type"><img/></span>' +
@@ -829,7 +835,9 @@
                     var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
                     aTemplate.querySelector(selector).classList.add('star');
                 }
-
+                if (!aNode.t && aNode.tvf) {
+                    aTemplate.classList.add('versioning');
+                }
                 if (this.viewmode) {
                     tmp = aTemplate.querySelector('.block-view-file-type');
 

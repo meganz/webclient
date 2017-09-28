@@ -56,7 +56,7 @@ MegaData.prototype.getDownloadFolderNodes = function(n, md, nodes, paths) {
         this.makeDir(n);
     }
 
-    var subids = this.getNodesSync(n);
+    var subids = this.getNodesSync(n, false, false, true);
 
     for (var j = 0; j < subids.length; j++) {
         var p = this.getPath(subids[j]);
@@ -184,7 +184,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                 }
 
                 if (node.t) {
-                    foreach(M.getNodesSync(node.h));
+                    foreach(M.getNodesSync(node.h, false, false, true));
                 }
             };
 

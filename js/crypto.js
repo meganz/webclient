@@ -1585,6 +1585,9 @@ function api_reqfailed(c, e) {
             );
         }});
     }
+    else {
+        api_reqerror(apixs[c], EAGAIN, 0);
+    }
 }
 
 var failxhr;

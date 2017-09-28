@@ -24,6 +24,8 @@ MegaData.prototype.renderMain = function(aUpdate) {
         this.megaRender = new MegaRender(this.viewmode);
     }
 
+    var container;
+
     // cleanupLayout will render an "empty grid" layout if there
     // are no nodes in the current list (Ie, M.v), if so no need
     // to call renderLayout therefore.
@@ -31,37 +33,71 @@ MegaData.prototype.renderMain = function(aUpdate) {
 
         if (this.currentdirid === 'opc') {
             this.drawSentContactRequests(this.v, 'clearGrid');
+            container = $('.grid-scrolling-table.opc');
         }
         else if (this.currentdirid === 'ipc') {
             this.drawReceivedContactRequests(this.v, 'clearGrid');
+            container = $('.grid-scrolling-table.ipc');
         }
         else {
             numRenderedNodes = this.megaRender.renderLayout(aUpdate, this.v);
+            container = this.megaRender.container;
         }
     }
 
     // No need to bind mouse events etc (gridUI/iconUI/selecddUI)
     // if there weren't new rendered nodes (Ie, they were cached)
-    if (numRenderedNodes) {
 
+    if (numRenderedNodes) {
         if (!aUpdate) {
             M.addContactUI();
-
             if (this.viewmode) {
                 fa_duplicates = Object.create(null);
                 fa_reqcnt = 0;
             }
-
             if ($.rmItemsInView) {
                 $.rmInitJSP = this.fsViewSel;
             }
         }
-
         this.rmSetupUI(aUpdate);
     }
 
+    this.initShortcutsAndSelection(container, aUpdate);
+
     if (d) {
         console.timeEnd('renderMain');
+    }
+};
+
+MegaData.prototype.initShortcutsAndSelection = function (container, aUpdate) {
+    if (!window.fmShortcuts) {
+        window.fmShortcuts = new FMShortcuts();
+    }
+
+
+    if (!aUpdate) {
+        if (window.selectionManager) {
+            window.selectionManager.destroy();
+            Object.freeze(window.selectionManager);
+        }
+
+        /**
+         * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
+         * reattach to its events.
+         *
+         * @type {SelectionManager}
+         */
+        window.selectionManager = new SelectionManager(
+            $(container),
+            $.selected && $.selected.length > 0
+        );
+
+        // restore selection if needed
+        if ($.selected) {
+            $.selected.forEach(function(h) {
+                selectionManager.add_to_selection(h);
+            });
+        }
     }
 };
 

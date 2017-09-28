@@ -114,7 +114,6 @@ module.exports = function(config) {
         'js/vendor/smartcrop.js',
         'js/filetypes.js',
         'js/ui/miniui.js',
-        'js/ui/filepicker.js',
         'js/ui/export.js',
         'js/ui/dialog.js',
         'js/ui/feedbackDialog.js',

@@ -1088,37 +1088,8 @@
              * @param {Array}   aNodeList The list of ufs-nodes processed
              * @param {Object}  aUserData  Any data provided by initializers
              */
-            '*': function(aUpdate, aNodeList, aUserData) {
-                if (!window.fmShortcuts) {
-                    window.fmShortcuts = new FMShortcuts();
-                }
+            '*': function(aUpdate, aNodeList, aUserData) {},
 
-
-                if (!aUpdate) {
-                    if (window.selectionManager) {
-                        window.selectionManager.destroy();
-                        Object.freeze(window.selectionManager);
-                    }
-
-                    /**
-                     * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
-                     * reattach to its events.
-                     *
-                     * @type {SelectionManager}
-                     */
-                    window.selectionManager = new SelectionManager(
-                        $(this.container),
-                        $.selected && $.selected.length > 0
-                    );
-
-                    // restore selection if needed
-                    if ($.selected) {
-                        $.selected.forEach(function(h) {
-                            selectionManager.add_to_selection(h);
-                        });
-                    }
-                }
-            },
             /**
              * @param {Boolean} aUpdate   Whether we're updating the list
              * @param {Array}   aNodeList The list of ufs-nodes processed

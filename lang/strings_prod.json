@@ -6631,6 +6631,30 @@
         "text": "Please check that the key is correct or ask the creator of the link again.",
         "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is a second message which is shown when the decryption key entered is not correct."
     },
+    "16474": {
+        "text": "Previous versions",
+        "context": "A button label which opens a dialog to display the full version history of the selected file."
+    },
+    "16475": {
+        "text": "Revert",
+        "context": "A button label which reverts a certain version of a file to be the current version of the selected file."
+    },
+    "16476": {
+        "text": "Edited by %1 ",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
+    },
+    "16477": {
+        "text": "Renamed from %1 by %2",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous filename by a particular user. Please keep the placeholders %1 which will be replaced by the filename and %2 which will be replaced by the email address."
+    },
+    "16480": {
+        "text": "Edited by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by the user themself."
+    },
+    "16481": {
+        "text": "Renamed from %1 by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name by the user itself. Please keep the placeholder %1 which will be replaced by the filename."
+    },
     "16485": {
         "text": "Duplicate items",
         "context": "Dialog header. Dialog is displayed if uploading file already exists in folder."
@@ -6642,14 +6666,6 @@
     "16487": {
         "text": "Select the file you want to keep:",
         "context": "User is able to select file version if uploading file already exists in folder."
-    },
-    "16488": {
-        "text": "Upload and replace",
-        "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
-    },
-    "16489": {
-        "text": "Replace the file in the destination folder with the file you are uploading:",
-        "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
     },
     "16490": {
         "text": "Don't upload",
@@ -7319,8 +7335,60 @@
         "text": "Are you sure you want to cancel these %1 file transfers?",
         "context": "A message shown to the user when they attempt to cancel a bunch of selected transfers. Please leave the %1 placeholder which will be replaced with the number of file transfers."
     },
+    "17093": {
+        "text": "Upload and update",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user update the file in the destination folder with generating a new version with the file he is uploading.\r\n"
+    },
+    "17094": {
+        "text": "Upload and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is uploading to avoid filename conflict.\r\n"
+    },
+    "17095": {
+        "text": "Copy and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is copying to avoid filename conflict.\r\n"
+    },
+    "17096": {
+        "text": "Move and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is moving to avoid filename conflict.\r\n"
+    },
+    "17097": {
+        "text": "The file will be updated with version history: [A]Learn more[\/A]",
+        "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
+    },
     "17146": {
         "text": "This page is for registered users only.",
         "context": "A dialog message when user is trying to access the page from an ephemeral session which is allowed for registered users only."
+    },
+    "17147": {
+        "text": "Clear previous versions",
+        "context": "Title of button to delete all previous versions of a file"
+    },
+    "17148": {
+        "text": "Current Versions",
+        "context": "Title of section to display information of all current versions of files."
+    },
+    "17149": {
+        "text": "Current Version",
+        "context": "Title of section to display information of the current version of a file."
+    },
+    "17150": {
+        "text": "Versions",
+        "context": "Title of section to display number of all historical versions of files."
+    },
+    "17151": {
+        "text": "[X] versions",
+        "context": "Message to display the number of historical versions of files. Please keep [X] as it will be replaced at the runtime."
+    },
+    "17152": {
+        "text": "1 version",
+        "context": "Version message when files only have 1 historical version."
+    },
+    "17154": {
+        "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
+        "context": "A warning message for deleting the whole version history of one file."
+    },
+    "17155": {
+        "text": "Total size taken up by file versions:",
+        "context": "A title message in the user's account settings for showing the storage used for file versions."
     }
 }

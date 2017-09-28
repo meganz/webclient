@@ -320,6 +320,11 @@ function accountUI() {
                 return false;
             });
 
+        perc_c = Math.floor(account.space_used / account.space * 100);
+        if (perc_c > 100) {
+            perc_c = 100;
+        }
+
         // Cloud drive
         $('.account.progress-size.cloud-drive').text(
             account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
@@ -343,8 +348,10 @@ function accountUI() {
         );
         // Progressbar
         $('.tab-content .account.progress-bar').css('width', perc_c + '%');
-
-
+        // Versioning
+        $('.tab-content .account.progress-size.versioning').text(
+            bytesToSize(account.stats[M.RootID].vbytes)
+        );
         /* achievements */
         if (!account.maf) {
             $('.fm-right-account-block').removeClass('active-achievements');

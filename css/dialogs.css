@@ -1222,12 +1222,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/nw-fm-sprite_v24.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v25.svg);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/nw-fm-sprite_v24.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v25.svg);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }
@@ -2035,6 +2035,290 @@ li.token-input-token-invite .input-close {
 
 }
 /* end of Password remider */
+
+/* FM file versioning overlay */
+.fm-versioning.overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 1010px;
+    background-color: #FAFAFA;
+    z-index: 1200;
+}
+.fm-versioning.header {
+    background-color: white;
+    height: 64px;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    
+}
+.fm-versioning.body {
+        height: 100%;
+    height: -webkit-calc(100% -64x);
+    height: -moz-calc(100% - 64px);
+    height: calc(100% - 64px);
+    width: 1010px;
+    margin: 0 auto;
+    padding: 0 50px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.fm-versioning.pad {
+    width: 1010px;
+    margin: 0 auto;
+    padding: 0 50px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: table;
+    table-layout: fixed;
+}
+.fm-versioning.top-column {
+    display: table-cell;
+    font-size: 0;
+    white-space: nowrap;
+    vertical-align: top;
+}
+.fm-versioning .jspVerticalBar {
+    width: 6px;
+}
+.fm-versioning.button.close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    cursor: pointer;
+}
+.fm-versioning.pad .default-white-button {
+    margin-top: 18px;
+    padding-left: 12px;
+    margin-left: 8px;
+    display: inline-block;
+    min-width: 0;
+}
+.default-white-button.semi-small i.reverted-clock, .default-white-button.semi-small i.clock-with-cross {
+    margin-top: 5px;
+}
+.default-white-button.semi-small i.rubbish-bin-icon {
+    margin-left: -7px;
+}
+.fm-versioning .medium-file-icon {
+    position:absolute;
+        margin: 13px 0 0 37px;
+}
+.fm-versioning.file-data {
+    padding: 14px 0 0 87px;
+    
+}
+.fm-versioning.file-name {
+    font-size: 18px;
+    line-height: 20px;
+    color: #666666;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    
+}
+.fm-versioning.file-name span.red {
+    font-size: 14px;
+    color: #FF333A;
+    font-family: 'source_sans_prosemibold';
+    padding: 0 0 0 10px;
+    cursor: default;
+}
+.fm-versioning.file-info span.red {
+    color: #FF333A;
+}
+.fm-versioning.file-path {
+    font-size: 13px;
+    line-height: 17px;
+    color: #999999;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+.fm-versioning.file-path span:not(:first-child) {
+    position:relative;
+    padding-left: 13px;
+}
+.fm-versioning.file-path span:not(:first-child)::before {
+    content:'';
+    display:block;
+    width: 10px;
+    height: 17px;
+    left: 2px;
+    top: 0;
+    position: absolute;
+    background-image: url(../images/mega/icons-sprite_v8.png);
+    background-position: -6px -743px;
+}
+.fm-versioning.scroll-bl {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.fm-versioning.content {
+    padding: 0 0 20px 0;
+}
+.fm-versioning.data {
+    font-size: 18px;
+    line-height: 23px;
+    color: #FF333A;
+    padding: 24px 0 10px 36px;
+}
+.fm-versioning.data span {
+    border-bottom: 2px solid #FF333A;
+    display:inline-block;
+    padding: 0 4px 2px 4px;
+}
+.fm-versioning.file-info-row {
+    height: 48px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position:relative;
+        -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.fm-versioning.file-info-row:last-child {
+    border-bottom: 0;
+}
+.fm-versioning.file-info-row:hover {
+    background-color: rgba(0,0,0,0.02);
+}
+.fm-versioning.table-cell {
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+        white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    -webkit-transition: all 100ms ease-in-out;
+    -moz-transition: all 100ms ease-in-out;
+    -o-transition: all 100ms ease-in-out;
+    -ms-transition: all 100ms ease-in-out;
+    transition: all 100ms ease-in-out;
+}
+.fm-versioning.table-cell span {
+    vertical-align: top;
+    padding-right: 14px;
+}
+.fm-versioning.table-cell span:empty {
+    padding: 0;
+}
+.fm-versioning.table-cell i {
+    display: inline-block;
+    margin: -2px 9px 0 0;
+    vertical-align: top;
+}
+.fm-versioning.file-info-row .medium-file-icon {
+    margin-top: 4px;
+    
+}
+.fm-versioning .radio-input {
+    position: absolute;
+    margin: 15px 0 0 7px;
+}
+.fm-versioning.table-cell .file-name {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+}
+.fm-versioning.file-info {
+    font-size: 13px;
+    line-height: 17px;
+     color:#999999;
+    
+}
+.fm-versioning.modified-time {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+}
+.fm-versioning.modified-info {
+    font-size: 14px;
+    line-height: 18px;
+    color: #777777;
+}
+.fm-versioning.file-data.table-cell {
+    padding: 5px 14px 0 87px;
+    width: 35%;
+}
+.fm-versioning.modified-time.table-cell {
+    padding: 14px 14px 0 0;
+    width: 15%;
+}
+.fm-versioning.modified-info.table-cell {
+    padding: 14px 0 0 0;
+    width: 50%;
+}
+.fm-versioning.modified-time.table-cell i.clock {
+    margin-right: 6px;
+    
+}
+.fm-versioning.file-info .size {
+    position:relative;
+}
+.fm-versioning.table-cell span.light-grey {
+    color: #999999;
+}
+.fm-versioning.table-cell span.italic {
+    font-style: italic;
+}
+.fm-versioning.table-cell span.strong {
+    color: #666666;
+    font-family: 'source_sans_prosemibold';
+}
+.fm-versioning.buttons {
+    position:absolute;
+    right: 6px;
+    top: 11px;
+    font-size: 0;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    visibility: hidden;
+}
+.fm-versioning.buttons .button {
+    display: inline-block;
+    padding: 3px;
+    margin: 0 0 0 11px;
+    
+}
+.fm-versioning.buttons .button i {
+    margin: 0;
+}
+.file-info-row:hover .fm-versioning.modified-info.table-cell {
+    padding-right: 110px;
+}
+.file-info-row:hover .fm-versioning.buttons {
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    visibility: visible;
+}
+.table-cell .file-path {
+    fline-height: 19px;
+}
+/* end of FM file versioning overlay */
 
 /* Resume-transfer dialog*/
 .fm-dialog.resume-transfer {

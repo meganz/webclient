@@ -355,7 +355,7 @@ dashboardUI.updateCloudDataWidget = function() {
     var folders = 832;
     var data = M.getDashboardData();
     var locale = [files, folders, files, folders, folders, files];
-    var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links'];
+    var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'versions'];
     var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
     $('.data-item .links-s').rebind('click', function() {

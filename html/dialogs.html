@@ -790,26 +790,35 @@
            </div>
         </div>
         <span class="file-status-icon"></span>
+        <div class="dialog versioning-indicator">
+            <i class="small-icon icons-sprite grey-clock"></i>
+        </div>
         <span class="link-icon"></span>
         <div class="properties-elements-counter"><span></span></div>
         <div class="properties-file-icon">
         </div>
-        <div class="properties-txt-pad">
-            <div class="properties-small-gray">[$86]</div>
-            <div class="priperties-name-block">
-              <div class="propreties-dark-txt">Filename.ext</div>
-              <span class="file-settings-icon"><span></span></span>
+        <div class="properties-txt-wrapper">
+            <div class="properties-txt-pad">
+                <div class="properties-small-gray">[$86]</div>
+                <div class="priperties-name-block">
+                  <div class="propreties-dark-txt">Filename.ext</div>
+                  <span class="file-settings-icon"><span></span></span>
+                </div>
+                <div class="properties-float-bl">
+                    <span class="properties-small-gray">[$87]:</span>
+                    <span class="propreties-dark-txt">100kb</span>
+                </div>
+                <div class="properties-float-bl second">
+                    <span class="properties-small-gray">Versions:</span>
+                    <a class="propreties-dark-txt">10 versions</a>
+                </div>
+                <div class="properties-small-gray">[$86]</div>
+                <div class="propreties-dark-txt">Filename.ext</div>
             </div>
-            <div class="properties-float-bl">
-                <span class="properties-small-gray">[$87]:</span>
-                <span class="propreties-dark-txt">100kb</span>
+        </div>
+        <div class="properties-previous-versions">
+            <div class="grid-scrolling-table">
             </div>
-            <div class="properties-float-bl second">
-                <span class="properties-small-gray">[$87]</span>
-                <span class="propreties-dark-txt">100kb</span>
-            </div>
-            <div class="properties-small-gray">[$86]</div>
-            <div class="propreties-dark-txt">Filename.ext</div>
         </div>
         <div class="clear"></div>
     </div>
@@ -3366,17 +3375,17 @@
 
         <div class="duplicate-conflict action-block a1">
             <div class="duplicate-conflict red-header">
-                [$16488]
+                [$17093]
                 <!--
-                    [$16488] - Upload and Replace
+                    [$17093] - Upload and update
                     [$16495] - Move and Replace
                     [$16496] - Copy and Replace
                 !-->
             </div>
             <div class="duplicate-conflict info-txt light-grey">
-                [$16489]
+                [$17097]
                 <!--
-                    [$16489] - Replace the file in the destination folder with the file you are uploading:
+                    [$17097] - The file will be updated with version history. [A]Learn more[/A]:
                     [$16497] - Replace the file in the destination folder with the file you are moving:
                     [$16498] - Replace the file in the destination folder with the file you are copying:
                 !-->
@@ -3603,6 +3612,414 @@
                 <i class="medium-icon icons-img fullscreen"></i>
             </div>
             <div class="clear"></div>
+        </div>
+    </div>
+</div>
+
+<div class="fm-versioning overlay hidden">
+    <div class="fm-versioning header">
+        <div class="fm-versioning button close">
+            <i class="medium-icon icons-sprite big-close"></i>
+        </div>
+        <div class="fm-versioning pad">
+            <div class="fm-versioning top-column">
+                <div class="medium-file-icon"></div>
+                <div class="fm-versioning file-data">
+                    <div class="fm-versioning file-name">
+                        <span class="grey">filename1.psd</span>
+                        <span class="red">(most recent version)</span>
+                    </div>
+                    <div class="fm-versioning file-path">
+                        <span>Cloud Drive</span>
+                        <span>folder name</span>
+                    </div>
+                </div>
+            </div>
+            <div class="fm-versioning top-column right-text-align">
+                <div class="default-white-button semi-small light-grey-txt" title='[$58]'>
+                    <i class="small-icon icons-sprite down-arrow"></i>
+                    <span>[$58]</span>
+                </div>
+                <div class="default-white-button semi-small light-grey-txt" title='[$16475]'>
+                    <i class="small-icon icons-sprite reverted-clock"></i>
+                    <span>[$16475]</span>
+                </div>
+                <div class="default-white-button semi-small light-grey-txt" title='[$1730]'>
+                    <i class="small-icon icons-sprite rubbish-bin-icon"></i>
+                    <span>[$1730]</span>
+                </div>
+                <div class="default-white-button semi-small light-grey-txt" title='[$17147]'>
+                    <i class="small-icon icons-sprite clock-with-cross"></i>
+                    <span>[$17147]</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fm-versioning body">
+        <!-- TODO: Init jScrollPane !-->
+        <div class="fm-versioning scroll-bl">
+            <div class="fm-versioning content">
+            
+                <!-- Modification Date !-->
+                <div class="fm-versioning data">
+                    <span>Today</span>
+                </div>
+                
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOn"><input type="radio" name="versioning" class="radioOn" value="1" checked></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.20</span>
+                            <span class="size">160 KB</span>
+                            <span class="red">(Current version)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>12:30</span>
+                    </div>
+                    
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite refresh-arrows"></i>
+                        <span class="modified-info-txt">
+                            Edited
+                        </span>
+                        
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+                        
+                    </div>
+                    
+                    <div class="clear"></div>
+                </div>
+                
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.19</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>12:30</span>
+                    </div>
+                    
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite mobile-device"></i>
+                        <span class="modified-info-txt">
+                            Renamed from <span class="light-grey italic">filename1.psd</span>
+                        </span>
+                        
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+                        
+                    </div>
+                    
+                    <div class="clear"></div>
+                </div>
+                
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.18</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+                    
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite earth"></i>
+                        <span class="modified-info-txt">
+                            Moved from <span class="fm-versioning file-path"><span>Cloud Drive</span><span>folder name</span></span>
+                        </span>
+                        
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+                        
+                    </div>
+                    
+                    <div class="clear"></div>
+                </div>
+                
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.17</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+                    
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite earth"></i>
+                        <span class="modified-info-txt">
+                            Edited
+                        </span>
+                        
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+                        
+                    </div>
+                    
+                    <div class="clear"></div>
+                </div>
+                
+                <!-- Modification Date !-->
+                <div class="fm-versioning data">
+                    <span>Yesterday</span>
+                </div>
+                
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.16 <span class="italic">(v.8)</span></span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+                    
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite reverted-light-clock"></i>
+                        <span class="modified-info-txt">
+                            reverted from <span class="strong">v. 8</span>
+                        </span>
+                        
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+                        
+                    </div>
+                    
+                    <div class="clear"></div>
+                </div>
+                
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.15</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+                    
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite earth"></i>
+                        <span class="modified-info-txt">
+                            Edited by <span class="strong">Lloyd Hubbard</span>
+                        </span>
+                        
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+                        
+                    </div>
+                    
+                    <div class="clear"></div>
+                </div>
+                
+                <!-- Modification Date !-->
+                <div class="fm-versioning data">
+                    <span>10 March</span>
+                </div>
+                
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.14</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+                    
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite earth"></i>
+                        <span class="modified-info-txt">
+                            Created
+                        </span>
+                        
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+                        
+                    </div>
+                    
+                    <div class="clear"></div>
+                </div>
+                
+            </div>
         </div>
     </div>
 </div>

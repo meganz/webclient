@@ -183,19 +183,29 @@
                 case 'copy':
                     $('.red-header', $a1).text(l[16496]);
                     $('.red-header', $a2).text(l[16500]);
+                    $('.red-header', $a3).text(l[17095]);
                     $('.light-grey', $a1).text(l[16498]);
                     $('.light-grey', $a3).text(l[16515]);
                     break;
                 case 'move':
                     $('.red-header', $a1).text(l[16495]);
                     $('.red-header', $a2).text(l[16499]);
+                    $('.red-header', $a3).text(l[17096]);
                     $('.light-grey', $a1).text(l[16497]);
                     $('.light-grey', $a3).text(l[16514]);
                     break;
                 case 'upload':
-                    $('.red-header', $a1).text(l[16488]);
+                    $('.red-header', $a1).text(l[17093]);
                     $('.red-header', $a2).text(l[16490]);
-                    $('.light-grey', $a1).text(l[16489]);
+                    $('.red-header', $a3).text(l[17094]);
+                    //FIXME: the following link needs to update once there is a help link regarding file versioning.
+                    var link = "https://mega.nz/help/client/webclient/";
+                    $('.light-grey', $a1).html(
+                        escapeHTML(l[17097])
+                        .replace(
+                        '[A]', '<a id = "versionhelp"\n' +
+                        'href="' + link + '" target="_blank" class="red">')
+                        .replace('[/A]', '</a>'));
                     $('.light-grey', $a3).text(l[16493]);
                     break;
             }
@@ -225,6 +235,11 @@
                 done(file, $('.file-name', this).text(), ns.KEEPBOTH);
             });
 
+            $('#versionhelp').rebind('click', function(ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                window.open(this.href, '_blank');
+            });
             $('.skip-button', $dialog).rebind('click', function() {
                 done(null, 0, ns.DONTCOPY);
             });

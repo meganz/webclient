@@ -246,7 +246,7 @@ MegaData.prototype.pathLength = function() {
     return length;
 };
 
-MegaData.prototype.renderPath = function() {
+MegaData.prototype.renderPath = function(fileHandle) {
     var name, hasnext = '', typeclass,
         html = '<div class="clear"></div>',
         a2 = this.getPath(this.currentdirid),
@@ -445,6 +445,9 @@ MegaData.prototype.renderPath = function() {
     if (folderlink) {
         $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
         $('.fm-breadcrumbs:first span').empty();
+    }
+    if (fileHandle) {
+        fileversioning.fileVersioningDialog(fileHandle);
     }
 };
 

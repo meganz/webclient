@@ -4,6 +4,11 @@
 .button > i, .button > span {
     cursor: pointer;
 }
+
+.nonclickable {
+    cursor: not-allowed !important;
+}
+
 .button input {
     position: absolute;
     top: 0;
@@ -128,6 +133,9 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     white-space: nowrap;
+}
+.default-white-button.light-grey-txt {
+    color: #777777;
 }
 .default-white-button::first-letter {
     text-transform: uppercase;

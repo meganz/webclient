@@ -16,7 +16,7 @@ MegaData.prototype.contactstatus = function(h, wantTimeStamp) {
                     if (n.t) {
                         folders++;
                     }
-                    else {
+                    else if (!n.fv) {
                         files++;
                     }
                 }

@@ -1033,6 +1033,22 @@ FileManager.prototype.initContextUI = function() {
         propertiesDialog();
     });
 
+    $(c + '.properties-versions').rebind('click', function() {
+        fileversioning.fileVersioningDialog();
+    });
+
+    $(c + '.clearprevious-versions').rebind('click', function() {
+        if ($.selected && $.selected[0]) {
+            var fh = $.selected[0];
+            msgDialog('remove', l[1003], l[17154], l[1007], function(e) {
+                if (e) {
+                    fileversioning.clearPreviousVersions(fh);
+                }
+            });
+        }
+
+    });
+
     $(c + '.findupes-item').rebind('click', M.findDupes);
 
     $(c + '.permissions-item').rebind('click', function() {
@@ -3215,6 +3231,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         // if another dialog wasn't opened previously
         if (!prevState || Object(options).custom) {
             M.safeShowDialog('over-storage-quota', $strgdlg);
+            $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
         }
         else {
             promise.reject();

@@ -68,6 +68,7 @@
 
         $dialog.removeClass('multiple folders-only two-elements shared shared-with-me');
         $dialog.removeClass('read-only read-and-write full-access taken-down undecryptable');
+        $dialog.removeClass('versioning');
         $('.properties-elements-counter span').text('');
 
         var users = null;

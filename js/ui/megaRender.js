@@ -479,7 +479,6 @@
             if (this.finalize) {
                 this.finalize(aUpdate, aNodeList, initData);
             }
-            this.finalizers['*'].call(this, aUpdate, aNodeList, initData);
 
             if (this.logger) {
                 console.timeEnd('MegaRender.renderLayout');
@@ -1081,15 +1080,6 @@
 
         /** Renderer finalizers */
         finalizers: freeze({
-            /**
-             * A generic finalizer that would be called after the 'section' one finishes.
-             *
-             * @param {Boolean} aUpdate   Whether we're updating the list
-             * @param {Array}   aNodeList The list of ufs-nodes processed
-             * @param {Object}  aUserData  Any data provided by initializers
-             */
-            '*': function(aUpdate, aNodeList, aUserData) {},
-
             /**
              * @param {Boolean} aUpdate   Whether we're updating the list
              * @param {Array}   aNodeList The list of ufs-nodes processed

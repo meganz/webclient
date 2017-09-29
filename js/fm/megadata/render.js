@@ -69,37 +69,6 @@ MegaData.prototype.renderMain = function(aUpdate) {
     }
 };
 
-MegaData.prototype.initShortcutsAndSelection = function (container, aUpdate) {
-    if (!window.fmShortcuts) {
-        window.fmShortcuts = new FMShortcuts();
-    }
-
-
-    if (!aUpdate) {
-        if (window.selectionManager) {
-            window.selectionManager.destroy();
-            Object.freeze(window.selectionManager);
-        }
-
-        /**
-         * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
-         * reattach to its events.
-         *
-         * @type {SelectionManager}
-         */
-        window.selectionManager = new SelectionManager(
-            $(container),
-            $.selected && $.selected.length > 0
-        );
-
-        // restore selection if needed
-        if ($.selected) {
-            $.selected.forEach(function(h) {
-                selectionManager.add_to_selection(h);
-            });
-        }
-    }
-};
 
 /**
  * Helper for M.renderMain

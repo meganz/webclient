@@ -1728,8 +1728,15 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, updated, keyid, msg
     var messagekey = this.getmessagekey(msgid, Chatd.MsgType.EDIT);
     for (var i = this.highnum; i > this.lownum; i--) {
         if (this.buf[i] && this.buf[i][Chatd.MsgField.MSGID] === msgid) {
-            // if we modified the message, remove from this.modified.
+            if (
+                this.buf[i][Chatd.MsgField.MESSAGE] === msg &&
+                this.buf[i][Chatd.MsgField.UPDATED] === updated
+            ) {
+                // potential duplicate MSGUPD, don't do anything.
+                return;
+            }
 
+            // if we modified the message, remove from this.modified.
             this.buf[i][Chatd.MsgField.MESSAGE] = msg;
             this.buf[i][Chatd.MsgField.UPDATED] = updated;
 

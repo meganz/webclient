@@ -540,6 +540,9 @@ ChatRoom.prototype.show = function() {
     var self = this;
 
     if (self.isCurrentlyActive) {
+        if (!self.messagesBlockEnabled && self.callManagerCall && self.getUnreadCount() > 0) {
+            $(self).trigger('toggleMessages');
+        }
         return false;
     }
     self.megaChat.hideAllChats();

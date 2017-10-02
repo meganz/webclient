@@ -499,10 +499,33 @@ var ConversationAudioVideoPanel = React.createClass({
             RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
             // attachMediaStream would do the .play call
         }
+
+        $(room).rebind('toggleMessages.av', function() {
+            self.toggleMessages();
+        });
+
+        room.messagesBlockEnabled = self.state.messagesBlockEnabled;
+    },
+    componentWillUnmount: function() {
+        var self = this;
+        var room = self.props.chatRoom;
+
+        var $container = $(ReactDOM.findDOMNode(self));
+        if ($container) {
+            $container.unbind('mouseover.chatUI' + self.props.chatRoom.roomId);
+            $container.unbind('mouseout.chatUI' + self.props.chatRoom.roomId);
+            $container.unbind('mousemove.chatUI' + self.props.chatRoom.roomId);
+        }
+
+        $(document).unbind("fullscreenchange.megaChat_" + room.roomId);
+        $(window).unbind('resize.chatUI_' + room.roomId);
+        $(room).unbind('toggleMessages.av');
     },
     toggleMessages: function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
 
         if (this.props.onMessagesToggle) {
@@ -514,7 +537,6 @@ var ConversationAudioVideoPanel = React.createClass({
         this.setState({
             'messagesBlockEnabled': !this.state.messagesBlockEnabled
         });
-
     },
     fullScreenModeToggle: function(e) {
         e.preventDefault();

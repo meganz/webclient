@@ -161,9 +161,8 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
         }
 
         var sortDirection = is_mobile ? 1 : Object($.sortTreePanel[prefix]).dir;
-        var sortFn = function(a, b) {
-            return M.compareStrings(a.name, b.name, sortDirection);
-        };
+        var sortFn = M.getSortByNameFn2(sortDirection);
+
         switch (Object($.sortTreePanel[prefix]).by) {
             case 'fav':
                 sortFn = function(a, b) {

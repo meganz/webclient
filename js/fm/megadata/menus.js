@@ -46,9 +46,7 @@
         // Check existance of sub-menu
         if ($('#csb_' + id + ' > .dropdown-item').length !== folders.length) {
             // sort by name is default in the tree
-            folders.sort(function(a, b) {
-                return M.compareStrings(a.name, b.name, 1);
-            });
+            folders.sort(M.getSortByNameFn2(1));
 
             for (var i = 0; i < folders.length; i++) {
                 cs = '';

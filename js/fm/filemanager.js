@@ -983,6 +983,21 @@ FileManager.prototype.initContextUI = function() {
         fmremove();
     });
 
+    $(c + '.addcontact-item').rebind('click', function() {
+        $.dialog = 'add-contact-popup';
+        contactAddDialog();
+        $('.fm-add-user').trigger('click');
+        $('.add-user-size-icon').trigger('click');
+
+        $(window).rebind('keydown.uikeyevents', function(e) {
+            if (e.keyCode === 27) {
+                closeDialog();
+            }
+        });
+
+        return false;
+    });
+
     $(c + '.startchat-item').rebind('click', function() {
         var $this = $(this);
         var user_handle = $.selected;

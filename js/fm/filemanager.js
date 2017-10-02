@@ -984,18 +984,19 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.addcontact-item').rebind('click', function() {
-        $.dialog = 'add-contact-popup';
-        contactAddDialog();
-        $('.fm-add-user').trigger('click');
-        $('.add-user-size-icon').trigger('click');
+        M.safeShowDialog('add-contact-popup', function() {
+            contactAddDialog();
+            $('.fm-add-user').trigger('click');
+            $('.add-user-size-icon').trigger('click');
 
-        $(window).rebind('keydown.uikeyevents', function(e) {
-            if (e.keyCode === 27) {
-                closeDialog();
-            }
+            $(window).rebind('keydown.uikeyevents', function(e) {
+                if (e.keyCode === 27) {
+                    closeDialog();
+                }
+            });
+
+            return $dialog;
         });
-
-        return false;
     });
 
     $(c + '.startchat-item').rebind('click', function() {

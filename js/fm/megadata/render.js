@@ -136,7 +136,7 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
                 $.selected = [M.currentdirid];
             };
 
-            $('.shared-details-info-block .grid-url-arrow').rebind('click', function(e) {
+            $('.shared-details-info-block .grid-url-arrow').rebind('click.sharesui', function(e) {
                 prepareShareMenuHandler(e);
                 if (!$(this).hasClass('active')) {
                     M.contextMenuUI(e, 1);

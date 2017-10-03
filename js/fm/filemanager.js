@@ -363,13 +363,21 @@ FileManager.prototype.initFileManagerUI = function() {
                 setTimeout(function() {
                     if ($.movet === M.RubbishID) {
                         $.selected = $.moveids;
-                        fmremove();
+                        fmremove()
+                            .always(function() {
+                                if (selectionManager) {
+                                    selectionManager.clear_selection();
+                                }
+                            });
                     }
                     else {
                         M.moveNodes($.moveids, $.movet)
                             .done(function(moves) {
                                 if (moves) {
                                     $ddelm.remove();
+                                    if (selectionManager) {
+                                        selectionManager.clear_selection();
+                                    }
                                 }
                             });
                     }
@@ -2492,12 +2500,25 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
 
     $ddUIitem.rebind('contextmenu', function(e) {
-        if ($(this).attr('class').indexOf('ui-selected') == -1) {
-            $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-            $(this).addClass('ui-selected');
-            selectionManager.clear_selection();
-            selectionManager.set_currently_selected($(this).attr('id'));
+        var s = e.shiftKey;
+        if (e.shiftKey) {
+            selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }
+        else if (e.ctrlKey !== false || e.metaKey !== false)
+        {
+            selectionManager.add_to_selection($(this).attr('id'));
+        }
+        else {
+            if (selectionManager.selected_list.indexOf($(this).attr('id')) === -1) {
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected($(this).attr('id'));
+            }
+            else {
+                selectionManager.add_to_selection($(this).attr('id'));
+            }
+
+        }
+
         M.searchPath();
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 1);

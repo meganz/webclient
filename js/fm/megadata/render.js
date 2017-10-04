@@ -451,8 +451,10 @@ MegaData.prototype.renderPath = function(fileHandle) {
         $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
         $('.fm-breadcrumbs:first span').empty();
     }
-    if (fileHandle) {
-        fileversioning.fileVersioningDialog(fileHandle);
+    if (!is_mobile) {
+        if (fileHandle) {
+            fileversioning.fileVersioningDialog(fileHandle);
+        }
     }
 };
 

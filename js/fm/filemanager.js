@@ -684,6 +684,45 @@ FileManager.prototype.initFileManagerUI = function() {
 };
 
 /**
+ * A FileManager related method for (re)initializing the shortcuts and selection managers.
+ *
+ * @param container
+ * @param aUpdate
+ */
+FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) {
+    if (!window.fmShortcuts) {
+        window.fmShortcuts = new FMShortcuts();
+    }
+
+
+    if (!aUpdate) {
+        if (window.selectionManager) {
+            window.selectionManager.destroy();
+            Object.freeze(window.selectionManager);
+        }
+
+        /**
+         * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
+         * reattach to its events.
+         *
+         * @type {SelectionManager}
+         */
+        window.selectionManager = new SelectionManager(
+            $(container),
+            $.selected && $.selected.length > 0
+        );
+
+        // restore selection if needed
+        if ($.selected) {
+            $.selected.forEach(function(h) {
+                selectionManager.add_to_selection(h);
+            });
+        }
+    }
+};
+
+
+/**
  * Update FileManager on new nodes availability
  * @details Former rendernew()
  * @returns {MegaPromise}

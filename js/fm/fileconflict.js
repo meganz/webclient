@@ -198,8 +198,8 @@
                     $('.red-header', $a1).text(l[17093]);
                     $('.red-header', $a2).text(l[16490]);
                     $('.red-header', $a3).text(l[17094]);
-                    //FIXME: the following link needs to update once there is a help link regarding file versioning.
-                    var link = "https://mega.nz/help/client/webclient/";
+
+                    var link = "https://mega.nz/help/client/webclient/cloud-drive/59d3095ef1b709dd018b4583";
                     $('.light-grey', $a1).html(
                         escapeHTML(l[17097])
                         .replace(

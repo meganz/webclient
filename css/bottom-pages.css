@@ -132,6 +132,9 @@ html.gbot {
     position: relative;
     height: 100%;
 }
+.bottom-page.table-cell.col-2, .bottom-page.table-cell.col-3 {
+    height: auto;
+}
 .bottom-page.vertical-centered-cell {
     vertical-align: middle;
 }
@@ -200,7 +203,7 @@ html.gbot {
     height: 26px;
     display: block;
     margin: 0 auto;
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v5.png);
     background-position: -110px 1px;
     background-repeat: no-repeat;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=64);
@@ -483,7 +486,7 @@ html.gbot {
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v5.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -503,7 +506,7 @@ html.gbot {
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v5.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -513,6 +516,9 @@ html.gbot {
 }
 .bottom-page.big-icon.global-access {
     background-position: -160px -533px;
+}
+.bottom-page.big-icon.pass-reminder {
+    background-position: -160px -2443px;
 }
 .bottom-page.big-icon.secure {
     background-position: 0 -673px;
@@ -725,7 +731,7 @@ html.gbot {
     margin: 14px auto 7px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v5.png);
     background-position: -0px -73px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
@@ -1544,6 +1550,9 @@ html.gbot {
 .medium-txt.small-lineheight.info {
     padding-bottom: 80px;
 }
+.top-bl .bottom-page.table.changed-order .order2, .bottom-page.table.changed-order .order2 {
+    display: none;
+}
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .download-megasync-dialog .icon, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow {
@@ -1802,20 +1811,14 @@ html.gbot {
 .img-description .bottom-page.big-header, .bottom-page.big-header.mid-pad {
     padding: 5px 0 37px 0;
 }
-.bottom-page.table.changed-order {
-    display: -webkit-box;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    flex-direction: column;
+.bottom-page.table.changed-order .order1 {
+    display: none;
 }
-.changed-order .bottom-page.left-cell {
-    order: 2;
+.bottom-page.table.changed-order .order2 {
+    display: block;
 }
-.changed-order .bottom-page.right-cell {
-    order: 1;
+.bottom-page.table.changed-order .left-cell, .bottom-page.table.changed-order .right-cell {
+    height: auto;
 }
 .bottom-page.img.ios3, .bottom-page.img.android3 {
     padding: 0;
@@ -1914,24 +1917,18 @@ html.gbot {
 }
 
 @media only screen and (max-width: 783px) {
-.top-bl .bottom-page.table.changed-order {
-    display: -webkit-box;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    flex-direction: column;
+.top-bl .bottom-page.table.changed-order .order1 {
+    display: none;
+}
+.top-bl .bottom-page.table.changed-order .order2 {
+    display: block;
+}
+.top-bl .bottom-page.table.changed-order.left-cell {
+    height: auto;
 }
 .top-bl .bottom-page.table {
     text-align: center;
     height: auto;
-}
-.top-bl .changed-order .bottom-page.left-cell {
-    order: 1;
-}
-.top-bl .changed-order .bottom-page.left-cell:first-child {
-    order: 2;
 }
 .top-bl .bottom-page.left-cell {
     width: 100%;
@@ -2092,7 +2089,7 @@ html.gbot {
 }
 }
 
-@media only screen and (max-height: 570px) {
+@media only screen and (max-height: 640px) {
 .img.browsers-top, .bottom-page.img.sync-top, .bottom-page.img.sync-top, .mobile .megasync .bottom-page.img.sync-top {
     max-width: 80%;
     padding-bottom: 29px;

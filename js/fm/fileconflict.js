@@ -1,4 +1,13 @@
 (function _fileconflict(global) {
+    'use strict';
+
+    var keepBothState = Object.create(null);
+    var saveKeepBothState = function(target, node, name) {
+        if (!keepBothState[target]) {
+            keepBothState[target] = Object.create(null);
+        }
+        keepBothState[target][name] = node;
+    };
 
     var ns = {
         /**
@@ -6,10 +15,11 @@
          * @param {Array} files An array of files to check for conflicts
          * @param {String} target The target node handle
          * @param {String} op Operation, one of copy, move, or upload
+         * @param {Number} [defaultAction] The optional default action to perform
          * @returns {MegaPromise} Resolves with a non-conflicting array
          * @memberof fileconflict
          */
-        check: function(files, target, op) {
+        check: function(files, target, op, defaultAction) {
             var noFileConflicts = !!localStorage.noFileConflicts;
             var promise = new MegaPromise();
             var conflicts = [];
@@ -69,6 +79,7 @@
             }
 
             var resolve = function() {
+                keepBothState = Object.create(null);
                 result.fileConflictChecked = true;
                 promise.resolve(result);
             };
@@ -82,11 +93,19 @@
 
                         result.push(file);
 
-                        if (action === 1) {
+                        if (action === ns.REPLACE) {
                             file._replaces = node.h;
                         }
                     }
+                    saveKeepBothState(target, node, name);
                 };
+
+                switch (defaultAction) {
+                    case ns.REPLACE:
+                    case ns.DONTCOPY:
+                    case ns.KEEPBOTH:
+                        repeat = defaultAction;
+                }
 
                 (function _prompt(a) {
                     var file = a.pop();
@@ -99,12 +118,12 @@
                             var name = file.name;
 
                             switch (repeat) {
-                                case 2:
+                                case ns.DONTCOPY:
                                     break;
-                                case 3:
+                                case ns.KEEPBOTH:
                                     name = self.findNewName(name, target);
                                 /* fallthrough */
-                                case 1:
+                                case ns.REPLACE:
                                     save(file, name, repeat, node);
                                     break;
                             }
@@ -164,19 +183,29 @@
                 case 'copy':
                     $('.red-header', $a1).text(l[16496]);
                     $('.red-header', $a2).text(l[16500]);
+                    $('.red-header', $a3).text(l[17095]);
                     $('.light-grey', $a1).text(l[16498]);
                     $('.light-grey', $a3).text(l[16515]);
                     break;
                 case 'move':
                     $('.red-header', $a1).text(l[16495]);
                     $('.red-header', $a2).text(l[16499]);
+                    $('.red-header', $a3).text(l[17096]);
                     $('.light-grey', $a1).text(l[16497]);
                     $('.light-grey', $a3).text(l[16514]);
                     break;
                 case 'upload':
-                    $('.red-header', $a1).text(l[16488]);
+                    $('.red-header', $a1).text(l[17093]);
                     $('.red-header', $a2).text(l[16490]);
-                    $('.light-grey', $a1).text(l[16489]);
+                    $('.red-header', $a3).text(l[17094]);
+                    //FIXME: the following link needs to update once there is a help link regarding file versioning.
+                    var link = "https://mega.nz/help/client/webclient/";
+                    $('.light-grey', $a1).html(
+                        escapeHTML(l[17097])
+                        .replace(
+                        '[A]', '<a id = "versionhelp"\n' +
+                        'href="' + link + '" target="_blank" class="red">')
+                        .replace('[/A]', '</a>'));
                     $('.light-grey', $a3).text(l[16493]);
                     break;
             }
@@ -192,23 +221,27 @@
             $('.file-name', $a3).text(this.findNewName(file.name, target));
 
             var done = function(file, name, action) {
-                fm_hideoverlay();
-                $dialog.addClass('hidden');
+                closeDialog();
                 promise.resolve(file, name, action, $('#duplicates-checkbox').attr('checked'));
             };
 
             $a1.rebind('click', function() {
-                done(file, $('.file-name', this).text(), 1);
+                done(file, $('.file-name', this).text(), ns.REPLACE);
             });
             $a2.rebind('click', function() {
-                done(null, 0, 2);
+                done(null, 0, ns.DONTCOPY);
             });
             $a3.rebind('click', function() {
-                done(file, $('.file-name', this).text(), 3);
+                done(file, $('.file-name', this).text(), ns.KEEPBOTH);
             });
 
+            $('#versionhelp').rebind('click', function(ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                window.open(this.href, '_blank');
+            });
             $('.skip-button', $dialog).rebind('click', function() {
-                done(null, 0, 2);
+                done(null, 0, ns.DONTCOPY);
             });
             $('.cancel-button, .fm-dialog-close', $dialog).rebind('click', function() {
                 done(-0xBADF);
@@ -228,8 +261,7 @@
             }
 
             uiCheckboxes($dialog);
-            $dialog.removeClass('hidden');
-            fm_showoverlay();
+            M.safeShowDialog('fileconflict-dialog', $dialog);
 
             return promise;
         },
@@ -289,6 +321,10 @@
         getNodeByName: function(target, name, matchSingle) {
             var res;
 
+            if (keepBothState[target] && keepBothState[target][name]) {
+                return keepBothState[target][name];
+            }
+
             for (var h in M.c[target]) {
                 var n = M.d[h] || false;
 
@@ -322,10 +358,13 @@
                     return q;
                 }
             }
-        }
+        },
+
+        REPLACE: 1,
+        DONTCOPY: 2,
+        KEEPBOTH: 3
     };
 
     Object.defineProperty(global, 'fileconflict', {value: ns});
-    ns = undefined;
 
 })(this);

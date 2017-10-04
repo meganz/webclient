@@ -1039,7 +1039,6 @@
     margin-right: 0;
 }
 #help2-main .support-search-container {
-    z-index: 999;
     position: relative;
     margin: 0 auto 50px;
     padding-left: 15%;

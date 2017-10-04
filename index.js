@@ -45,44 +45,54 @@ pages['placeholder'] = '<div class="bottom-page scroll-block">' +
         '<div class="main-mid-pad new-bottom-pages"></div>' +
     '</div>';
 
-function startMega() {
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
     if (!hashLogic) {
         $(window).rebind('popstate.mega', function(event) {
-
             var state = event.originalEvent.state || {};
 
             loadSubPage(state.subpage || state.fmpage || location.hash, event);
         });
     }
+});
 
+mBroadcaster.once('startMega:desktop', function() {
+    'use strict';
+
+    if (pages['dialogs']) {
+        $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
+        delete pages['dialogs'];
+    }
+    if (pages['onboarding']) {
+        $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
+        delete pages['onboarding'];
+    }
+    if (pages['chat']) {
+        $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
+        delete pages['chat'];
+    }
+});
+
+function startMega() {
     mBroadcaster.sendMessage('startMega');
 
-    if (silent_loading) {
-        jsl = [];
-        onIdle(silent_loading);
-        silent_loading = false;
-        return false;
+    if (is_mobile) {
+        mBroadcaster.sendMessage('startMega:mobile');
+        mBroadcaster.removeListeners('startMega:desktop');
+    }
+    else {
+        mBroadcaster.sendMessage('startMega:desktop');
+        mBroadcaster.removeListeners('startMega:mobile');
     }
 
-    if (!is_mobile) {
-        if (pages['dialogs']) {
-            $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
-            delete pages['dialogs'];
-        }
-        if (pages['onboarding']) {
-            $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
-            delete pages['onboarding'];
-        }
-        if (pages['chat']) {
-            $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
-            delete pages['chat'];
-        }
-    }
     jsl = [];
-    if(typeof(mega_custom_boot_fn) === 'undefined') {
+    if (silent_loading) {
+        onIdle(silent_loading);
+        silent_loading = false;
+    }
+    else {
         init_page();
-    } else {
-        mega_custom_boot_fn();
     }
 }
 
@@ -162,7 +172,8 @@ function topPopupAlign(button, popup, topPos) {
             buttonTopPos;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('.top-head').width();
+            pageWidth = $('body').width();
+            $popup.removeAttr('style');
             $popupArrow.removeAttr('style');
             popupRightPos = pageWidth
                 - $button.offset().left
@@ -281,6 +292,16 @@ function init_page() {
 
     if ('-fa-ar-he-'.indexOf('-' + lang + '-') > -1) {
         $('body').addClass('rtl');
+    }
+
+    if (is_mobile && is_android) {
+        var $html = $('html');
+
+        $html.height(window.innerHeight);
+
+        $(window).rebind('resize.htmlheight', function() {
+            $html.height(window.innerHeight);
+        });
     }
 
     // If on the plugin page, show the page with the relevant extension for their current browser
@@ -447,6 +468,24 @@ function init_page() {
                 });
             }
         }
+    }
+
+    if (localStorage.beingAccountCancellation) {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            // todo
+        }
+        else {
+            // Insert placeholder page while waiting for user input
+            parsepage(pages['placeholder']);
+
+            msgDialog('warninga', l[6188], l[6189], '', function() {
+                loadSubPage('start');
+            });
+        }
+
+        delete localStorage.beingAccountCancellation;
+        return false;
     }
 
     if (page.substr(0, 10) == 'blogsearch') {
@@ -1166,7 +1205,7 @@ function init_page() {
         }
         else {
             if (ul_queue.length > 0) {
-                openTransfersPanel();
+                M.openTransfersPanel();
             }
 
             if (u_type === 0 && !u_attr.terms) {
@@ -1180,7 +1219,7 @@ function init_page() {
                     ulQueue.resume();
                     uldl_hold = false;
                     if (ul_queue.length > 0) {
-                        showTransferToast('u', ul_queue.length);
+                        M.showTransferToast('u', ul_queue.length);
                     }
                 };
 
@@ -1239,6 +1278,7 @@ function init_page() {
         if (megaChatIsDisabled) {
             $(document.body).addClass("megaChatDisabled");
         }
+		pagemetadata();
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout) {
@@ -1272,6 +1312,7 @@ function init_page() {
 
     topmenuUI();
 
+
     loggedout = false;
     flhashchange = false;
 }
@@ -1285,7 +1326,7 @@ function loginDialog(close) {
     }
     $dialog.find('form').replaceWith(getTemplate('top-login'));
     if (localStorage.hideloginwarning || is_extension) {
-        $dialog.find('.top-login-warning').hide();
+        $dialog.find('.top-login-warning').addClass('hidden');
         $dialog.find('.login-notification-icon').removeClass('hidden');
     }
     $dialog.find('.login-checkbox, .radio-txt').rebind('click', function (e) {
@@ -1328,7 +1369,7 @@ function loginDialog(close) {
         $('.login-notification-icon').removeClass('hidden');
     });
     $('.login-notification-icon').rebind('click', function (e) {
-        $('.top-login-warning').show();
+        $('.top-login-warning').removeClass('hidden');
         $('.top-login-warning').addClass('active');
         $(this).addClass('hidden');
     });
@@ -1431,7 +1472,7 @@ function topmenuUI() {
     $topMenu.find('.top-menu-item.account').addClass('hidden');
     $topMenu.find('.top-menu-item.refresh-item').addClass('hidden');
     $topHeader.find('.top-icon.warning').addClass('hidden');
-    $topHeader.find('.activity-status-block .activity-status,.activity-status-block').hide();
+    $topHeader.find('.activity-status-block .activity-status,.activity-status-block').addClass('hidden');
     $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
     $topHeader.find('.membership-status, .top-head .user-name, .top-icon.achievements').addClass('hidden');
 
@@ -1448,7 +1489,7 @@ function topmenuUI() {
 
     var avatar = window.useravatar && useravatar.my;
     if (!avatar) {
-        $topHeader.find('.fm-avatar').hide();
+        $topHeader.find('.fm-avatar').addClass('hidden');
     }
 
     // Show active item in main menu
@@ -1493,7 +1534,7 @@ function topmenuUI() {
         name = name || u_attr.name;
 
         if (name) {
-            $topHeader.find('.user-name').text(name).show();
+            $topHeader.find('.user-name').text(name).removeClass('hidden');
         }
     }
 
@@ -1504,6 +1545,8 @@ function topmenuUI() {
     $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
 
     if (u_type) {
+        $('body').removeClass('not-logged').addClass('logged');
+
         $topMenu.find('.top-menu-item.start').addClass('hidden');
         $topMenu.find('.top-menu-item.fm').removeClass('hidden');
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
@@ -1519,12 +1562,13 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').removeClass('hidden');
 
         // Show the rocket icon if achievements are enabled
-        if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
-                $topHeader.find('.top-icon.achievements').show();
+                $topHeader.find('.top-icon.achievements').removeClass('hidden');
+            })
+            .fail(function() {
+                $topHeader.find('.top-icon.achievements').addClass('hidden');
             });
-        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1551,7 +1595,6 @@ function topmenuUI() {
         else {
             // Show the free badge
             $topMenu.find('.top-menu-item.account .right-el').text('FREE');
-            $topHeader.find('.membership-icon').attr('class', 'membership-icon');
             $topHeader.find('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('body').removeClass('lite').addClass('free');
         }
@@ -1562,7 +1605,7 @@ function topmenuUI() {
 
         // If the chat is disabled don't show the green status icon in the header
         if (!pfid && !megaChatIsDisabled) {
-            $topHeader.find('.activity-status-block, .activity-status-block .activity-status').show();
+            $topHeader.find('.activity-status-block, .activity-status-block .activity-status').removeClass('hidden');
             if (megaChatIsReady) {
                 megaChat.renderMyStatus();
             }
@@ -1572,7 +1615,10 @@ function topmenuUI() {
         alarm.planExpired.render();
     }
     else {
-        if (u_type === 0 && !confirmok && page !== 'key') {
+        if (u_type !== 0) {
+            $('body').removeClass('logged').addClass('not-logged');
+        }
+        else if (!confirmok && page !== 'key') {
 
             $topMenu.find('.top-menu-item.register').text(l[968]);
 
@@ -1596,7 +1642,7 @@ function topmenuUI() {
         $('.create-account-button').rebind('click', function () {
             loadSubPage('register');
         });
-        $topHeader.find('.top-login-button').show();
+        $topHeader.find('.top-login-button').removeClass('hidden');
         $('.top-login-button').rebind('click', function () {
             if (u_type === 0) {
                 mLogout();
@@ -1641,6 +1687,7 @@ function topmenuUI() {
             $topMenu.find('.top-menu-item.login').addClass('hidden');
             $topMenu.find('.top-menu-item.logout').removeClass('hidden');
         }
+
     }
 
     $.hideTopMenu = function (e) {
@@ -1742,7 +1789,7 @@ function topmenuUI() {
                     var presence = $(this).data("presence");
                     localStorage.megaChatPresence = presence;
                     localStorage.megaChatPresenceMtime = unixtime();
-    
+
                     mega.initLoadReport();
                     loadfm();
                     $topHeader.find('.activity-status-block').addClass("fadeinout");
@@ -2026,6 +2073,12 @@ function topmenuUI() {
     if (typeof notify === 'object') {
         notify.init();
     }
+
+    if (!is_mobile && u_type === 3) {
+        if (mega.ui.passwordReminderDialog) {
+            mega.ui.passwordReminderDialog.onTopmenuReinit();
+        }
+    }
 }
 
 function is_fm() {
@@ -2206,6 +2259,7 @@ function parsetopmenu() {
 
 function loadSubPage(tpage, event)
 {
+	pagemetadata();
     tpage = getCleanSitePath(tpage);
 
     if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {
@@ -2293,6 +2347,11 @@ window.onbeforeunload = function () {
 
 window.onunload = function() {
     mBroadcaster.crossTab.leave();
+
+    if (typeof dlpage_ph === 'string') {
+        // Clear the download activity flag navigating away on the downloads page.
+        dlmanager.dlClearActiveTransfer(dlpage_ph);
+    }
 };
 
 mBroadcaster.once('boot_done', function() {

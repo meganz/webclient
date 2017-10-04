@@ -512,7 +512,7 @@ MegaData.prototype.treeSearchUI = function() {
             sortTreePanel = $.sortTreePanel[type];
 
             if (d && !sortTreePanel) {
-                console.error('No sortTreePanel', type);
+                console.error('No sortTreePanel for "%s"', type);
             }
 
             $sortMenuItems = $('.sorting-menu-item').removeClass('active');
@@ -568,7 +568,7 @@ MegaData.prototype.treeSearchUI = function() {
             else if (type === 'inbox') {
                 M.buildtree(M.d[M.InboxID], M.buildtree.FORCE_REBUILD);
             }
-            else if (type === 'rubbsih-bin') {
+            else if (type === 'rubbish-bin') {
                 M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
             }
             else if ((type === 'cloud-drive') || (type === 'folder-link')) {
@@ -581,5 +581,8 @@ MegaData.prototype.treeSearchUI = function() {
 };
 
 MegaData.prototype.treePanelType = function() {
-    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
+    'use strict';
+
+    var remove = /(?:active|nw-fm-left-icon|ui-droppable|filled|glow)/g;
+    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(remove, ''));
 };

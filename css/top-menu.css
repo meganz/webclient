@@ -9,11 +9,15 @@
     right: 0;
     background-color: white;
     z-index: 1120;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
+    -webkit-transition: right 200ms ease-in-out, width 200ms ease-in-out, opacity 200ms ease-in-out;
+    -moz-transition: right 200ms ease-in-out, width 200ms ease-in-out, opacity 200ms ease-in-out;
+    -o-transition: right 200ms ease-in-out, width 200ms ease-in-out, opacity 200ms ease-in-out;
+    -ms-transition: right 200ms ease-in-out, width 200ms ease-in-out, opacity 200ms ease-in-out;
+    transition: right 200ms ease-in-out, width 200ms ease-in-out, opacity 200ms ease-in-out;
+     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
 }
 .top-menu-popup .jspTrack {
     -webkit-transition: all 200ms ease-in-out;
@@ -35,8 +39,12 @@
 .top-menu-popup.hidden {
     right: -256px;
     display: block;
+     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
 }
-.mobile .top-menu-popup.hidden {
+.mobile.top-menu-popup.hidden {
     display: block !important;
     width: 0;
 }
@@ -231,7 +239,7 @@
     height: 14px;
     right: 25px;
     top: 9px;
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-position: -12px -1303px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
@@ -287,7 +295,7 @@
     width: 24px;
     height: 24px;
     display: block;
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -341,7 +349,11 @@
     background-position: -7px -286px;
     float: left
 }
-.top-head .top-icon.language::after, .top-head .top-icon.close::after {
+.top-head .top-icon.pass-reminder::before {
+    background-position: -5px -1363px;
+    width: 28px;
+}
+.top-head .top-icon.language::after, .top-head .top-icon.close::after, .top-head .top-icon.pass-reminder::after {
     display: none;
 }
 .top-head .top-icon.search, .top-head .top-icon.language {

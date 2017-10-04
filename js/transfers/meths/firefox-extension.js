@@ -61,16 +61,27 @@ function FirefoxIO(dl_id, dl) {
             return this.begin();
         }
 
-        mozIOSetup(name, dl.zipid ? '' : dl.p, size, error, p => {
+        mozIOSetup(name, dl.zipid ? '' : dl.p, size, error, (p, byteLength) => {
             if (!dl.st) {
                 dl.st = Date.now();
             }
 
-            OS.File.open(PATH = p, {
-                trunc: true
-            }).then(fd => {
+            if (byteLength == size) {
+                return dlFatalError(dl, new Error(l[1668]));
+            }
+
+            var options = {write: true};
+
+            if (byteLength) {
+                options.append = true;
+            }
+            else {
+                options.trunc = true;
+            }
+
+            OS.File.open(PATH = p, options).then(fd => {
                 FD = fd;
-                Soon(() => this.begin(OS.Path.basename(p)));
+                Soon(() => this.begin(OS.Path.basename(p), byteLength));
             }, error);
         });
     };
@@ -84,6 +95,8 @@ function FirefoxIO(dl_id, dl) {
             }
         }
     };
+
+    this.hasResumeSupport = true;
 }
 
 function MemoryIO(dl_id, dl) {
@@ -129,7 +142,7 @@ function MemoryIO(dl_id, dl) {
 }
 MemoryIO.usable = function() {
     return true
-}
+};
 
 function mozIOError(name) {
     return function(e) {
@@ -151,8 +164,14 @@ function mozIOCleanup(name, path, size, dl) {
 function mozIOSetup(name, path, size, error, success) {
     function setup() {
         var root;
-        var rename;
         var dirname;
+        var byteLength;
+        var onSuccess = () => {
+            if (d) {
+                console.log('mozIOSetup', name, path, byteLength);
+            }
+            success(path, byteLength);
+        };
 
         try {
             if (path && mozIOSetup.lastPath[path]) {
@@ -178,50 +197,16 @@ function mozIOSetup(name, path, size, error, success) {
 
         dirname = OS.Path.dirname(path);
 
-        rename = function() {
-            OS.File.exists(path)
-                .then(yes => {
-                    if (yes) {
-                        var newName;
-                        var oldName = OS.Path.basename(path);
-                        var idx = oldName.match(/\((\d+)\)(?:\..*?)?$/);
-
-                        if (d) {
-                            console.log('File "%s" exists...', path, idx);
-                        }
-
-                        if (idx) {
-                            idx = idx[1] | 0;
-
-                            newName = oldName.replace('(' + (idx++) + ')', '(' + idx + ')');
-                        }
-                        else {
-                            newName = oldName.split('.');
-                            if (newName.length > 1) {
-                                var ext = newName.pop();
-                                newName = newName.join('.') + ' (1).' + ext;
-                            }
-                            else {
-                                newName += ' (1)';
-                            }
-                        }
-
-                        path = OS.Path.join(dirname, newName);
-                        rename();
+        OS.File.makeDir(dirname, {ignoreExisting: true, from: root}).then(() => {
+            OS.File.stat(path)
+                .then(info => {
+                    if (d) {
+                        console.log('File "%s" exists (%s bytes)', path, info.size, info);
                     }
-                    else {
-                        if (d) {
-                            console.log('mozIOSetup', name, path);
-                        }
-                        success(path);
-                    }
-                }, error);
-        };
-
-        OS.File.makeDir(dirname, {
-            ignoreExisting: true,
-            from: root
-        }).then(rename, error);
+                    byteLength = info.size;
+                    onSuccess();
+                }, onSuccess);
+        }, error);
     }
 
     webkitStorageInfo.queryUsageAndQuota((u, r) => {

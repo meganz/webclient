@@ -23,7 +23,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
             loadingDialog.show();
         }
 
-        api_req({a: 'uq', strg: 1, xfer: 1, pro: 1}, {
+        api_req({a: 'uq', strg: 1, xfer: 1, pro: 1, v: 1}, {
             account: account,
             callback: function(res, ctx) {
                 loadingDialog.hide();
@@ -155,7 +155,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
 
                 groups = groups.concat(['inshares', 'outshares', 'links']);
                 for (var i = groups.length; i--;) {
-                    stats[groups[i]] = array.to.object(['items', 'bytes', 'files', 'folders'], 0);
+                    stats[groups[i]] = array.to.object(['items', 'bytes', 'files', 'folders', 'vbytes', 'vfiles'], 0);
                     // stats[groups[i]].nodes = [];
                 }
 
@@ -179,6 +179,8 @@ MegaData.prototype.accountData = function(cb, blockui) {
                     stats[target].bytes += data[0];
                     stats[target].files += data[1];
                     stats[target].folders += data[2];
+                    stats[target].vbytes += data[3];
+                    stats[target].vfiles += data[4];
                 }
 
                 // calculate root's folders size

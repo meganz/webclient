@@ -77,7 +77,7 @@ var watchdog = Object.freeze({
             }
             tmpData['reply'] = token;
 
-            Soon(function() {
+            onIdle(function() {
                 self.notify('Q!' + what, tmpData);
             });
 
@@ -156,14 +156,6 @@ var watchdog = Object.freeze({
                 }
                 break;
 
-            case 'Q!dlsize':
-                this.notify('Q!Rep!y', {
-                    query: 'dlsize',
-                    token: strg.data.reply,
-                    value: dlmanager.getCurrentDownloadsSize()
-                });
-                break;
-
             case 'loadfm_done':
                 if (this.Strg.login === strg.origin) {
                     location.assign(location.pathname);
@@ -240,6 +232,31 @@ var watchdog = Object.freeze({
 
             default:
                 mBroadcaster.sendMessage("watchdog:" + msg, strg);
+
+                if (msg.startsWith('Q!')) {
+                    var value = false;
+                    var query = msg.substr(2);
+
+                    switch (query) {
+                        case 'dlsize':
+                            value = dlmanager.getCurrentDownloadsSize();
+                            break;
+
+                        case 'dling':
+                            value = dlmanager.getCurrentDownloads();
+                            break;
+
+                        case 'qbqdata':
+                            value = dlmanager.getQBQData();
+                            break;
+                    }
+
+                    this.notify('Q!Rep!y', {
+                        query: query,
+                        value: value,
+                        token: strg.data.reply
+                    });
+                }
 
                 break;
         }

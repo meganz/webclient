@@ -148,6 +148,11 @@
     background-color: transparent;
     border: 0;
 }
+/*TODO: kick this when its done */
+.viewer-button.fullscreen {
+    display: none !important;
+}
+/*end of TODO */
 .viewer-mid-button {
     width: 26px;
     height: 58px;
@@ -155,7 +160,7 @@
     left: 48px;
     top: 50%;
     margin: -33px 0 0 0;
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v8.png);
     background-position: -188px -670px;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;

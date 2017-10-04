@@ -394,10 +394,10 @@
 
     Dialog.prototype._hideOverlay = function() {
         var self = this;
-
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
-
+        if (!$('.fm-dialog.arrange-to-back').length) {
+            $('.fm-dialog-overlay').addClass('hidden');
+            $('body').removeClass('overlayed');
+        }
 
         $('.fm-dialog-overlay').unbind('click.dialog' + self.dialogIdx);
     };

@@ -853,6 +853,163 @@ ChatRoom.prototype.attachNodes = function(ids) {
     return $masterPromise;
 };
 
+
+ChatRoom.prototype.lookupPendingUpload = function(faid, handle) {
+    if (!this.pendingUploads) {
+        return;
+    }
+    assert(faid || handle, 'lookupPendingUpload is missing both faid and handle args.');
+
+    // find pending upload id by faid
+    for (var uid in this.pendingUploads) {
+        if (
+            (faid && this.pendingUploads[uid].faid === faid) ||
+            (handle && this.pendingUploads[uid].h === handle)
+        ) {
+            return uid;
+        }
+    }
+};
+
+ChatRoom.prototype.onUploadError = function(uid, error) {
+    // This upload is never going to succeed...
+    if (d) {
+        var logger = MegaLogger.getLogger('onUploadEvent[' + this.roomId + ']');
+        logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error);
+    }
+
+    var ul = this.pendingUploads ? this.pendingUploads[uid] : null;
+
+    // handle the onUploadError and if no more uploads are queued - clear any listeners
+    if (ul) {
+        delete this.pendingUploads[uid];
+        if (Object.keys(this.pendingUploads).length === 0) {
+            this.clearUploadListeners();
+        }
+    }
+};
+
+
+ChatRoom.prototype.onUploadStart = function(data) {
+    var self = this;
+    if (!self.pendingUploads) {
+        self.pendingUploads = Object.create(null);
+    }
+
+    Object.assign(self.pendingUploads, data);
+
+    // perhaps make this more lightweight by just queueing data[].chat entries
+
+    if (!self.uploadListeners) {
+        self.uploadListeners = [];
+    }
+
+    if (self.uploadListeners.length === 0) {
+        var logger = d && MegaLogger.getLogger('onUploadEvent[' + self.roomId + ']');
+
+        self.uploadListeners.push(
+            mBroadcaster.addListener('upload:completion', function(uid, handle, faid, chat) {
+                if (!chat) {
+                    return;
+                }
+                if (chat.indexOf("/" + self.roomId) === -1) {
+                    if (d) {
+                        logger.debug('ignoring upload:completion that is unrelated to this chat.');
+                    }
+                }
+
+                var n = M.d[handle];
+                var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+
+                if (d) {
+                    logger.debug('upload:completion', uid, handle, faid, ul, n);
+                }
+
+                if (!ul || !n) {
+                    // This should not happen...
+                    logger.error('Invalid state error...');
+                }
+                else if (!n.fa && ul.isim) {
+                    // The fa was not yet attached to the node, wait for one of pfa:* events
+                    ul.faid = faid;
+                    ul.h = handle;
+                }
+                else {
+                    // this is not an image, attach node to chat room
+                    delete self.pendingUploads[uid];
+                    self.onUploadComplete([handle]);
+                }
+            })
+        );
+
+
+        self.uploadListeners.push(mBroadcaster.addListener('upload:error', self.onUploadError.bind(self)));
+        self.uploadListeners.push(mBroadcaster.addListener('upload:abort', self.onUploadError.bind(self)));
+
+        self.uploadListeners.push(
+            mBroadcaster.addListener('fa:error', function(faid, error, onStorage) {
+                var uid = self.lookupPendingUpload(faid);
+                var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+
+                if (d) {
+                    logger.debug('fa:error', faid, error, onStorage, uid, ul);
+                }
+
+
+                delete self.pendingUploads[uid];
+
+                // Attaching the fa to the node failed permanently, handle it.
+                if (ul && ul.faid) {
+                    var n = M.d[handle];
+                    if (n) {
+                        self.onUploadComplete([handle]);
+                    }
+                }
+            })
+        );
+
+        self.uploadListeners.push(
+            mBroadcaster.addListener('fa:ready', function(handle, fa) {
+                var uid = self.lookupPendingUpload(false, handle);
+                var ul = self.pendingUploads[uid];
+                var n = M.d[handle];
+
+                if (d) {
+                    logger.debug('fa:ready', handle, fa, uid, ul, n);
+                }
+
+                delete self.pendingUploads[uid];
+
+                // The fa is now attached to the node, add it to the chat room
+                if (n) {
+                    self.onUploadComplete([handle]);
+                }
+            })
+        );
+    }
+};
+
+
+ChatRoom.prototype.onUploadComplete = function(uploads) {
+    this.attachNodes(uploads);
+
+    this.clearUploadListeners();
+};
+
+ChatRoom.prototype.clearUploadListeners = function() {
+    if (!this.pendingUploads || Object.keys(this.pendingUploads).length === 0) {
+        for (var i = 0; i < this.uploadListeners.length; i++) {
+            var listenerId = this.uploadListeners[i];
+            mBroadcaster.removeListener(listenerId);
+        }
+        this.uploadListeners = [];
+    }
+};
+
+ChatRoom.prototype.uploadFromComputer = function() {
+    $('#fileselect1').trigger('click');
+};
+
 /**
  * Attach/share (send as message) contact details
  * @param ids

@@ -68,7 +68,23 @@
     width: 402px;
     padding: 0;
 }
-.dropdown.body:not(.white-context-menu)::before {
+.dropdown.body.fm-dialog {
+    padding: 0;
+    width: 560px;
+    margin: -245px 0 0 -233px;
+    z-index: 1200;
+}
+.dropdown.body.popup .fm-dialog-close {
+    display: none;
+}
+.dropdown.body.fm-dialog .fm-dialog-close {
+    display: block;
+}
+.dropdown.body:not(.fm-dialog) .nw-fm-dialog-title {
+    padding-top: 34px;
+    
+}
+.dropdown.body:not(.white-context-menu):not(.fm-dialog)::before {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
@@ -108,7 +124,7 @@
     background-repeat: no-repeat;
     background-position: 0 -2249px;
 }
-.dropdown.dropdown-arrow:not(.dialog) .dropdown-white-arrow {
+.dropdown.dropdown-arrow:not(.dialog):not(.fm-dialog) .dropdown-white-arrow {
     display: block;
 }
 .down-arrow .dropdown-white-arrow {
@@ -174,7 +190,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v8.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
 }
@@ -426,7 +442,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v5.png);
+    background-image: url(../images/mega/icons-sprite_v8.png);
     background-position: 2px -532px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;

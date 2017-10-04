@@ -33,7 +33,7 @@ var exportPassword = {
     // List of algorithms
     algorithms: [
         {
-            // For unit testing with low rounds
+            // Algorithm (0) for unit testing with low rounds
             name: 'PBKDF2',                     // Name for the Web Crypto primary PBKDF algorithm
             hash: 'SHA-512',                    // Hash algorithm for the Web Crypto primary PBKDF algorithm
             failsafeName: 'PBKDF2_HMAC_SHA512', // Name for the asmCrypto failsafe PBKDF algorithm
@@ -45,7 +45,19 @@ var exportPassword = {
             iterations: 1000                    // Number of iterations to run
         },
         {
-            // Current algorithm
+            // Old algorithm (1) which used incorrect parameter order: HMAC(password, data)
+            name: 'PBKDF2',
+            hash: 'SHA-512',
+            failsafeName: 'PBKDF2_HMAC_SHA512',
+            macName: 'HMAC_SHA256',
+            saltLength: 256,
+            macKeyLength: 256,
+            macLength: 256,
+            derivedKeyLength: 512,
+            iterations: 100000
+        },
+        {
+            // Current algorithm (2)
             name: 'PBKDF2',
             hash: 'SHA-512',
             failsafeName: 'PBKDF2_HMAC_SHA512',
@@ -60,13 +72,13 @@ var exportPassword = {
     ],
 
     // The current algorithm in use for production
-    currentAlgorithm: 1,    // A 1 byte
+    currentAlgorithm: 1,    // 1 byte (0x01) ToDo: Update to 2 when the apps have decryption support for algorithm 2
 
     /**
      * Constants for folder or file type
      */
-    LINK_TYPE_FOLDER: 0,    // A 0 Byte
-    LINK_TYPE_FILE: 1,      // A 1 Byte
+    LINK_TYPE_FOLDER: 0,    // 1 byte (0x00)
+    LINK_TYPE_FILE: 1,      // 1 byte (0x01)
 
 
     /**
@@ -524,7 +536,15 @@ var exportPassword = {
 
             // Create the MAC of the data
             var macAlgorithm = exportPassword.algorithms[algorithm].macName;
-            var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToAuthenticateBytes);
+
+            // If using the old algorithm (1), use parameter order: HMAC(password, data)
+            if (algorithm === 1) {
+                var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToAuthenticateBytes);
+            }
+            else {
+                // Otherwise for newer links (algorithm >= 2) use the correct parameter order: HMAC(data, password)
+                var macBytes = asmCrypto[macAlgorithm].bytes(dataToAuthenticateBytes, macKeyBytes);
+            }
 
             // Create buffer for the data to be converted to Base64
             var numOfBytes = dataToAuthenticateBytes.length + macBytes.length;
@@ -750,7 +770,15 @@ var exportPassword = {
                 // Compute the MAC over the data to verify
                 var dataToVerifyBytes = decodedBytes.subarray(0, macStartOffset);
                 var macAlgorithm = exportPassword.algorithms[algorithm].macName;
-                var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToVerifyBytes);
+
+                // If the link was created with an old algorithm (1) which used parameter order: HMAC(password, data)
+                if (algorithm === 1) {
+                    var macBytes = asmCrypto[macAlgorithm].bytes(macKeyBytes, dataToVerifyBytes);
+                }
+                else {
+                    // Otherwise for newer links (algorithm >= 2) use the correct parameter order: HMAC(data, password)
+                    var macBytes = asmCrypto[macAlgorithm].bytes(dataToVerifyBytes, macKeyBytes);
+                }
 
                 // Convert the string to hex for simple string comparison
                 var macString = asmCrypto.bytes_to_hex(macBytes);
@@ -1293,9 +1321,7 @@ var exportExpiry = {
         deleteScrollPanel(scroll, 'jsp');
 
         if (close) {
-            $.dialog = false;
-            fm_hideoverlay();
-            $linksDialog.addClass('hidden');
+            closeDialog();
             $('.export-links-warning').addClass('hidden');
             if (window.onCopyEventHandler) {
                 document.removeEventListener('copy', window.onCopyEventHandler, false);
@@ -1303,8 +1329,6 @@ var exportExpiry = {
             }
             return true;
         }
-
-        $.dialog = 'links';
 
         $linksDialog.addClass('file-keys-view');
 
@@ -1319,21 +1343,24 @@ var exportExpiry = {
         $linkButtons.removeClass('selected');
         $linksDialog.find('.link-handle-and-key').addClass('selected');
 
-        fm_showoverlay();
+        M.safeShowDialog('links', function() {
+            fm_showoverlay();
+            $linksDialog.removeClass('hidden');
+            $('.export-links-warning').removeClass('hidden');
 
-        $linksDialog.removeClass('hidden');
-        $('.export-links-warning').removeClass('hidden');
+            $(scroll).jScrollPane({showArrows: true, arrowSize: 5});
+            jScrollFade(scroll);
 
-        $(scroll).jScrollPane({ showArrows: true, arrowSize: 5 });
-        jScrollFade(scroll);
+            $linksDialog.css('margin-top', $linksDialog.outerHeight() / 2 * -1);
 
-        $linksDialog.css('margin-top', ($linksDialog.outerHeight() / 2) * -1);
+            setTimeout(function() {
+                $('.file-link-info').rebind('click', function() {
+                    $('.file-link-info').select();
+                });
+            }, 300);
 
-        setTimeout(function() {
-            $('.file-link-info').rebind('click', function() {
-                $('.file-link-info').select();
-            });
-        }, 300);
+            return $linksDialog;
+        });
 
         // Setup toast notification
         toastTxt = l[7654];
@@ -1972,10 +1999,65 @@ var exportExpiry = {
         return false;
     };
 
+    /**
+     * Shows the copyright warning dialog.
+     *
+     * @param {Array} nodesToProcess Array of strings, node ids
+     */
+    var initCopyrightsDialog = function(nodesToProcess) {
+        'use strict';
+
+        $.itemExport = nodesToProcess;
+
+        var openGetLinkDialog = function() {
+            var exportLink = new mega.Share.ExportLink({
+                'showExportLinkDialog': true,
+                'updateUI': true,
+                'nodesToProcess': nodesToProcess
+            });
+            exportLink.getExportLink();
+        };
+
+        // If they've already agreed to the copyright warning this session
+        if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
+
+            // Go straight to Get Link dialog
+            openGetLinkDialog();
+            return false;
+        }
+
+        // Cache selector
+        var $copyrightDialog = $('.copyrights-dialog');
+
+        // Otherwise show the copyright warning dialog
+        M.safeShowDialog('copyrights', function() {
+            $.copyrightsDialog = 'copyrights';
+            return $copyrightDialog;
+        });
+
+        // Init click handler for 'I agree' / 'I disagree' buttons
+        $copyrightDialog.find('.default-white-button').rebind('click', function() {
+            closeDialog();
+
+            // User disagrees with copyright warning
+            if (!$(this).hasClass('cancel')) {
+                // User agrees, store flag in localStorage so they don't see it again for this session
+                localStorage.setItem('agreedToCopyrightWarning', '1');
+
+                // Go straight to Get Link dialog
+                openGetLinkDialog();
+            }
+        });
+
+        // Init click handler for 'Close' button
+        $copyrightDialog.find('.fm-dialog-close').rebind('click', closeDialog);
+    };
+
     // export
     scope.mega = scope.mega || {};
     scope.mega.Share = scope.mega.Share || {};
     scope.mega.Share.ExportLink = ExportLink;
+    scope.mega.Share.initCopyrightsDialog = initCopyrightsDialog;
 })(jQuery, window);
 
 
@@ -2004,6 +2086,13 @@ var exportExpiry = {
         var $nodeId = $('#' + nodeId);
         var $tree = $('#treea_' + nodeId);
 
+        if ($nodeId.length === 0) {
+            // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
+            if (M.megaRender.hasDOMNode(nodeId)) {
+                $nodeId = $(M.megaRender.getDOMNode(nodeId, M.d[nodeId]));
+            }
+        }
+
         if (!$nodeId.length && !$tree.length) {
             self.logger.warn('No DOM Node matching "%s"', nodeId);
 
@@ -2018,7 +2107,7 @@ var exportExpiry = {
             $('.own-data', $nodeId).addClass('linked');
 
             // Add link-icon to grid view
-            if ($nodeId.hasClass('file-block')) {
+            if ($nodeId.hasClass('data-block-view')) {
                 $nodeId.addClass('linked');
             }
         }
@@ -2035,12 +2124,19 @@ var exportExpiry = {
      * @param {String} nodeId
      */
     UiExportLink.prototype.removeExportLinkIcon = function(nodeId) {
+        var $node = $('#' + nodeId);
+        if ($node.length === 0) {
+            // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
+            if (M.megaRender.hasDOMNode(nodeId)) {
+                $node = $(M.megaRender.getDOMNode(nodeId, M.d[nodeId]));
+            }
+        }
 
         // Remove link icon from list view
-        $('#' + nodeId).removeClass('linked').find('.own-data').removeClass('linked');
+        $node.removeClass('linked').find('.own-data').removeClass('linked');
 
         // Remove link icon from grid view
-        $('#' + nodeId + '.file-block').removeClass('linked');
+        $node.filter('.data-block-view').removeClass('linked');
 
         // Remove link icon from left panel
         $('#treeli_' + nodeId + ' span').removeClass('linked');
@@ -2080,8 +2176,11 @@ var exportExpiry = {
         $('.grid-table.fm #' + nodeId).addClass('taken-down');
 
         // Add taken-down to block view
-        $('#' + nodeId + '.file-block').addClass('taken-down');
+        $('#' + nodeId + '.data-block-view').addClass('taken-down');
 
+        if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[nodeId]) {
+            $(M.megaRender.nodeMap[nodeId]).addClass('take-down');
+        }
         // Add taken-down to left panel
         $('#treea_' + nodeId).addClass('taken-down');
 
@@ -2096,7 +2195,7 @@ var exportExpiry = {
             }
 
             $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
-            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
+            $('#' + nodeId + '.data-block-view').attr('title', titleTooltip);
         }
         else {// Item is file
 
@@ -2108,7 +2207,7 @@ var exportExpiry = {
             }
 
             $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
-            $('#' + nodeId + '.file-block').attr('title', titleTooltip);
+            $('#' + nodeId + '.data-block-view').attr('title', titleTooltip);
         }
     };
 
@@ -2117,19 +2216,22 @@ var exportExpiry = {
      * @param {String} nodeId
      */
     UiExportLink.prototype.removeTakenDownIcon = function(nodeId) {
+        if (M.megaRender.hasDOMNode(nodeId)) {
+            $(M.megaRender.getDOMNode(nodeId, M.d[nodeId])).removeClass('take-down');
+        }
 
         // Add taken-down to list view
         $('.grid-table.fm #' + nodeId).removeClass('taken-down');
 
         // Add taken-down to block view
-        $('#' + nodeId + '.file-block').removeClass('taken-down');
+        $('#' + nodeId + '.data-block-view').removeClass('taken-down');
 
         // Add taken-down to left panel
         $('#treea_' + nodeId).removeClass('taken-down');
 
         // Remove title, mouse popup
         $('.grid-table.fm #' + nodeId).attr('title', '');
-        $('#' + nodeId + '.file-block').attr('title', '');
+        $('#' + nodeId + '.data-block-view').attr('title', '');
     };
 
     // export

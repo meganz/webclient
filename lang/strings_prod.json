@@ -1496,7 +1496,7 @@
         "context": ""
     },
     "999": {
-        "text": "Would you like to upgrade your temporary session to a free account now?",
+        "text": "Would you like to upgrade your temporary session to a FREE account now?",
         "context": "Ephemeral session refers to the current session the user has on MEGA which is of temporary nature"
     },
     "1000": {
@@ -2303,6 +2303,10 @@
         "text": "Cancel",
         "context": "Dialog button to cancel the operation"
     },
+    "1607": {
+        "text": "%1 of %2",
+        "context": "Label to indicate the current amount of account usage.over the total actual plan.  Keep %1 and %2 codes."
+    },
     "1624": {
         "text": "Downloading",
         "context": ""
@@ -2787,9 +2791,21 @@
         "text": "Outgoing Shares",
         "context": "Folders that have been shared by the user to other MEGA users"
     },
+    "5545": {
+        "text": "Create new folder",
+        "context": "Menu item"
+    },
     "5549": {
         "text": "Upgrade account",
         "context": "Button title which triggers the action to upgrade your MEGA account level"
+    },
+    "5552": {
+        "text": "Thumbnail view",
+        "context": "Menu item to change from list view to grid view"
+    },
+    "5553": {
+        "text": "List view",
+        "context": "Menu item to change from grid view to list view"
     },
     "5557": {
         "text": "file",
@@ -2830,10 +2846,6 @@
     "5738": {
         "text": "Rubbish bin",
         "context": "\"Trash\" or \"recycle bin\""
-    },
-    "5760": {
-        "text": "Error uploading asset",
-        "context": "there was a problem uploading the file to MEGA"
     },
     "5775": {
         "text": "Used",
@@ -3107,12 +3119,20 @@
         "text": "Click [A]here[\/A] to view your storage usage.",
         "context": "The placeholder \"[A]\" and \"[\/A]\" are important. They will be converted into a link. "
     },
+    "5945": {
+        "text": "Failed to download file. Please try again. [{0}]",
+        "context": "Message of the dialog displayed when the process\/request to download a node failed.\nPreserve the [{0}] code because is for include the error code or the error message in runtime."
+    },
     "6001": {
         "text": "Wrong password",
         "context": "Error text shown when you introduce a wrong password on the confirmation proccess"
     },
     "6078": {
         "text": "MEGA",
+        "context": ""
+    },
+    "6080": {
+        "text": "confirm",
         "context": ""
     },
     "6089": {
@@ -3399,14 +3419,6 @@
         "text": "We're sorry to see you go",
         "context": ""
     },
-    "6842": {
-        "text": "Your account has now been closed",
-        "context": ""
-    },
-    "6843": {
-        "text": "but before you leave we would love to know why you are leaving us",
-        "context": ""
-    },
     "6844": {
         "text": "Please select one",
         "context": ""
@@ -3522,6 +3534,10 @@
     "6889": {
         "text": "Setting up Bitcoin transaction...",
         "context": ""
+    },
+    "6909": {
+        "text": "Manage link",
+        "context": "Item menu option upon right click on one or multiple files."
     },
     "6941": {
         "text": "(non-recurring)",
@@ -3690,6 +3706,10 @@
     "7006": {
         "text": "Loading...",
         "context": "Label to show when an account detail request is waiting for the server response."
+    },
+    "7039": {
+        "text": "Do not ask me again",
+        "context": ""
     },
     "7086": {
         "text": "Please select your Linux Distro",
@@ -4302,18 +4322,6 @@
     "7872": {
         "text": "Access to any folders shared with you by selected [X] will be lost.",
         "context": "This is shown on a confirmation message dialog when removing one or more contacts. The placeholder [X] will be replaced with \"contact\" or \"contacts\" depending on how many contacts are being removed."
-    },
-    "7873": {
-        "text": "You can download the extension (v%1) below.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user they can download a specific version of the extension further down the page. The placeholder %1 will be replaced with the version of the extension e.g. \"3.2.8\". So the text would read \"You can download the extension (v3.2.8) below.\""
-    },
-    "7874": {
-        "text": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is not the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.7\". The placeholder %2 will be replaced with the newest version available for download e.g. \"3.2.8\". So the text would read \"It looks like your current extension (v3.2.7) is out of date. You can download the latest (v3.2.8) below.\""
-    },
-    "7875": {
-        "text": "Your extension (v%1) is up to date.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.8\". So the text would read \"Your extension (v3.2.8) is up to date.\""
     },
     "7879": {
         "text": "Access to folders shared by [X] was removed.",
@@ -5226,6 +5234,10 @@
     "8855": {
         "text": "You have attempted to log in too many times.[BR]Please wait until %1 and try again.",
         "context": "An error message which is shown when a user tries to log into the site too many times. Please leave the [BR] tag which will be replaced with a line break at run time. The %1 placeholder will be replaced with the time e.g. 14:37 which is when the user can try logging in again."
+    },
+    "8859": {
+        "text": "Backup Recovery Key",
+        "context": "The is a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key."
     },
     "8866": {
         "text": "View Profile",
@@ -6607,6 +6619,10 @@
         "text": "Unlocked bonuses:",
         "context": "Header of block with achievements bonuses."
     },
+    "16448": {
+        "text": "Resume Transfers",
+        "context": "A label of an option to resume all paused transfers."
+    },
     "16471": {
         "text": "The provided key is invalid.\r\n",
         "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is the error message shown when the decryption key entered is not correct."
@@ -6614,6 +6630,30 @@
     "16472": {
         "text": "Please check that the key is correct or ask the creator of the link again.",
         "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is a second message which is shown when the decryption key entered is not correct."
+    },
+    "16474": {
+        "text": "Previous versions",
+        "context": "A button label which opens a dialog to display the full version history of the selected file."
+    },
+    "16475": {
+        "text": "Revert",
+        "context": "A button label which reverts a certain version of a file to be the current version of the selected file."
+    },
+    "16476": {
+        "text": "Edited by %1 ",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
+    },
+    "16477": {
+        "text": "Renamed from %1 by %2",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous filename by a particular user. Please keep the placeholders %1 which will be replaced by the filename and %2 which will be replaced by the email address."
+    },
+    "16480": {
+        "text": "Edited by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by the user themself."
+    },
+    "16481": {
+        "text": "Renamed from %1 by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name by the user itself. Please keep the placeholder %1 which will be replaced by the filename."
     },
     "16485": {
         "text": "Duplicate items",
@@ -6626,14 +6666,6 @@
     "16487": {
         "text": "Select the file you want to keep:",
         "context": "User is able to select file version if uploading file already exists in folder."
-    },
-    "16488": {
-        "text": "Upload and replace",
-        "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
-    },
-    "16489": {
-        "text": "Replace the file in the destination folder with the file you are uploading:",
-        "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
     },
     "16490": {
         "text": "Don't upload",
@@ -7218,5 +7250,145 @@
     "16892": {
         "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
         "context": "A message which is shown when there was a server-side error retrieving the cloud drive contents."
+    },
+    "16895": {
+        "text": "Do you remember your password?",
+        "context": "Used as a title in the \"Password reminder\" dialog, that pop ups to ensure that the user had exported his recovery key OR still remembers his password."
+    },
+    "16896": {
+        "text": "Your password",
+        "context": "Used as a placeholder in the \"Password reminder\" dialog, that pop ups to ensure that the user had exported his recovery key OR still remembers his password.\r\nThe user is supposed to enter his password in this field, to validate\/confirm he did not forgot it."
+    },
+    "16897": {
+        "text": "Password accepted",
+        "context": "Used as a message in the \"Password reminder\" dialog that is shown when the user enters his password, clicks confirm and his password is correct."
+    },
+    "16898": {
+        "text": "Wrong password, backup your Recovery Key as soon as possible!",
+        "context": "Used as a message in the \"Password reminder\" dialog that is shown when the user enters his password, clicks confirm and his password is incorrect."
+    },
+    "16899": {
+        "text": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+        "context": "Used as a message in the \"Password reminder\" dialog as a tip on why backing up the \"Recovery Key\" is important and vital for the user to not lose any data in case he\/she forgets his password."
+    },
+    "16900": {
+        "text": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+        "context": "Used as a message in the \"Password reminder\" dialog as a tip on why confirming the password and\/or exporting the recovery key is important and vital for the user to not lose any data."
+    },
+    "16901": {
+        "text": "Password Reminder",
+        "context": "The tooltip when the user hovers over the key icon as visible in the screenshot. It is effectively a title for a dialog that tells the user to remember their password.\r\n\r\nUsed as a tooltip for the \"Password Reminder\" icon in the top bar, that when clicked would ask the user to confirm his password or do a recovery key backup\/export."
+    },
+    "16902": {
+        "text": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+        "context": "Message shown at the bottom when users run into an IP quota limitation without an account, informing them that they can get more if they create an account. Please make sure you keep \"10%\" together without spaces, as it can be replaced dynamically by the system."
+    },
+    "16903": {
+        "text": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
+        "context": "If the user is not logged in and in a market where we operate the achievement program and the user runs into a transfer limitation, this message is shown to inform the user that he can create an account to get free quota by achieving (albeit with a couple of days activation delay)."
+    },
+    "16904": {
+        "text": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
+        "context": "If the user is logged in with an achievement account while running into a transfer limitation, we show this message to remind the user that he can achieve to get more transfer quota for free."
+    },
+    "16927": {
+        "text": "This action can not be completed as it would take you over your current storage limit",
+        "context": "Error message shown to user when a copy\/import operation would take them over their storage limit."
+    },
+    "17081": {
+        "text": "Incomplete transfer, do you want to resume it?",
+        "context": "User is able to resume download is transfer wasn't complete before"
+    },
+    "17082": {
+        "text": "Completed transfer. Please save your file.",
+        "context": "If file was downloaded before user is able to save it immedialety"
+    },
+    "17083": {
+        "text": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
+        "context": "Explains, that new application for desktop and mobile Win devices is developed and ready for testing."
+    },
+    "17084": {
+        "text": "Your download cannot proceed because it would take you over the current transfer quota allowance for your account.",
+        "context": "A message shown to PRO users when they go over quota when downloading."
+    },
+    "17085": {
+        "text": "You have partially downloaded transfers. Would you like to resume them?",
+        "context": "A message shown when there are resumable downloads in the file manager."
+    },
+    "17086": {
+        "text": "Open folder",
+        "context": "The label text for a button which opens a folder in the cloud drive."
+    },
+    "17089": {
+        "text": "Before you close your account, we would like to know why you are leaving us...",
+        "context": "A message on the account cancellation dialog before a list of options the user can select to explain why they want to cancel their account."
+    },
+    "17090": {
+        "text": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+        "context": "Informs user that transfer quota will be exceeded soon and user should buy PRO account."
+    },
+    "17091": {
+        "text": "Continue Download",
+        "context": "Button label. Allows user to continue download if it was paused."
+    },
+    "17092": {
+        "text": "Are you sure you want to cancel these %1 file transfers?",
+        "context": "A message shown to the user when they attempt to cancel a bunch of selected transfers. Please leave the %1 placeholder which will be replaced with the number of file transfers."
+    },
+    "17093": {
+        "text": "Upload and update",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user update the file in the destination folder with generating a new version with the file he is uploading.\r\n"
+    },
+    "17094": {
+        "text": "Upload and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is uploading to avoid filename conflict.\r\n"
+    },
+    "17095": {
+        "text": "Copy and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is copying to avoid filename conflict.\r\n"
+    },
+    "17096": {
+        "text": "Move and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is moving to avoid filename conflict.\r\n"
+    },
+    "17097": {
+        "text": "The file will be updated with version history: [A]Learn more[\/A]",
+        "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
+    },
+    "17146": {
+        "text": "This page is for registered users only.",
+        "context": "A dialog message when user is trying to access the page from an ephemeral session which is allowed for registered users only."
+    },
+    "17147": {
+        "text": "Clear previous versions",
+        "context": "Title of button to delete all previous versions of a file"
+    },
+    "17148": {
+        "text": "Current Versions",
+        "context": "Title of section to display information of all current versions of files."
+    },
+    "17149": {
+        "text": "Current Version",
+        "context": "Title of section to display information of the current version of a file."
+    },
+    "17150": {
+        "text": "Versions",
+        "context": "Title of section to display number of all historical versions of files."
+    },
+    "17151": {
+        "text": "[X] versions",
+        "context": "Message to display the number of historical versions of files. Please keep [X] as it will be replaced at the runtime."
+    },
+    "17152": {
+        "text": "1 version",
+        "context": "Version message when files only have 1 historical version."
+    },
+    "17154": {
+        "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
+        "context": "A warning message for deleting the whole version history of one file."
+    },
+    "17155": {
+        "text": "Total size taken up by file versions:",
+        "context": "A title message in the user's account settings for showing the storage used for file versions."
     }
 }

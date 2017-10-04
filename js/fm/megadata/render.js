@@ -18,6 +18,9 @@ MegaData.prototype.renderMain = function(aUpdate) {
     }
 
     if (!aUpdate) {
+        if (this.megaRender) {
+            this.megaRender.destroy();
+        }
         this.megaRender = new MegaRender(this.viewmode);
     }
 
@@ -66,20 +69,17 @@ MegaData.prototype.renderMain = function(aUpdate) {
  * Helper for M.renderMain
  * @param {Boolean} u Whether we're just updating the list
  */
-MegaData.prototype.rmSetupUI = function(u) {
+MegaData.prototype.rmSetupUI = function(u, refresh) {
+    'use strict';
+
     if (this.viewmode === 1) {
-        if (this.v.length > 0) {
-            var o = $('.fm-blocks-view.fm .file-block-scrolling');
-            o.find('div.clear').remove();
-            o.append('<div class="clear"></div>');
-        }
-        M.addIconUI(u);
+        M.addIconUI(u, refresh);
         if (!u) {
             fm_thumbnails();
         }
     }
     else {
-        M.addGridUIDelayed();
+        M.addGridUIDelayed(refresh);
     }
     Soon(fmtopUI);
 
@@ -88,59 +88,53 @@ MegaData.prototype.rmSetupUI = function(u) {
         delete this.onRenderFinished;
     }
 
-    $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(e) {
-        var target = $(this).closest('tr');
-        if (!target.hasClass('ui-selected')) {
-            target.parent().find('tr').removeClass('ui-selected');
-        }
-        target.addClass('ui-selected');
-        e.preventDefault();
-        e.stopPropagation(); // do not treat it as a regular click on the file
-        e.currentTarget = target;
-        M.cacheselect();
-        M.searchPath();
-        if (!$(this).hasClass('active')) {
-            M.contextMenuUI(e, 1);
-            $(this).addClass('active');
-        }
-        else {
-            $.hideContextMenu();
-            $(this).removeClass('active');
-        }
-    });
+    var cmIconHandler = function _cmIconHandler(listView, elm, ev) {
+        var target = listView ? $(this).closest('tr') : $(this).parents('.data-block-view');
 
-    $('.data-block-view .file-settings-icon').rebind('click', function(e) {
-        var target = $(this).parents('.data-block-view');
-        if (target.attr('class').indexOf('ui-selected') == -1) {
-            target.parent().find('a').removeClass('ui-selected');
+        if (!target.hasClass('ui-selected')) {
+            target.parent().find(elm).removeClass('ui-selected');
+            selectionManager.clear_selection();
         }
         target.addClass('ui-selected');
-        e.preventDefault();
-        e.stopPropagation(); // do not treat it as a regular click on the file
-        e.currentTarget = target;
-        M.cacheselect();
+
+        selectionManager.add_to_selection(target.attr('id'));
+
+        ev.preventDefault();
+        ev.stopPropagation(); // do not treat it as a regular click on the file
+        ev.currentTarget = target;
+
         M.searchPath();
+
         if (!$(this).hasClass('active')) {
+            M.contextMenuUI(ev, 1);
             $(this).addClass('active');
-            M.contextMenuUI(e, 1);
         }
         else {
-            $(this).removeClass('active');
             $.hideContextMenu();
+            $(this).removeClass('active');
         }
+
+        return false;
+    };
+
+    $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(ev) {
+        return cmIconHandler.call(this, true, 'tr', ev);
+    });
+    $('.data-block-view .file-settings-icon').rebind('click', function(ev) {
+        return cmIconHandler.call(this, false, 'a', ev);
     });
 
     if (!u) {
 
         if (this.currentrootid === 'shares') {
 
-            function prepareShareMenuHandler(e) {
+            var prepareShareMenuHandler = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.currentTarget = $('#treea_' + M.currentdirid);
                 e.calculatePosition = true;
                 $.selected = [M.currentdirid];
-            }
+            };
 
             $('.shared-details-info-block .grid-url-arrow').rebind('click', function(e) {
                 prepareShareMenuHandler(e);
@@ -170,15 +164,7 @@ MegaData.prototype.rmSetupUI = function(u) {
                 }
             });
 
-            $('.shared-details-info-block .fm-share-copy').rebind('click', function(e) {
-                $.copyDialog = 'copy'; // this is used like identifier when key with key code 27 is pressed
-                $.mcselected = M.RootID;
-                $('.copy-dialog .dialog-copy-button').addClass('active');
-                $('.copy-dialog').removeClass('hidden');
-                handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
-                $('.fm-dialog-overlay').removeClass('hidden');
-                $('body').addClass('overlayed');
-            });
+            $('.shared-details-info-block .fm-share-copy').rebind('click', openCopyDialog);
 
             // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
             $('.shared-details-info-block .fm-leave-share').rebind('click', function(e) {
@@ -253,14 +239,6 @@ MegaData.prototype.renderTree = function() {
     return promise;
 };
 
-MegaData.prototype.cacheselect = function() {
-    $.selected = [];
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o) {
-        if ($(o).hasClass('ui-selected')) {
-            $.selected.push($(o).attr('id'));
-        }
-    });
-};
 
 MegaData.prototype.pathLength = function() {
     var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
@@ -268,7 +246,7 @@ MegaData.prototype.pathLength = function() {
     return length;
 };
 
-MegaData.prototype.renderPath = function() {
+MegaData.prototype.renderPath = function(fileHandle) {
     var name, hasnext = '', typeclass,
         html = '<div class="clear"></div>',
         a2 = this.getPath(this.currentdirid),
@@ -468,6 +446,9 @@ MegaData.prototype.renderPath = function() {
         $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
         $('.fm-breadcrumbs:first span').empty();
     }
+    if (fileHandle) {
+        fileversioning.fileVersioningDialog(fileHandle);
+    }
 };
 
 MegaData.prototype.searchPath = function() {
@@ -567,4 +548,57 @@ MegaData.prototype.searchPath = function() {
     }
 
     $('.fm-blocks-view, .files-grid-view').removeClass('search');
+};
+
+MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
+    'use strict';
+
+    $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-invalid-folder').addClass('hidden');
+    $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
+    $('.fm-empty-pad.fm-empty-sharef').remove();
+};
+
+/**
+ * A function, which would be called on every DOM update (or scroll). This func would implement
+ * throttling, so that we won't update the UI components too often.
+ *
+ */
+MegaData.prototype.rmSetupUIDelayed = function() {
+    delay('rmSetupUI', function() {
+        M.rmSetupUI(false, true);
+    }, 75);
+};
+
+
+MegaData.prototype.megaListRenderNode = function(aHandle) {
+    var megaRender = M.megaRender;
+    if (!megaRender) {
+        return;
+    }
+    megaRender.numInsertedDOMNodes++;
+
+    var node = megaRender.getDOMNode(aHandle, M.d[aHandle]);
+
+    var selList = selectionManager && selectionManager.selected_list ? selectionManager.selected_list : $.selected;
+
+    if (selList && selList.length) {
+        if (selList.indexOf(aHandle) > -1) {
+            node.classList.add('ui-selected');
+        }
+        else {
+            node.classList.remove('ui-selected');
+        }
+        node.classList.remove('ui-selectee');
+    }
+
+    if (M.d[aHandle]) {
+        M.d[aHandle].seen = true;
+    }
+    else {
+        if (d) {
+            console.error("megaListRenderNode was called with aHandle:", aHandle, "which was not found in M.d");
+        }
+    }
+
+    return node;
 };

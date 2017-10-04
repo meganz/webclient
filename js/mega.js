@@ -1231,10 +1231,9 @@ scparser.$finalize = function() {
                 delay('thumbnails', fm_thumbnails, 3200);
             }
 
-            /* er, why was this here?
             if ($.dialog === 'properties') {
-                propertiesDialog();
-            }*/
+                delay($.dialog, propertiesDialog.bind(this, 3));
+            }
 
             if (scsharesuiupd) {
                 onIdle(function() {

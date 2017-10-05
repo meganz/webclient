@@ -1924,7 +1924,7 @@ function passwordManager(form) {
             if (hashLogic || isPublicLink(path)) {
                 path = path.replace('/', '/#');
 
-                if (location.href.substr(0, 19) === 'chrome-extension://') {
+                if (is_chrome_web_ext || is_firefox_web_ext) {
                     path = path.replace('/#', '/mega/secure.html#');
                 }
             }

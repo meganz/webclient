@@ -2199,7 +2199,7 @@ function parsepage(pagehtml, pp) {
     $('#startholder').hide();
 
     pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
-    if (document.location.href.substr(0, 19) == 'chrome-extension://') {
+    if (is_chrome_web_ext || is_firefox_web_ext) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
 
@@ -2207,7 +2207,7 @@ function parsepage(pagehtml, pp) {
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
     var pagesmenu = pages['pagesmenu'];
-    if (document.location.href.substr(0, 19) == 'chrome-extension://') {
+    if (is_chrome_web_ext || is_firefox_web_ext) {
         bmenu2 = bmenu2.replace(/\/#/g, '/' + urlrootfile + '#');
     }
     pagehtml = pagehtml
@@ -2248,7 +2248,7 @@ function parsetopmenu() {
     else {
         top = pages['top'].replace(/{staticpath}/g, staticpath);
     }
-    if (document.location.href.substr(0, 19) === 'chrome-extension://') {
+    if (is_chrome_web_ext || is_firefox_web_ext) {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
     top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');

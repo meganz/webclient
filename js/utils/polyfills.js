@@ -18,23 +18,22 @@ mBroadcaster.once('startMega', function() {
 });
 
 /** getOwnPropertyDescriptors polyfill */
-mBroadcaster.once('startMega', function() {
-    if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
-        Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
-            value: function getOwnPropertyDescriptors(obj) {
-                var result = {};
+if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
+    Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
+        value: function getOwnPropertyDescriptors(obj) {
+            'use strict';
 
-                for (var key in obj) {
-                    if (obj.hasOwnProperty(key)) {
-                        result[key] = Object.getOwnPropertyDescriptor(obj, key);
-                    }
+            var result = {};
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    result[key] = Object.getOwnPropertyDescriptor(obj, key);
                 }
-
-                return result;
             }
-        });
-    }
-});
+
+            return result;
+        }
+    });
+}
 
 if (!String.prototype.startsWith) {
     // determines whether a string begins with the characters of a specified string

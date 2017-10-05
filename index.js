@@ -232,7 +232,6 @@ function init_page() {
         }
     }
 
-
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
 
@@ -777,6 +776,11 @@ function init_page() {
 
         // Handle old invalid links from emails and redirect them back to fm/account
         loadSubPage('fm/account');
+        return false;
+    }
+    else if (is_mobile && page === 'fm/account') {
+        parsepage(pages['mobile']);
+        mobile.account.init();
         return false;
     }
     else if (page == 'account') {
@@ -1504,8 +1508,12 @@ function topmenuUI() {
     // Remove red bar from all menu items
     $topMenuItems.removeClass('active');
 
+    // If in mobile My Account section, show red bar
+    if (is_mobile && page.indexOf('fm/account') === 0) {
+        $topMenuItems.filter('.account').addClass('active');
+    }
     // If in mobile Cloud Drive, show red bar
-    if (is_mobile && page.indexOf('fm') === 0) {
+    else if (is_mobile && page.indexOf('fm') === 0) {
         $topMenuItems.filter('.fm').addClass('active');
     }
     else if (section) {

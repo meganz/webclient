@@ -1837,7 +1837,7 @@
     "17094": "\u4e0a\u50b3\u4e14\u91cd\u65b0\u547d\u540d",
     "17095": "\u8907\u88fd\u4e14\u91cd\u65b0\u547d\u540d",
     "17096": "\u79fb\u52d5\u4e14\u91cd\u65b0\u547d\u540d",
-    "17097": "The file will be updated with version history: [A]Learn more[\/A]",
+    "17097": "\u8a72\u6a94\u6848\u5c07\u88ab\u66f4\u65b0\u81f3\u6b77\u53f2\u7248\u672c\u4e2d\uff1a[A]\u4e86\u89e3\u66f4\u591a[\/A]",
     "17146": "\u6b64\u9801\u9762\u50c5\u63d0\u4f9b\u7d66\u8a3b\u518a\u6703\u54e1\u4f7f\u7528\u3002",
     "17147": "\u6e05\u9664\u6240\u6709\u5148\u524d\u7684\u7248\u672c",
     "17148": "\u76ee\u524d\u7684\u7248\u672c",
@@ -1846,6 +1846,6 @@
     "17151": "[X]\u7a2e\u7248\u672c",
     "17152": "\u4e00\u7a2e\u7248\u672c",
     "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
-    "17155": "Total size taken up by file versions:",
-    "17156": "Renamed from %1"
+    "17155": "\u6a94\u6848\u7248\u672c\u6240\u4f54\u7528\u7684\u7e3d\u7a7a\u9593\u5927\u5c0f\uff1a",
+    "17156": "\u81ea\u820a\u540d\u70ba%1\u7684\u6a94\u6848\u66f4\u540d"
 }

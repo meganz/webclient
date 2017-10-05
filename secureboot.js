@@ -1833,13 +1833,13 @@ else if (!b_u) {
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
 
+    jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
     jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
     jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
     jsl.push({f:'js/utils/pictools.js', n: 'js_utils_pictools_js', j: 1});
-    jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
     jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});

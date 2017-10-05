@@ -712,6 +712,7 @@
     "5737": "Geen contacten",
     "5738": "Prullenbak",
     "5775": "Gebruikt",
+    "5799": "Gebruik",
     "5801": "gebruikt",
     "5814": "Upgrade Account",
     "5816": "[X] TB",
@@ -1660,9 +1661,7 @@
     "16474": "Vorige Versies",
     "16475": "Terugkeren",
     "16476": "Bewerkt door %1",
-    "16477": "Hernoemd van %1 door %2",
     "16480": "Bewerkt door mij",
-    "16481": "Hernoemd van %1 door mij",
     "16485": "Verdubbel items",
     "16486": "Het bestand %1 bestaat al op deze locatie.",
     "16487": "Selecteer het bestand die u wilt behouden:",
@@ -1823,6 +1822,7 @@
     "16903": "Of maak een account om deel te nemen aan ons beloningsprogramma, waar u gratis opslag & overdracht tegoed kunt verdienen wanneer u MEGA applicaties installeert of vrienden uitnodigt bij MEGA (activatie kan enkele dagen duren).",
     "16904": "Of neem deel aan in ons beloningsprogramma, waar u gratis opslag & overdracht tegoed kunt verdienen als u MEGA applicaties installeert of vrienden uitnodigt bij MEGA (activatie kan enkele dagen duren).",
     "16927": "Deze actie kan niet worden voltooid omdat het u over de huidige opslaglimiet brengt. ",
+    "17022": "Account Soort",
     "17081": "Incomplete overdracht, wilt u het hervatten?",
     "17082": "Voltooide overdracht. Uw bestand opslaan",
     "17083": "De MEGA Universele Windows Applicatie wordt momenteel ontwikkeld. U kunt de beta versie van de applicatie [A]hier[\/A] krijgen.",
@@ -1845,6 +1845,7 @@
     "17150": "Versies",
     "17151": "[X] versies",
     "17152": "1 versie",
-    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
-    "17155": "Total size taken up by file versions:"
+    "17154": "U staat op het punt de versiegeschiedenis van 1 bestand te verwijderen. Houd er rekening mee dat het huidige bestand niet verwijderd wordt. Wilt u doorgaan? ",
+    "17155": "Totale ruimte ingenomen door bestandsversies:",
+    "17156": "Hernoemd van %1"
 }

@@ -712,6 +712,7 @@
     "5737": "Aucun contact",
     "5738": "Corbeille",
     "5775": "Utilis\u00e9s",
+    "5799": "Utilisation",
     "5801": "utilis\u00e9",
     "5814": "Surclasser le compte",
     "5816": "[X] To",
@@ -1660,9 +1661,7 @@
     "16474": "Versions pr\u00e9c\u00e9dentes",
     "16475": "Revenir",
     "16476": "Modifi\u00e9 par %1",
-    "16477": "Renomm\u00e9 de %1 par %2",
     "16480": "Modifi\u00e9 par moi",
-    "16481": "Renomm\u00e9 de %1 par moi",
     "16485": "Doublons",
     "16486": "Un fichier nomm\u00e9 %1 existe d\u00e9j\u00e0 dans cet emplacement.",
     "16487": "S\u00e9lectionner le fichier \u00e0 conserver :",
@@ -1823,6 +1822,7 @@
     "16903": "Ou cr\u00e9ez un compte pour participer \u00e0 notre programme d'objectifs qui vous permettra de gagner de l'espace de stockage et un quota de transfert gratuits en installant les applis MEGA ou en invitant des amis \u00e0 MEGA (l'activation peut prendre plusieurs jours).",
     "16904": "Ou participez \u00e0 notre programme d'objectifs qui vous permettra de gagner de l'espace de stockage et un quota de transfert gratuits en installant les applis MEGA ou en invitant des amis \u00e0 MEGA (l'activation peut prendre plusieurs jours).",
     "16927": "Cette action ne peut pas \u00eatre men\u00e9e \u00e0 bien, car elle vous ferait d\u00e9passer votre limite de stockage actuelle",
+    "17022": "Type de compte",
     "17081": "Le transfert n'est pas termin\u00e9, souhaitez-vous le reprendre\u2009?",
     "17082": "Le transfert est termin\u00e9. Veuillez enregistrer votre fichier.",
     "17083": "L'appli Windows universelle de MEGA est en cours de d\u00e9veloppement. Vous pouvez obtenir la version b\u00eata de l'appli [A]ici[\/A].",
@@ -1845,6 +1845,7 @@
     "17150": "Versions ",
     "17151": "[X] versions",
     "17152": "1 version",
-    "17154": "Vous \u00eates sur le point de supprimer l'historique de version d'un fichier.Veuillez noter que le fichier actuel ne sera pas supprim\u00e9.",
-    "17155": "Taille totale occup\u00e9e par les versions de fichier :"
+    "17154": "Vous \u00eates sur le point de supprimer l'historique de version d'un fichier.Veuillez noter que le fichier actuel ne sera pas supprim\u00e9.Souhaitez-vous continuer\u2009?                            ",
+    "17155": "Taille totale occup\u00e9e par les versions de fichier :",
+    "17156": "Renomm\u00e9 de %1"
 }

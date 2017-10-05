@@ -1560,6 +1560,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             if ($.hideTopMenu) {
                 $.hideTopMenu();
             }
+            if ($.hideContextMenu) {
+                $.hideContextMenu();
+            }
         }
 
         if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {

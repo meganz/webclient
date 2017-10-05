@@ -16776,7 +16776,7 @@
         "context": "success message when emptying the RB"
     },
     "16991": {
-        "text": "Error. The rubbish bin has not be emptied",
+        "text": "Error. The rubbish bin has not been emptied",
         "context": "error message when emptying the RB"
     },
     "16992": {
@@ -17266,6 +17266,22 @@
     "17126": {
         "text": "The dashboard is for registered users only.",
         "context": "A dialog message saying it is forbidden for an ephemeral user to access the dashboard."
+    },
+    "17142": {
+        "text": "cache",
+        "context": "Label for any 'Cache' (cache memory) button, link, text, title, etc. - (String as short as possible)."
+    },
+    "17143": {
+        "text": "clear cache",
+        "context": "Label for any 'Clean cache' button, link, text, title, etc. - (String as short as possible)."
+    },
+    "17144": {
+        "text": "You have not selected a default download location for your files. To proceed with the download, please select a destination folder or go to settings in order to set up your default download location.",
+        "context": "Message of the dialog displayed when a user want to download some nodes and the app doesn't have configured a default download location. Asks the user to select a location for this download or configure a default location."
+    },
+    "17145": {
+        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card? Please try to save\/copy the file to your device's internal memory instead.",
+        "context": "Message of the dialog displayed when the process\/request to copy a file failed because the app or the user don't have write permission to copy into the destination (i.e. copy into a SD card an unsupported file type)."
     },
     "17146": {
         "text": "This page is for registered users only.",

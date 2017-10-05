@@ -307,7 +307,7 @@
                     if (i < versionList.length - 1) {
                         if (v.name !== versionList[i + 1].name) {
                             actionHtml = l[17156].replace('%1',
-                            '<span class="light-grey italic">' + versionList[i + 1].name + '</span>');
+                            '<span class="light-grey italic">' + htmlentities(versionList[i + 1].name) + '</span>');
                         }
                     }
 

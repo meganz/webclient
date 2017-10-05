@@ -3293,15 +3293,21 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
     };
 
     var _openDialog = function(name, dsp) {
-        if (d) {
+        if (d > 1) {
             console.log('safeShowDialog::_openDialog', name, typeof dsp, $.dialog);
         }
 
         onIdle(function() {
             if (typeof $.dialog === 'string') {
 
+                if ($.dialog === name) {
+                    if (d > 1) {
+                        console.log('Reopening same dialog...', name);
+                    }
+                }
+
                 // There are a few dialogs that can be opened from others, deal it.
-                if (!diagInheritance[$.dialog] || diagInheritance[$.dialog].indexOf(name) < 0) {
+                else if (!diagInheritance[$.dialog] || diagInheritance[$.dialog].indexOf(name) < 0) {
                     _cdialogq[name] = dsp;
                     return;
                 }
@@ -3335,7 +3341,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
             return tryCatch(function() {
                 var $dialog;
 
-                if (d) {
+                if (d > 1) {
                     console.warn('Dispatching queued dialog.', name);
                 }
 

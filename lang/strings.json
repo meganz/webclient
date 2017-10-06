@@ -17538,5 +17538,9 @@
     "17283": {
         "text": "Install the MEGA desktop app for Windows, Mac or Linux.[Br][Br]Synchronise single or multiple folders on your computer with your MEGA account.[Br][Br]Access and work with your data securely across different locations and devices. It\u2019s always on and fully automatic. ",
         "context": "Description of the benefits of using MEGA's apps"
+    },
+    "17389": {
+        "text": "Select contacts from your phone's contact list or enter multiple email addresses.",
+        "context": "Text shown to explain how and where you can invite friends."
     }
 }

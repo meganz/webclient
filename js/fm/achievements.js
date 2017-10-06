@@ -440,6 +440,7 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
 
     // Show dialog
     M.safeShowDialog('achievements', function() {
+    $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
         $dialog.removeClass('hidden');
 
         // Init scroll

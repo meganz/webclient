@@ -20,8 +20,11 @@
                     '<td width="100" class="size"></td>' +
                     '<td width="130" class="type"></td>' +
                     '<td width="120" class="time"></td>' +
-                    '<td width="62" class="grid-url-field own-data">' +
+                    '<td width="90" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="small-icon icons-sprite grey-clock"></i>' +
+                        '</span>' +
                         '<span class="data-item-icon"></span>' +
                     '</td>' +
                 '</tr>' +
@@ -32,6 +35,9 @@
                 '<span class="data-block-bg ">' +
                     '<span class="data-block-indicators">' +
                         '<span class="file-status-icon indicator"></span>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="small-icon icons-sprite grey-clock"></i>' +
+                        '</span>' +
                         '<span class="data-item-icon indicator"></span>' +
                     '</span>' +
                     '<span class="block-view-file-type"><img/></span>' +
@@ -473,7 +479,6 @@
             if (this.finalize) {
                 this.finalize(aUpdate, aNodeList, initData);
             }
-            this.finalizers['*'].call(this, aUpdate, aNodeList, initData);
 
             if (this.logger) {
                 console.timeEnd('MegaRender.renderLayout');
@@ -829,7 +834,9 @@
                     var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
                     aTemplate.querySelector(selector).classList.add('star');
                 }
-
+                if (!aNode.t && aNode.tvf) {
+                    aTemplate.classList.add('versioning');
+                }
                 if (this.viewmode) {
                     tmp = aTemplate.querySelector('.block-view-file-type');
 
@@ -1073,44 +1080,6 @@
 
         /** Renderer finalizers */
         finalizers: freeze({
-            /**
-             * A generic finalizer that would be called after the 'section' one finishes.
-             *
-             * @param {Boolean} aUpdate   Whether we're updating the list
-             * @param {Array}   aNodeList The list of ufs-nodes processed
-             * @param {Object}  aUserData  Any data provided by initializers
-             */
-            '*': function(aUpdate, aNodeList, aUserData) {
-                if (!window.fmShortcuts) {
-                    window.fmShortcuts = new FMShortcuts();
-                }
-
-
-                if (!aUpdate) {
-                    if (window.selectionManager) {
-                        window.selectionManager.destroy();
-                        Object.freeze(window.selectionManager);
-                    }
-
-                    /**
-                     * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
-                     * reattach to its events.
-                     *
-                     * @type {SelectionManager}
-                     */
-                    window.selectionManager = new SelectionManager(
-                        $(this.container),
-                        $.selected && $.selected.length > 0
-                    );
-
-                    // restore selection if needed
-                    if ($.selected) {
-                        $.selected.forEach(function(h) {
-                            selectionManager.add_to_selection(h);
-                        });
-                    }
-                }
-            },
             /**
              * @param {Boolean} aUpdate   Whether we're updating the list
              * @param {Array}   aNodeList The list of ufs-nodes processed

@@ -441,7 +441,7 @@ Chat.prototype.init = function() {
 
         for (var k in data) {
             if (data[k].chat) {
-                var roomId = data[k].chat.split("/")[1];
+                var roomId = data[k].chat.replace("g/", "").split("/")[1];
                 if (self.chats[roomId]) {
                     self.chats[roomId].onUploadStart(data);
                     break;

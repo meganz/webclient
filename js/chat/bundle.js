@@ -419,7 +419,7 @@ React.makeElement = React['createElement'];
 
 	        for (var k in data) {
 	            if (data[k].chat) {
-	                var roomId = data[k].chat.split("/")[1];
+	                var roomId = data[k].chat.replace("g/", "").split("/")[1];
 	                if (self.chats[roomId]) {
 	                    self.chats[roomId].onUploadStart(data);
 	                    break;
@@ -5501,6 +5501,8 @@ React.makeElement = React['createElement'];
 	        $(document.body).addClass('overlayed');
 	        $('.fm-dialog-overlay').removeClass('hidden');
 
+	        $('textarea:focus').blur();
+
 	        document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 	        document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
@@ -5708,6 +5710,22 @@ React.makeElement = React['createElement'];
 	    },
 	    getInitialState: function getInitialState() {
 	        return {};
+	    },
+	    componentDidMount: function componentDidMount() {
+	        var self = this;
+
+	        setTimeout(function () {
+	            $(document).rebind('keyup.confirmDialog' + self.getUniqueId(), function (e) {
+	                if (e.which === 13 || e.keyCode === 13) {
+	                    self.onConfirmClicked();
+	                    return false;
+	                }
+	            });
+	        }, 75);
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        $(document).unbind('keyup.confirmDialog' + self.getUniqueId());
 	    },
 	    onConfirmClicked: function onConfirmClicked() {
 	        if (this.props.onConfirmClicked) {
@@ -10628,7 +10646,7 @@ React.makeElement = React['createElement'];
 	            if (!chat) {
 	                return;
 	            }
-	            if (chat.indexOf(self.roomId) === -1) {
+	            if (chat.indexOf("/" + self.roomId) === -1) {
 	                if (d) {
 	                    logger.debug('ignoring upload:completion that is unrelated to this chat.');
 	                }

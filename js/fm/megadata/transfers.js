@@ -56,7 +56,7 @@ MegaData.prototype.getDownloadFolderNodes = function(n, md, nodes, paths) {
         this.makeDir(n);
     }
 
-    var subids = this.getNodesSync(n);
+    var subids = this.getNodesSync(n, false, false, true);
 
     for (var j = 0; j < subids.length; j++) {
         var p = this.getPath(subids[j]);
@@ -184,7 +184,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                 }
 
                 if (node.t) {
-                    foreach(M.getNodesSync(node.h));
+                    foreach(M.getNodesSync(node.h, false, false, true));
                 }
             };
 
@@ -897,7 +897,7 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
 };
 
 var __ul_id = 8000;
-MegaData.prototype.addUpload = function(u, ignoreWarning) {
+MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
     var flag = 'ulMegaSyncAD';
 
     if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
@@ -1090,6 +1090,12 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
 
             if (file.path) {
                 paths[file.path] = null;
+            }
+        }
+
+        if (emptyFolders) {
+            for (var x = emptyFolders.length; x--;) {
+                paths[emptyFolders[x]] = null;
             }
         }
     }

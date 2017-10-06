@@ -46,9 +46,7 @@
         // Check existance of sub-menu
         if ($('#csb_' + id + ' > .dropdown-item').length !== folders.length) {
             // sort by name is default in the tree
-            folders.sort(function(a, b) {
-                return M.compareStrings(a.name, b.name, 1);
-            });
+            folders.sort(M.getSortByNameFn2(1));
 
             for (var i = 0; i < folders.length; i++) {
                 cs = '';
@@ -138,8 +136,16 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 items['.sh4r1ng-item'] = 1;
             }
         }
-        else if (is_image(selNode)) {
-            items['.preview-item'] = 1;
+        else {
+            if ((selNode.tvf > 0) && !folderlink) {
+                items['.properties-versions'] = 1;
+                if (M.getNodeRights(selNode.h) > 1) {
+                    items['.clearprevious-versions'] = 1;
+                }
+            }
+            if (is_image(selNode)) {
+                items['.preview-item'] = 1;
+            }
         }
 
         if (M.getNodeRights(selNode.h) > 1) {
@@ -197,6 +203,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.copy-item'];
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
         items['.import-item'] = 1;
     }
 

@@ -68,9 +68,17 @@
             }
         }
 
-        // remove ufssizecache records
-        if (h.length === 8) {
-            ufsc.delNode(h, ignoreDB);
+        if (this.d[h] && !this.d[h].t && this.d[h].tvf) {
+            var versions = fileversioning.getAllVersionsSync(h);
+            for (var i = versions.length; i--;) {
+                ufsc.delNode(versions[i].h, ignoreDB);
+            }
+        }
+        else {
+            // remove ufssizecache records
+            if (h.length === 8) {
+                ufsc.delNode(h, ignoreDB);
+            }
         }
 
         // node deletion traversal
@@ -450,7 +458,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     var a = tree;
     var nodesCount;
     var importNodes = Object(a).length;
-    var sconly = importNodes > 10;   // true -> new nodes delivered via SC `t` command only
+    var sconly = importNodes > 0;   // true -> new nodes delivered via SC `t` command only
     var ops = {a: 'p', t: t, n: a}; // FIXME: deploy API-side sn check
 
     var reportError = function copyNodesError(ex) {
@@ -563,7 +571,13 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
 
                 if (res.f) {
                     nodesCount = Object(res.f).length;
+                    if (res.f2) {
+                        nodesCount += Object(res.f2).length;
+                    }
                     process_f(res.f, onCopyNodesDone);
+                    if (res.f2) {
+                        process_f(res.f2, null, true);
+                    }
                 }
                 else {
                     onCopyNodesDone();
@@ -646,9 +660,25 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                                     }
                                 }
                                 M.c[t][h] = 1;
-                                ufsc.delNode(h);
-                                node.p = t;
-                                ufsc.addNode(node);
+                                if (!M.d[h].t && M.d[h].tvf) {
+                                    fileversioning.getAllVersions(h).done(
+                                    function(versions) {
+                                        for (var i = versions.length; i--;) {
+                                            ufsc.delNode(versions[i].h);
+                                        }
+                                        for (var i = 0; i < versions.length; i++) {
+                                            if (i === 0) {
+                                                versions[i].p = t;
+                                            }
+                                            ufsc.addNode(versions[i]);
+                                        }
+                                    });
+                                }
+                                else {
+                                    ufsc.delNode(h);
+                                    node.p = t;
+                                    ufsc.addNode(node);
+                                }
                                 for (var i = tn.length; i--;) {
                                     var n = M.d[tn[i]];
                                     if (n) {
@@ -857,7 +887,20 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 }
             }
         }
-
+        // Update versioning dialog if it is open and the folder is its parent folder,
+        // the purpose of the following code is to update permisions of historical files.
+        if ($.selected
+            && ($.selected.length > 0)
+            && !$('.fm-versioning').hasClass('hidden')) {
+            var parentNode = M.d[$.selected[0]] ? M.d[$.selected[0]].p : null;
+            while (parentNode) {
+                if (parentNode === n.h) {
+                    fileversioning.updateFileVersioningDialog();
+                    break;
+                }
+                parentNode = M.d[parentNode] ? M.d[parentNode].p : null;
+            }
+        }
     }
 };
 
@@ -891,7 +934,10 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
             }, 90);
         }
 
-        $(document).trigger('MegaNodeRename', [itemHandle, newItemName]);
+        // update file versioning dialog if the name of the versioned file changes.
+        if (!M.d[itemHandle].t && M.d[itemHandle].tvf > 0) {
+            fileversioning.updateFileVersioningDialog(itemHandle);
+        }
     }
 };
 
@@ -983,7 +1029,9 @@ MegaData.prototype.colourLabeling = function(handles, labelId) {
                 newLabelState = 0;
             }
             node.lbl = newLabelState;
-
+            if (node.tvf) {
+                fileversioning.labelVersions(handle, newLabelState);
+            }
             api_setattr(node, mRandomToken('lbl'));
             M.colourLabelDomUpdate(handle, newLabelState);
         });
@@ -1029,6 +1077,9 @@ MegaData.prototype.favourite = function(handles, newFavState) {
             if (node && !exportLink.isTakenDown(handle)) {
                 node.fav = newFavState;
                 api_setattr(node, mRandomToken('fav'));
+                if (node.tvf) {
+                    fileversioning.favouriteVersions(handle, newFavState);
+                }
                 M.favouriteDomUpdate(node, newFavState);
             }
         });
@@ -1062,6 +1113,23 @@ MegaData.prototype.isFavourite = function(nodesId) {
     return result;
 };
 
+/**
+ * versioningDomUpdate
+ *
+ * @param {Object} node      Node object
+ * @param {Number} versionsNumber  Number of previous versions.
+ */
+MegaData.prototype.versioningDomUpdate = function(node, versionsNumber) {
+    var $nodeView = $('#' + node.h);
+
+    if (versionsNumber) {// Add versioning
+        $nodeView.addClass('versioning');
+    }
+    else {// Remove versioning
+        $nodeView.removeClass('versioning');
+    }
+};
+
 MegaData.prototype.getNode = function(idOrObj) {
     if (isString(idOrObj) === true && this.d[idOrObj]) {
         return this.d[idOrObj];
@@ -1082,14 +1150,15 @@ MegaData.prototype.getNode = function(idOrObj) {
  * @param {Boolean} [includeroot]  includes root itself
  * @param {Boolean} [excludebad]   prunes everything that's undecryptable - good nodes under a
  *                                 bad parent will NOT be returned to keep the result tree-shaped.
+ * @param {Boolean} [excludeverions]  excludes file versions.
  * @returns {MegaPromise}
  */
-MegaData.prototype.getNodes = function fm_getnodes(root, includeroot, excludebad) {
+MegaData.prototype.getNodes = function fm_getnodes(root, includeroot, excludebad, excludeverions) {
     var promise = new MegaPromise();
 
     dbfetch.coll([root])
         .always(function() {
-            var result = M.getNodesSync(root, includeroot, excludebad);
+            var result = M.getNodesSync(root, includeroot, excludebad, excludeverions);
             promise.resolve(result);
         });
 
@@ -1104,9 +1173,10 @@ MegaData.prototype.getNodes = function fm_getnodes(root, includeroot, excludebad
  * @param {Boolean} [includeroot]  includes root itself
  * @param {Boolean} [excludebad]   prunes everything that's undecryptable - good nodes under a
  *                                 bad parent will NOT be returned to keep the result tree-shaped.
+ * @param {Boolean} [excludeverions]  excludes file versions.
  * @returns {Array}
  */
-MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, excludebad) {
+MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, excludebad, excludeverions) {
     var nodes = [];
     var parents = [root];
     var newparents;
@@ -1119,7 +1189,8 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
             // must exist and optionally be fully decrypted to qualify
             if (this.d[parents[i]] && (!excludebad || !this.d[parents[i]].a)) {
                 nodes.push(parents[i]);
-                if (this.c[parents[i]]) {
+                if (this.c[parents[i]] &&
+                    ((excludeverions && this.d[parents[i]].t) || (!excludeverions))) {
                     newparents = newparents.concat(Object.keys(this.c[parents[i]]));
                 }
             }
@@ -2064,6 +2135,7 @@ MegaData.prototype.getDashboardData = function() {
     res.ishares = {cnt: s.inshares.items, size: s.inshares.bytes, xfiles: s.inshares.files};
     res.oshares = {cnt: s.outshares.items, size: s.outshares.bytes};
     res.links = {cnt: s.links.files, size: s.links.bytes};
+    res.versions = {cnt: s[this.RootID].vfiles, size: s[this.RootID].vbytes};
 
     return res;
 };

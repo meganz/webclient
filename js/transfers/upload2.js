@@ -120,9 +120,10 @@ var ulmanager = {
                 var ul = o[0];
                 var idx = o[1];
 
-                mBroadcaster.sendMessage('upload:abort', ul.file.id, -0xDEADBEEF);
-
                 if (ul) {
+                    if (ul.file) {
+                        mBroadcaster.sendMessage('upload:abort', ul.file.id, -0xDEADBEEF);
+                    }
                     ul.destroy();
                 }
                 ul_queue[idx] = Object.freeze({});
@@ -392,14 +393,41 @@ var ulmanager = {
             hash: file.hash,
             k: file.filekey
         };
+        if (file._replaces) {
+            if (M.d[file._replaces].fav && M.d[file._replaces].lbl) {
+                n = {
+                    name: file.name,
+                    hash: file.hash,
+                    fav: M.d[file._replaces].fav,
+                    lbl: M.d[file._replaces].lbl,
+                    k: file.filekey
+                };
+            }
+            else if (M.d[file._replaces].fav) {
+                n = {
+                    name: file.name,
+                    hash: file.hash,
+                    fav: M.d[file._replaces].fav,
+                    k: file.filekey
+                };
+            }
+            else if (M.d[file._replaces].lbl) {
+                n = {
+                    name: file.name,
+                    hash: file.hash,
+                    lbl: M.d[file._replaces].lbl,
+                    k: file.filekey
+                };
+            }
+        };
 
         var req = {
             a: 'p',
             t: target,
             n: [
                 {
-                    h: file.response,
                     t: 0,
+                    h: file.response,
                     a: ab_to_base64(crypto_makeattr(n)),
                     k: target.length === 11
                         ? base64urlencode(encryptto(target, a32_to_str(file.filekey)))
@@ -408,6 +436,33 @@ var ulmanager = {
             ],
             i: requesti
         };
+
+        var ctx = {
+            file: file,
+            target: target,
+            size: file.size,
+            faid: file.faid,
+            ul_queue_num: file.pos,
+            callback: function(res, ctx) {
+                if (!req.v || typeof res === 'number') {
+                    ulmanager.ulCompletePending2.apply(ulmanager, arguments);
+                }
+                else {
+                    // accelerate arrival of SC-conveyed new nodes by directly issuing a fetch
+                    delay(getsc);
+                }
+            }
+        };
+
+        if (file._replaces) {
+            req.v = 3;
+            req.i = mRandomToken('fv');
+            req.n[0].ov = file._replaces;
+
+            M.scAckQueue['t.' + req.i] = function(packet, nodes) {
+                ulmanager.ulCompletePending2({f: 'pv3', n: nodes[0]}, ctx);
+            };
+        }
 
         if (file.faid) {
             req.n[0].fa = api_getfa(file.faid);
@@ -429,14 +484,7 @@ var ulmanager = {
             ulmanager.logger.info("Completing upload for %s, into %s", file.name, target, req);
         }
 
-        api_req(req, {
-            target: target,
-            ul_queue_num: file.pos,
-            size: file.size,
-            faid: file.faid,
-            file: file,
-            callback: ulmanager.ulCompletePending2
-        });
+        api_req(req, ctx);
     },
 
     ulGetPostURL: function UM_ul_get_posturl(File) {
@@ -647,26 +695,25 @@ var ulmanager = {
                 ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = h || ctx.target;
                 M.ulcomplete(ul_queue[ctx.ul_queue_num], h || false, ctx.faid);
             }
-            if (ctx.file._replaces) {
-                M.moveNodes([ctx.file._replaces], M.RubbishID, true);
-            }
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;
             ulmanager.ulCompletePending(ctx.target);
         };
 
         if (typeof res === 'object' && res.f) {
-            var n = res.f[0];
+            var n = res.f === 'pv3' ? res.n : res.f[0];
 
             if (ctx.faid) {
                 storedattr[ctx.faid].target = n.h;
             }
 
-            newnodes = [];
-            process_f(res.f);
-            M.updFileManagerUI();
-            if (M.viewmode) {
-                fm_thumbnails();
+            if (res.f !== 'pv3') {
+                newnodes = [];
+                process_f(res.f);
+                M.updFileManagerUI();
+                if (M.viewmode) {
+                    fm_thumbnails();
+                }
             }
             onSuccess(n.h);
         }

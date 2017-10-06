@@ -635,6 +635,7 @@ ClassFile.prototype.run = function(task_done) {
                 console.error('Too many errors for "' + this.dl.n + '", saving as 0-bytes...');
                 try {
                     this.dl.size = 0;
+                    this.dl.urls = [];
                     return this.dl.io.setCredentials("", 0, this.dl.n);
                 }
                 catch (e) {

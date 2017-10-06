@@ -79,7 +79,11 @@ var useravatar = (function() {
     function _getAvatarProperties(user) {
         user = String(user.u || user);
         var name  = M.getNameByHandle(user) || user;
-        var color = user.charCodeAt(0) % _colors.length;
+        var color = UH64(user).mod(_colors.length);
+
+        if (color === false) {
+            color = user.charCodeAt(0) % _colors.length;
+        }
 
         return {letters: name.toUpperCase()[0], color: _colors[color], colorIndex: color + 1};
     }

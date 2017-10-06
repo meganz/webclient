@@ -943,7 +943,8 @@ function mKeyDialog(ph, fl, keyr) {
 }
 
 function mRandomToken(pfx) {
-    return (pfx || '!') + '$' + (Math.random() * Date.now()).toString(36);
+    // return (pfx || '!') + '$' + (Math.random() * Date.now()).toString(36);
+    return (pfx || '') + '!' + (Date.now() - 15e11).toString(36) + rand(0x10000).toString(36);
 }
 
 function str_mtrunc(str, len) {
@@ -1923,7 +1924,7 @@ function passwordManager(form) {
             if (hashLogic || isPublicLink(path)) {
                 path = path.replace('/', '/#');
 
-                if (location.href.substr(0, 19) === 'chrome-extension://') {
+                if (is_chrome_web_ext || is_firefox_web_ext) {
                     path = path.replace('/#', '/mega/secure.html#');
                 }
             }

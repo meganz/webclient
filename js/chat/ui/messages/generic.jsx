@@ -620,8 +620,7 @@ var GenericConversationMessage = React.createClass({
                                                 var title = l[150];
 
                                                 // The user [X] has been invited and will appear in your contact list
-                                                // once
-                                                // accepted."
+                                                // once accepted."
                                                 var msg = l[5898].replace('[X]', contactEmail);
 
 

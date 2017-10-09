@@ -1028,7 +1028,7 @@ FileManager.prototype.initContextUI = function() {
             $('.fm-add-user').trigger('click');
             $('.add-user-size-icon').trigger('click');
 
-            $(window).rebind('keydown.uikeyevents', function(e) {
+            $(window).rebind('keydown.esc_contact_dialog', function(e) {
                 if (e.keyCode === 27) {
                     closeDialog();
                 }

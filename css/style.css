@@ -18473,7 +18473,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .loginrequired-dialog .fm-notification-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v4.png);
+    background-image: url(../images/mega/startpage-sprite_v6.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;
@@ -20706,7 +20706,7 @@ a.opensource-icon-txt.coming-soon {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v4.png);
+    background-image: url(../images/mega/startpage-sprite_v6.png);
     background-position: center -2173px;
     background-repeat: no-repeat;
     height: 210px;
@@ -21895,7 +21895,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 .bottom-info.icon {
     width: 66px;
     height: 66px;
-    background-image: url(../images/mega/startpage-sprite_v4.png);
+    background-image: url(../images/mega/startpage-sprite_v6.png);
     background-position: 1px -1468px;
     background-repeat: no-repeat;
 }

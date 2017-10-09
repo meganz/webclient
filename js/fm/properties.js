@@ -39,11 +39,11 @@
         }
     }
 
-    function _propertiesDialog(close) {
-
+    function _propertiesDialog(action) {
+        var update = action === 3;
+        var close = !update && action;
         var $dialog = $('.fm-dialog.properties-dialog');
 
-        $(document).unbind('MegaNodeRename.Properties');
         $(document).unbind('MegaCloseDialog.Properties');
 
         if (close) {
@@ -58,16 +58,12 @@
             $('.properties-context-menu').fadeOut(200);
             $.hideContextMenu();
 
-            // Revert $.selected to an array of handles
-            $.selected = $.selected.map(function(n) {
-                return n.h || n;
-            });
-
             return true;
         }
 
         $dialog.removeClass('multiple folders-only two-elements shared shared-with-me');
         $dialog.removeClass('read-only read-and-write full-access taken-down undecryptable');
+        $dialog.removeClass('versioning');
         $('.properties-elements-counter span').text('');
 
         var users = null;
@@ -82,16 +78,18 @@
         var versioningFlag = false;
 
         for (var i = $.selected.length; i--;) {
-            n = $.selected[i];
+            n = M.d[$.selected[i]];
+            if (!n) {
+                console.error('propertiesDialog: invalid node', $.selected[i]);
+                continue;
+            }
+
             if (n.tvf) {
                 $dialog.addClass('versioning');
                 versioningFlag = true;
             }
 
-            if (!n) {
-                console.error('propertiesDialog: invalid node', $.selected[i]);
-            }
-            else if (n.t) {
+            if (n.t) {
                 size += n.tb;
                 sfilecnt += n.tf;
                 sfoldercnt += n.td;
@@ -366,11 +364,6 @@
         });
 
         $(document).bind('MegaCloseDialog.Properties', __fsi_close);
-        $(document).bind('MegaNodeRename.Properties', function(e, h, name) {
-            if (n.h === h) {
-                $dialog.find('.properties-name-block .propreties-dark-txt').text(name);
-            }
-        });
 
         if (p.hideContacts) {
             $('.properties-txt-pad .contact-list-icon').hide();
@@ -477,10 +470,10 @@
                         return true;
                     }
                 });
-            var promise = dbfetch.node(nodes.concat(shares));
+            $.selected = nodes.concat(shares);
+            var promise = dbfetch.geta($.selected);
 
-            promise.always(function(r) {
-                $.selected = r;
+            promise.always(function() {
                 _propertiesDialog();
             });
 

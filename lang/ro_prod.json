@@ -712,6 +712,7 @@
     "5737": "Niciun contact",
     "5738": "Co\u015f de gunoi",
     "5775": "Folosit",
+    "5799": "Utilizare",
     "5801": "folosit",
     "5814": "Upgradeaz\u0103 contul",
     "5816": "[X] TB",
@@ -1660,9 +1661,7 @@
     "16474": "Versiuni anterioare",
     "16475": "Revenire la versiunea anterioar\u0103",
     "16476": "Editat de %1",
-    "16477": "Redenumit din numele %1 de %2",
     "16480": "Editat de mine",
-    "16481": "Redenumit din numele %1 de mine",
     "16485": "Elemente duplicate",
     "16486": "Un fi\u015fier numit %1 exist\u0103 deja \u00een aceast\u0103 loca\u0163ie.",
     "16487": "Selecteaz\u0103 fi\u015fierul pe care dore\u015fti s\u0103-l p\u0103strezi:",
@@ -1823,6 +1822,7 @@
     "16903": "Sau creeaz\u0103 un cont pentru a participa la programul nostru cu realiz\u0103ri, unde po\u0163i c\u00e2\u015ftiga cot\u0103 de transfer \u015fi de stocare gratuit\u0103 atunci c\u00e2nd instalezi aplica\u0163ii MEGA sau invi\u0163i prieteni pe MEGA (activarea poate dura c\u00e2teva zile zile).",
     "16904": "Sau particip\u0103 la programul nostru cu realiz\u0103ri, unde po\u0163i c\u00e2\u015ftiga cot\u0103 de transfer \u015fi de stocare gratuit\u0103 atunci c\u00e2nd instalezi aplica\u0163ii MEGA sau invi\u0163i prieteni pe MEGA (activarea poate dura c\u00e2teva zile zile).",
     "16927": "Aceast\u0103 ac\u0163iune nu poate fi finalizat\u0103, deoarece \u00ee\u0163i va dep\u0103\u015fi limita actual\u0103 de stocare",
+    "17022": "Account Type",
     "17081": "Incomplete transfer, do you want to resume it?",
     "17082": "Completed transfer. Please save your file.",
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
@@ -1845,6 +1845,7 @@
     "17150": "Versions",
     "17151": "[X] versions",
     "17152": "1 version",
-    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
-    "17155": "Total size taken up by file versions:"
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
+    "17155": "Total size taken up by file versions:",
+    "17156": "Renamed from %1"
 }

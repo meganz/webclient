@@ -712,6 +712,7 @@
     "5737": "Brak kontakt\u00f3w",
     "5738": "Kosz",
     "5775": "U\u017cyte",
+    "5799": "Zu\u017cycie",
     "5801": "u\u017cyte",
     "5814": "Zmie\u0144 konto",
     "5816": "[X] TB",
@@ -1660,9 +1661,7 @@
     "16474": "Poprzednie wersje",
     "16475": "Wycofaj",
     "16476": "Edytowany przez %1",
-    "16477": "Zmieniony z %1 na %2",
     "16480": "Edytowny przeze mnie",
-    "16481": "Zmienione z %1 przez ze mnie",
     "16485": "Duplikaty",
     "16486": "Plik o nazwie %1 ju\u017c istnieje w tej lokalizacji.",
     "16487": "Wybierz plik, kt\u00f3ry chcesz zachowa\u0107:",
@@ -1823,6 +1822,7 @@
     "16903": "lub utw\u00f3rz konto aby skorzysta\u0107 z dodatkowych nagr\u00f3d, dzi\u0119ki kt\u00f3rym mo\u017cesz otrzyma\u0107 dodatkow\u0105 powierzchni\u0119 lub transfer za darmo, kiedy zainstalujesz jedn\u0105 z naszych MEGA aplikacji lub zaprosisz znajomych do MEGA (aktywacja mo\u017ce potrwa\u0107 do kilku dni).",
     "16904": "lub we\u017a udzia\u0142 a naszym programie nagr\u00f3d, gdzie mo\u017cesz otrzyma\u0107 dodatkow\u0105 powierzchni\u0119 lub transfer za darmo, kiedy zainstalujesz jedn\u0105 z naszych MEGA aplikacji lub zaprosisz znajomych do MEGA (aktywacja mo\u017ce potrwa\u0107 do kilku dni).",
     "16927": "Ta operacja nie zostanie zako\u0144czona prawid\u0142owo, poniewa\u017c przekroczy dost\u0119pny limit pami\u0119ci na Twoim koncie.",
+    "17022": "Rodzaj konta",
     "17081": "Transfer niekompletny, czy chcesz wznowi\u0107?",
     "17082": "Transfer zako\u0144czony. Zapisz swoj plik.",
     "17083": "MEGA Universal Windows App jest aktualnie w trakcie prac. Mo\u017cesz pobra\u0107\u00a0wersj\u0119 beta [A]tutaj[\/A].",
@@ -1845,6 +1845,7 @@
     "17150": "Wersje",
     "17151": "[X] wersji",
     "17152": "1 wersja",
-    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
-    "17155": "Total size taken up by file versions:"
+    "17154": "Masz zamiar usun\u0105\u0107 wersj\u0119 zapisu 1 pliku. Pami\u0119taj, \u017ce aktualny plik nie zostanie usuni\u0119ty. Czy chcesz kontynuowa\u0107?",
+    "17155": "Ca\u0142kowita powierzchnia zaj\u0119ta przez pliki:",
+    "17156": "Zmienione z %1"
 }

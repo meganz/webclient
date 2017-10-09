@@ -16776,7 +16776,7 @@
         "context": "success message when emptying the RB"
     },
     "16991": {
-        "text": "Error. The rubbish bin has not be emptied",
+        "text": "Error. The rubbish bin has not been emptied",
         "context": "error message when emptying the RB"
     },
     "16992": {
@@ -17195,9 +17195,93 @@
         "text": "The file will be updated with version history: [A]Learn more[\/A]",
         "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
     },
+    "17098": {
+        "text": "Add exclusion",
+        "context": "The title of a dialog which is displayed when a user is adding a new exclusion rule for the synchronizations."
+    },
+    "17099": {
+        "text": "Enter a name, an absolute path (wildcards * and ? are allowed) or choose which file or folder you want to exclude from the synchronization",
+        "context": "A label to describe the different options that the user has to set an exclusion for all synchronizations."
+    },
+    "17100": {
+        "text": "Choose File",
+        "context": "A label of a button that pops up a selection dialog to choose a file to be excluded for the synchronization."
+    },
+    "17101": {
+        "text": "Choose Folder",
+        "context": "A label of a button that pops up a selection dialog to choose a folder to be excluded from the synchronization."
+    },
+    "17102": {
+        "text": "Please enter a valid file name or absolute path.",
+        "context": "An information message which is shown when the user selects an invalid file name or path for the exclusion."
+    },
+    "17103": {
+        "text": "Select the file or folder you want to exclude",
+        "context": "A caption in a dialog to select a file or folder to exclude from the synchronizations."
+    },
+    "17104": {
+        "text": "Select the folder you want to exclude",
+        "context": "A caption in a dialog to select a folder to exclude from the synchronizations."
+    },
+    "17105": {
+        "text": "Select the file you want to exclude",
+        "context": "A caption in a dialog to select a file to exclude from the synchronizations."
+    },
+    "17106": {
+        "text": "You are about to allow a setting that could allow your communications to be intercepted. Your data would be still inaccessible for attackers due to our end-to-end encryption, but they could blindly move your files and folders in MEGA, delete them or deny you access to your account.",
+        "context": "Information for the user about the consequences of disabling a security check of MEGAsync."
+    },
+    "17109": {
+        "text": "Unable to get the filesystem. Please, try again. If the problem persists please contact bug@mega.co.nz.",
+        "context": "A message which is displayed when an error occurs while fetching nodes from the server."
+    },
+    "17111": {
+        "text": "Error: Invalid destination folder. The download has been cancelled.",
+        "context": "A notification message which is shown when an error occurs while downloading a file to a invalid destination folder."
+    },
+    "17113": {
+        "text": "The link cannot be generated because the file is in an incoming shared folder or in your Rubbish Bin.",
+        "context": "A notification error message which is shown while generating a public link of a file from an incoming shared folder or from the Rubbish Bin."
+    },
+    "17114": {
+        "text": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
+        "context": "A message which is displayed when a user tries to upload a file to a synced folder which already contains it. This asks the user for confirmation. Please keep the (%1) placeholder because it will be filled with name of the file."
+    },
+    "17115": {
+        "text": "You need full access rights to be able to sync the selected folder.",
+        "context": "An error message which is shown when a user is trying synchronise a non compatible folder."
+    },
+    "17117": {
+        "text": "The new excluded file names will be taken into account\r\nwhen the application starts again.",
+        "context": "A message which is displayed to inform the user that the new file name exclusion changes will be applied on the next application startup."
+    },
+    "17120": {
+        "text": "The new excluded file names will be taken into account\r\nwhen the application starts again.",
+        "context": "A message displayed to inform the user that the new file name exclusion changes will be applied on next application startup."
+    },
+    "17121": {
+        "text": "Restart",
+        "context": "A label for the Restart button to relaunch MEGAsync."
+    },
     "17126": {
         "text": "The dashboard is for registered users only.",
         "context": "A dialog message saying it is forbidden for an ephemeral user to access the dashboard."
+    },
+    "17142": {
+        "text": "cache",
+        "context": "Label for any 'Cache' (cache memory) button, link, text, title, etc. - (String as short as possible)."
+    },
+    "17143": {
+        "text": "clear cache",
+        "context": "Label for any 'Clean cache' button, link, text, title, etc. - (String as short as possible)."
+    },
+    "17144": {
+        "text": "You have not selected a default download location for your files. To proceed with the download, please select a destination folder or go to settings in order to set up your default download location.",
+        "context": "Message of the dialog displayed when a user want to download some nodes and the app doesn't have configured a default download location. Asks the user to select a location for this download or configure a default location."
+    },
+    "17145": {
+        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card? Please try to save\/copy the file to your device's internal memory instead.",
+        "context": "Message of the dialog displayed when the process\/request to copy a file failed because the app or the user don't have write permission to copy into the destination (i.e. copy into a SD card an unsupported file type)."
     },
     "17146": {
         "text": "This page is for registered users only.",
@@ -17228,15 +17312,235 @@
         "context": "Version message when files only have 1 historical version."
     },
     "17153": {
-        "text": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted.",
+        "text": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted. Would you like to proceed?",
         "context": "A warning message for deleting the whole version history of multiple files."
     },
     "17154": {
-        "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
+        "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
         "context": "A warning message for deleting the whole version history of one file."
     },
     "17155": {
         "text": "Total size taken up by file versions:",
         "context": "A title message in the user's account settings for showing the storage used for file versions."
+    },
+    "17156": {
+        "text": "Renamed from %1",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name. Please keep the placeholder %1 which will be replaced by the filename.\r\n"
+    },
+    "17213": {
+        "text": "Install the desktop or mobile apps",
+        "context": "Title above links to download MEGAsync or the mobile apps from the app stores"
+    },
+    "17214": {
+        "text": "[B]Right click[\/B] on any file(s) or folder(s) within any of your synced folders in your computer.",
+        "context": "Step one of sharing your files & folders using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17215": {
+        "text": "1",
+        "context": "Numeric list counter"
+    },
+    "17216": {
+        "text": "On Windows, Mac or Linux using the desktop app",
+        "context": "Title for help sections using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17217": {
+        "text": "For Windows and Linux select [B]Get MEGA link[\/B] from context menu. On Mac select [B]MEGA[\/B] to get the link.",
+        "context": "Step two of sharing your files & folders using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17218": {
+        "text": "2",
+        "context": "Numeric list counter"
+    },
+    "17220": {
+        "text": "3",
+        "context": "Numeric list counter"
+    },
+    "17221": {
+        "text": "On iOS and Android",
+        "context": "Title for help sections using the mobile app on iOS and Android"
+    },
+    "17222": {
+        "text": "For iOS tap the [W13][B]info[\/B][\/W13] icon on the file\/folder you want to share.[Br]For Android, tap the [W11][B]option[\/B][\/W11] icon on the file\/folder you want to share.",
+        "context": "Step one of sharing your files & folders using the mobile app on iOS and Android."
+    },
+    "17223": {
+        "text": "The link is now created and in your clipboard. ",
+        "context": "Step three of sharing your files & folders using the mobile app on iOS and Android"
+    },
+    "17224": {
+        "text": "[H1]Collaborate with others[\/H1]",
+        "context": "Title for the collaboration with others help section"
+    },
+    "17225": {
+        "text": "Sharing a folder is a great way to collaborate with your contacts. You can share your folder with any contact, with any existing MEGA user and even with any new user, as long as you have their email address. [Br][Br]If the user does not have a MEGA account yet, he or she will automatically receive an invitation email to join MEGA so the user can see your shared folder.",
+        "context": "Description for the collaboration with others help section"
+    },
+    "17226": {
+        "text": "[B]Right click[\/B] on any folder or file you wish to share.",
+        "context": "Step one of how to collaborate with others on the mega.nz website"
+    },
+    "17227": {
+        "text": "Click on [W13][B]Sharing[\/B][\/W13] in the context menu.",
+        "context": "Step two of how to collaborate with others on the mega.nz website"
+    },
+    "17228": {
+        "text": "Enter an email address or the first letters of your MEGA contact name(s).",
+        "context": "Step three of how to collaborate with others on the mega.nz website"
+    },
+    "17229": {
+        "text": "Choose the permissions (default is read-only).",
+        "context": "Step four of how to collaborate with others on the mega.nz website"
+    },
+    "17230": {
+        "text": "[H1]Welcome to MEGA![\/H1]",
+        "context": "Title welcoming user to MEGA"
+    },
+    "17231": {
+        "text": "4",
+        "context": "Numeric list counter"
+    },
+    "17232": {
+        "text": "On the mega.nz website",
+        "context": "Title for help sections using the mega.nz website"
+    },
+    "17233": {
+        "text": "Click on the [B]Done[\/B] button. Your shared folder is now created.",
+        "context": "Step five of how to collaborate with others on the mega.nz website"
+    },
+    "17234": {
+        "text": "5",
+        "context": "Numeric list counter"
+    },
+    "17235": {
+        "text": "For iOS, tap the [B]Info[\/B] [W14]icon[\/W14] on the folder you want to share.[Br]For Android, tap the [B]option[\/B] [W11]icon[\/W11] on the folder you want to share.",
+        "context": "Step one of how to share\/collaborate with others on iOS or Android"
+    },
+    "17236": {
+        "text": "For iOS tap the [B]Share[\/B] [W13]icon[\/W13] and select [B]Share Folder.[\/B] On Android select the [B]Share folder[\/B] [W15]option[\/W15] on the menu.",
+        "context": "Step two of how to collaborate with others on iOS or Android"
+    },
+    "17237": {
+        "text": "Enter an email address or the first letters of your MEGA contact name.",
+        "context": "Step three of how to collaborate with others"
+    },
+    "17238": {
+        "text": "Choose the permissions for this shared folder.",
+        "context": "Step four of how to collaborate with others on iOS or Android"
+    },
+    "17239": {
+        "text": "Your contact now has access to the folder.",
+        "context": "Step five of how to collaborate with others on iOS or Android"
+    },
+    "17240": {
+        "text": "[H1]Getting started with MEGA[\/H1]",
+        "context": "Title of Getting Started PDF"
+    },
+    "17241": {
+        "text": "Mac",
+        "context": "Description text for images for the Mac OSX operating system"
+    },
+    "17242": {
+        "text": "Windows",
+        "context": "Description text for images for the Windows operating system"
+    },
+    "17243": {
+        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
+        "context": "Step two of how to share with others on iOS or Android"
+    },
+    "17244": {
+        "text": "Using your desktop browser, you can have a secure voice or video call with a single contact or have a group text chat with several contacts participating. You can also send files from your MEGA Cloud Drive to other members of the group chat while messages are flowing. [Br]Secure text chat is also available on Android and iOS applications (encrypted voice and video calls are coming to mobile soon).",
+        "context": "MEGAchat introduction and description for new users"
+    },
+    "17245": {
+        "text": "[H1]You now know the basics of your MEGA account.[\/H1]",
+        "context": "Heading for final page of the getting started PDF"
+    },
+    "17246": {
+        "text": "[H1]Congratulations![\/H1]",
+        "context": "Title for final page of the getting started PDF"
+    },
+    "17251": {
+        "text": "Log in at [A]https:\/\/mega.nz\/[\/A]",
+        "context": "Step one of how to add files to MEGA on the mega.nz website"
+    },
+    "17252": {
+        "text": "Click the[B] [W10]File[\/W10] Upload[\/B] button on the top right.",
+        "context": "Step two of how to add files to MEGA on the mega.nz website"
+    },
+    "17253": {
+        "text": "Choose the file(s) you would like to upload and click open.",
+        "context": "Step three of how to add files to MEGA on the mega.nz website"
+    },
+    "17255": {
+        "text": "[H1]Add files to MEGA[\/H1]",
+        "context": "Title for how to add files to MEGA"
+    },
+    "17256": {
+        "text": "[A]Install the desktop app[\/A] on your computer",
+        "context": "Step one of how to add files to MEGA using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17258": {
+        "text": "For iOS tap the [W14][B]More[\/B][\/W14] [W1]icon[\/W1] on the top right corner. For Android tap the [W12]button[\/W12] in the bottom right corner.",
+        "context": "Step one of how to add files to MEGA on iOS or Android"
+    },
+    "17259": {
+        "text": "For iOS, select [B]Upload[\/B]. For Android, select the type of upload.",
+        "context": "Step two of how to add files to MEGA on iOS or Android"
+    },
+    "17262": {
+        "text": "[H1]Access your content anywhere[\/H1]",
+        "context": "Title for page descriping the benefits of using MEGA's apps"
+    },
+    "17264": {
+        "text": "[H1]Share your files and folders[\/H1]",
+        "context": "Title for sharing your files & folders"
+    },
+    "17265": {
+        "text": "[B]Right click[\/B] on any folder or file you wish to share (you can also left click on the [W12][B]More[\/B][\/W12] icon which appears upon mouseover)",
+        "context": "Step one of sharing your files & folders using the mobile app on the mega.nz website"
+    },
+    "17266": {
+        "text": "Click on[B] [W13]Get[\/W13] Link[\/B] in the context menu.",
+        "context": "Step two of sharing your files & folders using the mobile app on the mega.nz website"
+    },
+    "17267": {
+        "text": "If you are a first time user, please agree with the copyright warning.",
+        "context": "Step three of sharing your files & folders using the mobile app on the mega.nz website"
+    },
+    "17268": {
+        "text": "Your link is now created. You can manually select and copy the link or use the [B]Copy[\/B] button.",
+        "context": "Step four of sharing your files & folders using the mobile app on the mega.nz website"
+    },
+    "17277": {
+        "text": "The MEGA link is now automatically copied to your clipboard. Just paste it wherever you\u2019d like.",
+        "context": "Step three of sharing your files & folders using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17278": {
+        "text": "Go to our [A]Help Centre[\/A] in order to find out more tips & tricks and get the most out of our service.",
+        "context": "Description for the learn more section linking the user to our Help Centre"
+    },
+    "17279": {
+        "text": "Or just drag & drop files directly from your computer into your web browser.",
+        "context": "Step four of how to add files to MEGA on the mega.nz website"
+    },
+    "17280": {
+        "text": "Drag & Drop files into the MEGA folder (or into the folders you selected to synchronize, if you configured this during installation)",
+        "context": "Step two of how to add files to MEGA using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17281": {
+        "text": "Select the location you\u2019d like to upload files from.",
+        "context": "Step three of how to add files to MEGA on iOS or Android"
+    },
+    "17282": {
+        "text": "Select the file you\u2019d like to upload.",
+        "context": "Step four of how to add files to MEGA on iOS or Android"
+    },
+    "17283": {
+        "text": "Install the MEGA desktop app for Windows, Mac or Linux.[Br][Br]Synchronise single or multiple folders on your computer with your MEGA account.[Br][Br]Access and work with your data securely across different locations and devices. It\u2019s always on and fully automatic. ",
+        "context": "Description of the benefits of using MEGA's apps"
+    },
+    "17389": {
+        "text": "Select contacts from your phone's contact list or enter multiple email addresses.",
+        "context": "Text shown to explain how and where you can invite friends."
     }
 }

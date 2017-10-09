@@ -712,6 +712,7 @@
     "5737": "Nincsenek kapcsolatok",
     "5738": "Szemetes",
     "5775": "Felhaszn\u00e1lva",
+    "5799": "Haszn\u00e1lat",
     "5801": "felhaszn\u00e1lva",
     "5814": "Fi\u00f3k b\u0151v\u00edt\u00e9se",
     "5816": "[X] TB",
@@ -1660,9 +1661,7 @@
     "16474": "Previous versions",
     "16475": "Revert",
     "16476": "Edited by %1 ",
-    "16477": "Renamed from %1 by %2",
     "16480": "Edited by me",
-    "16481": "Renamed from %1 by me",
     "16485": "Duplicate items",
     "16486": "A file named %1 already exists in this location.",
     "16487": "Select the file you want to keep:",
@@ -1823,6 +1822,7 @@
     "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
     "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
     "16927": "This action can not be completed as it would take you over your current storage limit",
+    "17022": "Account Type",
     "17081": "Incomplete transfer, do you want to resume it?",
     "17082": "Completed transfer. Please save your file.",
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
@@ -1845,6 +1845,7 @@
     "17150": "Versions",
     "17151": "[X] versions",
     "17152": "1 version",
-    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
-    "17155": "Total size taken up by file versions:"
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
+    "17155": "Total size taken up by file versions:",
+    "17156": "Renamed from %1"
 }

@@ -424,8 +424,8 @@ body.pro:after {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
-.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .viewer-mid-button, .small-icon.clock, i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v5@2x.png);
+.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .viewer-mid-button, .small-icon.clock, i.icons-sprite, .transfer-panel-title span::before, .transfer-type.upload::before, .transfer-type.download::before {
+    background-image: url(../images/mega/icons-sprite_v9@2x.png);
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {

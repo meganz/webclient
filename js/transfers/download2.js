@@ -1628,20 +1628,21 @@ function fm_tfsupdate() {
 
     M.pendingTransfers = i + u;
     var t;
-    if (i && u) {
-        t = '\u2191 ' + u + ' \u2193 ' + i;
-    }
-    else if (i) {
-        t =  '\u2193 ' + i;
-    }
-    else if (u) {
-        t = '\u2191 ' + u;
+    if (i) {
+        tfse.domDownloadBlock.textContent = (i);
     }
     else {
-        t = '';
+       tfse.domDownloadBlock.textContent = ''; 
+    }
+    if (u) {
+        tfse.domUploadBlock.textContent = (u);
+    }
+    else {
+       tfse.domUploadBlock.textContent = ''; 
+    }
+    if (!i && !u) {
         mega.ui.tpp.hide();
     }
-    tfse.domPanelTitle.textContent = (t);
 }
 
 var dlQueue = new TransferQueue(function _downloader(task, done) {

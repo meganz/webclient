@@ -1694,7 +1694,7 @@ FileManager.prototype.addTransferPanelUI = function() {
             $('.transfer-clear-completed').addClass('disabled');
             $('.transfer-table-header').hide();
             $('.transfer-panel-empty-txt').removeClass('hidden');
-            $('.transfer-panel-title').text('');
+            $('.transfer-panel-title span').text('');
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
             if (M.currentdirid === 'transfers') {
                 fm_tfsupdate();

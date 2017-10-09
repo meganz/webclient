@@ -337,7 +337,7 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
         }
-        $('.transfer-panel-title').text('');
+        $('.transfer-panel-title span').text('');
         dlmanager.dlRetryInterval = 3000;
         percent_megatitle();
     }

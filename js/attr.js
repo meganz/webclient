@@ -120,7 +120,7 @@ var attribCache = false;
 
                 // Otherwise if a non-encrypted private attribute, base64 decode the data
                 else if (attribute.charAt(0) === '^') {
-                    res = base64urldecode(value);
+                    res = base64urldecode(res);
                 }
 
                 if (d > 1 || is_karma) {
@@ -834,39 +834,6 @@ var attribCache = false;
     var uaPacketParserHandler = Object.create(null);
 
     /**
-     * Updated the local version cache IF the action packet contains a version
-     *
-     * @param actionPacketUserId
-     * @param attributeName
-     * @param actionPacketVersion
-     */
-    ns.handleVersionFromActionPacket = function (actionPacketUserId, attributeName, actionPacketVersion) {
-        if (
-            actionPacketVersion &&
-            !mega.attr._versions[actionPacketUserId + "_" + attributeName]
-        ) {
-            logger.debug("Got new version from ap: ", actionPacketUserId + "_" + attributeName, actionPacketVersion);
-            mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
-        }
-    };
-
-    /**
-     * Process action-packet for attribute updates.
-     *
-     * @param actionPacketUserId
-     * @param attributeName
-     * @param actionPacketVersion
-     */
-    ns.handleVersionFromActionPacket = function (actionPacketUserId, attributeName, actionPacketVersion) {
-        if (
-            actionPacketVersion &&
-            !mega.attr._versions[actionPacketUserId + "_" + attributeName]
-        ) {
-            mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
-        }
-    };
-
-    /**
      * Process action-packet for attribute updates.
      *
      * @param {String}  attrName          Attribute name
@@ -927,6 +894,10 @@ var attribCache = false;
             crypt.getPubEd25519(userHandle);
         };
         uaPacketParserHandler['*!fmconfig'] = function() { mega.config.fetch(); };
+
+        uaPacketParserHandler['^!prd'] = function() {
+            mBroadcaster.sendMessage('attr:passwordReminderDialog');
+        };
 
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;

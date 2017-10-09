@@ -191,7 +191,7 @@ var slideshowid;
                             ephemeralDialog(l[1005]);
                         }
                         else {
-                            initCopyrightsDialog([slideshowid]);
+                            mega.Share.initCopyrightsDialog([slideshowid]);
                         }
                     });
             }
@@ -202,6 +202,7 @@ var slideshowid;
 
     function slideshow(id, close) {
         var $overlay = $('.viewer-overlay');
+        var $document = $(document);
 
         $overlay.removeClass('fullscreen mouse-idle');
 
@@ -212,10 +213,11 @@ var slideshowid;
         if (close) {
             slideshowid = false;
             $overlay.addClass('hidden');
-            if ($(document).fullScreen()) {
+            if ($document.fullScreen()) {
                 clearTimeout(fullScreenTimer);
-                $(document).fullScreen(false);
-                $(document).unbind('mousemove.mediaviewer');
+                $document.fullScreen(false);
+                $document.unbind('mousemove.mediaviewer');
+                $document.rebind('keydown.slideshow');
             }
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === id) {
@@ -228,6 +230,19 @@ var slideshowid;
             return false;
         }
         var n = slideshow_node(id, $overlay);
+
+        // Bind keydown events
+        $document.rebind('keydown.slideshow', function(e) {
+            if (e.keyCode === 37 && slideshowid) {
+                slideshow_prev();
+            }
+            else if (e.keyCode === 39 && slideshowid) {
+                slideshow_next();
+            }
+            else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
+                slideshow(slideshowid, true);
+            }
+        });
 
         // Close icon
         $overlay.find('.viewer-button.close,.viewer-error-close')
@@ -282,7 +297,7 @@ var slideshowid;
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                     dl_queue[i].preview = false;
-                    openTransfersPanel();
+                    M.openTransfersPanel();
                     return;
                 }
             }

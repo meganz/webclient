@@ -88,7 +88,7 @@
                 t.css('background-color', 'rgba(222,222,10,0.3)');
             }
             else if (M.viewmode) {
-                if (t.hasClass('file-block folder')) {
+                if (t.hasClass('data-block-view folder')) {
                     t.addClass('ui-selected');
                 }
             }
@@ -130,31 +130,60 @@
 
     var dir_inflight = 0;
     var filedrag_u = [];
+    var filedrag_paths = Object.create(null);
 
     function pushUpload() {
         if (!--dir_inflight && $.dostart) {
-            addupload(filedrag_u);
+            var emptyFolders = Object.keys(filedrag_paths)
+                .filter(function(p) {
+                    return filedrag_paths[p] < 1;
+                });
+
+            M.addUpload(filedrag_u, false, emptyFolders);
             filedrag_u = [];
+            filedrag_paths = Object.create(null);
+
             if (page === 'start') {
                 start_upload();
             }
         }
     }
 
-    function traverseFileTree(item, path) {
+    function pushFile(file, path) {
+        'use strict';
+
+        if (d > 1) {
+            console.warn('Adding file %s', file.name, file);
+        }
+        if (file) {
+            file.path = path;
+            filedrag_u.push(file);
+        }
+        pushUpload();
+    }
+
+    function traverseFileTree(item, path, symlink) {
+        'use strict';
+
         path = path || "";
+
         if (item.isFile) {
             dir_inflight++;
             item.file(function(file) {
-                if (d > 1) {
-                    console.log(file);
+                pushFile(file, path);
+            }, function(error) {
+                if (d) {
+                    var fn = symlink ? 'debug' : 'warn';
+
+                    console[fn]('Failed to get File from FileEntry for "%s", %s',
+                        item.name, Object(error).name, error, item);
                 }
-                file.path = path;
-                filedrag_u.push(file);
-                pushUpload();
+                pushFile(symlink, path);
             });
         }
         else if (item.isDirectory) {
+            var newPath = path + item.name + "/";
+            filedrag_paths[newPath] = 0;
             dir_inflight++;
             var dirReader = item.createReader();
             var dirReaderIterator = function() {
@@ -162,14 +191,20 @@
                     if (entries.length) {
                         var i = entries.length;
                         while (i--) {
-                            traverseFileTree(entries[i], path + item.name + "/");
+                            traverseFileTree(entries[i], newPath);
                         }
+                        filedrag_paths[newPath] += entries.length;
 
                         dirReaderIterator();
                     }
                     else {
                         pushUpload();
                     }
+                }, function(error) {
+                    console.warn('Unable to traverse folder "%s", %s',
+                        item.name, Object(error).name, error, item);
+
+                    pushUpload();
                 });
             };
             dirReaderIterator();
@@ -193,7 +228,7 @@
                         uldl_hold = false;
 
                         if (ul_queue.length > 0) {
-                            showTransferToast('u', ul_queue.length);
+                            M.showTransferToast('u', ul_queue.length);
                         }
                     });
                 }
@@ -239,7 +274,7 @@
             targetid = target.attr('id').split('_').pop();
         }
         else if (M.viewmode) {
-            if (target.hasClass('file-block folder')) {
+            if (target.hasClass('data-block-view folder')) {
                 targetid = target.attr('id');
             }
         }
@@ -286,11 +321,11 @@
                 targetid = null;
 
                 if (M.viewmode) {
-                    if (target.parent().hasClass('file-block ustatus')) {
+                    if (target.parent().hasClass('data-block-view ustatus')) {
                         target = target.parent();
                     }
 
-                    if (target.hasClass('file-block ustatus')) {
+                    if (target.hasClass('data-block-view ustatus')) {
                         targetid = target.attr('id');
                     }
                 }
@@ -330,7 +365,7 @@
                         if (i == items.length - 1) {
                             $.dostart = true;
                         }
-                        traverseFileTree(item);
+                        traverseFileTree(item, '', item.isFile && items[i].getAsFile());
                     }
                 }
             }
@@ -378,7 +413,7 @@
                     u.push(f);
                 }
             }
-            addupload(u);
+            M.addUpload(u);
             if (page == 'start') {
                 start_upload();
             }

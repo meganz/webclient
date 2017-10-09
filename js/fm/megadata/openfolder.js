@@ -1,8 +1,6 @@
 (function(global) {
     "use strict";
 
-    var fcv_watch = Object.create(null);
-
     // map handle to root name
     var maph = function(h) {
         if (h === M.RootID) {
@@ -28,7 +26,12 @@
      * @private
      */
     var _openFolderCompletion = function(id, newHashLocation, first, promise) {
-        var pchk = null;
+        // if the id is a file handle, then set the folder id as the file's folder.
+        var fid;
+        if (M.d[id] && (M.d[id].t === 0)) {
+            fid = fileversioning.getTopNodeSync(id);
+            id = M.d[fid].p;
+        }
 
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
@@ -43,11 +46,6 @@
                 console.log('d%s, c%s, t%s', $.len(this.d), $.len(this.c), $.len(this.tree));
                 console.log('RootID=%s, InboxID=%s, RubbishID=%s', this.RootID, this.InboxID, this.RubbishID);
             }
-
-            fcv_watch[M.RootID] = 1;
-            fcv_watch[M.InboxID] = 1;
-            fcv_watch[M.RubbishID] = 1;
-            fcv_watch.shares = 1;
         }
 
         if (d) {
@@ -180,39 +178,8 @@
                 console.timeEnd('time for rendering');
             }
 
-            if (fcv_watch[this.currentrootid]
-                    && this.currentdirid !== 'shares'
-                    && (is_extension || !(Date.now() % 10))) {
-
-                var f = 0;
-                var t = 0;
-                var n = this.d[this.currentdirid] || false;
-
-                for (var i = this.v.length; i--;) {
-                    if (this.v[i].t) t++;
-                    else f++;
-                }
-
-                api_req({
-                    a: 'fcv',
-                    h: this.currentdirid,
-                    v: 2,
-                    f: f,
-                    d: t,
-                    td: n.td,
-                    tf: n.tf,
-                    tb: n.tb,
-                    sn: currsn,
-                    fsn: mega.fcv_fsn,
-                    sc: array.pack(sc_history),
-                    db: mega.fcv_db | 0
-                }, {}, pfid ? 1 : 0);
-
-                pchk = this.currentdirid;
-            }
-
             Soon(function() {
-                M.renderPath();
+                M.renderPath(fid);
             });
         }
 
@@ -254,17 +221,8 @@
         M.searchPath();
         M.treeSearchUI();
 
-        if (!pchk) {
-            promise.resolve(id);
-            mBroadcaster.sendMessage('mega:openfolder');
-        }
-        else {
-            checkParentNodeInconsistency(pchk)
-                .always(function() {
-                    promise.resolve(id);
-                    mBroadcaster.sendMessage('mega:openfolder');
-                });
-        }
+        promise.resolve(id);
+        mBroadcaster.sendMessage('mega:openfolder');
     };
 
     // ------------------------------------------------------------------------
@@ -381,6 +339,9 @@
             fetchshares = !M.c[id];
         }
         else if (id !== 'transfers' && id !== 'links') {
+            if (id && id.substr(0, 9) === 'versions/') {
+                id = id.substr(9);
+            }
             if (!id) {
                 id = this.RootID;
             }

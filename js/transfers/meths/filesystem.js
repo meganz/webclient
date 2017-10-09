@@ -109,7 +109,9 @@
             }
 
             // https://code.google.com/p/chromium/issues/detail?id=375297
-            MemoryIO.fileSizeLimit = 496 * 1024 * 1024;
+            if (!window.chrome || parseInt(ua.details.version) < 58) {
+                MemoryIO.fileSizeLimit = 496 * 1024 * 1024;
+            }
 
             return true;
         }
@@ -119,7 +121,7 @@
         dlFatalError(dl, e, false, 2);
 
         onIdle(function() {
-            if (page !== 'download') {
+            if (dl_id !== dl.ph) {
                 M.addWebDownload([dl_id]);
             }
             else {
@@ -130,8 +132,13 @@
         });
     }
 
-    function canSwitchDownloadMethod(dl, dl_id) {
+    function canSwitchDownloadMethod(dl, dl_id, entry) {
         if (MemoryIO.usable() && dl.size < MemoryIO.fileSizeLimit) {
+            if (entry && Object(dl.resumeInfo).byteOffset) {
+                var tid = dlmanager.getResumeInfoTag(dl);
+                dlmanager.resumeInfoCache[tid] = Object.assign(dl.resumeInfo, {entry: entry});
+                dl.io.keepFileOnAbort = true;
+            }
             dlMethod = MemoryIO;
             abortAndStartOver(dl, dl_id, Error(l[16871]));
             return true;
@@ -148,7 +155,7 @@
     }
 
     function clearit(storagetype, t, callback) {
-        var tsec = t || 3600;
+        var tsec = t || 172800;
 
         function errorHandler2(e) {
             if (d) {
@@ -187,6 +194,10 @@
                                         console.log('temp file removed',
                                             file.name, bytesToSize(metadata.size));
                                     }
+
+                                    dlmanager.remResumeInfo({ph: file.name});
+                                    dlmanager.remResumeInfo({id: file.name});
+
                                     if (++del == entries.length && callback) {
                                         callback(totalsize);
                                     }
@@ -204,7 +215,8 @@
                         else {
                             if (d) {
                                 console.log('tmp file too new to remove',
-                                    file.name, bytesToSize(metadata.size));
+                                    file.name, bytesToSize(metadata.size),
+                                    'Can be removed on ' + String(new Date(deltime)));
                             }
                             if (++del == entries.length && callback) {
                                 callback(totalsize);
@@ -264,15 +276,15 @@
     var WRITERR_DIAGTITLE = l[16871];
     var chrome_write_error_msg = 0;
 
-    function free_space(callback, ms) {
+    function free_space(callback, ms, delta) {
         /* error */
-        clearit(0, 0, function(s) {
+        clearit(0, delta | 0, function(s) {
             if (d) {
                 console.log('Freed %s of temporary storage', bytesToSize(s));
             }
 
             // clear persistent files:
-            clearit(1, 0, function(s) {
+            clearit(1, delta | 0, function(s) {
                 if (d) {
                     console.log('Freed %s of persistent storage', bytesToSize(s));
                 }
@@ -404,6 +416,8 @@
         }
     }
 
+    var nosplog = true;
+
     window.FileSystemAPI = function fsIO(dl_id, dl) {
         var
             dl_fw,
@@ -443,10 +457,22 @@
 
                 fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {
                     fileEntry.createWriter(function(fileWriter) {
+                        var resumeOffset = dl.byteOffset || 0;
+
                         if (d) {
                             logger.info('File "mega/' + dl_id + '" created');
                         }
                         dl_fw = fileWriter;
+
+                        var beginDownload = function() {
+                            if (that.begin) {
+                                that.begin(null, resumeOffset);
+                            }
+                            else if (d) {
+                                logger.error("No 'begin' function, this must be aborted...", dl);
+                            }
+                            that = false;
+                        };
 
                         dl_fw.onerror = function(ev) {
                             /* onwriteend() will take care of it */
@@ -463,16 +489,10 @@
 
                         dl_fw.onwriteend = function() {
                             if (that) {
-                                ASSERT(dl_fw.readyState === dl_fw.DONE,
-                                    'Error truncating file!');
+                                ASSERT(dl_fw.readyState === dl_fw.DONE, 'Error truncating file!');
+
                                 if (dl_fw.readyState === dl_fw.DONE) {
-                                    if (that.begin) {
-                                        that.begin();
-                                    }
-                                    else if (d) {
-                                        logger.error("No 'begin' function, this must be aborted...", dl);
-                                    }
-                                    that = null;
+                                    beginDownload();
                                 }
                                 return;
                             }
@@ -484,9 +504,10 @@
                             }
                             else {
                                 logger.error('Short write (%d/%d)', dl_fw.position, targetpos, dl_fw.readyState);
+                                // debugger;
 
                                 /* try to release disk space and retry */
-                                free_space(function() {
+                                var onSpaceFreed = function() {
                                     if (!dl_fw) {
                                         logger.debug('Transfer %s cancelled while freeing space', dl_id);
                                         return;
@@ -494,8 +515,12 @@
                                     if (!(++chrome_write_error_msg % 21) && !$.msgDialog) {
                                         chrome_write_error_msg = 0;
 
-                                        // XXX: Hmm, not sure how weird this is if the user downloaded too many data..
-                                        if (canSwitchDownloadMethod(dl, dl_id)) {
+                                        if (nosplog) {
+                                            nosplog = false;
+                                            api_req({a: 'log', e: 99657, m: 'Out of HTML5 Offline Storage space.'});
+                                        }
+
+                                        if (canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
                                             return;
                                         }
 
@@ -507,15 +532,71 @@
                                                     dlFatalError(dl, WRITERR_DIAGTITLE, false);
                                                 }
                                             });
-
-                                        srvlog('Out of HTML5 Offline Storage space (write)');
                                     }
                                     failed = true;
                                     dl_ack_write();
-                                });
+                                };
+
+                                // Before downloads resume support we were just seeking back to the write offset,
+                                // we now have to actually truncate the file so that any sudden reload will preserve
+                                // the offset as stored in the resumable storage entry... at least more chances to it.
+                                var oldOnWriteEnd = dl_fw.onwriteend;
+                                var ackWrite = function() {
+                                    dl_fw.onwriteend = oldOnWriteEnd;
+                                    free_space(onSpaceFreed, 450, chrome_write_error_msg && 300);
+                                };
+                                var onError = function() {
+                                    // Something went wrong, go back to seeking...
+                                    try {
+                                        dl_fw.seek(dl_position);
+                                        ackWrite();
+                                    }
+                                    catch (ex) {
+                                        dlFatalError(dl, ex);
+                                    }
+                                };
+
+                                dl_fw.onwriteend = tryCatch(function() {
+                                    var error = true;
+
+                                    if (dl_fw.readyState === dl_fw.DONE) {
+                                        if (dl_fw.position === dl_position) {
+                                            logger.debug('Truncation succeed at offset ' + dl_position);
+                                            error = false;
+                                        }
+                                        else {
+                                            logger.warn('Truncation failed...', dl_fw.position, dl_position);
+                                        }
+                                    }
+                                    else {
+                                        logger.warn('Invalid state on truncation...', dl_fw.readyState);
+                                    }
+
+                                    if (error) {
+                                        onError();
+                                    }
+                                    else {
+                                        ackWrite();
+                                    }
+                                }, onError);
+
+                                logger.debug('Truncating file to offset ' + dl_position);
+                                dl_fw.truncate(dl_position);
                             }
                         };
                         zfileEntry = fileEntry;
+
+                        if (resumeOffset) {
+                            if (resumeOffset === dl_fw.length) {
+                                dl_fw.seek(resumeOffset);
+                                onIdle(beginDownload);
+                                return;
+                            }
+
+                            console.warn('Cannot resume, byteOffset mismatch %s-%s', resumeOffset, dl_fw.length);
+                        }
+
+                        resumeOffset = 0;
                         dl_fw.truncate(0);
                     },
                     errorHandler.bind(that, 'createWriter'));
@@ -534,14 +615,16 @@
                 }
 
                 if (aFail === -1 && !isSecurityError(aEvent)) {
+                    if (nosplog) {
+                        nosplog = false;
+                        api_req({a: 'log', e: 99658, m: 'Out of HTML5 Offline Storage space (open)'});
+                    }
 
-                    if (canSwitchDownloadMethod(dl, dl_id)) {
+                    if (canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
                         return;
                     }
 
                     if (!$.msgDialog) {
-                        srvlog('Out of HTML5 Offline Storage space (open)');
-
                         msgDialog('warningb:' + l[103], WRITERR_DIAGTITLE,
                             l[16891],
                             str_mtrunc(dl_filename), function(cancel) {
@@ -568,7 +651,9 @@
                     dl_createtmpfile,
                     function(e) {
                         if (!onSecurityErrorSwitchMethod(dl, dl_id, e)) {
-                            errorHandler.call(this, 'RequestFileSystem', e);
+                            if (!canSwitchDownloadMethod(dl, dl_id)) {
+                                errorHandler.call(this, 'RequestFileSystem', e);
+                            }
                         }
                     }.bind(this)
                 );
@@ -588,7 +673,7 @@
                 if (is_chrome_firefox) {
                     dl_fw.close(err);
                 }
-                else if (err) {
+                else if (err && !this.keepFileOnAbort) {
                     try {
                         var onWriteEnd = (function(writer, entry) {
                             return function() {
@@ -632,17 +717,18 @@
             if (failed) {
                 /* reset error flag */
                 failed = false;
-                /* retry */
-                try {
-                    dl_fw.seek(dl_position);
-                }
-                catch (e) {
-                    return dlFatalError(dl, e);
-                }
                 logger.warn('write error, retrying...', dl_fw.readyState);
-                return wTimer = setTimeout(function() {
-                    dl_fw.write(new Blob([dl_buffer]))
-                }, 4480);
+
+                wTimer = setTimeout(function() {
+                    try {
+                        dl_fw.write(new Blob([dl_buffer]));
+                    }
+                    catch (ex) {
+                        dlFatalError(dl, ex);
+                    }
+                }, 2100);
+
+                return;
             }
 
             if ($.msgDialog
@@ -656,6 +742,8 @@
                 dl_done();
             } /* notify writer */
         }
+
+        var testSwitchOver = localStorage.fsTestSwitchOver || 0;
 
         this.write = function(buffer, position, done) {
             if (dl_writing || position != dl_fw.position) {
@@ -672,6 +760,11 @@
             if (d) {
                 logger.info("Write " + buffer.length + " bytes at " + position + "/" + dl_fw.position);
             }
+
+            if (testSwitchOver && position > 0x1000000 && canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
+                return;
+            }
+
             try {
                 dl_fw.write(new Blob([buffer]));
             }
@@ -738,6 +831,9 @@
             // Try to free space before starting the download.
             free_space(this.fsInitOp.bind(this), 50);
         };
+
+        this.keepFileOnAbort = false;
+        this.hasResumeSupport = !is_chrome_firefox;
     };
 
     if (window.d) {

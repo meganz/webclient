@@ -148,6 +148,11 @@
     background-color: transparent;
     border: 0;
 }
+/*TODO: kick this when its done */
+.viewer-button.fullscreen {
+    display: none !important;
+}
+/*end of TODO */
 .viewer-mid-button {
     width: 26px;
     height: 58px;

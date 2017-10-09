@@ -64,7 +64,7 @@
     background-color: #d90007;
     overflow: hidden;
     margin: 27px 0 0 0;
-    background-image: url(../images/mega/startpage-sprite_v2.png);
+    background-image: url(../images/mega/startpage-sprite_v6.png);
     background-position: -11px -1371px;
 }
 .bottom-menu.company-info {
@@ -158,13 +158,16 @@
     padding: 10px 43px 23px 43px;
     text-align: center;
 }
-.mobile .bottom-menu.column:first-child, .mobile .bottom-menu.copyrights {
+.mobile .bottom-menu.column:first-child {
     padding-bottom: 0;
     padding-left: 0;
     margin-left: 0;
     margin-right: 0;
     margin-top: 0;
     text-align: center;
+}
+.mobile .bottom-menu.copyrights {
+    text-align:center;
 }
 .mobile .bottom-menu.company-info strong {
     display: block;

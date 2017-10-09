@@ -102,6 +102,20 @@ function removeUInode(h, parent) {
             break;
     }
 
+    if (M.megaRender && M.megaRender.megaList) {
+        if (parent) {
+            // this was a move node op
+            if (parent === M.currentdirid) {
+                // the node was moved out of the current viewport, so lets remove it from the MegaList
+                M.megaRender.megaList.remove(h);
+            }
+        }
+        else {
+            M.megaRender.megaList.remove(h);
+        }
+    }
+
+
     if (M.currentdirid === h || M.isCircular(h, M.currentdirid) === true) {
         parent = parent || M.getNodeParent(n || h) || M.getNodeRoot(h);
         delay('openfolder', M.openFolder.bind(M, parent));

@@ -131,7 +131,7 @@
 }
 #help2-main .search-suggestions-list li a:hover {
     background-color: #f44;
-    background-image: linear-gradient(90deg, #f44 0%, #f66 100%)
+    background-image: linear-gradient(90deg, #f44 0%, #f66 100%);
     border-radius: 6px;
     color: #fff !important;
 }
@@ -1039,7 +1039,6 @@
     margin-right: 0;
 }
 #help2-main .support-search-container {
-    z-index: 999;
     position: relative;
     margin: 0 auto 50px;
     padding-left: 15%;
@@ -1090,9 +1089,9 @@
     font-style: normal;
 }
 #help2-main .support-article-info ul {
-    list-style-image: disc ;
+    list-style-image: disc;
     list-style-position: disc;
-    list-style-type: disc ;
+    list-style-type: disc;
     display: block;
     margin-block-end: 1em;
     margin-block-start: 1em;
@@ -1104,9 +1103,9 @@
     text-align: left;
 }
 #help2-main .support-article-info ol {
-    list-style-image: decimal; ;
-    list-style-position: decimal;;
-    list-style-type: decimal; ;
+    list-style-image: decimal;
+    list-style-position: decimal;
+    list-style-type: decimal;
     display: block;
     margin-block-end: 1em;
     margin-block-start: 1em;
@@ -1118,9 +1117,9 @@
     text-align: left;
 }
 #help2-main .support-article-info .support-image-instructions ul {
-    list-style-image: disc ;
+    list-style-image: disc;
     list-style-position: disc;
-    list-style-type: disc ;
+    list-style-type: disc;
     display: block;
     margin-block-end: 1em;
     margin-block-start: 1em;
@@ -1132,9 +1131,9 @@
     text-align: left;
 }
 #help2-main .support-article-info .mobile-support-image-instructions ul {
-    list-style-image: disc ;
+    list-style-image: disc;
     list-style-position: disc;
-    list-style-type: disc ;
+    list-style-type: disc;
     display: block;
     margin-block-end: 1em;
     margin-block-start: 1em;
@@ -2877,9 +2876,9 @@
         line-height: 48px;
     }
     #help2-main .support-article-info ol {
-        list-style-image: decimal; ;
-        list-style-position: decimal;;
-        list-style-type: decimal; ;
+        list-style-image: decimal;
+        list-style-position: decimal;
+        list-style-type: decimal;
         display: block;
         margin-block-end: 1em;
         margin-block-start: 1em;
@@ -3481,8 +3480,8 @@
         border-right: none;
     }
     #help2-main ul.mobile-search-list {
-        padding-inline-start: 00px;
-        -webkit-padding-start: 00px;
+        padding-inline-start: 0;
+        -webkit-padding-start: 0;
         -webkit-margin-before: 0;
         -webkit-margin-after: 0;
         margin-block-end: 0;
@@ -3673,7 +3672,6 @@
 }
 #help2-main.search-overlay .support-go-back, #help2-main.search-overlay .support-search, .search-overlay .search-section, #help2-main.search-overlay .sidebar-menu-container, .search-overlay .support-info-container, .search-overlay .main-title-section {
     display: none;
-    
 }
 .search-overlay .search-close, #help2-main.search-overlay .search-section-header .popular-question-block, #help2-main.search-overlay .search-section-header {
     display: block;

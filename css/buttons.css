@@ -4,6 +4,11 @@
 .button > i, .button > span {
     cursor: pointer;
 }
+
+.nonclickable {
+    cursor: not-allowed !important;
+}
+
 .button input {
     position: absolute;
     top: 0;
@@ -128,6 +133,12 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     white-space: nowrap;
+}
+.default-white-button.light-grey-txt {
+    color: #777777;
+}
+.default-white-button::first-letter {
+    text-transform: uppercase;
 }
 .default-white-button.small-height {
     line-height: 19px;
@@ -458,6 +469,11 @@
     left: 0;
     top: 0;
     padding: 0 24px;
+    background: rgb(255,255,255);
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmY2ZjZmMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(252,252,252,1) 100%);
+background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(252,252,252,1) 100%);
+background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1) 100%);
 }
 .default-big-button span::before {
     content: '';
@@ -491,6 +507,10 @@
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.05);
 }
+.default-big-button.inline {
+    display: inline-block;
+    margin: 0 6px;
+}
 .default-big-button.grey-gradient {
     color: white;
 }
@@ -507,9 +527,9 @@
     background: linear-gradient(to bottom, rgba(184,184,184,1) 0%, rgba(166,166,166,1) 100%);
 }
 .default-big-button.grey-gradient span::before {
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.35);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.35);
-    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.35);
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
 }
 .default-big-button i {
     vertical-align:middle;
@@ -556,6 +576,9 @@
 .default-huge-button i {
     margin: 19px 20px 0 0;
     vertical-align: top;
+}
+.default-white-button.grey-txt {
+    color: #777777;
 }
 .default-white-button.small-square-button {
     width: 24px;

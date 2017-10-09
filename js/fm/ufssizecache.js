@@ -12,26 +12,36 @@ function UFSSizeCache() {
 // - if n.t is 0, n.s is always set
 // - if n.t is 1, n.s is never set or set and != 0
 UFSSizeCache.prototype.feednode = function(n) {
+
     if (n.p) {
         if (!this.cache[n.p]) {
             // create previously unknown parent
-            this.cache[n.p] = [n.t, 1 - n.t, n.s || 0, false, 0, 0, 0];
+            this.cache[n.p] = [n.t, 1 - n.t, n.s || 0, false, 0, 0, 0, 0, 0, 0];
         }
         else {
             // update known parent
-            this.cache[n.p][1 - n.t]++;
-            if (n.s) {
-                this.cache[n.p][2] += n.s;
-            }
-        }
-        if (n.t) {
-            // record folder's parent linkage
-            if (!this.cache[n.h]) {
-                this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0];
+            if (n.fv) { // this is a versioned file.
+                this.cache[n.p][7]++;
+                this.cache[n.p][8] += n.s;
             }
             else {
-                this.cache[n.h][3] = n.p;
+                this.cache[n.p][1 - n.t]++;
+                if (n.s) {
+                    this.cache[n.p][2] += n.s;
+                }
             }
+        }
+
+        // record parent linkage
+        if (!this.cache[n.h]) {
+            if (n.fv) {
+                this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, 1];
+            } else {
+                this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, 0];
+            }
+        }
+        else {
+            this.cache[n.h][3] = n.p;
         }
     }
 };
@@ -42,14 +52,20 @@ UFSSizeCache.prototype.sum = function() {
         var p = h;
 
         do {
-            for (var i = 3; i--;) {
-                this.cache[p][i + 4] += this.cache[h][i];
+            this.cache[p][4] += this.cache[h][0];
+            if (this.cache[p][9]) {
+                this.cache[p][7] +=  this.cache[h][1];
+                this.cache[p][8] +=  this.cache[h][2];
+            }
+            else {
+                this.cache[p][5] +=  this.cache[h][1];
+                this.cache[p][6] +=  this.cache[h][2];
             }
         } while ((p = this.cache[p][3]));
     }
 };
 
-// Save computed td / tf / tb for all folders
+// Save computed td / tf / tb / tvf /tvb for all folders
 // if no root node is provided, cache is a full cloud tree
 UFSSizeCache.prototype.save = function(rootNode) {
     this.sum();
@@ -73,6 +89,8 @@ UFSSizeCache.prototype.save = function(rootNode) {
             n.td = (n.td || 0) + this.cache[h][4];
             n.tf = (n.tf || 0) + this.cache[h][5];
             n.tb = (n.tb || 0) + this.cache[h][6];
+            n.tvf = (n.tvf || 0) + this.cache[h][7];
+            n.tvb = (n.tvb || 0) + this.cache[h][8];
             this.addToDB(n);
 
             if (!this.cache[h][3]) {
@@ -80,6 +98,8 @@ UFSSizeCache.prototype.save = function(rootNode) {
                     n.td = (n.td || 0) + this.cache[h][4];
                     n.tf = (n.tf || 0) + this.cache[h][5];
                     n.tb = (n.tb || 0) + this.cache[h][6];
+                    n.tvf = (n.tvf || 0) + this.cache[h][7];
+                    n.tvb = (n.tvb || 0) + this.cache[h][8];
                     this.addToDB(n);
                 }
             }
@@ -126,6 +146,8 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     tmp.td = n.td || 0;
     tmp.tf = n.tf || 0;
     tmp.tb = n.tb || 0;
+    tmp.tvf = n.tvf || 0;
+    tmp.tvb = n.tvb || 0;
     tmp.h = n.h;
     tmp.p = n.p;
     tmp.t = M.IS_TREE;
@@ -193,32 +215,36 @@ UFSSizeCache.prototype.delTreeNode = function(h, p) {
  * @param {Boolean} [ignoreDB] Hint: do not set it...
  */
 UFSSizeCache.prototype.addNode = function(n, ignoreDB) {
-    var td, tf, tb;
+    var td, tf, tb, tvf, tvb;
 
     if (n.t) {
         td = (n.td || 0) + 1;
         tf = (n.tf || 0);
         tb = (n.tb || 0);
-
-        if (!ignoreDB) {
-            // if a new folder was created, save it to db
-            this.addToDB(n);
-        }
+        tvf = (n.tvf || 0);
+        tvb = (n.tvb || 0);
     }
     else {
         td = 0;
-        tf = 1;
-        tb = n.s;
+        tf = (n.fv) ? 0 : 1;
+        tb = (n.fv) ? 0 : n.s;
+        tvf = (n.fv) ? 1 : 0;
+        tvb = (n.fv) ? n.s : 0;
     }
-
+    if (!ignoreDB) {
+        // if a new folder was created, save it to db
+        this.addToDB(n);
+    }
     if (d) {
-        console.debug('ufsc.add', n.h, td, tf, tb);
+        console.debug('ufsc.add', n.h, td, tf, tb, tvf, tvb);
     }
 
     while ((n = M.d[n.p])) {
         n.td = (n.td || 0) + td;
         n.tf = (n.tf || 0) + tf;
         n.tb = (n.tb || 0) + tb;
+        n.tvf = (n.tvf || 0) + tvf;
+        n.tvb = (n.tvb || 0) + tvb;
         this.addToDB(n);
     }
 };
@@ -232,29 +258,37 @@ UFSSizeCache.prototype.delNode = function(h, ignoreDB) {
     var n = M.d[h];
 
     if (n) {
-        var td, tf, tb;
+        var td, tf, tb, tvf, tvb;
 
         if (n.t) {
             td = n.td + 1;
             tf = n.tf;
             tb = n.tb;
+            tvf = n.tvf;
+            tvb = n.tvb;
 
             this.delTreeNode(n.h, n.p);
         }
         else {
             td = 0;
-            tf = 1;
-            tb = n.s;
+            tf = (n.fv) ? 0 : 1;
+            tb = (n.fv) ? 0 : n.s;
+            tvf = (n.fv) ? 1 : 0;
+            tvb = (n.fv) ? n.s : 0;
         }
 
         if (d) {
-            console.debug('ufsc.del', h, td, tf, tb);
+            console.debug('ufsc.del', h, td, tf, tb, tvf, tvb);
+
+            if (!td && td !== 0) debugger;
         }
 
         while ((n = M.d[n.p])) {
             n.td -= td;
             n.tf -= tf;
             n.tb -= tb;
+            n.tvf -= tvf;
+            n.tvb -= tvb;
             this.addToDB(n);
         }
     }

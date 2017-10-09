@@ -1,4 +1,20 @@
 function dashboardUI() {
+    "use strict";
+
+    // Prevent ephemeral session to access dashboard via url
+    if (u_type === 0) {
+        msgDialog('confirmation', l[998], l[17146]
+             + ' ' + l[999], l[1000], function(e) {
+            if (e) {
+                loadSubPage('register');
+                return false;
+            }
+            loadSubPage('fm');
+        });
+
+        return false;
+    }
+
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
     $('.fm-right-block.dashboard').removeClass('hidden');
 
@@ -339,7 +355,7 @@ dashboardUI.updateCloudDataWidget = function() {
     var folders = 832;
     var data = M.getDashboardData();
     var locale = [files, folders, files, folders, folders, files];
-    var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links'];
+    var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'versions'];
     var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
     $('.data-item .links-s').rebind('click', function() {

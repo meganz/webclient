@@ -48,6 +48,8 @@
             loadingDialog.show();
 
             obj.opt.code = page.replace(obj.opt.prefix, '');
+
+            // Check is entered password correct
             postLogin(u_attr.email, $(obj.opt.passwordInputId).val(), false, function(r) {
 
                 loadingDialog.hide();
@@ -56,8 +58,6 @@
                     if (_accountClosureCallback) {
                         _accountClosureCallback(obj.opt.code, obj.opt.email, obj.opt.secret.toString());
                     }
-
-                    obj._deleteLeftovers();
                 }
                 else {// Password is wrong
                     $(obj.opt.passwordInputId).val('');
@@ -102,7 +102,7 @@
      *
      */
     AccountClosure.prototype._accountClosure = function(code, email, hash) {
-        var self = this;
+        localStorage.beingAccountCancellation = 1;
 
         api_resetuser({callback: function(code) {
             closeDialog();
@@ -113,11 +113,12 @@
 
             if (code === 0) {
                 // Account successfully canceled/deleted
-                msgDialog('warninga', l[6188], l[6189], '', function() {
-                    loadSubPage('login');
-                });
+                u_logout(true);
+                location.reload();
             }
             else if (code === EEXPIRED || code === ENOENT) {
+                delete localStorage.beingAccountCancellation;
+
                 msgDialog('warninga', l[6184], l[6185], '', function() {
                     loadSubPage('fm/account');
                 });
@@ -160,14 +161,6 @@
                 }
             }
         });
-    };
-
-    AccountClosure.prototype._deleteLeftovers = function() {
-        u_logout(true);
-        closeDialog();
-        $('.reset-success-st3').removeClass('active');
-        loadSubPage('login');
-        document.location.reload();
     };
 
     AccountClosure.prototype._gatherFeedback = function() {

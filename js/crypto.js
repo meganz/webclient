@@ -719,7 +719,7 @@ var crypt = (function () {
         prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
         newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
 
-        // Show warning dialog if it hasn't been locally overriden (as need by poor user Fiup who added 600
+        // Show warning dialog if it hasn't been locally overriden (as needed by poor user Fiup who added 600
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
         if (localStorage.hideCryptoWarningDialogs !== '1') {
             var showDialog = function() {
@@ -892,6 +892,7 @@ var EBLOCKED = -16;
 var EOVERQUOTA = -17;
 var ETEMPUNAVAIL = -18;
 var ETOOMANYCONNECTIONS = -19;
+var EGOINGOVERQUOTA = -24;
 
 // custom errors
 var ETOOERR = -400;
@@ -1094,7 +1095,7 @@ function api_setsid(sid) {
 
                     if (!dlmanager.isOverFreeQuota) {
                         dlmanager.uqFastTrack = 1;
-                        dlmanager._overquotaInfo();
+                        delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
                     }
                 }
 
@@ -1212,7 +1213,7 @@ function api_req(request, context, channel) {
 // FIXME: check for fetch on !Firefox, not just on Chrome
 var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
 
-if (typeof Uint8Array.prototype.indexOf !== 'function') {
+if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
     if (d) {
         console.debug('No chunked method on this browser: ' + ua);
     }
@@ -1584,6 +1585,9 @@ function api_reqfailed(c, e) {
             );
         }});
     }
+    else {
+        api_reqerror(apixs[c], EAGAIN, 0);
+    }
 }
 
 var failxhr;
@@ -1768,6 +1772,8 @@ function waitsc() {
     waitxhr.send();
 }
 mBroadcaster.once('startMega', function() {
+    'use strict';
+
     window.addEventListener('online', function(ev) {
         if (d) {
             console.info(ev);
@@ -1776,6 +1782,27 @@ mBroadcaster.once('startMega', function() {
 
         if (waiturl) {
             waitsc();
+        }
+    });
+
+    var invisibleTime;
+    document.addEventListener('visibilitychange', function(ev) {
+        if (d) {
+            console.info(ev, document.hidden);
+        }
+
+        if (document.hidden) {
+            invisibleTime = Date.now();
+        }
+        else {
+            invisibleTime = Date.now() - invisibleTime;
+
+            if (mega.loadReport && !mega.loadReport.sent) {
+                if (!mega.loadReport.invisibleTime) {
+                    mega.loadReport.invisibleTime = 0;
+                }
+                mega.loadReport.invisibleTime += invisibleTime;
+            }
         }
     });
 });
@@ -2322,8 +2349,12 @@ function api_setshare1(ctx, params) {
             req.s[i].u = req.s[i].m;
         }
 
-        if (d && M.opc[req.s[i].u]) {
-            logger.debug(req.s[i].u + ' is an outgoing pending contact...');
+        if (M.opc[req.s[i].u]) {
+            if (d) {
+                logger.warn(req.s[i].u + ' is an outgoing pending contact, fixing to email...', M.opc[req.s[i].u].m);
+            }
+            // the caller incorrectly passed a handle for a pending contact, so fixup..
+            req.s[i].u = M.opc[req.s[i].u].m;
         }
     }
 
@@ -2995,6 +3026,7 @@ function api_faretry(ctx, error, host) {
         }, ctx.faRetryI);
     }
 
+    mBroadcaster.sendMessage('fa:error', ctx.id, error, ctx.p);
     srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 
@@ -3247,19 +3279,26 @@ function api_getfa(id) {
 }
 
 function api_attachfileattr(node, id) {
+    'use strict';
+
     var fa = api_getfa(id);
 
     storedattr[id].target = node;
 
     if (fa) {
-        api_req({ a: 'pfa', n: node, fa: fa }, {
-            callback: function(res) {
+        M.req({a: 'pfa', n: node, fa: fa})
+            .fail(function(res) {
                 if (res === EACCESS) {
                     api_pfaerror(node);
                 }
-            }
-        });
+                mBroadcaster.sendMessage('pfa:error', id, node, res);
+            })
+            .done(function() {
+                mBroadcaster.sendMessage('pfa:complete', id, node, fa);
+            });
     }
+
+    return fa;
 }
 
 /** handle ufa/pfa EACCESS error */
@@ -3690,6 +3729,8 @@ function api_strerror(errno) {
         return "Temporarily not available";
     case ETOOMANYCONNECTIONS:
         return "Connection overflow";
+    case EGOINGOVERQUOTA:
+        return "Not enough quota";
     default:
         break;
     }

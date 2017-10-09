@@ -8,16 +8,19 @@ mega.ui.tpp = function () {
     var opts = {
         dlg: {
             $: {},
+            cached: false,
             visible: false,
             enabled: true,
             dl: {
                 $: {},
                 class: '.download',
+                initialized: false,
                 paused: []// ids of paused dl items
             },
             ul: {
                 $: {},
                 class: '.upload',
+                initialized: false,
                 paused: []// ids of paused ul items
             }
         },
@@ -30,7 +33,8 @@ mega.ui.tpp = function () {
                 progress: 0,
                 bps: 0,
                 time: 0,// Start time in ms
-                curr: {}
+                curr: {},
+                fileName: ''
             },
             dl: {
                 index: 0,
@@ -38,9 +42,14 @@ mega.ui.tpp = function () {
                 progress: 0,
                 bps: 0,
                 time: 0,// Start time in ms
-                curr: {}
+                curr: {},
+                fileName: ''
             }
         }
+    };
+
+    var isCached = function isCached() {
+        return opts.dlg.cached;
     };
 
     /**
@@ -129,7 +138,7 @@ mega.ui.tpp = function () {
         var visible = isVisible();
         var enabled = isEnabled();
 
-        if (enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
+        if (isCached() && enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
             opts.dlg.$.show(opts.duration);
             setStatus(true);
         }
@@ -142,7 +151,7 @@ mega.ui.tpp = function () {
         var $tppDlg = opts.dlg.$;
         var visible = isVisible();
 
-        if (!$.isEmptyObject($tppDlg) && visible) {
+        if (isCached() && !$.isEmptyObject($tppDlg) && visible) {
             $tppDlg.hide(opts.duration);
             setStatus(false);
         }
@@ -155,7 +164,7 @@ mega.ui.tpp = function () {
     var showBlock = function showBlock(block) {
         var $item = opts.dlg[block].$;
 
-        if ($item.is(':hidden')) {
+        if (isCached() && $item.is(':hidden')) {
             $item.removeClass('hidden');
             setStatus(true);
         }
@@ -176,12 +185,16 @@ mega.ui.tpp = function () {
 
     /**
      * Get index of latest started dl/ul item from queue
-     * @param {String} block i.e. ['dl', 'ul']
+     * @param {String} blk i.e. ['dl', 'ul']
      */
-    var getIndex = function getIndex(block) {
-        var result = opts.queue[block].index;
+    var getIndex = function getIndex(blk) {
+        var result = opts.queue[blk].index;
 
         return result;
+    };
+
+    var getFileName = function getFileName(blk) {
+        return opts.queue[blk].fileName;
     };
 
     /**
@@ -206,19 +219,19 @@ mega.ui.tpp = function () {
     /**
      * Set index of latest started dl/ul item from queue
      * @param {Number} value Index of current dl/ul file
-     * @param {String} block i.e. ['dl', 'ul'] download or upload
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
-    var setIndex = function setIndex(value, block) {
-        var index = opts.queue[block].index;
-        var total = opts.queue[block].total;
+    var setIndex = function setIndex(value, blk) {
+        var index = opts.queue[blk].index;
+        var total = opts.queue[blk].total;
 
         if (value) {
             if (value > 0 && index < total || value < 0 && index > 1) {
-                opts.queue[block].index += value;
+                opts.queue[blk].index += value;
             }
         }
         else {
-            opts.queue[block].index = 0;
+            opts.queue[blk].index = 0;
         }
     };
 
@@ -247,6 +260,40 @@ mega.ui.tpp = function () {
         }
     };
 
+    var drawInit = function drawInit(blk) {
+        var name = '';
+        var total = 0;
+        var index = 0;
+        var type = '';
+
+        setTotal(M.pendingTransfers, blk);
+        total = getTotal(blk).toString();
+        setIndex(1, blk);
+        index = getIndex(blk);
+        setTime(Date.now(), blk);
+        name = getFileName(blk);
+
+        // Situation when switching from paused import file to clouddrive
+        if (name === '' && blk === 'dl' && typeof fdl_queue_var !== 'undefined') {
+            name = Object(fdl_queue_var).name;
+        }
+        type = ext[fileext(name)];
+
+        if (typeof type === 'undefined') {
+            type = ext['*'][0];// general
+        }
+
+        opts.dlg[blk].$.num.text(total);
+        opts.dlg[blk].$.name.text(name);
+        opts.dlg[blk].$.ibLeft.text(l[5528]);
+        opts.dlg[blk].$.crr.text(index);
+        opts.dlg[blk].$.tfi
+            .removeClass()
+            .addClass('transfer-filetype-icon ' + type + ' file');
+
+        opts.dlg[blk].initialized = true;
+    };
+
     /**
      * Set state to paused for given dl/ul
      * @param {String} id ul/dl item id
@@ -254,6 +301,10 @@ mega.ui.tpp = function () {
      */
     var pause = function pause(id, blk) {
         console.log('tpp.pause');
+
+        if (!opts.dlg[blk].initialized) {
+            drawInit(blk);
+        }
 
         opts.dlg[blk].paused.push(id);
         opts.dlg[blk].$.stxt.text('');
@@ -365,21 +416,23 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
     var updateBlock = function updateBlock(blk) {
+
         if (!Object(opts.dlg[blk].$).prg) {
             console.error("FIXME: TypeError: Cannot read property 'css' of undefined");
             return false;
         }
 
+        if (!opts.dlg[blk].initialized) {
+            drawInit(blk);
+        }
+
         var index = getIndex(blk);
         var len = getTotal(blk).toString();
         var perc = getProgress(blk).toString();
-        var avgSpeed = getAvgSpeed(blk);
         var speed;
+        var avgSpeed = getAvgSpeed(blk);
 
         speed = numOfBytes(avgSpeed, 1);
-        opts.dlg[blk].$.prg.css('width', perc + '%');
-        opts.dlg[blk].$.num.text(len);
-        opts.dlg[blk].$.crr.text(index);
         if (speed.size === 0) {
             opts.dlg[blk].$.stxt.text('');
             opts.dlg[blk].$.spd.text(l[1042]);
@@ -388,6 +441,10 @@ mega.ui.tpp = function () {
             opts.dlg[blk].$.stxt.text(speed.unit + '\u2215' + 's');
             opts.dlg[blk].$.spd.text(speed.size);
         }
+
+        opts.dlg[blk].$.prg.css('width', perc + '%');
+        opts.dlg[blk].$.num.text(len);
+        opts.dlg[blk].$.crr.text(index);
     };
 
     /**
@@ -408,7 +465,7 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
     var _init = function _init(queue, blk) {
-        var name = '';
+        var name = getFileName(blk);
         var index = getIndex(blk).toString();
         var total = getTotal(blk).toString();
         var type = ext[fileext(name)];
@@ -416,13 +473,6 @@ mega.ui.tpp = function () {
 
         if (typeof type === 'undefined') {
             type = ext['*'][0];// general
-        }
-
-        if (blk === 'dl') {
-            name = queue.zipname || queue.n || queue.name;
-        }
-        else {
-            name = queue.name;
         }
 
         opts.dlg[blk].$.name.text(name);
@@ -435,14 +485,16 @@ mega.ui.tpp = function () {
         opts.dlg[blk].$.tfi
             .removeClass()
             .addClass('transfer-filetype-icon ' + type + ' file');
+
+        opts.dlg[blk].initialized = true;
     };
 
     /**
-     * Shows TPP as soon as file or folder is picked, instant initialization
+     * Shows TPP as soon as file or folder is picked
      * @param {String} bl Download or upload block i.e. ['dl', 'ul']
      */
     var started = function started(bl) {
-        if (!getIndex(bl)) {
+        if (!getIndex(bl) && isEnabled()) {
             resetBlock(bl);
             showBlock(bl);
             opts.dlg.$.show(opts.duration);
@@ -470,25 +522,28 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
     var start = function start(queue, blk) {
-        if (!getIndex(blk)) {
-            setIndex(1, blk);
-        }
-
-        if (getIndex(blk) === 1) {
-            _init(queue, blk);
-            showBlock(blk);
-            show();
+        if (isCached()) {
+            if (!getIndex(blk)) {
+                setIndex(1, blk);
+            }
+            if (getIndex(blk) === 1) {
+                _init(queue, blk);
+                showBlock(blk);
+                show();
+            }
         }
     };
 
     var reset = function reset(blk) {
-        hideBlock(blk);
-        setTime(0, blk);
-        setIndex(0, blk);
-        setTotal(0, blk);
-        setTotalProgress(0, blk);
-        setTransfered(-1, 0, blk);
-        opts.dlg[blk].paused = [];
+        if (isCached()) {
+            setTime(0, blk);
+            setIndex(0, blk);
+            setTotal(0, blk);
+            setTotalProgress(0, blk);
+            setTransfered(-1, 0, blk);
+            hideBlock(blk);
+            opts.dlg[blk].paused = [];
+        }
     };
 
     mBroadcaster.addListener('fm:initialized', function() {
@@ -497,11 +552,13 @@ mega.ui.tpp = function () {
 
         // Check if tpp used before, if not force usage
         if (typeof fmconfig.tpp === 'undefined' || isEph) {
-            mega.config.set('tpp', true);
+            mega.config.set('tpp', 1);
+            setEnabled(1);
         }
         else {
             setEnabled(fmconfig.tpp);
         }
+
         // Cache dialog
         opts.dlg.$ = $('.transfer-widget.popup');
         opts.dlg.dl.$ = opts.dlg.$.find('.download');
@@ -520,38 +577,34 @@ mega.ui.tpp = function () {
             opts.dlg[blk].$.tfi = opts.dlg[blk].$.find('.transfer-filetype-icon');
         }
 
-        // If ephemeral, then hide close button for ongoing transfers popup dialog
-        if (isEph) {
-            $('.transfer-widget.popup .fm-dialog-close.small').addClass('hidden');
-        }
-        else {
+        // Cached
+        opts.dlg.cached = true;
 
-            // Close button, Ongoing Transfers Popup Dialog
-            $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
-                opts.dlg.$.hide(opts.duration);
-            });
-        }
+        // Close button, Ongoing Transfers Popup Dialog
+        $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
+            opts.dlg.$.hide(opts.duration);
+        });
     });
 
     mBroadcaster.addListener('fmconfig:tpp', function(value) {
 
         setEnabled(value);
         if (isEphemeral()) {
-            setEnabled(true);
+            setEnabled(1);
         }
         var visible = isVisible();
 
-        if (!$.isEmptyObject(opts.dlg.$)) {
-            if (!value && visible) {
-                hide();
-            }
-            else if (value && !visible) {
-                show();
-            }
+        if (!value && visible) {
+            hide();
+        }
+        else if (value && !visible) {
+            show();
         }
     });
 
     return {
+        isCached: isCached,
+        isEnabled: isEnabled,
         show: show,
         hide: hide,
         pause: pause,

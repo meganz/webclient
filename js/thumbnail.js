@@ -354,7 +354,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
-        }, 350 + Math.floor(Math.random() * 600));
+        }, parseInt(localStorage.delayedThumbnailCreation) || 350 + Math.floor(Math.random() * 600));
     }
 }
 

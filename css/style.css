@@ -5283,7 +5283,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     display: none;
     position: absolute;
     padding: 8px 0 0 8px;
-    
+
 }
 .transfers .transfers-header-bl {
     display: block;
@@ -15548,67 +15548,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .arrow.desc {
     background-position: right -1285px;
-}
-/* MegaSync dialog */
-.fm-dialog.download-megasync-dialog {
-    margin: -154px 0 0 -265px;
-    width: auto;
-}
-.download-megasync-dialog .content {
-    text-align: center;
-    padding: 10px;
-}
-.download-megasync-dialog .button {
-    border: 2px solid #d9d9d9;
-    border-radius: 4px;
-    display: inline-block;
-    margin: 30px 25px 25px;
-    position: relative;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-.download-megasync-dialog .button:hover {
-    background-color: #b2b2b2;
-    border-color: #b2b2b2;
-}
-.download-megasync-dialog .icon {
-    background-image: url(../images/mega/pages-sprite.png);
-    background-position: 2px -771px;
-    background-repeat: no-repeat;
-    display: block;
-    height: 50px;
-    left: 10px;
-    position: absolute;
-    top: 5px;
-    width: 50px;
-}
-.download-megasync-dialog .button:hover .icon {
-    background-position: 2px -821px;
-}
-.download-megasync-dialog .button-txt {
-    color: #777;
-    display: block;
-    font-family: "source_sans_prosemibold", Arial;
-    font-size: 14px;
-    line-height: 60px;
-    margin-left: 70px;
-    margin-right: 15px;
-    text-transform: capitalize;
-}
-.download-megasync-dialog .button:hover .button-txt {
-    color: #fff;
-}
-.download-megasync-dialog .txt {
-    color: #777;
-    font-size: 14px;
-    line-height: 24px;
-    margin: 20px 25px 0;
-    max-width: 477px;
-    padding: 0;
-    text-align: left;
 }
 .search-bottom-menu {
     background-color: #EEEEEE;

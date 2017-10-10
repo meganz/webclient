@@ -316,6 +316,8 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         if (page !== 'download') {
             mega.ui.tpp.reset('dl');
         }
+
+        $.totalDL = false;
     }
     else {
         if (page !== 'download') {
@@ -343,6 +345,11 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         $('.transfer-panel-title span').text('');
         dlmanager.dlRetryInterval = 3000;
         percent_megatitle();
+
+        if (dlmanager.onDownloadFatalError) {
+            dlmanager.showMEGASyncOverlay(true, dlmanager.onDownloadFatalError);
+            delete dlmanager.onDownloadFatalError;
+        }
     }
 
     if (d) {

@@ -1045,7 +1045,7 @@
 
                     // are there any 'newnodes'? if yes, generate the .newNodeList, even if this was previously a
                     // non-megaList/megaRender initialized folder (e.g. empty)
-                    if (aNodeList.length && Object(newnodes).length) {
+                    if (aUpdate && aNodeList.length && Object(newnodes).length) {
                         if (!result) {
                             result = {};
                         }

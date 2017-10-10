@@ -1200,7 +1200,7 @@ i.icons-sprite {
 .download.big-icon {
     width: 74px;
     height: 74px;
-    background-image: url(../images/mega/download-dialog.png);
+    background-image: url(../images/mega/download-dialog_v1.png);
     background-position: -622px -81px;
 }
 .chrome .download.big-icon {

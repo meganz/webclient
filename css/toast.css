@@ -148,6 +148,12 @@
     cursor: pointer;
     position: relative;
 }
+.toast-button span {
+    display: inline-block;
+}
+.toast-button span:first-letter {
+    text-transform: uppercase;
+}
 .toast-button i {
     vertical-align: top;
     margin: 6px 3px 0 -2px;

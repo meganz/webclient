@@ -560,7 +560,7 @@
 .megasync-slider.button::after {
     content: '';
     display: block;
-    background-image: url(../images/mega/download-dialog.png);
+    background-image: url(../images/mega/download-dialog_v1.png);
     background-position: 18px 14px;
     background-repeat: no-repeat;
     width: 100%;

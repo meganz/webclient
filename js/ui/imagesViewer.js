@@ -318,7 +318,7 @@ var slideshowid;
         }
 
         if (previews[n.h]) {
-            previewsrc(previews[n.h].src);
+            previewsrc(n.h);
             fetchnext();
         }
         else if (!preqs[n.h]) {
@@ -346,9 +346,41 @@ var slideshowid;
         }
         eot.timeout = 8500;
 
+        var preview = function preview(ctx, h, u8) {
+            previewimg(h, u8, ctx.type);
+
+            if (!n.fa || n.fa.indexOf(':0*') < 0) {
+                if (d) {
+                    console.log('Thumbnail found missing on preview, creating...', h, n);
+                }
+                var aes = new sjcl.cipher.aes([
+                    n.k[0] ^ n.k[4],
+                    n.k[1] ^ n.k[5],
+                    n.k[2] ^ n.k[6],
+                    n.k[3] ^ n.k[7]
+                ]);
+                var img = is_image(n);
+                createnodethumbnail(n.h, aes, h, u8, {raw: img !== 1 && img});
+            }
+            if (h === slideshowid) {
+                fetchnext();
+            }
+        };
+
         var n = slideshow_node(id);
         if (!n) {
-            console.error('handle "%s" not found...', id);
+            console.error('Node "%s" not found...', id);
+            return false;
+        }
+
+        if (filetype(n) === 'PDF Document') {
+            if (!preqs[n.h]) {
+                preqs[n.h] = 1;
+
+                M.gfsfetch(n.h, 0, -1).done(function(data) {
+                    preview({type: 'application/pdf'}, n.h, data.buffer);
+                });
+            }
             return false;
         }
 
@@ -363,30 +395,32 @@ var slideshowid;
         var treq = Object.create(null);
         preqs[n.h] = 1;
         treq[n.h] = {fa: n.fa, k: n.k};
-        api_getfileattr(treq, 1, function(ctx, h, uint8arr) {
-            previewimg(h, uint8arr);
-
-            if (!n.fa || n.fa.indexOf(':0*') < 0) {
-                if (d) {
-                    console.log('Thumbnail found missing on preview, creating...', h, n);
-                }
-                var aes = new sjcl.cipher.aes([
-                    n.k[0] ^ n.k[4],
-                    n.k[1] ^ n.k[5],
-                    n.k[2] ^ n.k[6],
-                    n.k[3] ^ n.k[7]
-                ]);
-                createnodethumbnail(n.h, aes, h, uint8arr);
-            }
-            if (h === slideshowid) {
-                fetchnext();
-            }
-        }, eot);
+        api_getfileattr(treq, 1, preview, eot);
     }
 
-    function previewsrc(src) {
-        var img = new Image();
+    function previewsrc(id) {
         var $overlay = $('.viewer-overlay');
+
+        var src = Object(previews[id]).src;
+        if (!src) {
+            console.error('Cannot preview %s', id);
+            return;
+        }
+
+        $overlay.find('.viewer-image-bl embed').addClass('hidden');
+        $overlay.find('.viewer-image-bl img').removeClass('hidden');
+
+        if (previews[id].type === 'application/pdf') {
+            $overlay.find('.viewer-pending').addClass('hidden');
+            $overlay.find('.viewer-progress').addClass('hidden');
+            $overlay.find('.viewer-image-bl img').addClass('hidden');
+            $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
+            $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);
+            api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
+            return;
+        }
+
+        var img = new Image();
         img.onload = function() {
             var w = this.width;
             var h = this.height;
@@ -404,26 +438,31 @@ var slideshowid;
         img.src = src;
     }
 
-    function previewimg(id, uint8arr) {
+    function previewimg(id, uint8arr, type) {
         var blob;
 
+        type = typeof type === 'string' && type || 'image/jpeg';
+
         try {
-            blob = new Blob([uint8arr], {type: 'image/jpeg'});
+            blob = new Blob([uint8arr], {type: type});
         }
-        catch (err) {
+        catch (ex) {
         }
         if (!blob || blob.size < 25) {
-            blob = new Blob([uint8arr.buffer]);
+            blob = new Blob([uint8arr.buffer], {type: type});
         }
-        previews[id] =
-            {
-                blob: blob,
-                src: myURL.createObjectURL(blob),
-                time: new Date().getTime()
-            };
+
+        previews[id] = {
+            blob: blob,
+            type: type,
+            time: Date.now(),
+            src: myURL.createObjectURL(blob)
+        };
+
         if (id === slideshowid) {
-            previewsrc(previews[id].src);
+            previewsrc(id);
         }
+
         if (Object.keys(previews).length === 1) {
             $(window).unload(function() {
                 for (var id in previews) {

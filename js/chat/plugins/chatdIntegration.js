@@ -845,10 +845,8 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                 }
 
                 // generate preview/icon
-                var icon = fileIcon(v);
-
                 if (!attachmentMetaInfo.revoked && !message.revoked) {
-                    if (v.fa && (icon === "graphic" || icon === "image")) {
+                    if (v.fa && is_image(v)) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
                             v.id = imagesListKey;

@@ -6534,11 +6534,9 @@ React.makeElement = React['createElement'];
 	                " "
 	            );
 
-	            if (fileIcon(node) === "graphic" && node.fa) {
+	            if (is_image(node) && node.fa) {
 	                var src = thumbnails[node.h];
 	                if (!src) {
-	                    src = M.getNodeByHandle(node.h);
-
 	                    M.v.push(node);
 	                    if (!node.seen) {
 	                        node.seen = 1;
@@ -8797,7 +8795,7 @@ React.makeElement = React['createElement'];
 	                        var previewButtons = null;
 
 	                        if (!attachmentMetaInfo.revoked) {
-	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                            if (v.fa && is_image(v)) {
 	                                var imagesListKey = message.messageId + "_" + v.h;
 	                                if (!chatRoom.images.exists(imagesListKey)) {
 	                                    v.id = imagesListKey;
@@ -8880,7 +8878,7 @@ React.makeElement = React['createElement'];
 	                        );
 
 	                        if (M.chat && !message.revoked) {
-	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                            if (v.fa && is_image(v)) {
 	                                var src = thumbnails[v.h];
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);

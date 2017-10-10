@@ -298,12 +298,13 @@ MegaPromise.prototype.finally = MegaPromise.prototype.wait;
 
 /**
  * Invoke promise fulfilment through try/catch and reject it if there's some exception...
- * @param {Function} resolve
- * @param {Function} reject
+ * @param {Function} resolve The function to invoke on fulfilment
+ * @param {Function} [reject] The function to invoke on rejection/caught exceptions
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.tryCatch = function(resolve, reject) {
     'use strict';
+    reject = reject || function() {};
     return this.done(tryCatch(resolve, reject)).fail(reject);
 };
 

@@ -493,12 +493,12 @@ for (var i in extensions) {
     }
 }
 
-function filemime(n) {
+function filemime(n, def) {
     if (typeof n === 'object') {
         n = n.name;
     }
     var fext = fileext(String(n));
-    return extmime[fext] || 'application/octet-stream';
+    return extmime[fext] || def || 'application/octet-stream';
 }
 
 function filetype(n) {

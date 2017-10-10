@@ -726,11 +726,6 @@ function fmtopUI() {
             }
             else if (ua.details.engine === 'Gecko') {
                 $('.fm-folder-upload').removeClass('hidden');
-                $('input[webkitdirectory], .fm-folder-upload input')
-                    .rebind('click', function() {
-                        firefoxDialog();
-                        return false;
-                    });
             }
             else {
                 $('.fm-file-upload').addClass('last-button');
@@ -2310,52 +2305,6 @@ function chromeDialog(close) {
             $(this).attr('checked', false);
         }
     });
-}
-
-function firefoxDialog(close) {
-    "use strict";
-
-    if (close)
-    {
-        $.dialog = false;
-        fm_hideoverlay();
-        $('.fm-dialog.firefox-dialog').addClass('hidden');
-        return true;
-    }
-
-    if (page === 'download')
-        $('.ff-extension-txt').text(l[1932]);
-    else
-        $('.ff-extension-txt').text(l[1174]);
-
-    fm_showoverlay();
-    $('.fm-dialog.firefox-dialog').removeClass('hidden');
-    $.dialog = 'firefox';
-
-    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').rebind('click', function()
-    {
-        firefoxDialog(1);
-    });
-
-    $('#firefox-checkbox').rebind('click', function()
-    {
-        if ($(this).hasClass('checkboxOn') === false)
-        {
-            localStorage.firefoxDialog = 1;
-            $(this).removeClass('checkboxOff').addClass('checkboxOn');
-            $(this).parent().removeClass('checkboxOff').addClass('checkboxOn');
-            $(this).attr('checked', true);
-        }
-        else
-        {
-            delete localStorage.firefoxDialog;
-            $(this).removeClass('checkboxOn').addClass('checkboxOff');
-            $(this).parent().removeClass('checkboxOn').addClass('checkboxOff');
-            $(this).attr('checked', false);
-        }
-    });
-
-    clickURLs();
 }
 
 function browserDialog(close) {

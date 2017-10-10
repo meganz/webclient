@@ -296,8 +296,6 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         pauseTxt = l[1651];
     }
 
-    dlmanager.maxDownloadSize = 1;
-
     var ttl = this.getTransferTableLengths();
     for (var k in nodes) {
         /* jshint -W089 */

@@ -93,12 +93,18 @@ function WebrtcApi() {
                 elem.setAttribute('src', URL.createObjectURL(stream));
             }
         }
-        elem.setSinkId('default')
-        .then(function() {
+        if (HTMLMediaElement.prototype.setSinkId) {
+            elem.setSinkId('default')
+            .then(function() {
+                if (stream) {
+                    elem.play();
+                }
+            });
+        } else {
             if (stream) {
                 elem.play();
             }
-        });
+        }
     };
 
 

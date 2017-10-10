@@ -40,6 +40,7 @@ var is_extension = is_chrome_firefox || is_electron || document.location.href.su
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
+var isWebkit = /webkit/.test(ua);
 
 /**
  * Check if the user is coming from a mobile device
@@ -1847,6 +1848,7 @@ else if (!b_u) {
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
+        jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
     } // !is_mobile
 
     // Transfers
@@ -2769,7 +2771,7 @@ else if (!b_u) {
         var esid='';
         if (u_storage.sid) esid = u_storage.sid;
         dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-        dlxhr.send(JSON.stringify([{a: 'g', g: 1, p: page.substr(1, 8), 'ad': showAd(), 'esid': esid}]));
+        dlxhr.send(JSON.stringify([{a: 'g', p: page.substr(1, 8), 'ad': showAd(), 'esid': esid}]));
     }
 }
 

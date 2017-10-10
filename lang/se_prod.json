@@ -778,6 +778,7 @@
     "5931": "Click [A]here[\/A] to view your storage usage.",
     "6001": "Fel l\u00f6senord",
     "6078": "MEGA",
+    "6080": "bekr\u00e4fta",
     "6089": "Inga \u00f6verg\u00e5ngar",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1306,6 +1307,7 @@
     "8853": "Det uppstod ett problem vid avkodning av din privata RSA-nyckel, kontakta support@mega.nz f\u00f6r ytterligare hj\u00e4lp.",
     "8854": "Om du tidigare prenumererar p\u00e5 en PRO plan med Google Play eller Apple iTunes, v\u00e4nligen avbryt manuellt din prenumeration med dem eftersom det inte \u00e4r en del av den h\u00e4r processen. ",
     "8855": "Du har f\u00f6rs\u00f6kt logga in f\u00f6r m\u00e5nga g\u00e5nger. [BR] V\u00e4nta tills %1 och f\u00f6rs\u00f6k igen.",
+    "8859": "S\u00e4kerhetskopiera \u00e5terst\u00e4llningsnyckel",
     "8866": "Se profil",
     "8867": "Ta bort deltagare",
     "8868": "Ange beh\u00f6righet:",
@@ -1802,5 +1804,16 @@
     "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and more.",
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder",
+    "16902": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+    "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
+    "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)."
 }

@@ -1115,14 +1115,11 @@ FileManager.prototype.initContextUI = function() {
         fm_tfsupdate();
 
         if (toabort.length) {
-            // FIXME: toabort is an array of transfers to abort, don't just pick the first element
-
-            var blk = String(toabort[0]).indexOf('ul_') !== -1 ? 'ul' : 'dl';
-            //               ^^^^^^^^^^
-
-            mega.ui.tpp.setTotal(-1, blk);
-            // mega.ui.tpp.setIndex(-1, blk);
-            mega.ui.tpp.updateIndexes(blk);
+            for (var i = toabort.length; i--;) {
+                var blk = String(toabort[i]).indexOf('ul_') !== -1 ? 'ul' : 'dl';
+                mega.ui.tpp.setTotal(-1, blk);
+                mega.ui.tpp.updateIndexes(blk);
+            }
         }
 
         onIdle(function() {

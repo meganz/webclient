@@ -778,6 +778,7 @@
     "5931": "Nh\u1ea5p [A]v\u00e0o \u0111\u00e2y[\/A] \u0111\u1ec3 xem l\u01b0\u1ee3ng s\u1eed d\u1ee5ng c\u1ee7a b\u1ea1n.",
     "6001": "Sai m\u1eadt kh\u1ea9u",
     "6078": "MEGA",
+    "6080": "x\u00e1c nh\u1eadn",
     "6089": "Kh\u00f4ng c\u00f3 truy\u1ec1n t\u1ea3i",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1306,6 +1307,7 @@
     "8853": "C\u00f3 l\u1ed7i ph\u00e1t sinh khi gi\u1ea3i m\u00e3 kh\u00f3a RSA c\u00e1 nh\u00e2n, xin vui l\u00f2ng li\u00ean l\u1ea1c support@mega.nz \u0111\u1ec3 \u0111\u01b0\u1ee3c nh\u1eadn h\u01b0\u1edbng d\u1eabn chi ti\u1ebft.",
     "8854": "N\u1ebfu qu\u00fd kh\u00e1ch mua g\u00f3i th\u00e0nh vi\u00ean h\u1ea1ng PRO th\u00f4ng qua c\u1eeda h\u00e0ng Google Play ho\u1eb7c Apple iTunes, xin vui l\u00f2ng h\u1ee7y d\u1ecbch v\u1ee5 v\u1edbi b\u00ean \u0111\u00f3 tr\u01b0\u1edbc b\u1edfi v\u00ec vi\u1ec7c h\u1ee7y b\u1ecf tr\u00ean trang web n\u00e0y kh\u00f4ng c\u00f3 li\u00ean k\u1ebft g\u00ec v\u1edbi Google v\u00e0 Apple.",
     "8855": "B\u1ea1n \u0111\u00e3 c\u1ed1 th\u1eed \u0111\u0103ng nh\u1eadp qu\u00e1 nhi\u1ec1u l\u1ea7n. [BR]Xin vui l\u00f2ng ch\u1edd t\u1edbi %1 r\u1ed3i th\u1eed l\u1ea1i.",
+    "8859": "Sao L\u01b0u M\u00e3 Kh\u00f3a Ph\u1ee5c H\u1ed3i",
     "8866": "Xem Th\u00f4ng Tin",
     "8867": "Lo\u1ea1i B\u1ecf Th\u00e0nh Vi\u00ean",
     "8868": "\u0110\u1eb7t Quy\u1ec1n H\u1ea1n",
@@ -1802,5 +1804,16 @@
     "16873": "L\u1eadp phi\u00ean b\u1ea3n th\u1eddi gian th\u1ef1c, t\u00ednh n\u0103ng b\u1ea3o l\u01b0u c\u00e1c d\u1eef li\u1ec7u b\u1ecb x\u00f3a, t\u0103ng c\u01b0\u1eddng hi\u1ec7u n\u0103ng truy\u1ec1n t\u1ea3i t\u1ec7p tin, t\u00edch h\u1ee3p v\u00e0o tr\u00ecnh duy\u1ec7t v\u00e0 nhi\u1ec1u h\u01a1n n\u1eefa.",
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder",
+    "16902": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+    "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
+    "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)."
 }

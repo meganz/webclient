@@ -778,6 +778,7 @@
     "5931": "\u041d\u0430\u0442\u0438\u0441\u043d\u0456\u0442\u044c [A]\u0442\u0443\u0442[\/A] \u0449\u043e\u0431 \u043f\u043e\u0431\u0430\u0447\u0438\u0442\u0438 \u0432\u0438\u043a\u043e\u0440\u0438\u0441\u0442\u0430\u043d\u0438\u0439 \u043f\u0440\u043e\u0441\u0442\u0456\u0440.",
     "6001": "\u041d\u0435\u0432\u0456\u0440\u043d\u0438\u0439 \u043f\u0430\u0440\u043e\u043b\u044c",
     "6078": "MEGA",
+    "6080": "\u043f\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0438",
     "6089": "\u041d\u0435\u043c\u0430\u0454 \u043f\u0435\u0440\u0435\u0434\u0430\u0447\u0456",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1306,6 +1307,7 @@
     "8853": "\u0404 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0430 \u0440\u043e\u0437\u043a\u043e\u0434\u0443\u0432\u0430\u043d\u043d\u044f \u0432\u0430\u0448\u043e\u0433\u043e \u043f\u0440\u0438\u0432\u0430\u0442\u043d\u043e\u0433\u043e RSA \u043a\u043b\u044e\u0447\u0430, \u0431\u0443\u0434\u044c \u043b\u0430\u0441\u043a\u0430, \u0437\u0432'\u044f\u0436\u0456\u0442\u044c\u0441\u044f \u0437 support@mega.nz \u0434\u043b\u044f \u043e\u0442\u0440\u0438\u043c\u0430\u043d\u043d\u044f \u0434\u043e\u0434\u0430\u0442\u043a\u043e\u0432\u043e\u0457 \u0434\u043e\u043f\u043e\u043c\u043e\u0433\u0438.",
     "8854": "\u042f\u043a\u0449\u043e \u0440\u0430\u043d\u0456\u0448\u0435 \u0432\u0438 \u043f\u0456\u0434\u043f\u0438\u0441\u0430\u043b\u0438\u0441\u044f \u043d\u0430 PRO \u043f\u043b\u0430\u043d \u0437\u0430 \u0434\u043e\u043f\u043e\u043c\u043e\u0433\u043e\u044e Google Play \u0430\u0431\u043e Apple iTunes, \u0431\u0443\u0434\u044c \u043b\u0430\u0441\u043a\u0430, \u0441\u043a\u0430\u0441\u0443\u0439\u0442\u0435 \u043f\u0456\u0434\u043f\u0438\u0441\u043a\u0443 \u0432\u0440\u0443\u0447\u043d\u0443, \u0442\u0430\u043a \u044f\u043a \u0446\u044f \u043f\u0456\u0434\u043f\u0438\u0441\u043a\u0430 \u043d\u0435 \u0454 \u0447\u0430\u0441\u0442\u0438\u043d\u043e\u044e \u0432\u0438\u0434\u0430\u043b\u0435\u043d\u043d\u044f \u0430\u0431\u043e \u043f\u0440\u0438\u0437\u0443\u043f\u0438\u043d\u0435\u043d\u043d\u044f \u0430\u043a\u0430\u0443\u043d\u0442\u0443.",
     "8855": "\u0412\u0438 \u043d\u0430\u043c\u0430\u0433\u0430\u043b\u0438\u0441\u044f \u0443\u0432\u0456\u0439\u0442\u0438 \u0437\u0430\u0431\u0430\u0433\u0430\u0442\u043e \u0440\u0430\u0437\u0456\u0432.[BR]\u0411\u0443\u0434\u044c \u043b\u0430\u0441\u043a\u0430, \u0437\u0430\u0447\u0435\u043a\u0430\u0439\u0442\u0435 %1 \u0456 \u0441\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0449\u0435 \u0440\u0430\u0437.",
+    "8859": "\u0417\u0431\u0435\u0440\u0435\u0433\u0442\u0438 \u041a\u043b\u044e\u0447 \u0432\u0456\u0434\u043d\u043e\u0432\u043b\u0435\u043d\u043d\u044f",
     "8866": "\u041f\u0435\u0440\u0435\u0433\u043b\u044f\u043d\u0443\u0442\u0438 \u043f\u0440\u043e\u0444\u0456\u043b\u044c",
     "8867": "\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u0443\u0447\u0430\u0441\u043d\u0438\u043a\u0430",
     "8868": "\u041d\u0430\u0431\u0456\u0440 \u0434\u043e\u0437\u0432\u043e\u043b\u0456\u0432:",
@@ -1802,5 +1804,16 @@
     "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and more.",
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space."
+    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
+    "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
+    "16895": "Do you remember your password?",
+    "16896": "Your password",
+    "16897": "Password accepted",
+    "16898": "Wrong password, backup your Recovery Key as soon as possible!",
+    "16899": "Backing up your Recovery Key enables you to set a new password without data loss. We suggest that you back it up now to a secure location.",
+    "16900": "Please test your password below to ensure you remember it. If you lose your password, you will lose access to your MEGA data. [A]Learn more[\/A]",
+    "16901": "Password Reminder",
+    "16902": "Or create a free MEGA account. Registered users enjoy an extra 10% free IP quota allowance.",
+    "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
+    "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days)."
 }

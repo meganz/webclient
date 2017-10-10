@@ -10,8 +10,8 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
 
-    if (text.length > 48) {
-        text = text.substr(0, 48) + "\u2026";
+    if (text.length > 56) {
+        text = text.substr(0, 56) + "\u2026";
     }
 
     if (ethrow) {
@@ -72,7 +72,9 @@ function dlFatalError(dl, error, ethrow, lock) {
         }
         error = String(Object(error).message || error).replace(/\s+/g, ' ').trim();
 
-        srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+        if (error.indexOf(l[16871]) < 0 && error.indexOf(l[16872]) < 0) {
+            srvlog('dlFatalError: ' + error.substr(0, 60) + (window.Incognito ? ' (Incognito)' : ''));
+        }
     });
 
     // Set transfer status and abort it

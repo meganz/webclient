@@ -449,6 +449,24 @@ function init_page() {
         }
     }
 
+    if (localStorage.beingAccountCancellation) {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            // todo
+        }
+        else {
+            // Insert placeholder page while waiting for user input
+            parsepage(pages['placeholder']);
+
+            msgDialog('warninga', l[6188], l[6189], '', function() {
+                loadSubPage('start');
+            });
+        }
+
+        delete localStorage.beingAccountCancellation;
+        return false;
+    }
+
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
         if (!blogsearch) {
@@ -1272,6 +1290,7 @@ function init_page() {
 
     topmenuUI();
 
+
     loggedout = false;
     flhashchange = false;
 }
@@ -1285,7 +1304,7 @@ function loginDialog(close) {
     }
     $dialog.find('form').replaceWith(getTemplate('top-login'));
     if (localStorage.hideloginwarning || is_extension) {
-        $dialog.find('.top-login-warning').hide();
+        $dialog.find('.top-login-warning').addClass('hidden');
         $dialog.find('.login-notification-icon').removeClass('hidden');
     }
     $dialog.find('.login-checkbox, .radio-txt').rebind('click', function (e) {
@@ -1328,7 +1347,7 @@ function loginDialog(close) {
         $('.login-notification-icon').removeClass('hidden');
     });
     $('.login-notification-icon').rebind('click', function (e) {
-        $('.top-login-warning').show();
+        $('.top-login-warning').removeClass('hidden');
         $('.top-login-warning').addClass('active');
         $(this).addClass('hidden');
     });
@@ -1431,7 +1450,7 @@ function topmenuUI() {
     $topMenu.find('.top-menu-item.account').addClass('hidden');
     $topMenu.find('.top-menu-item.refresh-item').addClass('hidden');
     $topHeader.find('.top-icon.warning').addClass('hidden');
-    $topHeader.find('.activity-status-block .activity-status,.activity-status-block').hide();
+    $topHeader.find('.activity-status-block .activity-status,.activity-status-block').addClass('hidden');
     $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
     $topHeader.find('.membership-status, .top-head .user-name, .top-icon.achievements').addClass('hidden');
 
@@ -1448,7 +1467,7 @@ function topmenuUI() {
 
     var avatar = window.useravatar && useravatar.my;
     if (!avatar) {
-        $topHeader.find('.fm-avatar').hide();
+        $topHeader.find('.fm-avatar').addClass('hidden');
     }
 
     // Show active item in main menu
@@ -1493,7 +1512,7 @@ function topmenuUI() {
         name = name || u_attr.name;
 
         if (name) {
-            $topHeader.find('.user-name').text(name).show();
+            $topHeader.find('.user-name').text(name).removeClass('hidden');
         }
     }
 
@@ -1522,7 +1541,7 @@ function topmenuUI() {
         if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
-                $topHeader.find('.top-icon.achievements').show();
+                $topHeader.find('.top-icon.achievements').removeClass('hidden');
             });
         }
 
@@ -1551,7 +1570,6 @@ function topmenuUI() {
         else {
             // Show the free badge
             $topMenu.find('.top-menu-item.account .right-el').text('FREE');
-            $topHeader.find('.membership-icon').attr('class', 'membership-icon');
             $topHeader.find('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('body').removeClass('lite').addClass('free');
         }
@@ -1562,7 +1580,7 @@ function topmenuUI() {
 
         // If the chat is disabled don't show the green status icon in the header
         if (!pfid && !megaChatIsDisabled) {
-            $topHeader.find('.activity-status-block, .activity-status-block .activity-status').show();
+            $topHeader.find('.activity-status-block, .activity-status-block .activity-status').removeClass('hidden');
             if (megaChatIsReady) {
                 megaChat.renderMyStatus();
             }
@@ -1596,7 +1614,7 @@ function topmenuUI() {
         $('.create-account-button').rebind('click', function () {
             loadSubPage('register');
         });
-        $topHeader.find('.top-login-button').show();
+        $topHeader.find('.top-login-button').removeClass('hidden');
         $('.top-login-button').rebind('click', function () {
             if (u_type === 0) {
                 mLogout();
@@ -1641,6 +1659,7 @@ function topmenuUI() {
             $topMenu.find('.top-menu-item.login').addClass('hidden');
             $topMenu.find('.top-menu-item.logout').removeClass('hidden');
         }
+
     }
 
     $.hideTopMenu = function (e) {
@@ -1742,7 +1761,7 @@ function topmenuUI() {
                     var presence = $(this).data("presence");
                     localStorage.megaChatPresence = presence;
                     localStorage.megaChatPresenceMtime = unixtime();
-    
+
                     mega.initLoadReport();
                     loadfm();
                     $topHeader.find('.activity-status-block').addClass("fadeinout");
@@ -2025,6 +2044,12 @@ function topmenuUI() {
     // Initialise notification popup and tooltip
     if (typeof notify === 'object') {
         notify.init();
+    }
+
+    if (!is_mobile && u_type === 3) {
+        if (mega.ui.passwordReminderDialog) {
+            mega.ui.passwordReminderDialog.onTopmenuReinit();
+        }
     }
 }
 

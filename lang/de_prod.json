@@ -778,6 +778,7 @@
     "5931": "Ihre Speicherplatznutzung ist [A]hier[\/A] verf\u00fcgbar.",
     "6001": "Falsches Passwort",
     "6078": "MEGA",
+    "6080": "best\u00e4tigen",
     "6089": "Keine Transfers",
     "6125": "PRO II",
     "6126": "PRO III",
@@ -1306,6 +1307,7 @@
     "8853": "Ihr privater RSA-Schl\u00fcssel konnte nicht decodiert werden. Bitte setzen Sie sich mit support@mega.nz in Verbindung.",
     "8854": "Sollten Sie ein PRO-Abonnement mit Google Play oder Apple iTune abgeschlossen haben, so stornieren Sie diese bitte direkt in der Play Store\/iTunes App.",
     "8855": "Zuviele Fehlversuche.[BR]Bitte warten Sie bis %1 und versuchen Sie es dann noch einmal.",
+    "8859": "Rettungsschl\u00fcssel sichern",
     "8866": "Profil ansehen",
     "8867": "Teilnehmer entfernen",
     "8868": "Rechte \u00e4ndern:",
@@ -1802,5 +1804,16 @@
     "16873": "Echtzeit-Dateiversionierung, Wiederherstellung versehentlich gel\u00f6schter Dateien, Browser-Integration und mehr.",
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Der MEGA zugeteilte Browser-Speicher ist voll. Ihr Download wird automatisch fortgesetzt, sobald mehr Plattenplatz zur Verf\u00fcgung steht.",
-    "16891": "Der MEGA zugeteilte Browser-Speicher ist zu klein f\u00fcr einen Download dieser Gr\u00f6\u00dfe. Bitte sorgen Sie f\u00fcr mehr Plattenplatz."
+    "16891": "Der MEGA zugeteilte Browser-Speicher ist zu klein f\u00fcr einen Download dieser Gr\u00f6\u00dfe. Bitte sorgen Sie f\u00fcr mehr Plattenplatz.",
+    "16892": "Leider ist beim Lesen Ihrer Daten ein Fehler aufgetreten.",
+    "16895": "K\u00f6nnen Sie sich noch an Ihr Passwort erinnern?",
+    "16896": "Ihr Passwort",
+    "16897": "Passwort akzeptiert",
+    "16898": "Passwort nicht korrekt - bitte exportieren Sie sofort Ihren Rettungsschl\u00fcssel!",
+    "16899": "Ihr Rettungsschl\u00fcssel erlaubt es Ihnen, Ihr Passwort ohne Datenverlust zur\u00fcckzusetzen. Bitte speichern Sie ihn nun an einem sicheren Ort.",
+    "16900": "Ihr MEGA-Passwort kann nicht einfach zur\u00fcckgesetzt werden (es sei denn, Sie haben Ihren [A]Rettungsschl\u00fcsel exportiert[\/A])! Passwortverlust bedeutet Datenverlust. Bitte geben Sie zur Erinnerung Ihr Passwort ein.",
+    "16901": "Passworterinnerung",
+    "16902": "Oder melden Sie sich kostenlos bei MEGA an. Registrierte Benutzer genie\u00dfen ein um 10% erh\u00f6htes kostenloses Transfervolumen!",
+    "16903": "Oder melden Sie sich an und nutzen Sie unser Bonusprogramm: Kostenloser Extra-Speicherplatz und -Transfervolumen f\u00fcr die Installation unserer Apps oder f\u00fcr das Werben neuer Nutzer (die Aktivierung der Boni kann mehrere Tage in Anspruch nehmen).",
+    "16904": "Oder nutzen Sie unser Bonusprogramm: Kostenloser Extra-Speicherplatz und -Transfervolumen f\u00fcr die Installation unserer Apps oder f\u00fcr das Werben neuer Nutzer (die Aktivierung der Boni kann mehrere Tage in Anspruch nehmen)."
 }

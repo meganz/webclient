@@ -50,7 +50,7 @@ function dlinfo(ph,key,next)
     }
     else {
         // Fetch the file information and optionally the download URL
-        api_req({a: 'g', p: ph, 'ad': showAd(), g: 1}, {callback: tryCatch(dl_g)});
+        api_req({a: 'g', p: ph, 'ad': showAd()}, {callback: tryCatch(dl_g)});
     }
 
     if (is_mobile) {
@@ -156,11 +156,8 @@ function dl_g(res) {
             dlmanager.getMaximumDownloadSize().done(function(size) {
                 maxDownloadSize = size;
 
-                if (is_extension) {
-                    uncheckMegaSyncDownload();
-                    $('.download.checkbox-bl').addClass('hidden');
-                }
-                else if (fdl_filesize > maxDownloadSize) {
+                
+                if (fdl_filesize > maxDownloadSize) {
                     checkMegaSyncDownload();
                 }
                 else if (localStorage.megaSyncDownloadUnchecked) {

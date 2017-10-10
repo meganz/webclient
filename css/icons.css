@@ -90,6 +90,13 @@
 .tiny-icon.grey-plus-icon, .minimized .tiny-icon.grey-minus-icon {
     background-position: -51px -3609px;
 }
+.tiny-icon.green-tick, .tiny-icon.red-cross {
+    background-image: url(../images/mega/top-sprite_v3.png);
+    background-position: -12px -1437px;
+}
+.tiny-icon.red-cross {
+    background-position: -12px -1403px;
+}
 .small-icon.audio-call {
     background-position: -4px -38px;
 }
@@ -480,7 +487,7 @@
     background-position: -17px -10463px;
 }
 .medium-icon.rocket {
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-position: -7px -16px;
 }
 .medium-icon.down-arrow {
@@ -519,7 +526,7 @@
             background-position: -237px -347px;
 }
 .huge-white-icon.achievement {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     width: 72px;
     height: 72px;
 }
@@ -691,7 +698,7 @@
     background-position: -15px -11404px;
 }
 .tiny-icon.membership-status {
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-position: -10px -979px;
     width: 16px;
 }
@@ -708,11 +715,11 @@
     background-position: -10px -1059px;
 }
 .semi-small-icon.grey-mega {
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-position: -10px -326px;
 }
 .semi-small-icon.yellow-triangle {
-    background-image: url(../images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v3.png);
     background-position: -10px -1266px;
 }
 .small-icon.dark-grey-plus {
@@ -882,7 +889,9 @@
     height: 22px;
     margin: 0 13px 1px -1px;
 }
-.small-icon.context.cloud {}
+.small-icon.context.cloud {
+    background-position: -102px -30px;
+}
 .dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
 }
@@ -994,7 +1003,7 @@
 }
 /* End of Context menu icons */
 .huge-icon.storage-icon {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 20px -771px;
     background-repeat: no-repeat;
 }
@@ -1002,23 +1011,38 @@
     background-position: 20px -651px;
 }
 .semi-small-icon.rocket {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: -156px -619px;
 }
 .semi-huge-icon.green-tick {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 0 -1045px;
 }
+.semi-huge-icon.speedometer {
+    background-image: url(../images/mega/account-sprite_v4.png);
+    background-position: -102px -1407px;
+    width: 68px;
+    height: 68px;
+}
+.semi-huge-icon.storage {
+    background-image: url(../images/mega/account-sprite_v4.png);
+    background-position: -2px -1406px;
+    width: 68px;
+    height: 68px;
+}
+.exceeded.achievements .semi-huge-icon.storage {
+    background-position: -2px -88px;
+}
 .semi-big-icon.blue-cloud {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: -100px -984px;
 }
 .semi-big-icon.green-speedometer {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: -100px -1032px;
 }
 .big-104px-icon.speedometer {
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 2px -1269px;
 }
 .big-104px-icon.speedometer.almost-full {
@@ -1028,7 +1052,7 @@
     background-position: -121px -790px;
     width: 52px;
     height: 52px;
-    background-image: url(../images/mega/account-sprite_v3.png);
+    background-image: url(../images/mega/account-sprite_v4.png);
 }
 .small-icon.clock {
     background-image: url(../images/mega/icons-sprite_v5.png);

@@ -161,7 +161,7 @@ var sc_history = [];                     // array holding the history of action-
 function sc_fqueue(handle, packet) {
     "use strict";
 
-    if (handle && !M.d[handle]) {
+    if (handle && !M.c[handle]) {
         if (scwaitnodes[packet.scqi]) {
             scwaitnodes[packet.scqi]++;
         }
@@ -240,22 +240,45 @@ function sc_fetcher() {
             $.scFetcherRunning = false;
         }
         else {
-            dbfetch.geta(bunch, new MegaPromise())
-                .always(function() {
-                    for (var i = bunch.length; i--;) {
-                        var h = bunch[i];
-                        for (var p = queue[h].length; p--;) {
-                            var scqi = queue[h][p];
-                            if (!--scwaitnodes[scqi]) {
-                                delete scwaitnodes[scqi];
-                            }
+            // finish bunch processing
+            var finish = function() {
+                for (var i = bunch.length; i--;) {
+                    var h = bunch[i];
+                    for (var p = queue[h].length; p--;) {
+                        var scqi = queue[h][p];
+                        if (!--scwaitnodes[scqi]) {
+                            delete scwaitnodes[scqi];
                         }
                     }
+                }
 
-                    onIdle(function _scfr() {
-                        resumesc();
-                        onIdle(_proc);
-                    });
+                onIdle(function _scfr() {
+                    resumesc();
+                    onIdle(_proc);
+                });
+            };
+
+            dbfetch.geta(bunch, new MegaPromise())
+                .always(function() {
+                    // Retrieve all file versions, if any, and then finish the bunch processing
+                    // FIXME: this is only needed for (redundant!) `d` packets...
+                    var versions = Object.create(null);
+
+                    for (var i = bunch.length; i--;) {
+                        var h = bunch[i];
+
+                        if (M.d[h] && !M.d[h].t && M.d[h].tf) {
+                            versions[h] = 1;
+                        }
+                    }
+                    versions = Object.keys(versions);
+
+                    if (versions.length) {
+                        dbfetch.tree(versions, -1, new MegaPromise()).always(finish);
+                    }
+                    else {
+                        finish();
+                    }
                 });
         }
     })();
@@ -469,6 +492,16 @@ scparser.$add = function(type, handler) {
     }
 };
 
+scparser.$helper.f2 = function(a, previousFile) {
+    process_f(a.t.f2, null, true);
+    if (fminitialized) {
+        var previousFileHandle = (previousFile)
+        ? previousFile.h
+        : ((a.t.f2.length > 0) ? a.t.f2[0].h : null);
+        fileversioning.updateFileVersioningDialog(previousFileHandle);
+    }
+};
+
 scparser.$helper.c = function(a) {
     // contact notification
     process_u(a.u);
@@ -500,7 +533,11 @@ scparser.$add('c', {
                 if ($.selected && ($.selected[0] === userHandle)) {
 
                     // was selected
+                    if (selectionManager) {
+                        selectionManager.clear_selection();
+                    }
                     $.selected = [];
+
                     if ($('.dropdown.body.files-menu').is(":visible")) {
                         $.hideContextMenu();
                     }
@@ -742,7 +779,7 @@ scparser.$add('t', function(a, scnodes) {
 
     var i;
     var ufsc = new UFSSizeCache();
-    var rootNode = scnodes.length && scnodes[0];
+    var rootNode = scnodes.length && scnodes[0] || false;
 
     // is this tree a new inshare with root scinshare.h? set share-relevant
     // attributes in its root node.
@@ -811,6 +848,17 @@ scparser.$add('t', function(a, scnodes) {
 
     if (!pfid && u_type) {
         M.checkStorageQuota();
+    }
+    if (!is_mobile) {
+        // update versioning info.
+        if (a.t && a.t.f2) {
+            scparser.$helper.f2(a);
+        }
+        else {
+            if (scnodes.length === 1) {
+                fileversioning.updateFileVersioningDialog(scnodes[0].h);
+            }
+        }
     }
 });
 
@@ -941,6 +989,11 @@ scparser.$add('fa', function(a) {
     if (n) {
         n.fa = a.fa;
         M.nodeUpdated(n);
+
+        if (String(n.fa).indexOf('/') > 0) {
+            // both thumb & prev is being set
+            mBroadcaster.sendMessage('fa:ready', a.n, a.fa);
+        }
     }
 });
 
@@ -1035,14 +1088,23 @@ scparser.$add('u', function(a) {
 });
 
 scparser.$add('d', function(a) {
+    var fileDeletion = (M.d[a.n] && !M.d[a.n].t);
     // node deletion
     M.delNode(a.n);
-
+    // was selected, now clear the selected array.
+    if ($.selected && ($.selected[0] === a.n)) {
+        $.selected = [];
+    }
     if (!pfid) {
         scparser.$notify(a);
 
         if (u_type) {
             M.checkStorageQuota();
+        }
+    }
+    if (!is_mobile) {
+        if (fileDeletion && !a.v) {// this is not a versioning deletion.
+            fileversioning.closeFileVersioningDialog(a.n);
         }
     }
 });
@@ -1117,6 +1179,7 @@ scparser.$notify = function(a) {
 };
 
 scparser.$call = function(a, scnodes) {
+
     try {
         if (scparser.$common[a.a]) {
             // no matter who triggered it
@@ -1172,7 +1235,7 @@ scparser.$finalize = function() {
             }
 
             if ($.dialog === 'properties') {
-                propertiesDialog();
+                delay($.dialog, propertiesDialog.bind(this, 3));
             }
 
             if (scsharesuiupd) {
@@ -1238,12 +1301,14 @@ function execsc() {
         scparser.$call(a, scnodes);
 
         // If there is any listener waiting for acknowledge from API, dispatch it.
-        if (typeof M.scAckQueue[a.i] === 'function') {
+        var cid = M.scAckQueue[a.i] ? a.i : a.a + '.' + a.i;
+
+        if (typeof M.scAckQueue[cid] === 'function') {
             if (d) {
                 console.debug('execsc: dispatching ' + a.i);
             }
-            onIdle(M.scAckQueue[a.i]);
-            delete M.scAckQueue[a.i];
+            onIdle(M.scAckQueue[cid].bind(null, a, scnodes));
+            delete M.scAckQueue[cid];
         }
 
         if (a.a === 's' || a.a === 's2') {
@@ -1254,7 +1319,7 @@ function execsc() {
     } while (Date.now()-tick < 200);
 
     if (d) console.log("Processed " + tickcount + " SC commands in the past 200 ms");
-    setTimeout(execsc, 1);
+    onIdle(execsc);
 }
 
 // a node was updated significantly: write to DB and redraw
@@ -1742,7 +1807,6 @@ function worker_procmsg(ev) {
                 }
             }
 
-            ufsc.save();
             loadfm_callback(residualfm);
             residualfm = false;
         }
@@ -1755,11 +1819,6 @@ function worker_procmsg(ev) {
 // the FM DB engine (cf. mDB.js)
 var fmdb;
 var ufsc;
-
-mBroadcaster.once('startMega', function() {
-    // Initialize ufs size cache
-    ufsc = new UFSSizeCache();
-});
 
 function loadfm(force) {
     "use strict";
@@ -1832,6 +1891,9 @@ function fetchfm(sn) {
     // before showing the filemanager
     initialscfetch = true;
 
+    // Initialize ufs size cache
+    ufsc = new UFSSizeCache();
+
     var promise;
     if (is_mobile) {
         promise = MegaPromise.resolve();
@@ -1902,11 +1964,17 @@ function dbfetchfm() {
             fmdb.get('mk').always(function get_mk(r) {
                 crypto_missingkeysfromdb(r);
 
+                mega.loadReport.pn1 = Date.now() - mega.loadReport.stepTimeStamp;
+
                 fmdb.get('u').always(function get_u(r) {
                     process_u(r, true);
 
+                    mega.loadReport.pn2 = Date.now() - mega.loadReport.stepTimeStamp;
+
                     fmdb.get('s').always(function get_s(r) {
                         var promises = [];
+
+                        mega.loadReport.pn3 = Date.now() - mega.loadReport.stepTimeStamp;
 
                         for (i = r.length; i--;) {
                             if (r[i].su) {
@@ -1921,6 +1989,8 @@ function dbfetchfm() {
                                 promises.push(M.nodeShare(r[i].h, r[i], true));
                             }
                         }
+
+                        mega.loadReport.pn4 = Date.now() - mega.loadReport.stepTimeStamp;
 
                         var tables = {
                             opc: processOPC,
@@ -1949,8 +2019,9 @@ function dbfetchfm() {
                             });
                             promises.push(promise);
                         });
+                        mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
 
-                        MegaPromise.allDone(promises).wait(function dbfetchfm_done() {
+                        MegaPromise.allDone(promises).always(function dbfetchfm_done() {
 
                             mega.loadReport.mode = 1;
                             mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
@@ -2102,6 +2173,12 @@ function ddtype(ids, toid, alt) {
  * @returns {doShare.$promise|MegaPromise}
  */
 function doShare(nodeId, targets, dontShowShareDialog) {
+    'use strict';
+
+    if (!nodeId || !targets || !targets.length) {
+        console.error('Invalid parameters for doShare()', nodeId, targets);
+        return MegaPromise.reject(EARGS);
+    }
 
     var masterPromise = new MegaPromise();
     var logger = MegaLogger.getLogger('doShare');
@@ -2140,11 +2217,27 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                             setLastInteractionWith(user, "0:" + unixtime());
                         }
                         else {
-                            logger.warn('Invalid user (%s[%s]): c=%s',
-                                user,
-                                users[k].u,
-                                M.u[user] ? String(M.u[user].c) : 'unknown!',
-                                M.u[user], users[k]);
+                            var isPendingContact = false;
+
+                            if (users[k].m) {
+                                for (var pid in M.opc) {
+                                    if (M.opc[pid].m === users[k].m) {
+                                        isPendingContact = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!isPendingContact) {
+                                logger.warn('Invalid user (%s[%s]): c=%s',
+                                    user,
+                                    users[k].u,
+                                    M.u[user] ? String(M.u[user].c) : 'unknown!',
+                                    M.u[user], users[k]);
+                            }
+                            else {
+                                logger.debug('Finished share action with pending contact.', JSON.stringify(users[k]));
+                            }
                         }
                     }
                 }
@@ -2198,7 +2291,8 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                     // 'u' is returned user handle, 'r' is access right
                     var usersWithHandle = [];
 
-                    if (M.u[userHandle] && M.u[userHandle].c !== 0) {
+                    // M.u[].c might be 0 for invisible/removed, or undefined for pending contact
+                    if (M.u[userHandle] && M.u[userHandle].c) {
                         usersWithHandle.push({ 'r': ctx.shareAccessRightsLevel, 'u': userHandle });
                     }
                     else {
@@ -2284,13 +2378,24 @@ function processmove(apireq) {
     }
 }
 
-function process_f(f, cb) {
+function process_f(f, cb, updateVersioning) {
     "use strict";
 
     if (f) {
         for (var i = 0; i < f.length; i++) {
-            M.addNode(f[i]);
-            ufsc.addNode(f[i]);
+            var n = f[i];
+            if (updateVersioning) {
+                // this is a response from updating versioning, clear the previous versions first.
+                if (M.d[n.h]) {
+                    M.delNode(n.h);
+                    ufsc.delNode(n.h);
+                }
+            }
+            M.addNode(n);
+            if (updateVersioning) {
+                M.d[n.h].fv = 1;
+            }
+            ufsc.addNode(n);
         }
 
         if (cb) {
@@ -2522,6 +2627,11 @@ function processPS(pendingShares, ignoreDB) {
                     'r':shareRights,
                     'ts':timeStamp
                 }, ignoreDB);
+
+                if (M.d[nodeHandle] && M.d[nodeHandle].t) {
+                    // Update M.IS_SHARED flag
+                    ufsc.addTreeNode(M.d[nodeHandle]);
+                }
             }
 
             if (fminitialized) {
@@ -2856,6 +2966,11 @@ function loadfm_callback(res) {
             processPH(res.ph);
         }
 
+        // Handle versioning nodes
+        if (res.f2) {
+            process_f(res.f2, null, true);
+        }
+
         // decrypt hitherto undecrypted nodes
         crypto_fixmissingkeys(missingkeys);
 
@@ -2875,6 +2990,10 @@ function loadfm_callback(res) {
         mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = Date.now();
+
+        // Time to save the ufs-size-cache, from which M.tree nodes will be created and being
+        // those dependant on in-memory-nodes from the initial load to set flags such SHARED.
+        ufsc.save();
 
         // retrieve initial batch of action packets, if any
         // we'll then complete the process using loadfm_done
@@ -2978,7 +3097,10 @@ function loadfm_done(mDBload) {
                 mega.loadReport.sent = true;
 
                 var r = mega.loadReport;
+                var tick = Date.now() - r.aliveTimeStamp;
+
                 r.totalTimeSpent = Date.now() - mega.loadReport.startTime;
+
                 r = [
                     r.mode, // 1: DB, 2: API
                     r.recvNodes, r.procNodes, r.procAPs,
@@ -3002,12 +3124,18 @@ function loadfm_done(mDBload) {
                     r.ttlb | 0, // time to last byte
                     r.ttfm | 0, // time to fm since ttlb
                     u_type === 3 ? (mBroadcaster.crossTab.master ? 1 : 0) : -1, // master, or slave tab?
+                    r.pn1, r.pn2, r.pn3, r.pn4, r.pn5, // procNodes steps
+                    Object.keys(M.tree || {}).length, // total tree nodes
+                    r.invisibleTime | 0, // time spent as background tab
                 ];
 
                 if (d) {
-                    console.debug('loadReport', r);
+                    console.debug('loadReport', r, tick, document.hidden);
                 }
-                api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+
+                if (!(tick > 2100) && !document.hidden) {
+                    api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+                }
             }
 
             if (mDBload) {

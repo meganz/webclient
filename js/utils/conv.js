@@ -180,7 +180,19 @@
     };
 
 
-
+    /**
+     * Compare to arrays and return a diff ({'removed': [...], 'added': [...]}) object
+     *
+     * @param {Array} old_arr
+     * @param {Array} new_arr
+     * @returns {{removed, added}}
+     */
+    array.diff = function(old_arr, new_arr) {
+        return {
+            'removed': old_arr.filter(function(v) { return new_arr.indexOf(v) < 0; }),
+            'added': new_arr.filter(function(v) { return old_arr.indexOf(v) < 0; }),
+        };
+    };
 
 
     /**
@@ -231,3 +243,60 @@ function hex2bin(hex) {
 
     return String.fromCharCode.apply(String, bytes);
 }
+
+
+(function uh64(global) {
+    'use strict';
+
+    function getInt32(data, offset) {
+        return data[offset] | data[offset + 1] << 8 | data[offset + 2] << 16 | data[offset + 3] << 24;
+    }
+
+    function makeClass(o) {
+        return {value: Object.create(null, Object.getOwnPropertyDescriptors(o))};
+    }
+
+    /**
+     * Helper to deal with user-handles as int64_t (ala SDK)
+     * @param {String} aUserHandle The 11 chars long user handle
+     * @constructor
+     * @global
+     */
+    function UH64(aUserHandle) {
+        if (!(this instanceof UH64)) {
+            return new UH64(aUserHandle);
+        }
+
+        try {
+            this.buffer = new Uint8Array(base64_to_ab(aUserHandle), 0, 8);
+            this.lo = getInt32(this.buffer, 0);
+            this.hi = getInt32(this.buffer, 4);
+        }
+        catch (ex) {}
+    }
+
+    Object.defineProperty(UH64, 'prototype', makeClass({
+        constructor: UH64,
+        mod: function mod(n) {
+            var r = 0;
+            var b = 64;
+
+            if (!this.buffer) {
+                return false;
+            }
+
+            while (b--) {
+                r <<= 1;
+                r |= (b < 32 ? this.lo >>> b : this.hi >>> b - 32) & 1;
+                if (r >= n) {
+                    r = r + ~n + 1 | 0;
+                }
+            }
+
+            return r;
+        }
+    }));
+
+    global.UH64 = UH64;
+
+})(self);

@@ -1,4 +1,19 @@
 function accountUI() {
+    "use strict";
+
+    // Prevent ephemeral session to access account settings via url
+    if (u_type === 0) {
+        msgDialog('confirmation', l[998], l[17146]
+            + ' ' + l[999], l[1000], function(e) {
+            if (e) {
+                loadSubPage('register');
+                return false;
+            }
+            loadSubPage('fm');
+        });
+
+        return false;
+    }
 
     $('.fm-account-notifications').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
@@ -236,6 +251,19 @@ function accountUI() {
             $('.account.plan-info-row.bandwidth').hide();
         }
 
+        // Bind Inpust Focus/Blur events
+        $('.fm-account-input input').rebind('focus', function() {
+            var $wrapper = $(this).parent();
+
+            if (!$wrapper.hasClass('disabled')) {
+                $wrapper.addClass('focused');
+            }
+        });
+
+        $('.fm-account-input input').rebind('blur', function() {
+            $(this).parent().removeClass('focused');
+        });
+
         // Upgrade Account Button
         $('.default-white-button.upgrade-to-pro').rebind('click', function() {
             loadSubPage('pro');
@@ -292,6 +320,11 @@ function accountUI() {
                 return false;
             });
 
+        perc_c = Math.floor(account.space_used / account.space * 100);
+        if (perc_c > 100) {
+            perc_c = 100;
+        }
+
         // Cloud drive
         $('.account.progress-size.cloud-drive').text(
             account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
@@ -315,8 +348,10 @@ function accountUI() {
         );
         // Progressbar
         $('.tab-content .account.progress-bar').css('width', perc_c + '%');
-
-
+        // Versioning
+        $('.tab-content .account.progress-size.versioning').text(
+            bytesToSize(account.stats[M.RootID].vbytes)
+        );
         /* achievements */
         if (!account.maf) {
             $('.fm-right-account-block').removeClass('active-achievements');
@@ -358,7 +393,8 @@ function accountUI() {
         $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
         $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
 
-        var $passwords = $('#account-password,#account-new-password,#account-confirm-password').unbind('click');
+        var $passwords = $('#account-password,#account-new-password,#account-confirm-password');
+        $passwords.unbind('click');
 
         M.account.sessions.sort(function(a, b) {
             if (a[0] < b[0]) {
@@ -661,6 +697,7 @@ function accountUI() {
         var $cancelButton = $saveBlock.find('.fm-account-cancel');
         var $saveButton = $saveBlock.find('.fm-account-save');
 
+        $('#account-password').val('');
         $('#account-new-password').val('');
         $('#account-confirm-password').val('');
 
@@ -735,6 +772,9 @@ function accountUI() {
             $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             $saveBlock.addClass('hidden');
             $personalInfoBlock.removeClass('email-confirm');
+            $('#account-password').val('');
+            $('#account-new-password').val('');
+            $('#account-confirm-password').val('');
             accountUI();
         });
 
@@ -778,6 +818,7 @@ function accountUI() {
                         if (res === u_handle) {
                             $('.user-name').text(u_attr.name);
                             showToast('settings', l[7698]);
+                            accountUI();
                         }
                     }
                 });
@@ -848,13 +889,15 @@ function accountUI() {
                             u_attr.k = a32_to_base64(encrypt_key(pw_aes, u_k));
                             $passwords.val('');
                         }
+                        accountUI();
                     }
                 });
             }
             else if ($('#account-password').val() !== ''
                     && $('#account-confirm-password').val() === $('#account-password').val()) {
                 msgDialog('warninga', l[135], l[16664]);
-                $passwords.val('');
+                $('#account-confirm-password').val('');
+                $('#account-new-password').val('');
             }
             else {
                 $passwords.val('');
@@ -894,7 +937,6 @@ function accountUI() {
             }
 
             $('.fm-account-save-block').addClass('hidden');
-            accountUI();
         });
 
         $('#current-email').val(u_attr.email);
@@ -1148,7 +1190,7 @@ function accountUI() {
         });
 
         var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
-        if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
+        if (fmconfig.tpp) {
 
             $cbTpp.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
             $cbTpp.parent().switchClass('checkboxOff', 'checkboxOn');
@@ -1161,17 +1203,16 @@ function accountUI() {
         $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
             var $this = $(this);
 
-            if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
+            if (fmconfig.tpp) {
                 $this.switchClass('checkboxOn', 'checkboxOff');
                 $this.parent().switchClass('checkboxOn', 'checkboxOff');
-                mega.config.setn('tpp', false);
+                mega.config.setn('tpp', 0);
             }
             else {
                 $this.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
                 $this.parent().switchClass('checkboxOff', 'checkboxOn');
-                mega.config.setn('tpp', true);
+                mega.config.setn('tpp', 1);
             }
-
         });
 
         $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');
@@ -1286,9 +1327,9 @@ function accountUI() {
                 $('.fm-account-overlay').fadeIn(100);
                 $this.addClass('active');
                 $('.fm-voucher-popup').removeClass('hidden');
-                voucherCentering($this);
+                accountUI.voucherCentering($this);
                 $(window).rebind('resize.voucher', function(e) {
-                    voucherCentering($this);
+                    accountUI.voucherCentering($this);
                 });
 
                 $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button').rebind('click.closeDialog', function() {
@@ -1583,6 +1624,7 @@ function accountUI() {
 
     $('.account.tab-lnk').rebind('click', function() {
         if (!$(this).hasClass('active')) {
+            $('.fm-account-save-block').addClass('hidden');
             var $this = $(this);
             var $sectionBlock = $this.closest('.fm-account-sections');
             var currentTab = $this.attr('data-tab');
@@ -2315,5 +2357,24 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                 $(this).val(presenceInt.userPresence.autoawaytimeout / 60);
             })
             .val(lastValidNumber);
+    }
+};
+
+accountUI.voucherCentering = function voucherCentering($button) {
+    'use strict';
+
+    var $popupBlock = $('.fm-voucher-popup');
+    var popupHeight = $popupBlock.outerHeight();
+
+    $popupBlock.css({
+        'top': $button.offset().top - popupHeight - 10,
+        'right': $('body').outerWidth() - $button.outerWidth() - $button.offset().left
+    });
+
+    if ($button.offset().top + 10 > popupHeight) {
+        $popupBlock.css('top', $button.offset().top - popupHeight - 10);
+    }
+    else {
+        $popupBlock.css('top', $button.offset().top + $button.outerHeight() + 10);
     }
 };

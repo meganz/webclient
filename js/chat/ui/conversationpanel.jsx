@@ -6,6 +6,7 @@ var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
 var ButtonsUI = require('./../../ui/buttons.jsx');
 var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
+var CloudBrowserModalDialog = require('./../../ui/cloudBrowserModalDialog.jsx');
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationsUI = require('./../ui/conversations.jsx');
@@ -738,7 +739,7 @@ var ConversationPanel = React.createClass({
     },
 
     uploadFromComputer: function() {
-        $('#fileselect1').trigger('click')
+        this.props.chatRoom.uploadFromComputer();
     },
     refreshUI: function() {
         var self = this;
@@ -1398,7 +1399,7 @@ var ConversationPanel = React.createClass({
         var attachCloudDialog = null;
         if (self.state.attachCloudDialog === true) {
             var selected = [];
-            attachCloudDialog = <ModalDialogsUI.CloudBrowserDialog
+            attachCloudDialog = <CloudBrowserModalDialog.CloudBrowserDialog
                 folderSelectNotAllowed={true}
                 onClose={() => {
                     self.setState({'attachCloudDialog': false});

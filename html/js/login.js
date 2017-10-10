@@ -36,7 +36,7 @@ function dologin() {
                                 alert(l[732]);
                             }
                             else if (typeof res[0] === 'string') {
-                                if (u_type) {
+                                if (u_type) {									
                                     if (login_next) {
                                         loadSubPage(login_next);
                                     }

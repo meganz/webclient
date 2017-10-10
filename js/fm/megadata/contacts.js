@@ -16,7 +16,7 @@ MegaData.prototype.contactstatus = function(h, wantTimeStamp) {
                     if (n.t) {
                         folders++;
                     }
-                    else {
+                    else if (!n.fv) {
                         files++;
                     }
                 }
@@ -146,7 +146,32 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
             $('.contact-requests-grid').removeClass('hidden');
 
             initIpcGridScrolling();
-            initBindIPC();
+
+            /**
+             * Bind actions to Received Pending Conctact Request buttons
+             */
+            $('.contact-requests-grid .contact-request-button').rebind('click', function() {
+
+                var $self = $(this);
+                var $reqRow = $self.closest('tr');
+                var ipcId = $reqRow.attr('id').replace('ipc_', '');
+
+                if ($self.is('.accept')) {
+                    if (M.acceptPendingContactRequest(ipcId) === 0) {
+                        $reqRow.remove();
+                    }
+                }
+                else if ($self.is('.delete')) {
+                    if (M.denyPendingContactRequest(ipcId) === 0) {
+                        $reqRow.remove();
+                    }
+                }
+                else if ($self.is('.ignore')) {
+                    if (M.ignorePendingContactRequest(ipcId) === 0) {
+                        $reqRow.remove();
+                    }
+                }
+            });
         }
     }
 };
@@ -248,7 +273,31 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
             $('.sent-requests-grid').removeClass('hidden');
 
             initOpcGridScrolling();
-            initBindOPC();
+
+            /**
+             * Bind actions to Received pending contacts requests buttons
+             */
+
+            $('.sent-requests-grid .contact-request-button').rebind('click', function() {
+                var $self = $(this);
+                var $reqRow = $self.closest('tr');
+                var opcId = $reqRow.attr('id').replace('opc_', '');
+
+                if ($self.is('.reinvite')) {
+                    M.reinvitePendingContactRequest(M.opc[opcId].m);
+                    $reqRow.children().children('.contact-request-button.reinvite').addClass('hidden');
+                }
+                else if ($self.is('.cancel')) {
+
+                    // If successfully deleted, grey column and hide buttons
+                    if (M.cancelPendingContactRequest(M.opc[opcId].m) === 0) {
+                        $(this).addClass('hidden');
+                        $reqRow.children().children('.contact-request-button.cancel').addClass('hidden');
+                        $reqRow.children().children('.contact-request-button.reinvite').addClass('hidden');
+                        $reqRow.addClass('deleted');
+                    }
+                }
+            });
         }
     }
 };
@@ -701,7 +750,7 @@ MegaData.prototype.delIPC = function(id) {
  */
 MegaData.prototype.addPS = function(ps, ignoreDB) {
     if (!this.ps[ps.h]) {
-        this.ps[ps.h] = {};
+        this.ps[ps.h] = Object.create(null);
     }
     this.ps[ps.h][ps.p] = ps;
 

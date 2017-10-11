@@ -1227,8 +1227,9 @@ function siteLoadError(error, filename) {
     if (!is_extension) {
         message.push('Please try again later. We apologize for the inconvenience.');
     }
-    message.push("If the problem persist, please try disabling all third-party browser "
-                + "extensions and reload your browser. If that doesn't help, contact support@mega.nz");
+    message.push("If the problem persists, please try disabling all third-party browser extensions, " +
+                 "update your browser and MEGA browser extension to the latest version and reload the page. " +
+                 "If that does not help, contact support@mega.nz");
 
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
 

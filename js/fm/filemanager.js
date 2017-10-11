@@ -1958,7 +1958,6 @@ FileManager.prototype.addContactUI = function() {
     "use strict";
 
     $('.nw-contact-item').removeClass('selected');
-    $('.contact-details-pad .grid-url-arrow').unbind('click');
 
     var n = this.u[this.currentdirid];
     if (n && n.u) {
@@ -1976,25 +1975,6 @@ FileManager.prototype.addContactUI = function() {
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
         $('.contact-top-details .contact-details-user-name').text(this.getNameByHandle(user.u));
         $('.contact-top-details .contact-details-email').text(user.m);
-
-        $('.contact-details-pad .grid-url-arrow').rebind('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation(); // do not treat it as a regular click on the file
-            // $(this).addClass('active');
-            $('.dropdown.body').addClass('arrange-to-front');
-            e.currentTarget = $(this);
-            e.calculatePosition = true;
-            $.selected = [getSitePath().replace('/fm/', '')];
-            M.searchPath();
-            if (!$(this).hasClass('active')) {
-                M.contextMenuUI(e, 4);
-                $(this).addClass('active');
-            }
-            else {
-                $.hideContextMenu();
-                $(this).removeClass('active');
-            }
-        });
 
         // Display the current fingerpring
         showAuthenticityCredentials(user);

@@ -4024,10 +4024,33 @@ React.makeElement = React['createElement'];
 	        if (room.megaChat.rtc && room.megaChat.rtc.gLocalStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
 	            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
 	        }
+
+	        $(room).rebind('toggleMessages.av', function () {
+	            self.toggleMessages();
+	        });
+
+	        room.messagesBlockEnabled = self.state.messagesBlockEnabled;
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        var room = self.props.chatRoom;
+
+	        var $container = $(ReactDOM.findDOMNode(self));
+	        if ($container) {
+	            $container.unbind('mouseover.chatUI' + self.props.chatRoom.roomId);
+	            $container.unbind('mouseout.chatUI' + self.props.chatRoom.roomId);
+	            $container.unbind('mousemove.chatUI' + self.props.chatRoom.roomId);
+	        }
+
+	        $(document).unbind("fullscreenchange.megaChat_" + room.roomId);
+	        $(window).unbind('resize.chatUI_' + room.roomId);
+	        $(room).unbind('toggleMessages.av');
 	    },
 	    toggleMessages: function toggleMessages(e) {
-	        e.preventDefault();
-	        e.stopPropagation();
+	        if (e) {
+	            e.preventDefault();
+	            e.stopPropagation();
+	        }
 
 	        if (this.props.onMessagesToggle) {
 	            this.props.onMessagesToggle(!this.state.messagesBlockEnabled);
@@ -10375,6 +10398,9 @@ React.makeElement = React['createElement'];
 	    var self = this;
 
 	    if (self.isCurrentlyActive) {
+	        if (!self.messagesBlockEnabled && self.callManagerCall && self.getUnreadCount() > 0) {
+	            $(self).trigger('toggleMessages');
+	        }
 	        return false;
 	    }
 	    self.megaChat.hideAllChats();

@@ -155,7 +155,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
         args = undefined;
     };
 
-    if (z || preview || !fmconfig.dlThroughMEGAsync) {
+    if (!folderlink && (z || preview || !fmconfig.dlThroughMEGAsync)) {
         return webdl();
     }
 

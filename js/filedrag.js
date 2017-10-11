@@ -411,6 +411,9 @@
                 }
                 if (f.name != '.') {
                     u.push(f);
+                    if (Math.floor(f.lastModified / 1000) === Math.floor(Date.now() / 1000)) {
+                        api_req({a: 'log', e: 99659, m: 'file modification time uses current time for uploading.'});
+                    }
                 }
             }
             M.addUpload(u);

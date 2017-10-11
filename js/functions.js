@@ -751,6 +751,9 @@ function srvlog2(type /*, ...*/) {
             if (is_chrome_firefox) {
                 version = window.mozMEGAExtensionVersion || buildVersion.firefox;
             }
+            else if (is_firefox_web_ext) {
+                version = buildVersion.firefox;
+            }
             else if (window.chrome) {
                 version = buildVersion.chrome;
             }

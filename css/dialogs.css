@@ -1600,8 +1600,7 @@ li.token-input-token-invite .input-close {
     left: -1536px;
 }
 .megasync-slider.body-block {
-    width: 2304px;
-    min-height: 422px;
+    min-height: 481px;
     position: relative;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -1609,38 +1608,40 @@ li.token-input-token-invite .input-close {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
-.files-ammount .megasync-slider.body-block {
-    width: 3072px;
-}
 .megasync-info-txt a {
     cursor: pointer;
 }
 .megasync-slide {
     width: 768px;
-    min-height: 422px;
-    float: left;
-    position: relative;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
+    min-height: 481px;
+    position: absolute;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+    left: 0;
+    visibility: hidden;
 }
-.megasync-slide.slide0 {
-    display: none;
+.megasync-slide.next {
+    left: 100%;
+}
+.megasync-slide.prev {
+    left: -100%;
 }
 .files-ammount .megasync-slide.slide0 {
     display: block;
 }
-.slide0 .megasync-slide.slide0, .slide1 .megasync-slide.slide1, .slide2 .megasync-slide.slide2, .slide3 .megasync-slide.slide3 {
+.megasync-slide.current {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
+    visibility: visible;
 }
 .megasync-slide.slide2 {
     text-align: left;
@@ -1661,7 +1662,7 @@ li.token-input-token-invite .input-close {
     height: 393px;
 }
 .megasync-img.img0::before {
-    background-position: center -969px;
+    background-position: center -1069px;
     width: 600px;
     height: 200px;
     bottom: auto;

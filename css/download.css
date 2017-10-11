@@ -570,7 +570,7 @@
     height: 100%;
     position: absolute;
 }
-.slide1 .megasync-slider.prev, .slide3 .megasync-slider.next {
+.megasync-slider.prev.disabled, .megasync-slider.next.disabled {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;

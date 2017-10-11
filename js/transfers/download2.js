@@ -1861,7 +1861,6 @@ var dlmanager = {
         'use strict';
 
         var $overlay = $('.megasync-overlay');
-        var slidesNum = $('.megasync-controls div').length;
         var $body = $('body');
 
         var hideOverlay = function() {
@@ -1873,42 +1872,61 @@ var dlmanager = {
         $overlay.addClass('msd-dialog').removeClass('hidden downloading');
         $body.addClass('overlayed');
 
+        var $slides = $overlay.find('.megasync-slide');
+        var $currentSlide = $slides.filter('.megasync-slide:not(.hidden)').first();
+        var $sliderControl = $overlay.find('.megasync-slider.button');
+        var $sliderPrevButton = $sliderControl.filter('.prev');
+        var $sliderNextButton = $sliderControl.filter('.next');
+
+        $slides.removeClass('prev current next');
+        $currentSlide.addClass('current');
+        $currentSlide.prev().not('.hidden').addClass('prev');
+        $currentSlide.next().not('.hidden').addClass('next');
+        $sliderPrevButton.addClass('disabled');
+        $sliderNextButton.removeClass('disabled');
+
+        $sliderControl.rebind('click', function() {
+            var $this = $(this);
+            var $currentSlide = $overlay.find('.megasync-slide.current');
+            var $prevSlide = $currentSlide.prev().not('.hidden');
+            var $nextSlide = $currentSlide.next().not('.hidden');
+
+            if ($this.hasClass('prev') && $prevSlide.length) {
+                $slides.removeClass('prev current next');
+                $prevSlide.addClass('current');
+                $currentSlide.addClass('next');
+                $sliderNextButton.removeClass('disabled');
+
+                if ($prevSlide.prev().not('.hidden').length) {
+                    $prevSlide.prev().addClass('prev');
+                    $sliderPrevButton.removeClass('disabled');
+                }
+                else {
+                    $sliderPrevButton.addClass('disabled');
+                }
+            }
+            else if ($nextSlide.length) {
+                $slides.removeClass('prev current next');
+                $nextSlide.addClass('current');
+                $currentSlide.addClass('prev');
+                $sliderPrevButton.removeClass('disabled');
+
+                if ($nextSlide.next().not('.hidden').length) {
+                    $nextSlide.next().addClass('next');
+                    $sliderNextButton.removeClass('disabled');
+                }
+                else {
+                    $sliderNextButton.addClass('disabled');
+                }
+            }
+        });
+
         if (onSizeExceed) {
             dlmanager.setBrowserWarningClasses('.megasync-bottom-warning', $overlay, dlStateError);
         }
 
         $('.big-button.download-megasync', $overlay).rebind('click', function() {
             megasync.download(dlpage_ph, dlpage_key);
-        });
-
-        $('.megasync-slider.button', $overlay).rebind('click', function() {
-            var $this = $(this);
-            var activeSlide = parseInt($('.megasync-controls div.active').attr('data-slidernum'));
-
-            if ($this.hasClass('prev')) {
-                if (activeSlide > 1) {
-                    $('.megasync-controls div.active').removeClass('active').prev().addClass('active');
-                    $('.megasync-content.slider')
-                        .removeClass('slide1 slide2 slide3')
-                        .addClass('slide' + (activeSlide - 1));
-                }
-            }
-            else {
-                if (activeSlide < slidesNum) {
-                    $('.megasync-controls div.active').removeClass('active').next().addClass('active');
-                    $('.megasync-content.slider')
-                        .removeClass('slide1 slide2 slide3')
-                        .addClass('slide' + (activeSlide + 1));
-                }
-            }
-        });
-
-        $('.megasync-controls div', $overlay).rebind('click', function() {
-            $('.megasync-content.slider')
-                .removeClass('slide1 slide2 slide3')
-                .addClass('slide' + $(this).attr('data-slidernum'));
-            $('.megasync-controls div.active').removeClass('active');
-            $(this).addClass('active');
         });
 
         $('.megasync-info-txt a', $overlay).rebind('click', function() {
@@ -2241,19 +2259,9 @@ function fm_tfsupdate() {
     }
 
     M.pendingTransfers = i + u;
-    var t;
-    if (i) {
-        tfse.domDownloadBlock.textContent = (i);
-    }
-    else {
-        tfse.domDownloadBlock.textContent = '';
-    }
-    if (u) {
-        tfse.domUploadBlock.textContent = (u);
-    }
-    else {
-        tfse.domUploadBlock.textContent = '';
-    }
+    tfse.domUploadBlock.textContent = u || '';
+    tfse.domDownloadBlock.textContent = i || '';
+
     if (!i && !u) {
         mega.ui.tpp.hide();
     }

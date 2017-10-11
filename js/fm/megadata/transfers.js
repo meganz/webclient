@@ -350,6 +350,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (d) {
             console.log('Downloads exceed max size', entries.length, entries);
         }
+        mega.config.set('dlThroughMEGAsync', 1);
         return dlmanager.showMEGASyncOverlay(true);
     }
 

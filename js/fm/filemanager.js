@@ -1022,6 +1022,22 @@ FileManager.prototype.initContextUI = function() {
         fmremove();
     });
 
+    $(c + '.addcontact-item').rebind('click', function() {
+        M.safeShowDialog('add-contact-popup', function() {
+            contactAddDialog();
+            $('.fm-add-user').trigger('click');
+            $('.add-user-size-icon').trigger('click');
+
+            $(window).rebind('keydown.esc_contact_dialog', function(e) {
+                if (e.keyCode === 27) {
+                    closeDialog();
+                }
+            });
+
+            return $dialog;
+        });
+    });
+
     $(c + '.startchat-item').rebind('click', function() {
         var $this = $(this);
         var user_handle = $.selected;

@@ -62,11 +62,11 @@ React.makeElement = React['createElement'];
 
 	var EMOJI_DATASET_VERSION = 2;
 
-	var chatui;
+	var _chatui;
 	var webSocketsSupport = typeof WebSocket !== 'undefined';
 
 	(function () {
-	    chatui = function chatui(id) {
+	    _chatui = function chatui(id) {
 	        var roomOrUserHash = id.replace("chat/", "");
 
 	        var roomType = false;
@@ -74,7 +74,15 @@ React.makeElement = React['createElement'];
 	        if (roomOrUserHash.substr(0, 2) === "g/") {
 	            roomType = "group";
 	            roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
+
 	            if (!megaChat.chats[roomOrUserHash]) {
+
+	                if (ChatdIntegration._loadingChats[roomOrUserHash] && ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.state() === 'pending') {
+	                    ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.done(function () {
+	                        _chatui(id);
+	                    });
+	                    return;
+	                }
 
 	                setTimeout(function () {
 	                    loadSubPage('fm/chat');
@@ -692,11 +700,37 @@ React.makeElement = React['createElement'];
 	        self.currentlyOpenedChat = null;
 	    }
 
+	    if (!chatId && ChatdIntegration._loadingChats[roomId]) {
+
+	        ChatdIntegration._loadingChats[roomId].loadingPromise.done(function () {
+
+	            if (self.chats[roomId]) {
+	                return;
+	            }
+	            var res = self.openChat(userHandles, ap.g === 1 ? "group" : "private", ap.id, ap.cs, ap.url, setAsActive);
+
+	            $promise.linkDoneAndFailTo(res[2]);
+	        }).fail(function () {
+	            $promise.reject(arguments[0]);
+	        });
+
+	        if (setAsActive) {
+
+	            ChatdIntegration._loadingChats[roomId].setAsActive = true;
+	        }
+
+	        return [roomId, undefined, $promise];
+	    }
+
 	    var room = new ChatRoom(self, roomId, type, userHandles, unixtime(), undefined, chatId, chatShard, chatdUrl);
 
 	    self.chats.set(room.roomId, room);
 
 	    if (setAsActive && !self.currentlyOpenedChat) {
+	        room.show();
+	    }
+
+	    if (setAsActive === false && chatId && ChatdIntegration._loadingChats[roomId] && ChatdIntegration._loadingChats[roomId].setAsActive) {
 	        room.show();
 	    }
 
@@ -833,7 +867,7 @@ React.makeElement = React['createElement'];
 
 	    M.onSectionUIOpen('conversations');
 
-	    if (Object.keys(self.chats).length === 0) {
+	    if (Object.keys(self.chats).length === 0 || Object.keys(ChatdIntegration._loadingChats).length !== 0) {
 	        $('.fm-empty-conversations').removeClass('hidden');
 	    } else {
 	        $('.fm-empty-conversations').addClass('hidden');
@@ -844,21 +878,48 @@ React.makeElement = React['createElement'];
 	            self.chats[self.lastOpenedChat].show();
 	            return self.chats[self.lastOpenedChat];
 	        } else {
-
-	            var sortedConversations = obj_values(self.chats.toJS());
-
-	            sortedConversations.sort(M.sortObjFn("lastActivity", -1));
-
-	            if (sortedConversations.length > 0) {
-	                var room = sortedConversations[0];
-	                room.setActive();
-	                room.show();
-	                return room;
+	            if (self.chats.length > 0) {
+	                return self.showLastActive();
 	            } else {
 	                $('.fm-empty-conversations').removeClass('hidden');
 	            }
 	        }
 	    }
+	};
+
+	Chat.prototype.showLastActive = function () {
+	    var self = this;
+
+	    if (self.chats.length > 0 && self.allChatsHadLoadedHistory()) {
+	        var sortedConversations = obj_values(self.chats.toJS());
+
+	        sortedConversations.sort(M.sortObjFn("lastActivity", -1));
+
+	        var room = sortedConversations[0];
+	        if (!room.isActive()) {
+	            room.setActive();
+	            room.show();
+	        }
+
+	        return room;
+	    } else {
+	        return false;
+	    }
+	};
+
+	Chat.prototype.allChatsHadLoadedHistory = function () {
+	    var self = this;
+
+	    var chatIds = self.chats.keys();
+
+	    for (var i = 0; i < chatIds.length; i++) {
+	        var room = self.chats[chatIds[i]];
+	        if (room.isLoading()) {
+	            return false;
+	        }
+	    }
+
+	    return true;
 	};
 
 	Chat.prototype.getPrivateRoom = function (h) {
@@ -872,7 +933,7 @@ React.makeElement = React['createElement'];
 	};
 
 	Chat.prototype.createAndShowPrivateRoomFor = function (h) {
-	    chatui(h);
+	    _chatui(h);
 	    return this.getPrivateRoom(h);
 	};
 
@@ -1014,11 +1075,11 @@ React.makeElement = React['createElement'];
 	};
 
 	window.Chat = Chat;
-	window.chatui = chatui;
+	window.chatui = _chatui;
 
 	module.exports = {
 	    Chat: Chat,
-	    chatui: chatui
+	    chatui: _chatui
 	};
 
 /***/ }),
@@ -1369,7 +1430,7 @@ React.makeElement = React['createElement'];
 	            var megaChat = self.props.megaChat;
 	            if (megaChat.currentlyOpenedChat) {
 
-	                if ($(e.target).is(".messages-textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $('.fm-dialog:visible,.dropdown:visible').length > 0 || $('input:focus,textarea:focus,select:focus').length > 0) {
+	                if (megaChat.currentlyOpenedChat && megaChat.getCurrentRoom().isReadOnly() || $(e.target).is(".messages-textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $('.fm-dialog:visible,.dropdown:visible').length > 0 || $('input:focus,textarea:focus,select:focus').length > 0) {
 	                    return;
 	                }
 
@@ -1491,6 +1552,53 @@ React.makeElement = React['createElement'];
 	            leftPanelStyles.width = self.state.leftPaneWidth;
 	        }
 
+	        var loadingOrEmpty = null;
+	        var megaChat = this.props.megaChat;
+
+	        if (megaChat.chats.length === 0) {
+	            loadingOrEmpty = React.makeElement(
+	                "div",
+	                { className: "fm-empty-messages hidden" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "fm-empty-pad" },
+	                    React.makeElement("div", { className: "fm-empty-messages-bg" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "fm-empty-cloud-txt" },
+	                        l[6870]
+	                    ),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "fm-not-logged-text" },
+	                        React.makeElement("div", { className: "fm-not-logged-description", dangerouslySetInnerHTML: {
+	                                __html: __(l[8762]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
+	                            } }),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "fm-not-logged-button create-account" },
+	                            __(l[968])
+	                        )
+	                    )
+	                )
+	            );
+	        } else if (megaChat.allChatsHadLoadedHistory() === false && !megaChat.currentlyOpenedChat) {
+	            loadingOrEmpty = React.makeElement(
+	                "div",
+	                { className: "fm-empty-messages" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "loading-spinner js-messages-loading light manual-management", style: { "top": "50%" } },
+	                    React.makeElement("div", { className: "main-loader", style: {
+	                            "position": "fixed",
+	                            "top": "50%",
+	                            "left": "50%",
+	                            "marginLeft": "72px"
+	                        } })
+	                )
+	            );
+	        }
+
 	        return React.makeElement(
 	            "div",
 	            { className: "conversationsApp", key: "conversationsApp" },
@@ -1544,32 +1652,7 @@ React.makeElement = React['createElement'];
 	            React.makeElement(
 	                "div",
 	                { className: "fm-right-files-block" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-empty-messages hidden" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "fm-empty-pad" },
-	                        React.makeElement("div", { className: "fm-empty-messages-bg" }),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "fm-empty-cloud-txt" },
-	                            __(l[6870])
-	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "fm-not-logged-text" },
-	                            React.makeElement("div", { className: "fm-not-logged-description", dangerouslySetInnerHTML: {
-	                                    __html: __(l[8762]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
-	                                } }),
-	                            React.makeElement(
-	                                "div",
-	                                { className: "fm-not-logged-button create-account" },
-	                                __(l[968])
-	                            )
-	                        )
-	                    )
-	                ),
+	                loadingOrEmpty,
 	                React.makeElement(ConversationPanelUI.ConversationPanels, _extends({}, this.props, {
 	                    conversations: this.props.megaChat.chats
 	                }))
@@ -4298,7 +4381,7 @@ React.makeElement = React['createElement'];
 	    handleKeyDown: SoonFc(function (e) {
 	        var self = this;
 	        var chatRoom = self.props.chatRoom;
-	        if (self.isMounted() && chatRoom.isActive()) {
+	        if (self.isMounted() && chatRoom.isActive() && !chatRoom.isReadOnly()) {
 	            chatRoom.trigger("onChatIsFocused");
 	        }
 	    }, 150),
@@ -4581,11 +4664,11 @@ React.makeElement = React['createElement'];
 
 	        var messagesList = [];
 
-	        if (self.isRetrievingHistoryViaScrollPull && !self.loadingShown || self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true || self.props.chatRoom.messagesBuff.joined === false || self.props.chatRoom.messagesBuff.joined === true && self.props.chatRoom.messagesBuff.haveMessages === true && self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true || self.props.chatRoom.messagesBuff.isDecrypting && self.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending') {
+	        if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
 	            self.loadingShown = true;
-	        } else if (self.props.chatRoom.messagesBuff.joined === true) {
+	        } else if (room.messagesBuff.joined === true) {
 	            if (!self.isRetrievingHistoryViaScrollPull) {
-	                var headerText = self.props.chatRoom.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
+	                var headerText = room.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
 
 	                headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
 
@@ -4628,7 +4711,7 @@ React.makeElement = React['createElement'];
 	        var lastMessageState = null;
 	        var grouped = false;
 
-	        self.props.chatRoom.messagesBuff.messages.forEach(function (v, k) {
+	        room.messagesBuff.messages.forEach(function (v, k) {
 	            if (!v.protocol && v.revoked !== true) {
 	                var shouldRender = true;
 	                if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false || v.deleted === true) {
@@ -5365,7 +5448,9 @@ React.makeElement = React['createElement'];
 
 	        var conversations = [];
 
-	        if (getSitePath() === "/fm/chat") {
+	        var hadLoaded = ChatdIntegration.allChatsHadLoaded.state() !== 'pending' && ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending' && Object.keys(ChatdIntegration._loadingChats).length === 0;
+
+	        if (hadLoaded && getSitePath() === "/fm/chat") {
 
 	            var activeFound = false;
 	            self.props.conversations.forEach(function (chatRoom) {
@@ -5374,12 +5459,11 @@ React.makeElement = React['createElement'];
 	                }
 	            });
 	            if (self.props.conversations.length > 0 && !activeFound) {
-	                self.props.conversations[self.props.conversations.keys()[0]].setActive();
-	                self.props.conversations[self.props.conversations.keys()[0]].show();
+	                self.props.megaChat.showLastActive();
 	            }
 	        }
 
-	        self.props.conversations.forEach(function (chatRoom) {
+	        hadLoaded && self.props.conversations.forEach(function (chatRoom) {
 	            var otherParticipants = chatRoom.getParticipantsExceptMe();
 
 	            var contact;
@@ -5400,8 +5484,6 @@ React.makeElement = React['createElement'];
 	        if (conversations.length === 0) {
 	            var contactsList = [];
 	            var contactsListOffline = [];
-
-	            var hadLoaded = ChatdIntegration.allChatsHadLoaded.state() !== 'pending' && ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending';
 
 	            if (hadLoaded) {
 	                self.props.contacts.forEach(function (contact) {
@@ -10403,6 +10485,12 @@ React.makeElement = React['createElement'];
 
 	    self.trigger('activity');
 	    self.trigger('onChatShown');
+
+	    Soon(function () {
+	        if (megaChat.$conversationsAppInstance) {
+	            megaChat.$conversationsAppInstance.safeForceUpdate();
+	        }
+	    });
 	};
 
 	ChatRoom.prototype.isActive = function () {
@@ -10415,6 +10503,12 @@ React.makeElement = React['createElement'];
 	    Soon(function () {
 	        loadSubPage(self.getRoomUrl());
 	    });
+	};
+
+	ChatRoom.prototype.isLoading = function () {
+	    var self = this;
+	    var mb = self.messagesBuff;
+	    return mb.messagesHistoryIsLoading() || mb.isDecrypting && mb.isDecrypting.state() === 'pending';
 	};
 
 	ChatRoom.prototype.getRoomUrl = function () {

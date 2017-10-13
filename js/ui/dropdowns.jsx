@@ -7,9 +7,12 @@ var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
 var Dropdown = React.createClass({
     mixins: [MegaRenderMixin],
+    getInitialState: function() {
+        return {}
+    },
     getDefaultProps: function() {
         return {
-            requiresUpdateOnResize: true,
+            'requiresUpdateOnResize': true,
         };
     },
     componentWillUpdate: function(nextProps, nextState) {
@@ -121,15 +124,16 @@ var Dropdown = React.createClass({
         }.bind(this))
     },
     render: function() {
-        var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
-
-
         if (this.props.active !== true) {
-            classes += " hidden";
+
 
             return null;
         }
         else {
+            var classes = (
+                "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className
+            );
+
             var styles;
 
             // calculate and move the popup arrow to the correct position.
@@ -143,8 +147,20 @@ var Dropdown = React.createClass({
 
             var self = this;
 
-            return (
-                <utils.RenderTo element={document.body} className={classes} style={styles}
+            var child = null;
+
+            if (this.props.children) {
+                child = <div>{self.renderChildren()}</div>;
+            }
+            else if (this.props.dropdownItemGenerator) {
+                child = this.props.dropdownItemGenerator(this);
+            }
+            else {
+                child = null;
+            }
+
+
+            return <utils.RenderTo element={document.body} className={classes} style={styles}
                     popupDidMount={(popupElement) => {
                         self.popupElement = popupElement;
                     }}
@@ -153,10 +169,9 @@ var Dropdown = React.createClass({
                     }}>
                     <div>
                         {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
-                        {this.renderChildren()}
+                        {child}
                     </div>
-                </utils.RenderTo>
-            );
+                </utils.RenderTo>;
         }
     }
 });

@@ -868,12 +868,6 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 }
             }
         }
-
-
-        // allow distributed notifications to 3rd party (mainly UI) components
-        // using mBroadcaster
-        mBroadcaster.sendMessage("nodeUpdated_" + n.h);
-
     }
 };
 
@@ -1040,7 +1034,7 @@ MegaData.prototype.favourite = function(handles, newFavState) {
         }
 
         $.each(handles, function(index, handle) {
-            var node = M.d[handle];
+            var node = M.getNodeByHandle(handle);
 
             if (node && !exportLink.isTakenDown(handle)) {
                 node.fav = newFavState;

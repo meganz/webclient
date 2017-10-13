@@ -63,7 +63,6 @@ var GenericConversationMessage = React.createClass({
         var $node = $(self.findDOMNode());
         $node.unbind('onEditRequest.genericMessage');
         $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
-        self._removeNodeListeners();
     },
     _nodeUpdated: function(h) {
         var self = this;
@@ -78,27 +77,6 @@ var GenericConversationMessage = React.createClass({
                 }
             }
         });
-    },
-    _removeNodeListeners: function() {
-        var self = this;
-        if (self.nodeListeners && self.nodeListeners.length > 0) {
-            for (var i = 0; i < self.nodeListeners.length; i++) {
-                mBroadcaster.removeListener(self.nodeListeners[i]);
-            }
-        }
-    },
-    componentDidMount: function() {
-        var self = this;
-        if (self.attachments) {
-            self._removeNodeListeners();
-            self.nodeListeners = [];
-            for (var i = 0; i < self.attachments.length; i++) {
-                var node = self.attachments[i];
-                self.nodeListeners.push(
-                    mBroadcaster.addListener("nodeUpdated_" + node.h, self._nodeUpdated.bind(self, node.h))
-                );
-            }
-        }
     },
     doDelete: function(e, msg) {
         e.preventDefault(e);
@@ -143,7 +121,6 @@ var GenericConversationMessage = React.createClass({
     },
     _favourite: function(h) {
         var newFavState = Number(!M.isFavourite(h));
-
         M.favourite([h], newFavState);
     },
     _addFavouriteButtons: function(h, arr) {
@@ -435,8 +412,6 @@ var GenericConversationMessage = React.createClass({
 
                         var dropdown = null;
                         var previewButton = null;
-                        var linkButtons = [];
-                        var firstGroupOfButtons = [];
 
                         if (!attachmentMetaInfo.revoked) {
                             if (v.fa && (icon === "graphic" || icon === "image")) {
@@ -453,36 +428,8 @@ var GenericConversationMessage = React.createClass({
                                 </span>;
                             }
                             if (contact.u === u_handle) {
-                                var revokeButton = null;
-
-                                var linkState = self._addLinkButtons(v.h, linkButtons);
-
-                                if (message.isEditable && message.isEditable()) {
-                                    revokeButton = <DropdownsUI.DropdownItem icon="red-cross" label={__(l[83])}
-                                                className="red" onClick={() => {
-                                                    chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
-                                                        chatRoom,
-                                                        message.internalId ? message.internalId : message.orderValue,
-                                                    ""
-                                                    );
-                                              }} />
-                                }
-
-                                firstGroupOfButtons.push(
-                                    <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
-                                                              key="infoDialog"
-                                                              onClick={() => {
-                                        $.selected = [v.h];
-                                        propertiesDialog();
-                                    }} />
-                                );
-
-                                var favState = self._addFavouriteButtons(v.h, firstGroupOfButtons);
-
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
-                                    linkState={linkState}
-                                    favState={favState}
                                     icon="tiny-icon grey-down-arrow">
                                     <DropdownsUI.Dropdown
                                         ref={(refObj) => {
@@ -493,26 +440,56 @@ var GenericConversationMessage = React.createClass({
                                         positionMy="left bottom"
                                         positionAt="right bottom"
                                         horizOffset={4}
-                                        linkState={linkState}
-                                        favState={favState}
                                         onBeforeActiveChange={(newState) => {
                                             if (newState === true) {
                                                 self.forceUpdate();
                                             }
                                         }}
-                                    >
-                                        {firstGroupOfButtons}
-                                        {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
-                                        {previewButton}
-                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
-                                                                  onClick={self._startDownload.bind(self, v)}/>
-                                        {linkButtons}
-                                        {revokeButton ? <hr /> : ""}
-                                        {revokeButton}
+                                        dropdownItemGenerator={function(dd) {
+                                            var linkButtons = [];
+                                            var firstGroupOfButtons = [];
+                                            var revokeButton = null;
+                                            if (message.isEditable && message.isEditable()) {
+                                                revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
+                                                    label={__(l[83])} className="red" onClick={() => {
+                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
+                                                            chatRoom,
+                                                            (
+                                                                message.internalId ?
+                                                                    message.internalId : message.orderValue
+                                                            ),
+                                                            ""
+                                                        );
+                                                    }} />
+                                            }
 
-                                    </DropdownsUI.Dropdown>
+                                            self._addLinkButtons(v.h, linkButtons);
+
+                                            firstGroupOfButtons.push(
+                                                <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
+                                                                          key="infoDialog"
+                                                                          onClick={() => {
+                                                                              $.selected = [v.h];
+                                                                              propertiesDialog();
+                                                                          }} />
+                                            );
+
+
+                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+
+                                            return <div>
+                                                {firstGroupOfButtons}
+                                                {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
+                                                {previewButton}
+                                                <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
+                                                                          onClick={self._startDownload.bind(self, v)}/>
+                                                {linkButtons}
+                                                {revokeButton ? <hr /> : ""}
+                                                {revokeButton}
+                                            </div>;
+                                        }}
+                                    />
                                 </ButtonsUI.Button>;
-
 
                             }
                             else {

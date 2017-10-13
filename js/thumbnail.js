@@ -85,9 +85,10 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         // thumbnail:
         if (fa.indexOf(':0*') < 0) {
+            // XXX: Make this width/height divisible by 16 for optimal SmartCrop results!
             var options = {
-                width: 200,
-                height: 200
+                width: 240,
+                height: 240
             };
 
             canvas = document.createElement('canvas');
@@ -112,7 +113,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     (options.height / 2) - (this.naturalHeight / 2));
             }
 
-            dataURI = canvas.toDataURL(imageType, 0.70);
+            dataURI = canvas.toDataURL(imageType, 0.80);
             // if (d) console.log('THUMBNAIL', dataURI);
             if (MurmurHash3(dataURI, 0x7fee00aa) === MURMURHASH3RR) {
                 console.error('Error generating thumbnail, aborting...');
@@ -164,7 +165,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
             }
 
-            if (node) {
+            if (node && filetype(n) !== 'PDF Document') {
                 previewimg(node, ab);
             }
 
@@ -348,9 +349,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 }
             }
             else {
-                file = new Blob([new Uint8Array(imagedata)], {
-                    type: 'image/jpeg'
-                });
+                file = new Blob([new Uint8Array(imagedata)], {type: filemime(M.d[node], 'image/jpeg')});
                 M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);

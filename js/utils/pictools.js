@@ -62,11 +62,12 @@ is_image.raw = {
 };
 
 var mThumbHandler = {
-    sup: {},
+    sup: Object.create(null),
 
     add: function(exts, parser) {
         exts = exts.split(",");
-        for (var i in exts) {
+
+        for (var i = exts.length; i--;) {
             this.sup[exts[i].toUpperCase()] = parser;
         }
     },
@@ -124,6 +125,53 @@ mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
         console.timeEnd('psd-proc');
     }
     cb(result);
+});
+
+mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
+    'use strict';
+
+    M.require('pdfjs').tryCatch(function() {
+        var timeTag = 'pdfjs.' + makeUUID();
+
+        if (d) {
+            console.debug('Using pdf.js %s (%s)', PDFJS.version, PDFJS.build);
+            console.time(timeTag);
+        }
+
+        PDFJS.verbosity = d ? 10 : 0;
+        PDFJS.isEvalSupported = false;
+        PDFJS.workerSrc = (is_extension ? '' : '/') + 'pdf.worker.js';
+
+        PDFJS.getDocument(ab).then(function(pdf) {
+            pdf.getPage(1).then(function(page) {
+                var scale = 2.5;
+                var viewport = page.getViewport(scale);
+
+                // Prepare canvas using PDF page dimensions
+                var canvas = document.createElement('canvas');
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page into canvas context
+                var renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                var renderTask = page.render(renderContext);
+                renderTask.then(function() {
+                    ab = dataURLToAB(canvas.toDataURL('image/png'));
+
+                    if (d) {
+                        console.timeEnd(timeTag);
+                        console.log('pdf2img %sx%s (%s bytes)', canvas.width, canvas.height, ab.byteLength);
+                    }
+                    cb(ab);
+                    api_req({a: 'log', e: 99661, m: 'Generated PDF thumbnail.'});
+                });
+            });
+        });
+    });
 });
 
 mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {

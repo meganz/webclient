@@ -3908,12 +3908,40 @@ React.makeElement = React['createElement'];
 	        });
 
 	        $container.rebind('mouseout.chatUI' + self.props.chatRoom.roomId, function () {
+	            var $this = $(this);
 	            clearTimeout(mouseoutThrottling);
 	            mouseoutThrottling = setTimeout(function () {
 	                self.visiblePanel = false;
 	                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
 	                $('.call.top-panel', $container).removeClass('visible-panel');
-	            }, 3000);
+	            }, 500);
+	        });
+
+	        var idleMouseTimer;
+	        var forceMouseHide = false;
+	        $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomId, function (ev) {
+	            var $this = $(this);
+	            clearTimeout(idleMouseTimer);
+	            if (!forceMouseHide) {
+	                self.visiblePanel = true;
+	                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
+	                $container.removeClass('no-cursor');
+	                if ($this.hasClass('full-sized-block')) {
+	                    $('.call.top-panel', $container).addClass('visible-panel');
+	                }
+	                idleMouseTimer = setTimeout(function () {
+	                    self.visiblePanel = false;
+	                    $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+
+	                    $container.addClass('no-cursor');
+	                    $('.call.top-panel', $container).removeClass('visible-panel');
+
+	                    forceMouseHide = true;
+	                    setTimeout(function () {
+	                        forceMouseHide = false;
+	                    }, 400);
+	                }, 2000);
+	            }
 	        });
 
 	        $(document).unbind("fullscreenchange.megaChat_" + room.roomId).bind("fullscreenchange.megaChat_" + room.roomId, function () {

@@ -3887,6 +3887,18 @@ React.makeElement = React['createElement'];
 	            'localMediaDisplay': true
 	        };
 	    },
+	    _hideBottomPanel: function _hideBottomPanel() {
+	        var self = this;
+	        var room = self.props.chatRoom;
+	        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
+	            return;
+	        }
+
+	        var $container = $(ReactDOM.findDOMNode(self));
+
+	        self.visiblePanel = false;
+	        $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        var self = this;
 	        var room = self.props.chatRoom;
@@ -3912,7 +3924,7 @@ React.makeElement = React['createElement'];
 	            clearTimeout(mouseoutThrottling);
 	            mouseoutThrottling = setTimeout(function () {
 	                self.visiblePanel = false;
-	                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+	                self._hideBottomPanel();
 	                $('.call.top-panel', $container).removeClass('visible-panel');
 	            }, 500);
 	        });
@@ -3921,6 +3933,9 @@ React.makeElement = React['createElement'];
 	        var forceMouseHide = false;
 	        $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomId, function (ev) {
 	            var $this = $(this);
+	            if (self._bottomPanelMouseOver) {
+	                return;
+	            }
 	            clearTimeout(idleMouseTimer);
 	            if (!forceMouseHide) {
 	                self.visiblePanel = true;
@@ -3931,7 +3946,8 @@ React.makeElement = React['createElement'];
 	                }
 	                idleMouseTimer = setTimeout(function () {
 	                    self.visiblePanel = false;
-	                    $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+
+	                    self._hideBottomPanel();
 
 	                    $container.addClass('no-cursor');
 	                    $('.call.top-panel', $container).removeClass('visible-panel');
@@ -3942,6 +3958,28 @@ React.makeElement = React['createElement'];
 	                    }, 400);
 	                }, 2000);
 	            }
+	        });
+
+	        $('.call.bottom-panel', $container).rebind('mouseenter.chatUI' + self.props.chatRoom.roomId, function (ev) {
+	            self._bottomPanelMouseOver = true;
+	            clearTimeout(idleMouseTimer);
+	        });
+	        $('.call.bottom-panel', $container).rebind('mouseleave.chatUI' + self.props.chatRoom.roomId, function (ev) {
+	            self._bottomPanelMouseOver = false;
+
+	            idleMouseTimer = setTimeout(function () {
+	                self.visiblePanel = false;
+
+	                self._hideBottomPanel();
+
+	                $container.addClass('no-cursor');
+	                $('.call.top-panel', $container).removeClass('visible-panel');
+
+	                forceMouseHide = true;
+	                setTimeout(function () {
+	                    forceMouseHide = false;
+	                }, 400);
+	            }, 2000);
 	        });
 
 	        $(document).unbind("fullscreenchange.megaChat_" + room.roomId).bind("fullscreenchange.megaChat_" + room.roomId, function () {

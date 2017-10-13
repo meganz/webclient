@@ -6656,7 +6656,7 @@ React.makeElement = React['createElement'];
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog-empty-header" },
-	                        __(l[782])
+	                        self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]
 	                    )
 	                )
 	            );

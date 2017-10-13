@@ -85,6 +85,7 @@ var Dropdown = React.createClass({
                             vertOffset += (info.vertical == "top" ? $arrow.outerHeight() : 0);
                         }
 
+
                         if (self.props.vertOffset) {
                            vertOffset += (self.props.vertOffset * (info.vertical == "top" ? 1 : -1));
                         }
@@ -92,6 +93,7 @@ var Dropdown = React.createClass({
                         if (self.props.horizOffset) {
                             horizOffset += self.props.horizOffset;
                         }
+
 
                         $(this).css({
                             left: (obj.left + (offsetLeft ? offsetLeft/2 : 0) + horizOffset) + 'px',

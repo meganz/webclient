@@ -437,9 +437,10 @@ var GenericConversationMessage = React.createClass({
                                         }}
                                         className="white-context-menu attachments-dropdown"
                                         noArrow={true}
-                                        positionMy="left bottom"
-                                        positionAt="right bottom"
-                                        horizOffset={4}
+                                        positionMy="left top"
+                                        positionAt="left bottom"
+                                        horizOffset={-4}
+                                        vertOffset={3}
                                         onBeforeActiveChange={(newState) => {
                                             if (newState === true) {
                                                 self.forceUpdate();
@@ -478,9 +479,9 @@ var GenericConversationMessage = React.createClass({
                                             self._addFavouriteButtons(v.h, firstGroupOfButtons);
 
                                             return <div>
+                                                {previewButton}
                                                 {firstGroupOfButtons}
                                                 {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
-                                                {previewButton}
                                                 <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                           onClick={self._startDownload.bind(self, v)}/>
                                                 {linkButtons}
@@ -497,7 +498,12 @@ var GenericConversationMessage = React.createClass({
                                     className="default-white-button tiny-button"
                                     icon="tiny-icon grey-down-arrow">
                                     <DropdownsUI.Dropdown
-                                        className="attachments-dropdown"
+                                        className="white-context-menu attachments-dropdown"
+                                        noArrow={true}
+                                        positionMy="left top"
+                                        positionAt="left bottom"
+                                        horizOffset={-4}
+                                        vertOffset={3}
                                     >
                                         {previewButton}
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}

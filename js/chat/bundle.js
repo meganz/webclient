@@ -8507,9 +8507,10 @@ React.makeElement = React['createElement'];
 	                                        },
 	                                        className: 'white-context-menu attachments-dropdown',
 	                                        noArrow: true,
-	                                        positionMy: 'left bottom',
-	                                        positionAt: 'right bottom',
-	                                        horizOffset: 4,
+	                                        positionMy: 'left top',
+	                                        positionAt: 'left bottom',
+	                                        horizOffset: -4,
+	                                        vertOffset: 3,
 	                                        onBeforeActiveChange: function onBeforeActiveChange(newState) {
 	                                            if (newState === true) {
 	                                                self.forceUpdate();
@@ -8540,9 +8541,9 @@ React.makeElement = React['createElement'];
 	                                            return React.makeElement(
 	                                                'div',
 	                                                null,
+	                                                previewButton,
 	                                                firstGroupOfButtons,
 	                                                firstGroupOfButtons && firstGroupOfButtons.length > 0 ? React.makeElement('hr', null) : "",
-	                                                previewButton,
 	                                                React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                                    onClick: self._startDownload.bind(self, v) }),
 	                                                linkButtons,
@@ -8561,7 +8562,12 @@ React.makeElement = React['createElement'];
 	                                    React.makeElement(
 	                                        DropdownsUI.Dropdown,
 	                                        {
-	                                            className: 'attachments-dropdown'
+	                                            className: 'white-context-menu attachments-dropdown',
+	                                            noArrow: true,
+	                                            positionMy: 'left top',
+	                                            positionAt: 'left bottom',
+	                                            horizOffset: -4,
+	                                            vertOffset: 3
 	                                        },
 	                                        previewButton,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),

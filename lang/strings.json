@@ -7651,10 +7651,6 @@
         "text": "Unable to write file",
         "context": "Message displayed when an error occurs exporting the master key to a file."
     },
-    "7068": {
-        "text": "The new excluded file names will be taken into account when the application starts again",
-        "context": "Message displayed to inform the user that the new file name exclusion changes will be applied on next startup."
-    },
     "7069": {
         "text": "The new excluded file sizes will be taken into account when the application starts again.",
         "context": "Message displayed to inform the user that the new file size exclusion changes will be applied on next startup."
@@ -16479,10 +16475,6 @@
         "text": "The link cannot be generated because the file is in an incoming shared folder or in your Rubbish Bin.",
         "context": "A notification error message which is shown while generating a public link of a file from an incoming shared folder or from the rubbish bin."
     },
-    "16916": {
-        "text": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
-        "context": "A confirmation message which is displayed when a user tries to upload a file to a synced folder which already contains it. Please keep the (%1) code because it will be filled with name of the file."
-    },
     "16917": {
         "text": "You need Full access rights to be able to sync the selected folder.",
         "context": "An error message which is shown when a user is trying sync a non compatible folder."
@@ -16495,29 +16487,13 @@
         "text": "Export Recovery Key",
         "context": "A dialog title to export the Recovery Key for the current user."
     },
-    "16921": {
-        "text": "Always keep physical control of your Recovery Key (e.g. on a client device, external storage, or print).",
-        "context": "A label to inform the user to keep physical control of the Recovery Key."
-    },
-    "16922": {
-        "text": "You have to accept our Terms of Service",
-        "context": "A label which is displayed when the user has not checked the agreement for the Terms of Service."
-    },
     "16923": {
         "text": "When you finish this assistant, you will be able to sync additional folders using the settings dialog",
         "context": "A label which is shown when the initial setup wizard is at the final stage. This informs the user about the possibility of adding new synchronizations through the settings dialog."
     },
-    "16924": {
-        "text": "Free transfer quota exceeded",
-        "context": "Label to indicate the user that his free bandwidth\/transfer is exceeded. He should upgrade to a PRO plan or wait the specified time to get new free transfer quota"
-    },
     "16925": {
         "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to PRO[\/A], which will give you your own transfer package and also ample extra storage space.",
         "context": "Explanation shown to the user when he exceeds all his free transfer quota and needs to upgrade to circumvent the limit."
-    },
-    "16926": {
-        "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free.",
-        "context": "Label to indicate the user that should to upgrade or wait the specific time in order to continue with his transfers"
     },
     "16927": {
         "text": "This action can not be completed as it would take you over your current storage limit",
@@ -17235,29 +17211,9 @@
         "text": "Unable to get the filesystem. Please, try again. If the problem persists please contact bug@mega.co.nz.",
         "context": "A message which is displayed when an error occurs while fetching nodes from the server."
     },
-    "17111": {
-        "text": "Error: Invalid destination folder. The download has been cancelled.",
-        "context": "A notification message which is shown when an error occurs while downloading a file to a invalid destination folder."
-    },
     "17113": {
         "text": "The link cannot be generated because the file is in an incoming shared folder or in your Rubbish Bin.",
         "context": "A notification error message which is shown while generating a public link of a file from an incoming shared folder or from the Rubbish Bin."
-    },
-    "17114": {
-        "text": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
-        "context": "A message which is displayed when a user tries to upload a file to a synced folder which already contains it. This asks the user for confirmation. Please keep the (%1) placeholder because it will be filled with name of the file."
-    },
-    "17115": {
-        "text": "You need full access rights to be able to sync the selected folder.",
-        "context": "An error message which is shown when a user is trying synchronise a non compatible folder."
-    },
-    "17117": {
-        "text": "The new excluded file names will be taken into account\r\nwhen the application starts again.",
-        "context": "A message which is displayed to inform the user that the new file name exclusion changes will be applied on the next application startup."
-    },
-    "17120": {
-        "text": "The new excluded file names will be taken into account\r\nwhen the application starts again.",
-        "context": "A message displayed to inform the user that the new file name exclusion changes will be applied on next application startup."
     },
     "17121": {
         "text": "Restart",
@@ -17412,11 +17368,11 @@
         "context": "Numeric list counter"
     },
     "17235": {
-        "text": "For iOS, tap the [B]Info[\/B] [W14]icon[\/W14] on the folder you want to share.[Br]For Android, tap the [B]option[\/B] [W11]icon[\/W11] on the folder you want to share.",
+        "text": "For iOS, tap the [W14][B]Info[\/B][\/W14] icon on the folder you want to share.[Br]For Android, tap the [W11][B]option[\/B][\/W11] icon on the folder you want to share.",
         "context": "Step one of how to share\/collaborate with others on iOS or Android"
     },
     "17236": {
-        "text": "For iOS tap the [B]Share[\/B] [W13]icon[\/W13] and select [B]Share Folder.[\/B] On Android select the [B]Share folder[\/B] [W15]option[\/W15] on the menu.",
+        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Share Folder.[\/B] [Br]On Android select the[B] [W15]Share[\/W15] folder[\/B] option on the menu.",
         "context": "Step two of how to collaborate with others on iOS or Android"
     },
     "17237": {
@@ -17444,7 +17400,7 @@
         "context": "Description text for images for the Windows operating system"
     },
     "17243": {
-        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
+        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] [br]On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
         "context": "Step two of how to share with others on iOS or Android"
     },
     "17244": {

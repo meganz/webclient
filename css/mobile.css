@@ -605,6 +605,9 @@ ul, li {
     display: table;
     table-layout: fixed;
 }
+.mobile.signin-register-block .mobile.fm-block {
+    background-color: #F8F9FA;
+}
 .mobile.full-page-scrollable {
     overflow: scroll;
     -webkit-overflow-scrolling: touch;
@@ -633,14 +636,11 @@ ul, li {
     display: table-cell;
     position: relative;
     overflow: hidden;
+    background-color: #fff;
 }
 .mobile.fm-header.fm-hr, .mobile.sign-header.fm-hr {
     box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.15);
     z-index: 1;
-}
-.mobile.sign-header {
-    height: 120px;
-    border-bottom: 0;
 }
 .mobile.fm-header.folder-link {
     height: 126px;
@@ -1045,21 +1045,22 @@ ul, li {
     color: #777777;
 }
 .mobile.top-links {
-    padding: 38px 0 0 0;
-    margin: 0 auto;
+    margin: 8px 0px;
     clear: both;
     text-align: center;
     font-size: 0;
+    line-height: 48px;
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
+    background-color: #fff;
 }
 .mobile.top-link {
     cursor: pointer;
-    width: 50%;
+    width: 100%;
     font-size: 15px;
-    line-height: 19px;
-    color: #CCCCCC;
-    background: url(../images/mobile/mobile-sprite_v8.png);
-    background-repeat: no-repeat;
-    background-position: -1px -1190px;
+    letter-spacing: 0.2px;
+    color: #f66;
+    text-decoration: underline;
     text-align: center;
     display: inline-block;
 }
@@ -1080,14 +1081,17 @@ ul, li {
     background-image: none;
 }
 .mobile.signin-input {
-    background-color: #F8F8F8;
-    height: 60px;
-    padding: 19px 55px 0 55px;
+    background-color: #FAFAFA;
+    border:1px solid #EEEEEE;
+    height: 48px;
+    padding: 12px 16px 0 52px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
+    margin-left: 16px;
+    margin-right: 16px;
 }
 .mobile.signin-input span {
     width: 20px;
@@ -1097,22 +1101,8 @@ ul, li {
     background-repeat: no-repeat;
     background-position: -130px -1149px;
     position: absolute;
-    left: 20px;
-    top: 20px;
-}
-.mobile.signin-input .warning-icon {
-    display: none;
-}
-.mobile.signin-input.incorrect .warning-icon {
-    width: 20px;
-    height: 20px;
-    display: block;
-    background-image: url(../images/mobile/mobile-sprite_v8.png);
-    background-repeat: no-repeat;
-    background-position: -213px -1216px;
-    position: absolute;
-    right: 20px;
-    top: 20px;
+    left: 16px;
+    top: 13px;
 }
 .mobile.signin-input.incorrect span {
     background-position: -130px -1219px
@@ -1134,11 +1124,12 @@ ul, li {
     border: 0;
     padding: 0;
     margin: 0;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
     color: #666666;
     height: 20px;
     width: 100%;
+    font-family: 'source_sans_proregular';
 }
 .mobile.signin-input input::-webkit-input-placeholder {
     color: #aaa;
@@ -1193,16 +1184,19 @@ ul, li {
 input[type='checkbox'] {
     display: none;
 }
-.mobile.remember-me {
-    background-color: #f8f8f8;
+.mobile.remember-me, .mobile.confirm-terms {
     overflow: hidden;
     padding-left: 18px;
+    margin-right: 16px;
+    margin-left: 16px;
+    margin-bottom: 4px;
+    background-color: #fff; 
 }
 .mobile.remember-me div.checkboxOn, .mobile.remember-me div.checkboxOff {
-    margin: 21px 0 0 0;
+    margin: 19px 0 0 0;
 }
 .mobile.confirm-terms div.checkboxOn, .mobile.confirm-terms div.checkboxOff {
-    margin: 21px 0 0 0;
+    margin: 17px 0 0 0;
 }
 .checkboxOn.square, .checkboxOff.square {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.05);
@@ -1243,11 +1237,11 @@ input[type='checkbox'] {
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;
-    line-height: 21px;
+    line-height: 54px;
     letter-spacing: normal;
     color: #666;
     float: none;
-    padding: 20px 0 20px 37px;
+    padding: 0 0 0px 37px;
 }
 .mobile.sign-in .first-message, .mobile.register .first-message {
     font-size: 15px;
@@ -1262,9 +1256,9 @@ input[type='checkbox'] {
     margin: 15px auto 0 auto;
 }
 .mobile.confirm-terms {
-    background-color: #f8f8f8;
+    background-color: #fff;
     overflow: hidden;
-    padding-left: 18px;
+    padding-left: 17px;
 }
 .mobile.confirm-terms .checkbox {
     border-radius: 2px;
@@ -1284,20 +1278,22 @@ input[type='checkbox'] {
     line-height: 21px;
     letter-spacing: normal;
     color: #666;
-    padding: 20px 0 20px 37px;
+    padding: 16px 0 16px 36px;
 }
 .mobile.confirm-terms .text a {
     color: #eb4444;
 }
 .mobile.signin-button, .mobile.register-button, .mobile.resend-button {
-    background-color: #ff5555;
+    background-color: #f44;
     padding: 0;
     position: relative;
     font-size: 16px;
     text-align: center;
-    line-height: 60px;
+    line-height: 48px;
     color: #fff;
-    height: 60px;
+    height: 48px;
+    margin-left: 16px;
+    margin-right: 16px;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -1334,7 +1330,9 @@ input[type='checkbox'] {
 }
 .new-registration {
     padding-bottom: 2px;
-    margin-bottom: 2px;
+    margin-bottom: 8px;
+    margin-left: 16px;
+    margin-right: 11px;
 }
 .register-pass-status-line1, .register-pass-status-line2, .register-pass-status-line3, .register-pass-status-line4, .register-pass-status-line5 {
     background-color: rgba(0, 0, 0, 0.1);
@@ -1447,8 +1445,11 @@ div.checkboxOn, div.checkboxOff {
     -webkit-animation: rotate-loading 0.8s infinite linear;
     animation: rotate-loading 0.8s infinite linear;
 }
-.mobile.tab-block.register {
-    min-height: 100%;
+.mobile.tab-block.sign-in, .mobile.tab-block.register {
+    padding-top: 24px;
+    background-color: #fff;
+    padding-bottom: 24px;
+    border-bottom:1px solid #eee;
 }
 .mobile.registration-confirm-email .email-icon {
     width: 200px;
@@ -4377,15 +4378,6 @@ div.checkboxOn, div.checkboxOff {
     }
 }
 
-@media only screen and (max-height: 570px) {
-    .mobile.sign-header {
-        height: 100px;
-    }
-    .mobile.top-links {
-        padding: 18px 0 0 0;
-    }
-}
-
 /* Adjust the layout of the My Account page for longer screens to push buttons into acceptable range */
 @media only screen and (min-height: 668px) {
     .mobile.my-account-page .avatar-name-block {
@@ -4408,6 +4400,20 @@ div.checkboxOn, div.checkboxOff {
     .mobile.my-account-page .user-name {
         margin-top: 8px;
         margin-bottom: 4px;
+    }
+    .mobile.tab-block.sign-in, .mobile.tab-block.register {
+        padding-top: 48px;
+    }
+    .mobile.signin-input {
+        height: 54px;
+        padding-top: 16px;
+    }
+    .mobile.signin-input span {
+        top: 17px;
+    }
+    .mobile.signin-button, .mobile.register-button, .mobile.resend-button {
+        height: 54px;
+        line-height: 54px;
     }
 }
 
@@ -4451,7 +4457,7 @@ div.checkboxOn, div.checkboxOff {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.download-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.top-link, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow {
+    .mobile.logo, .mobile.download-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow {
         background-image: url(../images/mobile/mobile-sprite_v8@2x.png);
         background-size: 280px auto;
     }

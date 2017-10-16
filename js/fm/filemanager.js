@@ -2272,7 +2272,17 @@ FileManager.prototype.addGridUI = function(refresh) {
         $('.grid-url-header').text('');
     }
 
-    $('.files-grid-view .grid-scrolling-table,.files-grid-view .file-block-scrolling' +
+    $('.fm .grid-table-header th:nth-child(5)').rebind('contextmenu.column_time', function(e) {
+        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
+        if (selectionManager) {
+            selectionManager.clear_selection();
+        }
+        $.selected = [];
+        $.hideTopMenu();
+        return !!M.contextMenuUI(e, 6);
+    });
+
+    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling' +
         ',.fm-empty-cloud,.fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         if (selectionManager) {

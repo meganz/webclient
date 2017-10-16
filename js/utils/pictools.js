@@ -1,7 +1,7 @@
 function is_rawimage(name, ext) {
     ext = ext || ('' + name).split('.').pop().toUpperCase();
 
-    return (typeof dcraw !== 'undefined') && is_image.raw[ext] && ext;
+    return is_image.raw[ext] && ext;
 }
 
 function is_image(name) {

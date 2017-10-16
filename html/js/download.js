@@ -701,27 +701,9 @@ function closedlpopup()
 }
 
 function importFile() {
+    'use strict';
 
-    api_req({
-        a: 'p',
-        t: M.RootID,
-        n: [{
-                ph: dl_import[0],
-                t: 0,
-                a: dl_attr,
-                k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dl_import[1]).slice(0, 8)))
-            }]
-    }, {
-        callback: function (r) {
-            if (typeof r === 'object') {
-                $.onRenderNewSelectNode = r.f[0].h;
-            }
-            else {
-                M.ulerror(null, r);
-            }
-        }
-    });
-
+    M.importFileLink(dl_import[0], dl_import[1], dl_attr);
     dl_import = false;
 }
 

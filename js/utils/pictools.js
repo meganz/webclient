@@ -191,3 +191,12 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
 if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
     delete mThumbHandler.sup.SVG;
 }
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+    var engine = browserdetails().engine;
+
+    if (engine !== 'Webkit' && engine !== 'Gecko') {
+        delete mThumbHandler.sup.PDF;
+    }
+});

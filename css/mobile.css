@@ -606,8 +606,15 @@ ul, li {
     table-layout: fixed;
 }
 .mobile.signin-register-block .mobile.fm-block {
+    background-color: #F8F9FA; 
+}
+.mobile.registration-confirm-email{
     background-color: #F8F9FA;
 }
+.mobile.registration-confirm-email .mobile.fm-block {
+    padding-bottom: 24px;
+    border-bottom: 1px solid #eee;
+} 
 .mobile.full-page-scrollable {
     overflow: scroll;
     -webkit-overflow-scrolling: touch;
@@ -811,7 +818,12 @@ ul, li {
     line-height: 24px;
     padding: 0 30px;
     color: #333333;
-    padding: 21px 60px 0 60px;
+    padding: 23px 00px 0 00px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: left;
+    white-space: nowrap;
+    margin: 0 60px 0;
 }
 .mobile.fm-folder-size {
     font-size: 14px;
@@ -1300,6 +1312,7 @@ input[type='checkbox'] {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
     opacity: 0.3;
+    border-radius: 2px;
 }
 .mobile.signin-button.active, .mobile.register-button.active, .mobile.resend-button.active {
     background-color: #ff5555;
@@ -1448,7 +1461,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.tab-block.sign-in, .mobile.tab-block.register {
     padding-top: 24px;
     background-color: #fff;
-    padding-bottom: 24px;
+    padding-bottom: 16px;
     border-bottom:1px solid #eee;
 }
 .mobile.registration-confirm-email .email-icon {
@@ -1460,18 +1473,20 @@ div.checkboxOn, div.checkboxOff {
     margin: 46px auto 0 auto;
 }
 .mobile.registration-confirm-email .confirm-message {
-    color: #667;
-    font-size: 16px;
+    color: #666;
+    font-size: 15px;
     text-align: center;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 16px;
+    margin-right: 16px;
     margin-top: 26px;
 }
 .mobile.registration-confirm-email .change-email {
-    background-color: #f8f8f8;
+    background-color: #fafafa;
     margin-top: 30px;
-    padding: 20px 0;
+    padding: 14px 0;
     text-align: center;
+    margin: 24px 16px;
+    border: 1px solid #eee;
 }
 .mobile.registration-confirm-email .change-email input {
     background-color: #f8f8f8;
@@ -1495,12 +1510,23 @@ div.checkboxOn, div.checkboxOff {
     margin: 16px 10px 20px 10px;
 }
 .mobile.registration-generating-keys .information-message {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.63;
     text-align: center;
     color: #939da3;
     margin-left: 20px;
     margin-right: 20px;
+}
+.mobile.registration-generating-keys {
+    height: 100%;
+    position: relative;
+    display: block;
+}
+.mobile.registration-generating-keys .fm-header-txt {
+    margin: 0 32px 0 60px;
+}
+.mobile.registration-generating-keys .fm-content {
+    margin-top: 50%; 
 }
 .mobile.white-text-bl {
     padding: 61px 30px 65px 30px;
@@ -4407,13 +4433,33 @@ div.checkboxOn, div.checkboxOff {
     .mobile.signin-input {
         height: 54px;
         padding-top: 16px;
+        margin-left: 24px;
+        margin-right: 24px;
     }
     .mobile.signin-input span {
         top: 17px;
     }
+    .new-registration {
+        margin-left: 24px;
+        margin-right: 19px;
+    }
     .mobile.signin-button, .mobile.register-button, .mobile.resend-button {
         height: 54px;
         line-height: 54px;
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+    .mobile.remember-me, .mobile.confirm-terms {
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+    .mobile.registration-confirm-email .email-icon {
+        margin-top: 72px;
+    }
+    .mobile.registration-confirm-email .change-email {
+        padding: 17px 0;
+        margin-left: 24px;
+        margin-right: 24px;
     }
 }
 

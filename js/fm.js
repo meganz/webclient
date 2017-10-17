@@ -965,9 +965,7 @@ function FMShortcuts() {
                 return; // dont do anything.
             }
 
-            $.selected = items;
-
-            fmremove();
+            fmremove(items);
 
             // force remove, no confirmation
             if (e.ctrlKey || e.metaKey) {

@@ -362,22 +362,13 @@ FileManager.prototype.initFileManagerUI = function() {
                 var $ddelm = $(ui.draggable);
                 setTimeout(function() {
                     if ($.movet === M.RubbishID) {
-                        $.selected = $.moveids;
-                        fmremove()
-                            .always(function() {
-                                if (selectionManager) {
-                                    selectionManager.clear_selection();
-                                }
-                            });
+                        fmremove($.moveids);
                     }
                     else {
                         M.moveNodes($.moveids, $.movet)
                             .done(function(moves) {
                                 if (moves) {
                                     $ddelm.remove();
-                                    if (selectionManager) {
-                                        selectionManager.clear_selection();
-                                    }
                                 }
                             });
                     }
@@ -1482,7 +1473,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             M.getNodeRights(M.currentdirid) > 1
         ) {
             // delete
-            fmremove();
+            fmremove(s);
         }
         else if ((e.keyCode === 46) && (selPanel.length > 0)
             && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
@@ -2035,8 +2026,7 @@ FileManager.prototype.addContactUI = function() {
 
         // Remove contact button on contacts page
         $('.fm-remove-contact').rebind('click', function() {
-            $.selected = [M.currentdirid];
-            fmremove();
+            fmremove([M.currentdirid]);
         });
 
         if (!megaChatIsDisabled) {
@@ -2538,7 +2528,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
 
     $ddUIitem.rebind('contextmenu', function(e) {
-        var s = e.shiftKey;
         if (e.shiftKey) {
             selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }

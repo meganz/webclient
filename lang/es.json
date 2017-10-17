@@ -4349,7 +4349,7 @@
     "17240": "[H1]Introducci\u00f3n a MEGA[\/H1]",
     "17241": "Mac",
     "17242": "Windows",
-    "17243": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] [br]On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
+    "17243": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] [Br]On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
     "17244": "Using your desktop browser, you can have a secure voice or video call with a single contact or have a group text chat with several contacts participating. You can also send files from your MEGA Cloud Drive to other members of the group chat while messages are flowing. [Br]Secure text chat is also available on Android and iOS applications (encrypted voice and video calls are coming to mobile soon).",
     "17245": "[H1]Ahora sabes lo b\u00e1sico de tu cuenta MEGA.[\/H1]",
     "17246": "[H1]Congratulations![\/H1]",
@@ -4373,5 +4373,8 @@
     "17281": "Selecciona la ubicaci\u00f3n desde donde quieres subir archivos.",
     "17282": "Selecciona el archivo que quieres subir.",
     "17283": "Install the MEGA desktop app for Windows, Mac or Linux.[Br][Br]Synchronise single or multiple folders on your computer with your MEGA account.[Br][Br]Access and work with your data securely across different locations and devices. It\u2019s always on and fully automatic. ",
-    "17389": "Select contacts from your phone's contact list or enter multiple email addresses."
+    "17389": "Select contacts from your phone's contact list or enter multiple email addresses.",
+    "17398": "Label",
+    "17445": "Date Added",
+    "17446": "Date Created"
 }

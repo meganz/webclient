@@ -1265,7 +1265,7 @@
     "5737": "Brak kontakt\u00f3w",
     "5738": "Kosz",
     "5739": "Wyst\u0105pi\u0142y b\u0142\u0119dy!",
-    "5740": "Downloading...",
+    "5740": "Pobieranie...",
     "5741": "Przygotowywanie pobrania",
     "5742": "Wgrywanie: [X]%",
     "5743": "Zapisane lokalnie",
@@ -4373,5 +4373,8 @@
     "17281": "Wybierz lokalizacje z kt\u00f3rej chcesz wgrywa\u0107 pliki.",
     "17282": "Wybierz plik, kt\u00f3ry chcesz wgra\u0107.",
     "17283": "Zainstaluj aplikacje MEGA na Windows, Mac lub Linux.[Br][Br]Synchronizuj pojedyncze lub pakiety plik\u00f3w i katalog\u00f3w ze swojego komputera do MEGA.[Br][Br]Korzystaj z bezpiecznego dost\u0119pu do swoich plik\u00f3w z dowolnej lokalizacji i urz\u0105dzenia. Wszystko jest w pe\u0142ni zautomatyzowane.",
-    "17389": "Wybierz kontakty z listy lub wpisz adresy email."
+    "17389": "Wybierz kontakty z listy lub wpisz adresy email.",
+    "17398": "Label",
+    "17445": "Date Added",
+    "17446": "Date Created"
 }

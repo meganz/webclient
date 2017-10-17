@@ -13848,7 +13848,7 @@
         "context": "A toast notification which is shown when saving settings."
     },
     "16169": {
-        "text": "Date created",
+        "text": "Date Created",
         "context": "A table column header for the date when a file was created."
     },
     "16171": {
@@ -17372,7 +17372,7 @@
         "context": "Step one of how to share\/collaborate with others on iOS or Android"
     },
     "17236": {
-        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Share Folder.[\/B] [Br]On Android select the[B] [W15]Share[\/W15] folder[\/B] option on the menu.",
+        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Share Folder.[\/B] [Br]On Android select the[B] [W13]Share[\/W13] folder[\/B] option on the menu.",
         "context": "Step two of how to collaborate with others on iOS or Android"
     },
     "17237": {
@@ -17400,7 +17400,7 @@
         "context": "Description text for images for the Windows operating system"
     },
     "17243": {
-        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] [br]On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
+        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] [Br]On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
         "context": "Step two of how to share with others on iOS or Android"
     },
     "17244": {
@@ -17498,5 +17498,17 @@
     "17389": {
         "text": "Select contacts from your phone's contact list or enter multiple email addresses.",
         "context": "Text shown to explain how and where you can invite friends."
+    },
+    "17398": {
+        "text": "Label",
+        "context": "A menu item in the left panel drop down menu to allow sorting by label."
+    },
+    "17445": {
+        "text": "Date Added",
+        "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's date of encryption on the Cloud Drive (not the date of the file's creation on their local machine)."
+    },
+    "17446": {
+        "text": "Date Created",
+        "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's original timestamp, when it is created on their local machine."
     }
 }

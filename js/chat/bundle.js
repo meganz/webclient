@@ -6106,7 +6106,8 @@ React.makeElement = React['createElement'];
 	        var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
 
 	        if (self.props.sortBy[0] === self.props.id) {
-	            classes += " " + self.props.sortBy[1];
+	            var ordClass = self.props.sortBy[1] == "desc" ? "asc" : "desc";
+	            classes = classes + " " + ordClass;
 	        }
 	        return React.makeElement(
 	            "th",
@@ -6753,10 +6754,6 @@ React.makeElement = React['createElement'];
 	            sortFunc = M.getSortByFavFn();
 	        }
 
-	        entries.sort(function (a, b) {
-	            return sortFunc(a, b, order);
-	        });
-
 	        var folders = [];
 
 	        for (var i = entries.length; i--;) {
@@ -6765,6 +6762,14 @@ React.makeElement = React['createElement'];
 	                entries.splice(i, 1);
 	            }
 	        }
+
+	        folders.sort(function (a, b) {
+	            return sortFunc(a, b, order);
+	        });
+
+	        entries.sort(function (a, b) {
+	            return sortFunc(a, b, order);
+	        });
 
 	        return folders.concat(entries);
 	    },

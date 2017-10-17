@@ -310,7 +310,7 @@ var slideshowid;
             }
         });
 
-        if (n.p) {
+        if (n.p || M.chat) {
             $dlBut.removeClass('hidden');
         }
         else {

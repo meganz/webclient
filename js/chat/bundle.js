@@ -4024,10 +4024,33 @@ React.makeElement = React['createElement'];
 	        if (room.megaChat.rtc && room.megaChat.rtc.gLocalStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
 	            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
 	        }
+
+	        $(room).rebind('toggleMessages.av', function () {
+	            self.toggleMessages();
+	        });
+
+	        room.messagesBlockEnabled = self.state.messagesBlockEnabled;
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        var room = self.props.chatRoom;
+
+	        var $container = $(ReactDOM.findDOMNode(self));
+	        if ($container) {
+	            $container.unbind('mouseover.chatUI' + self.props.chatRoom.roomId);
+	            $container.unbind('mouseout.chatUI' + self.props.chatRoom.roomId);
+	            $container.unbind('mousemove.chatUI' + self.props.chatRoom.roomId);
+	        }
+
+	        $(document).unbind("fullscreenchange.megaChat_" + room.roomId);
+	        $(window).unbind('resize.chatUI_' + room.roomId);
+	        $(room).unbind('toggleMessages.av');
 	    },
 	    toggleMessages: function toggleMessages(e) {
-	        e.preventDefault();
-	        e.stopPropagation();
+	        if (e) {
+	            e.preventDefault();
+	            e.stopPropagation();
+	        }
 
 	        if (this.props.onMessagesToggle) {
 	            this.props.onMessagesToggle(!this.state.messagesBlockEnabled);
@@ -5501,6 +5524,8 @@ React.makeElement = React['createElement'];
 	        $(document.body).addClass('overlayed');
 	        $('.fm-dialog-overlay').removeClass('hidden');
 
+	        $('textarea:focus').blur();
+
 	        document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 	        document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
@@ -5708,6 +5733,22 @@ React.makeElement = React['createElement'];
 	    },
 	    getInitialState: function getInitialState() {
 	        return {};
+	    },
+	    componentDidMount: function componentDidMount() {
+	        var self = this;
+
+	        setTimeout(function () {
+	            $(document).rebind('keyup.confirmDialog' + self.getUniqueId(), function (e) {
+	                if (e.which === 13 || e.keyCode === 13) {
+	                    self.onConfirmClicked();
+	                    return false;
+	                }
+	            });
+	        }, 75);
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        $(document).unbind('keyup.confirmDialog' + self.getUniqueId());
 	    },
 	    onConfirmClicked: function onConfirmClicked() {
 	        if (this.props.onConfirmClicked) {
@@ -6516,11 +6557,9 @@ React.makeElement = React['createElement'];
 	                " "
 	            );
 
-	            if (fileIcon(node) === "graphic" && node.fa) {
+	            if (is_image(node) && node.fa) {
 	                var src = thumbnails[node.h];
 	                if (!src) {
-	                    src = M.getNodeByHandle(node.h);
-
 	                    M.v.push(node);
 	                    if (!node.seen) {
 	                        node.seen = 1;
@@ -8779,7 +8818,7 @@ React.makeElement = React['createElement'];
 	                        var previewButtons = null;
 
 	                        if (!attachmentMetaInfo.revoked) {
-	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                            if (v.fa && is_image(v)) {
 	                                var imagesListKey = message.messageId + "_" + v.h;
 	                                if (!chatRoom.images.exists(imagesListKey)) {
 	                                    v.id = imagesListKey;
@@ -8862,7 +8901,7 @@ React.makeElement = React['createElement'];
 	                        );
 
 	                        if (M.chat && !message.revoked) {
-	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                            if (v.fa && is_image(v)) {
 	                                var src = thumbnails[v.h];
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);
@@ -10357,6 +10396,9 @@ React.makeElement = React['createElement'];
 	    var self = this;
 
 	    if (self.isCurrentlyActive) {
+	        if (!self.messagesBlockEnabled && self.callManagerCall && self.getUnreadCount() > 0) {
+	            $(self).trigger('toggleMessages');
+	        }
 	        return false;
 	    }
 	    self.megaChat.hideAllChats();

@@ -712,6 +712,7 @@
     "5737": "Nessun contatto",
     "5738": "Cestino",
     "5775": "Usato",
+    "5799": "Utilizzo",
     "5801": "usato",
     "5814": "Incrementa spazio",
     "5816": "[X] TB",
@@ -1660,9 +1661,7 @@
     "16474": "Versioni precedenti",
     "16475": "Ritorna",
     "16476": "Modificato da %1",
-    "16477": "Rinominato da %1 da %2",
     "16480": "Modificato da me",
-    "16481": "Rinominato da %1 da me",
     "16485": "Elementi duplicati",
     "16486": "Un file nominato %1 gi\u00e0 esiste in questo percorso.",
     "16487": "Seleziona il file che vuoi mantenere:",
@@ -1823,6 +1822,7 @@
     "16903": "O crea un account per partecipare al nostro programma ad obiettivi, dove puoi guadagnare spazio di archiviazione e banda di trasferimento extra quando installi le app di MEGA o inviti amici su MEGA (l'attivazione pu\u00f2 richiedere pi\u00f9 giorni).",
     "16904": "O partecipa al nostro programma ad obiettivi, dove puoi guadagnare spazio di archiviazione e banda di trasferimento extra quando installi le app di MEGA o inviti amici su MEGA (l'attivazione pu\u00f2 richiedere pi\u00f9 giorni).",
     "16927": "Questa azione non pu\u00f2 essere completata in quanto ti farebbe superare il limite del tuo spazio di archiviazione",
+    "17022": "Tipo di account",
     "17081": "Trasferimento incompleto, vuoi riprenderlo?",
     "17082": "Trasferimento completato. Per favore, salva il tuo file.",
     "17083": "L'app universale di MEGA per Windows \u00e8 al momento sotto sviluppo. Puoi ottenere la versione beta [A]qui[\/A].",
@@ -1845,6 +1845,7 @@
     "17150": "Versioni",
     "17151": "[X] versioni",
     "17152": "1 versione",
-    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
-    "17155": "Total size taken up by file versions:"
+    "17154": "Stai per cancellare la storia delle versioni di 1 file. Per favore, ricorda che il file corrente non verr\u00e0 eliminato. Vuoi procedere?                                ",
+    "17155": "Grandezza totale occupata dalle versioni dei file:",
+    "17156": "Rinominato da %1"
 }

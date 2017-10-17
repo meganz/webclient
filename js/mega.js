@@ -849,13 +849,15 @@ scparser.$add('t', function(a, scnodes) {
     if (!pfid && u_type) {
         M.checkStorageQuota();
     }
-    // update versioning info.
-    if (a.t && a.t.f2) {
-        scparser.$helper.f2(a);
-    }
-    else {
-        if (scnodes.length === 1) {
-            fileversioning.updateFileVersioningDialog(scnodes[0].h);
+    if (!is_mobile) {
+        // update versioning info.
+        if (a.t && a.t.f2) {
+            scparser.$helper.f2(a);
+        }
+        else {
+            if (scnodes.length === 1) {
+                fileversioning.updateFileVersioningDialog(scnodes[0].h);
+            }
         }
     }
 });
@@ -1100,9 +1102,10 @@ scparser.$add('d', function(a) {
             M.checkStorageQuota();
         }
     }
-
-    if (fileDeletion && !a.v) {// this is not a versioning deletion.
-        fileversioning.closeFileVersioningDialog(a.n);
+    if (!is_mobile) {
+        if (fileDeletion && !a.v) {// this is not a versioning deletion.
+            fileversioning.closeFileVersioningDialog(a.n);
+        }
     }
 });
 
@@ -1231,10 +1234,9 @@ scparser.$finalize = function() {
                 delay('thumbnails', fm_thumbnails, 3200);
             }
 
-            /* er, why was this here?
             if ($.dialog === 'properties') {
-                propertiesDialog();
-            }*/
+                delay($.dialog, propertiesDialog.bind(this, 3));
+            }
 
             if (scsharesuiupd) {
                 onIdle(function() {

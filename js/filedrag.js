@@ -130,31 +130,60 @@
 
     var dir_inflight = 0;
     var filedrag_u = [];
+    var filedrag_paths = Object.create(null);
 
     function pushUpload() {
         if (!--dir_inflight && $.dostart) {
-            M.addUpload(filedrag_u);
+            var emptyFolders = Object.keys(filedrag_paths)
+                .filter(function(p) {
+                    return filedrag_paths[p] < 1;
+                });
+
+            M.addUpload(filedrag_u, false, emptyFolders);
             filedrag_u = [];
+            filedrag_paths = Object.create(null);
+
             if (page === 'start') {
                 start_upload();
             }
         }
     }
 
-    function traverseFileTree(item, path) {
+    function pushFile(file, path) {
+        'use strict';
+
+        if (d > 1) {
+            console.warn('Adding file %s', file.name, file);
+        }
+        if (file) {
+            file.path = path;
+            filedrag_u.push(file);
+        }
+        pushUpload();
+    }
+
+    function traverseFileTree(item, path, symlink) {
+        'use strict';
+
         path = path || "";
+
         if (item.isFile) {
             dir_inflight++;
             item.file(function(file) {
-                if (d > 1) {
-                    console.log(file);
+                pushFile(file, path);
+            }, function(error) {
+                if (d) {
+                    var fn = symlink ? 'debug' : 'warn';
+
+                    console[fn]('Failed to get File from FileEntry for "%s", %s',
+                        item.name, Object(error).name, error, item);
                 }
-                file.path = path;
-                filedrag_u.push(file);
-                pushUpload();
+                pushFile(symlink, path);
             });
         }
         else if (item.isDirectory) {
+            var newPath = path + item.name + "/";
+            filedrag_paths[newPath] = 0;
             dir_inflight++;
             var dirReader = item.createReader();
             var dirReaderIterator = function() {
@@ -162,14 +191,20 @@
                     if (entries.length) {
                         var i = entries.length;
                         while (i--) {
-                            traverseFileTree(entries[i], path + item.name + "/");
+                            traverseFileTree(entries[i], newPath);
                         }
+                        filedrag_paths[newPath] += entries.length;
 
                         dirReaderIterator();
                     }
                     else {
                         pushUpload();
                     }
+                }, function(error) {
+                    console.warn('Unable to traverse folder "%s", %s',
+                        item.name, Object(error).name, error, item);
+
+                    pushUpload();
                 });
             };
             dirReaderIterator();
@@ -330,7 +365,7 @@
                         if (i == items.length - 1) {
                             $.dostart = true;
                         }
-                        traverseFileTree(item);
+                        traverseFileTree(item, '', item.isFile && items[i].getAsFile());
                     }
                 }
             }
@@ -376,6 +411,9 @@
                 }
                 if (f.name != '.') {
                     u.push(f);
+                    if (Math.floor(f.lastModified / 1000) === Math.floor(Date.now() / 1000)) {
+                        api_req({a: 'log', e: 99659, m: 'file modification time uses current time for uploading.'});
+                    }
                 }
             }
             M.addUpload(u);

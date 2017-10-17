@@ -25,6 +25,10 @@ var ModalDialog = React.createClass({
         $(document.body).addClass('overlayed');
         $('.fm-dialog-overlay').removeClass('hidden');
 
+        // blur the chat textarea if its selected.
+        $('textarea:focus').blur();
+
+
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
@@ -243,6 +247,24 @@ var ConfirmDialog = React.createClass({
     getInitialState: function() {
         return {
         }
+    },
+    componentDidMount: function() {
+        var self = this;
+
+        // since ModalDialogs can be opened in other keyup (on enter) event handlers THIS is required to be delayed a
+        // bit...otherwise the dialog would open up and get immediately confirmed
+        setTimeout(function() {
+            $(document).rebind('keyup.confirmDialog' + self.getUniqueId(), function(e) {
+                if (e.which === 13 || e.keyCode === 13) {
+                    self.onConfirmClicked();
+                    return false;
+                }
+            });
+        }, 75);
+    },
+    componentWillUnmount: function() {
+        var self = this;
+        $(document).unbind('keyup.confirmDialog' + self.getUniqueId());
     },
     onConfirmClicked: function() {
         if (this.props.onConfirmClicked) {

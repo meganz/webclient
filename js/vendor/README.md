@@ -129,6 +129,11 @@ Unless otherwise noted, they were released under a [MIT License].
 [notification.js]: A shim polyfill for adding notifications to browsers which offer limited support.
 
 ---
+[pdf.js]: PDF Reader in JavaScript.
+
+> This is released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+---
 [react-dom.js, react.js]: A declarative, efficient, and flexible JavaScript library for building user interfaces.
 
 ---
@@ -206,6 +211,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [moment.js]: <https://github.com/moment/moment/tree/2.10.6>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
+[pdf.js]: <https://github.com/mozilla/pdfjs-dist/tree/v1.9.638>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>

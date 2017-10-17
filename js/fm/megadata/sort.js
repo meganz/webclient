@@ -1,8 +1,10 @@
 MegaData.prototype.sortBy = function(fn, d) {
+    'use strict';
+
+    if (!d) {
+        d = 1;
+    }
     this.v.sort(function(a, b) {
-        if (!d) {
-            d = 1;
-        }
         if (a.t > b.t) {
             return -1;
         }
@@ -29,6 +31,34 @@ MegaData.prototype.sortReverse = function() {
     this.sortBy(this.sortfn, d);
 };
 
+MegaData.prototype.doFallbackSort = function(a, b, d) {
+    'use strict';
+
+    if (a.ts !== b.ts) {
+        return (a.ts < b.ts ? -1 : 1) * d;
+    }
+
+    if (this.collator) {
+        return this.collator.compare(a.h, b.h) * d;
+    }
+
+    return String(a.h).localeCompare(String(b.h)) * d;
+};
+
+MegaData.prototype.doFallbackSortWithName = function(a, b, d) {
+    'use strict';
+
+    if (a.name !== b.name) {
+        if (this.collator) {
+            return this.collator.compare(a.name, b.name) * d;
+        }
+
+        return String(a.name).localeCompare(String(b.name)) * d;
+    }
+
+    return M.doFallbackSort(a, b, d);
+};
+
 MegaData.prototype.getSortByNameFn = function() {
     var self = this;
 
@@ -37,26 +67,41 @@ MegaData.prototype.getSortByNameFn = function() {
         var itemA = self.getNameByHandle(a.h);
         var itemB = self.getNameByHandle(b.h);
 
-        return M.compareStrings(itemA, itemB, d);
+        if (itemA !== itemB) {
+            return M.compareStrings(itemA, itemB, d);
+        }
+
+        return M.doFallbackSort(itemA, itemB, d);
+    };
+};
+
+MegaData.prototype.getSortByNameFn2 = function(d) {
+    'use strict';
+
+    if (typeof Intl !== 'undefined' && Intl.Collator) {
+        var intl = this.collator || new Intl.Collator('co', {numeric: true});
+
+        return function(a, b) {
+            if (a.name !== b.name) {
+                return intl.compare(a.name, b.name) * d;
+            }
+
+            return M.doFallbackSort(a, b, d);
+        };
+    }
+
+    return function(a, b) {
+        if (typeof a.name === 'string' && typeof b.name === 'string') {
+            return a.name.localeCompare(b.name) * d;
+        }
+        return M.doFallbackSort(a, b, d);
     };
 };
 
 MegaData.prototype.sortByName = function(d) {
-    if (typeof Intl !== 'undefined' && Intl.Collator) {
-        var intl = new Intl.Collator('co', {numeric: true});
+    'use strict';
 
-        this.sortfn = function(a, b, d) {
-            return intl.compare(a.name, b.name) * d;
-        };
-    }
-    else {
-        this.sortfn = function(a, b, d) {
-            if (typeof a.name === 'string' && typeof b.name === 'string') {
-                return a.name.localeCompare(b.name) * d;
-            }
-            return -1;
-        };
-    }
+    this.sortfn = M.getSortByNameFn2(d);
     this.sortd = d;
     this.sort();
 };
@@ -85,7 +130,13 @@ MegaData.prototype.sortByEmail = function(d) {
 
 MegaData.prototype.sortByModTime = function(d) {
     this.sortfn = function(a, b, d) {
-        return (a.mtime < b.mtime) ? -1 * d : d;
+        var time1 = a.mtime - a.mtime % 60;
+        var time2 = b.mtime - b.mtime % 60;
+        if (time1 !== time2) {
+            return (time1 < time2 ? -1 : 1) * d;
+        }
+
+        return M.doFallbackSortWithName(a, b, d);
     };
     this.sortd = d;
     this.sort();
@@ -102,12 +153,13 @@ MegaData.prototype.getSortByDateTimeFn = function() {
     var sortfn;
 
     sortfn = function(a, b, d) {
-        if (a.ts < b.ts) {
-            return -1 * d;
+        var time1 = a.ts - a.ts % 60;
+        var time2 = b.ts - b.ts % 60;
+        if (time1 !== time2) {
+            return (time1 < time2 ? -1 : 1) * d;
         }
-        else {
-            return 1 * d;
-        }
+
+        return M.doFallbackSortWithName(a, b, d);
     };
 
     return sortfn;
@@ -132,7 +184,7 @@ MegaData.prototype.getSortByFavFn = function() {
             return d;
         }
 
-        return 0;
+        return M.doFallbackSortWithName(a, b, d);
     };
 
     return sortfn;
@@ -145,29 +197,34 @@ MegaData.prototype.sortBySize = function(d) {
 };
 
 MegaData.prototype.getSortBySizeFn = function() {
-    var nameSort = this.getSortByNameFn();
+    'use strict';
+
+    var nameSort = Object.create(null);
+    nameSort['1'] = this.getSortByNameFn2(1);
+    nameSort['-1'] = this.getSortByNameFn2(-1);
 
     return function(a, b, d) {
-        if (a.s !== undefined && b.s !== undefined) {
-            if (a.s < b.s) {
-                return -1 * d;
-            }
-            return 1 * d;
+        if (a.s !== undefined && b.s !== undefined && a.s !== b.s) {
+            return (a.s < b.s ? -1 : 1) * d;
         }
         // fallback to sorting by name (folders)
-        return nameSort(a, b, 1);
+        return nameSort[d](a, b);
     };
 };
 
 MegaData.prototype.sortByType = function(d) {
     this.sortfn = function(a, b, d) {
-        if (typeof a.name == 'string' && typeof b.name == 'string') {
-            return filetype(a.name).localeCompare(filetype(b.name)) * d;
+        if (typeof a.name === 'string' && typeof b.name === 'string') {
+            var type1 = filetype(a.name);
+            var type2 = filetype(b.name);
+
+            if (type1 !== type2) {
+                return M.compareStrings(type1, type2, d);
+            }
         }
-        else {
-            return -1;
-        }
-    }
+
+        return M.doFallbackSortWithName(a, b, d);
+    };
     this.sortd = d;
     this.sort();
 };
@@ -180,10 +237,9 @@ MegaData.prototype.sortByOwner = function(d) {
         if (typeof usera.name === 'string' && typeof userb.name === 'string') {
             return usera.name.localeCompare(userb.name) * d;
         }
-        else {
-            return -1;
-        }
-    }
+
+        return M.doFallbackSort(usera, userb, d);
+    };
     this.sortd = d;
     this.sort();
 };

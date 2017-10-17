@@ -845,10 +845,8 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                 }
 
                 // generate preview/icon
-                var icon = fileIcon(v);
-
                 if (!attachmentMetaInfo.revoked && !message.revoked) {
-                    if (v.fa && (icon === "graphic" || icon === "image")) {
+                    if (v.fa && is_image(v)) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
                             v.id = imagesListKey;
@@ -1417,11 +1415,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 MegaPromise.allDone(promises).done(
                     function() {
                         if (pendingkeys.length > 0) {
-                            ChatdIntegration._ensureKeysAreDecrypted(pendingkeys, chatRoom.protocolHandler).done(
-                                function () {
-                                    _runDecryption();
-                                }
-                            );
+                            ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
+                                ChatdIntegration._ensureKeysAreDecrypted(pendingkeys, chatRoom.protocolHandler).done(
+                                    function () {
+                                        _runDecryption();
+                                    }
+                                );
+                            });
                         }
                         else {
                             _runDecryption();
@@ -1538,7 +1538,8 @@ ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
 ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
     var self = this;
     if (!chatRoom.stateIsLeftOrLeaving()) {
-        self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
+        // Temporarily disabled, until we get into the state in which we need this again in the UI:
+        // self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
     }
 };
 

@@ -833,10 +833,21 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
+        if (!chatRoom.protocolHandler) {
+            ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
+                chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
 
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.trackDataChange();
+                if (chatRoom.roomId === self.chatRoom.roomId) {
+                    self.trackDataChange();
+                }
+            });
+        }
+        else {
+            chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
+
+            if (chatRoom.roomId === self.chatRoom.roomId) {
+                self.trackDataChange();
+            }
         }
     });
 
@@ -888,7 +899,14 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var keys = eventData.keys;
 
         var seedKeys = function() {
-            chatRoom.protocolHandler.restoreKeys(keyxid, keys);
+            if (!chatRoom.protocolHandler) {
+                ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
+                    chatRoom.protocolHandler.restoreKeys(keyxid, keys);
+                });
+            }
+            else {
+                chatRoom.protocolHandler.restoreKeys(keyxid, keys);
+            }
         };
         ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
 

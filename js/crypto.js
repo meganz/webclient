@@ -1213,7 +1213,7 @@ function api_req(request, context, channel) {
 // FIXME: check for fetch on !Firefox, not just on Chrome
 var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
 
-if (typeof Uint8Array.prototype.indexOf !== 'function') {
+if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
     if (d) {
         console.debug('No chunked method on this browser: ' + ua);
     }

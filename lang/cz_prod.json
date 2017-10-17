@@ -712,6 +712,7 @@
     "5737": "\u017d\u00e1dn\u00e9 kontakty",
     "5738": "Ko\u0161",
     "5775": "Vyu\u017eito",
+    "5799": "Vyu\u017eit\u00ed",
     "5801": "vyu\u017eito",
     "5814": "Upgradujte \u00fa\u010det",
     "5816": "[X] TB",
@@ -1660,9 +1661,7 @@
     "16474": "P\u0159edchoz\u00ed verze",
     "16475": "Vr\u00e1tit",
     "16476": "Upravil %1",
-    "16477": "P\u0159ejmenoval %2 z %1",
     "16480": "Upraveno mnou",
-    "16481": "P\u0159ejmenov\u00e1no z %1 mnou",
     "16485": "Duplicitn\u00ed polo\u017eky",
     "16486": "Soubor s n\u00e1zvem %1 ji\u017e v tomto um\u00edst\u011bn\u00ed existuje.",
     "16487": "Vyberte soubor, kter\u00fd chcete ponechat:",
@@ -1823,6 +1822,7 @@
     "16903": "Or create an account to participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
     "16904": "Or participate in our achievement program, where you can earn free storage & transfer quota when installing MEGA apps or inviting friends to MEGA (activation can take several days).",
     "16927": "This action can not be completed as it would take you over your current storage limit",
+    "17022": "Account Type",
     "17081": "Incomplete transfer, do you want to resume it?",
     "17082": "Completed transfer. Please save your file.",
     "17083": "The MEGA Universal Windows App is currently being developed. You can get the beta version of the app [A]here[\/A].",
@@ -1845,6 +1845,7 @@
     "17150": "Versions",
     "17151": "[X] versions",
     "17152": "1 version",
-    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted.",
-    "17155": "Total size taken up by file versions:"
+    "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
+    "17155": "Total size taken up by file versions:",
+    "17156": "Renamed from %1"
 }

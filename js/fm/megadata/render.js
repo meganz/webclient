@@ -24,6 +24,8 @@ MegaData.prototype.renderMain = function(aUpdate) {
         this.megaRender = new MegaRender(this.viewmode);
     }
 
+    var container;
+
     // cleanupLayout will render an "empty grid" layout if there
     // are no nodes in the current list (Ie, M.v), if so no need
     // to call renderLayout therefore.
@@ -31,39 +33,42 @@ MegaData.prototype.renderMain = function(aUpdate) {
 
         if (this.currentdirid === 'opc') {
             this.drawSentContactRequests(this.v, 'clearGrid');
+            container = $('.grid-scrolling-table.opc');
         }
         else if (this.currentdirid === 'ipc') {
             this.drawReceivedContactRequests(this.v, 'clearGrid');
+            container = $('.grid-scrolling-table.ipc');
         }
         else {
             numRenderedNodes = this.megaRender.renderLayout(aUpdate, this.v);
+            container = this.megaRender.container;
         }
     }
 
     // No need to bind mouse events etc (gridUI/iconUI/selecddUI)
     // if there weren't new rendered nodes (Ie, they were cached)
-    if (numRenderedNodes) {
 
+    if (numRenderedNodes) {
         if (!aUpdate) {
             M.addContactUI();
-
             if (this.viewmode) {
                 fa_duplicates = Object.create(null);
                 fa_reqcnt = 0;
             }
-
             if ($.rmItemsInView) {
                 $.rmInitJSP = this.fsViewSel;
             }
         }
-
         this.rmSetupUI(aUpdate);
     }
+
+    this.initShortcutsAndSelection(container, aUpdate);
 
     if (d) {
         console.timeEnd('renderMain');
     }
 };
+
 
 /**
  * Helper for M.renderMain
@@ -446,8 +451,10 @@ MegaData.prototype.renderPath = function(fileHandle) {
         $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
         $('.fm-breadcrumbs:first span').empty();
     }
-    if (fileHandle) {
-        fileversioning.fileVersioningDialog(fileHandle);
+    if (!is_mobile) {
+        if (fileHandle) {
+            fileversioning.fileVersioningDialog(fileHandle);
+        }
     }
 };
 

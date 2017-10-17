@@ -306,15 +306,8 @@
                                     : l[16476].replace('%1', M.u[v.u].m);
                     if (i < versionList.length - 1) {
                         if (v.name !== versionList[i + 1].name) {
-                            if (v.u === u_handle) {
-                                actionHtml = l[16481].replace('%1',
-                                '<span class="light-grey italic">' + versionList[i + 1].name + '</span>');
-                            }
-                            else {
-                                actionHtml = l[16477].replace('%1',
-                                '<span class="light-grey italic">' + versionList[i + 1].name + '</span>')
-                                .replace('%2', M.u[v.u].m);
-                            }
+                            actionHtml = l[17156].replace('%1',
+                            '<span class="light-grey italic">' + htmlentities(versionList[i + 1].name) + '</span>');
                         }
                     }
 

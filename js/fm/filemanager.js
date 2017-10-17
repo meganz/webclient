@@ -692,6 +692,45 @@ FileManager.prototype.initFileManagerUI = function() {
 };
 
 /**
+ * A FileManager related method for (re)initializing the shortcuts and selection managers.
+ *
+ * @param container
+ * @param aUpdate
+ */
+FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) {
+    if (!window.fmShortcuts) {
+        window.fmShortcuts = new FMShortcuts();
+    }
+
+
+    if (!aUpdate) {
+        if (window.selectionManager) {
+            window.selectionManager.destroy();
+            Object.freeze(window.selectionManager);
+        }
+
+        /**
+         * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
+         * reattach to its events.
+         *
+         * @type {SelectionManager}
+         */
+        window.selectionManager = new SelectionManager(
+            $(container),
+            $.selected && $.selected.length > 0
+        );
+
+        // restore selection if needed
+        if ($.selected) {
+            $.selected.forEach(function(h) {
+                selectionManager.add_to_selection(h);
+            });
+        }
+    }
+};
+
+
+/**
  * Update FileManager on new nodes availability
  * @details Former rendernew()
  * @returns {MegaPromise}
@@ -989,6 +1028,22 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.remove-item').rebind('click', function() {
         fmremove();
+    });
+
+    $(c + '.addcontact-item').rebind('click', function() {
+        M.safeShowDialog('add-contact-popup', function() {
+            contactAddDialog();
+            $('.fm-add-user').trigger('click');
+            $('.add-user-size-icon').trigger('click');
+
+            $(window).rebind('keydown.esc_contact_dialog', function(e) {
+                if (e.keyCode === 27) {
+                    closeDialog();
+                }
+            });
+
+            return $dialog;
+        });
     });
 
     $(c + '.startchat-item').rebind('click', function() {
@@ -1529,6 +1584,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             if ($.hideTopMenu) {
                 $.hideTopMenu();
             }
+            if ($.hideContextMenu) {
+                $.hideContextMenu();
+            }
         }
 
         if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {
@@ -1924,7 +1982,6 @@ FileManager.prototype.addContactUI = function() {
     "use strict";
 
     $('.nw-contact-item').removeClass('selected');
-    $('.contact-details-pad .grid-url-arrow').unbind('click');
 
     var n = this.u[this.currentdirid];
     if (n && n.u) {
@@ -1942,25 +1999,6 @@ FileManager.prototype.addContactUI = function() {
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
         $('.contact-top-details .contact-details-user-name').text(this.getNameByHandle(user.u));
         $('.contact-top-details .contact-details-email').text(user.m);
-
-        $('.contact-details-pad .grid-url-arrow').rebind('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation(); // do not treat it as a regular click on the file
-            // $(this).addClass('active');
-            $('.dropdown.body').addClass('arrange-to-front');
-            e.currentTarget = $(this);
-            e.calculatePosition = true;
-            $.selected = [getSitePath().replace('/fm/', '')];
-            M.searchPath();
-            if (!$(this).hasClass('active')) {
-                M.contextMenuUI(e, 4);
-                $(this).addClass('active');
-            }
-            else {
-                $.hideContextMenu();
-                $(this).removeClass('active');
-            }
-        });
 
         // Display the current fingerpring
         showAuthenticityCredentials(user);
@@ -3275,15 +3313,21 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
     };
 
     var _openDialog = function(name, dsp) {
-        if (d) {
+        if (d > 1) {
             console.log('safeShowDialog::_openDialog', name, typeof dsp, $.dialog);
         }
 
         onIdle(function() {
             if (typeof $.dialog === 'string') {
 
+                if ($.dialog === name) {
+                    if (d > 1) {
+                        console.log('Reopening same dialog...', name);
+                    }
+                }
+
                 // There are a few dialogs that can be opened from others, deal it.
-                if (!diagInheritance[$.dialog] || diagInheritance[$.dialog].indexOf(name) < 0) {
+                else if (!diagInheritance[$.dialog] || diagInheritance[$.dialog].indexOf(name) < 0) {
                     _cdialogq[name] = dsp;
                     return;
                 }
@@ -3317,7 +3361,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
             return tryCatch(function() {
                 var $dialog;
 
-                if (d) {
+                if (d > 1) {
                     console.warn('Dispatching queued dialog.', name);
                 }
 

@@ -2245,6 +2245,40 @@ MegaData.prototype.disableDescendantFolders = function(id, pref) {
 };
 
 /**
+ * Import file link
+ * @param {String} ph  Public handle
+ * @param {String} key  Node key
+ * @param {String} attr Node attributes
+ * @returns {MegaPromise}
+ */
+MegaData.prototype.importFileLink = function importFileLink(ph, key, attr) {
+    'use strict';
+    return new MegaPromise(function(resolve, reject) {
+        api_req({
+            a: 'p',
+            t: M.RootID,
+            n: [{
+                ph: ph,
+                t: 0,
+                a: attr,
+                k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(key).slice(0, 8)))
+            }]
+        }, {
+            callback: function (r) {
+                if (typeof r === 'object') {
+                    $.onRenderNewSelectNode = r.f[0].h;
+                    resolve(r.f[0].h);
+                }
+                else {
+                    M.ulerror(null, r);
+                    reject(r);
+                }
+            }
+        });
+    });
+};
+
+/**
  * Import folderlink nodes
  * @param {Array} nodes The array of nodes to import
  */

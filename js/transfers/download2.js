@@ -1789,7 +1789,7 @@ var dlmanager = {
             M.require('megasync_js').always(loader);
         }
         else {
-            loader();
+            onIdle(loader);
         }
 
         setTimeout(reject, timeout);

@@ -139,27 +139,22 @@ function addNewContact($addButton) {
 
                     // Extract email addresses one by one
                     email = $(value).contents().eq(1).text();
-
-                    // Make sure that API return positive value, otherwise we have API error
-                    if (!M.inviteContact(M.u[u_handle].m, email, emailText)) {
-
-                        // Singular or plural
-                        if (index === mailNum - 1) {
-                            if (mailNum === 1) {
-                                title = l[150]; // Contact invited
-                                msg = l[5898].replace('[X]', email); // The user [X] has been invited and will appear in your contact list once accepted."
-                            }
-                            else {
-                                title = l[165] + ' ' + l[5859]; // Contacts Invited
-                                msg = l[5899]; // The users have been invited and will appear in your contact list once accepted
-                            }
-
-                            closeDialog();
-                            msgDialog('info', title, msg);
-                            $('.token-input-token-mega').remove();
-                        }
-                    }
+                    M.inviteContact(M.u[u_handle].m, email, emailText);
                 });
+
+                // Singular or plural
+                if (mailNum === 1) {
+                    title = l[150];
+                    msg = l[5898].replace('[X]', email);
+                }
+                else {
+                    title = l[165] + ' ' + l[5859];
+                    msg = l[5899];
+                }
+
+                closeDialog();
+                msgDialog('info', title, msg);
+                $('.token-input-token-mega').remove();
             }
         }
     }
@@ -2726,7 +2721,7 @@ function fm_resize_handler(force) {
 
     if (M.currentdirid !== 'transfers') {
         if (slideshowid && previews[slideshowid]) {
-            previewsrc(previews[slideshowid].src);
+            previewsrc(slideshowid);
         }
 
         if (megaChatIsReady && megaChat.resized) {

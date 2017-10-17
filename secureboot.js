@@ -2091,10 +2091,6 @@ else if (!b_u) {
     jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
     jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
 
-    if (is_extension) {
-        jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
-    }
-
     if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
@@ -2106,6 +2102,7 @@ else if (!b_u) {
 
     var jsl2 =
     {
+        'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'megasync_js': {f:'html/js/megasync.js', n: 'megasync_js', j:1},
@@ -2155,6 +2152,7 @@ else if (!b_u) {
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
+        'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},

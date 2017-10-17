@@ -224,6 +224,7 @@ Chatd.Shard = function(chatd, shard) {
     // active chats on this connection
     self.chatIds = {};
     self.joinedChatIds = {};
+    self.mcurlRequests = {};
 
     // queued commands
     self.cmdq = '';
@@ -275,16 +276,13 @@ Chatd.Shard = function(chatd, shard) {
                     // TODO: change this to use the new API method for retrieving a mcurl for a specific shard
                     // (not chat)
                     var firstChatId = Object.keys(self.chatIds)[0];
-                    asyncApiReq({
-                        a: 'mcurl',
-                        id: base64urlencode(firstChatId),
-                        v: Chatd.VERSION
-                    })
-                        .done(function(mcurl) {
+                    self.retrieveMcurlAndExecuteOnce(
+                        base64urlencode(firstChatId),
+                        function(mcurl) {
                             self.url = mcurl;
                             self.reconnect();
-                        })
-                        .fail(function(r) {
+                        },
+                        function(r) {
                             if (r === EEXPIRED) {
                                 if (megaChat && megaChat.plugins && megaChat.plugins.chatdIntegration) {
                                     megaChat.plugins.chatdIntegration.requiresUpdate();
@@ -294,7 +292,8 @@ Chatd.Shard = function(chatd, shard) {
                             if (connectionRetryManager._$connectingPromise) {
                                 connectionRetryManager._$connectingPromise.reject();
                             }
-                        });
+                        }
+                    );
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection
@@ -391,6 +390,33 @@ Chatd.Shard.prototype.triggerEventOnAllChats = function(evtName) {
     });
 };
 
+
+Chatd.Shard.prototype.retrieveMcurlAndExecuteOnce = function(chatId, resolvedCb, failedCb) {
+    var self = this;
+    if (self.mcurlRequests[chatId]) {
+        // already waiting for mcurl response
+        return;
+    }
+
+    var promise = self.mcurlRequests[chatId] = asyncApiReq({
+        a: 'mcurl',
+        id: chatId,
+        v: Chatd.VERSION
+    });
+
+    promise.done(function(mcurl) {
+            resolvedCb(mcurl);
+        })
+        .fail(function(r) {
+            failedCb(r);
+        })
+        .always(function() {
+            if (promise === self.mcurlRequests[chatId]) {
+                delete self.mcurlRequests[chatId]
+            }
+        });
+};
+
 // is this chatd connection currently active?
 Chatd.Shard.prototype.isOnline = function() {
     return this.s && this.s.readyState === this.s.OPEN;
@@ -474,6 +500,7 @@ Chatd.Shard.prototype.reconnect = function() {
 
         self.joinedChatIds = {};
         self.connectionRetryManager.gotDisconnected();
+        self.mcurlRequests = {};
         self.triggerEventOnAllChats('onRoomDisconnected');
 
         self.chatd.trigger('onClose', {
@@ -508,6 +535,7 @@ Chatd.Shard.prototype.disconnect = function() {
     self.keepAlive.stop();
     self.keepAlivePing.stop();
 
+    self.mcurlRequests = {};
     self.connectionRetryManager.gotDisconnected();
 };
 
@@ -1728,8 +1756,15 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, updated, keyid, msg
     var messagekey = this.getmessagekey(msgid, Chatd.MsgType.EDIT);
     for (var i = this.highnum; i > this.lownum; i--) {
         if (this.buf[i] && this.buf[i][Chatd.MsgField.MSGID] === msgid) {
-            // if we modified the message, remove from this.modified.
+            if (
+                this.buf[i][Chatd.MsgField.MESSAGE] === msg &&
+                this.buf[i][Chatd.MsgField.UPDATED] === updated
+            ) {
+                // potential duplicate MSGUPD, don't do anything.
+                return;
+            }
 
+            // if we modified the message, remove from this.modified.
             this.buf[i][Chatd.MsgField.MESSAGE] = msg;
             this.buf[i][Chatd.MsgField.UPDATED] = updated;
 

@@ -735,7 +735,7 @@ ul, li {
 }
 .mobile.fm-header .fm-icon.cloud {
     cursor: default;
-    margin: 13px 6px 0 7px;
+    margin: 14px 6px 0 7px;
 }
 .mobile.fm-icon.menu {
     background-position: -1px -1138px;
@@ -818,7 +818,7 @@ ul, li {
     line-height: 24px;
     padding: 0 30px;
     color: #333333;
-    padding: 23px 00px 0 00px;
+    padding: 22px 00px 0 00px;
     text-overflow: ellipsis;
     overflow: hidden;
     text-align: left;

@@ -1156,6 +1156,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.preview-item').rebind('click', function() {
+        closeDialog();
         slideshow($.selected[0]);
     });
 

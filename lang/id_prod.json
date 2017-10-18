@@ -618,7 +618,6 @@
     "1917": "Chrome web store",
     "1929": "Install MEGA pada browser anda untuk meningkatkan performa dan keamanan.",
     "1930": "Cloud dalam genggaman anda. Akses dan stream file anda dari smartphone atau tablet.",
-    "1932": "Untuk mendownload file lebih besar dari 1GB, harap install extension browser kami",
     "1933": "Untuk mendownload file lebih besar dari 1GB, harap install browser terbaru",
     "1934": "Lupa password?",
     "1935": "Jika anda memiliki cadangan master crypto key anda, anda dapat mereset password dengan memilih YA. Tidak ada data yang akan hilang.",
@@ -703,7 +702,6 @@
     "5553": "List view",
     "5557": "file",
     "5561": "folder",
-    "5565": "download",
     "5569": "Pengguna",
     "5582": "Buat akun",
     "5589": "Folder yang dibagikan dengan saya",
@@ -785,6 +783,7 @@
     "6078": "MEGA",
     "6080": "konfirmasi",
     "6089": "Tidak ada transfer",
+    "6117": "settings",
     "6125": "PRO II",
     "6126": "PRO III",
     "6159": "MEGA SDK",
@@ -990,7 +989,6 @@
     "7233": "Transaksi tidak dapat dijalankan karena masalah koneksi. Jika masalah ini terulang kembali, harap kontak support@mega.nz",
     "7234": "Ada yang salah dan kami tidak dapat mencas kartu anda.",
     "7235": "Pembayaran gagal",
-    "7236": "Untuk mendownload file lebih besar dari 1GB atau untuk meng-upload folder, harap install klien MEGAsync kami. Ini membolehkan syncing otomatis dan mudah antara komputer anda dengan MEGA cloud drive.",
     "7241": "Anda harus setuju dengan Kebijakan Pelayanan kami.",
     "7272": "Format data salah",
     "7352": "State",
@@ -1809,7 +1807,6 @@
     "16873": "Versi file real-time, perlindungan file yang telah terhapus, peningkatan kinerja pada transfer file, integrasi browser dan banyak lagi.",
     "16883": "Sayangnya, browser Anda memiliki buffer yang tidak mencukupi untuk mendekripsi data, harap instal [A]aplikasi desktop MEGA[\/A] untuk mendownload file berukuran besar %2",
     "16890": "Penyimpanan browser Anda untuk MEGA sudah penuh. Download Anda akan berlanjut secara otomatis setelah Anda membebaskan beberapa ruang.",
-    "16891": "Penyimpanan browser yang tersedia untuk MEGA tidak dapat menangani ukuran unduhan ini, harap kosongkan beberapa ruang disk.",
     "16892": "Maaf, kami tidak dapat mengambil konten Cloud Drive.",
     "16895": "Apa anda ingat password anda?",
     "16896": "Password anda",
@@ -1847,5 +1844,6 @@
     "17152": "1 versi",
     "17154": "Anda akan menghapus riwayat versi 1 file. Harap dicatat bahwa file saat ini tidak akan dihapus. Apakah Anda ingin melanjutkan?",
     "17155": "Ukuran total diambil oleh versi file:",
-    "17156": "Berganti nama dari %1"
+    "17156": "Berganti nama dari %1",
+    "17398": "Label"
 }

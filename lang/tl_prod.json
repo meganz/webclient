@@ -618,7 +618,6 @@
     "1917": "Chrome web store",
     "1929": "I-install ang MEGA sa inyong browser para sa mas pinagandang performance at pinatibay na seguridad.",
     "1930": "Ang cloud sa inyong bulsa. I-access at i-stream ang inyong files sa inyong smartphone o tablet.",
-    "1932": "Para makapagdownload ng mas higit pa sa 1GB, pakiusap na i-install ang aming browser extension.",
     "1933": "Para makapagdownload ng mas higit pa sa 1GB, pakiusap na maglagay ng mas bagong browser.",
     "1934": "Nalimutan ang inyong password?",
     "1935": "Kung meron kang backup ng inyong master crypto key, maaari mong i-reset ang inyong password sa pagpili ng OO. Walang data ang mawawala.",
@@ -703,7 +702,6 @@
     "5553": "Kuhang palista",
     "5557": "file",
     "5561": "folder",
-    "5565": "i-download",
     "5569": "users",
     "5582": "Gumawa ng account",
     "5589": "Naibahagi sa akin",
@@ -785,6 +783,7 @@
     "6078": "MEGA",
     "6080": "ikumpirma",
     "6089": "Walang transfer",
+    "6117": "mga settings",
     "6125": "PRO II",
     "6126": "PRO III",
     "6159": "MEGA SDK",
@@ -990,7 +989,6 @@
     "7233": "Ang transaction ay hindi maitigil ng dahil sa problema sa connection. Kung magpatuloy man ito, i-contact kami sa support@mega.nz",
     "7234": "Mayroong nangyaring hindi inaasahan at hindi namin ma-charge ang inyong card.",
     "7235": "Nabigo ang Pagbabayad",
-    "7236": "Para mag-download ng files na mas malaki sa 1GB o mag-upload ng folders, ilagay ang aming MEGAsync client. Ito ay magbibigay daan sa madali at agarang syncing sa pagitan ng inyong computer at ng inyong MEGA cloud drive.",
     "7241": "Kailangan mong pumayag sa aming Terms of Service",
     "7272": "Maling format ng data",
     "7352": "State",
@@ -1809,7 +1807,6 @@
     "16873": "Real-time na file versioning, proteksyon para sa deleted file, mas pinagandang file transfers, browser integration at marami pa.",
     "16883": "Kulang ang buffer ng inyong browser para makapag-decrypt ng data, i-install ang [A]MEGA desktop app[\/A] para makapag-download ng malalaking files %2",
     "16890": "Ang inyong browser storage para sa MEGA ay puno na. Magpapatuloy ang inyong download matapos mong magbawas para magkaroon ng space.",
-    "16891": "Ang iyong available browser storage para sa MEGA ay hindi kayang hawakan ang laki ng download, magbawas para madagdagan ang disk space.",
     "16892": "Paumanhin, ngunit hindi namin makuha ang laman ng Cloud Drive.",
     "16895": "Do you remember your password?",
     "16896": "Your password",
@@ -1847,5 +1844,6 @@
     "17152": "1 version",
     "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
     "17155": "Buong size na nakuha ng file versions:",
-    "17156": "Renamed from %1"
+    "17156": "Renamed from %1",
+    "17398": "Label"
 }

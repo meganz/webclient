@@ -618,7 +618,6 @@
     "1917": "Chrome Web Store",
     "1929": "Installa MEGA nel browser per migliorare le prestazioni e la sicurezza.",
     "1930": "Il cloud nella tua tasca. Accedi ai tuoi files dal tuo smartphone o tablet.",
-    "1932": "Per scaricare files pi\u00f9 grandi di 1GB, installa la nostra estensione per il browser.",
     "1933": "Per scaricare files pi\u00f9 grandi di 1GB, installa un browser pi\u00f9 moderno.",
     "1934": "Hai dimenticato la password?",
     "1935": "Se disponi di un backup della chiave di crittografia, puoi reimpostare la password selezionando SI. Non ci sono dati saranno persi.",
@@ -703,7 +702,6 @@
     "5553": "Modalit\u00e0 lista",
     "5557": "file",
     "5561": "cartella",
-    "5565": "Download",
     "5569": "utenti",
     "5582": "Nuovo conto",
     "5589": "Condivise con me",
@@ -785,6 +783,7 @@
     "6078": "MEGA",
     "6080": "conferma",
     "6089": "Nessun trasferimento",
+    "6117": "impostazioni",
     "6125": "PRO II",
     "6126": "PRO III",
     "6159": "MEGA SDK",
@@ -990,7 +989,6 @@
     "7233": "Operazione non avviata a causa di problemi di connessione. Se il problema persiste, si prega di contattare support@mega.nz",
     "7234": "Qualcosa \u00e8 andato storto e non siamo stati in grado di addebitare sulla carta.",
     "7235": "Pagamento Fallito",
-    "7236": "Per scaricare i file pi\u00f9 grandi di 1 GB o di caricare le cartelle, si prega di installare il nostro cliente MEGAsync. Questo permetter\u00e0 la sincronizzazione automatica tra il computer e il cloud MEGA.",
     "7241": "\u00c8 necessario concordare con i termini di servizio",
     "7272": "Formato errato",
     "7352": "Stato",
@@ -1809,7 +1807,6 @@
     "16873": "Versionamento dei file in tempo reale, protezione dei file eliminati, performance migliorata nei trasferimenti dei file, integrazione del browser e altro.",
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Lo spazio di archiviazione del tuo browser \u00e8 pieno. Il tuo download continuer\u00e0 automaticamente quando libererai abbastanza spazio.",
-    "16891": "Il tuo spazio di archiviazione del browser disponibile per MEGA non pu\u00f2 gestire questa grandezza di download, per favore libera abbastanza spazio sul disco. ",
     "16892": "Scusa, non siamo stati capaci di recuperare i contenuti del tuo Cloud Drive.",
     "16895": "Ricordi la tua password?",
     "16896": "La tua password",
@@ -1847,5 +1844,6 @@
     "17152": "1 versione",
     "17154": "Stai per cancellare la storia delle versioni di 1 file. Per favore, ricorda che il file corrente non verr\u00e0 eliminato. Vuoi procedere?                                ",
     "17155": "Grandezza totale occupata dalle versioni dei file:",
-    "17156": "Rinominato da %1"
+    "17156": "Rinominato da %1",
+    "17398": "Label"
 }

@@ -618,7 +618,6 @@
     "1917": "Chrome Web Store",
     "1929": "Verbesserte Performance und h\u00f6here Sicherheit mit unseren Browser-Erweiterungen.",
     "1930": "Die Cloud in der Tasche. Nutzen und streamen Sie Ihre Daten \u00fcber Ihr Smartphone oder Tablet. ",
-    "1932": "Bitte installieren Sie unsere Browser-Erweiterung, um Dateien gr\u00f6\u00dfer als 1GB, herunterzuladen. ",
     "1933": "Bitte installieren Sie einen moderneren Browser, um Dateien gr\u00f6\u00dfer als 1GB herunterzuladen.",
     "1934": "Passwort vergessen?",
     "1935": "Haben Sie Ihren Rettungsschl\u00fcssel exportiert? (Dies ist Voraussetzung f\u00fcr einen verlustfreien Passwort-Reset.)",
@@ -703,7 +702,6 @@
     "5553": "Listenansicht",
     "5557": "Upload",
     "5561": "Ordner",
-    "5565": "Download",
     "5569": "Benutzer",
     "5582": "Account erstellen",
     "5589": "Fremdordner",
@@ -785,6 +783,7 @@
     "6078": "MEGA",
     "6080": "best\u00e4tigen",
     "6089": "Keine Transfers",
+    "6117": "Einstellungen",
     "6125": "PRO II",
     "6126": "PRO III",
     "6159": "MEGA SDK",
@@ -990,7 +989,6 @@
     "7233": "Die Transaktion wegen Verbindungsproblemen nicht initiiert werden. Bitte setzen Sie sich ggf. mit support@mega.nz in Verbindung.",
     "7234": "Bei der Belastung Ihrer Kreditkarte ist ein Fehler aufgetreten.",
     "7235": "Zahlung fehlgeschlagen",
-    "7236": "Zum Download sehr gro\u00dfer Dateien (gr\u00f6\u00dfer als 1 GB) oder f\u00fcr den Upload von ganzen Ordnern empfehlen wir die Installation von MEGAsync. Diese Software erm\u00f6glicht auch den vollautomatischen Datenabgleich zwischen Ihren Ger\u00e4ten und Ihrem MEGA Cloud Drive.",
     "7241": "Sie m\u00fcssen unseren AGBs zustimmen",
     "7272": "Ung\u00fcltiges Format",
     "7352": "Staat",
@@ -1809,7 +1807,6 @@
     "16873": "Echtzeit-Dateiversionierung, Wiederherstellung versehentlich gel\u00f6schter Dateien, Browser-Integration und mehr.",
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Der MEGA zugeteilte Browser-Speicher ist voll. Ihr Download wird automatisch fortgesetzt, sobald mehr Plattenplatz zur Verf\u00fcgung steht.",
-    "16891": "Der MEGA zugeteilte Browser-Speicher ist zu klein f\u00fcr einen Download dieser Gr\u00f6\u00dfe. Bitte sorgen Sie f\u00fcr mehr Plattenplatz.",
     "16892": "Leider ist beim Lesen Ihrer Daten ein Fehler aufgetreten.",
     "16895": "K\u00f6nnen Sie sich noch an Ihr Passwort erinnern?",
     "16896": "Ihr Passwort",
@@ -1847,5 +1844,6 @@
     "17152": "1 Version",
     "17154": "Die Versionshistorie dieser Datei wird gel\u00f6scht. Die aktuelle Version bleibt erhalten. Fortfahren?",
     "17155": "Platzverbrauch \u00e4lterer Dateiversionen:",
-    "17156": "Von %1 umbenannt"
+    "17156": "Von %1 umbenannt",
+    "17398": "Label"
 }

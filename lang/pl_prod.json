@@ -618,7 +618,6 @@
     "1917": "Chrome web store",
     "1929": "Zainstaluj MEGA w swojej przegl\u0105darce aby zwi\u0119kszy\u0107 wydajno\u015b\u0107 i bezpiecze\u0144stwo.",
     "1930": "Chmura w Twojej kieszeni. Udost\u0119pniaj pliki ze swojego telefonu lub tableta.",
-    "1932": "Aby pobiera\u0107 pliki wi\u0119ksze ni\u017c 1GB, prosimy zainstalowa\u0107 dodatek do przegl\u0105darki.",
     "1933": "Aby pobiera\u0107 pliki wi\u0119ksze ni\u017c 1GB, prosimy zainstalowa\u0107 nowsz\u0105 wersj\u0119 przegl\u0105darki.",
     "1934": "Zapomnia\u0142e\u015b has\u0142a?",
     "1935": "Je\u017celi posiadasz kopi\u0119 swoje klucza szyfrowania, mo\u017cesz zresetowa\u0107 swoje has\u0142o klikaj\u0105c TAK. \u017badne dane nie zostan\u0105 utracone.",
@@ -703,7 +702,6 @@
     "5553": "Widok listy",
     "5557": "pliki",
     "5561": "katalog",
-    "5565": "pobranie",
     "5569": "u\u017cytkownicy",
     "5582": "Utw\u00f3rz konto",
     "5589": "Udost\u0119pnione dla mnie",
@@ -785,6 +783,7 @@
     "6078": "MEGA",
     "6080": "potwierd\u017a",
     "6089": "Brak dzia\u0142a\u0144",
+    "6117": "ustawienia",
     "6125": "PRO II",
     "6126": "PRO III",
     "6159": "MEGA SDK",
@@ -990,7 +989,6 @@
     "7233": "Transakcja nie mo\u017ce by\u0107 kontynuowana ze wzgl\u0119du na problemy z \u0142\u0105czno\u015bci\u0105. Je\u017celi problem b\u0119dzie si\u0119 powtarza\u0107, prosimy o kontakt na support@mega.nz",
     "7234": "Operacja nie powiod\u0142a si\u0119 i nie mo\u017cemy obci\u0105\u017cy\u0107 Twojej karty kredytowej.",
     "7235": "P\u0142atno\u015b\u0107 anulowana",
-    "7236": "W celu pobierania lub wgrywania plik\u00f3w wi\u0119kszych ni\u017c 1GB, prosimy zainstalowa\u0107 nasz\u0105 aplikacj\u0119 MEGAsync, kt\u00f3ra umo\u017cliwia \u0142atwe i automatyczne synchronizowanie Twojego komputera z dyskiem MEGA.",
     "7241": "Musisz wyrazi\u0107 akceptacj\u0119 regulaminu",
     "7272": "B\u0142\u0119dny format danych",
     "7352": "Stan",
@@ -1809,7 +1807,6 @@
     "16873": "Wersjonowanie plik\u00f3w, ochrona przed skasowaniem, zwi\u0119kszona pr\u0119dko\u015b\u0107 przesy\u0142ania plik\u00f3w, integracja z przegl\u0105dark\u0105 i wi\u0119cej.",
     "16883": "Niestety, Twoja przegl\u0105darka ma niewystarczaj\u0105ca ilo\u015b\u0107 pami\u0119ci do odszyfrowania danych, prosimy zainstalowa\u0107 [A]aplikacj\u0119 MEGA desktop[\/A] aby m\u00f3c pobiera\u0107 du\u017ce pliki %2",
     "16890": "Nie masz wystarczaj\u0105cej ilo\u015bci pami\u0119ci. Pobieranie plik\u00f3w zostanie wznowione gdy udost\u0119pnisz wi\u0119cej pami\u0119ci na dysku.",
-    "16891": "Dost\u0119pna powierzchnia dla MEGA nie pozwala na pobranie pliku. Zwolnij powierzchni\u0119 na dysku aby kontynuowa\u0107.",
     "16892": "Przepraszamy, ale wyst\u0105pi\u0142y problemy podczas pobierania danych z Cloud Drive.",
     "16895": "Czy pami\u0119tasz swoje has\u0142o?",
     "16896": "Twoje has\u0142o",
@@ -1847,5 +1844,6 @@
     "17152": "1 wersja",
     "17154": "Masz zamiar usun\u0105\u0107 wersj\u0119 zapisu 1 pliku. Pami\u0119taj, \u017ce aktualny plik nie zostanie usuni\u0119ty. Czy chcesz kontynuowa\u0107?",
     "17155": "Ca\u0142kowita powierzchnia zaj\u0119ta przez pliki:",
-    "17156": "Zmienione z %1"
+    "17156": "Zmienione z %1",
+    "17398": "Etykieta"
 }

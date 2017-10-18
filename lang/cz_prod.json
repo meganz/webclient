@@ -618,7 +618,6 @@
     "1917": "Internetov\u00fd obchod Chrome",
     "1929": "Nainstalujte MEGA do sv\u00e9ho prohl\u00ed\u017ee\u010de kv\u016fli zlep\u0161en\u00ed v\u00fdkonu a zv\u00fd\u0161en\u00ed bezpe\u010dnosti.",
     "1930": "Cloud ve va\u0161\u00ed kapse. P\u0159istupujte k soubor\u016fm a streamujte je ze sv\u00e9ho chytr\u00e9ho telefonu nebo tabletu. ",
-    "1932": "Pro stahov\u00e1n\u00ed soubor\u016f v\u011bt\u0161\u00edch ne\u017e 1\u00a0GB si nainstalujte na\u0161e roz\u0161\u00ed\u0159en\u00ed prohl\u00ed\u017ee\u010de.",
     "1933": "Pro stahov\u00e1n\u00ed soubor\u016f v\u011bt\u0161\u00edch ne\u017e 1\u00a0GB si nainstalujte modern\u011bj\u0161\u00ed prohl\u00ed\u017ee\u010d.",
     "1934": "Zapomn\u011bli jste sv\u00e9 heslo?",
     "1935": "Pokud m\u00e1te z\u00e1lohu sv\u00e9ho hlavn\u00edho \u0161ifrovac\u00edho kl\u00ed\u010de, m\u016f\u017eete obnovit sv\u00e9 heslo v\u00fdb\u011brem volby ANO. Nep\u0159ijdete o \u017e\u00e1dn\u00e1 data.",
@@ -703,7 +702,6 @@
     "5553": "Zobrazen\u00ed seznamu",
     "5557": "soubor",
     "5561": "slo\u017eka",
-    "5565": "st\u00e1hnout",
     "5569": "u\u017eivatel\u00e9",
     "5582": "Vytvo\u0159it \u00fa\u010det",
     "5589": "Sd\u00edleno se mnou",
@@ -785,6 +783,7 @@
     "6078": "MEGA",
     "6080": "potvrdit",
     "6089": "\u017d\u00e1dn\u00e9 p\u0159enosy",
+    "6117": "nastaven\u00ed",
     "6125": "PRO II",
     "6126": "PRO III",
     "6159": "SDK MEGA",
@@ -990,7 +989,6 @@
     "7233": "Transakce nem\u016f\u017ee b\u00fdt zah\u00e1jena kv\u016fli probl\u00e9m\u016fm s p\u0159ipojen\u00edm. Pokud probl\u00e9m p\u0159etrv\u00e1v\u00e1, obra\u0165te se na support@mega.nz",
     "7234": "N\u011bco se nepovedlo a nepoda\u0159ilo se n\u00e1m strhnout \u010d\u00e1stku z va\u0161\u00ed karty.",
     "7235": "Platba selhala",
-    "7236": "Pro stahov\u00e1n\u00ed soubor\u016f v\u011bt\u0161\u00edch ne\u017e 1 Gb nebo nahr\u00e1v\u00e1n\u00ed slo\u017eek si nainstalujte n\u00e1\u0161 klient MEGAsync. Umo\u017en\u00ed to snadnou automatizovanou synchronizace mezi va\u0161\u00edm po\u010d\u00edta\u010dem a va\u0161\u00ed cloudovou jednotkou MEGA.",
     "7241": "Mus\u00edte souhlasit s Podm\u00ednkami u\u017e\u00edv\u00e1n\u00ed",
     "7272": "\u0160patn\u00fd form\u00e1t data",
     "7352": "Stav",
@@ -1809,7 +1807,6 @@
     "16873": "Real-time file versioning, deleted file protection, enhanced performance on file transfers, browser integration and more.",
     "16883": "Unfortunately, your browser has an insufficient buffer to decrypt data, please install the [A]MEGA desktop app[\/A] to download large files %2",
     "16890": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "16891": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
     "16892": "Sorry, we were unable to retrieve the Cloud Drive contents.",
     "16895": "Do you remember your password?",
     "16896": "Your password",
@@ -1847,5 +1844,6 @@
     "17152": "1 version",
     "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
     "17155": "Total size taken up by file versions:",
-    "17156": "Renamed from %1"
+    "17156": "Renamed from %1",
+    "17398": "Label"
 }

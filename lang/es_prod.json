@@ -618,7 +618,6 @@
     "1917": "Chrome web store",
     "1929": "Instala MEGA en tu navegador para un mejor rendimiento y una mayor seguridad.",
     "1930": "La nube en tu bolsillo. Accede y reproduce tus archivos desde tu smartphone o tablet.",
-    "1932": "Para descargar archivos mayores de 1GB, por favor instala nuestra extensi\u00f3n para navegadores.",
     "1933": "Para descargar archivos mayores de 1GB, por favor instala MEGAsync, Google Chrome u Opera.",
     "1934": "\u00bfHas olvidado tu contrase\u00f1a?",
     "1935": "Si tienes una copia de seguridad de tu Clave de Recuperaci\u00f3n, puedes resetear tu contrase\u00f1a eligiendo la opci\u00f3n \"SI\". Ning\u00fan dato se perder\u00e1 en el proceso.",
@@ -703,7 +702,6 @@
     "5553": "Ver como lista",
     "5557": "archivo",
     "5561": "carpeta",
-    "5565": "descarga",
     "5569": "usuarios",
     "5582": "Crear cuenta",
     "5589": "Carpetas compartidas",
@@ -785,6 +783,7 @@
     "6078": "MEGA",
     "6080": "confirmar",
     "6089": "No hay transferencias",
+    "6117": "Ajustes",
     "6125": "PRO II",
     "6126": "PRO III",
     "6159": "SDK MEGA",
@@ -990,7 +989,6 @@
     "7233": "La transacci\u00f3n no se ha iniciado debido a un problema de conexi\u00f3n. Si el problema persiste, por favor contacta con support@mega.nz",
     "7234": "Algo ha salido mal y no se ha podido cobrar el pago en tu tarjeta.",
     "7235": "Pago fallido",
-    "7236": "Para descargar archivos de m\u00e1s de 1GB o para subir carpetas, por favor instala nuestro cliente MEGAsync. Esto te permitir\u00e1 una sincronizaci\u00f3n sencilla y automatizada entre tu ordenador y tu nube MEGA.",
     "7241": "Debes aceptar nuestros T\u00e9rminos de Servicio",
     "7272": "Formato de datos incorrecto",
     "7352": "Estado",
@@ -1809,7 +1807,6 @@
     "16873": "Control de versiones en tiempo real, conservaci\u00f3n de datos eliminados, mejor rendimiento en las transferencias de archivos, integraci\u00f3n en el navegador y mucho m\u00e1s.",
     "16883": "Lamentablemente tu navegador no tiene memoria suficiente para descifrar datos. Para descargar archivos grandes por favor instala la [A]aplicaci\u00f3n de escritorio[\/A] de MEGA %2",
     "16890": "La memoria disponible para MEGA en tu navegador est\u00e1 llena. La descarga continuar\u00e1 autom\u00e1ticamente en cuanto liberes espacio en el disco.",
-    "16891": "La memoria disponible para MEGA en tu navegador no es suficiente para esta descarga, por favor libera espacio en el disco.",
     "16892": "No se ha podido recuperar el contenido de la secci\u00f3n Mi nube.",
     "16895": "\u00bfRecuerdas tu contrase\u00f1a?",
     "16896": "Tu contrase\u00f1a",
@@ -1847,5 +1844,6 @@
     "17152": "1 versi\u00f3n",
     "17154": "Est\u00e1s a punto de eliminar el historial de versiones de 1 archivo. Ten en cuenta que no se eliminar\u00e1 la versi\u00f3n actual del archivo.\u00bfQuieres continuar?",
     "17155": "Espacio ocupado por las versiones de los archivos:",
-    "17156": "Renombrado desde %1"
+    "17156": "Renombrado desde %1",
+    "17398": "Label"
 }

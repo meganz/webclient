@@ -721,11 +721,6 @@ function fmtopUI() {
             }
             else if (ua.details.engine === 'Gecko') {
                 $('.fm-folder-upload').removeClass('hidden');
-                $('input[webkitdirectory], .fm-folder-upload input')
-                    .rebind('click', function() {
-                        firefoxDialog();
-                        return false;
-                    });
             }
             else {
                 $('.fm-file-upload').addClass('last-button');
@@ -2305,92 +2300,6 @@ function chromeDialog(close) {
             $(this).attr('checked', false);
         }
     });
-}
-
-/**
- * Open a dialog asking the user to download MEGAsync for files over 1GB
- */
-function megaSyncDialog() {
-    "use strict";
-
-    // Cache selector
-    var $dialog = $('.fm-dialog.download-megasync-dialog');
-
-    // Show the dialog and overlay
-    M.safeShowDialog('download-megasync-dialog', $dialog);
-
-    // Add close button handler
-    $dialog.find('.fm-dialog-close, .close-button').rebind('click', closeDialog);
-
-    // Add checkbox handling
-    $dialog.find('#megasync-checkbox').rebind('click', function() {
-
-        var $this = $(this);
-
-        // If it has not been checked, check it
-        if (!$this.hasClass('checkboxOn')) {
-
-            // Store a flag so that it won't show this dialog again if triggered
-            localStorage.megaSyncDialog = 1;
-            $this.attr('class', 'checkboxOn');
-            $this.parent().attr('class', 'checkboxOn');
-            $this.attr('checked', true);
-        }
-        else {
-            // Otherwise uncheck it
-            delete localStorage.megaSyncDialog;
-            $this.attr('class', 'checkboxOff');
-            $this.parent().attr('class', 'checkboxOff');
-            $this.attr('checked', false);
-        }
-    });
-    clickURLs();
-}
-
-function firefoxDialog(close) {
-    "use strict";
-
-    if (close)
-    {
-        $.dialog = false;
-        fm_hideoverlay();
-        $('.fm-dialog.firefox-dialog').addClass('hidden');
-        return true;
-    }
-
-    if (page === 'download')
-        $('.ff-extension-txt').text(l[1932]);
-    else
-        $('.ff-extension-txt').text(l[1174]);
-
-    fm_showoverlay();
-    $('.fm-dialog.firefox-dialog').removeClass('hidden');
-    $.dialog = 'firefox';
-
-    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').rebind('click', function()
-    {
-        firefoxDialog(1);
-    });
-
-    $('#firefox-checkbox').rebind('click', function()
-    {
-        if ($(this).hasClass('checkboxOn') === false)
-        {
-            localStorage.firefoxDialog = 1;
-            $(this).removeClass('checkboxOff').addClass('checkboxOn');
-            $(this).parent().removeClass('checkboxOff').addClass('checkboxOn');
-            $(this).attr('checked', true);
-        }
-        else
-        {
-            delete localStorage.firefoxDialog;
-            $(this).removeClass('checkboxOn').addClass('checkboxOff');
-            $(this).parent().removeClass('checkboxOn').addClass('checkboxOff');
-            $(this).attr('checked', false);
-        }
-    });
-
-    clickURLs();
 }
 
 function browserDialog(close) {

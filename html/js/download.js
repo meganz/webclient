@@ -254,7 +254,7 @@ function dl_g(res) {
                 }
                 else if (fdl_filesize > maxDownloadSize) {
                     checkMegaSyncDownload();
-                    setBrowserWarningClasses('.download.warning-block');
+                    dlmanager.setBrowserWarningClasses('.download.warning-block');
                 }
                 else {
                     uncheckMegaSyncDownload();
@@ -273,8 +273,9 @@ function dl_g(res) {
                             if (res.msd !== 0 && (!err || is)) {
                                 $('.megasync-overlay').removeClass('downloading');
                                 megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
-                            } else {
-                                megasyncOverlay();
+                            }
+                            else {
+                                dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
                             }
                         });
                     }
@@ -562,136 +563,6 @@ function setMobileAppInfo() {
             $('.app-info-block').addClass('android');
             break;
     }
-}
-
-function setBrowserWarningClasses(selector, $container, message) {
-    'use strict';
-
-    var uad = ua.details || false;
-    var $elm = $(selector, $container);
-
-    if (message) {
-        $elm.addClass('default-warning');
-    }
-    else if (window.safari) {
-        $elm.addClass('safari');
-    }
-    else if (window.chrome) {
-        $elm.addClass('chrome');
-    }
-    else if (window.opr) {
-        $elm.addClass('opera');
-    }
-    else if (uad.engine === 'Gecko') {
-        $elm.addClass('ff');
-    }
-    else if (uad.engine === 'Trident') {
-        $elm.addClass('ie');
-    }
-    else if (uad.browser === 'Edge') {
-        $elm.addClass('edge');
-    }
-
-    var setText = function(locale, $elm) {
-        var text = uad.browser ? String(locale).replace('%1', uad.browser) : l[16883];
-
-        if (message) {
-            text = l[1676] + ': ' + message + '<br/>' + l[16870] + ' %2';
-        }
-
-        if (window.chrome) {
-            if (window.Incognito) {
-                text = text.replace('%2', '(' + l[16869] + ')');
-            }
-            else {
-                text = text.replace('%2', '');
-            }
-        }
-        else {
-            text = text.replace('%2', '(' + l[16868] + ')');
-        }
-
-        $elm.find('span').safeHTML(text);
-    };
-
-    if ($container && $elm) {
-        setText(l[16866], $elm);
-        $container.addClass('warning');
-    }
-    else {
-        setText(l[16865], $elm.addClass('visible'));
-    }
-}
-
-// MEGAsync dialog If filesize is too big for downloading through browser
-function megasyncOverlay() {
-    'use strict';
-
-    var $this = $('.megasync-overlay');
-    var slidesNum = $('.megasync-controls div').length;
-    var $body = $('body');
-
-    $this.addClass('msd-dialog').removeClass('hidden downloading');
-    $body.addClass('overlayed');
-
-    if (fdl_filesize > maxDownloadSize) {
-        setBrowserWarningClasses('.megasync-bottom-warning', $this);
-    }
-
-    $('.big-button.download-megasync', $this).rebind('click', function() {
-        megasync.download(dlpage_ph, dlpage_key);
-    });
-
-    $('.megasync-slider.button', $this).rebind('click', function()
-    {
-        var $this = $(this);
-        var activeSlide = parseInt($('.megasync-controls div.active').attr('data-slidernum'));
-
-        if ($this.hasClass('prev')) {
-            if (activeSlide > 1) {
-                $('.megasync-controls div.active').removeClass('active').prev().addClass('active');
-                $('.megasync-content.slider')
-                    .removeClass('slide1 slide2 slide3')
-                    .addClass('slide' + (activeSlide - 1));
-            }
-            else {
-
-            }
-        }
-        else {
-            if (activeSlide < slidesNum) {
-                $('.megasync-controls div.active').removeClass('active').next().addClass('active');
-                $('.megasync-content.slider')
-                    .removeClass('slide1 slide2 slide3')
-                    .addClass('slide' + (activeSlide + 1));
-            }
-        }
-    });
-
-    $('.megasync-controls div', $this).rebind('click', function()
-    {
-        $('.megasync-content.slider').removeClass('slide1 slide2 slide3').addClass('slide' + $(this).attr('data-slidernum'));
-        $('.megasync-controls div.active').removeClass('active');
-        $(this).addClass('active');
-    });
-
-    $('.megasync-info-txt a', $this).rebind('click', function(e) {
-        $this.addClass('hidden');
-        $body.removeClass('overlayed');
-        loadSubPage('pro');
-    });
-
-    $('.megasync-close, .fm-dialog-close', $this).rebind('click', function(e) {
-        $this.addClass('hidden');
-        $body.removeClass('overlayed');
-    });
-
-    $('body').rebind('keyup.msd', function(e) {
-        if (e.keyCode === 27) {
-            $this.addClass('hidden');
-            $body.removeClass('overlayed');
-        }
-    });
 }
 
 function closedlpopup()

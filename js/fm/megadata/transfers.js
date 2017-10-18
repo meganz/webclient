@@ -151,8 +151,13 @@ MegaData.prototype.addDownload = function(n, z, preview) {
 MegaData.prototype.addDownloadSync = function(n, z, preview) {
     var args = toArray.apply(null, arguments);
     var webdl = function() {
-        M.addWebDownload.apply(M, args);
-        args = undefined;
+        dlmanager.getMaximumDownloadSize()
+            .done(function(size) {
+                dlmanager.maxDownloadSize = size;
+
+                M.addWebDownload.apply(M, args);
+                args = undefined;
+            });
     };
 
     if (z || preview || !fmconfig.dlThroughMEGAsync) {
@@ -219,10 +224,11 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
 MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     delete $.dlhash;
     var path;
-    var added = 0;
     var nodes = [];
     var paths = {};
     var zipsize = 0;
+    var entries = [];
+
     if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO)) {
         var nf = [], cbs = [];
         for (var i in n) {
@@ -284,6 +290,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
     var p = '';
     var pauseTxt = '';
+
     if (uldl_hold) {
         p = 'transfer-paused';
         pauseTxt = l[1651];
@@ -304,6 +311,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         }
         path = paths[nodes[k]] || '';
         $.totalDL += n.s;
+
         var $tr = $('.transfer-table #dl_' + htmlentities(n.h));
         if ($tr.length) {
             if (!$tr.hasClass('transfer-completed')) {
@@ -311,7 +319,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             }
             $tr.remove();
         }
-        dl_queue.push({
+        var entry = {
             size: n.s,
             nauth: n_h,
             id: n.h,
@@ -327,27 +335,35 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             onBeforeDownloadComplete: this.dlbeforecomplete.bind(this),
             onDownloadError: this.dlerror.bind(this),
             onDownloadStart: this.dlstart.bind(this)
-        });
-        added++;
-        zipsize += n.s;
-
-        if (!z) {
-            this.putToTransferTable(n, ttl);
-            mega.ui.tpp.setTotal(1, 'dl');
-        }
+        };
+        entries.push({node: n, entry: entry});
     }
 
-    if (!added) {
+    if (!entries.length) {
         if (d) {
             dlmanager.logger.warn('Nothing to download.');
         }
         return;
     }
 
-    // If regular download using Firefox and the total download is over 1GB then show the dialog
-    // to use the extension, but not if they've seen the dialog before and ticked the checkbox
-    if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
-        later(firefoxDialog);
+    if ($.totalDL > dlmanager.maxDownloadSize) {
+        if (d) {
+            console.log('Downloads exceed max size', entries.length, entries);
+        }
+        mega.config.set('dlThroughMEGAsync', 1);
+        return dlmanager.showMEGASyncOverlay(true);
+    }
+
+    for (var e = 0; e < entries.length; e++) {
+        n = entries[e].node;
+
+        dl_queue.push(entries[e].entry);
+        zipsize += n.s;
+
+        if (!z) {
+            this.putToTransferTable(n, ttl);
+            mega.ui.tpp.setTotal(1, 'dl');
+        }
     }
 
     var flashhtml = '';
@@ -381,7 +397,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     }
 
     if (!preview) {
-        this.onDownloadAdded(added, uldl_hold, z, zipsize);
+        this.onDownloadAdded(entries.length, uldl_hold, z, zipsize);
         setupTransferAnalysis();
     }
 
@@ -799,6 +815,8 @@ MegaData.prototype.getTransferElements = function() {
     obj.domTableWrapper = obj.domTransfersBlock.querySelector('.transfer-table-wrapper');
     obj.domTransferHeader = obj.domTransfersBlock.querySelector('.fm-transfers-header');
     obj.domPanelTitle = obj.domTransferHeader.querySelector('.transfer-panel-title');
+    obj.domUploadBlock = obj.domPanelTitle.querySelector('.upload');
+    obj.domDownloadBlock = obj.domPanelTitle.querySelector('.download');
     obj.domTableEmptyTxt = obj.domTableWrapper.querySelector('.transfer-panel-empty-txt');
     obj.domTableHeader = obj.domTableWrapper.querySelector('.transfer-table-header');
     obj.domScrollingTable = obj.domTableWrapper.querySelector('.transfer-scrolling-table');

@@ -929,31 +929,6 @@
     </div>
 </div>
 
-<div class="fm-dialog download-megasync-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$1626]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-    <div class="content">
-        <div class="txt">[$7236]</div>
-        <a class="button clickurl" href="/sync">
-            <span class="icon"></span>
-            <span class="button-txt">[$5565] [$1626]</span>
-        </a>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="checkboxOff">
-            <input type="checkbox" name="megasync-checkbox" id="megasync-checkbox" class="checkboxOff">
-        </div>
-        <label for="megasync-checkbox" class="radio-txt">[$229]</label>
-        <div class="default-white-button right close-button">
-            <span>[$148]</span>
-        </div>
-        <div class="clear"></div>
-    </div>
-</div>
-
 <div class="create-new-folder dropdown body popup dropdown-arrow hidden">
     <i class="dropdown-white-arrow"></i>
     <div class="create-folder-size-icon full-size"></div>
@@ -1945,6 +1920,17 @@
                 <div class="megasync-slider-wrap">
                     <div class="megasync-slider body-block">
 
+                        <div class="megasync-slide slide0 hidden">
+                            <div class="megasync-header">
+                                That's impressive!
+                            </div>
+                            <div class="megasync-img img0">
+                                <div class="megasync-text">
+                                    It appears that you are trying to transfer a large amount of files. This can lead to performance issues when downloading with your browser. Try our app for enhanced performance on file transfers.
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="megasync-slide slide1">
                             <div class="megasync-header">
                                 [$16861]
@@ -1996,20 +1982,17 @@
 
                             </div>
                         </div>
-                        <div class="clear"></div>
                     </div>
 
                     <div class="megasync-slider button prev"></div>
                     <div class="megasync-slider button next"></div>
 
-                    <div class="megasync-controls">
-                        <div class="active" data-slidernum="1"></div>
-                        <div data-slidernum="2"></div>
-                        <div data-slidernum="3"></div>
-                    </div>
                     <div class="megasync-buttons">
                         <div class="download big-button red download-megasync transition">
-                            [$1913]
+                            <span>Download MEGA app</span>
+                        </div>
+                        <div class="download big-button continue-with-browser transition hidden">
+                            <span>Continue with browser</span>
                         </div>
                     </div>
                 </div>
@@ -2240,8 +2223,14 @@
     <div class="toast-body">
         <div class="toast-col">
             <span></span>
-            <div class="toast-button">
-                [$726]
+        </div>
+        <div class="toast-col">
+            <div class="toast-button first">
+                <span>[$726]</span>
+            </div>
+            <div class="toast-button second hidden">
+                <i class="small-icon icons-sprite cog"></i>
+                <span>[$6117]</span>
             </div>
         </div>
         <div class="toast-col">

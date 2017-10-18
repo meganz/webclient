@@ -27,10 +27,14 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
             .text(text);
 
         if (fatalError) {
-            setBrowserWarningClasses('.download.warning-block', 0, status);
+            dlmanager.setBrowserWarningClasses('.download.warning-block', 0, status);
         }
     }
     else {
+        if (fatalError) {
+            dlmanager.onDownloadFatalError = status;
+        }
+
         $('.transfer-table #' + id + ' .transfer-status')
             .attr('title', status)
             .text(text);

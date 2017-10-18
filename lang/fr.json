@@ -4112,7 +4112,6 @@
     "16904": "Ou participez \u00e0 notre programme d'objectifs qui vous permettra de gagner de l'espace de stockage et un quota de transfert gratuits en installant les applis MEGA ou en invitant des amis \u00e0 MEGA (l'activation peut prendre plusieurs jours).",
     "16905": "La d\u00e9sactivation de ce contr\u00f4le de s\u00e9curit\u00e9 pourrait permettre l'interception de vos communications. Les attaquants ne pourraient toujours pas acc\u00e9der \u00e0 vos donn\u00e9es en raison de notre chiffrement de bout en bout, mais ils pourraient d\u00e9placer vos fichiers et dossiers \u00e0 l'aveuglette dans MEGA, les supprimer ou vous refuser l'acc\u00e8s \u00e0 votre compte.",
     "16906": "Voir les versions ant\u00e9rieures",
-    "16908": "Profitez de 50 Go de stockage nuagique avec un compte gratuit et soyez en mesure de chiffrer tous vos fichiers avec nos g\u00e9n\u00e9reuses [A]offres PRO[\/A].",
     "16909": "Un probl\u00e8me est survenu lors de l'installation de cette mise \u00e0 jour. Veuillez ressayer ult\u00e9rieurement ou t\u00e9l\u00e9charger la derni\u00e8re version de\u2009:https:\/\/mega.co.nz\/#sync ",
     "16910": "Impossible de r\u00e9cup\u00e9rer le syst\u00e8me de fichiers. Veuillez ressayer. Si le probl\u00e8me persiste, veuillez contacter bug@mega.co.nz.",
     "16912": "Erreur\u2009: le dossier de destination est invalide. Le t\u00e9l\u00e9chargement a \u00e9t\u00e9 annul\u00e9.",
@@ -4374,7 +4373,7 @@
     "17282": "Choisissez le fichier que vous souhaitez t\u00e9l\u00e9verser.",
     "17283": "Installez l\u2019appli pour ordinateur de MEGA pour Windows, Mac ou Linux.[Br][Br]Synchronisez un ou plusieurs dossiers de votre ordinateur avec votre compte MEGA.[Br][Br]Acc\u00e9dez et travaillez avec vos donn\u00e9es en toute s\u00e9curit\u00e9 \u00e0 partir de diff\u00e9rents lieux et appareils. L\u2019appli est toujours en fonction et enti\u00e8rement automatique.",
     "17389": "Choisissez des contacts de la liste de contacts de votre t\u00e9l\u00e9phone ou saisissez plusieurs adresses courriel.",
-    "17398": "Label",
-    "17445": "Date Added",
-    "17446": "Date Created"
+    "17398": "\u00c9tiquette",
+    "17445": "Date d\u2019ajout",
+    "17446": "Date de cr\u00e9ation"
 }

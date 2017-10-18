@@ -443,6 +443,14 @@
         "text": "Downloading",
         "context": "Title header on the download page while the file is downloading."
     },
+    "366": {
+        "text": "Copyright warning",
+        "context": ""
+    },
+    "367": {
+        "text": "MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.",
+        "context": ""
+    },
     "368": {
         "text": "Caution:",
         "context": ""
@@ -1644,7 +1652,7 @@
         "context": ""
     },
     "999": {
-        "text": "Would you like to upgrade your temporary session to a free account now?",
+        "text": "Would you like to upgrade your temporary session to a FREE account now?",
         "context": "Ephemeral session refers to the current session the user has on MEGA which is of temporary nature"
     },
     "1000": {
@@ -3507,6 +3515,82 @@
         "text": "You are currently logged in. Would you like to log out and register a new account?",
         "context": "Confirmation message, that we show when the user clicks an invite link to register a new account while the user is logged in."
     },
+    "1825": {
+        "text": "What is MEGAsync?",
+        "context": ""
+    },
+    "1827": {
+        "text": "How do I install MEGAsync?",
+        "context": ""
+    },
+    "1829": {
+        "text": "Can I use MEGAsync on multiple computers?",
+        "context": ""
+    },
+    "1831": {
+        "text": "How can I monitor the sync status of my local files and folders?",
+        "context": ""
+    },
+    "1833": {
+        "text": "MEGAsync stores my login credentials to perform autologin. Isn't that a security concern?",
+        "context": ""
+    },
+    "1839": {
+        "text": "Does MEGAsync perform explicit file versioning?",
+        "context": "e.g. when a user updates a file (a partial write operation), the user would have the ability to go back in time and reverse the operation, which is currently not supported by MEGA"
+    },
+    "1840": {
+        "text": "No. However, you can access overwritten files in the respective debris folders until they are purged.",
+        "context": ""
+    },
+    "1841": {
+        "text": "Does MEGAsync support modifying existing files?",
+        "context": ""
+    },
+    "1845": {
+        "text": "Are there any restrictions with regards to filenames?",
+        "context": ""
+    },
+    "1849": {
+        "text": "How can I make sure that I always have the latest version of MEGAsync?",
+        "context": ""
+    },
+    "1851": {
+        "text": "Will MEGAsync use peer-to-peer transfers to achieve faster syncing between computers in the same local area network?",
+        "context": ""
+    },
+    "1852": {
+        "text": "No. The current incarnation of MEGAsync always syncs via MEGA's cloud infrastructure.",
+        "context": ""
+    },
+    "1853": {
+        "text": "What happens if conflicting concurrent actions are performed on clients synced to the same cloud location?",
+        "context": ""
+    },
+    "1854": {
+        "text": "The current version of MEGAsync does not resolve such clashes in a deterministic manner. Avoid them if possible.",
+        "context": ""
+    },
+    "1856": {
+        "text": "No. Do not expect these to be replicated to the cloud.",
+        "context": ""
+    },
+    "1857": {
+        "text": "Does MEGAsync support syncing the same local folder to different remote locations or the same remote folder to different local locations?",
+        "context": ""
+    },
+    "1858": {
+        "text": "No, unless you want to run multiple MEGAsync processes in parallel, which is not recommended. As a general rule, each filesystem item must only be visible to MEGAsync once, so avoid syncing subfolders of synced folders or placing multiple links to the same filesystem item in a local synced folder.",
+        "context": "Whether you can sync one local folder to multiple remote folders, which is not possible. Each local folder can only be synced to one remote folder"
+    },
+    "1859": {
+        "text": "Where can I find your iOS app?",
+        "context": ""
+    },
+    "1861": {
+        "text": "Where can I find your Android app?",
+        "context": ""
+    },
     "1864": {
         "text": "Error report",
         "context": ""
@@ -3561,6 +3645,10 @@
     },
     "1885": {
         "text": "%1 folders weren't uploaded because they are extremely large. We do this check to prevent the uploading of entire boot volumes, which is inefficient and dangerous.",
+        "context": ""
+    },
+    "1886": {
+        "text": "I am trying to rename a local folder in Explorer, but the name of the corresponding folder in my cloud drive stays the same, no matter what I do.",
         "context": ""
     },
     "1888": {
@@ -3910,6 +3998,10 @@
     "1993": {
         "text": "or [A]create an account[\/A]",
         "context": "New link on the login page, to make it easier for users without an account to find the registration page if they ever end up on the login page."
+    },
+    "1995": {
+        "text": "I just remembered the password of my old account after performing a password reset. How do I get my data back?",
+        "context": "Help section question"
     },
     "2001": {
         "text": "Do you want to upload your files to a new session?",
@@ -5451,6 +5543,14 @@
         "text": "Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!",
         "context": "This string is shown inside the Add Contact dialog and sent to a user in an email."
     },
+    "5881": {
+        "text": "Press Releases",
+        "context": ""
+    },
+    "5882": {
+        "text": "Shareholder Reports",
+        "context": ""
+    },
     "5884": {
         "text": "End call ...\r\n",
         "context": "end a phonecall"
@@ -6412,8 +6512,8 @@
         "context": ""
     },
     "6143": {
-        "text": "cache",
-        "context": ""
+        "text": "Cache",
+        "context": "A label for any Cache button, link, text, title, etc. Cache mean cache memory."
     },
     "6144": {
         "text": "cancel all",
@@ -6428,8 +6528,8 @@
         "context": ""
     },
     "6147": {
-        "text": "clear cache",
-        "context": ""
+        "text": "Clear cache",
+        "context": "A label for any Clear cache button, link, text, title, etc."
     },
     "6148": {
         "text": "clear selection",
@@ -6677,6 +6777,18 @@
     },
     "6240": {
         "text": "Windows Phone App",
+        "context": ""
+    },
+    "6243": {
+        "text": "Where do my downloads go?",
+        "context": ""
+    },
+    "6260": {
+        "text": "Audio & Video setup",
+        "context": ""
+    },
+    "6277": {
+        "text": "How do I register for an account?",
         "context": ""
     },
     "6690": {
@@ -7538,10 +7650,6 @@
     "7066": {
         "text": "Unable to write file",
         "context": "Message displayed when an error occurs exporting the master key to a file."
-    },
-    "7068": {
-        "text": "The new excluded file names will be taken into account when the application starts again",
-        "context": "Message displayed to inform the user that the new file name exclusion changes will be applied on next startup."
     },
     "7069": {
         "text": "The new excluded file sizes will be taken into account when the application starts again.",
@@ -12975,6 +13083,38 @@
         "text": "You can add multiple people at once with e-mail addresses separated by commas",
         "context": "Invite dialog default info text, below input box and above Send button."
     },
+    "9094": {
+        "text": "Frequently Asked Questions",
+        "context": "A title for the commonly asked questions in the Help section of the site."
+    },
+    "9095": {
+        "text": "How can we help you today?",
+        "context": "A title for the main page of the Help section of the site. A casual question about how Mega can help the user"
+    },
+    "9096": {
+        "text": "Support Centre",
+        "context": "A button for going back to the Support Centre, the main page of the Help section of the site."
+    },
+    "9098": {
+        "text": "We can't find what you are after",
+        "context": "A message which is displayed when the search query does not return any results"
+    },
+    "9099": {
+        "text": "Please try your search again or contact our support team directly",
+        "context": "A message which is displayed when the search query does not return any results."
+    },
+    "9100": {
+        "text": "Email Support",
+        "context": "A button to contact MEGA support via email."
+    },
+    "9101": {
+        "text": "If you can't find what you are looking for, please contact our support team for direct assistance.",
+        "context": "A message for the Get Support section informing the user to contact MEGA support if they can't find the help they need."
+    },
+    "9102": {
+        "text": "Go Back",
+        "context": "A button in the Help section to take the user back to a previous screen on the website."
+    },
     "9103": {
         "text": "Copy the link below to share the article.",
         "context": "Body for dialog with a link to share an article of our help section"
@@ -12982,6 +13122,10 @@
     "9104": {
         "text": "Share the Article",
         "context": "Title for dialog"
+    },
+    "9105": {
+        "text": "Enter your search here...",
+        "context": "The placeholder text in the search field of the help section."
     },
     "9106": {
         "text": "Email %1 for assistance.",
@@ -13704,7 +13848,7 @@
         "context": "A toast notification which is shown when saving settings."
     },
     "16169": {
-        "text": "Date created",
+        "text": "Date Created",
         "context": "A table column header for the date when a file was created."
     },
     "16171": {
@@ -15823,6 +15967,18 @@
         "text": "All data associated with the selected contacts will be permanently lost.",
         "context": "Plural version, warning about the loss of shared data with these users if they are removed."
     },
+    "16773": {
+        "text": "%1$s [A]is typing...[\/A]",
+        "context": "Singular, a hint that appears when one user is typing in a chat. Please do not translate or modify the tags or placeholders."
+    },
+    "16774": {
+        "text": "%1$s [A]are typing...[\/A]",
+        "context": "Plural, a hint that appears when two users are typing in a group chat at the same time. The parameter will be the concatenation of both user names. Please do not translate or modify the tags or placeholders."
+    },
+    "16775": {
+        "text": "%1$s [A]and more are typing...[\/A]",
+        "context": "text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing... The parameter will be the concatenation of the first two user names. Please do not translate or modify the tags or placeholders."
+    },
     "16776": {
         "text": "not available",
         "context": "Label in section the storage tab in My Account Section when no info info is received"
@@ -16295,10 +16451,6 @@
         "text": "View previous versions",
         "context": "Finder context menu option to view previous versions of a file within your MEGA account through the web browser."
     },
-    "16908": {
-        "text": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
-        "context": "Label to encourage users about the advantages of create an account and benefits of PRO plans"
-    },
     "16909": {
         "text": "There was a problem installing the update. Please try again later or download the last version from:\r\nhttps:\/\/mega.co.nz\/#sync",
         "context": "A notification message which is launched when a problem occurs during the installation of an update."
@@ -16319,10 +16471,6 @@
         "text": "The link cannot be generated because the file is in an incoming shared folder or in your Rubbish Bin.",
         "context": "A notification error message which is shown while generating a public link of a file from an incoming shared folder or from the rubbish bin."
     },
-    "16916": {
-        "text": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
-        "context": "A confirmation message which is displayed when a user tries to upload a file to a synced folder which already contains it. Please keep the (%1) code because it will be filled with name of the file."
-    },
     "16917": {
         "text": "You need Full access rights to be able to sync the selected folder.",
         "context": "An error message which is shown when a user is trying sync a non compatible folder."
@@ -16335,29 +16483,13 @@
         "text": "Export Recovery Key",
         "context": "A dialog title to export the Recovery Key for the current user."
     },
-    "16921": {
-        "text": "Always keep physical control of your Recovery Key (e.g. on a client device, external storage, or print).",
-        "context": "A label to inform the user to keep physical control of the Recovery Key."
-    },
-    "16922": {
-        "text": "You have to accept our Terms of Service",
-        "context": "A label which is displayed when the user has not checked the agreement for the Terms of Service."
-    },
     "16923": {
         "text": "When you finish this assistant, you will be able to sync additional folders using the settings dialog",
         "context": "A label which is shown when the initial setup wizard is at the final stage. This informs the user about the possibility of adding new synchronizations through the settings dialog."
     },
-    "16924": {
-        "text": "Free transfer quota exceeded",
-        "context": "Label to indicate the user that his free bandwidth\/transfer is exceeded. He should upgrade to a PRO plan or wait the specified time to get new free transfer quota"
-    },
     "16925": {
         "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to PRO[\/A], which will give you your own transfer package and also ample extra storage space.",
         "context": "Explanation shown to the user when he exceeds all his free transfer quota and needs to upgrade to circumvent the limit."
-    },
-    "16926": {
-        "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free.",
-        "context": "Label to indicate the user that should to upgrade or wait the specific time in order to continue with his transfers"
     },
     "16927": {
         "text": "This action can not be completed as it would take you over your current storage limit",
@@ -16471,6 +16603,10 @@
         "text": "Inbox Empty",
         "context": "Text that indicates that Inbox is empty"
     },
+    "16955": {
+        "text": "Incoming shares with",
+        "context": "title of the screen where the folders are shown with the contact owner of those folders. Please view screenshot for context."
+    },
     "16956": {
         "text": "Add new contacts using the button below",
         "context": "Adding new relationships (contacts) using the actions."
@@ -16543,6 +16679,10 @@
         "text": "and %d items were not sent successfully",
         "context": "success message when moving a node. Please do not modify the %d placeholder. This sentence follows an earlier message."
     },
+    "16974": {
+        "text": "Error. %d shares were not completed",
+        "context": "error message when sharing a folder. Please do not modify the %d placeholder, it will be replaced by the number of shares that were not completed."
+    },
     "16975": {
         "text": "Error. %d process of removing shares is not completed",
         "context": "error message when sharing a folder. Please do not modify the %d placeholder."
@@ -16550,6 +16690,10 @@
     "16976": {
         "text": "%d items are not removed successfully",
         "context": "error message when moving a node. Please do not modify the %d placeholder."
+    },
+    "16977": {
+        "text": "%d folders were not left successfully",
+        "context": "error message when leaving a shared folder. Please do not modify the %d placeholder."
     },
     "16978": {
         "text": "File sent to %d contacts successfully",
@@ -16604,7 +16748,7 @@
         "context": "success message when emptying the RB"
     },
     "16991": {
-        "text": "Error. The rubbish bin has not be emptied",
+        "text": "Error. The rubbish bin has not been emptied",
         "context": "error message when emptying the RB"
     },
     "16992": {
@@ -16614,6 +16758,10 @@
     "16993": {
         "text": "Type feedback here",
         "context": "hint cancel subscriptions dialog"
+    },
+    "16994": {
+        "text": "Your subscription has not been cancelled. Please provide a reason for your cancellation",
+        "context": "provide a reason to cancel subscriptions dialog, if the user tried to cancel without providing a reason. This alerts them that they did not successfully cancel yet and must give a reason."
     },
     "16995": {
         "text": "Please enter the decryption key for the link",
@@ -16827,6 +16975,14 @@
         "text": "You will receive a recovery link that will allow you to reset your password.",
         "context": "Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass"
     },
+    "17048": {
+        "text": "Improve your cloud capacity![A]Get more space & transfer quota with a PRO account!",
+        "context": "Message to promote PRO accounts. [A] will be a newline break."
+    },
+    "17049": {
+        "text": "The Recovery Key has been backed up into: %1s.[A]While the file remains in this path, you will find it at the Saved for Offline Section.[A]Note: It will be deleted if you log out, please store it in a safe place.",
+        "context": "success message when the Recovery Key file has been downloaded\r\n[A] will be newline breaks."
+    },
     "17050": {
         "text": "The key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
         "context": "Alert when the user introduces his MK to reset pass incorrectly"
@@ -16986,5 +17142,369 @@
     "17091": {
         "text": "Continue Download",
         "context": "Button label. Allows user to continue download if it was paused."
+    },
+    "17092": {
+        "text": "Are you sure you want to cancel these %1 file transfers?",
+        "context": "A message shown to the user when they attempt to cancel a bunch of selected transfers. Please leave the %1 placeholder which will be replaced with the number of file transfers."
+    },
+    "17093": {
+        "text": "Upload and update",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user update the file in the destination folder with generating a new version with the file he is uploading.\r\n"
+    },
+    "17094": {
+        "text": "Upload and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is uploading to avoid filename conflict.\r\n"
+    },
+    "17095": {
+        "text": "Copy and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is copying to avoid filename conflict.\r\n"
+    },
+    "17096": {
+        "text": "Move and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is moving to avoid filename conflict.\r\n"
+    },
+    "17097": {
+        "text": "The file will be updated with version history: [A]Learn more[\/A]",
+        "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
+    },
+    "17098": {
+        "text": "Add exclusion",
+        "context": "The title of a dialog which is displayed when a user is adding a new exclusion rule for the synchronizations."
+    },
+    "17099": {
+        "text": "Enter a name, an absolute path (wildcards * and ? are allowed) or choose which file or folder you want to exclude from the synchronization",
+        "context": "A label to describe the different options that the user has to set an exclusion for all synchronizations."
+    },
+    "17100": {
+        "text": "Choose File",
+        "context": "A label of a button that pops up a selection dialog to choose a file to be excluded for the synchronization."
+    },
+    "17101": {
+        "text": "Choose Folder",
+        "context": "A label of a button that pops up a selection dialog to choose a folder to be excluded from the synchronization."
+    },
+    "17102": {
+        "text": "Please enter a valid file name or absolute path.",
+        "context": "An information message which is shown when the user selects an invalid file name or path for the exclusion."
+    },
+    "17103": {
+        "text": "Select the file or folder you want to exclude",
+        "context": "A caption in a dialog to select a file or folder to exclude from the synchronizations."
+    },
+    "17104": {
+        "text": "Select the folder you want to exclude",
+        "context": "A caption in a dialog to select a folder to exclude from the synchronizations."
+    },
+    "17105": {
+        "text": "Select the file you want to exclude",
+        "context": "A caption in a dialog to select a file to exclude from the synchronizations."
+    },
+    "17106": {
+        "text": "You are about to allow a setting that could allow your communications to be intercepted. Your data would be still inaccessible for attackers due to our end-to-end encryption, but they could blindly move your files and folders in MEGA, delete them or deny you access to your account.",
+        "context": "Information for the user about the consequences of disabling a security check of MEGAsync."
+    },
+    "17109": {
+        "text": "Unable to get the filesystem. Please, try again. If the problem persists please contact bug@mega.co.nz.",
+        "context": "A message which is displayed when an error occurs while fetching nodes from the server."
+    },
+    "17113": {
+        "text": "The link cannot be generated because the file is in an incoming shared folder or in your Rubbish Bin.",
+        "context": "A notification error message which is shown while generating a public link of a file from an incoming shared folder or from the Rubbish Bin."
+    },
+    "17121": {
+        "text": "Restart",
+        "context": "A label for the Restart button to relaunch MEGAsync."
+    },
+    "17126": {
+        "text": "The dashboard is for registered users only.",
+        "context": "A dialog message saying it is forbidden for an ephemeral user to access the dashboard."
+    },
+    "17142": {
+        "text": "cache",
+        "context": "Label for any 'Cache' (cache memory) button, link, text, title, etc. - (String as short as possible)."
+    },
+    "17143": {
+        "text": "clear cache",
+        "context": "Label for any 'Clean cache' button, link, text, title, etc. - (String as short as possible)."
+    },
+    "17144": {
+        "text": "You have not selected a default download location for your files. To proceed with the download, please select a destination folder or go to settings in order to set up your default download location.",
+        "context": "Message of the dialog displayed when a user want to download some nodes and the app doesn't have configured a default download location. Asks the user to select a location for this download or configure a default location."
+    },
+    "17145": {
+        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card? Please try to save\/copy the file to your device's internal memory instead.",
+        "context": "Message of the dialog displayed when the process\/request to copy a file failed because the app or the user don't have write permission to copy into the destination (i.e. copy into a SD card an unsupported file type)."
+    },
+    "17146": {
+        "text": "This page is for registered users only.",
+        "context": "A dialog message when user is trying to access the page from an ephemeral session which is allowed for registered users only."
+    },
+    "17147": {
+        "text": "Clear previous versions",
+        "context": "Title of button to delete all previous versions of a file"
+    },
+    "17148": {
+        "text": "Current Versions",
+        "context": "Title of section to display information of all current versions of files."
+    },
+    "17149": {
+        "text": "Current Version",
+        "context": "Title of section to display information of the current version of a file."
+    },
+    "17150": {
+        "text": "Versions",
+        "context": "Title of section to display number of all historical versions of files."
+    },
+    "17151": {
+        "text": "[X] versions",
+        "context": "Message to display the number of historical versions of files. Please keep [X] as it will be replaced at the runtime."
+    },
+    "17152": {
+        "text": "1 version",
+        "context": "Version message when files only have 1 historical version."
+    },
+    "17153": {
+        "text": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted. Would you like to proceed?",
+        "context": "A warning message for deleting the whole version history of multiple files."
+    },
+    "17154": {
+        "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
+        "context": "A warning message for deleting the whole version history of one file."
+    },
+    "17155": {
+        "text": "Total size taken up by file versions:",
+        "context": "A title message in the user's account settings for showing the storage used for file versions."
+    },
+    "17156": {
+        "text": "Renamed from %1",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name. Please keep the placeholder %1 which will be replaced by the filename.\r\n"
+    },
+    "17213": {
+        "text": "Install the desktop or mobile apps",
+        "context": "Title above links to download MEGAsync or the mobile apps from the app stores"
+    },
+    "17214": {
+        "text": "[B]Right click[\/B] on any file(s) or folder(s) within any of your synced folders in your computer.",
+        "context": "Step one of sharing your files & folders using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17215": {
+        "text": "1",
+        "context": "Numeric list counter"
+    },
+    "17216": {
+        "text": "On Windows, Mac or Linux using the desktop app",
+        "context": "Title for help sections using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17217": {
+        "text": "For Windows and Linux select [B]Get MEGA link[\/B] from context menu. On Mac select [B]MEGA[\/B] to get the link.",
+        "context": "Step two of sharing your files & folders using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17218": {
+        "text": "2",
+        "context": "Numeric list counter"
+    },
+    "17220": {
+        "text": "3",
+        "context": "Numeric list counter"
+    },
+    "17221": {
+        "text": "On iOS and Android",
+        "context": "Title for help sections using the mobile app on iOS and Android"
+    },
+    "17222": {
+        "text": "For iOS tap the [W13][B]info[\/B][\/W13] icon on the file\/folder you want to share.[Br]For Android, tap the [W11][B]option[\/B][\/W11] icon on the file\/folder you want to share.",
+        "context": "Step one of sharing your files & folders using the mobile app on iOS and Android."
+    },
+    "17223": {
+        "text": "The link is now created and in your clipboard. ",
+        "context": "Step three of sharing your files & folders using the mobile app on iOS and Android"
+    },
+    "17224": {
+        "text": "[H1]Collaborate with others[\/H1]",
+        "context": "Title for the collaboration with others help section"
+    },
+    "17225": {
+        "text": "Sharing a folder is a great way to collaborate with your contacts. You can share your folder with any contact, with any existing MEGA user and even with any new user, as long as you have their email address. [Br][Br]If the user does not have a MEGA account yet, he or she will automatically receive an invitation email to join MEGA so the user can see your shared folder.",
+        "context": "Description for the collaboration with others help section"
+    },
+    "17226": {
+        "text": "[B]Right click[\/B] on any folder or file you wish to share.",
+        "context": "Step one of how to collaborate with others on the mega.nz website"
+    },
+    "17227": {
+        "text": "Click on [W13][B]Sharing[\/B][\/W13] in the context menu.",
+        "context": "Step two of how to collaborate with others on the mega.nz website"
+    },
+    "17228": {
+        "text": "Enter an email address or the first letters of your MEGA contact name(s).",
+        "context": "Step three of how to collaborate with others on the mega.nz website"
+    },
+    "17229": {
+        "text": "Choose the permissions (default is read-only).",
+        "context": "Step four of how to collaborate with others on the mega.nz website"
+    },
+    "17230": {
+        "text": "[H1]Welcome to MEGA![\/H1]",
+        "context": "Title welcoming user to MEGA"
+    },
+    "17231": {
+        "text": "4",
+        "context": "Numeric list counter"
+    },
+    "17232": {
+        "text": "On the mega.nz website",
+        "context": "Title for help sections using the mega.nz website"
+    },
+    "17233": {
+        "text": "Click on the [B]Done[\/B] button. Your shared folder is now created.",
+        "context": "Step five of how to collaborate with others on the mega.nz website"
+    },
+    "17234": {
+        "text": "5",
+        "context": "Numeric list counter"
+    },
+    "17235": {
+        "text": "For iOS, tap the [W14][B]Info[\/B][\/W14] icon on the folder you want to share.[Br]For Android, tap the [W11][B]option[\/B][\/W11] icon on the folder you want to share.",
+        "context": "Step one of how to share\/collaborate with others on iOS or Android"
+    },
+    "17236": {
+        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Share Folder.[\/B] [Br]On Android select the[B] [W13]Share[\/W13] folder[\/B] option on the menu.",
+        "context": "Step two of how to collaborate with others on iOS or Android"
+    },
+    "17237": {
+        "text": "Enter an email address or the first letters of your MEGA contact name.",
+        "context": "Step three of how to collaborate with others"
+    },
+    "17238": {
+        "text": "Choose the permissions for this shared folder.",
+        "context": "Step four of how to collaborate with others on iOS or Android"
+    },
+    "17239": {
+        "text": "Your contact now has access to the folder.",
+        "context": "Step five of how to collaborate with others on iOS or Android"
+    },
+    "17240": {
+        "text": "[H1]Getting started with MEGA[\/H1]",
+        "context": "Title of Getting Started PDF"
+    },
+    "17241": {
+        "text": "Mac",
+        "context": "Description text for images for the Mac OSX operating system"
+    },
+    "17242": {
+        "text": "Windows",
+        "context": "Description text for images for the Windows operating system"
+    },
+    "17243": {
+        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] [Br]On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
+        "context": "Step two of how to share with others on iOS or Android"
+    },
+    "17244": {
+        "text": "Using your desktop browser, you can have a secure voice or video call with a single contact or have a group text chat with several contacts participating. You can also send files from your MEGA Cloud Drive to other members of the group chat while messages are flowing. [Br]Secure text chat is also available on Android and iOS applications (encrypted voice and video calls are coming to mobile soon).",
+        "context": "MEGAchat introduction and description for new users"
+    },
+    "17245": {
+        "text": "[H1]You now know the basics of your MEGA account.[\/H1]",
+        "context": "Heading for final page of the getting started PDF"
+    },
+    "17246": {
+        "text": "[H1]Congratulations![\/H1]",
+        "context": "Title for final page of the getting started PDF"
+    },
+    "17251": {
+        "text": "Log in at [A]https:\/\/mega.nz\/[\/A]",
+        "context": "Step one of how to add files to MEGA on the mega.nz website"
+    },
+    "17252": {
+        "text": "Click the[B] [W10]File[\/W10] Upload[\/B] button on the top right.",
+        "context": "Step two of how to add files to MEGA on the mega.nz website"
+    },
+    "17253": {
+        "text": "Choose the file(s) you would like to upload and click open.",
+        "context": "Step three of how to add files to MEGA on the mega.nz website"
+    },
+    "17255": {
+        "text": "[H1]Add files to MEGA[\/H1]",
+        "context": "Title for how to add files to MEGA"
+    },
+    "17256": {
+        "text": "[A]Install the desktop app[\/A] on your computer",
+        "context": "Step one of how to add files to MEGA using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17258": {
+        "text": "For iOS tap the [W14][B]More[\/B][\/W14] [W1]icon[\/W1] on the top right corner. For Android tap the [W12]button[\/W12] in the bottom right corner.",
+        "context": "Step one of how to add files to MEGA on iOS or Android"
+    },
+    "17259": {
+        "text": "For iOS, select [B]Upload[\/B]. For Android, select the type of upload.",
+        "context": "Step two of how to add files to MEGA on iOS or Android"
+    },
+    "17262": {
+        "text": "[H1]Access your content anywhere[\/H1]",
+        "context": "Title for page descriping the benefits of using MEGA's apps"
+    },
+    "17264": {
+        "text": "[H1]Share your files and folders[\/H1]",
+        "context": "Title for sharing your files & folders"
+    },
+    "17265": {
+        "text": "[B]Right click[\/B] on any folder or file you wish to share (you can also left click on the [W12][B]More[\/B][\/W12] icon which appears upon mouseover)",
+        "context": "Step one of sharing your files & folders using the mobile app on the mega.nz website"
+    },
+    "17266": {
+        "text": "Click on[B] [W13]Get[\/W13] Link[\/B] in the context menu.",
+        "context": "Step two of sharing your files & folders using the mobile app on the mega.nz website"
+    },
+    "17267": {
+        "text": "If you are a first time user, please agree with the copyright warning.",
+        "context": "Step three of sharing your files & folders using the mobile app on the mega.nz website"
+    },
+    "17268": {
+        "text": "Your link is now created. You can manually select and copy the link or use the [B]Copy[\/B] button.",
+        "context": "Step four of sharing your files & folders using the mobile app on the mega.nz website"
+    },
+    "17277": {
+        "text": "The MEGA link is now automatically copied to your clipboard. Just paste it wherever you\u2019d like.",
+        "context": "Step three of sharing your files & folders using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17278": {
+        "text": "Go to our [A]Help Centre[\/A] in order to find out more tips & tricks and get the most out of our service.",
+        "context": "Description for the learn more section linking the user to our Help Centre"
+    },
+    "17279": {
+        "text": "Or just drag & drop files directly from your computer into your web browser.",
+        "context": "Step four of how to add files to MEGA on the mega.nz website"
+    },
+    "17280": {
+        "text": "Drag & Drop files into the MEGA folder (or into the folders you selected to synchronize, if you configured this during installation)",
+        "context": "Step two of how to add files to MEGA using the desktop application on Windows\/Mac\/Linux"
+    },
+    "17281": {
+        "text": "Select the location you\u2019d like to upload files from.",
+        "context": "Step three of how to add files to MEGA on iOS or Android"
+    },
+    "17282": {
+        "text": "Select the file you\u2019d like to upload.",
+        "context": "Step four of how to add files to MEGA on iOS or Android"
+    },
+    "17283": {
+        "text": "Install the MEGA desktop app for Windows, Mac or Linux.[Br][Br]Synchronise single or multiple folders on your computer with your MEGA account.[Br][Br]Access and work with your data securely across different locations and devices. It\u2019s always on and fully automatic. ",
+        "context": "Description of the benefits of using MEGA's apps"
+    },
+    "17389": {
+        "text": "Select contacts from your phone's contact list or enter multiple email addresses.",
+        "context": "Text shown to explain how and where you can invite friends."
+    },
+    "17398": {
+        "text": "Label",
+        "context": "A menu item in the left panel drop down menu to allow sorting by label."
+    },
+    "17445": {
+        "text": "Date Added",
+        "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's date of encryption on the Cloud Drive (not the date of the file's creation on their local machine)."
+    },
+    "17446": {
+        "text": "Date Created",
+        "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's original timestamp, when it is created on their local machine."
     }
 }

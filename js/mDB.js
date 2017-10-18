@@ -60,9 +60,6 @@ function FMDB(plainname, schema, channelmap) {
     // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
     this.cantransact = -1;
 
-    // Backoff to throttle bulkPut & bulkDel operations.
-    this.bulkBackoff = 300;
-
     // initialise additional channels
     for (var i in this.channelmap) {
         i = this.channelmap[i];
@@ -99,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm15d_';
+    var dbpfx = 'fm16b_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -568,8 +565,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                                 onIdle(dispatchputs);
                             }
                             else {
-                                fmdb.bulkBackoff = Math.min(1e4, fmdb.bulkBackoff << 1);
-                                setTimeout(dispatchputs, fmdb.bulkBackoff);
+                                setTimeout(dispatchputs, 2600);
                             }
                             return;
                         }
@@ -577,7 +573,6 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                     // loop back to write more pending data (or to commit the transaction)
                     fmdb.inflight = false;
-                    fmdb.bulkBackoff = 300;
                     dispatchputs();
                 }).catch(Dexie.BulkError, function(e) {
                     // TODO: retry instead?
@@ -1588,8 +1583,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
                             for (var h in M.c[parents[i]]) {
                                 handles.push(h);
 
-                                // FIXME: with file versioning, files can have children, too!
-                                if (M.d[h].t) {
+                                // with file versioning, files can have children, too!
+                                if (M.d[h].t || M.d[h].tvf) {
                                     p.push(h);
                                 }
                             }
@@ -1729,7 +1724,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     var folders = [];
                     for (var i = handles.length; i--;) {
                         var h = handles[i];
-                        if (M.d[h] && M.d[h].t) {
+                        if (M.d[h] && (M.d[h].t || M.d[h].tf)) {
                             folders.push(h);
                         }
                     }

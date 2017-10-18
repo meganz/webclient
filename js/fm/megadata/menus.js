@@ -46,9 +46,7 @@
         // Check existance of sub-menu
         if ($('#csb_' + id + ' > .dropdown-item').length !== folders.length) {
             // sort by name is default in the tree
-            folders.sort(function(a, b) {
-                return M.compareStrings(a.name, b.name, 1);
-            });
+            folders.sort(M.getSortByNameFn2(1));
 
             for (var i = 0; i < folders.length; i++) {
                 cs = '';
@@ -74,6 +72,8 @@
 
                 $('#csb_' + id).append(html);
             }
+
+            M.disableCircularTargets('#fi_');
         }
     };
 })(this);
@@ -136,8 +136,16 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 items['.sh4r1ng-item'] = 1;
             }
         }
-        else if (is_image(selNode)) {
-            items['.preview-item'] = 1;
+        else {
+            if ((selNode.tvf > 0) && !folderlink) {
+                items['.properties-versions'] = 1;
+                if (M.getNodeRights(selNode.h) > 1) {
+                    items['.clearprevious-versions'] = 1;
+                }
+            }
+            if (is_image(selNode)) {
+                items['.preview-item'] = 1;
+            }
         }
 
         if (M.getNodeRights(selNode.h) > 1) {
@@ -195,6 +203,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.copy-item'];
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
         items['.import-item'] = 1;
     }
 
@@ -215,8 +225,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
     // Selection of first child level ONLY of .dropdown-item in .dropdown.body
     var menuCMI = '.dropdown.body.files-menu .dropdown-section > .dropdown-item';
-    var currNodeClass = $(e.currentTarget).attr('class');
-    var id = $(e.currentTarget).attr('id');
 
     // is contextmenu disabled
     if (localStorage.contextmenu) {
@@ -260,10 +268,15 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (M.getNodeRights(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.dropdown-item').hide();
-            $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
+            if (M.currentrootid === 'contacts') {
+                $(menuCMI).filter('.addcontact-item').show();
+            }
+            else {
+                $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
-            if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
-                $(menuCMI).filter('.folderupload-item').show();
+                if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
+                    $(menuCMI).filter('.folderupload-item').show();
+                }
             }
         }
         else {
@@ -308,7 +321,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // Hide all menu-items
         $(menuCMI).hide();
 
-        id = $(e.currentTarget).attr('id');
+        var id = $(e.currentTarget).attr('id');
+        var currNodeClass = $(e.currentTarget).attr('class');
 
         if (id) {
 

@@ -1095,7 +1095,7 @@ function api_setsid(sid) {
 
                     if (!dlmanager.isOverFreeQuota) {
                         dlmanager.uqFastTrack = 1;
-                        dlmanager._overquotaInfo();
+                        delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
                     }
                 }
 
@@ -1213,7 +1213,7 @@ function api_req(request, context, channel) {
 // FIXME: check for fetch on !Firefox, not just on Chrome
 var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
 
-if (typeof Uint8Array.prototype.indexOf !== 'function') {
+if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
     if (d) {
         console.debug('No chunked method on this browser: ' + ua);
     }
@@ -1584,6 +1584,9 @@ function api_reqfailed(c, e) {
                 }
             );
         }});
+    }
+    else {
+        api_reqerror(apixs[c], EAGAIN, 0);
     }
 }
 
@@ -3023,6 +3026,7 @@ function api_faretry(ctx, error, host) {
         }, ctx.faRetryI);
     }
 
+    mBroadcaster.sendMessage('fa:error', ctx.id, error, ctx.p);
     srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 
@@ -3275,19 +3279,26 @@ function api_getfa(id) {
 }
 
 function api_attachfileattr(node, id) {
+    'use strict';
+
     var fa = api_getfa(id);
 
     storedattr[id].target = node;
 
     if (fa) {
-        api_req({ a: 'pfa', n: node, fa: fa }, {
-            callback: function(res) {
+        M.req({a: 'pfa', n: node, fa: fa})
+            .fail(function(res) {
                 if (res === EACCESS) {
                     api_pfaerror(node);
                 }
-            }
-        });
+                mBroadcaster.sendMessage('pfa:error', id, node, res);
+            })
+            .done(function() {
+                mBroadcaster.sendMessage('pfa:complete', id, node, fa);
+            });
     }
+
+    return fa;
 }
 
 /** handle ufa/pfa EACCESS error */

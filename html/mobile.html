@@ -6,7 +6,7 @@
         <div class="top-menu-content">
             <div class="top-menu-item start">[$1888]</div>
             <div class="top-menu-item fm">[$164]</div>
-            <div class="top-menu-item account not-mobile-ready"><span class="right-el">[$435]</span><span>[$187]</span></div>
+            <div class="top-menu-item account"><span class="right-el">[$435]</span><span>[$187]</span></div>
             <div class="top-menu-item upgrade-your-account not-mobile-ready">[$433]</div>
             <div class="top-menu-item backup not-mobile-ready"><span class="right-el"><i class="semi-small-icon yellow-triangle"></i></span><span>[$8921]</span></div>
             <div class="top-menu-item refresh-item not-mobile-ready">[$85]</div>
@@ -124,7 +124,7 @@
     <div class="mobile fm-row">
 
         <!-- Cloud drive / Folder link header -->
-        <div class="mobile fm-header folder-link">
+        <div class="mobile fm-header fm-hr folder-link">
             <div class="mobile fm-icon cloud left hidden"></div>
             <div class="mobile fm-icon top-icon menu right"></div>
             <div class="mobile fm-icon upload right hidden">
@@ -134,7 +134,6 @@
             <div class="mobile fm-icon folder"></div>
             <div class="mobile fm-header-txt"><span>[$1456]...</span></div>
             <div class="mobile fm-folder-size"></div>
-            <div class="mobile fm-hr"></div>
         </div>
     </div>
 
@@ -220,8 +219,6 @@
     <div class="mobile fm-row">
         <div class="mobile fm-bottom"></div>
     </div>
-
-
 </div>
 
 
@@ -320,6 +317,51 @@
         <div class="mobile right-buttons">
             <div class="mobile fm-icon download download-button"></div>
             <div class="mobile fm-icon manage-link manage-link-button"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- My Account page -->
+<div class="mobile main-block my-account-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon account left"></div>
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-header-txt"><span>[$187]</span></div>
+    </div>
+    <div class="mobile content-row">
+        <div class="mobile content-cell">
+            <div class="mobile avatar-name-block">
+                <div class="mobile main-avatar">
+                    <div class="mobile avatar-bg"><span></span></div>
+                    <div class="mobile avatar-wrapper avatar">
+                        <img alt="" />
+                    </div>
+                </div>
+                <div class="mobile user-info">
+                    <div class="mobile user-name"></div>
+                    <div class="mobile user-email"></div>
+                </div>
+            </div>
+            <div class="mobile account-type-block">
+                <div class="mobile icon pro-mini"></div>
+                <div class="mobile account-type-text">[$17022]</div>
+                <div class="mobile pro-plan-name"></div>
+            </div>
+            <div class="mobile account-usage-block">
+                <div class="mobile fm-icon cloud"></div>
+                <div class="mobile account-usage-text">[$5799]</div>
+                <div class="mobile storage-usage">
+                    <span class="used">0 GB</span> [$5528] <span class="total">0 GB</span><br>
+                    (<span class="percentage"></span>%)
+                </div>
+                <div class="over-quota-message">[$16136]</div>
+            </div>
+            <div class="mobile account-upgrade-block">
+                <div class="mobile fm-icon credit-card"></div>
+                <div class="mobile account-upgrade-text">[$5814]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -535,18 +577,11 @@
 <div class="mobile signin-register-block hidden">
     <div class="mobile fm-block">
         <div class="mobile fm-row">
-            <div class="mobile fm-header sign-header">
+            <div class="mobile fm-header fm-hr sign-header">
                 <div class="mobile fm-icon top-icon menu right"></div>
                 <div class="mobile fm-icon mega left"></div>
-                <div class="mobile top-links">
-                    <div class="mobile top-link sign-in">
-                        [$171]
-                    </div>
-                    <div class="mobile top-link register">
-                        [$968]
-                    </div>
-                </div>
-                <div class="mobile fm-hr"></div>
+                <div class="mobile fm-header-txt sign-in">[$171]</div>
+                <div class="mobile fm-header-txt register">[$968]</div>
             </div>
         </div>
 
@@ -564,22 +599,22 @@
                                 <span></span>
                                 <input type="password" value="" placeholder="[$16344]" />
                             </div>
-                            <div class="mobile signin-button">
-                                <span class="label">[$16345]</span>
-                                <span class="loading-image">
-                                    <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
-                                </span>
-                            </div>
                             <div class="mobile remember-me">
                                 <div class="checkboxOff checkboxOn square"><i></i><input class="checkbox" type="checkbox" checked="checked"></div>
                                 <div class="checkbox-label text">
                                     [$192]
                                 </div>
                             </div>
-                            <div class="first-message">
+                            <div class="mobile signin-button">
+                                <span class="label">[$16345]</span>
+                                <span class="loading-image">
+                                    <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                                </span>
+                            </div>
+                            <div class="first-message hidden">
                                 [$16653]
                             </div>
-                            <a class="mobile download-app hidden"></a>
+                           <!--  <a class="mobile download-app hidden"></a> -->
                         </form>
                     </div>
 
@@ -626,11 +661,19 @@
                             <div class="mobile register-button">
                                 <span class="label">[$209]</span>
                             </div>
-                            <div class="first-message">
+                            <div class="first-message hidden">
                                 [$16653]
                             </div>
-                            <a class="mobile download-app hidden"></a>
+                            <!-- <a class="mobile download-app hidden"></a> -->
                         </form>
+                    </div>
+                    <div class="mobile top-links">
+                        <div class="mobile top-link sign-in">
+                            [$171]
+                        </div>
+                        <div class="mobile top-link register">
+                            [$968]
+                        </div>
                     </div>
                 </div>
             </div>
@@ -643,15 +686,13 @@
 <div class="mobile registration-confirm-email full-page-scrollable hidden">
     <div class="mobile fm-block">
         <div class="mobile fm-row">
-            <div class="mobile sign-header">
+            <div class="mobile fm-header sign-header fm-hr">
                 <div class="mobile fm-icon top-icon menu right"></div>
                 <div class="mobile fm-icon mega left"></div>
-                <div class="mobile top-links">
-                    <div class="mobile top-link full active">
+                <div class="mobile fm-header-txt">[$7732]</div>
+                    <!-- <div class="mobile top-link full active">
                         [$7732]
-                    </div>
-                </div>
-                <div class="mobile fm-hr"></div>
+                    </div> -->
             </div>
         </div>
 
@@ -682,14 +723,12 @@
 <div class="mobile registration-generating-keys full-page-scrollable hidden">
     <div class="mobile fm-block">
         <div class="mobile fm-row">
-            <div class="mobile sign-header">
-                <div class="mobile fm-icon mega"></div>
-                <div class="mobile top-links">
-                    <div class="mobile top-link active">
+            <div class="mobile sign-header fm-header fm-hr">
+                <div class="mobile fm-icon mega left"></div>
+                <div class="mobile fm-header-txt">[$1796]</div>
+                    <!-- <div class="mobile top-link active">
                         [$1796]
-                    </div>
-                </div>
-                <div class="mobile fm-hr"></div>
+                    </div> -->
             </div>
         </div>
 
@@ -711,11 +750,10 @@
 <!-- Pro page step 2 - Provider and plan options !-->
 <div class="mobile fm-block membership-step2 hidden">
     <div class="mobile fm-row">
-        <div class="mobile fm-header">
+        <div class="mobile fm-header fm-hr">
             <div class="mobile fm-icon mega left"></div>
             <div class="mobile fm-icon top-icon menu right"></div>
             <div class="mobile fm-header-txt"><span>[$16111]</span></div>
-            <div class="mobile fm-hr"></div>
         </div>
     </div>
     <div class="mobile fm-row">
@@ -1071,10 +1109,9 @@
 <!-- Terms of Service -->
 <div class="mobile fm-block terms-of-service hidden">
     <div class="mobile fm-row">
-        <div class="mobile fm-header">
+        <div class="mobile fm-header fm-hr">
             <div class="mobile fm-icon top-icon menu right"></div>
             <div class="mobile fm-icon mega left"></div>
-            <div class="mobile fm-hr"></div>
         </div>
     </div>
 

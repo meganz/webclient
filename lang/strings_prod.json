@@ -1496,7 +1496,7 @@
         "context": ""
     },
     "999": {
-        "text": "Would you like to upgrade your temporary session to a free account now?",
+        "text": "Would you like to upgrade your temporary session to a FREE account now?",
         "context": "Ephemeral session refers to the current session the user has on MEGA which is of temporary nature"
     },
     "1000": {
@@ -2475,10 +2475,6 @@
         "text": "The cloud in your pocket. Access and stream your files from your smartphone or tablet.",
         "context": "Advertising text for mobile apps"
     },
-    "1932": {
-        "text": "To download files larger than 1 GB, please install MEGAsync or our browser extension.",
-        "context": "When a user attempt to download a file larger than 1GB using Firefox, he will be prompted with a dialog asking him to install our browser extension with this text."
-    },
     "1933": {
         "text": "To download files larger than 1 GB, please install MEGAsync, Google Chrome or Opera.",
         "context": ""
@@ -2791,9 +2787,21 @@
         "text": "Outgoing Shares",
         "context": "Folders that have been shared by the user to other MEGA users"
     },
+    "5545": {
+        "text": "Create new folder",
+        "context": "Menu item"
+    },
     "5549": {
         "text": "Upgrade account",
         "context": "Button title which triggers the action to upgrade your MEGA account level"
+    },
+    "5552": {
+        "text": "Thumbnail view",
+        "context": "Menu item to change from list view to grid view"
+    },
+    "5553": {
+        "text": "List view",
+        "context": "Menu item to change from grid view to list view"
     },
     "5557": {
         "text": "file",
@@ -2802,10 +2810,6 @@
     "5561": {
         "text": "folder",
         "context": "Singular of folder\/directory. 1 folder"
-    },
-    "5565": {
-        "text": "download",
-        "context": "Item menu option upon clicking on one or multiple files. Singular"
     },
     "5569": {
         "text": "users",
@@ -2838,6 +2842,10 @@
     "5775": {
         "text": "Used",
         "context": "Title for \"Used\" MEGA space."
+    },
+    "5799": {
+        "text": "Usage",
+        "context": "Button title that goes to the section Usage where you can see how your MEGA space is used"
     },
     "5801": {
         "text": "used",
@@ -3127,6 +3135,10 @@
         "text": "No transfers",
         "context": ""
     },
+    "6117": {
+        "text": "settings",
+        "context": ""
+    },
     "6125": {
         "text": "PRO II",
         "context": "Label to indicate that the current user has a PRO II account."
@@ -3405,14 +3417,6 @@
     },
     "6841": {
         "text": "We're sorry to see you go",
-        "context": ""
-    },
-    "6842": {
-        "text": "Your account has now been closed",
-        "context": ""
-    },
-    "6843": {
-        "text": "but before you leave we would love to know why you are leaving us",
         "context": ""
     },
     "6844": {
@@ -3703,6 +3707,10 @@
         "text": "Loading...",
         "context": "Label to show when an account detail request is waiting for the server response."
     },
+    "7039": {
+        "text": "Do not ask me again",
+        "context": ""
+    },
     "7086": {
         "text": "Please select your Linux Distro",
         "context": ""
@@ -3950,10 +3958,6 @@
     "7235": {
         "text": "Payment Failed",
         "context": "A dialog box heading, when the user has tried to pay, but something has gone wrong."
-    },
-    "7236": {
-        "text": "To download files larger than 1 GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
-        "context": "Description in a popup dialog when they are trying to download a file larger than 1GB using the browser."
     },
     "7241": {
         "text": "You must agree with our Terms of Service",
@@ -4314,18 +4318,6 @@
     "7872": {
         "text": "Access to any folders shared with you by selected [X] will be lost.",
         "context": "This is shown on a confirmation message dialog when removing one or more contacts. The placeholder [X] will be replaced with \"contact\" or \"contacts\" depending on how many contacts are being removed."
-    },
-    "7873": {
-        "text": "You can download the extension (v%1) below.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user they can download a specific version of the extension further down the page. The placeholder %1 will be replaced with the version of the extension e.g. \"3.2.8\". So the text would read \"You can download the extension (v3.2.8) below.\""
-    },
-    "7874": {
-        "text": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is not the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.7\". The placeholder %2 will be replaced with the newest version available for download e.g. \"3.2.8\". So the text would read \"It looks like your current extension (v3.2.7) is out of date. You can download the latest (v3.2.8) below.\""
-    },
-    "7875": {
-        "text": "Your extension (v%1) is up to date.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.8\". So the text would read \"Your extension (v3.2.8) is up to date.\""
     },
     "7879": {
         "text": "Access to folders shared by [X] was removed.",
@@ -6160,7 +6152,7 @@
         "context": "A toast notification which is shown when saving settings."
     },
     "16169": {
-        "text": "Date created",
+        "text": "Date Created",
         "context": "A table column header for the date when a file was created."
     },
     "16172": {
@@ -6635,6 +6627,22 @@
         "text": "Please check that the key is correct or ask the creator of the link again.",
         "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is a second message which is shown when the decryption key entered is not correct."
     },
+    "16474": {
+        "text": "Previous versions",
+        "context": "A button label which opens a dialog to display the full version history of the selected file."
+    },
+    "16475": {
+        "text": "Revert",
+        "context": "A button label which reverts a certain version of a file to be the current version of the selected file."
+    },
+    "16476": {
+        "text": "Edited by %1 ",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
+    },
+    "16480": {
+        "text": "Edited by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by the user themself."
+    },
     "16485": {
         "text": "Duplicate items",
         "context": "Dialog header. Dialog is displayed if uploading file already exists in folder."
@@ -6646,14 +6654,6 @@
     "16487": {
         "text": "Select the file you want to keep:",
         "context": "User is able to select file version if uploading file already exists in folder."
-    },
-    "16488": {
-        "text": "Upload and replace",
-        "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
-    },
-    "16489": {
-        "text": "Replace the file in the destination folder with the file you are uploading:",
-        "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
     },
     "16490": {
         "text": "Don't upload",
@@ -7231,10 +7231,6 @@
         "text": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
         "context": "An error shown to Chrome users when their download cannot continue because they are running out of disk space."
     },
-    "16891": {
-        "text": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
-        "context": "An error shown to Chrome users when their download cannot start because they are running out of disk space."
-    },
     "16892": {
         "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
         "context": "A message which is shown when there was a server-side error retrieving the cloud drive contents."
@@ -7283,6 +7279,10 @@
         "text": "This action can not be completed as it would take you over your current storage limit",
         "context": "Error message shown to user when a copy\/import operation would take them over their storage limit."
     },
+    "17022": {
+        "text": "Account Type",
+        "context": "title of the My Account screen"
+    },
     "17081": {
         "text": "Incomplete transfer, do you want to resume it?",
         "context": "User is able to resume download is transfer wasn't complete before"
@@ -7306,5 +7306,85 @@
     "17086": {
         "text": "Open folder",
         "context": "The label text for a button which opens a folder in the cloud drive."
+    },
+    "17089": {
+        "text": "Before you close your account, we would like to know why you are leaving us...",
+        "context": "A message on the account cancellation dialog before a list of options the user can select to explain why they want to cancel their account."
+    },
+    "17090": {
+        "text": "Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Please consider purchasing a PRO account in order to substantially raise your transfer quota.",
+        "context": "Informs user that transfer quota will be exceeded soon and user should buy PRO account."
+    },
+    "17091": {
+        "text": "Continue Download",
+        "context": "Button label. Allows user to continue download if it was paused."
+    },
+    "17092": {
+        "text": "Are you sure you want to cancel these %1 file transfers?",
+        "context": "A message shown to the user when they attempt to cancel a bunch of selected transfers. Please leave the %1 placeholder which will be replaced with the number of file transfers."
+    },
+    "17093": {
+        "text": "Upload and update",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user update the file in the destination folder with generating a new version with the file he is uploading.\r\n"
+    },
+    "17094": {
+        "text": "Upload and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is uploading to avoid filename conflict.\r\n"
+    },
+    "17095": {
+        "text": "Copy and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is copying to avoid filename conflict.\r\n"
+    },
+    "17096": {
+        "text": "Move and rename",
+        "context": "Header of clickable block in Duplicate items dialog. Allows user keep existing file in the destination folder and rename the file he is moving to avoid filename conflict.\r\n"
+    },
+    "17097": {
+        "text": "The file will be updated with version history: [A]Learn more[\/A]",
+        "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
+    },
+    "17146": {
+        "text": "This page is for registered users only.",
+        "context": "A dialog message when user is trying to access the page from an ephemeral session which is allowed for registered users only."
+    },
+    "17147": {
+        "text": "Clear previous versions",
+        "context": "Title of button to delete all previous versions of a file"
+    },
+    "17148": {
+        "text": "Current Versions",
+        "context": "Title of section to display information of all current versions of files."
+    },
+    "17149": {
+        "text": "Current Version",
+        "context": "Title of section to display information of the current version of a file."
+    },
+    "17150": {
+        "text": "Versions",
+        "context": "Title of section to display number of all historical versions of files."
+    },
+    "17151": {
+        "text": "[X] versions",
+        "context": "Message to display the number of historical versions of files. Please keep [X] as it will be replaced at the runtime."
+    },
+    "17152": {
+        "text": "1 version",
+        "context": "Version message when files only have 1 historical version."
+    },
+    "17154": {
+        "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
+        "context": "A warning message for deleting the whole version history of one file."
+    },
+    "17155": {
+        "text": "Total size taken up by file versions:",
+        "context": "A title message in the user's account settings for showing the storage used for file versions."
+    },
+    "17156": {
+        "text": "Renamed from %1",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name. Please keep the placeholder %1 which will be replaced by the filename.\r\n"
+    },
+    "17398": {
+        "text": "Label",
+        "context": "A menu item in the left panel drop down menu to allow sorting by label."
     }
 }

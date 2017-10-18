@@ -1321,9 +1321,7 @@ var exportExpiry = {
         deleteScrollPanel(scroll, 'jsp');
 
         if (close) {
-            $.dialog = false;
-            fm_hideoverlay();
-            $linksDialog.addClass('hidden');
+            closeDialog();
             $('.export-links-warning').addClass('hidden');
             if (window.onCopyEventHandler) {
                 document.removeEventListener('copy', window.onCopyEventHandler, false);
@@ -1331,8 +1329,6 @@ var exportExpiry = {
             }
             return true;
         }
-
-        $.dialog = 'links';
 
         $linksDialog.addClass('file-keys-view');
 
@@ -1347,21 +1343,24 @@ var exportExpiry = {
         $linkButtons.removeClass('selected');
         $linksDialog.find('.link-handle-and-key').addClass('selected');
 
-        fm_showoverlay();
+        M.safeShowDialog('links', function() {
+            fm_showoverlay();
+            $linksDialog.removeClass('hidden');
+            $('.export-links-warning').removeClass('hidden');
 
-        $linksDialog.removeClass('hidden');
-        $('.export-links-warning').removeClass('hidden');
+            $(scroll).jScrollPane({showArrows: true, arrowSize: 5});
+            jScrollFade(scroll);
 
-        $(scroll).jScrollPane({ showArrows: true, arrowSize: 5 });
-        jScrollFade(scroll);
+            $linksDialog.css('margin-top', $linksDialog.outerHeight() / 2 * -1);
 
-        $linksDialog.css('margin-top', ($linksDialog.outerHeight() / 2) * -1);
+            setTimeout(function() {
+                $('.file-link-info').rebind('click', function() {
+                    $('.file-link-info').select();
+                });
+            }, 300);
 
-        setTimeout(function() {
-            $('.file-link-info').rebind('click', function() {
-                $('.file-link-info').select();
-            });
-        }, 300);
+            return $linksDialog;
+        });
 
         // Setup toast notification
         toastTxt = l[7654];
@@ -2000,10 +1999,65 @@ var exportExpiry = {
         return false;
     };
 
+    /**
+     * Shows the copyright warning dialog.
+     *
+     * @param {Array} nodesToProcess Array of strings, node ids
+     */
+    var initCopyrightsDialog = function(nodesToProcess) {
+        'use strict';
+
+        $.itemExport = nodesToProcess;
+
+        var openGetLinkDialog = function() {
+            var exportLink = new mega.Share.ExportLink({
+                'showExportLinkDialog': true,
+                'updateUI': true,
+                'nodesToProcess': nodesToProcess
+            });
+            exportLink.getExportLink();
+        };
+
+        // If they've already agreed to the copyright warning this session
+        if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
+
+            // Go straight to Get Link dialog
+            openGetLinkDialog();
+            return false;
+        }
+
+        // Cache selector
+        var $copyrightDialog = $('.copyrights-dialog');
+
+        // Otherwise show the copyright warning dialog
+        M.safeShowDialog('copyrights', function() {
+            $.copyrightsDialog = 'copyrights';
+            return $copyrightDialog;
+        });
+
+        // Init click handler for 'I agree' / 'I disagree' buttons
+        $copyrightDialog.find('.default-white-button').rebind('click', function() {
+            closeDialog();
+
+            // User disagrees with copyright warning
+            if (!$(this).hasClass('cancel')) {
+                // User agrees, store flag in localStorage so they don't see it again for this session
+                localStorage.setItem('agreedToCopyrightWarning', '1');
+
+                // Go straight to Get Link dialog
+                openGetLinkDialog();
+            }
+        });
+
+        // Init click handler for 'Close' button
+        $copyrightDialog.find('.fm-dialog-close').rebind('click', closeDialog);
+    };
+
     // export
     scope.mega = scope.mega || {};
     scope.mega.Share = scope.mega.Share || {};
     scope.mega.Share.ExportLink = ExportLink;
+    scope.mega.Share.initCopyrightsDialog = initCopyrightsDialog;
 })(jQuery, window);
 
 

@@ -172,7 +172,8 @@ function topPopupAlign(button, popup, topPos) {
             buttonTopPos;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('.top-head').width();
+            pageWidth = $('body').width();
+            $popup.removeAttr('style');
             $popupArrow.removeAttr('style');
             popupRightPos = pageWidth
                 - $button.offset().left
@@ -230,7 +231,6 @@ function init_page() {
             return false;
         }
     }
-
 
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
@@ -778,6 +778,11 @@ function init_page() {
         loadSubPage('fm/account');
         return false;
     }
+    else if (is_mobile && page === 'fm/account') {
+        parsepage(pages['mobile']);
+        mobile.account.init();
+        return false;
+    }
     else if (page == 'account') {
         loadSubPage('fm/account');
         return false;
@@ -1132,7 +1137,7 @@ function init_page() {
         return false;
     }
 
-    else if (is_fm()) {		
+    else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
@@ -1204,7 +1209,7 @@ function init_page() {
         }
         else {
             if (ul_queue.length > 0) {
-                openTransfersPanel();
+                M.openTransfersPanel();
             }
 
             if (u_type === 0 && !u_attr.terms) {
@@ -1218,7 +1223,7 @@ function init_page() {
                     ulQueue.resume();
                     uldl_hold = false;
                     if (ul_queue.length > 0) {
-                        showTransferToast('u', ul_queue.length);
+                        M.showTransferToast('u', ul_queue.length);
                     }
                 };
 
@@ -1503,8 +1508,12 @@ function topmenuUI() {
     // Remove red bar from all menu items
     $topMenuItems.removeClass('active');
 
+    // If in mobile My Account section, show red bar
+    if (is_mobile && page.indexOf('fm/account') === 0) {
+        $topMenuItems.filter('.account').addClass('active');
+    }
     // If in mobile Cloud Drive, show red bar
-    if (is_mobile && page.indexOf('fm') === 0) {
+    else if (is_mobile && page.indexOf('fm') === 0) {
         $topMenuItems.filter('.fm').addClass('active');
     }
     else if (section) {
@@ -1544,6 +1553,8 @@ function topmenuUI() {
     $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
 
     if (u_type) {
+        $('body').removeClass('not-logged').addClass('logged');
+
         $topMenu.find('.top-menu-item.start').addClass('hidden');
         $topMenu.find('.top-menu-item.fm').removeClass('hidden');
         $topMenu.find('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
@@ -1559,12 +1570,13 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').removeClass('hidden');
 
         // Show the rocket icon if achievements are enabled
-        if (!is_mobile) {
         mega.achievem.enabled()
             .done(function() {
                 $topHeader.find('.top-icon.achievements').removeClass('hidden');
+            })
+            .fail(function() {
+                $topHeader.find('.top-icon.achievements').addClass('hidden');
             });
-        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1611,7 +1623,10 @@ function topmenuUI() {
         alarm.planExpired.render();
     }
     else {
-        if (u_type === 0 && !confirmok && page !== 'key') {
+        if (u_type !== 0) {
+            $('body').removeClass('logged').addClass('not-logged');
+        }
+        else if (!confirmok && page !== 'key') {
 
             $topMenu.find('.top-menu-item.register').text(l[968]);
 
@@ -2192,7 +2207,7 @@ function parsepage(pagehtml, pp) {
     $('#startholder').hide();
 
     pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
-    if (document.location.href.substr(0, 19) == 'chrome-extension://') {
+    if (is_chrome_web_ext || is_firefox_web_ext) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
 
@@ -2200,7 +2215,7 @@ function parsepage(pagehtml, pp) {
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
     var pagesmenu = pages['pagesmenu'];
-    if (document.location.href.substr(0, 19) == 'chrome-extension://') {
+    if (is_chrome_web_ext || is_firefox_web_ext) {
         bmenu2 = bmenu2.replace(/\/#/g, '/' + urlrootfile + '#');
     }
     pagehtml = pagehtml
@@ -2241,7 +2256,7 @@ function parsetopmenu() {
     else {
         top = pages['top'].replace(/{staticpath}/g, staticpath);
     }
-    if (document.location.href.substr(0, 19) === 'chrome-extension://') {
+    if (is_chrome_web_ext || is_firefox_web_ext) {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
     top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
@@ -2340,6 +2355,11 @@ window.onbeforeunload = function () {
 
 window.onunload = function() {
     mBroadcaster.crossTab.leave();
+
+    if (typeof dlpage_ph === 'string') {
+        // Clear the download activity flag navigating away on the downloads page.
+        dlmanager.dlClearActiveTransfer(dlpage_ph);
+    }
 };
 
 mBroadcaster.once('boot_done', function() {

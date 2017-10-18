@@ -27,8 +27,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         if (d && thumbHandler) {
             console.log('ThumbHandler: ' + thumbHandler.name);
         }
-
-        ASSERT(!isRawImage || typeof dcraw !== 'undefined', 'DCRAW is unavailale.');
     }
     else {
         onPreviewRetry = !!opt;
@@ -51,10 +49,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var ab;
         var imageType = 'image/jpeg';
         var canStoreAttr = !n || (n.u === u_handle && n.f !== u_handle);
-        // XXX: In Firefox loading a ~100MB image might throw `Image corrupt or truncated.`
-        // and this .onload called back with a white image. Bug #941823 / #1045926
-        // This is the MurmurHash3 for such image's dataURI.
-        var MURMURHASH3RR = 0x59d73a69;
 
         if (img.isPNG) {
             var transparent;
@@ -75,7 +69,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
             if (transparent) {
                 imageType = 'image/png';
-                MURMURHASH3RR = 0xE6BC61E0;
             }
         }
 
@@ -85,9 +78,10 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         // thumbnail:
         if (fa.indexOf(':0*') < 0) {
+            // XXX: Make this width/height divisible by 16 for optimal SmartCrop results!
             var options = {
-                width: 200,
-                height: 200
+                width: 240,
+                height: 240
             };
 
             canvas = document.createElement('canvas');
@@ -112,12 +106,19 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     (options.height / 2) - (this.naturalHeight / 2));
             }
 
-            dataURI = canvas.toDataURL(imageType, 0.70);
-            // if (d) console.log('THUMBNAIL', dataURI);
-            if (MurmurHash3(dataURI, 0x7fee00aa) === MURMURHASH3RR) {
-                console.error('Error generating thumbnail, aborting...');
+            ab = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+            var len = ab.byteLength;
+            while (len-- && !ab[len]) {}
+            if (len < 0) {
+                console.warn('All pixels are black, aborting thumbnail creation...', ab.byteLength);
+                api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
+                mBroadcaster.sendMessage('fa:error', this.id, ERANGE);
                 return;
             }
+
+            dataURI = canvas.toDataURL(imageType, 0.80);
+            // if (d) console.log('THUMBNAIL', dataURI);
 
             if (canStoreAttr) {
                 ab = dataURLToAB(dataURI);
@@ -154,7 +155,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
             ab = dataURLToAB(dataURI);
 
-            // only store preview when the user is the file owner, and when it's not a retry (because then there is already a preview image, it's just unavailable:
+            // only store preview when the user is the file owner, and when it's not a
+            // retry (because then there is already a preview image, it's just unavailable)
 
             if (!onPreviewRetry && canStoreAttr && fa.indexOf(':1*') < 0) {
                 if (d) {
@@ -164,7 +166,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
             }
 
-            if (node) {
+            if (node && filetype(n) !== 'PDF Document') {
                 previewimg(node, ab);
             }
 
@@ -187,7 +189,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
     };
     if (typeof FileReader !== 'undefined') {
-        setTimeout(function() {
+        var loader = function() {
             var ThumbFR = new FileReader();
             ThumbFR.onload = function(e) {
                 var orientation;
@@ -252,15 +254,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                         if (d) {
                             console.error('dcraw error', e);
                         }
-                    } finally {
-                        try {
-                            FS.unlink(filename);
-                        }
-                        catch (e) {
-                            if (e.code !== 'ENOENT') {
-                                console.error('FS.unlink error', e);
-                            }
-                        }
                     }
 
                     var thumb = filename.substr(0, filename.lastIndexOf('.'));
@@ -280,13 +273,42 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                             if (e.code !== 'ENOENT') {
                                 console.error('FS.readFile error', e);
                             }
+                            else {
+                                if (d) {
+                                    console.log(filename + ' has no thumbnail, converting whole image...');
+                                    console.time('dcraw-conv');
+                                }
+                                api_req({a: 'log', e: 99662, m: 'RAW image w/o thumbnail.'});
+
+                                run(['-O', thumb + '.ppm', filename]);
+
+                                try {
+                                    thumbData = ppmtojpeg(FS.readFile(thumb + '.ppm'));
+                                }
+                                catch (e) {}
+
+                                if (d) {
+                                    console.timeEnd('dcraw-conv');
+                                }
+                            }
+                        }
+                    }
+
+                    try {
+                        FS.unlink(filename);
+                    }
+                    catch (ex) {
+                        if (ex.code !== 'ENOENT') {
+                            console.error('FS.unlink error', ex);
                         }
                     }
 
                     if (thumbData) {
-                        file = new Blob([thumbData], {
-                            type: 'image/jpg'
-                        });
+                        file = new Blob([thumbData], {type: 'image/jpg'});
+                        api_req({a: 'log', e: 99663, m: 'RAW image processed.'});
+                    }
+                    else {
+                        api_req({a: 'log', e: 99664, m: 'Failed to decode RAW image.'});
                     }
 
                     try {
@@ -348,13 +370,30 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 }
             }
             else {
-                file = new Blob([new Uint8Array(imagedata)], {
-                    type: 'image/jpeg'
-                });
+                file = new Blob([new Uint8Array(imagedata)], {type: filemime(M.d[node], 'image/jpeg')});
                 M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
-        }, 350 + Math.floor(Math.random() * 600));
+        };
+        var timeout = parseInt(localStorage.delayedThumbnailCreation) || 350 + Math.floor(Math.random() * 600);
+
+        loader = setTimeout.bind(window, loader, timeout);
+
+        if (isRawImage) {
+            M.require('dcrawjs').always(function() {
+                'use strict';
+
+                if (typeof dcraw !== 'undefined') {
+                    loader();
+                }
+                else {
+                    console.error('Failed to load dcraw.js');
+                }
+            });
+        }
+        else {
+            loader();
+        }
     }
 }
 
@@ -429,10 +468,10 @@ function ppmtojpeg(ppm) {
             i = 0;
             j = 0;
             while (i < ppmLen && j < iLen) {
-                imageData.data[j] = ppm[i]; // R
+                imageData.data[j] = ppm[i];         // R
                 imageData.data[j + 1] = ppm[i + 1]; // G
                 imageData.data[j + 2] = ppm[i + 2]; // B
-                imageData.data[j + 3] = 0xBE; // A
+                imageData.data[j + 3] = 0xCE;       // A
                 j += 4;
                 i += 3;
             }

@@ -751,6 +751,9 @@ function srvlog2(type /*, ...*/) {
             if (is_chrome_firefox) {
                 version = window.mozMEGAExtensionVersion || buildVersion.firefox;
             }
+            else if (is_firefox_web_ext) {
+                version = buildVersion.firefox;
+            }
             else if (window.chrome) {
                 version = buildVersion.chrome;
             }
@@ -943,7 +946,8 @@ function mKeyDialog(ph, fl, keyr) {
 }
 
 function mRandomToken(pfx) {
-    return (pfx || '!') + '$' + (Math.random() * Date.now()).toString(36);
+    // return (pfx || '!') + '$' + (Math.random() * Date.now()).toString(36);
+    return (pfx || '') + '!' + (Date.now() - 15e11).toString(36) + rand(0x10000).toString(36);
 }
 
 function str_mtrunc(str, len) {
@@ -1535,8 +1539,22 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
  * Perform a normal logout
  *
  * @param {Function} aCallback optional
+ * @param {Bool} force optional
  */
-function mLogout(aCallback) {
+function mLogout(aCallback, force) {
+    "use strict";
+
+    if (!force && mega.ui.passwordReminderDialog) {
+        var passwordReminderLogout = mega.ui.passwordReminderDialog.recheckLogoutDialog();
+
+        passwordReminderLogout
+            .done(function() {
+                mLogout(aCallback, true);
+            });
+
+        return;
+    }
+
     var cnt = 0;
     if (M.c[M.RootID] && u_type === 0) {
         for (var i in M.c[M.RootID]) {
@@ -1909,7 +1927,7 @@ function passwordManager(form) {
             if (hashLogic || isPublicLink(path)) {
                 path = path.replace('/', '/#');
 
-                if (location.href.substr(0, 19) === 'chrome-extension://') {
+                if (is_chrome_web_ext || is_firefox_web_ext) {
                     path = path.replace('/#', '/mega/secure.html#');
                 }
             }
@@ -2148,8 +2166,57 @@ if (typeof sjcl !== 'undefined') {
         return result;
     };
 
+    /**
+     * addContactToFolderShare
+     *
+     * Add verified email addresses to folder shares.
+     */
+    Share.prototype.addContactToFolderShare = function addContactToFolderShare() {
+
+        var promise = MegaPromise.resolve();
+        var targets = [];
+        var $shareDialog = $('.share-dialog');
+        var $newContacts;
+        var permissionLevel;
+        var iconPermLvl;
+        var permissionClass;
+        var selectedNode;
+
+        // Share button enabled
+        if ($.dialog === 'share' && !$shareDialog.find('.dialog-share-button').is('.disabled')) {
+
+            selectedNode = $.selected[0];
+            $newContacts = $shareDialog.find('.token-input-list-mega .token-input-token-mega');
+
+            // Is there a new contacts planned for addition to share
+            if ($newContacts.length) {
+
+                // Determin current group permission level
+                iconPermLvl = $shareDialog.find('.permissions-icon')[0];
+                permissionClass = checkMultiInputPermission($(iconPermLvl));
+                permissionLevel = sharedPermissionLevel(permissionClass[0]);
+
+                // Add new planned contact to list
+                $.each($newContacts, function(ind, val) {
+                    targets.push({u: $(val).contents().eq(1).text(), r: permissionLevel});
+                });
+            }
+
+            closeDialog();
+            $('.export-links-warning').addClass('hidden');
+
+            // Add new contacts to folder share
+            if (targets.length > 0) {
+                promise = doShare(selectedNode, targets, true);
+            }
+        }
+
+        return promise;
+    };
+
     Share.prototype.updateNodeShares = function() {
 
+        var self = this;
         var promise = new MegaPromise();
 
         loadingDialog.show();
@@ -2160,7 +2227,7 @@ if (typeof sjcl !== 'undefined') {
                 if (Object($.changedPermissions).length > 0) {
                     promises.push(doShare($.selected[0], $.changedPermissions, true));
                 }
-                promises.push(addContactToFolderShare());
+                promises.push(self.addContactToFolderShare());
 
                 MegaPromise.allDone(promises)
                     .always(function() {

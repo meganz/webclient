@@ -34,6 +34,8 @@ MegaApi.prototype.prod = function(aSave) {
 };
 
 MegaApi.prototype.req = function(params) {
+    'use strict';
+
     var promise = new MegaPromise();
 
     if (typeof params === 'string') {
@@ -41,14 +43,14 @@ MegaApi.prototype.req = function(params) {
     }
 
     api_req(params, {
-        callback: function(res) {
+        callback: tryCatch(function(res) {
             if (typeof res === 'number' && res < 0) {
                 promise.reject.apply(promise, arguments);
             }
             else {
                 promise.resolve.apply(promise, arguments);
             }
-        }
+        }, promise.reject.bind(promise, EFAILED))
     });
 
     return promise;
@@ -182,6 +184,7 @@ MegaUtils.prototype.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
     var url;
     var method;
     var options;
+    var json = false;
     var promise = new MegaPromise();
 
     if (typeof aURLOrOptions === 'object') {
@@ -204,12 +207,18 @@ MegaUtils.prototype.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
     }
 
     xhr.onloadend = function(ev) {
+        var error = false;
+
         if (this.status === 200) {
-            promise.resolve(ev, this.response);
+            try {
+                return promise.resolve(ev, json ? JSON.parse(this.response) : this.response);
+            }
+            catch (ex) {
+                error = ex;
+            }
         }
-        else {
-            promise.reject(ev);
-        }
+
+        promise.reject(ev, error);
     };
 
     try {
@@ -221,8 +230,14 @@ MegaUtils.prototype.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
         if (options.type) {
             xhr.responseType = options.type;
             if (xhr.responseType !== options.type) {
-                xhr.abort();
-                throw new Error('Unsupported responseType');
+                if (options.type === 'json') {
+                    xhr.responseType = 'text';
+                    json = true;
+                }
+                else {
+                    xhr.abort();
+                    throw new Error('Unsupported responseType');
+                }
             }
         }
 
@@ -314,6 +329,8 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         if (page !== 'download') {
             mega.ui.tpp.reset('dl');
         }
+
+        $.totalDL = false;
     }
     else {
         if (page !== 'download') {
@@ -338,9 +355,14 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
         }
-        $('.transfer-panel-title').text('');
+        $('.transfer-panel-title span').text('');
         dlmanager.dlRetryInterval = 3000;
         percent_megatitle();
+
+        if (dlmanager.onDownloadFatalError) {
+            dlmanager.showMEGASyncOverlay(true, dlmanager.onDownloadFatalError);
+            delete dlmanager.onDownloadFatalError;
+        }
     }
 
     if (d) {

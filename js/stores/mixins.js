@@ -173,7 +173,7 @@ var MegaRenderMixin = {
         }
         // offsetParent should NOT trigger a reflow/repaint
         if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
-            return false
+            return false;
         }
         return true;
     },

@@ -20,8 +20,11 @@
                     '<td width="100" class="size"></td>' +
                     '<td width="130" class="type"></td>' +
                     '<td width="120" class="time"></td>' +
-                    '<td width="62" class="grid-url-field own-data">' +
+                    '<td width="90" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="small-icon icons-sprite grey-clock"></i>' +
+                        '</span>' +
                         '<span class="data-item-icon"></span>' +
                     '</td>' +
                 '</tr>' +
@@ -30,8 +33,13 @@
             // Icon view mode
             '<a class="data-block-view">' +
                 '<span class="data-block-bg ">' +
-                    '<span class="file-status-icon indicator"></span>' +
-                    '<span class="data-item-icon indicator"></span>' +
+                    '<span class="data-block-indicators">' +
+                        '<span class="file-status-icon indicator"></span>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="small-icon icons-sprite grey-clock"></i>' +
+                        '</span>' +
+                        '<span class="data-item-icon indicator"></span>' +
+                    '</span>' +
                     '<span class="block-view-file-type"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-detalis">' +
@@ -78,8 +86,10 @@
             // Icon view mode
             '<a class="data-block-view folder">' +
                 '<span class="data-block-bg">' +
-                    '<span class="file-status-icon indicator"></span>' +
-                    '<span class="shared-folder-access indicator"></span>' +
+                    '<span class="data-block-indicators">' +
+                       '<span class="file-status-icon indicator"></span>' +
+                       '<span class="shared-folder-access indicator"></span>' +
+                    '</span>' +
                     '<span class="block-view-file-type"></span>' +
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-detalis">' +
@@ -159,8 +169,10 @@
             // Icon view mode
             '<a class="data-block-view folder">' +
                 '<span class="data-block-bg">' +
-                    '<span class="file-status-icon indicator"></span>' +
-                    '<span class="shared-folder-access indicator"></span>' +
+                    '<span class="data-block-indicators">' +
+                       '<span class="file-status-icon indicator"></span>' +
+                       '<span class="shared-folder-access indicator"></span>' +
+                    '</span>' +
                     '<span class="block-view-file-type folder-shared"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-detalis">' +
@@ -322,7 +334,7 @@
 
             var lSel = aListSelector;
 
-            hideEmptyGrids();
+            M.hideEmptyGrids();
             $.tresizer();
 
             if (!aUpdate) {
@@ -467,7 +479,6 @@
             if (this.finalize) {
                 this.finalize(aUpdate, aNodeList, initData);
             }
-            this.finalizers['*'].call(this, aUpdate, aNodeList, initData);
 
             if (this.logger) {
                 console.timeEnd('MegaRender.renderLayout');
@@ -823,7 +834,9 @@
                     var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
                     aTemplate.querySelector(selector).classList.add('star');
                 }
-
+                if (!aNode.t && aNode.tvf) {
+                    aTemplate.classList.add('versioning');
+                }
                 if (this.viewmode) {
                     tmp = aTemplate.querySelector('.block-view-file-type');
 
@@ -1029,7 +1042,10 @@
 
                         define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));
                     }
-                    else if(aNodeList.length && Object(newnodes).length) {
+
+                    // are there any 'newnodes'? if yes, generate the .newNodeList, even if this was previously a
+                    // non-megaList/megaRender initialized folder (e.g. empty)
+                    if (aUpdate && aNodeList.length && Object(newnodes).length) {
                         if (!result) {
                             result = {};
                         }
@@ -1067,39 +1083,6 @@
 
         /** Renderer finalizers */
         finalizers: freeze({
-            /**
-             * A generic finalizer that would be called after the 'section' one finishes.
-             *
-             * @param {Boolean} aUpdate   Whether we're updating the list
-             * @param {Array}   aNodeList The list of ufs-nodes processed
-             * @param {Object}  aUserData  Any data provided by initializers
-             */
-            '*': function(aUpdate, aNodeList, aUserData) {
-                if (!window.fmShortcuts) {
-                    window.fmShortcuts = new FMShortcuts();
-                }
-
-
-                if (!aUpdate) {
-                    /**
-                     * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
-                     * reattach to its events.
-                     *
-                     * @type {SelectionManager}
-                     */
-                    window.selectionManager = new SelectionManager(
-                        $(this.container),
-                        $.selected && $.selected.length > 0
-                    );
-
-                    // restore selection if needed
-                    if ($.selected) {
-                        $.selected.forEach(function(h) {
-                            selectionManager.add_to_selection(h);
-                        });
-                    }
-                }
-            },
             /**
              * @param {Boolean} aUpdate   Whether we're updating the list
              * @param {Array}   aNodeList The list of ufs-nodes processed
@@ -1179,6 +1162,9 @@
             // megaList can be undefined/empty if the current folder had no nodes in it.
             if (DYNLIST_ENABLED && this.megaList) {
                 this.megaList.destroy();
+                if (window.selectionManager) {
+                    window.selectionManager.destroy();
+                }
                 window.selectionManager = false;
             }
         },

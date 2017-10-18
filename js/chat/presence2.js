@@ -242,7 +242,6 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
         self.keepalivechecktimer = false;
     }
 
-
     if (self.url) {
         self.s = new WebSocket(self.url);
 
@@ -417,20 +416,16 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
         };
     }
     else {
-        api_req(
-            {
-                a: 'pu'
-            },
-            {
-                callback: function(res, ctx) {
+        if (!self._puRequest || self._puRequest.state() !== "pending") {
+            self._puRequest = asyncApiReq({'a': 'pu'})
+                .done(function(res) {
                     if (typeof res == 'string') {
-                        ctx.self.url = res;
+                        self.url = res;
                     }
-                    ctx.self.reconnect();
-                },
-                self: self
-            }
-        );
+
+                    self.reconnect();
+                });
+        }
     }
 };
 

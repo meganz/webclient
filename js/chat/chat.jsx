@@ -39,7 +39,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
         }
         // XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
-        hideEmptyGrids();
+        M.hideEmptyGrids();
 
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
@@ -410,19 +410,6 @@ Chat.prototype.init = function() {
         }
     });
 
-
-    $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {
-        if (ul_target.indexOf("chat/") > -1) {
-            var chatRoom = megaChat.getRoomFromUrlHash(ul_target);
-
-            if (!chatRoom) {
-                return;
-            }
-
-            chatRoom.attachNodes(uploads);
-        }
-    });
-
     $(document.body).delegate('.tooltip-trigger', 'mouseover.notsentindicator', function() {
         var $this = $(this),
             $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
@@ -444,6 +431,23 @@ Chat.prototype.init = function() {
         // hide all tooltips
         var $notification = $('.tooltip');
         $notification.addClass('hidden').removeAttr('style');
+    });
+
+
+    mBroadcaster.addListener('upload:start', function(data) {
+        if (d) {
+            MegaLogger.getLogger('onUploadEvent').debug('upload:start', data);
+        }
+
+        for (var k in data) {
+            if (data[k].chat) {
+                var roomId = data[k].chat.replace("g/", "").split("/")[1];
+                if (self.chats[roomId]) {
+                    self.chats[roomId].onUploadStart(data);
+                    break;
+                }
+            }
+        }
     });
 
     self.trigger("onInit");
@@ -782,6 +786,17 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                 );
                 M.syncUsersFullname(contactHash);
                 self.processNewUser(contactHash);
+                asyncApiReq({
+                    'a': 'uge',
+                    'u': contactHash
+                })
+                    .done(function(r) {
+                        if (r && isString(r)) {
+                            if (M.u[contactHash]) {
+                                M.u[contactHash].m = r;
+                            }
+                        }
+                    });
             }
         });
     }
@@ -1041,7 +1056,7 @@ Chat.prototype.renderListing = function() {
 
     self.hideAllChats();
 
-    hideEmptyGrids();
+    M.hideEmptyGrids();
 
     //$('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
     //$('.fm-tree-panel > .nw-tree-panel-header').hide();

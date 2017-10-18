@@ -16451,10 +16451,6 @@
         "text": "View previous versions",
         "context": "Finder context menu option to view previous versions of a file within your MEGA account through the web browser."
     },
-    "16908": {
-        "text": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
-        "context": "Label to encourage users about the advantages of create an account and benefits of PRO plans"
-    },
     "16909": {
         "text": "There was a problem installing the update. Please try again later or download the last version from:\r\nhttps:\/\/mega.co.nz\/#sync",
         "context": "A notification message which is launched when a problem occurs during the installation of an update."

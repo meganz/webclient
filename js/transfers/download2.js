@@ -1860,6 +1860,8 @@ var dlmanager = {
     showMEGASyncOverlay: function(onSizeExceed, dlStateError) {
         'use strict';
 
+        M.require('megasync_js').dump();
+
         var $overlay = $('.megasync-overlay');
         var $body = $('body');
 
@@ -1926,7 +1928,19 @@ var dlmanager = {
         }
 
         $('.big-button.download-megasync', $overlay).rebind('click', function() {
-            megasync.download(dlpage_ph, dlpage_key);
+            if (typeof megasync === 'undefined') {
+                console.error('Failed to load megasync.js');
+            }
+            else {
+                if (typeof dlpage_ph === 'string') {
+                    megasync.download(dlpage_ph, dlpage_key);
+                }
+                else {
+                    open(megasync.getMegaSyncUrl() || '/sync');
+                }
+            }
+
+            return false;
         });
 
         $('.megasync-info-txt a', $overlay).rebind('click', function() {
@@ -1940,6 +1954,11 @@ var dlmanager = {
             if (e.keyCode === 27) {
                 hideOverlay();
             }
+        });
+
+        $('a.clickurl', $overlay).rebind('click', function() {
+            open(this.href);
+            return false;
         });
     }
 };

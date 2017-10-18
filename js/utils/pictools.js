@@ -194,9 +194,9 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
 mBroadcaster.once('startMega', function() {
     'use strict';
-    var engine = browserdetails().engine;
+    var uad = ua.details;
 
-    if (engine !== 'Webkit' && engine !== 'Gecko') {
+    if (uad.engine !== 'Webkit' && uad.engine !== 'Gecko' || uad.browser === 'Edge') {
         delete mThumbHandler.sup.PDF;
     }
 });

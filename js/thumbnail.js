@@ -39,7 +39,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     var img = new Image();
     img.id = id;
     img.aes = aes;
-    img.onload = function() {
+    img.onload = tryCatch(function() {
         var t = new Date().getTime();
         var n = M.d[node];
         var fa = '' + (n && n.fa);
@@ -112,9 +112,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             while (len-- && !ab[len]) {}
             if (len < 0) {
                 console.warn('All pixels are black, aborting thumbnail creation...', ab.byteLength);
-                api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
-                mBroadcaster.sendMessage('fa:error', this.id, ERANGE);
-                return;
+                throw new Error('Unsupported image type/format.');
             }
 
             dataURI = canvas.toDataURL(imageType, 0.80);
@@ -181,13 +179,16 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         delete this.aes;
         img = null;
-    };
-    img.onerror = function(e) {
+    }, img.onerror = function(e) {
         if (d) {
-            console.error('createthumbnail error', e);
             console.timeEnd('createthumbnail' + id);
+            console.error('Failed to create thumbnail', e);
         }
-    };
+
+        api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
+        mBroadcaster.sendMessage('fa:error', id, e);
+    });
+
     if (typeof FileReader !== 'undefined') {
         var loader = function() {
             var ThumbFR = new FileReader();

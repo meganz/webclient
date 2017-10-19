@@ -51,8 +51,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Remove all files in the language directory (in case we removed some languages in the code)
-rm *.json
+# Remove all files in the language directory except the production strings and the downloaded lang.tar.gz file
+find . -type f -not -name '*_prod.json' -not -name 'lang.tar.gz' -delete
 
 # Extract the tar.gz file
 tar xfvz lang.tar.gz
@@ -77,7 +77,7 @@ mergeResult=$(git ls-files -u)
 
 # If there was a merge conflict
 if [ -n "$mergeResult" ]; then
-    echo "Problem merging, fetching strings from Babel again to resolve conflict..."
+    echo "Problem merging, re-extracting strings from Babel again to resolve conflict..."
     git status
 
     # Extract the tar.gz file again

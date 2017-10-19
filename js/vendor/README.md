@@ -134,6 +134,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > This is released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 ---
+[pdf.viewer.js]: PDF Reader Viewer in JavaScript.
+
+> This is released under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+---
 [react-dom.js, react.js]: A declarative, efficient, and flexible JavaScript library for building user interfaces.
 
 ---
@@ -212,6 +217,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [pdf.js]: <https://github.com/mozilla/pdfjs-dist/tree/v1.9.638>
+[pdf.viewer.js]: <https://github.com/mozilla/pdf.js/releases/download/v1.8.188/pdfjs-1.8.188-dist.zip>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>

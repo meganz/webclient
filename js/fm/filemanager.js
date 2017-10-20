@@ -3214,13 +3214,14 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         }
 
         var closeDialog = function() {
-            $.dialog = null;
+            $strgdlg.unbind('dialog-closed');
             window.closeDialog();
 
             promise.resolve();
             delete M.showOverStorageQuotaPromise;
         };
-        $.dialog = closeDialog;
+
+        $strgdlg.rebind('dialog-closed', closeDialog);
 
         $('.button', $strgdlg).rebind('click', function() {
             var $this = $(this);
@@ -3269,7 +3270,6 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         // if another dialog wasn't opened previously
         if (!prevState || Object(options).custom) {
             M.safeShowDialog('over-storage-quota', $strgdlg);
-            $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
         }
         else {
             promise.reject();
@@ -3358,7 +3358,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
                     // arrange to back any non-controlled dialogs,
                     // this class will be removed on the next closeDialog()
-                    $('.fm-dialog').addClass('arrange-to-back');
+                    $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
 
                     fm_showoverlay();
                     $dialog.removeClass('hidden arrange-to-back');
@@ -3366,6 +3366,9 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
                 $.dialog = String(name);
             }, function(ex) {
                 // There was an exception dispatching the above code, move to the next queued dialog...
+                if (d) {
+                    console.warn(ex);
+                }
                 mBroadcaster.sendMessage('closedialog', ex);
             });
         })(dialogName, dispatcher);

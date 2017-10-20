@@ -1294,12 +1294,19 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     });
     $('#msgDialog').removeClass('hidden');
     fm_showoverlay();
+
+    if ($.dialog) {
+        $('.fm-dialog').addClass('arrange-to-back');
+    }
 }
 
 function closeMsg() {
     $('#msgDialog').addClass('hidden');
 
-    if (!$('.pro-register-dialog').is(':visible')) {
+    if ($.dialog) {
+        $('.fm-dialog').removeClass('arrange-to-back');
+    }
+    else {
         fm_hideoverlay();
     }
 
@@ -2076,11 +2083,6 @@ function closeDialog(ev) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }
 
-    if (typeof $.dialog === 'function') {
-        onIdle($.dialog);
-        $.dialog = null;
-    }
-
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         fm_hideoverlay();
         $('.fm-dialog.registration-page-success').addClass('hidden').removeClass('special');
@@ -2154,7 +2156,7 @@ function closeDialog(ev) {
             delete $.onImportCopyNodes;
         }
     }
-    $('.fm-dialog').removeClass('arrange-to-back');
+    $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
 
     $('.export-links-warning').addClass('hidden');
     if ($.dialog === 'terms' && $.termsAgree) {
@@ -2408,24 +2410,22 @@ function bottomPageDialog(close, pp, hh) {
     "use strict";
 
     var $dialog = $('.fm-dialog.bottom-pages-dialog');
+    var closeDialog = function() {
+        $dialog.unbind('dialog-closed');
+        window.closeDialog();
+        delete $.termsAgree;
+        delete $.termsDeny;
+        return false;
+    };
 
-    if (close)
-    {
-        $dialog.addClass('hidden');
-        if (!$('.pro-register-dialog').is(":visible")) {
-            fm_hideoverlay();
-            $.dialog = false;
-        }
-        if ($.termsAgree) $.termsAgree = undefined;
-        if ($.termsDeny) $.termsDeny = undefined;
+    if (close) {
+        closeDialog();
         return false;
     }
 
     if (!pp) {
         pp = 'terms';
     }
-
-    $.dialog = pp;
 
     // Show Agree/Cancel buttons for Terms dialogs
     if (pp === 'terms' || pp === 'sdkterms') {
@@ -2470,28 +2470,48 @@ function bottomPageDialog(close, pp, hh) {
         });
     }
 
-    if (!pages[pp])
-    {
-        loadingDialog.show();
+    var asyncTaskID;
+    if (!pages[pp]) {
+        asyncTaskID = 'page.' + pp + '.' + makeUUID();
+
         M.require(pp)
-            .done(function() {
-                loadingDialog.hide();
-                bottomPageDialog(false, $.dialog);
+            .always(function() {
+                mBroadcaster.sendMessage(asyncTaskID);
+                asyncTaskID = null;
             });
-        return false;
     }
 
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
-    $('.bp-main', $dialog).safeHTML(
-        translate(
-            pages[pp].split('((TOP))')[1].split('((BOTTOM))')[0].replace('main-mid-pad new-bottom-pages', '')
-        )
-    );
+    M.safeShowDialog(pp, function _showDialog() {
+        if (asyncTaskID) {
+            loadingDialog.show();
+            mBroadcaster.once(asyncTaskID, function() {
+                loadingDialog.hide();
+                asyncTaskID = null;
+                _showDialog();
+            });
 
-    $('.bp-body', $dialog).jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
-    jScrollFade('.bp-body');
-    clickURLs();
+            return $dialog;
+        }
+        $dialog.rebind('dialog-closed', closeDialog).removeClass('hidden');
+
+        $('.bp-main', $dialog)
+            .safeHTML(translate(String(pages[pp])
+                .split('((TOP))')[1]
+                .split('((BOTTOM))')[0]
+                .replace('main-mid-pad new-bottom-pages', ''))
+            );
+
+        $('.bp-body', $dialog).jScrollPane({
+            showArrows: true,
+            arrowSize: 5,
+            animateScroll: true,
+            verticalDragMinHeight: 50
+        });
+        jScrollFade('.bp-body');
+        clickURLs();
+
+        return $dialog;
+    });
 }
 
 function clipboardcopycomplete()

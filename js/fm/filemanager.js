@@ -1018,7 +1018,8 @@ FileManager.prototype.initContextUI = function() {
         $('#fileselect4').click();
     });
 
-    $(c + '.remove-item').rebind('click', function() {
+    $(c + '.remove-item').rebind('click', function () {
+        closeDialog();// added by khaled
         fmremove();
     });
 

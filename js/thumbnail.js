@@ -334,7 +334,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     }
                 }
 
-                __render_thumb(img, u8, orientation, file);
+                __render_thumb(img, u8, orientation, file, isRawImage);
                 file = imagedata = undefined;
             };
             if (file) {
@@ -396,14 +396,40 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     }
 }
 
-function __render_thumb(img, u8, orientation, blob) {
-    if (u8) {
+function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
+    'use strict';
+
+    if (u8 && !noMagicNumCheck) {
         var dv = new DataView(u8.buffer || u8);
-        if (dv.getUint32(0) === 0x89504e47) {
-            img.isPNG = true;
+        // Perform magic number checks for each recognized image type by is_image() per file extension.
+        // Anything handled from mThumbHandler is meant to return a PNG, so we don't need to add a magic for eg SVG.
+        switch (dv.getUint16(0)) {
+            case 0xFFD8: // JPEG
+            case 0x4D4D: // TIFF, big-endian
+            case 0x4949: // TIFF, little-endian
+            case 0x424D: // BMP
+                break;
+
+            default:
+                switch (dv.getUint32(0)) {
+                    case 0x89504e47: // PNG
+                        img.isPNG = true;
+                    /* fallthrough */
+                    case 0x47494638: // GIF8
+                    case 0x47494639: // GIF9
+                        break;
+
+                    default:
+                        if (d) {
+                            console.warn('Unrecognized image format.', dv);
+                        }
+                        u8 = null;
+                }
         }
         dv = undefined;
+    }
 
+    if (u8) {
         if (orientation === undefined || orientation < 1 || orientation > 8) {
             if (d) {
                 console.time('exif');
@@ -423,6 +449,7 @@ function __render_thumb(img, u8, orientation, blob) {
         }
         M.neuterArrayBuffer(u8);
     }
+
     if (!u8 || (img.huge && img.dataSize === blob.size)) {
         if (d) {
             console.warn('Unable to generate thumbnail...');

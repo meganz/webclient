@@ -279,6 +279,10 @@ function dl_g(res) {
                             }
                         });
                     }
+                    else if (filetype(filename) === 'PDF Document' && Object(previews[dlpage_ph]).buffer) {
+                        onDownloadReady();
+                        M.saveAs(previews[dlpage_ph].buffer, filename);
+                    }
                     else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
                         browserDownload();
                     }
@@ -418,10 +422,21 @@ function dl_g(res) {
                             $infoBlock.find('img').attr('src', data);
 
                             if (is_image(filename)) {
-                                $infoBlock.find('.img-preview-button')
-                                    .removeClass('hidden')
+                                var $ipb = $infoBlock.find('.img-preview-button');
+
+                                if (filetype(filename) === 'PDF Document') {
+                                    $ipb.find('span').text(l[17489]);
+                                }
+
+                                $ipb.removeClass('hidden')
                                     .rebind('click', function() {
-                                        slideshow({h: dlpage_ph, fa: res.fa, k: key});
+                                        slideshow({
+                                            k: key,
+                                            fa: res.fa,
+                                            h: dlpage_ph,
+                                            name: filename,
+                                            link: dlpage_ph + '!' + dlpage_key
+                                        });
                                     });
                             }
                         }

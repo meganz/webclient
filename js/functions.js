@@ -901,29 +901,28 @@ function mKeyDialog(ph, fl, keyr) {
     $('.new-download-file-icon').addClass(fileIcon({
         name: 'unknown.unknown'
     }));
-    $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('disabled');
-    $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').removeClass('active');
+
+    var newFolderBtn = $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button');
+    newFolderBtn.addClass('disabled').removeClass('active');
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     fm_showoverlay();
 
-    $('.fm-dialog.dlkey-dialog input').off('input');
-    $('.fm-dialog.dlkey-dialog input').on('input', function(e) {
+    $('.fm-dialog.dlkey-dialog input').off('input keypress');
+    $('.fm-dialog.dlkey-dialog input').on('input keypress', function(e) {
         var length = $('.fm-dialog.dlkey-dialog input').val().length;
 
         if (length) {
-            $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').removeClass('disabled');
-            $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
+            newFolderBtn.removeClass('disabled').addClass('active');
             if (e.keyCode === 13) {
-                $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
+                newFolderBtn.click();
             }
         }
         else {
-            $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').removeClass('active');
-            $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('disabled');
+            newFolderBtn.removeClass('active').addClass('disabled');
         }
     });
 
-    $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function() {
+    newFolderBtn.rebind('click', function() {
 
         if ($(this).hasClass('active')) {
 

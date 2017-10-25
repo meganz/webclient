@@ -3184,7 +3184,9 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
                 .safeHTML(Object(options).body || l[16360]);
         }
         else {
-            $('.fm-main').addClass('fm-notification almost-full');
+            if (perc >90) {
+                $('.fm-main').addClass('fm-notification almost-full');
+            }
             $strgdlg.addClass('almost-full')
                 .find('.fm-dialog-body.almost-full')
                 .find('.fm-dialog-title')

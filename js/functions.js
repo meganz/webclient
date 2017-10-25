@@ -907,8 +907,7 @@ function mKeyDialog(ph, fl, keyr) {
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     fm_showoverlay();
 
-    $('.fm-dialog.dlkey-dialog input').off('input keypress');
-    $('.fm-dialog.dlkey-dialog input').on('input keypress', function(e) {
+    $('.fm-dialog.dlkey-dialog input').off('input keypress').on('input keypress', function(e) {
         var length = $('.fm-dialog.dlkey-dialog input').val().length;
 
         if (length) {

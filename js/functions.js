@@ -884,8 +884,9 @@ function MurmurHash3(key, seed) {
  * @return {MegaPromise}
  */
 function mKeyDialog(ph, fl, keyr) {
-    var promise = new MegaPromise();
+    "use strict";
 
+    var promise = new MegaPromise();
     if (keyr) {
         $('.fm-dialog.dlkey-dialog .instruction-message')
             .text(l[9048]);
@@ -902,8 +903,8 @@ function mKeyDialog(ph, fl, keyr) {
         name: 'unknown.unknown'
     }));
 
-    var newFolderBtn = $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button');
-    newFolderBtn.addClass('disabled').removeClass('active');
+    var $newFolderBtn = $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button');
+    $newFolderBtn.addClass('disabled').removeClass('active');
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     fm_showoverlay();
 
@@ -911,17 +912,17 @@ function mKeyDialog(ph, fl, keyr) {
         var length = $('.fm-dialog.dlkey-dialog input').val().length;
 
         if (length) {
-            newFolderBtn.removeClass('disabled').addClass('active');
+            $newFolderBtn.removeClass('disabled').addClass('active');
             if (e.keyCode === 13) {
-                newFolderBtn.click();
+                $newFolderBtn.click();
             }
         }
         else {
-            newFolderBtn.removeClass('active').addClass('disabled');
+            $newFolderBtn.removeClass('active').addClass('disabled');
         }
     });
 
-    newFolderBtn.rebind('click', function() {
+    $newFolderBtn.rebind('click', function() {
 
         if ($(this).hasClass('active')) {
 

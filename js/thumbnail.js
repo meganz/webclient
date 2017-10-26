@@ -1,5 +1,3 @@
-var noThumbURI = staticpath + 'images/mega/no-img.png';
-
 function createnodethumbnail(node, aes, id, imagedata, opt) {
     storedattr[id] = {};
     storedattr[id] = {
@@ -27,8 +25,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         if (d && thumbHandler) {
             console.log('ThumbHandler: ' + thumbHandler.name);
         }
-
-        ASSERT(!isRawImage || typeof dcraw !== 'undefined', 'DCRAW is unavailale.');
     }
     else {
         onPreviewRetry = !!opt;
@@ -41,7 +37,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     var img = new Image();
     img.id = id;
     img.aes = aes;
-    img.onload = function() {
+    img.onload = tryCatch(function() {
         var t = new Date().getTime();
         var n = M.d[node];
         var fa = '' + (n && n.fa);
@@ -51,10 +47,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var ab;
         var imageType = 'image/jpeg';
         var canStoreAttr = !n || (n.u === u_handle && n.f !== u_handle);
-        // XXX: In Firefox loading a ~100MB image might throw `Image corrupt or truncated.`
-        // and this .onload called back with a white image. Bug #941823 / #1045926
-        // This is the MurmurHash3 for such image's dataURI.
-        var MURMURHASH3RR = 0x59d73a69;
 
         if (img.isPNG) {
             var transparent;
@@ -75,7 +67,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
             if (transparent) {
                 imageType = 'image/png';
-                MURMURHASH3RR = 0xE6BC61E0;
             }
         }
 
@@ -113,12 +104,17 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     (options.height / 2) - (this.naturalHeight / 2));
             }
 
+            ab = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+            var len = ab.byteLength;
+            while (len-- && !ab[len]) {}
+            if (len < 0) {
+                console.warn('All pixels are black, aborting thumbnail creation...', ab.byteLength);
+                throw new Error('Unsupported image type/format.');
+            }
+
             dataURI = canvas.toDataURL(imageType, 0.80);
             // if (d) console.log('THUMBNAIL', dataURI);
-            if (MurmurHash3(dataURI, 0x7fee00aa) === MURMURHASH3RR) {
-                console.error('Error generating thumbnail, aborting...');
-                return;
-            }
 
             if (canStoreAttr) {
                 ab = dataURLToAB(dataURI);
@@ -155,7 +151,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
             ab = dataURLToAB(dataURI);
 
-            // only store preview when the user is the file owner, and when it's not a retry (because then there is already a preview image, it's just unavailable:
+            // only store preview when the user is the file owner, and when it's not a
+            // retry (because then there is already a preview image, it's just unavailable)
 
             if (!onPreviewRetry && canStoreAttr && fa.indexOf(':1*') < 0) {
                 if (d) {
@@ -180,15 +177,18 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         delete this.aes;
         img = null;
-    };
-    img.onerror = function(e) {
+    }, img.onerror = function(e) {
         if (d) {
-            console.error('createthumbnail error', e);
             console.timeEnd('createthumbnail' + id);
+            console.error('Failed to create thumbnail', e);
         }
-    };
+
+        api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
+        mBroadcaster.sendMessage('fa:error', id, e);
+    });
+
     if (typeof FileReader !== 'undefined') {
-        setTimeout(function() {
+        var loader = function() {
             var ThumbFR = new FileReader();
             ThumbFR.onload = function(e) {
                 var orientation;
@@ -253,15 +253,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                         if (d) {
                             console.error('dcraw error', e);
                         }
-                    } finally {
-                        try {
-                            FS.unlink(filename);
-                        }
-                        catch (e) {
-                            if (e.code !== 'ENOENT') {
-                                console.error('FS.unlink error', e);
-                            }
-                        }
                     }
 
                     var thumb = filename.substr(0, filename.lastIndexOf('.'));
@@ -281,13 +272,42 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                             if (e.code !== 'ENOENT') {
                                 console.error('FS.readFile error', e);
                             }
+                            else {
+                                if (d) {
+                                    console.log(filename + ' has no thumbnail, converting whole image...');
+                                    console.time('dcraw-conv');
+                                }
+                                api_req({a: 'log', e: 99662, m: 'RAW image w/o thumbnail.'});
+
+                                run(['-O', thumb + '.ppm', filename]);
+
+                                try {
+                                    thumbData = ppmtojpeg(FS.readFile(thumb + '.ppm'));
+                                }
+                                catch (e) {}
+
+                                if (d) {
+                                    console.timeEnd('dcraw-conv');
+                                }
+                            }
+                        }
+                    }
+
+                    try {
+                        FS.unlink(filename);
+                    }
+                    catch (ex) {
+                        if (ex.code !== 'ENOENT') {
+                            console.error('FS.unlink error', ex);
                         }
                     }
 
                     if (thumbData) {
-                        file = new Blob([thumbData], {
-                            type: 'image/jpg'
-                        });
+                        file = new Blob([thumbData], {type: 'image/jpg'});
+                        api_req({a: 'log', e: 99663, m: 'RAW image processed.'});
+                    }
+                    else {
+                        api_req({a: 'log', e: 99664, m: 'Failed to decode RAW image.'});
                     }
 
                     try {
@@ -314,7 +334,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     }
                 }
 
-                __render_thumb(img, u8, orientation, file);
+                __render_thumb(img, u8, orientation, file, isRawImage);
                 file = imagedata = undefined;
             };
             if (file) {
@@ -353,18 +373,63 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
-        }, parseInt(localStorage.delayedThumbnailCreation) || 350 + Math.floor(Math.random() * 600));
+        };
+        var timeout = parseInt(localStorage.delayedThumbnailCreation) || 350 + Math.floor(Math.random() * 600);
+
+        loader = setTimeout.bind(window, loader, timeout);
+
+        if (isRawImage) {
+            M.require('dcrawjs').always(function() {
+                'use strict';
+
+                if (typeof dcraw !== 'undefined') {
+                    loader();
+                }
+                else {
+                    console.error('Failed to load dcraw.js');
+                }
+            });
+        }
+        else {
+            loader();
+        }
     }
 }
 
-function __render_thumb(img, u8, orientation, blob) {
-    if (u8) {
+function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
+    'use strict';
+
+    if (u8 && !noMagicNumCheck) {
         var dv = new DataView(u8.buffer || u8);
-        if (dv.getUint32(0) === 0x89504e47) {
-            img.isPNG = true;
+        // Perform magic number checks for each recognized image type by is_image() per file extension.
+        // Anything handled from mThumbHandler is meant to return a PNG, so we don't need to add a magic for eg SVG.
+        switch (dv.getUint16(0)) {
+            case 0xFFD8: // JPEG
+            case 0x4D4D: // TIFF, big-endian
+            case 0x4949: // TIFF, little-endian
+            case 0x424D: // BMP
+                break;
+
+            default:
+                switch (dv.getUint32(0)) {
+                    case 0x89504e47: // PNG
+                        img.isPNG = true;
+                    /* fallthrough */
+                    case 0x47494638: // GIF8
+                    case 0x47494639: // GIF9
+                        break;
+
+                    default:
+                        if (d) {
+                            console.warn('Unrecognized image format.', dv);
+                        }
+                        u8 = null;
+                }
         }
         dv = undefined;
+    }
 
+    if (u8) {
         if (orientation === undefined || orientation < 1 || orientation > 8) {
             if (d) {
                 console.time('exif');
@@ -384,6 +449,7 @@ function __render_thumb(img, u8, orientation, blob) {
         }
         M.neuterArrayBuffer(u8);
     }
+
     if (!u8 || (img.huge && img.dataSize === blob.size)) {
         if (d) {
             console.warn('Unable to generate thumbnail...');
@@ -428,10 +494,10 @@ function ppmtojpeg(ppm) {
             i = 0;
             j = 0;
             while (i < ppmLen && j < iLen) {
-                imageData.data[j] = ppm[i]; // R
+                imageData.data[j] = ppm[i];         // R
                 imageData.data[j + 1] = ppm[i + 1]; // G
                 imageData.data[j + 2] = ppm[i + 2]; // B
-                imageData.data[j + 3] = 0xBE; // A
+                imageData.data[j + 3] = 0xCE;       // A
                 j += 4;
                 i += 3;
             }
@@ -557,3 +623,15 @@ function benchmarkireq() {
     }
 
 }
+
+// Do not change this to a remote URL since it'll cause a CORS issue (tainted canvas)
+var noThumbURI = 'data:image/svg+xml;charset-utf-8,%3csvg%20xmlns%3d%22http%3a%2f%2fwww.w3.org%2f' +
+    '2000%2fsvg%22%20width%3d%22240pt%22%20height%3d%22240pt%22%20viewBox%3d%220%200%20240%20240%22' +
+    '%3e%3cpath%20fill%3d%22rgb%2880%25%2c79.607843%25%2c79.607843%25%29%22%20fill-rule%3d%22evenodd%22' +
+    '%20d%3d%22M120%20132c6.63%200%2012-5.37%2012-12%200-2.3-.65-4.42-1.76-6.24l-16.48%2016.48c1.82%201.1%203' +
+    '.95%201.76%206.24%201.76zm-21.7%205.7c-3.93-4.83-6.3-11-6.3-17.7%200-15.47%2012.54-28%2028-28%206.7%200%2012' +
+    '.87%202.37%2017.7%206.3l10.48-10.48C140%2083.18%20130.65%2080%20120%2080c-32%200-52.37%2028.57-64%2040%206.96' +
+    '%206.84%2017.05%2019.8%2030.88%2029.13zm54.83-46.82L141.7%20102.3c3.93%204.83%206.3%2011%206.3%2017.7%200%2015' +
+    '.47-12.54%2028-28%2028-6.7%200-12.87-2.37-17.7-6.3l-10.48%2010.48C100%20156.82%20109.35%20160%20120%20160c32' +
+    '%200%2052.37-28.57%2064-40-6.96-6.84-17.05-19.8-30.88-29.13zM120%20108c-6.63%200-12%205.37-12%2012%200%202.' +
+    '3.65%204.42%201.76%206.24l16.48-16.48c-1.82-1.1-3.95-1.76-6.24-1.76zm0%200%22%2f%3e%3c%2fsvg%3e';

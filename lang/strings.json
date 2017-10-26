@@ -13848,7 +13848,7 @@
         "context": "A toast notification which is shown when saving settings."
     },
     "16169": {
-        "text": "Date created",
+        "text": "Date Created",
         "context": "A table column header for the date when a file was created."
     },
     "16171": {
@@ -14676,8 +14676,8 @@
         "context": "Email body for the confirmation email sent when a user closes their account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1], [$megaemail], and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16428": {
-        "text": "[1]MEGA Chat Notification\r\n\r\n[2]You have received new encrypted chat messages on MEGA chat while you were offline.\r\n\r\n[3]Chat securely at MEGA",
-        "context": "Email body for notification email sent when a user has received a chat message while they were inactive or offline.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [2] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
+        "text": "[1]MEGAchat Notification\r\n\r\n[2]You have received new encrypted chat messages on MEGAchat while you were offline.\r\n\r\n[3]Chat securely at MEGA",
+        "context": "Edit: \"MEGA chat\" changed to \"MEGAchat\".\r\n\r\nEmail body for notification email sent when a user has received a chat message while they were inactive or offline.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [2] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
     },
     "16429": {
         "text": "[1]MEGA Account Closure\r\n\r\n[2]Caution: You have elected to close your MEGA account. The account under this email address will be permanently closed and your data deleted. This can not be undone.\r\n\r\n[3]By completing this action, you will lose access to all your uploaded data, shares, and contacts. Any remaining account balance or PRO quota will be voided.\r\n\r\n[4]If you have a paid MEGA subscription with [A1]Apple[\/A1] or [A2]Google[\/A2], then you must cancel it separately at Apple iTunes or Google Play, as MEGA is not able to cancel it for you.\r\n\r\n[5]Close my Account",
@@ -16451,10 +16451,6 @@
         "text": "View previous versions",
         "context": "Finder context menu option to view previous versions of a file within your MEGA account through the web browser."
     },
-    "16908": {
-        "text": "Take advantage of 50GB of cloud storage with a free  account and be able to encrypt all your files with our generous [A]PRO plans[\/A].",
-        "context": "Label to encourage users about the advantages of create an account and benefits of PRO plans"
-    },
     "16909": {
         "text": "There was a problem installing the update. Please try again later or download the last version from:\r\nhttps:\/\/mega.co.nz\/#sync",
         "context": "A notification message which is launched when a problem occurs during the installation of an update."
@@ -17372,7 +17368,7 @@
         "context": "Step one of how to share\/collaborate with others on iOS or Android"
     },
     "17236": {
-        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Share Folder.[\/B] [Br]On Android select the[B] [W15]Share[\/W15] folder[\/B] option on the menu.",
+        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Share Folder.[\/B] [Br]On Android select the[B] [W13]Share[\/W13] folder[\/B] option on the menu.",
         "context": "Step two of how to collaborate with others on iOS or Android"
     },
     "17237": {
@@ -17400,7 +17396,7 @@
         "context": "Description text for images for the Windows operating system"
     },
     "17243": {
-        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] [br]On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
+        "text": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] [Br]On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
         "context": "Step two of how to share with others on iOS or Android"
     },
     "17244": {
@@ -17498,5 +17494,81 @@
     "17389": {
         "text": "Select contacts from your phone's contact list or enter multiple email addresses.",
         "context": "Text shown to explain how and where you can invite friends."
+    },
+    "17398": {
+        "text": "Label",
+        "context": "A menu item in the left panel drop down menu to allow sorting by label."
+    },
+    "17399": {
+        "text": "Manage MEGAdrop Folder",
+        "context": "Manage MEGAdrop folder using right click menu in cloud drive tab (context menu)"
+    },
+    "17400": {
+        "text": "Cancel MEGAdrop Folder",
+        "context": "Cancel MEGAdrop folder using right click menu in cloud drive tab (context menu)"
+    },
+    "17401": {
+        "text": "MEGAdrop Folders",
+        "context": "Acccount settings page (fm\/account)  List of available MEGAdrop Folders where user can manage\/remove\/preview them"
+    },
+    "17402": {
+        "text": "MEGAdrop Folder Management",
+        "context": "Title or right panel for page (fm\/account\/widget)"
+    },
+    "17404": {
+        "text": "Upload a file directly to my MEGA cloud drive without signing up.",
+        "context": "Introductory text on public upload page window"
+    },
+    "17405": {
+        "text": "Current speed",
+        "context": "Current transfer speed during file uploading on public upload page"
+    },
+    "17406": {
+        "text": "Completion",
+        "context": "Status of uploaded file on public upload page"
+    },
+    "17407": {
+        "text": "Embed code",
+        "context": "Tab label for public upload page dialog."
+    },
+    "17408": {
+        "text": "Copy code",
+        "context": "Action in public upload page dialog"
+    },
+    "17409": {
+        "text": "Preview MEGAdrop Folder",
+        "context": "Button label for action in MEGAdrop folder dialog"
+    },
+    "17410": {
+        "text": "Copy and paste the link below to provide an easy access link to the MEGAdrop landing page.",
+        "context": "MEGAdrop folder dialog, share link tab, explanation."
+    },
+    "17411": {
+        "text": "Copy and paste the link below into your website to generate a button that users can click to open your personal MEGAdrop folder.",
+        "context": "MEGAdrop foloder dialog, embed link tab, explantion text."
+    },
+    "17412": {
+        "text": "Create MEGAdrop Folder",
+        "context": "Introduction text in make\/manage MEGAdrop folder info dialog."
+    },
+    "17413": {
+        "text": "A MEGAdrop folder allows anyone to upload files to your MEGA account, even if they don't have an account!",
+        "context": "Description text for make\/manage public upload page dialog."
+    },
+    "17445": {
+        "text": "Date Added",
+        "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's date of encryption on the Cloud Drive (not the date of the file's creation on their local machine)."
+    },
+    "17446": {
+        "text": "Date Created",
+        "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's original timestamp, when it is created on their local machine."
+    },
+    "17450": {
+        "text": "Make MEGAdrop Folder",
+        "context": "Create MEGAdrop folder using right click menu in cloud drive tab (context menu)"
+    },
+    "17489": {
+        "text": "view document",
+        "context": "Button for the downloads page to let users preview PDF documents."
     }
 }

@@ -366,6 +366,22 @@ var megasync = (function() {
     ns.isInstalled = function(next) {
         SyncAPI({a: "v"}, next);
     };
+	
+	ns.uploadFile = function(handle,next) {
+        SyncAPI({a: "ufi",h:handle}, next);
+    };
+	
+	ns.uploadFolder = function(handle,next) {
+        SyncAPI({a: "ufo",h:handle}, next);
+    };
+	
+	ns.syncFolder = function(handle,next) {
+        SyncAPI({a: "s",h:handle}, next);
+    };
+	
+	ns.downloadStatus = function(handle,next) {
+        SyncAPI({"a":"t","h":handle}, next);
+    };
 
     ns.megaSyncRequest = megaSyncRequest;
 

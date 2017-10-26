@@ -1530,7 +1530,7 @@ var exportExpiry = {
         var key;
         var type;
         var links = [];
-        var handles = $.selected;
+        var handles = $.itemExport;
         var $dialog = $('.export-links-dialog .export-content-block');
         var modeFull = $dialog.hasClass('full-link');
         var modePublic = $dialog.hasClass('public-handle');
@@ -1754,6 +1754,7 @@ var exportExpiry = {
             self.logger.debug('getExportLink');
 
             $.each(self.options.nodesToProcess, function(index, nodeId) {
+                // ToDo: Improve conditions use .getNodeByHandle()
                 if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
                     self._getFolderExportLinkRequest(nodeId);
                 }
@@ -2086,7 +2087,8 @@ var exportExpiry = {
         var $nodeId = $('#' + nodeId);
         var $tree = $('#treea_' + nodeId);
 
-        if ($nodeId.length === 0) {
+        if ($nodeId.length === 0 && M.currentdirid.indexOf('chat') === -1) {
+
             // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
             if (M.megaRender.hasDOMNode(nodeId)) {
                 $nodeId = $(M.megaRender.getDOMNode(nodeId, M.d[nodeId]));

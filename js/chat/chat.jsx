@@ -786,6 +786,17 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                 );
                 M.syncUsersFullname(contactHash);
                 self.processNewUser(contactHash);
+                asyncApiReq({
+                    'a': 'uge',
+                    'u': contactHash
+                })
+                    .done(function(r) {
+                        if (r && isString(r)) {
+                            if (M.u[contactHash]) {
+                                M.u[contactHash].m = r;
+                            }
+                        }
+                    });
             }
         });
     }

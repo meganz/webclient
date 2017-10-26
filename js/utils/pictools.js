@@ -1,7 +1,7 @@
 function is_rawimage(name, ext) {
     ext = ext || ('' + name).split('.').pop().toUpperCase();
 
-    return (typeof dcraw !== 'undefined') && is_image.raw[ext] && ext;
+    return is_image.raw[ext] && ext;
 }
 
 function is_image(name) {
@@ -191,3 +191,12 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
 if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
     delete mThumbHandler.sup.SVG;
 }
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+    var uad = ua.details;
+
+    if (uad.engine !== 'Webkit' && uad.engine !== 'Gecko' || uad.browser === 'Edge') {
+        delete mThumbHandler.sup.PDF;
+    }
+});

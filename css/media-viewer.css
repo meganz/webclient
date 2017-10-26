@@ -126,7 +126,7 @@
     border: 12px solid #111111;
     background-color: #111111;
     background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
-    background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%), linear-gradient(-45deg, rgba(255,255,255,0.1) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.1) 75%), linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.1) 75%);
+    background-image: none;
     background-size: 24px 24px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -165,7 +165,7 @@
     left: 48px;
     top: 50%;
     margin: -33px 0 0 0;
-    background-image: url(../images/mega/icons-sprite_v8.png);
+    background-image: url(../images/mega/icons-sprite_v9.png);
     background-position: -188px -670px;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;

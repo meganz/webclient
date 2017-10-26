@@ -419,10 +419,12 @@
                 if (section === 'contacts') {
                     // Enable all menu items
                     $menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                    $menu.find('*[data-by=label]').addClass('hidden');
                 }
                 else {
                     // Hide sort by status and last-interaction items from menu
                     $menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+                    $menu.find('*[data-by=label]').removeClass('hidden');
                 }
 
                 // @ToDo: Make sure .by is hadeled properly once when we have chat available

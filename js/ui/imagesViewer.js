@@ -310,7 +310,7 @@ var slideshowid;
             }
         });
 
-        if (n.p) {
+        if (n.p || M.chat) {
             $dlBut.removeClass('hidden');
         }
         else {
@@ -377,8 +377,20 @@ var slideshowid;
             if (!preqs[n.h]) {
                 preqs[n.h] = 1;
 
-                M.gfsfetch(n.h, 0, -1).done(function(data) {
+                M.gfsfetch(n.link || n.h, 0, -1).done(function(data) {
                     preview({type: 'application/pdf'}, n.h, data.buffer);
+                }).fail(function(ev) {
+                    if (d) {
+                        console.warn('Failed to retrieve PDF, failing back to broken eye image...', ev);
+                    }
+
+                    var svg = decodeURIComponent(noThumbURI.substr(noThumbURI.indexOf(',') + 1));
+                    var u8 = new Uint8Array(svg.length);
+                    for (var i = svg.length; i--;) {
+                        u8[i] = svg.charCodeAt(i);
+                    }
+                    previewimg(n.h, u8, 'image/svg+xml');
+                    delete previews[n.h].buffer;
                 });
             }
             return false;
@@ -435,6 +447,9 @@ var slideshowid;
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
         };
+        img.onerror = function(ev) {
+            console.error('Preview image error', ev);
+        };
         img.src = src;
     }
 
@@ -456,7 +471,8 @@ var slideshowid;
             blob: blob,
             type: type,
             time: Date.now(),
-            src: myURL.createObjectURL(blob)
+            src: myURL.createObjectURL(blob),
+            buffer: uint8arr.buffer || uint8arr
         };
 
         if (id === slideshowid) {

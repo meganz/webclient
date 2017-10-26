@@ -792,47 +792,6 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
     }
 };
 
-
-/**
- * Check existance of contact/pending contact
- *
- *
- * @param {email} email of invited contact
- *
- * @returns {number} error code, 0 proceed with request
- *
- * -12, Owner already invited user & expiration period didn't expired, fail.
- * -12 In case expiration period passed new upc is sent, but what to do with old request?
- * Delete it as soon as opc response is received for same email (idealy use user ID, if exist)
- * -10, User already invited Owner (ToDO. how to check diff emails for one account) (Check M.opc)
- * -2, User is already in contact list (check M.u)
- *
- */
-MegaData.prototype.checkInviteContactPrerequisites = function(email) {
-    "use strict";
-
-    // Check pending invitations
-    var opc = M.opc;
-    for (var i in opc) {
-        if (this.opc[i].m === email) {
-            return 0;
-        }
-    }
-
-    // Check active contacts
-    var result = 0;
-    M.u.forEach(function(v, k) {
-
-        // Invite all except full contact users
-        if (v.m === email && v.c === 1) {
-            result = -2;
-            return false; // break;
-        }
-    });
-
-    return result;
-};
-
 /**
  * Invite contacts using email address, also known as ongoing pending contacts.
  * This uses API 2.0
@@ -844,27 +803,23 @@ MegaData.prototype.checkInviteContactPrerequisites = function(email) {
  * look at API response code table.
  */
 MegaData.prototype.inviteContact = function(owner, target, msg) {
-    if (d) console.debug('inviteContact');
-    var proceed = this.checkInviteContactPrerequisites(target);
+    "use strict";
 
-    if (proceed === 0) {
-        api_req({'a': 'upc', 'e': owner, 'u': target, 'msg': msg, 'aa': 'a', i: requesti}, {
-            callback: function(resp) {
-                if (typeof resp === 'object') {
-                    if (resp.p) {
-                        proceed = resp.p;
-                    }
+    if (d) {
+        console.debug('inviteContact');
+    }
+
+    api_req({ 'a': 'upc', 'e': owner, 'u': target, 'msg': msg, 'aa': 'a', i: requesti }, {
+        callback: function(resp) {
+            if (typeof resp === 'object' && resp.p) {
+
+                // In case of invite-dialog we will use notifications
+                if ($.dialog !== 'invite-friend') {
+                    M.inviteContactMessageHandler(resp.p);
                 }
             }
-        });
-    }
-
-    // In case of invite-dialog we will use notifications
-    if ($.dialog !== 'invite-friend') {
-        this.inviteContactMessageHandler(proceed);
-    }
-
-    return proceed;
+        }
+    });
 };
 
 /**

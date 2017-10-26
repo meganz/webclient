@@ -199,7 +199,7 @@
                     $('.red-header', $a2).text(l[16490]);
                     $('.red-header', $a3).text(l[17094]);
 
-                    var link = "https://mega.nz/help/client/webclient/cloud-drive/59d3095ef1b709dd018b4583";
+                    var link = 'https://mega.nz/help/client/webclient/cloud-drive/59f13b42f1b7093a7f8b4589';
                     $('.light-grey', $a1).html(
                         escapeHTML(l[17097])
                         .replace(

@@ -1050,9 +1050,6 @@ html.gbot {
 .linux .bottom-page.top-header {
     padding-top: 17px;
 }
-.linux .default-select.megaapp-dropdown {
-    margin-top: 20px;
-}
 .linux .megaapp-button-info {
     padding-bottom: 60px;
 }
@@ -1137,9 +1134,6 @@ html.gbot {
 }
 .linux .bottom-page.img.sync-top {
     max-width: 40%;
-}
-.megaapp-button-info .nautilus-lnk {
-    margin: 26px 5px -10px 0;
 }
 }
 /* end of MEGAsync */

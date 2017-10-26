@@ -7386,5 +7386,9 @@
     "17398": {
         "text": "Label",
         "context": "A menu item in the left panel drop down menu to allow sorting by label."
+    },
+    "17489": {
+        "text": "view document",
+        "context": "Button for the downloads page to let users preview PDF documents."
     }
 }

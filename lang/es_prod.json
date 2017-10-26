@@ -14,7 +14,7 @@
     "47": "Ups, algo ha salido mal. \u00a1Lo sentimos!",
     "55": "Solo lectura",
     "56": "Lectura y escritura",
-    "57": "Acceso total",
+    "57": "Acceso completo",
     "58": "Descargar",
     "59": "Obtener enlace",
     "60": "Compartir",
@@ -1845,5 +1845,6 @@
     "17154": "Est\u00e1s a punto de eliminar el historial de versiones de 1 archivo. Ten en cuenta que no se eliminar\u00e1 la versi\u00f3n actual del archivo.\u00bfQuieres continuar?",
     "17155": "Espacio ocupado por las versiones de los archivos:",
     "17156": "Renombrado desde %1",
-    "17398": "Label"
+    "17398": "Etiqueta",
+    "17489": "view document"
 }

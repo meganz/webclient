@@ -1018,7 +1018,8 @@ FileManager.prototype.initContextUI = function() {
         $('#fileselect4').click();
     });
 
-    $(c + '.remove-item').rebind('click', function() {
+    $(c + '.remove-item').rebind('click', function () {
+        closeDialog();// added by khaled
         fmremove();
     });
 
@@ -1156,6 +1157,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.preview-item').rebind('click', function() {
+        closeDialog();
         slideshow($.selected[0]);
     });
 
@@ -3182,7 +3184,9 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
                 .safeHTML(Object(options).body || l[16360]);
         }
         else {
-            $('.fm-main').addClass('fm-notification almost-full');
+            if (perc >90) {
+                $('.fm-main').addClass('fm-notification almost-full');
+            }
             $strgdlg.addClass('almost-full')
                 .find('.fm-dialog-body.almost-full')
                 .find('.fm-dialog-title')

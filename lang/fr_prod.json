@@ -1842,8 +1842,9 @@
     "17150": "Versions ",
     "17151": "[X] versions",
     "17152": "1 version",
-    "17154": "Vous \u00eates sur le point de supprimer l'historique de version d'un fichier.Veuillez noter que le fichier actuel ne sera pas supprim\u00e9.Souhaitez-vous continuer\u2009?                            ",
+    "17154": "Vous \u00eates sur le point de supprimer l\u2019historique de version d\u2019un fichier.Veuillez noter que le fichier actuel ne sera pas supprim\u00e9.Souhaitez-vous continuer\u2009?",
     "17155": "Taille totale occup\u00e9e par les versions de fichier :",
     "17156": "Renomm\u00e9 de %1",
-    "17398": "\u00c9tiquette"
+    "17398": "\u00c9tiquette",
+    "17489": "visualiser le document"
 }

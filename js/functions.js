@@ -887,13 +887,15 @@ function MurmurHash3(key, seed) {
  * @return {MegaPromise}
  */
 function mKeyDialog(ph, fl, keyr) {
-    var promise = new MegaPromise();
+    "use strict";
 
+    var promise = new MegaPromise();
     if (keyr) {
         $('.fm-dialog.dlkey-dialog .instruction-message')
             .text(l[9048]);
     }
     else {
+        $('.fm-dialog.dlkey-dialog input').val('');
         $('.fm-dialog.dlkey-dialog .instruction-message')
             .safeHTML(l[7945] + '<br/>' + l[7972]);
     }
@@ -903,44 +905,60 @@ function mKeyDialog(ph, fl, keyr) {
     $('.new-download-file-icon').addClass(fileIcon({
         name: 'unknown.unknown'
     }));
+
+    var $newFolderBtn = $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button');
+    $newFolderBtn.addClass('disabled').removeClass('active');
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     fm_showoverlay();
 
-    $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e) {
-        $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
-        if (e.keyCode === 13) {
-            $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
-        }
-    });
+    $('.fm-dialog.dlkey-dialog input').off('input keypress').on('input keypress', function(e) {
+        var length = $('.fm-dialog.dlkey-dialog input').val().length;
 
-    $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
-
-        // Trim the input from the user for whitespace, newlines etc on either end
-        var key = $.trim($('.fm-dialog.dlkey-dialog input').val());
-
-        if (key) {
-            // Remove the ! from the key which is exported from the export dialog
-            key = key.replace('!', '');
-
-            var newHash = (fl ? '/F!' : '/!') + ph + '!' + key;
-
-            if (getSitePath() !== newHash) {
-                promise.resolve(key);
-
-                fm_hideoverlay();
-                $('.fm-dialog.dlkey-dialog').addClass('hidden');
-                loadSubPage(newHash);
+        if (length) {
+            $newFolderBtn.removeClass('disabled').addClass('active');
+            if (e.keyCode === 13) {
+                $newFolderBtn.click();
             }
         }
         else {
-            promise.reject();
+            $newFolderBtn.removeClass('active').addClass('disabled');
         }
     });
-    $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function(e) {
-        $('.fm-dialog.dlkey-dialog').addClass('hidden');
-        fm_hideoverlay();
-        promise.reject();
+
+    $newFolderBtn.rebind('click', function() {
+
+        if ($(this).hasClass('active')) {
+
+            // Trim the input from the user for whitespace, newlines etc on either end
+            var key = $.trim($('.fm-dialog.dlkey-dialog input').val());
+
+            if (key) {
+
+                // Remove the ! from the key which is exported from the export dialog
+                key = key.replace('!', '');
+
+                var newHash = (fl ? '/#F!' : '/#!') + ph + '!' + key;
+
+                if (getSitePath() !== newHash) {
+                    promise.resolve(key);
+
+                    fm_hideoverlay();
+                    $('.fm-dialog.dlkey-dialog').addClass('hidden');
+                    loadSubPage(newHash);
+                }
+            }
+            else {
+                promise.reject();
+            }
+        }
     });
+
+    // Close button is removed in eff07477006e49667edad81a1deae7d79a03a3f1
+    // $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function() {
+    //     $('.fm-dialog.dlkey-dialog').addClass('hidden');
+    //     fm_hideoverlay();
+    //     promise.reject();
+    // });
 
     return promise;
 }

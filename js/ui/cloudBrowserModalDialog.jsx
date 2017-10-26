@@ -583,7 +583,7 @@ var BrowserEntries = React.createClass({
                     <div className="dialog-empty-pad">
                         <div className="dialog-empty-icon"></div>
                         <div className="dialog-empty-header">
-                            {__(l[782])}
+                            {self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]}
                         </div>
                     </div>
                 </div>

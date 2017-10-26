@@ -17563,6 +17563,10 @@
         "text": "Date Created",
         "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's original timestamp, when it is created on their local machine."
     },
+    "17450": {
+        "text": "Make MEGAdrop Folder",
+        "context": "Create MEGAdrop folder using right click menu in cloud drive tab (context menu)"
+    },
     "17489": {
         "text": "view document",
         "context": "Button for the downloads page to let users preview PDF documents."

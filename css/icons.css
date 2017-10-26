@@ -337,6 +337,9 @@
 .dropdown-item:hover .small-icon.video-call {
     background-position: -154px -74px;
 }
+.dropdown-item:hover .small-icon.rounded-stop {
+    background-position: -54px -218px;
+}
 .dashed-conversation {
     background-position: 1px -1644px;
 }

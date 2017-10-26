@@ -954,6 +954,9 @@ html.gbot {
     margin-top: 65px;
     font-family: 'montserrat', 'open_sans', sans-serif;
 }
+.bottom-page .megaapp-linux:not(.hidden) + .button.default-huge-button {
+    margin-top: 18px;
+}
 .cmd-bg .top-header {
     color: #333333;
 }
@@ -1109,7 +1112,7 @@ html.gbot {
     cursor: default;
 }
 .megaapp-button-info .nautilus-lnk {
-    margin: 26px 5px -30px 0;
+    margin: 14px 5px -30px 0;
     display: block;
 }
 .megasync .vertical-centered-bl .pages-nav.content-block {

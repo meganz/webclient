@@ -240,6 +240,7 @@
     -moz-opacity: 0.73;
     -khtml-opacity: 0.73;
     opacity: 0.73;
+    float: left;
 }
 .dropdown-item:hover > i, .dropdown-item.opened > i, .dropdown-item.red i, .dropdown-item.do-sort i {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);

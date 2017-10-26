@@ -126,6 +126,8 @@
 }
 .small-icon.conversations {
     background-position: -3px -3012px;
+    width: 21px;
+    margin-right: 8px;
 }
 .small-icon.refresh-circle {
     background-position: -4px -2074px;
@@ -143,7 +145,7 @@
     background-position: -53px -347px;
 }
 .small-icon.clear-arrow {
-    background-position: -83px -1400px;
+    background-position: -54px -2074px;
 }
 .small-icon.quotes {
     background-position: -3px -389px;

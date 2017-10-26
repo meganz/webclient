@@ -3942,7 +3942,7 @@ label.iPhoneCheckLabelOff span {
 }
 .conversations .fm-tree-panel .jspPane {
     min-height: 100%;
-    background-image: url(../images/mega/nw-chat-bg.svg);
+    background-image: url(../images/mega/nw-chat-bg_v1.svg);
 }
 .fm-tree-panel ul, .fm-move-dialog-body ul, .fm-dialog-body ul {
     padding: 0;

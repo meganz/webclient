@@ -3802,6 +3802,17 @@ div.checkboxOn, div.checkboxOff {
     top: 9px;
 }
 
+.help-section.fm-header {
+    background-color: #fff;
+    box-shadow:  0 1px 4px 0 rgba(0,0,0,0.10);
+}
+.help-section .mobile.fm-header-txt {
+    padding: 22px 0px 0 0px;
+    margin: 0 60px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {
@@ -4557,3 +4568,4 @@ div.checkboxOn, div.checkboxOff {
         -o-transform: rotate(360deg);
     }
 }
+

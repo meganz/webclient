@@ -224,6 +224,11 @@ var ContactCard = React.createClass({
                 );
             }
             else if (contact.c === 0) {
+                if (moreDropdowns.length > 0) {
+                    moreDropdowns.unshift(
+                        <hr key="separator" />
+                    );
+                }
                 moreDropdowns.unshift(
                     <DropdownsUI.DropdownItem
                         key="view" icon="human-profile" label={__(l[101])} onClick={() => {

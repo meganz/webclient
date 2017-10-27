@@ -2869,6 +2869,9 @@
         height: 480px;
         min-width: 801px;
     }
+    #help2-main .block:last-of-type {
+        width: calc((100%/3) - 1px);
+    }
     #help2-main .block {
         width: calc(100%/3);
         height: 240px
@@ -3128,6 +3131,9 @@
         height: 558px;
         margin:0 auto;
         border-bottom: none;
+    }
+    #help2-main .block:last-of-type {
+        width: calc((100%/2) - 1px);
     }
     #help2-main .block {
         width: calc(100%/2);

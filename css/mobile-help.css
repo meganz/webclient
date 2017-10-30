@@ -2989,7 +2989,14 @@
     }
     #help2-main .block {
         width: calc(100%/3);
-        height: 240px
+        height: 240px;
+        border-bottom: 1px solid #eee;
+    }
+    #help2-main .block:nth-child(1), #help2-main .block:nth-child(2), #help2-main .block:nth-child(4), #help2-main .block:nth-child(5) {
+        border-right: 1px solid #eee;
+    }
+    #help2-main .block:nth-child(4), #help2-main .block:nth-child(5), #help2-main .block:nth-child(6) {
+        border-bottom: none;
     }
     #help2-main .first-search-section {
         height: 260px;
@@ -3182,8 +3189,16 @@
     }
     #help2-main .block {
         width: calc(100%/3);
-        height: 200px
+        height: 200px;
+        border-bottom: 1px solid #eee;
     }
+    #help2-main .block:nth-child(1), #help2-main .block:nth-child(2), #help2-main .block:nth-child(4), #help2-main .block:nth-child(5) {
+        border-right: 1px solid #eee;
+    }
+    #help2-main .block:nth-child(4), #help2-main .block:nth-child(5), #help2-main .block:nth-child(6) {
+        border-bottom: none;
+    }
+
     #help2-main .block-webclient, #help2-main .block-web-client, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop,
     #help2-main .block-megasync, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync,
     #help2-main .block-android, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone,

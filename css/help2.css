@@ -2874,7 +2874,7 @@
     }
     #help2-main .block {
         width: calc(100%/3);
-        height: 240px
+        height: 240px;
     }
     #help2-main .first-search-section {
         height: 240px;
@@ -2946,7 +2946,7 @@
     }
     #help2-main .block {
         width: calc(100%/3);
-        height: 200px
+        height: 200px;
     }
     #help2-main .block:last-of-type {
         width: calc((100%/3) - 1px);
@@ -3132,14 +3132,11 @@
         margin:0 auto;
         border-bottom: none;
     }
-    #help2-main .block:last-of-type {
-        width: calc((100%/2) - 1px);
-    }
+
     #help2-main .block {
         width: calc(100%/2);
         height: 186px;
         background-color: #fff;
-        border-bottom: 1px solid #eee;
         z-index: 1;
         text-align: center;
         position: relative;
@@ -3152,9 +3149,9 @@
     #help2-main .block:nth-child(1) {
         margin-top: 0px;
     }
-    #help2-main .block:nth-child(even) {
-        border-right: 1px solid #eee;
-    } 
+    #help2-main .block:last-of-type {
+        width: calc((100%/2) - 1px);
+    }
     #help2-main .block-webclient, #help2-main .block-web-client, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop,
     #help2-main .block-megasync, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync,
     #help2-main .block-android, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone,

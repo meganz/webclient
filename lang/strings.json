@@ -14607,10 +14607,6 @@
         "text": "Unlocked bonuses:",
         "context": "Header of block with achievements bonuses."
     },
-    "16406": {
-        "text": "[1]MEGA Account Reset\r\n\r\n[2]It looks like you have forgotten your password and do not have a backup of your Recovery Key.\r\n\r\n[3]If you proceed, the existing account under this address will be deactivated, and you will lose access to your data. The data will still be preserved for at least another 60 days. Should you remember the deactivated account's password or locate its previously exported Recovery Key, please contact [A1]support@mega.nz[\/A1] to have it restored.\r\n\r\n[4]Even if you manage to restore the deactivated account, all associated contacts and shares will remain deleted and need to be re-established.\r\n\r\n[5]Reset my Account\r\n\r\n[6]Didn't work? No worries. Copy and paste this link below into your web browser:",
-        "context": "The 'reset my account' email body received when somebody requests to park their account. MEGA needs them to click the link to confirm their password.\r\n\r\nPlease do not translate or modify anything inside square brackets (do not change [1] or [A1] )"
-    },
     "16407": {
         "text": "[1]Best regards,[BR]\u2014 Team MEGA",
         "context": "The footer for our emails. Please do not translate anything inside square brackets (do not translate the [1] or the [BR]. The [BR] corresponds to a line break and will be replaced)"
@@ -14686,10 +14682,6 @@
     "16430": {
         "text": "[1]MEGA Confirm New Email\r\n\r\n[2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:\r\n\r\n[3]Confirm New Email\r\n\r\n[4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.\r\n",
         "context": "Email body for when a user needs to confirm their new email address. It emphasises that it will not be a second email, but will replace their current one on their Mega account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
-    },
-    "16431": {
-        "text": "[1]MEGA Password Recovery\r\n\r\n[2]You can easily access your MEGA account with your Recovery Key.\r\n\r\n[3]Unlock Account\r\n\r\n[4]This request originated from IP address: [R][$cred][\/R]",
-        "context": "Email body for the password reset email where the user has their Master Key (Recovery Key)\r\nPlease do not translate the text inside square brackets (i.e. leave the [1],[$cred], and [R] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16432": {
         "text": "You can also earn more free storage and transfer quota by achieving bonuses. For example, by installing our software or inviting friends to MEGA.",
@@ -17565,7 +17557,7 @@
     },
     "17450": {
         "text": "Make MEGAdrop Folder",
-        "context": "Create MEGAdrop folder using right click menu in cloud drive tab (context menu)"
+        "context": "Change an existing folder into a MEGAdrop folder using the right click menu in the cloud drive tab (context menu)."
     },
     "17489": {
         "text": "view document",

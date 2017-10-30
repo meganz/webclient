@@ -916,7 +916,7 @@ var centili = {
      */
     redirectToSite: function(utsResult) {
 
-        window.location = 'https://megapay.nz/?saleid=' + utsResult + '&provider=centili';
+        window.location = 'http://api.centili.com/payment/widget?apikey=9e8eee856f4c048821954052a8d734ac&reference=' + utsResult;
     }
 };
 

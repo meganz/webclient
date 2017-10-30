@@ -1227,8 +1227,9 @@ function siteLoadError(error, filename) {
     if (!is_extension) {
         message.push('Please try again later. We apologize for the inconvenience.');
     }
-    message.push("If the problem persist, please try disabling all third-party browser "
-                + "extensions and reload your browser. If that doesn't help, contact support@mega.nz");
+    message.push("If the problem persists, please try disabling all third-party browser extensions, " +
+                 "update your browser and MEGA browser extension to the latest version and reload the page. " +
+                 "If that does not help, contact support@mega.nz");
 
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
 
@@ -2059,6 +2060,7 @@ else if (!b_u) {
     // Load files common to all mobile pages
     if (is_mobile) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
@@ -2091,10 +2093,6 @@ else if (!b_u) {
     jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
     jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
 
-    if (is_extension) {
-        jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
-    }
-
     if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
@@ -2106,6 +2104,7 @@ else if (!b_u) {
 
     var jsl2 =
     {
+        'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'megasync_js': {f:'html/js/megasync.js', n: 'megasync_js', j:1},
@@ -2155,6 +2154,7 @@ else if (!b_u) {
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
+        'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},

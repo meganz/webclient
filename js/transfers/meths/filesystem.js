@@ -515,13 +515,13 @@
                                     if (!(++chrome_write_error_msg % 21) && !$.msgDialog) {
                                         chrome_write_error_msg = 0;
 
+                                        if (canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
+                                            return;
+                                        }
+
                                         if (nosplog) {
                                             nosplog = false;
                                             api_req({a: 'log', e: 99657, m: 'Out of HTML5 Offline Storage space.'});
-                                        }
-
-                                        if (canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
-                                            return;
                                         }
 
                                         msgDialog('warningb:' + l[103],
@@ -615,28 +615,17 @@
                 }
 
                 if (aFail === -1 && !isSecurityError(aEvent)) {
-                    if (nosplog) {
-                        nosplog = false;
-                        api_req({a: 'log', e: 99658, m: 'Out of HTML5 Offline Storage space (open)'});
+                    if (!canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
+                        if (nosplog) {
+                            nosplog = false;
+                            api_req({a: 'log', e: 99658, m: 'Out of HTML5 Offline Storage space (open)'});
+                        }
+
+                        dlFatalError(dl, WRITERR_DIAGTITLE, false);
+                        dlmanager.showMEGASyncOverlay(1, WRITERR_DIAGTITLE);
                     }
 
-                    if (canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
-                        return;
-                    }
-
-                    if (!$.msgDialog) {
-                        msgDialog('warningb:' + l[103], WRITERR_DIAGTITLE,
-                            l[16891],
-                            str_mtrunc(dl_filename), function(cancel) {
-                                if (cancel) {
-                                    dlFatalError(dl, WRITERR_DIAGTITLE, false);
-                                }
-                            });
-                    }
-                    wTimer = setTimeout(function() {
-                        this.fsInitOp();
-                    }.bind(this), 2801);
-                    return wTimer;
+                    return;
                 }
                 dl_storagetype = aStorageType !== 1 ? 0 : 1;
 

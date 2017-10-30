@@ -1018,8 +1018,25 @@ FileManager.prototype.initContextUI = function() {
         $('#fileselect4').click();
     });
 
-    $(c + '.remove-item').rebind('click', function() {
+    $(c + '.remove-item').rebind('click', function () {
+        closeDialog();// added by khaled
         fmremove();
+    });
+
+    $(c + '.addcontact-item').rebind('click', function() {
+        M.safeShowDialog('add-contact-popup', function() {
+            contactAddDialog();
+            $('.fm-add-user').trigger('click');
+            $('.add-user-size-icon').trigger('click');
+
+            $(window).rebind('keydown.esc_contact_dialog', function(e) {
+                if (e.keyCode === 27) {
+                    closeDialog();
+                }
+            });
+
+            return $dialog;
+        });
     });
 
     $(c + '.startchat-item').rebind('click', function() {
@@ -1140,6 +1157,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.preview-item').rebind('click', function() {
+        closeDialog();
         slideshow($.selected[0]);
     });
 
@@ -1858,7 +1876,7 @@ FileManager.prototype.addTransferPanelUI = function() {
             $('.transfer-clear-completed').addClass('disabled');
             $('.transfer-table-header').hide();
             $('.transfer-panel-empty-txt').removeClass('hidden');
-            $('.transfer-panel-title').text('');
+            $('.transfer-panel-title span').text('');
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
             if (M.currentdirid === 'transfers') {
                 fm_tfsupdate();
@@ -1958,7 +1976,6 @@ FileManager.prototype.addContactUI = function() {
     "use strict";
 
     $('.nw-contact-item').removeClass('selected');
-    $('.contact-details-pad .grid-url-arrow').unbind('click');
 
     var n = this.u[this.currentdirid];
     if (n && n.u) {
@@ -1976,25 +1993,6 @@ FileManager.prototype.addContactUI = function() {
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
         $('.contact-top-details .contact-details-user-name').text(this.getNameByHandle(user.u));
         $('.contact-top-details .contact-details-email').text(user.m);
-
-        $('.contact-details-pad .grid-url-arrow').rebind('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation(); // do not treat it as a regular click on the file
-            // $(this).addClass('active');
-            $('.dropdown.body').addClass('arrange-to-front');
-            e.currentTarget = $(this);
-            e.calculatePosition = true;
-            $.selected = [getSitePath().replace('/fm/', '')];
-            M.searchPath();
-            if (!$(this).hasClass('active')) {
-                M.contextMenuUI(e, 4);
-                $(this).addClass('active');
-            }
-            else {
-                $.hideContextMenu();
-                $(this).removeClass('active');
-            }
-        });
 
         // Display the current fingerpring
         showAuthenticityCredentials(user);
@@ -3186,7 +3184,9 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
                 .safeHTML(Object(options).body || l[16360]);
         }
         else {
-            $('.fm-main').addClass('fm-notification almost-full');
+            if (perc >90) {
+                $('.fm-main').addClass('fm-notification almost-full');
+            }
             $strgdlg.addClass('almost-full')
                 .find('.fm-dialog-body.almost-full')
                 .find('.fm-dialog-title')

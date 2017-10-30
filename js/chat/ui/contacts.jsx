@@ -223,12 +223,52 @@ var ContactCard = React.createClass({
                             }} />
                 );
             }
+            else if (contact.c === 0) {
+                moreDropdowns.unshift(
+                    <DropdownsUI.DropdownItem
+                        key="view" icon="human-profile" label={__(l[101])} onClick={() => {
+                        loadingDialog.show();
+
+                        asyncApiReq({
+                            'a': 'uge',
+                            'u': contact.u
+                        })
+                            .done(function(r) {
+                                if (r) {
+                                    var exists = false;
+                                    Object.keys(M.opc).forEach(function (k) {
+                                        if (!exists && M.opc[k].m === r) {
+                                            exists = true;
+                                            return false;
+                                        }
+                                    });
+
+                                    if (exists) {
+                                        closeDialog();
+                                        msgDialog('warningb', '', l[7413]);
+                                    } else {
+                                        M.inviteContact(M.u[u_handle].m, r);
+                                        var title = l[150];
+
+                                        var msg = l[5898].replace('[X]', r);
+
+                                        closeDialog();
+                                        msgDialog('info', title, msg);
+                                    }
+                                }
+                            })
+                            .always(function() {
+                                loadingDialog.hide();
+                            });
+                    }} />
+                );
+            }
 
             if (moreDropdowns.length > 0) {
                 contextMenu = <ButtonsUI.Button
                     className={self.props.dropdownButtonClasses}
                     icon={self.props.dropdownIconClasses}
-                    disabled={self.props.dropdownDisabled}>
+                    disabled={moreDropdowns.length === 0 || self.props.dropdownDisabled}>
                     <DropdownsUI.Dropdown className="contact-card-dropdown"
                                           positionMy="right top"
                                           positionAt="right bottom"

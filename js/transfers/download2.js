@@ -1789,12 +1789,177 @@ var dlmanager = {
             M.require('megasync_js').always(loader);
         }
         else {
-            loader();
+            onIdle(loader);
         }
 
         setTimeout(reject, timeout);
 
         return promise;
+    },
+
+    setBrowserWarningClasses: function(selector, $container, message) {
+        'use strict';
+
+        var uad = ua.details || false;
+        var $elm = $(selector, $container);
+
+        if (message) {
+            $elm.addClass('default-warning');
+        }
+        else if (window.safari) {
+            $elm.addClass('safari');
+        }
+        else if (window.chrome) {
+            $elm.addClass('chrome');
+        }
+        else if (window.opr) {
+            $elm.addClass('opera');
+        }
+        else if (uad.engine === 'Gecko') {
+            $elm.addClass('ff');
+        }
+        else if (uad.engine === 'Trident') {
+            $elm.addClass('ie');
+        }
+        else if (uad.browser === 'Edge') {
+            $elm.addClass('edge');
+        }
+
+        var setText = function(locale, $elm) {
+            var text = uad.browser ? String(locale).replace('%1', uad.browser) : l[16883];
+
+            if (message) {
+                text = l[1676] + ': ' + message + '<br/>' + l[16870] + ' %2';
+            }
+
+            if (window.chrome) {
+                if (window.Incognito) {
+                    text = text.replace('%2', '(' + l[16869] + ')');
+                }
+                else {
+                    text = text.replace('%2', '');
+                }
+            }
+            else {
+                text = text.replace('%2', '(' + l[16868] + ')');
+            }
+
+            $elm.find('span').safeHTML(text);
+        };
+
+        if ($container && $elm) {
+            setText(l[16866], $elm);
+            $container.addClass('warning');
+        }
+        else {
+            setText(l[16865], $elm.addClass('visible'));
+        }
+    },
+
+    // MEGAsync dialog If filesize is too big for downloading through browser
+    showMEGASyncOverlay: function(onSizeExceed, dlStateError) {
+        'use strict';
+
+        M.require('megasync_js').dump();
+
+        var $overlay = $('.megasync-overlay');
+        var $body = $('body');
+
+        var hideOverlay = function() {
+            $body.unbind('keyup.msd');
+            $overlay.addClass('hidden');
+            $body.removeClass('overlayed');
+        };
+
+        $overlay.addClass('msd-dialog').removeClass('hidden downloading');
+        $body.addClass('overlayed');
+
+        var $slides = $overlay.find('.megasync-slide');
+        var $currentSlide = $slides.filter('.megasync-slide:not(.hidden)').first();
+        var $sliderControl = $overlay.find('.megasync-slider.button');
+        var $sliderPrevButton = $sliderControl.filter('.prev');
+        var $sliderNextButton = $sliderControl.filter('.next');
+
+        $slides.removeClass('prev current next');
+        $currentSlide.addClass('current');
+        $currentSlide.prev().not('.hidden').addClass('prev');
+        $currentSlide.next().not('.hidden').addClass('next');
+        $sliderPrevButton.addClass('disabled');
+        $sliderNextButton.removeClass('disabled');
+
+        $sliderControl.rebind('click', function() {
+            var $this = $(this);
+            var $currentSlide = $overlay.find('.megasync-slide.current');
+            var $prevSlide = $currentSlide.prev().not('.hidden');
+            var $nextSlide = $currentSlide.next().not('.hidden');
+
+            if ($this.hasClass('prev') && $prevSlide.length) {
+                $slides.removeClass('prev current next');
+                $prevSlide.addClass('current');
+                $currentSlide.addClass('next');
+                $sliderNextButton.removeClass('disabled');
+
+                if ($prevSlide.prev().not('.hidden').length) {
+                    $prevSlide.prev().addClass('prev');
+                    $sliderPrevButton.removeClass('disabled');
+                }
+                else {
+                    $sliderPrevButton.addClass('disabled');
+                }
+            }
+            else if ($nextSlide.length) {
+                $slides.removeClass('prev current next');
+                $nextSlide.addClass('current');
+                $currentSlide.addClass('prev');
+                $sliderPrevButton.removeClass('disabled');
+
+                if ($nextSlide.next().not('.hidden').length) {
+                    $nextSlide.next().addClass('next');
+                    $sliderNextButton.removeClass('disabled');
+                }
+                else {
+                    $sliderNextButton.addClass('disabled');
+                }
+            }
+        });
+
+        if (onSizeExceed) {
+            dlmanager.setBrowserWarningClasses('.megasync-bottom-warning', $overlay, dlStateError);
+        }
+
+        $('.big-button.download-megasync', $overlay).rebind('click', function() {
+            if (typeof megasync === 'undefined') {
+                console.error('Failed to load megasync.js');
+            }
+            else {
+                if (typeof dlpage_ph === 'string') {
+                    megasync.download(dlpage_ph, dlpage_key);
+                }
+                else {
+                    open(megasync.getMegaSyncUrl() || '/sync');
+                }
+            }
+
+            return false;
+        });
+
+        $('.megasync-info-txt a', $overlay).rebind('click', function() {
+            hideOverlay();
+            loadSubPage('pro');
+        });
+
+        $('.megasync-close, .fm-dialog-close', $overlay).rebind('click', hideOverlay);
+
+        $body.rebind('keyup.msd', function(e) {
+            if (e.keyCode === 27) {
+                hideOverlay();
+            }
+        });
+
+        $('a.clickurl', $overlay).rebind('click', function() {
+            open(this.href);
+            return false;
+        });
     }
 };
 
@@ -2113,21 +2278,12 @@ function fm_tfsupdate() {
     }
 
     M.pendingTransfers = i + u;
-    var t;
-    if (i && u) {
-        t = '\u2191 ' + u + ' \u2193 ' + i;
-    }
-    else if (i) {
-        t =  '\u2193 ' + i;
-    }
-    else if (u) {
-        t = '\u2191 ' + u;
-    }
-    else {
-        t = '';
+    tfse.domUploadBlock.textContent = u || '';
+    tfse.domDownloadBlock.textContent = i || '';
+
+    if (!i && !u) {
         mega.ui.tpp.hide();
     }
-    tfse.domPanelTitle.textContent = (t);
 }
 
 var dlQueue = new TransferQueue(function _downloader(task, done) {

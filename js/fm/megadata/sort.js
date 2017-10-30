@@ -462,3 +462,22 @@ MegaData.prototype.setLastColumn = function(col) {
         $('.do-sort[data-by="' + col + '"]').addClass('selected');
     }
 };
+
+MegaData.prototype.sortByLabel = function(d) {
+    "use strict";
+
+    this.sortfn = this.getSortByLabelFn();
+    this.sortd = d;
+    this.sort();
+};
+
+MegaData.prototype.getSortByLabelFn = function() {
+    "use strict";
+    var sortfn;
+
+    sortfn = function(a, b, d) {
+        return (a.lbl < b.lbl ? -1 : 1) * d;
+    };
+
+    return sortfn;
+};

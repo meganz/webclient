@@ -268,10 +268,15 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (M.getNodeRights(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.dropdown-item').hide();
-            $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
+            if (M.currentrootid === 'contacts') {
+                $(menuCMI).filter('.addcontact-item').show();
+            }
+            else {
+                $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
-            if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
-                $(menuCMI).filter('.folderupload-item').show();
+                if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
+                    $(menuCMI).filter('.folderupload-item').show();
+                }
             }
         }
         else {

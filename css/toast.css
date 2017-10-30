@@ -20,11 +20,11 @@
     color: #666666;
     font-size: 14px;
     line-height: 18px;
-    -webkit-transition: all 500ms ease-in-out;
-    -moz-transition: all 500ms ease-in-out;
-    -o-transition: all 500ms ease-in-out;
-    -ms-transition: all 500ms ease-in-out;
-    transition: all 500ms ease-in-out;
+    -webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    -moz-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    -o-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    -ms-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
     cursor: default;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
@@ -69,7 +69,7 @@
     left: 15px;
     top: 50%;
     margin: -15px 0 0 0;
-    background-image: url(../images/mega/register-big-sprite-v13.png);
+    background-image: url(../images/mega/register-big-sprite-v14.png);
     background-position: -85px -860px;
 }
 .clipboard .toast-icon {
@@ -96,6 +96,9 @@
     display: table-cell;
     vertical-align: middle;
     font-family: 'source_sans_proregular';
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .toast-col:nth-child(1) span {
     display: inline-block;
@@ -103,9 +106,16 @@
     padding-right: 20px;
 }
 .toast-col:nth-child(1) {
-    padding: 0px 16px 2px 0;
+    padding: 0 0 4px 0;
 }
 .toast-col:nth-child(2) {
+    padding: 0 16px 2px 0;
+    text-align: right;
+    white-space: nowrap;
+    width: 0;
+    font-size: 0;
+}
+.toast-col:nth-child(3) {
     width: 40px;
     height: 40px;
     text-align: right;
@@ -114,7 +124,7 @@
     cursor: pointer;
     width: 30px;
     height: 30px;
-    background-image: url(../images/mega/register-big-sprite-v13.png);
+    background-image: url(../images/mega/register-big-sprite-v14.png);
     background-position: 10px -130px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -124,25 +134,84 @@
 .toast-button {
     display: inline-block;
     font-size: 14px;
-    line-height: 23px;
+    line-height: 31px;
     vertical-align: middle;
-    height: 24px;
-    padding: 0 8px;
+    height: 32px;
+    padding: 0 12px;
     color: #666666;
-    background-color: #EEEEEE;
+    background-color: rgba(0,0,0,0.02);
     white-space: nowrap;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    margin: 7px 0 5px 0;
+    margin: 3px 0 1px 8px;
     cursor: pointer;
+    position: relative;
 }
+.toast-button span {
+    display: inline-block;
+}
+.toast-button span:first-letter {
+    text-transform: uppercase;
+}
+.toast-button i {
+    vertical-align: top;
+    margin: 6px 3px 0 -2px;
+}
+.toast-button::before, .toast-button::after {
+    content: '';
+    position:absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: inherit;
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.1);
+    -moz-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.1);
+    box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.1);
+}
+.toast-button::after {
+    -webkit-box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.1);
+    box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.1);
+}
+/* Megasync transfer */
+.toast-notification.megasync-transfer {
+    width: 720px;
+    max-width: 720px;
+    margin-left: -360px;
+}
+.megasync-transfer .toast-icon {
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 0;
+    background-position: -83px -767px;
+}
+.megasync-transfer .toast-col:nth-child(1) {
+    padding-left: 10px;
+}
+.megasync-transfer .toast-col:nth-child(1) span::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background-image: url(../images/mega/icons-sprite_v9@2x.png);
+    vertical-align: top;
+    margin: 2px 9px 0 1px;
+    background-position: -198px -1240px;
+}
+.megasync-transfer.upload .toast-col:nth-child(1) span::before {
+    background-position: -228px -1240px;
+}
+/* end of Megasync transfer */
 
 /* Mobile*/
 .mobile.toast-notification {
     font-size: 15px;
     line-height: 40px;
-    margin: 0 0 0 -37%;
+    margin-left: -37%;
     padding: 0;
     text-align: center;
     width: 75%;

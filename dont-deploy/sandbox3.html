@@ -54,6 +54,11 @@
             localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
         }
 
+        // Use the beta CMS if requested
+        if (window.location.search.indexOf('betacms=1') > -1) {
+            localStorage.cms = 'https://cms2.systems.mega.nz/';
+        }
+
         // Force viewing of the mobile site if requested
         if (window.location.search.indexOf('mobile=1') > -1) {
             localStorage.testMobileSite = '1';

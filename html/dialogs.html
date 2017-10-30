@@ -321,6 +321,7 @@
             <div class="context-menu-section">
                 <div class="sorting-menu-arrow"></div>
                 <div data-by="name" class="sorting-menu-item active">[$86]</div>
+                <div data-by="label" class="sorting-menu-item">[$17398]</div>
                 <div data-by="status" class="sorting-menu-item">[$89]</div>
                 <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
                 <div class="sorting-item-divider"></div>
@@ -443,6 +444,7 @@
             <div class="context-menu-section">
                 <div class="sorting-menu-arrow"></div>
                 <div data-by="name" class="sorting-menu-item active">[$86]</div>
+                <div data-by="label" class="sorting-menu-item">[$17398]</div>
                 <div data-by="status" class="sorting-menu-item">[$89]</div>
                 <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
                 <div class="sorting-item-divider"></div>
@@ -927,31 +929,6 @@
     </div>
 </div>
 
-<div class="fm-dialog download-megasync-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$1626]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-    <div class="content">
-        <div class="txt">[$7236]</div>
-        <a class="button clickurl" href="/sync">
-            <span class="icon"></span>
-            <span class="button-txt">[$5565] [$1626]</span>
-        </a>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="checkboxOff">
-            <input type="checkbox" name="megasync-checkbox" id="megasync-checkbox" class="checkboxOff">
-        </div>
-        <label for="megasync-checkbox" class="radio-txt">[$229]</label>
-        <div class="default-white-button right close-button">
-            <span>[$148]</span>
-        </div>
-        <div class="clear"></div>
-    </div>
-</div>
-
 <div class="create-new-folder dropdown body popup dropdown-arrow hidden">
     <i class="dropdown-white-arrow"></i>
     <div class="create-folder-size-icon full-size"></div>
@@ -1168,6 +1145,7 @@
       <div class="context-menu-section hidden">
         <div class="sorting-menu-arrow"></div>
         <div data-by="name" class="sorting-menu-item active">[$86]</div>
+        <div data-by="label" class="sorting-menu-item">[$17398]</div>
         <div data-by="status" class="sorting-menu-item">[$89]</div>
         <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
         <div class="sorting-item-divider"></div>
@@ -1942,6 +1920,17 @@
                 <div class="megasync-slider-wrap">
                     <div class="megasync-slider body-block">
 
+                        <div class="megasync-slide slide0 hidden">
+                            <div class="megasync-header">
+                                That's impressive!
+                            </div>
+                            <div class="megasync-img img0">
+                                <div class="megasync-text">
+                                    It appears that you are trying to transfer a large amount of files. This can lead to performance issues when downloading with your browser. Try our app for enhanced performance on file transfers.
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="megasync-slide slide1">
                             <div class="megasync-header">
                                 [$16861]
@@ -1993,20 +1982,17 @@
 
                             </div>
                         </div>
-                        <div class="clear"></div>
                     </div>
 
                     <div class="megasync-slider button prev"></div>
                     <div class="megasync-slider button next"></div>
 
-                    <div class="megasync-controls">
-                        <div class="active" data-slidernum="1"></div>
-                        <div data-slidernum="2"></div>
-                        <div data-slidernum="3"></div>
-                    </div>
                     <div class="megasync-buttons">
                         <div class="download big-button red download-megasync transition">
-                            [$1913]
+                            <span>Download MEGA app</span>
+                        </div>
+                        <div class="download big-button continue-with-browser transition hidden">
+                            <span>Continue with browser</span>
                         </div>
                     </div>
                 </div>
@@ -2237,8 +2223,14 @@
     <div class="toast-body">
         <div class="toast-col">
             <span></span>
-            <div class="toast-button">
-                [$726]
+        </div>
+        <div class="toast-col">
+            <div class="toast-button first">
+                <span>[$726]</span>
+            </div>
+            <div class="toast-button second hidden">
+                <i class="small-icon icons-sprite cog"></i>
+                <span>[$6117]</span>
             </div>
         </div>
         <div class="toast-col">
@@ -3566,6 +3558,7 @@
 
         <div class="viewer-image-bl hidden">
             <img alt="" />
+            <embed type="application/pdf" class="hidden">
         </div>
 
         <div class="viewer-pending hidden">
@@ -3636,19 +3629,19 @@
                 </div>
             </div>
             <div class="fm-versioning top-column right-text-align">
-                <div class="default-white-button semi-small light-grey-txt" title='[$58]'>
+                <div class="default-white-button semi-small light-grey-txt" title="[$58]">
                     <i class="small-icon icons-sprite down-arrow"></i>
                     <span>[$58]</span>
                 </div>
-                <div class="default-white-button semi-small light-grey-txt" title='[$16475]'>
+                <div class="default-white-button semi-small light-grey-txt" title="[$16475]">
                     <i class="small-icon icons-sprite reverted-clock"></i>
                     <span>[$16475]</span>
                 </div>
-                <div class="default-white-button semi-small light-grey-txt" title='[$1730]'>
+                <div class="default-white-button semi-small light-grey-txt" title="[$1730]">
                     <i class="small-icon icons-sprite rubbish-bin-icon"></i>
                     <span>[$1730]</span>
                 </div>
-                <div class="default-white-button semi-small light-grey-txt" title='[$17147]'>
+                <div class="default-white-button semi-small light-grey-txt" title="[$17147]">
                     <i class="small-icon icons-sprite clock-with-cross"></i>
                     <span>[$17147]</span>
                 </div>
@@ -3659,12 +3652,12 @@
         <!-- TODO: Init jScrollPane !-->
         <div class="fm-versioning scroll-bl">
             <div class="fm-versioning content">
-            
+
                 <!-- Modification Date !-->
                 <div class="fm-versioning data">
                     <span>Today</span>
                 </div>
-                
+
                 <!-- File Data Row !-->
                 <div class="fm-versioning file-info-row">
                     <div class="radio-input radioOn"><input type="radio" name="versioning" class="radioOn" value="1" checked></div>
@@ -3681,13 +3674,13 @@
                             <span class="red">(Current version)</span>
                         </div>
                     </div>
-                    
+
                     <!-- Modification time !-->
                     <div class="fm-versioning modified-time table-cell">
                         <i class="small-icon icons-sprite clock"></i>
                         <span>12:30</span>
                     </div>
-                    
+
                     <!-- Modification info !-->
                     <div class="fm-versioning modified-info table-cell">
                         <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
@@ -3695,7 +3688,7 @@
                         <span class="modified-info-txt">
                             Edited
                         </span>
-                        
+
                         <!-- Buttons !-->
                         <div class="fm-versioning buttons">
                             <div class="button download-file">
@@ -3709,12 +3702,12 @@
                             </div>
                         </div>
                         <!-- End of Buttons !-->
-                        
+
                     </div>
-                    
+
                     <div class="clear"></div>
                 </div>
-                
+
                 <!-- File Data Row !-->
                 <div class="fm-versioning file-info-row">
                     <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
@@ -3730,13 +3723,13 @@
                             <span class="size">160 KB</span>
                         </div>
                     </div>
-                    
+
                     <!-- Modification time !-->
                     <div class="fm-versioning modified-time table-cell">
                         <i class="small-icon icons-sprite clock"></i>
                         <span>12:30</span>
                     </div>
-                    
+
                     <!-- Modification info !-->
                     <div class="fm-versioning modified-info table-cell">
                         <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
@@ -3744,7 +3737,7 @@
                         <span class="modified-info-txt">
                             Renamed from <span class="light-grey italic">filename1.psd</span>
                         </span>
-                        
+
                         <!-- Buttons !-->
                         <div class="fm-versioning buttons">
                             <div class="button download-file">
@@ -3758,12 +3751,12 @@
                             </div>
                         </div>
                         <!-- End of Buttons !-->
-                        
+
                     </div>
-                    
+
                     <div class="clear"></div>
                 </div>
-                
+
                 <!-- File Data Row !-->
                 <div class="fm-versioning file-info-row">
                     <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
@@ -3779,13 +3772,13 @@
                             <span class="size">160 KB</span>
                         </div>
                     </div>
-                    
+
                     <!-- Modification time !-->
                     <div class="fm-versioning modified-time table-cell">
                         <i class="small-icon icons-sprite clock"></i>
                         <span>15:30</span>
                     </div>
-                    
+
                     <!-- Modification info !-->
                     <div class="fm-versioning modified-info table-cell">
                         <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
@@ -3793,7 +3786,7 @@
                         <span class="modified-info-txt">
                             Moved from <span class="fm-versioning file-path"><span>Cloud Drive</span><span>folder name</span></span>
                         </span>
-                        
+
                         <!-- Buttons !-->
                         <div class="fm-versioning buttons">
                             <div class="button download-file">
@@ -3807,12 +3800,12 @@
                             </div>
                         </div>
                         <!-- End of Buttons !-->
-                        
+
                     </div>
-                    
+
                     <div class="clear"></div>
                 </div>
-                
+
                 <!-- File Data Row !-->
                 <div class="fm-versioning file-info-row">
                     <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
@@ -3828,13 +3821,13 @@
                             <span class="size">160 KB</span>
                         </div>
                     </div>
-                    
+
                     <!-- Modification time !-->
                     <div class="fm-versioning modified-time table-cell">
                         <i class="small-icon icons-sprite clock"></i>
                         <span>15:30</span>
                     </div>
-                    
+
                     <!-- Modification info !-->
                     <div class="fm-versioning modified-info table-cell">
                         <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
@@ -3842,7 +3835,7 @@
                         <span class="modified-info-txt">
                             Edited
                         </span>
-                        
+
                         <!-- Buttons !-->
                         <div class="fm-versioning buttons">
                             <div class="button download-file">
@@ -3856,17 +3849,17 @@
                             </div>
                         </div>
                         <!-- End of Buttons !-->
-                        
+
                     </div>
-                    
+
                     <div class="clear"></div>
                 </div>
-                
+
                 <!-- Modification Date !-->
                 <div class="fm-versioning data">
                     <span>Yesterday</span>
                 </div>
-                
+
                 <!-- File Data Row !-->
                 <div class="fm-versioning file-info-row">
                     <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
@@ -3882,13 +3875,13 @@
                             <span class="size">160 KB</span>
                         </div>
                     </div>
-                    
+
                     <!-- Modification time !-->
                     <div class="fm-versioning modified-time table-cell">
                         <i class="small-icon icons-sprite clock"></i>
                         <span>15:30</span>
                     </div>
-                    
+
                     <!-- Modification info !-->
                     <div class="fm-versioning modified-info table-cell">
                         <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
@@ -3896,7 +3889,7 @@
                         <span class="modified-info-txt">
                             reverted from <span class="strong">v. 8</span>
                         </span>
-                        
+
                         <!-- Buttons !-->
                         <div class="fm-versioning buttons">
                             <div class="button download-file">
@@ -3910,12 +3903,12 @@
                             </div>
                         </div>
                         <!-- End of Buttons !-->
-                        
+
                     </div>
-                    
+
                     <div class="clear"></div>
                 </div>
-                
+
                 <!-- File Data Row !-->
                 <div class="fm-versioning file-info-row">
                     <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
@@ -3931,13 +3924,13 @@
                             <span class="size">160 KB</span>
                         </div>
                     </div>
-                    
+
                     <!-- Modification time !-->
                     <div class="fm-versioning modified-time table-cell">
                         <i class="small-icon icons-sprite clock"></i>
                         <span>15:30</span>
                     </div>
-                    
+
                     <!-- Modification info !-->
                     <div class="fm-versioning modified-info table-cell">
                         <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
@@ -3945,7 +3938,7 @@
                         <span class="modified-info-txt">
                             Edited by <span class="strong">Lloyd Hubbard</span>
                         </span>
-                        
+
                         <!-- Buttons !-->
                         <div class="fm-versioning buttons">
                             <div class="button download-file">
@@ -3959,17 +3952,17 @@
                             </div>
                         </div>
                         <!-- End of Buttons !-->
-                        
+
                     </div>
-                    
+
                     <div class="clear"></div>
                 </div>
-                
+
                 <!-- Modification Date !-->
                 <div class="fm-versioning data">
                     <span>10 March</span>
                 </div>
-                
+
                 <!-- File Data Row !-->
                 <div class="fm-versioning file-info-row">
                     <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
@@ -3985,13 +3978,13 @@
                             <span class="size">160 KB</span>
                         </div>
                     </div>
-                    
+
                     <!-- Modification time !-->
                     <div class="fm-versioning modified-time table-cell">
                         <i class="small-icon icons-sprite clock"></i>
                         <span>15:30</span>
                     </div>
-                    
+
                     <!-- Modification info !-->
                     <div class="fm-versioning modified-info table-cell">
                         <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
@@ -3999,7 +3992,7 @@
                         <span class="modified-info-txt">
                             Created
                         </span>
-                        
+
                         <!-- Buttons !-->
                         <div class="fm-versioning buttons">
                             <div class="button download-file">
@@ -4013,12 +4006,12 @@
                             </div>
                         </div>
                         <!-- End of Buttons !-->
-                        
+
                     </div>
-                    
+
                     <div class="clear"></div>
                 </div>
-                
+
             </div>
         </div>
     </div>

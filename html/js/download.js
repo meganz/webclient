@@ -254,7 +254,7 @@ function dl_g(res) {
                 }
                 else if (fdl_filesize > maxDownloadSize) {
                     checkMegaSyncDownload();
-                    setBrowserWarningClasses('.download.warning-block');
+                    dlmanager.setBrowserWarningClasses('.download.warning-block');
                 }
                 else {
                     uncheckMegaSyncDownload();
@@ -273,10 +273,15 @@ function dl_g(res) {
                             if (res.msd !== 0 && (!err || is)) {
                                 $('.megasync-overlay').removeClass('downloading');
                                 megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
-                            } else {
-                                megasyncOverlay();
+                            }
+                            else {
+                                dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
                             }
                         });
+                    }
+                    else if (filetype(filename) === 'PDF Document' && Object(previews[dlpage_ph]).buffer) {
+                        onDownloadReady();
+                        M.saveAs(previews[dlpage_ph].buffer, filename);
                     }
                     else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
                         browserDownload();
@@ -417,10 +422,21 @@ function dl_g(res) {
                             $infoBlock.find('img').attr('src', data);
 
                             if (is_image(filename)) {
-                                $infoBlock.find('.img-preview-button')
-                                    .removeClass('hidden')
+                                var $ipb = $infoBlock.find('.img-preview-button');
+
+                                if (filetype(filename) === 'PDF Document') {
+                                    $ipb.find('span').text(l[17489]);
+                                }
+
+                                $ipb.removeClass('hidden')
                                     .rebind('click', function() {
-                                        slideshow({h: dlpage_ph, fa: res.fa, k: key});
+                                        slideshow({
+                                            k: key,
+                                            fa: res.fa,
+                                            h: dlpage_ph,
+                                            name: filename,
+                                            link: dlpage_ph + '!' + dlpage_key
+                                        });
                                     });
                             }
                         }
@@ -564,136 +580,6 @@ function setMobileAppInfo() {
     }
 }
 
-function setBrowserWarningClasses(selector, $container, message) {
-    'use strict';
-
-    var uad = ua.details || false;
-    var $elm = $(selector, $container);
-
-    if (message) {
-        $elm.addClass('default-warning');
-    }
-    else if (window.safari) {
-        $elm.addClass('safari');
-    }
-    else if (window.chrome) {
-        $elm.addClass('chrome');
-    }
-    else if (window.opr) {
-        $elm.addClass('opera');
-    }
-    else if (uad.engine === 'Gecko') {
-        $elm.addClass('ff');
-    }
-    else if (uad.engine === 'Trident') {
-        $elm.addClass('ie');
-    }
-    else if (uad.browser === 'Edge') {
-        $elm.addClass('edge');
-    }
-
-    var setText = function(locale, $elm) {
-        var text = uad.browser ? String(locale).replace('%1', uad.browser) : l[16883];
-
-        if (message) {
-            text = l[1676] + ': ' + message + '<br/>' + l[16870] + ' %2';
-        }
-
-        if (window.chrome) {
-            if (window.Incognito) {
-                text = text.replace('%2', '(' + l[16869] + ')');
-            }
-            else {
-                text = text.replace('%2', '');
-            }
-        }
-        else {
-            text = text.replace('%2', '(' + l[16868] + ')');
-        }
-
-        $elm.find('span').safeHTML(text);
-    };
-
-    if ($container && $elm) {
-        setText(l[16866], $elm);
-        $container.addClass('warning');
-    }
-    else {
-        setText(l[16865], $elm.addClass('visible'));
-    }
-}
-
-// MEGAsync dialog If filesize is too big for downloading through browser
-function megasyncOverlay() {
-    'use strict';
-
-    var $this = $('.megasync-overlay');
-    var slidesNum = $('.megasync-controls div').length;
-    var $body = $('body');
-
-    $this.addClass('msd-dialog').removeClass('hidden downloading');
-    $body.addClass('overlayed');
-
-    if (fdl_filesize > maxDownloadSize) {
-        setBrowserWarningClasses('.megasync-bottom-warning', $this);
-    }
-
-    $('.big-button.download-megasync', $this).rebind('click', function() {
-        megasync.download(dlpage_ph, dlpage_key);
-    });
-
-    $('.megasync-slider.button', $this).rebind('click', function()
-    {
-        var $this = $(this);
-        var activeSlide = parseInt($('.megasync-controls div.active').attr('data-slidernum'));
-
-        if ($this.hasClass('prev')) {
-            if (activeSlide > 1) {
-                $('.megasync-controls div.active').removeClass('active').prev().addClass('active');
-                $('.megasync-content.slider')
-                    .removeClass('slide1 slide2 slide3')
-                    .addClass('slide' + (activeSlide - 1));
-            }
-            else {
-
-            }
-        }
-        else {
-            if (activeSlide < slidesNum) {
-                $('.megasync-controls div.active').removeClass('active').next().addClass('active');
-                $('.megasync-content.slider')
-                    .removeClass('slide1 slide2 slide3')
-                    .addClass('slide' + (activeSlide + 1));
-            }
-        }
-    });
-
-    $('.megasync-controls div', $this).rebind('click', function()
-    {
-        $('.megasync-content.slider').removeClass('slide1 slide2 slide3').addClass('slide' + $(this).attr('data-slidernum'));
-        $('.megasync-controls div.active').removeClass('active');
-        $(this).addClass('active');
-    });
-
-    $('.megasync-info-txt a', $this).rebind('click', function(e) {
-        $this.addClass('hidden');
-        $body.removeClass('overlayed');
-        loadSubPage('pro');
-    });
-
-    $('.megasync-close, .fm-dialog-close', $this).rebind('click', function(e) {
-        $this.addClass('hidden');
-        $body.removeClass('overlayed');
-    });
-
-    $('body').rebind('keyup.msd', function(e) {
-        if (e.keyCode === 27) {
-            $this.addClass('hidden');
-            $body.removeClass('overlayed');
-        }
-    });
-}
-
 function closedlpopup()
 {
     document.getElementById('download_overlay').style.display='none';
@@ -701,27 +587,9 @@ function closedlpopup()
 }
 
 function importFile() {
+    'use strict';
 
-    api_req({
-        a: 'p',
-        t: M.RootID,
-        n: [{
-                ph: dl_import[0],
-                t: 0,
-                a: dl_attr,
-                k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dl_import[1]).slice(0, 8)))
-            }]
-    }, {
-        callback: function (r) {
-            if (typeof r === 'object') {
-                $.onRenderNewSelectNode = r.f[0].h;
-            }
-            else {
-                M.ulerror(null, r);
-            }
-        }
-    });
-
+    M.importFileLink(dl_import[0], dl_import[1], dl_attr);
     dl_import = false;
 }
 

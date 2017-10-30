@@ -502,7 +502,7 @@
     width: 18px;
 }
 .medium-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v8.png);
+    background-image: url(../images/mega/icons-sprite_v9.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -765,28 +765,28 @@
     background-position: -14px -11665px;
 }
 .small-icon.green-arrow {
-    background-image: url(../images/mega/register-big-sprite-v13.png);
+    background-image: url(../images/mega/register-big-sprite-v14.png);
     background-position: 0px -56px;
 }
 .small-icon.blue-arrow {
-    background-image: url(../images/mega/register-big-sprite-v13.png);
+    background-image: url(../images/mega/register-big-sprite-v14.png);
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v8.png);
+    background-image: url(../images/mega/icons-sprite_v9.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v8.png);
+    background-image: url(../images/mega/icons-sprite_v9.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v8.png);
+    background-image: url(../images/mega/icons-sprite_v9.png);
     background-position: -188px -634px;
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v8.png);
+    background-image: url(../images/mega/icons-sprite_v9.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1134,7 +1134,7 @@
     background-position: -192px -781px;
 }
 i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v8.png);
+    background-image: url(../images/mega/icons-sprite_v9.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
@@ -1154,8 +1154,14 @@ i.icons-sprite {
 .small-icon.icons-sprite.dark-down-arrow {
     background-position: 5px -870px;
 }
+.small-icon.icons-sprite.mega {
+    background-position: 4px -1237px;
+}
 .small-icon.icons-sprite.red-down-arrow {
     background-position: -25px -870px;
+}
+.small-icon.icons-sprite.cog {
+    background-position: -158px -1199px;
 }
 .paused .small-icon.icons-sprite.red-down-arrow {
     background-position: -55px -870px;
@@ -1194,7 +1200,7 @@ i.icons-sprite {
 .download.big-icon {
     width: 74px;
     height: 74px;
-    background-image: url(../images/mega/download-dialog.png);
+    background-image: url(../images/mega/download-dialog_v1.png);
     background-position: -622px -81px;
 }
 .chrome .download.big-icon {

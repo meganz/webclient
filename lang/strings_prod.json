@@ -2475,10 +2475,6 @@
         "text": "The cloud in your pocket. Access and stream your files from your smartphone or tablet.",
         "context": "Advertising text for mobile apps"
     },
-    "1932": {
-        "text": "To download files larger than 1 GB, please install MEGAsync or our browser extension.",
-        "context": "When a user attempt to download a file larger than 1GB using Firefox, he will be prompted with a dialog asking him to install our browser extension with this text."
-    },
     "1933": {
         "text": "To download files larger than 1 GB, please install MEGAsync, Google Chrome or Opera.",
         "context": ""
@@ -2815,10 +2811,6 @@
         "text": "folder",
         "context": "Singular of folder\/directory. 1 folder"
     },
-    "5565": {
-        "text": "download",
-        "context": "Item menu option upon clicking on one or multiple files. Singular"
-    },
     "5569": {
         "text": "users",
         "context": "used for example when a folder is shared with 2 or more users"
@@ -3141,6 +3133,10 @@
     },
     "6089": {
         "text": "No transfers",
+        "context": ""
+    },
+    "6117": {
+        "text": "settings",
         "context": ""
     },
     "6125": {
@@ -3962,10 +3958,6 @@
     "7235": {
         "text": "Payment Failed",
         "context": "A dialog box heading, when the user has tried to pay, but something has gone wrong."
-    },
-    "7236": {
-        "text": "To download files larger than 1 GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
-        "context": "Description in a popup dialog when they are trying to download a file larger than 1GB using the browser."
     },
     "7241": {
         "text": "You must agree with our Terms of Service",
@@ -6160,7 +6152,7 @@
         "context": "A toast notification which is shown when saving settings."
     },
     "16169": {
-        "text": "Date created",
+        "text": "Date Created",
         "context": "A table column header for the date when a file was created."
     },
     "16172": {
@@ -7239,10 +7231,6 @@
         "text": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
         "context": "An error shown to Chrome users when their download cannot continue because they are running out of disk space."
     },
-    "16891": {
-        "text": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
-        "context": "An error shown to Chrome users when their download cannot start because they are running out of disk space."
-    },
     "16892": {
         "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
         "context": "A message which is shown when there was a server-side error retrieving the cloud drive contents."
@@ -7394,5 +7382,13 @@
     "17156": {
         "text": "Renamed from %1",
         "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name. Please keep the placeholder %1 which will be replaced by the filename.\r\n"
+    },
+    "17398": {
+        "text": "Label",
+        "context": "A menu item in the left panel drop down menu to allow sorting by label."
+    },
+    "17489": {
+        "text": "view document",
+        "context": "Button for the downloads page to let users preview PDF documents."
     }
 }

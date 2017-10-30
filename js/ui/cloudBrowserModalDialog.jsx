@@ -499,12 +499,9 @@ var BrowserEntries = React.createClass({
             var icon = <span
                 className={"transfer-filetype-icon " + (isFolder ? " folder " : "") + fileIcon(node)}> </span>;
 
-            if (fileIcon(node) === "graphic" && node.fa) {
+            if (is_image(node) && node.fa) {
                 var src = thumbnails[node.h];
                 if (!src) {
-                    src = M.getNodeByHandle(node.h);
-
-
                     M.v.push(node);
                     if (!node.seen) {
                         node.seen = 1; // HACK
@@ -586,7 +583,7 @@ var BrowserEntries = React.createClass({
                     <div className="dialog-empty-pad">
                         <div className="dialog-empty-icon"></div>
                         <div className="dialog-empty-header">
-                            {__(l[782])}
+                            {self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]}
                         </div>
                     </div>
                 </div>

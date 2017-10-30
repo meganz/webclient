@@ -300,7 +300,7 @@ body.pro:after {
     background-image: url(../images/mega/register-info@2x.png);
     background-size: 120px auto;
 }
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .download.file-icon-wrap {
+.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .download.file-icon-wrap {
     background-image: url(../images/mega/download-sprite-v7@2x.png);
     background-size: 257px auto;
 }
@@ -309,7 +309,7 @@ body.pro:after {
     background-size: 48px auto;
 }
 .reg-success-icon, .reg-st3-save-icon, .toast-icon, .resend-email-button, .reg-st3-storage::before, .reg-st3-bandwidth::before, .pro-icon, .pro-bottom-info-header::before, .toast-close-button, .small-icon.green-arrow, .small-icon.blue-arrow, .fm-dialog-close.small {
-    background-image: url(../images/mega/register-big-sprite-v13@2x.png);
+    background-image: url(../images/mega/register-big-sprite-v14@2x.png);
     background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {
@@ -424,12 +424,12 @@ body.pro:after {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
-.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .viewer-mid-button, .small-icon.clock, i.icons-sprite, .fm-versioning.file-path span:not(:first-child)::before {
-    background-image: url(../images/mega/icons-sprite_v8@2x.png);
+.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .viewer-mid-button, .small-icon.clock, i.icons-sprite, .fm-versioning.file-path span:not(:first-child)::before, .transfer-panel-title span::before, .transfer-type.upload::before, .transfer-type.download::before, .megasync-transfer .toast-col:nth-child(1) span::before {
+    background-image: url(../images/mega/icons-sprite_v9@2x.png);
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
-    background-image: url(../images/mega/help2/welcome_icons@2x.png);
+    background-image: url(../images/mega/help2/welcome_icons_v2@2x.png);
     background-size: 250px auto;
 }
 .huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon, .huge-icon.storage-icon, .semi-small-icon.rocket, .semi-huge-icon.green-tick, .semi-big-icon.blue-cloud, .semi-big-icon.green-speedometer, .achieved .account.progress-indicator, .achievement-complete::after, .big-104px-icon.speedometer, .big-icon.almost-full-storage, .semi-huge-icon.speedometer, .semi-huge-icon.storage {
@@ -448,8 +448,8 @@ body.pro:after {
     background-image: url(../images/mega/files-icons@2x.png);
     background-size: 82px auto;
 }
-.download.big-icon, .fm-dialog-close.big, .megasync-img::before, .megasync-slider.button {
-    background-image: url(../images/mega/download-dialog@2x.png);
+.download.big-icon, .fm-dialog-close.big, .megasync-img::before, .megasync-slider.button::after {
+    background-image: url(../images/mega/download-dialog_v1@2x.png);
     background-size: 768px auto;
 }
 .upload-overlay-icon {

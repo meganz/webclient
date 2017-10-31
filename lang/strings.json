@@ -14607,10 +14607,6 @@
         "text": "Unlocked bonuses:",
         "context": "Header of block with achievements bonuses."
     },
-    "16406": {
-        "text": "[1]MEGA Account Reset\r\n\r\n[2]It looks like you have forgotten your password and do not have a backup of your Recovery Key.\r\n\r\n[3]If you proceed, the existing account under this address will be deactivated, and you will lose access to your data. The data will still be preserved for at least another 60 days. Should you remember the deactivated account's password or locate its previously exported Recovery Key, please contact [A1]support@mega.nz[\/A1] to have it restored.\r\n\r\n[4]Even if you manage to restore the deactivated account, all associated contacts and shares will remain deleted and need to be re-established.\r\n\r\n[5]Reset my Account\r\n\r\n[6]Didn't work? No worries. Copy and paste this link below into your web browser:",
-        "context": "The 'reset my account' email body received when somebody requests to park their account. MEGA needs them to click the link to confirm their password.\r\n\r\nPlease do not translate or modify anything inside square brackets (do not change [1] or [A1] )"
-    },
     "16407": {
         "text": "[1]Best regards,[BR]\u2014 Team MEGA",
         "context": "The footer for our emails. Please do not translate anything inside square brackets (do not translate the [1] or the [BR]. The [BR] corresponds to a line break and will be replaced)"
@@ -14686,10 +14682,6 @@
     "16430": {
         "text": "[1]MEGA Confirm New Email\r\n\r\n[2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:\r\n\r\n[3]Confirm New Email\r\n\r\n[4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.\r\n",
         "context": "Email body for when a user needs to confirm their new email address. It emphasises that it will not be a second email, but will replace their current one on their Mega account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
-    },
-    "16431": {
-        "text": "[1]MEGA Password Recovery\r\n\r\n[2]You can easily access your MEGA account with your Recovery Key.\r\n\r\n[3]Unlock Account\r\n\r\n[4]This request originated from IP address: [R][$cred][\/R]",
-        "context": "Email body for the password reset email where the user has their Master Key (Recovery Key)\r\nPlease do not translate the text inside square brackets (i.e. leave the [1],[$cred], and [R] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16432": {
         "text": "You can also earn more free storage and transfer quota by achieving bonuses. For example, by installing our software or inviting friends to MEGA.",
@@ -17491,6 +17483,14 @@
         "text": "Install the MEGA desktop app for Windows, Mac or Linux.[Br][Br]Synchronise single or multiple folders on your computer with your MEGA account.[Br][Br]Access and work with your data securely across different locations and devices. It\u2019s always on and fully automatic. ",
         "context": "Description of the benefits of using MEGA's apps"
     },
+    "17386": {
+        "text": "Copy key",
+        "context": "Title for a button that copies the key of the link to the clipboard"
+    },
+    "17387": {
+        "text": "Invite friends and get bonuses",
+        "context": "Subtitle show on My Account view under the 'Achievements' title to give more details of the section that will appear if tapped 2\/2"
+    },
     "17389": {
         "text": "Select contacts from your phone's contact list or enter multiple email addresses.",
         "context": "Text shown to explain how and where you can invite friends."
@@ -17514,6 +17514,10 @@
     "17402": {
         "text": "MEGAdrop Folder Management",
         "context": "Title or right panel for page (fm\/account\/widget)"
+    },
+    "17403": {
+        "text": "By doing this you will cancel your MEGAdrop setup for the folder named %1",
+        "context": "Confirmation dialog when user want to create new public link for a folder but there's a active MEGAdrop folder"
     },
     "17404": {
         "text": "Upload a file directly to my MEGA cloud drive without signing up.",
@@ -17555,6 +17559,46 @@
         "text": "A MEGAdrop folder allows anyone to upload files to your MEGA account, even if they don't have an account!",
         "context": "Description text for make\/manage public upload page dialog."
     },
+    "17427": {
+        "text": "You have not selected a default download location for your files.To proceed with the download, please select a destination folder or go to settings in order to set up your default download location.",
+        "context": "Message of the dialog displayed when a user want to download some nodes and the app doesn't have configured a default download location. Asks the user to select a location for this download or configure a default location."
+    },
+    "17428": {
+        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card? Please try to save\/copy the file to your device's internal memory instead.",
+        "context": "Message of the dialog displayed when the process\/request to copy a file failed because the app or the user don't have write permission to copy into the destination (i.e. copy into a SD card an unsupported file type)."
+    },
+    "17429": {
+        "text": "Failed to clear folder. Please try again.",
+        "context": "Message of the dialog displayed when the process\/request to clear a folder failed."
+    },
+    "17430": {
+        "text": "Clear folder failed",
+        "context": "Title of the dialog displayed when the process\/request to clear a folder failed - (String as short as possible)."
+    },
+    "17431": {
+        "text": "Failed to open the internal file\/folder of the link. Please try again.",
+        "context": "Title of the dialog displayed when fail trying to open a link of an internal node."
+    },
+    "17432": {
+        "text": "Failed to open internal file\/folder",
+        "context": "Title of the dialog displayed when fail trying to open a link of an internal node - (String as short as possible)."
+    },
+    "17433": {
+        "text": "I agree with the Terms of Service",
+        "context": "Text placed just after a checkbox to indicate that user is agree with the 'Terms of Service' into the 'create account' page."
+    },
+    "17434": {
+        "text": "Confirm PIN lock",
+        "context": "Label for any 'Confirm PIN lock' button, link, text, title, etc. - (String as short as possible).\r\nPreserve the PIN uppercase word."
+    },
+    "17435": {
+        "text": "New PIN lock",
+        "context": "Label for any 'New PIN lock' button, link, text, title, etc. - (String as short as possible).\r\nPreserve the PIN uppercase word."
+    },
+    "17436": {
+        "text": "View Terms of Service here",
+        "context": "Text used as a link to view the 'Terms of Service' into the 'create account' page."
+    },
     "17445": {
         "text": "Date Added",
         "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's date of encryption on the Cloud Drive (not the date of the file's creation on their local machine)."
@@ -17563,12 +17607,256 @@
         "text": "Date Created",
         "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's original timestamp, when it is created on their local machine."
     },
+    "17447": {
+        "text": "Select contacts from your phone\u2019s contact list or enter multiple email addresses.",
+        "context": "Text shown to explain how and where you can invite friends"
+    },
+    "17448": {
+        "text": "Upload in background",
+        "context": "Option title to enable Camera Uploads in background"
+    },
+    "17449": {
+        "text": "MEGA can periodically start Camera Uploads when your location changes.",
+        "context": "Alert message shown explaining why the app use location permissions."
+    },
     "17450": {
         "text": "Make MEGAdrop Folder",
-        "context": "Create MEGAdrop folder using right click menu in cloud drive tab (context menu)"
+        "context": "Change an existing folder into a MEGAdrop folder using the right click menu in the cloud drive tab (context menu)."
+    },
+    "17451": {
+        "text": "Used storage",
+        "context": "Title of the Used storage section"
+    },
+    "17452": {
+        "text": "I agree with MEGA's [A]Terms of Service[\/A]",
+        "context": "text placed on the checkbox of acceptation of the Terms of Service"
+    },
+    "17453": {
+        "text": "Remove from MEGA",
+        "context": "menu item"
+    },
+    "17454": {
+        "text": "Set password",
+        "context": "Alert Dialog to get link with password"
+    },
+    "17455": {
+        "text": "Enter password",
+        "context": "Hint of the dialog to get link with password"
+    },
+    "17456": {
+        "text": "Processing...",
+        "context": "Status text at the beginning of getting a link"
+    },
+    "17457": {
+        "text": "No connection",
+        "context": "Info label about the status of the user"
+    },
+    "17458": {
+        "text": "%1$d file copied",
+        "context": "Singular"
+    },
+    "17459": {
+        "text": "%1$d files copied",
+        "context": "Plural"
+    },
+    "17460": {
+        "text": "%1$d file previously downloaded",
+        "context": "Singular"
+    },
+    "17461": {
+        "text": "%1$d files previously downloaded",
+        "context": "Plural"
+    },
+    "17462": {
+        "text": "Downloaded %1$d of %2$d file",
+        "context": "Singular, as in \"Downloaded 1 of 1 file\""
+    },
+    "17463": {
+        "text": "Downloaded %1$d of %2$d files",
+        "context": "Plural, as in \"Downloaded 1 of 3 files\""
+    },
+    "17464": {
+        "text": "Invite friends and get bonuses",
+        "context": "subtitle of the section for achievements"
+    },
+    "17465": {
+        "text": "Invite friends",
+        "context": "button to invite friends for getting achievements"
+    },
+    "17466": {
+        "text": "Get %1$s of storage and %2$s of transfers for each referral",
+        "context": "title of the introduction for the achievements screen"
+    },
+    "17467": {
+        "text": "Get %1$s of storage and %2$s of transfers",
+        "context": "sentence to detail the figures of storage and transfer quota related to each achievement"
+    },
+    "17468": {
+        "text": "Unlocked bonuses",
+        "context": "title of the section for unlocked bonuses"
+    },
+    "17469": {
+        "text": "Referral Bonuses",
+        "context": "title of the section for referral bonuses in achivements section (maximum 24 chars)"
+    },
+    "17470": {
+        "text": "Install a mobile app",
+        "context": "title of the section for install a mobile app in achivements section (maximum 24 chars)"
+    },
+    "17471": {
+        "text": "Registration bonus",
+        "context": "title of the section for install megasync in achivements section (maximum 24 chars)"
+    },
+    "17472": {
+        "text": "Install the MEGA desktop app",
+        "context": "title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)"
+    },
+    "17473": {
+        "text": "Account Base Quota",
+        "context": "title of the section for base quota in achivements section"
+    },
+    "17474": {
+        "text": "No media on Camera Uploads",
+        "context": "Text that indicates that no pictures have been uploaded to the Camera Uploads section"
+    },
+    "17475": {
+        "text": "%1$d d left",
+        "context": "indicates the number of days left related to a achievement. The 'd' is short for days, please keep to a single letter or short representation if possible."
+    },
+    "17476": {
+        "text": "Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you will receive bonus storage and transfer quota.",
+        "context": "first paragraph of screen to invite friends and get an achievement"
+    },
+    "17477": {
+        "text": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection. Invited contacts must install the MEGA mobile app or the MEGA app on their devices.",
+        "context": "second paragraph of screen to invite friends and get an achievement"
+    },
+    "17478": {
+        "text": "Select contacts from your phone contact list or enter multiple email addresses.",
+        "context": "explanation of screen to invite friends and get an achievement"
+    },
+    "17479": {
+        "text": "Invite friends to MEGA",
+        "context": "title of the dialog to confirm the contact request"
+    },
+    "17480": {
+        "text": "Thanks! Invitation was sent by email",
+        "context": "subtitle of the dialog to confirm the contact request"
+    },
+    "17481": {
+        "text": "Encourage your friends to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your bonus allocation of transfer quota.",
+        "context": "paragraph of the dialog to confirm the contact request"
+    },
+    "17482": {
+        "text": "Email is malformed",
+        "context": "Error shown when the user writes a email with an incorrect format"
+    },
+    "17483": {
+        "text": "When you install the MEGA desktop app you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. The MEGA desktop app is available for Windows, macOS and most Linux distros.",
+        "context": "info paragraph about the achievement install megasync (the mega desktop app)"
+    },
+    "17484": {
+        "text": "When you install our mobile app you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. We provide mobiles apps for iOS, Android and Windows Phone.",
+        "context": "info paragraph about the achievement install mobile app"
+    },
+    "17486": {
+        "text": "You have received %1$s storage space and %2$s transfer quota for installing our mobile app.",
+        "context": "info paragraph about the completed achievement install mobile app"
+    },
+    "17487": {
+        "text": "You have received %1$s storage space as your free registration bonus.",
+        "context": "info paragraph about the completed achievement registration"
+    },
+    "17488": {
+        "text": "Bonus expires in %1$d days",
+        "context": "info paragraph about the completed achievement registration"
     },
     "17489": {
         "text": "view document",
         "context": "Button for the downloads page to let users preview PDF documents."
+    },
+    "17490": {
+        "text": "Manage",
+        "context": "Label of action button on MEGAdrop info dialog. When user choose 'Manage MEGAdrop Folder' from context menu dialog is shown by default."
+    },
+    "17496": {
+        "text": "Contacts [A](%1$d)[\/A]",
+        "context": "Item of the navigation title for the contacts section when there is any pending incoming request."
+    },
+    "17497": {
+        "text": "[W]SENT REQUESTS[W]",
+        "context": "Title of the sent requests tab. Capital letters"
+    },
+    "17498": {
+        "text": "Chat [A](%1$d)[\/A]",
+        "context": "Item of the navigation title for the chat section when there is any unread message"
+    },
+    "17499": {
+        "text": "File sent to %1$s",
+        "context": "Success message when the attachment has been sent to a chat"
+    },
+    "17500": {
+        "text": "File sent to %1$d chats",
+        "context": "Success message when the attachment has been sent to a many chats"
+    },
+    "17501": {
+        "text": "Error. The file has not been sent to any of the selected chats",
+        "context": "Error message when the attachment cannot be sent to any of the selected chats"
+    },
+    "17502": {
+        "text": "Please, write your feedback here:",
+        "context": "mail body"
+    },
+    "17503": {
+        "text": "Device model",
+        "context": "mail body"
+    },
+    "17504": {
+        "text": "Android version",
+        "context": "mail body"
+    },
+    "17505": {
+        "text": "New file",
+        "context": "Title of the dialog to create a new file by inserting the name"
+    },
+    "17506": {
+        "text": "File Name",
+        "context": "Input field description in the create file dialog."
+    },
+    "17507": {
+        "text": "SUBJECT",
+        "context": "Title of the field subject when a new file is created to upload"
+    },
+    "17508": {
+        "text": "CONTENT",
+        "context": "Title of the field content when a new file is created to upload"
+    },
+    "17509": {
+        "text": "EMAIL",
+        "context": "Title of the field email when a new contact is created to upload"
+    },
+    "17510": {
+        "text": "[W]and %d items were not sent successfully",
+        "context": "success message when moving a node"
+    },
+    "17511": {
+        "text": "Renews on[W]",
+        "context": "title of the Expiration Date"
+    },
+    "17512": {
+        "text": "[W]and %d contacts were not successfully removed",
+        "context": "success message when removing a contact from a shared folder"
+    },
+    "17513": {
+        "text": "Files cannot be used if you have a passcode in MEGA. If you want to use Files, please open MEGA and disable it.",
+        "context": "Text shown when you try to use the Files app while having a passcode"
+    },
+    "17517": {
+        "text": "used %tq",
+        "context": "used transfer quota of the account - the placeholder represents transfer quota to give context"
+    },
+    "17520": {
+        "text": "Manage links",
+        "context": "A menu item in the right click context menu in the Cloud Drive. This menu item will take the user to a dialog where they can manage the public folder\/file links which they currently have selected."
     }
 }

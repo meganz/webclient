@@ -1054,7 +1054,14 @@ function renameDialog() {
             $dialog.removeClass('focused');
         });
 
-        $input.rebind('click keydown keyup keypress', function() {
+        $input.rebind('click keydown keyup keypress', function (event) {
+            // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
+            if (event.type === 'keydown') {
+                if (event.keyCode === 13) {
+                    $('.rename-dialog-button.rename').click();
+                    return;
+                }
+            }
             var value = $(this).val();
 
             if (!value || (!n.t && ext.length > 0 && value === '.' + ext)) {

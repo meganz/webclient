@@ -2918,6 +2918,7 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     e = $('#treea_' + id_s);
     $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
     e.addClass('selected');
+    $.selected = [id]; // added by khaled - to indicate the selection
 
     if (!ignoreScroll) {
         if (id === this.RootID || id === 'shares' || id === 'contacts' || id === 'chat' || id === 'opc' || id === 'ipc') {

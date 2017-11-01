@@ -1194,9 +1194,8 @@
     font-family: 'source_sans_prosemibold';
     font-size: 15px;
     color: #bbb;
-    line-height: 15px;
+    line-height: 18px;
     display: inline-block;
-    float: left;
     position: relative;
 }
 #help2-main .related-articles .related-articles-title {

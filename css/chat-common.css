@@ -155,6 +155,12 @@
 .contacts-info .icon-dropdown {
     margin: 5px 4px 0 0;
 }
+.contacts-info .icon-dropdown i {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
+    -moz-opacity: 0.73;
+    -khtml-opacity: 0.73;
+    opacity: 0.73;
+}
 .contacts-info .icon-dropdown + .user-card-data {
     padding-right: 46px;
 }

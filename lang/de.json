@@ -4464,10 +4464,11 @@
     "17512": "[W]and %d contacts were not successfully removed",
     "17513": "Files cannot be used if you have a passcode in MEGA. If you want to use Files, please open MEGA and disable it.",
     "17514": "MEGA accesses your contacts when you select some of them to save\/export.",
+    "17517": "used %tq",
     "17520": "Manage links",
     "17521": "The content you are trying to access is not available for this account. Try to login with same account as in the mobile web client.",
     "17522": "Invite friends and get Bonuses",
     "17523": "Select contacts from your phone's contact list or enter multiple email addresses.",
-    "17524": "used %tq1",
-    "17525": "used %tq2"
+    "17524": "verbraucht %tq1",
+    "17525": "verbraucht %tq2"
 }

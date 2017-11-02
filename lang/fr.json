@@ -4464,6 +4464,7 @@
     "17512": "[W]et %d contacts n\u2019ont pas \u00e9t\u00e9 retir\u00e9s avec succ\u00e8s",
     "17513": "L\u2019appli Fichiers ne peut pas \u00eatre utilis\u00e9e si vous avez un code de verrouillage dans MEGA. Si vous souhaitez utiliser Fichiers, veuillez ouvrir MEGA et d\u00e9sactiver le code.",
     "17514": "MEGA accesses your contacts when you select some of them to save\/export.",
+    "17517": "Because of singular\/plural agreement in many languages we cannot have one string for 1 and more than 1 MB.",
     "17520": "G\u00e9rer les liens",
     "17521": "The content you are trying to access is not available for this account. Try to login with same account as in the mobile web client.",
     "17522": "Invite friends and get Bonuses",

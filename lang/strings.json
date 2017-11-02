@@ -17859,6 +17859,10 @@
         "text": "MEGA accesses your contacts when you select some of them to save\/export.",
         "context": "Contacts Usage Description. To protect user privacy Apple requires a purpose string explaining why will be accessed."
     },
+    "17517": {
+        "text": "used %tq",
+        "context": "Used transfer quota of the account. The placeholder represents transfer quota to give context. The amount of quota will be plural (more than 2)."
+    },
     "17520": {
         "text": "Manage links",
         "context": "A menu item in the right click context menu in the Cloud Drive. This menu item will take the user to a dialog where they can manage the public folder\/file links which they currently have selected."

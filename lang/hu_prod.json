@@ -711,7 +711,6 @@
     "5738": "Szemetes",
     "5775": "Felhaszn\u00e1lva",
     "5799": "Haszn\u00e1lat",
-    "5801": "felhaszn\u00e1lva",
     "5814": "Fi\u00f3k b\u0151v\u00edt\u00e9se",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Expires %1",
     "8700": "Thunderbird Extension",
     "8726": "Megh\u00edv\u00e1s",
-    "8732": "Update link",
-    "8733": "Update links",
     "8734": "Get links",
     "8735": "Remove links",
     "8736": "Set new expiry date",
@@ -1540,7 +1537,6 @@
     "16169": "Date Created",
     "16172": "Label...",
     "16173": "Choose colour:",
-    "16174": "Date Modified",
     "16175": "Subscription Expires On",
     "16221": "Add label %1",
     "16222": "Remove label %1",
@@ -1846,5 +1842,8 @@
     "17155": "Total size taken up by file versions:",
     "17156": "Renamed from %1",
     "17398": "Label",
-    "17489": "view document"
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17520": "Manage links"
 }

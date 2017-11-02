@@ -711,7 +711,6 @@
     "5738": "Roskakori",
     "5775": "K\u00e4ytetty",
     "5799": "K\u00e4ytt\u00f6",
-    "5801": "k\u00e4ytetty",
     "5814": "P\u00e4ivit\u00e4 tili",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Vanhenee %1",
     "8700": "Thunderbird-laajennus",
     "8726": "Kutsu",
-    "8732": "P\u00e4ivit\u00e4 linkki",
-    "8733": "P\u00e4ivit\u00e4 linkit",
     "8734": "Hanki linkit",
     "8735": "Poista linkit",
     "8736": "Aseta uusi vanhentumisp\u00e4iv\u00e4",
@@ -1540,7 +1537,6 @@
     "16169": "Date Created",
     "16172": "Label...",
     "16173": "Choose colour:",
-    "16174": "Date Modified",
     "16175": "Subscription Expires On",
     "16221": "Add label %1",
     "16222": "Remove label %1",
@@ -1846,5 +1842,8 @@
     "17155": "Total size taken up by file versions:",
     "17156": "Renamed from %1",
     "17398": "Label",
-    "17489": "view document"
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17520": "Manage links"
 }

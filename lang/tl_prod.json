@@ -711,7 +711,6 @@
     "5738": "Basurahan",
     "5775": "Gamit na",
     "5799": "Nagamit na",
-    "5801": "nagamit na",
     "5814": "I-upgrade ang account",
     "5816": "[X] na TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Mawawala sa loob ng %1",
     "8700": "Extension ng Thunderbird",
     "8726": "Imbitahan",
-    "8732": "I-update ang link",
-    "8733": "I-update ang links",
     "8734": "Kumuha ng links",
     "8735": "Tanggalin ang links",
     "8736": "Magtakda ng bagong expiry date",
@@ -1540,7 +1537,6 @@
     "16169": "Petsa kung kailan ginawa",
     "16172": "Label...",
     "16173": "Pumili ng kulay:",
-    "16174": "Petsa kung kailan binago",
     "16175": "Matatapos ang Subscription Sa",
     "16221": "Lagyan ng %1",
     "16222": "Tanggalin ang label %1",
@@ -1846,5 +1842,8 @@
     "17155": "Buong size na nakuha ng file versions:",
     "17156": "Renamed from %1",
     "17398": "Label",
-    "17489": "view document"
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17520": "Manage links"
 }

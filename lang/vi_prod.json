@@ -711,7 +711,6 @@
     "5738": "Th\u00f9ng r\u00e1c",
     "5775": "\u0110\u00e3 D\u00f9ng",
     "5799": "L\u01b0\u1ee3ng D\u00f9ng",
-    "5801": "\u0111\u00e3 d\u00f9ng",
     "5814": "N\u00e2ng C\u1ea5p T\u00e0i Kho\u1ea3n",
     "5816": "[X] TB",
     "5819": "G\u00f3i PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Tgian h\u1ebft h\u1ea1n %1",
     "8700": "B\u1ed5 Tr\u1ee3 Thunderbird",
     "8726": "M\u1eddi",
-    "8732": "C\u1eadp nh\u1eadt \u0111\u01b0\u1eddng li\u00ean k\u1ebft",
-    "8733": "C\u1eadp nh\u1eadt \u0111\u01b0\u1eddng li\u00ean k\u1ebft",
     "8734": "L\u1ea5y \u0111\u01b0\u1eddng li\u00ean k\u1ebft",
     "8735": "X\u00f3a \u0111\u01b0\u1eddng li\u00ean l\u1ebft",
     "8736": "\u0110\u1eb7t l\u1ea1i ng\u00e0y h\u1ebft h\u1ea1n",
@@ -1540,7 +1537,6 @@
     "16169": "Ng\u00e0y T\u1ea1o",
     "16172": "D\u00e1n nh\u00e3n...",
     "16173": "Ch\u1ecdn m\u00e0u:",
-    "16174": "Ng\u00e0y Ch\u1ec9nh S\u1eeda",
     "16175": "H\u1ea1ng Th\u00e0nh Vi\u00ean h\u1ebft h\u1ea1n v\u00e0o ng\u00e0y",
     "16221": "D\u00e1n nh\u00e3n %1",
     "16222": "Remove label %1",
@@ -1846,5 +1842,8 @@
     "17155": "T\u1ed5ng k\u00edch th\u01b0\u1edbc b\u1ecb chi\u1ebfm d\u1ee5ng b\u1edfi c\u00e1c t\u1ec7p phi\u00ean b\u1ea3n b\u1ea3o l\u01b0u:",
     "17156": "T\u00ean c\u0169 l\u00e0 %1",
     "17398": "Label",
-    "17489": "view document"
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17520": "Manage links"
 }

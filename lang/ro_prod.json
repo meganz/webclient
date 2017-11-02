@@ -711,7 +711,6 @@
     "5738": "Co\u015f de gunoi",
     "5775": "Folosit",
     "5799": "Utilizare",
-    "5801": "folosit",
     "5814": "Upgradeaz\u0103 contul",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Expir\u0103 \u00een %1",
     "8700": "Extensie Thunderbird",
     "8726": "Invit\u0103",
-    "8732": "Actualizeaz\u0103 linkul",
-    "8733": "Actualizeaz\u0103 linkurile",
     "8734": "Ob\u0163ine linkuri",
     "8735": "Elimin\u0103 linkurile",
     "8736": "Seteaz\u0103 data nou\u0103 de expirare",
@@ -1540,7 +1537,6 @@
     "16169": "Data cre\u0103rii",
     "16172": "Etichet\u0103...",
     "16173": "Alege culoarea:",
-    "16174": "Data modific\u0103rii",
     "16175": "Abonamentul expir\u0103 pe",
     "16221": "Adaug\u0103 eticheta %1",
     "16222": "Elimin\u0103 eticheta %1",
@@ -1846,5 +1842,8 @@
     "17155": "Total size taken up by file versions:",
     "17156": "Renamed from %1",
     "17398": "Label",
-    "17489": "view document"
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17520": "Manage links"
 }

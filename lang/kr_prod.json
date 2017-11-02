@@ -711,7 +711,6 @@
     "5738": "\ud734\uc9c0\ud1b5",
     "5775": "\uc0ac\uc6a9\ub428",
     "5799": "\uc0ac\uc6a9\ub7c9",
-    "5801": "\uc0ac\uc6a9\ub428",
     "5814": "\uacc4\uc815 \uc5c5\uadf8\ub808\uc774\ub4dc",
     "5816": "[X] TB",
     "5819": "\ud504\ub85c I",
@@ -1218,8 +1217,6 @@
     "8698": "\ub9cc\ub8cc\uc77c %1",
     "8700": "Thunderbird \ud655\uc7a5\uc790",
     "8726": "\ucd08\ub300",
-    "8732": "\ub9c1\ud06c \uc5c5\ub370\uc774\ud2b8",
-    "8733": "\ub9c1\ud06c \uc5c5\ub370\uc774\ud2b8",
     "8734": "\ub9c1\ud06c \uc5bb\uae30",
     "8735": "\ub9c1\ud06c \uc81c\uac70",
     "8736": "\uc0c8 \ub9cc\ub8cc\uc77c \uc124\uc815",
@@ -1540,7 +1537,6 @@
     "16169": "\uc0dd\uc131\uc77c\uc790                                ",
     "16172": "\ub77c\ubca8...",
     "16173": "\uc0c9\uc0c1 \uc120\ud0dd:",
-    "16174": "\uc218\uc815\uc77c\uc790",
     "16175": "\uad6c\ub3c5 \ub9cc\uae30\uc77c",
     "16221": "%1 \ub77c\ubca8 \ucd94\uac00",
     "16222": "%1 \ub77c\ubca8 \uc81c\uac70",
@@ -1846,5 +1842,8 @@
     "17155": "\ud30c\uc77c \ubc84\uc804\uc73c\ub85c \uc774\uc6a9\uc911\uc778 \ucd1d \uc6a9\ub7c9:",
     "17156": "%1\uc5d0\uc11c \uc774\ub984 \ubcc0\uacbd\ub428",
     "17398": "\ub77c\ubca8",
-    "17489": "\ubb38\uc11c \ubcf4\uae30"
+    "17445": "\ucd94\uac00\uc77c\uc790",
+    "17446": "\uc0dd\uc131\uc77c\uc790",
+    "17489": "\ubb38\uc11c \ubcf4\uae30",
+    "17520": "Manage links"
 }

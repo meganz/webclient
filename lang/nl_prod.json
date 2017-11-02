@@ -711,7 +711,6 @@
     "5738": "Prullenbak",
     "5775": "Gebruikt",
     "5799": "Gebruik",
-    "5801": "gebruikt",
     "5814": "Upgrade Account",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Verloopt %1",
     "8700": "Thunderbird Uitbreiding",
     "8726": "Uitnodigen",
-    "8732": "Update koppeling",
-    "8733": "Update koppelingen",
     "8734": "Haal koppelingen",
     "8735": "Verwijder koppelingen",
     "8736": "Stel nieuwe vervaldatum in",
@@ -1540,7 +1537,6 @@
     "16169": "Datum Gemaakt",
     "16172": "Label...",
     "16173": "Kies kleur:",
-    "16174": "Datum Gewijzigd",
     "16175": "Abonnement Verloopt Op",
     "16221": "Add label %1",
     "16222": "Remove label %1",
@@ -1846,5 +1842,8 @@
     "17155": "Totale ruimte ingenomen door bestandsversies:",
     "17156": "Hernoemd van %1",
     "17398": "Label",
-    "17489": "document weergeven"
+    "17445": "Datum Toegevoegd",
+    "17446": "Datum Gemaakt",
+    "17489": "document weergeven",
+    "17520": "Beheer koppelingen"
 }

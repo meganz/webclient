@@ -711,7 +711,6 @@
     "5738": "Papperskorg",
     "5775": "Anv\u00e4nt",
     "5799": "Anv\u00e4ndning",
-    "5801": "anv\u00e4nt",
     "5814": "Uppgradera Konto",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "utg\u00e5r %1",
     "8700": "Thunderbird Till\u00e4gg",
     "8726": "Bjud in",
-    "8732": "Uppdatera l\u00e4nk",
-    "8733": "Uppdatera l\u00e4nkar",
     "8734": "H\u00e4mta l\u00e4nkar",
     "8735": "Ta bort l\u00e4nkar",
     "8736": "Ange nytt utg\u00e5ngsdatum",
@@ -1540,7 +1537,6 @@
     "16169": "Skapad datum",
     "16172": "Etikett",
     "16173": "V\u00e4lj f\u00e4rg:",
-    "16174": "Senast \u00e4ndrad",
     "16175": "Prenumeration g\u00e5r ut den",
     "16221": "L\u00e4gg till etikett %1",
     "16222": "Ta bort etikett %1",
@@ -1846,5 +1842,8 @@
     "17155": "Total size taken up by file versions:",
     "17156": "Renamed from %1",
     "17398": "Label",
-    "17489": "view document"
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17520": "Manage links"
 }

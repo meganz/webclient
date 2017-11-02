@@ -3330,6 +3330,9 @@ React.makeElement = React['createElement'];
 	                        loadSubPage('fm/' + contact.u);
 	                    } }));
 	            } else if (contact.c === 0) {
+	                if (moreDropdowns.length > 0) {
+	                    moreDropdowns.unshift(React.makeElement("hr", { key: "separator" }));
+	                }
 	                moreDropdowns.unshift(React.makeElement(DropdownsUI.DropdownItem, {
 	                    key: "view", icon: "human-profile", label: __(l[101]), onClick: function onClick() {
 	                        loadingDialog.show();
@@ -3411,13 +3414,13 @@ React.makeElement = React['createElement'];
 	                { className: "user-card-data" },
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-name small" },
+	                    { className: "user-card-name light" },
 	                    this.props.namePrefix ? this.props.namePrefix : null,
 	                    M.getNameByHandle(contact.u)
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-email small" },
+	                    { className: "user-card-email" },
 	                    contact.m
 	                )
 	            )

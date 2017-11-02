@@ -17759,6 +17759,10 @@
         "text": "When you install our mobile app you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. We provide mobiles apps for iOS, Android and Windows Phone.",
         "context": "info paragraph about the achievement install mobile app"
     },
+    "17485": {
+        "text": "You have received %1$s storage space and %2$s transfer quota for installing our MEGA desktop app.",
+        "context": "info paragraph about the completed achievement install megasync"
+    },
     "17486": {
         "text": "You have received %1$s storage space and %2$s transfer quota for installing our mobile app.",
         "context": "info paragraph about the completed achievement install mobile app"
@@ -17851,12 +17855,32 @@
         "text": "Files cannot be used if you have a passcode in MEGA. If you want to use Files, please open MEGA and disable it.",
         "context": "Text shown when you try to use the Files app while having a passcode"
     },
-    "17517": {
-        "text": "used %tq",
-        "context": "used transfer quota of the account - the placeholder represents transfer quota to give context"
+    "17514": {
+        "text": "MEGA accesses your contacts when you select some of them to save\/export.",
+        "context": "Contacts Usage Description. To protect user privacy Apple requires a purpose string explaining why will be accessed."
     },
     "17520": {
         "text": "Manage links",
         "context": "A menu item in the right click context menu in the Cloud Drive. This menu item will take the user to a dialog where they can manage the public folder\/file links which they currently have selected."
+    },
+    "17521": {
+        "text": "The content you are trying to access is not available for this account. Try to login with same account as in the mobile web client.",
+        "context": "Message shown when you're trying to open a file or folder from the mobile webclient and the accounts logged are not the same"
+    },
+    "17522": {
+        "text": "Invite friends and get Bonuses",
+        "context": "Subtitle show on My Account view under the 'Achievements' title to give more details of the section that will appear if tapped 2\/2"
+    },
+    "17523": {
+        "text": "Select contacts from your phone's contact list or enter multiple email addresses.",
+        "context": "Some text shown to explain how and where you can invite friends."
+    },
+    "17524": {
+        "text": "used %tq1",
+        "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[Singular] (=1)\r\n"
+    },
+    "17525": {
+        "text": "used %tq2",
+        "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[pair] (= 2)"
     }
 }

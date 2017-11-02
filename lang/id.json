@@ -4439,6 +4439,7 @@
     "17482": "Email is malformed",
     "17483": "When you install the MEGA desktop app you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. The MEGA desktop app is available for Windows, macOS and most Linux distros.",
     "17484": "When you install our mobile app you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. We provide mobiles apps for iOS, Android and Windows Phone.",
+    "17485": "You have received %1$s storage space and %2$s transfer quota for installing our MEGA desktop app.",
     "17486": "You have received %1$s storage space and %2$s transfer quota for installing our mobile app.",
     "17487": "You have received %1$s storage space as your free registration bonus.",
     "17488": "Bonus expires in %1$d days",
@@ -4462,6 +4463,11 @@
     "17511": "Renews on[W]",
     "17512": "[W]and %d contacts were not successfully removed",
     "17513": "Files cannot be used if you have a passcode in MEGA. If you want to use Files, please open MEGA and disable it.",
-    "17517": "used %tq",
-    "17520": "Manage links"
+    "17514": "MEGA accesses your contacts when you select some of them to save\/export.",
+    "17520": "Manage links",
+    "17521": "The content you are trying to access is not available for this account. Try to login with same account as in the mobile web client.",
+    "17522": "Invite friends and get Bonuses",
+    "17523": "Select contacts from your phone's contact list or enter multiple email addresses.",
+    "17524": "used %tq1",
+    "17525": "used %tq2"
 }

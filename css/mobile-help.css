@@ -237,7 +237,7 @@
 #help2-main .android-mobile-block {
     display: inline-block;
     position: relative;
-    background-image: url(""../images/mega/help2/welcome_icons_v2.png"");
+    background-image: url("../images/mega/help2/welcome_icons_v2.png");
     background-repeat: no-repeat;
     height: 20px;
     background-position: -150px -366px;

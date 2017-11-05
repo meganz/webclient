@@ -1018,7 +1018,14 @@ function renameDialog() {
                 var value = $input.val();
 
                 if (value && n.name && value !== n.name) {
-                    M.rename(n.h, value);
+                    if (M.isSafeName(value)) {
+                        M.rename(n.h, value);
+                    }
+                    else {
+                        $dialog.removeClass('active');
+                        $input.addClass('error');
+                        return;
+                    }
                 }
 
                 closeDialog();
@@ -1054,7 +1061,7 @@ function renameDialog() {
             $dialog.removeClass('focused');
         });
 
-        $input.rebind('click keydown keyup keypress', function (event) {
+        $input.rebind('click keydown', function (event) {
             // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
             if (event.type === 'keydown') {
                 if (event.keyCode === 13) {
@@ -1064,11 +1071,12 @@ function renameDialog() {
             }
             var value = $(this).val();
 
-            if (!value || (!n.t && ext.length > 0 && value === '.' + ext)) {
+            if (!value) {
                 $dialog.removeClass('active');
             }
             else {
                 $dialog.addClass('active');
+                $input.removeClass('error');
             }
             /*if (!n.t && ext.length > 0) {
                 if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {

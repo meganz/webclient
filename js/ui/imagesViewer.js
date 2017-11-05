@@ -410,6 +410,22 @@ var slideshowid;
         api_getfileattr(treq, 1, preview, eot);
     }
 
+    // a method to fetch scripts and files needed to run pdfviewer
+    // and then excute them on iframe element [#pdfpreviewdiv1]
+    function prepareAndViewPdfViewer() {
+        M.require('pdfjs2',  'pdfviewer', 'pdfviewercss', 'pdforiginalviewerjs').done(function () {
+            var myPage = pages['pdfviewer'];
+            myPage = myPage.replace('^$#^1', window['pdfviewercss']);
+            myPage = myPage.replace('^$#^3', window['pdfjs2']);
+            myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
+            $('#pdfpreviewdiv1').removeClass('hidden');
+            var doc = document.getElementById('pdfpreviewdiv1').contentWindow.document;
+            doc.open();
+            doc.write(myPage);
+            doc.close();
+        });
+    }
+
     function previewsrc(id) {
         var $overlay = $('.viewer-overlay');
 
@@ -421,13 +437,20 @@ var slideshowid;
 
         $overlay.find('.viewer-image-bl embed').addClass('hidden');
         $overlay.find('.viewer-image-bl img').removeClass('hidden');
-
+        $('#pdfpreviewdiv1').addClass('hidden');
         if (previews[id].type === 'application/pdf') {
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
             $overlay.find('.viewer-image-bl img').addClass('hidden');
             $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
-            $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);
+            if (ua.details.browser !== 'Edge' && ua.details.engine !== 'Trident' ) { 
+                $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);  
+            }
+            else { // some other browser
+                // to fix pdf compatibility - Bug #7796
+                localStorage.setItem('currPdfPrev2', JSON.stringify(src));
+                prepareAndViewPdfViewer();
+            }
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }

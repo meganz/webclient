@@ -711,7 +711,6 @@
     "5738": "\u00c7\u00f6p kutusu",
     "5775": "Kullan\u0131lan",
     "5799": "Kullan\u0131m",
-    "5801": "kullan\u0131lan",
     "5814": "Hesab\u0131 Y\u00fckselt",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "%1 tarihinde s\u00fcresi dolacak",
     "8700": "Thunderbird Eklentisi",
     "8726": "Davet et",
-    "8732": "Ba\u011flant\u0131y\u0131 g\u00fcncelle",
-    "8733": "Ba\u011flant\u0131lar\u0131 g\u00fcncelle",
     "8734": "Ba\u011flant\u0131lar\u0131 al",
     "8735": "Ba\u011flant\u0131lar\u0131 kald\u0131r",
     "8736": "Yeni vade tarihini se\u00e7in",
@@ -1540,7 +1537,6 @@
     "16169": "Olu\u015fturuldu\u011fu Tarih                                ",
     "16172": "Etiket...",
     "16173": "Renk se\u00e7:",
-    "16174": "Son D\u00fczenlenme",
     "16175": "Aboneli\u011fin Biti\u015f Tarihi",
     "16221": "%1 etiketini ekle",
     "16222": "%1 etiketini \u00e7\u0131kar",
@@ -1845,5 +1841,10 @@
     "17154": "1 dosyan\u0131n s\u00fcr\u00fcm ge\u00e7mi\u015fini silmek \u00fczeresiniz. Dosyan\u0131n \u015eu anki dosyan\u0131n silinmeyece\u011fini unutmay\u0131n.Devam etmek ister misiniz?",
     "17155": "Dosya s\u00fcr\u00fcmlerinin kaplad\u0131\u011f\u0131 toplam boyut:",
     "17156": "%1 iken yeniden adland\u0131r\u0131ld\u0131",
-    "17398": "Etiket"
+    "17398": "Etiket",
+    "17445": "Eklendi\u011fi Tarih",
+    "17446": "Olu\u015fturulma Tarihi",
+    "17489": "belgeyi g\u00f6r\u00fcnt\u00fcle",
+    "17517": "kullan\u0131lan %tq",
+    "17520": "Ba\u011flant\u0131lar\u0131 y\u00f6net"
 }

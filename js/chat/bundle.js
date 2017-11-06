@@ -3349,6 +3349,9 @@ React.makeElement = React['createElement'];
 	                        loadSubPage('fm/' + contact.u);
 	                    } }));
 	            } else if (contact.c === 0) {
+	                if (moreDropdowns.length > 0) {
+	                    moreDropdowns.unshift(React.makeElement("hr", { key: "separator" }));
+	                }
 	                moreDropdowns.unshift(React.makeElement(DropdownsUI.DropdownItem, {
 	                    key: "view", icon: "human-profile", label: __(l[101]), onClick: function onClick() {
 	                        loadingDialog.show();
@@ -3430,13 +3433,13 @@ React.makeElement = React['createElement'];
 	                { className: "user-card-data" },
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-name small" },
+	                    { className: "user-card-name light" },
 	                    this.props.namePrefix ? this.props.namePrefix : null,
 	                    M.getNameByHandle(contact.u)
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-email small" },
+	                    { className: "user-card-email" },
 	                    contact.m
 	                )
 	            )
@@ -6193,7 +6196,8 @@ React.makeElement = React['createElement'];
 	        var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
 
 	        if (self.props.sortBy[0] === self.props.id) {
-	            classes += " " + self.props.sortBy[1];
+	            var ordClass = self.props.sortBy[1] == "desc" ? "asc" : "desc";
+	            classes = classes + " " + ordClass;
 	        }
 	        return React.makeElement(
 	            "th",
@@ -6741,7 +6745,7 @@ React.makeElement = React['createElement'];
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog-empty-header" },
-	                        __(l[782])
+	                        self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]
 	                    )
 	                )
 	            );
@@ -6838,10 +6842,6 @@ React.makeElement = React['createElement'];
 	            sortFunc = M.getSortByFavFn();
 	        }
 
-	        entries.sort(function (a, b) {
-	            return sortFunc(a, b, order);
-	        });
-
 	        var folders = [];
 
 	        for (var i = entries.length; i--;) {
@@ -6850,6 +6850,14 @@ React.makeElement = React['createElement'];
 	                entries.splice(i, 1);
 	            }
 	        }
+
+	        folders.sort(function (a, b) {
+	            return sortFunc(a, b, order);
+	        });
+
+	        entries.sort(function (a, b) {
+	            return sortFunc(a, b, order);
+	        });
 
 	        return folders.concat(entries);
 	    },

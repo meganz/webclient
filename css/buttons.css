@@ -24,15 +24,18 @@
     padding: 0;
     border: 0;
 }
-.button input[type=file], .button input[type=file]::-webkit-file-upload-button {
- cursor: pointer;
+.button input[type=file] {
+     cursor: pointer;
 }
+.button input[type=file]::-webkit-file-upload-button {
+    cursor: pointer;
+}    
 .link-button {
     display: block;
     cursor: pointer;
     font-size: 13px;
     line-height: 20px;
-    color: #777777;
+    color: #666666;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -46,7 +49,7 @@
     transition: all 200ms ease-in-out;
 }
 .link-button:hover {
-    color: #555555;
+    color: #444444;
 }
 .link-button.right {
     margin-left: 27px;
@@ -331,7 +334,7 @@
     opacity: 0.6;
 }
 .icon-dropdown:not(.disabled):hover, .icon-dropdown.active {
-    background-image: url(../images/mega/new-chat-sprite-v5.svg);
+    background-image: url(../images/mega/new-chat-sprite-v6.svg);
     background-repeat: no-repeat;
     background-position: -64px -657px;
 }
@@ -558,20 +561,20 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
     height: 64px;
     text-align: center;
     cursor: pointer;
-    background-color: rgba(217,0,7,0.7);
+    background-color: #F0373B;
     position: relative;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
+    -webkit-transition: background-color 200ms ease-in-out;
+    -moz-transition: background-color 200ms ease-in-out;
+    -o-transition: background-color 200ms ease-in-out;
+    -ms-transition: background-color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     white-space: nowrap;
 }
 .default-huge-button:not(.disabled):hover {
-    background-color: rgba(217,0,7,1);
+    background-color: #E12124;
 }
 .default-huge-button i {
     margin: 19px 20px 0 0;

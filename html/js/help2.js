@@ -50,28 +50,32 @@ var Help = (function() {
     }
 
     function searchAnimations() {
-        var buttons = $('.support-search,.support-go-back');
-        buttons.rebind('mouseover', function() {
-            $(this).addClass('hover');
-        }).rebind('mouseout', function() {
-            $(this).removeClass('hover');
+        var topPos = 0;
+        var $container = $('#help2-main');
+
+        $('.close-icon', $container).rebind('click', function() {
+
+            $container.removeClass('search-overlay');
+            $('.fmholder').scrollTop(topPos);
         });
 
-        $('.support-search').rebind('click', function(e) {
+        $('.support-search', $container).rebind('click', function(e) {
             e.preventDefault();
-            var $container = $('#help2-main');
 
             if ($container.hasClass('search-overlay')) {
                 $container.removeClass('search-overlay');
+                $('.fmholder').scrollTop(topPos);
             }
             else {
+                topPos = $('.fmholder').scrollTop();
                 $container.addClass('search-overlay');
+                $('.fmholder').scrollTop(0);
             }
         });
     }
 
     function url() {
-        return 'help/' + toArray.apply(null, arguments).join("/");
+        return 'help/' + toArray.apply(null, arguments).join('/');
     }
 
     function selectMenuItem($element, $elements) {
@@ -101,7 +105,7 @@ var Help = (function() {
                 page = newpage;
 
                 try {
-                    history.pushState({subpage: newpage}, "", "/" + newpage);
+                    history.pushState({subpage: newpage}, '', '/' + newpage);
                 }
                 catch (ex) {
                     skipHashChange = true;
@@ -172,17 +176,19 @@ var Help = (function() {
     }
 
     function patchLinks() {
-        $('.d-section-items a, .popular-question-items a').each(function(i,el) {
+        $('.d-section-items a, .popular-question-items a, .related-articles-list a').each(function(i,el) {
             var url = $(el).attr('href') || $(el).data('fxhref');
 
             if (url) {
                 $(el).attr('href', String(url).replace('#', '/'));
             }
         });
-        $('.d-section-items a, .popular-question-items a').rebind('click',function(e) {
+        $('.d-section-items a, .popular-question-items a, .related-articles-list a').rebind('click', function() {
             var url = $(this).attr('href') || $(this).data('fxhref');
             if (url) {
                 loadSubPage(url);
+                initScrollDownToQuestionId(url);
+
                 return false;
             }
         });
@@ -191,13 +197,13 @@ var Help = (function() {
     function sidebars() {
 
         var $container = $('#help2-main');
-        var $deviceTop = $(".device-selector-top", $container);
-        var $deviceIcon = $(".device-menu-icon", $container);
-        var $deviceMenu = $(".device-selector", $container);
-        var $articleSlider = $(".sidebar-menu-slider", $container);
-        var $articleList = $(".sidebar-menu-link:hover", $container);
+        var $deviceTop = $('.device-selector-top', $container);
+        var $deviceIcon = $('.device-menu-icon', $container);
+        var $deviceMenu = $('.device-selector', $container);
+        var $articleSlider = $('.sidebar-menu-slider', $container);
+        var $articleList = $('.sidebar-menu-link:hover', $container);
         var $deviceHover = $('.device-container-hover', $container);
-        var $tagContainer = $(".sidebar-tags-container", $container);
+        var $tagContainer = $('.sidebar-tags-container', $container);
         var $deviceSelect = $('.device-select', $container);
 
         $container.find('form').rebind('submit', function(e) {
@@ -206,7 +212,7 @@ var Help = (function() {
             // Log search submitted
             api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
 
-            loadSubPage(url("search", $(this).find('input[type="text"]').val()));
+            loadSubPage(url('search', $(this).find('input[type="text"]').val()));
         });
 
         $container.find('form input[type=text]').each(function() {
@@ -233,7 +239,7 @@ var Help = (function() {
                 var $label = $('<span>').addClass('label-text').text(item.label);
 
                 return $('<li>')
-                    .attr("data-value", item.value)
+                    .attr('data-value', item.value)
                     .append($icon)
                     .append($label)
                     .appendTo(ul);
@@ -254,28 +260,28 @@ var Help = (function() {
         $deviceMenu.rebind('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            if ($deviceMenu.is(":visible")){
-                $deviceMenu.fadeOut(1000, "easeOutQuart");
-                $deviceHover.fadeIn(500, "easeOutQuart");
+            if ($deviceMenu.is(':visible')){
+                $deviceMenu.fadeOut(1000, 'easeOutQuart');
+                $deviceHover.fadeIn(500, 'easeOutQuart');
                 $deviceIcon.rotate(180, 0, 300, 'easeOutQuint').css('backgroundPosition', '-133px -307px');
-                $articleSlider.css({"opacity":".1", "cursor":"default"});
-                $tagContainer.css({"opacity":".1", "cursor":"default"});
+                $articleSlider.css({'opacity':'.1', 'cursor':'default'});
+                $tagContainer.css({'opacity':'.1', 'cursor':'default'});
                 $articleList.unbind('mouseenter mouseleave');
             } else {
                 $deviceIcon.rotate(0, 180, 300, 'easeOutQuint').css('backgroundPosition', '-133px -339px');
-                $deviceTop.fadeOut(500, "easeOutQuart");
-                $articleSlider.css({"opacity":"1", "cursor":"pointer"});
-                $tagContainer.css({"opacity":"1", "cursor":"default"});
+                $deviceTop.fadeOut(500, 'easeOutQuart');
+                $articleSlider.css({'opacity':'1', 'cursor':'pointer'});
+                $tagContainer.css({'opacity':'1', 'cursor':'default'});
                 $articleList.bind('mouseenter mouseleave');
             }
         });
 
         $(document).rebind('click.deviceHover', function() {
-            if ($deviceHover.is(":visible")){
-                $deviceHover.fadeOut(500, "easeOutQuart");
-                $deviceMenu.fadeIn(500, "easeOutQuart");
-                $articleSlider.css({"opacity":"1", "cursor":"pointer"});
-                $tagContainer.css({"opacity":"1", "cursor":"default"});
+            if ($deviceHover.is(':visible')){
+                $deviceHover.fadeOut(500, 'easeOutQuart');
+                $deviceMenu.fadeIn(500, 'easeOutQuart');
+                $articleSlider.css({'opacity':'1', 'cursor':'pointer'});
+                $tagContainer.css({'opacity':'1', 'cursor':'default'});
                 $deviceIcon.rotate(0, 180, 400, 'easeOutQuint');
             }
         });
@@ -315,7 +321,7 @@ var Help = (function() {
                         data[val.name] = val.value;
                     });
 
-                $.post("https://cms2.mega.nz/feedback", data);
+                $.post('https://cms2.mega.nz/feedback', data);
                 sent($this.parents('.article-feedback-container'));
 
             });
@@ -326,7 +332,7 @@ var Help = (function() {
             $this.find('.icon').animate({marginTop: 1}, 200, 'easeOutQuint')
                          .animate({marginTop: 6}, 200, 'easeOutQuint');
 
-            $.post("https://cms2.mega.nz/feedback", {hash: $this.data('hash')});
+            $.post('https://cms2.mega.nz/feedback', {hash: $this.data('hash')});
             sent($this.parents('.article-feedback-container'));
         });
 
@@ -346,8 +352,8 @@ var Help = (function() {
     function homepageinteraction() {
 
         var $container = $('#help2-main');
-        var $mobileDeviceBlock = $(".block-mobile-device", $container);
-        var $mobileNavBlock = $(".mobile-block", $container);
+        var $mobileDeviceBlock = $('.block-mobile-device', $container);
+        var $mobileNavBlock = $('.mobile-block', $container);
         var timer;
 
         $mobileNavBlock
@@ -365,20 +371,20 @@ var Help = (function() {
     function searchBarInteraction() {
 
         var $container = $('#help2-main');
-        var $inputSearch = $("input.search", $container);
-        var $sideBar = $(".sidebar-menu-container", $container);
-        var $autoSuggestContainer = $(".ui-autocomplete", $container);
-        var $popularQuestions = $(".search-section .popular-question-block");
+        var $inputSearch = $('input.search', $container);
+        var $sideBar = $('.sidebar-menu-container', $container);
+        var $autoSuggestContainer = $('.ui-autocomplete', $container);
+        var $popularQuestions = $('.search-section .popular-question-block');
 
         $inputSearch.on('focus', function () {
-            $sideBar.animate({opacity:'0.6'}, 300, "easeOutQuart");
-            $popularQuestions.animate({opacity:'0.3'}, 400, "easeOutQuart");
-            $autoSuggestContainer.animate({marginTop: 72 }, 100, "easeOutQuart");
+            $sideBar.animate({opacity:'0.6'}, 300, 'easeOutQuart');
+            $popularQuestions.animate({opacity:'0.3'}, 400, 'easeOutQuart');
+            $autoSuggestContainer.animate({marginTop: 72 }, 100, 'easeOutQuart');
         });
 
         $inputSearch.on('blur', function () {
-            $sideBar.animate({opacity:'1'}, 200, "easeOutQuart");
-            $popularQuestions.animate({opacity:'1'}, 200, "easeOutQuart");
+            $sideBar.animate({opacity:'1'}, 200, 'easeOutQuart');
+            $popularQuestions.animate({opacity:'1'}, 200, 'easeOutQuart');
         });
     }
 
@@ -387,36 +393,12 @@ var Help = (function() {
     function headerInteraction() {
 
         var $container = $('#help2-main');
-        var $goBackContainer = $(".support-go-back", $container);
-        var $goBackArrow = $(".support-go-back-icon", $container);
-        var $searchContainer = $(".support-search", $container);
-        var $searchMagnifyGlass = $(".support-search-icon", $container);
-        var $sideBar = $(".sidebar-menu-container", $container);
+        var $sideBar = $('.sidebar-menu-container', $container);
         var $mainTitleSection = $('.main-title-section', $container);
-        var $searchHeader = $(".support-section-header", $container);
-        var $cloneHeader = $(".support-section-header-clone", $container);
-        var $closeIcon = $(".close-icon", $container);
-        var $getStartTitle = $(".getstart-title-section", $container);
+        var $searchHeader = $('.support-section-header', $container);
+        var $cloneHeader = $('.support-section-header-clone', $container);
         var $elements = $('.updateSelected:visible', $container);
         var timer;
-
-        // Arrow Animation for Go back block
-        $goBackContainer
-            .rebind('mouseenter', function() {
-                timer = setTimeout(function() {
-                    $goBackArrow.animate({marginRight: 8}, 300, "easeOutQuart");
-                }, 300);
-            })
-            .rebind('mouseleave', function() {
-                clearTimeout(timer);
-                $goBackArrow.animate({marginRight: 16}, 300, "easeOutQuart");
-            });
-
-        $closeIcon.rebind('click', function() {
-            var $container = $('#help2-main');
-
-            $container.removeClass('search-overlay');
-        });
 
         $searchHeader.fadeIn();
         $cloneHeader.fadeOut();
@@ -447,45 +429,12 @@ var Help = (function() {
                 $sideBar.removeAttr('style').removeClass('fixed');
             }
 
-            if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
-                $cloneHeader.css('top', topPos + 60 + 'px').addClass('fixed');
-            }
-            else {
-                $cloneHeader.removeClass('fixed');
-            }
-
-            <!-- Search header !-->
-            if (topPos > 210) {
-                $searchHeader.fadeOut(10);
-                $cloneHeader.fadeIn(300);
-            }
-            else {
-                $searchHeader.fadeIn(300);
-                $cloneHeader.fadeOut(10);
-            }
         });
-
-        $searchContainer
-            .rebind('mouseenter', function() {
-                timer = setTimeout(function() {
-                    $searchMagnifyGlass.animate({
-                        marginLeft: "8",
-                        marginRight: "8"
-                    }, 300, "easeOutQuart");
-                }, 300);
-            })
-            .rebind('mouseleave', function() {
-                clearTimeout(timer);
-                $searchMagnifyGlass.animate({
-                    marginLeft: "16",
-                    marginRight: "0"
-                }, 300, "easeOutQuart");
-            });
     }
 
 
     var urls = {
-        "search": function(args) {
+        'search': function(args) {
             var searchTerm = String(args[1]);
 
             if (searchTerm.indexOf('%25') >= 0) {
@@ -498,7 +447,7 @@ var Help = (function() {
             }
             catch (e) {}
 
-            var sText = searchTerm.replace(/[+-]/g, " ");;
+            var sText = searchTerm.replace(/[+-]/g, ' ');
             var search = sText.replace(/%([0-9a-f]+)/g, function(all, number) {
                 return String.fromCharCode(parseInt(number, 16));
             });
@@ -525,8 +474,8 @@ var Help = (function() {
             }
 
             articles.reverse().map(function(article) {
-                var $article = $('<div>').addClass("search-result link content-by-tags")
-                    .data('href', "help/client/" + article.id)
+                var $article = $('<div>').addClass('search-result link content-by-tags')
+                    .data('href', 'help/client/' + article.id)
                     .data('tags', article.tags.map(function(w) { return tagUri(w); }));
 
                 $('<div>').addClass('search-result-title')
@@ -559,12 +508,12 @@ var Help = (function() {
                 $('<div>').addClass('tag-' + tag.tag)
                     .addClass('support-tag real-time-filter')
                     .data('tag', tag.tag)
-                    .text(tag.text + " " + tag.count)
+                    .text(tag.text + ' ' + tag.count)
                     .appendTo('.sidebar-tags-container');
             });
 
         },
-        "client": function(args) {
+        'client': function(args) {
             if (args[1] === 'mobile') {
                 args[1] = 'android';
                 loadSubPage(url.apply(null, args));
@@ -572,12 +521,12 @@ var Help = (function() {
             }
 
             args.shift();
-            var question = "";
+            var question = '';
             if (args.length === 3 || args.length === 2) {
                 question = args.pop();
                 if (args.length === 2) {// if this a question.
-                    if (question.lastIndexOf("-") !== -1) {
-                        question = question.substring(question.lastIndexOf("-") + 1);
+                    if (question.lastIndexOf('-') !== -1) {
+                        question = question.substring(question.lastIndexOf('-') + 1);
                     }
                 }
             } else if (args.length !== 1) {
@@ -587,7 +536,7 @@ var Help = (function() {
 
 
 
-            var data = Data["help_" + args.join("_")];
+            var data = Data['help_' + args.join('_')];
             if (!data) {
                 loadSubPage('help');
                 return;
@@ -601,7 +550,7 @@ var Help = (function() {
                 var newpage = 'support';
                 if (!u_type) {
                     login_next = newpage;
-                    newpage = "login";
+                    newpage = 'login';
                 }
                 loadSubPage(newpage);
             });
@@ -641,7 +590,7 @@ var Help = (function() {
                 }, 400);
             }
         },
-        "welcome": function welcome(args) {
+        'welcome': function welcome() {
             parsepage(Data.help_index.html);
         }
     };
@@ -670,7 +619,7 @@ var Help = (function() {
         }
 
         // init page here instead with page set as 'help' ?!
-        // document.location.href = "#help";
+        // document.location.href = '#help';
         //loadSubPage('help');
     }
 
@@ -697,13 +646,70 @@ var Help = (function() {
         return args[0][0];
     }
 
+    /**
+     * Initialises scrolling the view down to the specific question
+     * @param {String} url The URL the user clicked on, or from the address bar
+     */
+    function initScrollDownToQuestionId(url) {
+
+        // Only used for mobile, the desktop site has another method to scroll to the question
+        if (!is_mobile) {
+            return false;
+        }
+
+        // Find all the images in the page which are visible
+        var visibleImages = $('.img-active');
+
+        // If there are no images, scroll to the question based on the URL immediately
+        if (visibleImages.length === 0) {
+            scrollDownToQuestionId(url);
+        }
+        else {
+            // Once all the images have loaded, scroll to the question
+            $('.img-active').off('load.helpImagesLoad').on('load.helpImagesLoad', function() {
+
+                // Scroll to the question
+                scrollDownToQuestionId(url);
+            });
+        }
+    }
+
+    /**
+     * Scrolls the view down to the specific question
+     * @param {String} url The URL the user clicked on, or from the address bar
+     */
+    function scrollDownToQuestionId(url) {
+
+        // On page refresh, get the element id of the question from the end of the URL
+        // The id on the end is usually in a URL like /where-can-i-find-my-recovery-key-577360fe886688e7028b45e7
+        var idStartIndex = String(url).lastIndexOf('-');
+
+        // Check it found the '-' character or exit
+        if (idStartIndex === -1) {
+            return false;
+        }
+
+        // Get the question id
+        var questionElementId = url.substr(idStartIndex + 1);
+
+        // Check that the id is 24 characters long or exit
+        // Without this check it will break on URL /help/client/ios/getting-started
+        if (questionElementId.length !== 24) {
+            return false;
+        }
+
+        // Scroll to the start of the question
+        $('html, body').animate({
+            scrollTop: $('#' + questionElementId).offset().top
+        }, 200);
+    }
 
     ns.loadfromCMS = function(callback)
     {
-        CMS.index("help_" + lang, function(err, blobs)
+        CMS.index('help_' + lang, function(err, blobs)
         {
             if (err) {
-                return alert("Invalid response from the server");
+                return alert('Invalid response from the server');
             }
 
             for (var name in blobs) {
@@ -716,7 +722,7 @@ var Help = (function() {
             titles = blobs.help_search.object.map(function(entry) {
                 entry.label = entry.title;
                 entry.value = entry.title;
-                entry.url   = "help/client/" + entry.id;
+                entry.url   = 'help/client/' + entry.id;
                 return entry;
             });
 
@@ -734,7 +740,7 @@ var Help = (function() {
             Data.help_search.object.map(function(obj, id) {
                 obj.pos = id;
                 obj.tags = obj.tags.split(/, /);
-                obj.indexedTitle = obj.title.split("").join(" ");
+                obj.indexedTitle = obj.title.split('').join(' ');
                 idx.search.addDoc(obj);
             });
 
@@ -793,7 +799,7 @@ var Help = (function() {
                 var url = getCleanSitePath($this.data('href').replace('https://mega.nz', ''));
                 if (url === 'support' && !u_type) {
                     login_next = url;
-                    url = "login";
+                    url = 'login';
                 }
                 // Log that they clicked on the panel
                 api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
@@ -812,6 +818,12 @@ var Help = (function() {
                 $('.bottom-pages .fmholder').stop().animate({
                     scrollTop: $target.position().top - 20
                 }, 1000);
+            }
+
+            // Fix for sidebar articles was not working on mobile wide screen
+            if (is_mobile) {
+                var url = $this.attr('data-state');
+                scrollDownToQuestionId(url);
             }
         });
 
@@ -882,6 +894,11 @@ var Help = (function() {
             }
         });
 
+        // Update header text
+        $('.mobile.main-top-header-text').text(l[384]);
+
+        // On page load, scroll to the question id based on the URL
+        initScrollDownToQuestionId(page);
     };
 
     return ns;

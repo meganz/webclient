@@ -61,7 +61,7 @@
     margin: 0 8px;
     padding: 0 15px;
     display: inline-block;
-    background-color: rgba(102,102,102,0.7);
+    background-color: #777777;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -81,14 +81,14 @@
     transition: background-color 200ms ease-in-out;
 }
 .startpage.button-48-height:hover {
-    background-color: rgba(102,102,102,1);
+    background-color: #666666;
 }
 .startpage.button-48-height.red {
-    background-color: rgba(217,0,7,0.7);
+    background-color: #F0373B;
 }
 
 .startpage.button-48-height.red:hover {
-    background-color: rgba(217,0,7,1);
+    background-color: #E12124;
 }
 .startpage.white-question {
     width: 18px;

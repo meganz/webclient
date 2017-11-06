@@ -18,7 +18,7 @@
 .messages-block {
     height: 100%;
     position: relative;
-    background-color: #fafafa;
+    background-color: #FFFFFF;
     margin-right: 256px;
     overflow: hidden;
 }
@@ -26,22 +26,6 @@
     height: -webkit-calc(100% - 38px);
     height: -moz-calc(100% - 38px);
     height: calc(100% - 38px);
-}
-.messages-block::before {
-    display: block;
-    content: '';
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    height: 390px;
-    background: #fafafa;
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlZWVlZWUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-    background: -moz-linear-gradient(top, #fafafa 0%, #eeeeee 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fafafa), color-stop(100%, #eeeeee));
-    background: -webkit-linear-gradient(top, #fafafa 0%, #eeeeee 100%);
-    background: -o-linear-gradient(top, #fafafa 0%, #eeeeee 100%);
-    background: -ms-linear-gradient(top, #fafafa 0%, #eeeeee 100%);
-    background: linear-gradient(to bottom, #fafafa 0%, #eeeeee 100%);
 }
 .messages-block.small-block {
     height: 240px;
@@ -130,7 +114,10 @@
     margin: 2px 0 0 0;
 }
 .message.text-block {
-    margin: 1px 30px 0 0;
+    font-size: 14px;
+    line-height: 24px;
+    color: #333333;
+    margin: -1px 30px 0 0;
     word-wrap: break-word;
     min-height: 20px;
     position: relative;
@@ -168,7 +155,7 @@
 }
 .message.date-time {
     font-size: 13px;
-    line-height: 18px;
+    line-height: 20px;
     display: inline-block;
     vertical-align: top;
     padding-top: 1px;
@@ -181,7 +168,9 @@
 .message.user-card-name {
     display: inline-block;
     padding: 0 10px 0 0;
-    color: rgba(51,51,51,0.84);
+    color: rgba(17,17,17,0.84);
+    font-size: 15px;
+    line-height: 20px;
     vertical-align: top;
     height: 20px;
     max-width: -webkit-calc(100% - 60px);
@@ -192,7 +181,7 @@
     font-size: 16px;
     line-height: 18px;
     color: #2BA6DE;
-    padding: 24px 0 0 71px;
+    padding: 36px 0 3px 71px;
     font-family: 'source_sans_prosemibold';
 }
 .message.shared-info {

@@ -711,7 +711,6 @@
     "5738": "\u05e4\u05d7 \u05de\u05d7\u05d6\u05d5\u05e8",
     "5775": "\u05e9\u05d5\u05de\u05e9",
     "5799": "\u05e9\u05d9\u05de\u05d5\u05e9",
-    "5801": "\u05e9\u05d5\u05de\u05e9",
     "5814": "\u05e9\u05d3\u05e8\u05d2 \u05d7\u05e9\u05d1\u05d5\u05df",
     "5816": "[X] \u05d8\u05e8\u05d4 \u05d1\u05d9\u05d9\u05d8",
     "5819": "PRO 1",
@@ -1218,8 +1217,6 @@
     "8698": "\u05e4\u05d2 \u05ea\u05d5\u05e7\u05e3 %1",
     "8700": "\u05d4\u05e8\u05d7\u05d1\u05d4 \u05dc\u05ea'\u05e0\u05d3\u05e8\u05d1\u05d9\u05e8\u05d3 (Thunderbird)",
     "8726": "\u05d4\u05d6\u05de\u05df",
-    "8732": "\u05e2\u05d3\u05db\u05df \u05e7\u05d9\u05e9\u05d5\u05e8",
-    "8733": "\u05e2\u05d3\u05db\u05df \u05e7\u05d9\u05e9\u05d5\u05e8\u05d9\u05dd",
     "8734": "\u05e7\u05d1\u05dc \u05e7\u05d9\u05e9\u05d5\u05e8",
     "8735": "\u05de\u05d7\u05e7 \u05e7\u05d9\u05e9\u05d5\u05e8\u05d9\u05dd",
     "8736": "\u05e7\u05d1\u05e2 \u05ea\u05d0\u05e8\u05d9\u05da \u05e4\u05e7\u05d9\u05e2\u05ea \u05ea\u05d5\u05e7\u05e3 \u05d7\u05d3\u05e9",
@@ -1540,7 +1537,6 @@
     "16169": "\u05ea\u05d0\u05e8\u05d9\u05da \u05d9\u05e6\u05d9\u05e8\u05d4",
     "16172": "\u05ea\u05d2\u05d9\u05ea...",
     "16173": "\u05d1\u05d7\u05e8 \u05e6\u05d1\u05e2:",
-    "16174": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e9\u05d9\u05e0\u05d5\u05d9",
     "16175": "\u05d4\u05de\u05e0\u05d5\u05d9 \u05e4\u05d2 \u05ea\u05d5\u05e7\u05e3 \u05d1-",
     "16221": "\u05d4\u05d5\u05e1\u05e3 \u05ea\u05d5\u05d5\u05d9\u05ea %1",
     "16222": "\u05de\u05d7\u05e7 \u05ea\u05d5\u05d5\u05d9\u05ea %1",
@@ -1845,5 +1841,10 @@
     "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
     "17155": "Total size taken up by file versions:",
     "17156": "Renamed from %1",
-    "17398": "Label"
+    "17398": "Label",
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17517": "used %tq",
+    "17520": "Manage links"
 }

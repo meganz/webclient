@@ -377,8 +377,20 @@ var slideshowid;
             if (!preqs[n.h]) {
                 preqs[n.h] = 1;
 
-                M.gfsfetch(n.h, 0, -1).done(function(data) {
+                M.gfsfetch(n.link || n.h, 0, -1).done(function(data) {
                     preview({type: 'application/pdf'}, n.h, data.buffer);
+                }).fail(function(ev) {
+                    if (d) {
+                        console.warn('Failed to retrieve PDF, failing back to broken eye image...', ev);
+                    }
+
+                    var svg = decodeURIComponent(noThumbURI.substr(noThumbURI.indexOf(',') + 1));
+                    var u8 = new Uint8Array(svg.length);
+                    for (var i = svg.length; i--;) {
+                        u8[i] = svg.charCodeAt(i);
+                    }
+                    previewimg(n.h, u8, 'image/svg+xml');
+                    delete previews[n.h].buffer;
                 });
             }
             return false;
@@ -398,6 +410,22 @@ var slideshowid;
         api_getfileattr(treq, 1, preview, eot);
     }
 
+    // a method to fetch scripts and files needed to run pdfviewer
+    // and then excute them on iframe element [#pdfpreviewdiv1]
+    function prepareAndViewPdfViewer() {
+        M.require('pdfjs2',  'pdfviewer', 'pdfviewercss', 'pdforiginalviewerjs').done(function () {
+            var myPage = pages['pdfviewer'];
+            myPage = myPage.replace('^$#^1', window['pdfviewercss']);
+            myPage = myPage.replace('^$#^3', window['pdfjs2']);
+            myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
+            $('#pdfpreviewdiv1').removeClass('hidden');
+            var doc = document.getElementById('pdfpreviewdiv1').contentWindow.document;
+            doc.open();
+            doc.write(myPage);
+            doc.close();
+        });
+    }
+
     function previewsrc(id) {
         var $overlay = $('.viewer-overlay');
 
@@ -409,13 +437,20 @@ var slideshowid;
 
         $overlay.find('.viewer-image-bl embed').addClass('hidden');
         $overlay.find('.viewer-image-bl img').removeClass('hidden');
-
+        $('#pdfpreviewdiv1').addClass('hidden');
         if (previews[id].type === 'application/pdf') {
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
             $overlay.find('.viewer-image-bl img').addClass('hidden');
             $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
-            $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);
+            if (ua.details.browser !== 'Edge' && ua.details.engine !== 'Trident' ) { 
+                $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);  
+            }
+            else { // some other browser
+                // to fix pdf compatibility - Bug #7796
+                localStorage.setItem('currPdfPrev2', JSON.stringify(src));
+                prepareAndViewPdfViewer();
+            }
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }
@@ -434,6 +469,9 @@ var slideshowid;
             $overlay.find('.viewer-image-bl').removeClass('hidden');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
+        };
+        img.onerror = function(ev) {
+            console.error('Preview image error', ev);
         };
         img.src = src;
     }
@@ -456,7 +494,8 @@ var slideshowid;
             blob: blob,
             type: type,
             time: Date.now(),
-            src: myURL.createObjectURL(blob)
+            src: myURL.createObjectURL(blob),
+            buffer: uint8arr.buffer || uint8arr
         };
 
         if (id === slideshowid) {

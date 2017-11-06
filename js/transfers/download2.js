@@ -1518,7 +1518,6 @@ var dlmanager = {
             delete this.onLimitedBandwidth;
         };
 
-        $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
         flags = flags !== undefined ? flags : this.lmtUserFlags;
 
         if (d) {
@@ -1576,7 +1575,6 @@ var dlmanager = {
             return;
         }
 
-        $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
         $dialog
             .removeClass('registered achievements exceeded pro slider')
             .find('.transfer-overquota-txt')
@@ -1634,8 +1632,6 @@ var dlmanager = {
                 $('.fm-dialog-overlay').unbind('click.dloverq');
                 $dialog.unbind('dialog-closed');
                 closeDialog();
-            $('.fm-dialog.arrange-to-back, .overlay.arrange-to-back')
-                .removeClass('arrange-to-back');
                 return false;
             };
             dlmanager._overquotaInfo();

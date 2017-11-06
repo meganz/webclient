@@ -153,7 +153,7 @@
     height: 32px;
     font-size: 13px;
     line-height: 31px;
-    color: #777777;
+    color: #666666;
     -webkit-transition: all 100ms ease-in-out;
     -moz-transition: all 100ms ease-in-out;
     -o-transition: all 100ms ease-in-out;
@@ -190,12 +190,20 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v9.png);
+    background-image: url(../images/mega/icons-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
+    -moz-opacity: 0.73;
+    -khtml-opacity: 0.73;
+    opacity: 0.73;
 }
 .dropdown-item.contains-submenu:hover::before, .dropdown-item.contains-submenu.opened::before {
     background-position: -146px -254px;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
 }
 .dropdown-item.tick-item {
     padding-right: 24px;
@@ -226,8 +234,19 @@
     color: white;
 }
 .dropdown-item i {
-    margin: 0 9px 1px 0;
+    margin: 6px 9px 1px 0;
     vertical-align: middle;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
+    -moz-opacity: 0.73;
+    -khtml-opacity: 0.73;
+    opacity: 0.73;
+    float: left;
+}
+.dropdown-item:hover > i, .dropdown-item.opened > i, .dropdown-item.red i, .dropdown-item.do-sort i {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
 }
 .dropdown-items-info {
     font-size: 13px;
@@ -372,7 +391,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     line-height: 31px;
 }
 .context .small-icon {
-    margin: 0 13px 1px 1px;
+    margin: 6px 13px 1px 1px;
+    float: left;
 }
 .dropdown.submenu.labels {
     width: 216px;
@@ -442,7 +462,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v9.png);
+    background-image: url(../images/mega/icons-sprite_v10.png);
     background-position: 2px -532px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;

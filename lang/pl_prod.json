@@ -711,7 +711,6 @@
     "5738": "Kosz",
     "5775": "U\u017cyte",
     "5799": "Zu\u017cycie",
-    "5801": "u\u017cyte",
     "5814": "Zmie\u0144 konto",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Wygasa %1",
     "8700": "Rozszerzenia dla Thunderbird",
     "8726": "Zaproszenie",
-    "8732": "Uaktualnij link",
-    "8733": "Uaktualnij linki",
     "8734": "Pobierz linki",
     "8735": "Usu\u0144 linki",
     "8736": "Ustaw now\u0105 dat\u0119 wyga\u015bni\u0119cia",
@@ -1540,7 +1537,6 @@
     "16169": "Data utworzenia",
     "16172": "Etykieta...",
     "16173": "Wybierz kolor:",
-    "16174": "Data modyfikacji",
     "16175": "Subskrypcja wygasa w:",
     "16221": "Dodaj etykiet\u0119 %1",
     "16222": "Usu\u0144 etykiet\u0119 %1",
@@ -1845,5 +1841,10 @@
     "17154": "Masz zamiar usun\u0105\u0107 wersj\u0119 zapisu 1 pliku. Pami\u0119taj, \u017ce aktualny plik nie zostanie usuni\u0119ty. Czy chcesz kontynuowa\u0107?",
     "17155": "Ca\u0142kowita powierzchnia zaj\u0119ta przez pliki:",
     "17156": "Zmienione z %1",
-    "17398": "Etykieta"
+    "17398": "Etykieta",
+    "17445": "Data dodania",
+    "17446": "Data utworzenia",
+    "17489": "zobacz dokument",
+    "17517": "wykorzystano %tq",
+    "17520": "Zarz\u0105dzaj linkami"
 }

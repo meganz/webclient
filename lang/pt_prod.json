@@ -711,7 +711,6 @@
     "5738": "Lixo",
     "5775": "Utilizados",
     "5799": "Utiliza\u00e7\u00e3o",
-    "5801": "utilizados",
     "5814": "Fazer atualiza\u00e7\u00e3o da Conta",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Expira em %1",
     "8700": "Extens\u00e3o Thunderbird",
     "8726": "Convidar",
-    "8732": "Carregar liga\u00e7\u00e3o",
-    "8733": "Carregar liga\u00e7\u00f5es",
     "8734": "Obter liga\u00e7\u00f5es",
     "8735": "Apagar liga\u00e7\u00f5es",
     "8736": "Definir nova data de validade",
@@ -1540,7 +1537,6 @@
     "16169": "Date Created",
     "16172": "Label...",
     "16173": "Choose colour:",
-    "16174": "Date Modified",
     "16175": "Subscription Expires On",
     "16221": "Add label %1",
     "16222": "Remove label %1",
@@ -1845,5 +1841,10 @@
     "17154": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
     "17155": "Total size taken up by file versions:",
     "17156": "Renamed from %1",
-    "17398": "Label"
+    "17398": "Label",
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17517": "used %tq",
+    "17520": "Manage links"
 }

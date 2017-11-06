@@ -363,6 +363,9 @@ FileManager.prototype.initFileManagerUI = function() {
                 setTimeout(function() {
                     if ($.movet === M.RubbishID) {
                         fmremove($.moveids);
+                        if (selectionManager) {
+                            selectionManager.clear_selection();
+                        }
                     }
                     else {
                         M.moveNodes($.moveids, $.movet)
@@ -371,6 +374,10 @@ FileManager.prototype.initFileManagerUI = function() {
                                     $ddelm.remove();
                                 }
                             });
+                        if (selectionManager) {
+                            selectionManager.clear_selection();
+                            selectionManager.set_currently_selected($.movet);
+                        }
                     }
                 }, 50);
             }
@@ -2928,7 +2935,6 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     e = $('#treea_' + id_s);
     $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
     e.addClass('selected');
-    $.selected = [id]; // added by khaled - to indicate the selection
 
     if (!ignoreScroll) {
         if (id === this.RootID || id === 'shares' || id === 'contacts' || id === 'chat' || id === 'opc' || id === 'ipc') {

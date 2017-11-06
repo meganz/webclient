@@ -1245,13 +1245,15 @@ FileManager.prototype.createFolderUI = function() {
         var $inputWrapper = $('.create-folder-pad');
         var $input = $('.create-new-folder input');
 
-        if ($input.val() === '') {
+        if ($input.val() === '' || !M.isSafeName($input.val())) {
             $inputWrapper.addClass('error');
+            $input.addClass('error');
 
-            setTimeout(function() {
+            setTimeout(function () {
                 $inputWrapper.removeClass('error');
+                $input.removeClass('error');
                 $input.focus();
-            }, 200);
+            }, 1500);
         }
         else {
             loadingDialog.pshow();

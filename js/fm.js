@@ -2202,17 +2202,22 @@ function createFolderDialog(close) {
 
     var $dialog = $('.fm-dialog.create-folder-dialog');
     var $input = $('input', $dialog);
+    $input.val('');
 
     if (close) {
         if ($.cftarget) {
             delete $.cftarget;
         }
-        $input.val('');
         closeDialog();
         return true;
     }
 
-    var doCreateFolder = function(v) {
+    var doCreateFolder = function (v) {
+        if (!M.isSafeName(v)) {
+            $dialog.removeClass('active');
+            $input.addClass('error');
+            return;
+        }
         var target = $.cftarget = $.cftarget || M.currentdirid;
 
         loadingDialog.pshow();
@@ -2248,6 +2253,7 @@ function createFolderDialog(close) {
         }
         else {
             $dialog.addClass('active');
+            $input.removeClass('error');
         }
     });
 
@@ -2274,7 +2280,6 @@ function createFolderDialog(close) {
         else {
             doCreateFolder(v);
         }
-        $input.val('');
     });
 
     M.safeShowDialog('createfolder', function() {

@@ -173,6 +173,12 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
                 sortFn = function(a, b) {
                     return (a.ts < b.ts ? -1 : 1) * sortDirection;
                 };
+                break;
+            case 'label':
+                sortFn = function(a, b) {
+                    return (a.lbl < b.lbl ? -1 : 1) * sortDirection;
+                };
+                break;
         }
         folders.sort(sortFn);
 
@@ -338,13 +344,13 @@ MegaData.prototype.initTreePanelSorting = function() {
     var sections = [
         'folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'
     ];
-    var byType = ['name', 'status', 'last-interaction'];
+    var byType = ['name', 'status', 'last-interaction', 'label'];
 
     $.sortTreePanel = Object.create(null);
 
     for (var i = sections.length; i--;) {
         var type = sections[i];
-        var byDefault = (type === 'contacts' ? "status" : "name");
+        var byDefault = type === 'contacts' ? "status" : "name";
 
         $.sortTreePanel[type] = {
             by: anyOf(byType, localStorage['sort' + type + 'By']) || byDefault,
@@ -498,10 +504,7 @@ MegaData.prototype.treeSearchUI = function() {
             // Show only contacts related sorting options
             if (type === 'contacts') {
                 menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
-                menu.find(
-                    '*[data-by="fav"],' +
-                    '*[data-by="created"]'
-                ).addClass('hidden');
+                menu.find('*[data-by=fav],*[data-by=created],*[data-by=label]').addClass('hidden');
             }
             else { // Hide status and last-interaction sorting options in sort dialog
                 menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');

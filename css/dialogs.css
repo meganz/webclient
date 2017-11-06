@@ -1222,12 +1222,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/nw-fm-sprite_v25.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v26.svg);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/nw-fm-sprite_v25.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v26.svg);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }
@@ -1524,7 +1524,7 @@ li.token-input-token-invite .input-close {
     background-color: rgba(34,34,34,0.95);
 }
 .fm-dialog-close.big {
-    background-image: url(../images/mega/download-dialog.png);
+    background-image: url(../images/mega/download-dialog_v1.png);
     background-position: -368px 7px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
@@ -1600,8 +1600,7 @@ li.token-input-token-invite .input-close {
     left: -1536px;
 }
 .megasync-slider.body-block {
-    width: 2304px;
-    min-height: 422px;
+    min-height: 481px;
     position: relative;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -1614,24 +1613,35 @@ li.token-input-token-invite .input-close {
 }
 .megasync-slide {
     width: 768px;
-    min-height: 422px;
-    float: left;
-    position: relative;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
+    min-height: 481px;
+    position: absolute;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+    left: 0;
+    visibility: hidden;
 }
-.slide1 .megasync-slide.slide1, .slide2 .megasync-slide.slide2, .slide3 .megasync-slide.slide3 {
+.megasync-slide.next {
+    left: 100%;
+}
+.megasync-slide.prev {
+    left: -100%;
+}
+.files-ammount .megasync-slide.slide0 {
+    display: block;
+}
+.megasync-slide.current {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
+    visibility: visible;
 }
 .megasync-slide.slide2 {
     text-align: left;
@@ -1642,7 +1652,7 @@ li.token-input-token-invite .input-close {
 }
 .megasync-img::before {
     content: '';
-    background-image: url(../images/mega/download-dialog.png);
+    background-image: url(../images/mega/download-dialog_v1.png);
     background-position: center -175px;
     background-repeat: no-repeat;
     position: absolute;
@@ -1650,6 +1660,22 @@ li.token-input-token-invite .input-close {
     left: 0;
     bottom: 0;
     height: 393px;
+}
+.megasync-img.img0::before {
+    background-position: center -1069px;
+    width: 600px;
+    height: 200px;
+    bottom: auto;
+    left: 50%;
+    margin: 84px 0 0 -300px;
+    border: 1px dashed #d0d0d0;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 .megasync-img.img2::before {
     background-position: center -621px;
@@ -1759,6 +1785,9 @@ li.token-input-token-invite .input-close {
     width: 100%;
     margin: -104px 0 0 0;
 }
+.megasync-buttons .big-button {
+    padding: 0 24px;
+}
 .megasync-bottom-warning {
     -webkit-box-shadow: 0px -1px 0px 0px rgba(0,0,0,0.1);
     -moz-box-shadow: 0px -1px 0px 0px rgba(0,0,0,0.1);
@@ -1797,44 +1826,6 @@ li.token-input-token-invite .input-close {
     color: #666666;
     font-family: 'montserrat', 'open_sans', sans-serif;
     margin: -7px 0 0 0;
-}
-.megasync-controls {
-    bottom: 0;
-    width: 100%;
-    position: absolute;
-    z-index: 10;
-    font-size: 0;
-}
-.megasync-controls div {
-    display: inline-block;
-    width: 60px;
-    height: 2px;
-    -moz-border-radius: 1px;
-    -webkit-border-radius: 1px;
-    border-radius: 1px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    margin: 0 4px;
-    cursor: pointer;
-    background-color: rgba(0,0,0,0.2);
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-    position: relative;
-}
-.megasync-controls div.active {
-    background-color: #F0373A;
-}
-.megasync-controls div::before {
-    position: absolute;
-    height: 22px;
-    top: -10px;
-    content: '';
-    width: 100%;
-    left: 0;
 }
 .megasync .toast-icon {
     background-position: -85px -816px;
@@ -2154,7 +2145,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v8.png);
+    background-image: url(../images/mega/icons-sprite_v10.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {

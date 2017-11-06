@@ -670,9 +670,6 @@ div.pro-feature-icon {
     font-size: 16px;
     text-transform: none;
 }
-.reg-st3-big-txt span.bandwidth-unit {
-    text-transform: uppercase;
-}
 .reg-st3-mid-txt {
     color: #999999;
     font-size: 13px;
@@ -1325,7 +1322,7 @@ div.pro-feature-icon {
     height: 82px;
     width: 82px;
     float: left;
-    background-image: url(../images/mega/register-big-sprite-v13.png);
+    background-image: url(../images/mega/register-big-sprite-v14.png);
     background-position: center -960px;
     background-repeat: no-repeat;
     margin-top: 28px;

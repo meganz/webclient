@@ -139,6 +139,9 @@ var bottompage = {
         if (page === 'download') {
             topHeader = '.download.top-bar';
         }
+        else if (page.substr(0, 4) === 'help') {
+            topHeader = '.bottom-page .top-head, .old .top-head, .support-section-header';
+        }
         else {
             topHeader = '.bottom-page .top-head, .old .top-head';
         }

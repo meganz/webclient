@@ -1017,7 +1017,8 @@ FileManager.prototype.initContextUI = function() {
         $('#fileselect4').click();
     });
 
-    $(c + '.remove-item').rebind('click', function() {
+    $(c + '.remove-item').rebind('click', function () {
+        closeDialog();// added by khaled
         fmremove();
     });
 
@@ -1155,6 +1156,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.preview-item').rebind('click', function() {
+        closeDialog();
         slideshow($.selected[0]);
     });
 
@@ -1873,7 +1875,7 @@ FileManager.prototype.addTransferPanelUI = function() {
             $('.transfer-clear-completed').addClass('disabled');
             $('.transfer-table-header').hide();
             $('.transfer-panel-empty-txt').removeClass('hidden');
-            $('.transfer-panel-title').text('');
+            $('.transfer-panel-title span').text('');
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
             if (M.currentdirid === 'transfers') {
                 fm_tfsupdate();
@@ -2270,18 +2272,18 @@ FileManager.prototype.addGridUI = function(refresh) {
         $('.grid-url-header').text('');
     }
 
-    $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
+    $('.fm .grid-table-header th:nth-child(5)').rebind('contextmenu.column_time', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         if (selectionManager) {
             selectionManager.clear_selection();
         }
-
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 6);
     });
 
-    $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
+    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling' +
+        ',.fm-empty-cloud,.fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         if (selectionManager) {
             selectionManager.clear_selection();
@@ -2926,6 +2928,7 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     e = $('#treea_' + id_s);
     $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
     e.addClass('selected');
+    $.selected = [id]; // added by khaled - to indicate the selection
 
     if (!ignoreScroll) {
         if (id === this.RootID || id === 'shares' || id === 'contacts' || id === 'chat' || id === 'opc' || id === 'ipc') {
@@ -3192,7 +3195,9 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
                 .safeHTML(Object(options).body || l[16360]);
         }
         else {
-            $('.fm-main').addClass('fm-notification almost-full');
+            if (perc >90) {
+                $('.fm-main').addClass('fm-notification almost-full');
+            }
             $strgdlg.addClass('almost-full')
                 .find('.fm-dialog-body.almost-full')
                 .find('.fm-dialog-title')
@@ -3224,13 +3229,14 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         }
 
         var closeDialog = function() {
-            $.dialog = null;
+            $strgdlg.unbind('dialog-closed');
             window.closeDialog();
 
             promise.resolve();
             delete M.showOverStorageQuotaPromise;
         };
-        $.dialog = closeDialog;
+
+        $strgdlg.rebind('dialog-closed', closeDialog);
 
         $('.button', $strgdlg).rebind('click', function() {
             var $this = $(this);
@@ -3279,7 +3285,6 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         // if another dialog wasn't opened previously
         if (!prevState || Object(options).custom) {
             M.safeShowDialog('over-storage-quota', $strgdlg);
-            $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
         }
         else {
             promise.reject();
@@ -3368,7 +3373,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
                     // arrange to back any non-controlled dialogs,
                     // this class will be removed on the next closeDialog()
-                    $('.fm-dialog').addClass('arrange-to-back');
+                    $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
 
                     fm_showoverlay();
                     $dialog.removeClass('hidden arrange-to-back');
@@ -3376,6 +3381,9 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
                 $.dialog = String(name);
             }, function(ex) {
                 // There was an exception dispatching the above code, move to the next queued dialog...
+                if (d) {
+                    console.warn(ex);
+                }
                 mBroadcaster.sendMessage('closedialog', ex);
             });
         })(dialogName, dispatcher);

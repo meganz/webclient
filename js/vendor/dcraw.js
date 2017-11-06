@@ -84,7 +84,7 @@
    for (var curr; length > 0; ) curr = String.fromCharCode.apply(String, HEAPU8.subarray(ptr, ptr + Math.min(length, 1024))), ret = ret ? ret + curr : curr, ptr += 1024, length -= 1024;
    return ret;
   }
-  return Module.UTF8ToString(ptr);
+  return UTF8ArrayToString(HEAPU8, ptr);
  }
  function UTF8ArrayToString(u8Array, idx) {
   for (var endPtr = idx; u8Array[endPtr]; ) ++endPtr;

@@ -1893,7 +1893,8 @@ accountUI.fillCharts = function(account, onDashboard) {
     else {
         $bandwidthChart.addClass('no-percs');
         $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
-        $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
+        var usedW = l[17517].toLowerCase().replace('%tq', '').trim();
+        $bandwidthChart.find('.chart.data .pecents-txt').text(usedW);
     }
     /* End of New Used Bandwidth chart */
 

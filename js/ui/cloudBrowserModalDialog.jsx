@@ -18,7 +18,8 @@ var BrowserCol = React.createClass({
         var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
 
         if (self.props.sortBy[0] === self.props.id) {
-            classes += " " + self.props.sortBy[1];
+            var ordClass = self.props.sortBy[1] == "desc" ? "asc" : "desc";
+            classes = classes + " " + ordClass;
         }
         return (
             <th onClick={(e) => {
@@ -583,7 +584,7 @@ var BrowserEntries = React.createClass({
                     <div className="dialog-empty-pad">
                         <div className="dialog-empty-icon"></div>
                         <div className="dialog-empty-header">
-                            {__(l[782])}
+                            {self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]}
                         </div>
                     </div>
                 </div>
@@ -684,10 +685,6 @@ var CloudBrowserDialog = React.createClass({
             sortFunc = M.getSortByFavFn();
         }
 
-        entries.sort(function(a, b) {
-            return sortFunc(a, b, order);
-        });
-
         // always return first the folders and then the files
         var folders = [];
 
@@ -697,6 +694,14 @@ var CloudBrowserDialog = React.createClass({
                 entries.splice(i, 1);
             }
         }
+
+        folders.sort(function(a, b) {
+            return sortFunc(a, b, order);
+        });
+
+        entries.sort(function(a, b) {
+            return sortFunc(a, b, order);
+        });
 
         return folders.concat(entries);
     },

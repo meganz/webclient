@@ -721,11 +721,6 @@ function fmtopUI() {
             }
             else if (ua.details.engine === 'Gecko') {
                 $('.fm-folder-upload').removeClass('hidden');
-                $('input[webkitdirectory], .fm-folder-upload input')
-                    .rebind('click', function() {
-                        firefoxDialog();
-                        return false;
-                    });
             }
             else {
                 $('.fm-file-upload').addClass('last-button');
@@ -1057,7 +1052,14 @@ function renameDialog() {
             $dialog.removeClass('focused');
         });
 
-        $input.rebind('click keydown keyup keypress', function() {
+        $input.rebind('click keydown keyup keypress', function (event) {
+            // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
+            if (event.type === 'keydown') {
+                if (event.keyCode === 13) {
+                    $('.rename-dialog-button.rename').click();
+                    return;
+                }
+            }
             var value = $(this).val();
 
             if (!value || (!n.t && ext.length > 0 && value === '.' + ext)) {
@@ -1297,12 +1299,19 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     });
     $('#msgDialog').removeClass('hidden');
     fm_showoverlay();
+
+    if ($.dialog) {
+        $('.fm-dialog').addClass('arrange-to-back');
+    }
 }
 
 function closeMsg() {
     $('#msgDialog').addClass('hidden');
 
-    if (!$('.pro-register-dialog').is(':visible')) {
+    if ($.dialog) {
+        $('.fm-dialog').removeClass('arrange-to-back');
+    }
+    else {
         fm_hideoverlay();
     }
 
@@ -2079,11 +2088,6 @@ function closeDialog(ev) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }
 
-    if (typeof $.dialog === 'function') {
-        onIdle($.dialog);
-        $.dialog = null;
-    }
-
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         fm_hideoverlay();
         $('.fm-dialog.registration-page-success').addClass('hidden').removeClass('special');
@@ -2157,7 +2161,7 @@ function closeDialog(ev) {
             delete $.onImportCopyNodes;
         }
     }
-    $('.fm-dialog').removeClass('arrange-to-back');
+    $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
 
     $('.export-links-warning').addClass('hidden');
     if ($.dialog === 'terms' && $.termsAgree) {
@@ -2305,92 +2309,6 @@ function chromeDialog(close) {
     });
 }
 
-/**
- * Open a dialog asking the user to download MEGAsync for files over 1GB
- */
-function megaSyncDialog() {
-    "use strict";
-
-    // Cache selector
-    var $dialog = $('.fm-dialog.download-megasync-dialog');
-
-    // Show the dialog and overlay
-    M.safeShowDialog('download-megasync-dialog', $dialog);
-
-    // Add close button handler
-    $dialog.find('.fm-dialog-close, .close-button').rebind('click', closeDialog);
-
-    // Add checkbox handling
-    $dialog.find('#megasync-checkbox').rebind('click', function() {
-
-        var $this = $(this);
-
-        // If it has not been checked, check it
-        if (!$this.hasClass('checkboxOn')) {
-
-            // Store a flag so that it won't show this dialog again if triggered
-            localStorage.megaSyncDialog = 1;
-            $this.attr('class', 'checkboxOn');
-            $this.parent().attr('class', 'checkboxOn');
-            $this.attr('checked', true);
-        }
-        else {
-            // Otherwise uncheck it
-            delete localStorage.megaSyncDialog;
-            $this.attr('class', 'checkboxOff');
-            $this.parent().attr('class', 'checkboxOff');
-            $this.attr('checked', false);
-        }
-    });
-    clickURLs();
-}
-
-function firefoxDialog(close) {
-    "use strict";
-
-    if (close)
-    {
-        $.dialog = false;
-        fm_hideoverlay();
-        $('.fm-dialog.firefox-dialog').addClass('hidden');
-        return true;
-    }
-
-    if (page === 'download')
-        $('.ff-extension-txt').text(l[1932]);
-    else
-        $('.ff-extension-txt').text(l[1174]);
-
-    fm_showoverlay();
-    $('.fm-dialog.firefox-dialog').removeClass('hidden');
-    $.dialog = 'firefox';
-
-    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').rebind('click', function()
-    {
-        firefoxDialog(1);
-    });
-
-    $('#firefox-checkbox').rebind('click', function()
-    {
-        if ($(this).hasClass('checkboxOn') === false)
-        {
-            localStorage.firefoxDialog = 1;
-            $(this).removeClass('checkboxOff').addClass('checkboxOn');
-            $(this).parent().removeClass('checkboxOff').addClass('checkboxOn');
-            $(this).attr('checked', true);
-        }
-        else
-        {
-            delete localStorage.firefoxDialog;
-            $(this).removeClass('checkboxOn').addClass('checkboxOff');
-            $(this).parent().removeClass('checkboxOn').addClass('checkboxOff');
-            $(this).attr('checked', false);
-        }
-    });
-
-    clickURLs();
-}
-
 function browserDialog(close) {
     'use strict';
 
@@ -2497,24 +2415,22 @@ function bottomPageDialog(close, pp, hh) {
     "use strict";
 
     var $dialog = $('.fm-dialog.bottom-pages-dialog');
+    var closeDialog = function() {
+        $dialog.unbind('dialog-closed');
+        window.closeDialog();
+        delete $.termsAgree;
+        delete $.termsDeny;
+        return false;
+    };
 
-    if (close)
-    {
-        $dialog.addClass('hidden');
-        if (!$('.pro-register-dialog').is(":visible")) {
-            fm_hideoverlay();
-            $.dialog = false;
-        }
-        if ($.termsAgree) $.termsAgree = undefined;
-        if ($.termsDeny) $.termsDeny = undefined;
+    if (close) {
+        closeDialog();
         return false;
     }
 
     if (!pp) {
         pp = 'terms';
     }
-
-    $.dialog = pp;
 
     // Show Agree/Cancel buttons for Terms dialogs
     if (pp === 'terms' || pp === 'sdkterms') {
@@ -2559,28 +2475,48 @@ function bottomPageDialog(close, pp, hh) {
         });
     }
 
-    if (!pages[pp])
-    {
-        loadingDialog.show();
+    var asyncTaskID;
+    if (!pages[pp]) {
+        asyncTaskID = 'page.' + pp + '.' + makeUUID();
+
         M.require(pp)
-            .done(function() {
-                loadingDialog.hide();
-                bottomPageDialog(false, $.dialog);
+            .always(function() {
+                mBroadcaster.sendMessage(asyncTaskID);
+                asyncTaskID = null;
             });
-        return false;
     }
 
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
-    $('.bp-main', $dialog).safeHTML(
-        translate(
-            pages[pp].split('((TOP))')[1].split('((BOTTOM))')[0].replace('main-mid-pad new-bottom-pages', '')
-        )
-    );
+    M.safeShowDialog(pp, function _showDialog() {
+        if (asyncTaskID) {
+            loadingDialog.show();
+            mBroadcaster.once(asyncTaskID, function() {
+                loadingDialog.hide();
+                asyncTaskID = null;
+                _showDialog();
+            });
 
-    $('.bp-body', $dialog).jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
-    jScrollFade('.bp-body');
-    clickURLs();
+            return $dialog;
+        }
+        $dialog.rebind('dialog-closed', closeDialog).removeClass('hidden');
+
+        $('.bp-main', $dialog)
+            .safeHTML(translate(String(pages[pp])
+                .split('((TOP))')[1]
+                .split('((BOTTOM))')[0]
+                .replace('main-mid-pad new-bottom-pages', ''))
+            );
+
+        $('.bp-body', $dialog).jScrollPane({
+            showArrows: true,
+            arrowSize: 5,
+            animateScroll: true,
+            verticalDragMinHeight: 50
+        });
+        jScrollFade('.bp-body');
+        clickURLs();
+
+        return $dialog;
+    });
 }
 
 function clipboardcopycomplete()

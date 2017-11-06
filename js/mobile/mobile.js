@@ -62,19 +62,25 @@ var mobile = {
         // Cache selectors
         var $screen = $('.mobile.signin-register-block');
         var $loginTab = $screen.find('.top-link.sign-in');
+        var $loginNavHead = $screen.find('.fm-header-txt.sign-in');
         var $registerTab = $screen.find('.top-link.register');
+        var $registerNavHead = $screen.find('.fm-header-txt.register');
         var $loginContent = $screen.find('.tab-block.sign-in');
         var $registerContent = $screen.find('.tab-block.register');
 
         // Show the signin content and light up the signin tab
         if (showTab === 'login') {
             $loginContent.removeClass('hidden');
-            $loginTab.addClass('active');
+            $loginTab.addClass('hidden');
+            $registerNavHead.addClass('hidden');
+            $loginNavHead.removeClass('hidden');
         }
         else {
             // Otherwise show the register content and light up the register tab
             $registerContent.removeClass('hidden');
-            $registerTab.addClass('active');
+            $registerTab.addClass('hidden');
+            $loginNavHead.addClass('hidden');
+            $registerNavHead.removeClass('hidden');
         }
 
         // If the login tab is clicked, load the login page

@@ -8,7 +8,7 @@
      * @param {String} notification The text for the toast notification
      * @param {String} [buttonLabel] Optional button label
      */
-    global.showToast = function showToast(toastClass, notification, buttonLabel) {
+    global.showToast = function showToast(toastClass, notification, buttonLabel, secondButtonLabel) {
         var $toast = $('.toast-notification.common-toast');
         $toast.attr('class', 'toast-notification common-toast ' + toastClass)
             .find('.toast-col:first-child span').safeHTML(notification);
@@ -22,11 +22,17 @@
 
         var closeSelector = '.toast-close-button';
         if (buttonLabel) {
-            $('.common-toast .toast-button').safeHTML(buttonLabel);
+            $('.common-toast .toast-button.first span').safeHTML(buttonLabel);
         }
         else {
             closeSelector += ', .common-toast .toast-button';
-            $('.common-toast .toast-button').safeHTML(l[726]);
+            $('.common-toast .toast-button.first span').safeHTML(l[726]);
+        }
+
+        if (secondButtonLabel) {
+            $('.common-toast .toast-button.second')
+                .removeClass('hidden')
+                .find('span').safeHTML(secondButtonLabel);
         }
 
         $(closeSelector)

@@ -954,6 +954,9 @@ html.gbot {
     margin-top: 65px;
     font-family: 'montserrat', 'open_sans', sans-serif;
 }
+.bottom-page .megaapp-linux:not(.hidden) + .button.default-huge-button {
+    margin-top: 18px;
+}
 .cmd-bg .top-header {
     color: #333333;
 }
@@ -1047,9 +1050,6 @@ html.gbot {
 .linux .bottom-page.top-header {
     padding-top: 17px;
 }
-.linux .default-select.megaapp-dropdown {
-    margin-top: 20px;
-}
 .linux .megaapp-button-info {
     padding-bottom: 60px;
 }
@@ -1109,7 +1109,7 @@ html.gbot {
     cursor: default;
 }
 .megaapp-button-info .nautilus-lnk {
-    margin: 26px 5px -30px 0;
+    margin: 14px 5px -30px 0;
     display: block;
 }
 .megasync .vertical-centered-bl .pages-nav.content-block {
@@ -1134,9 +1134,6 @@ html.gbot {
 }
 .linux .bottom-page.img.sync-top {
     max-width: 40%;
-}
-.megaapp-button-info .nautilus-lnk {
-    margin: 26px 5px -10px 0;
 }
 }
 /* end of MEGAsync */
@@ -1555,7 +1552,7 @@ html.gbot {
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .download-megasync-dialog .icon, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow {
+.medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow {
     background-image: url(../images/mega/pages-sprite@2x.png) !important;
     background-size: 300px auto;
 }

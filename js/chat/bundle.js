@@ -663,6 +663,16 @@ React.makeElement = React['createElement'];
 	                }));
 	                M.syncUsersFullname(contactHash);
 	                self.processNewUser(contactHash);
+	                asyncApiReq({
+	                    'a': 'uge',
+	                    'u': contactHash
+	                }).done(function (r) {
+	                    if (r && isString(r)) {
+	                        if (M.u[contactHash]) {
+	                            M.u[contactHash].m = r;
+	                        }
+	                    }
+	                });
 	            }
 	        });
 	    }
@@ -3319,6 +3329,44 @@ React.makeElement = React['createElement'];
 	                    key: "view", icon: "human-profile", label: __(l[8866]), onClick: function onClick() {
 	                        loadSubPage('fm/' + contact.u);
 	                    } }));
+	            } else if (contact.c === 0) {
+	                if (moreDropdowns.length > 0) {
+	                    moreDropdowns.unshift(React.makeElement("hr", { key: "separator" }));
+	                }
+	                moreDropdowns.unshift(React.makeElement(DropdownsUI.DropdownItem, {
+	                    key: "view", icon: "human-profile", label: __(l[101]), onClick: function onClick() {
+	                        loadingDialog.show();
+
+	                        asyncApiReq({
+	                            'a': 'uge',
+	                            'u': contact.u
+	                        }).done(function (r) {
+	                            if (r) {
+	                                var exists = false;
+	                                Object.keys(M.opc).forEach(function (k) {
+	                                    if (!exists && M.opc[k].m === r) {
+	                                        exists = true;
+	                                        return false;
+	                                    }
+	                                });
+
+	                                if (exists) {
+	                                    closeDialog();
+	                                    msgDialog('warningb', '', l[7413]);
+	                                } else {
+	                                    M.inviteContact(M.u[u_handle].m, r);
+	                                    var title = l[150];
+
+	                                    var msg = l[5898].replace('[X]', r);
+
+	                                    closeDialog();
+	                                    msgDialog('info', title, msg);
+	                                }
+	                            }
+	                        }).always(function () {
+	                            loadingDialog.hide();
+	                        });
+	                    } }));
 	            }
 
 	            if (moreDropdowns.length > 0) {
@@ -3327,7 +3375,7 @@ React.makeElement = React['createElement'];
 	                    {
 	                        className: self.props.dropdownButtonClasses,
 	                        icon: self.props.dropdownIconClasses,
-	                        disabled: self.props.dropdownDisabled },
+	                        disabled: moreDropdowns.length === 0 || self.props.dropdownDisabled },
 	                    React.makeElement(
 	                        DropdownsUI.Dropdown,
 	                        { className: "contact-card-dropdown",
@@ -3366,13 +3414,13 @@ React.makeElement = React['createElement'];
 	                { className: "user-card-data" },
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-name small" },
+	                    { className: "user-card-name light" },
 	                    this.props.namePrefix ? this.props.namePrefix : null,
 	                    M.getNameByHandle(contact.u)
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-email small" },
+	                    { className: "user-card-email" },
 	                    contact.m
 	                )
 	            )
@@ -6129,7 +6177,8 @@ React.makeElement = React['createElement'];
 	        var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
 
 	        if (self.props.sortBy[0] === self.props.id) {
-	            classes += " " + self.props.sortBy[1];
+	            var ordClass = self.props.sortBy[1] == "desc" ? "asc" : "desc";
+	            classes = classes + " " + ordClass;
 	        }
 	        return React.makeElement(
 	            "th",
@@ -6677,7 +6726,7 @@ React.makeElement = React['createElement'];
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog-empty-header" },
-	                        __(l[782])
+	                        self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]
 	                    )
 	                )
 	            );
@@ -6774,10 +6823,6 @@ React.makeElement = React['createElement'];
 	            sortFunc = M.getSortByFavFn();
 	        }
 
-	        entries.sort(function (a, b) {
-	            return sortFunc(a, b, order);
-	        });
-
 	        var folders = [];
 
 	        for (var i = entries.length; i--;) {
@@ -6786,6 +6831,14 @@ React.makeElement = React['createElement'];
 	                entries.splice(i, 1);
 	            }
 	        }
+
+	        folders.sort(function (a, b) {
+	            return sortFunc(a, b, order);
+	        });
+
+	        entries.sort(function (a, b) {
+	            return sortFunc(a, b, order);
+	        });
 
 	        return folders.concat(entries);
 	    },
@@ -8438,10 +8491,14 @@ React.makeElement = React['createElement'];
 	                var dropdownIconClasses = "small-icon tiny-icon grey-down-arrow";
 
 	                if (room.type === "group" && room.members && myPresence !== 'offline') {
-	                    var removeParticipantButton = React.makeElement(DropdownsUI.DropdownItem, {
-	                        key: "remove", icon: "rounded-stop", label: __(l[8867]), onClick: function onClick() {
-	                            $(room).trigger('onRemoveUserRequest', [contactHash]);
-	                        } });
+	                    var removeParticipantButton = null;
+
+	                    if (room.iAmOperator() && contactHash !== u_handle) {
+	                        removeParticipantButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                            key: "remove", icon: "rounded-stop", label: __(l[8867]), onClick: function onClick() {
+	                                $(room).trigger('onRemoveUserRequest', [contactHash]);
+	                            } });
+	                    }
 
 	                    if (room.iAmOperator() || contactHash === u_handle) {
 
@@ -8491,7 +8548,7 @@ React.makeElement = React['createElement'];
 	                        dropdownIconClasses = "small-icon eye-icon";
 	                    } else {}
 
-	                    if (contactHash !== u_handle) {
+	                    if (contactHash !== u_handle && room.iAmOperator()) {
 	                        dropdowns.push(removeParticipantButton);
 	                    }
 	                }
@@ -8504,7 +8561,7 @@ React.makeElement = React['createElement'];
 	                    dropdownPositionMy: "right top",
 	                    dropdownPositionAt: "right bottom",
 	                    dropdowns: dropdowns,
-	                    dropdownDisabled: !room.iAmOperator() || contactHash === u_handle,
+	                    dropdownDisabled: contactHash === u_handle,
 	                    dropdownButtonClasses: room.type == "group" && myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button",
 	                    dropdownIconClasses: dropdownIconClasses,
 	                    style: {

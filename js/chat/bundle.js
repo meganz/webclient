@@ -8773,13 +8773,17 @@ React.makeElement = React['createElement'];
 	    _addLinkButtons: function _addLinkButtons(h, arr) {
 	        var self = this;
 
+	        var haveLink = self._isNodeHavingALink(h) === true;
+
+	        var getManageLinkText = haveLink ? l[6909] : l[59];
+
 	        arr.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'icons-sprite chain',
 	            key: 'getLinkButton',
-	            label: __(l[59]),
+	            label: getManageLinkText,
 	            onClick: self._getLink.bind(self, h)
 	        }));
 
-	        if (self._isNodeHavingALink(h) === true) {
+	        if (haveLink) {
 	            arr.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context remove-link',
 	                key: 'removeLinkButton',
 	                label: __(l[6821]),
@@ -8805,7 +8809,7 @@ React.makeElement = React['createElement'];
 	        if (u_type === 0) {
 	            ephemeralDialog(l[1005]);
 	        } else {
-	            initCopyrightsDialog([h]);
+	            mega.Share.initCopyrightsDialog([h]);
 	        }
 	        if (e) {
 	            e.preventDefault();

@@ -2656,10 +2656,6 @@ function fm_resize_handler(force) {
     }
 
     if (M.currentdirid !== 'transfers') {
-        if (slideshowid && previews[slideshowid]) {
-            previewsrc(slideshowid);
-        }
-
         if (megaChatIsReady && megaChat.resized) {
             megaChat.resized();
         }

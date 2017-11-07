@@ -672,9 +672,7 @@ var dlmanager = {
                         ctx.object.data = new ArrayBuffer(res.s);
                     }
 
-                    dlmanager.isOverQuota = false;
-                    dlmanager.isOverFreeQuota = false;
-                    $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
+                    dlmanager.onNolongerOverquota();
                     return ctx.next(false, res, attr, ctx.object);
                 }
             }
@@ -683,6 +681,14 @@ var dlmanager = {
         dlmanager.dlReportStatus(dl, error);
 
         ctx.next(error || new Error("failed"));
+    },
+
+    onNolongerOverquota: function() {
+        'use strict';
+
+        dlmanager.isOverQuota = false;
+        dlmanager.isOverFreeQuota = false;
+        $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
     },
 
     dlQueuePushBack: function DM_dlQueuePushBack(aTask) {
@@ -1498,7 +1504,9 @@ var dlmanager = {
     },
 
     showLimitedBandwidthDialog: function(res, callback, flags) {
-        var $dialog = $('.limited-bandwidth-dialog');
+        'use strict';
+
+        var $dialog = $('.limited-bandwidth-dialog').removeClass('exceeded');
 
         loadingDialog.hide();
         this.onLimitedBandwidth = function() {
@@ -1630,7 +1638,7 @@ var dlmanager = {
             var doCloseModal = function closeModal() {
                 clearInterval(dlmanager._overQuotaTimeLeftTick);
                 $('.fm-dialog-overlay').unbind('click.dloverq');
-                $dialog.unbind('dialog-closed');
+                $dialog.unbind('dialog-closed').find('.fm-dialog-close').unbind('click.quota');
                 closeDialog();
                 return false;
             };

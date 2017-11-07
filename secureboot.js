@@ -2155,6 +2155,7 @@ else if (!b_u) {
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
+        'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},

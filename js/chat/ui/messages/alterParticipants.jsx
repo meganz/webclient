@@ -27,7 +27,7 @@ var AlterParticipantsConversationMessage = React.createClass({
 
         var displayName;
         if (contact) {
-            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+            displayName = generateAvatarMeta(contact.u).fullName;
         }
         else {
             displayName = contact;
@@ -43,8 +43,7 @@ var AlterParticipantsConversationMessage = React.createClass({
             };
 
             var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
-            var otherDisplayName = 
-                otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
+            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
             var text = __(l[8907]).replace(
                 "%s",
@@ -73,8 +72,7 @@ var AlterParticipantsConversationMessage = React.createClass({
             };
 
             var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
-            var otherDisplayName = 
-                otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
+            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
             var text;
             if (otherContact.u === contact.u) {

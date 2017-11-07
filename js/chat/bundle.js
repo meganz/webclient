@@ -1151,7 +1151,7 @@ React.makeElement = React['createElement'];
 	            var iso = msgDate.toISOString();
 	            if (todayOrYesterday(iso)) {
 
-	                curTimeMarker = time2lastSeparator(iso) + ", " + msgDate.getHours() + ":" + msgDate.getMinutes();
+	                curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
 	            } else {
 
 	                curTimeMarker = acc_time2date(timestamp, true);
@@ -8815,7 +8815,7 @@ React.makeElement = React['createElement'];
 
 	            var displayName;
 	            if (contact) {
-	                displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	                displayName = generateAvatarMeta(contact.u).fullName;
 	            } else {
 	                displayName = contact;
 	            }
@@ -9700,7 +9700,7 @@ React.makeElement = React['createElement'];
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	            displayName = generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }
@@ -9715,7 +9715,7 @@ React.makeElement = React['createElement'];
 	            };
 
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
-	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
+	            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
 	            var text = __(l[8907]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
@@ -9745,7 +9745,7 @@ React.makeElement = React['createElement'];
 	            };
 
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
-	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
+	            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
 	            var text;
 	            if (otherContact.u === contact.u) {
@@ -9823,7 +9823,7 @@ React.makeElement = React['createElement'];
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	            displayName = generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }
@@ -9912,7 +9912,7 @@ React.makeElement = React['createElement'];
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	            displayName = generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }
@@ -9926,7 +9926,7 @@ React.makeElement = React['createElement'];
 	        };
 
 	        var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
-	        var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
+	        var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
 	        var newPrivilegeText = "";
 	        if (message.meta.privilege === 3) {
@@ -10007,7 +10007,7 @@ React.makeElement = React['createElement'];
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	            displayName = generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }

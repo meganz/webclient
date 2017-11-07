@@ -1208,12 +1208,11 @@ else {
 }
 
 function siteLoadError(error, filename) {
-    var message = ['An error occurred while loading MEGA.'];
-
+    'use strict';
+    var message = ['MEGA failed to load because of '];
     if (location.host !== 'mega.nz') {
         message[0] += '..';
     }
-
     if (error === 1) {
         message.push('The file "' + filename + '" is corrupt.');
     }
@@ -1223,19 +1222,17 @@ function siteLoadError(error, filename) {
     else {
         message.push('Filename: ' + filename + "\nException: " + error);
     }
-
-    if (!is_extension) {
-        message.push('Please try again later. We apologize for the inconvenience.');
-    }
-    message.push("If the problem persists, please try disabling all third-party browser extensions, " +
-                 "update your browser and MEGA browser extension to the latest version and reload the page. " +
-                 "If that does not help, contact support@mega.nz");
-
+    message.push('Please click OK to refresh and try again.');
+    message.push("If the problem persists, please try disabling all third-party browser extensions,"
+        + " update your browser and MEGA browser extension to the latest version.If that does not help, "
+        + "contact support@mega.nz");
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
-
-
+    message.push('Static server: ' + staticpath);
     contenterror = 1;
-    alert(message.join("\n\n"));
+    // showing a confirm dialog containing the message, and if 'OK' pressed it will reload
+    if (confirm(message.join("\n\n")) === true) {
+        location.reload(true);
+    }
 }
 
 

@@ -2280,6 +2280,10 @@ function loadSubPage(tpage, event)
         return false;
     }
 
+    if (slideshowid) {
+        slideshow(0, 1);
+    }
+
     if (folderlink) {
         flhashchange = true;
     }

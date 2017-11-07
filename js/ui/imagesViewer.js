@@ -209,15 +209,15 @@ var slideshowid;
         if (d) {
             console.log('slideshow', id, close, slideshowid);
         }
-
+        
         if (close) {
             slideshowid = false;
             $overlay.addClass('hidden');
+            $document.unbind('keydown.slideshow');
             if ($document.fullScreen()) {
                 clearTimeout(fullScreenTimer);
                 $document.fullScreen(false);
                 $document.unbind('mousemove.mediaviewer');
-                $document.rebind('keydown.slideshow');
             }
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === id) {
@@ -230,10 +230,21 @@ var slideshowid;
             return false;
         }
         var n = slideshow_node(id, $overlay);
-
+        // Checking if this the first preview (not a preview navigation)
+        // then pushing fake states of history/hash
+        if (!slideshowid) {
+            if (!hashLogic) {
+                history.pushState({ subpage: page }, '', '/' + page);
+            }
+            else {
+                // pushing a fake state (hashed) to be consumed on back action
+                history.pushState({ subpage: page }, '', '/#' + page + '1');              
+                page = '';
+            }            
+        }
         // Bind keydown events
-        $document.rebind('keydown.slideshow', function(e) {
-            if (e.keyCode === 37 && slideshowid) {
+        var overlayKeyDownHandler = function (e) {
+            if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
                 slideshow_prev();
             }
             else if (e.keyCode === 39 && slideshowid) {
@@ -242,12 +253,19 @@ var slideshowid;
             else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
                 slideshow(slideshowid, true);
             }
-        });
+            else if (e.keyCode === 8 || e.key === 'Backspace' || key.code === 'Backspace') {
+                // since Backspace event is processed with keydown at document level for cloudBrowser.
+                // i prefered that to process it here, instead of unbind the previous handler.
+                e.stopPropagation();
+                history.back();
+            }
+        };
+        $document.rebind('keydown.slideshow', overlayKeyDownHandler);
 
         // Close icon
         $overlay.find('.viewer-button.close,.viewer-error-close')
-            .rebind('click', function() {
-                slideshow(id, 1);
+            .rebind('click', function () {
+                history.back();
             });
 
         // Fullscreen icon

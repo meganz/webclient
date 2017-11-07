@@ -362,8 +362,10 @@ FileManager.prototype.initFileManagerUI = function() {
                 var $ddelm = $(ui.draggable);
                 setTimeout(function() {
                     if ($.movet === M.RubbishID) {
-                        $.selected = $.moveids;
-                        fmremove();
+                        fmremove($.moveids);
+                        if (selectionManager) {
+                            selectionManager.clear_selection();
+                        }
                     }
                     else {
                         M.moveNodes($.moveids, $.movet)
@@ -372,6 +374,10 @@ FileManager.prototype.initFileManagerUI = function() {
                                     $ddelm.remove();
                                 }
                             });
+                        if (selectionManager) {
+                            selectionManager.clear_selection();
+                            selectionManager.set_currently_selected($.movet);
+                        }
                     }
                 }, 50);
             }
@@ -1476,7 +1482,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             M.getNodeRights(M.currentdirid) > 1
         ) {
             // delete
-            fmremove();
+            fmremove(s);
         }
         else if ((e.keyCode === 46) && (selPanel.length > 0)
             && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
@@ -2029,8 +2035,7 @@ FileManager.prototype.addContactUI = function() {
 
         // Remove contact button on contacts page
         $('.fm-remove-contact').rebind('click', function() {
-            $.selected = [M.currentdirid];
-            fmremove();
+            fmremove([M.currentdirid]);
         });
 
         if (!megaChatIsDisabled) {
@@ -2532,12 +2537,24 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
 
     $ddUIitem.rebind('contextmenu', function(e) {
-        if ($(this).attr('class').indexOf('ui-selected') == -1) {
-            $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-            $(this).addClass('ui-selected');
-            selectionManager.clear_selection();
-            selectionManager.set_currently_selected($(this).attr('id'));
+        if (e.shiftKey) {
+            selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }
+        else if (e.ctrlKey !== false || e.metaKey !== false)
+        {
+            selectionManager.add_to_selection($(this).attr('id'));
+        }
+        else {
+            if (selectionManager.selected_list.indexOf($(this).attr('id')) === -1) {
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected($(this).attr('id'));
+            }
+            else {
+                selectionManager.add_to_selection($(this).attr('id'));
+            }
+
+        }
+
         M.searchPath();
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 1);
@@ -2918,7 +2935,6 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     e = $('#treea_' + id_s);
     $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
     e.addClass('selected');
-    $.selected = [id]; // added by khaled - to indicate the selection
 
     if (!ignoreScroll) {
         if (id === this.RootID || id === 'shares' || id === 'contacts' || id === 'chat' || id === 'opc' || id === 'ipc') {

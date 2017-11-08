@@ -4439,7 +4439,7 @@
     "17482": "Email is misvormed",
     "17483": "Wanneer u de MEGA desktop applicatie installeert krijgt u %1$s aan extra opslag ruimte plus %2$s aan overdracht tegoed, beide geldig voor 180 dagen. De MEGA desktop applicatie is beschikbaar voor Windows, macOS, en de meeste Linux distributies.",
     "17484": "Wanneer u onze mobiele applicatie installeert krijgt u %1$s aan extra opslag ruimte plus %2$s aan overdracht tegoed, beide geldig voor 180 dagen. We bieden mobiele applicaties voor iOS, Android en Windows Phone. ",
-    "17485": "You have received %1$s storage space and %2$s transfer quota for installing our MEGA desktop app.",
+    "17485": "U heeft %1$s aan opslag ruimte en %2$s overdracht tegoed ontvangen voor het installeren van onze MEGA desktop applicatie.",
     "17486": "U heeft %1$s aan opslag ruimte en %2$s overdracht tegoed ontvangen voor het installeren van onze mobiele applicatie.",
     "17487": "U heeft %1$s opslag ruimte ontvangen voor uw gratis registratie bonus.",
     "17488": "Bonus verloopt over %1$d dagen",
@@ -4463,12 +4463,12 @@
     "17511": "Vernieuwd op [W]",
     "17512": "[W]en %d contacten waren niet succesvol verwijderd",
     "17513": "Bestanden kunnen niet gebruikt worden als u een passcode heeft in MEGA. Als u bestanden wilt gebruiken, open MEGA en schakel het uit.",
-    "17514": "MEGA accesses your contacts when you select some of them to save\/export.",
+    "17514": "MEGA krijgt toegang tot uw contacten wanneer u sommige selecteert om op te slaan\/exporteren.",
     "17517": "gebruikt %tq",
     "17520": "Beheer koppelingen",
-    "17521": "The content you are trying to access is not available for this account. Try to login with same account as in the mobile web client.",
-    "17522": "Invite friends and get Bonuses",
-    "17523": "Select contacts from your phone's contact list or enter multiple email addresses.",
-    "17524": "used %tq1",
-    "17525": "used %tq2"
+    "17521": "De inhoud die u probeert te krijgen is niet beschikbaar voor deze account. Probeer in te loggen met dezelfde account als in de mobiele web programma.",
+    "17522": "Nodig vrienden uit en krijg Bonussen ",
+    "17523": "Selecteer contacten vanuit de contactlijst op uw telefoon of voer meerdere e-mailadressen in.",
+    "17524": "gebruikt %tq1",
+    "17525": "gebruikt %tq2"
 }

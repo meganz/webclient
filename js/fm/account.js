@@ -1878,7 +1878,8 @@ accountUI.fillCharts = function(account, onDashboard) {
 
     // Maximum bandwidth
     b2 = bytesToSize(account.tfsq.max, 0).split(' ');
-    $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.tfsq.used, 0));
+    var usedB = bytesToSize(account.tfsq.used, 0);
+    $bandwidthChart.find('.chart.data .size-txt').text(usedB);
     $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
     $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
     if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
@@ -1893,7 +1894,16 @@ accountUI.fillCharts = function(account, onDashboard) {
     else {
         $bandwidthChart.addClass('no-percs');
         $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
-        var usedW = l[17517].toLowerCase().replace('%tq', '').trim();
+        var usedW;
+        if (usedB[0] === '1') {
+            usedW = l[17524].toLowerCase().replace('%tq1', '').trim();
+        }
+        else if (usedB[0] === '2') {
+            usedW = l[17525].toLowerCase().replace('%tq2', '').trim();
+        }
+        else {
+            usedW = l[17517].toLowerCase().replace('%tq', '').trim();
+        }
         $bandwidthChart.find('.chart.data .pecents-txt').text(usedW);
     }
     /* End of New Used Bandwidth chart */

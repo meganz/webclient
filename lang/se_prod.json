@@ -1339,7 +1339,6 @@
     "8906": "togs bort fr\u00e5n gruppchatten av %s",
     "8907": "anslutit sig till gruppchatten med inbjudan fr\u00e5n% s.",
     "8908": "L\u00e4mnade gruppen",
-    "8909": "\u00c5terkalla",
     "8910": "Borttagna objekt fr\u00e5n delad mapp",
     "8912": "Jag anv\u00e4nder [B]MEGAsync[\/B]",
     "8913": "Tagit bort [X] objekt fr\u00e5n delning",
@@ -1846,5 +1845,7 @@
     "17446": "Date Created",
     "17489": "view document",
     "17517": "used %tq",
-    "17520": "Manage links"
+    "17520": "Manage links",
+    "17524": "used %tq1",
+    "17525": "used %tq2"
 }

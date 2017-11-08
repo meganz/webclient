@@ -1339,7 +1339,6 @@
     "8906": "telah dihapus dari group chat oleh %s.",
     "8907": "bergabung dengan group chat oleh undangan dari %s.",
     "8908": "meninggalkan group chat.",
-    "8909": "Ambil kembali",
     "8910": "Menghapus item dari folder berbagi",
     "8912": "Saya akan menggunakan [B]MEGAsync[\/B]",
     "8913": "Menghapus [X] item dari berbagi",
@@ -1846,5 +1845,7 @@
     "17446": "Tanggal Dibuat",
     "17489": "view document",
     "17517": "used %tq",
-    "17520": "Manage links"
+    "17520": "Manage links",
+    "17524": "used %tq1",
+    "17525": "used %tq2"
 }

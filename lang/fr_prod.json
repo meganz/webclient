@@ -115,7 +115,7 @@
     "392": "D\u00e9veloppeurs",
     "396": "\u00c0 propos de nous",
     "398": "Abonnement PRO",
-    "399": "Contactez-nous",
+    "399": "Nous contacter",
     "403": "Compte",
     "405": "Outils",
     "408": "janvier",
@@ -176,7 +176,7 @@
     "509": "UNE ENTREPRISE QUI VOUS RESPECTE",
     "511": "Votre bicl\u00e9 RSA 2048 bits publique \/ priv\u00e9e est en cours de cr\u00e9ation.",
     "514": "Le solde est insuffisant, veuillez ressayer.",
-    "516": "Obtenir de l'assistance",
+    "516": "Obtenir de l\u2019assistance",
     "517": "Quelque chose ne fonctionne pas? Veuillez d'abord consulter notre [A]centre d'assistance[\/A]. Si vous n'y trouvez pas de r\u00e9ponse, n'h\u00e9sitez pas \u00e0 nous contacter.",
     "518": "Juridique",
     "519": "Notre service juridique est \u00e0 votre disposition pour r\u00e9pondre \u00e0 votre demande.",
@@ -1339,7 +1339,6 @@
     "8906": "a \u00e9t\u00e9 supprim\u00e9 de la conversation de groupe par %s.",
     "8907": "s'est joint \u00e0 la conversation de groupe sur invitation de %s.",
     "8908": "a quitt\u00e9 la conversation de groupe.",
-    "8909": "R\u00e9voquer",
     "8910": "Un \u00e9l\u00e9ment a \u00e9t\u00e9 retir\u00e9 d'un dossier partag\u00e9",
     "8912": "Je vais utiliser [B]MEGAsync[\/B]",
     "8913": "[X] \u00e9l\u00e9ments ont \u00e9t\u00e9 retir\u00e9s d'un partage",
@@ -1845,6 +1844,8 @@
     "17445": "Date d\u2019ajout",
     "17446": "Date de cr\u00e9ation",
     "17489": "visualiser le document",
-    "17517": "Because of singular\/plural agreement in many languages we cannot have one string for 1 and more than 1 MB.",
-    "17520": "G\u00e9rer les liens"
+    "17517": "%tq utilis\u00e9s",
+    "17520": "G\u00e9rer les liens",
+    "17524": "%tq1 utilis\u00e9",
+    "17525": "%tq2 utilis\u00e9s"
 }

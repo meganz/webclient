@@ -1339,7 +1339,6 @@
     "8906": "%s taraf\u0131ndan grup sohbetinden \u00e7\u0131kar\u0131ld\u0131.",
     "8907": "%s daveti ile grup sohbetine kat\u0131ld\u0131.",
     "8908": "grup sohbetinden ayr\u0131ld\u0131.",
-    "8909": "\u0130ptal et",
     "8910": "\u00d6\u011fe payla\u015f\u0131lan klas\u00f6rden kald\u0131r\u0131ld\u0131",
     "8912": "[B]MEGAsync[\/B] kullanaca\u011f\u0131m",
     "8913": "Payla\u015f\u0131lanlardan [X] nesne silindi",
@@ -1846,5 +1845,7 @@
     "17446": "Olu\u015fturulma Tarihi",
     "17489": "belgeyi g\u00f6r\u00fcnt\u00fcle",
     "17517": "kullan\u0131lan %tq",
-    "17520": "Ba\u011flant\u0131lar\u0131 y\u00f6net"
+    "17520": "Ba\u011flant\u0131lar\u0131 y\u00f6net",
+    "17524": "kullan\u0131lan %tq1",
+    "17525": "kullan\u0131lan %tq2"
 }

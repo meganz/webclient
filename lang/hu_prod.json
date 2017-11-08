@@ -1339,7 +1339,6 @@
     "8906": "was removed from the group chat by %s.",
     "8907": "joined the group chat by invitation from %s.",
     "8908": "left the group chat.",
-    "8909": "Revoke",
     "8910": "Removed item from shared folder",
     "8912": "I'll use [B]MEGAsync[\/B]",
     "8913": "Removed [X] items from a share",
@@ -1846,5 +1845,7 @@
     "17446": "Date Created",
     "17489": "view document",
     "17517": "used %tq",
-    "17520": "Manage links"
+    "17520": "Manage links",
+    "17524": "used %tq1",
+    "17525": "used %tq2"
 }

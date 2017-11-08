@@ -1339,7 +1339,6 @@
     "8906": "bol zo skupinovej konverz\u00e1cie odstr\u00e1nen\u00fd u\u017e\u00edvate\u013eom %s.",
     "8907": "sa pridal do skupinovej konverz\u00e1cie na pozvanie od %s.",
     "8908": "opustil skupinov\u00fd chat.",
-    "8909": "Odobra\u0165",
     "8910": "Polo\u017eka odstr\u00e1nen\u00e1 zo zdie\u013ean\u00e9ho prie\u010dinku",
     "8912": "Pou\u017eijem [B]MEGAsync[\/B]",
     "8913": "Odstr\u00e1nil [X] polo\u017eiek zo zdie\u013eania",
@@ -1846,5 +1845,7 @@
     "17446": "Date Created",
     "17489": "view document",
     "17517": "used %tq",
-    "17520": "Manage links"
+    "17520": "Manage links",
+    "17524": "used %tq1",
+    "17525": "used %tq2"
 }

@@ -1339,7 +1339,6 @@
     "8906": "tinanggal sa grupohang chat ni %s.",
     "8907": "sumali sa grupohang chat pamula sa paanyaya ni %s.",
     "8908": "iniwan ang group chat.",
-    "8909": "Bawiin",
     "8910": "Tanggalin ang item sa binabahaging folder",
     "8912": "Gagamitin ko ang [B]MEGAsync[\/B]",
     "8913": "Natanggal [X] ang items sa binahagi",
@@ -1846,5 +1845,7 @@
     "17446": "Date Created",
     "17489": "view document",
     "17517": "used %tq",
-    "17520": "Manage links"
+    "17520": "Manage links",
+    "17524": "used %tq1",
+    "17525": "used %tq2"
 }

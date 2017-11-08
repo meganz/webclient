@@ -5359,10 +5359,6 @@
         "text": "left the group chat.",
         "context": "A log message in the chat conversation underneath a user\/avatar (the subject) to tell the reader that a participant (the subject) left the group chat.\r\nFor example, [Alice] left the group chat."
     },
-    "8909": {
-        "text": "Revoke",
-        "context": "A button title to revoke the access to an attachment in a chat."
-    },
     "8910": {
         "text": "Removed item from shared folder",
         "context": "Notification when on client side when owner of a shared folder removes folder\/file from it."
@@ -7390,5 +7386,13 @@
     "17520": {
         "text": "Manage links",
         "context": "A menu item in the right click context menu in the Cloud Drive. This menu item will take the user to a dialog where they can manage the public folder\/file links which they currently have selected."
+    },
+    "17524": {
+        "text": "used %tq1",
+        "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[Singular] (=1)\r\n"
+    },
+    "17525": {
+        "text": "used %tq2",
+        "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[pair] (= 2)"
     }
 }

@@ -1339,7 +1339,6 @@
     "8906": "foi removido da conversa em grupo por %s.",
     "8907": "entrou na conversa em grupo por convite de %s.",
     "8908": "saiu da conversa em grupo.",
-    "8909": "Revogar",
     "8910": "Item removido da pasta partilhada",
     "8912": "Vou usar o [B]MEGAsync[\/B] ",
     "8913": "Removeu [X] itens de uma partilha",
@@ -1846,5 +1845,7 @@
     "17446": "Date Created",
     "17489": "view document",
     "17517": "used %tq",
-    "17520": "Manage links"
+    "17520": "Manage links",
+    "17524": "used %tq1",
+    "17525": "used %tq2"
 }

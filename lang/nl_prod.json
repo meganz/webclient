@@ -1339,7 +1339,6 @@
     "8906": "werd verwijderd uit de groeps-chat door %s.",
     "8907": "toegevoegd aan de groeps-chat op uitnodiging van %s.",
     "8908": "heeft de groeps-chat verlaten",
-    "8909": "Intrekken",
     "8910": "Verwijderd item van gedeelde map",
     "8912": "Ik zal gebruik maken van [B]MEGAsync[\/B]",
     "8913": "Verwijder [X] items van gedeelde map",
@@ -1846,5 +1845,7 @@
     "17446": "Datum Gemaakt",
     "17489": "document weergeven",
     "17517": "gebruikt %tq",
-    "17520": "Beheer koppelingen"
+    "17520": "Beheer koppelingen",
+    "17524": "gebruikt %tq1",
+    "17525": "gebruikt %tq2"
 }

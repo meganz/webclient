@@ -1339,7 +1339,6 @@
     "8906": "je bil odstranjen iz skupinskega pogovora s strani %s.",
     "8907": "se je pridru\u017eil skupinskemu pogovoru po povabilu s strani %s.",
     "8908": "je zapustil skupinski pogovor.",
-    "8909": "Prekli\u010di",
     "8910": "Odstranjen predmet iz deljene mape",
     "8912": "Uporabil bom [B]MEGAsync[\/B]",
     "8913": "Odstranjenih [X] elementov z deljenja",
@@ -1846,5 +1845,7 @@
     "17446": "Date Created",
     "17489": "view document",
     "17517": "used %tq",
-    "17520": "Manage links"
+    "17520": "Manage links",
+    "17524": "used %tq1",
+    "17525": "used %tq2"
 }

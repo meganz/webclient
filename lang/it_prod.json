@@ -1339,7 +1339,6 @@
     "8906": "\u00e8 stato rimosso dalla chat di gruppo da %s.",
     "8907": "si \u00e8 unito alla chat di gruppo dietro invito di %s.",
     "8908": "ha lasciato la chat di gruppo.",
-    "8909": "Revoca",
     "8910": "Oggetto rimosso dalla cartella condivisa",
     "8912": "User\u00f2 [B]MEGAsync[\/B]",
     "8913": "Rimossi [X] oggetti dalla condivisione",
@@ -1845,6 +1844,8 @@
     "17445": "Data aggiunta",
     "17446": "Data creazione",
     "17489": "vedi documento",
-    "17517": "utilizzati %tq",
-    "17520": "Gestisci i link"
+    "17517": "utilizzati %tq                                ",
+    "17520": "Gestisci i link",
+    "17524": "utilizzati %tq1",
+    "17525": "utilizzati %tq2"
 }

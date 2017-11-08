@@ -1339,7 +1339,6 @@
     "8906": "zosta\u0142 usuni\u0119ty z czatu przez %s.",
     "8907": "do\u0142\u0105czy\u0142 do czatu z zaproszenia od %s.",
     "8908": "opu\u015bci\u0142 grupowy czat.",
-    "8909": "Odrzu\u0107",
     "8910": "Usu\u0144 element z udost\u0119pnionego katalogu",
     "8912": "U\u017cyj\u0119 [B]MEGAsync[\/B]",
     "8913": "Usuni\u0119to [X] element\u00f3w z udost\u0119pnionego katalogu",
@@ -1845,6 +1844,8 @@
     "17445": "Data dodania",
     "17446": "Data utworzenia",
     "17489": "zobacz dokument",
-    "17517": "wykorzystano %tq",
-    "17520": "Zarz\u0105dzaj linkami"
+    "17517": "wykorzystane %tq",
+    "17520": "Zarz\u0105dzaj linkami",
+    "17524": "wykorzstane %tq1",
+    "17525": "wykorzstane %tq2"
 }

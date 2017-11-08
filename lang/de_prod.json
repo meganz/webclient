@@ -1339,7 +1339,6 @@
     "8906": "wurde von %s aus dem Chat entfernt.",
     "8907": "ist der Unterhaltung auf Einladung von %s beigetreten.",
     "8908": "hat den Chat verlassen",
-    "8909": "Entfernen",
     "8910": "Datei oder Ordner aus Freigabe entfernt",
     "8912": "[B]MEGAsync[\/B] verwenden",
     "8913": "[X] Dateien und Ordner aus Freigabe entfernt",
@@ -1846,5 +1845,7 @@
     "17446": "Date Created",
     "17489": "view document",
     "17517": "used %tq",
-    "17520": "Manage links"
+    "17520": "Manage links",
+    "17524": "verbraucht %tq1",
+    "17525": "verbraucht %tq2"
 }

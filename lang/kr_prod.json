@@ -1339,7 +1339,6 @@
     "8906": "%s\uc5d0 \uc758\ud574 \uadf8\ub8f9 \ub300\ud654\uc5d0\uc11c \uc81c\uac70\ub428.",
     "8907": "%s\uc758 \ucd08\ub300\uc5d0 \uc758\ud574 \uadf8\ub8f9 \ub300\ud654\uc5d0 \ucc38\uc5ec\ud568.",
     "8908": "\uadf8\ub8f9 \ub300\ud654 \ub5a0\ub0a8.",
-    "8909": "\ucca0\ud68c",
     "8910": "\uacf5\uc720 \ud3f4\ub354\uc5d0\uc11c \ud56d\ubaa9\uc744 \uc81c\uac70\ud588\uc2b5\ub2c8\ub2e4",
     "8912": "[B]MEGAsync[\/B]\ub97c \uc0ac\uc6a9\ud558\uaca0\uc2b5\ub2c8\ub2e4",
     "8913": "[X] \ud56d\ubaa9\uc774 \uacf5\uc720\uc5d0\uc11c \uc81c\uac70\ub428",
@@ -1845,6 +1844,8 @@
     "17445": "\ucd94\uac00\uc77c\uc790",
     "17446": "\uc0dd\uc131\uc77c\uc790",
     "17489": "\ubb38\uc11c \ubcf4\uae30",
-    "17517": "used %tq",
-    "17520": "Manage links"
+    "17517": "%tq \uc0ac\uc6a9\ud568",
+    "17520": "\ub9c1\ud06c \uad00\ub9ac",
+    "17524": "%tq1 \uc0ac\uc6a9\ud568",
+    "17525": "%tq2 \uc0ac\uc6a9\ud568"
 }

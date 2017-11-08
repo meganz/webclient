@@ -1339,7 +1339,6 @@
     "8906": "poistettu ryhm\u00e4keskustelusta k\u00e4ytt\u00e4j\u00e4n %s toimesta.",
     "8907": "liittyi ryhm\u00e4keskusteluun k\u00e4ytt\u00e4j\u00e4n %s kutsusta.",
     "8908": "poistui ryhm\u00e4keskustelusta",
-    "8909": "Poista",
     "8910": "Kohde poistettu jaetusta kansiosta",
     "8912": "K\u00e4yt\u00e4n [B]MEGAsynci\u00e4[\/B]",
     "8913": "Poistettu [X] kohdetta jaosta",
@@ -1846,5 +1845,7 @@
     "17446": "Date Created",
     "17489": "view document",
     "17517": "used %tq",
-    "17520": "Manage links"
+    "17520": "Manage links",
+    "17524": "used %tq1",
+    "17525": "used %tq2"
 }

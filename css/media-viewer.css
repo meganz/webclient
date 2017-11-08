@@ -94,7 +94,7 @@
     font-size: 0;
     line-height: 0;
 }
-.viewer-image-bl img, .viewer-image-bl embed, .viewer-image-bl iframe {
+.viewer-image-bl img, .viewer-image-bl embed, .viewer-image-bl iframe, .viewer-image-bl video {
     max-width: -webkit-calc(100% - 342px);
     max-width: -moz-calc(100% - 342px);
     max-width: calc(100% - 342px);

@@ -1511,7 +1511,7 @@ FileManager.prototype.initUIKeyEvents = function() {
                 if (n && n.t) {
                     M.openFolder(n.h);
                 }
-                else if ($.selected.length == 1 && M.d[$.selected[0]] && is_image(M.d[$.selected[0]])) {
+                else if ($.selected.length < 2 && (is_image(n) || is_video(n))) {
                     slideshow($.selected[0]);
                 }
                 else {
@@ -2605,7 +2605,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $('.top-context-menu').hide();
             M.openFolder(h);
         }
-        else if (is_image(n)) {
+        else if (is_image(n) || is_video(n)) {
             slideshow(h);
         }
         else {

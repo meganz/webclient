@@ -4,6 +4,21 @@ function is_rawimage(name, ext) {
     return is_image.raw[ext] && ext;
 }
 
+function is_video(n) {
+    'use strict';
+
+    return !window.safari && is_video.mime[filemime(n)];
+}
+
+is_video.mime = {
+    'video/mp4': -1,
+    'video/x-m4v': -1
+};
+
+if (d) {
+    is_video.mime['video/quicktime'] = 1;
+}
+
 function is_image(name) {
     if (name) {
         if (typeof name === 'object') {
@@ -191,12 +206,3 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
 if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
     delete mThumbHandler.sup.SVG;
 }
-
-mBroadcaster.once('startMega', function() {
-    'use strict';
-    var uad = ua.details;
-
-    if (uad.engine !== 'Webkit' && uad.engine !== 'Gecko' || uad.browser === 'Edge') {
-        delete mThumbHandler.sup.PDF;
-    }
-});

@@ -711,7 +711,6 @@
     "5738": "Papierkorb",
     "5775": "Belegt",
     "5799": "Nutzung",
-    "5801": "belegt",
     "5814": "Accountupgrade",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "G\u00fcltig bis %1",
     "8700": "Thunderbird-Erweiterung",
     "8726": "Einladen",
-    "8732": "Link \u00e4ndern",
-    "8733": "Links \u00e4ndern",
     "8734": "Linkexport",
     "8735": "Links l\u00f6schen",
     "8736": "G\u00fcltig bis",
@@ -1540,7 +1537,6 @@
     "16169": "Erstellt am\/um",
     "16172": "Markierung...",
     "16173": "Farbe w\u00e4hlen:",
-    "16174": "\u00c4nderungsdatum",
     "16175": "Status g\u00fcltig bis",
     "16221": "Mit %1 markieren",
     "16222": "Markierung %1 entfernen",
@@ -1846,5 +1842,9 @@
     "17155": "Platzverbrauch \u00e4lterer Dateiversionen:",
     "17156": "Von %1 umbenannt",
     "17398": "Label",
-    "17489": "view document"
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17517": "used %tq",
+    "17520": "Manage links"
 }

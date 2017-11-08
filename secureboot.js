@@ -1208,12 +1208,11 @@ else {
 }
 
 function siteLoadError(error, filename) {
-    var message = ['An error occurred while loading MEGA.'];
-
+    'use strict';
+    var message = ['MEGA failed to load because of '];
     if (location.host !== 'mega.nz') {
         message[0] += '..';
     }
-
     if (error === 1) {
         message.push('The file "' + filename + '" is corrupt.');
     }
@@ -1223,19 +1222,17 @@ function siteLoadError(error, filename) {
     else {
         message.push('Filename: ' + filename + "\nException: " + error);
     }
-
-    if (!is_extension) {
-        message.push('Please try again later. We apologize for the inconvenience.');
-    }
-    message.push("If the problem persists, please try disabling all third-party browser extensions, " +
-                 "update your browser and MEGA browser extension to the latest version and reload the page. " +
-                 "If that does not help, contact support@mega.nz");
-
+    message.push('Please click OK to refresh and try again.');
+    message.push("If the problem persists, please try disabling all third-party browser extensions,"
+        + " update your browser and MEGA browser extension to the latest version.If that does not help, "
+        + "contact support@mega.nz");
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
-
-
+    message.push('Static server: ' + staticpath);
     contenterror = 1;
-    alert(message.join("\n\n"));
+    // showing a confirm dialog containing the message, and if 'OK' pressed it will reload
+    if (confirm(message.join("\n\n")) === true) {
+        location.reload(true);
+    }
 }
 
 
@@ -2155,6 +2152,7 @@ else if (!b_u) {
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
+        'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
@@ -2164,7 +2162,11 @@ else if (!b_u) {
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
         'ios': {f:'html/ios.html', n: 'ios', j:0},
         'android': {f:'html/android.html', n: 'android', j:0},
-        'wp': {f:'html/wp.html', n: 'wp', j:0}
+        'wp': {f:'html/wp.html', n: 'wp', j:0},
+        'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 }, 
+        'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
+        'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
+        'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 }
     };
 
     var jsl3 = {
@@ -2681,6 +2683,23 @@ else if (!b_u) {
                         }, 300);
                     }
                     throw new Error('Error parsing language file '+lang+'.json');
+                }
+            }
+            else if (jsl[i].j === 4) { // new type to distinguish files to be used on iframes
+                if (!window[jsl[i].n]) {
+                    var scriptText = jsl[i].text;
+                    var blobLink;
+                    if ((jsl[i].n || '').indexOf('css') > -1) {
+                        scriptText = scriptText.replace(/\.\.\//g, staticpath).replace(new RegExp("\\/en\\/", "g"), '/' + lang + '/');
+                        blobLink = mObjectURL([scriptText], 'text/css');
+                    }
+                    else {
+                        if (jsl[i].n === 'pdforiginalviewerjs') {
+                            scriptText = modifyPdfViewerScript(scriptText);
+                        }
+                        blobLink = mObjectURL([scriptText], 'text/javascript');
+                    }
+                    window[jsl[i].n] = blobLink;
                 }
             }
             else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {

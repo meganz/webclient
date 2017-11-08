@@ -56,8 +56,7 @@ mobile.deleteOverlay = {
         this.$overlay.find('.first.delete').off('tap').on('tap', function() {
 
             // Delete the file
-            $.selected = [nodeHandle];
-            fmremove();
+            fmremove([nodeHandle]);
 
             // Run the callback function on successful deletion
             if (typeof successCallback !== 'undefined') {

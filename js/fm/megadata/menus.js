@@ -143,7 +143,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     items['.clearprevious-versions'] = 1;
                 }
             }
-            if (is_image(selNode)) {
+            if (is_image(selNode) || is_video(selNode)) {
                 items['.preview-item'] = 1;
             }
         }
@@ -466,9 +466,9 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
         }
     }
 
-    // If all the selected nodes have existing public links, set text to 'Update links' or 'Update link'
+    // If all the selected nodes have existing public links, set text to 'Manage links' or 'Manage link'
     if (numOfSelectedNodes === numOfExistingPublicLinks) {
-        getLinkText = (numOfSelectedNodes > 1) ? l[8733] : l[8732];
+        getLinkText = numOfSelectedNodes > 1 ? l[17520] : l[6909];
     }
     else {
         // Otherwise change text to 'Get links' or 'Get link' if there are selected nodes without links

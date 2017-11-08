@@ -711,7 +711,6 @@
     "5738": "Sampah",
     "5775": "Terpakai",
     "5799": "Pemakaian",
-    "5801": "Terpakai",
     "5814": "Upgrade akun",
     "5816": "[X] TB",
     "5819": "PRO 1",
@@ -1218,8 +1217,6 @@
     "8698": "Hangus %1",
     "8700": "Extension Thunderbird",
     "8726": "Undang",
-    "8732": "Update link",
-    "8733": "Update links",
     "8734": "Dapatkan links",
     "8735": "Hapus links",
     "8736": "Set tanggal expiration baru",
@@ -1540,7 +1537,6 @@
     "16169": "Tanggal Dibuat",
     "16172": "Label...",
     "16173": "Pilih warna:",
-    "16174": "Tanggal diubah",
     "16175": "Subskripsi Berakhir Pada",
     "16221": "Tambah label %1",
     "16222": "Hapus label %1",
@@ -1846,5 +1842,9 @@
     "17155": "Ukuran total diambil oleh versi file:",
     "17156": "Berganti nama dari %1",
     "17398": "Label",
-    "17489": "view document"
+    "17445": "Tanggal Ditambahkan",
+    "17446": "Tanggal Dibuat",
+    "17489": "view document",
+    "17517": "used %tq",
+    "17520": "Manage links"
 }

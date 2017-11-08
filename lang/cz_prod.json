@@ -711,7 +711,6 @@
     "5738": "Ko\u0161",
     "5775": "Vyu\u017eito",
     "5799": "Vyu\u017eit\u00ed",
-    "5801": "vyu\u017eito",
     "5814": "Upgradujte \u00fa\u010det",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Expires %1",
     "8700": "Roz\u0161\u00ed\u0159en\u00ed pro Thunderbird",
     "8726": "Pozvat",
-    "8732": "Aktualizovat odkaz",
-    "8733": "Aktualizovat odkaz",
     "8734": "Z\u00edskat odkazy",
     "8735": "Odebrat odkazy",
     "8736": "Nastavit nov\u00e9 datum vypr\u0161en\u00ed",
@@ -1540,7 +1537,6 @@
     "16169": "Datum vytvo\u0159en\u00ed",
     "16172": "\u0160t\u00edtek...",
     "16173": "Zvolte barvu:",
-    "16174": "Datum zm\u011bny",
     "16175": "P\u0159edplatn\u00e9 plat\u00ed do",
     "16221": "P\u0159idat \u0161t\u00edtek %1",
     "16222": "Odebrat \u0161t\u00edtek %1",
@@ -1846,5 +1842,9 @@
     "17155": "Total size taken up by file versions:",
     "17156": "Renamed from %1",
     "17398": "Label",
-    "17489": "view document"
+    "17445": "Date Added",
+    "17446": "Date Created",
+    "17489": "view document",
+    "17517": "used %tq",
+    "17520": "Manage links"
 }

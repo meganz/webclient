@@ -960,9 +960,7 @@ function FMShortcuts() {
                 return; // dont do anything.
             }
 
-            $.selected = items;
-
-            fmremove();
+            fmremove(items);
 
             // force remove, no confirmation
             if (e.ctrlKey || e.metaKey) {
@@ -1018,7 +1016,14 @@ function renameDialog() {
                 var value = $input.val();
 
                 if (value && n.name && value !== n.name) {
-                    M.rename(n.h, value);
+                    if (M.isSafeName(value)) {
+                        M.rename(n.h, value);
+                    }
+                    else {
+                        $dialog.removeClass('active');
+                        $input.addClass('error');
+                        return;
+                    }
                 }
 
                 closeDialog();
@@ -1054,14 +1059,22 @@ function renameDialog() {
             $dialog.removeClass('focused');
         });
 
-        $input.rebind('click keydown keyup keypress', function() {
+        $input.rebind('click keydown', function (event) {
+            // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
+            if (event.type === 'keydown') {
+                if (event.keyCode === 13) {
+                    $('.rename-dialog-button.rename').click();
+                    return;
+                }
+            }
             var value = $(this).val();
 
-            if (!value || (!n.t && ext.length > 0 && value === '.' + ext)) {
+            if (!value) {
                 $dialog.removeClass('active');
             }
             else {
                 $dialog.addClass('active');
+                $input.removeClass('error');
             }
             /*if (!n.t && ext.length > 0) {
                 if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {
@@ -1294,12 +1307,19 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     });
     $('#msgDialog').removeClass('hidden');
     fm_showoverlay();
+
+    if ($.dialog) {
+        $('.fm-dialog').addClass('arrange-to-back');
+    }
 }
 
 function closeMsg() {
     $('#msgDialog').addClass('hidden');
 
-    if (!$('.pro-register-dialog').is(':visible')) {
+    if ($.dialog) {
+        $('.fm-dialog').removeClass('arrange-to-back');
+    }
+    else {
         fm_hideoverlay();
     }
 
@@ -2076,11 +2096,6 @@ function closeDialog(ev) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
     }
 
-    if (typeof $.dialog === 'function') {
-        onIdle($.dialog);
-        $.dialog = null;
-    }
-
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         fm_hideoverlay();
         $('.fm-dialog.registration-page-success').addClass('hidden').removeClass('special');
@@ -2154,7 +2169,7 @@ function closeDialog(ev) {
             delete $.onImportCopyNodes;
         }
     }
-    $('.fm-dialog').removeClass('arrange-to-back');
+    $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
 
     $('.export-links-warning').addClass('hidden');
     if ($.dialog === 'terms' && $.termsAgree) {
@@ -2408,24 +2423,22 @@ function bottomPageDialog(close, pp, hh) {
     "use strict";
 
     var $dialog = $('.fm-dialog.bottom-pages-dialog');
+    var closeDialog = function() {
+        $dialog.unbind('dialog-closed');
+        window.closeDialog();
+        delete $.termsAgree;
+        delete $.termsDeny;
+        return false;
+    };
 
-    if (close)
-    {
-        $dialog.addClass('hidden');
-        if (!$('.pro-register-dialog').is(":visible")) {
-            fm_hideoverlay();
-            $.dialog = false;
-        }
-        if ($.termsAgree) $.termsAgree = undefined;
-        if ($.termsDeny) $.termsDeny = undefined;
+    if (close) {
+        closeDialog();
         return false;
     }
 
     if (!pp) {
         pp = 'terms';
     }
-
-    $.dialog = pp;
 
     // Show Agree/Cancel buttons for Terms dialogs
     if (pp === 'terms' || pp === 'sdkterms') {
@@ -2470,28 +2483,48 @@ function bottomPageDialog(close, pp, hh) {
         });
     }
 
-    if (!pages[pp])
-    {
-        loadingDialog.show();
+    var asyncTaskID;
+    if (!pages[pp]) {
+        asyncTaskID = 'page.' + pp + '.' + makeUUID();
+
         M.require(pp)
-            .done(function() {
-                loadingDialog.hide();
-                bottomPageDialog(false, $.dialog);
+            .always(function() {
+                mBroadcaster.sendMessage(asyncTaskID);
+                asyncTaskID = null;
             });
-        return false;
     }
 
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
-    $('.bp-main', $dialog).safeHTML(
-        translate(
-            pages[pp].split('((TOP))')[1].split('((BOTTOM))')[0].replace('main-mid-pad new-bottom-pages', '')
-        )
-    );
+    M.safeShowDialog(pp, function _showDialog() {
+        if (asyncTaskID) {
+            loadingDialog.show();
+            mBroadcaster.once(asyncTaskID, function() {
+                loadingDialog.hide();
+                asyncTaskID = null;
+                _showDialog();
+            });
 
-    $('.bp-body', $dialog).jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
-    jScrollFade('.bp-body');
-    clickURLs();
+            return $dialog;
+        }
+        $dialog.rebind('dialog-closed', closeDialog).removeClass('hidden');
+
+        $('.bp-main', $dialog)
+            .safeHTML(translate(String(pages[pp])
+                .split('((TOP))')[1]
+                .split('((BOTTOM))')[0]
+                .replace('main-mid-pad new-bottom-pages', ''))
+            );
+
+        $('.bp-body', $dialog).jScrollPane({
+            showArrows: true,
+            arrowSize: 5,
+            animateScroll: true,
+            verticalDragMinHeight: 50
+        });
+        jScrollFade('.bp-body');
+        clickURLs();
+
+        return $dialog;
+    });
 }
 
 function clipboardcopycomplete()
@@ -2629,10 +2662,6 @@ function fm_resize_handler(force) {
     }
 
     if (M.currentdirid !== 'transfers') {
-        if (slideshowid && previews[slideshowid]) {
-            previewsrc(slideshowid);
-        }
-
         if (megaChatIsReady && megaChat.resized) {
             megaChat.resized();
         }

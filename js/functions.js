@@ -2533,3 +2533,131 @@ Hash.prototype = Object.create(null, {
         }
     }
 });
+
+
+// this is to change pdf.viewer.js on the fly, as we cant change the original file
+function modifyPdfViewerScript(pdfViewerSrcCode) {
+    'use strict';
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('defaultFilename = \'compressed.tracemonkey - pldi - 09.pdf\';',
+        'defaultFilename = \'document.pdf\';');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('PDFJS.imageResourcesPath = \'./images/\';',
+        'PDFJS.imageResourcesPath = \'/images/pdfV/\';');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('PDFJS.workerSrc = \'../build/pdf.worker.js\';',
+        'PDFJS.workerSrc = \'/pdf.worker.js\';');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('setTitleUsingUrl: function pdfViewSetTitleUsingUrl(url) {',
+        'setTitleUsingUrl: function pdfViewSetTitleUsingUrl(url) { return;');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('var filename = getPDFFileNameFromURL(this.url);',
+        'var filename = this.documentInfo.Title + \'.pdf\';');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('validateFileURL(file);',
+        ' ');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('mozL10n.setLanguage(PDFJS.locale);',
+        ' ');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('document.getElementsByTagName(\'html\')[0].dir = mozL10n.getDirection();',
+        ' ');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('\'fileName\': getPDFFileNameFromURL(this.url),',
+        '\'fileName\': data.info.Title,');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('debuggerScriptPath: \'./debugger.js\',',
+        ' ');
+
+    // algorithm to remove 'mozL10n.get'
+    var st = 5000; // start from char 50000
+
+    var getMsgFromLine = function (startPos, endPos, file) { // this method cuts the last parameter
+        var firstParam = true;
+        var secondParam = false;
+        var finalParam = false;
+        var msg = '';
+        var lastLoc = -1;
+        for (var k = startPos; k < endPos; k++) {
+            if (!finalParam) {
+                if (file.charAt(k) === ',') {
+                    if (firstParam) {
+                        firstParam = false;
+                        secondParam = true;
+                    }
+                    else if (secondParam) {
+                        secondParam = false;
+                        finalParam = true;
+                    }
+                }
+                else if (secondParam && file.charAt(k) === '{') {
+                    while (file.charAt(k) !== '}') {
+                        k++;
+                    }
+                }
+            }
+            else {
+                var counter = 0;
+                for (var h = k; h < endPos; h++) {
+                    if (file.charAt(h) === ')') {
+                        if (counter === 0) {
+                            lastLoc = h + 1;
+                            break;
+                        }
+                        else {
+                            counter--;
+                        }
+                    }
+                    else if (file.charAt(h) === '(') {
+                        counter++;
+                    }
+                    msg += file.charAt(h);
+                }
+                break;
+            }
+        }
+        return {
+            message: msg, endLocation: lastLoc
+        };
+    };
+
+    var loc = -1;
+    loc = pdfViewerSrcCode.indexOf('mozL10n.get(', st);
+    while (loc !== -1) {
+        var endPos = pdfViewerSrcCode.indexOf(';', loc);
+        var currRes = getMsgFromLine(loc, endPos, pdfViewerSrcCode);
+        pdfViewerSrcCode = pdfViewerSrcCode.substring(0, loc)
+            + currRes.message
+            + pdfViewerSrcCode.substring(currRes.endLocation, pdfViewerSrcCode.length);
+        loc = pdfViewerSrcCode.indexOf('mozL10n.get', loc + 1);
+    }
+    // end algorithm to remove 'mozL10n.get'
+
+    var finalFunctionOnViewLoad = 'function webViewerLoad() { '
+        + 'var config = getViewerConfiguration(); '
+        + 'var pdfRef = JSON.parse(localStorage.getItem(\'currPdfPrev2\')); '
+        + 'localStorage.removeItem(\'currPdfPrev2\'); '
+        + 'config.defaultUrl = pdfRef; '
+        + 'config.toolbar.openFile.setAttribute(\'hidden\', \'true\'); '
+        + 'config.secondaryToolbar.openFileButton.setAttribute(\'hidden\', \'true\'); '
+        + 'window.PDFViewerApplication = pdfjsWebApp.PDFViewerApplication; '
+        + 'pdfjsWebApp.PDFViewerApplication.run(config);} '
+        + 'document.addEventListener(\'DOMContentLoaded\', webViewerLoad, true); '
+        + '}) ]);';
+
+    var placeToCut = pdfViewerSrcCode.indexOf('function webViewerLoad() {');
+    pdfViewerSrcCode = pdfViewerSrcCode.substring(0, placeToCut);
+
+    pdfViewerSrcCode += finalFunctionOnViewLoad;
+
+    return pdfViewerSrcCode;
+}

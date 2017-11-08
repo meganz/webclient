@@ -711,7 +711,6 @@
     "5738": "Lixeira",
     "5775": "Utilizado",
     "5799": "Utiliza\u00e7\u00e3o",
-    "5801": "utilizado",
     "5814": "Atualizar conta",
     "5816": "[X] TB",
     "5819": "PRO I",
@@ -1218,8 +1217,6 @@
     "8698": "Vencimento %1",
     "8700": "Extens\u00e3o para Thunderbird",
     "8726": "Invitar",
-    "8732": "Atualizar link",
-    "8733": "Atualizar links",
     "8734": "Obter links",
     "8735": "remover links",
     "8736": "Definir nova data de validade",
@@ -1540,7 +1537,6 @@
     "16169": "Data de cria\u00e7\u00e3o",
     "16172": "Etiqueta...",
     "16173": "Escolha a cor:",
-    "16174": "Data de modifica\u00e7\u00e3o",
     "16175": "A assinatura expira em",
     "16221": "Adicionar marcador %1",
     "16222": "Remover marcador %1",
@@ -1846,5 +1842,9 @@
     "17155": "Espa\u00e7o ocupado por vers\u00f5es de arquivos:",
     "17156": "Nome anterior %1",
     "17398": "Etiqueta",
-    "17489": "view document"
+    "17445": "Data de inclus\u00e3o",
+    "17446": "Data de cria\u00e7\u00e3o",
+    "17489": "Ver documento",
+    "17517": "used %tq",
+    "17520": "Manage links"
 }

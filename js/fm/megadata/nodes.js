@@ -1072,7 +1072,7 @@ MegaData.prototype.favourite = function(handles, newFavState) {
         }
 
         $.each(handles, function(index, handle) {
-            var node = M.d[handle];
+            var node = M.getNodeByHandle(handle);
 
             if (node && !exportLink.isTakenDown(handle)) {
                 node.fav = newFavState;

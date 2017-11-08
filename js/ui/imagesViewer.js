@@ -72,6 +72,7 @@ var slideshowid;
         var steps = slideshowsteps();
         if (steps.forward.length > 0) {
             slideshow(steps.forward[0]);
+            mBroadcaster.sendMessage('slideshow:next', steps);
         }
     }
 
@@ -90,6 +91,7 @@ var slideshowid;
         var steps = slideshowsteps();
         if (steps.backward.length > 0) {
             slideshow(steps.backward[steps.backward.length - 1]);
+            mBroadcaster.sendMessage('slideshow:prev', steps);
         }
     }
 
@@ -227,6 +229,7 @@ var slideshowid;
                     break;
                 }
             }
+            mBroadcaster.sendMessage('slideshow:close');
             return false;
         }
         var n = slideshow_node(id, $overlay);
@@ -344,6 +347,7 @@ var slideshowid;
             delete pfails[id];
             M.addDownload([id], false, err ? -1 : true);
         }
+
         eot.timeout = 8500;
 
         var preview = function preview(ctx, h, u8) {
@@ -396,6 +400,21 @@ var slideshowid;
             return false;
         }
 
+        if (is_video(n)) {
+            if (!preqs[n.h]) {
+                preqs[n.h] = 1;
+
+                M.require('videostream').done(function() {
+                    if (preqs[n.h]) {
+                        slideshow_videostream(n);
+                    }
+                }).fail(function() {
+                    console.error('Failed to load videostream.js');
+                });
+            }
+            return false;
+        }
+
         if (pfails[n.h]) {
             // for slideshow_next/prev
             if (slideshowid === n.h) {
@@ -410,6 +429,103 @@ var slideshowid;
         api_getfileattr(treq, 1, preview, eot);
     }
 
+    // start streaming a video file
+    function slideshow_videostream(n) {
+        dlmanager.setUserFlags();
+        previewimg(n.h, Array(26).join('x'), filemime(n));
+        preqs[n.h] = Streamer(n.link || n.h, $('.viewer-overlay video').get(0));
+
+        var fullscreenElement;
+        var onFullScreenChange = function() {
+            fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement || fullscreenElement;
+
+            if (fullscreenElement && fullscreenElement.nodeName === 'VIDEO') {
+                var isFullScreen = document.fullscreen || document.webkitIsFullScreen;
+
+                if (isFullScreen) {
+                    $(fullscreenElement).css('border', 'none');
+                }
+                else {
+                    $(fullscreenElement).css('border', '12px solid #111111');
+                    fullscreenElement = null;
+                }
+            }
+        };
+        document.addEventListener('fullscreenchange', onFullScreenChange, false);
+        document.addEventListener('webkitfullscreenchange', onFullScreenChange, false);
+
+        var destroy = function() {
+            document.removeEventListener('fullscreenchange', onFullScreenChange);
+            document.removeEventListener('webkitfullscreenchange', onFullScreenChange);
+
+            if (preqs[n.h] instanceof Streamer) {
+                mBroadcaster.removeListener(preqs[n.h].ev1);
+                mBroadcaster.removeListener(preqs[n.h].ev2);
+                mBroadcaster.removeListener(preqs[n.h].ev3);
+
+                preqs[n.h].destroy();
+                preqs[n.h] = previews[n.h] = false;
+            }
+        };
+        preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
+        preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
+        preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:close', destroy);
+
+        preqs[n.h].onplayback(function() {
+            var video = this.video;
+
+            if (video && video.duration) {
+                video.removeAttribute('style');
+                var maxWidth = innerWidth * 70 / 100;
+                var maxHeight = innerHeight * 70 / 100;
+                var ratio = Math.min(maxWidth / video.videoWidth, maxHeight / video.videoHeight);
+
+                video.width = Math.ceil(video.videoWidth * ratio);
+
+                if (maxWidth > video.videoWidth) {
+                    $(video).css({
+                        'min-width': video.videoWidth * ratio + 'px',
+                        'min-height': video.videoHeight * ratio + 'px'
+                    });
+                }
+
+                return -1;
+            }
+        });
+
+        preqs[n.h].onerror(function(ev, error) {
+            // <video>'s element `error` handler
+            if (!$.dialog) {
+                msgDialog('warninga', l[135], l[47], error.message || error);
+            }
+            destroy();
+
+            if (filemime(n) !== 'video/quicktime') {
+                api_req({a: 'log', e: 99669, m: 'stream error'});
+            }
+        });
+
+        if (d) {
+            window.strm = preqs[n.h];
+        }
+    }
+
+    // a method to fetch scripts and files needed to run pdfviewer
+    // and then excute them on iframe element [#pdfpreviewdiv1]
+    function prepareAndViewPdfViewer() {
+        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdforiginalviewerjs').done(function() {
+            var myPage = pages['pdfviewer'];
+            myPage = myPage.replace('^$#^1', window['pdfviewercss']);
+            myPage = myPage.replace('^$#^3', window['pdfjs2']);
+            myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
+            $('#pdfpreviewdiv1').removeClass('hidden');
+            var doc = document.getElementById('pdfpreviewdiv1').contentWindow.document;
+            doc.open();
+            doc.write(myPage);
+            doc.close();
+        });
+    }
+
     function previewsrc(id) {
         var $overlay = $('.viewer-overlay');
 
@@ -420,15 +536,39 @@ var slideshowid;
         }
 
         $overlay.find('.viewer-image-bl embed').addClass('hidden');
+        $overlay.find('.viewer-image-bl video').addClass('hidden');
         $overlay.find('.viewer-image-bl img').removeClass('hidden');
+        $('#pdfpreviewdiv1').addClass('hidden');
 
         if (previews[id].type === 'application/pdf') {
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
             $overlay.find('.viewer-image-bl img').addClass('hidden');
             $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
-            $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);
+            if (ua.details.browser !== 'Edge' && ua.details.engine !== 'Trident') {
+                $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);
+            }
+            else { // some other browser
+                // to fix pdf compatibility - Bug #7796
+                localStorage.setItem('currPdfPrev2', JSON.stringify(src));
+                prepareAndViewPdfViewer();
+            }
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
+            return;
+        }
+
+        if (String(previews[id].type).startsWith('video')) {
+            var maxWidth = Math.ceil(innerWidth * 70 / 100);
+
+            $overlay.find('.viewer-pending').addClass('hidden');
+            // $overlay.find('.viewer-progress').addClass('hidden');
+            $overlay.find('.viewer-image-bl img').addClass('hidden');
+            $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
+            $overlay.find('.viewer-image-bl video')
+                .attr('width', maxWidth)
+                .css('min-width', maxWidth)
+                .removeClass('hidden');
+            api_req({a: 'log', e: 99668, m: 'video watch'});
             return;
         }
 

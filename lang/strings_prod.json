@@ -2847,10 +2847,6 @@
         "text": "Usage",
         "context": "Button title that goes to the section Usage where you can see how your MEGA space is used"
     },
-    "5801": {
-        "text": "used",
-        "context": "as in storage used in the CloudDrive"
-    },
     "5814": {
         "text": "Upgrade Account",
         "context": "Change from a free account to paying MEGA"
@@ -4875,14 +4871,6 @@
         "text": "Invite",
         "context": "A button on a dialog which invites a contact to join MEGA."
     },
-    "8732": {
-        "text": "Update link",
-        "context": "A right click context menu item. This will let the user update a public link with additional information. For example the public link can now be updated with an expiry time."
-    },
-    "8733": {
-        "text": "Update links",
-        "context": "A right click context menu item. This will let the user update multiple public links with additional information. For example the public links can now be updated with an expiry time."
-    },
     "8734": {
         "text": "Get links",
         "context": "A right click context menu item. This will let the user create multiple public links for the selected folders and files."
@@ -6163,10 +6151,6 @@
         "text": "Choose colour:",
         "context": "Context menu item which allows to choose color of selected folder"
     },
-    "16174": {
-        "text": "Date Modified",
-        "context": "A table column header for the date when a file was modified."
-    },
     "16175": {
         "text": "Subscription Expires On",
         "context": "A label on the My Account page indicating the expiration date of a PRO account. This is shown if they do not have a recurring subscription (e.g. the purchased a one-off plan for a specific time period) or the recurring subscription was recently canceled so they still have some time remaining on their plan."
@@ -7387,8 +7371,24 @@
         "text": "Label",
         "context": "A menu item in the left panel drop down menu to allow sorting by label."
     },
+    "17445": {
+        "text": "Date Added",
+        "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's date of encryption on the Cloud Drive (not the date of the file's creation on their local machine)."
+    },
+    "17446": {
+        "text": "Date Created",
+        "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's original timestamp, when it is created on their local machine."
+    },
     "17489": {
         "text": "view document",
         "context": "Button for the downloads page to let users preview PDF documents."
+    },
+    "17517": {
+        "text": "used %tq",
+        "context": "Used transfer quota of the account. The placeholder represents transfer quota to give context. The amount of quota will be plural (more than 2)."
+    },
+    "17520": {
+        "text": "Manage links",
+        "context": "A menu item in the right click context menu in the Cloud Drive. This menu item will take the user to a dialog where they can manage the public folder\/file links which they currently have selected."
     }
 }

@@ -10,7 +10,7 @@
     margin: -36px 0 0 0;
 }
 .content-panel.conversations {
-    background-image: url(../images/mega/nw-chat-bg.svg);
+    background-image: url(../images/mega/nw-chat-bg_v1.svg);
     background-repeat: repeat;
     min-height: 100%;
     display: block;
@@ -25,10 +25,10 @@
     cursor: pointer;
 }
 .conversations-pane li:nth-child(even) {
-    background-color: #F6F6F6;
+    background-color: #FFFFFF;
 }
 .conversations-pane li:nth-child(odd) {
-    background-color: #EEEEEE;
+    background-color: #FAFAFA;
 }
 .user-card-name.conversation-name {
     padding: 0 26px 0 0;
@@ -48,7 +48,7 @@
 .conversation-message {
     font-size: 13px;
     line-height: 18px;
-    color: #777777;
+    color: #555555;
     margin: 0 40px 0 0;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;

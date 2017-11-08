@@ -1773,7 +1773,9 @@ function topmenuUI() {
         var $this = $(this);
         if ($this.attr('class').indexOf('active') == -1) {
             $this.addClass('active');
-            $topHeader.find('.top-user-status-popup').removeClass('hidden');
+            $topHeader.find('.top-user-status-popup')
+                .removeClass('hidden')
+                .find('.dropdown-item').show();
             topPopupAlign('.activity-status-block', '.top-user-status-popup', 40);
         }
         else {

@@ -410,6 +410,32 @@ function dl_g(res) {
                 }
             }
 
+            var showPreviewButton = function($infoBlock) {
+                $infoBlock = $infoBlock || $('.download.info-block');
+
+                if (is_image(filename) || is_video(filename)) {
+                    var $ipb = $infoBlock.find('.img-preview-button');
+
+                    if (filetype(filename) === 'PDF Document') {
+                        $ipb.find('span').text(l[17489]);
+                    }
+                    else if (is_video(filename)) {
+                        $ipb.find('span').text('view video');
+                    }
+
+                    $ipb.removeClass('hidden')
+                        .rebind('click', function() {
+                            slideshow({
+                                k: key,
+                                fa: res.fa,
+                                h: dlpage_ph,
+                                name: filename,
+                                link: dlpage_ph + '!' + dlpage_key
+                            });
+                        });
+                }
+            };
+
             if (res.fa) {
                 // load thumbnail
                 api_getfileattr([{fa: res.fa, k: key}], 0, function(a, b, data) {
@@ -421,27 +447,13 @@ function dl_g(res) {
                             $infoBlock.addClass('thumb');
                             $infoBlock.find('img').attr('src', data);
 
-                            if (is_image(filename)) {
-                                var $ipb = $infoBlock.find('.img-preview-button');
-
-                                if (filetype(filename) === 'PDF Document') {
-                                    $ipb.find('span').text(l[17489]);
-                                }
-
-                                $ipb.removeClass('hidden')
-                                    .rebind('click', function() {
-                                        slideshow({
-                                            k: key,
-                                            fa: res.fa,
-                                            h: dlpage_ph,
-                                            name: filename,
-                                            link: dlpage_ph + '!' + dlpage_key
-                                        });
-                                    });
-                            }
+                            showPreviewButton($infoBlock);
                         }
                     }
                 });
+            }
+            else if (is_video(filename)) {
+                showPreviewButton();
             }
         }
         else if (is_mobile) {

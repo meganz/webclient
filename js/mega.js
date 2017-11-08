@@ -2119,7 +2119,7 @@ function ddtype(ids, toid, alt) {
                 r = 'move';
             }
             else if (fromtype == 'shares') {
-                r = (toid === M.RubbishID) ? 'copydel' : 'copy';
+                r = (toid === M.RubbishID) ? 'copydel' : 'copy';                
             }
         }
         else if (totype == 'contacts') {
@@ -2139,7 +2139,13 @@ function ddtype(ids, toid, alt) {
                         return false;
                     }
 
-                    r = (M.getNodeRights(fromid) > 1) ? 'move' : 'copy';
+                    //r = (M.getNodeRights(fromid) > 1) ? 'move' : 'copy'; //commented out by khaled - fixing Bug #7697
+                    if (M.getNodeRights(fromid) > 1) { // added by khaled
+                        r = 'move';
+                    }
+                    else {
+                        return false;  // fixing Bug #7697, dont allow drag and drop if permission <2  
+                    }
                 }
                 else {
                     r = 'copy';

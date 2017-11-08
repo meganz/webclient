@@ -362,8 +362,10 @@ FileManager.prototype.initFileManagerUI = function() {
                 var $ddelm = $(ui.draggable);
                 setTimeout(function() {
                     if ($.movet === M.RubbishID) {
-                        $.selected = $.moveids;
-                        fmremove();
+                        fmremove($.moveids);
+                        if (selectionManager) {
+                            selectionManager.clear_selection();
+                        }
                     }
                     else {
                         M.moveNodes($.moveids, $.movet)
@@ -372,6 +374,10 @@ FileManager.prototype.initFileManagerUI = function() {
                                     $ddelm.remove();
                                 }
                             });
+                        if (selectionManager) {
+                            selectionManager.clear_selection();
+                            selectionManager.set_currently_selected($.movet);
+                        }
                     }
                 }, 50);
             }
@@ -1476,7 +1482,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             M.getNodeRights(M.currentdirid) > 1
         ) {
             // delete
-            fmremove();
+            fmremove(s);
         }
         else if ((e.keyCode === 46) && (selPanel.length > 0)
             && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
@@ -1505,7 +1511,7 @@ FileManager.prototype.initUIKeyEvents = function() {
                 if (n && n.t) {
                     M.openFolder(n.h);
                 }
-                else if ($.selected.length == 1 && M.d[$.selected[0]] && is_image(M.d[$.selected[0]])) {
+                else if ($.selected.length < 2 && (is_image(n) || is_video(n))) {
                     slideshow($.selected[0]);
                 }
                 else {
@@ -2029,8 +2035,7 @@ FileManager.prototype.addContactUI = function() {
 
         // Remove contact button on contacts page
         $('.fm-remove-contact').rebind('click', function() {
-            $.selected = [M.currentdirid];
-            fmremove();
+            fmremove([M.currentdirid]);
         });
 
         if (!megaChatIsDisabled) {
@@ -2274,18 +2279,18 @@ FileManager.prototype.addGridUI = function(refresh) {
         $('.grid-url-header').text('');
     }
 
-    $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
+    $('.fm .grid-table-header th:nth-child(5)').rebind('contextmenu.column_time', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         if (selectionManager) {
             selectionManager.clear_selection();
         }
-
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 6);
     });
 
-    $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
+    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling' +
+        ',.fm-empty-cloud,.fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         if (selectionManager) {
             selectionManager.clear_selection();
@@ -2532,12 +2537,24 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
 
     $ddUIitem.rebind('contextmenu', function(e) {
-        if ($(this).attr('class').indexOf('ui-selected') == -1) {
-            $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-            $(this).addClass('ui-selected');
-            selectionManager.clear_selection();
-            selectionManager.set_currently_selected($(this).attr('id'));
+        if (e.shiftKey) {
+            selectionManager.shift_select_to($(this).attr('id'), false, true, true);
         }
+        else if (e.ctrlKey !== false || e.metaKey !== false)
+        {
+            selectionManager.add_to_selection($(this).attr('id'));
+        }
+        else {
+            if (selectionManager.selected_list.indexOf($(this).attr('id')) === -1) {
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected($(this).attr('id'));
+            }
+            else {
+                selectionManager.add_to_selection($(this).attr('id'));
+            }
+
+        }
+
         M.searchPath();
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 1);
@@ -2588,7 +2605,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $('.top-context-menu').hide();
             M.openFolder(h);
         }
-        else if (is_image(n)) {
+        else if (is_image(n) || is_video(n)) {
             slideshow(h);
         }
         else {
@@ -3218,13 +3235,14 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         }
 
         var closeDialog = function() {
-            $.dialog = null;
+            $strgdlg.unbind('dialog-closed');
             window.closeDialog();
 
             promise.resolve();
             delete M.showOverStorageQuotaPromise;
         };
-        $.dialog = closeDialog;
+
+        $strgdlg.rebind('dialog-closed', closeDialog);
 
         $('.button', $strgdlg).rebind('click', function() {
             var $this = $(this);
@@ -3273,7 +3291,6 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
         // if another dialog wasn't opened previously
         if (!prevState || Object(options).custom) {
             M.safeShowDialog('over-storage-quota', $strgdlg);
-            $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
         }
         else {
             promise.reject();
@@ -3362,7 +3379,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
                     // arrange to back any non-controlled dialogs,
                     // this class will be removed on the next closeDialog()
-                    $('.fm-dialog').addClass('arrange-to-back');
+                    $('.fm-dialog:visible, .overlay:visible').addClass('arrange-to-back');
 
                     fm_showoverlay();
                     $dialog.removeClass('hidden arrange-to-back');
@@ -3370,6 +3387,9 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
                 $.dialog = String(name);
             }, function(ex) {
                 // There was an exception dispatching the above code, move to the next queued dialog...
+                if (d) {
+                    console.warn(ex);
+                }
                 mBroadcaster.sendMessage('closedialog', ex);
             });
         })(dialogName, dispatcher);

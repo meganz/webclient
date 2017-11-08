@@ -224,6 +224,11 @@ var ContactCard = React.createClass({
                 );
             }
             else if (contact.c === 0) {
+                if (moreDropdowns.length > 0) {
+                    moreDropdowns.unshift(
+                        <hr key="separator" />
+                    );
+                }
                 moreDropdowns.unshift(
                     <DropdownsUI.DropdownItem
                         key="view" icon="human-profile" label={__(l[101])} onClick={() => {
@@ -305,10 +310,10 @@ var ContactCard = React.createClass({
                 {contextMenu}
 
                 <div className="user-card-data">
-                    <div className="user-card-name small">
+                    <div className="user-card-name light">
                         {this.props.namePrefix ? this.props.namePrefix : null}{M.getNameByHandle(contact.u)}
                     </div>
-                    <div className="user-card-email small">{contact.m}</div>
+                    <div className="user-card-email">{contact.m}</div>
                 </div>
             </div>;
     }

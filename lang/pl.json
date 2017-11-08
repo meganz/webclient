@@ -4463,12 +4463,12 @@
     "17511": "Odnawia si\u0119 za [W]",
     "17512": "[W]and %d kontakt\u00f3w nie zosta\u0142o usuni\u0119te",
     "17513": "Pliki nie mog\u0105 u\u017cyte je\u017celi masz ustawione has\u0142a w MEGA. Je\u017celi chcesz kontynuowa\u0107, otw\u00f3rz MEGA i zablokuj t\u0105 opcj\u0119.",
-    "17514": "MEGA accesses your contacts when you select some of them to save\/export.",
-    "17517": "wykorzystano %tq",
+    "17514": "MEGA uzyskuje dost\u0119p do Twoich kontakt\u00f3w w momencie wybrania kogo\u015b do zapisania\/wyeksportowania.",
+    "17517": "wykorzystane %tq",
     "17520": "Zarz\u0105dzaj linkami",
-    "17521": "The content you are trying to access is not available for this account. Try to login with same account as in the mobile web client.",
-    "17522": "Invite friends and get Bonuses",
-    "17523": "Select contacts from your phone's contact list or enter multiple email addresses.",
-    "17524": "used %tq1",
-    "17525": "used %tq2"
+    "17521": "Plik\/Katalog kr\u00f3ry pr\u00f3bujesz otworzy\u0107 jest niedost\u0119pny dla Twojego konta. Spr\u00f3buj otworzy\u0107 na urz\u0105dzeniu mobilnym, urzywaj\u0105c tego samego konta.",
+    "17522": "Zapro\u015b znajomych aby odebra\u0107 bonusy",
+    "17523": "Wybierz kontakty z listy w telefonie lub wpisz adresy email.",
+    "17524": "wykorzstane %tq1",
+    "17525": "wykorzstane %tq2"
 }

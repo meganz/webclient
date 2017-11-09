@@ -165,7 +165,7 @@
 
                     api_req({a: 'log', e: 99670, m: JSON.stringify(result)});
 
-
+                    self.cleanup();
                 }
             });
         }

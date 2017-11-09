@@ -77,7 +77,7 @@
             }
             str = x.join(".");
             // console.error("After", str, res, str ? str.split(".")[0] : "", str ? str.split(".")[1] : "");
-        };
+        }
 
         return res;
     };
@@ -182,6 +182,7 @@
             return;
         }
 
+        var receivedMsgs = {};
         var shardConnecting = {};
 
         // time to first data received from shard
@@ -221,7 +222,6 @@
                     receivedMsgs[args[0]] = 0;
                 })
         );
-        var receivedMsgs = {};
 
         self.unwrapOnDone.push(
             self.wrapFunction(

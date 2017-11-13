@@ -1467,7 +1467,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.registration-confirm-email .email-icon {
     width: 200px;
     height: 114px;
-    background-image: url(../images/mega/register-big-sprite-v14.png);
+    background-image: url(../images/mega/register-big-sprite-v15.png);
     background-position: center -1021px;
     background-repeat: no-repeat;
     margin: 46px auto 0 auto;
@@ -4519,7 +4519,7 @@ div.checkboxOn, div.checkboxOff {
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {
-        background-image: url(../images/mega/register-big-sprite-v14@2x.png);
+        background-image: url(../images/mega/register-big-sprite-v15@2x.png);
         background-size: 200px auto;
     }
 }

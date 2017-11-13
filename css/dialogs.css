@@ -2066,13 +2066,16 @@ li.token-input-token-invite .input-close {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     display: table;
-    table-layout: fixed;
 }
 .fm-versioning.top-column {
     display: table-cell;
     font-size: 0;
     white-space: nowrap;
     vertical-align: top;
+    position: relative;
+}
+.fm-versioning.top-column:nth-child(2) {
+    width: 10px;
 }
 .fm-versioning .jspVerticalBar {
     width: 6px;
@@ -2102,7 +2105,13 @@ li.token-input-token-invite .input-close {
 }
 .fm-versioning.file-data {
     padding: 14px 0 0 87px;
-    
+}
+.header .fm-versioning.file-data {
+    position: absolute;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .fm-versioning.file-name {
     font-size: 18px;

@@ -1031,6 +1031,58 @@ function crypto_rsagenkey() {
     return $promise;
 }
 
+function ApiQueue() { // double storage
+    'use strict';
+    this._head = 0;
+    this._tail = 0;
+    this._storage1 = {};
+    this._storage2 = {};
+}
+ApiQueue.prototype.size = function () {
+    'use strict';
+    return this._tail - this._head;
+};
+ApiQueue.prototype.sneak = function () {
+    'use strict';
+    if (this._head !== this._tail) {
+        return { st1: this._storage1[this._head], st2: this._storage2[this._head] };
+    }
+};
+ApiQueue.prototype.enqueue = function (data1, data2) {
+    'use strict';
+    // reset to 0 index, we dont want indexes to keep getting bigger
+    // this is very safe, since it takes place during enqueue,
+    // and it is not possible to have another undergoing dequeue(because head=tail)
+    if (this._head === this._tail) {
+        this._head = 0;
+        this._tail = 0;
+    }
+    this._storage1[this._tail] = data1;
+    this._storage2[this._tail++] = data2;
+};
+ApiQueue.prototype.clear = function () {
+    'use strict';
+    this._head = 0;
+    this._tail = 0;
+    this._storage1 = {};
+    this._storage2 = {};
+};
+ApiQueue.prototype.dequeue = function (onlySingle) {
+    'use strict';
+    if (this._head !== this._tail) {
+        var data1 = this._storage1[this._head];
+        if (onlySingle && data1.length) {
+            return null;
+        }
+        var data2 = this._storage2[this._head];
+        delete this._storage1[this._head];
+        delete this._storage2[this._head++];
+        
+        return { st1: data1, st2: data2 };
+    }
+};
+
+
 /**
  * Converts a Unicode string to a UTF-8 cleanly encoded string.
  *
@@ -1135,8 +1187,9 @@ function stopapi() {
 
     for (var i = apixs.length; i--;) {
         api_cancel(apixs[i]);
-        apixs[i].cmds = [[], []];
-        apixs[i].ctxs = [[], []];
+        apixs[i].cmdsQueue.clear();
+        apixs[i].cmdsBuffer = [];
+        apixs[i].ctxsBuffer = [];
     }
 }
 
@@ -1166,8 +1219,9 @@ function api_init(channel, service, split) {
 
     apixs[channel] = {
         c: channel,                 // channel
-        cmds: [[], []],             // queued/executing commands (double-buffered)
-        ctxs: [[], []],             // associated command contexts
+        cmdsQueue: new ApiQueue(),    // queued executing commands + contexts
+        cmdsBuffer: [],               // pulled cmds from queue (under processing)
+        ctxsBuffer: [],               // pulled ctxs from queue
         i: 0,                       // currently executing buffer
         seqno: -Math.floor(Math.random() * 0x100000000), // unique request start ID
         xhr: false,                 // channel XMLHttpRequest
@@ -1199,8 +1253,7 @@ function api_req(request, context, channel) {
 
     var q = apixs[channel];
 
-    q.cmds[q.i ^ 1].push(request);
-    q.ctxs[q.i ^ 1].push(context);
+    q.cmdsQueue.enqueue(request, context);
 
     if (!q.setimmediate) {
         q.setimmediate = setTimeout(api_proc, 0, q);
@@ -1264,11 +1317,28 @@ function api_proc(q) {
         q.setimmediate = false;
     }
 
-    if (q.ctxs[q.i].length || !q.ctxs[q.i ^ 1].length) {
+    if (q.cmdsQueue.size() === 0 || q.cmdsBuffer.length && q.cmdsBuffer.length > 0) {
         return;
     }
+    var currCmd = [];
+    var currCtx = [];
+    var element = q.cmdsQueue.dequeue(); // only first element alone
+    if (element && element !== null) {
+        currCmd.push(element.st1);
+        currCtx.push(element.st2);
+        if (!element.st1.length) { // we will distinguish String + array of CMDs
+            element = q.cmdsQueue.dequeue(true);
+            while (element && element !== null) {
+                currCmd.push(element.st1);
+                currCtx.push(element.st2);
+                element = q.cmdsQueue.dequeue(true);
+            }
+        }
+    }
 
-    q.i ^= 1;
+    q.cmdsBuffer = currCmd;
+    q.ctxsBuffer = currCtx;
+    
 
     if (!q.xhr) {
         // we need a real XHR only if we don't use fetch for this channel
@@ -1291,7 +1361,7 @@ function api_proc(q) {
             q.xhr.onprogress = function(evt) {
                 if (!this.cancelled) {
                     // caller wants progress updates? give caller progress updates!
-                    if (this.q.ctxs[this.q.i][0] && this.q.ctxs[this.q.i][0].progress) {
+                    if (this.q.ctxsBuffer[0] && this.q.ctxsBuffer[0].progress) {
                         var progressPercent = 0;
                         var bytes = evt.total || this.totalBytes;
 
@@ -1305,7 +1375,7 @@ function api_proc(q) {
                         }
 
                         if (evt.loaded > 0 && bytes) {
-                            this.q.ctxs[this.q.i][0].progress(evt.loaded / bytes * 100);
+                            this.q.ctxsBuffer[0].progress(evt.loaded / bytes * 100);
                         }
                     }
 
@@ -1389,7 +1459,7 @@ function api_proc(q) {
                 }
 
                 if (typeof t === 'object') {
-                    var ctxs = this.q.ctxs[this.q.i];
+                    var ctxs = this.q.ctxsBuffer;
 
                     for (var i = 0; i < ctxs.length; i++) {
                         var ctx = ctxs[i];
@@ -1418,12 +1488,18 @@ function api_proc(q) {
               + '&lang=' + lang         // selected language
               + mega.urlParams();       // additional parameters
 
-        if (typeof q.cmds[q.i][0] === 'string') {
-            q.url += '&' + q.cmds[q.i][0];
+        if (typeof q.cmdsBuffer[0] === 'string') {
+            q.url += '&' + q.cmdsBuffer[0];
             q.rawreq = '';
         }
         else {
-            q.rawreq = JSON.stringify(q.cmds[q.i]);
+            if (q.cmdsBuffer.length === 1 && q.cmdsBuffer[0].length) {
+                q.url += '&bc=1';
+                q.rawreq = JSON.stringify(q.cmdsBuffer[0]);
+            }
+            else {
+                q.rawreq = JSON.stringify(q.cmdsBuffer);
+            }
         }
     }
 
@@ -1515,8 +1591,8 @@ function api_reqerror(q, e, status) {
 function api_ready(q) {
     q.rawreq = false;
     q.backoff = 0; // request succeeded - reset backoff timer
-    q.cmds[q.i] = [];
-    q.ctxs[q.i] = [];
+    q.cmdsBuffer = [];
+    q.ctxsBuffer = [];
 }
 
 var apiFloorCap = 3000;
@@ -1556,8 +1632,9 @@ function api_reqfailed(c, e) {
     else if (e == EBLOCKED) {
         var queue = apixs[c];
         queue.rawreq = false;
-        queue.cmds = [[], []];
-        queue.ctxs = [[], []];
+        cmdsQueue.clear();
+        cmdsBuffer = [];
+        ctxsBuffer = [];
         queue.setimmediate = false;
 
         api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reasonCode) {

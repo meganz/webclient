@@ -98,6 +98,12 @@ ClassChunk.prototype.abort = function() {
         clearTimeout(this.oet);
     }
     if (this.xhr) {
+        if (d) {
+            dlmanager.logger.log(this + " ttfb@%s: %sms", this.xhr._host, this.xhr._ttfb);
+        }
+        if (this.xhr._host && this.xhr._ttfb > 1000) {
+            api_req({a: 'log', e: 99671, m: 'ttfb>1e3@' + this.xhr._host});
+        }
         this.xhr.abort(this.xhr.ABORT_CLEANUP);
     }
     if (this.Progress) {
@@ -324,6 +330,10 @@ ClassChunk.prototype.run = function(task_done) {
     }
     this.xhr = getTransferXHR(this);
     this.xhr._murl = this.url;
+    this.xhr._host = String(this.url).match(/\/\/(\w+)\./);
+    if (this.xhr._host) {
+        this.xhr._host = this.xhr._host[1];
+    }
 
     this.xhr.open('POST', this.url, true);
     this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';

@@ -10,6 +10,7 @@ function MegaUtils() {
 function MegaApi() {
     this.logger = new MegaLogger('MegaApi');
 }
+
 MegaApi.prototype = new FileManager();
 MegaApi.prototype.constructor = MegaApi;
 
@@ -570,6 +571,7 @@ MegaUtils.prototype.clearFileSystemStorage = function megaUtilsClearFileSystemSt
         if (d) {
             console.log('Cleaning FileSystem storage...', storagetype);
         }
+
         function onInitFs(fs) {
             var dirReader = fs.root.createReader();
             (function _readEntries(e) {
@@ -870,12 +872,12 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
 
     var fetcher = function(data) {
 
-        if (aEndOffset === -1) {
-            aEndOffset = data.s;
-        }
-
         aEndOffset = parseInt(aEndOffset);
         aStartOffset = parseInt(aStartOffset);
+
+        if (aEndOffset === -1 || aEndOffset > data.s) {
+            aEndOffset = data.s;
+        }
 
         if ((!aStartOffset && aStartOffset !== 0)
             || aStartOffset > data.s || !aEndOffset

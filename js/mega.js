@@ -990,7 +990,7 @@ scparser.$add('fa', function(a) {
         n.fa = a.fa;
         M.nodeUpdated(n);
 
-        if (String(n.fa).indexOf('/') > 0) {
+        if (String(n.fa).indexOf('/') > 0 || is_video(n)) {
             // both thumb & prev is being set
             mBroadcaster.sendMessage('fa:ready', a.n, a.fa);
         }
@@ -2119,7 +2119,7 @@ function ddtype(ids, toid, alt) {
                 r = 'move';
             }
             else if (fromtype == 'shares') {
-                r = (toid === M.RubbishID) ? 'copydel' : 'copy';                
+                r = toid === M.RubbishID ? 'copydel' : 'copy';
             }
         }
         else if (totype == 'contacts') {
@@ -2144,7 +2144,7 @@ function ddtype(ids, toid, alt) {
                         r = 'move';
                     }
                     else {
-                        return false;  // fixing Bug #7697, dont allow drag and drop if permission <2  
+                        return false;  // fixing Bug #7697, dont allow drag and drop if permission <2
                     }
                 }
                 else {

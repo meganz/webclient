@@ -3199,7 +3199,7 @@
     "9015": "\u00e4ndra l\u00e4nk",
     "9016": "%d \u00e5terinbjudningar har s\u00e4nts korrekt.",
     "9017": "%d f\u00f6rfr\u00e5gningar raderade. ",
-    "9018": "%1$d requests successfully deleted but %2$d requests were not deleted.",
+    "9018": "%1$d beg\u00e4ran raderats men %2$d beg\u00e4ran togs inte bort",
     "9019": "Vill du radera inbjudan till %s?",
     "9020": "Vill du radera %d f\u00f6rfr\u00e5gningar?",
     "9021": "%d svar skickade",

@@ -71,8 +71,8 @@ var slideshowid;
         }
         var steps = slideshowsteps();
         if (steps.forward.length > 0) {
-            slideshow(steps.forward[0]);
             mBroadcaster.sendMessage('slideshow:next', steps);
+            slideshow(steps.forward[0]);
         }
     }
 
@@ -90,8 +90,8 @@ var slideshowid;
         }
         var steps = slideshowsteps();
         if (steps.backward.length > 0) {
-            slideshow(steps.backward[steps.backward.length - 1]);
             mBroadcaster.sendMessage('slideshow:prev', steps);
+            slideshow(steps.backward[steps.backward.length - 1]);
         }
     }
 
@@ -292,6 +292,8 @@ var slideshowid;
                     slideshow_next();
                 }
             }
+
+            return false;
         });
 
         var $dlBut = $overlay.find('.viewer-button.download');
@@ -353,18 +355,8 @@ var slideshowid;
         var preview = function preview(ctx, h, u8) {
             previewimg(h, u8, ctx.type);
 
-            if (!n.fa || n.fa.indexOf(':0*') < 0) {
-                if (d) {
-                    console.log('Thumbnail found missing on preview, creating...', h, n);
-                }
-                var aes = new sjcl.cipher.aes([
-                    n.k[0] ^ n.k[4],
-                    n.k[1] ^ n.k[5],
-                    n.k[2] ^ n.k[6],
-                    n.k[3] ^ n.k[7]
-                ]);
-                var img = is_image(n);
-                createnodethumbnail(n.h, aes, h, u8, {raw: img !== 1 && img});
+            if (isThumbnailMissing(n)) {
+                createNodeThumbnail(n, u8);
             }
             if (h === slideshowid) {
                 fetchnext();
@@ -471,42 +463,84 @@ var slideshowid;
         preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
         preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:close', destroy);
 
-        preqs[n.h].onplayback(function() {
+        preqs[n.h].on('playing', function() {
             var video = this.video;
 
             if (video && video.duration) {
                 video.removeAttribute('style');
                 var maxWidth = innerWidth * 70 / 100;
                 var maxHeight = innerHeight * 70 / 100;
-                var ratio = Math.min(maxWidth / video.videoWidth, maxHeight / video.videoHeight);
+                var dim = preqs[n.h].dim(video.videoWidth, video.videoHeight, maxWidth, maxHeight);
 
-                video.width = Math.ceil(video.videoWidth * ratio);
+                video.width = Math.ceil(dim.width);
 
                 if (maxWidth > video.videoWidth) {
                     $(video).css({
-                        'min-width': video.videoWidth * ratio + 'px',
-                        'min-height': video.videoHeight * ratio + 'px'
+                        'min-width': Math.round(dim.width) + 'px',
+                        'min-height': Math.round(dim.height) + 'px'
                     });
                 }
 
-                return -1;
+                if (isThumbnailMissing(n) && n.u === u_handle && n.f !== u_handle) {
+                    var took = Math.round(2 * video.duration / 100);
+
+                    if (d) {
+                        console.debug('Video thumbnail missing, will take image at %s...', secondsToTime(took));
+                    }
+
+                    this.on('timeupdate', function() {
+                        if (video.currentTime < took) {
+                            return true;
+                        }
+
+                        this.getImage().then(createNodeThumbnail.bind(null, n)).catch(console.warn.bind(console));
+                    });
+                }
+
+                return false;
             }
+
+            return true;
         });
 
-        preqs[n.h].onerror(function(ev, error) {
+        preqs[n.h].on('error', function(ev, error) {
             // <video>'s element `error` handler
             if (!$.dialog) {
                 msgDialog('warninga', l[135], l[47], error.message || error);
             }
+            if (d) {
+                console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime);
+            }
             destroy();
 
-            if (filemime(n) !== 'video/quicktime') {
+            if (filemime(n) !== 'video/quicktime' && !d) {
                 api_req({a: 'log', e: 99669, m: 'stream error'});
             }
         });
 
         if (d) {
             window.strm = preqs[n.h];
+        }
+    }
+
+    function isThumbnailMissing(n) {
+        return !n.fa || n.fa.indexOf(':0*') < 0;
+    }
+
+    function createNodeThumbnail(n, ab) {
+        if (isThumbnailMissing(n)) {
+            if (d) {
+                console.log('Thumbnail found missing on preview, creating...', n.h, n);
+            }
+            var aes = new sjcl.cipher.aes([
+                n.k[0] ^ n.k[4],
+                n.k[1] ^ n.k[5],
+                n.k[2] ^ n.k[6],
+                n.k[3] ^ n.k[7]
+            ]);
+            var img = is_image(n);
+            var vid = is_video(n);
+            createnodethumbnail(n.h, aes, n.h, ab, {raw: img !== 1 && img, isVideo: vid});
         }
     }
 
@@ -568,7 +602,9 @@ var slideshowid;
                 .attr('width', maxWidth)
                 .css('min-width', maxWidth)
                 .removeClass('hidden');
-            api_req({a: 'log', e: 99668, m: 'video watch'});
+            if (!d) {
+                api_req({a: 'log', e: 99668, m: 'video watch'});
+            }
             return;
         }
 

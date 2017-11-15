@@ -101,7 +101,7 @@ var ConversationsListItem = React.createClass({
             var iso = (msgDate.toISOString());
             if (todayOrYesterday(iso)) {
                 // if in last 2 days, use the time2lastSeparator
-                curTimeMarker = time2lastSeparator(iso) + ", " + msgDate.getHours() + ":" + msgDate.getMinutes();
+                curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
             }
             else {
                 // if not in the last 2 days, use 1st June [Year]

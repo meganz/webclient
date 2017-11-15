@@ -342,6 +342,7 @@ var ConversationsApp = React.createClass({
                 // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
                 // is visible/active at the moment
                 if (
+                    (megaChat.currentlyOpenedChat && megaChat.getCurrentRoom().isReadOnly()) ||
                     $(e.target).is(".messages-textarea") ||
                     ((e.ctrlKey || e.metaKey || e.which === 19) && (e.keyCode === 67)) ||
                     e.keyCode === 91 /* cmd+... */ ||
@@ -493,6 +494,43 @@ var ConversationsApp = React.createClass({
             leftPanelStyles.width = self.state.leftPaneWidth;
         }
 
+        var loadingOrEmpty = null;
+        var megaChat = this.props.megaChat;
+
+        if (megaChat.chats.length === 0) {
+            loadingOrEmpty = <div className="fm-empty-messages hidden">
+                <div className="fm-empty-pad">
+                    <div className="fm-empty-messages-bg"></div>
+                    <div className="fm-empty-cloud-txt">{l[6870]}</div>
+                    <div className="fm-not-logged-text">
+                        <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
+                            __html: __(l[8762])
+                                .replace("[S]", "<span className='red'>")
+                                .replace("[/S]", "</span>")
+                        }}></div>
+                        <div className="fm-not-logged-button create-account">
+                            {__(l[968])}
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+        else if (
+            megaChat.allChatsHadLoadedHistory() === false &&
+            !megaChat.currentlyOpenedChat
+        ) {
+            loadingOrEmpty = <div className="fm-empty-messages">
+                <div className="loading-spinner js-messages-loading light manual-management" style={{"top":"50%"}}>
+                    <div className="main-loader" style={{
+                        "position":"fixed",
+                        "top": "50%",
+                        "left": "50%",
+                        "marginLeft": "72px"
+                    }}></div>
+                </div>
+            </div>;
+        }
+
 
         return (
             <div className="conversationsApp" key="conversationsApp">
@@ -535,22 +573,7 @@ var ConversationsApp = React.createClass({
                     </div>
                 </div>
                 <div className="fm-right-files-block">
-                    <div className="fm-empty-messages hidden">
-                    <div className="fm-empty-pad">
-                        <div className="fm-empty-messages-bg"></div>
-                        <div className="fm-empty-cloud-txt">{__(l[6870])}</div>
-                        <div className="fm-not-logged-text">
-                            <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
-                                __html: __(l[8762])
-                                     .replace("[S]", "<span className='red'>")
-                                     .replace("[/S]", "</span>")
-                             }}></div>
-                            <div className="fm-not-logged-button create-account">
-                                {__(l[968])}
-                            </div>
-                        </div>
-                    </div>
-                    </div>
+                    {loadingOrEmpty}
 
 
                     <ConversationPanelUI.ConversationPanels

@@ -170,7 +170,8 @@ React.makeElement = React['createElement'];
 	            'emoticonsFilter': EmoticonsFilter,
 	            'callFeedback': CallFeedback,
 	            'presencedIntegration': PresencedIntegration,
-	            'persistedTypeArea': PersistedTypeArea
+	            'persistedTypeArea': PersistedTypeArea,
+	            'rtfFilter': RtfFilter
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {
@@ -1142,6 +1143,7 @@ React.makeElement = React['createElement'];
 
 	            renderableSummary = htmlentities(renderableSummary);
 	            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+	            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
 
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
 

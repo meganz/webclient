@@ -39,6 +39,7 @@
 
 // Keep a record of active transfers.
 var GlobalProgress = Object.create(null);
+var gfsttfbhosts = Object.create(null);
 var __ccXID = 0;
 
 if (localStorage.aTransfers) {
@@ -101,9 +102,10 @@ ClassChunk.prototype.abort = function() {
         if (d) {
             dlmanager.logger.log(this + " ttfb@%s: %sms", this.xhr._host, this.xhr._ttfb);
         }
-        if (this.xhr._host && this.xhr._ttfb > 1000) {
-            api_req({a: 'log', e: 99671, m: 'ttfb>1e3@' + this.xhr._host});
+        if (!(gfsttfbhosts[this.xhr._host] > 5000) && this.xhr._ttfb > 5000) {
+            api_req({a: 'log', e: 99671, m: 'ttfb:' + this.xhr._ttfb + '@' + this.xhr._host});
         }
+        gfsttfbhosts[this.xhr._host] = this.xhr._ttfb;
         this.xhr.abort(this.xhr.ABORT_CLEANUP);
     }
     if (this.Progress) {

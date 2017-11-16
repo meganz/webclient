@@ -3651,6 +3651,7 @@
     "16400": "Account-Basisquota",
     "16401": "Registrierungsbonus",
     "16402": "Erhaltene Boni:",
+    "16406": "[1]MEGA Account-Neustart[2]Sie haben angegeben, sich nicht mehr an Ihr Passwort erinnern zu k\u00f6nnen und keinen Rettungsschl\u00fcssel zu besitzen.[3]Ihre Daten sind verschl\u00fcsselt und nun unlesbar. Ihr bestehender Account wird daher deaktiviert und ein neuer, leerer Account unter der bestehenden E-Mail-Adresse er\u00f6ffnet. Die unlesbaren Daten werden f\u00fcr mindestens 60 Tage f\u00fcr Sie aufbewahrt - sollte Ihnen in dieser Zeit Ihr Passwort wieder einfallen, so setzen Sie sich umgehend mit [A1]support@mega.nz[\/A1] in Verbindung.[4]Auch bei Wiederherstellung Ihres alten Accounts bleiben Ihre Kontakte und Ordnerfreigaben gel\u00f6scht. Sie m\u00fcssen neu eingerichtet werden.[5]Account deaktivieren und neu beginnen[6]Funktioniert nicht? Kein Problem - kopieren Sie einfach diesen Link in Ihren Browser:",
     "16407": "[1]Mit freundlichen Gr\u00fc\u00dfen,[BR]Ihr MEGA-Team",
     "16408": "Bitte klicken Sie auf den Link oder kopieren Sie Ihn in Ihren Webbrowser:",
     "16410": "[1]MEGA Account Expiry Warning[2]We noticed that there hasn't been any activity on your MEGA account since [B][$month] [$day], [$year][\/B].[3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A1]Terms of Service[\/A1]) if you don\u2019t log in at [A2]mega.nz[\/A2] within the next 30 (thirty) days[\/B].[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.[5]Login at MEGA",
@@ -3670,6 +3671,7 @@
     "16428": "[1]MEGA-Chatnachricht[2]Sie haben neue verschl\u00fcsselte Chatnachrichten erhalten, w\u00e4hrend Sie abwesend waren[3]Sicher chatten mit MEGA",
     "16429": "[1]MEGA Account Closure[2]Caution: You have elected to close your MEGA account. The account under this email address will be permanently closed and your data deleted. This can not be undone.[3]By completing this action, you will lose access to all your uploaded data, shares, and contacts. Any remaining account balance or PRO quota will be voided.[4]If you have a paid MEGA subscription with [A1]Apple[\/A1] or [A2]Google[\/A2], then you must cancel it separately at Apple iTunes or Google Play, as MEGA is not able to cancel it for you.[5]Close my Account",
     "16430": "[1]MEGA Confirm New Email[2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:[3]Confirm New Email[4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.",
+    "16431": "[1]MEGA-Passwortreset[2]Sie k\u00f6nnen den Zugang zu Ihren MEGA-Account mit Ihrem Rettungsschl\u00fcssel wiederherstellen[3]Account entsperren[4]Die Anfrage kam von folgender IP: [R][$cred][\/R]",
     "16432": "Sie k\u00f6nnen sich auch zus\u00e4tzlichen Bonus-Speicherplatz und -Transfervolumen verdienen - beispielsweise, indem Sie unsere Software installieren oder Ihre Freunde auf MEGA einladen.",
     "16433": "[1]Unter [A1]mega.nz\/account[\/A1] erhalten Sie eine \u00dcbersicht \u00fcber Ihren Speicherplatzverbrauch. Ihr Papierkorb z\u00e4hlt dazu - leeren Sie ihn ggf.[2]Um MEGA weiterhin ungest\u00f6rt nutzen zu k\u00f6nnen, erweitern Sie Ihren Account. [B]Sie haben hierf\u00fcr sieben Tage Zeit[\/B]. Sollte Ihr Account sich nach dem [R][$lastdate][\/R] noch \u00fcber dem Limit befinden, werden wir Ihren Papierkorb automatisch leeren.",
     "16435": "[1]MEGA Password Change[2]Click on the button below to change your password.[3]Click on the link below to change your password. [4]You will need to enter your current password before you can choose a new one.[5]Change Password[6]If you didn't make this request, you can ignore and delete this email. If you need more assistance, please contact our support team at [A1]support@mega.nz[\/A1]",
@@ -4329,7 +4331,6 @@
     "17223": "Der Link ist nun exportiert und in Ihrer Zwischenablage.",
     "17224": "[H1]Zusammenarbeit mit Dritten[\/H1]",
     "17225": "Eine Ordnerfreigabe ist eine m\u00e4chtige Basis f\u00fcr die Zusammenarbeit mit Ihren Kontakten. Sie k\u00f6nnen Ordner an beliebige Kontakte, bestehende MEGA-User und sogar unregistrierte Benutzer (via deren E-Mail-Adresse) freigeben. [Br][Br]Sollte der Empf\u00e4nger Ihres Ordners noch keinen MEGA-Account haben, erh\u00e4lt er eine Einladung per E-Mail zur Einrichtung eines Accounts, der ihm dann den Zugriff auf den Ordner erm\u00f6glicht.",
-    "17226": "[B]Rechtsklicken[\/B] Sie den Ordner, den Sie freigeben m\u00f6chten.",
     "17227": "Klicken Sie auf [W13][B]Freigabe[\/B][\/W13] im Kontextmen\u00fc.",
     "17228": "Geben Sie eine E-Mail-Adresse oder die ersten Buchstaben des Namens eines Kontakts ein.",
     "17229": "W\u00e4hlen Sie die Zugriffstufe (Standardeinstellung: \"Nur lesen\").",
@@ -4477,7 +4478,7 @@
     "17529": "Failed to clear cache. Please try again.",
     "17530": "Clear cache failed",
     "17533": "MEGAdrop is unavailable",
-    "17534": "Either the MEGAdrop link is cancelled by the owner or the URL you have provided is incorrect.",
+    "17534": "Either the MEGAdrop link has been cancelled by the owner or the URL you have provided is incorrect.",
     "17535": "Account storage limit has been reached.",
     "17536": "The owner of this MEGAdrop folder has reached their account storage limit and cannot accept any more uploads. Please contact them about upgrading their plan.",
     "17537": "This MEGAdrop is full, please try again later.",
@@ -4488,5 +4489,5 @@
     "17543": "Not achieved",
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
-    "17546": "That user already sent you an invitation."
+    "17546": "This user has already sent you an invitation."
 }

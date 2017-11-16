@@ -768,6 +768,26 @@ function init_page() {
             init_login();
         }
     }
+    else if (is_mobile && page === 'fm/account/invites/how-it-works') {
+        parsepage(pages['mobile']);
+        mobile.achieve.howItWorks.init();
+        return false;
+    }
+    else if (is_mobile && page === 'fm/account/invites') {
+        parsepage(pages['mobile']);
+        mobile.achieve.invites.init();
+        return false;
+    }
+    else if (is_mobile && page === 'fm/account/referrals') {
+        parsepage(pages['mobile']);
+        mobile.achieve.referrals.init();
+        return false;
+    }
+    else if (is_mobile && page === 'fm/account/achievements') {
+        parsepage(pages['mobile']);
+        mobile.achieve.init();
+        return false;
+    }
     else if (page === 'achievements') {
         loadSubPage('fm/account/achievements');
         return false;

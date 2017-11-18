@@ -6,6 +6,7 @@
  * @constructor
  */
 var RtfFilter = function(megaChat) {
+    "use strict";
     var self = this;
 
     self.regexps = {};
@@ -24,6 +25,7 @@ var RtfFilter = function(megaChat) {
 
 
 RtfFilter.prototype.processStripRtfFromMessage = function(msg) {
+    "use strict";
     var self = this;
     Object.keys(self.regexps).forEach(function(regexp) {
         var replacement = self.regexps[regexp];
@@ -33,6 +35,7 @@ RtfFilter.prototype.processStripRtfFromMessage = function(msg) {
 };
 
 RtfFilter.prototype.processMessage = function(e, eventData) {
+    "use strict";
     var self = this;
 
     if (eventData.message.decrypted === false) {
@@ -66,7 +69,10 @@ RtfFilter.prototype.processMessage = function(e, eventData) {
 
 
     messageContents = messageContents ? $.trim(messageContents) : "";
+
+    /*jshint -W049 */
     messageContents = messageContents.replace(/\<br\/\>/gi, '\n');
+    /*jshint +W049 */
     Object.keys(self.regexps).forEach(function(regexp) {
         var replacement = self.regexps[regexp];
         messageContents = messageContents.replace(new RegExp(regexp, "gi"), replacement[0]);

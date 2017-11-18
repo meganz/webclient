@@ -147,7 +147,7 @@ describe("chat.rtf_filter unit test", function() {
                 msg.message.messageHtml,
                 'RTF formatting failed'
             );
-        })
+        });
 
     });
 });

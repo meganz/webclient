@@ -960,9 +960,7 @@ function FMShortcuts() {
                 return; // dont do anything.
             }
 
-            $.selected = items;
-
-            fmremove();
+            fmremove(items);
 
             // force remove, no confirmation
             if (e.ctrlKey || e.metaKey) {
@@ -1018,7 +1016,14 @@ function renameDialog() {
                 var value = $input.val();
 
                 if (value && n.name && value !== n.name) {
-                    M.rename(n.h, value);
+                    if (M.isSafeName(value)) {
+                        M.rename(n.h, value);
+                    }
+                    else {
+                        $dialog.removeClass('active');
+                        $input.addClass('error');
+                        return;
+                    }
                 }
 
                 closeDialog();
@@ -1054,7 +1059,7 @@ function renameDialog() {
             $dialog.removeClass('focused');
         });
 
-        $input.rebind('click keydown keyup keypress', function (event) {
+        $input.rebind('click keydown', function (event) {
             // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
             if (event.type === 'keydown') {
                 if (event.keyCode === 13) {
@@ -1064,11 +1069,12 @@ function renameDialog() {
             }
             var value = $(this).val();
 
-            if (!value || (!n.t && ext.length > 0 && value === '.' + ext)) {
+            if (!value) {
                 $dialog.removeClass('active');
             }
             else {
                 $dialog.addClass('active');
+                $input.removeClass('error');
             }
             /*if (!n.t && ext.length > 0) {
                 if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {
@@ -2194,17 +2200,22 @@ function createFolderDialog(close) {
 
     var $dialog = $('.fm-dialog.create-folder-dialog');
     var $input = $('input', $dialog);
+    $input.val('');
 
     if (close) {
         if ($.cftarget) {
             delete $.cftarget;
         }
-        $input.val('');
         closeDialog();
         return true;
     }
 
-    var doCreateFolder = function(v) {
+    var doCreateFolder = function (v) {
+        if (!M.isSafeName(v)) {
+            $dialog.removeClass('active');
+            $input.addClass('error');
+            return;
+        }
         var target = $.cftarget = $.cftarget || M.currentdirid;
 
         loadingDialog.pshow();
@@ -2240,6 +2251,7 @@ function createFolderDialog(close) {
         }
         else {
             $dialog.addClass('active');
+            $input.removeClass('error');
         }
     });
 
@@ -2266,7 +2278,6 @@ function createFolderDialog(close) {
         else {
             doCreateFolder(v);
         }
-        $input.val('');
     });
 
     M.safeShowDialog('createfolder', function() {
@@ -2656,10 +2667,6 @@ function fm_resize_handler(force) {
     }
 
     if (M.currentdirid !== 'transfers') {
-        if (slideshowid && previews[slideshowid]) {
-            previewsrc(slideshowid);
-        }
-
         if (megaChatIsReady && megaChat.resized) {
             megaChat.resized();
         }

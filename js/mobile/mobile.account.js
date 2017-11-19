@@ -10,6 +10,12 @@ mobile.account = {
 
         'use strict';
 
+        // If not logged in, return to the login page
+        if (typeof u_attr === 'undefined') {
+            loadSubPage('login');
+            return false;
+        }
+
         // Cache selectors
         var $page = $('.mobile.my-account-page');
 
@@ -18,12 +24,16 @@ mobile.account = {
         mobile.account.displayProPlanDetails($page);
         mobile.account.fetchAndDisplayStorageUsage($page);
         mobile.account.initUpgradeAccountButton($page);
+        mobile.account.initAchievementsButton($page);
 
         // Initialise the top menu
         topmenuUI();
 
         // Show the account page content
         $page.removeClass('hidden');
+
+        // Add a server log
+        api_req({ a: 'log', e: 99672, m: 'Mobile web My Account page accessed' });
     },
 
     /**
@@ -127,11 +137,38 @@ mobile.account = {
 
         'use strict';
 
-        // On clicking/tapping the Upgrade Account row
+        // On clicking/tapping the Upgrade Account button
         $page.find('.account-upgrade-block').off('tap').on('tap', function() {
 
             // Load the Pro page
             loadSubPage('pro');
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the Achievements button to see the main Achievements page
+     * @param {String} $page The jQuery selector for the current page
+     */
+    initAchievementsButton: function($page) {
+
+        'use strict';
+
+        var $achievementsButton = $page.find('.account-achievements-block');
+
+        // If achievements are enabled, show the button
+        if (typeof u_attr.flags.ach !== 'undefined' && u_attr.flags.ach) {
+            $achievementsButton.removeClass('hidden');
+        }
+
+        // On clicking/tapping the Achievements button
+        $achievementsButton.off('tap').on('tap', function() {
+
+            // Hide the account page
+            $page.addClass('hidden');
+
+            // Render the achievements information
+            loadSubPage('fm/account/achievements');
             return false;
         });
     }

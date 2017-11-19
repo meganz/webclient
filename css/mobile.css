@@ -137,7 +137,7 @@ ul, li {
     width: 68px;
     height: 68px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v8.png);
+    background-image: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: 1px 2px;
     position: absolute;
@@ -184,7 +184,7 @@ ul, li {
 }
 .mobile.homepage .company-logo {
     height: 120px;
-    background-image: url(../images/mobile/mobile-sprite_v8.png);
+    background-image: url(../images/mobile/mobile-sprite_v9.png);
     background-position: center -1955px;
     background-repeat: no-repeat;
     margin: 0 0 0 0;
@@ -200,7 +200,7 @@ ul, li {
     max-width: 500px;
 }
 .mobile.homepage .feature-icon {
-    background-image: url(../images/mobile/mobile-sprite_v8.png);
+    background-image: url(../images/mobile/mobile-sprite_v9.png);
     background-position: -2px top;
     background-repeat: no-repeat;
     margin: 0 auto 32px auto;
@@ -253,7 +253,7 @@ ul, li {
 .mobile.homepage .bottom-link {
     cursor: pointer;
     display: inline-block;
-    background: url(../images/mobile/mobile-sprite_v8.png);
+    background: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: left -1190px;
     color: #aaa;
@@ -344,12 +344,12 @@ ul, li {
 .mobile.download-speed {
     text-align: right;
     padding: 0 28px 0 0;
-    background: url(../images/mobile/mobile-sprite_v8.png) no-repeat right -246px;
+    background: url(../images/mobile/mobile-sprite_v9.png) no-repeat right -246px;
 }
 .mobile.download-percents, .mobile.upload-percents {
     text-align: left;
     padding: 0 0 0 28px;
-    background: url(../images/mobile/mobile-sprite_v8.png) no-repeat -247px -246px;
+    background: url(../images/mobile/mobile-sprite_v9.png) no-repeat -247px -246px;
 }
 .mobile.public-link {
     background-color: rgba(242, 242, 242, 1);
@@ -394,7 +394,7 @@ ul, li {
 .mobile.red-button.disabled i {
     position: absolute;
     display: inline-block;
-    background: url(../images/mobile/mobile-sprite_v8.png);
+    background: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: 0px -207px;
     margin: 0 4px 0 0;
@@ -477,7 +477,7 @@ ul, li {
 .mobile.warning-icon {
     width: 60px;
     height: 62px;
-    background: url(../images/mobile/mobile-sprite_v8.png);
+    background: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -3px -100px;
     display: inline-block;
@@ -496,7 +496,7 @@ ul, li {
     width: 178px;
     height: 54px;
     margin: 0 auto;
-    background: url(../images/mobile/mobile-sprite_v8.png);
+    background: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: 0 -345px;
 }
@@ -606,7 +606,7 @@ ul, li {
     table-layout: fixed;
 }
 .mobile.signin-register-block .mobile.fm-block {
-    background-color: #F8F9FA; 
+    background-color: #F8F9FA;
 }
 .mobile.registration-confirm-email{
     background-color: #F8F9FA;
@@ -614,7 +614,7 @@ ul, li {
 .mobile.registration-confirm-email .mobile.fm-block {
     padding-bottom: 24px;
     border-bottom: 1px solid #eee;
-} 
+}
 .mobile.full-page-scrollable {
     overflow: scroll;
     -webkit-overflow-scrolling: touch;
@@ -704,7 +704,7 @@ ul, li {
 .mobile.fm-icon {
     width: 42px;
     height: 40px;
-    background: url(../images/mobile/mobile-sprite_v8.png);
+    background: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
     cursor: pointer;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -795,11 +795,20 @@ ul, li {
 .mobile.fm-icon.cloud {
     background-position: -52px -2010px;
 }
+.mobile.fm-icon.invite {
+    background-position: 2px -2161px;
+}
 .mobile.fm-icon.right-arrow {
     background-position: -98px -1962px;
 }
+.mobile.fm-icon.info {
+    background-position: -151px -1626px;
+}
+.mobile.fm-icon.red-warning {
+    background-position: 12px -2114px;
+}
 .mobile.fm-dialog-close {
-    background: url(../images/mobile/mobile-sprite_v8.png);
+    background: url(../images/mobile/mobile-sprite_v9.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -936,7 +945,7 @@ ul, li {
     font-size: 13px;
     line-height: 17px;
     color: #FF5555;
-    background: url(../images/mobile/mobile-sprite_v8.png);
+    background: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: left -1192px;
     text-align: center;
@@ -1044,7 +1053,7 @@ ul, li {
     width: 145px;
     height: 108px;
     margin: 0 auto 20px auto;
-    background-image: url(../images/mobile/mobile-sprite_v8.png);
+    background-image: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
 }
 .mobile.empty-cloud .empty-icon {
@@ -1109,7 +1118,7 @@ ul, li {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v8.png);
+    background-image: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -130px -1149px;
     position: absolute;
@@ -1202,7 +1211,7 @@ input[type='checkbox'] {
     margin-right: 16px;
     margin-left: 16px;
     margin-bottom: 4px;
-    background-color: #fff; 
+    background-color: #fff;
 }
 .mobile.remember-me div.checkboxOn, .mobile.remember-me div.checkboxOff {
     margin: 19px 0 0 0;
@@ -1232,7 +1241,7 @@ input[type='checkbox'] {
     display: block;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mobile/mobile-sprite_v8.png);
+    background-image: url(../images/mobile/mobile-sprite_v9.png);
     background-position: -49px -1179px;
 }
 .checkboxOn.square input, .checkboxOff.square input {
@@ -1452,7 +1461,7 @@ div.checkboxOn, div.checkboxOff {
     left: 50%;
     top: 50%;
     margin: -29px 0 0 -29px;
-    background-image: url(../images/mobile/mobile-sprite_v8.png);
+    background-image: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -7px -1212px;
     -webkit-animation: rotate-loading 0.8s infinite linear;
@@ -1467,7 +1476,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.registration-confirm-email .email-icon {
     width: 200px;
     height: 114px;
-    background-image: url(../images/mega/register-big-sprite-v14.png);
+    background-image: url(../images/mega/register-big-sprite-v15.png);
     background-position: center -1021px;
     background-repeat: no-repeat;
     margin: 46px auto 0 auto;
@@ -1526,7 +1535,7 @@ div.checkboxOn, div.checkboxOff {
     margin: 0 32px 0 60px;
 }
 .mobile.registration-generating-keys .fm-content {
-    margin-top: 50%; 
+    margin-top: 50%;
 }
 .mobile.white-text-bl {
     padding: 61px 30px 65px 30px;
@@ -2788,14 +2797,12 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
     margin-bottom: 2px;
 }
-
 /* Styling for jQueryUI selectmenu in use with address dialog */
 .ui-selectmenu-button {
     margin: 12px 0 0 0;
 }
 #address-dialog-countries-button {
     display: block;
-    width: 100%;
     margin-top: 4px;
     float: none;
 }
@@ -2899,9 +2906,9 @@ div.checkboxOn, div.checkboxOff {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mega/nw-fm-sprite_v26.svg);
+    background-image: url(../images/mobile/mobile-sprite_v9.png);
     background-repeat: no-repeat;
-    background-position: right -8344px;
+    background-position: right -2053px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -3346,7 +3353,7 @@ div.checkboxOn, div.checkboxOff {
     margin: 20px 15px 30px 15px;
 }
 .mobile.top-menu-popup .top-icon.close {
-    background: url(../images/mobile/mobile-sprite_v8.png);
+    background: url(../images/mobile/mobile-sprite_v9.png);
     background-position: -65px -1143px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -3501,7 +3508,7 @@ div.checkboxOn, div.checkboxOff {
     top: 50%;
     width: 36px;
     margin-top: -18px;
-    background-image: url(../images/mobile/mobile-sprite_v8.png);
+    background-image: url(../images/mobile/mobile-sprite_v9.png);
     background-position: -148px -1897px;
     background-repeat: no-repeat;
     z-index: 10;
@@ -3801,7 +3808,40 @@ div.checkboxOn, div.checkboxOff {
     position: absolute;
     top: 9px;
 }
+.mobile.my-account-page .account-achievements-block {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    margin-top: 4px;
+    padding: 17px 0;
+    position: relative;
+}
+.mobile.my-account-page .account-achievements-block .fm-icon.rocket {
+    left: 10px;
+    position: absolute;
+    top: 18px;
+}
+.mobile.my-account-page .account-achievements-block .achievements-heading {
+    color: #000;
+    font-size: 17px;
+    line-height: 22px;
+    margin-left: 60px;
+    text-align: left;
+}
+.mobile.my-account-page .account-achievements-block .achievements-text {
+    color: #777e82;
+    font-size: 14px;
+    line-height: 18px;
+    margin-left: 60px;
+    text-align: left;
+}
+.mobile.my-account-page .account-achievements-block .fm-icon.right-arrow {
+    right: 4px;
+    position: absolute;
+    top: 18px;
+}
 
+/* Help centre header */
 .help-section.fm-header {
     background-color: #fff;
     box-shadow:  0 1px 4px 0 rgba(0,0,0,0.10);
@@ -3813,6 +3853,445 @@ div.checkboxOn, div.checkboxOff {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+/* Achievements page */
+.mobile.achievements-page .invite-friends-block {
+    background: #fff;
+    padding: 23px 0 26px 0;
+    position: relative;
+}
+.mobile.achievements-page .invite-friends-block .fm-icon.invite {
+    left: 9px;
+    position: absolute;
+    top: 14px;
+}
+.mobile.achievements-page .invite-friends-heading {
+    color: #eb4444;
+    font-family: 'source_sans_prosemibold';
+    font-size: 17px;
+    line-height: 22px;
+    margin: 0 0 0 60px;
+}
+.mobile.achievements-page .invite-friends-text {
+    color: #777e82;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 5px 57px 0 60px;
+}
+.mobile.achievements-page .invite-friends-block .right-arrow {
+    margin-top: -20px;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+}
+.mobile.achievements-page .unlocked-rewards-block {
+    background: #f8f9fa;
+    border-top: 1px solid #ddd;
+    padding-bottom: 26px;
+}
+.mobile.achievements-page .unlocked-rewards-header {
+    color: #000;
+    font-size: 17px;
+    line-height: 22px;
+    margin: 16px 0 15px 0;
+    text-align: center;
+}
+.mobile.achievements-page .storage-quota-block,
+.mobile.achievements-page .transfer-quota-block {
+    display: inline-block;
+    text-align: center;
+    width: 49%;
+}
+.mobile.achievements-page .transfer-quota-block {
+    border-left: 1px solid #d8d8d8;
+}
+
+.mobile.achievements-page .storage-quota-block .storage-amount,
+.mobile.achievements-page .transfer-quota-block .transfer-amount {
+    display: inline-block;
+    font-size: 36px;
+    line-height: 36px;
+    text-align: center;
+}
+.mobile.achievements-page .storage-quota-block .storage-amount {
+    color: #2ba6de;
+}
+.mobile.achievements-page .transfer-quota-block .transfer-amount {
+    color: #32b500;
+}
+
+.mobile.achievements-page .storage-quota-block .storage-unit,
+.mobile.achievements-page .transfer-quota-block .transfer-unit {
+    display: inline-block;
+    font-size: 15px;
+    line-height: 19px;
+}
+.mobile.achievements-page .storage-quota-block .storage-unit {
+    color: #2ba6de;
+}
+.mobile.achievements-page .transfer-quota-block .transfer-unit {
+    color: #32b500;
+}
+
+.mobile.achievements-page .storage-quota-block .storage-text,
+.mobile.achievements-page .transfer-quota-block .transfer-text {
+    color: #8b9faa;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 5px 0 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 16px;
+    padding-left: 16px;
+}
+
+.mobile.achievements-page .bonus-information-block {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    margin-bottom: 4px;
+    padding: 2px 11px 8px 11px;
+    position: relative;
+}
+.mobile.achievements-page .bonus-information-block .left-block,
+.mobile.achievements-page .bonus-information-block .right-block {
+    display: inline-block;
+}
+.mobile.achievements-page .bonus-information-block .right-block {
+    margin-left: 11px;
+}
+.mobile.achievements-page .bonus-information-block .storage-bonus,
+.mobile.achievements-page .bonus-information-block .transfer-bonus {
+    background-color: #2ba6de;
+    border-radius: 2px;
+    color: #fff;
+    font-size: 12px;
+    line-height: 17px;
+    padding: 1px 6px;
+    text-align: center;
+}
+.mobile.achievements-page .bonus-information-block .storage-bonus {
+    background-color: #2ba6de;
+}
+.mobile.achievements-page .bonus-information-block.inactive .storage-bonus {
+    background-color: #fff;
+    border: 1px solid #2ba6de;
+    color: #2ba6de;
+}
+.mobile.achievements-page .bonus-information-block .transfer-bonus {
+    background-color: #32b500;
+    margin-top: 2px;
+}
+.mobile.achievements-page .bonus-information-block.inactive .transfer-bonus {
+    background-color: #fff;
+    margin-top: 2px;
+    color: #32b500;
+    border: 1px solid #32b500;
+}
+.mobile.achievements-page .bonus-information-block .storage-bonus.greyed-out,
+.mobile.achievements-page .bonus-information-block .transfer-bonus.greyed-out {
+    background-color: #aaa;
+    border: none;
+    color: #fff;
+}
+.mobile.achievements-page .bonus-information-block .bonus-header {
+    color: #000;
+    font-size: 17px;
+    line-height: 22px;
+    position: relative;
+    top: 8px;
+}
+.mobile.achievements-page .bonus-information-block .time-remaining {
+    color: #777e82;
+    font-size: 14px;
+    line-height: 28px;
+    margin-top: 3px
+}
+.mobile.achievements-page .bonus-information-block .time-remaining.expiring-soon {
+    color: #eb4444;
+}
+.mobile.achievements-page .bonus-information-block.disabled .right-arrow {
+    display: none;
+}
+.mobile.achievements-page .bonus-information-block .right-arrow {
+    position: absolute;
+    right: 8px;
+    top: 12px;
+}
+
+/* Achievements Referral Bonus page */
+.mobile.main-block.achievements-referral-bonuses-page {
+    background-color: #F8F9FA;
+}
+.mobile.achievements-referral-bonuses-page .total-referral-bonuses-block {
+    background: #f8f9fa;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 26px 0;
+}
+.mobile.achievements-referral-bonuses-page .storage-quota-block,
+.mobile.achievements-referral-bonuses-page .transfer-quota-block {
+    display: inline-block;
+    text-align: center;
+    width: 49%;
+}
+.mobile.achievements-referral-bonuses-page .transfer-quota-block {
+    border-left: 1px solid #d8d8d8;
+}
+.mobile.achievements-referral-bonuses-page .storage-quota-block .storage-amount,
+.mobile.achievements-referral-bonuses-page .transfer-quota-block .transfer-amount {
+    display: inline-block;
+    font-size: 36px;
+    line-height: 45px;
+    text-align: center;
+}
+.mobile.achievements-referral-bonuses-page .storage-quota-block .storage-amount {
+    color: #2ba6de;
+}
+.mobile.achievements-referral-bonuses-page .transfer-quota-block .transfer-amount {
+    color: #32b500;
+}
+
+.mobile.achievements-referral-bonuses-page .storage-quota-block .storage-unit,
+.mobile.achievements-referral-bonuses-page .transfer-quota-block .transfer-unit {
+    display: inline-block;
+    font-size: 16px;
+    line-height: 25px;
+}
+.mobile.achievements-referral-bonuses-page .storage-quota-block .storage-unit {
+    color: #2ba6de;
+}
+.mobile.achievements-referral-bonuses-page .transfer-quota-block .transfer-unit {
+    color: #32b500;
+}
+
+.mobile.achievements-referral-bonuses-page .storage-quota-block .storage-text,
+.mobile.achievements-referral-bonuses-page .transfer-quota-block .transfer-text {
+    color: #8b9faa;
+    font-size: 14px;
+    line-height: 20px;
+    margin: 5px 0 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 16px;
+    padding-left: 16px;
+}
+.mobile.achievements-referral-bonuses-page .referral-block {
+    padding: 8px 0;
+    position: relative;
+    background-color: #fff;
+    height: 48px;
+}
+.mobile.achievements-referral-bonuses-page .referral-block:last-of-type {
+    border-bottom: 1px solid #ddd;
+}
+.mobile.achievements-referral-bonuses-page .referral-block .avatar-container {
+    left: 16px;
+    position: absolute;
+    top: 13px;
+}
+.mobile.achievements-referral-bonuses-page .referral-block .small-rounded-avatar {
+    color: #fff;
+}
+.mobile.achievements-referral-bonuses-page .referral-block .name {
+    color: #000;
+    font-size: 16px;
+    line-height: 20px;
+    margin-left: 70px;
+}
+.mobile.achievements-referral-bonuses-page .referral-block .email {
+    color: #000;
+    font-size: 16px;
+    margin-left: 70px;
+    line-height: 25px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-right: 12px;
+}
+.mobile.achievements-referral-bonuses-page .referral-block .time-remaining {
+    top: 22px;
+    right: 20px;
+    color: #777E82;
+    font-size: 14px;
+    line-height: 20px;
+    margin-left: 70px;
+}
+.mobile.achievements-referral-bonuses-page .referral-block .time-remaining.expiring-soon {
+    color: #eb4444;
+}
+.mobile.achievements-referral-bonuses-page .referral-block .referral-row-border {
+    border-bottom: 1px solid #ddd;
+    position: absolute;
+    bottom: 0;
+    left: 70px;
+    right: 0;
+}
+.mobile.achievements-referral-bonuses-page .referral-block:last-of-type .referral-row-border {
+    border-bottom:none;
+}
+
+/* Achievements Invite Friends page */
+.mobile.achievements-invite-friends-page .top-block {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+.mobile.achievements-invite-friends-page .invite-friends-block {
+    padding: 23px 0 26px 0;
+    position: relative;
+}
+.mobile.achievements-invite-friends-page .invite-friends-block .fm-icon.invite {
+    left: 9px;
+    position: absolute;
+    top: 14px;
+}
+.mobile.achievements-invite-friends-page .invite-friends-heading {
+    color: #eb4444;
+    font-family: 'source_sans_prosemibold';
+    font-size: 17px;
+    line-height: 22px;
+    margin: 0 0 0 60px;
+}
+.mobile.achievements-invite-friends-page .invite-friends-text {
+    color: #777e82;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 5px 57px 0 60px;
+}
+.mobile.achievements-invite-friends-page .email-input-container {
+    padding: 0 26px;
+}
+.mobile.achievements-invite-friends-page .email-input {
+    border-radius: 3px;
+    background-color: rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.05);
+    box-sizing: border-box;
+    color: #000;
+    font-size: 15px;
+    line-height: 19px;
+    opacity: 0.4;
+    padding: 14px 10px;
+    width: 100%;
+}
+.mobile.achievements-invite-friends-page .email-input:focus {
+    border: 1px solid rgba(51,51,51,0.35);
+    opacity: 1;
+}
+.mobile.achievements-invite-friends-page .email-warning-block {
+    position: relative;
+}
+.mobile.achievements-invite-friends-page .email-warning-block .fm-icon.red-warning {
+    left: -4px;
+    position: absolute;
+    top: -3px;
+}
+.mobile.achievements-invite-friends-page .email-warning-block .warning-text {
+    opacity: 0.6;
+    color: #131313;
+    font-size: 12px;
+    line-height: 15px;
+    padding: 9px 0 9px 31px;
+}
+.mobile.achievements-invite-friends-page .success-message-block {
+    color: #2aaf5f;
+    font-size: 12px;
+    line-height: 15px;
+    padding: 9px 0;
+}
+.mobile.achievements-invite-friends-page .invite-button {
+    background-color: #eb4444;
+    border-radius: 2px;
+    color: #fff;
+    font-size: 15px;
+    line-height: 17px;
+    margin: 4px 26px 28px 26px;
+    opacity: 0.5;
+    padding: 16px 0;
+    text-align: center;
+}
+.mobile.achievements-invite-friends-page .invite-button .loading-image {
+    display: none;
+}
+.mobile.achievements-invite-friends-page .invite-button.loading .label {
+    visibility: hidden;
+}
+.mobile.achievements-invite-friends-page .invite-button.loading .loading-image {
+    display: inline-block;
+    height: 28px;
+    left: 50%;
+    margin-left: -14px;
+    margin-top: -5px;
+    position: absolute;
+    width: 28px;
+    font-size: 0;
+    line-height: 0;
+}
+.mobile.achievements-invite-friends-page .invite-button .loading-image img {
+    width: 28px;
+    height: 28px;
+}
+.mobile.achievements-invite-friends-page .invite-button.active {
+    opacity: 1;
+}
+.mobile.achievements-invite-friends-page .how-it-works-block {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    margin-top: 4px;
+    padding: 17px 0;
+    position: relative;
+}
+.mobile.achievements-invite-friends-page .how-it-works-block .fm-icon.info {
+    left: 10px;
+    position: absolute;
+    top: 9px;
+}
+.mobile.achievements-invite-friends-page .how-it-works-text {
+    color: #000;
+    font-size: 17px;
+    line-height: 22px;
+    margin-left: 60px;
+    text-align: left;
+}
+.mobile.achievements-invite-friends-page .how-it-works-block .fm-icon.right-arrow {
+    right: 4px;
+    position: absolute;
+    top: 9px;
+}
+
+/* Achievements Invites How it Works page */
+.mobile.achievements-how-it-works-page .top-block {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 40px 26px 28px 26px;
+}
+.mobile.achievements-how-it-works-page .fm-icon.invite {
+    margin: 0 auto;
+}
+.mobile.achievements-how-it-works-page .heading {
+    color: #eb4444;
+    font-family: 'source_sans_prosemibold';
+    font-size: 20px;
+    line-height: 25px;
+    text-align: center;
+}
+.mobile.achievements-how-it-works-page .heading.how-it-works {
+    margin-top: 8px;
+}
+.mobile.achievements-how-it-works-page .heading.why-is-it-not-working {
+    margin-top: 31px;
+}
+.mobile.achievements-how-it-works-page p {
+    color: #778187;
+    font-size: 16px;
+    line-height: 26px;
+    text-align: center;
+    margin: 11px 0 0 0;
+}
+
+
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {
@@ -4008,7 +4487,7 @@ div.checkboxOn, div.checkboxOff {
         display: none;
     }
     .mobile.white-block {
-        width: 308px;
+        width: 340px;
         padding: 12px;
         margin: 0 0 28px 0;
     }
@@ -4029,7 +4508,10 @@ div.checkboxOn, div.checkboxOff {
     }
     .mobile.filename {
         font-size: 17px;
-        line-height: 17px;
+        line-height: 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow:ellipsis;
     }
     .mobile.public-link {
         font-size: 17px;
@@ -4046,12 +4528,12 @@ div.checkboxOn, div.checkboxOff {
         height: 54px;
     }
     .wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block  {
-        bottom: -66px;
+        bottom: -160px;
     }
     .mobile.application-txt {
         font-size: 24px;
         line-height: 34px;
-        padding-top: 72px;
+        padding-top: 40px;
     }
     .mobile.logo {
         width: 42px;
@@ -4145,7 +4627,7 @@ div.checkboxOn, div.checkboxOff {
 
 @media only screen and (orientation:landscape) and (max-width: 670px), only screen and (orientation:portrait) and (max-height: 670px) {
     .mobile.white-block {
-        width: 280px;
+        width: 300px;
         padding: 9px;
         margin: 0 0 22px 0;
         -moz-border-radius: 2px;
@@ -4162,11 +4644,16 @@ div.checkboxOn, div.checkboxOff {
         min-height: 128px;
     }
     .wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block {
-        bottom: -53px;
+        bottom: -140px;
     }
     .mobile.filename {
         font-size: 15px;
-        line-height: 15px;
+        line-height: 20px;
+        margin: -32px 15px -1px 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        letter-spacing: 0px;
     }
     .mobile.public-link {
         font-size: 15px;
@@ -4175,6 +4662,9 @@ div.checkboxOn, div.checkboxOff {
     .mobile.filesize, .mobile.download-speed, .mobile.download-percents, .mobile.upload-percents {
         margin: 3px 0 10px 0;
         font-size: 14px;
+        line-height: 24px;
+        padding: 0 10px;
+        letter-spacing: 0px;
     }
     .mobile.red-button, .mobile.download-progress, .mobile.upload-progress {
         height: 44px;
@@ -4288,7 +4778,7 @@ div.checkboxOn, div.checkboxOff {
         top: 29px;
     }
     .mobile.white-block {
-        width: 240px;
+        width: 260px;
         padding: 8px;
         margin: 0 0 22px 0;
         -moz-border-radius: 2px;
@@ -4301,8 +4791,12 @@ div.checkboxOn, div.checkboxOff {
     }
     .mobile.filename {
         font-size: 14px;
-        line-height: 14px;
+        line-height: 20px;
         margin: -32px 15px -1px 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        letter-spacing: 0px;
     }
     .mobile.public-link {
         font-size: 14px;
@@ -4311,9 +4805,10 @@ div.checkboxOn, div.checkboxOff {
     .mobile.filesize, .mobile.download-speed, .mobile.download-percents, .mobile.upload-percents {
         margin: 0;
         font-size: 13px;
-        color: #BBBBBB;
-        line-height: 19px;
+        color: #777E82;
+        line-height: 24px;
         padding: 0 10px;
+        letter-spacing: 0px;
     }
     .mobile.download-speed {
         padding: 0 13px 0 0;
@@ -4370,7 +4865,7 @@ div.checkboxOn, div.checkboxOff {
         height: 54.5%;
     }
     .wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block {
-        bottom: -48px;
+        bottom: -110px;
     }
     .mobile.wrong-file-block {
         padding-top: 52px;
@@ -4460,7 +4955,7 @@ div.checkboxOn, div.checkboxOff {
         margin-left: 24px;
         margin-right: 24px;
     }
-    .mobile.remember-me, .mobile.confirm-terms {
+    .mobile.remember-me, .mobile.confirm-terms, .payment-address-dialog .ui-selectmenu-button {
         margin-left: 24px;
         margin-right: 24px;
     }
@@ -4514,12 +5009,12 @@ div.checkboxOn, div.checkboxOff {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.download-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow {
-        background-image: url(../images/mobile/mobile-sprite_v8@2x.png);
+    .mobile.logo, .mobile.download-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button {
+        background-image: url(../images/mobile/mobile-sprite_v9@2x.png);
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {
-        background-image: url(../images/mega/register-big-sprite-v14@2x.png);
+        background-image: url(../images/mega/register-big-sprite-v15@2x.png);
         background-size: 200px auto;
     }
 }

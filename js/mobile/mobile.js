@@ -225,13 +225,6 @@ mega.ui.tpp = {
     resume: function() {}
 };
 
-mega.achievem = {
-    enabled: function() {
-        'use strict';
-        return MegaPromise.reject();
-    }
-};
-
 var notify = {
     init: function() {},
     notifyFromActionPacket: function() {},
@@ -274,6 +267,8 @@ function fm_hideoverlay() {
 }
 
 mega.ui.showRegisterDialog = function() {};
+
+mega.loadReport = {};
 
 function removeUInode(nodeHandle, parentHandle) {
 

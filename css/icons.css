@@ -97,7 +97,7 @@
     background-position: -51px -3609px;
 }
 .tiny-icon.green-tick, .tiny-icon.red-cross {
-    background-image: url(../images/mega/top-sprite_v3.png);
+    background-image: url(../images/mega/top-sprite_v4.png);
     background-position: -12px -1437px;
 }
 .tiny-icon.red-cross {
@@ -271,6 +271,11 @@
 .dropdown-item .small-icon.grey-chain {
     background-position: -3px -2761px;
 }
+.dropdown-item .small-icon.icons-sprite.chain {
+    width: 22px;
+    background-position: -200px -133px;
+    margin: 6px 8px 1px -1px;
+}
 .dropdown-item .small-icon.writing-pen {
     background-position: -3px -347px;
 }
@@ -279,6 +284,9 @@
 }
 .dropdown-item:hover .small-icon.grey-chain {
     background-position: -3px -2881px;
+}
+.dropdown-item:hover .small-icon.icons-sprite.chain {
+    background-position: -240px -133px;
 }
 .dropdown-item:hover .small-icon.rounded-grey-down-arrow {
     background-position: -3px -2841px;
@@ -500,7 +508,7 @@
     background-position: -17px -10463px;
 }
 .medium-icon.rocket {
-    background-image: url(../images/mega/top-sprite_v3.png);
+    background-image: url(../images/mega/top-sprite_v4.png);
     background-position: -7px -16px;
 }
 .medium-icon.down-arrow {
@@ -711,7 +719,7 @@
     background-position: -15px -11404px;
 }
 .tiny-icon.membership-status {
-    background-image: url(../images/mega/top-sprite_v3.png);
+    background-image: url(../images/mega/top-sprite_v4.png);
     background-position: -10px -979px;
     width: 16px;
 }
@@ -728,11 +736,11 @@
     background-position: -10px -1059px;
 }
 .semi-small-icon.grey-mega {
-    background-image: url(../images/mega/top-sprite_v3.png);
+    background-image: url(../images/mega/top-sprite_v4.png);
     background-position: -10px -326px;
 }
 .semi-small-icon.yellow-triangle {
-    background-image: url(../images/mega/top-sprite_v3.png);
+    background-image: url(../images/mega/top-sprite_v4.png);
     background-position: -10px -1266px;
 }
 .small-icon.dark-grey-plus {
@@ -772,11 +780,11 @@
     background-position: -14px -11665px;
 }
 .small-icon.green-arrow {
-    background-image: url(../images/mega/register-big-sprite-v14.png);
+    background-image: url(../images/mega/register-big-sprite-v15.png);
     background-position: 0px -56px;
 }
 .small-icon.blue-arrow {
-    background-image: url(../images/mega/register-big-sprite-v14.png);
+    background-image: url(../images/mega/register-big-sprite-v15.png);
     background-position: 0px -99px;
 }
 .small-icon.red-lens {

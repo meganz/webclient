@@ -370,7 +370,7 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin) {
         }, isGroup, isJoin, handler);
 
     self.calls[chatid] = call;
-    call._startOrJoin(av, isJoin);
+    call._startOrJoin(av);
     return call;
 };
 
@@ -870,7 +870,7 @@ Call.prototype._fire = function(evName) {
         logger.error("Event handler '" + evName + "' threw exception:\n" + e, "\n", e.stack);
     }
 };
-Call.prototype._startOrJoin = function(av, isJoin) {
+Call.prototype._startOrJoin = function(av) {
     var self = this;
     self._getLocalStream(av)
     .catch(function(err) {
@@ -878,7 +878,7 @@ Call.prototype._startOrJoin = function(av, isJoin) {
         return err;
     })
     .then(function() {
-        if (isJoin) {
+        if (self.isJoiner) {
             self._join();
         } else {
             self._broadcastCallReq();
@@ -941,11 +941,12 @@ Call.prototype._join = function(userid) {
 
 Call.prototype.answer = function(av) {
     var self = this;
+    assert(self.isJoiner);
     if (self.state !== CallState.kRingIn) {
         self.logger.warn("answer: Not in kRingIn state, nothing to answer");
         return false;
     }
-    return self._startOrJoin(av, true);
+    return self._startOrJoin(av);
 };
 
 Call.prototype.hangup = function(reason) {
@@ -995,17 +996,11 @@ Call.prototype.hangup = function(reason) {
     this._destroy(term, true);
 };
 
-Call.prototype.hangupAllCalls = function() {
-    var calls = this.calls;
-    for (var id in calls) {
-        calls[id].hangup();
-    }
-};
-
 Call.prototype._onUserOffline = function(userid, clientid) {
-    if (this.state === CallState.kRingIn) {
-        this._destroy(Term.kCallReqCancel, false);
-        return;
+    if (this.state === CallState.kRingIn && userid === this._callerInfo.userid
+        && clientid === this._callerInfo.clientid) {
+            this._destroy(Term.kCallReqCancel, false);
+            return;
     }
     for (var sid in this.sessions) {
         var sess = this.sessions[sid];
@@ -1474,7 +1469,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
     }
 
     if (msg) {
-        self.logger.warn("Terminating due to:", msg);
+        self.logger.error("Terminating due to:", msg);
     }
     self._setState(SessState.kTerminating);
     self.terminatePromise = new Promise(function(resolve, reject) {
@@ -1504,6 +1499,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
 Session.prototype.msgSessTerminateAck = function(packet) {
     if (this.state !== SessState.kTerminating) {
         this.logger.warn("Ignoring unexpected TERMINATE_ACK");
+        return;
     }
     assert(this.terminateAckCallback);
     var cb = this.terminateAckCallback;

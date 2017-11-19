@@ -7,9 +7,12 @@ var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
 var Dropdown = React.createClass({
     mixins: [MegaRenderMixin],
+    getInitialState: function() {
+        return {}
+    },
     getDefaultProps: function() {
         return {
-            requiresUpdateOnResize: true,
+            'requiresUpdateOnResize': true,
         };
     },
     componentWillUpdate: function(nextProps, nextState) {
@@ -19,6 +22,9 @@ var Dropdown = React.createClass({
     },
     specificShouldComponentUpdate: function(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
+            if (this.props.onBeforeActiveChange) {
+                this.props.onBeforeActiveChange(nextProps.active);
+            }
             return true;
         }
         else if (this.props.focused != nextProps.focused) {
@@ -79,6 +85,7 @@ var Dropdown = React.createClass({
                             vertOffset += (info.vertical == "top" ? $arrow.outerHeight() : 0);
                         }
 
+
                         if (self.props.vertOffset) {
                            vertOffset += (self.props.vertOffset * (info.vertical == "top" ? 1 : -1));
                         }
@@ -86,6 +93,7 @@ var Dropdown = React.createClass({
                         if (self.props.horizOffset) {
                             horizOffset += self.props.horizOffset;
                         }
+
 
                         $(this).css({
                             left: (obj.left + (offsetLeft ? offsetLeft/2 : 0) + horizOffset) + 'px',
@@ -118,15 +126,16 @@ var Dropdown = React.createClass({
         }.bind(this))
     },
     render: function() {
-        var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
-
-
         if (this.props.active !== true) {
-            classes += " hidden";
+
 
             return null;
         }
         else {
+            var classes = (
+                "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className
+            );
+
             var styles;
 
             // calculate and move the popup arrow to the correct position.
@@ -140,8 +149,20 @@ var Dropdown = React.createClass({
 
             var self = this;
 
-            return (
-                <utils.RenderTo element={document.body} className={classes} style={styles}
+            var child = null;
+
+            if (this.props.children) {
+                child = <div>{self.renderChildren()}</div>;
+            }
+            else if (this.props.dropdownItemGenerator) {
+                child = this.props.dropdownItemGenerator(this);
+            }
+            else {
+                child = null;
+            }
+
+
+            return <utils.RenderTo element={document.body} className={classes} style={styles}
                     popupDidMount={(popupElement) => {
                         self.popupElement = popupElement;
                     }}
@@ -150,10 +171,9 @@ var Dropdown = React.createClass({
                     }}>
                     <div>
                         {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
-                        {this.renderChildren()}
+                        {child}
                     </div>
-                </utils.RenderTo>
-            );
+                </utils.RenderTo>;
         }
     }
 });
@@ -202,11 +222,11 @@ var DropdownContactsSelector = React.createClass({
     render: function() {
         var self = this;
 
-        return <Dropdown className={"popup contacts-search " + this.props.className} 
-                         active={this.props.active} 
-                         closeDropdown={this.props.closeDropdown} 
+        return <Dropdown className={"popup contacts-search " + this.props.className}
+                         active={this.props.active}
+                         closeDropdown={this.props.closeDropdown}
                          ref="dropdown"
-                         positionMy={this.props.positionMy} 
+                         positionMy={this.props.positionMy}
                          positionAt={this.props.positionAt}
                 >
                 <ContactsUI.ContactPickerWidget

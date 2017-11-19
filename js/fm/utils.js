@@ -10,6 +10,7 @@ function MegaUtils() {
 function MegaApi() {
     this.logger = new MegaLogger('MegaApi');
 }
+
 MegaApi.prototype = new FileManager();
 MegaApi.prototype.constructor = MegaApi;
 
@@ -570,6 +571,7 @@ MegaUtils.prototype.clearFileSystemStorage = function megaUtilsClearFileSystemSt
         if (d) {
             console.log('Cleaning FileSystem storage...', storagetype);
         }
+
         function onInitFs(fs) {
             var dirReader = fs.root.createReader();
             (function _readEntries(e) {
@@ -870,12 +872,12 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
 
     var fetcher = function(data) {
 
-        if (aEndOffset === -1) {
-            aEndOffset = data.s;
-        }
-
         aEndOffset = parseInt(aEndOffset);
         aStartOffset = parseInt(aStartOffset);
+
+        if (aEndOffset === -1 || aEndOffset > data.s) {
+            aEndOffset = data.s;
+        }
 
         if ((!aStartOffset && aStartOffset !== 0)
             || aStartOffset > data.s || !aEndOffset
@@ -1258,6 +1260,32 @@ MegaUtils.prototype.getSafeName = function(name) {
         name = '!' + name;
     }
     return name;
+};
+/**
+ * checking if name (file|folder)is satisfaying all OSs [Win + linux + Mac + Android + iOs] rules,
+ * so syncing to local disks won't cause any issue...
+ * we cant yet control cases in which :
+ *     I sync a file named [x] from OS [A],
+ *     to another device running another OS [B]
+ *     And the name [x] breaks OS [B] rules.
+ *
+ * this method will be called to control, renamings from webclient UI.
+ * @param {String} name The filename
+ * @returns {Boolean}
+ */
+MegaUtils.prototype.isSafeName = function (name) {
+    'use strict';
+    // below are mainly denied in windows or android.
+    // we can enhance this as much as we can as
+    // denied chars set D = W + L + M + A + I
+    // where W: denied chars on Winfows, L: on linux, M: on MAC, A: on Android, I: on iOS
+    if (name.trim().length <= 0) {
+        return false;
+    }
+    if (name.search(/[\\\/<>:*\"\|?+\[\]]/) >= 0 || name.length > 250) {
+        return false;
+    }
+    return true;
 };
 
 /**

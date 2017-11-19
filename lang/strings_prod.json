@@ -3891,10 +3891,6 @@
         "text": "Your browser does not have the required audio\/video capabilities for making calls.",
         "context": "Shown when the user's browser does not have the capabilities for making audio\/video calls."
     },
-    "7212": {
-        "text": "Advertisement",
-        "context": "Shown on the download page to inform the user that the image below is an external ad."
-    },
     "7218": {
         "text": "Clear transfer",
         "context": "Context menu item"
@@ -5299,10 +5295,6 @@
         "text": "Message not sent. Click here if you want to cancel it.",
         "context": "A hint message displayed when the message failed to send. It reminds the user to click it to cancel."
     },
-    "8885": {
-        "text": "Me",
-        "context": "The title for my message in a chat. The message was sent from yourself."
-    },
     "8887": {
         "text": "(edited)",
         "context": "A log message in a chat to indicate that the message has been edited by the user."
@@ -5358,10 +5350,6 @@
     "8908": {
         "text": "left the group chat.",
         "context": "A log message in the chat conversation underneath a user\/avatar (the subject) to tell the reader that a participant (the subject) left the group chat.\r\nFor example, [Alice] left the group chat."
-    },
-    "8909": {
-        "text": "Revoke",
-        "context": "A button title to revoke the access to an attachment in a chat."
     },
     "8910": {
         "text": "Removed item from shared folder",
@@ -6286,6 +6274,10 @@
     "16295": {
         "text": "Install",
         "context": "Text placed in some button to tell the user to install something."
+    },
+    "16297": {
+        "text": "Registration Bonus",
+        "context": "achievement type"
     },
     "16298": {
         "text": "Referral bonuses",
@@ -7379,6 +7371,26 @@
         "text": "Date Created",
         "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's original timestamp, when it is created on their local machine."
     },
+    "17464": {
+        "text": "Invite friends and get bonuses",
+        "context": "subtitle of the section for achievements"
+    },
+    "17465": {
+        "text": "Invite friends",
+        "context": "button to invite friends for getting achievements"
+    },
+    "17466": {
+        "text": "Get %1$s of storage and %2$s of transfers for each referral",
+        "context": "title of the introduction for the achievements screen"
+    },
+    "17476": {
+        "text": "Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you will receive bonus storage and transfer quota.",
+        "context": "first paragraph of screen to invite friends and get an achievement"
+    },
+    "17477": {
+        "text": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection. Invited contacts must install the MEGA mobile app or the MEGA desktop app on their devices.",
+        "context": "second paragraph of screen to invite friends and get an achievement"
+    },
     "17489": {
         "text": "view document",
         "context": "Button for the downloads page to let users preview PDF documents."
@@ -7390,5 +7402,29 @@
     "17520": {
         "text": "Manage links",
         "context": "A menu item in the right click context menu in the Cloud Drive. This menu item will take the user to a dialog where they can manage the public folder\/file links which they currently have selected."
+    },
+    "17524": {
+        "text": "used %tq1",
+        "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[Singular] (=1)\r\n"
+    },
+    "17525": {
+        "text": "used %tq2",
+        "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[pair] (= 2)"
+    },
+    "17543": {
+        "text": "Not achieved",
+        "context": "A string used in the mobile webclient to indicate that the bonus (reward) has not been achieved yet."
+    },
+    "17544": {
+        "text": "Invitation sent! Invite another.",
+        "context": "A message which is shown after successfully inviting a user. It informs that the previous action was a success, and that they can send another."
+    },
+    "17545": {
+        "text": "Invite already sent, waiting for response.",
+        "context": "A message on an error dialog explaining that they already sent an invite to that email address and that the system is waiting for a response from that user."
+    },
+    "17546": {
+        "text": "This user has already sent you an invitation.",
+        "context": "An error message after just trying to send a user an invite which explains that the user already sent them an invitation first."
     }
 }

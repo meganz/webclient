@@ -239,11 +239,6 @@ var slideshowid;
             if (!hashLogic) {
                 history.pushState({ subpage: page }, '', '/' + page);
             }
-            else {
-                // pushing a fake state (hashed) to be consumed on back action
-                history.pushState({ subpage: page }, '', '/#' + page + '1');              
-                page = '';
-            }            
         }
         // Bind keydown events
         var overlayKeyDownHandler = function (e) {
@@ -260,7 +255,13 @@ var slideshowid;
                 // since Backspace event is processed with keydown at document level for cloudBrowser.
                 // i prefered that to process it here, instead of unbind the previous handler.
                 e.stopPropagation();
-                history.back();
+                if (!hashLogic) {
+                    history.back();
+                }
+                else {
+                    slideshow(slideshowid, 1);
+                }
+                return false;
             }
         };
         $document.rebind('keydown.slideshow', overlayKeyDownHandler);
@@ -268,7 +269,12 @@ var slideshowid;
         // Close icon
         $overlay.find('.viewer-button.close,.viewer-error-close')
             .rebind('click', function () {
-                history.back();
+                if (!hashLogic) {
+                    history.back();
+                }
+                else {
+                    slideshow(slideshowid, 1);
+                }
             });
 
         // Fullscreen icon

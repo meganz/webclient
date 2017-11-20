@@ -254,7 +254,7 @@
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
 }
-.emoji-preview.shadow::after {
+.textarea-autofill-emoji::after {
     clear: both;
     content: '';
     display: block;

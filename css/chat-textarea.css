@@ -184,11 +184,28 @@
     padding: 10px 0 0 0;
     font-size:13px;
     line-height: 18px;
-    color: #666666;
+    color: #777777;
     min-height: 36px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
+}
+.textarea-autofill-info strong {
+    color: #666666;
+    padding-right: 4px;
+}
+.textarea-autofill-info i {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    vertical-align: top;
+    margin: -1px 2px 0 2px;
+    
+}
+.textarea-autofill-info .left-pad {
+    margin-left:21px;
+    
 }
 .textarea-autofill-emoji {
     text-align: center;

@@ -628,9 +628,8 @@ var TypingArea = React.createClass({
             <div className={"chat-textarea " + self.props.className}>
                 <div className="textarea-autofill-bl">
                     <div className="textarea-autofill-info">
-                        <strong>tab</strong> or  <i class="small-icon"></i> to navigate
-                        <i class="small-icon left-pad"></i> to select
-                        <strong class="left-pad">esc</strong> to dismiss
+                        <strong>tab</strong> or  <i className="small-icon tab-icon"></i> to navigate
+                        <i className="small-icon enter-icon left-pad"></i> to select <strong className="left-pad">esc</strong> to dismiss
                     </div>
                     <div className="textarea-autofill-emoji">
 

@@ -626,6 +626,26 @@ var TypingArea = React.createClass({
 
         return <div className={"typingarea-component" + self.props.className}>
             <div className={"chat-textarea " + self.props.className}>
+                <div className="textarea-autofill-bl">
+                    <div className="textarea-autofill-info">
+                        <strong>tab</strong> or  <i class="small-icon"></i> to navigate
+                        <i class="small-icon left-pad"></i> to select
+                        <strong class="left-pad">esc</strong> to dismiss
+                    </div>
+                    <div className="textarea-autofill-emoji">
+
+                        <div className="emoji-preview shadow active">
+                            <img width="20" height="20" className="emoji"
+                                src={
+                                    staticpath +
+                                    "images/mega/twemojis/2_v2/72x72/1f642.png"
+                                }
+                            />
+                            <div className="emoji title">{":wink:"}</div>
+                        </div>
+
+                    </div>
+                </div>
                 <i className={self.props.iconClass ? self.props.iconClass : "small-icon conversations"}></i>
                 <div className="chat-textarea-buttons">
                     <ButtonsUI.Button

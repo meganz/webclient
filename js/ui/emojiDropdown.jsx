@@ -410,8 +410,9 @@ var DropdownEmojiSelector = React.createClass({
 
             preview = <div className="emoji-preview">
                 {self._generateEmoji(meta)}
-                <div className="emoji title">{":" + meta.n + ":"}</div>
+                <div className="emoji title">{":" + meta.u + ":"}</div>
             </div>;
+            console.log(meta);
         }
 
 

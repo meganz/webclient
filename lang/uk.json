@@ -206,6 +206,7 @@
     "527": "\u041c\u0438 \u0437\u0430\u043f\u0440\u043e\u0448\u0443\u0454\u043c\u043e \u043f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043d\u0438\u043a\u0456\u0432 \u043c\u0430\u0441\u043e\u0432\u043e\u0457 \u0456\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0456\u0457, \u0432\u043a\u043b\u044e\u0447\u0430\u044e\u0447\u0438 \u0431\u043b\u043e\u0491\u0435\u0440\u0456\u0432, \u0437\u0432\u0435\u0440\u0442\u0430\u0442\u0438\u0441\u044c \u0434\u043e \u043d\u0430\u0441 \u0456\u0437 \u0437\u0430\u043f\u0438\u0442\u0430\u043d\u043d\u044f\u043c\u0438, \u043f\u043e\u0432'\u044f\u0437\u0430\u043d\u0438\u043c\u0438 \u0437 MEGA.",
     "543": "\u0431\u0456\u043b\u044c\u0448 \u043d\u0456\u0436 [X]",
     "553": "\u041f\u043e\u0441\u0442\u0430\u0447\u0430\u043b\u044c\u043d\u0438\u043a\u0430 \u0432\u0430\u0448\u0438\u0445 \u043f\u043b\u0430\u0442\u0435\u0436\u0456\u0432 \u043d\u0435\u043c\u0430\u0454 \u0443 \u0441\u043f\u0438\u0441\u043a\u0443? \u0411\u0443\u0434\u044c \u043b\u0430\u0441\u043a\u0430, [A]\u043b\u0438\u0441\u0442\u0443\u0439\u0442\u0435 \u043d\u0430\u043c \u0435\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u043e\u044e \u043f\u043e\u0448\u0442\u043e\u044e[\/A].",
+    "554": "\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u0438",
     "555": "\u042f \u0437\u0433\u043e\u0434\u0435\u043d \u0437 [A]\u0443\u043c\u043e\u0432\u0430\u043c\u0438 \u043d\u0430\u0434\u0430\u043d\u043d\u044f \u043f\u043e\u0441\u043b\u0443\u0433 \u043f\u043e\u0441\u0435\u0440\u0435\u0434\u043d\u0438\u043a\u0430[\/A] MEGA",
     "556": "\u0414\u0430\u043b\u0456",
     "561": "\u0410\u0434\u0440\u0435\u0441\u0430",
@@ -4331,6 +4332,7 @@
     "17223": "The link is now created and in your clipboard. ",
     "17224": "[H1]Collaborate with others[\/H1]",
     "17225": "Sharing a folder is a great way to collaborate with your contacts. You can share your folder with any contact, with any existing MEGA user and even with any new user, as long as you have their email address. [Br][Br]If the user does not have a MEGA account yet, he or she will automatically receive an invitation email to join MEGA so the user can see your shared folder.",
+    "17226": "[B]Right click[\/B] on any folder you wish to share.",
     "17227": "Click on [W13][B]Sharing[\/B][\/W13] in the context menu.",
     "17228": "Enter an email address or the first letters of your MEGA contact name(s).",
     "17229": "Choose the permissions (default is read-only).",
@@ -4489,5 +4491,7 @@
     "17543": "Not achieved",
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
-    "17546": "This user has already sent you an invitation."
+    "17546": "This user has already sent you an invitation.",
+    "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period."
 }

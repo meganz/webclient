@@ -827,6 +827,10 @@
         "text": "Your payment provider is not listed? Please [A]e-mail us[\/A]",
         "context": ""
     },
+    "554": {
+        "text": "Complete",
+        "context": ""
+    },
     "555": {
         "text": "I agree with the MEGA [A]Reseller Terms of Service[\/A]",
         "context": ""
@@ -17327,6 +17331,10 @@
         "text": "Sharing a folder is a great way to collaborate with your contacts. You can share your folder with any contact, with any existing MEGA user and even with any new user, as long as you have their email address. [Br][Br]If the user does not have a MEGA account yet, he or she will automatically receive an invitation email to join MEGA so the user can see your shared folder.",
         "context": "Description for the collaboration with others help section"
     },
+    "17226": {
+        "text": "[B]Right click[\/B] on any folder you wish to share.",
+        "context": "Step one of how to collaborate with others on the mega.nz website."
+    },
     "17227": {
         "text": "Click on [W13][B]Sharing[\/B][\/W13] in the context menu.",
         "context": "Step two of how to collaborate with others on the mega.nz website"
@@ -17962,5 +17970,13 @@
     "17546": {
         "text": "This user has already sent you an invitation.",
         "context": "An error message after just trying to send a user an invite which explains that the user already sent them an invitation first."
+    },
+    "17547": {
+        "text": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+        "context": "A description of why write-only access to the user\u2019s photo library is needed. To protect user privacy Apple requires a purpose string explaining why this will be accessed."
+    },
+    "17548": {
+        "text": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+        "context": "A dialog message in the mobile webclient informing the user that their account will return to the free plan after their currenly paid for subscription runs out if they choose to confirm in cancelling their subscription."
     }
 }

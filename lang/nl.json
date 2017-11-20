@@ -206,6 +206,7 @@
     "527": "Wij verwelkomen media inclusief bloggers om contact met ons op te nemen voor al uw vragen gerelateerd aan MEGA.",
     "543": "meer dan [X]",
     "553": "Staat uw betalingsprovider niet in de lijst? Stuur ons dan a.u.b. [A]een e-mail[\/A]",
+    "554": "Voltooi",
     "555": "Ik ga akkoord met de MEGA [A]Reseller Algemene Voorwaarden[\/A]",
     "556": "Volgende",
     "561": "Adres",
@@ -4331,6 +4332,7 @@
     "17223": "De koppeling is nu gemaakt in uw klembord.",
     "17224": "[H1]Samenwerken met anderen[\/H1]",
     "17225": "Een map delen is een geweldige manier om samen te werken met uw contacten. U kunt uw map delen met elk contact, met elke bestaande MEGA gebruiker en zelfs met een nieuwe gebruiker, zolang u hun e-mailadres heeft. [Br][Br]Als de gebruiker nog geen MEGA account heeft, ontvangt hij of zij automatisch een uitnodigings-email om mee te doen bij MEGA zodat de gebruiker uw gedeelde map kan zien. ",
+    "17226": "[B]Rechter klik[\/B] op elke map of bestand die u wilt delen.",
     "17227": "Klik op [W13][B]Delen[\/B][\/W13] in de context menu.",
     "17228": "Voer een e-mailadres in of de eerste letters van uw MEGA contact naam(namen). ",
     "17229": "Kies de permissies (standaard is alleen-lezen).",
@@ -4489,5 +4491,7 @@
     "17543": "Niet bereikt",
     "17544": "Uitnodiging ontvangen! Nodig nog iemand uit.",
     "17545": "Uitnodiging al verzonden, wachtend op antwoord.",
-    "17546": "Die gebruiker heeft u al een uitnodiging verzonden."
+    "17546": "Die gebruiker heeft u al een uitnodiging verzonden.",
+    "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period."
 }

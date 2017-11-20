@@ -206,6 +206,7 @@
     "527": "N\u00f3s damos as boas-vindas a membro da comunica\u00e7\u00e3o social, incluindo bloggers, para nos contactarem sobre assuntos relacionados com o MEGA.",
     "543": "mais de [X]",
     "553": "O seu provedor de pagamentos n\u00e3o est\u00e1 listado? Por favor, [A]envie-nos um e-mail[\/A]",
+    "554": "Completar",
     "555": "Eu aceito os [A]Termos de Servi\u00e7o de Revendedores[\/A] do MEGA.",
     "556": "Pr\u00f3ximo",
     "561": "Morada",
@@ -4331,6 +4332,7 @@
     "17223": "The link is now created and in your clipboard. ",
     "17224": "[H1]Collaborate with others[\/H1]",
     "17225": "Sharing a folder is a great way to collaborate with your contacts. You can share your folder with any contact, with any existing MEGA user and even with any new user, as long as you have their email address. [Br][Br]If the user does not have a MEGA account yet, he or she will automatically receive an invitation email to join MEGA so the user can see your shared folder.",
+    "17226": "[B]Right click[\/B] on any folder you wish to share.",
     "17227": "Click on [W13][B]Sharing[\/B][\/W13] in the context menu.",
     "17228": "Enter an email address or the first letters of your MEGA contact name(s).",
     "17229": "Choose the permissions (default is read-only).",
@@ -4489,5 +4491,7 @@
     "17543": "Not achieved",
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
-    "17546": "This user has already sent you an invitation."
+    "17546": "This user has already sent you an invitation.",
+    "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period."
 }

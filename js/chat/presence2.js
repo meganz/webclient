@@ -417,7 +417,11 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
     }
     else {
         if (!self._puRequest || self._puRequest.state() !== "pending") {
+            self.connectionRetryManager.pause();
             self._puRequest = asyncApiReq({'a': 'pu'})
+                .always(function() {
+                    self.connectionRetryManager.unpause();
+                })
                 .done(function(res) {
                     if (typeof res == 'string') {
                         self.url = res;

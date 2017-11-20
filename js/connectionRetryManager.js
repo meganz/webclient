@@ -12,6 +12,8 @@ var ConnectionRetryManager = function(opts, parentLogger) {
     self._lastConnectionRetryTime = 0;
     self._connectionRetryInProgress = null;
     self._connectionRetries = 0;
+    self._is_paused = false;
+
     if (localStorage.connectionRetryManagerDebug) {
         var _connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
         Object.defineProperty(self, "_connectionState", {
@@ -274,6 +276,9 @@ ConnectionRetryManager.prototype.gotConnected = function(){
 ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, delayed, name) {
     var self = this;
 
+    if (self._is_paused) {
+        return MegaPromise.reject();
+    }
     self._$connectingPromise = createTimeoutPromise(
         function() {
             return self.options.functions.isConnected();
@@ -302,6 +307,17 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
             self.doConnectionRetry();
         });
     return self._$connectingPromise;
+};
+
+ConnectionRetryManager.prototype.pause = function() {
+    this._is_paused = true;
+    if (this._$connectingPromise) {
+        this._$connectingPromise.stopTimers();
+    }
+};
+
+ConnectionRetryManager.prototype.unpause = function() {
+    this._is_paused = false;
 };
 
 /**

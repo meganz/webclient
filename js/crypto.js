@@ -1187,6 +1187,17 @@ function api_init(channel, service, split) {
 function api_req(request, context, channel) {
     "use strict";
 
+    /* TODO: REMOVE BEFORE MERGE! */
+    if (localStorage.breakApiReq && arguments[3] !== -1) {
+        console.error('(breakApiReq) delaying: ', request.a);
+        setTimeout(function() {
+            console.error('(breakApiReq) executing: ', request.a);
+            api_req(request, context, channel, -1);
+        }, 60000);
+        return;
+    }
+    /* TODO: END OF CODE TO BE REMOVED BEFORE MERGE! */
+
     if (channel === undefined) {
         channel = 0;
     }

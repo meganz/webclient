@@ -413,11 +413,19 @@ function dl_g(res) {
                 }
             };
 
+            // Change layout for video
+            if (is_video(filename)) {
+                $('.bottom-page.scroll-block').addClass('video');
+            }
+            else {
+                $('.bottom-page.scroll-block').removeClass('video');
+            }
+
             if (res.fa) {
                 // load thumbnail
                 api_getfileattr([{fa: res.fa, k: key}], 0, function(a, b, data) {
                     if (data !== 0xDEAD) {
-                        data = mObjectURL([data.buffer || data], 'image/jpeg');
+                        data = mObjectURL('image/jpeg');
 
                         if (data) {
                             var $infoBlock = $('.download.info-block');
@@ -428,9 +436,6 @@ function dl_g(res) {
                         }
                     }
                 });
-            }
-            else if (is_video(filename)) {
-                showPreviewButton();
             }
         }
         else if (is_mobile) {

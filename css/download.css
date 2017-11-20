@@ -301,7 +301,7 @@
     float: left;
     position: relative;
     margin: 1px 0 0 7px;
-    background-image: url(../images/mega/download-sprite-v7.png);
+    background-image: url(../images/mega/download-sprite-v8.png);
     background-repeat: no-repeat;
     background-position: 0 0;
 }
@@ -510,7 +510,7 @@
     font-family: 'Open Sans Semibold Italic', Arial;
 }
 .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon {
-    background-image: url(../images/mega/download-sprite-v7.png);
+    background-image: url(../images/mega/download-sprite-v8.png);
     background-repeat: no-repeat;
     background-position: -117px -772px;
     padding-left: 40px;
@@ -657,3 +657,169 @@
 .downloading .download.in-progress, .download-complete .download.download.in-progress, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
     display: block;
 }
+
+/* Video dl page */
+.video .download.main-pad {
+    width: 656px;
+    min-height: 590px;
+    table-layout: fixed;
+}
+.video .download.transfer-wrapper {
+    background-color: white;
+    min-height: 507px;
+    -webkit-box-shadow: 0px 0px 0px 1px #EEEEEE;
+    -moz-box-shadow: 0px 0px 0px 1px #EEEEEE;
+    box-shadow: 0px 0px 0px 1px #EEEEEE;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px; 
+    padding: 7px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.download.video-block {
+    display: none;
+}
+.video .download.video-block {
+    display: block;
+    height: 360px;
+    background-color: black;
+    position: relative;
+    text-align:center;
+}
+.video .download.video-block img {
+    margin: 0 auto;
+    height: 100%;
+}
+.download.play-video-button {
+    position:absolute;
+    width: 72px;
+    height: 72px;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    left: 50%;
+    top: 50%;
+    margin: -36px 0 0 -36px;
+    z-index: 10;
+    cursor: pointer;
+    background-color: #F52929;
+    background-image: url(../images/mega/download-sprite-v8.png);
+    background-position: -64px -2285px;
+}
+.video .download.checkbox-bl {
+    padding: 8px 15px 0 15px;
+}
+.video .download.file-icon-wrap {
+    height: 43px;
+    width: 32px;
+    background-position: 0 -2299px;
+    margin: 15px 0 0 15px;
+}
+.video .download.file-icon-wrap div {
+    display: none;
+}
+.video .download.file-info {
+    margin-left: 66px;
+    padding-top: 16px;
+    padding-right: 15px;
+}
+.video .download.info-txt.big-txt {
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    display: block;
+}
+.video .download.info-txt.small-txt {
+    line-height: 24px;
+}
+.video .download.info-block {
+    padding: 0 0 13px 0;
+}
+.video .download.buttons-block {
+    text-align: right;
+    border-top: 1px solid #F6F6F6;
+    padding: 16px 16px 9px 16px;
+    margin: 0 -7px;
+}
+.video .download.big-button {
+    font-size: 14px;
+    line-height: 33px;
+    letter-spacing: 0.5px;
+    height: 34px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0 7px 0 18px;
+    min-width: 10px;
+    margin-left: 10px;
+}
+.video .download.big-button.red {
+    padding: 0 18px;
+}
+.video .download.big-button i {
+    margin-top: 3px !important;
+}
+.video .big-button .medium-icon.icons-sprite.mega {
+    background-position: -49px -1004px;
+}
+.video .big-button .medium-icon.icons-sprite.download {
+    background-position: -158px -954px;
+}
+.video .download .checkdiv {
+    margin: 8px 16px 0 0;
+}
+.video .download .small-red-link {
+    margin: 2px 0 0 32px;
+}
+.video .bottom-page.top-bl {
+    min-height: 704px;
+}
+.video .download.transfer-buttons {
+    display: none;
+}
+.video .download.in-progress {
+    padding: 0 68px 10px 8px;
+}
+.video .download.progress-block {
+    margin-top: 17px;
+}
+.video .download.error-text, .video .download.state-text, .video .download.main-transfer-info {
+    padding-top: 5px;
+}
+.download .pause-transfer.square {
+    width: 40px;
+    height: 32px;
+    position: absolute;
+    right: 15px;
+    z-index: 10;
+    margin-top: -1px;
+    min-width: 0;
+    text-align: center;
+    padding: 0;
+    display: none;
+}
+.download .pause-transfer.square i {
+    margin: 7px auto 0 auto;
+}
+.video .download .pause-transfer.square {
+    display: block;
+}
+.video.download-complete  .pause-transfer.square {
+    cursor: default;
+    opacity: 0.5;
+}
+.video.download-complete  .pause-transfer.square:hover {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.video.download-complete .pause-transfer.square i {
+    background-position: -31px -913px;
+}
+.video.download-complete .semi-small-icon.icons-sprite.pause {
+    margin: 7px auto 0 auto;
+}
+/* end of Video dl page */

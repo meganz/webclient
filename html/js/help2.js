@@ -610,11 +610,14 @@ var Help = (function() {
     function doRouting() {
         var parts = getUrlParts();
 
+        if (parts.length === 1) {
+            return urls.welcome();
+        }
+
         if (urls[parts[1]]) {
             return urls[parts[1]](parts.slice(1));
         }
-
-        if (parts.length === 1) {
+        else {
             return urls.welcome();
         }
 

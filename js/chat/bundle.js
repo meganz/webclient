@@ -8559,7 +8559,7 @@ React.makeElement = React['createElement'];
 	                    { className: "left-pad" },
 	                    "esc"
 	                ),
-	                " to dismiss"
+	                "to dismiss"
 	            ),
 	            React.makeElement(
 	                "div",

@@ -191,7 +191,8 @@ var EmojiAutocomplete = React.createClass({
         return <div className="textarea-autofill-bl">
             <div className="textarea-autofill-info">
                 <strong>tab</strong> or  <i className="small-icon tab-icon"></i> to navigate
-                <i className="small-icon enter-icon left-pad"></i> to select <strong className="left-pad">esc</strong> to dismiss
+                <i className="small-icon enter-icon left-pad"></i> to select <strong className="left-pad">esc</strong>
+                to dismiss
             </div>
             <div className="textarea-autofill-emoji">
 

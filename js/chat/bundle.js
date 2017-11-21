@@ -4835,15 +4835,18 @@ React.makeElement = React['createElement'];
 	                        onUpdate: function onUpdate() {
 	                            self.onResizeDoUpdate();
 	                        },
+	                        editing: self.state.editing === v.messageId || self.state.editing === v.pendingMessageId,
 	                        onEditStarted: function onEditStarted($domElement) {
 	                            self.editDomElement = $domElement;
-	                            self.setState({ 'editing': v });
+	                            self.setState({ 'editing': v.messageId });
 	                            self.forceUpdate();
 	                        },
 	                        onEditDone: function onEditDone(messageContents) {
 	                            self.editDomElement = null;
 
 	                            var currentContents = v.textContents;
+
+	                            v.edited = false;
 
 	                            if (messageContents === false || messageContents === currentContents) {
 	                                self.messagesListScrollable.scrollToBottom(true);
@@ -5365,7 +5368,7 @@ React.makeElement = React['createElement'];
 	                                persist: true,
 	                                onUpEditPressed: function onUpEditPressed() {
 	                                    var foundMessage = false;
-	                                    room.messagesBuff.messages.keys().reverse().forEach(function (k) {
+	                                    room.messagesBuff.messages.keys().reverse().some(function (k) {
 	                                        if (!foundMessage) {
 	                                            var message = room.messagesBuff.messages[k];
 
@@ -5373,16 +5376,17 @@ React.makeElement = React['createElement'];
 	                                            if (message.userId) {
 	                                                if (!M.u[message.userId]) {
 
-	                                                    return false;
+	                                                    return;
 	                                                }
 	                                                contact = M.u[message.userId];
 	                                            } else {
 
-	                                                return false;
+	                                                return;
 	                                            }
 
 	                                            if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && !message.requiresManualRetry && !message.deleted && (!message.type || message instanceof Message) && (!message.isManagement || !message.isManagement())) {
 	                                                foundMessage = message;
+	                                                return foundMessage;
 	                                            }
 	                                        }
 	                                    });
@@ -5390,7 +5394,16 @@ React.makeElement = React['createElement'];
 	                                    if (!foundMessage) {
 	                                        return false;
 	                                    } else {
-	                                        $('.message.body.' + foundMessage.messageId).trigger('onEditRequest');
+	                                        var $domNode = $('.message.body.' + foundMessage.messageId);
+	                                        if ($domNode && $domNode.size() > 0) {
+	                                            $domNode.trigger('onEditRequest');
+	                                        } else {
+
+	                                            setTimeout(function () {
+	                                                $domNode.trigger('onEditRequest');
+	                                            }, 120);
+	                                        }
+	                                        self.setState({ 'editing': foundMessage.messageId });
 	                                        self.lastScrolledToBottom = false;
 	                                        return true;
 	                                    }
@@ -8628,7 +8641,7 @@ React.makeElement = React['createElement'];
 	    mixins: [ConversationMessageMixin],
 	    getInitialState: function getInitialState() {
 	        return {
-	            'editing': false
+	            'editing': this.props.editing
 	        };
 	    },
 	    componentDidUpdate: function componentDidUpdate(oldProps, oldState) {
@@ -9586,8 +9599,7 @@ React.makeElement = React['createElement'];
 	            textMessage = getMessageString(message.type);
 	            if (!textMessage) {
 	                console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
-	                debugger;
-	                throw new Error("boom");
+	                return;
 	            }
 
 	            if (textMessage.splice) {

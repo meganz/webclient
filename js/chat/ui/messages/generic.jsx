@@ -14,7 +14,7 @@ var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],
     getInitialState: function() {
         return {
-            'editing': false
+            'editing': this.props.editing
         };
     },
     componentDidUpdate: function(oldProps, oldState) {
@@ -1020,8 +1020,7 @@ var GenericConversationMessage = React.createClass({
             textMessage = getMessageString(message.type);
             if (!textMessage) {
                 console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
-                debugger;
-                throw new Error("boom");
+                return;
             }
             // if is an array.
             if (textMessage.splice) {

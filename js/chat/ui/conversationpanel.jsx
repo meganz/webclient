@@ -1342,15 +1342,18 @@ var ConversationPanel = React.createClass({
                             onUpdate={() => {
                                 self.onResizeDoUpdate();
                             }}
+                            editing={self.state.editing === v.messageId || self.state.editing === v.pendingMessageId}
                             onEditStarted={($domElement) => {
                                 self.editDomElement = $domElement;
-                                self.setState({'editing': v});
+                                self.setState({'editing': v.messageId});
                                 self.forceUpdate();
                             }}
                             onEditDone={(messageContents) => {
                                 self.editDomElement = null;
 
                                 var currentContents = v.textContents;
+
+                                v.edited = false;
 
                                 if (messageContents === false || messageContents === currentContents) {
                                     self.messagesListScrollable.scrollToBottom(true);
@@ -1908,7 +1911,7 @@ var ConversationPanel = React.createClass({
                                 persist={true}
                                 onUpEditPressed={() => {
                                     var foundMessage = false;
-                                    room.messagesBuff.messages.keys().reverse().forEach(function(k) {
+                                    room.messagesBuff.messages.keys().reverse().some(function(k) {
                                         if(!foundMessage) {
                                             var message = room.messagesBuff.messages[k];
 
@@ -1916,13 +1919,13 @@ var ConversationPanel = React.createClass({
                                             if (message.userId) {
                                                 if (!M.u[message.userId]) {
                                                     // data is still loading!
-                                                    return false;
+                                                    return;
                                                 }
                                                 contact = M.u[message.userId];
                                             }
                                             else {
                                                 // contact not found
-                                                return false;
+                                                return;
                                             }
 
                                             if (
@@ -1935,6 +1938,7 @@ var ConversationPanel = React.createClass({
                                                     (!message.isManagement || !message.isManagement())
                                                 ) {
                                                     foundMessage = message;
+                                                    return foundMessage;
                                             }
                                         }
                                     });
@@ -1943,7 +1947,17 @@ var ConversationPanel = React.createClass({
                                         return false;
                                     }
                                     else {
-                                        $('.message.body.' + foundMessage.messageId).trigger('onEditRequest');
+                                        var $domNode = $('.message.body.' + foundMessage.messageId);
+                                        if ($domNode && $domNode.size() > 0) {
+                                            $domNode.trigger('onEditRequest');
+                                        }
+                                        else {
+                                            // still waiting for our react throttling to render the dom node?
+                                            setTimeout(function() {
+                                                $domNode.trigger('onEditRequest');
+                                            }, 120);
+                                        }
+                                        self.setState({'editing': foundMessage.messageId});
                                         self.lastScrolledToBottom = false;
                                         return true;
                                     }

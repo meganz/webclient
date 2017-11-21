@@ -17978,5 +17978,9 @@
     "17548": {
         "text": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
         "context": "A dialog message in the mobile webclient informing the user that their account will return to the free plan after their currenly paid for subscription runs out if they choose to confirm in cancelling their subscription."
+    },
+    "17549": {
+        "text": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+        "context": "A message in a popup dialog explaining that there is an update available for the Firefox Legacy extension which works on browsers such as Pale Moon."
     }
 }

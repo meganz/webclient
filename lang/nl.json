@@ -3652,7 +3652,7 @@
     "16400": "Account basis tegoed",
     "16401": "Account registratie bonus",
     "16402": "Geopende bonussen:",
-    "16406": "[1]MEGA Account Resetten[2]Het lijkt erop dat u uw wachtwoord vergeten bent en geen reservekopie heeft van uw Herstel Sleutel.[3]Als u doorgaat, wordt het bestaande account onder dit adres gedeactiveerd, en zal u toegang tot uw gegevens verliezen. De gegevens worden nog steeds bewaard voor ten minste nog 60 dagen. Kunt u zich de ge-deactiveerde account wachtwoord of locatie van voorheen ge\u00ebxporteerde Herstel Sleutel herinneren, neem a.u.b. contact op met [A1]support@mega.nz[\/A1] om het te herstellen.[4]Zelfs als het u lukt om de ge-deactiveerde account te herstellen, alle geassocieerde contacten en gedeeld blijven verwijderd en zullen moeten hersteld worden.[5]Reset mijn Account[6]Niet gewerkt? Geen Probleem. Kopieer en plak deze koppeling in uw webbrowser:",
+    "16406": "[1]Parkeer uw MEGA account[2]Het lijk dat u uw wachtwoord vergeten bent en dat u geen Herstel Sleutel heeft.[3]Als u doorgaat, wordt het bestaande account onder dit adres geparkeerd (gedeactiveerd), en u start een nieuw account onder uw bestaande e-mailadres.  Door dit te doen verliest u toegang tot uw gegevens, maar de gegevens worden nog steeds bewaard voor ten minste 60 dagen.Mocht u het gedeactiveerd account wachtwoord herinneren of de Herstel Sleutel ervan terugvinden, neem dan contact op met [A1]support@mega.nz[\/A1] om het te herstellen.[4]Zelfs als u in staat bent om het account dat gedeactiveerd was te herstellen, blijven alle geassocieerde contacten en gedeeld verwijderd en moeten worden hersteld.[5]Parkeer mijn Account[6]Niet gewerkt?Geen zorgen. Kopieer en plak deze koppeling hieronder in uw webbrowser:",
     "16407": "[1]Met vriendelijke groet,[BR]\u2014 Team MEGA",
     "16408": "Om verder te gaan klik de koppeling hieronder of kopieer en plak het in uw webbrowser:",
     "16410": "[1]MEGA Account Vervaldatum Waarschuwing[2]We merkten op dat er geen enkele activiteit was op uw account sinds [B][$month] [$day], [$year][\/B].[3]We willen u graag als gebruiker, maar we kunnen [B] alle opgeslagen gegevens verwijderen (zoals omschreven in onze[A1]Algemene Voorwaarden[\/A1])als u niet inlogt op [A2]mega.nz[\/A2] binnen de volgende 30 (dertig) dagen [\/B][4]Als u recent MEGA gebruikt heeft maar nog steeds deze email ontvangt, dan mailen we u over een andere account. Vergelijk het e-mailadres van de account die u recent gebruikt heeft met degene die in deze email staat.",
@@ -3672,7 +3672,7 @@
     "16428": "[1]MEGAchat notificatie[2]U heeft een nieuw gecodeerd chat bericht ontvangen op MEGAchat terwijl u offline was.[3]Veilig Chatten bij MEGA",
     "16429": "[1]MEGA Account Sluiting[2]Waarschuwing: U heeft gekozen om uw MEGA account te sluiten. De account bij dit e-mailadres wordt permanent gesloten en uw gegevens worden verwijderd. Dit kan niet ongedaan gemaakt worden.[3]Door het voltooien van deze actie, verliest u toegang tot al uw upgeloade gegevens, gedeeld, en contacten.Elk overblijvende account tegoed of PRO tegoed wordt leeggemaakt.[4]Als u een betaalde MEGA abonnement heeft bij [A1]Apple[\/A1] of [A2]Google[\/A2], dan zou u het gescheiden moeten be\u00ebindigen bij Apple ITunes of Google Play, omdat MEGA niet in staat is om het voor u te be\u00ebindigen.[5]Sluit mijn Account",
     "16430": "[1]MEGA Bevestig Nieuwe Email[2]Het lijkt erop dat u uw e-mailadres heeft veranderd. We hoeven alleen uw nieuwe e-mailadres te bevestigen door op de volgende koppeling te klikken:[3]Bevestig Nieuwe Email[4]Houd er rekening mee dat deze [B]uw huidige MEGA account e-mailadres vervangt [\/B] U zal voortaan met dit nieuwe e-mailadres in moeten loggen.",
-    "16431": "[1]MEGA Wachtwoord Herstelling[2]U heeft makkelijk toegang tot uw MEGA account met uw Herstel Sleutel.[3]Open account[4]Dit verzoek is ontstaan van IP adres:[R][$cred][\/R]",
+    "16431": "[1]MEGA Wachtwoord Reset[2]U kunt makkelijk uw MEGA account wachtwoord resetten met uw Herstel Sleutel.[3]Uw wachtwoord resetten[4]Dit verzoek is afkomstig van IP adres: [R][$cred][R]",
     "16432": "U kunt ook meer gratis opslag en overdracht tegoed verdienen door bonussen te bereiken. Bijvoorbeeld, door het installeren van onze software of door het uitnodigen van vrienden bij MEGA.",
     "16433": "[1]Bezoek [A1]mega.nz\/account[\/A1] om het gemiddelde van uw verbruik te zien. Houd er rekening mee dat uw prullenbak meerekent naar uw verbruik, en moet verwijderd worden om ruimte vrij te maken.[2]Om verder te gaan met het gebruik van MEGA, upgrade naar \u00e9\u00e9n van onze betaalde abonnementen of koop een grotere abonnement [B]U heeft 7 dagen over om actie te ondernemen[\/B]. Als de account over het tegoed gaat na [R][$lastdate][\/R], gaat MEGA automatisch uw prullenbak leegmaken in een poging de situatie te herstellen voor uw gemak.",
     "16435": "[1]MEGA Wachtwoord Veranderen[2]Klik op de knop hieronder om uw wachtwoord te veranderen.[3]Klik op de koppeling hieronder om uw wachtwoord te veranderen.[4]U zal uw huidige wachtwoord in moeten voeren voordat u een nieuwe kunt kiezen.[5]Verander Wachtwoord[6]Als u dit verzoek niet heeft gemaakt, kunt u deze email negeren en verwijderen. Als u meer assistentie nodig hebt, neem a.u.b. contact op met ons ondersteunende team bij [A1]support@mega.nz[\/A1]",
@@ -4332,7 +4332,7 @@
     "17223": "De koppeling is nu gemaakt in uw klembord.",
     "17224": "[H1]Samenwerken met anderen[\/H1]",
     "17225": "Een map delen is een geweldige manier om samen te werken met uw contacten. U kunt uw map delen met elk contact, met elke bestaande MEGA gebruiker en zelfs met een nieuwe gebruiker, zolang u hun e-mailadres heeft. [Br][Br]Als de gebruiker nog geen MEGA account heeft, ontvangt hij of zij automatisch een uitnodigings-email om mee te doen bij MEGA zodat de gebruiker uw gedeelde map kan zien. ",
-    "17226": "[B]Rechter klik[\/B] op elke map of bestand die u wilt delen.",
+    "17226": "[B]Rechter klik[\/B] op elke map die u wilt delen.",
     "17227": "Klik op [W13][B]Delen[\/B][\/W13] in de context menu.",
     "17228": "Voer een e-mailadres in of de eerste letters van uw MEGA contact naam(namen). ",
     "17229": "Kies de permissies (standaard is alleen-lezen).",
@@ -4492,6 +4492,7 @@
     "17544": "Uitnodiging ontvangen! Nodig nog iemand uit.",
     "17545": "Uitnodiging al verzonden, wachtend op antwoord.",
     "17546": "Die gebruiker heeft u al een uitnodiging verzonden.",
-    "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
-    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period."
+    "17547": "MEGA heeft toegang tot uw foto collage om foto's of videos op te slaan voor het geval u dat wilt doen.",
+    "17548": "Weet u zeker dat u uw abonnement wilt annuleren. U verliest uw PRO status aan het einde van uw huidige abonnement periode.",
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

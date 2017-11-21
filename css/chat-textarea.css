@@ -179,6 +179,9 @@
     -moz-box-shadow: 0 0 0 1px #CCCCCC;
     box-shadow: 0 0 0 1px #CCCCCC;
 }
+.edit-typing-area .textarea-autofill-bl {
+    bottom: 34px;
+}
 .textarea-autofill-info {
     text-align: center;
     padding: 10px 0 0 0;
@@ -201,11 +204,11 @@
     opacity: 1;
     vertical-align: top;
     margin: -1px 2px 0 2px;
-    
+
 }
 .textarea-autofill-info .left-pad {
     margin-left:21px;
-    
+
 }
 .textarea-autofill-emoji {
     text-align: center;
@@ -215,7 +218,7 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 0 5px 6px 2px; 
+    padding: 0 5px 6px 2px;
 }
 .emoji-preview.shadow {
     margin: 5px 0 0 4px;

@@ -27,7 +27,7 @@ var PrivilegeChange = React.createClass({
 
         var displayName;
         if (contact) {
-            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+            displayName = generateAvatarMeta(contact.u).fullName;
         }
         else {
             displayName = contact;
@@ -44,7 +44,7 @@ var PrivilegeChange = React.createClass({
         };
 
         var avatar = <ContactsUI.Avatar contact={otherContact} className="message small-rounded-avatar"/>;
-        var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
+        var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
         var newPrivilegeText = "";
         if (message.meta.privilege === 3) {
@@ -79,7 +79,7 @@ var PrivilegeChange = React.createClass({
                 </div>
             </div>
         )
-        
+
 
         return <div>{messages}</div>;
     }

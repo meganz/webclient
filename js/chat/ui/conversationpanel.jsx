@@ -789,7 +789,7 @@ var ConversationPanel = React.createClass({
     handleKeyDown: SoonFc(function(e) {
         var self = this;
         var chatRoom = self.props.chatRoom;
-        if (self.isMounted() && chatRoom.isActive()) {
+        if (self.isMounted() && chatRoom.isActive() && !chatRoom.isReadOnly()) {
             chatRoom.trigger("onChatIsFocused");
         }
     }, 150),
@@ -1137,27 +1137,31 @@ var ConversationPanel = React.createClass({
         ];
 
         if (
-            (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
-            self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true ||
-            self.props.chatRoom.messagesBuff.joined === false ||
             (
-                self.props.chatRoom.messagesBuff.joined === true &&
-                self.props.chatRoom.messagesBuff.haveMessages === true &&
-                self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true
+                ChatdIntegration._loadingChats[room.roomId] &&
+                ChatdIntegration._loadingChats[room.roomId].state() === 'pending'
+            ) ||
+            (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
+            room.messagesBuff.messagesHistoryIsLoading() === true ||
+            room.messagesBuff.joined === false ||
+            (
+                room.messagesBuff.joined === true &&
+                room.messagesBuff.haveMessages === true &&
+                room.messagesBuff.messagesHistoryIsLoading() === true
             ) ||
             (
-                self.props.chatRoom.messagesBuff.isDecrypting &&
-                self.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending'
+                room.messagesBuff.isDecrypting &&
+                room.messagesBuff.isDecrypting.state() === 'pending'
             )
         ) {
             self.loadingShown = true;
         }
         else if (
-            self.props.chatRoom.messagesBuff.joined === true
+            room.messagesBuff.joined === true
         ) {
             if (!self.isRetrievingHistoryViaScrollPull) {
                 var headerText = (
-                    self.props.chatRoom.messagesBuff.messages.length === 0 ?
+                    room.messagesBuff.messages.length === 0 ?
                         __(l[8002]) :
                         __(l[8002])
                 );
@@ -1204,7 +1208,7 @@ var ConversationPanel = React.createClass({
         var lastMessageState = null;
         var grouped = false;
 
-        self.props.chatRoom.messagesBuff.messages.forEach(function(v, k) {
+        room.messagesBuff.messages.forEach(function(v, k) {
             if (!v.protocol && v.revoked !== true) {
                 var shouldRender = true;
                 if (
@@ -2018,7 +2022,13 @@ var ConversationPanels = React.createClass({
 
         var conversations = [];
 
-        if (getSitePath() === "/fm/chat") {
+        var hadLoaded = (
+            ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
+            ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending' &&
+            Object.keys(ChatdIntegration._loadingChats).length === 0
+        );
+
+        if (hadLoaded && getSitePath() === "/fm/chat") {
             // do we need to "activate" an conversation?
             var activeFound = false;
             self.props.conversations.forEach(function (chatRoom) {
@@ -2027,12 +2037,11 @@ var ConversationPanels = React.createClass({
                 }
             });
             if (self.props.conversations.length > 0 && !activeFound) {
-                self.props.conversations[self.props.conversations.keys()[0]].setActive();
-                self.props.conversations[self.props.conversations.keys()[0]].show();
+                self.props.megaChat.showLastActive();
             }
         }
 
-        self.props.conversations.forEach(function(chatRoom) {
+        hadLoaded && self.props.conversations.forEach(function(chatRoom) {
             var otherParticipants = chatRoom.getParticipantsExceptMe();
 
             var contact;
@@ -2056,8 +2065,6 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-            var hadLoaded = ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
-                ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending';
 
             if (hadLoaded) {
                 self.props.contacts.forEach(function (contact) {

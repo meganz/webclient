@@ -64,9 +64,43 @@ var ChatdIntegration = function(megaChat) {
             ChatdIntegration.mcfHasFinishedPromise.done(function () {
                 var allPromises = [];
                 Object.keys(ChatdIntegration._queuedChats).forEach(function (id) {
+                    var ap = ChatdIntegration._queuedChats[id];
+
+                    var promise = self.openChatFromApi(ap, true);
+
+                    var chatId = false;
+
+                    if (ap.g === 0) {
+                        // extract the chatId, if the type of the chat is private (e.g. == other user's id)
+                        (ap.n || ap.u).forEach(function(member) {
+                            if (!chatId && member.u !== u_handle) {
+                                chatId = member.u;
+                            }
+                        });
+                    }
+                    else {
+                        chatId = ap.id;
+                    }
+
+                    if (chatId && !ChatdIntegration._loadingChats[chatId]) {
+                        ChatdIntegration._loadingChats[chatId] = {
+                            'loadingPromise': promise,
+                            'ap': ap
+                        };
+
+                        ChatdIntegration._loadingChats[chatId].loadingPromise.always(function() {
+                            // since any .done may want to see if the chat was "just loaded"
+                            // I'm delaying the cleanup of the _loadingChats cache
+                            Soon(function() {
+                                delete ChatdIntegration._loadingChats[chatId];
+                            });
+                        });
+                    }
+
                     allPromises.push(
-                        self.openChatFromApi(ChatdIntegration._queuedChats[id], true)
+                        promise
                     );
+
                 });
                 ChatdIntegration._queuedChats = {};
                 ChatdIntegration.allChatsHadLoaded.linkDoneAndFailTo(MegaPromise.allDone(allPromises));
@@ -144,6 +178,8 @@ ChatdIntegration.mcfHasFinishedPromise = new MegaPromise();
  */
 ChatdIntegration.allChatsHadLoaded = new MegaPromise();
 ChatdIntegration._queuedChats = {};
+
+ChatdIntegration._loadingChats = {};
 
 ChatdIntegration.prototype.retrieveChatsFromApi = function() {
     var self = this;
@@ -1467,6 +1503,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     }
 
 
+    $(chatRoom).trigger('onChatdIntegrationReady');
 
 };
 

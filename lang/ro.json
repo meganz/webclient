@@ -206,6 +206,7 @@
     "527": "Invit\u0103m persoane din zona mass-mediei, inclusiv bloggeri, s\u0103 ne contacteze pentru \u00eentreb\u0103ri referitoare la MEGA.",
     "543": "mai mult de [X]",
     "553": "Furnizorul t\u0103u de plat\u0103 nu este listat? Te rug\u0103m s\u0103 ne trimi\u0163i un [A]e-mail[\/A]",
+    "554": "Completat",
     "555": "Sunt de acord cu [A]Termenii de utilizare a serviciului pentru v\u00e2nz\u0103torii[\/A] MEGA",
     "556": "Urm\u0103torul",
     "561": "Adresa",
@@ -3651,6 +3652,7 @@
     "16400": "Cot\u0103 de baz\u0103 a contului",
     "16401": "Bonus de \u00eenregistrare a contului",
     "16402": "Bonusuri deblocate:",
+    "16406": "[1]Resetarea contului MEGA[2]Se pare c\u0103 \u0163i-ai uitat parola \u015fi nu ai un backup al cheii de recuperare.[3]Dac\u0103 continui, contul existent sub aceast\u0103 adres\u0103 va fi dezactivat \u015fi vei pierde accesul c\u0103tre datele tale. Datele vor fi p\u0103strate \u00een continuare pentru cel pu\u0163in \u00eenc\u0103 60 de zile. Dac\u0103 \u00ee\u0163i aduci aminte parola contului dezactivat sau g\u0103se\u015fti cheia sa de recuperare exportat\u0103 anterior, te rug\u0103m s\u0103 contactezi [A1]support@mega.nz[\/A1] pentru a-l restaura.[4]Chiar dac\u0103 reu\u015fe\u015fti s\u0103 restaurezi contul dezactivat, toate contactele \u015fi partaj\u0103rile asociate vor r\u0103m\u00e2ne \u015fterse \u015fi vor trebui restabilite.[5]Reseteaz\u0103-mi contul[6]Nu a func\u0163ionat? Nicio grij\u0103. Copiaz\u0103 \u015fi lipe\u015fte acest link de mai jos \u00een browserul web:",
     "16407": "[1]Toate cele bune,[BR]\u2014 Echipa MEGA",
     "16408": "Pentru a continua te rug\u0103m s\u0103 dai clic pe linkul de mai jos sau copiaz\u0103 \u015fi lipe\u015fte linkul \u00een browserul web:",
     "16410": "[1]Avertizare privind expirarea contului MEGA[2]Am observat c\u0103 nu a existat nicio activitate \u00een contul MEGA \u00eencep\u00e2nd cu [B][$day] [$month], [$year][\/B].[3]Ne-ar pl\u0103cea s\u0103 te avem ca utilizator, \u00eens\u0103 putem [B]s\u0103 \u015ftergem orice date stocate (a\u0219a cum se specific\u0103 \u00een [A1]Termenii de utilizare a serviciului[\/A1] dac\u0103 nu te autentifici pe [A2]mega.nz[\/A2] \u00een urm\u0103toarele 30 (treizeci) de zile[\/B].[4]Dac\u0103 ai folosit recent MEGA, dar \u00eenc\u0103 ai primit acest e-mail, atunci \u00ee\u0163i trimitem e-mail cu referire la un cont diferit. Te rug\u0103m s\u0103 compari adresa de e-mail din contul pe care l-ai folosit recent cu cea din acest e-mail.[5]Autentific\u0103-te pe MEGA",
@@ -3670,6 +3672,7 @@
     "16428": "[1]Notificare MEGAchat[2]Ai primit mesaje noi chat criptate pe MEGAchat \u00een timp ce erai offline.[3]Converseaz\u0103 securizat la MEGA",
     "16429": "[1]\u00cenchiderea contului MEGA[2]Aten\u0163ie: Ai ales s\u0103 \u00ee\u0163i \u00eenchizi contul MEGA. Contul sub aceast\u0103 adres\u0103 de e-mail va fi \u00eenchis definitiv, iar datele tale vor fi \u015fterse. Acest lucru nu poate fi anulat.[3]Prin completarea acestei ac\u0163iuni, ve\u0163i pierde accesul la toate datele \u00eenc\u0103rcate, partaj\u0103rile \u015fi contactele. Orice sold restant al contului sau cota PRO va fi anulat(\u0103).[4]Dac\u0103 ai un abonament MEGA pl\u0103tit cu [A1]Apple[\/A1] sau [A2]Google[\/A2], atunci trebuie s\u0103 \u00eel anulezi separat la Apple iTunes sau Google Play, deoarece MEGA nu \u00eel poate anula pentru tine.[5]\u00cenchide contul meu",
     "16430": "[1]Confirm\u0103 e-mailul nou MEGA[2]Se pare c\u0103 ai schimbat adresa de e-mail. Trebuie doar s\u0103 confirmi noua adres\u0103 de e-mail d\u00e2nd clic pe urm\u0103torul link:[3]Confirm\u0103 e-mailul nou[4]Te rug\u0103m s\u0103 re\u0163ii c\u0103 acest lucru va [B]\u00eenlocui adresa de e-mail existent\u0103 a contul MEGA[\/B]. Va trebui s\u0103 te autentifici de acum \u00eenainte cu aceast\u0103 nou\u0103 adres\u0103 de e-mail.",
+    "16431": "[1]Recuperarea parolei MEGA[2]Po\u0163i accesa cu u\u015furin\u0163\u0103 contul MEGA folosind cheia de recuperare.[3]Deblocheaz\u0103 contul[4]Aceast\u0103 cerere a provenit de la adresa IP: [R][$cred][\/R]",
     "16432": "Po\u0163i c\u00e2\u015ftiga \u015fi mai mult spa\u0163iu de stocare gratuit \u015fi cot\u0103 de transfer prin realizarea bonusurilor. De exemplu, prin instalarea software-ului nostru sau prin invitarea prietenilor pe MEGA.",
     "16433": "[1]Viziteaz\u0103 [A1]mega.nz\/account[\/A1] pentru a vedea o detaliere a utiliz\u0103rii tale. Te rug\u0103m s\u0103 re\u0163ii c\u0103 co\u015ful de gunoi este luat \u00een calcul \u00een ceea ce prive\u015fte utilizarea ta \u015fi poate fi necesar s\u0103 fie golit pentru a elibera spa\u0163iu.[2]Pentru a continua s\u0103 folose\u015fti MEGA, te rug\u0103m s\u0103 upgradezi la unul dintre planurile noastre pl\u0103tite sau s\u0103 cumperi un plan mai mare. [B]Ai la dispozi\u0163ie 7 zile pentru a lua m\u0103suri[\/B]. \u00cen cazul \u00een care contul r\u0103m\u00e2ne peste cot\u0103 dup\u0103 [R][$ lastdate][\/R], MEGA va goli automat co\u015ful de gunoi \u00een \u00eencercarea de a remedia situa\u0163ia pentru confortul t\u0103u.",
     "16435": "[1]Schimbarea parolei MEGA[2]Clic pe butonul de mai jos pentru a-\u0163i schimba parola.[3]Clic pe linkul de mai jos pentru a-\u0163i schimba parola.[4]Va trebui s\u0103 introduci parola actual\u0103 \u00eenainte de a putea alege una nou\u0103.[5]Schimb\u0103 parola[6]Dac\u0103 nu ai f\u0103cut aceast\u0103 solicitare, po\u0163i ignora \u015fi \u015fterge acest e-mail. Dac\u0103 ai nevoie de mai mult\u0103 asisten\u0163\u0103, contacteaz\u0103 echipa noastr\u0103 de asisten\u0163\u0103 la [A1]support@mega.nz[\/A1]",
@@ -4477,7 +4480,7 @@
     "17529": "Failed to clear cache. Please try again.",
     "17530": "Clear cache failed",
     "17533": "MEGAdrop is unavailable",
-    "17534": "Either the MEGAdrop link is cancelled by the owner or the URL you have provided is incorrect.",
+    "17534": "Either the MEGAdrop link has been cancelled by the owner or the URL you have provided is incorrect.",
     "17535": "Account storage limit has been reached.",
     "17536": "The owner of this MEGAdrop folder has reached their account storage limit and cannot accept any more uploads. Please contact them about upgrading their plan.",
     "17537": "This MEGAdrop is full, please try again later.",
@@ -4488,5 +4491,8 @@
     "17543": "Not achieved",
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
-    "17546": "That user already sent you an invitation."
+    "17546": "This user has already sent you an invitation.",
+    "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

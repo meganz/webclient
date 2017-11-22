@@ -7,16 +7,18 @@ function is_rawimage(name, ext) {
 function is_video(n) {
     'use strict';
 
-    return !window.safari && is_video.mime[filemime(n)];
+    var ext = String(n && n.name || n).split('.').pop().toUpperCase();
+
+    return !window.safari && is_video.ext[ext];
 }
 
-is_video.mime = {
-    'video/mp4': -1,
-    'video/x-m4v': -1
+is_video.ext = {
+    'MP4': -1,
+    'M4V': -1
 };
 
 if (d) {
-    is_video.mime['video/quicktime'] = 1;
+    is_video.ext.MOV = 1;
 }
 
 function is_image(name) {
@@ -80,7 +82,9 @@ var mThumbHandler = {
     sup: Object.create(null),
 
     add: function(exts, parser) {
-        exts = exts.split(",");
+        'use strict';
+
+        exts = String(exts).split(',');
 
         for (var i = exts.length; i--;) {
             this.sup[exts[i].toUpperCase()] = parser;

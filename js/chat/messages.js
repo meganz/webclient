@@ -325,6 +325,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.retrieveChatHistory(false);
             }
         }
+        chatRoom.trigger('onHistoryDecryptedDone');
     });
 
     self.chatd.rebind('onMessageLastSeen.messagesBuff' + chatRoomId, function(e, eventData) {

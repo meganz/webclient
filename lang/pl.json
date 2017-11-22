@@ -206,6 +206,7 @@
     "527": "Zapraszamy przedstawicieli medi\u00f3w, w tym bloger\u00f3w, o kontakt i przesy\u0142anie pyta\u0144 dotycz\u0105cych MEGA.",
     "543": "wi\u0119cej ni\u017c [X]",
     "553": "Je\u017celi Tw\u00f3j dostawca p\u0142atno\u015bci nie znajduje si\u0119 na li\u015bcie, prosimy o przes\u0142anie do nas [A]e-mail[\/A].",
+    "554": "Zako\u0144cz",
     "555": "Akceptuj\u0119 [A]regulamin dystrybutor\u00f3w MEGA[\/A]",
     "556": "Nast\u0119pne",
     "561": "Adres",
@@ -3651,6 +3652,7 @@
     "16400": "Podstawowy limit",
     "16401": "Zarejestrowane bonusy",
     "16402": "Odblokowane bonusy:",
+    "16406": "[1]Zwieszenie konta MEGA[2]Wygl\u0105da na to, \u017ce zapomnia\u0142e\u015b has\u0142a i nie posiadasz kopii klucza.[3]Je\u017celi chcesz kontynuowa\u0107, aktualne konto o podanych adresie email zostane zawieszone (zablokowane) i dost\u0119p do dahcn zostanie utracony. Dane b\u0119d\u0105 przechowywane conajmniej 60 dni. Je\u017celi pami\u0119tasz has\u0142o lub posiadasz kopi\u0119 klucza, skontaktuj si\u0119 z nami [A1]support@mega.nz[\/A1] w celu odzyskania dost\u0119pu.[4]Je\u017celi odzyskasz dost\u0119p do zablokowanego konta, wszystkie powi\u0105zane z nim kontakty i udost\u0119pnienia pozostan\u0105\u00a0usuni\u0119te i musz\u0105 by\u0107 dodane na nowo.[5]Zawie\u015b moje konto[6]Nie dzia\u0142a? Nie ma problemu. Skopiuj i wklej link poni\u017cej w pasku adresu swojej przegl\u0105darki:                                ",
     "16407": "[1]Pozdrawiamy.[BR]\u2014 Zesp\u00f3l MEGA",
     "16408": "Aby kontynuowa\u0107 kliknij link poni\u017cej o skopiuj i wklej do swojej przegl\u0105darki:",
     "16410": "[1]Twoje konto MEGA niebawem wyga\u015bnie[2]Odnotowali\u015bmy brak aktywno\u015bci na Twoim koncie od [B][$month] [$day], [$year][\/B].[3]Chcieliby\u015bmy aby\u015b by\u0142 naszym aktywnym u\u017cytkownikiem, jednak [B]mo\u017cliwe, \u017ce b\u0119dziey musieli usun\u0105\u0107 Twoje dane zgodnie z [A1]regulaminem[\/A1] je\u017celi si\u0119 nie zalogujesz na [A2]mega.nz[\/A2] w przeci\u0105gu kolejnych 30 dni[\/B].[4]Je\u017celi korzysta\u0142e\u015b ostatnio z MEGA i wci\u0105\u017c otrzymujesz tego emaila, oznacza to, \u017ce dotyczy to konta o innym adresie email.[5]Zaloguj si\u0119\u00a0na MEGA",
@@ -3670,6 +3672,7 @@
     "16428": "[1]MEGAchat powiadomienie[2]Otrzymale\u015b zaszyforowan\u0105 wiadomo\u015b\u0107 na MEGA kiedy byle\u015b offline.[3]Bezpieczny czat na MEGA",
     "16429": "[1]Zg\u0142oszenie zamkni\u0119ca konta[2]Uwaga: Zg\u0142osi\u0142e\u015b zamkni\u0119cie konta na MEGA. Konto o podanym adresie email zostanie zamkni\u0119te a dane zostan\u0105 usuni\u0119te. Operacja jest nieodwracalna.[3]Wykonuj\u0105\u0107 to procedur\u0119, utracisz dost\u0119p do konta, wgranych danych, udost\u0119pnionych plik\u00f3w i katalog\u00f3w oraz kontakt\u00f3w. Pozostaj\u0105cy limit na ko\u0144cie PRO zostanie uniewa\u017cniony.[4]Je\u017celi posiadasz subskrypcj\u0119 MEGA aktywowan\u0105 poprzez [A1]Apple[\/A1] lub [A2]Google[\/A2], wtedy musisz dokona\u0107 osobnego anulowania sukrypcji w sklepie, poniewa\u017c MEGA nie ma takiej mo\u017cliwo\u015bci.[5]Zamknij moje konto",
     "16430": "[1]MEGA Potwierdzenie nowego adresu email[2]Wygl\u0105da na to, \u017ce zmieni\u0142e\u015b adres email. Musisz potwierdzi\u0107 zmian\u0119 na nowy adres email poprzez klikni\u0119cie w link:[3]Potwierd\u017a nowy adres email[4]Pami\u0119taj, \u017ce ta zmiana [B]zast\u0105pi Tw\u00f3j aktualny adres email na MEGA[\/B]. B\u0119dziesz musia\u0142 si\u0119 zalogowa\u0107 ponownie.",
+    "16431": "[1]Odzyskiwanie has\u0142a na MEGA[2]Mo\u017cesz uzyska\u0107 dost\u0119p do konta na MEGA korzystaj\u0105c ze swojego klucza.[3]Zresetuje swoje has\u0142o[4]Zg\u0142oszenie z adresu IP: [R][$cred][\/R]                                ",
     "16432": "Mo\u017cesz r\u00f3wnie\u017c zdobywa\u0107 dodatkow\u0105 przestrze\u0144 na pliki lub zwi\u0119kszy\u0107 limit transferu poprzez zdobywanie bonus\u00f3w, np. poprzez instalacj\u0119 naszego oprogramowania lub zapraszanie znajomych do MEGA.",
     "16433": "[1]Przejd\u017a do strony [A1]mega.nz\/account[\/A1] i zobacz zu\u017cycie na koncie. Pami\u0119taj, \u017ce zawarto\u015b\u0107 kosza jest wliczana w zaj\u0119t\u0105 powierzchni\u0119, i wyczyszczenie go mo\u017ce zwi\u0119kszy\u0107 woln\u0105 powierzchni\u0119.[2]Aby kontynuowa\u0107 korzystanie z MEGA, zmie\u0144 konto na p\u0142atne. [B]Masz 7 dni na podj\u0119cie akcji[\/B]. Je\u017celi konto pozostanie ponad wykorzystanym limietem po [R][$lastdate][\/R], MEGA automatycznie wyczy\u015bci zawarto\u015b\u0107 Twojego kosza.",
     "16435": "[1]Zmiana has\u0142a na MEGA[2]Kliknij w przycisk poni\u017cej aby zmieni\u0107 has\u0142o.[3]Kliknij w link poni\u017cej aby zmieni\u0107\u00a0has\u0142o.[4]Musisz wprowadzi\u0107 aktualne has\u0142o aby dokona\u0107 zmiany[5]Zmie\u0144 has\u0142o[6]Je\u017celi nie dokonywa\u0142e\u015b zg\u0142oszenia zmiany has\u0142a, mo\u017cesz zignorowa\u0107 i usun\u0105\u0107 tego maila. Je\u017celi masz pytania skontatuj si\u0119\u00a0z nami [A1]support@mega.nz[\/A1]",
@@ -4329,7 +4332,7 @@
     "17223": "List zosta\u0142\u00a0utowrzony i zapisany w schowku",
     "17224": "[H1]Wsp\u00f3\u0142pracuj z innymi[\/H1]",
     "17225": "Udost\u0119pnianie katalogu jest wygodn\u0105 metod\u0105 na wsp\u00f3\u0142prac\u0119 ze swoimi znajomymi. Mo\u017cesz udost\u0119pni\u0107\u00a0katalogu dowolnej osobie z kontakt\u00f3w, posiadaj\u0105cych konto na MEGA lub ca\u0142kowicie nowej osobie, je\u017celi posiadasz jej adres email. [Br][Br]Je\u017celi u\u017cytkownik nie posiada konta na MEGA, on lub ona automatycznie dostan\u0105 zaproszenie do za\u0142o\u017cenia kotna na MEGA aby zobaczy\u0107 udost\u0119pniony katalog.",
-    "17226": "[B]Kliknij prawy przycisk[\/B] na katalogu lub pliku aby wybra\u0107 opcj\u0119 udost\u0119pniania.",
+    "17226": "[B]Kliknij prawy przycisk[\/B] na dowolnym katalogu kt\u00f3ry chcesz udost\u0119pni\u0107.",
     "17227": "Kliknij [W13][B]Udost\u0119pnianie[\/B][\/W13] w menu.",
     "17228": "Wpisz pierwsze litery adresu email swojego kontaktu.",
     "17229": "Wybierz uprawnienia (domy\u015blnie tylko odczyt)",
@@ -4488,5 +4491,8 @@
     "17543": "Nie osi\u0105gni\u0119to",
     "17544": "Zaproszenie zosta\u0142o wys\u0142ane! Wy\u015blij kolejne.",
     "17545": "Zaproszenie zosta\u0142o wys\u0142ane, oczekiwanie na potwierdzenie.",
-    "17546": "Ten u\u017cytkownik wys\u0142a\u0142 ju\u017c zaproszoszenie."
+    "17546": "Ten u\u017cytkownik wys\u0142a\u0142 ju\u017c zaproszoszenie.",
+    "17547": "MEGA posiada dost\u0119p do Twojej biblioteki zdj\u0119\u0107 i film\u00f3w aby zapisa\u0107 je w chmurze gdzie czekaj\u0105 na Ciebie.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

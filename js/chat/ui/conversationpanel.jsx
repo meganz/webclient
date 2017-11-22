@@ -1414,6 +1414,7 @@ var ConversationPanel = React.createClass({
                             }}
                             onDeleteClicked={(e, msg) => {
                                 self.setState({
+                                    'editing': false,
                                     'confirmDeleteDialog': true,
                                     'messageToBeDeleted': msg
                                 });
@@ -1887,6 +1888,7 @@ var ConversationPanel = React.createClass({
                                    chatRoom={self.props.chatRoom}
                                    messagesBuff={self.props.chatRoom.messagesBuff}
                                    editDomElement={self.state.editDomElement}
+                                   editingMessageId={self.state.editing}
                                    confirmDeleteDialog={self.state.confirmDeleteDialog}
                                 >
                                 <div className="messages main-pad">
@@ -1951,16 +1953,6 @@ var ConversationPanel = React.createClass({
                                         return false;
                                     }
                                     else {
-                                        var $domNode = $('.message.body.' + foundMessage.messageId);
-                                        if ($domNode && $domNode.size() > 0) {
-                                            $domNode.trigger('onEditRequest');
-                                        }
-                                        else {
-                                            // still waiting for our react throttling to render the dom node?
-                                            setTimeout(function() {
-                                                $domNode.trigger('onEditRequest');
-                                            }, 120);
-                                        }
                                         self.setState({'editing': foundMessage.messageId});
                                         self.lastScrolledToBottom = false;
                                         return true;

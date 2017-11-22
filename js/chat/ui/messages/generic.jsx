@@ -17,9 +17,12 @@ var GenericConversationMessage = React.createClass({
             'editing': this.props.editing
         };
     },
+    isBeingEdited: function() {
+        return this.state.editing === true || this.props.editing === true;
+    },
     componentDidUpdate: function(oldProps, oldState) {
         var self = this;
-        if (self.state.editing === true && self.isMounted()) {
+        if (self.isBeingEdited() && self.isMounted()) {
             var $generic = $(self.findDOMNode());
             var $textarea = $('textarea', $generic);
             if ($textarea.size() > 0 && !$textarea.is(":focus")) {
@@ -32,26 +35,11 @@ var GenericConversationMessage = React.createClass({
                 }
             }
         }
-        else if (self.isMounted() && self.state.editing === false && oldState.editing === true) {
+        else if (self.isMounted() && !self.isBeingEdited() && oldState.editing === true) {
             if (self.props.onUpdate) {
                 self.props.onUpdate();
             }
         }
-        var $node = $(self.findDOMNode());
-        $node.rebind('onEditRequest.genericMessage', function(e) {
-            if (self.state.editing === false) {
-                self.setState({'editing': true});
-
-                Soon(function() {
-                    var $generic = $(self.findDOMNode());
-                    var $textarea = $('textarea', $generic);
-                    if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-                        $textarea.focus();
-                        moveCursortoToEnd($textarea[0]);
-                    }
-                });
-            }
-        });
         $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
             Soon(function() {
                 if (self.isMounted()) {
@@ -63,6 +51,16 @@ var GenericConversationMessage = React.createClass({
     componentDidMount: function() {
         var self = this;
         var $node = $(self.findDOMNode());
+
+        if (self.isBeingEdited() && self.isMounted()) {
+            var $generic = $(self.findDOMNode());
+            var $textarea = $('textarea', $generic);
+            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
+                $textarea.focus();
+                moveCursortoToEnd($textarea[0]);
+            }
+        }
+
         $node.delegate(
             CLICKABLE_ATTACHMENT_CLASSES,
             'click.dropdownShortcut',
@@ -86,7 +84,7 @@ var GenericConversationMessage = React.createClass({
     componentWillUnmount: function() {
         var self = this;
         var $node = $(self.findDOMNode());
-        $node.unbind('onEditRequest.genericMessage');
+
         $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
         $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
     },
@@ -358,7 +356,7 @@ var GenericConversationMessage = React.createClass({
                                 clearTimeout(self._rerenderTimer);
                             }
                             self._rerenderTimer = setTimeout(function () {
-                                if (message.sending === true) {
+                                if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
                                     chatRoom.messagesBuff.trackDataChange();
                                     if (self.isMounted()) {
                                         self.forceUpdate();
@@ -863,7 +861,7 @@ var GenericConversationMessage = React.createClass({
                             </div>;
                         }
                         else {
-                            if (self.state.editing !== true) {
+                            if (self.isBeingEdited()  !== true) {
                                 messageNotSendIndicator = <div className="not-sent-indicator">
                                         <span className="tooltip-trigger"
                                               key="retry"
@@ -901,7 +899,7 @@ var GenericConversationMessage = React.createClass({
                 }
 
                 var messageDisplayBlock;
-                if (self.state.editing === true) {
+                if (self.isBeingEdited() === true) {
                     var msgContents = message.textContents;
                     msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
 
@@ -926,7 +924,9 @@ var GenericConversationMessage = React.createClass({
                                     };
                                     megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
                                     self.props.onEditDone(tmpMessageObj.textContents);
-                                    self.forceUpdate();
+                                    if (self.isMounted()) {
+                                        self.forceUpdate();
+                                    }
                                 });
                             }
 
@@ -956,7 +956,7 @@ var GenericConversationMessage = React.createClass({
                     if (
                         contact && contact.u === u_handle &&
                         (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
-                        self.state.editing !== true &&
+                        self.isBeingEdited() !== true &&
                         chatRoom.isReadOnly() === false &&
                         !message.requiresManualRetry
                     ) {

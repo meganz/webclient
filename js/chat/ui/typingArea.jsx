@@ -298,9 +298,9 @@ var TypingArea = React.createClass({
 
         var $container = $(ReactDOM.findDOMNode(this));
         if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
-            if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
+            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
 
-                moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
             }
         }
     },
@@ -389,7 +389,7 @@ var TypingArea = React.createClass({
         }
         if (self.onUpdateCursorPosition) {
             var $container = $(ReactDOM.findDOMNode(this));
-            var el = $('.chat-textarea:visible textarea:visible', $container)[0];
+            var el = $('.chat-textarea:visible:first textarea:visible', $container)[0];
             el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
             self.onUpdateCursorPosition = false;
         }
@@ -495,11 +495,11 @@ var TypingArea = React.createClass({
                     enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false
                 }
             );
-            var textareaWasFocused = $textarea.is(":focus");
+            var textareaIsFocused = $textarea.is(":focus");
             jsp = $textareaScrollBlock.data('jsp');
 
-            if (textareaWasFocused) {
-                moveCursortoToEnd($('textarea:first', $node)[0]);
+            if (!textareaIsFocused) {
+                moveCursortoToEnd($('textarea:visible:first', $node)[0]);
             }
         }
 
@@ -513,7 +513,23 @@ var TypingArea = React.createClass({
             )
         );
 
+        var textareaWasFocusedBeforeReinit = $textarea.is(":focus");
+        var selectionPos = false;
+        if (textareaWasFocusedBeforeReinit) {
+            selectionPos = [$textarea[0].selectionStart, $textarea[0].selectionEnd];
+        }
+
         jsp.reinitialise();
+
+        // requery to get the new <textarea/> that JSP had just replaced in the DOM.
+        $textarea = $('textarea:first', $node);
+
+        if (textareaWasFocusedBeforeReinit) {
+            // restore selection after JSP.reinit!
+            $textarea[0].selectionStart = selectionPos[0];
+            $textarea[0].selectionEnd = selectionPos[1];
+        }
+
 
         // Scrolling according cursor position
         if (textareaCloneHeight > textareaMaxHeight && textareaCloneSpanHeight < textareaMaxHeight) {

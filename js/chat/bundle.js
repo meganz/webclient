@@ -4970,6 +4970,7 @@ React.makeElement = React['createElement'];
 	                        },
 	                        onDeleteClicked: function onDeleteClicked(e, msg) {
 	                            self.setState({
+	                                'editing': false,
 	                                'confirmDeleteDialog': true,
 	                                'messageToBeDeleted': msg
 	                            });
@@ -5418,6 +5419,7 @@ React.makeElement = React['createElement'];
 	                                chatRoom: self.props.chatRoom,
 	                                messagesBuff: self.props.chatRoom.messagesBuff,
 	                                editDomElement: self.state.editDomElement,
+	                                editingMessageId: self.state.editing,
 	                                confirmDeleteDialog: self.state.confirmDeleteDialog
 	                            },
 	                            React.makeElement(
@@ -5480,15 +5482,6 @@ React.makeElement = React['createElement'];
 	                                    if (!foundMessage) {
 	                                        return false;
 	                                    } else {
-	                                        var $domNode = $('.message.body.' + foundMessage.messageId);
-	                                        if ($domNode && $domNode.size() > 0) {
-	                                            $domNode.trigger('onEditRequest');
-	                                        } else {
-
-	                                            setTimeout(function () {
-	                                                $domNode.trigger('onEditRequest');
-	                                            }, 120);
-	                                        }
 	                                        self.setState({ 'editing': foundMessage.messageId });
 	                                        self.lastScrolledToBottom = false;
 	                                        return true;
@@ -7423,9 +7416,9 @@ React.makeElement = React['createElement'];
 
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
-	            if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
+	            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
 
-	                moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+	                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
 	            }
 	        }
 	    },
@@ -7501,7 +7494,7 @@ React.makeElement = React['createElement'];
 	        }
 	        if (self.onUpdateCursorPosition) {
 	            var $container = $(ReactDOM.findDOMNode(this));
-	            var el = $('.chat-textarea:visible textarea:visible', $container)[0];
+	            var el = $('.chat-textarea:visible:first textarea:visible', $container)[0];
 	            el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
 	            self.onUpdateCursorPosition = false;
 	        }
@@ -7588,11 +7581,11 @@ React.makeElement = React['createElement'];
 	            $textareaScrollBlock.jScrollPane({
 	                enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false
 	            });
-	            var textareaWasFocused = $textarea.is(":focus");
+	            var textareaIsFocused = $textarea.is(":focus");
 	            jsp = $textareaScrollBlock.data('jsp');
 
-	            if (textareaWasFocused) {
-	                moveCursortoToEnd($('textarea:first', $node)[0]);
+	            if (!textareaIsFocused) {
+	                moveCursortoToEnd($('textarea:visible:first', $node)[0]);
 	            }
 	        }
 
@@ -7601,7 +7594,21 @@ React.makeElement = React['createElement'];
 
 	        $textareaScrollBlock.height(Math.min(textareaCloneHeight, textareaMaxHeight));
 
+	        var textareaWasFocusedBeforeReinit = $textarea.is(":focus");
+	        var selectionPos = false;
+	        if (textareaWasFocusedBeforeReinit) {
+	            selectionPos = [$textarea[0].selectionStart, $textarea[0].selectionEnd];
+	        }
+
 	        jsp.reinitialise();
+
+	        $textarea = $('textarea:first', $node);
+
+	        if (textareaWasFocusedBeforeReinit) {
+
+	            $textarea[0].selectionStart = selectionPos[0];
+	            $textarea[0].selectionEnd = selectionPos[1];
+	        }
 
 	        if (textareaCloneHeight > textareaMaxHeight && textareaCloneSpanHeight < textareaMaxHeight) {
 	            jsp.scrollToY(0);
@@ -8729,9 +8736,12 @@ React.makeElement = React['createElement'];
 	            'editing': this.props.editing
 	        };
 	    },
+	    isBeingEdited: function isBeingEdited() {
+	        return this.state.editing === true || this.props.editing === true;
+	    },
 	    componentDidUpdate: function componentDidUpdate(oldProps, oldState) {
 	        var self = this;
-	        if (self.state.editing === true && self.isMounted()) {
+	        if (self.isBeingEdited() && self.isMounted()) {
 	            var $generic = $(self.findDOMNode());
 	            var $textarea = $('textarea', $generic);
 	            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
@@ -8743,26 +8753,11 @@ React.makeElement = React['createElement'];
 	                    self.props.onEditStarted($generic);
 	                }
 	            }
-	        } else if (self.isMounted() && self.state.editing === false && oldState.editing === true) {
+	        } else if (self.isMounted() && !self.isBeingEdited() && oldState.editing === true) {
 	            if (self.props.onUpdate) {
 	                self.props.onUpdate();
 	            }
 	        }
-	        var $node = $(self.findDOMNode());
-	        $node.rebind('onEditRequest.genericMessage', function (e) {
-	            if (self.state.editing === false) {
-	                self.setState({ 'editing': true });
-
-	                Soon(function () {
-	                    var $generic = $(self.findDOMNode());
-	                    var $textarea = $('textarea', $generic);
-	                    if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-	                        $textarea.focus();
-	                        moveCursortoToEnd($textarea[0]);
-	                    }
-	                });
-	            }
-	        });
 	        $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function () {
 	            Soon(function () {
 	                if (self.isMounted()) {
@@ -8774,6 +8769,16 @@ React.makeElement = React['createElement'];
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        var $node = $(self.findDOMNode());
+
+	        if (self.isBeingEdited() && self.isMounted()) {
+	            var $generic = $(self.findDOMNode());
+	            var $textarea = $('textarea', $generic);
+	            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
+	                $textarea.focus();
+	                moveCursortoToEnd($textarea[0]);
+	            }
+	        }
+
 	        $node.delegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut', function (e) {
 	            if (e.target.classList.contains('button')) {
 
@@ -8793,7 +8798,7 @@ React.makeElement = React['createElement'];
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;
 	        var $node = $(self.findDOMNode());
-	        $node.unbind('onEditRequest.genericMessage');
+
 	        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
 	        $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
 	    },
@@ -9016,7 +9021,7 @@ React.makeElement = React['createElement'];
 	                                clearTimeout(self._rerenderTimer);
 	                            }
 	                            self._rerenderTimer = setTimeout(function () {
-	                                if (message.sending === true) {
+	                                if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
 	                                    chatRoom.messagesBuff.trackDataChange();
 	                                    if (self.isMounted()) {
 	                                        self.forceUpdate();
@@ -9523,7 +9528,7 @@ React.makeElement = React['createElement'];
 	                                React.makeElement('i', { className: 'small-icon yellow-triangle' })
 	                            );
 	                        } else {
-	                            if (self.state.editing !== true) {
+	                            if (self.isBeingEdited() !== true) {
 	                                messageNotSendIndicator = React.makeElement(
 	                                    'div',
 	                                    { className: 'not-sent-indicator' },
@@ -9574,7 +9579,7 @@ React.makeElement = React['createElement'];
 	                }
 
 	                var messageDisplayBlock;
-	                if (self.state.editing === true) {
+	                if (self.isBeingEdited() === true) {
 	                    var msgContents = message.textContents;
 	                    msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
 
@@ -9599,7 +9604,9 @@ React.makeElement = React['createElement'];
 	                                    };
 	                                    megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
 	                                    self.props.onEditDone(tmpMessageObj.textContents);
-	                                    self.forceUpdate();
+	                                    if (self.isMounted()) {
+	                                        self.forceUpdate();
+	                                    }
 	                                });
 	                            }
 
@@ -9623,7 +9630,7 @@ React.makeElement = React['createElement'];
 	                    }
 	                }
 	                if (!message.deleted) {
-	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
+	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.isBeingEdited() !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
 	                        messageActionButtons = React.makeElement(
 	                            ButtonsUI.Button,
 	                            {

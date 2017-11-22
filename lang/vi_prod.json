@@ -960,6 +960,7 @@
     "7157": "Xin \u0111\u00f3ng t\u1ea5t c\u1ea3 tr\u00ecnh duy\u1ec7t\/hay th\u1ebb (tab) \u0111ang ch\u1ea1y MEGA tr\u01b0\u1edbc khi ti\u1ebfn h\u00e0nh vi\u1ec7c n\u00e0y.",
     "7160": "Nh\u1eadp m\u00e3 Voucher",
     "7162": "G\u00f3i thu\u00ea bao n\u00e0y qu\u00e1 \u0111\u1eaft \u0111\u1ec3 giao d\u1ecbch ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n n\u00e0y.",
+    "7165": "H\u1ee7y thu\u00ea bao",
     "7179": "H\u1ee7y Thu\u00ea Bao",
     "7201": "S\u1ed1 ti\u1ec1n c\u00f2n trong t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n l\u00e0",
     "7202": "\u0110\u1ec3 th\u00eam ti\u1ec1n v\u00e0o t\u00e0i kho\u1ea3n, click n\u00fat Nh\u1eadp m\u00e3 Voucher v\u00e0 nh\u1eadp m\u00e3. n\u1ebfu b\u1ea1n kh\u00f4ng c\u00f3 voucher, b\u1ea1n n\u00ean [A]mua m\u1ed9t voucher[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

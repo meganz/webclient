@@ -960,6 +960,7 @@
     "7157": "Pred pokra\u010dovan\u00edm pros\u00edm zavrite v\u0161etky ostatn\u00e9 okn\u00e1 alebo z\u00e1lo\u017eky v\u00e1\u0161ho prehliada\u010da, na ktor\u00fdm be\u017e\u00ed MEGA.",
     "7160": "Uplatni\u0165 poukaz",
     "7162": "tento pl\u00e1n je pr\u00edli\u0161 drah\u00fd, aby bol zaplaten\u00fd va\u0161im aktu\u00e1lnym poskytovate\u013eom platieb.",
+    "7165": "Zru\u0161i\u0165 predplatn\u00e9",
     "7179": "Zru\u0161i\u0165 Predplatenie",
     "7201": "Dostupn\u00e9 prostriedky na va\u0161om \u00fa\u010dte s\u00fa",
     "7202": "Pre zv\u00fd\u0161enie svojho zostatku, kliknite na tla\u010didlo Uplatni\u0165 poukaz a zadajte k\u00f3d v\u00e1\u0161ho poukazu. Ak nem\u00e1te poukaz, pros\u00edm [A]k\u00fapte si ho[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

@@ -960,6 +960,7 @@
     "7157": "K\u00e9rlek z\u00e1rj be minden ablakot\/f\u00fclet, melyen futhat a MEGA miel\u0151tt folytatod.",
     "7160": "Kupon Bev\u00e1lt\u00e1sa",
     "7162": "Ez a csomag t\u00fal dr\u00e1ga, hogy ezzel a fizet\u00e9sszolg\u00e1ltat\u00f3val meg lehessen v\u00e1s\u00e1rolni.",
+    "7165": "El\u0151fizet\u00e9s megszak\u00edt\u00e1sa",
     "7179": "El\u0151fizet\u00e9s Megszak\u00edt\u00e1sa",
     "7201": "Fi\u00f3kod egyenlege",
     "7202": "Az egyenlege n\u00f6vel\u00e9s\u00e9hez, kattintson az Utalv\u00e1ny bev\u00e1lt\u00e1sa gombra \u00e9s adja meg a k\u00f3dod. Amennyiben nincs utalv\u00e1nya, k\u00e9rj\u00fck [A]v\u00e1s\u00e1roljon egyet[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

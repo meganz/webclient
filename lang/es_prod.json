@@ -960,6 +960,7 @@
     "7157": "Por favor, cierra todas las dem\u00e1s ventanas\/pesta\u00f1as del navegador donde se est\u00e1 ejecutando MEGA antes de proceder.",
     "7160": "Canjear cup\u00f3n",
     "7162": "Este plan no est\u00e1 disponible con este proveedor de pago.",
+    "7165": "Cancelar suscripci\u00f3n",
     "7179": "Cancelar Suscripci\u00f3n",
     "7201": "El saldo de tu cuenta es",
     "7202": "Para aumentar tu cr\u00e9dito, pulsa el bot\u00f3n Canjear cup\u00f3n e introduce tu c\u00f3digo de cup\u00f3n. Si no tienes un cup\u00f3n, por favor [A]compra uno[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitaci\u00f3n enviada, \u00a1invita a otro m\u00e1s!",
     "17545": "Invitaci\u00f3n enviada, esperando respuesta.",
     "17546": "Ese usuario ya te ha enviado una invitaci\u00f3n.",
+    "17548": "\u00bfQuieres cancelar tu suscripci\u00f3n? Dejar\u00e1s de ser PRO al final del per\u00edodo de suscripci\u00f3n actual.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

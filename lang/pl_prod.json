@@ -960,6 +960,7 @@
     "7157": "Zamknij wszystkie okna i zak\u0142adki z uruchomion\u0105 aplikacj\u0105\u00a0MEGA.",
     "7160": "Zrealizuj kupon",
     "7162": "Te konto jest zbyt drogie aby zamawia\u0107 wybran\u0105 form\u0105 p\u0142atno\u015bci.",
+    "7165": "Anuluj subskrypcj\u0119",
     "7179": "Anuluj subskrypcj\u0119",
     "7201": "Twoje saldo wynosi",
     "7202": "Aby zwi\u0119kszy\u0107 saldo, kliknij zrealizuj kupon i wprowad\u017a jego kod. Je\u017celi nie masz kuponu, wejd\u017a na [A]zam\u00f3wi kupon[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Zaproszenie zosta\u0142o wys\u0142ane! Wy\u015blij kolejne.",
     "17545": "Zaproszenie zosta\u0142o wys\u0142ane, oczekiwanie na potwierdzenie.",
     "17546": "Ten u\u017cytkownik wys\u0142a\u0142 ju\u017c zaproszoszenie.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

@@ -960,6 +960,7 @@
     "7157": "Por favor feche todas as janelas\/separadores do navegador que estejam a correr o MEGA antes de prosseguir.",
     "7160": "Usar voucher",
     "7162": "Este plano \u00e9 demasiado caro para ser pago atrav\u00e9s deste fornecedor de pagamento.",
+    "7165": "Cancelar subscri\u00e7\u00e3o",
     "7179": "Cancelar Subscri\u00e7\u00e3o",
     "7201": "O saldo da sua conta \u00e9",
     "7202": "Para aumentar o seu saldo, clique no bot\u00e3o Utilizar Voucher e introduza o c\u00f3digo do voucher. Se n\u00e3o tem um voucher, por favor [A]compre um voucher[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

@@ -960,6 +960,7 @@
     "7157": "Antes de continuar, feche todas as janelas\/abas nas quais o MEGA estiver aberto.",
     "7160": "Usar cupom",
     "7162": "Este plano \u00e9 caro demais para ser comprado com este provedor de pagamento.",
+    "7165": "cancelar assinatura",
     "7179": "cancelar assinatura",
     "7201": "O saldo da sua conta \u00e9 de",
     "7202": "Para aumentar o seu saldo, clique no bot\u00e3o Usar cupom e insira o c\u00f3digo do mesmo. Se voc\u00ea n\u00e3o tiver nenhum, por favor, [A]compre um cupom[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Convite enviado! Convide outro.",
     "17545": "Convite j\u00e1 enviado, aguardando resposta.",
     "17546": "Esse usu\u00e1rio j\u00e1 lhe enviou um convite.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17548": "Voc\u00ea tem certeza de que quer cancelar a sua assinatura? Voc\u00ea perder\u00e1 o status PRO ao final do per\u00edodo atualmente contratado.",
+    "17549": "Recentemente fizemos algumas melhorias na nossa extens\u00e3o original para Firefox. Voc\u00ea pode baixar e instalar a atualiza\u00e7\u00e3o usando o bot\u00e3o abaixo."
 }

@@ -960,6 +960,7 @@
     "7157": "St\u00e4ng alla andra webbl\u00e4sarf\u00f6nster \/ flikar som k\u00f6r MEGA innan du forts\u00e4tter.",
     "7160": "L\u00f6s in v\u00e4rdekupong",
     "7162": "Denna plan \u00e4r f\u00f6r dyrt att k\u00f6pas med denna betalningsleverant\u00f6r.",
+    "7165": "Avbryt abonnemang",
     "7179": "Avbryt abonnemang",
     "7201": "Ditt konto saldo \u00e4r",
     "7202": "F\u00f6r att \u00f6ka ditt saldo genom att klicka p\u00e5 Redeem Voucher knappen och ange din kampanjkod. Om du inte har en kupong, v\u00e4nligen [A]k\u00f6pa en voucher[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

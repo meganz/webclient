@@ -960,6 +960,7 @@
     "7157": "Sarhan lahat ng browser windows\/tabs na nagpapatakbo ng MEGA bago magpatuloy.",
     "7160": "Kunin ang Voucher",
     "7162": "Ang planong ito ay masyadong mahal upang bilhin sa pamamagitan ng payment provider na ito.",
+    "7165": "Itigil ang subscription",
     "7179": "Itigil ang Subscription",
     "7201": "Ang inyong account balance ay",
     "7202": "Para mapataas ang inyong balanse, iclick ang Redeem Voucher na button at ipasok ang voucher code. Kung wala kang voucher, pakiusap na [A]bumili ng voucher[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Naipadala na ang invite, hinihintay ang sagot.",
     "17546": "Nagpadala na ng imbitasyon ang user na ito.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

@@ -3843,6 +3843,10 @@
         "text": "This plan is too expensive to be purchased with this payment provider.",
         "context": "A message shown when a payment provider is disabled because the selected Pro plan is too expensive e.g. for mobile payment providers they can only accept small sums of money so plans like PRO I, II & III are disabled."
     },
+    "7165": {
+        "text": "Cancel subscription",
+        "context": "Menu item to let the user cancel subscriptions"
+    },
     "7179": {
         "text": "Cancel Subscription",
         "context": "title cancel subscriptions dialog"
@@ -7426,6 +7430,10 @@
     "17546": {
         "text": "This user has already sent you an invitation.",
         "context": "An error message after just trying to send a user an invite which explains that the user already sent them an invitation first."
+    },
+    "17548": {
+        "text": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+        "context": "A dialog message in the mobile webclient informing the user that their account will return to the free plan after their currenly paid for subscription runs out if they choose to confirm in cancelling their subscription."
     },
     "17549": {
         "text": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",

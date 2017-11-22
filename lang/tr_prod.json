@@ -960,6 +960,7 @@
     "7157": "Devam etmeden \u00f6nce MEGA \u00e7al\u0131\u015fmakta olan t\u00fcm di\u011fer taray\u0131c\u0131 pencerelerini\/sekmeleri kapat\u0131n.",
     "7160": "Kupon Kullan",
     "7162": "Bu plan, bu \u00f6deme sa\u011flay\u0131c\u0131s\u0131 ile sat\u0131n alabilmek i\u00e7in \u00e7ok pahal\u0131.",
+    "7165": "Aboneli\u011fi iptal et",
     "7179": "Aboneli\u011fi \u0130ptal Et",
     "7201": "Hesap bakiyeniz",
     "7202": "Bakiyenizi art\u0131rmak i\u00e7in, \"Kupon Kullan\" butonuna t\u0131klay\u0131n ve kupon kodu girin. Kuponunuz yoksa, [A]kupon  sat\u0131n al\u0131n[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Davet g\u00f6nderildi! Ba\u015fka birini davet et.",
     "17545": "Davet zaten g\u00f6nderildi, yan\u0131t bekleniyor.",
     "17546": "Bu kullan\u0131c\u0131 size bir davetiye g\u00f6ndermi\u015fti zaten.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17548": "Aboneli\u011finizi iptal etmek istedi\u011finizden emin misiniz? PRO ayr\u0131cal\u0131klar\u0131n\u0131 abonelik d\u00f6neminizin sonunda kaybedeceksiniz.",
+    "17549": "Eski Firefox'lar i\u00e7in olan eklentimizi yak\u0131n zamanda geli\u015ftirdik. G\u00fcncellemeyi a\u015fa\u011f\u0131daki butonu kullanarak indirip kurabilirsiniz."
 }

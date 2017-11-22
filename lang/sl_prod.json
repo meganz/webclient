@@ -960,6 +960,7 @@
     "7157": "Prosim, zaprite druga okna\/tabe brskalnika, kjer te\u010de MEGA, preden nadaljujete.",
     "7160": "Vnov\u010di kupon",
     "7162": "Ta paket je predrag, da bi ga lahko kupili s tem ponudnikom pla\u010dila.",
+    "7165": "Prekli\u010di naro\u010dnino",
     "7179": "Prekli\u010di naro\u010dnino",
     "7201": "Stanje na va\u0161em ra\u010dunu je",
     "7202": "Za povi\u0161anje stanja na va\u0161em ra\u010dunu, kliknite na 'unov\u010di kupon' gumb in vnesite kodo kupona. \u010ce nimate kupona, prosim, [A]kupite kupon[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

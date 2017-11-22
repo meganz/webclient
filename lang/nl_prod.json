@@ -960,6 +960,7 @@
     "7157": "Sluit alle overige browservensters\/tabbladen waarop MEGA is geopend voordat u verder gaat.",
     "7160": "Gebruik Voucher",
     "7162": "Dit abonnement is te duur om te worden gekocht met deze betalingsprovider.",
+    "7165": "Abonnement opzeggen",
     "7179": "Abonnement opzeggen",
     "7201": "Uw saldo is",
     "7202": "Om uw saldo te verhogen, klikt u op de knop Voucher inwisselen en voert u uw voucher code in. Als u geen voucher heeft, kunt u [A] een voucher aanschaffen [\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Uitnodiging ontvangen! Nodig nog iemand uit.",
     "17545": "Uitnodiging al verzonden, wachtend op antwoord.",
     "17546": "Die gebruiker heeft u al een uitnodiging verzonden.",
+    "17548": "Weet u zeker dat u uw abonnement wilt annuleren. U verliest uw PRO status aan het einde van uw huidige abonnement periode.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

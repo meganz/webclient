@@ -960,6 +960,7 @@
     "7157": "Please close all other browser windows\/tabs which are running MEGA before proceeding.",
     "7160": "Redeem Voucher",
     "7162": "This plan is too expensive to be purchased with this payment provider.",
+    "7165": "Cancel subscription",
     "7179": "Cancel Subscription",
     "7201": "Your account balance is",
     "7202": "To increase your balance, click the Redeem Voucher button and enter your voucher code. If you don't have a voucher, please [A]purchase a voucher[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

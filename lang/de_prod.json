@@ -960,6 +960,7 @@
     "7157": "Bitte schlie\u00dfen Sie alle Browserfenster und -Tabs, bevor Sie fortfahren.",
     "7160": "Voucher einl\u00f6sen",
     "7162": "Der Preis f\u00fcr diesen Pro-Plan befindet sich au\u00dferhalb der M\u00f6glichkeiten dieses Zahlungsdienstleisters.",
+    "7165": "Abonnement stornieren",
     "7179": "Abonnement stornieren",
     "7201": "Ihr Guthaben betr\u00e4gt",
     "7202": "Um Ihren Kontostand zu erh\u00f6hen, klicken Sie auf \"Gutschein einl\u00f6sen\" und geben Sie Ihren Gutscheincode ein. Sollten Sie keinen Gutschein haben, k\u00f6nnen Sie einen solchen [A]k\u00e4uflich erwerben[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

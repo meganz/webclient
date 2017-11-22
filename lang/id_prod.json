@@ -960,6 +960,7 @@
     "7157": "Harap tutup seluruh browser windows\/ tabs yang sedang menjalankan MEGA sebelum melanjutkan.",
     "7160": "Tebus Voucher",
     "7162": "Plan ini terlalu mahal untuk dibeli untuk penyedia pembayaran ini.",
+    "7165": "Batalkan Subscription",
     "7179": "Batalkan Subscription",
     "7201": "Saldo akun anda ",
     "7202": "Untuk meningkatkan saldo anda, klik tombol Redeem Voucher dan masukan kode voucher anda. Jika anda tidak punya voucher, harap [A]beli voucher[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

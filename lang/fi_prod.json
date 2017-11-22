@@ -960,6 +960,7 @@
     "7157": "Ole hyv\u00e4 ja sulje ensin kaikki muut selainikkunat\/v\u00e4lilehdet, joissa MEGA on toiminnassa.",
     "7160": "Lunasta kuponki",
     "7162": "Tilausvaihtoehdon hinta on liian korkea kyseisen operaattorin v\u00e4lityksell\u00e4 maksettavaksi.",
+    "7165": "Lopeta tilaus",
     "7179": "Lopeta tilaus",
     "7201": "Saldo",
     "7202": "Korottaaksesi saldoasi, lunasta kuponki klikkaamalla ao. nappia, sitten sy\u00f6t\u00e4 kuponkikoodisi. Jos sinulla ei ole kuponkia, voit [A]ostaa kupongin[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
     "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

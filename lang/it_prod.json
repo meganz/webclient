@@ -960,6 +960,7 @@
     "7157": "Chiudi tutte le altre finestre\/schede del browser di MEGA prima di procedere.",
     "7160": "Riscuoti Voucher",
     "7162": "Questo piano \u00e8 troppo costoso per essere acquistato con questo fornitore di pagamento.",
+    "7165": "Annulla iscrizione",
     "7179": "Annulla Iscrizione",
     "7201": "Il bilancio del tuo account \u00e8",
     "7202": "Per aumentare il tuo bilancio, clicca su \"Riscatta Voucher\" ed inserisci il tuo codice. Se non hai un codice voucher, [A]comprane uno[\/A].",
@@ -1856,5 +1857,6 @@
     "17544": "Invito spedito! Invita qualcun'altro.",
     "17545": "Invito gi\u00e0 spedito, in attesa della risposta.",
     "17546": "Quell'utente ti ha gi\u00e0 spedito un invito.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17548": "Sei sicuro di voler annullare il tuo abbonamento? Perderai il tuo status PRO al termine del tuo periodo corrente di abbonamento.",
+    "17549": "Abbiamo recentemente apportato alcuni miglioramenti alla nostra estensione per Firefox Legacy. Puoi scaricare ed installare l'aggiornamento utilizzando il pulsante sottostante."
 }

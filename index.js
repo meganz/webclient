@@ -2300,7 +2300,7 @@ function loadSubPage(tpage, event)
         return false;
     }
 
-    if (slideshowid) {
+    if (!is_mobile && slideshowid) {
         slideshow(0, 1);
     }
 

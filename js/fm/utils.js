@@ -983,6 +983,12 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
                 if (typeof res === 'object' && res.g) {
                     res.key = key;
                     res.handle = handle;
+                    if (res.efq) {
+                        dlmanager.efq = true;
+                    }
+                    else {
+                        delete dlmanager.efq;
+                    }
                     fetcher(res);
                 }
                 else {

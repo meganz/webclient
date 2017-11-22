@@ -91,6 +91,7 @@ var ConversationsListItem = React.createClass({
 
             renderableSummary = htmlentities(renderableSummary);
             renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
 
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
                     </div>;

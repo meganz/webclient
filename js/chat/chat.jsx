@@ -159,7 +159,8 @@ var Chat = function() {
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
             'presencedIntegration': PresencedIntegration,
-            'persistedTypeArea': PersistedTypeArea
+            'persistedTypeArea': PersistedTypeArea,
+            'rtfFilter': RtfFilter
         },
         'chatNotificationOptions': {
             'textMessages': {

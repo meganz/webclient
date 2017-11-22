@@ -206,6 +206,7 @@
     "527": "Kami menyambut pengguna dari media, termasuk bloggers, untuk menghubungi kami dengan pertanyaan terkait dengan MEGA.",
     "543": "lebih dari [X]",
     "553": "Penyedia pembayaran anda tidak terdaftar? Harap [A]e-mail kami[\/A]",
+    "554": "Selesai",
     "555": "Saya setuju dengan [A]Persyaratan Pelayanan Reseller[\/A]",
     "556": "Berikut",
     "561": "Alamat",
@@ -4331,6 +4332,7 @@
     "17223": "Link sekarang dibuat dan di clipboard Anda.",
     "17224": "[H1]Berkolaborasi dengan orang lain[\/H1]",
     "17225": "Berbagi folder adalah cara terbaik untuk berkolaborasi dengan kontak Anda. Anda dapat berbagi folder dengan kontak apa pun, dengan pengguna MEGA yang ada dan bahkan dengan pengguna baru, selama Anda memiliki alamat email mereka. [Br][Br] Jika pengguna belum memiliki akun MEGA, dia akan secara otomatis menerima email undangan untuk bergabung dengan MEGA sehingga pengguna dapat melihat folder bersama Anda.",
+    "17226": "[B]Klik kanan[\/B] pada folder atau file yang ingin Anda bagikan.",
     "17227": "Klik [W13][B]Sharing[\/B][\/W13] pada menu konteks.",
     "17228": "Masukkan alamat email atau huruf pertama dari nama kontak MEGA Anda.",
     "17229": "Pilih permission (defaultnya hanya bisa dibaca).",
@@ -4489,5 +4491,8 @@
     "17543": "Not achieved",
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
-    "17546": "This user has already sent you an invitation."
+    "17546": "This user has already sent you an invitation.",
+    "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

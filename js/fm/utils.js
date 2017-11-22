@@ -983,6 +983,12 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
                 if (typeof res === 'object' && res.g) {
                     res.key = key;
                     res.handle = handle;
+                    if (res.efq) {
+                        dlmanager.efq = true;
+                    }
+                    else {
+                        delete dlmanager.efq;
+                    }
                     fetcher(res);
                 }
                 else {
@@ -1279,10 +1285,11 @@ MegaUtils.prototype.isSafeName = function (name) {
     // we can enhance this as much as we can as
     // denied chars set D = W + L + M + A + I
     // where W: denied chars on Winfows, L: on linux, M: on MAC, A: on Android, I: on iOS
+    // minimized to NTFS only
     if (name.trim().length <= 0) {
         return false;
     }
-    if (name.search(/[\\\/<>:*\"\|?+\[\]]/) >= 0 || name.length > 250) {
+    if (name.search(/[\\\/<>:*\"\|?]/) >= 0 || name.length > 250) {
         return false;
     }
     return true;

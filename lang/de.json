@@ -206,6 +206,7 @@
     "527": "Wir hei\u00dfen Medien und Blogger herzlich willkommen und beantworten gerne Ihre Fragen bez\u00fcglich MEGA.",
     "543": "mehr als [X]",
     "553": "Ihr Zahlungs-Provider ist nicht aufgelistet? Schreiben Sie uns bitte eine [A]E-Mail[\/A]",
+    "554": "Abschlie\u00dfen",
     "555": "Ich akzeptiere die MEGA [A]Reseller-AGB[\/A]",
     "556": "N\u00e4chste",
     "561": "Adresse",
@@ -4331,6 +4332,7 @@
     "17223": "Der Link ist nun exportiert und in Ihrer Zwischenablage.",
     "17224": "[H1]Zusammenarbeit mit Dritten[\/H1]",
     "17225": "Eine Ordnerfreigabe ist eine m\u00e4chtige Basis f\u00fcr die Zusammenarbeit mit Ihren Kontakten. Sie k\u00f6nnen Ordner an beliebige Kontakte, bestehende MEGA-User und sogar unregistrierte Benutzer (via deren E-Mail-Adresse) freigeben. [Br][Br]Sollte der Empf\u00e4nger Ihres Ordners noch keinen MEGA-Account haben, erh\u00e4lt er eine Einladung per E-Mail zur Einrichtung eines Accounts, der ihm dann den Zugriff auf den Ordner erm\u00f6glicht.",
+    "17226": "[B]Rechtsklicken[\/B] Sie den Ordner, den Sie freigeben m\u00f6chten.",
     "17227": "Klicken Sie auf [W13][B]Freigabe[\/B][\/W13] im Kontextmen\u00fc.",
     "17228": "Geben Sie eine E-Mail-Adresse oder die ersten Buchstaben des Namens eines Kontakts ein.",
     "17229": "W\u00e4hlen Sie die Zugriffstufe (Standardeinstellung: \"Nur lesen\").",
@@ -4489,5 +4491,8 @@
     "17543": "Not achieved",
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
-    "17546": "This user has already sent you an invitation."
+    "17546": "This user has already sent you an invitation.",
+    "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

@@ -206,6 +206,7 @@
     "527": "Invit\u0103m persoane din zona mass-mediei, inclusiv bloggeri, s\u0103 ne contacteze pentru \u00eentreb\u0103ri referitoare la MEGA.",
     "543": "mai mult de [X]",
     "553": "Furnizorul t\u0103u de plat\u0103 nu este listat? Te rug\u0103m s\u0103 ne trimi\u0163i un [A]e-mail[\/A]",
+    "554": "Completat",
     "555": "Sunt de acord cu [A]Termenii de utilizare a serviciului pentru v\u00e2nz\u0103torii[\/A] MEGA",
     "556": "Urm\u0103torul",
     "561": "Adresa",
@@ -4331,6 +4332,7 @@
     "17223": "Linkul este creat acum \u015fi \u00een clipboard.",
     "17224": "[H1]Colaboreaz\u0103 cu al\u0163ii[\/H1]",
     "17225": "Partajarea unui folder este o modalitate grozav\u0103 de a colabora cu contactele tale. Po\u0163i partaja folderul cu orice contact, cu orice utilizator MEGA existent \u015fi chiar cu orice utilizator nou, at\u00e2ta timp c\u00e2t ai adresa de e-mail a acestuia. Br][Br]Dac\u0103 utilizatorul nu are un cont MEGA \u00eenc\u0103, el sau ea vor primi automat un e-mail de invita\u0163ie pentru a se al\u0103tura MEGA astfel \u00eenc\u00e2t utilizatorul s\u0103 poat\u0103 vedea folderul t\u0103u partajat.",
+    "17226": "[B]Clic dreapta[\/B] pe orice fi\u015fier sau folder pe care dore\u015fti s\u0103-l partajezi.",
     "17227": "Clic pe [W13][B]Partajare[\/B][\/W13] din meniul contextual.",
     "17228": "Introdu adresa de e-mail sau primele litere ale numelui(or) contactului(elor) MEGA.",
     "17229": "Alege permisiunile (\u00een mod implicit este numai citire)",
@@ -4489,5 +4491,8 @@
     "17543": "Not achieved",
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
-    "17546": "This user has already sent you an invitation."
+    "17546": "This user has already sent you an invitation.",
+    "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

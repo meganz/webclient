@@ -152,6 +152,7 @@ var Chat = function() {
          * Really simple plugin architecture
          */
         'plugins': {
+            'chatStats': ChatStats,
             'chatdIntegration': ChatdIntegration,
             'callManager': CallManager,
             'urlFilter': UrlFilter,
@@ -159,7 +160,8 @@ var Chat = function() {
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
             'presencedIntegration': PresencedIntegration,
-            'persistedTypeArea': PersistedTypeArea
+            'persistedTypeArea': PersistedTypeArea,
+            'rtfFilter': RtfFilter
         },
         'chatNotificationOptions': {
             'textMessages': {

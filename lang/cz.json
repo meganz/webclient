@@ -206,6 +206,7 @@
     "527": "Zveme \u010dleny m\u00e9di\u00ed, v\u010detn\u011b bloger\u016f, aby se n\u00e1s obr\u00e1tili s ot\u00e1zkami souvisej\u00edc\u00edmi s MEGA.",
     "543": "v\u00edce ne\u017e [X]",
     "553": "V\u00e1\u0161 poskytovatel platebn\u00edch slu\u017eeb nen\u00ed uveden v seznamu? [A]Za\u0161lete n\u00e1m e-mail[\/A]",
+    "554": "Dokon\u010dit",
     "555": "Souhlas\u00edm s [A]Podm\u00ednkami u\u017e\u00edv\u00e1n\u00ed pro prodejce[\/A] MEGA",
     "556": "Dal\u0161\u00ed",
     "561": "Adresa",
@@ -4331,6 +4332,7 @@
     "17223": "The link is now created and in your clipboard. ",
     "17224": "[H1]Collaborate with others[\/H1]",
     "17225": "Sharing a folder is a great way to collaborate with your contacts. You can share your folder with any contact, with any existing MEGA user and even with any new user, as long as you have their email address. [Br][Br]If the user does not have a MEGA account yet, he or she will automatically receive an invitation email to join MEGA so the user can see your shared folder.",
+    "17226": "[B]Right click[\/B] on any folder you wish to share.",
     "17227": "Click on [W13][B]Sharing[\/B][\/W13] in the context menu.",
     "17228": "Enter an email address or the first letters of your MEGA contact name(s).",
     "17229": "Choose the permissions (default is read-only).",
@@ -4489,5 +4491,8 @@
     "17543": "Not achieved",
     "17544": "Invitation sent! Invite another.",
     "17545": "Invite already sent, waiting for response.",
-    "17546": "This user has already sent you an invitation."
+    "17546": "This user has already sent you an invitation.",
+    "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+    "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

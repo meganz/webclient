@@ -206,6 +206,7 @@
     "527": "Nous invitons les personnes du monde des m\u00e9dias, blogueurs inclus, \u00e0 nous contacter pour toute demande relative \u00e0 MEGA. ",
     "543": "plus de [X]",
     "553": "Votre fournisseur de service de paiement ne figure pas dans la liste? Veuillez nous [A]envoyer un courriel[\/A]",
+    "554": "Terminer",
     "555": "J'accepte les [A]conditions g\u00e9n\u00e9rales d'utilisation des revendeurs[\/A] de MEGA",
     "556": "Suivant",
     "561": "Adresse",
@@ -4331,6 +4332,7 @@
     "17223": "Le lien est maintenant cr\u00e9\u00e9 et plac\u00e9 dans votre presse-papiers.",
     "17224": "[H1]Collaborer avec les autres[\/H1]",
     "17225": "Partager un dossier est une excellente fa\u00e7on de collaborer avec vos contacts. Vous pouvez partager un dossier avec n\u2019importe quel contact, n\u2019importe quel utilisateur existant de MEGA et m\u00eame n\u2019importe quel utilisateur tant que vous connaissez son adresse courriel. [Br][Br] Si l\u2019utilisateur n\u2019a pas encore de compte MEGA, il recevra automatiquement un courriel d\u2019invitation \u00e0 se joindre \u00e0 MEGA afin de voir votre dossier partag\u00e9.",
+    "17226": "[B]Cliquez \u00e0 droite[\/B] sur n\u2019importe quel dossier que vous souhaitez partager.                                ",
     "17227": "Cliquez sur [W13][B]Partage[\/B][\/W13] dans le menu contextuel.",
     "17228": "Saisissez une adresse courriel ou les premi\u00e8res lettres du nom de votre contact MEGA.",
     "17229": "Choisissez les droits (lecture seulement par d\u00e9faut)",
@@ -4489,5 +4491,8 @@
     "17543": "Non atteint",
     "17544": "L\u2019invitation a \u00e9t\u00e9 envoy\u00e9e\u2009! Inviter quelqu\u2019un d\u2019autre.",
     "17545": "Une invitation a d\u00e9j\u00e0 \u00e9t\u00e9 envoy\u00e9e, en attente de r\u00e9ponse.",
-    "17546": "Cet utilisateur vous a d\u00e9j\u00e0 envoy\u00e9 une invitation."
+    "17546": "Cet utilisateur vous a d\u00e9j\u00e0 envoy\u00e9 une invitation.",
+    "17547": "MEGA acc\u00e8de \u00e0 votre phototh\u00e8que pour enregistrer vos photos ou vid\u00e9os si vous souhaitez le faire.",
+    "17548": "Voulez-vous vraiment annuler votre abonnement\u2009? Votre statut PRO expirera \u00e0 la fin de la p\u00e9riode d\u2019abonnement actuelle.",
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
 }

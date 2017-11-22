@@ -147,6 +147,7 @@ module.exports = function(config) {
         'js/chat/plugins/urlFilter.js',
         'js/chat/plugins/emoticonShortcutsFilter.js',
         'js/chat/plugins/emoticonsFilter.js',
+        'js/chat/plugins/rtfFilter.js',
         'js/chat/plugins/chatNotifications.js',
         'js/chat/plugins/callFeedback.js',
         'js/chat/plugins/callManager.js',

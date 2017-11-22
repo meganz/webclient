@@ -171,6 +171,7 @@ React.makeElement = React['createElement'];
 	        },
 	        filePickerOptions: {},
 	        'plugins': {
+	            'chatStats': ChatStats,
 	            'chatdIntegration': ChatdIntegration,
 	            'callManager': CallManager,
 	            'urlFilter': UrlFilter,

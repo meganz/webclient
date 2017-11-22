@@ -152,6 +152,7 @@ var Chat = function() {
          * Really simple plugin architecture
          */
         'plugins': {
+            'chatStats': ChatStats,
             'chatdIntegration': ChatdIntegration,
             'callManager': CallManager,
             'urlFilter': UrlFilter,

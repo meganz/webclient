@@ -1503,6 +1503,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     }
 
 
+    $(chatRoom).trigger('onChatdIntegrationReady');
 
 };
 

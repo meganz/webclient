@@ -128,16 +128,16 @@ var EmojiAutocomplete = React.createClass({
                 if (match === 0) {
                     exactMatch.push(emoji);
                 }
-                else {
+                else if (partialMatch.length < (self.props.maxEmojis - exactMatch.length)) {
                     partialMatch.push(emoji);
                 }
             }
-            if (exactMatch.length + partialMatch.length >= self.props.maxEmojis) {
+            if (exactMatch.length >= self.props.maxEmojis) {
                 break;
             }
         };
 
-        var found = exactMatch.concat(partialMatch);
+        var found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
 
         // explicit mem cleanup
         exactMatch = partialMatch = null;

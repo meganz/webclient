@@ -7426,5 +7426,9 @@
     "17546": {
         "text": "This user has already sent you an invitation.",
         "context": "An error message after just trying to send a user an invite which explains that the user already sent them an invitation first."
+    },
+    "17549": {
+        "text": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+        "context": "A message in a popup dialog explaining that there is an update available for the Firefox Legacy extension which works on browsers such as Pale Moon."
     }
 }

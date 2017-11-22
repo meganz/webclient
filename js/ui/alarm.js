@@ -484,9 +484,9 @@ var alarm = {
                 });
             }
 
-            // Otherwise start timer only if using the website because extensions have their own
-            // auto-update mechanism. Also don't start a new timer if there is one already started.
-            else if ((is_extension === false) && (this.timeoutId === null)) {
+            // Otherwise start timer only if using the legacy extension or website because web extensions have
+            // their own auto-update mechanism. Also don't start a new timer if there is one already started.
+            else if (is_chrome_web_ext === false && is_firefox_web_ext === false && this.timeoutId === null) {
                 this.startUpdateCheckTimer();
             }
         },
@@ -499,13 +499,14 @@ var alarm = {
             // If localStorage testing variable exists
             if (localStorage.getItem('testSiteUpdate')) {
 
-                // Check for update in 5 seconds using the test update file
-                this.checkInterval = 5 * 1000;
+                // Check for update in 3 seconds using the test update file
+                this.checkInterval = 3 * 1000;
                 this.updateUrl = 'https://eu.static.mega.co.nz/3/current_ver_test.txt';
             }
 
-            // Only run the update check if on mega.nz or the testSiteUpdate flag is set
-            if ((window.location.hostname === 'mega.nz') || localStorage.getItem('testSiteUpdate')) {
+            // Only run the update check if using legacy Firefox ext, or on mega.nz, or the testSiteUpdate flag is set
+            if (is_chrome_firefox || window.location.hostname === 'mega.nz' ||
+                    localStorage.getItem('testSiteUpdate')) {
 
                 // Clear old timer
                 window.clearTimeout(this.timeoutId);
@@ -582,6 +583,12 @@ var alarm = {
                 $dialog.find('.release-version').text(serverBuildVersion.website);
                 $dialog.find('.release-date-time').text(time2date(serverBuildVersion.timestamp));
 
+                // Change the text for the Legacy Extension
+                if (is_chrome_firefox) {
+                    $dialog.find('.description').addClass('hidden');
+                    $dialog.find('.description-legacy-extension').removeClass('hidden');
+                }
+
                 // Cache server update details so the popup can be immediately re-rendered if they switch page
                 this.cachedServerBuildVersion = serverBuildVersion;
 
@@ -642,8 +649,14 @@ var alarm = {
                     // Add a log
                     api_req({ a: 'log', e: 99612, m: 'User chose to update from site update dialog' });
 
-                    // Hard refresh the page
-                    document.location.reload(true);
+                    // If Firefox Legacy extension go the URL
+                    if (is_chrome_firefox) {
+                        window.location = 'https://mega.nz/meganz-legacy.xpi';
+                    }
+                    else {
+                        // If on the mega.nz site, hard refresh the page
+                        document.location.reload(true);
+                    }
                 });
             });
         }

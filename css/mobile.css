@@ -792,6 +792,9 @@ ul, li {
 .mobile.fm-icon.rocket {
     background-position: -51px -1960px;
 }
+.mobile.fm-icon.cancel-subscription {
+    background-position: -1px -1789px;
+}
 .mobile.fm-icon.cloud {
     background-position: -52px -2010px;
 }
@@ -3840,6 +3843,38 @@ div.checkboxOn, div.checkboxOff {
     position: absolute;
     top: 18px;
 }
+.mobile.my-account-page .account-cancel-subscription-block {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    margin-top: 4px;
+    padding: 17px 0;
+    position: relative;
+}
+.mobile.my-account-page .account-cancel-subscription-block .fm-icon.cancel-subscription {
+    left: 10px;
+    position: absolute;
+    top: 18px;
+}
+.mobile.my-account-page .account-cancel-subscription-block .subscription-heading {
+    color: #000;
+    font-size: 17px;
+    line-height: 22px;
+    margin-left: 60px;
+    text-align: left;
+}
+.mobile.my-account-page .account-cancel-subscription-block .subscription-text {
+    color: #777e82;
+    font-size: 14px;
+    line-height: 18px;
+    margin-left: 60px;
+    text-align: left;
+}
+.mobile.my-account-page .account-cancel-subscription-block .fm-icon.right-arrow {
+    right: 4px;
+    position: absolute;
+    top: 18px;
+}
 
 /* Help centre header */
 .help-section.fm-header {
@@ -4291,6 +4326,77 @@ div.checkboxOn, div.checkboxOff {
     margin: 11px 0 0 0;
 }
 
+/* Cancel subscription information overlay */
+.mobile.cancel-subscription-information-overlay {
+    left: 0;
+    position: absolute;
+    top: 0;
+    z-index: 100;
+}
+.mobile.cancel-subscription-information-overlay .first-message {
+    font-family: 'source_sans_prosemibold';
+}
+
+/* Cancel subscription overlay */
+.mobile.cancel-subscription-overlay {
+    left: 0;
+    position: absolute;
+    top: 0;
+    z-index: 100;
+}
+.mobile.cancel-subscription-overlay .white-block {
+    width: 300px;
+}
+.mobile.cancel-subscription-overlay .membership-icon.free {
+    margin: 10px auto;
+}
+.mobile.cancel-subscription-overlay .mobile.dialog-information {
+    font-size: 15px;
+    line-height: 24px;
+    color: #555;
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: normal;
+}
+.mobile.cancel-subscription-overlay .first-message {
+    font-family: 'source_sans_prosemibold';
+    color: #444;
+    font-size: 17px;
+    line-height: 22px;
+    text-align: center;
+}
+.mobile.cancel-subscription-overlay .second-message {
+    color: #777e82;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 10px;
+    text-align: center;
+}
+.mobile.cancel-subscription-overlay .buttons {
+    margin-top: 5px;
+    text-align: center;
+}
+.mobile.cancel-subscription-overlay .red-button {
+    display: inline-block;
+    width: 47%;
+    border: 1px solid #ff4246;
+    height: 44px;
+    line-height: 40px;
+    font-size: 14px;
+}
+.mobile.cancel-subscription-overlay .red-button.close-button {
+    background: #fff;
+    border: 1px solid #ff4246;
+    border-radius: 2px;
+    color: #ff4246;
+    margin-right: 2px;
+}
+.mobile.cancel-subscription-overlay .red-button.confirm-ok-button {
+    border-radius: 2px;
+    margin-left: 2px;
+}
 
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {

@@ -129,6 +129,14 @@ function dl_g(res) {
             var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
 
+            // Change layout for video
+            if (is_video(filename)) {
+                $('.bottom-page.scroll-block').addClass('video');
+            }
+            else {
+                $('.bottom-page.scroll-block').removeClass('video');
+            }
+
             var checkMegaSyncDownload = function() {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
                 $('#megaapp-download').prop('checked', true);
@@ -390,14 +398,11 @@ function dl_g(res) {
             var showPreviewButton = function($infoBlock) {
                 $infoBlock = $infoBlock || $('.download.info-block');
 
-                if (is_image(filename) || is_video(filename)) {
+                if (is_image(filename)) {
                     var $ipb = $infoBlock.find('.img-preview-button');
 
                     if (filetype(filename) === 'PDF Document') {
                         $ipb.find('span').text(l[17489]);
-                    }
-                    else if (is_video(filename)) {
-                        $ipb.find('span').text('view video');
                     }
 
                     $ipb.removeClass('hidden')
@@ -412,14 +417,6 @@ function dl_g(res) {
                         });
                 }
             };
-
-            // Change layout for video
-            if (is_video(filename)) {
-                $('.bottom-page.scroll-block').addClass('video');
-            }
-            else {
-                $('.bottom-page.scroll-block').removeClass('video');
-            }
 
             if (res.fa) {
                 // load thumbnail

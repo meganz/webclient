@@ -334,7 +334,7 @@
 }
 .download.main-transfer-info i, .download.complete-block i {
     vertical-align: top;
-    margin: -1px 5px 0 -5px;
+    margin: -1px 5px 0 -4px;
 }
 .download.info-txt.small-txt .dark {
     color: #333333;

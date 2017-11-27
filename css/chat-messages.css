@@ -330,5 +330,5 @@
 }
 
 .message pre.rtf-single, .message pre.rtf-multi {
-    white-space: normal;
+    white-space: pre-wrap;
 }

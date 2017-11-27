@@ -1035,8 +1035,8 @@ function ApiQueue() { // double storage
     'use strict';
     this._head = 0;
     this._tail = 0;
-    this._storage1 = {};
-    this._storage2 = {};
+    this._storage1 = Object.create(null);
+    this._storage2 = Object.create(null);
 }
 ApiQueue.prototype.size = function () {
     'use strict';
@@ -1064,8 +1064,8 @@ ApiQueue.prototype.clear = function () {
     'use strict';
     this._head = 0;
     this._tail = 0;
-    this._storage1 = {};
-    this._storage2 = {};
+    this._storage1 = Object.create(null);
+    this._storage2 = Object.create(null);
 };
 ApiQueue.prototype.dequeue = function (onlySingle) {
     'use strict';

@@ -7,9 +7,8 @@ function CacheStream(e, t) {
   Readable.call(this);
   this.pos = e;
   this._file = t;
-  this._file.stream && console.warn("overwriting previous cachestream..");
   this._file.stream = this;
-  var i = MIN_CACHE, r = t.cachefind(e);
+  var i = t.minCache, r = t.cachefind(e);
   r < 0 && (r = -r - 1);
   t.mru++;
   for (;r < t.cachepos.length && i > 0; ) {
@@ -33,6 +32,13 @@ function VideoFile(e) {
   this.throttle = 0;
   this.paused = !1;
   this.playing = !1;
+  this.minCache = MIN_CACHE;
+  this.maxCache = MAX_CACHE;
+  if (e instanceof Blob) {
+    this.minCache = 10485760;
+    this.maxCache = 41943040;
+    this.fetcher = this.fileReader;
+  }
 }
 
 /**
@@ -47,9 +53,10 @@ function Streamer(e, t) {
   this.engine = ua.details.engine;
   this.browser = ua.details.browser;
   this._events = [ "progress", "timeupdate", "canplay", "pause", "playing", "error", "abort", "updateend", "ended" ];
-  "Edge" !== this.browser && this._events.push("seeking");
+  "Edge" !== this.browser && t.parentNode && !window.chrome && this._events.push("seeking");
   for (var i = this._events.length; i--; ) t.addEventListener(this._events[i], this, !1);
   this.video = t;
+  this.evs = Object.create(null);
   this.file = new VideoFile(e);
   this.stream = new VideoStream(this.file.fetch(0), t, {
     bufferDuration: 1.8 * MAX_BUF_SECONDS
@@ -117,12 +124,12 @@ VideoFile.prototype.cacheadd = function(e, t) {
     this.cache[e] = t;
     this.cachemru[e] = this.mru++;
     this.cachesize += t.byteLength;
-    if (this.cachesize > MAX_CACHE) {
+    if (this.cachesize > this.maxCache) {
       var r = this, s = this.cachepos.slice(0);
       s.sort(function(e, t) {
         return (r.cachemru[e] > r.cachemru[t]) - (r.cachemru[e] < r.cachemru[t]);
       });
-      for (var a = 0; this.cachesize > MIN_CACHE; a++) {
+      for (var a = 0; this.cachesize > this.minCache; a++) {
         var h = s[a];
         this.cachesize -= this.cache[h].byteLength;
         delete this.cache[h];
@@ -133,9 +140,27 @@ VideoFile.prototype.cacheadd = function(e, t) {
   }
 };
 
+VideoFile.prototype.fetcher = function(e, t, i) {
+  return M.gfsfetch(e, t, i);
+};
+
+VideoFile.prototype.fileReader = function(e, t, i) {
+  return new Promise(function(r, s) {
+    var a = e.slice(t, i), h = new FileReader();
+    h.onload = function() {
+      r({
+        buffer: h.result,
+        s: e.size
+      });
+    };
+    h.onerror = s;
+    h.readAsArrayBuffer(a);
+  });
+};
+
 VideoFile.prototype.fetch = function(e, t) {
   var i, r = this, s = e;
-  if (t && this.paused && this.cachesize >= MIN_CACHE) d && console.debug("[VideoFile.fetch()] MIN_CACHE reached, will not fetch more data until no longer %s...", this.paused ? "paused" : "throttled"); else if (void 0 !== this.mru) {
+  if (t && this.paused && this.cachesize >= this.minCache) d && console.debug("[VideoFile.fetch()] MIN_CACHE reached, will not fetch more data until no longer %s...", this.paused ? "paused" : "throttled"); else if (void 0 !== this.mru) {
     this.curfetch += !t;
     var a;
     do {
@@ -162,11 +187,11 @@ VideoFile.prototype.fetch = function(e, t) {
       this.fetching[s] = a;
       var o = this.curfetch;
       d && console.debug("Fetching %s-%s, length=%s...", s, s + a, a);
-      M.gfsfetch(this.data, s, s + a).done(function(e) {
+      this.fetcher(this.data, s, s + a).then(function(e) {
         var t = e.buffer;
         delete e.buffer;
         if (void 0 !== r.mru) {
-          r.data = e;
+          "string" == typeof r.data && (r.data = e);
           r.filesize < 0 && (r.filesize = e.s);
           delete r.fetching[s];
           r.cacheadd(s, t);
@@ -174,21 +199,21 @@ VideoFile.prototype.fetch = function(e, t) {
           o === r.curfetch && setTimeout(r.fetch.bind(r, s, 1), 100);
           r.feedPlayer();
         }
-      }).fail(function(i) {
+      }).catch(function(i, a) {
         if (void 0 !== r.mru) {
           delete r.fetching[s];
-          var a = function() {
+          var h = function() {
             setImmediate(r.fetch.bind(r, e, t));
           };
-          if ("number" == typeof i) r._vs._onError(new Error(api_strerror(i))); else if (509 === i.target.status) {
+          if ("number" == typeof i) (i !== ERANGE || s < a.s) && r._vs._onError(new Error(api_strerror(i))); else if (509 === i.target.status) {
             d && console.warn("stream overquota, holding...", i);
             dlmanager.showOverQuotaDialog(function() {
               dlmanager.onNolongerOverquota();
-              a();
+              h();
             });
           } else {
             d && console.warn("stream fetch error, retrying...", i);
-            a();
+            h();
           }
         }
       });
@@ -207,6 +232,27 @@ VideoFile.prototype.feedPlayer = function() {
 };
 
 Streamer.prototype = Object.create(null);
+
+Streamer.prototype.destroy = function() {
+  var e, t = Object.keys(this.file);
+  d && console.debug("Destroying Streamer instance.", this);
+  try {
+    this.stream.destroy();
+  } catch (e) {
+    console.warn(e);
+  }
+  if (this.video) {
+    for (e = this._events.length; e--; ) this.video.removeEventListener(this._events[e], this);
+    if (this.video.parentNode) {
+      var i = this.video, r = i.cloneNode(), s = i.parentNode;
+      s.removeChild(i);
+      s.appendChild(r);
+    }
+  }
+  for (e = t.length; e--; ) delete this.file[t[e]];
+  delete this.file;
+  delete this.video;
+};
 
 Streamer.prototype.handleEvent = function(e) {
   var t = e.target, i = this.file;
@@ -228,7 +274,6 @@ Streamer.prototype.handleEvent = function(e) {
     if ("playing" === e.type) {
       i.playing = !0;
       i.seeking = !1;
-      this.onPlayBack && onIdle(this.onPlayBack.bind(this));
     }
     break;
 
@@ -250,8 +295,15 @@ Streamer.prototype.handleEvent = function(e) {
     if (i.throttle && i.throttle - t.currentTime < MAX_BUF_SECONDS / 3) {
       d && console.debug("[Streamer.timeupdate] Throttle threshold %s reached at playback time %s, resuming...", secondsToTime(i.throttle), secondsToTime(t.currentTime), !!i.stream);
       i.throttle = 0;
-      i.stream ? i.stream._read(0) : console.warn("no stream on timeupdate");
+      i.stream && i.stream._read(0);
     }
+  }
+  if (this.evs[e.type]) {
+    var r = "error" === e.type && this.stream.detailedError || !1;
+    this.evs[e.type] = this.evs[e.type].filter(function(t) {
+      return t(e, r);
+    });
+    this.evs[e.type].length || delete this.evs[e.type];
   }
 };
 
@@ -266,37 +318,59 @@ Streamer.prototype.play = function() {
   } catch (e) {}
 };
 
-Streamer.prototype.onplayback = function(e) {
-  this.onPlayBack = function() {
-    e.call(this) < 0 && (this.onPlayBack = null);
+Streamer.prototype.on = function(e, t, i) {
+  t = tryCatch(t.bind(this), i);
+  this.evs[e] ? this.evs[e].push(t) : this.evs[e] = [ t ];
+  return this;
+};
+
+Streamer.prototype.getImage = function(e, t) {
+  var i = this, r = this.video;
+  return new Promise(function _(s, a) {
+    if (!r.videoWidth) return a(-9);
+    var h = i.dim(r.videoWidth, r.videoHeight, e || 1280, t || 720);
+    d && console.debug("[Streamer.getImage()] Taking %sx%s image from %sx%s at %s", h.width, h.height, r.videoWidth, r.videoHeight, secondsToTime(r.currentTime));
+    var o = document.createElement("canvas"), n = o.getContext("2d");
+    o.width = Math.round(h.width);
+    o.height = Math.round(h.height);
+    n.drawImage(r, 0, 0, o.width, o.height);
+    for (var c, f = n.getImageData(0, 0, o.width, o.height).data, l = c = f.byteLength, u = 0; c--; ) f[c] < 10 && u++;
+    if (Math.round(100 * u / l) > 70) {
+      d && console.debug("[Streamer.getImage()] Got +70% of black pixels, retrying...");
+      r.paused ? a(-5) : r.ended ? a(-8) : setTimeout(_.bind(this, s, a), 800);
+    } else s(dataURLToAB(o.toDataURL("image/png")));
+  });
+};
+
+Streamer.prototype.dim = function(e, t, i, r) {
+  var s = Math.min(i / e, r / t);
+  return {
+    width: e * s,
+    height: t * s,
+    ratio: s
   };
 };
 
-Streamer.prototype.onerror = function(e) {
-  var t = this;
-  this.file._onError = function() {
-    d && console.debug("ct=%s, buf=%s", t.video.currentTime, t.stream.bufTime);
-    e.apply(this, arguments);
-  };
-};
-
-Streamer.prototype.destroy = function() {
-  var e, t = Object.keys(this.file);
-  d && console.debug("Destroying Streamer instance.", this);
-  try {
-    this.stream.destroy();
-  } catch (e) {
-    console.warn(e);
-  }
-  if (this.video) {
-    for (e = this._events.length; e--; ) this.video.removeEventListener(this._events[e], this);
-    var i = this.video, r = i.cloneNode(), s = i.parentNode;
-    s.removeChild(i);
-    s.appendChild(r);
-  }
-  for (e = t.length; e--; ) delete this.file[t[e]];
-  delete this.file;
-  delete this.video;
+Streamer.getThumbnail = function(e) {
+  return new Promise(function(t, i) {
+    var r = document.createElement("video");
+    r.muted = !0;
+    var s = -1, a = Streamer(e, r), h = function(e) {
+      a.destroy();
+      i(e);
+    };
+    a.on("playing", function() {
+      if (!++s) {
+        r.currentTime = 20 * r.duration / 100;
+        return !0;
+      }
+      a.getImage().then(function(e) {
+        t(e);
+        a.destroy();
+      }).catch(h);
+    });
+    a.on("error", h);
+  });
 };
 
 /**
@@ -304,7 +378,9 @@ Streamer.prototype.destroy = function() {
  *  @preserve
  *  @name Streamer
  */
-self.Streamer = module.exports = Streamer;
+Object.defineProperty(self, "Streamer", {
+  value: Object.freeze(Streamer)
+});
 },{"../":34,"/bundle/utils":2,"buffer":6,"readable-stream":29}],2:[function(require,module,exports){
 var Buffer = require("buffer").Buffer, onNextTick = function(e) {
   setTimeout(e, 0);
@@ -596,6 +672,7 @@ MP4Remuxer.prototype._findSampleBefore = function(e, t) {
     return e.dts + e.presentationOffset - t;
   });
   -1 === i ? i = 0 : i < 0 && (i = -i - 2);
+  if (i < 1) return 0;
   for (;!r.samples[i].sync; ) i--;
   return i;
 };
@@ -1157,7 +1234,7 @@ function toHex(e) {
 }
 
 function utf8ToBytes(e, t) {
-  t = t || 1 / 0;
+  t = t || Infinity;
   for (var r, n = e.length, f = null, i = [], o = 0; o < n; ++o) {
     if ((r = e.charCodeAt(o)) > 55295 && r < 57344) {
       if (!f) {
@@ -2046,57 +2123,57 @@ EventEmitter.listenerCount = function(e, t) {
   return e.listenerCount(t);
 };
 },{}],9:[function(require,module,exports){
-exports.read = function(a, o, t, r, e) {
-  var f, h, M = 8 * e - r - 1, i = (1 << M) - 1, p = i >> 1, w = -7, s = t ? e - 1 : 0, N = t ? -1 : 1, l = a[o + s];
-  s += N;
-  f = l & (1 << -w) - 1;
-  l >>= -w;
-  w += M;
-  for (;w > 0; f = 256 * f + a[o + s], s += N, w -= 8) ;
-  h = f & (1 << -w) - 1;
-  f >>= -w;
-  w += r;
-  for (;w > 0; h = 256 * h + a[o + s], s += N, w -= 8) ;
-  if (0 === f) f = 1 - p; else {
-    if (f === i) return h ? NaN : 1 / 0 * (l ? -1 : 1);
-    h += Math.pow(2, r);
-    f -= p;
+exports.read = function(t, a, o, f, i) {
+  var r, e, h = 8 * i - f - 1, M = (1 << h) - 1, p = M >> 1, n = -7, w = o ? i - 1 : 0, s = o ? -1 : 1, N = t[a + w];
+  w += s;
+  r = N & (1 << -n) - 1;
+  N >>= -n;
+  n += h;
+  for (;n > 0; r = 256 * r + t[a + w], w += s, n -= 8) ;
+  e = r & (1 << -n) - 1;
+  r >>= -n;
+  n += f;
+  for (;n > 0; e = 256 * e + t[a + w], w += s, n -= 8) ;
+  if (0 === r) r = 1 - p; else {
+    if (r === M) return e ? NaN : Infinity * (N ? -1 : 1);
+    e += Math.pow(2, f);
+    r -= p;
   }
-  return (l ? -1 : 1) * h * Math.pow(2, f - r);
+  return (N ? -1 : 1) * e * Math.pow(2, r - f);
 };
 
-exports.write = function(a, o, t, r, e, f) {
-  var h, M, i, p = 8 * f - e - 1, w = (1 << p) - 1, s = w >> 1, N = 23 === e ? Math.pow(2, -24) - Math.pow(2, -77) : 0, l = r ? 0 : f - 1, n = r ? 1 : -1, u = o < 0 || 0 === o && 1 / o < 0 ? 1 : 0;
-  o = Math.abs(o);
-  if (isNaN(o) || o === 1 / 0) {
-    M = isNaN(o) ? 1 : 0;
-    h = w;
+exports.write = function(t, a, o, f, i, r) {
+  var e, h, M, p = 8 * r - i - 1, n = (1 << p) - 1, w = n >> 1, s = 23 === i ? Math.pow(2, -24) - Math.pow(2, -77) : 0, N = f ? 0 : r - 1, l = f ? 1 : -1, u = a < 0 || 0 === a && 1 / a < 0 ? 1 : 0;
+  a = Math.abs(a);
+  if (isNaN(a) || Infinity === a) {
+    h = isNaN(a) ? 1 : 0;
+    e = n;
   } else {
-    h = Math.floor(Math.log(o) / Math.LN2);
-    if (o * (i = Math.pow(2, -h)) < 1) {
-      h--;
-      i *= 2;
+    e = Math.floor(Math.log(a) / Math.LN2);
+    if (a * (M = Math.pow(2, -e)) < 1) {
+      e--;
+      M *= 2;
     }
-    if ((o += h + s >= 1 ? N / i : N * Math.pow(2, 1 - s)) * i >= 2) {
-      h++;
-      i /= 2;
+    if ((a += e + w >= 1 ? s / M : s * Math.pow(2, 1 - w)) * M >= 2) {
+      e++;
+      M /= 2;
     }
-    if (h + s >= w) {
-      M = 0;
-      h = w;
-    } else if (h + s >= 1) {
-      M = (o * i - 1) * Math.pow(2, e);
-      h += s;
-    } else {
-      M = o * Math.pow(2, s - 1) * Math.pow(2, e);
+    if (e + w >= n) {
       h = 0;
+      e = n;
+    } else if (e + w >= 1) {
+      h = (a * M - 1) * Math.pow(2, i);
+      e += w;
+    } else {
+      h = a * Math.pow(2, w - 1) * Math.pow(2, i);
+      e = 0;
     }
   }
-  for (;e >= 8; a[t + l] = 255 & M, l += n, M /= 256, e -= 8) ;
-  h = h << e | M;
-  p += e;
-  for (;p > 0; a[t + l] = 255 & h, l += n, h /= 256, p -= 8) ;
-  a[t + l - n] |= 128 * u;
+  for (;i >= 8; t[o + N] = 255 & h, N += l, h /= 256, i -= 8) ;
+  e = e << i | h;
+  p += i;
+  for (;p > 0; t[o + N] = 255 & e, N += l, e /= 256, p -= 8) ;
+  t[o + N - l] |= 128 * u;
 };
 },{}],10:[function(require,module,exports){
 function MediaElementWrapper(e, r) {
@@ -5308,9 +5385,8 @@ function VideoStream(e, r, t) {
   i._tracks = null;
   "none" !== i._elem.preload && i._createMuxer();
   i._onError = function(e) {
-    i.detailedError = i._elemWrapper.detailedError;
+    i.detailedError = i._elemWrapper.detailedError || e;
     d && console.error("VideoStream Error.", e, i.detailedError);
-    i._file._onError && i._file._onError(e, i.detailedError || e, i);
     i.destroy();
   };
   i._onWaiting = function() {
@@ -5413,7 +5489,7 @@ VideoStream.prototype.destroy = function() {
     }
     String(this._elem.src).startsWith("blob:") && URL.revokeObjectURL(this._elem.src);
     this._elem.src = "";
-    this._elem = null;
+    this._elem = !1;
   }
 };
 

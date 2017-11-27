@@ -575,6 +575,12 @@ ChatRoom.prototype.show = function() {
 
     self.trigger('activity');
     self.trigger('onChatShown');
+
+    Soon(function() {
+        if (megaChat.$conversationsAppInstance) {
+            megaChat.$conversationsAppInstance.safeForceUpdate();
+        }
+    });
 };
 
 /**
@@ -584,6 +590,9 @@ ChatRoom.prototype.isActive = function() {
     return document.hasFocus() && this.isCurrentlyActive;
 };
 
+/**
+ * Shows the current room (changes url if needed)
+ */
 ChatRoom.prototype.setActive = function() {
     // We need to delay this, since it can get called BY openFolder and it would then call again openFolder, which
     // would cause .currentdirid to not be set correctly.
@@ -594,6 +603,22 @@ ChatRoom.prototype.setActive = function() {
 };
 
 
+/**
+ * Returns true if messages are still being retrieved from chatd OR in decrypting state
+ * (e.g. nothing to render in the messages history pane yet)
+ * @returns {MegaPromise|boolean}
+ */
+ChatRoom.prototype.isLoading = function() {
+    var self = this;
+    var mb = self.messagesBuff;
+    return (mb.messagesHistoryIsLoading() || (mb.isDecrypting && mb.isDecrypting.state() === 'pending'));
+};
+
+/**
+ * Returns relative url for this room
+ *
+ * @returns {string}
+ */
 ChatRoom.prototype.getRoomUrl = function() {
     var self = this;
     if (self.type === "private") {

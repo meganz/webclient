@@ -922,7 +922,9 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
         $('#' + itemHandle + ' .shared-folder-info-block .shared-folder-name').text(newItemName);
 
         // DOM update, right panel view during browsing shared content
-        $('.shared-details-block .shared-details-pad .shared-details-folder-name').text(newItemName);
+        if (M.currentdirid === itemHandle) {
+            $('.shared-details-block .shared-details-pad .shared-details-folder-name').text(newItemName);
+        }
 
         // DOM update, breadcrumbs in 'Shared with me' tab
         if ($('#path_' + itemHandle).length > 0) {

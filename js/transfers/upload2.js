@@ -644,12 +644,21 @@ var ulmanager = {
             ulQueue.pushFirst(new ChunkUpload(file, 0, 0));
         }
 
-        var isi = have_ab && !file.faid && is_image(file.name);
-        if (isi) {
-            file.faid = ++ulmanager.ulFaId;
-            createthumbnail(file, file.ul_aes, ulmanager.ulFaId, null, null, {
-                raw: isi !== 1 && isi
-            });
+        if (!file.faid) {
+            var img = is_image(file.name);
+            var vid = is_video(file.name);
+
+            if (img || vid) {
+                file.faid = ++ulmanager.ulFaId;
+
+                createthumbnail(
+                    file,
+                    file.ul_aes,
+                    file.faid,
+                    null, null,
+                    {raw: img !== 1 && img, isVideo: vid}
+                );
+            }
         }
 
         M.ulstart(file);

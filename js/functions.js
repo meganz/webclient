@@ -260,7 +260,15 @@ function secondsToTimeShort(secs) {
  */
 function numOfBytes(bytes, precision) {
 
-    var parts = bytesToSize(bytes, precision || 2).split(' ');
+    'use strict';
+
+    // If not defined, default to 2dp (this still allows setting precision to 0 for 0dp)
+    if (typeof precision === 'undefined') {
+        precision = 2;
+    }
+
+    var parts = bytesToSize(bytes, precision).split(' ');
+
     return { size: parts[0], unit: parts[1] || 'B' };
 }
 

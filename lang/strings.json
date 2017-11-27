@@ -827,6 +827,10 @@
         "text": "Your payment provider is not listed? Please [A]e-mail us[\/A]",
         "context": ""
     },
+    "554": {
+        "text": "Complete",
+        "context": ""
+    },
     "555": {
         "text": "I agree with the MEGA [A]Reseller Terms of Service[\/A]",
         "context": ""
@@ -14607,6 +14611,10 @@
         "text": "Unlocked bonuses:",
         "context": "Header of block with achievements bonuses."
     },
+    "16406": {
+        "text": "[1]Park your MEGA account\r\n\r\n[2]It looks like you have forgotten your password and do not have a backup of your Recovery Key.\r\n\r\n[3]If you proceed, the existing account under this address will be parked (deactivated), and you will start a fresh account under your existing email address. By doing this you will lose access to your data, but the data will still be preserved for at least another 60 days. Should you remember the deactivated account's password or locate its previously exported Recovery Key, please contact [A1]support@mega.nz[\/A1] to have it restored.\r\n\r\n[4]Even if you manage to restore the deactivated account, all associated contacts and shares will remain deleted and need to be re-established.\r\n\r\n[5]Park my Account\r\n\r\n[6]Didn't work? No worries. Copy and paste this link below into your web browser:",
+        "context": "EDIT: Reworded to emphasise the word Park, to align with our website pages better.\r\n\r\nThe 'reset my account' email body received when somebody requests to park their account. MEGA needs them to click the link to confirm their password.\r\n\r\nPlease do not translate or modify anything inside square brackets (do not change [1] or [A1] )"
+    },
     "16407": {
         "text": "[1]Best regards,[BR]\u2014 Team MEGA",
         "context": "The footer for our emails. Please do not translate anything inside square brackets (do not translate the [1] or the [BR]. The [BR] corresponds to a line break and will be replaced)"
@@ -14682,6 +14690,10 @@
     "16430": {
         "text": "[1]MEGA Confirm New Email\r\n\r\n[2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:\r\n\r\n[3]Confirm New Email\r\n\r\n[4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.\r\n",
         "context": "Email body for when a user needs to confirm their new email address. It emphasises that it will not be a second email, but will replace their current one on their Mega account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16431": {
+        "text": "[1]MEGA Password Reset\r\n\r\n[2]You can easily reset your MEGA account password with your Recovery Key.\r\n\r\n[3]Reset your password\r\n\r\n[4]This request originated from IP address: [R][$cred][\/R]",
+        "context": "EDIT: Recovery changed to reset a few times.\r\n\r\nEmail body for the password reset email where the user has their Master Key (Recovery Key)\r\nPlease do not translate the text inside square brackets (i.e. leave the [1],[$cred], and [R] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16432": {
         "text": "You can also earn more free storage and transfer quota by achieving bonuses. For example, by installing our software or inviting friends to MEGA.",
@@ -17320,8 +17332,8 @@
         "context": "Description for the collaboration with others help section"
     },
     "17226": {
-        "text": "[B]Right click[\/B] on any folder or file you wish to share.",
-        "context": "Step one of how to collaborate with others on the mega.nz website"
+        "text": "[B]Right click[\/B] on any folder you wish to share.",
+        "context": "Step one of how to collaborate with others on the mega.nz website."
     },
     "17227": {
         "text": "Click on [W13][B]Sharing[\/B][\/W13] in the context menu.",
@@ -17886,5 +17898,89 @@
     "17525": {
         "text": "used %tq2",
         "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[pair] (= 2)"
+    },
+    "17526": {
+        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card? Please try to save\/copy the file to your device's internal memory instead.",
+        "context": "A dialog message which is displayed when the process\/request to copy a file failed because the app or the user don't have write permission to copy into the destination (i.e. copy an unsupported file type into an SD card)."
+    },
+    "17527": {
+        "text": "Failed to open the internal file\/folder of the link. Please try again.",
+        "context": "The title of a dialog which is displayed when there was a failure trying to open the link of an internal node."
+    },
+    "17528": {
+        "text": "Failed to open the internal file\/folder",
+        "context": "The title of a dialog which is displayed when there was a failure trying to open the link of an internal file\/folder node."
+    },
+    "17529": {
+        "text": "Failed to clear cache. Please try again.",
+        "context": "A message on the dialog which is displayed when the process to clear the cache failed."
+    },
+    "17530": {
+        "text": "Clear cache failed",
+        "context": "The title of a dialog which is displayed when the process to clear the cache failed."
+    },
+    "17533": {
+        "text": "MEGAdrop is unavailable",
+        "context": "The MEGAdrop window title when the provided URL is not valid."
+    },
+    "17534": {
+        "text": "Either the MEGAdrop link has been cancelled by the owner or the URL you have provided is incorrect.",
+        "context": "Explanation for a wrong MEGAdrop URL."
+    },
+    "17535": {
+        "text": "Account storage limit has been reached.",
+        "context": "A dialog message on the MEGAdrop overquota popup."
+    },
+    "17536": {
+        "text": "The owner of this MEGAdrop folder has reached their account storage limit and cannot accept any more uploads. Please contact them about upgrading their plan.",
+        "context": "An explanation on the MEGAdrop overquota popup."
+    },
+    "17537": {
+        "text": "This MEGAdrop is full, please try again later.",
+        "context": "An explanation on the MEGAdrop over quota window."
+    },
+    "17539": {
+        "text": "MEGA accesses your photo library to save your photos or videos in case you need to do so.",
+        "context": "This is a message about why write-only access to the user\u2019s photo library description is required. To protect user privacy, Apple requires a purpose string explaining why this will be accessed."
+    },
+    "17540": {
+        "text": "Calling...",
+        "context": "A label which is shown when you receive an incoming call. This is shown before accepting and starting the call."
+    },
+    "17541": {
+        "text": "Received",
+        "context": "The title of one of the filters in the 'Contacts requests' section. If 'Received' is selected, it will only show the requests which have been received."
+    },
+    "17542": {
+        "text": "Buy PRO",
+        "context": "A button title that shows the different MEGA PRO plans to which you can upgrade."
+    },
+    "17543": {
+        "text": "Not achieved",
+        "context": "A string used in the mobile webclient to indicate that the bonus (reward) has not been achieved yet."
+    },
+    "17544": {
+        "text": "Invitation sent! Invite another.",
+        "context": "A message which is shown after successfully inviting a user. It informs that the previous action was a success, and that they can send another."
+    },
+    "17545": {
+        "text": "Invite already sent, waiting for response.",
+        "context": "A message on an error dialog explaining that they already sent an invite to that email address and that the system is waiting for a response from that user."
+    },
+    "17546": {
+        "text": "This user has already sent you an invitation.",
+        "context": "An error message after just trying to send a user an invite which explains that the user already sent them an invitation first."
+    },
+    "17547": {
+        "text": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+        "context": "A description of why write-only access to the user\u2019s photo library is needed. To protect user privacy Apple requires a purpose string explaining why this will be accessed."
+    },
+    "17548": {
+        "text": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+        "context": "A dialog message in the mobile webclient informing the user that their account will return to the free plan after their currenly paid for subscription runs out if they choose to confirm in cancelling their subscription."
+    },
+    "17549": {
+        "text": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+        "context": "A message in a popup dialog explaining that there is an update available for the Firefox Legacy extension which works on browsers such as Pale Moon."
     }
 }

@@ -328,3 +328,7 @@
     display: block;
     width: auto;
 }
+
+.message pre.rtf-single, .message pre.rtf-multi {
+    white-space: pre-wrap;
+}

@@ -603,14 +603,10 @@ var slideshowid;
             $overlay.find('.viewer-progress').addClass('hidden');
             $overlay.find('.viewer-image-bl img').addClass('hidden');
             $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
-            if (ua.details.browser !== 'Edge' && ua.details.engine !== 'Trident') {
-                $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);
-            }
-            else { // some other browser
-                // to fix pdf compatibility - Bug #7796
-                localStorage.setItem('currPdfPrev2', JSON.stringify(src));
-                prepareAndViewPdfViewer();
-            }
+            // preview pdfs using pdfjs for all browsers #8036
+            // to fix pdf compatibility - Bug #7796
+            localStorage.setItem('currPdfPrev2', JSON.stringify(src));
+            prepareAndViewPdfViewer();
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }

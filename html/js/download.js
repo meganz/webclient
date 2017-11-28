@@ -579,10 +579,13 @@ function importFile() {
     'use strict';
     var filename = null;
     var file = null;
+    var ph = null;
+    var key = null;
+    var attr = null;
     if (dl_import) {
-        var ph  = dl_import[0];
-        var key = dl_import[1];
-        var attr = dl_attr;
+        ph  = dl_import[0];
+        key = dl_import[1];
+        attr = dl_attr;
     }
     if (key) {
         var base64key = String(key).trim();
@@ -590,25 +593,25 @@ function importFile() {
         if (dkey.length === 8) {
             var dl_a = base64_to_ab(attr);
             file = dec_attr(dl_a, dkey);
-            filename =file.n;
+            filename = file.n;
         }
     }
     if (filename) {
-        var f ={
+        var f = {
             target:M.RootID,
             t:0,
             name:filename,
             size:fdl_filesize,
             // FIXME: it can not get the last modification time from file link, it uses the present time instead.
             lastModified: (new Date()).getTime()
-        }
+        };
         fileconflict.check([f], M.RootID, 'import').
-            done(function (files) {
-                if (files.length > 0) {
-                    for (var i = 0; i < files.length; i++) {
-                        // Import as version
-                        if (files[i]._replaces) {
-                            api_req({
+        done(function (files) {
+            if (files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    // Import as version
+                    if (files[i]._replaces) {
+                        api_req({
                             a: 'p',
                             t: M.RootID,
                             n: [{
@@ -618,26 +621,26 @@ function importFile() {
                                 k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(key).slice(0, 8))),
                                 ov: files[i]._replaces
                             }]
-                            }, {
-                                callback: function (r) {
-                                    if (typeof r === 'object') {
-                                        $.onRenderNewSelectNode = r.f[0].h;
-                                    }
-                                    else {
-                                        M.ulerror(null, r);
-                                    }
+                        }, {
+                            callback: function (r) {
+                                if (typeof r === 'object') {
+                                    $.onRenderNewSelectNode = r.f[0].h;
                                 }
-                            });
-                        }
-                        // Import as same/different name
-                        else {
-                            var n = {
-                                name: files[i].name,
-                                hash: file.c,
-                                k: base64_to_a32(key).slice(0, 8)
-                            };
-                            var ea = ab_to_base64(crypto_makeattr(n));
-                            api_req({
+                                else {
+                                    M.ulerror(null, r);
+                                }
+                            }
+                        });
+                    }
+                    // Import as same/different name
+                    else {
+                        var n = {
+                            name: files[i].name,
+                            hash: file.c,
+                            k: base64_to_a32(key).slice(0, 8)
+                        };
+                        var ea = ab_to_base64(crypto_makeattr(n));
+                        api_req({
                             a: 'p',
                             t: M.RootID,
                             n: [{
@@ -646,18 +649,18 @@ function importFile() {
                                 a: ea,
                                 k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(key).slice(0, 8))),
                             }]
-                            }, {
-                                callback: function (r) {
-                                    if (typeof r === 'object') {
-                                        $.onRenderNewSelectNode = r.f[0].h;
-                                    }
-                                    else {
-                                        M.ulerror(null, r);
-                                    }
+                        }, {
+                            callback: function (r) {
+                                if (typeof r === 'object') {
+                                    $.onRenderNewSelectNode = r.f[0].h;
                                 }
-                            });
-                        }
+                                else {
+                                    M.ulerror(null, r);
+                                }
+                            }
+                        });
                     }
+                }
             }
         });
     }

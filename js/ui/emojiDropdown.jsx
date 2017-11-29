@@ -139,8 +139,6 @@ var DropdownEmojiSelector = React.createClass({
         </div>;
     },
     componentWillUpdate: function(nextProps, nextState) {
-        window.$emojiDropdown = this;
-
         if (
             nextState.searchValue !== this.state.searchValue ||
             nextState.browsingCategories !== this.state.browsingCategories
@@ -410,8 +408,9 @@ var DropdownEmojiSelector = React.createClass({
 
             preview = <div className="emoji-preview">
                 {self._generateEmoji(meta)}
-                <div className="emoji title">{":" + meta.n + ":"}</div>
+                <div className="emoji title">{":" + meta.u + ":"}</div>
             </div>;
+            console.log(meta);
         }
 
 

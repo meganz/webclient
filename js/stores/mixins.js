@@ -410,7 +410,7 @@ var MegaRenderMixin = {
             }
         }
 
-        if (!this.isComponentEventuallyVisible()) {
+        if (!this.props.disableCheckingVisibility && !this.isComponentEventuallyVisible()) {
             if (window.RENDER_DEBUG) {
                 console.error(
                     "shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState

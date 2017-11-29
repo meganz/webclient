@@ -4494,5 +4494,17 @@
     "17546": "This user has already sent you an invitation.",
     "17547": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
     "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+    "17550": "A folder named %1 already exists in this location.",
+    "17551": "Copy and merge",
+    "17552": "Merge the folder at the destination with the folder you are copying:",
+    "17553": "Move and merge",
+    "17554": "Merge the folder at the destination with the folder you are moving:",
+    "17555": "Upload and merge",
+    "17556": "Select whether you want to merge the folders:",
+    "17557": "The link you are trying to access is not valid.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:"
 }

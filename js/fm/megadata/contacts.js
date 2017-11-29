@@ -548,15 +548,11 @@ MegaData.prototype.getContacts = function(n) {
 };
 
 MegaData.prototype.syncUsersFullname = function(userId) {
+    "use strict";
     var self = this;
 
-    if (this.u[userId].firstName || this.u[userId].lastName) {
-        // already loaded.
-        return;
-    }
-
-    var lastName = {name: 'lastname', value: null};
-    var firstName = {name: 'firstname', value: null};
+    var lastName = {name: 'lastname', value: undefined};
+    var firstName = {name: 'firstname', value: undefined};
 
     MegaPromise.allDone([
         mega.attr.get(userId, 'firstname', -1)
@@ -613,7 +609,12 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
         if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
             self.u[userId].avatar = false;
-            useravatar.loaded(userId); // FIXME: why is this needed here?
+
+            // FIXME: why is this needed here? Should be removed elsewhere
+            // Also should check is .type != "image" valid condition
+            // In case that contact updates his profile image it will be updated on owners side
+            // i.e. Avatar of full contact will be changed in realtime on contacts tab etc.
+            useravatar.loaded(userId);
         }
 
         if (userId === u_handle) {
@@ -626,11 +627,6 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             $('.membership-big-txt.name:visible').text(
                 u_attr.name
             );
-
-            // XXX: why are we invalidating avatars on first/last-name change?
-            /*if (fminitialized) {
-             M.avatars(u_handle);
-             }*/
         }
     });
 };
@@ -684,11 +680,28 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 delete cleanedUpUserData.presence;
                 delete cleanedUpUserData.presenceMtime;
                 delete cleanedUpUserData.shortName;
+                delete cleanedUpUserData.firstName;
+                delete cleanedUpUserData.lastName;
                 delete cleanedUpUserData.name;
                 delete cleanedUpUserData.avatar;
                 fmdb.add('u', {u: u.u, d: cleanedUpUserData});
             }
 
+            // On every new full contact relation re/established we want
+            // atributes refreshed, not to read from cache because in case
+            // that contact changed data and relation is re-established
+            // cached attributes will be wrong until hard refresh
+            if (attribCache) {
+                var cacheKey = userId + '_firstname';
+                attribCache.removeItem(cacheKey);
+                cacheKey = userId + '_lastname';
+                attribCache.removeItem(cacheKey);
+            }
+            else {
+                if (d) {
+                    console.warn('addUser: attribCache.removeItem function is not available cached data are used');
+                }
+            }
             this.syncUsersFullname(userId);
         }
     };

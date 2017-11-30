@@ -54,15 +54,16 @@ git checkout -b $current_branch-squashed
 # If the checkout succeeded, all good
 if [ $? -eq 0 ]; then
     echo
-    echo "4. Created new branch $current_branch-squashed"
+    echo "3. Created new branch $current_branch-squashed"
     echo "---"
 else
     # Otherwise reset the branch back to prior commit (should be same as current develop now)
     # This is done to preserve commit history in GitLab because deleting the squashed branch and remaking loses history
     git checkout $current_branch-squashed
     git reset --hard HEAD^
+
     echo
-    echo "4. Reset of origin/$current_branch-squashed back to prior commit complete"
+    echo "3. Reset of origin/$current_branch-squashed back to prior commit complete"
     echo "---"
 fi
 
@@ -71,13 +72,13 @@ git apply $current_branch.diff
 rm $current_branch.diff
 git status
 echo
-echo "5. Applied $current_branch.diff"
+echo "4. Applied $current_branch.diff"
 echo "---"
 
 # Add all the files and read in a commit message for the squashed branch
 git add .
 echo
-echo "6. Added files. Enter commit message for the squashed branch (e.g. 5163: Ticket title):"
+echo "5. Added files. Enter commit message for the squashed branch (e.g. 5163: Ticket title):"
 read commitMessage
 
 # Commit the changes and try push as a new squashed branch
@@ -87,9 +88,13 @@ git push -u origin $current_branch-squashed
 # If the push succeeds, then the -squashed branch didn't exist on origin so all good
 if [ $? -eq 0 ]; then
     echo
-    echo "7. Pushed new branch $current_branch-squashed. All done."
+    echo "6. Pushed new branch $current_branch-squashed. All done."
     echo "---"
 else
+    echo
+    echo "6. Branch already exists on origin. Force pushing squashed branch $current_branch-squashed instead..."
+    echo "---"
+
     # If the push failed then the squashed branch already exists on origin so force push the changes
     # This will retain one single commit on the -squashed branch and retain the history of recent changes on GitLab
     git push -f origin $current_branch-squashed

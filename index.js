@@ -103,9 +103,10 @@ function topMenu(close) {
         $('.top-icon.menu').removeClass('active');
         $('.top-menu-popup').addClass('hidden');
 
+        // If on mobile, hide the menu and also remove the close click/tap handler on the dark background overlay
         if (is_mobile) {
             $('html').removeClass('overlayed');
-            $('.mobile.dark-overlay').addClass('hidden').removeClass('active');
+            $('.mobile.dark-overlay').addClass('hidden').removeClass('active').off('tap');
         }
         $(window).unbind('resize.topmenu');
     }
@@ -123,8 +124,12 @@ function topMenu(close) {
             });
         }
         else {
+            // If on mobile, show the dark backround overlay behind the menu and if it's clicked, close the menu
             $('html').addClass('overlayed');
-            $('.mobile.dark-overlay').removeClass('hidden').addClass('active');
+            $('.mobile.dark-overlay').removeClass('hidden').addClass('active').off('tap').on('tap', function() {
+                topMenu(true);
+                return false;
+            });
         }
     }
 }

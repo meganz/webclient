@@ -187,7 +187,7 @@ function start_counts() {
 }
 
 start_APIcount_inflight = false;
-
+var start_APIcountdata;
 function start_APIcount() {
     "use strict";
 

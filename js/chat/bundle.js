@@ -58,7 +58,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var ConversationsUI = __webpack_require__(4);
-	var ChatRoom = __webpack_require__(27);
+	var ChatRoom = __webpack_require__(28);
 
 	var EMOJI_DATASET_VERSION = 2;
 
@@ -2338,7 +2338,7 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 
-	        if (!this.isComponentEventuallyVisible()) {
+	        if (!this.props.disableCheckingVisibility && !this.isComponentEventuallyVisible()) {
 	            if (window.RENDER_DEBUG) {
 	                console.error(
 	                    "shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState
@@ -3759,16 +3759,16 @@ React.makeElement = React['createElement'];
 	var ContactsUI = __webpack_require__(10);
 	var ConversationsUI = __webpack_require__(4);
 	var TypingAreaUI = __webpack_require__(16);
-	var WhosTyping = __webpack_require__(18).WhosTyping;
-	var getMessageString = __webpack_require__(19).getMessageString;
+	var WhosTyping = __webpack_require__(19).WhosTyping;
+	var getMessageString = __webpack_require__(20).getMessageString;
 	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
-	var ParticipantsList = __webpack_require__(20).ParticipantsList;
+	var ParticipantsList = __webpack_require__(21).ParticipantsList;
 
-	var GenericConversationMessage = __webpack_require__(21).GenericConversationMessage;
-	var AlterParticipantsConversationMessage = __webpack_require__(23).AlterParticipantsConversationMessage;
-	var TruncatedMessage = __webpack_require__(24).TruncatedMessage;
-	var PrivilegeChange = __webpack_require__(25).PrivilegeChange;
-	var TopicChange = __webpack_require__(26).TopicChange;
+	var GenericConversationMessage = __webpack_require__(22).GenericConversationMessage;
+	var AlterParticipantsConversationMessage = __webpack_require__(24).AlterParticipantsConversationMessage;
+	var TruncatedMessage = __webpack_require__(25).TruncatedMessage;
+	var PrivilegeChange = __webpack_require__(26).PrivilegeChange;
+	var TopicChange = __webpack_require__(27).TopicChange;
 
 	var ConversationRightArea = React.createClass({
 	    displayName: "ConversationRightArea",
@@ -4921,15 +4921,18 @@ React.makeElement = React['createElement'];
 	                        onUpdate: function onUpdate() {
 	                            self.onResizeDoUpdate();
 	                        },
+	                        editing: self.state.editing === v.messageId || self.state.editing === v.pendingMessageId,
 	                        onEditStarted: function onEditStarted($domElement) {
 	                            self.editDomElement = $domElement;
-	                            self.setState({ 'editing': v });
+	                            self.setState({ 'editing': v.messageId });
 	                            self.forceUpdate();
 	                        },
 	                        onEditDone: function onEditDone(messageContents) {
 	                            self.editDomElement = null;
 
 	                            var currentContents = v.textContents;
+
+	                            v.edited = false;
 
 	                            if (messageContents === false || messageContents === currentContents) {
 	                                self.messagesListScrollable.scrollToBottom(true);
@@ -4967,6 +4970,7 @@ React.makeElement = React['createElement'];
 	                        },
 	                        onDeleteClicked: function onDeleteClicked(e, msg) {
 	                            self.setState({
+	                                'editing': false,
 	                                'confirmDeleteDialog': true,
 	                                'messageToBeDeleted': msg
 	                            });
@@ -5415,6 +5419,7 @@ React.makeElement = React['createElement'];
 	                                chatRoom: self.props.chatRoom,
 	                                messagesBuff: self.props.chatRoom.messagesBuff,
 	                                editDomElement: self.state.editDomElement,
+	                                editingMessageId: self.state.editing,
 	                                confirmDeleteDialog: self.state.confirmDeleteDialog
 	                            },
 	                            React.makeElement(
@@ -5451,7 +5456,7 @@ React.makeElement = React['createElement'];
 	                                persist: true,
 	                                onUpEditPressed: function onUpEditPressed() {
 	                                    var foundMessage = false;
-	                                    room.messagesBuff.messages.keys().reverse().forEach(function (k) {
+	                                    room.messagesBuff.messages.keys().reverse().some(function (k) {
 	                                        if (!foundMessage) {
 	                                            var message = room.messagesBuff.messages[k];
 
@@ -5459,16 +5464,17 @@ React.makeElement = React['createElement'];
 	                                            if (message.userId) {
 	                                                if (!M.u[message.userId]) {
 
-	                                                    return false;
+	                                                    return;
 	                                                }
 	                                                contact = M.u[message.userId];
 	                                            } else {
 
-	                                                return false;
+	                                                return;
 	                                            }
 
 	                                            if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && !message.requiresManualRetry && !message.deleted && (!message.type || message instanceof Message) && (!message.isManagement || !message.isManagement())) {
 	                                                foundMessage = message;
+	                                                return foundMessage;
 	                                            }
 	                                        }
 	                                    });
@@ -5476,7 +5482,7 @@ React.makeElement = React['createElement'];
 	                                    if (!foundMessage) {
 	                                        return false;
 	                                    } else {
-	                                        $('.message.body.' + foundMessage.messageId).trigger('onEditRequest');
+	                                        self.setState({ 'editing': foundMessage.messageId });
 	                                        self.lastScrolledToBottom = false;
 	                                        return true;
 	                                    }
@@ -7149,11 +7155,13 @@ React.makeElement = React['createElement'];
 	var ContactsUI = __webpack_require__(10);
 	var ConversationsUI = __webpack_require__(4);
 	var DropdownEmojiSelector = __webpack_require__(17).DropdownEmojiSelector;
+	var EmojiAutocomplete = __webpack_require__(18).EmojiAutocomplete;
 
 	var TypingArea = React.createClass({
 	    displayName: "TypingArea",
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
+	    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gui"),
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'textareaMaxHeight': "40%"
@@ -7163,6 +7171,7 @@ React.makeElement = React['createElement'];
 	        var initialText = this.props.initialText;
 
 	        return {
+	            emojiSearchQuery: false,
 	            typedMessage: initialText ? initialText : "",
 	            textareaHeight: 20
 	        };
@@ -7307,7 +7316,14 @@ React.makeElement = React['createElement'];
 	        var element = e.target;
 	        var val = $.trim(element.value);
 
+	        if (self.state.emojiSearchQuery) {
+	            return;
+	        }
 	        if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+
+	            if (e.isPropagationStopped() || e.isDefaultPrevented()) {
+	                return;
+	            }
 
 	            if (self.onConfirmTrigger(val) !== true) {
 	                self.setState({ typedMessage: "" });
@@ -7335,6 +7351,9 @@ React.makeElement = React['createElement'];
 	            e.stopPropagation();
 	            return;
 	        } else if (key === 13) {
+	            if (self.state.emojiSearchQuery) {
+	                return;
+	            }
 
 	            if (e.altKey) {
 	                var content = element.value;
@@ -7348,6 +7367,10 @@ React.makeElement = React['createElement'];
 	                e.preventDefault();
 	            }
 	        } else if (key === 38) {
+	            if (self.state.emojiSearchQuery) {
+	                return;
+	            }
+
 	            if ($.trim(val).length === 0) {
 	                if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
 	                    e.preventDefault();
@@ -7355,10 +7378,65 @@ React.makeElement = React['createElement'];
 	                }
 	            }
 	        } else if (key === 27) {
+	            if (self.state.emojiSearchQuery) {
+	                return;
+	            }
+
 	            if (self.props.showButtons === true) {
 	                e.preventDefault();
 	                self.onCancelClicked(e);
 	                return;
+	            }
+	        } else {
+	            var char = String.fromCharCode(key);
+	            if (key === 16 || key === 17 || key === 18 || key === 91 || key === 8 || key === 37 || key === 39 || key === 40 || key === 38 || key === 9 || char.match(self.validEmojiCharacters)) {
+	                var currentContent = element.value;
+	                var currentCursorPos = self.getCursorPosition(element) - 1;
+
+	                var startPos = false;
+	                var endPos = false;
+
+	                var matchedWord = "";
+	                var currentChar;
+	                for (var x = currentCursorPos; x >= 0; x--) {
+	                    currentChar = currentContent.substr(x, 1);
+	                    if (currentChar && currentChar.match(self.validEmojiCharacters)) {
+	                        matchedWord = currentChar + matchedWord;
+	                    } else {
+	                        startPos = x + 1;
+	                        break;
+	                    }
+	                }
+
+	                for (var x = currentCursorPos + 1; x < currentContent.length; x++) {
+	                    currentChar = currentContent.substr(x, 1);
+	                    if (currentChar && currentChar.match(self.validEmojiCharacters)) {
+	                        matchedWord = matchedWord + currentChar;
+	                    } else {
+	                        endPos = x;
+	                        break;
+	                    }
+	                }
+
+	                if (matchedWord && matchedWord.length > 2 && matchedWord.substr(0, 1) === ":" && matchedWord.substr(-1) !== ":") {
+	                    self.setState({
+	                        'emojiSearchQuery': matchedWord,
+	                        'emojiStartPos': startPos ? startPos : 0,
+	                        'emojiEndPos': endPos ? endPos : startPos + matchedWord.length
+	                    });
+	                    return;
+	                } else {
+	                    if (self.state.emojiSearchQuery) {
+	                        self.setState({
+	                            'emojiSearchQuery': false,
+	                            'emojiStartPos': false,
+	                            'emojiEndPos': false
+	                        });
+	                    }
+	                }
+	            }
+	            if (self.state.emojiSearchQuery) {
+	                self.setState({ 'emojiSearchQuery': false });
 	            }
 	        }
 
@@ -7372,6 +7450,17 @@ React.makeElement = React['createElement'];
 	        }
 
 	        var self = this;
+
+	        if (self.state.emojiSearchQuery) {
+
+	            setTimeout(function () {
+	                self.setState({
+	                    'emojiSearchQuery': false,
+	                    'emojiStartPos': false,
+	                    'emojiEndPos': false
+	                });
+	            }, 300);
+	        }
 	    },
 	    onTypeAreaChange: function onTypeAreaChange(e) {
 	        if (this.props.disabled) {
@@ -7410,9 +7499,9 @@ React.makeElement = React['createElement'];
 
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
-	            if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
+	            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
 
-	                moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+	                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
 	            }
 	        }
 	    },
@@ -7488,7 +7577,7 @@ React.makeElement = React['createElement'];
 	        }
 	        if (self.onUpdateCursorPosition) {
 	            var $container = $(ReactDOM.findDOMNode(this));
-	            var el = $('.chat-textarea:visible textarea:visible', $container)[0];
+	            var el = $('.chat-textarea:visible:first textarea:visible', $container)[0];
 	            el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
 	            self.onUpdateCursorPosition = false;
 	        }
@@ -7575,11 +7664,11 @@ React.makeElement = React['createElement'];
 	            $textareaScrollBlock.jScrollPane({
 	                enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false
 	            });
-	            var textareaWasFocused = $textarea.is(":focus");
+	            var textareaIsFocused = $textarea.is(":focus");
 	            jsp = $textareaScrollBlock.data('jsp');
 
-	            if (textareaWasFocused) {
-	                moveCursortoToEnd($('textarea:first', $node)[0]);
+	            if (!textareaIsFocused) {
+	                moveCursortoToEnd($('textarea:visible:first', $node)[0]);
 	            }
 	        }
 
@@ -7588,7 +7677,21 @@ React.makeElement = React['createElement'];
 
 	        $textareaScrollBlock.height(Math.min(textareaCloneHeight, textareaMaxHeight));
 
+	        var textareaWasFocusedBeforeReinit = $textarea.is(":focus");
+	        var selectionPos = false;
+	        if (textareaWasFocusedBeforeReinit) {
+	            selectionPos = [$textarea[0].selectionStart, $textarea[0].selectionEnd];
+	        }
+
 	        jsp.reinitialise();
+
+	        $textarea = $('textarea:first', $node);
+
+	        if (textareaWasFocusedBeforeReinit) {
+
+	            $textarea[0].selectionStart = selectionPos[0];
+	            $textarea[0].selectionEnd = selectionPos[1];
+	        }
 
 	        if (textareaCloneHeight > textareaMaxHeight && textareaCloneSpanHeight < textareaMaxHeight) {
 	            jsp.scrollToY(0);
@@ -7681,12 +7784,40 @@ React.makeElement = React['createElement'];
 	            height: Math.min(self.state.textareaHeight, self.getTextareaMaxHeight())
 	        };
 
+	        var emojiAutocomplete = null;
+	        if (self.state.emojiSearchQuery) {
+	            emojiAutocomplete = React.makeElement(EmojiAutocomplete, {
+	                emojiSearchQuery: self.state.emojiSearchQuery,
+	                onSelect: function onSelect(e, emojiAlias) {
+	                    if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
+	                        var msg = self.state.typedMessage;
+	                        var pre = msg.substr(0, self.state.emojiStartPos);
+	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+	                        self.setState({
+	                            'typedMessage': pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " "),
+	                            'emojiSearchQuery': false,
+	                            'emojiStartPos': false,
+	                            'emojiEndPos': false
+	                        });
+	                    }
+	                },
+	                onCancel: function onCancel() {
+	                    self.setState({
+	                        'emojiSearchQuery': false,
+	                        'emojiStartPos': false,
+	                        'emojiEndPos': false
+	                    });
+	                }
+	            });
+	        }
+
 	        return React.makeElement(
 	            "div",
 	            { className: "typingarea-component" + self.props.className },
 	            React.makeElement(
 	                "div",
 	                { className: "chat-textarea " + self.props.className },
+	                emojiAutocomplete,
 	                React.makeElement("i", { className: self.props.iconClass ? self.props.iconClass : "small-icon conversations" }),
 	                React.makeElement(
 	                    "div",
@@ -7856,8 +7987,6 @@ React.makeElement = React['createElement'];
 	        );
 	    },
 	    componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
-	        window.$emojiDropdown = this;
-
 	        if (nextState.searchValue !== this.state.searchValue || nextState.browsingCategories !== this.state.browsingCategories) {
 	            this._cachedNodes = {};
 	            if (this.scrollableArea) {
@@ -8086,9 +8215,10 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "div",
 	                    { className: "emoji title" },
-	                    ":" + meta.n + ":"
+	                    ":" + meta.u + ":"
 	                )
 	            );
+	            console.log(meta);
 	        }
 
 	        var categoryIcons = {
@@ -8249,6 +8379,233 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ButtonsUI = __webpack_require__(8);
+
+	var EmojiAutocomplete = React.createClass({
+	    displayName: "EmojiAutocomplete",
+
+	    mixins: [MegaRenderMixin],
+	    data_emojis: null,
+	    getDefaultProps: function getDefaultProps() {
+	        return {
+	            'requiresUpdateOnResize': true,
+	            'emojiSearchQuery': false,
+	            'disableCheckingVisibility': true,
+	            'maxEmojis': 12
+	        };
+	    },
+	    getInitialState: function getInitialState() {
+	        return {
+	            'selected': 0
+	        };
+	    },
+
+	    preload_emojis: function preload_emojis() {
+	        var self = this;
+	        if (!self.loadingPromise) {
+	            self.loadingPromise = megaChat.getEmojiDataSet('emojis').done(function (emojis) {
+	                Soon(function () {
+	                    self.data_emojis = emojis;
+	                    self.safeForceUpdate();
+	                });
+	            });
+	        };
+	    },
+	    unbindKeyEvents: function unbindKeyEvents() {
+	        $(document).unbind('keydown.emojiAutocomplete' + this.getUniqueId());
+	    },
+	    bindKeyEvents: function bindKeyEvents() {
+	        var self = this;
+	        $(document).rebind('keydown.emojiAutocomplete' + self.getUniqueId(), function (e) {
+	            if (!self.props.emojiSearchQuery) {
+	                self.unbindKeyEvents();
+	                return;
+	            }
+
+	            var key = e.keyCode || e.which;
+
+	            if (!$(e.target).is("textarea")) {
+	                console.error("this should never happen.");
+	                return;
+	            }
+
+	            var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
+	            var handled = false;
+	            if (key === 37 || key === 38) {
+
+	                selected = selected - 1;
+	                selected = selected < 0 ? self.maxFound - 1 : selected;
+	                self.setState({ 'selected': selected });
+	                handled = true;
+	            } else if (key === 39 || key === 40 || key === 9) {
+
+	                selected = selected + 1;
+	                selected = selected >= self.props.maxEmojis ? 0 : selected;
+	                self.setState({ 'selected': selected });
+	                handled = true;
+	            } else if (key === 13) {
+
+	                self.unbindKeyEvents();
+	                self.props.onSelect(false, ":" + self.found[selected].n + ":");
+	                handled = true;
+	            } else if (key === 27) {
+
+	                self.unbindKeyEvents();
+	                self.props.onCancel();
+	                handled = true;
+	            }
+
+	            if (handled) {
+	                e.preventDefault();
+	                e.stopPropagation();
+	                return false;
+	            }
+	        });
+	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        if (!this.props.emojiSearchQuery) {
+	            this.unbindKeyEvents();
+	        } else {
+	            this.bindKeyEvents();
+	        }
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        this.unbindKeyEvents();
+	    },
+	    render: function render() {
+	        var self = this;
+	        if (!self.props.emojiSearchQuery) {
+	            return null;
+	        }
+
+	        self.preload_emojis();
+
+	        if (self.loadingPromise && self.loadingPromise.state() === 'pending') {
+	            return React.makeElement(
+	                "div",
+	                { className: "textarea-autofill-bl" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "textarea-autofill-info" },
+	                    l[5533]
+	                )
+	            );
+	        }
+
+	        var q = self.props.emojiSearchQuery.substr(1, self.props.emojiSearchQuery.length);
+
+	        var exactMatch = [];
+	        var partialMatch = [];
+	        var emojis = self.data_emojis || [];
+	        for (var i = 0; i < emojis.length; i++) {
+	            var emoji = emojis[i];
+	            var match = emoji.n.indexOf(q);
+	            if (match !== -1) {
+	                if (match === 0) {
+	                    exactMatch.push(emoji);
+	                } else if (partialMatch.length < self.props.maxEmojis - exactMatch.length) {
+	                    partialMatch.push(emoji);
+	                }
+	            }
+	            if (exactMatch.length >= self.props.maxEmojis) {
+	                break;
+	            }
+	        };
+
+	        var found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
+
+	        exactMatch = partialMatch = null;
+
+	        this.maxFound = found.length;
+	        this.found = found;
+
+	        if (!found || found.length === 0) {
+	            return null;
+	        }
+
+	        var emojisDomList = [];
+
+	        for (var i = 0; i < found.length; i++) {
+	            var meta = found[i];
+	            var filename = twemoji.convert.toCodePoint(meta.u);
+
+	            emojisDomList.push(React.makeElement(
+	                "div",
+	                { className: "emoji-preview shadow " + (this.state.selected === i ? "active" : ""),
+	                    key: meta.n + "_" + (this.state.selected === i ? "selected" : "inselected"),
+	                    title: ":" + meta.n + ":",
+	                    onClick: function onClick(e) {
+	                        self.props.onSelect(e, e.target.title);
+	                        self.unbindKeyEvents();
+	                    } },
+	                React.makeElement("img", {
+	                    width: "20",
+	                    height: "20",
+	                    className: "emoji emoji-loading",
+	                    draggable: "false",
+	                    alt: meta.u,
+	                    onLoad: function onLoad(e) {
+	                        e.target.classList.remove('emoji-loading');
+	                    },
+	                    onError: function onError(e) {
+	                        e.target.classList.remove('emoji-loading');
+	                        e.target.classList.add('emoji-loading-error');
+	                    },
+	                    src: staticpath + "images/mega/twemojis/2_v2/72x72/" + filename + ".png"
+	                }),
+	                React.makeElement(
+	                    "div",
+	                    { className: "emoji title" },
+	                    ":" + meta.n + ":"
+	                )
+	            ));
+	        }
+
+	        return React.makeElement(
+	            "div",
+	            { className: "textarea-autofill-bl" },
+	            React.makeElement(
+	                "div",
+	                { className: "textarea-autofill-info" },
+	                React.makeElement(
+	                    "strong",
+	                    null,
+	                    "tab"
+	                ),
+	                " or  ",
+	                React.makeElement("i", { className: "small-icon tab-icon" }),
+	                " to navigate",
+	                React.makeElement("i", { className: "small-icon enter-icon left-pad" }),
+	                " to select ",
+	                React.makeElement(
+	                    "strong",
+	                    { className: "left-pad" },
+	                    "esc"
+	                ),
+	                "to dismiss"
+	            ),
+	            React.makeElement(
+	                "div",
+	                { className: "textarea-autofill-emoji" },
+	                emojisDomList
+	            )
+	        );
+	    }
+	});
+
+	module.exports = {
+	    EmojiAutocomplete: EmojiAutocomplete
+	};
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 
 	var WhosTyping = React.createClass({
 	    displayName: "WhosTyping",
@@ -8367,7 +8724,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -8403,7 +8760,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8691,15 +9048,15 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(2);
 	var utils = __webpack_require__(5);
-	var getMessageString = __webpack_require__(19).getMessageString;
-	var ConversationMessageMixin = __webpack_require__(22).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
 	var ContactsUI = __webpack_require__(10);
 	var TypingAreaUI = __webpack_require__(16);
 
@@ -8713,12 +9070,15 @@ React.makeElement = React['createElement'];
 	    mixins: [ConversationMessageMixin],
 	    getInitialState: function getInitialState() {
 	        return {
-	            'editing': false
+	            'editing': this.props.editing
 	        };
+	    },
+	    isBeingEdited: function isBeingEdited() {
+	        return this.state.editing === true || this.props.editing === true;
 	    },
 	    componentDidUpdate: function componentDidUpdate(oldProps, oldState) {
 	        var self = this;
-	        if (self.state.editing === true && self.isMounted()) {
+	        if (self.isBeingEdited() && self.isMounted()) {
 	            var $generic = $(self.findDOMNode());
 	            var $textarea = $('textarea', $generic);
 	            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
@@ -8730,26 +9090,11 @@ React.makeElement = React['createElement'];
 	                    self.props.onEditStarted($generic);
 	                }
 	            }
-	        } else if (self.isMounted() && self.state.editing === false && oldState.editing === true) {
+	        } else if (self.isMounted() && !self.isBeingEdited() && oldState.editing === true) {
 	            if (self.props.onUpdate) {
 	                self.props.onUpdate();
 	            }
 	        }
-	        var $node = $(self.findDOMNode());
-	        $node.rebind('onEditRequest.genericMessage', function (e) {
-	            if (self.state.editing === false) {
-	                self.setState({ 'editing': true });
-
-	                Soon(function () {
-	                    var $generic = $(self.findDOMNode());
-	                    var $textarea = $('textarea', $generic);
-	                    if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-	                        $textarea.focus();
-	                        moveCursortoToEnd($textarea[0]);
-	                    }
-	                });
-	            }
-	        });
 	        $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function () {
 	            Soon(function () {
 	                if (self.isMounted()) {
@@ -8761,6 +9106,16 @@ React.makeElement = React['createElement'];
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        var $node = $(self.findDOMNode());
+
+	        if (self.isBeingEdited() && self.isMounted()) {
+	            var $generic = $(self.findDOMNode());
+	            var $textarea = $('textarea', $generic);
+	            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
+	                $textarea.focus();
+	                moveCursortoToEnd($textarea[0]);
+	            }
+	        }
+
 	        $node.delegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut', function (e) {
 	            if (e.target.classList.contains('button')) {
 
@@ -8780,7 +9135,7 @@ React.makeElement = React['createElement'];
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;
 	        var $node = $(self.findDOMNode());
-	        $node.unbind('onEditRequest.genericMessage');
+
 	        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
 	        $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
 	    },
@@ -9003,7 +9358,7 @@ React.makeElement = React['createElement'];
 	                                clearTimeout(self._rerenderTimer);
 	                            }
 	                            self._rerenderTimer = setTimeout(function () {
-	                                if (message.sending === true) {
+	                                if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
 	                                    chatRoom.messagesBuff.trackDataChange();
 	                                    if (self.isMounted()) {
 	                                        self.forceUpdate();
@@ -9510,7 +9865,7 @@ React.makeElement = React['createElement'];
 	                                React.makeElement('i', { className: 'small-icon yellow-triangle' })
 	                            );
 	                        } else {
-	                            if (self.state.editing !== true) {
+	                            if (self.isBeingEdited() !== true) {
 	                                messageNotSendIndicator = React.makeElement(
 	                                    'div',
 	                                    { className: 'not-sent-indicator' },
@@ -9561,7 +9916,7 @@ React.makeElement = React['createElement'];
 	                }
 
 	                var messageDisplayBlock;
-	                if (self.state.editing === true) {
+	                if (self.isBeingEdited() === true) {
 	                    var msgContents = message.textContents;
 	                    msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
 
@@ -9586,7 +9941,9 @@ React.makeElement = React['createElement'];
 	                                    };
 	                                    megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
 	                                    self.props.onEditDone(tmpMessageObj.textContents);
-	                                    self.forceUpdate();
+	                                    if (self.isMounted()) {
+	                                        self.forceUpdate();
+	                                    }
 	                                });
 	                            }
 
@@ -9610,7 +9967,7 @@ React.makeElement = React['createElement'];
 	                    }
 	                }
 	                if (!message.deleted) {
-	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
+	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.isBeingEdited() !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
 	                        messageActionButtons = React.makeElement(
 	                            ButtonsUI.Button,
 	                            {
@@ -9671,8 +10028,7 @@ React.makeElement = React['createElement'];
 	            textMessage = getMessageString(message.type);
 	            if (!textMessage) {
 	                console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
-	                debugger;
-	                throw new Error("boom");
+	                return;
 	            }
 
 	            if (textMessage.splice) {
@@ -9781,7 +10137,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9891,7 +10247,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9901,8 +10257,8 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(10);
-	var ConversationMessageMixin = __webpack_require__(22).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(19).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
 
 	var AlterParticipantsConversationMessage = React.createClass({
 	    displayName: "AlterParticipantsConversationMessage",
@@ -10014,7 +10370,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10024,8 +10380,8 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(10);
-	var ConversationMessageMixin = __webpack_require__(22).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(19).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
 
 	var TruncatedMessage = React.createClass({
 	    displayName: "TruncatedMessage",
@@ -10103,7 +10459,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10113,8 +10469,8 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(10);
-	var ConversationMessageMixin = __webpack_require__(22).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(19).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
 
 	var PrivilegeChange = React.createClass({
 	    displayName: "PrivilegeChange",
@@ -10198,7 +10554,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10208,8 +10564,8 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(10);
-	var ConversationMessageMixin = __webpack_require__(22).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(19).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
 
 	var TopicChange = React.createClass({
 	    displayName: "TopicChange",
@@ -10279,12 +10635,12 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var utils = __webpack_require__(28);
+	var utils = __webpack_require__(29);
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(11);
 
@@ -11172,7 +11528,7 @@ React.makeElement = React['createElement'];
 	module.exports = ChatRoom;
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports) {
 
 	'use strict';

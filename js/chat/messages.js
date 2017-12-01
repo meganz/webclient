@@ -541,8 +541,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         eventData.id = (eventData.id>>>0);
 
         if (eventData.state === "EDITED" || eventData.state === "TRUNCATED") {
-            var timestamp = chatRoom.messagesBuff.messages[eventData.messageId].delay ?
-                chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime();
+            var originalMessage = chatRoom.messagesBuff.messages[eventData.messageId];
+            var timestamp = originalMessage.delay ?
+                originalMessage.delay : unixtime();
 
             var editedMessage = new Message(
                 chatRoom,
@@ -558,7 +559,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'sent': true
                 }
             );
-            var originalMessage = chatRoom.messagesBuff.messages[eventData.messageId];
 
             var _decryptSuccessCb = function(decrypted) {
                 if (decrypted) {

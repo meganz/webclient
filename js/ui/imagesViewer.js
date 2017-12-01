@@ -251,7 +251,7 @@ var slideshowid;
             else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
                 slideshow(slideshowid, true);
             }
-            else if (e.keyCode === 8 || e.key === 'Backspace' || key.code === 'Backspace') {
+            else if (e.keyCode === 8 || e.key === 'Backspace') {
                 // since Backspace event is processed with keydown at document level for cloudBrowser.
                 // i prefered that to process it here, instead of unbind the previous handler.
                 e.stopPropagation();
@@ -576,8 +576,14 @@ var slideshowid;
             myPage = myPage.replace('^$#^1', window['pdfviewercss']);
             myPage = myPage.replace('^$#^3', window['pdfjs2']);
             myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
-            $('#pdfpreviewdiv1').removeClass('hidden');
-            var doc = document.getElementById('pdfpreviewdiv1').contentWindow.document;
+            // remove then re-add iframe to avoid History changes [push]
+            var pdfIframe = document.getElementById('pdfpreviewdiv1');
+            var newPdfIframe = document.createElement('iframe');
+            newPdfIframe.id = 'pdfpreviewdiv1';
+            newPdfIframe.src = 'about:blank';
+            var pdfIframeParent = pdfIframe.parentNode;
+            pdfIframeParent.replaceChild(newPdfIframe, pdfIframe);
+            var doc = newPdfIframe.contentWindow.document;
             doc.open();
             doc.write(myPage);
             doc.close();
@@ -603,14 +609,10 @@ var slideshowid;
             $overlay.find('.viewer-progress').addClass('hidden');
             $overlay.find('.viewer-image-bl img').addClass('hidden');
             $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
-            if (ua.details.browser !== 'Edge' && ua.details.engine !== 'Trident') {
-                $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);
-            }
-            else { // some other browser
-                // to fix pdf compatibility - Bug #7796
-                localStorage.setItem('currPdfPrev2', JSON.stringify(src));
-                prepareAndViewPdfViewer();
-            }
+            // preview pdfs using pdfjs for all browsers #8036
+            // to fix pdf compatibility - Bug #7796
+            localStorage.setItem('currPdfPrev2', JSON.stringify(src));
+            prepareAndViewPdfViewer();
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }

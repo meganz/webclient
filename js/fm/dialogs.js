@@ -85,6 +85,12 @@
     var setDialogButtonState = function($btn) {
         $btn = $($btn);
 
+        // if we are using this dialog from contacts (means share with)
+        // --> it does not mean anything to get selected since where choosing something to share from dialog itself
+        if (!$('.fm-dialog.copy-dialog .share-dialog-permissions').hasClass('hidden')) {
+            return;
+        }
+
         if (!getNonCircularNodes().length && !$.onImportCopyNodes) {
             $btn.addClass('disabled');
         }
@@ -186,7 +192,13 @@
         var $btn = $('.dialog-' + dialogPrefix + '-button');
 
         // Disable/enable button
-        setDialogButtonState($btn);
+        // coming from contacts tab, and into sharing dlg.
+        if (dialogTabClass === 'cloud-drive' && M.currentrootid === 'contacts') {
+            $btn.removeClass('disabled');
+        }
+        else {
+            setDialogButtonState($btn);
+        }
 
         // Activate proper tab
         $('.' + dialogPrefix + '-dialog-txt' + '.' + dialogTabClass).addClass('active');

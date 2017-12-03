@@ -808,7 +808,22 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
         var finishLogout = function() {
             if (--step === 0) {
                 u_logout(true);
-                location.reload();
+                if (is_extension) {
+                    location.reload();
+                }
+                else {
+                    if (location.href.includes('search')) {
+                        if (localStorage.d === '1' && localStorage.jj === '1') {
+                            location.replace('http://' + location.host); // dev mode, http will be redirected to https @server
+                        }
+                        else {
+                            location.replace('https://' + location.host);
+                        }
+                    }
+                    else {
+                        location.reload();
+                    }
+                }
             }
         }, step = 1;
 

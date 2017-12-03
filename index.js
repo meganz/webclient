@@ -1156,7 +1156,6 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
-
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {

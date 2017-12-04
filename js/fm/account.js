@@ -853,15 +853,17 @@ function accountUI() {
                 });
             }
             else if ($('#account-password').val() !== ''
-                && $('#account-confirm-password').val() !== '' && $('#account-new-password').val() !== '' && (pws.score === 0 || pws.entropy < 16)) {alert(4);
+                && $('#account-confirm-password').val() !== ''
+                && $('#account-new-password').val() !== ''
+                && (pws.score === 0 || pws.entropy < 16)) {alert(4);
 
-                msgDialog('warninga', l[135], l[1129], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                });
+                    msgDialog('warninga', l[135], l[1129], false, function() {
+                        $('#account-new-password').val('');
+                        $('#account-confirm-password').val('');
+                        $('#account-new-password').focus();
+                        $('.fm-account-save-block').removeClass('hidden');
+                        $('.fm-account-save').addClass('disabled');
+                    });
             }
             else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
                 && $('#account-confirm-password').val() !== $('#account-password').val()) {

@@ -155,7 +155,7 @@
 @media only screen and (max-width: 565px) {
 .mobile .bottom-menu.pad {
     min-height: 10px;
-    padding: 10px 43px 23px 43px;
+    padding: 10px 43px 36px 43px;
     text-align: center;
 }
 .mobile .bottom-menu.column:first-child {

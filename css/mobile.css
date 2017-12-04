@@ -4874,7 +4874,7 @@ div.checkboxOn, div.checkboxOff {
         margin-top: 5px;
     }
 }
-
+@media only screen and (orientation:landscape) and (max-width: 570px), only screen and (orientation:portrait) and (max-height: 570px) {
 @media only screen and (orientation:landscape) and (max-width: 570px), only screen and (orientation:portrait) and (max-height: 570px) {
     .mobile.logo {
         width: 32px;
@@ -4971,7 +4971,7 @@ div.checkboxOn, div.checkboxOff {
         height: 54.5%;
     }
     .wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block {
-        bottom: -110px;
+        bottom: -48px;
     }
     .mobile.wrong-file-block {
         padding-top: 52px;

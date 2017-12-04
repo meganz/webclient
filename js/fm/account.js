@@ -765,7 +765,7 @@ function accountUI() {
         });
 
         $saveButton.rebind('click', function() {
-            if ($(this).hasClass('.disabled')) {
+            if ($(this).hasClass('disabled')) {
                 return false;
             }
 

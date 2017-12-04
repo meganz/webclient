@@ -13875,6 +13875,10 @@
         "text": "Subscription Expires On",
         "context": "A label on the My Account page indicating the expiration date of a PRO account. This is shown if they do not have a recurring subscription (e.g. the purchased a one-off plan for a specific time period) or the recurring subscription was recently canceled so they still have some time remaining on their plan."
     },
+    "16176": {
+        "text": "Paste",
+        "context": "A button which allows the user to paste a file\/folder into another folder."
+    },
     "16177": {
         "text": "Remaining Downloads",
         "context": "A label to indicate the number of remaining downloads."

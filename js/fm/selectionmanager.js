@@ -508,7 +508,7 @@ var SelectionManager = function($selectable, resume) {
         this.clear_last_selected();
     }
 
-    var $selectable = $('.fm-right-files-block .ui-selectable:visible');
+    var $selectable = $('.fm-right-files-block .ui-selectable:visible:not(.hidden)');
 
     if ($selectable.length === 1) {
         this.bindSelectable($selectable);

@@ -8674,8 +8674,13 @@ React.makeElement = React['createElement'];
 
 	        if (Object.keys(self.state.currentlyTyping).length > 0) {
 	            var names = Object.keys(self.state.currentlyTyping).map(function (u_h) {
-	                var avatarMeta = generateAvatarMeta(u_h);
-	                return avatarMeta.fullName.split(" ")[0];
+	                var contact = M.u[u_h];
+	                if (contact && contact.firstName) {
+	                    return contact.firstName;
+	                } else {
+	                    var avatarMeta = generateAvatarMeta(u_h);
+	                    return avatarMeta.fullName.split(" ")[0];
+	                }
 	            });
 
 	            var namesDisplay = "";

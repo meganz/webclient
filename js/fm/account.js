@@ -718,6 +718,8 @@ function accountUI() {
             var mail = $.trim($newEmail.val());
 
             $passwords.val('');
+            $saveBlock.find('.fm-account-save').removeClass('disabled');
+            $saveBlock.addClass('hidden');
 
             // Show information message
             $emailInfoMessage.removeClass('hidden');

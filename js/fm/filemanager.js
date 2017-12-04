@@ -1456,7 +1456,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 38 &&
-            s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
@@ -1468,7 +1467,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 40 &&
-            s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {

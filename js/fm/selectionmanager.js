@@ -508,10 +508,10 @@ var SelectionManager = function($selectable, resume) {
         this.clear_last_selected();
     }
 
-    var $selectable = $('.fm-right-files-block .ui-selectable:visible:not(.hidden)');
+    var $uiSelectable = $('.fm-right-files-block .ui-selectable:visible:not(.hidden)');
 
-    if ($selectable.length === 1) {
-        this.bindSelectable($selectable);
+    if ($uiSelectable.length === 1) {
+        this.bindSelectable($uiSelectable);
     }
 
     $('.fm-right-files-block').undelegate('selectablecreate.sm');

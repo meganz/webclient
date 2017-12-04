@@ -711,12 +711,6 @@ function accountUI() {
                 texts.push($(this).val());
             });
             $newEmail.val('');
-            if (texts.join("") === "") {
-                $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            }
-            else {
-                $newEmail.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
-            }
         });
 
         // On text entry in the new email text field
@@ -724,13 +718,6 @@ function accountUI() {
             var mail = $.trim($newEmail.val());
 
             $passwords.val('');
-
-            if (mail === "") {
-                $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            }
-            else {
-                $passwords.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
-            }
 
             // Show information message
             $emailInfoMessage.removeClass('hidden');

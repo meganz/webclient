@@ -857,7 +857,7 @@ function accountUI() {
             else if ($('#account-password').val() !== ''
                 && $('#account-confirm-password').val() !== ''
                 && $('#account-new-password').val() !== ''
-                && (pws.score === 0 || pws.entropy < 16)) {alert(4);
+                && (pws.score === 0 || pws.entropy < 16)) {
 
                     msgDialog('warninga', l[135], l[1129], false, function() {
                         $('#account-new-password').val('');

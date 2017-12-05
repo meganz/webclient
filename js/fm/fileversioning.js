@@ -513,7 +513,6 @@
             $('.fm-versioning .header .button.close').rebind('click', function() {
                 pd.addClass('hidden');
                 current_sel_version = false;
-                closeDialog();
             });
             fileversioning.getAllVersions(fh).done(
                 function(versions) {
@@ -595,13 +594,11 @@
                             });
                         }
                     });
+                    refreshHeader(fh);
+                    pd.removeClass('hidden');
+                    // Init scrolling
+                    fileversioning.initFileVersioningScrolling();
                 });
-
-            refreshHeader(fh);
-            pd.removeClass('hidden');
-
-            // Init scrolling
-            fileversioning.initFileVersioningScrolling();
             $(window).bind('resize.fmbreadcrumbs', function() {
                 fileversioning.initFileVersioningScrolling();
             });

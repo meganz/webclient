@@ -1256,12 +1256,6 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype.encryptTo = function(message, refs) {
         var encryptedMessages = new Array();
 
-        if (this.otherParticipants.size === 0) {
-            logger.warn('No destinations or other participants to send to.');
-
-            return false;
-        }
-
         // Assemble main message body.
         var trackedParticipants = new Set(this.otherParticipants);
         trackedParticipants.add(this.ownHandle);
@@ -1869,9 +1863,6 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype.getKeyBlob = function(senderKey, trackedParticipants) {
         var self = this;
 
-        if (self.otherParticipants.size === 0) {
-            return false;
-        }
         if (!senderKey) {
             return false;
         }

@@ -23,6 +23,8 @@ function accountUI() {
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
     $('.account.data-block.storage-data').removeClass('exceeded');
+    $('.fm-account-save-block').addClass('hidden');
+    $('.fm-account-save').removeClass('disabled');
 
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();

@@ -506,11 +506,12 @@ var SelectionManager = function($selectable, resume) {
         });
 
         this.clear_last_selected();
+    }
 
-        var $selectable = $('.fm-right-files-block .ui-selectable:visible');
-        if ($selectable.length === 1) {
-            this.bindSelectable($selectable);
-        }
+    var $uiSelectable = $('.fm-right-files-block .ui-selectable:visible:not(.hidden)');
+
+    if ($uiSelectable.length === 1) {
+        this.bindSelectable($uiSelectable);
     }
 
     $('.fm-right-files-block').undelegate('selectablecreate.sm');

@@ -513,6 +513,7 @@
             $('.fm-versioning .header .button.close').rebind('click', function() {
                 pd.addClass('hidden');
                 current_sel_version = false;
+                closeDialog();
             });
             fileversioning.getAllVersions(fh).done(
                 function(versions) {

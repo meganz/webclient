@@ -3309,7 +3309,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
-        properties: ['links', 'rename', 'copyrights', 'copy', 'move'],
+        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
         copy: ['createfolder'],
         move: ['createfolder']
     };

@@ -375,7 +375,7 @@
     "998": "Veuillez cr\u00e9er votre compte gratuit",
     "999": "Voulez vous passer de votre session temporaire \u00e0 un compte gratuit maintenant?",
     "1000": "\u00c9vitez de perdre d\u2019acc\u00e8s. Une inscription gratuite est fortement recommand\u00e9e\u2009!",
-    "1001": "Supprimer les contacts",
+    "1001": "Supprimer le contact",
     "1002": "Voulez-vous vraiment supprimer [X] de votre liste?",
     "1003": "Confirmer la suppression",
     "1004": "Voulez-vous vraiment d\u00e9placer [X] vers votre corbeille?",
@@ -863,7 +863,7 @@
     "6855": "S\u00e9lectionner le dossier \u00e0 partager",
     "6858": "Nouveaux authentifiants non v\u00e9rifi\u00e9s",
     "6859": "Infos",
-    "6860": "Envoyer au contact",
+    "6860": "Envoyer \u00e0 un contact",
     "6864": "Faire monter dans la file",
     "6865": "Faire descendre dans la file",
     "6868": "Messages",
@@ -1147,6 +1147,7 @@
     "8527": "Demande d'information g\u00e9n\u00e9rale",
     "8528": "Probl\u00e8me technique",
     "8529": "Probl\u00e8me de paiement",
+    "8531": "Lien invalide",
     "8535": "MEGA changera ses conditions g\u00e9n\u00e9rales d'utilisation le [B]20 f\u00e9vrier 2016[\/B]. Veuillez lire notre billet de blogue d'anniversaire pour plus d'informations.",
     "8536": "Merci d'utiliser MEGA.",
     "8537": "Avis important :",
@@ -1857,5 +1858,10 @@
     "17545": "Une invitation a d\u00e9j\u00e0 \u00e9t\u00e9 envoy\u00e9e, en attente de r\u00e9ponse.",
     "17546": "Cet utilisateur vous a d\u00e9j\u00e0 envoy\u00e9 une invitation.",
     "17548": "Voulez-vous vraiment annuler votre abonnement\u2009? Votre statut PRO expirera \u00e0 la fin de la p\u00e9riode d\u2019abonnement actuelle.",
-    "17549": "Nous avons r\u00e9cemment apport\u00e9 des modifications \u00e0 notre extension Firefox \u00ab\u00a0Obsol\u00e8te\u00a0\u00bb. Vous pouvez t\u00e9l\u00e9charger et installer la mise \u00e0 jour en utilisant le bouton ci-dessous."
+    "17549": "Nous avons r\u00e9cemment apport\u00e9 des modifications \u00e0 notre extension Firefox \u00ab\u00a0Obsol\u00e8te\u00a0\u00bb. Vous pouvez t\u00e9l\u00e9charger et installer la mise \u00e0 jour en utilisant le bouton ci-dessous.",
+    "17557": "Le lien auquel vous tentez d\u2019acc\u00e9der n\u2019est pas valide.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:"
 }

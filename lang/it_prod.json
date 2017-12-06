@@ -1147,6 +1147,7 @@
     "8527": "Domanda generale",
     "8528": "Problema tecnico",
     "8529": "Problema di pagamento",
+    "8531": "Link non valido",
     "8535": "MEGA cambier\u00e0 i Termini di Servizio il [B]20 febbraio 2016[\/B]. Per favore, leggi il post di anniversario sul blog per pi\u00f9 informazioni.",
     "8536": "Grazie per usare MEGA.",
     "8537": "Avviso importante:",
@@ -1590,7 +1591,7 @@
     "16320": "Grazie! Abbiamo inviato una mail di invito.",
     "16322": "URL diretto a MEGAsync:",
     "16323": "URL diretto alle nostre app:",
-    "16325": "Get [S]%1[\/S] free storage and [S]%2[\/S] of transfer quota for each friend who installs a MEGA app",
+    "16325": "Ottieni [S]%1[\/S] di spazio gratuito e [S]%2[\/S] di quota di trasferimento per ogni amico che installa l'app di MEGA.",
     "16331": "Non riceverai bonus se inviti qualcuno che ha gi\u00e0 usato MEGA in precedenza e non verrai notificato di un rifiuto.",
     "16332": "Ti qualifichi solo se:",
     "16333": "Hai invitato qualcuno che non ha usato MEGA precedentemente.",
@@ -1857,5 +1858,10 @@
     "17545": "Invito gi\u00e0 spedito, in attesa della risposta.",
     "17546": "Quell'utente ti ha gi\u00e0 spedito un invito.",
     "17548": "Sei sicuro di voler annullare il tuo abbonamento? Perderai il tuo status PRO al termine del tuo periodo corrente di abbonamento.",
-    "17549": "Abbiamo recentemente apportato alcuni miglioramenti alla nostra estensione per Firefox Legacy. Puoi scaricare ed installare l'aggiornamento utilizzando il pulsante sottostante."
+    "17549": "Abbiamo recentemente apportato alcuni miglioramenti alla nostra estensione per Firefox Legacy. Puoi scaricare ed installare l'aggiornamento utilizzando il pulsante sottostante.",
+    "17557": "Il link a cui stai cercando di accedere non \u00e8 valido",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:"
 }

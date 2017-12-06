@@ -669,7 +669,7 @@
     "1981": "Ihr Passwort wurde erfolgreich zur\u00fcckgesetzt. Bitte loggen Sie sich nun ein.",
     "1982": "Sichern Sie Ihren [A]Rettungsschl\u00fcssel[\/A]",
     "1983": "Ihr Passwort entsperrt Ihren Master Key.",
-    "1984": "Die Entschl\u00fcsselung Ihrer beginnt stets mit dem Hauptschl\u00fcssel (dem Rettungschl\u00fcssel), den wir mit Ihrem Passwort verschl\u00fcsselt bei uns speichern. Bei Verlust Ihres Passworts kann niemand (auch nicht wir) den Hauptschl\u00fcssel entschl\u00fcsseln. Ihre Daten werden unlesbar.",
+    "1984": "Die Entschl\u00fcsselung Ihrer Daten beginnt stets mit dem Hauptschl\u00fcssel (der auch Ihr Rettungschl\u00fcssel ist!), den wir mit Ihrem Passwort verschl\u00fcsselt bei uns speichern. Bei Verlust Ihres Passworts kann niemand (auch nicht wir) den Hauptschl\u00fcssel entschl\u00fcsseln. Ihre Daten werden unlesbar.",
     "1985": "Der Export Ihres Rettungsschl\u00fcssels und das Verwahren an einem sicheren Ort erm\u00f6glicht es Ihnen, Ihr Passwort ohne Datenverlust zur\u00fcckzusetzen.",
     "1986": "Ein Angreifer, der sich eine Kopie Ihres Rettungsschl\u00fcssels verschafft hat, kann damit trotzdem noch nicht auf Ihre Daten zugreifen, da ein Passwort-Reset zus\u00e4tzlich den Zugang zu Ihrer E-Mail voraussetzt.",
     "1987": "Rettungsschl\u00fcssel als Textdatei abspeichern",
@@ -1147,6 +1147,7 @@
     "8527": "Allgemeine Anfrage",
     "8528": "Technisches Problem",
     "8529": "Problem mit einer Bezahlung",
+    "8531": "Ung\u00fcltiger Link",
     "8535": "MEGA will be changing its Terms of Service on the [B]20th February 2016[\/B]. Please read our anniversary blog post for more information.",
     "8536": "Danke f\u00fcr Ihr Vertrauen.",
     "8537": "Wichtige Information:",
@@ -1457,7 +1458,7 @@
     "13753": "Sie sind dabei, eine Datei und einen Ordner unwiderruflich zu l\u00f6schen. Fortfahren?",
     "13754": "Sie sind dabei, eine Datei und %1 Ordner unwiderruflich zu l\u00f6schen. Fortfahren?",
     "13755": "Sie sind dabei, %1 Dateien und einen Ordner unwiderruflich zu l\u00f6schen. Fortfahren?",
-    "13756": "You are about to permanently remove %1 files and %2 folders. Would you like to proceed?",
+    "13756": "Sie sind dabei, %1 Dateien und %2 Ordner unwiderruflich zu l\u00f6schen. Fortfahren?",
     "13757": "Sie haben eine Datei unwiderruflich gel\u00f6scht.",
     "13758": "Sie haben %1 Dateien unwiderruflich gel\u00f6scht.",
     "13759": "Sie haben einen Ordner unwiderruflich gel\u00f6scht.",
@@ -1857,5 +1858,10 @@
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
     "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+    "17557": "The link you are trying to access is not valid.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:"
 }

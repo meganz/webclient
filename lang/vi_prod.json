@@ -1147,6 +1147,7 @@
     "8527": "V\u1ea5n \u0111\u1ec1 Th\u01b0\u1eddng G\u1eb7p",
     "8528": "V\u1ea5n \u0111\u1ec1 K\u1ef9 Thu\u1eadt",
     "8529": "V\u1ea5n \u0111\u1ec1 Ph\u01b0\u01a1ng Th\u1ee9c Thanh To\u00e1n",
+    "8531": "\u0110\u01b0\u1eddng d\u1eabn li\u00ean k\u1ebft kh\u00f4ng h\u1ee3p l\u1ec7",
     "8535": "MEGA s\u1ebd thay \u0111\u1ed5i ch\u00ednh s\u00e1ch \u0110i\u1ec1u Kho\u1ea3n S\u1eed D\u1ee5ng D\u1ecbch V\u1ee5 v\u00e0o ng\u00e0y [B]20 Th\u00e1ng Hai, 2016[\/B]. Xin \u0111\u1ecdc b\u00e0i vi\u1ebft t\u1eeb blog c\u1ee7a ch\u00fang t\u00f4i \u0111\u1ec3 bi\u1ebft th\u00eam th\u00f4ng tin.",
     "8536": "C\u00e1m \u01a1n qu\u00fd kh\u00e1ch \u0111\u00e3 ch\u1ecdn d\u00f9ng MEGA.",
     "8537": "Th\u00f4ng b\u00e1o quan tr\u1ecdng:",
@@ -1536,7 +1537,7 @@
     "16173": "Ch\u1ecdn m\u00e0u:",
     "16175": "H\u1ea1ng Th\u00e0nh Vi\u00ean h\u1ebft h\u1ea1n v\u00e0o ng\u00e0y",
     "16221": "D\u00e1n nh\u00e3n %1",
-    "16222": "Remove label %1",
+    "16222": "X\u00f3a nh\u00e3n %1",
     "16223": "M\u00e0u \u0111\u1ecf",
     "16224": "M\u00e0u cam",
     "16225": "M\u00e0u v\u00e0ng",
@@ -1857,5 +1858,10 @@
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
     "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+    "17557": "The link you are trying to access is not valid.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:"
 }

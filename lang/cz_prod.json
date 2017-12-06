@@ -1147,6 +1147,7 @@
     "8527": "Obecn\u00fd po\u017eadavek",
     "8528": "Technick\u00fd probl\u00e9m",
     "8529": "Probl\u00e9m s platbou",
+    "8531": "Neplatn\u00fd odkaz",
     "8535": "MEGA zm\u011bn\u00ed Podm\u00ednky slu\u017eby [B]20. \u00fanora 2016[\/B]. P\u0159e\u010dt\u011bte si n\u00e1\u0161 v\u00fdro\u010dn\u00ed p\u0159\u00edsp\u011bvek blogu kv\u016fli dal\u0161\u00edm informac\u00edm.",
     "8536": "D\u011bkujeme, \u017ee pou\u017e\u00edv\u00e1te MEGA",
     "8537": "D\u016fle\u017eit\u00e9 ozn\u00e1men\u00ed",
@@ -1213,7 +1214,7 @@
     "8695": "Pouze PRO",
     "8696": "Upgradovat na PRO",
     "8697": "Vyberte datum",
-    "8698": "Expires %1",
+    "8698": "Vypr\u0161\u00ed %1",
     "8700": "Roz\u0161\u00ed\u0159en\u00ed pro Thunderbird",
     "8726": "Pozvat",
     "8734": "Z\u00edskat odkazy",
@@ -1857,5 +1858,10 @@
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
     "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+    "17557": "The link you are trying to access is not valid.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:"
 }

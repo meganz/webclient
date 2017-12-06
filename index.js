@@ -330,7 +330,8 @@ function init_page() {
     }
 
     var oldPFKey = pfkey;
-    if (page.substr(0, 2) == 'F!' && page.length > 2) {
+    var pageBeginLetters = page.substr(0, 2);
+    if (pageBeginLetters === 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
 
         pfid = false;
@@ -416,6 +417,10 @@ function init_page() {
     }
     confirmcode = false;
     pwchangecode = false;
+
+    if (pageBeginLetters.toLowerCase() === 'n!') {
+        return invalidLinkError();
+    }
 
     if (page.substr(0, 7) === 'confirm') {
         confirmcode = page.replace("confirm", "");

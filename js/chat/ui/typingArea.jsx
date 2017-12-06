@@ -14,7 +14,7 @@ var EmojiAutocomplete = require('./emojiAutocomplete.jsx').EmojiAutocomplete;
 
 var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
-    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gui"),
+    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gi"),
     getDefaultProps: function() {
         return {
             'textareaMaxHeight': "40%"

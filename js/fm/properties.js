@@ -18,7 +18,7 @@
         for (var i = users.length; i--;) {
             var user = users[i];
             var userHandle = user.u || user.p;
-            var hidden = i >= MAX_CONTACTS ? 'hidden' : '';
+            var hidden = i >= MAX_CONTACTS ? 'hidden' : ''; console.log('!!!!!!' + user.u);
             var status = megaChatIsReady && megaChat.getPresenceAsCssClass(user.u);
 
             shareUsersHtml += '<div class="properties-context-item ustatus ' + escapeHTML(userHandle)

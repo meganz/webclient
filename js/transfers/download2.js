@@ -1641,6 +1641,13 @@ var dlmanager = {
             });
         }
 
+        if (is_mobile) {
+            $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
+                $dialog.addClass('hidden');
+                fm_hideoverlay();
+            });
+        }
+
         M.safeShowDialog('download-overquota', function() {
             var doCloseModal = function closeModal() {
                 clearInterval(dlmanager._overQuotaTimeLeftTick);

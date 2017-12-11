@@ -1543,6 +1543,13 @@ var dlmanager = {
         uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
         this._overquotaClickListeners($dialog, flags, res || true);
 
+        if (is_mobile) {
+            $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
+                $dialog.addClass('hidden');
+                fm_hideoverlay();
+            });
+        }
+
         M.safeShowDialog('download-pre-warning', $dialog);
     },
 

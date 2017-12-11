@@ -2445,7 +2445,7 @@ div.checkboxOn, div.checkboxOff {
 .fm-dialog-overlay {
     width: 100%;
     height: 100%;
-    position: absolute;
+    position: fixed;
     z-index: 1100;
     background: -moz-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.5) 100%);
     background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(0,0,0,0.1)), color-stop(100%, rgba(20,20,20,0.5)));
@@ -3041,7 +3041,7 @@ div.checkboxOn, div.checkboxOff {
 
 /* Limited available bandwidth dialog */
 .fm-dialog {
-    position: absolute;
+    position: fixed;
     z-index: 1200;
     border: 2px solid rgba(0,0,0,0.15);
     background-color: white;
@@ -3058,10 +3058,13 @@ div.checkboxOn, div.checkboxOff {
 }
 .fm-dialog.limited-bandwidth-dialog {
     background-color: rgba(255,255,255,0.94);
-    position: absolute;
+    position: fixed;
     z-index: 1200;
     left: 0;
     top: 0;
+}
+.limited-bandwidth-dialog .mobile.white-block {
+    margin: 0;
 }
 .limited-bandwidth-dialog .mobile.white-block p {
     white-space: initial;
@@ -3092,6 +3095,7 @@ div.checkboxOn, div.checkboxOff {
     text-align: center;
     margin-top: 24px;
     margin-bottom: 12px;
+    white-space: normal;
 }
 .dialog.p-after-icon {
     font-size: 15px;
@@ -4970,8 +4974,11 @@ div.checkboxOn, div.checkboxOff {
     .wrong-file .mobile.content-row.second {
         height: 54.5%;
     }
-    .wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block {
+    .wrong-file .mobile.white-block {
         bottom: -48px;
+    }
+    .downloading .mobile.white-block, .uploading .mobile.white-block {
+        bottom: -93px;
     }
     .mobile.wrong-file-block {
         padding-top: 52px;
@@ -5013,6 +5020,30 @@ div.checkboxOn, div.checkboxOff {
     }
     .mobile.content-row {
         min-height: 0;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .mobile.my-account-page .pro-plan-name {
+        display: block;
+        line-height: 22px;
+        text-align: left;
+        margin-left: 60px;
+        margin-top: 8px;
+        position: static;
+    }
+    .mobile.my-account-page .storage-usage {
+        display: block;
+        line-height: 22px;
+        position: static;
+        right: 0;
+        top: 0;
+        text-align: left;
+        margin-left: 60px;
+        margin-top: 8px;
+    }
+    .mobile.my-account-page .account-type-block {
+        border-bottom: 1px solid #ddd;
     }
 }
 

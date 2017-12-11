@@ -13,6 +13,12 @@
         var $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
         var targets = $.selected || [];
 
+        if (!$ro.length) {
+            if ($('.' + dialogName + '-dialog-txt' + '.shared-with-me').hasClass('active')) {
+                // disable import btn
+                $('.dialog-' + dialogName + '-button').addClass('disabled');
+            }
+        }
         $ro.each(function(i, v) {
             var node = M.d[$(v).attr('id').replace('mctreea_', '')];
 
@@ -53,7 +59,10 @@
                 $('#mctreea_' + String(sel[i]).replace(/[^\w-]/g, '')).addClass('disabled');
             }
         }
-        disableReadOnlySharedFolders(dialogPrefix);
+        dbfetch.geta(Object.keys(M.c.shares || {}))
+            .always(function () {
+                disableReadOnlySharedFolders(dialogPrefix);
+            });
     };
 
     /**
@@ -161,18 +170,6 @@
                                        dialogPrefix, buttonLabel, convTab) {
 
         var html;
-
-        if (($.copyToShare || $.onImportCopyNodes) && (!newFolderButton || dialogPrefix !== 'copy')) {
-
-            // XXX: Ideally show some notification that importing from folder link
-            //      to anything else than the cloud isn't supported.
-            $('.copy-dialog-button.' + String(dialogTabClass).replace(/[^\w-]/g, '')).fadeOut(200).fadeIn(100);
-            // clicking the shares tab deactivates the "Import" button, restore it.
-            $('.dialog-copy-button').removeClass('disabled');
-            $.mcselected = $.mcselected || M.RootID;
-
-            return;
-        }
         $('.' + dialogPrefix + '-dialog-txt').removeClass('active');
         $('.' + dialogPrefix + '-dialog-button').removeClass('active');
         $('.' + dialogPrefix + '-dialog-tree-panel').removeClass('active');
@@ -392,7 +389,7 @@
                     handleDialogContent(section, 'ul', true, type, move ? l[62] : $.mcImport ? l[236] : l[63]);
                 }
                 else if (section === 'shared-with-me') {
-                    handleDialogContent(section, 'ul', false, type, l[1344]); // Share
+                    handleDialogContent(section, 'ul', false, type, $.mcImport ? l[236] :l[1344]); // Share
                 }
                 else if (section === 'conversations') {
                     handleDialogContent(section, 'div', false, type, l[1940], '.conversations-container'); // Send

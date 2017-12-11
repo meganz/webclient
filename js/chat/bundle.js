@@ -7161,7 +7161,7 @@ React.makeElement = React['createElement'];
 	    displayName: "TypingArea",
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
-	    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gui"),
+	    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gi"),
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'textareaMaxHeight': "40%"

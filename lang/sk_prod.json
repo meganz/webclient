@@ -1147,6 +1147,7 @@
     "8527": "V\u0161eobecn\u00e1 ot\u00e1zka",
     "8528": "Technick\u00fd probl\u00e9m",
     "8529": "Probl\u00e9m s platbou",
+    "8531": "Neplatn\u00fd odkaz",
     "8535": "MEGA men\u00ed [B]20. febru\u00e1ra 2016[\/B] svoje Podmienky pou\u017e\u00edvania slu\u017eby. Pros\u00edme, pre\u010d\u00edtajte si n\u00e1\u0161 v\u00fdro\u010dn\u00fd blog post, pre viac inform\u00e1ci\u00ed.",
     "8536": "\u010eakujeme v\u00e1m, za pou\u017e\u00edvanie MEGA.",
     "8537": "Dole\u017eit\u00fd oznam",
@@ -1465,7 +1466,7 @@
     "13761": "Permanentne ste odstr\u00e1nili 1 s\u00fabor a 1 prie\u010dinok.",
     "13762": "Permanentne ste odstr\u00e1nili 1 s\u00fabor a %1 prie\u010dinkov.",
     "13763": "Permanentne ste odstr\u00e1nili %1 s\u00faborov a 1 prie\u010dinok.",
-    "13764": "You permanently removed %1 files and %2 folders.",
+    "13764": "Permanentne ste odstr\u00e1nili %1 s\u00faborov a %2 prie\u010dinkov.",
     "15536": "Kliknite [B]Aktualizova\u0165[\/B] pre beh najnov\u0161ieho k\u00f3du v browseri. Va\u0161a rel\u00e1cia zostane otvoren\u00e1.",
     "16100": "Data odoslan\u00e9",
     "16101": "Stav pozv\u00e1nky",
@@ -1857,5 +1858,10 @@
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
     "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+    "17557": "The link you are trying to access is not valid.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:"
 }

@@ -1147,6 +1147,7 @@
     "8527": "Splo\u0161na poizvedba",
     "8528": "Tehni\u010dna te\u017eava",
     "8529": "Te\u017eava s pla\u010dilom",
+    "8531": "Neveljavna povezava",
     "8535": "MEGA bo spremenil svoja Pravila uporabe storitve dne [B]20. februarja 2016[\/B]. Prosim, preberite na\u0161 blog zapis ob obletnici za ve\u010d informacij.",
     "8536": "Hvala, da uporabljate MEGA.",
     "8537": "Va\u017eno opozorilo:",
@@ -1857,5 +1858,10 @@
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
     "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+    "17557": "The link you are trying to access is not valid.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:"
 }

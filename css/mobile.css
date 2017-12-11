@@ -856,6 +856,7 @@ ul, li {
 .folder-link .mobile.fm-header-txt span {
     font-size: 18px;
     line-height: 24px;
+    text-align: center;
 }
 .mobile.fm-item-img {
     float: left;

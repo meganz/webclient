@@ -1097,7 +1097,7 @@
     "7988": "Introdu numele complet",
     "7989": "Num\u0103rul %1",
     "7990": "Introdu num\u0103rul %1",
-    "7991": "You have selected %1 as your payment provider.",
+    "7991": "Ai selectat %1 ca furnizor de plat\u0103.",
     "7992": "Cum dore\u015fti s\u0103 pl\u0103te\u015fti?",
     "7993": "Clic aici pentru a ar\u0103ta mai multe op\u0163iuni de plat\u0103...",
     "7994": "C\u00e2t de lung\u0103 perioad\u0103 dore\u015fti s\u0103 fii membru?",
@@ -1147,6 +1147,7 @@
     "8527": "Cerere general\u0103",
     "8528": "Problem\u0103 tehnic\u0103",
     "8529": "Problem\u0103 cu plata",
+    "8531": "Link invalid",
     "8535": "MEGA \u00ee\u015fi va schimba Termenii de utilizare a serviciului s\u0103u pe data de [B]20 februarie 2016[\/B]. Te rug\u0103m s\u0103 cite\u015fti postarea noastr\u0103 aniversar\u0103 de pe blog pentru mai multe informa\u0163ii.",
     "8536": "\u00ce\u0163i mul\u0163umim c\u0103 folose\u015fti MEGA.",
     "8537": "Notificare important\u0103:",
@@ -1857,5 +1858,10 @@
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
     "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+    "17557": "The link you are trying to access is not valid.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:"
 }

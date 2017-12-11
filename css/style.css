@@ -3356,7 +3356,7 @@ img.blog-new-logos {
     top: -1px;
     bottom: auto;
 }
-.multiple .properties-name-block .file-settings-icon {
+.multiple .properties-name-block .file-settings-icon, .hidden-context .properties-name-block .file-settings-icon {
     display: none;
 }
 .propreties-dark-txt b {

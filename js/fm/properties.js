@@ -63,7 +63,7 @@
 
         $dialog.removeClass('multiple folders-only two-elements shared shared-with-me');
         $dialog.removeClass('read-only read-and-write full-access taken-down undecryptable');
-        $dialog.removeClass('versioning');
+        $dialog.removeClass('hidden-context versioning');
         $('.properties-elements-counter span').text('');
 
         var users = null;
@@ -188,6 +188,7 @@
                 p.t2 = htmlentities(n.name);
             }
             else if (n.h === M.RootID) {
+                $dialog.addClass('hidden-context');
                 p.t2 = htmlentities(l[164]);
             }
             else if (n.h === M.InboxID) {

@@ -35,9 +35,10 @@ if (typeof process !== 'undefined') {
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&
-                        document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_chrome_web_ext = document.location.href.substr(0, 19) === 'chrome-extension://';
-var is_firefox_web_ext = document.location.href.substr(0, 16) === 'moz-extension://';
+    document.location.host === 'mega' || document.location.protocol === 'mega:';
+var location_sub = document.location.href.substr(0, 16);
+var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
+var is_firefox_web_ext = location_sub === 'moz-extension://';
 var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);

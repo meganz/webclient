@@ -133,13 +133,7 @@ mobile.linkOverlay = {
         // Set the URL into the text field
         $publicLinkTextField.removeClass('hidden').val(publicUrl);
 
-        // check if we are on ios (doesnt allow copy to clipboard)
-        if (!is_ios) {
-            $copyLinkButton.removeClass('disabled');
-        }
-        else {
-            $copyLinkButton.addClass('hidden');
-        }
+        $copyLinkButton.removeClass('disabled');
         $removeLinkButton.removeClass('disabled');
 
         // Update the link icon in the file manager view

@@ -255,7 +255,7 @@ function fm_showoverlay() {
     'use strict';
 
     $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    $('html').addClass('overlayed');
 }
 
 function fm_hideoverlay() {
@@ -263,7 +263,7 @@ function fm_hideoverlay() {
     'use strict';
 
     $('.fm-dialog-overlay').addClass('hidden');
-    $('body').removeClass('overlayed');
+    $('html').removeClass('overlayed');
 }
 
 mega.ui.showRegisterDialog = function() {};

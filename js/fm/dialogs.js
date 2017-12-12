@@ -326,7 +326,7 @@
 
             $dialog.removeClass('hidden');
             $('.dialog-copy-button', $dialog).addClass('active');
-            handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : l[63]);
+            handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : l[16176]);
 
             $.hideContextMenu();
             return $dialog;

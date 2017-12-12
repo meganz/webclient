@@ -464,6 +464,7 @@ function init_page() {
             if (is_mobile) {
                 parsepage(pages['mobile']);
                 mobile.register.showConfirmEmailScreen(acc);
+                topmenuUI();
                 return false;
             }
             else {

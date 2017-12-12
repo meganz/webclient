@@ -2168,7 +2168,7 @@ function closeDialog(ev) {
         delete $.copyToShare;
         delete $.copyrightsDialog;
 
-        if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button')) {
+        if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
             delete $.onImportCopyNodes;
         }
     }

@@ -451,8 +451,24 @@ function init_page() {
         closeDialog();
     }
 
-    // Do not show this dialog while entering into the downloads or Pro pages (so they can still choose plan and pay)
-    if ((page.substr(0, 1) !== '!') && (page.substr(0, 3) !== 'pro') && localStorage.awaitingConfirmationAccount) {
+    if ((page.substr(0, 1) !== '!')
+        && (page.substr(0, 3) !== 'pro')
+        && (page.substr(0, 5) !== 'start')
+        && (page.substr(0, 4) !== 'help')
+        && (page !== 'contact')
+        && (page !== 'ios')
+        && (page !== 'android')
+        && (page !== 'wp')
+        && (page !== 'extensions')
+        && (page !== 'sync')
+        && (page !== 'bird')
+        && (page !== 'cmd')
+        && (page !== 'terms')
+        && (page !== 'privacy')
+        && (page !== 'takendown')
+        && (page !== 'general')
+        && localStorage.awaitingConfirmationAccount) {
+
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
         // if visiting a #confirm link, or they confirmed it elsewhere.

@@ -38,6 +38,7 @@ html, body {
     top: 0;
     z-index: 10;
     border: 0;
+    background-color: transparent;
 }
 html.overlayed {
     overflow: hidden;

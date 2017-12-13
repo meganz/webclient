@@ -354,6 +354,9 @@
 .dropdown-item:hover .small-icon.rounded-stop {
     background-position: -54px -218px;
 }
+.dropdown.body:not(.context) .dropdown-item .small-icon.remove-link {
+    margin: 6px 8px 1px -1px;
+}
 .dashed-conversation {
     background-position: 1px -1644px;
 }

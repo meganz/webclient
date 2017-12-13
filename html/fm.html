@@ -1035,6 +1035,9 @@
                                                  <div class="account progress-size versioning">-</div>
                                                 <div class="clear"></div>
                                             </div>
+                                            <div class="">
+                                                <div class="account version-settings-button">View file version settings</div>
+                                            </div>
                                         </div>
                                         <div class="chart-warning red">
                                             [$16136]
@@ -1990,8 +1993,31 @@
                                       </div>
                                       <!-- Use rad20 as next radio button to allow further rubsched options -->
 
-                                 </div>
-
+                                </div>
+                                <div id="enable-versioning" class="versioning-block">
+                                    <div class="fm-account-header">Enable file versioning for this account only:
+                                    </div>
+                                    <div class="enable-version">
+                                        <label class="versioning-switch"> 
+                                          <input type="checkbox" checked>
+                                          <span class="versioning-slider"></span>
+                                          <label class="label-heading">Enabled</label>
+                                        </label>
+                                    </div>
+                                    <div class="account-italic-txt">
+                                        You may still receive file versions from shared folders if your contacts have this enabled.
+                                    </div>
+                                </div>
+                                <div id="delete-all-versions" class="versioning-block">
+                                    <div class="fm-account-header">Delete all file versions:</div>
+                                    <div class="versioning-body-text">You have <span class="versioning-text total-file-versions">345</span> file versions, taking up a total of <span class="versioning-text total-versions-size">3.5 GB</span>.</div>
+                                    <div class="delete-all-versions-block">
+                                        <div class="button default-grey-button left delete-all-versions"><span>Delete all</span></div>
+                                    </div>
+                                    <div class="account-italic-txt">
+                                        This will permanently delete all your own file versions. Any file version shared to you from a contact will need to be deleted by them.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

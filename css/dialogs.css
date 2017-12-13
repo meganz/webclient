@@ -2080,6 +2080,16 @@ li.token-input-token-invite .input-close {
 .fm-versioning .jspVerticalBar {
     width: 6px;
 }
+.fm-versioning.button.settings {
+    position: absolute;
+    top: 22px;
+    left: 20px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+.fm-versioning.button.settings:hover {
+    opacity: 1;
+}
 .fm-versioning.button.close {
     position: absolute;
     top: 18px;

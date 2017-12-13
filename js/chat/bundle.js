@@ -1037,7 +1037,7 @@ React.makeElement = React['createElement'];
 	};
 
 	Chat.prototype.getPresence = function (user_handle) {
-	    if (this.plugins.presencedIntegration) {
+	    if (user_handle && this.plugins.presencedIntegration) {
 	        return this.plugins.presencedIntegration.getPresence(user_handle);
 	    } else {
 	        return;

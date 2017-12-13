@@ -465,7 +465,6 @@
     "1143": "Sleutel aan het genereren",
     "1144": "Het oudst bekende gebruik van cryptografie gaat terug tot bijna 4000 jaar geleden in het oude Egypte",
     "1145": "Vandaag, 4000 jaar later, hebben de meeste grote cloud opslag diensten codering nog steeds niet volledig opgenomen.",
-    "1146": "Account voltooien",
     "1147": "Kies uw type account",
     "1148": "[A]Krijg 2 maanden gratis[\/A] als u een PRO abonnement voor een jaar koopt.",
     "1149": "Beperkt",
@@ -1536,6 +1535,7 @@
     "16172": "Label...",
     "16173": "Kies kleur:",
     "16175": "Abonnement Verloopt Op",
+    "16176": "Plakken",
     "16221": "Voeg label toe %1",
     "16222": "Verwijder label %1",
     "16223": "Rood",
@@ -1863,5 +1863,6 @@
     "17558": "Import and update",
     "17559": "Don't import",
     "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

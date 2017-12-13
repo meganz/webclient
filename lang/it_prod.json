@@ -465,7 +465,6 @@
     "1143": "Generazione della chiave",
     "1144": "L'uso pi\u00f9 antico della crittografia fuquasi 4000 anni fa nell'antico Egitto",
     "1145": "Oggi, 4000 anni dopo, la maggior parte dei principali fornitori di cloud storage non hanno ancora pienamente adottato la crittografia.",
-    "1146": "Completa il tuo account",
     "1147": "Scegli il tuo tipo di account",
     "1148": "[A]Ottieni 2 mesi gratis[\/A] se acquisti un piano PRO di un anno.",
     "1149": "Limitata",
@@ -1536,6 +1535,7 @@
     "16172": "Categoria...",
     "16173": "Scegli colore:",
     "16175": "L'abbonamento scade il",
+    "16176": "Incolla",
     "16221": "Aggiungi etichetta %1",
     "16222": "Rimuovi etichetta %1",
     "16223": "Rosso",
@@ -1860,8 +1860,9 @@
     "17548": "Sei sicuro di voler annullare il tuo abbonamento? Perderai il tuo status PRO al termine del tuo periodo corrente di abbonamento.",
     "17549": "Abbiamo recentemente apportato alcuni miglioramenti alla nostra estensione per Firefox Legacy. Puoi scaricare ed installare l'aggiornamento utilizzando il pulsante sottostante.",
     "17557": "Il link a cui stai cercando di accedere non \u00e8 valido",
-    "17558": "Import and update",
-    "17559": "Don't import",
-    "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17558": "Importa e aggiorna",
+    "17559": "Non importare",
+    "17560": "Importa e rinomina",
+    "17561": "I file che stai importando saranno rinominati con:",
+    "17564": "Errore del link"
 }

@@ -465,7 +465,6 @@
     "1143": "Tworzenie klucza",
     "1144": "Pierwsze znane u\u017cycie szyfrowania mia\u0142o miejsce prawie 4000 lat temu, w staro\u017cytnym Egipcie.",
     "1145": "Dzisiaj, 4000 lat p\u00f3\u017aniej, wci\u0105\u017c wi\u0119kszo\u015b\u0107 dost\u0119pnych chmur przechowywania plik\u00f3w nie wdro\u017cy\u0142a pe\u0142nego szyfrowania.",
-    "1146": "Uzupe\u0142nij swoje konto",
     "1147": "Wybierz rodzaj konta",
     "1148": "[A]2 miesi\u0105ce gratis[\/A] je\u017celi zam\u00f3wisz pakiet na 1 rok.",
     "1149": "Ograniczony",
@@ -1536,6 +1535,7 @@
     "16172": "Etykieta...",
     "16173": "Wybierz kolor:",
     "16175": "Subskrypcja wygasa w:",
+    "16176": "Wklej",
     "16221": "Dodaj etykiet\u0119 %1",
     "16222": "Usu\u0144 etykiet\u0119 %1",
     "16223": "Czerwony",
@@ -1863,5 +1863,6 @@
     "17558": "Importuj i aktualizuj",
     "17559": "Nie importuj",
     "17560": "Importuj i zmie\u0144 nazw\u0119",
-    "17561": "Plik kt\u00f3ry importujesz b\u0119dzie nazwany jak:"
+    "17561": "Plik kt\u00f3ry importujesz b\u0119dzie nazwany jak:",
+    "17564": "Link error"
 }

@@ -465,7 +465,6 @@
     "1143": "Generando clave",
     "1144": "El primer uso conocido de la criptograf\u00eda se encuentra hace casi 4.000 a\u00f1os, en el antiguo Egipto",
     "1145": "Hoy, 4000 a\u00f1os despu\u00e9s, la mayor\u00eda de los principales proveedores de almacenamiento en la nube todav\u00eda no usan la criptograf\u00eda.",
-    "1146": "Completa tu cuenta",
     "1147": "Elige tu tipo de cuenta",
     "1148": "[A]Consigue 2 meses gratis[\/A] si compras 1 a\u00f1o PRO.",
     "1149": "Limitado",
@@ -1536,6 +1535,7 @@
     "16172": "Etiqueta...",
     "16173": "Elige color:",
     "16175": "La suscripci\u00f3n caduca el",
+    "16176": "Pegar",
     "16221": "A\u00f1adir etiqueta %1",
     "16222": "Eliminar etiqueta %1",
     "16223": "Rojo",
@@ -1863,5 +1863,6 @@
     "17558": "Import and update",
     "17559": "Don't import",
     "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

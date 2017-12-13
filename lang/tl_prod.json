@@ -465,7 +465,6 @@
     "1143": "Nag-gegenerate na ng key",
     "1144": "Ang pinakaunang paggamit ng cryptography ay nangyari noong una sa Ehipto, 4000 taon na ang nakakalipas",
     "1145": "Ngayon, makalipas ang 4000 taon, karamihan sa mga cloud storage providers ay hindi pa na-aadopt ang cryptography.",
-    "1146": "Kumpletohin ang inyong account",
     "1147": "Pumili ng account type",
     "1148": "[A]Makakuha ng 2 buwang libre[\/A] kung ikaw ay bibili ng one-year PRO plan.",
     "1149": "Limitado",
@@ -1536,6 +1535,7 @@
     "16172": "Label...",
     "16173": "Pumili ng kulay:",
     "16175": "Matatapos ang Subscription Sa",
+    "16176": "I-paste",
     "16221": "Lagyan ng %1",
     "16222": "Tanggalin ang label %1",
     "16223": "Lagyan ng pula",
@@ -1863,5 +1863,6 @@
     "17558": "Import and update",
     "17559": "Don't import",
     "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

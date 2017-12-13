@@ -465,7 +465,6 @@
     "1143": "Genererar nyckel",
     "1144": "Den tidigaste k\u00e4nda anv\u00e4ndningen av kryptografi har sitt ursprung fr\u00e5n n\u00e4stan 4000 \u00e5r sedan, i antika Egypten.",
     "1145": "Idag, n\u00e4stan 4000 \u00e5r senare, har de flesta stora molnlagringsf\u00f6retagen inte \u00e4nnu tagit kryptografin i bruk.",
-    "1146": "F\u00e4rdigst\u00e4ll Ert konto",
     "1147": "V\u00e4lj typ av konto",
     "1148": "[A]F\u00e5 2 m\u00e5nader gratis[\/A] vid k\u00f6p av en ett\u00e5rig PRO plan. ",
     "1149": "Begr\u00e4nsad",
@@ -1536,6 +1535,7 @@
     "16172": "Etikett",
     "16173": "V\u00e4lj f\u00e4rg:",
     "16175": "Prenumeration g\u00e5r ut den",
+    "16176": "Klistra in",
     "16221": "L\u00e4gg till etikett %1",
     "16222": "Ta bort etikett %1",
     "16223": "R\u00f6d",
@@ -1863,5 +1863,6 @@
     "17558": "Import and update",
     "17559": "Don't import",
     "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

@@ -1077,7 +1077,7 @@ ApiQueue.prototype.dequeue = function (onlySingle) {
         var data2 = this._storage2[this._head];
         delete this._storage1[this._head];
         delete this._storage2[this._head++];
-        
+
         return { st1: data1, st2: data2 };
     }
 };
@@ -1288,7 +1288,7 @@ function chunkedfetch(xhr, uri, postdata) {
                 if (r.done) {
                     // signal completion through .onload()
                     xhr.response = null;
-                    xhr.onload();
+                    xhr.onloadend();
                 }
                 else {
                     // feed received chunk to JSONSplitter via .onprogress()
@@ -1338,22 +1338,13 @@ function api_proc(q) {
 
     q.cmdsBuffer = currCmd;
     q.ctxsBuffer = currCtx;
-    
+
 
     if (!q.xhr) {
         // we need a real XHR only if we don't use fetch for this channel
         q.xhr = (!q.split || chunked_method != 2) ? getxhr() : Object.create(null);
 
         q.xhr.q = q;
-
-        q.xhr.onerror = function () {
-            if (!this.cancelled) {
-                if (logger) {
-                    logger.debug("API request error - retrying");
-                }
-                api_reqerror(q, EAGAIN, this.status);
-            }
-        };
 
         // JSON splitters are keen on processing the data as soon as it arrives,
         // so route .onprogress to it.
@@ -1406,7 +1397,7 @@ function api_proc(q) {
             };
         }
 
-        q.xhr.onload = function onAPIProcXHRLoad() {
+        q.xhr.onloadend = function onAPIProcXHRLoad(ev) {
             if (!this.cancelled) {
                 var t;
                 var status = this.status;
@@ -1474,6 +1465,11 @@ function api_proc(q) {
                     api_proc(this.q);
                 }
                 else {
+                    if (ev.type === 'error') {
+                        if (logger) {
+                            logger.debug("API request error - retrying");
+                        }
+                    }
                     api_reqerror(this.q, t, status);
                 }
             }

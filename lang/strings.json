@@ -18034,5 +18034,65 @@
     "17561": {
         "text": "The file you are importing will be renamed as:",
         "context": "A description for a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and also the file they are importing by renaming it automatically."
+    },
+    "17562": {
+        "text": "MEGA accesses your photo library to save your photos or videos in case you need to do so.",
+        "context": "A description for why write-only access to the user\u2019s photo library is required. To protect user privacy Apple requires a purpose string explaining why this will be accessed."
+    },
+    "17563": {
+        "text": "MEGA accesses Face ID to allow you to easily unlock the app's passcode in case you enable this option.",
+        "context": "A description for usage of Face ID. To protect user privacy Apple requires a purpose string explaining why will be accessed."
+    },
+    "17564": {
+        "text": "Link error",
+        "context": "The title of an error dialog while getting the sharing link of a file\/folder."
+    },
+    "17566": {
+        "text": "Visit the Contacts tab to add or manage your contacts. [B]Invite your friends to MEGA[\/B] to allow you to [B]share[\/B] with them privately or [B]chat securely[\/B] using MEGAchat.",
+        "context": "This text is shown to users who have two or more contacts."
+    },
+    "17567": {
+        "text": "Communicate securely with your family, friends and colleagues using MEGAchat. Chats and calls are end-to-end encrypted, [B]not even MEGA can read or listen to your communication[\/B].",
+        "context": "This message is shown to users who have two or more contacts and less than two chats."
+    },
+    "17568": {
+        "text": "Start uploading files to your account by using the [B]file or folder upload button[\/B], or simply [B]drag and drop[\/B] from your local computer to MEGA in the browser.",
+        "context": "Onboarding tip on how to upload new files, only shown to users with less than two files in their cloud drive (typically, they would have the welcome pdf, so that may mean that they had never uploaded files in their current folder that they are viewing)."
+    },
+    "17569": {
+        "text": "Start uploading files to your account by using the [B]file upload button[\/B], or simply [B]drag and drop[\/B] from your local computer to MEGA in the browser.",
+        "context": "Same as string 17568, but shown to browsers which only support file uploads (and no folder uploads)."
+    },
+    "17570": {
+        "text": "Items moved to the Rubbish Bin will remain there temporarily. The Rubbish Bin is periodically [B]cleaned for you automatically[\/B], and you can control its setup in your Settings.",
+        "context": "Once the user has moved an item to the Rubbish bin, we would remind him (if we never did before) that there are items that can be cleared automatically by going into their Settings."
+    },
+    "17571": {
+        "text": "Manage your transfers",
+        "context": "Title for the \"Manage your transfers\" onboarding hint."
+    },
+    "17572": {
+        "text": "You can see the progress of your transfers by placing the mouse over the Transfers tab. If you want to have more control over your transfers, just click the icon to move to the Transfer Manager.",
+        "context": "An onboarding tip which is shown once the user starts a new download. Typically this is only shown once."
+    },
+    "17573": {
+        "text": "Notifications will keep you posted regarding everything going on with your account. You can manage your notifications in your Settings.",
+        "context": "An onboarding tip shown once when the user gets a new notification."
+    },
+    "17574": {
+        "text": "Share your content",
+        "context": "The title of the \"Share your content\" onboarding tooltip. This is typically only shown once when the user doesn't have any files shared."
+    },
+    "17575": {
+        "text": "You can create a link to share your content by right clicking on the file or folder you want to share and selecting Get Link from the context menu.",
+        "context": "An onboarding tooltip message. This is typically shown only once when the user doesn't have any files shared."
+    },
+    "17576": {
+        "text": "Sharing folders",
+        "context": "The title of the \"Sharing folders\" onboarding tip. This is shown only once with all other onboarding tips and only when the user doesn't have any shared folders."
+    },
+    "17577": {
+        "text": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu.",
+        "context": "An onboarding tooltip message which is shown only once along with all other onboarding tips and only when the user doesn't have any shared folders."
     }
 }

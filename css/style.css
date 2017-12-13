@@ -8444,8 +8444,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     margin: 0;
 }
 .fm-dialog.copy-dialog, .fm-dialog.move-dialog {
-    width: 480px;
-    margin: -200px 0 0 -240px;
+    width: 604px;
+    margin: -220px 0 0 -302px;
 }
 .fm-dialog.arrange-to-back, div.overlay.arrange-to-back {
     z-index: 900;
@@ -17442,9 +17442,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .copy-dialog .fm-dialog-body, .move-dialog .fm-dialog-body {
     padding: 14px 0 0 0;
 }
-.copy-dialog-button, .move-dialog-button {
+.copy-dialog-button, .move-dialog-button  {
     height: 48px;
-    width: 244px;
+    width: 200px;
     float: left;
     background-color: rgba(0,0,0,0.15);
     background-image: url(../images/mega/nw-fm-sprite_v26.svg);
@@ -17456,7 +17456,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .copy-dialog-button.shared-with-me, .move-dialog-button.shared-with-me {
     background-position: center -87px;
-    width: 232px;
+    width: 200px;
 }
 .copy-dialog-button.conversations, .move-dialog-button.conversations {
     background-position: center -184px;
@@ -17477,7 +17477,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-color: rgba(49,181,0,1);
 }
 .dialog-empty-block {
-    height: 240px;
+    height: 280px;
     position: relative;
     display: none;
     background-color: #FAFAFA;
@@ -17487,10 +17487,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     display: block;
 }
 .move-dialog-button {
-    width: 158px;
+    width: 200px;
 }
 .move-dialog-button.shared-with-me {
-    width: 160px;
+    width: 200px;
 }
 .dialog-empty-icon {
     height: 128px;
@@ -17532,7 +17532,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     border: 0;
 }
 .copy-dialog-tree-panel, .move-dialog-tree-panel {
-    height: 240px;
+    height: 280px;
     overflow: hidden;
     display: none;
 }

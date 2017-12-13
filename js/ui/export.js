@@ -1336,6 +1336,10 @@ var exportExpiry = {
         html = itemExportLink();
 
         // Fill with content
+        if (!html.length) { // some how we dont have a link
+            msgDialog('warninga', l[17564], l[17565]);
+            return true;
+        }
         $linksDialog.find('.export-link-body').safeHTML(html);
 
         // Reset state from previous dialog opens and pre-select the 'Link with key' option by default

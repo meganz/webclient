@@ -2455,16 +2455,15 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         if (!$(this).hasClass('disabled')) {
             msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
                 if (e) {
+                    loadingDialog.show();
                     api_req({
                             a: 'dv'
                             }, {
                             callback: function(res, ctx) {
                                 if (res === 0) {
-                                    setTimeout(function() {
-                                        M.accountData(function() {
-                                            updateVersionInfo();
-                                        }, true, true);
-                                    }, 2000);
+                                    M.accountData(function() {
+                                        updateVersionInfo();
+                                    }, false, true);
                                 }
                             }
                         });

@@ -1282,7 +1282,7 @@ var notify = {
             M.u.forEach(function(contact) {
 
                 // If the email is found
-                if ((contact.m === email) && contact.firstName && contact.lastName) {
+                if (contact.m === email && contact.firstName && contact.lastName) {
 
                     // Set the name and email
                     displayName = contact.firstName + ' ' + contact.lastName + ' (' + email + ')';

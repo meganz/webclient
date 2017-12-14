@@ -39,7 +39,8 @@ is_image.def = {
     'JPEG': 1,
     'GIF': 1,
     'BMP': 1,
-    'PNG': 1
+    'PNG': 1,
+	'HEIC': 1
 };
 
 is_image.raw = {

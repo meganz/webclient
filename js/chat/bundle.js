@@ -1037,7 +1037,7 @@ React.makeElement = React['createElement'];
 	};
 
 	Chat.prototype.getPresence = function (user_handle) {
-	    if (this.plugins.presencedIntegration) {
+	    if (user_handle && this.plugins.presencedIntegration) {
 	        return this.plugins.presencedIntegration.getPresence(user_handle);
 	    } else {
 	        return;
@@ -7161,7 +7161,7 @@ React.makeElement = React['createElement'];
 	    displayName: "TypingArea",
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
-	    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gui"),
+	    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gi"),
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'textareaMaxHeight': "40%"
@@ -8674,8 +8674,13 @@ React.makeElement = React['createElement'];
 
 	        if (Object.keys(self.state.currentlyTyping).length > 0) {
 	            var names = Object.keys(self.state.currentlyTyping).map(function (u_h) {
-	                var avatarMeta = generateAvatarMeta(u_h);
-	                return avatarMeta.fullName.split(" ")[0];
+	                var contact = M.u[u_h];
+	                if (contact && contact.firstName) {
+	                    return contact.firstName;
+	                } else {
+	                    var avatarMeta = generateAvatarMeta(u_h);
+	                    return avatarMeta.fullName.split(" ")[0];
+	                }
 	            });
 
 	            var namesDisplay = "";

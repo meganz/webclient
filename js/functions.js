@@ -2669,3 +2669,24 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
 
     return pdfViewerSrcCode;
 }
+
+function invalidLinkError() {
+    'use strict';
+    loadingDialog.hide();
+    loadingInitDialog.hide();
+
+    loadfm.loaded = false;
+    loadfm.loading = false;
+    if (!is_mobile) {
+        var title = l[8531];
+        var message = l[17557];
+        msgDialog('warninga', title, message, false, function () {
+            // If the user is logged-in, he'll be redirected to the cloud
+            loadSubPage('login');
+        });
+    }
+    else {
+        // Show file/folder not found overlay
+        mobile.notFoundOverlay.show();
+    }
+}

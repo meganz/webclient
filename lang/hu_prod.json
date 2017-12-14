@@ -465,7 +465,6 @@
     "1143": "Kulcs el\u0151\u00e1ll\u00edt\u00e1sa folyamatban",
     "1144": "A kriptogr\u00e1fia legkor\u00e1bbi ismert haszn\u00e1lata mintegy 4000 \u00e9vvel ezel\u0151ttre, az \u00f3kori Egyiptomba visszavezethet\u0151 vissza.",
     "1145": "Ma, 4000 \u00e9vvel k\u00e9s\u0151bb, a legt\u00f6bb nagyobb felh\u0151t\u00e1rhely szolg\u00e1ltat\u00f3 tov\u00e1bbra sem vette \u00e1t teljes m\u00e9rt\u00e9kben a kriptogr\u00e1fi\u00e1t.",
-    "1146": "Fejezd be fi\u00f3kod",
     "1147": "V\u00e1laszd ki fi\u00f3kt\u00edpusod",
     "1148": "[A]\u00d6n\u00e9 lehet 2 h\u00f3nap ingyen[\/A], ha v\u00e1s\u00e1rol egy 1 \u00e9ves PRO csomagot.",
     "1149": "Korl\u00e1tozott",
@@ -1147,6 +1146,7 @@
     "8527": "General Enquiry",
     "8528": "Technical Issue",
     "8529": "Fizet\u00e9si probl\u00e9ma",
+    "8531": "\u00c9rv\u00e9nytelen link",
     "8535": "MEGA will be changing its Terms of Service on the [B]20th February 2016[\/B]. Please read our anniversary blog post for more information.",
     "8536": "Thank you for using MEGA.",
     "8537": "Important notice:",
@@ -1535,6 +1535,7 @@
     "16172": "Label...",
     "16173": "Choose colour:",
     "16175": "Subscription Expires On",
+    "16176": "Paste",
     "16221": "Add label %1",
     "16222": "Remove label %1",
     "16223": "Red",
@@ -1857,5 +1858,11 @@
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
     "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+    "17557": "The link you are trying to access is not valid.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

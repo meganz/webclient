@@ -2399,6 +2399,29 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             .val(lastValidNumber);
     }
     var updateVersionInfo = function () {
+        mega.attr.get(
+            u_handle,
+            'dv',
+            -2,
+            true
+        )
+        .done(function(r) {
+            if (r === "0") {
+                $('#versioning-status').attr('checked', true);
+                $('.label-heading').text('Enabled');
+            }
+            else if (r === "1") {
+                $('#versioning-status').attr('checked', false);
+                $('.label-heading').text('Disabled');
+            }
+        })
+        .fail(function (e) {
+                if (e === ENOENT) {
+                    $('#versioning-status').attr('checked', true);
+                    $('.label-heading').text('Enabled');
+                }
+        });
+
         var data = M.getDashboardData();
         //FIXME: 17582
         var verionInfo = 'You have <span class="versioning-text total-file-versions">'
@@ -2406,6 +2429,24 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                 + bytesToSize(data.versions.size) + '</span>.'
         $('.versioning-body-text').safeHTML(verionInfo);
     };
+    $('.versioning-switch')
+    .rebind('click', function() {
+        var info = $('#versioning-status').attr('checked')
+                    ? "Are you sure you want to disable file versions?"
+                    : "Are you sure you want to enable file versions?";
+        var val = $('#versioning-status').attr('checked') ? 1 : 0;
+        msgDialog('confirmation', l[882], info, false, function(e) {
+            if (e) {
+                mega.attr.set(
+                    'dv',
+                    val,
+                    -2,
+                    true
+                );
+                updateVersionInfo();
+            }
+        });
+    });
     //update versioning info
     updateVersionInfo();
     $('.delete-all-versions')

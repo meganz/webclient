@@ -1,8 +1,8 @@
-MegaData.prototype.accountData = function(cb, blockui) {
+MegaData.prototype.accountData = function(cb, blockui, force) {
     "use strict";
 
     var account = Object(this.account);
-    var reuseData = account.lastupdate > Date.now() - 30000;
+    var reuseData = (account.lastupdate > Date.now() - 30000) && !force;
 
     if (reuseData && (!account.stats || !account.stats[M.RootID])) {
         if (d) {

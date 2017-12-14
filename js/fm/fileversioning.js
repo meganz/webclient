@@ -605,6 +605,10 @@
             $(window).bind('resize.fmbreadcrumbs', function() {
                 fileversioning.initFileVersioningScrolling();
             });
+            $('.fm-versioning .header .button.settings').rebind('click', function() {
+                pd.addClass('hidden');
+                loadSubPage('fm/account/file-management');
+            });
         },
 
         /**

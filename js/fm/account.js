@@ -354,6 +354,11 @@ function accountUI() {
         $('.tab-content .account.progress-size.versioning').text(
             bytesToSize(account.stats[M.RootID].vbytes)
         );
+
+        // Go to versioning settings.
+        $('.tab-content .version-settings-button').rebind('click', function() {
+            loadSubPage('fm/account/file-management');
+        });
         /* achievements */
         if (!account.maf) {
             $('.fm-right-account-block').removeClass('active-achievements');
@@ -2393,6 +2398,39 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             })
             .val(lastValidNumber);
     }
+    var updateVersionInfo = function () {
+        var data = M.getDashboardData();
+        //FIXME: 17582
+        var verionInfo = 'You have <span class="versioning-text total-file-versions">'
+                + data.versions.cnt + '</span> file versions, taking up a total of <span class="versioning-text total-versions-size">'
+                + bytesToSize(data.versions.size) + '</span>.'
+        $('.versioning-body-text').safeHTML(verionInfo);
+    };
+    //update versioning info
+    updateVersionInfo();
+    $('.delete-all-versions')
+    .rebind('click', function() {
+
+        if (!$(this).hasClass('disabled')) {
+            msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
+                if (e) {
+                    api_req({
+                            a: 'dv'
+                            }, {
+                            callback: function(res, ctx) {
+                                if (res === 0) {
+                                    setTimeout(function() {
+                                        M.accountData(function() {
+                                            updateVersionInfo();
+                                        }, true, true);
+                                    }, 2000);
+                                }
+                            }
+                        });
+                }
+            });
+        }
+    });
 };
 
 accountUI.voucherCentering = function voucherCentering($button) {

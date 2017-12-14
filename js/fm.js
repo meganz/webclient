@@ -1062,9 +1062,12 @@ function renameDialog() {
         $input.rebind('click keydown', function (event) {
             // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
             if (event.type === 'keydown') {
-                if (event.keyCode === 13) {
+                if (event.keyCode === 13) { // Enter
                     $('.rename-dialog-button.rename').click();
                     return;
+                }
+                else if (event.keyCode === 27){ // ESC
+                    closeDialog();
                 }
             }
             var value = $(this).val();
@@ -2165,7 +2168,7 @@ function closeDialog(ev) {
         delete $.copyToShare;
         delete $.copyrightsDialog;
 
-        if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button')) {
+        if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
             delete $.onImportCopyNodes;
         }
     }

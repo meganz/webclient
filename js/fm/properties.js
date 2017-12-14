@@ -63,7 +63,7 @@
 
         $dialog.removeClass('multiple folders-only two-elements shared shared-with-me');
         $dialog.removeClass('read-only read-and-write full-access taken-down undecryptable');
-        $dialog.removeClass('versioning');
+        $dialog.removeClass('hidden-context versioning');
         $('.properties-elements-counter span').text('');
 
         var users = null;
@@ -76,18 +76,17 @@
         var svfilecnt = 0;
         var n;
         var versioningFlag = false;
+        var hasValid = false;
+        var icons = [];
 
-        for (var i = $.selected.length; i--;) {
-            n = M.d[$.selected[i]];
+        var nodeInfoCalculator = function _nodeInfoCalculator(handle) {
+            n = M.d[handle];
             if (!n) {
-                console.error('propertiesDialog: invalid node', $.selected[i]);
-                continue;
+                console.error('propertiesDialog: invalid node', handle);
+                return;
             }
-
-            if (n.tvf) {
-                $dialog.addClass('versioning');
-                versioningFlag = true;
-            }
+            hasValid = true;
+            icons.push(fileIcon(n));
 
             if (n.t) {
                 size += n.tb;
@@ -103,8 +102,27 @@
                 vsize += (n.tvb) ? n.tvb : 0;
                 svfilecnt += (n.tvf) ? n.tvf : 0;
             }
+        };
+        // stupid code, but with optimized performance.
+        if ($.selected.length && $.selected.length > 1) {
+            for (var i = $.selected.length; i--;) {
+                nodeInfoCalculator($.selected[i]);
+            }
+            n = Object.create(null); // empty n [multiple selection]
         }
-        if (!n) {
+        else {
+            if ($.selected.length) { // > 0
+                nodeInfoCalculator($.selected[0]);
+                if (n.tvf) {
+                    $dialog.addClass('versioning');
+                    versioningFlag = true;
+                }
+            }
+            else {
+                return propertiesDialog(1); // no selection!
+            }
+        }
+        if (!hasValid) {
             // $.selected had no valid nodes!
             return propertiesDialog(1);
         }
@@ -119,54 +137,53 @@
         var isUndecrypted = missingkeys[$.selected[0].h];
         var notificationText = '';
 
-        if (isTakenDown || isUndecrypted) {
-            if (isTakenDown) {
-                $dialog.addClass('taken-down');
-                notificationText = l[7703] + '\n';
-            }
-            if (isUndecrypted) {
-                $dialog.addClass('undecryptable');
-
-                if ($.selected[0].t) {// folder
-                    notificationText += l[8595];
-                }
-                else {// file
-                    notificationText += l[8602];
-                }
-            }
-            showToast('clipboard', notificationText);
-        }
-
-        var star = '';
-        if (n.fav) {
-            star = ' star';
-        }
-        $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
-
-        if (fileIcon(n).indexOf('shared') > -1) {
-            $dialog.addClass('shared');
-        }
-
-        if (typeof n.r === "number") {
-            var zclass = "read-only";
-
-            if (n.r === 1) {
-                zclass = "read-and-write";
-            }
-            else if (n.r === 2) {
-                zclass = "full-access";
-            }
-            $dialog.addClass('shared shared-with-me ' + zclass);
-        }
-
         var p = {};
-        var user = Object(M.d[n.su || n.p]);
+        if (filecnt + foldercnt === 1) { // one item
+            if (isTakenDown || isUndecrypted) {
+                if (isTakenDown) {
+                    $dialog.addClass('taken-down');
+                    notificationText = l[7703] + '\n';
+                }
+                if (isUndecrypted) {
+                    $dialog.addClass('undecryptable');
 
-        if (d) {
-            console.log('propertiesDialog', n, user);
-        }
+                    if ($.selected[0].t) {// folder
+                        notificationText += l[8595];
+                    }
+                    else {// file
+                        notificationText += l[8602];
+                    }
+                }
+                showToast('clipboard', notificationText);
+            }
+            var star = '';
+            if (n.fav) {
+                star = ' star';
+            }
+            $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
 
-        if (filecnt + foldercnt === 1) {
+            if (fileIcon(n).indexOf('shared') > -1) {
+                $dialog.addClass('shared');
+            }
+
+            if (typeof n.r === "number") {
+                var zclass = "read-only";
+
+                if (n.r === 1) {
+                    zclass = "read-and-write";
+                }
+                else if (n.r === 2) {
+                    zclass = "full-access";
+                }
+                $dialog.addClass('shared shared-with-me ' + zclass);
+            }
+
+            var user = Object(M.d[n.su || n.p]);
+
+            if (d) {
+                console.log('propertiesDialog', n, user);
+            }
+
             p.t6 = '';
             p.t7 = '';
 
@@ -188,6 +205,7 @@
                 p.t2 = htmlentities(n.name);
             }
             else if (n.h === M.RootID) {
+                $dialog.addClass('hidden-context');
                 p.t2 = htmlentities(l[164]);
             }
             else if (n.h === M.InboxID) {
@@ -254,7 +272,7 @@
                 }
             }
             if (filecnt && versioningFlag) {
-                p.t14 = '<a href ="#" id = "previousversions" class="red" >'  + p.t14 + '</a>';
+                p.t14 = '<a href ="#" id = "previousversions" class="red" >' + p.t14 + '</a>';
             }
         }
         else {
@@ -274,11 +292,6 @@
             p.t17 = '';
             p.t18 = l[16474] + ':';
             p.t19 = bytesToSize(vsize);
-
-            users = M.getSharingUsers($.selected, true);
-            if (users.length) {
-                fillPropertiesContactList($dialog, users);
-            }
         }
 
         var vhtml = versioningFlag
@@ -435,15 +448,37 @@
             $('.properties-elements-counter span').text(filecnt + foldercnt);
             $('.properties-file-icon').html('');
 
-            for (var j = 0, a = 0; j < $.selected.length; ++j) {
-                var ico = fileIcon($.selected[j]);
+            var iconsTypes = [];
+            for (var j = 0; j < icons.length; j++) {
+                var ico = icons[j];
 
-                if (a <= 3) {
+                if (iconsTypes.indexOf(ico) === -1) {
                     if (ico.indexOf('folder') === -1) {
                         $dialog.removeClass('folders-only');
+                        iconsTypes.push('generic');
+                        break;// when we find generic --> all generic
                     }
-                    $('.properties-file-icon').prepend('<div class="' + escapeHTML(ico) + '"></div>');
-                    a++;
+                    else {
+                        iconsTypes.push(ico);
+                    }
+                    if (iconsTypes.length === 3) { // we only need 3 icons types, so we stop
+                        break;
+                    }
+                }
+            }
+            if (!$dialog.hasClass('folders-only')) {
+                for (var k1 = 0; k1 < 3; k1++) {
+                    $('.properties-file-icon').prepend('<div class="' + escapeHTML('generic') + '"></div>');
+                }
+            }
+            else {
+                for (var k = 0; k < iconsTypes.length; k++) {
+                    if (iconsTypes[k] === 'generic') {
+                        $('.properties-file-icon').prepend('<div class="' + escapeHTML(iconsTypes[k]) + '"></div>');
+                    }
+                    else {
+                        $('.properties-file-icon').append('<div class="' + escapeHTML(iconsTypes[k]) + '"></div>');
+                    }
                 }
             }
         }

@@ -220,7 +220,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
     "use strict";
 
     var flt;
-    var async = false;
+    var asyncShow = false;
     var m = $('.dropdown.body.files-menu');
 
     // Selection of first child level ONLY of .dropdown-item in .dropdown.body
@@ -292,7 +292,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
 
-        async = true;
+        asyncShow = true;
         M.menuItems()
             .done(function(items) {
 
@@ -399,7 +399,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             || currNodeClass.indexOf('fm-tree-folder') > -1)
             || String(id).length === 8) {
 
-            async = true;
+            asyncShow = true;
             M.menuItems()
                 .done(function(items) {
                     for (var item in items) {
@@ -435,7 +435,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         }
     }
 
-    if (!async) {
+    if (!asyncShow) {
         showContextMenu();
     }
 

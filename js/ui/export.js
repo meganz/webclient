@@ -234,9 +234,8 @@ var exportPassword = {
                 // Reinit link body scrolling
                 exportPassword.encrypt.reInitScrolling();
 
-                // Reposition the dialog, and re-initialise the scrolling so it scrolls all the way to the bottom
+                // Reposition the dialog
                 exportPassword.encrypt.repositionDialog();
-                exportPassword.encrypt.reInitScrolling();
             });
         },
 
@@ -258,10 +257,7 @@ var exportPassword = {
          */
         reInitScrolling: function() {
             var $scrollBlock = this.$dialog.find('.export-link-body');
-            var jsp = $scrollBlock.data('jsp');
-            if (jsp) {
-                jsp.destroy();
-            }
+
             $scrollBlock.jScrollPane({
                 showArrows: true,
                 arrowSize: 5
@@ -1336,6 +1332,10 @@ var exportExpiry = {
         html = itemExportLink();
 
         // Fill with content
+        if (!html.length) { // some how we dont have a link
+            msgDialog('warninga', l[17564], l[17565]);
+            return true;
+        }
         $linksDialog.find('.export-link-body').safeHTML(html);
 
         // Reset state from previous dialog opens and pre-select the 'Link with key' option by default

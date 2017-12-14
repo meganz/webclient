@@ -1456,7 +1456,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 38 &&
-            s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
@@ -1468,7 +1467,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 40 &&
-            s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
@@ -3309,7 +3307,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
-        properties: ['links', 'rename', 'copyrights', 'copy', 'move'],
+        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
         copy: ['createfolder'],
         move: ['createfolder']
     };

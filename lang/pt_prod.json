@@ -465,7 +465,6 @@
     "1143": "A criar chave",
     "1144": "O uso mais antigo conhecido de criptografia conhecido \u00e9 de h\u00e1 quase 4000 anos atr\u00e1s, no Antigo Egipto",
     "1145": "Hoje, 4000 anos depois, a maior parte dos provedores de armazenamento na cloud ainda n\u00e3o adoptaram totalmente a encripta\u00e7\u00e3o.",
-    "1146": "Completa a tua conta",
     "1147": "Escolhe o tipo de conta",
     "1148": "[A]Obtenha 2 meses gr\u00e1tis[\/A] se comprar um plano PRO de 1 ano.",
     "1149": "Limitado",
@@ -1147,6 +1146,7 @@
     "8527": "\u00c2mbito Geral",
     "8528": "Quest\u00e3o t\u00e9cnica",
     "8529": "Factura\u00e7\u00e3o",
+    "8531": "Endere\u00e7o inv\u00e1lido",
     "8535": "O MEGA ir\u00e1 mudar os seus Termos de Utiliza\u00e7\u00e3o em [B]20 de Fevereiro de 2016[\/B]. Por favor leia o nosso post de anivers\u00e1rio no blog para mais informa\u00e7\u00f5es.",
     "8536": "Obrigado por usar o MEGA.",
     "8537": "Aviso importante:",
@@ -1535,6 +1535,7 @@
     "16172": "Label...",
     "16173": "Choose colour:",
     "16175": "Subscription Expires On",
+    "16176": "Paste",
     "16221": "Add label %1",
     "16222": "Remove label %1",
     "16223": "Red",
@@ -1857,5 +1858,11 @@
     "17545": "Invite already sent, waiting for response.",
     "17546": "This user has already sent you an invitation.",
     "17548": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
-    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below."
+    "17549": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+    "17557": "The link you are trying to access is not valid.",
+    "17558": "Import and update",
+    "17559": "Don't import",
+    "17560": "Import and rename",
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

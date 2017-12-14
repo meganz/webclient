@@ -1352,7 +1352,7 @@ Chat.prototype.getMyPresence = function() {
  * @returns {Number|undefined} UserPresence.PRESENCE.* or undefined for offline/unknown presence
  */
 Chat.prototype.getPresence = function(user_handle) {
-    if (this.plugins.presencedIntegration) {
+    if (user_handle && this.plugins.presencedIntegration) {
         return this.plugins.presencedIntegration.getPresence(user_handle);
     }
     else {

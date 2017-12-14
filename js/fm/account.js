@@ -2407,17 +2407,17 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         )
         .done(function(r) {
             if (r === "0") {
-                $('#versioning-status').attr('checked', true);
+                $('#versioning-status').prop('checked', true)
                 $('.label-heading').text('Enabled');
             }
             else if (r === "1") {
-                $('#versioning-status').attr('checked', false);
+                $('#versioning-status').prop('checked', false)
                 $('.label-heading').text('Disabled');
             }
         })
         .fail(function (e) {
                 if (e === ENOENT) {
-                    $('#versioning-status').attr('checked', true);
+                    $('#versioning-status').prop('checked', true)
                     $('.label-heading').text('Enabled');
                 }
         });
@@ -2431,10 +2431,10 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
     };
     $('.versioning-switch')
     .rebind('click', function() {
-        var info = $('#versioning-status').attr('checked')
+        var info = $('#versioning-status').prop('checked')
                     ? "Are you sure you want to disable file versions?"
                     : "Are you sure you want to enable file versions?";
-        var val = $('#versioning-status').attr('checked') ? 1 : 0;
+        var val = $('#versioning-status').prop('checked') ? 1 : 0;
         msgDialog('confirmation', l[882], info, false, function(e) {
             if (e) {
                 mega.attr.set(

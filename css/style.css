@@ -5498,18 +5498,23 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
+  -webkit-transform: translateX(0px);
+  -ms-transform: translateX(0px);
+  transform: translateX(0px);
 }
-input:checked + .versioning-slider {
+.versioning-switch input[type=checkbox]:focus + .versioning-slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+.versioning-switch input[type=checkbox]:checked + .versioning-slider {
     background-color: #ff4444;
     border-radius: 10px;
+    -webkit-transition: .4s;
+    transition: .4s;
 }
-input:focus + .versioning-slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-input:checked + .versioning-slider:before {
-  -webkit-transform: translateX(20px);
-  -ms-transform: translateX(20px);
-  transform: translateX(20px);
+.versioning-switch input[type=checkbox]:checked + .versioning-slider:before {
+    left: 22px;
+    -webkit-transition: .4s;
+    transition: .4s;
 }
 .versioning-switch .label-heading {
     font-size: 14px;
@@ -10606,7 +10611,7 @@ table {
     font-size: 16px;
     line-height: 18px;
     margin: 3px 0;
-    color: #666666;
+    color: #444;
     white-space: pre-line;
     height: 18px;
 }

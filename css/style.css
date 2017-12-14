@@ -4094,7 +4094,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
-.nw-conversations-item .nw-contact-status, .fm-tree-panel .nw-contact-status {
+.nw-conversations-item .nw-contact-status, .fm-tree-panel .nw-contact-status, .fm-dialog-body .nw-contact-status {
     margin: 9px 0 0 14px;
 }
 .online .nw-contact-status, .online .properties-contact-status {
@@ -4276,7 +4276,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -khtml-opacity: 0.7;
     opacity: 0.7;
 }
-.nw-conversations-item, .fm-tree-panel .nw-contact-item {
+.nw-conversations-item, .fm-tree-panel .nw-contact-item, .fm-dialog-body .nw-contact-item {
     height: 24px;
     padding-right: 12px;
     overflow: hidden;
@@ -4344,7 +4344,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(43,166,222,0.5);
     color: white;
 }
-.nw-conversations-name, .fm-tree-panel .nw-contact-name {
+.nw-conversations-name, .fm-tree-panel .nw-contact-name, .fm-dialog-body .nw-contact-item {
     margin: 0 25px 0 32px;
     font-size: 13px;
     line-height: 23px;
@@ -5872,6 +5872,46 @@ th.grid-first-th {
 }
 .fm-blocks-view.shared-view .block-view-file-type.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder, .block-view-file-type.folder.inbound-share, .contact-details-view .block-view-file-type.folder-shared {
     background-position: center -9747px;
+}
+/* Ct changes for copy to conversations */
+.fm-dialog-body .nw-contact-name {
+    font-size: 13px;
+    line-height: 24px;
+    margin: 0 0 0 14px;
+    overflow: hidden;
+    display: inline-block;
+    padding: 0 0 0 0;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    width: calc(50% - 34px);
+    color: inherit;
+}
+.fm-dialog-body .nw-contact-item {
+    padding: 0 14px 0 14px;
+    margin: 0 0;
+    background-color:rgba(0,0,0,0);
+    color: #666;
+}
+.fm-dialog-body .nw-contact-item:hover {
+    background-color: rgba(43, 166, 222, 0.5);
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-item.active {
+    background-color: rgba(43, 166, 222, 1);
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-details {
+    font-size: 13px;
+    line-height: 24px;
+    margin: 0 0;
+    overflow: hidden;
+    display: inline-block;
+    padding: 0 0;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    width: calc(50% - 14px);
 }
 .file-icon-area {
     width: 120px;
@@ -17559,7 +17599,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     top: 11px;
 }
 .dialog-tree-panel-scroll {
-    height: 168px;
+    height: 232px;
     min-width: 100%;
 }
 .fm-dialog-body .nw-conversations-item {

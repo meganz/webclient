@@ -4094,7 +4094,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
-.nw-conversations-item .nw-contact-status, .fm-tree-panel .nw-contact-status, .fm-dialog-body .nw-contact-status {
+.nw-conversations-item .nw-contact-status, .fm-tree-panel .nw-contact-status {
     margin: 9px 0 0 14px;
 }
 .online .nw-contact-status, .online .properties-contact-status {
@@ -5877,15 +5877,23 @@ th.grid-first-th {
 .fm-dialog-body .nw-contact-name {
     font-size: 13px;
     line-height: 24px;
-    margin: 0 0 0 14px;
+    margin: 0 20px 0 19px;
     overflow: hidden;
     display: inline-block;
     padding: 0 0 0 0;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    width: calc(50% - 34px);
+    width: calc(50% - 56px);
     color: inherit;
+}
+.fm-dialog-body .online .nw-contact-status, .fm-dialog-body .away .nw-contact-status, .fm-dialog-body .offline .nw-contact-status {
+    border:1px solid #fff;
+    margin: 8px 0 0 14px;
+}
+.fm-dialog-body .nw-contact-status {
+    width: 8px;
+    height: 8px;
 }
 .fm-dialog-body .nw-contact-item {
     padding: 0 14px 0 14px;
@@ -5898,10 +5906,10 @@ th.grid-first-th {
     color: #fff;
 }
 .fm-dialog-body .nw-contact-item.active {
-    background-color: rgba(43, 166, 222, 1);
+    background-color: rgba(43, 166, 222, 0.75);
     color: #fff;
 }
-.fm-dialog-body .nw-contact-details {
+.fm-dialog-body .nw-contact-email, .fm-dialog-body .nw-contact-group {
     font-size: 13px;
     line-height: 24px;
     margin: 0 0;
@@ -5911,7 +5919,32 @@ th.grid-first-th {
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    width: calc(50% - 14px);
+    width: calc(50% - 2px);
+}
+.fm-dialog-body .nw-contact-group {
+    cursor: pointer;
+}
+.fm-dialog-body .nw-contact-group:hover {
+    text-decoration: underline;
+} 
+.fm-dialog-body .nw-contact-group-icon {
+    width: 19px;
+    height: 14px;
+    float: left;
+    margin-left: 11px;
+    margin-top: 4px;
+    background-image: url(../images/mega/nw-fm-sprite_v27.svg);
+    background-repeat: no-repeat;
+    background-size: 48px 12022px;
+    background-position: -14px -6225px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.fm-dialog-body .nw-contact-name.group {
+    margin-left: 11px;
 }
 .file-icon-area {
     width: 120px;
@@ -7817,7 +7850,7 @@ table {
     top: 34px;
 }
 .dialog-sorting-menu {
-    left: 466px;
+    left: 590px;
     top: 103px;
 }
 .context-menu-divider, .pause-item-divider, .sorting-item-divider {

@@ -2431,21 +2431,29 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
     };
     $('.versioning-switch')
     .rebind('click', function() {
-        var info = $('#versioning-status').prop('checked')
-                    ? "Are you sure you want to disable file versions?"
-                    : "Are you sure you want to enable file versions?";
         var val = $('#versioning-status').prop('checked') ? 1 : 0;
-        msgDialog('confirmation', l[882], info, false, function(e) {
-            if (e) {
-                mega.attr.set(
-                    'dv',
-                    val,
-                    -2,
-                    true
-                );
-                updateVersionInfo();
-            }
-        });
+        if ($('#versioning-status').prop('checked')) {
+            msgDialog('confirmation', l[882], 'Are you sure you want to disable file versions?', false, function(e) {
+                if (e) {
+                    mega.attr.set(
+                        'dv',
+                        val,
+                        -2,
+                        true
+                    );
+                    updateVersionInfo();
+                }
+            });
+        }
+        else {
+            mega.attr.set(
+                'dv',
+                val,
+                -2,
+                true
+            );
+            updateVersionInfo();
+        }
     });
     //update versioning info
     updateVersionInfo();
@@ -2470,6 +2478,9 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                 }
             });
         }
+    });
+    mBroadcaster.addListener('versionsettingchange', function() {
+        updateVersionInfo();
     });
 };
 

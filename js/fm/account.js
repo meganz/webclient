@@ -2433,7 +2433,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
     .rebind('click', function() {
         var val = $('#versioning-status').prop('checked') ? 1 : 0;
         if ($('#versioning-status').prop('checked')) {
-            msgDialog('confirmation', l[882], 'Are you sure you want to disable file versions?', false, function(e) {
+            msgDialog('confirmation', l[882], 'Disabling file versioning will prevent the creation and storage of new file versions. Are you sure you want to disable file versioning?', false, function(e) {
                 if (e) {
                     mega.attr.set(
                         'dv',

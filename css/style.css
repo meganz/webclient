@@ -5451,10 +5451,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-color: #FFFFFF;
 }
 .tab-content .versioning-block {
-    margin-top: 32px;
+    margin-top: 40px;
 }
-.tab-content .versioning-block:first-of-type {
-    margin-top: 24px;
+.versioning-block:first-of-type {
+    margin-top: 32px;
 }
 .versioning-block .fm-account-header {
     margin-bottom: 16px;

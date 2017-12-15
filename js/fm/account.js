@@ -2435,6 +2435,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         if ($('#versioning-status').prop('checked')) {
             msgDialog('confirmation', l[882], 'Are you sure you want to disable file versions?', false, function(e) {
                 if (e) {
+                    showToast('settings', l[16168]);
                     mega.attr.set(
                         'dv',
                         val,
@@ -2446,6 +2447,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             });
         }
         else {
+            showToast('settings', l[16168]);
             mega.attr.set(
                 'dv',
                 val,

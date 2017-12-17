@@ -5452,6 +5452,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .tab-content .versioning-block {
     margin-top: 40px;
+    margin-bottom: 54px;
 }
 .versioning-block:first-of-type {
     margin-top: 32px;

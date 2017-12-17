@@ -383,10 +383,12 @@ dashboardUI.updateCloudDataWidget = function() {
             if (props.cnt > 0) {
                 elm.children[2].textContent = bytesToSize(props.size);
                 $(elm).removeClass('empty');
+                $('.account.data-item .tiny-icon.cog').show();
             }
             else {
                 elm.children[2].textContent = '-';
                 $(elm).addClass('empty');
+                $('.account.data-item .tiny-icon.cog').hide();
             }
         });
 };

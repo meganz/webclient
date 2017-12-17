@@ -11374,6 +11374,15 @@ table {
 .account.data-item {
     display: table-row;
 }
+.account.data-item  .tiny-icon.cog {
+    margin-top: 2px;
+    margin-left: 4px;
+    opacity: 0.8;
+    cursor: pointer;
+}
+.account.data-item  .tiny-icon.cog:hover {
+    opacity: 1;
+} 
 .account.bonuses-block {
     float: left;
     width: 50%;

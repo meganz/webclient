@@ -151,7 +151,6 @@
                                     n: previousVersion.h
                                 }, {
                                 callback: function(res, ctx) {
-                                    M.versioningDomUpdate(M.d[h], 0);
                             }
                         });
                     }
@@ -487,9 +486,6 @@
                              v: 1
                             }, {
                         callback: function(res, ctx) {
-                            if (M.d[fh].tvf) {
-                                M.versioningDomUpdate(M.d[fh], M.d[fh].tvf - 1);
-                            }
                         }
                     });
                 };
@@ -566,9 +562,6 @@
                                      v: 1
                                     }, {
                                 callback: function(res, ctx) {
-                                    if (versions.length > 1) {
-                                        M.versioningDomUpdate(M.d[fh], versions.length - 1);
-                                    }
                                 }
                             });
                         };
@@ -620,12 +613,16 @@
          *
          */
         updateFileVersioningDialog: function (fileHandle) {
+            var current_sel = fileHandle ? fileHandle : $.selected[0];
+            var p = fileversioning.getTopNodeSync(current_sel);
+            if (p) {
+                // update node DOM.
+                M.versioningDomUpdate(p);
+            }
             if (!$('.fm-versioning').hasClass('hidden')) {
-                var current_sel = fileHandle ? fileHandle : $.selected[0];
                 if ($.selected.length === 0 ||
                     fileversioning.checkPreviousVersionSync(current_sel, $.selected[0]) ||
                     fileversioning.checkPreviousVersionSync($.selected[0], current_sel)) {
-                    var p = fileversioning.getTopNodeSync(current_sel);
                     if (p) {
                         fileversioning.fileVersioningDialog(p);
                         $.selected[0] = p;

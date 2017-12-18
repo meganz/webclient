@@ -1089,8 +1089,13 @@ scparser.$add('u', function(a) {
 
 scparser.$add('d', function(a) {
     var fileDeletion = (M.d[a.n] && !M.d[a.n].t);
+    var topVersion = null;
+    if (fileDeletion) {
+        topVersion = fileversioning.getTopNodeSync(a.n);
+    }
     // node deletion
     M.delNode(a.n);
+
     // was selected, now clear the selected array.
     if ($.selected && ($.selected[0] === a.n)) {
         $.selected = [];
@@ -1103,8 +1108,13 @@ scparser.$add('d', function(a) {
         }
     }
     if (!is_mobile) {
-        if (fileDeletion && !a.v) {// this is not a versioning deletion.
-            fileversioning.closeFileVersioningDialog(a.n);
+        if (fileDeletion && !a.v) {// this is a deletion of file.
+            if (M.d[topVersion]) {
+                fileversioning.updateFileVersioningDialog(topVersion);
+            }
+            else {
+                fileversioning.closeFileVersioningDialog(a.n);
+            }
         }
     }
 });

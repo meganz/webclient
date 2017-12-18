@@ -1330,6 +1330,7 @@ input.radioOn, input.radioOff {
     display: block;
     margin-left: 32px;
     float: none;
+    margin-bottom: 25px;
 }
 .nt-settings .radio-txt {
     padding-bottom: 7px;
@@ -3355,7 +3356,7 @@ img.blog-new-logos {
     top: -1px;
     bottom: auto;
 }
-.multiple .properties-name-block .file-settings-icon {
+.multiple .properties-name-block .file-settings-icon, .hidden-context .properties-name-block .file-settings-icon {
     display: none;
 }
 .propreties-dark-txt b {
@@ -11437,8 +11438,13 @@ table {
 .data .account.data-td {
     padding: 9px 15px 9px 0;
 }
+.data .account.data-td span {
+    margin-left: 25px;
+    display: block;
+}
 .account.data-td:last-child {
     padding-right: 0;
+    white-space: nowrap;
 }
 .account.data-right-td {
     width: 19px;
@@ -11448,6 +11454,7 @@ table {
 }
 .account.data-td .semi-small-icon {
     margin-right: 7px;
+    float: left;
 }
 .account.data-right-td span {
     min-width: 19px;
@@ -15260,10 +15267,9 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     color: #FFB800;
 }
 .recover-button {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     background-color: #b2b2b2;
-    border: 5px solid white;
     margin: 0 35px 0 -5px;
     text-align: center;
     font-size: 17px;
@@ -15280,21 +15286,22 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     -o-border-radius: 100%;
     border-radius: 100%;
     cursor: pointer;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
-.recover-button.yes:hover {
-    border: 5px solid #89c147;
-    background-color: #89c147;
-}
-.recover-button.yes.active:hover, .recover-button.yes.active {
-    border: 5px solid #6BB219;
+.recover-button.yes:hover, .recover-button.yes.active {
+    -webkit-box-shadow: 0px 0px 0px 5px #6BB219;
+    -moz-box-shadow: 0px 0px 0px 5px #6BB219;
+    box-shadow: 0px 0px 0px 5px #6BB219;
     background-color: #6BB219;
 }
-.recover-button.no:hover {
-    border: 5px solid #dd5133;
-    background-color: #dd5133;
-}
-.recover-button.no.active:hover, .recover-button.no.active {
-    border: 5px solid #d52600;
+.recover-button.no:hover, .recover-button.no.active {
+    -webkit-box-shadow: 0px 0px 0px 5px #d52600;
+    -moz-box-shadow: 0px 0px 0px 5px #d52600;
+    box-shadow: 0px 0px 0px 5px #d52600;
     background-color: #d52600;
 }
 .main-right-block.recover-block {

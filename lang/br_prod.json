@@ -465,7 +465,6 @@
     "1143": "Gerando a chave",
     "1144": "O registro mais antigo do uso da criptografia \u00e9 de quase 4000 anos atr\u00e1s, no antigo Egito.",
     "1145": "Hoje, 4000 anos depois, a maioria das grandes empresas de armazenamento em nuvem ainda n\u00e3o adotou completamente a criptografia.",
-    "1146": "Complete a sua conta",
     "1147": "Escolha o seu tipo de conta",
     "1148": "[A]Ganhe 2 meses gr\u00e1tis[\/A] ao comprar um plano PRO anual.",
     "1149": "Limitado",
@@ -1536,6 +1535,7 @@
     "16172": "Etiqueta...",
     "16173": "Escolha a cor:",
     "16175": "A assinatura expira em",
+    "16176": "Colar",
     "16221": "Adicionar marcador %1",
     "16222": "Remover marcador %1",
     "16223": "Vermelho",
@@ -1863,5 +1863,6 @@
     "17558": "Import and update",
     "17559": "Don't import",
     "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

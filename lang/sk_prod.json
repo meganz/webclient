@@ -465,7 +465,6 @@
     "1143": "Generovanie k\u00f3du",
     "1144": "Najskor\u0161ie zn\u00e1me pou\u017eitie \u0161ifrovania sa datuje skoro 4000 rokov dozadu, v starovekom Egypte",
     "1145": "Dnes, 4000 rokov nesk\u00f4r, poskytovatelia cloudov\u00e9ho \u00falo\u017eiska e\u0161te st\u00e1le plne neadaptovali \u0161ifrovanie.",
-    "1146": "Dokon\u010dite svoj \u00fa\u010det",
     "1147": "Vyberte si typ \u00fa\u010dtu",
     "1148": "[A]Z\u00edskajte 2 mesiace zdarma[\/A] ak si k\u00fapite jednoro\u010dn\u00fd PRO pl\u00e1n.",
     "1149": "Obmedzen\u00e1",
@@ -1536,6 +1535,7 @@
     "16172": "Label...",
     "16173": "Choose colour:",
     "16175": "Subscription Expires On",
+    "16176": "Paste",
     "16221": "Add label %1",
     "16222": "Remove label %1",
     "16223": "Red",
@@ -1863,5 +1863,6 @@
     "17558": "Import and update",
     "17559": "Don't import",
     "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

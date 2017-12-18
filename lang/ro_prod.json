@@ -465,7 +465,6 @@
     "1143": "Se genereaz\u0103 cheia",
     "1144": "Prima utilizare cunoscut\u0103 a criptografiei dateaz\u0103 de acum aproape 4000 ani \u00een Egiptul Antic",
     "1145": "Ast\u0103zi, 4000 de ani mai t\u00e2rziu, majoritatea furnizorilor de stocare \u00een cloud nu au adoptat \u00een totalitate criptografia.",
-    "1146": "Completeaz\u0103 contul",
     "1147": "Alege tipul contului t\u0103u",
     "1148": "[A]Ob\u0163ii 2 luni gratuite[\/A] dac\u0103 achizi\u0163ionezi un plan PRO pe un an.",
     "1149": "Limitat",
@@ -1536,6 +1535,7 @@
     "16172": "Etichet\u0103...",
     "16173": "Alege culoarea:",
     "16175": "Abonamentul expir\u0103 pe",
+    "16176": "Paste",
     "16221": "Adaug\u0103 eticheta %1",
     "16222": "Elimin\u0103 eticheta %1",
     "16223": "Ro\u015fu",
@@ -1863,5 +1863,6 @@
     "17558": "Import and update",
     "17559": "Don't import",
     "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

@@ -465,7 +465,6 @@
     "1143": "Luodaan avainta",
     "1144": "Aikaisin tunnettu kryptografian k\u00e4ytt\u00f6 tapahtui noin 4000 vuotta sitten muinaisessa Egyptiss\u00e4",
     "1145": "T\u00e4n\u00e4\u00e4n, 4000 vuotta my\u00f6hemmin suurin osa merkitt\u00e4vimmist\u00e4 pilvipalvelutarjoajista eiv\u00e4t silti kokonaisuudessaan hy\u00f6dynn\u00e4 kryptografiaa.",
-    "1146": "Viimeistele tilisi",
     "1147": "Valitse tilisi tyyppi",
     "1148": "[A]Saa 2 kuukautta ilmaiseksi[\/A] jos ostat yhden vuoden PRO-suunnitelman.",
     "1149": "Rajoitettu",
@@ -1536,6 +1535,7 @@
     "16172": "Label...",
     "16173": "Choose colour:",
     "16175": "Subscription Expires On",
+    "16176": "Paste",
     "16221": "Add label %1",
     "16222": "Remove label %1",
     "16223": "Red",
@@ -1863,5 +1863,6 @@
     "17558": "Import and update",
     "17559": "Don't import",
     "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

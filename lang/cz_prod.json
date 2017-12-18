@@ -465,7 +465,6 @@
     "1143": "Generov\u00e1n\u00ed kl\u00ed\u010de",
     "1144": "Nejstar\u0161\u00ed zn\u00e1m\u00e9 pou\u017eit\u00ed \u0161ifrov\u00e1n\u00ed se v\u00e1\u017ee ke starov\u011bk\u00e9mu Egyptu t\u00e9m\u011b\u0159 p\u0159ed 4000 lety",
     "1145": "Dnes, o 4000 let pozd\u011bji, v\u011bt\u0161ina hlavn\u00edch poskytovatel\u016f cloudov\u00fdch \u00falo\u017ei\u0161\u0165 st\u00e1le je\u0161t\u011b pln\u011b nep\u0159ijala \u0161ifrov\u00e1n\u00ed.",
-    "1146": "Dokon\u010dit \u00fa\u010det",
     "1147": "Vyberte typ sv\u00e9ho \u00fa\u010dtu",
     "1148": "[A]Z\u00edskejte 2 m\u011bs\u00edce zdarma[\/A], pokud si zakoup\u00edte ro\u010dn\u00ed pl\u00e1n PRO.",
     "1149": "Omezen\u00e1",
@@ -1536,6 +1535,7 @@
     "16172": "\u0160t\u00edtek...",
     "16173": "Zvolte barvu:",
     "16175": "P\u0159edplatn\u00e9 plat\u00ed do",
+    "16176": "Vlo\u017eit",
     "16221": "P\u0159idat \u0161t\u00edtek %1",
     "16222": "Odebrat \u0161t\u00edtek %1",
     "16223": "\u010cerven\u00e1",
@@ -1863,5 +1863,6 @@
     "17558": "Import and update",
     "17559": "Don't import",
     "17560": "Import and rename",
-    "17561": "The file you are importing will be renamed as:"
+    "17561": "The file you are importing will be renamed as:",
+    "17564": "Link error"
 }

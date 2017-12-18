@@ -4509,8 +4509,8 @@
     "17560": "\u0418\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0438 \u043f\u0435\u0440\u0435\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u0442\u044c",
     "17561": "\u0418\u043c\u043f\u043e\u0440\u0442\u0438\u0440\u0443\u0435\u043c\u044b\u0435 \u0444\u0430\u0439\u043b\u044b \u0431\u0443\u0434\u0443\u0442 \u043f\u0435\u0440\u0435\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u043d\u044b \u0432:",
     "17562": "MEGA accesses your photo library to save your photos or videos in case you need to do so.",
-    "17563": "MEGA accesses Face ID to allow you to easily unlock the app's passcode in case you enable this option.",
-    "17564": "Link error",
+    "17563": "MEGA \u043e\u0431\u0440\u0430\u0449\u0430\u0435\u0442\u0441\u044f \u043a Face ID, \u0447\u0442\u043e\u0431\u044b \u0432\u044b \u043b\u0435\u0433\u043a\u043e \u043c\u043e\u0433\u043b\u0438 \u0440\u0430\u0437\u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043a\u043e\u0434 \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f, \u0435\u0441\u043b\u0438 \u044d\u0442\u0430 \u043e\u043f\u0446\u0438\u044f \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430.",
+    "17564": "\u041e\u0448\u0438\u0431\u043a\u0430 \u0441\u0441\u044b\u043b\u043a\u0438",
     "17566": "Visit the Contacts tab to add or manage your contacts. [B]Invite your friends to MEGA[\/B] to allow you to [B]share[\/B] with them privately or [B]chat securely[\/B] using MEGAchat.",
     "17567": "Communicate securely with your family, friends and colleagues using MEGAchat. Chats and calls are end-to-end encrypted, [B]not even MEGA can read or listen to your communication[\/B].",
     "17568": "Start uploading files to your account by using the [B]file or folder upload button[\/B], or simply [B]drag and drop[\/B] from your local computer to MEGA in the browser.",
@@ -4522,5 +4522,8 @@
     "17574": "Share your content",
     "17575": "You can create a link to share your content by right clicking on the file or folder you want to share and selecting Get Link from the context menu.",
     "17576": "Sharing folders",
-    "17577": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu."
+    "17577": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu.",
+    "17578": "There is already a file with the same name",
+    "17579": "There is already a folder with the same name",
+    "17590": "by %1"
 }

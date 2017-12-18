@@ -834,6 +834,67 @@ var crypt = (function () {
     return ns;
 }());
 
+var xxtea = (function() {
+    'use strict';
+
+    // (from https://github.com/xxtea/xxtea-js/blob/master/src/xxtea.js)
+    var DELTA = 0x9E3779B9;
+    var ns = Object.create(null);
+
+    var int32 = function(i) {
+        return i & 0xFFFFFFFF;
+    };
+
+    var mx = function(sum, y, z, p, e, k) {
+        return (z >>> 5 ^ y << 2) + (y >>> 3 ^ z << 4) ^ (sum ^ y) + (k[p & 3 ^ e] ^ z);
+    };
+
+    ns.encryptUint32Array = function encryptUint32Array(v, k) {
+        var length = v.length;
+        var n = length - 1;
+        var y;
+        var z = v[n];
+        var sum = 0;
+        var e;
+        var p;
+        var q;
+        for (q = Math.floor(6 + 52 / length) | 0; q > 0; --q) {
+            sum = int32(sum + DELTA);
+            e = sum >>> 2 & 3;
+            for (p = 0; p < n; ++p) {
+                y = v[p + 1];
+                z = v[p] = int32(v[p] + mx(sum, y, z, p, e, k));
+            }
+            y = v[0];
+            z = v[n] = int32(v[n] + mx(sum, y, z, n, e, k));
+        }
+        return v;
+    };
+
+    ns.decryptUint32Array = function decryptUint32Array(v, k) {
+        var length = v.length;
+        var n = length - 1;
+        var y = v[0];
+        var z;
+        var sum;
+        var e;
+        var p;
+        var q = Math.floor(6 + 52 / length);
+        for (sum = int32(q * DELTA); sum !== 0; sum = int32(sum - DELTA)) {
+            e = sum >>> 2 & 3;
+            for (p = n; p > 0; --p) {
+                z = v[p - 1];
+                y = v[p] = int32(v[p] - mx(sum, y, z, p, e, k));
+            }
+            z = v[n];
+            y = v[0] = int32(v[0] - mx(sum, y, z, 0, e, k));
+        }
+        return v;
+    };
+
+    return Object.freeze(ns);
+}());
+
 window.URL = window.URL || window.webkitURL;
 
 var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';

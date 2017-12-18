@@ -353,6 +353,11 @@
                 return false;
             }
         }
+
+        if (localStorage.testMediaInfo) {
+            return MediaInfoLib.test(files);
+        }
+
         if (e.dataTransfer
                 && e.dataTransfer.items
                 && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry) {

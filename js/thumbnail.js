@@ -134,7 +134,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
 
         // preview image:
-        if ((fa.indexOf(':1*') < 0 || onPreviewRetry) && !isVideo) {
+        if (fa.indexOf(':1*') < 0 || onPreviewRetry) {
             canvas = document.createElement('canvas');
             var preview_x = this.width,
                 preview_y = this.height;
@@ -167,7 +167,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
             }
 
-            if (node && filetype(n) !== 'PDF Document') {
+            if (node && filetype(n) !== 'PDF Document' && !is_video(n)) {
                 previewimg(node, ab);
             }
 
@@ -345,7 +345,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             };
             if (!file) {
                 var defMime = 'image/jpeg';
-                var curMime = is_video(M.d[node]) ? defMime : filemime(M.d[node], defMime);
+                var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
                 M.neuterArrayBuffer(imagedata);
             }

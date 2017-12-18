@@ -63,7 +63,7 @@ module.exports = function(config) {
         'js/utils/conv.js',
         'js/utils/dom.js',
         'js/utils/locale.js',
-        'js/utils/pictools.js',
+        'js/utils/media.js',
         'js/utils/stringcrypt.js',
         'js/utils/timers.js',
         'js/utils/watchdog.js',

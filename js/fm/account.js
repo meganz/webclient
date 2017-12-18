@@ -2409,32 +2409,34 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         .done(function(r) {
             if (r === "0") {
                 $('#versioning-status').prop('checked', true)
-                $('.label-heading').text('Enabled');
+                $('.label-heading').text(l[17601]);
             }
             else if (r === "1") {
                 $('#versioning-status').prop('checked', false)
-                $('.label-heading').text('Disabled');
+                $('.label-heading').text(l[7070]);
             }
         })
         .fail(function (e) {
                 if (e === ENOENT) {
                     $('#versioning-status').prop('checked', true)
-                    $('.label-heading').text('Enabled');
+                    $('.label-heading').text(l[17601]);
                 }
         });
 
         var data = M.getDashboardData();
-        //FIXME: 17582
-        var verionInfo = 'You have <span class="versioning-text total-file-versions">'
-                + data.versions.cnt + '</span> file versions, taking up a total of <span class="versioning-text total-versions-size">'
-                + bytesToSize(data.versions.size) + '</span>.'
+        var verionInfo = l[17582]
+                .replace('[X1]',
+                '<span class="versioning-text total-file-versions">' + data.versions.cnt + '</span>')
+                .replace('[X2]',
+                '<span class="versioning-text total-versions-size">' + bytesToSize(data.versions.size) + '</span>');
+
         $('.versioning-body-text').safeHTML(verionInfo);
     };
     $('.versioning-switch')
     .rebind('click', function() {
         var val = $('#versioning-status').prop('checked') ? 1 : 0;
         if ($('#versioning-status').prop('checked')) {
-            msgDialog('confirmation', l[882], 'Disabling file versioning will prevent the creation and storage of new file versions. Are you sure you want to disable file versioning?', false, function(e) {
+            msgDialog('confirmation', l[882], l[17595], false, function(e) {
                 if (e) {
                     showToast('settings', l[16168]);
                     mega.attr.set(

@@ -11438,10 +11438,6 @@ table {
 .data .account.data-td {
     padding: 9px 15px 9px 0;
 }
-.data .account.data-td span {
-    margin-left: 25px;
-    display: block;
-}
 .account.data-td:last-child {
     padding-right: 0;
     white-space: nowrap;

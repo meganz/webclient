@@ -359,9 +359,7 @@ function accountUI() {
         $('.tab-content .version-settings-button').rebind('click', function() {
             loadSubPage('fm/account/file-management');
         });
-        $('.account.data-item .tiny-icon.cog').rebind('click', function() {
-            loadSubPage('fm/account/file-management');
-        });
+
         /* achievements */
         if (!account.maf) {
             $('.fm-right-account-block').removeClass('active-achievements');

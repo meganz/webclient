@@ -363,6 +363,10 @@ dashboardUI.updateCloudDataWidget = function() {
         return false;
     });
 
+    $('.account.data-item .tiny-icon.cog').rebind('click', function() {
+        loadSubPage('fm/account/file-management');
+    });
+
     $('.data-float-bl').find('.data-item')
         .each(function(idx, elm) {
             var props = data[map[idx]];

@@ -4522,5 +4522,8 @@
     "17574": "\u0130\u00e7eri\u011finizi payla\u015f\u0131n",
     "17575": "Payla\u015fmak istedi\u011finiz dosya veya klas\u00f6re sa\u011f t\u0131klayarak ve ba\u011flam men\u00fcs\u00fcnden Ba\u011flant\u0131 Al'\u0131 se\u00e7erek i\u00e7eri\u011finizi payla\u015facak bir ba\u011flant\u0131 olu\u015fturabilirsiniz.",
     "17576": "Payla\u015f\u0131m klas\u00f6rleri",
-    "17577": "Ki\u015filerinizle klas\u00f6r payla\u015fmaya ba\u015flamak i\u00e7in, payla\u015fmak istedi\u011finiz klas\u00f6re sa\u011f t\u0131klay\u0131n ve ba\u011flam men\u00fcs\u00fcnden [B]Payla\u015f[\/B]'\u0131 se\u00e7in."
+    "17577": "Ki\u015filerinizle klas\u00f6r payla\u015fmaya ba\u015flamak i\u00e7in, payla\u015fmak istedi\u011finiz klas\u00f6re sa\u011f t\u0131klay\u0131n ve ba\u011flam men\u00fcs\u00fcnden [B]Payla\u015f[\/B]'\u0131 se\u00e7in.",
+    "17578": "There is already a file with the same name",
+    "17579": "There is already a folder with the same name",
+    "17590": "by %1"
 }

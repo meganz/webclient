@@ -18094,5 +18094,17 @@
     "17577": {
         "text": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu.",
         "context": "An onboarding tooltip message which is shown only once along with all other onboarding tips and only when the user doesn't have any shared folders."
+    },
+    "17578": {
+        "text": "There is already a file with the same name",
+        "context": "A tooltip message which shows when a file name is duplicated during renaming."
+    },
+    "17579": {
+        "text": "There is already a folder with the same name",
+        "context": "A tooltip message which is shown when a folder name is duplicated during renaming or creation."
+    },
+    "17590": {
+        "text": "by %1",
+        "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
     }
 }

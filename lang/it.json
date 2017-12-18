@@ -4522,5 +4522,8 @@
     "17574": "Condividi il tuo contenuto",
     "17575": "You can create a link to share your content by right clicking on the file or folder you want to share and selecting Get Link from the context menu.",
     "17576": "Condivisione della cartella",
-    "17577": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu."
+    "17577": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu.",
+    "17578": "C'\u00e8 gi\u00e0 un file con lo stesso nome",
+    "17579": "There is already a folder with the same name",
+    "17590": "by %1"
 }

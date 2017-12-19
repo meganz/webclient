@@ -4511,6 +4511,7 @@
     "17562": "\u30e6\u30fc\u30b6\u30fc\u69d8\u306e\u5fc5\u8981\u6027\u3092\u8003\u616e\u3057\u3001MEGA\u306f\u30e6\u30fc\u30b6\u30fc\u69d8\u306e\u30d5\u30a9\u30c8\u30e9\u30a4\u30d6\u30e9\u30ea\u306b\u30a2\u30af\u30bb\u30b9\u3057\u3001\u5199\u771f\u3084\u52d5\u753b\u3092\u4fdd\u5b58\u3044\u305f\u3057\u307e\u3059\u3002",
     "17563": "\u3053\u306e\u30aa\u30d7\u30b7\u30e7\u30f3\u3092\u6709\u52b9\u306b\u3057\u305f\u5834\u5408\u3001MEGA\u306fFace ID\u306b\u30a2\u30af\u30bb\u30b9\u3057\u3066\u3001\u30e6\u30fc\u30b6\u30fc\u69d8\u304c\u30a2\u30d7\u30ea\u306e\u30d1\u30b9\u30b3\u30fc\u30c9\u3092\u7c21\u5358\u306b\u30ed\u30c3\u30af\u89e3\u9664\u3067\u304d\u308b\u3088\u3046\u306b\u3057\u307e\u3059\u3002",
     "17564": "\u30ea\u30f3\u30af\u30a8\u30e9\u30fc",
+    "17565": "The link can not be managed, due to an unknown error received from server.",
     "17566": "Visit the Contacts tab to add or manage your contacts. [B]Invite your friends to MEGA[\/B] to allow you to [B]share[\/B] with them privately or [B]chat securely[\/B] using MEGAchat.",
     "17567": "Communicate securely with your family, friends and colleagues using MEGAchat. Chats and calls are end-to-end encrypted, [B]not even MEGA can read or listen to your communication[\/B].",
     "17568": "Start uploading files to your account by using the [B]file or folder upload button[\/B], or simply [B]drag and drop[\/B] from your local computer to MEGA in the browser.",
@@ -4525,5 +4526,16 @@
     "17577": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu.",
     "17578": "There is already a file with the same name",
     "17579": "There is already a folder with the same name",
-    "17590": "by %1"
+    "17580": "View file versioning settings",
+    "17581": "You are about to delete the version histories of all files. Please note that the current files will not be deleted. Would you like to proceed?",
+    "17582": "You have [X1] file versions, taking up a total of [X2].",
+    "17590": "by %1",
+    "17595": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
+    "17596": "Enable or disable file versioning for your entire account:",
+    "17597": "You may still receive file versions from shared folders if your contacts have this enabled.",
+    "17598": "Delete all file versions:",
+    "17599": "Delete all",
+    "17600": "This will permanently delete all your own file versions. Any file version shared to you from a contact will need to be deleted by them.",
+    "17601": "Enabled",
+    "17602": "The current version of the file will be replaced with the file you are uploading."
 }

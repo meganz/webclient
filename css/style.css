@@ -17524,6 +17524,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-repeat: no-repeat;
     cursor: pointer;
 }
+.copy-dialog .fm-dialog-body.two-tabs .copy-dialog-button.conversations {
+    display: none;
+}
+.copy-dialog .fm-dialog-body.two-tabs .copy-dialog-button {
+    width: 300px;
+}
 .copy-dialog-button.cloud-drive, .move-dialog-button.cloud-drive {
     background-position: center 8px;
 }

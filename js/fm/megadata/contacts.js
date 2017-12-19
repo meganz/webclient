@@ -551,8 +551,13 @@ MegaData.prototype.syncUsersFullname = function(userId) {
     "use strict";
     var self = this;
 
-    var lastName = {name: 'lastname', value: undefined};
-    var firstName = {name: 'firstname', value: undefined};
+    if (this.u[userId].firstName || this.u[userId].lastName) {
+        // already loaded.
+        return;
+    }
+
+    var lastName = {name: 'lastname', value: null};
+    var firstName = {name: 'firstname', value: null};
 
     MegaPromise.allDone([
         mega.attr.get(userId, 'firstname', -1)
@@ -563,12 +568,13 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             .done(function(r) {
                 lastName.value = r;
             })
-    ]).done(function(results) {
+    ]).done(function() {
         if (!self.u[userId]) {
             return;
         }
 
         [firstName, lastName].forEach(function(obj) {
+
             // -1, -9, -2, etc...
             if (typeof obj.value === 'string') {
                 try {
@@ -589,11 +595,9 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
         self.u[userId].firstName = firstName;
         self.u[userId].lastName = lastName;
+        var user = self.u[userId];
 
-        if (
-            (firstName && $.trim(firstName).length > 0) ||
-            (lastName && $.trim(lastName).length > 0)
-        ) {
+        if (firstName && $.trim(firstName).length > 0 || lastName && $.trim(lastName).length > 0) {
             self.u[userId].name = "";
 
             if (firstName && $.trim(firstName).length > 0) {
@@ -602,6 +606,16 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             if (lastName && $.trim(lastName).length > 0) {
                 self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
             }
+
+            if (M.currentdirid === 'shares') {// Update right panel list and block view
+                $('.shared-grid-view .' + userId + ' .fm-chat-user').text(user.name);
+                $('.inbound-share .' + userId).next().find('.shared-folder-info')
+                    .text(l[17590].replace('%1', user.name));
+            }
+            else if (M.getNodeRoot(M.currentdirid) === 'shares') {
+                $('.shared-details-info-block .' + userId).next()
+                    .find('.fm-chat-user').text(user.name + ' <' + user.m + '>');
+            }
         }
         else {
             self.u[userId].name = "";
@@ -609,11 +623,6 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
         if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
             self.u[userId].avatar = false;
-
-            // FIXME: why is this needed here? Should be removed elsewhere
-            // Also should check is .type != "image" valid condition
-            // In case that contact updates his profile image it will be updated on owners side
-            // i.e. Avatar of full contact will be changed in realtime on contacts tab etc.
             useravatar.loaded(userId);
         }
 
@@ -671,7 +680,6 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
             }
 
-
             this.u[userId].addChangeListener(onContactChanged);
 
             if (fmdb && !ignoreDB && !pfkey) {
@@ -685,23 +693,10 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 delete cleanedUpUserData.name;
                 delete cleanedUpUserData.avatar;
                 fmdb.add('u', {u: u.u, d: cleanedUpUserData});
+                M.u[userId].firstName = '';
+                M.u[userId].lastName = '';
             }
 
-            // On every new full contact relation re/established we want
-            // atributes refreshed, not to read from cache because in case
-            // that contact changed data and relation is re-established
-            // cached attributes will be wrong until hard refresh
-            if (attribCache) {
-                var cacheKey = userId + '_firstname';
-                attribCache.removeItem(cacheKey);
-                cacheKey = userId + '_lastname';
-                attribCache.removeItem(cacheKey);
-            }
-            else {
-                if (d) {
-                    console.warn('addUser: attribCache.removeItem function is not available cached data are used');
-                }
-            }
             this.syncUsersFullname(userId);
         }
     };

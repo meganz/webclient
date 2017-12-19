@@ -1208,12 +1208,13 @@ function init_page() {
         // current object and switching UI/XHR comms/IndexedDB
 
         // switch between FM & folderlinks (completely reinitialize)
-        if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
+        if ((!pfid && folderlink) || (pfid && folderlink === 0)
+            || pfkey !== oldPFKey || (pfid && folderlink && pfid === folderlink)) {
 
             M.reset();
-            folderlink     = 0;
-            fminitialized  = false;
-            loadfm.loaded  = false;
+            folderlink = 0;
+            fminitialized = false;
+            loadfm.loaded = false;
             loadfm.loading = false;
 
             stopapi();

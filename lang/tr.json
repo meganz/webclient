@@ -4511,6 +4511,7 @@
     "17562": "MEGA, foto\u011fraflar\u0131n\u0131z\u0131 ve videolar\u0131n\u0131z\u0131 kaydetmek istersiniz diye foto\u011fraf kitapl\u0131\u011f\u0131n\u0131za eri\u015fir.",
     "17563": "MEGA, bu se\u00e7ene\u011fi etkinle\u015ftirirseniz uygulaman\u0131n \u015fifresini kolayca a\u00e7man\u0131za olanak tan\u0131yan Face ID'ye eri\u015fir.",
     "17564": "Ba\u011flant\u0131 hatas\u0131",
+    "17565": "The link can not be managed, due to an unknown error received from server.",
     "17566": "Visit the Contacts tab to add or manage your contacts. [B]Invite your friends to MEGA[\/B] to allow you to [B]share[\/B] with them privately or [B]chat securely[\/B] using MEGAchat.",
     "17567": "MEGAchat'\u0131 kullanarak aileniz, arkada\u015flar\u0131n\u0131z ve meslekta\u015flar\u0131n\u0131zla g\u00fcvenli bir \u015fekilde ileti\u015fim kurun. Sohbetler ve aramalar u\u00e7tan uca \u015fifrelidir. [B]MEGA bile ileti\u015fiminizi okuyamaz veya dinleyemez [\/B].",
     "17568": "[B]Dosya veya klas\u00f6r y\u00fckleme d\u00fc\u011fmesi[\/B]ni kullanarak dosyalar\u0131 hesab\u0131n\u0131za y\u00fcklemeye ba\u015flay\u0131n veya taray\u0131c\u0131n\u0131zdaki yerel bilgisayardan MEGA'ya [B]s\u00fcr\u00fckleyip b\u0131rak\u0131n[\/B].",
@@ -4522,5 +4523,19 @@
     "17574": "\u0130\u00e7eri\u011finizi payla\u015f\u0131n",
     "17575": "Payla\u015fmak istedi\u011finiz dosya veya klas\u00f6re sa\u011f t\u0131klayarak ve ba\u011flam men\u00fcs\u00fcnden Ba\u011flant\u0131 Al'\u0131 se\u00e7erek i\u00e7eri\u011finizi payla\u015facak bir ba\u011flant\u0131 olu\u015fturabilirsiniz.",
     "17576": "Payla\u015f\u0131m klas\u00f6rleri",
-    "17577": "Ki\u015filerinizle klas\u00f6r payla\u015fmaya ba\u015flamak i\u00e7in, payla\u015fmak istedi\u011finiz klas\u00f6re sa\u011f t\u0131klay\u0131n ve ba\u011flam men\u00fcs\u00fcnden [B]Payla\u015f[\/B]'\u0131 se\u00e7in."
+    "17577": "Ki\u015filerinizle klas\u00f6r payla\u015fmaya ba\u015flamak i\u00e7in, payla\u015fmak istedi\u011finiz klas\u00f6re sa\u011f t\u0131klay\u0131n ve ba\u011flam men\u00fcs\u00fcnden [B]Payla\u015f[\/B]'\u0131 se\u00e7in.",
+    "17578": "There is already a file with the same name",
+    "17579": "There is already a folder with the same name",
+    "17580": "View file versioning settings",
+    "17581": "You are about to delete the version histories of all files. Please note that the current files will not be deleted. Would you like to proceed?",
+    "17582": "You have [X1] file versions, taking up a total of [X2].",
+    "17590": "by %1",
+    "17595": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
+    "17596": "Enable or disable file versioning for your entire account:",
+    "17597": "You may still receive file versions from shared folders if your contacts have this enabled.",
+    "17598": "Delete all file versions:",
+    "17599": "Delete all",
+    "17600": "This will permanently delete all your own file versions. Any file version shared to you from a contact will need to be deleted by them.",
+    "17601": "Enabled",
+    "17602": "The current version of the file will be replaced with the file you are uploading."
 }

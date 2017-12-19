@@ -18048,7 +18048,7 @@
         "context": "The title of an error dialog while getting the sharing link of a file\/folder."
     },
     "17565": {
-        "text": "The link can not be managed, due to an unknown error received from server.",
+        "text": "The link cannot be managed, due to an unknown error received from server.",
         "context": "An error message originating from the Manage Link dialog.\r\n"
     },
     "17566": {

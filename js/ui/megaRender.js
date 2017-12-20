@@ -890,7 +890,8 @@
                         aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
                     }
 
-                    aTemplate.querySelector('.shared-folder-info').textContent = 'by ' + aProperties.userName;
+                    aTemplate.querySelector('.shared-folder-info')
+                        .textContent = l[17590].replace('%1', aProperties.userName);
                 }
                 else {
                     tmp.textContent = aProperties.accessRightsText;

@@ -876,6 +876,7 @@ var attribCache = false;
     mBroadcaster.once('boot_done', function() {
         uaPacketParserHandler['firstname'] = function(userHandle) {
             if (M.u[userHandle]) {
+                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
                 M.syncUsersFullname(userHandle);
             }
             else {

@@ -2257,7 +2257,6 @@ accountUI.initRadio.enable = function(value, $container) {
         .removeAttr('disabled');
 };
 
-
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
     // TODO: FIXME, make accountUI elements not dependant!
     if (!megaChatIsReady) {
@@ -2399,69 +2398,38 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             })
             .val(lastValidNumber);
     }
-    var updateVersionInfo = function () {
-        mega.attr.get(
-            u_handle,
-            'dv',
-            -2,
-            true
-        )
-        .done(function(r) {
-            if (r === "0") {
-                $('#versioning-status').prop('checked', true)
-                $('.label-heading').text(l[17601]);
-            }
-            else if (r === "1") {
-                $('#versioning-status').prop('checked', false)
-                $('.label-heading').text(l[7070]);
-            }
-        })
-        .fail(function (e) {
-                if (e === ENOENT) {
-                    $('#versioning-status').prop('checked', true)
-                    $('.label-heading').text(l[17601]);
-                }
-        });
 
-        var data = M.getDashboardData();
-        var verionInfo = l[17582]
-                .replace('[X1]',
-                '<span class="versioning-text total-file-versions">' + data.versions.cnt + '</span>')
-                .replace('[X2]',
-                '<span class="versioning-text total-versions-size">' + bytesToSize(data.versions.size) + '</span>');
-
-        $('.versioning-body-text').safeHTML(verionInfo);
-    };
     $('.versioning-switch')
     .rebind('click', function() {
         var val = $('#versioning-status').prop('checked') ? 1 : 0;
-        if ($('#versioning-status').prop('checked')) {
-            msgDialog('confirmation', l[882], l[17595], false, function(e) {
-                if (e) {
-                    showToast('settings', l[16168]);
-                    mega.attr.set(
-                        'dv',
-                        val,
-                        -2,
-                        true
-                    );
-                    updateVersionInfo();
-                }
-            });
-        }
-        else {
+        var setVersioningAttr = function(val) {
             showToast('settings', l[16168]);
             mega.attr.set(
                 'dv',
                 val,
                 -2,
                 true
-            );
-            updateVersionInfo();
+            )
+            .done(
+            function(e) {
+                $('#versioning-status').prop('checked', val ? false : true);
+                $('.label-heading').text(val ? l[7070] : l[17601]);
+                fileversioning.dvState = val;
+            });
+        };
+        if ($('#versioning-status').prop('checked')) {
+            msgDialog('confirmation', l[882], l[17595], false, function(e) {
+                if (e) {
+                    setVersioningAttr(val);
+                }
+            });
+        }
+        else {
+            setVersioningAttr(val);
         }
     });
     //update versioning info
-    updateVersionInfo();
+    fileversioning.updateVersionInfo();
     $('.delete-all-versions')
     .rebind('click', function() {
 
@@ -2475,7 +2443,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                             callback: function(res, ctx) {
                                 if (res === 0) {
                                     M.accountData(function() {
-                                        updateVersionInfo();
+                                        fileversioning.updateVersionInfo();
                                     }, false, true);
                                 }
                             }
@@ -2483,9 +2451,6 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                 }
             });
         }
-    });
-    mBroadcaster.addListener('versionsettingchange', function() {
-        updateVersionInfo();
     });
 };
 

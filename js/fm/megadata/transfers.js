@@ -1201,32 +1201,10 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
                         }
                         target = M.currentdirid;
                     }
-                    var checkconflict = function (title) {
-                        fileconflict
-                        .check(u, onChat ? u[0].target : target, title, onChat ? fileconflict.KEEPBOTH : 0)
+
+                    fileconflict
+                        .check(u, onChat ? u[0].target : target, fileversioning.dvState ? 'replace' : 'upload', onChat ? fileconflict.KEEPBOTH : 0)
                         .done(startUpload);
-                    };
-
-                    mega.attr.get(
-                                u_handle,
-                                'dv',
-                                -2,
-                                true
-                            )
-                            .done(function(r) {
-                                if (r === "0") {
-                                    checkconflict('upload');
-                                }
-                                else if (r === "1") {
-                                    checkconflict('replace');
-                                }
-                            })
-                            .fail(function (e) {
-                                    if (e === ENOENT) {
-                                        checkconflict('upload');
-                                    }
-                            });
-
                 });
         });
 };

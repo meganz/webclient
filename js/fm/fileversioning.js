@@ -146,13 +146,10 @@
                 function(versions) {
                     var previousVersion = (versions && versions.length > 1) ? versions[1] : false;
                     if (previousVersion) {
-                         api_req({
+                        api_req({
                                     a: 'd',
                                     n: previousVersion.h
-                                }, {
-                                callback: function(res, ctx) {
-                            }
-                        });
+                                });
                     }
                 });
         },
@@ -187,6 +184,45 @@
                 });
         },
 
+        /**
+         * update file versioning setting.
+         */
+        updateVersionInfo: function () {
+            mega.attr.get(
+                u_handle,
+                'dv',
+                -2,
+                true
+            )
+            .done(function(r) {
+                if (r === "0") {
+                    $('#versioning-status').prop('checked', true)
+                    $('.label-heading').text(l[17601]);
+                    fileversioning.dvState = 0;
+                }
+                else if (r === "1") {
+                    $('#versioning-status').prop('checked', false)
+                    $('.label-heading').text(l[7070]);
+                    fileversioning.dvState = 1;
+                }
+            })
+            .fail(function (e) {
+                if (e === ENOENT) {
+                    $('#versioning-status').prop('checked', true)
+                    $('.label-heading').text(l[17601]);
+                    fileversioning.dvState = 0;
+                }
+            });
+
+            var data = M.getDashboardData();
+            var verionInfo = l[17582]
+                    .replace('[X1]',
+                    '<span class="versioning-text total-file-versions">' + data.versions.cnt + '</span>')
+                    .replace('[X2]',
+                    '<span class="versioning-text total-versions-size">' + bytesToSize(data.versions.size) + '</span>');
+
+            $('.versioning-body-text').safeHTML(verionInfo);
+        },
         /**
          * Open file versioning dialog and render file history versions list.
          * @param {hanlde} handle hanle of the file to render history versioning list.
@@ -274,10 +310,7 @@
                     revertedNode.t = n.t;
                     req.cr = crypto_makecr([revertedNode], share, false);
                 }
-                api_req(req, {
-                    callback: function(res, ctx) {
-                    }
-                });
+                api_req(req);
             };
             var fillVersionList = function(versionList) {
 
@@ -484,10 +517,7 @@
                     api_req({a: 'd',
                              n: handle,
                              v: 1
-                            }, {
-                        callback: function(res, ctx) {
-                        }
-                    });
+                            });
                 };
                 if (!$(this).hasClass('disabled')) {
                     msgDialog('remove', l[1003], l[13749], l[1007], function(e) {
@@ -560,10 +590,7 @@
                             api_req({a: 'd',
                                      n: handle,
                                      v: 1
-                                    }, {
-                                callback: function(res, ctx) {
-                                }
-                            });
+                                    });
                         };
                         var self = this;
                         if (!$(this).hasClass('disabled')) {
@@ -631,8 +658,28 @@
             }
         }
     };
+    ns.dvState = null;
     Object.defineProperty(global, 'fileversioning', {value: ns});
     ns = undefined;
 
+    mBroadcaster.once('fm:initialized', function() {
+        mega.attr.get(
+            u_handle,
+            'dv',
+            -2,
+            true
+        )
+        .done(function(r) {
+            if (r === "0") {
+                fileversioning.dvState = 0;
+            }
+            else if (r === "1") {
+                fileversioning.dvState = 1;
+            }
+        })
+        .fail(function (e) {
+            fileversioning.dvState = 0;
+        });
+    });
 })(this);
 

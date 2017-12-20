@@ -899,7 +899,7 @@ var attribCache = false;
         };
 
         uaPacketParserHandler['^!dv'] = function() {
-            mBroadcaster.sendMessage('versionsettingchange');
+            fileversioning.updateVersionInfo();
         };
 
         if (d) {

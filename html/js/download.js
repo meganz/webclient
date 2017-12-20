@@ -139,7 +139,7 @@ function dl_g(res) {
                 // Disable default video controls
                 $video.get(0).controls = false;
 
-                // TODO: Set preview image scr
+                // TODO: Set preview image/video scr
                 // $overlay.find('.viewer-image-bl video').attr('poster', src);
 
                 $('.play-video-button', $wrapper).rebind('click', function() {
@@ -147,7 +147,7 @@ function dl_g(res) {
                     // Show Loader until video is playing
                     $wrapper.find('.viewer-pending').removeClass('hidden');
 
-                    // TOTO: Init video controls
+                    // TODO: Init video controls
                     // initVideoControls($wrapper);
     
                     $wrapper.addClass('video-theatre-mode');

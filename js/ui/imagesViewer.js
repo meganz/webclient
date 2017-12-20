@@ -603,10 +603,10 @@ var slideshowid;
         // Add events for all buttons
         $playpause.rebind('click', function(e) {
             if (videoElement.paused || videoElement.ended) {
-                video.play();
+                videoElement.play();
             }
             else {
-                video.pause();
+                videoElement.pause();
             }
         });
 
@@ -687,18 +687,21 @@ var slideshowid;
         var timeDrag = false;   /* Drag status */
         $progress.rebind('mousedown.videoprogress', function(e) {
             timeDrag = true;
+            videoElement.pause();
             updatebar(e.pageX);
         });
 
         $document.rebind('mouseup.videoprogress', function(e) {
             if (timeDrag) {
                 timeDrag = false;
+                videoElement.play();
                 updatebar(e.pageX);
             }
         });
 
         $document.rebind('mousemove.videoprogress', function(e) {
             if (timeDrag) {
+                videoElement.pause();
                 updatebar(e.pageX);
             }
         });
@@ -720,7 +723,6 @@ var slideshowid;
             //Update progress bar and video currenttime
             $progressBar.css('width', percentage+'%');
             videoElement.currentTime = maxduration * percentage / 100;
-            videoElement.play();
         };
 
 

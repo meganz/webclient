@@ -1118,13 +1118,13 @@ MegaData.prototype.isFavourite = function(nodesId) {
 /**
  * versioningDomUpdate
  *
- * @param {Object} node      Node object
+ * @param {Handle} fh      Node handle
  * @param {Number} versionsNumber  Number of previous versions.
  */
-MegaData.prototype.versioningDomUpdate = function(node, versionsNumber) {
-    var $nodeView = $('#' + node.h);
+MegaData.prototype.versioningDomUpdate = function(fh) {
+    var $nodeView = $('#' + fh);
 
-    if (versionsNumber) {// Add versioning
+    if (M.d[fh] && M.d[fh].tvf) {// Add versioning
         $nodeView.addClass('versioning');
     }
     else {// Remove versioning

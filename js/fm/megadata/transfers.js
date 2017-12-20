@@ -1203,7 +1203,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
                     }
 
                     fileconflict
-                        .check(u, onChat ? u[0].target : target, 'upload', onChat ? fileconflict.KEEPBOTH : 0)
+                        .check(u, onChat ? u[0].target : target, fileversioning.dvState ? 'replace' : 'upload', onChat ? fileconflict.KEEPBOTH : 0)
                         .done(startUpload);
                 });
         });

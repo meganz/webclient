@@ -146,14 +146,10 @@
                 function(versions) {
                     var previousVersion = (versions && versions.length > 1) ? versions[1] : false;
                     if (previousVersion) {
-                         api_req({
+                        api_req({
                                     a: 'd',
                                     n: previousVersion.h
-                                }, {
-                                callback: function(res, ctx) {
-                                    M.versioningDomUpdate(M.d[h], 0);
-                            }
-                        });
+                                });
                     }
                 });
         },
@@ -188,6 +184,45 @@
                 });
         },
 
+        /**
+         * update file versioning setting.
+         */
+        updateVersionInfo: function () {
+            mega.attr.get(
+                u_handle,
+                'dv',
+                -2,
+                true
+            )
+            .done(function(r) {
+                if (r === "0") {
+                    $('#versioning-status').prop('checked', true)
+                    $('.label-heading').text(l[17601]);
+                    fileversioning.dvState = 0;
+                }
+                else if (r === "1") {
+                    $('#versioning-status').prop('checked', false)
+                    $('.label-heading').text(l[7070]);
+                    fileversioning.dvState = 1;
+                }
+            })
+            .fail(function (e) {
+                if (e === ENOENT) {
+                    $('#versioning-status').prop('checked', true)
+                    $('.label-heading').text(l[17601]);
+                    fileversioning.dvState = 0;
+                }
+            });
+
+            var data = M.getDashboardData();
+            var verionInfo = l[17582]
+                    .replace('[X1]',
+                    '<span class="versioning-text total-file-versions">' + data.versions.cnt + '</span>')
+                    .replace('[X2]',
+                    '<span class="versioning-text total-versions-size">' + bytesToSize(data.versions.size) + '</span>');
+
+            $('.versioning-body-text').safeHTML(verionInfo);
+        },
         /**
          * Open file versioning dialog and render file history versions list.
          * @param {hanlde} handle hanle of the file to render history versioning list.
@@ -275,10 +310,7 @@
                     revertedNode.t = n.t;
                     req.cr = crypto_makecr([revertedNode], share, false);
                 }
-                api_req(req, {
-                    callback: function(res, ctx) {
-                    }
-                });
+                api_req(req);
             };
             var fillVersionList = function(versionList) {
 
@@ -485,13 +517,7 @@
                     api_req({a: 'd',
                              n: handle,
                              v: 1
-                            }, {
-                        callback: function(res, ctx) {
-                            if (M.d[fh].tvf) {
-                                M.versioningDomUpdate(M.d[fh], M.d[fh].tvf - 1);
-                            }
-                        }
-                    });
+                            });
                 };
                 if (!$(this).hasClass('disabled')) {
                     msgDialog('remove', l[1003], l[13749], l[1007], function(e) {
@@ -563,13 +589,7 @@
                             api_req({a: 'd',
                                      n: handle,
                                      v: 1
-                                    }, {
-                                callback: function(res, ctx) {
-                                    if (versions.length > 1) {
-                                        M.versioningDomUpdate(M.d[fh], versions.length - 1);
-                                    }
-                                }
-                            });
+                                    });
                         };
                         var self = this;
                         if (!$(this).hasClass('disabled')) {
@@ -602,6 +622,10 @@
             $(window).bind('resize.fmbreadcrumbs', function() {
                 fileversioning.initFileVersioningScrolling();
             });
+            $('.fm-versioning .header .button.settings').rebind('click', function() {
+                pd.addClass('hidden');
+                loadSubPage('fm/account/file-management');
+            });
         },
 
         /**
@@ -613,12 +637,16 @@
          *
          */
         updateFileVersioningDialog: function (fileHandle) {
+            var current_sel = fileHandle ? fileHandle : $.selected[0];
+            var p = fileversioning.getTopNodeSync(current_sel);
+            if (p) {
+                // update node DOM.
+                M.versioningDomUpdate(p);
+            }
             if (!$('.fm-versioning').hasClass('hidden')) {
-                var current_sel = fileHandle ? fileHandle : $.selected[0];
                 if ($.selected.length === 0 ||
                     fileversioning.checkPreviousVersionSync(current_sel, $.selected[0]) ||
                     fileversioning.checkPreviousVersionSync($.selected[0], current_sel)) {
-                    var p = fileversioning.getTopNodeSync(current_sel);
                     if (p) {
                         fileversioning.fileVersioningDialog(p);
                         $.selected[0] = p;
@@ -627,8 +655,28 @@
             }
         }
     };
+    ns.dvState = null;
     Object.defineProperty(global, 'fileversioning', {value: ns});
     ns = undefined;
 
+    mBroadcaster.once('fm:initialized', function() {
+        mega.attr.get(
+            u_handle,
+            'dv',
+            -2,
+            true
+        )
+        .done(function(r) {
+            if (r === "0") {
+                fileversioning.dvState = 0;
+            }
+            else if (r === "1") {
+                fileversioning.dvState = 1;
+            }
+        })
+        .fail(function (e) {
+            fileversioning.dvState = 0;
+        });
+    });
 })(this);
 

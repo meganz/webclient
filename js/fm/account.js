@@ -354,6 +354,12 @@ function accountUI() {
         $('.tab-content .account.progress-size.versioning').text(
             bytesToSize(account.stats[M.RootID].vbytes)
         );
+
+        // Go to versioning settings.
+        $('.tab-content .version-settings-button').rebind('click', function() {
+            loadSubPage('fm/account/file-management');
+        });
+
         /* achievements */
         if (!account.maf) {
             $('.fm-right-account-block').removeClass('active-achievements');
@@ -2251,7 +2257,6 @@ accountUI.initRadio.enable = function(value, $container) {
         .removeAttr('disabled');
 };
 
-
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
     // TODO: FIXME, make accountUI elements not dependant!
     if (!megaChatIsReady) {
@@ -2393,6 +2398,60 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             })
             .val(lastValidNumber);
     }
+
+    $('.versioning-switch')
+    .rebind('click', function() {
+        var val = $('#versioning-status').prop('checked') ? 1 : 0;
+        var setVersioningAttr = function(val) {
+            showToast('settings', l[16168]);
+            mega.attr.set(
+                'dv',
+                val,
+                -2,
+                true
+            )
+            .done(
+            function(e) {
+                $('#versioning-status').prop('checked', val ? false : true);
+                $('.label-heading').text(val ? l[7070] : l[17601]);
+                fileversioning.dvState = val;
+            });
+        };
+        if ($('#versioning-status').prop('checked')) {
+            msgDialog('confirmation', l[882], l[17595], false, function(e) {
+                if (e) {
+                    setVersioningAttr(val);
+                }
+            });
+        }
+        else {
+            setVersioningAttr(val);
+        }
+    });
+    //update versioning info
+    fileversioning.updateVersionInfo();
+    $('.delete-all-versions')
+    .rebind('click', function() {
+
+        if (!$(this).hasClass('disabled')) {
+            msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
+                if (e) {
+                    loadingDialog.show();
+                    api_req({
+                            a: 'dv'
+                            }, {
+                            callback: function(res, ctx) {
+                                if (res === 0) {
+                                    M.accountData(function() {
+                                        fileversioning.updateVersionInfo();
+                                    }, false, true);
+                                }
+                            }
+                        });
+                }
+            });
+        }
+    });
 };
 
 accountUI.voucherCentering = function voucherCentering($button) {

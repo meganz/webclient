@@ -899,6 +899,10 @@ var attribCache = false;
             mBroadcaster.sendMessage('attr:passwordReminderDialog');
         };
 
+        uaPacketParserHandler['^!dv'] = function() {
+            fileversioning.updateVersionInfo();
+        };
+
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;
         }

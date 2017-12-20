@@ -990,7 +990,7 @@ scparser.$add('fa', function(a) {
         n.fa = a.fa;
         M.nodeUpdated(n);
 
-        if (String(n.fa).indexOf('/') > 0 || is_video(n)) {
+        if (String(n.fa).indexOf('/') > 0) {
             // both thumb & prev is being set
             mBroadcaster.sendMessage('fa:ready', a.n, a.fa);
         }
@@ -1627,7 +1627,7 @@ function emplacenode(node, noc) {
         srvlog2('parent-less', node.t, node.h);
     }
 
-    M.d[node.h] = node;
+    M.d[node.h] = new MegaNode(node);
 }
 
 // this receives the node objects one by one as per the filter rule

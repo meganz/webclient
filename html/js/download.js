@@ -5,6 +5,7 @@ var dl_attr;
 var fdl_queue_var=false;
 var fileSize;
 var dlResumeInfo;
+var mediaCollectFn;
 var maxDownloadSize = Math.pow(2, 53);
 
 var MOBILE_FILETYPES = {
@@ -156,6 +157,18 @@ function dl_g(res) {
             else {
                 $wrapper.removeClass('video video-theatre-mode');
             }
+
+            mediaCollectFn = function() {
+                MediaAttribute.setAttribute({
+                    k: key,
+                    fa: res.fa,
+                    h: dlpage_ph,
+                    ph: dlpage_ph,
+                    name: filename,
+                    link: dlpage_ph + '!' + dlpage_key
+                }).then(console.debug.bind(console, 'MediaAttribute'))
+                    .catch(console.warn.bind(console, 'MediaAttribute'));
+            };
 
             var checkMegaSyncDownload = function() {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
@@ -544,6 +557,10 @@ function browserDownload() {
 
         if (is_mobile) {
             $('body').addClass('downloading').find('.bar').width('1%');
+        }
+        else if (mediaCollectFn) {
+            onIdle(mediaCollectFn);
+            mediaCollectFn = null;
         }
 
         if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {

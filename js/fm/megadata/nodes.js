@@ -1,3 +1,32 @@
+function MegaNode(node) {
+    'use strict';
+
+    if (!node || !node.h || node.h.length !== 8) {
+        return Object(node || null);
+    }
+    Object.assign(this, node);
+}
+
+MegaNode.prototype = Object.create(null, {
+    constructor: {
+        value: MegaNode
+    },
+    toString: {
+        value: function toString() {
+            'use strict';
+
+            return this.h || '';
+        }
+    },
+    valueOf: {
+        value: function valueOf() {
+            'use strict';
+
+            return this.s || 0;
+        }
+    }
+});
+
 (function(global) {
     "use strict";
     var delInShareQueue = Object.create(null);
@@ -128,10 +157,8 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
                 this.u[n.h][k] = n[k];
             }
         }
-        n = this.u[n.h];
+        this.d[n.h] = this.u[n.h];
     }
-
-    this.d[n.h] = n;
 
     if (fminitialized) {
         newnodes.push(n);

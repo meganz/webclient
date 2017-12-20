@@ -994,14 +994,31 @@ function fm_showoverlay() {
     $('body').addClass('overlayed');
 }
 
+/**
+ * Looking for a already existing name of URL (M.v)
+ * @param {Integer} nodeType file:0 folder:1
+ * @param {String} value New file/folder name
+ */
+function duplicated(nodeType, value) {
+    "use strict";
+
+    var items = M.v.filter(function(item) {
+        return item.name === value && item.t === nodeType;
+    });
+
+    return items.length !== 0;
+}
+
 function renameDialog() {
     "use strict";
 
     if ($.selected.length > 0) {
         var n = M.d[$.selected[0]] || false;
+        var nodeType = n.t;// file: 0, folder: 1
         var ext = fileext(n.name);
         var $dialog = $('.fm-dialog.rename-dialog');
         var $input = $('input', $dialog);
+        var errMsg = '';
 
         M.safeShowDialog('rename', function() {
             $dialog.removeClass('hidden').addClass('active');
@@ -1017,7 +1034,24 @@ function renameDialog() {
 
                 if (value && n.name && value !== n.name) {
                     if (M.isSafeName(value)) {
-                        M.rename(n.h, value);
+                        if (!duplicated(nodeType, value)) {
+                            M.rename(n.h, value);
+                        }
+                        else {
+                            errMsg = nodeType ? l[17579] : l[17578];
+                            $dialog.find('.duplicated-input-warning span').text(errMsg);
+                            $dialog.addClass('duplicate');
+                            $input.addClass('error');
+
+                            setTimeout(function() {
+                                    $dialog.removeClass('duplicate');
+                                    $input.removeClass('error');
+
+                                    $input.focus();
+                                }, 2000);
+
+                            return;
+                        }
                     }
                     else {
                         $dialog.removeClass('active');
@@ -1079,19 +1113,6 @@ function renameDialog() {
                 $dialog.addClass('active');
                 $input.removeClass('error');
             }
-            /*if (!n.t && ext.length > 0) {
-                if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {
-                    this.selectionStart = $('.rename-dialog input').val().length - ext.length - 1;
-                    this.selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
-                    if (e.which === 46) {
-                        return false;
-                    }
-                }
-                else if (this.selectionEnd > $('.rename-dialog input').val().length - ext.length - 1) {
-                    this.selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
-                    return false;
-                }
-            }*/
         });
     }
 }
@@ -2211,15 +2232,31 @@ function createFolderDialog(close) {
         }
         closeDialog();
         return true;
-    }
 
+    }
     var doCreateFolder = function (v) {
+        var target = $.cftarget = $.cftarget || M.currentdirid;
+
         if (!M.isSafeName(v)) {
             $dialog.removeClass('active');
             $input.addClass('error');
             return;
         }
-        var target = $.cftarget = $.cftarget || M.currentdirid;
+        else {
+            if (duplicated(1, v)) {
+                $dialog.addClass('duplicate');
+                $input.addClass('error');
+
+                setTimeout(function () {
+                    $dialog.removeClass('duplicate');
+                    $input.removeClass('error');
+
+                    $input.focus();
+                }, 2000);
+
+                return;
+            }
+        }
 
         loadingDialog.pshow();
         M.createFolder(target, v, new MegaPromise())

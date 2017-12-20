@@ -35,9 +35,10 @@ if (typeof process !== 'undefined') {
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&
-                        document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_chrome_web_ext = document.location.href.substr(0, 19) === 'chrome-extension://';
-var is_firefox_web_ext = document.location.href.substr(0, 16) === 'moz-extension://';
+    document.location.host === 'mega' || document.location.protocol === 'mega:';
+var location_sub = document.location.href.substr(0, 16);
+var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
+var is_firefox_web_ext = location_sub === 'moz-extension://';
 var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
@@ -2167,7 +2168,7 @@ else if (!b_u) {
         'ios': {f:'html/ios.html', n: 'ios', j:0},
         'android': {f:'html/android.html', n: 'android', j:0},
         'wp': {f:'html/wp.html', n: 'wp', j:0},
-        'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 }, 
+        'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
         'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
         'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 }
@@ -2210,10 +2211,12 @@ else if (!b_u) {
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
             'emoticonsFilter_js': {f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1},
+            'rtfFilter_js': {f:'js/chat/plugins/rtfFilter.js', n: 'rtfFilter_js', j:1},
             'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
             'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
+            'chatStats_js': {f:'js/chat/plugins/chatStats.js', n: 'chatStats_js', j:1, w:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},

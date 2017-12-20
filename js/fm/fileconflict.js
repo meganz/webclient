@@ -178,7 +178,6 @@
             var $a1 = $('.action-block.a1', $dialog);
             var $a2 = $('.action-block.a2', $dialog);
             var $a3 = $('.action-block.a3', $dialog);
-
             switch (op) {
                 case 'copy':
                     $('.red-header', $a1).text(l[16496]);
@@ -198,15 +197,15 @@
                     $('.red-header', $a1).text(l[17093]);
                     $('.red-header', $a2).text(l[16490]);
                     $('.red-header', $a3).text(l[17094]);
-
-                    var link = 'https://mega.nz/help/client/webclient/cloud-drive/59f13b42f1b7093a7f8b4589';
-                    $('.light-grey', $a1).html(
-                        escapeHTML(l[17097])
-                        .replace(
-                        '[A]', '<a id = "versionhelp"\n' +
-                        'href="' + link + '" target="_blank" class="red">')
-                        .replace('[/A]', '</a>'));
+                    $('.light-grey', $a1).html(l[17097]);
                     $('.light-grey', $a3).text(l[16493]);
+                    break;
+                case 'import':
+                    $('.red-header', $a1).text(l[17558]);
+                    $('.red-header', $a2).text(l[17559]);
+                    $('.red-header', $a3).text(l[17560]);
+                    $('.light-grey', $a1).html(l[17097]);
+                    $('.light-grey', $a3).text(l[17561]);
                     break;
             }
 

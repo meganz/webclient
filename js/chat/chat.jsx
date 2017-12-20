@@ -152,6 +152,7 @@ var Chat = function() {
          * Really simple plugin architecture
          */
         'plugins': {
+            'chatStats': ChatStats,
             'chatdIntegration': ChatdIntegration,
             'callManager': CallManager,
             'urlFilter': UrlFilter,
@@ -159,7 +160,8 @@ var Chat = function() {
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
             'presencedIntegration': PresencedIntegration,
-            'persistedTypeArea': PersistedTypeArea
+            'persistedTypeArea': PersistedTypeArea,
+            'rtfFilter': RtfFilter
         },
         'chatNotificationOptions': {
             'textMessages': {
@@ -1350,7 +1352,7 @@ Chat.prototype.getMyPresence = function() {
  * @returns {Number|undefined} UserPresence.PRESENCE.* or undefined for offline/unknown presence
  */
 Chat.prototype.getPresence = function(user_handle) {
-    if (this.plugins.presencedIntegration) {
+    if (user_handle && this.plugins.presencedIntegration) {
         return this.plugins.presencedIntegration.getPresence(user_handle);
     }
     else {

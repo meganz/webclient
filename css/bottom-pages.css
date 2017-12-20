@@ -1773,8 +1773,11 @@ html.gbot {
     width: 100%;
 }
 .bottom-page.horizontal-centered-bl, .bottom-page.horizontal-centered-bl.side-paddings, .bottom-page.half-sized-cell, .absolute-pos .bottom-page.half-sized-cell, .top-bl .bottom-page.half-sized-cell, .top-bl .bottom-page .img-description, .android .top-bl .bottom-page.half-sized-cell {
-    padding-left: 43px;
-    padding-right: 43px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.bottom-page.big-header.red {
+    font-size: 30px;
 }
 .inline-block .big-icon.top-pad {
     margin-top: 11px;

@@ -1863,10 +1863,6 @@
         "text": "Today, 4000 years later, most major cloud storage providers still have not fully adopted cryptography.",
         "context": ""
     },
-    "1146": {
-        "text": "Complete your account",
-        "context": ""
-    },
     "1147": {
         "text": "Choose your account type",
         "context": ""
@@ -3275,10 +3271,6 @@
         "text": "I find the interface too confusing to use",
         "context": "Account closure, feedback dialog."
     },
-    "6234": {
-        "text": "PRO Lite",
-        "context": "The new LITE payment plan. This means it is a light or lightweight payment plan compared to the full \/ heavyweight plans with lots of bandwidth and storage (PRO I, PRO II, PRO III)."
-    },
     "6240": {
         "text": "Windows Phone App",
         "context": ""
@@ -3842,6 +3834,10 @@
     "7162": {
         "text": "This plan is too expensive to be purchased with this payment provider.",
         "context": "A message shown when a payment provider is disabled because the selected Pro plan is too expensive e.g. for mobile payment providers they can only accept small sums of money so plans like PRO I, II & III are disabled."
+    },
+    "7165": {
+        "text": "Cancel subscription",
+        "context": "Menu item to let the user cancel subscriptions"
     },
     "7179": {
         "text": "Cancel Subscription",
@@ -4590,6 +4586,10 @@
     "8529": {
         "text": "Payment Issue",
         "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a payment problem they are having e.g. missing payment."
+    },
+    "8531": {
+        "text": "Invalid link",
+        "context": "This message is displayed when the user clicks on an invalid hyperlink."
     },
     "8535": {
         "text": "MEGA will be changing its Terms of Service on the [B]20th February 2016[\/B]. Please read our anniversary blog post for more information.",
@@ -6143,6 +6143,10 @@
         "text": "Subscription Expires On",
         "context": "A label on the My Account page indicating the expiration date of a PRO account. This is shown if they do not have a recurring subscription (e.g. the purchased a one-off plan for a specific time period) or the recurring subscription was recently canceled so they still have some time remaining on their plan."
     },
+    "16176": {
+        "text": "Paste",
+        "context": "A button which allows the user to paste a file\/folder into another folder."
+    },
     "16221": {
         "text": "Add label %1",
         "context": "Information text for the user which tells them they can mark a folder or file with its own color. Example: Add label \"Red\". Please leave the %1 placeholder as it is because it will be replaced by the color name e.g. Red, Green, Blue etc."
@@ -7426,5 +7430,37 @@
     "17546": {
         "text": "This user has already sent you an invitation.",
         "context": "An error message after just trying to send a user an invite which explains that the user already sent them an invitation first."
+    },
+    "17548": {
+        "text": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+        "context": "A dialog message in the mobile webclient informing the user that their account will return to the free plan after their currenly paid for subscription runs out if they choose to confirm in cancelling their subscription."
+    },
+    "17549": {
+        "text": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+        "context": "A message in a popup dialog explaining that there is an update available for the Firefox Legacy extension which works on browsers such as Pale Moon."
+    },
+    "17557": {
+        "text": "The link you are trying to access is not valid.",
+        "context": "attached, this will be the dialog content"
+    },
+    "17558": {
+        "text": "Import and update",
+        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to import the file in the destination folder by generating a new version with the file he is importing."
+    },
+    "17559": {
+        "text": "Don't import",
+        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and not replace it with the file they are importing."
+    },
+    "17560": {
+        "text": "Import and rename",
+        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and rename the file he is importing to avoid a filename conflict."
+    },
+    "17561": {
+        "text": "The file you are importing will be renamed as:",
+        "context": "A description for a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and also the file they are importing by renaming it automatically."
+    },
+    "17564": {
+        "text": "Link error",
+        "context": "The title of an error dialog while getting the sharing link of a file\/folder."
     }
 }

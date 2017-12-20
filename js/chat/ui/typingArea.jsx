@@ -10,9 +10,11 @@ var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationsUI = require('./../ui/conversations.jsx');
 var DropdownEmojiSelector = require('./../../ui/emojiDropdown.jsx').DropdownEmojiSelector;
+var EmojiAutocomplete = require('./emojiAutocomplete.jsx').EmojiAutocomplete;
 
 var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gi"),
     getDefaultProps: function() {
         return {
             'textareaMaxHeight': "40%"
@@ -22,6 +24,7 @@ var TypingArea = React.createClass({
         var initialText = this.props.initialText;
 
         return {
+            emojiSearchQuery: false,
             typedMessage: initialText ? initialText : "",
             textareaHeight: 20
         };
@@ -173,7 +176,14 @@ var TypingArea = React.createClass({
         var element = e.target;
         var val = $.trim(element.value);
 
+        if (self.state.emojiSearchQuery) {
+            return;
+        }
         if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+
+            if (e.isPropagationStopped() || e.isDefaultPrevented()) {
+                return;
+            }
 
             if (self.onConfirmTrigger(val) !== true) {
                 self.setState({typedMessage: ""});
@@ -202,6 +212,10 @@ var TypingArea = React.createClass({
             return;
         }
         else if (key === 13) {
+            if (self.state.emojiSearchQuery) {
+                return;
+            }
+
             // Alt+Enter
             if (e.altKey) {
                 var content = element.value;
@@ -220,6 +234,10 @@ var TypingArea = React.createClass({
             }
         }
         else if (key === 38) {
+            if (self.state.emojiSearchQuery) {
+                return;
+            }
+
             /* arrow up! */
             if ($.trim(val).length === 0) {
                 if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
@@ -229,6 +247,10 @@ var TypingArea = React.createClass({
             }
         }
         else if (key === 27) {
+            if (self.state.emojiSearchQuery) {
+                return;
+            }
+
             /* ESC */
             if (self.props.showButtons === true) {
                 e.preventDefault();
@@ -236,7 +258,80 @@ var TypingArea = React.createClass({
                 return;
             }
         }
+        else {
+            var char = String.fromCharCode(key);
+            if (
+                key === 16 /* shift */ ||
+                key === 17 /* ctrl */ ||
+                key === 18 /* option */ ||
+                key === 91 /* cmd*/ ||
+                key === 8 /* backspace */ ||
+                key === 37 /* left */ ||
+                key === 39 /* right */ ||
+                key === 40 /* down */ ||
+                key === 38 /* up */ ||
+                key === 9 /* tab */ ||
+                char.match(self.validEmojiCharacters)
+            ) {
+                var currentContent = element.value;
+                var currentCursorPos = self.getCursorPosition(element) - 1;
 
+
+                var startPos = false;
+                var endPos = false;
+                // back
+                var matchedWord = "";
+                var currentChar;
+                for (var x = currentCursorPos; x >= 0; x--) {
+                    currentChar = currentContent.substr(x, 1);
+                    if (currentChar && currentChar.match(self.validEmojiCharacters)) {
+                        matchedWord = currentChar + matchedWord;
+                    }
+                    else {
+                        startPos = x + 1;
+                        break;
+                    }
+                }
+
+                // fwd
+                for (var x = currentCursorPos+1; x < currentContent.length; x++) {
+                    currentChar = currentContent.substr(x, 1);
+                    if (currentChar && currentChar.match(self.validEmojiCharacters)) {
+                        matchedWord = matchedWord + currentChar;
+                    }
+                    else {
+                        endPos = x;
+                        break;
+                    }
+                }
+
+                if (
+                    matchedWord &&
+                    matchedWord.length > 2 &&
+                    matchedWord.substr(0, 1) === ":" &&
+                    matchedWord.substr(-1) !== ":"
+                ) {
+                    self.setState({
+                        'emojiSearchQuery': matchedWord,
+                        'emojiStartPos': startPos ? startPos : 0,
+                        'emojiEndPos': endPos ? endPos : startPos + matchedWord.length,
+                    });
+                    return;
+                }
+                else {
+                    if (self.state.emojiSearchQuery) {
+                        self.setState({
+                            'emojiSearchQuery': false,
+                            'emojiStartPos': false,
+                            'emojiEndPos': false
+                        });
+                    }
+                }
+            }
+            if (self.state.emojiSearchQuery) {
+                self.setState({'emojiSearchQuery': false});
+            }
+        }
 
         self.updateScroll(true);
     },
@@ -249,6 +344,17 @@ var TypingArea = React.createClass({
 
         var self = this;
 
+        if (self.state.emojiSearchQuery) {
+            // delay is required, otherwise the onBlur -> setState may cause halt of child onclick handlers, in case
+            // of a onClick in the emoji autocomplete.
+            setTimeout(function() {
+                self.setState({
+                    'emojiSearchQuery': false,
+                    'emojiStartPos': false,
+                    'emojiEndPos': false
+                });
+            }, 300);
+        }
     },
     onTypeAreaChange: function (e) {
         if (this.props.disabled) {
@@ -298,9 +404,9 @@ var TypingArea = React.createClass({
 
         var $container = $(ReactDOM.findDOMNode(this));
         if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
-            if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
+            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
 
-                moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
             }
         }
     },
@@ -389,7 +495,7 @@ var TypingArea = React.createClass({
         }
         if (self.onUpdateCursorPosition) {
             var $container = $(ReactDOM.findDOMNode(this));
-            var el = $('.chat-textarea:visible textarea:visible', $container)[0];
+            var el = $('.chat-textarea:visible:first textarea:visible', $container)[0];
             el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
             self.onUpdateCursorPosition = false;
         }
@@ -495,11 +601,11 @@ var TypingArea = React.createClass({
                     enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false
                 }
             );
-            var textareaWasFocused = $textarea.is(":focus");
+            var textareaIsFocused = $textarea.is(":focus");
             jsp = $textareaScrollBlock.data('jsp');
 
-            if (textareaWasFocused) {
-                moveCursortoToEnd($('textarea:first', $node)[0]);
+            if (!textareaIsFocused) {
+                moveCursortoToEnd($('textarea:visible:first', $node)[0]);
             }
         }
 
@@ -513,7 +619,23 @@ var TypingArea = React.createClass({
             )
         );
 
+        var textareaWasFocusedBeforeReinit = $textarea.is(":focus");
+        var selectionPos = false;
+        if (textareaWasFocusedBeforeReinit) {
+            selectionPos = [$textarea[0].selectionStart, $textarea[0].selectionEnd];
+        }
+
         jsp.reinitialise();
+
+        // requery to get the new <textarea/> that JSP had just replaced in the DOM.
+        $textarea = $('textarea:first', $node);
+
+        if (textareaWasFocusedBeforeReinit) {
+            // restore selection after JSP.reinit!
+            $textarea[0].selectionStart = selectionPos[0];
+            $textarea[0].selectionEnd = selectionPos[1];
+        }
+
 
         // Scrolling according cursor position
         if (textareaCloneHeight > textareaMaxHeight && textareaCloneSpanHeight < textareaMaxHeight) {
@@ -624,8 +746,41 @@ var TypingArea = React.createClass({
                 )
         };
 
+        var emojiAutocomplete = null;
+        if (self.state.emojiSearchQuery) {
+            emojiAutocomplete = <EmojiAutocomplete
+                emojiSearchQuery={self.state.emojiSearchQuery}
+                onSelect={function (e, emojiAlias) {
+                    if (
+                        $.isNumeric(self.state.emojiStartPos) &&
+                        $.isNumeric(self.state.emojiEndPos)
+                    ) {
+                        var msg = self.state.typedMessage;
+                        var pre = msg.substr(0, self.state.emojiStartPos);
+                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+                        self.setState({
+                            'typedMessage': pre + emojiAlias + (
+                                post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
+                            ),
+                            'emojiSearchQuery': false,
+                            'emojiStartPos': false,
+                            'emojiEndPos': false
+                        });
+                    }
+                }}
+                onCancel={function () {
+                    self.setState({
+                        'emojiSearchQuery': false,
+                        'emojiStartPos': false,
+                        'emojiEndPos': false
+                    });
+                }}
+            />;
+        }
+
         return <div className={"typingarea-component" + self.props.className}>
             <div className={"chat-textarea " + self.props.className}>
+                {emojiAutocomplete}
                 <i className={self.props.iconClass ? self.props.iconClass : "small-icon conversations"}></i>
                 <div className="chat-textarea-buttons">
                     <ButtonsUI.Button

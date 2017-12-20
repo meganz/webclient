@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite-v6.svg);
+    background-image: url(../images/mega/new-chat-sprite-v7.svg);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v6.svg);
+    background-image: url(../images/mega/new-chat-sprite-v7.svg);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -241,6 +241,12 @@
 .small-icon.flag-icon {
     background-position: -98px -3230px;
 }
+.small-icon.tab-icon {
+    background-position: -5px -3829px;
+}
+.small-icon.enter-icon {
+    background-position: -43px -3829px;
+}
 
 .dropdown-item .small-icon.rounded-grey-plus {
     background-position: -3px -3131px;
@@ -348,6 +354,9 @@
 .dropdown-item:hover .small-icon.rounded-stop {
     background-position: -54px -218px;
 }
+.dropdown.body:not(.context) .dropdown-item .small-icon.remove-link {
+    margin: 6px 8px 1px -1px;
+}
 .dashed-conversation {
     background-position: 1px -1644px;
 }
@@ -355,7 +364,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v6.svg);
+    background-image: url(../images/mega/new-chat-sprite-v7.svg);
     background-repeat: no-repeat;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;

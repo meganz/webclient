@@ -312,3 +312,23 @@
 .not-sent-indicator i {
     cursor: pointer;
 }
+.message em.rtf-italic {
+    color: #333333;
+    position: static;
+}
+.message pre.rtf-single, .message pre.rtf-multi {
+    margin: 0;
+    display: inline;
+    border: 1px solid #ccc;
+    padding: 1px 6px;
+    background-color: #f1f1f1;
+    border-radius: 3px;
+}
+.message pre.rtf-multi {
+    display: block;
+    width: auto;
+}
+
+.message pre.rtf-single, .message pre.rtf-multi {
+    white-space: pre-wrap;
+}

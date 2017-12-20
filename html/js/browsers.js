@@ -8,7 +8,6 @@ var browserspage = {
      */
     init: function() {
         browserspage.getServerBuildVersion();
-        browserspage.initChromeManualDownloadButton();
         browserspage.initChromeWebstoreDownloadButton();
     },
 
@@ -17,11 +16,10 @@ var browserspage = {
      */
     getServerBuildVersion: function() {
 
-        // Use update.rdf URL if in Firefox, or use the static path. Also use a timestamp query param
-        // to break browser cache. Otherwise subsequent visits to the page don't show a new update.
-        var updateURL = (is_chrome_firefox) ?
-            mozMEGAExtensionUpdateURL + '&time=' + unixtime() :
-            mega.updateURL + '?time=' + unixtime();
+        'use strict';
+
+        // Use a timestamp query param to break cache otherwise subsequent visits to the page don't show a new update
+        var updateURL = mega.updateURL + '?time=' + unixtime();
 
         // Fetch the latest current_ver.txt
         M.xhr(updateURL)
@@ -53,7 +51,6 @@ var browserspage = {
             });
     },
 
-
     /**
      * Add warning rollover and log for Chrome webstore clicks
      */
@@ -65,22 +62,5 @@ var browserspage = {
         $webstoreButton.click(function() {
             api_req({ a: 'log', e: 99604, m: 'Downloaded Chrome ext via webstore link' });
         });
-    },
-
-    /**
-     * Change button text when clicked to show the different versions available
-     */
-    initChromeManualDownloadButton: function() {
-
-        var $downloadButton = $('.default-56px-button.extension, .browsers.icon.cloud');
-
-        // On manual download button click, hide the button text and show the mega.co.nz and mega.nz links
-        $('.chrome-download-button').rebind('click', function() {
-
-            // Log that they downloaded via the manual link
-            api_req({ a: 'log', e: 99605, m: 'Downloaded Chrome ext via manual link' });
-        });
-
     }
-
 };

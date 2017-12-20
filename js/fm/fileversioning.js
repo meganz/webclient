@@ -594,13 +594,11 @@
                             });
                         }
                     });
+                    refreshHeader(fh);
+                    pd.removeClass('hidden');
+                    // Init scrolling
+                    fileversioning.initFileVersioningScrolling();
                 });
-
-            refreshHeader(fh);
-            pd.removeClass('hidden');
-
-            // Init scrolling
-            fileversioning.initFileVersioningScrolling();
             $(window).bind('resize.fmbreadcrumbs', function() {
                 fileversioning.initFileVersioningScrolling();
             });

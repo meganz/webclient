@@ -38,6 +38,7 @@ html, body {
     top: 0;
     z-index: 10;
     border: 0;
+    background-color: transparent;
 }
 html.overlayed {
     overflow: hidden;
@@ -66,7 +67,7 @@ input, textarea {
     user-select: text !important;
 }
 .hidden {
-    display: none;
+    display: none !important;
 }
 a, a:link, a:visited, a:hover, a:active {
     outline: none;
@@ -792,6 +793,9 @@ ul, li {
 .mobile.fm-icon.rocket {
     background-position: -51px -1960px;
 }
+.mobile.fm-icon.cancel-subscription {
+    background-position: -1px -1789px;
+}
 .mobile.fm-icon.cloud {
     background-position: -52px -2010px;
 }
@@ -853,6 +857,7 @@ ul, li {
 .folder-link .mobile.fm-header-txt span {
     font-size: 18px;
     line-height: 24px;
+    text-align: center;
 }
 .mobile.fm-item-img {
     float: left;
@@ -2442,7 +2447,7 @@ div.checkboxOn, div.checkboxOff {
 .fm-dialog-overlay {
     width: 100%;
     height: 100%;
-    position: absolute;
+    position: fixed;
     z-index: 1100;
     background: -moz-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.5) 100%);
     background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(0,0,0,0.1)), color-stop(100%, rgba(20,20,20,0.5)));
@@ -3038,7 +3043,7 @@ div.checkboxOn, div.checkboxOff {
 
 /* Limited available bandwidth dialog */
 .fm-dialog {
-    position: absolute;
+    position: fixed;
     z-index: 1200;
     border: 2px solid rgba(0,0,0,0.15);
     background-color: white;
@@ -3055,10 +3060,13 @@ div.checkboxOn, div.checkboxOff {
 }
 .fm-dialog.limited-bandwidth-dialog {
     background-color: rgba(255,255,255,0.94);
-    position: absolute;
+    position: fixed;
     z-index: 1200;
     left: 0;
     top: 0;
+}
+.limited-bandwidth-dialog .mobile.white-block {
+    margin: 0;
 }
 .limited-bandwidth-dialog .mobile.white-block p {
     white-space: initial;
@@ -3089,6 +3097,7 @@ div.checkboxOn, div.checkboxOff {
     text-align: center;
     margin-top: 24px;
     margin-bottom: 12px;
+    white-space: normal;
 }
 .dialog.p-after-icon {
     font-size: 15px;
@@ -3840,6 +3849,38 @@ div.checkboxOn, div.checkboxOff {
     position: absolute;
     top: 18px;
 }
+.mobile.my-account-page .account-cancel-subscription-block {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    margin-top: 4px;
+    padding: 17px 0;
+    position: relative;
+}
+.mobile.my-account-page .account-cancel-subscription-block .fm-icon.cancel-subscription {
+    left: 10px;
+    position: absolute;
+    top: 18px;
+}
+.mobile.my-account-page .account-cancel-subscription-block .subscription-heading {
+    color: #000;
+    font-size: 17px;
+    line-height: 22px;
+    margin-left: 60px;
+    text-align: left;
+}
+.mobile.my-account-page .account-cancel-subscription-block .subscription-text {
+    color: #777e82;
+    font-size: 14px;
+    line-height: 18px;
+    margin-left: 60px;
+    text-align: left;
+}
+.mobile.my-account-page .account-cancel-subscription-block .fm-icon.right-arrow {
+    right: 4px;
+    position: absolute;
+    top: 18px;
+}
 
 /* Help centre header */
 .help-section.fm-header {
@@ -4291,6 +4332,77 @@ div.checkboxOn, div.checkboxOff {
     margin: 11px 0 0 0;
 }
 
+/* Cancel subscription information overlay */
+.mobile.cancel-subscription-information-overlay {
+    left: 0;
+    position: absolute;
+    top: 0;
+    z-index: 100;
+}
+.mobile.cancel-subscription-information-overlay .first-message {
+    font-family: 'source_sans_prosemibold';
+}
+
+/* Cancel subscription overlay */
+.mobile.cancel-subscription-overlay {
+    left: 0;
+    position: absolute;
+    top: 0;
+    z-index: 100;
+}
+.mobile.cancel-subscription-overlay .white-block {
+    width: 300px;
+}
+.mobile.cancel-subscription-overlay .membership-icon.free {
+    margin: 10px auto;
+}
+.mobile.cancel-subscription-overlay .mobile.dialog-information {
+    font-size: 15px;
+    line-height: 24px;
+    color: #555;
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: normal;
+}
+.mobile.cancel-subscription-overlay .first-message {
+    font-family: 'source_sans_prosemibold';
+    color: #444;
+    font-size: 17px;
+    line-height: 22px;
+    text-align: center;
+}
+.mobile.cancel-subscription-overlay .second-message {
+    color: #777e82;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 10px;
+    text-align: center;
+}
+.mobile.cancel-subscription-overlay .buttons {
+    margin-top: 5px;
+    text-align: center;
+}
+.mobile.cancel-subscription-overlay .red-button {
+    display: inline-block;
+    width: 47%;
+    border: 1px solid #ff4246;
+    height: 44px;
+    line-height: 40px;
+    font-size: 14px;
+}
+.mobile.cancel-subscription-overlay .red-button.close-button {
+    background: #fff;
+    border: 1px solid #ff4246;
+    border-radius: 2px;
+    color: #ff4246;
+    margin-right: 2px;
+}
+.mobile.cancel-subscription-overlay .red-button.confirm-ok-button {
+    border-radius: 2px;
+    margin-left: 2px;
+}
 
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
@@ -4768,7 +4880,6 @@ div.checkboxOn, div.checkboxOff {
         margin-top: 5px;
     }
 }
-
 @media only screen and (orientation:landscape) and (max-width: 570px), only screen and (orientation:portrait) and (max-height: 570px) {
     .mobile.logo {
         width: 32px;
@@ -4864,8 +4975,11 @@ div.checkboxOn, div.checkboxOff {
     .wrong-file .mobile.content-row.second {
         height: 54.5%;
     }
-    .wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block {
-        bottom: -110px;
+    .wrong-file .mobile.white-block {
+        bottom: -48px;
+    }
+    .downloading .mobile.white-block, .uploading .mobile.white-block {
+        bottom: -93px;
     }
     .mobile.wrong-file-block {
         padding-top: 52px;
@@ -4907,6 +5021,30 @@ div.checkboxOn, div.checkboxOff {
     }
     .mobile.content-row {
         min-height: 0;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .mobile.my-account-page .pro-plan-name {
+        display: block;
+        line-height: 22px;
+        text-align: left;
+        margin-left: 60px;
+        margin-top: 8px;
+        position: static;
+    }
+    .mobile.my-account-page .storage-usage {
+        display: block;
+        line-height: 22px;
+        position: static;
+        right: 0;
+        top: 0;
+        text-align: left;
+        margin-left: 60px;
+        margin-top: 8px;
+    }
+    .mobile.my-account-page .account-type-block {
+        border-bottom: 1px solid #ddd;
     }
 }
 
@@ -5018,9 +5156,7 @@ div.checkboxOn, div.checkboxOff {
         background-size: 200px auto;
     }
 }
-.hidden {
-    display: none !important;
-}
+
 @keyframes rotate-loading {
     0% {
         transform: rotate(0deg);

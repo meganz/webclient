@@ -211,15 +211,15 @@ var slideshowid;
         if (d) {
             console.log('slideshow', id, close, slideshowid);
         }
-
+        
         if (close) {
             slideshowid = false;
             $overlay.removeClass('video video-theatre-mode').addClass('hidden');
+            $document.unbind('keydown.slideshow');
             if ($document.fullScreen()) {
                 clearTimeout(fullScreenTimer);
                 $document.fullScreen(false);
                 $document.unbind('mousemove.mediaviewer');
-                $document.rebind('keydown.slideshow');
             }
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === id) {
@@ -233,10 +233,16 @@ var slideshowid;
             return false;
         }
         var n = slideshow_node(id, $overlay);
-
+        // Checking if this the first preview (not a preview navigation)
+        // then pushing fake states of history/hash
+        if (!slideshowid) {
+            if (!hashLogic) {
+                history.pushState({ subpage: page }, '', '/' + page);
+            }
+        }
         // Bind keydown events
-        $document.rebind('keydown.slideshow', function(e) {
-            if (e.keyCode === 37 && slideshowid) {
+        var overlayKeyDownHandler = function (e) {
+            if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
                 slideshow_prev();
             }
             else if (e.keyCode === 39 && slideshowid) {
@@ -245,12 +251,30 @@ var slideshowid;
             else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
                 slideshow(slideshowid, true);
             }
-        });
+            else if (e.keyCode === 8 || e.key === 'Backspace') {
+                // since Backspace event is processed with keydown at document level for cloudBrowser.
+                // i prefered that to process it here, instead of unbind the previous handler.
+                e.stopPropagation();
+                if (!hashLogic) {
+                    history.back();
+                }
+                else {
+                    slideshow(slideshowid, 1);
+                }
+                return false;
+            }
+        };
+        $document.rebind('keydown.slideshow', overlayKeyDownHandler);
 
         // Close icon
         $overlay.find('.viewer-button.close,.viewer-error-close')
-            .rebind('click', function() {
-                slideshow(id, 1);
+            .rebind('click', function () {
+                if (!hashLogic) {
+                    history.back();
+                }
+                else {
+                    slideshow(slideshowid, 1);
+                }
             });
 
         // Fullscreen icon
@@ -823,8 +847,14 @@ var slideshowid;
             myPage = myPage.replace('^$#^1', window['pdfviewercss']);
             myPage = myPage.replace('^$#^3', window['pdfjs2']);
             myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
-            $('#pdfpreviewdiv1').removeClass('hidden');
-            var doc = document.getElementById('pdfpreviewdiv1').contentWindow.document;
+            // remove then re-add iframe to avoid History changes [push]
+            var pdfIframe = document.getElementById('pdfpreviewdiv1');
+            var newPdfIframe = document.createElement('iframe');
+            newPdfIframe.id = 'pdfpreviewdiv1';
+            newPdfIframe.src = 'about:blank';
+            var pdfIframeParent = pdfIframe.parentNode;
+            pdfIframeParent.replaceChild(newPdfIframe, pdfIframe);
+            var doc = newPdfIframe.contentWindow.document;
             doc.open();
             doc.write(myPage);
             doc.close();
@@ -851,14 +881,10 @@ var slideshowid;
             $overlay.find('.viewer-progress').addClass('hidden');
             $overlay.find('.viewer-image-bl img').addClass('hidden');
             $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
-            if (ua.details.browser !== 'Edge' && ua.details.engine !== 'Trident') {
-                $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);
-            }
-            else { // some other browser
-                // to fix pdf compatibility - Bug #7796
-                localStorage.setItem('currPdfPrev2', JSON.stringify(src));
-                prepareAndViewPdfViewer();
-            }
+            // preview pdfs using pdfjs for all browsers #8036
+            // to fix pdf compatibility - Bug #7796
+            localStorage.setItem('currPdfPrev2', JSON.stringify(src));
+            prepareAndViewPdfViewer();
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }

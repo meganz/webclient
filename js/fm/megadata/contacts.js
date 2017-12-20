@@ -548,6 +548,7 @@ MegaData.prototype.getContacts = function(n) {
 };
 
 MegaData.prototype.syncUsersFullname = function(userId) {
+    "use strict";
     var self = this;
 
     if (this.u[userId].firstName || this.u[userId].lastName) {
@@ -567,12 +568,13 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             .done(function(r) {
                 lastName.value = r;
             })
-    ]).done(function(results) {
+    ]).done(function() {
         if (!self.u[userId]) {
             return;
         }
 
         [firstName, lastName].forEach(function(obj) {
+
             // -1, -9, -2, etc...
             if (typeof obj.value === 'string') {
                 try {
@@ -593,11 +595,9 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
         self.u[userId].firstName = firstName;
         self.u[userId].lastName = lastName;
+        var user = self.u[userId];
 
-        if (
-            (firstName && $.trim(firstName).length > 0) ||
-            (lastName && $.trim(lastName).length > 0)
-        ) {
+        if (firstName && $.trim(firstName).length > 0 || lastName && $.trim(lastName).length > 0) {
             self.u[userId].name = "";
 
             if (firstName && $.trim(firstName).length > 0) {
@@ -606,6 +606,16 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             if (lastName && $.trim(lastName).length > 0) {
                 self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
             }
+
+            if (M.currentdirid === 'shares') {// Update right panel list and block view
+                $('.shared-grid-view .' + userId + ' .fm-chat-user').text(user.name);
+                $('.inbound-share .' + userId).next().find('.shared-folder-info')
+                    .text(l[17590].replace('%1', user.name));
+            }
+            else if (M.getNodeRoot(M.currentdirid) === 'shares') {
+                $('.shared-details-info-block .' + userId).next()
+                    .find('.fm-chat-user').text(user.name + ' <' + user.m + '>');
+            }
         }
         else {
             self.u[userId].name = "";
@@ -613,7 +623,7 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
         if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
             self.u[userId].avatar = false;
-            useravatar.loaded(userId); // FIXME: why is this needed here?
+            useravatar.loaded(userId);
         }
 
         if (userId === u_handle) {
@@ -626,11 +636,6 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             $('.membership-big-txt.name:visible').text(
                 u_attr.name
             );
-
-            // XXX: why are we invalidating avatars on first/last-name change?
-            /*if (fminitialized) {
-             M.avatars(u_handle);
-             }*/
         }
     });
 };
@@ -675,7 +680,6 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
             }
 
-
             this.u[userId].addChangeListener(onContactChanged);
 
             if (fmdb && !ignoreDB && !pfkey) {
@@ -684,9 +688,13 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 delete cleanedUpUserData.presence;
                 delete cleanedUpUserData.presenceMtime;
                 delete cleanedUpUserData.shortName;
+                delete cleanedUpUserData.firstName;
+                delete cleanedUpUserData.lastName;
                 delete cleanedUpUserData.name;
                 delete cleanedUpUserData.avatar;
                 fmdb.add('u', {u: u.u, d: cleanedUpUserData});
+                M.u[userId].firstName = '';
+                M.u[userId].lastName = '';
             }
 
             this.syncUsersFullname(userId);

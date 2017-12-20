@@ -222,7 +222,14 @@ var mobile = {
 mega.ui.tpp = {
     reset: function() {},
     setTotalProgress: function() {},
-    resume: function() {}
+    resume: function() {},
+    getTime: function() {},
+    start: function() {},
+    setIndex: function() {},
+    isCached: function() {
+        'use strict';
+        return false;
+    }
 };
 
 var notify = {

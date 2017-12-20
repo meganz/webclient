@@ -31,8 +31,7 @@ mobile.linkOverlay = {
         this.$overlay.find('.filesize').text(fileSizeFormatted);
         this.$overlay.find('.filetype-img').attr('src', fileIconPath);
 
-        // By default hide the public link and remove button also show the copy button as disabled
-        this.$overlay.find('.public-link').addClass('hidden');
+        // By default show the remove and copy buttons as disabled
         this.$overlay.find('.copy').addClass('disabled');
         this.$overlay.find('.remove').addClass('disabled');
 
@@ -41,7 +40,7 @@ mobile.linkOverlay = {
             this.showPublicLinkAndEnableButtons(nodeHandle);
         }
         else {
-            // Otherwise create the link
+            // Otherwise create the link first then show the link and copy/remove buttons
             var exportLink = new mega.Share.ExportLink({
                 'showExportLinkDialog': false,
                 'updateUI': false,
@@ -130,16 +129,32 @@ mobile.linkOverlay = {
         var $copyLinkButton = $overlay.find('.copy');
         var $removeLinkButton = $overlay.find('.remove');
 
-        // Set the URL into the text field
-        $publicLinkTextField.removeClass('hidden').val(publicUrl);
+        // Reset the height of the textarea from previous viewings, then set the URL into the text field
+        $publicLinkTextField.height(0);
+        $publicLinkTextField.val(publicUrl);
 
-        // check if we are on ios (doesnt allow copy to clipboard)
+        // Set a small 100ms timeout to give time for the textarea scroll height to be updated
+        setTimeout(function() {
+
+            // Calculate the actual height of the textarea contents and subtract the top and bottom padding (in pixels)
+            var height = $publicLinkTextField.prop('scrollHeight') - 24;
+
+            // Set the correct height of the text field
+            $publicLinkTextField.height(height);
+
+        }, 100);
+
+        // If not on iOS allow copy link functionality
         if (!is_ios) {
             $copyLinkButton.removeClass('disabled');
         }
         else {
+            // If on iOS hide copy link button (iOS doesn't allow copy to clipboard for now)
             $copyLinkButton.addClass('hidden');
+            $removeLinkButton.addClass('ios');
         }
+
+        // Enable Remove Link button
         $removeLinkButton.removeClass('disabled');
 
         // Update the link icon in the file manager view

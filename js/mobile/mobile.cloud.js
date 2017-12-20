@@ -37,7 +37,7 @@ mobile.cloud = {
         // Render the file manager header, folders, files and footer
         this.renderHeader();
         this.renderFoldersAndFiles();
-        this.renderFooter();
+        this.renderFoldersAndFilesSubHeader();
         this.showEmptyCloudIfEmpty();
 
         // Init folder and file row handlers
@@ -126,7 +126,7 @@ mobile.cloud = {
         // Render the footer to update number of files/folders in the current folder, if empty show an icon and message
         this.showEmptyCloudIfEmpty();
         this.countAndUpdateSubFolderTotals();
-        this.renderFooter();
+        this.renderFoldersAndFilesSubHeader();
 
         // Re-initialise click handlers
         this.initFileRowClickHandler();
@@ -187,7 +187,7 @@ mobile.cloud = {
         // Update the file/folder count in the footer and show an Empty message and icon if no files
         mobile.cloud.showEmptyCloudIfEmpty();
         mobile.cloud.countAndUpdateSubFolderTotals();
-        mobile.cloud.renderFooter();
+        mobile.cloud.renderFoldersAndFilesSubHeader();
 
         // If in the current folder and this got removed, then we need to go back up and open the parent folder
         if (M.currentdirid === nodeHandle || M.isCircular(nodeHandle, M.currentdirid) === true) {
@@ -282,7 +282,6 @@ mobile.cloud = {
         var $fileManagerHeader = $('.mobile.file-manager-block .fm-header');
         var $backButton = $fileManagerHeader.find('.fm-icon.back');
         var $cloudIcon = $fileManagerHeader.find('.fm-icon.cloud');
-        var $uploadIcon = $fileManagerHeader.find('.fm-icon.upload');
         var $menuIcon = $fileManagerHeader.find('.fm-icon.menu');
         var $folderIcon = $fileManagerHeader.find('.fm-icon.folder');
         var $folderName = $fileManagerHeader.find('.fm-header-txt span');
@@ -291,7 +290,6 @@ mobile.cloud = {
         // Reset header to blank slate so only buttons/items are enabled as needed
         $backButton.addClass('hidden');
         $cloudIcon.addClass('hidden');
-        $uploadIcon.addClass('hidden');
         $menuIcon.addClass('hidden');
         $fileManagerHeader.removeClass('folder-link');
         $folderIcon.addClass('hidden');
@@ -327,20 +325,25 @@ mobile.cloud = {
             // Otherwise if this is the root folder of the regular cloud drive, show the cloud icon and text
             if (M.currentdirid === M.RootID) {
                 $cloudIcon.removeClass('hidden');
-                // $uploadIcon.removeClass('hidden');    // ToDo: re-enable when finished
                 $folderName.text(l[164]);               // Cloud Drive
             }
             else {
-                // Otherwise if a subfolder of the cloud drive, show the back button and the folder name
+                // If a subfolder of the cloud drive, show the back button
                 mobile.showAndInitBackButton($backButton);
+
+                // Show the folder name
                 $folderName.text(currentFolder.name);
             }
 
-            // Show the hamburger menu and initialise the upload button
+            // Show the hamburger menu icon
             $menuIcon.removeClass('hidden');
-            // mobile.upload.initUploadButton();         // ToDo: re-enable when finished
+
+            // Initialise the bottom action bar for Add Folder, Upload File functionality etc
+            mobile.cloud.actionBar.init();
         }
     },
+
+
 
     /**
      * Sums up all the file sizes (including sub directories) in the folder link
@@ -444,13 +447,13 @@ mobile.cloud = {
     },
 
     /**
-     * Updates the footer with the count of folders and files inside this folder
+     * Updates the text below the header with the count of folders and files inside this folder
      */
-    renderFooter: function() {
+    renderFoldersAndFilesSubHeader: function() {
 
         'use strict';
 
-        var $bottomInfoBar = $('.mobile.file-manager-block .fm-bottom');
+        var $infoBar = $('.mobile.file-manager-block .folders-files-text');
         var numOfFolders = 0;
         var numOfFiles = 0;
 
@@ -474,8 +477,8 @@ mobile.cloud = {
         var folderWording = numOfFolders === 1 ? l[834] : l[832].replace('[X]', numOfFolders);
         var fileWording = numOfFiles === 1 ? l[835] : l[833].replace('[X]', numOfFiles);
 
-        // Update the footer with the count of folders and files inside
-        $bottomInfoBar.text(folderWording + ', ' + fileWording);
+        // Update with the count of folders and files inside
+        $infoBar.text(folderWording + ', ' + fileWording);
     },
 
     /**

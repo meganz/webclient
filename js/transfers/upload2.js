@@ -720,6 +720,12 @@ var ulmanager = {
                 newnodes = [];
                 process_f(res.f);
                 M.updFileManagerUI();
+
+                // If on mobile, show that the upload has completed and allow them to upload another
+                if (is_mobile) {
+                    mobile.uploadOverlay.showUploadComplete(n);
+                }
+
                 if (M.viewmode) {
                     fm_thumbnails();
                 }
@@ -1495,11 +1501,22 @@ ulQueue.canExpand = function(max) {
 
 Object.defineProperty(ulQueue, 'maxActiveTransfers', {
     get: function() {
-        return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 20);
+        'use strict';
+
+        // If on mobile, there's only 1 upload at a time and the desktop calculation below fails
+        if (is_mobile) {
+            return 1;
+        }
+        else {
+            return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 20);
+        }
     }
 });
 
 mBroadcaster.once('startMega', function _setupEncrypter() {
+
+    'use strict';
+
     var encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
         var file = context.file;
         if (!file || !file.ul_macs) {

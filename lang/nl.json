@@ -4529,6 +4529,10 @@
     "17580": "Bestandsversie instellingen weergeven",
     "17581": "U staat op het punt de versiegeschiedenis van alle bestanden te verwijderen. Houd er rekening mee dat de huidige bestanden niet verwijderd worden. Wilt u doorgaan?",
     "17582": "U heeft [X1] bestandsversies, die gebruiken in totaal [X2].",
+    "17584": "Current Plan:",
+    "17587": "Invite Contact",
+    "17588": "Invite Sent",
+    "17589": "Later",
     "17590": "door %1",
     "17595": "Wanneer bestandsversie is uitgeschakeld, worden de huidige versies vervangen door de nieuwe versie zodra een bestand is ge-update ( en uw wijzigingen van het bestand niet langer worden vastgelegd). Weet u zeker dat u de bestandsversie wilt uitschakelen?",
     "17596": "Bestandsversie in of uitschakelen voor uw gehele account:",
@@ -4537,5 +4541,15 @@
     "17599": "Verwijder alles",
     "17600": "Dit verwijderd permanent all uw eigen bestandsversies. Elke bestandsversie die gedeeld is met u door een contact moet worden verwijderd door hun.",
     "17601": "Ingeschakkeld",
-    "17602": "De huidige versie van het bestand wordt vervangen met het bestand die u aan het uploaden bent."
+    "17602": "De huidige versie van het bestand wordt vervangen met het bestand die u aan het uploaden bent.",
+    "17608": "Please enter a valid value",
+    "17609": "Disable file versioning",
+    "17611": "A local folder with a backup of files deleted in MEGA",
+    "17612": "A folder in MEGA with a backup of files deleted in the local computer",
+    "17613": "Disabling file versioning will prevent the creation and storage of new file versions. Do you want to continue?",
+    "17614": "Remove files older than %1 days",
+    "17615": "Remove files older than 1 day",
+    "17616": "You are about to permanently remove all file versions. Would you like to proceed?",
+    "17617": "Create Folder",
+    "17618": "UPLOAD ANOTHER FILE"
 }

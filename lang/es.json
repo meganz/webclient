@@ -4529,6 +4529,10 @@
     "17580": "Ver los ajustes del control de versiones ",
     "17581": "Est\u00e1 a punto de eliminar el historial de versiones de todos los archivos. Ten en cuenta que los archivos actuales no ser\u00e1n eliminados. \u00bfQuieres continuar?",
     "17582": "Tiene [X1] versiones de archivo, que ocupan un total de [X2].",
+    "17584": "Current Plan:",
+    "17587": "Invite Contact",
+    "17588": "Invite Sent",
+    "17589": "Later",
     "17590": "por %1",
     "17595": "Si desactivas el control de versiones y subes un archivo, la versi\u00f3n nueva reemplazar\u00e1 la actual y los cambios no ser\u00e1n archivados como versiones. \u00bfSeguro que quieres desactivar el control de versiones?",
     "17596": "Activar o desactivar el control de versiones para tu cuenta:",
@@ -4537,5 +4541,15 @@
     "17599": "Eliminar todo",
     "17600": "Esta acci\u00f3n eliminar\u00e1 permanentemente todas las versiones de tus archivos. Las versiones que han sido compartidas contigo por tus contactos tendr\u00e1n que ser eliminadas por ellos.",
     "17601": "Activado",
-    "17602": "La versi\u00f3n actual del archivo ser\u00e1 reemplazada por el archivo que est\u00e1s subiendo."
+    "17602": "La versi\u00f3n actual del archivo ser\u00e1 reemplazada por el archivo que est\u00e1s subiendo.",
+    "17608": "Please enter a valid value",
+    "17609": "Disable file versioning",
+    "17611": "A local folder with a backup of files deleted in MEGA",
+    "17612": "A folder in MEGA with a backup of files deleted in the local computer",
+    "17613": "Disabling file versioning will prevent the creation and storage of new file versions. Do you want to continue?",
+    "17614": "Remove files older than %1 days",
+    "17615": "Remove files older than 1 day",
+    "17616": "You are about to permanently remove all file versions. Would you like to proceed?",
+    "17617": "Create Folder",
+    "17618": "UPLOAD ANOTHER FILE"
 }

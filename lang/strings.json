@@ -18119,6 +18119,22 @@
         "text": "You have [X1] file versions, taking up a total of [X2].\r\n",
         "context": "A message to summarise the total number of file versions (X1) and total storage usage (X2) of the versioned files. Please keep the placeholders [X1] and [X2] as they will be replaced at runtime."
     },
+    "17584": {
+        "text": "Current Plan:",
+        "context": "Text shown on the upgrade account page above the current PRO plan subscription"
+    },
+    "17587": {
+        "text": "Invite Contact",
+        "context": "Text shown when the user tries to make a call and the receiver is not a contact"
+    },
+    "17588": {
+        "text": "Invite Sent",
+        "context": "Text shown when the user sends a contact invitation"
+    },
+    "17589": {
+        "text": "Later",
+        "context": "Button title to allow the user postpone an action"
+    },
     "17590": {
         "text": "by %1",
         "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
@@ -18154,5 +18170,45 @@
     "17602": {
         "text": "The current version of the file will be replaced with the file you are uploading.",
         "context": "A description in the duplicate items dialog below the Upload and replace title. This option allows the user to update an existing file in the folder by replacing the current version of the file with the file they are uploading."
+    },
+    "17608": {
+        "text": "Please enter a valid value",
+        "context": "Information message shown when user introduces an invalid value"
+    },
+    "17609": {
+        "text": "Disable file versioning",
+        "context": "Checkbox label to enable\/disable file versioning feature"
+    },
+    "17611": {
+        "text": "A local folder with a backup of files deleted in MEGA",
+        "context": "Tooltip shown when hover local debris label."
+    },
+    "17612": {
+        "text": "A folder in MEGA with a backup of files deleted in the local computer",
+        "context": "Tooltip shown when hover remote SyncDebris label."
+    },
+    "17613": {
+        "text": "Disabling file versioning will prevent the creation and storage of new file versions. Do you want to continue?",
+        "context": "Informative text shown when user is trying to disable file versioning before proceed."
+    },
+    "17614": {
+        "text": "Remove files older than %1 days",
+        "context": "Informative label to indicate that local cleaning scheduler is active and files older than %1 days will be removed. Keep %1 placeholder, it will be replaced with the value specified by the user at runtime"
+    },
+    "17615": {
+        "text": "Remove files older than 1 day",
+        "context": "Informative label to indicate that local cleaning scheduler is active and files older than 1 day will be removed."
+    },
+    "17616": {
+        "text": "You are about to permanently remove all file versions. Would you like to proceed?",
+        "context": "Informative text asking for confirmation when user is trying to remove all file versions of the actual account. This removes the backup versions of files, but does not remove the current file itself."
+    },
+    "17617": {
+        "text": "Create Folder",
+        "context": "The title of a dialog in the mobile webclient which lets the user create a new folder (directory) to be added to their Cloud Drive"
+    },
+    "17618": {
+        "text": "UPLOAD ANOTHER FILE",
+        "context": "A button label in the mobile webclient to upload an additional file after completing a file upload already."
     }
 }

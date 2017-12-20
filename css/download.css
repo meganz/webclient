@@ -436,6 +436,7 @@
 .download.video .download.warning-block.visible {
     bottom: 20px;
     z-index: 30;
+    position: fixed;
     -webkit-animation: seconds 1.0s forwards;
   -webkit-animation-iteration-count: 1;
   -webkit-animation-delay: 7s;

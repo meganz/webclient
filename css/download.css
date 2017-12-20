@@ -874,7 +874,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .video.download-complete .semi-small-icon.icons-sprite.pause {
     margin: 7px auto 0 auto;
 }
-.video-theatre-mode .horizontal-centered-bl {
+.video-theatre-mode .top-bl .horizontal-centered-bl {
     max-width: 100%;
     height: 100%;
     display: block;
@@ -882,7 +882,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .video-theatre-mode .top-bl, .video-theatre-mode .top-bl .vertical-centered-cell {
     display: block;
 }
-.video-theatre-mode .download.main-pad {
+.video-theatre-mode .top-bl .download.main-pad {
     width: 100%;
     height: 100%;
     overflow: hidden;

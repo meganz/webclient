@@ -128,13 +128,33 @@ function dl_g(res) {
         {
             var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
+            var $wrapper = $('.bottom-page.scroll-block');
 
             // Change layout for video
             if (is_video(filename)) {
-                $('.bottom-page.scroll-block').addClass('video');
+                var $video = $wrapper.find('video');
+
+                $wrapper.addClass('video');
+
+                // Disable default video controls
+                $video.get(0).controls = false;
+
+                // TODO: Set preview image scr
+                // $overlay.find('.viewer-image-bl video').attr('poster', src);
+
+                $('.play-video-button', $wrapper).rebind('click', function() {
+
+                    // Show Loader until video is playing
+                    $wrapper.find('.viewer-pending').removeClass('hidden');
+
+                    // TOTO: Init video controls
+                    // initVideoControls($wrapper);
+    
+                    $wrapper.addClass('video-theatre-mode');
+                });
             }
             else {
-                $('.bottom-page.scroll-block').removeClass('video');
+                $wrapper.removeClass('video video-theatre-mode');
             }
 
             var checkMegaSyncDownload = function() {

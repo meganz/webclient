@@ -440,7 +440,7 @@
     color: #F0373B;
 }
 .download.big-icon {
-    position:absolute;
+    position: absolute;
     top: 50%;
     margin: -41px 0 0 1px;
 }
@@ -544,13 +544,13 @@
     background: #ffffff;
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYWZhZmEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
     background: -moz-linear-gradient(top, #ffffff 0%, #fafafa 100%);
-    background: -webkit-linear-gradient(top, #ffffff 0%,#fafafa 100%);
-    background: linear-gradient(to bottom, #ffffff 0%,#fafafa 100%);
+    background: -webkit-linear-gradient(top, #ffffff 0%, #fafafa 100%);
+    background: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
 }
 .megasync-slider.button::before {
     content: '';
     display: block;
-     position: absolute;
+    position: absolute;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
@@ -604,9 +604,9 @@
     position: relative;
 }
 .download.thumb-block::before {
-    content:'';
+    content: '';
     display: block;
-    position:absolute;
+    position: absolute;
     width: 100%;
     height: 100%;
     -moz-border-radius: 4px;
@@ -657,7 +657,6 @@
 .downloading .download.in-progress, .download-complete .download.download.in-progress, .download-complete .download.percents-block, .not-available-user .download.deleted-user, .temporary-na .download.temporarty-error, .na-some-reason .download.some-reason, .downloading .megasync-content.features {
     display: block;
 }
-
 /* Video dl page */
 .video .download.main-pad {
     width: 656px;
@@ -672,13 +671,12 @@
     box-shadow: 0px 0px 0px 1px #EEEEEE;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
-    border-radius: 3px; 
+    border-radius: 3px;
     padding: 7px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
-
 .download.video-block {
     display: none;
 }
@@ -687,27 +685,15 @@
     height: 360px;
     background-color: black;
     position: relative;
-    text-align:center;
+    text-align: center;
+}
+.video .download.video-block video {
+    width: 100%;
+    height: 100%;
 }
 .video .download.video-block img {
     margin: 0 auto;
     height: 100%;
-}
-.download.play-video-button {
-    position:absolute;
-    width: 72px;
-    height: 72px;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    left: 50%;
-    top: 50%;
-    margin: -36px 0 0 -36px;
-    z-index: 10;
-    cursor: pointer;
-    background-color: #F52929;
-    background-image: url(../images/mega/download-sprite-v8.png);
-    background-position: -64px -2285px;
 }
 .video .download.checkbox-bl {
     padding: 8px 15px 0 15px;
@@ -807,11 +793,11 @@
 .video .download .pause-transfer.square {
     display: block;
 }
-.video.download-complete  .pause-transfer.square {
+.video.download-complete .pause-transfer.square {
     cursor: default;
     opacity: 0.5;
 }
-.video.download-complete  .pause-transfer.square:hover {
+.video.download-complete .pause-transfer.square:hover {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
@@ -821,5 +807,109 @@
 }
 .video.download-complete .semi-small-icon.icons-sprite.pause {
     margin: 7px auto 0 auto;
+}
+.video-theatre-mode .horizontal-centered-bl {
+    max-width: 100%;
+    height: 100%;
+    display: block;
+}
+.video-theatre-mode .top-bl, .video-theatre-mode .top-bl .vertical-centered-cell {
+    display: block;
+}
+.video-theatre-mode .download.main-pad {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: block;
+}
+.bottom-page.video-theatre-mode {
+    height: -webkit-calc(100% + 73px);
+    height: -moz-calc(100% + 73px);
+    height: calc(100% + 73px);
+}
+.video-theatre-mode .download.transfer-wrapper {
+    min-height: 507px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    padding: 0;
+    margin-top: 37px;
+    height: -webkit-calc(100% - 110px);
+    height: -moz-calc(100% - 110px);
+    height: calc(100% - 110px);
+}
+.video-theatre-mode .download.video-block {
+    height: -webkit-calc(100% - 150px);
+    height: -moz-calc(100% - 150px);
+    height: calc(100% - 150px);
+}
+.video-theatre-mode .download.buttons-block {
+    border-top: 0;
+    max-width: 840px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+.video-theatre-mode .download.info-block, .video-theatre-mode .download.in-progress {
+    max-width: 840px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0 auto;
+    position: relative;
+}
+ .video-theatre-mode .download.in-progress .progress-block {
+     margin-top: 0;
+ }
+.video-theatre-mode .download.buttons-block::before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    margin-top: -16px;
+    height: 1px;
+    background-color: #F6F6F6;
+}
+.download.transfer-wrapper .checkbox-bl, .video-theatre-mode .download.main-pad > .checkbox-bl, .video-theatre-mode .download.transfer-wrapper .checkbox-bl.hidden, .video-theatre-mode .download.buttons-block.hidden, .video-theatre-mode.downloading .download.transfer-wrapper .download.checkbox-bl, .video-theatre-mode.downloading .video-mode-wrapper, .video-theatre-mode.download-complete .download.transfer-wrapper .download.checkbox-bl, .video-theatre-mode.download-complete .video-mode-wrapper {
+    display: none;
+}
+.video-theatre-mode .download.transfer-wrapper .checkbox-bl {
+    display: table-cell;
+    vertical-align: top;
+    padding: 11px 15px 0 22px;
+}
+.video-theatre-mode .video-mode-wrapper {
+    display: table;
+    width: 840px;
+    margin: 0 auto;
+}
+.video-theatre-mode .download.buttons-block {
+    border-top: 0;
+    white-space: nowrap;
+    display: table-cell;
+    vertical-align: top;
+}
+.video-theatre-mode label.radio-txt {
+    margin-left: 44px;
+    display: block;
+    float: none;
+    padding-right: 0;
+}
+.video-theatre-mode .download .small-red-link {
+    margin-left: 44px;
+}
+.video-theatre-mode .download.big-button.red {
+    margin-top: 2px;
+}
+.video-theatre-mode .download.info-block {
+    padding: 7px 0 10px 0;
+}
+.video-theatre-mode .download.in-progress {
+    padding: 13px 76px 10px 8px;
+}
+.video-theatre-mode .download .pause-transfer.square {
+    width: 48px;
 }
 /* end of Video dl page */

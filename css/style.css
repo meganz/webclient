@@ -5335,7 +5335,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v11.png);
+    background-image: url(../images/mega/icons-sprite_v12.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -7002,11 +7002,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v11.png);
+    background-image: url(../images/mega/icons-sprite_v12.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v11.png);
+    background-image: url(../images/mega/icons-sprite_v12.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {

@@ -60,8 +60,45 @@
                     <div class="download transfer-wrapper">
                         <!-- Video block !-->
                         <div class="download video-block">
-                                <!--Video tag here !-->
-                                <div class="download play-video-button"></div>
+                            <video id="video" controls="false" preload="metadata" poster=""></video>
+                            
+                            <div class="viewer-pending hidden">
+                                <div class="bounce1"></div>
+                                <div class="bounce2"></div>
+                                <div class="bounce3"></div>
+                            </div>
+                            
+                            <div class="viewer-bottom-bl">
+                                <div id="video-controls" class="video-controls" data-state="hidden">
+                                    <div data-state="play" class="viewer-button left playpause">
+                                        <i class="medium-icon icons-img pause"></i>
+                                    </div>
+                                    <div class="volume-control left">
+                                        <div data-state="mute" class="viewer-button mute">
+                                            <i class="medium-icon icons-img volume"></i>
+                                        </div>
+                                        <div class="video-vol-range">
+                                            <div class="volume-bar"><span></span></div>
+                                        </div>
+                                    </div>
+                                    <div class="video-timing current left">
+                                        00:00
+                                    </div>
+                                    <div data-state="go-fullscreen" class="viewer-button right fs">
+                                        <i class="medium-icon icons-img fullscreen"></i>
+                                    </div>
+                                    <div class="video-timing duration right">
+                                        00:00
+                                    </div>
+                                    <div class="video-progress-block">
+                                        <div class="video-progress-bar">
+                                            <div class="video-time-bar"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="download play-video-button"></div>
                          </div>
                         <div class="download info-block">
                             <div class="download file-icon-wrap">
@@ -116,16 +153,30 @@
                             <i class="semi-small-icon icons-sprite green-tick"></i>
                             <span>[$17082]</span>
                         </div>
-    
-                        <div class="download buttons-block">
-                            <div class="download big-button download-file red transition">
-                                <i class="medium-icon icons-sprite download"></i>
-                                <span>[$58]</span>
+                        
+                        <div class="video-mode-wrapper">
+                            <div class="download checkbox-bl">
+                                <div class="checkdiv megaapp-download checkboxOff">
+                                    <input type="checkbox" name="megaapp-download" id="megaapp-download" class="checkboxOff">
+                                </div>
+                                <label for="megaapp-download" class="radio-txt">[$16671]</label>
+                                <div class="clear"></div>
+                                <a href="https://mega.nz/sync" class="small-red-link" target="_blank" rel="noopener noreferrer">
+                                    [$8742]
+                                    <i></i>
+                                </a>
                             </div>
-                            <div class="download big-button to-clouddrive transition">
-                                <span>[$8752]</span>
+        
+                            <div class="download buttons-block">
+                                <div class="download big-button download-file red transition">
+                                    <i class="medium-icon icons-sprite download"></i>
+                                    <span>[$58]</span>
+                                </div>
+                                <div class="download big-button to-clouddrive transition">
+                                    <span>[$8752]</span>
+                                </div>
+                                <div class="clear"></div>
                             </div>
-                            <div class="clear"></div>
                         </div>
                         
                         

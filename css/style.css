@@ -6332,7 +6332,7 @@ table {
 .transfer-filetype-icon.font, .search-path-icon-span.font {
     background-position: -61px -1197px;
 }
-.rename-input-bl .transfer-filetype-icon.folder, .rename-input-bl .transfer-filetype-icon.folder-shared {
+.rename-input-bl .transfer-filetype-icon.folder, .rename-input-bl .transfer-filetype-icon.folder-shared, .create-folder-input-bl .transfer-filetype-icon.folder {
     background-image: url(../images/mega/dialogs-sprite_v13.svg);
     background-position: -9px -1894px;
     background-size: auto;
@@ -7826,8 +7826,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #333333;
     padding: 0 10px 0 42px;
     margin: 0;
-    background-image: url(../images/mega/dialogs-sprite_v13.svg);
-    background-position: 3px -1890px;
+    /* background-image: url(../images/mega/dialogs-sprite_v13.svg);
+    background-position: 3px -1890px; */
     background-repeat: no-repeat;
     background-color: transparent;
     border: 0;
@@ -7974,7 +7974,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .error .create-folder-input-bl, .error .fm-account-input, .error .rename-input-bl, .rename-input-bl input.error, .create-folder-input-bl input.error {
     color: #D90007;
 }
-.rename-input-bl .transfer-filetype-icon {
+.rename-input-bl .transfer-filetype-icon, .create-folder-input-bl .transfer-filetype-icon {
     width: 24px;
     position: absolute;
     left: 12px;
@@ -16081,10 +16081,9 @@ ul.token-input-list-mega {
     -ms-transition: box-shadow 200ms ease-in-out;
     transition: box-shadow 200ms ease-in-out;
 }
-.multiple-input-warning {
+.multiple-input-warning, .duplicated-input-warning {
     height: 32px;
     position: absolute;
-    right: 42px;
     background-color: #444444;
     padding: 0 8px 0 12px;
     line-height: 30px;
@@ -16096,10 +16095,17 @@ ul.token-input-list-mega {
     white-space: nowrap;
     display: none;
 }
-.error .multiple-input-warning {
+.multipl-input-warning {
+    right: 42px;
+}
+.duplicated-input-warning {
+    top: -4px;
+    right: 62px;
+}
+.error .multiple-input-warning, .duplicate .duplicated-input-warning {
     display: block;
 }
-.multiple-input-warning .arrow {
+.multiple-input-warning .arrow, .duplicated-input-warning .arrow {
     height: 32px;
     background-image: url(../images/mega/dialogs-sprite_v13.svg);
     background-repeat: no-repeat;

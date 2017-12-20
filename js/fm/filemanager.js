@@ -1248,10 +1248,11 @@ FileManager.prototype.createFolderUI = function() {
     "use strict";
 
     var doCreateFolder = function() {
-        var $inputWrapper = $('.create-folder-pad');
-        var $input = $('.create-new-folder input');
+        var $inputWrapper = $('.create-new-folder.popup .create-folder-pad');
+        var $input = $inputWrapper.find('input');
+        var name = $input.val();
 
-        if ($input.val() === '' || !M.isSafeName($input.val())) {
+        if (name === '' || !M.isSafeName(name)) {
             $inputWrapper.addClass('error');
             $input.addClass('error');
 
@@ -1259,11 +1260,23 @@ FileManager.prototype.createFolderUI = function() {
                 $inputWrapper.removeClass('error');
                 $input.removeClass('error');
                 $input.focus();
-            }, 1500);
+            }, 2000);
         }
         else {
+            if (duplicated(1, name)) {// Check if folder name already exists
+                $inputWrapper.addClass('duplicate');
+                $input.addClass('error');
+
+                setTimeout(function () {
+                    $inputWrapper.removeClass('duplicate');
+                    $input.removeClass('error');
+                    $input.focus();
+                }, 2000);
+
+                return;
+            }
             loadingDialog.pshow();
-            M.createFolder(M.currentdirid, $input.val(), new MegaPromise())
+            M.createFolder(M.currentdirid, name, new MegaPromise())
                 .done(function(h) {
                     if (d) {
                         console.log('Created new folder %s->%s.', M.currentdirid, h);

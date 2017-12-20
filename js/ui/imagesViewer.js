@@ -681,27 +681,25 @@ var slideshowid;
             $progressBar.css('width', percentage+'%');
 
             $wrapper.find('.video-timing.current')
-                    .text(secondsToTimeShort(videoElement.currentTime,1));
+                .text(secondsToTimeShort(videoElement.currentTime,1));
         });
 
-        var timeDrag = false;   /* Drag status */
+        var timeDrag = false; /* Drag status */
         $progress.rebind('mousedown.videoprogress', function(e) {
             timeDrag = true;
             videoElement.pause();
-            updatebar(e.pageX);
         });
 
         $document.rebind('mouseup.videoprogress', function(e) {
             if (timeDrag) {
                 timeDrag = false;
-                videoElement.play();
                 updatebar(e.pageX);
+                videoElement.play();
             }
         });
 
         $document.rebind('mousemove.videoprogress', function(e) {
             if (timeDrag) {
-                videoElement.pause();
                 updatebar(e.pageX);
             }
         });
@@ -711,7 +709,8 @@ var slideshowid;
             var maxduration = videoElement.duration; //Video duraiton
             var position = x - $progress.offset().left; //Click pos
             var percentage = 100 * position / $progress.width();
-         
+            var selectedTime;
+
             //Check within range
             if (percentage > 100) {
                 percentage = 100;
@@ -721,8 +720,15 @@ var slideshowid;
             }
 
             //Update progress bar and video currenttime
+            selectedTime = Math.round(maxduration * percentage / 100);
+
             $progressBar.css('width', percentage+'%');
-            videoElement.currentTime = maxduration * percentage / 100;
+            $wrapper.find('.video-timing.current')
+                .text(secondsToTimeShort(selectedTime,1));
+
+            if (!timeDrag) {
+                videoElement.currentTime = selectedTime;
+            }
         };
 
 

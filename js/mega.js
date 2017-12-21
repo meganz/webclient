@@ -2022,6 +2022,8 @@ function dbfetchfm() {
                             opc: processOPC,
                             ipc: processIPC,
                             ps: processPS,
+                            puf: mega.megadrop.pufProcessDb,
+                            pup: mega.megadrop.pupProcessDb,
                             tree: function(r) {
                                 for (var i = r.length; i--;) {
                                     ufsc.addTreeNode(r[i], true);
@@ -2029,9 +2031,11 @@ function dbfetchfm() {
                             },
                             mcf: 1
                         };
-                        if (!is_mobile) {
-                            tables['puf'] = mega.megadrop.pufProcessDb;
-                            tables['pub'] = mega.megadrop.pufProcessDb;
+
+                        // Prevent MEGAdrop tables being created for mobile
+                        if (is_mobile) {
+                            delete tables.puf;
+                            delete tables.pup;
                         }
 
                         Object.keys(tables).forEach(function(t) {

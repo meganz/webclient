@@ -17,7 +17,7 @@ var slideshowid;
 
         // Loop through available items and extract images
         for (var i in M.v) {
-            if (is_image(M.v[i])) {
+            if (is_image(M.v[i]) || is_video(M.v[i])) {
                 // is currently previewed item
                 if (M.v[i].h === slideshowid) {
                     ci = i;
@@ -615,7 +615,7 @@ var slideshowid;
                     }
                 });
             }
-            else {
+            else if (page === 'download') {
                 // autoplay if no poster available
                 onIdle(function() {
                     $('.viewer-overlay .play-video-button').trigger('click');

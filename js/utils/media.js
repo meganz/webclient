@@ -229,14 +229,13 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
     'use strict';
 
     // Init custom video controls
-    var _initVideoControls = function(wrapper) {
+    var _initVideoControls = function(wrapper, streamer) {
         var $wrapper = $(wrapper);
         var $video = $wrapper.find('video');
         var videoElement = $video.get(0);
         var $videoContainer = $video.parent();
         var $videoControls = $wrapper.find('.video-controls');
         var $document = $(document);
-
 
         // Hide the default controls
         videoElement.controls = false;
@@ -386,13 +385,16 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         $progress.rebind('mousedown.videoprogress', function(e) {
             timeDrag = true;
             videoElement.pause();
+            onIdle(updatebar.bind(0, e.pageX));
         });
 
         $document.rebind('mouseup.videoprogress', function(e) {
             if (timeDrag) {
                 timeDrag = false;
                 updatebar(e.pageX);
-                videoElement.play();
+                if (streamer._events.indexOf('seeking') < 0) {
+                    videoElement.play();
+                }
             }
         });
 
@@ -423,7 +425,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 .text(secondsToTimeShort(selectedTime, 1));
 
             if (!timeDrag) {
-                videoElement.currentTime = selectedTime;
+                videoElement.currentTime = selectedTime | 0;
             }
         };
 
@@ -523,7 +525,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
     var _initVideoStream = function(node, $wrapper, destroy) {
         var s = Streamer(node.link || node.h, $wrapper.find('video').get(0));
 
-        _initVideoControls($wrapper);
+        _initVideoControls($wrapper, s);
 
         destroy = destroy || s.destroy.bind(s);
 

@@ -235,13 +235,11 @@ var slideshowid;
         var n = slideshow_node(id, $overlay);
         // Checking if this the first preview (not a preview navigation)
         // then pushing fake states of history/hash
-        if (!slideshowid) {
-            if (!hashLogic) {
-                history.pushState({ subpage: page }, '', '/' + page);
-            }
+        if (!slideshowid && !hashLogic && !location.hash) {
+            history.pushState({subpage: page}, '', '/' + page);
         }
         // Bind keydown events
-        var overlayKeyDownHandler = function (e) {
+        $document.rebind('keydown.slideshow', function(e) {
             if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
                 slideshow_prev();
             }
@@ -254,27 +252,26 @@ var slideshowid;
             else if (e.keyCode === 8 || e.key === 'Backspace') {
                 // since Backspace event is processed with keydown at document level for cloudBrowser.
                 // i prefered that to process it here, instead of unbind the previous handler.
-                e.stopPropagation();
-                if (!hashLogic) {
-                    history.back();
+                if (hashLogic || location.hash) {
+                    slideshow(slideshowid, 1);
                 }
                 else {
-                    slideshow(slideshowid, 1);
+                    history.back();
                 }
                 return false;
             }
-        };
-        $document.rebind('keydown.slideshow', overlayKeyDownHandler);
+        });
 
         // Close icon
         $overlay.find('.viewer-button.close,.viewer-error-close')
             .rebind('click', function () {
-                if (!hashLogic) {
-                    history.back();
+                if (hashLogic || location.hash) {
+                    slideshow(0, 1);
                 }
                 else {
-                    slideshow(slideshowid, 1);
+                    history.back();
                 }
+                return false;
             });
 
         // Fullscreen icon
@@ -475,46 +472,47 @@ var slideshowid;
             $wrapper.addClass('video-theatre-mode')
                 .find('.viewer-image-bl').removeClass('default-state');
 
-            initVideoStream(n, $wrapper, destroy)
-                .done(function(streamer) {
-                    preqs[n.h] = streamer;
+            initVideoStream(n, $wrapper, destroy).done(function(streamer) {
+                preqs[n.h] = streamer;
 
-                    preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
-                    preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
-                    preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:close', destroy);
+                preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
+                preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
+                preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:close', destroy);
 
-                    // If video is playing
-                    preqs[n.h].on('playing', function() {
-                        var video = this.video;
+                // If video is playing
+                preqs[n.h].on('playing', function() {
+                    var video = this.video;
 
-                        if (video && video.duration) {
+                    if (video && video.duration) {
 
-                            if (isThumbnailMissing(n) && n.u === u_handle && n.f !== u_handle) {
-                                var took = Math.round(2 * video.duration / 100);
+                        if (isThumbnailMissing(n) && n.u === u_handle && n.f !== u_handle) {
+                            var took = Math.round(2 * video.duration / 100);
 
-                                if (d) {
-                                    console.debug('Video thumbnail missing, will take image at %s...', secondsToTime(took));
-                                }
-
-                                this.on('timeupdate', function() {
-                                    if (video.currentTime < took) {
-                                        return true;
-                                    }
-
-                                    this.getImage().then(createNodeThumbnail.bind(null, n)).catch(console.warn.bind(console));
-                                });
+                            if (d) {
+                                console.debug('Video thumbnail missing, will take image at %s...',
+                                    secondsToTime(took));
                             }
 
-                            return false;
+                            this.on('timeupdate', function() {
+                                if (video.currentTime < took) {
+                                    return true;
+                                }
+
+                                this.getImage().then(createNodeThumbnail.bind(null, n))
+                                    .catch(console.warn.bind(console));
+                            });
                         }
 
-                        return true;
-                    });
-
-                    if (d) {
-                        window.strm = preqs[n.h];
+                        return false;
                     }
+
+                    return true;
                 });
+
+                if (d) {
+                    window.strm = preqs[n.h];
+                }
+            });
         });
 
     }
@@ -615,6 +613,12 @@ var slideshowid;
                             $video.attr('poster', data);
                         }
                     }
+                });
+            }
+            else {
+                // autoplay if no poster available
+                onIdle(function() {
+                    $('.viewer-overlay .play-video-button').trigger('click');
                 });
             }
             previews[id].poster = previews[id].poster || '';

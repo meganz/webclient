@@ -225,6 +225,343 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
 // ---------------------------------------------------------------------------------------------------------------
 
+(function _initVideoStream(global) {
+    'use strict';
+
+    // Init custom video controls
+    var _initVideoControls = function(wrapper) {
+        var $wrapper = $(wrapper);
+        var $video = $wrapper.find('video');
+        var videoElement = $video.get(0);
+        var $videoContainer = $video.parent();
+        var $videoControls = $wrapper.find('.video-controls');
+        var $document = $(document);
+
+
+        // Hide the default controls
+        videoElement.controls = false;
+
+        // Obtain handles to buttons and other elements
+        var $playpause = $videoControls.find('.playpause');
+        var $mute = $videoControls.find('.mute');
+        var $progress = $videoControls.find('.video-progress-bar');
+        var $progressBar = $videoControls.find('.video-time-bar');
+        var $fullscreen = $videoControls.find('.fs');
+        var $volumeBar = $videoControls.find('.volume-bar');
+
+        // Wait for the video's meta data to be loaded, then set
+        // the progress bar's max value to the duration of the video
+        $video.rebind('loadedmetadata', function() {
+            $wrapper.find('.video-timing.duration')
+                .text(secondsToTimeShort(videoElement.duration, 1));
+        });
+
+        // Changes the button state of certain button's so the correct visuals can be displayed with CSS
+        var changeButtonState = function(type) {
+            // Play/Pause button
+            if (type === 'playpause') {
+                if (videoElement.paused || videoElement.ended) {
+                    $playpause.find('i').removeClass('pause').addClass('play');
+                }
+                else {
+                    $playpause.find('i').removeClass('play').addClass('pause');
+                }
+            }
+            // Mute button
+            else if (type === 'mute') {
+                if (videoElement.muted) {
+                    $mute.find('i').removeClass('volume').addClass('volume-muted');
+                }
+                else {
+                    $mute.find('i').removeClass('volume-muted').addClass('volume');
+                }
+            }
+        };
+
+        // Set Init Values
+        changeButtonState('playpause');
+        changeButtonState('mute');
+        $wrapper.find('.video-timing').text('00:00');
+        $progressBar.removeAttr('style');
+        $volumeBar.find('style').removeAttr('style');
+
+        // Add event listeners for video specific events
+        $video.rebind('play pause', function() {
+            changeButtonState('playpause');
+        });
+
+        $video.rebind('playing', function() {
+            if (videoElement && videoElement.duration) {
+                $wrapper.find('.viewer-pending').addClass('hidden');
+            }
+        });
+
+        // Add events for all buttons
+        $playpause.rebind('click', function() {
+            if (videoElement.paused || videoElement.ended) {
+                videoElement.play();
+            }
+            else {
+                videoElement.pause();
+            }
+        });
+
+        // Volume Bar control
+        var volumeDrag = false;
+        /* Drag status */
+        $volumeBar.rebind('mousedown.volumecontrol', function(e) {
+            volumeDrag = true;
+            updateVolumeBar(e.pageY);
+        });
+
+        $document.rebind('mouseup.volumecontrol', function(e) {
+            if (volumeDrag) {
+                volumeDrag = false;
+                updateVolumeBar(e.pageY);
+            }
+        });
+
+        $document.rebind('mousemove.volumecontrol', function(e) {
+            if (volumeDrag) {
+                updateVolumeBar(e.pageY);
+            }
+        });
+
+        // update Volume Bar control
+        var updateVolumeBar = function(y) {
+            var $this = $($volumeBar);
+
+            if (y) {
+                var position = $this.height() - (y - $this.offset().top);
+                var percentage = 100 * position / $this.height();
+
+                //Check within range
+                if (percentage > 100) {
+                    percentage = 100;
+                }
+                else if (percentage > 0) {
+                    videoElement.muted = false;
+                }
+                else {
+                    percentage = 0;
+                    videoElement.muted = true;
+                }
+
+                changeButtonState('mute');
+                $this.find('span').css('height', percentage + '%');
+                videoElement.volume = percentage / 100;
+            }
+            else {
+                if (!videoElement.muted) {
+                    var currentVolume = videoElement.volume * 100;
+                    $this.find('span').css('height', currentVolume + '%');
+                }
+                else {
+                    $this.find('span').css('height', '0%');
+                }
+            }
+        };
+        updateVolumeBar();
+
+        // Bind Mute button
+        $mute.rebind('click', function() {
+            videoElement.muted = !videoElement.muted;
+            changeButtonState('mute');
+            updateVolumeBar();
+        });
+
+        // As the video is playing, update the progress bar
+        $video.rebind('timeupdate', function() {
+            var currentPos = videoElement.currentTime;
+            var maxduration = videoElement.duration;
+            var percentage = 100 * currentPos / maxduration;
+            $progressBar.css('width', percentage + '%');
+
+            $wrapper.find('.video-timing.current')
+                .text(secondsToTimeShort(videoElement.currentTime, 1));
+        });
+
+        var timeDrag = false;
+        /* Drag status */
+        $progress.rebind('mousedown.videoprogress', function(e) {
+            timeDrag = true;
+            videoElement.pause();
+            updatebar(e.pageX);
+        });
+
+        $document.rebind('mouseup.videoprogress', function(e) {
+            if (timeDrag) {
+                timeDrag = false;
+                videoElement.play();
+                updatebar(e.pageX);
+            }
+        });
+
+        $document.rebind('mousemove.videoprogress', function(e) {
+            if (timeDrag) {
+                videoElement.pause();
+                updatebar(e.pageX);
+            }
+        });
+
+        // Update Progress Bar control
+        var updatebar = function(x) {
+            var maxduration = videoElement.duration; //Video duraiton
+            var position = x - $progress.offset().left; //Click pos
+            var percentage = 100 * position / $progress.width();
+
+            //Check within range
+            if (percentage > 100) {
+                percentage = 100;
+            }
+            else if (percentage < 0) {
+                percentage = 0;
+            }
+
+            //Update progress bar and video currenttime
+            $progressBar.css('width', percentage + '%');
+            videoElement.currentTime = maxduration * percentage / 100;
+        };
+
+
+        // Check if the browser supports the Fullscreen mode
+        var fullScreenEnabled = !!(document.fullscreenEnabled
+            || document.mozFullScreenEnabled
+            || document.msFullscreenEnabled
+            || document.webkitSupportsFullscreen
+            || document.webkitFullscreenEnabled
+            || document.createElement('video').webkitRequestFullScreen);
+
+        // If the browser doesn't support the Fulscreen then hide the fullscreen button
+        if (!fullScreenEnabled) {
+            $fullscreen.addClas('hidden');
+        }
+
+        // Set the video container's fullscreen state
+        var setFullscreenData = function(state) {
+            $videoContainer.attr('data-fullscreen', !!state);
+
+            // Set the fullscreen button's 'data-state' which allows the correct button image to be set via CSS
+            $fullscreen
+                .attr('data-state', !!state ? 'cancel-fullscreen' : 'go-fullscreen');
+        };
+
+        // Checks if the document is currently in fullscreen mode
+        var isFullScreen = function() {
+            return !!(document.fullScreen
+                || document.webkitIsFullScreen
+                || document.mozFullScreen
+                || document.msFullscreenElement
+                || document.fullscreenElement);
+        };
+
+        // Fullscreen
+        var handleFullscreen = function() {
+            // If fullscreen mode is active...
+            if (isFullScreen()) {
+                // ...exit fullscreen mode
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+                else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                }
+                else if (document.webkitCancelFullScreen) {
+                    document.webkitCancelFullScreen();
+                }
+                else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+
+                $fullscreen.find('i').removeClass('lowscreen').addClass('fullscreen');
+                setFullscreenData(false);
+            }
+            else {
+                // ...otherwise enter fullscreen mode
+                var containerEl = $wrapper.get(0);
+
+                if (containerEl.requestFullscreen) {
+                    containerEl.requestFullscreen();
+                }
+                else if (containerEl.mozRequestFullScreen) {
+                    containerEl.mozRequestFullScreen();
+                }
+                else if (containerEl.webkitRequestFullScreen) {
+                    containerEl.webkitRequestFullScreen();
+                }
+                else if (containerEl.msRequestFullscreen) {
+                    containerEl.msRequestFullscreen();
+                }
+
+                $fullscreen.find('i').removeClass('fullscreen').addClass('lowscreen');
+                setFullscreenData(true);
+            }
+        };
+
+        // Bind Fullscreen button
+        $fullscreen.rebind('click', handleFullscreen);
+
+        // Listen for fullscreen change events (from other controls, e.g. right clicking on the video itself)
+        document.addEventListener('fullscreenchange', function() {
+            setFullscreenData(!!(document.fullScreen || document.fullscreenElement));
+        });
+        document.addEventListener('webkitfullscreenchange', function() {
+            setFullscreenData(document.webkitIsFullScreen);
+        });
+        document.addEventListener('mozfullscreenchange', function() {
+            setFullscreenData(!!document.mozFullScreen);
+        });
+        document.addEventListener('msfullscreenchange', function() {
+            setFullscreenData(!!document.msFullscreenElement);
+        });
+    };
+
+    var _initVideoStream = function(node, $wrapper, destroy) {
+        var s = Streamer(node.link || node.h, $wrapper.find('video').get(0));
+
+        _initVideoControls($wrapper);
+
+        destroy = destroy || s.destroy.bind(s);
+
+        s.on('error', function(ev, error) {
+            // <video>'s element `error` handler
+            if (!$.dialog) {
+                msgDialog('warninga', l[135], l[47], error.message || error);
+            }
+            if (d) {
+                console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime);
+            }
+            destroy();
+
+            if (filemime(node) !== 'video/quicktime' && !d) {
+                api_req({a: 'log', e: 99669, m: 'stream error'});
+            }
+        });
+
+        return s;
+    };
+
+    /**
+     * Fire video stream
+     * @param {MegaNode} node An ufs node
+     * @param {Object} wrapper Video element wrapper
+     * @param {Function} [destroy] Function to invoke when the video is destroyed
+     * @global
+     */
+    global.initVideoStream = function(node, wrapper, destroy) {
+        return new MegaPromise(function(resolve, reject) {
+            M.require('videostream').tryCatch(function() {
+                resolve(_initVideoStream(node, wrapper, destroy));
+            }, function(ex) {
+                msgDialog('warninga', l[135], l[47], ex);
+                reject(ex);
+            });
+        });
+    };
+})(self);
+
+// ---------------------------------------------------------------------------------------------------------------
+
 (function _MediaInfoLib(global) {
     'use strict';
 
@@ -452,7 +789,12 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                         return reject(res);
                     }
 
-                    var data = {container: {byIdx: {}}, video: {byIdx: {}}, audio: {byIdx: {}}, shortformat: {}};
+                    var data = {
+                        container: {byIdx: {}},
+                        video: {byIdx: {}},
+                        audio: {byIdx: {}},
+                        shortformat: {byIdx: {}}
+                    };
                     var keys = Object.keys(data);
                     var stringify = function(s) {
                         return String(s || '');
@@ -468,6 +810,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                                     + ':' + stringify(data.video.byIdx[sec[j][2]])
                                     + ':' + stringify(data.audio.byIdx[sec[j][3]]);
                                 data[key][fmt] = sec[j][0];
+                                data[key].byIdx[sec[j][0]] = fmt;
                             }
                         }
                         else {
@@ -523,7 +866,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
             db.version(1).stores({kv: '&k'});
             db.open().then(read).catch(console.warn.bind(console, dbname));
-            timer = setTimeout(apiReq, 2e3);
+            timer = setTimeout(apiReq, 800);
 
             // save the db name for our getDatabaseNames polyfill
             localStorage['_$mdb$' + dbname] = 1;
@@ -1213,6 +1556,54 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         });
     };
 
+    MediaAttribute.canPlayMedia = function(entry) {
+        var canPlayType = function(container, videocodec, audiocodec) {
+            switch (container) {
+                case 'mp42':
+                case 'isom':
+                case 'M4V ':
+                    if (videocodec === 'avc1') {
+                        if (String(audiocodec).startsWith('mp4a')) {
+                            audiocodec = audiocodec.replace(/-/g, '.');
+                        }
+
+                        return MediaSource.isTypeSupported('video/mp4; codecs="avc1.640029, ' + audiocodec + '"');
+                    }
+                    break;
+            }
+
+            return false;
+        };
+
+        return new Promise(function(resolve, reject) {
+            entry = new MediaAttribute(entry);
+
+            var mfa = entry.data;
+            if (!mfa || !('MediaSource' in window)) {
+                return resolve(false);
+            }
+
+            MediaInfoLib.getMediaCodecsList()
+                .then(function(mc) {
+
+                    var container = mc.container.byIdx[mfa.container];
+                    var videocodec = mc.video.byIdx[mfa.videocodec];
+                    var audiocodec = mc.audio.byIdx[mfa.audiocodec];
+
+                    if (mfa.shortformat) {
+                        var fmt = String(mc.shortformat.byIdx[mfa.shortformat]).split(':');
+
+                        container = fmt[0];
+                        videocodec = fmt[1];
+                        audiocodec = fmt[2];
+                    }
+
+                    resolve(canPlayType(container, videocodec, audiocodec));
+                })
+                .catch(reject);
+        });
+    };
+
     /**
      * Returns a file attribute string for the specified media info properties
      * @param {MediaInfoReport} res Media info report.
@@ -1373,7 +1764,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 req.ph = self.ph;
             }
             else {
-                req.nh = self.h;
+                req.n = self.h;
             }
 
             if (d) {

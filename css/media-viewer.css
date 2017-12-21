@@ -326,7 +326,7 @@
 }
 .video-theatre-mode .viewer-bottom-bl, .video-theatre-mode .viewer-top-bl {
     background-color: rgba(0,0,0,0.5);
-    
+
 }
 .video .viewer-image-bl.default-state {
     /* height: auto; */
@@ -366,6 +366,7 @@
     max-height: 100%;
     vertical-align: middle;
     background-color: black;
+    object-fit: cover;
 }
 .video-theatre-mode .play-video-button {
     display: none;
@@ -487,7 +488,7 @@
     background-color: rgba(0,0,0,0.6);
     position: relative;
     cursor: pointer;
-    
+
 }
 .video-vol-range .volume-bar span {
     position: absolute;

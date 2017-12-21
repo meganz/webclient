@@ -127,46 +127,23 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
+            var $pageScrollBlock = $('.bottom-page.scroll-block').removeClass('video video-theatre-mode');
             var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
-            var $wrapper = $('.bottom-page.scroll-block');
-
-            // Change layout for video
-            if (is_video(filename)) {
-                var $video = $wrapper.find('video');
-
-                $wrapper.addClass('video');
-
-                // Disable default video controls
-                $video.get(0).controls = false;
-
-                // TODO: Set preview image/video scr
-                // $overlay.find('.viewer-image-bl video').attr('poster', src);
-
-                $('.play-video-button', $wrapper).rebind('click', function() {
-
-                    // Show Loader until video is playing
-                    $wrapper.find('.viewer-pending').removeClass('hidden');
-
-                    // TODO: Init video controls
-                    // initVideoControls($wrapper);
-    
-                    $wrapper.addClass('video-theatre-mode');
-                });
-            }
-            else {
-                $wrapper.removeClass('video video-theatre-mode');
-            }
+            var isVideo = is_video(filename);
+            var prevBut = isVideo;
+            var mNode = new MegaNode({
+                k: key,
+                fa: res.fa,
+                h: dlpage_ph,
+                ph: dlpage_ph,
+                name: filename,
+                link: dlpage_ph + '!' + dlpage_key
+            });
 
             mediaCollectFn = function() {
-                MediaAttribute.setAttribute({
-                    k: key,
-                    fa: res.fa,
-                    h: dlpage_ph,
-                    ph: dlpage_ph,
-                    name: filename,
-                    link: dlpage_ph + '!' + dlpage_key
-                }).then(console.debug.bind(console, 'MediaAttribute'))
+                MediaAttribute.setAttribute(mNode)
+                    .then(console.debug.bind(console, 'MediaAttribute'))
                     .catch(console.warn.bind(console, 'MediaAttribute'));
             };
 
@@ -431,41 +408,89 @@ function dl_g(res) {
             var showPreviewButton = function($infoBlock) {
                 $infoBlock = $infoBlock || $('.download.info-block');
 
-                if (is_image(filename)) {
+                if (is_image(filename) || isVideo) {
                     var $ipb = $infoBlock.find('.img-preview-button');
 
                     if (filetype(filename) === 'PDF Document') {
                         $ipb.find('span').text(l[17489]);
                     }
+                    else if (isVideo) {
+                        $ipb.find('span').text('view video');
+                    }
 
                     $ipb.removeClass('hidden')
                         .rebind('click', function() {
-                            slideshow({
-                                k: key,
-                                fa: res.fa,
-                                h: dlpage_ph,
-                                name: filename,
-                                link: dlpage_ph + '!' + dlpage_key
-                            });
+                            slideshow(mNode);
                         });
                 }
             };
 
             if (res.fa) {
-                // load thumbnail
-                api_getfileattr([{fa: res.fa, k: key}], 0, function(a, b, data) {
-                    if (data !== 0xDEAD) {
-                        data = mObjectURL('image/jpeg');
+                var promise = Promise.resolve();
 
-                        if (data) {
-                            var $infoBlock = $('.download.info-block');
-                            $infoBlock.addClass('thumb');
-                            $infoBlock.find('img').attr('src', data);
+                if (isVideo && String(res.fa).indexOf('8*') > 0) {
+                    promise = MediaAttribute.canPlayMedia(mNode);
+                    prevBut = false;
+                }
+                else {
+                    // load thumbnail
+                    api_getfileattr([{fa: res.fa, k: key}], 0, function(a, b, data) {
+                        if (data !== 0xDEAD) {
+                            data = mObjectURL([data.buffer || data], 'image/jpeg');
 
-                            showPreviewButton($infoBlock);
+                            if (data) {
+                                var $infoBlock = $('.download.info-block');
+                                $infoBlock.addClass('thumb');
+                                $infoBlock.find('img').attr('src', data);
+
+                                showPreviewButton($infoBlock);
+                            }
                         }
+                    });
+                }
+
+                promise.then(function(ok) {
+                    if (!ok) {
+                        return false;
+                    }
+
+                    // Change layout for video
+                    var $video = $pageScrollBlock.find('video');
+
+                    $pageScrollBlock.addClass('video');
+
+                    // Disable default video controls
+                    $video.get(0).controls = false;
+
+                    api_getfileattr([{fa: res.fa, k: key}], 1, function(a, b, data) {
+                        if (data !== 0xDEAD) {
+                            data = mObjectURL([data.buffer || data], 'image/jpeg');
+
+                            if (data) {
+                                $video.attr('poster', data);
+                            }
+                        }
+                    });
+
+                    $('.play-video-button', $pageScrollBlock).rebind('click', function() {
+
+                        // Show Loader until video is playing
+                        $pageScrollBlock.find('.viewer-pending').removeClass('hidden');
+
+                        initVideoStream(mNode, $pageScrollBlock);
+
+                        $pageScrollBlock.addClass('video-theatre-mode');
+                    });
+                }).catch(function(ex) {
+                    if (ex) {
+                        console.warn(ex);
+                        showPreviewButton();
                     }
                 });
+            }
+
+            if (prevBut) {
+                showPreviewButton();
             }
         }
         else if (is_mobile) {

@@ -3006,7 +3006,7 @@ function loadfm_callback(res) {
         }
 
         // This package is sent on hard refresh if owner have enabled or disabled PUF
-        if (res.uph) {
+        if (!is_mobile && res.uph) {
             mega.megadrop.processUPH(res.uph, false);
         }
 

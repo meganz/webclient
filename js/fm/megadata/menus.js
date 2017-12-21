@@ -135,6 +135,20 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             if (sourceRoot === M.RootID && !folderlink) {
                 items['.sh4r1ng-item'] = 1;
             }
+
+            if ((sourceRoot === M.RootID || sourceRoot === M.InboxID)
+                && u_type === 3
+                && !M.getShareNodesSync(selNode.h).length) {
+
+                // Create or Remove upload page context menu action
+                if (mega.megadrop.pufs[selNode.h] && mega.megadrop.pufs[selNode.h].s !== 1) {
+                    items['.removewidget-item'] = 1;
+                    items['.managewidget-item'] = 1;
+                }
+                else {
+                    items['.createwidget-item'] = 1;
+                }
+            }
         }
         else {
             if ((selNode.tvf > 0) && !folderlink) {

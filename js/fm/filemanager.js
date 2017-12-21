@@ -942,7 +942,21 @@ FileManager.prototype.initContextUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            mega.Share.initCopyrightsDialog($.selected);
+            if (mega.megadrop.pufs[$.selected[0]]) {
+                var fldName = l[17403].replace('%1', M.d[$.selected[0]].name);
+                msgDialog(
+                    'confirmation',
+                    l[1003],
+                    fldName,
+                    false, function(e) {
+                    if (e) {
+                        mega.Share.initCopyrightsDialog($.selected);
+                    }
+                });
+            }
+            else {
+                mega.Share.initCopyrightsDialog($.selected);
+            }
         }
     });
 
@@ -967,7 +981,7 @@ FileManager.prototype.initContextUI = function() {
         }
         var $dialog = $('.fm-dialog.share-dialog');
 
-        M.safeShowDialog('share', function() {
+        var showShareDlg = function() {
             $.hideContextMenu();
             clearScrollPanel('.share-dialog');
 
@@ -998,7 +1012,23 @@ FileManager.prototype.initContextUI = function() {
             $('.token-input-input-token-mega input', $dialog).focus();
 
             return $dialog;
-        });
+        };
+
+        if (mega.megadrop.pufs[$.selected[0]]) {
+            var fldName = l[17403].replace('%1', M.d[$.selected[0]].name);
+            msgDialog(
+                'confirmation',
+                l[1003],
+                fldName,
+                false, function(e) {
+                if (e) {
+                    M.safeShowDialog('share', showShareDlg);
+                }
+            });
+        }
+        else {
+            M.safeShowDialog('share', showShareDlg);
+        }
     });
 
     // Move Dialog
@@ -2993,6 +3023,14 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
     else if (id === 'account') {
         tmpId = 'account';
+
+        // ToDo: Missing layout for empty Public Upload Page
+        if (!Object.keys(mega.megadrop.pufs).length) {// Hide PUF tab
+            $('.fm-account-button.megadrop').addClass('hidden');
+        }
+        else {
+            $('.fm-account-button.megadrop').removeClass('hidden');
+        }
     }
     else if (id === 'dashboard') {
         tmpId = 'dashboard';
@@ -3162,7 +3200,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         }
     }
 };
-
 
 /**
  * Show storage overquota dialog

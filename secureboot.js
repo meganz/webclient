@@ -1924,6 +1924,9 @@ else if (!b_u) {
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
         jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
+        jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
+        jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
+        jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
     } // !is_mobile
 
     // Transfers
@@ -2173,7 +2176,10 @@ else if (!b_u) {
         'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
         'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
-        'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 }
+        'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
+        'megadrop': { f: 'html/megadrop.html', n: 'megadrop', j: 0 },
+        'nomegadrop': { f: 'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
+        'megadrop_js': { f: 'js/megadrop.js', n: 'megadrop_js', j: 1 }
     };
 
     var jsl3 = {

@@ -310,6 +310,10 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
 
         if (page !== 'download') {
             mega.ui.tpp.reset('ul');
+
+            if (mega.megadrop.isInit()) {
+                mega.megadrop.onCompletion();
+            }
         }
     }
     else {

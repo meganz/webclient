@@ -126,7 +126,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
-.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .viewer-mid-button, .small-icon.clock, i.icons-sprite, .fm-versioning.file-path span:not(:first-child)::before, .transfer-panel-title span::before, .transfer-type.upload::before, .transfer-type.download::before, .megasync-transfer .toast-col:nth-child(1) span::before {
+.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .viewer-mid-button, .small-icon.clock, i.icons-sprite, .fm-versioning.file-path span:not(:first-child)::before, .fm-account-button.megadrop::before , .transfer-panel-title span::before, .transfer-type.upload::before, .transfer-type.download::before, .megasync-transfer .toast-col:nth-child(1) span::before {
     background-image: url(../images/mega/icons-sprite_v10@2x.png);
     background-size: 262px auto;
 }
@@ -147,8 +147,12 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 38px auto;
 }
 .block-view-file-type, .dragger-icon, .export-icon, .new-download-file-icon, .share-folder-icon div, .transfer-filetype-icon, .medium-file-icon, .shared-folder-icon, .nw-fm-tree-folder::before, .shared-details-icon, .contact-share-notification::before, .search-path-icon.folder, .search-path-icon-span {
-    background-image: url(../images/mega/files-icons@2x.png);
+    background-image: url(../images/mega/files-icons_v2@2x.png);
     background-size: 82px auto;
+}
+.fm-widget-illustration {
+    background-image: url(../images/mega/PUf_illustration@2x.png);
+    background-size: 560px auto;
 }
 .download.big-icon, .fm-dialog-close.big, .megasync-img::before, .megasync-slider.button::after {
     background-image: url(../images/mega/download-dialog_v1@2x.png);

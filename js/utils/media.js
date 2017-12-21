@@ -386,20 +386,18 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         $progress.rebind('mousedown.videoprogress', function(e) {
             timeDrag = true;
             videoElement.pause();
-            updatebar(e.pageX);
         });
 
         $document.rebind('mouseup.videoprogress', function(e) {
             if (timeDrag) {
                 timeDrag = false;
-                videoElement.play();
                 updatebar(e.pageX);
+                videoElement.play();
             }
         });
 
         $document.rebind('mousemove.videoprogress', function(e) {
             if (timeDrag) {
-                videoElement.pause();
                 updatebar(e.pageX);
             }
         });
@@ -417,10 +415,16 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             else if (percentage < 0) {
                 percentage = 0;
             }
+            var selectedTime = Math.round(maxduration * percentage / 100);
 
             //Update progress bar and video currenttime
             $progressBar.css('width', percentage + '%');
-            videoElement.currentTime = maxduration * percentage / 100;
+            $wrapper.find('.video-timing.current')
+                .text(secondsToTimeShort(selectedTime, 1));
+
+            if (!timeDrag) {
+                videoElement.currentTime = selectedTime;
+            }
         };
 
 

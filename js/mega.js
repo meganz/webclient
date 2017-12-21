@@ -923,6 +923,20 @@ scparser.$add('upco', {
     }
 });
 
+scparser.$add('puh', {
+    b: function(a) {
+        "use strict";
+        mega.megadrop.pufProcessPUH([a], false, true);
+    }
+});
+
+scparser.$add('pup', {
+    b: function(a) {
+        "use strict";
+        mega.megadrop.pupProcessPUP([a], false);
+    }
+});
+
 scparser.$add('se', {
     b: function(a) {
         processEmailChangeActionPacket(a);
@@ -1879,6 +1893,8 @@ function loadfm(force) {
                     mcf    : '&id',            // chats - id
                     ua     : '&k',             // user attributes - key (maintained by IndexedBKVStorage)
                     _sn    : '&i',             // sn - fixed index 1
+                    puf    : '&ph',            // public upload folder - handle
+                    pup    : '&p',             // public upload page - handle
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k', // queued chat messages - k
@@ -2006,6 +2022,8 @@ function dbfetchfm() {
                             opc: processOPC,
                             ipc: processIPC,
                             ps: processPS,
+                            puf: mega.megadrop.pufProcessDb,
+                            pup: mega.megadrop.pupProcessDb,
                             tree: function(r) {
                                 for (var i = r.length; i--;) {
                                     ufsc.addTreeNode(r[i], true);
@@ -2985,6 +3003,11 @@ function loadfm_callback(res) {
         // Handle versioning nodes
         if (res.f2) {
             process_f(res.f2, null, true);
+        }
+
+        // This package is sent on hard refresh if owner have enabled or disabled PUF
+        if (res.uph) {
+            mega.megadrop.processUPH(res.uph, false);
         }
 
         // decrypt hitherto undecrypted nodes

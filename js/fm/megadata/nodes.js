@@ -936,6 +936,8 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
             }, 90);
         }
 
+        mega.megadrop.onRename(itemHandle, newItemName);
+
         // update file versioning dialog if the name of the versioned file changes.
         if (!M.d[itemHandle].t && M.d[itemHandle].tvf > 0) {
             fileversioning.updateFileVersioningDialog(itemHandle);

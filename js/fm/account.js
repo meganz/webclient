@@ -150,6 +150,11 @@ function accountUI() {
             $('.fm-account-reseller').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
             sectionClass = 'reseller';
         }
+        else if (id === '/fm/account/megadrop') {
+            $('.fm-account-widget').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
+            mega.megadrop.stngsDraw();
+            sectionClass = 'megadrop';
+        }
         else {
             // This is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
@@ -1620,20 +1625,23 @@ function accountUI() {
     $('.fm-account-button').rebind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
             switch (true) {
-                case ($(this).hasClass('account-s')):
+                case $(this).hasClass('account-s'):
                     loadSubPage('fm/account');
                     break;
-                case ($(this).hasClass('advanced')):
+                case $(this).hasClass('advanced'):
                     loadSubPage('fm/account/advanced');
                     break;
-                case ($(this).hasClass('notifications')):
+                case $(this).hasClass('notifications'):
                     loadSubPage('fm/account/notifications');
                     break;
-                case ($(this).hasClass('history')):
+                case $(this).hasClass('history'):
                     loadSubPage('fm/account/history');
                     break;
-                case ($(this).hasClass('reseller')):
+                case $(this).hasClass('reseller'):
                     loadSubPage('fm/account/reseller');
+                    break;
+                case $(this).hasClass('megadrop'):
+                    loadSubPage('fm/account/megadrop');
                     break;
             }
         }

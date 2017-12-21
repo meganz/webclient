@@ -234,7 +234,8 @@ mega.ui.tpp = {
 
 mega.megadrop = {
     pufs: false,
-    isInit: function() { return false; }
+    isInit: function() { return false; },
+    pufProcessDb: function() { return false; }
 };
 
 var notify = {

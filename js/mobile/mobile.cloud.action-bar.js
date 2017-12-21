@@ -52,7 +52,7 @@ mobile.cloud.actionBar = {
 
         // Cache selectors
         var $fileManager = $('.mobile.file-manager-block');
-        var $createFolderIcon = $fileManager.find('.fm-icon.create-new-folder');
+        var $createFolderIcon = $fileManager.find('.fm-icon.mobile-create-new-folder');
 
         // On clicking the Create Folder icon
         $createFolderIcon.off('tap').on('tap', function() {

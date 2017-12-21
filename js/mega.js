@@ -2022,8 +2022,6 @@ function dbfetchfm() {
                             opc: processOPC,
                             ipc: processIPC,
                             ps: processPS,
-                            puf: mega.megadrop.pufProcessDb,
-                            pup: mega.megadrop.pupProcessDb,
                             tree: function(r) {
                                 for (var i = r.length; i--;) {
                                     ufsc.addTreeNode(r[i], true);
@@ -2031,6 +2029,11 @@ function dbfetchfm() {
                             },
                             mcf: 1
                         };
+                        if (!is_mobile) {
+                            tables['puf'] = mega.megadrop.pufProcessDb;
+                            tables['pub'] = mega.megadrop.pufProcessDb;
+                        }
+
                         Object.keys(tables).forEach(function(t) {
                             promise = fmdb.get(t);
                             promise.always(function(r) {

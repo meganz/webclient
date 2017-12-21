@@ -5877,7 +5877,7 @@ th.grid-first-th {
 .fm-dialog-body .nw-contact-name {
     font-size: 13px;
     line-height: 24px;
-    margin: 0 20px 0 19px;
+    margin: 0 20px 0 14px;
     overflow: hidden;
     display: inline-block;
     padding: 0 0 0 0;
@@ -5920,28 +5920,37 @@ th.grid-first-th {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     width: calc(50% - 2px);
+    color: #888;
 }
 .fm-dialog-body .nw-contact-group {
     cursor: pointer;
 }
 .fm-dialog-body .nw-contact-group:hover {
     text-decoration: underline;
-} 
+}
+.fm-dialog-body .nw-contact-item:hover .nw-contact-email {
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-item:hover .nw-contact-group {
+    color: #fff;
+}
 .fm-dialog-body .nw-contact-group-icon {
-    width: 19px;
-    height: 14px;
+    width: 12px;
+    height: 10px;
     float: left;
-    margin-left: 11px;
-    margin-top: 4px;
-    background-image: url(../images/mega/nw-fm-sprite_v27.svg);
+    margin-left: 13px;
+    margin-top: 7px;
+    background-image: url(../images/mega/group_copy@2x.png);
     background-repeat: no-repeat;
-    background-size: 48px 12022px;
-    background-position: -14px -6225px;
+    background-size: 12px 10px;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
     -o-transition: opacity 200ms ease-in-out;
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
+}
+.fm-dialog-body .nw-contact-item:hover > .nw-contact-group-icon {
+    background-image: url(../images/mega/group_copy_white@2x.png);
 }
 .fm-dialog-body .nw-contact-name.group {
     margin-left: 11px;
@@ -17612,7 +17621,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .copy-dialog-tree-panel, .move-dialog-tree-panel {
     height: 280px;
-    overflow: hidden;
     display: none;
 }
 .share-dialog-tree-panel {

@@ -716,7 +716,7 @@ ul, li {
     background-position: -240px -1709px;
     margin-left: -10px;
 }
-.mobile.bottom-action-bar .fm-icon.create-new-folder {
+.mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
     background-position: -240px -1790px;
 }
 .mobile.bottom-action-bar .fm-icon.upload-file {
@@ -769,7 +769,7 @@ ul, li {
 .mobile.fm-header .fm-icon.mega.left {
     margin-left: 10px;
 }
-.mobile.fm-icon.create-new-folder {
+.mobile.fm-icon.mobile-create-new-folder {
     background-position: -250px -1790px;
 }
 .mobile.fm-icon.upload-file {

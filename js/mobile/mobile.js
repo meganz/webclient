@@ -232,6 +232,11 @@ mega.ui.tpp = {
     }
 };
 
+mega.megadrop = {
+    pufs: false,
+    isInit: function() { return false; }
+};
+
 var notify = {
     init: function() {},
     notifyFromActionPacket: function() {},

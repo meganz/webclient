@@ -222,6 +222,9 @@ mobile.uploadOverlay = {
         // Initialise buttons
         mobile.uploadOverlay.initGetLinkButton(node);
         mobile.uploadOverlay.initUploadAnotherFileButton();
+
+        // Add a server log
+        api_req({ a: 'log', e: 99678, m: 'Mobile web file upload completed' });
     },
 
     /**

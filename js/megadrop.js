@@ -1191,7 +1191,7 @@ mega.megadrop = (function() {
 
             // Widget expanded copy link
             $('.widget-container').on('click.WS_copyUrl', '.url-link .copy-widget-dialog.button', function () {
-                var toastText = 'MEGAdrop url is successfully copied to clipboard.';
+                var toastText = l[17619];
                 var success = false;
 
                 // If extension, use the native extension method
@@ -1209,7 +1209,7 @@ mega.megadrop = (function() {
 
             // Widget expanded copy source code
             $('.widget-container').on('click.WS_copyCode', '.embed-link .copy-widget-dialog.button', function () {
-                var toastText = 'MEGAdrop source code is successfully copied to clipboard.';
+                var toastText = l[17620];
                 var success = false;
 
                 // If extension, use the native extension method
@@ -1369,7 +1369,7 @@ mega.megadrop = (function() {
                     class: '.fm-dialog.manage-widget'
                 }
             },
-            widgetLink: getAppBaseUrl() + '/megadrop/',
+            widgetLink: '',
             widgetCode: [
                 '<script type="text/javascript">',
                 'function MEGAdrop() {',
@@ -1398,6 +1398,11 @@ mega.megadrop = (function() {
             }
         };
 
+        var _widgetLink = function _uiWidgetLink() {
+            var url = is_extension ? getBaseUrl() : getAppBaseUrl();
+            return url + '/megadrop/';
+        };
+        
         var _queueScroll = function _uiQueueScroll(itemsNum) {
             var SCROLL_TRIGGER = 6;
             var queueDOM = uiOpts.window.class + ' ' + uiOpts.window.queueClass;
@@ -1473,7 +1478,7 @@ mega.megadrop = (function() {
             // Widget dialog copy url
             // NOTE: document.execCommand('copy') calls must take place as a direct result of a user action
             $(uiOpts.dlg.widget.class + ' .copy-widget-code').rebind('click.WD_copy_code', function () {
-                var toastText = 'MEGAdrop source code is successfully copied to clipboard.';
+                var toastText = l[17620];
                 var success = false;
 
                 // If extension, use the native extension method
@@ -1492,7 +1497,7 @@ mega.megadrop = (function() {
             // Widget dialog copy source code
             // NOTE: document.execCommand('copy') calls must take place as a direct result of a user action
             $(uiOpts.dlg.widget.class + ' .copy-widget-url').rebind('click.WD_copy_url', function () {
-                var toastText = 'MEGAdrop url is successfully copied to clipboard.';
+                var toastText = l[17619];
                 var success = false;
 
                 // If extension, use the native extension method
@@ -1566,7 +1571,7 @@ mega.megadrop = (function() {
         };
 
         var generateUrl = function uiGenerateUrl(pupHandle) {
-            return uiOpts.widgetLink + pupHandle;
+            return _widgetLink() + pupHandle;
         };
 
         var fillForm = function uiFillForm($elem, pupHandle) {

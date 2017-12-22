@@ -4529,7 +4529,9 @@
     "17580": "Ver as configura\u00e7\u00f5es do controle de vers\u00f5es de arquivos",
     "17581": "Voc\u00ea est\u00e1 prestes a excluir o hist\u00f3rico de vers\u00f5es de todos os arquivos. Por favor, tenha em conta que os arquivos atuais n\u00e3o ser\u00e3o exclu\u00eddos. Voc\u00ea quer continuar?",
     "17582": "Voc\u00ea possui [X1] vers\u00f5es de arquivos, ocupando um total de [X2].",
+    "17583": "MEGA requires access to your photo library to add photos and videos to your device gallery",
     "17584": "Plano atual:",
+    "17585": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17587": "Convidar contato",
     "17588": "Convite enviado",
     "17589": "Depois",
@@ -4544,6 +4546,7 @@
     "17602": "A vers\u00e3o atual do arquivo ser\u00e1 substitu\u00edda pelo arquivo que voc\u00ea est\u00e1 fazendo upload.",
     "17608": "Por favor, digite um valor v\u00e1lido",
     "17609": "Desabilitar o controle de vers\u00f5es de arquivos",
+    "17610": "File versions size: %1",
     "17611": "Pasta local com um backup dos arquivos deletados da pasta sincronizada remota (no MEGA)",
     "17612": "Pasta no MEGA com um backup dos arquivos deletados da pasta sincronizada local (no computador)",
     "17613": "Desativar o controle de vers\u00f5es impedir\u00e1 a cria\u00e7\u00e3o e o armazenamento de novas vers\u00f5es de arquivos. Voc\u00ea quer continuar?",
@@ -4553,5 +4556,6 @@
     "17617": "Criar pasta",
     "17618": "FAZER UPLOAD DE OUTRO ARQUIVO",
     "17619": "MEGAdrop URL was successfully copied to clipboard.",
-    "17620": "MEGAdrop source code was successfully copied to clipboard."
+    "17620": "MEGAdrop source code was successfully copied to clipboard.",
+    "17621": "Sync"
 }

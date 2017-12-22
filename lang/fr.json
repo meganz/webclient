@@ -4529,7 +4529,9 @@
     "17580": "Visualiser les param\u00e8tres de versionnage des fichiers",
     "17581": "Vous \u00eates sur le point de supprimer les historiques de version de tous les fichiers. Veuillez noter que les fichiers actuels ne seront pas supprim\u00e9s. Souhaitez-vous continuer\u2009?",
     "17582": "Vous avez [X1] versions de fichiers occupant un total de [X2].",
+    "17583": "MEGA requires access to your photo library to add photos and videos to your device gallery",
     "17584": "Abonnement actuel\u00a0:",
+    "17585": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17587": "Inviter le contact",
     "17588": "L\u2019invitation a \u00e9t\u00e9 envoy\u00e9e",
     "17589": "Plus tard",
@@ -4544,6 +4546,7 @@
     "17602": "La version actuelle du fichier sera remplac\u00e9e par le fichier que vous t\u00e9l\u00e9versez.",
     "17608": "Veuillez saisir une valeur valide",
     "17609": "D\u00e9sactiver le versionnage des fichiers",
+    "17610": "File versions size: %1",
     "17611": "Un dossier local contenant une sauvegarde des fichiers supprim\u00e9s dans MEGA",
     "17612": "Un dossier dans MEGA contenant une sauvegarde des fichiers supprim\u00e9s sur l\u2019ordinateur local",
     "17613": "La d\u00e9sactivation du versionnage des fichiers emp\u00eachera la cr\u00e9ation et l\u2019enregistrement de nouvelles versions des fichiers. Souhaitez-vous continuer\u2009?",
@@ -4553,5 +4556,6 @@
     "17617": "Cr\u00e9er un dossier",
     "17618": "T\u00c9L\u00c9VERSER UN AUTRE FICHIER",
     "17619": "MEGAdrop URL was successfully copied to clipboard.",
-    "17620": "MEGAdrop source code was successfully copied to clipboard."
+    "17620": "MEGAdrop source code was successfully copied to clipboard.",
+    "17621": "Sync"
 }

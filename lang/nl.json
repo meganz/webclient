@@ -4529,7 +4529,9 @@
     "17580": "Bestandsversie instellingen weergeven",
     "17581": "U staat op het punt de versiegeschiedenis van alle bestanden te verwijderen. Houd er rekening mee dat de huidige bestanden niet verwijderd worden. Wilt u doorgaan?",
     "17582": "U heeft [X1] bestandsversies, die gebruiken in totaal [X2].",
+    "17583": "MEGA requires access to your photo library to add photos and videos to your device gallery",
     "17584": "Huidig Abonnement:",
+    "17585": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17587": "Contact Uitnodigen",
     "17588": "Verzend Uitnodiging",
     "17589": "Later",
@@ -4544,6 +4546,7 @@
     "17602": "De huidige versie van het bestand wordt vervangen met het bestand die u aan het uploaden bent.",
     "17608": "Voer een geldige waarde in",
     "17609": "Bestandsversie uitschakelen",
+    "17610": "File versions size: %1",
     "17611": "Een lokale map met een reservekopie van bestanden die verwijderd zijn in MEGA.",
     "17612": "Een map in MEGA met een reservekopie van bestanden die verwijderd zijn in de lokale computer",
     "17613": "Bestandsversie uitschakelen zorgt ervoor dat er geen nieuwe bestandsversies worden gemaakt of opgeslagen. Wilt u doorgaan?",
@@ -4553,5 +4556,6 @@
     "17617": "Map cre\u00ebren",
     "17618": "EEN ANDER BESTAND UPLOADEN",
     "17619": "MEGAdrop URL was successfully copied to clipboard.",
-    "17620": "MEGAdrop source code was successfully copied to clipboard."
+    "17620": "MEGAdrop source code was successfully copied to clipboard.",
+    "17621": "Sync"
 }

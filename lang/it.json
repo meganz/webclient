@@ -4529,7 +4529,9 @@
     "17580": "Guarda le impostazioni di versioni del file",
     "17581": "Stai per eliminare la cronologia delle versioni di tutti i file. Per favore, ricorda che i file correnti non verranno eliminati. Vuoi procedere?",
     "17582": "Hai [X1] versioni del file, che porteranno ad un totale di [X2].",
+    "17583": "MEGA requires access to your photo library to add photos and videos to your device gallery",
     "17584": "Piano corrente:",
+    "17585": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17587": "Invita contatto",
     "17588": "Invito spedito",
     "17589": "Pi\u00f9 tardi",
@@ -4544,6 +4546,7 @@
     "17602": "La versione corrente del file verr\u00e0 rimpiazzata con il file che stai caricando.",
     "17608": "Per favore, inserisci un valore valido",
     "17609": "Disattiva le versioni del file",
+    "17610": "File versions size: %1",
     "17611": "Una cartella locale con il backup dei file eliminati in MEGA",
     "17612": "Una cartella in MEGA con il backup dei file eliminati nel computer locale",
     "17613": "Disabilitare le versioni del file perverr\u00e0 la creazione e l'archiviazione delle nuove versioni del file. Vuoi continuare?",
@@ -4553,5 +4556,6 @@
     "17617": "Crea cartella",
     "17618": "CARICA UN ALTRO FILE",
     "17619": "MEGAdrop URL was successfully copied to clipboard.",
-    "17620": "MEGAdrop source code was successfully copied to clipboard."
+    "17620": "MEGAdrop source code was successfully copied to clipboard.",
+    "17621": "Sync"
 }

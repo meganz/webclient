@@ -4529,7 +4529,9 @@
     "17580": "\ud30c\uc77c \uae30\ub85d \ubcf4\uae30 \uc124\uc815",
     "17581": "\ub2f9\uc2e0\uc740 \ubaa8\ub4e0 \ud30c\uc77c\uc758 \uae30\ub85d\uc744 \uc0ad\uc81c\ud558\ub824\uace0 \ud569\ub2c8\ub2e4.\ud604\uc7ac \ud30c\uc77c\uc740 \uc0ad\uc81c\ub418\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.\uacc4\uc18d\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
     "17582": "\ub2f9\uc2e0\uc740 [X1]\uac1c\uc758 \ud30c\uc77c \uae30\ub85d\uc744 \uac00\uc9c0\uace0 \uc788\uc73c\uba70, [X2]\uc758 \uc6a9\ub7c9\uc744 \uc0ac\uc6a9\uc911\uc785\ub2c8\ub2e4.",
+    "17583": "MEGA requires access to your photo library to add photos and videos to your device gallery",
     "17584": "\ud604\uc7ac \uc694\uae08\uc81c:",
+    "17585": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17587": "\uc9c0\uc778 \ucd08\ub300",
     "17588": "\ucd08\ub300 \ubc1c\uc1a1\ub428",
     "17589": "\ub098\uc911\uc5d0",
@@ -4544,6 +4546,7 @@
     "17602": "\ud30c\uc77c\uc758 \ud604\uc7ac \ubc84\uc804\uc774 \uc5c5\ub85c\ub4dc\uc911\uc778 \ud30c\uc77c\ub85c \uad50\uccb4\ub429\ub2c8\ub2e4.",
     "17608": "\uc62c\ubc14\ub978 \uac12\uc744 \uc785\ub825\ud558\uc138\uc694",
     "17609": "\ud30c\uc77c \uae30\ub85d \ud574\uc81c",
+    "17610": "File versions size: %1",
     "17611": "MEGA\uc5d0\uc11c \ud30c\uc77c\uc758 \ubc31\uc5c5\uc774 \uc0ad\uc81c\ub41c \ub85c\uceec \ud3f4\ub354",
     "17612": "\ub85c\uceec \ucef4\ud4e8\ud130\uc5d0\uc11c \ud30c\uc77c\uc758 \ubc31\uc5c5\uc774 \uc0ad\uc81c\ub41c MEGA \ud3f4\ub354",
     "17613": "\ud30c\uc77c \uae30\ub85d\uc744 \ud574\uc81c\ud558\uba74 \ud30c\uc77c \uae30\ub85d\uc758 \uc0dd\uc131\uacfc \ubcf4\uad00\uc744 \ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4. \uacc4\uc18d\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
@@ -4553,5 +4556,6 @@
     "17617": "\ud3f4\ub354 \uc0dd\uc131",
     "17618": "\ub2e4\ub978 \ud30c\uc77c \uc5c5\ub85c\ub4dc",
     "17619": "MEGAdrop URL was successfully copied to clipboard.",
-    "17620": "MEGAdrop source code was successfully copied to clipboard."
+    "17620": "MEGAdrop source code was successfully copied to clipboard.",
+    "17621": "Sync"
 }

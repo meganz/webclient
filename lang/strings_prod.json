@@ -7662,5 +7662,13 @@
     "17618": {
         "text": "UPLOAD ANOTHER FILE",
         "context": "A button label in the mobile webclient to upload an additional file after completing a file upload already."
+    },
+    "17619": {
+        "text": "MEGAdrop URL was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop URL was copied to the clipboard."
+    },
+    "17620": {
+        "text": "MEGAdrop source code was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop source code was copied to the clipboard."
     }
 }

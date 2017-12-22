@@ -1914,5 +1914,7 @@
     "17601": "Enabled",
     "17602": "The current version of the file will be replaced with the file you are uploading.",
     "17617": "Create Folder",
-    "17618": "UPLOAD ANOTHER FILE"
+    "17618": "UPLOAD ANOTHER FILE",
+    "17619": "MEGAdrop URL was successfully copied to clipboard.",
+    "17620": "MEGAdrop source code was successfully copied to clipboard."
 }

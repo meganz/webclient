@@ -4551,5 +4551,7 @@
     "17615": "Remove files older than 1 day",
     "17616": "Vous \u00eates sur le point de supprimer irr\u00e9m\u00e9diablement toutes les versions des fichiers. Souhaitez-vous continuer\u2009?",
     "17617": "Cr\u00e9er un dossier",
-    "17618": "T\u00c9L\u00c9VERSER UN AUTRE FICHIER"
+    "17618": "T\u00c9L\u00c9VERSER UN AUTRE FICHIER",
+    "17619": "MEGAdrop URL was successfully copied to clipboard.",
+    "17620": "MEGAdrop source code was successfully copied to clipboard."
 }

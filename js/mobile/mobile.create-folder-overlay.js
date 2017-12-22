@@ -103,6 +103,9 @@ mobile.createFolderOverlay = {
 
                             // Show message 'Folder created'
                             mobile.showToast(l[5645]);
+
+                            // Add a server log
+                            api_req({ a: 'log', e: 99677, m: 'Mobile web new folder created' });
                         }
 
                         promise.resolve();

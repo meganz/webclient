@@ -4551,5 +4551,7 @@
     "17615": "Remove files older than 1 day",
     "17616": "You are about to permanently remove all file versions. Would you like to proceed?",
     "17617": "Create Folder",
-    "17618": "UPLOAD ANOTHER FILE"
+    "17618": "UPLOAD ANOTHER FILE",
+    "17619": "MEGAdrop URL was successfully copied to clipboard.",
+    "17620": "MEGAdrop source code was successfully copied to clipboard."
 }

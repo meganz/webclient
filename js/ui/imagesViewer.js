@@ -595,12 +595,12 @@ var slideshowid;
             $overlay.find('.viewer-pending').addClass('hidden');
             // $overlay.find('.viewer-progress').addClass('hidden');
             $overlay.find('.viewer-image-bl img').addClass('hidden');
-            $overlay.find('.viewer-image-bl').addClass('default-state').removeClass('hidden');
+            $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
 
             var $video = $overlay.find('.viewer-image-bl video');
             $video.attr('poster', '').attr('controls', false).removeClass('hidden');
 
-            if (previews[id].poster !== undefined) {
+            if (previews[id].poster) {
                 $video.attr('poster', previews[id].poster);
             }
             else if (String(Object(M.d[id]).fa).indexOf('1*') > 0) {
@@ -620,6 +620,9 @@ var slideshowid;
                 onIdle(function() {
                     $('.viewer-overlay .play-video-button').trigger('click');
                 });
+            }
+            else {
+                $overlay.find('.viewer-image-bl').addClass('default-state');
             }
             previews[id].poster = previews[id].poster || '';
 

@@ -356,7 +356,14 @@ function dl_g(res) {
 
             // XXX: remove this once all browsers support `text-overflow: ellipsis;`
             Soon(function() {
-                while (filenameLength-- && $('.download.info-txt.filename').width() > 316) {
+                var filenameWidth = 316;
+                var $infoBlock = $('.bottom-page.scroll-block');
+
+                if ($pageScrollBlock.hasClass('video')) {
+                    filenameWidth = 560;
+                }
+
+                while (filenameLength-- && $('.download.info-txt.filename').width() > filenameWidth) {
                     $('.file-info .download.info-txt.filename').text(str_mtrunc(filename, filenameLength));
                 }
                 if (filenameLength < 1) {

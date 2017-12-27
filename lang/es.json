@@ -4529,7 +4529,9 @@
     "17580": "Ver los ajustes del control de versiones ",
     "17581": "Est\u00e1 a punto de eliminar el historial de versiones de todos los archivos. Ten en cuenta que los archivos actuales no ser\u00e1n eliminados. \u00bfQuieres continuar?",
     "17582": "Tiene [X1] versiones de archivo, que ocupan un total de [X2].",
+    "17583": "MEGA requires access to your photo library to add photos and videos to your device gallery",
     "17584": "Current Plan:",
+    "17585": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17587": "Invite Contact",
     "17588": "Invite Sent",
     "17589": "Later",
@@ -4544,6 +4546,7 @@
     "17602": "La versi\u00f3n actual del archivo ser\u00e1 reemplazada por el archivo que est\u00e1s subiendo.",
     "17608": "Please enter a valid value",
     "17609": "Disable file versioning",
+    "17610": "File versions size: %1",
     "17611": "A local folder with a backup of files deleted in MEGA",
     "17612": "A folder in MEGA with a backup of files deleted in the local computer",
     "17613": "Disabling file versioning will prevent the creation and storage of new file versions. Do you want to continue?",
@@ -4551,5 +4554,8 @@
     "17615": "Remove files older than 1 day",
     "17616": "You are about to permanently remove all file versions. Would you like to proceed?",
     "17617": "Create Folder",
-    "17618": "UPLOAD ANOTHER FILE"
+    "17618": "UPLOAD ANOTHER FILE",
+    "17619": "MEGAdrop URL was successfully copied to clipboard.",
+    "17620": "MEGAdrop source code was successfully copied to clipboard.",
+    "17621": "Sync"
 }

@@ -150,6 +150,11 @@ function accountUI() {
             $('.fm-account-reseller').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
             sectionClass = 'reseller';
         }
+        else if (id === '/fm/account/megadrop') {
+            $('.fm-account-widget').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
+            mega.megadrop.stngsDraw();
+            sectionClass = 'megadrop';
+        }
         else {
             // This is the main entry point for users who just had upgraded their accounts
             if (isNonActivatedAccount()) {
@@ -354,6 +359,12 @@ function accountUI() {
         $('.tab-content .account.progress-size.versioning').text(
             bytesToSize(account.stats[M.RootID].vbytes)
         );
+
+        // Go to versioning settings.
+        $('.tab-content .version-settings-button').rebind('click', function() {
+            loadSubPage('fm/account/file-management');
+        });
+
         /* achievements */
         if (!account.maf) {
             $('.fm-right-account-block').removeClass('active-achievements');
@@ -1614,20 +1625,23 @@ function accountUI() {
     $('.fm-account-button').rebind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
             switch (true) {
-                case ($(this).hasClass('account-s')):
+                case $(this).hasClass('account-s'):
                     loadSubPage('fm/account');
                     break;
-                case ($(this).hasClass('advanced')):
+                case $(this).hasClass('advanced'):
                     loadSubPage('fm/account/advanced');
                     break;
-                case ($(this).hasClass('notifications')):
+                case $(this).hasClass('notifications'):
                     loadSubPage('fm/account/notifications');
                     break;
-                case ($(this).hasClass('history')):
+                case $(this).hasClass('history'):
                     loadSubPage('fm/account/history');
                     break;
-                case ($(this).hasClass('reseller')):
+                case $(this).hasClass('reseller'):
                     loadSubPage('fm/account/reseller');
+                    break;
+                case $(this).hasClass('megadrop'):
+                    loadSubPage('fm/account/megadrop');
                     break;
             }
         }
@@ -2251,7 +2265,6 @@ accountUI.initRadio.enable = function(value, $container) {
         .removeAttr('disabled');
 };
 
-
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
     // TODO: FIXME, make accountUI elements not dependant!
     if (!megaChatIsReady) {
@@ -2393,6 +2406,60 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             })
             .val(lastValidNumber);
     }
+
+    $('.versioning-switch')
+    .rebind('click', function() {
+        var val = $('#versioning-status').prop('checked') ? 1 : 0;
+        var setVersioningAttr = function(val) {
+            showToast('settings', l[16168]);
+            mega.attr.set(
+                'dv',
+                val,
+                -2,
+                true
+            )
+            .done(
+            function(e) {
+                $('#versioning-status').prop('checked', val ? false : true);
+                $('.label-heading').text(val ? l[7070] : l[17601]);
+                fileversioning.dvState = val;
+            });
+        };
+        if ($('#versioning-status').prop('checked')) {
+            msgDialog('confirmation', l[882], l[17595], false, function(e) {
+                if (e) {
+                    setVersioningAttr(val);
+                }
+            });
+        }
+        else {
+            setVersioningAttr(val);
+        }
+    });
+    //update versioning info
+    fileversioning.updateVersionInfo();
+    $('.delete-all-versions')
+    .rebind('click', function() {
+
+        if (!$(this).hasClass('disabled')) {
+            msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
+                if (e) {
+                    loadingDialog.show();
+                    api_req({
+                            a: 'dv'
+                            }, {
+                            callback: function(res, ctx) {
+                                if (res === 0) {
+                                    M.accountData(function() {
+                                        fileversioning.updateVersionInfo();
+                                    }, false, true);
+                                }
+                            }
+                        });
+                }
+            });
+        }
+    });
 };
 
 accountUI.voucherCentering = function voucherCentering($button) {

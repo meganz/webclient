@@ -421,19 +421,27 @@ var ulmanager = {
             }
         };
 
+        var req_type = 'p';
+        var dir = target;
+
+        // Put to public upload folder
+        if (getCleanSitePath().substr(0, 8) === 'megadrop') {
+            req_type = 'pp';
+            target = mega.megadrop.getOwnersHandle();
+            dir = mega.megadrop.getPufHandle();
+        }
+
         var req = {
-            a: 'p',
-            t: target,
-            n: [
-                {
-                    t: 0,
-                    h: file.response,
-                    a: ab_to_base64(crypto_makeattr(n)),
-                    k: target.length === 11
-                        ? base64urlencode(encryptto(target, a32_to_str(file.filekey)))
-                        : a32_to_base64(encrypt_key(u_k_aes, file.filekey))
-                }
-            ],
+            a: req_type,
+            t: dir,
+            n: [{
+                t: 0,
+                h: file.response,
+                a: ab_to_base64(crypto_makeattr(n)),
+                k: target.length === 11
+                    ? base64urlencode(encryptto(target, a32_to_str(file.filekey)))
+                    : a32_to_base64(encrypt_key(u_k_aes, file.filekey))
+            }],
             i: requesti
         };
 
@@ -558,15 +566,19 @@ var ulmanager = {
                 continue;
             }
             cfile.uReqFired = Date.now();
-            api_req({
+            var req = {
                 a: 'u',
                 v: 2,
                 ssl: use_ssl,
                 ms: fmconfig.ul_maxSpeed | 0,
                 s: cfile.size,
                 r: cfile.retries,
-                e: cfile.ul_lastreason
-            }, {
+                e: cfile.ul_lastreason,
+            };
+            if (File.file.ownerId) {
+                req.t = File.file.ownerId;
+            }
+            api_req(req, {
                 reqindex: i,
                 callback: next
             });
@@ -723,10 +735,17 @@ var ulmanager = {
                 storedattr[ctx.faid].target = n.h;
             }
 
-            if (res.f !== 'pv3') {
+            // Don't execute if MEGAdrop upload window exist
+            if (res.f !== 'pv3' && !mega.megadrop.isInit()) {
                 newnodes = [];
                 process_f(res.f);
                 M.updFileManagerUI();
+
+                // If on mobile, show that the upload has completed and allow them to upload another
+                if (is_mobile) {
+                    mobile.uploadOverlay.showUploadComplete(n);
+                }
+
                 if (M.viewmode) {
                     fm_thumbnails();
                 }
@@ -898,7 +917,7 @@ var ulmanager = {
             promises.push(dbfetch.get(aFile.target, new MegaPromise()));
         }
 
-        if (!M.h[hash] || !M.d[M.h[hash].substr(0, 8)]) {
+        if ((!M.h[hash] || !M.d[M.h[hash].substr(0, 8)]) && !mega.megadrop.isInit()) {
             promises.push(
                 dbfetch.hash(aFile.hash)
                     .always(function(node) {
@@ -1502,11 +1521,22 @@ ulQueue.canExpand = function(max) {
 
 Object.defineProperty(ulQueue, 'maxActiveTransfers', {
     get: function() {
-        return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 20);
+        'use strict';
+
+        // If on mobile, there's only 1 upload at a time and the desktop calculation below fails
+        if (is_mobile) {
+            return 1;
+        }
+        else {
+            return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 20);
+        }
     }
 });
 
 mBroadcaster.once('startMega', function _setupEncrypter() {
+
+    'use strict';
+
     var encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
         var file = context.file;
         if (!file || !file.ul_macs) {

@@ -18119,9 +18119,17 @@
         "text": "You have [X1] file versions, taking up a total of [X2].\r\n",
         "context": "A message to summarise the total number of file versions (X1) and total storage usage (X2) of the versioned files. Please keep the placeholders [X1] and [X2] as they will be replaced at runtime."
     },
+    "17583": {
+        "text": "MEGA requires access to your photo library to add photos and videos to your device gallery",
+        "context": "This is a description of why write-only access to the user\u2019s photo library is required. To protect user privacy, Apple requires a purpose or explanation of why this functionality will be accessed."
+    },
     "17584": {
         "text": "Current Plan:",
         "context": "Text shown on the upgrade account page above the current PRO plan subscription"
+    },
+    "17585": {
+        "text": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+        "context": "An alert message shown in case the user has an active subscription and is in the process of buying a higher plan (i.e. a higher level PRO account)."
     },
     "17587": {
         "text": "Invite Contact",
@@ -18179,6 +18187,10 @@
         "text": "Disable file versioning",
         "context": "Checkbox label to enable\/disable file versioning feature"
     },
+    "17610": {
+        "text": "File versions size: %1",
+        "context": "A label to indicate the total file size which is taken up by file versions. Please keep the %1 placeholder as it will be replaced at runtime with the total size."
+    },
     "17611": {
         "text": "A local folder with a backup of files deleted in MEGA",
         "context": "Tooltip shown when hover local debris label."
@@ -18210,5 +18222,17 @@
     "17618": {
         "text": "UPLOAD ANOTHER FILE",
         "context": "A button label in the mobile webclient to upload an additional file after completing a file upload already."
+    },
+    "17619": {
+        "text": "MEGAdrop URL was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop URL was copied to the clipboard."
+    },
+    "17620": {
+        "text": "MEGAdrop source code was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop source code was copied to the clipboard."
+    },
+    "17621": {
+        "text": "Sync",
+        "context": "This is a new option in the right click context menu of a folder. The button will allow synchronisation of the folder with MEGAsync."
     }
 }

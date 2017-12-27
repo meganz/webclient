@@ -9,14 +9,12 @@ var mediaCollectFn;
 var maxDownloadSize = Math.pow(2, 53);
 
 var MOBILE_FILETYPES = {
-    "docx" : 'word',
-    "jpeg" : 'image',
-    "jpg"  : 'image',
-    "mp3"  : 'audio',
-    "mp4"  : 'video',
-    "pdf"  : 'pdf',
-    "png"  : 'image',
-    "xlsx" : 'word'
+    jpeg: 'image',
+    jpg: 'image',
+    png: 'image',
+    gif: 'image',
+    mp3: 'audio',
+    mp4: 'video'
 };
 
 function dlinfo(ph,key,next)

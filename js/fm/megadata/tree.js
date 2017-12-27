@@ -240,6 +240,9 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             else if (folders[idx].t & M.IS_SHARED) {
                 sharedfolder = ' shared-folder';
             }
+            else if (mega.megadrop.pufs[curItemHandle] && mega.megadrop.pufs[curItemHandle].s !== 1) {
+                sharedfolder = ' puf-folder';
+            }
             else {
                 sharedfolder = '';
             }

@@ -923,6 +923,20 @@ scparser.$add('upco', {
     }
 });
 
+scparser.$add('puh', {
+    b: function(a) {
+        "use strict";
+        mega.megadrop.pufProcessPUH([a], false, true);
+    }
+});
+
+scparser.$add('pup', {
+    b: function(a) {
+        "use strict";
+        mega.megadrop.pupProcessPUP([a], false);
+    }
+});
+
 scparser.$add('se', {
     b: function(a) {
         processEmailChangeActionPacket(a);
@@ -1089,8 +1103,13 @@ scparser.$add('u', function(a) {
 
 scparser.$add('d', function(a) {
     var fileDeletion = (M.d[a.n] && !M.d[a.n].t);
+    var topVersion = null;
+    if (fileDeletion) {
+        topVersion = fileversioning.getTopNodeSync(a.n);
+    }
     // node deletion
     M.delNode(a.n);
+
     // was selected, now clear the selected array.
     if ($.selected && ($.selected[0] === a.n)) {
         $.selected = [];
@@ -1103,8 +1122,13 @@ scparser.$add('d', function(a) {
         }
     }
     if (!is_mobile) {
-        if (fileDeletion && !a.v) {// this is not a versioning deletion.
-            fileversioning.closeFileVersioningDialog(a.n);
+        if (fileDeletion && !a.v) {// this is a deletion of file.
+            if (M.d[topVersion]) {
+                fileversioning.updateFileVersioningDialog(topVersion);
+            }
+            else {
+                fileversioning.closeFileVersioningDialog(a.n);
+            }
         }
     }
 });
@@ -1869,6 +1893,8 @@ function loadfm(force) {
                     mcf    : '&id',            // chats - id
                     ua     : '&k',             // user attributes - key (maintained by IndexedBKVStorage)
                     _sn    : '&i',             // sn - fixed index 1
+                    puf    : '&ph',            // public upload folder - handle
+                    pup    : '&p',             // public upload page - handle
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k', // queued chat messages - k
@@ -1996,6 +2022,8 @@ function dbfetchfm() {
                             opc: processOPC,
                             ipc: processIPC,
                             ps: processPS,
+                            puf: mega.megadrop.pufProcessDb,
+                            pup: mega.megadrop.pupProcessDb,
                             tree: function(r) {
                                 for (var i = r.length; i--;) {
                                     ufsc.addTreeNode(r[i], true);
@@ -2003,6 +2031,13 @@ function dbfetchfm() {
                             },
                             mcf: 1
                         };
+
+                        // Prevent MEGAdrop tables being created for mobile
+                        if (is_mobile) {
+                            delete tables.puf;
+                            delete tables.pup;
+                        }
+
                         Object.keys(tables).forEach(function(t) {
                             promise = fmdb.get(t);
                             promise.always(function(r) {
@@ -2975,6 +3010,11 @@ function loadfm_callback(res) {
         // Handle versioning nodes
         if (res.f2) {
             process_f(res.f2, null, true);
+        }
+
+        // This package is sent on hard refresh if owner have enabled or disabled PUF
+        if (!is_mobile && res.uph) {
+            mega.megadrop.processUPH(res.uph, false);
         }
 
         // decrypt hitherto undecrypted nodes

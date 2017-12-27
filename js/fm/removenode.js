@@ -175,6 +175,7 @@ function fmremovesync(selectedNodes) {
     var foldercnt = 0;
     var contactcnt = 0;
     var removesharecnt = 0;
+    var widgets = [];
 
     // If on mobile we will bypass the warning dialog prompts
     if (is_mobile) {
@@ -192,6 +193,9 @@ function fmremovesync(selectedNodes) {
         }
         else if (n && n.t) {
             foldercnt++;
+            if (mega.megadrop.pufs[selectedNodes[i]]) {
+                widgets.push(selectedNodes[i]);
+            }
         }
         else {
             filecnt++;
@@ -343,6 +347,11 @@ function fmremovesync(selectedNodes) {
             else {
                 M.moveNodes(selectedNodes, M.RubbishID);
             }
+
+            // Remove PUF/PUP if any
+            for (var w = widgets.length - 1; w >= 0; w--) {
+                mega.megadrop.pufRemove(widgets[w]);
+            }
         }
         else {
             // Contains complete directory structure of selected nodes, their ids
@@ -367,6 +376,11 @@ function fmremovesync(selectedNodes) {
                     }
                     else {
                         var delctx = {pending: 1, selected: selected};
+
+                        // Remove PUF/PUP if any
+                        for (var w = widgets.length - 1; w >= 0; w--) {
+                            mega.megadrop.pufRemove(widgets[w]);
+                        }
 
                         // Remove all shares related to selected nodes
                         for (var i = dirTree.length; i--;) {

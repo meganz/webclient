@@ -960,6 +960,15 @@
 .small-icon.context.shared-folder-item {
     background-position: -100px -331px;
 }
+.small-icon.context.create-widget {
+    background-position: -82px -1071px;
+}
+.small-icon.context.remove-widget {
+    background-position: -162px -1071px;
+}
+.small-icon.context.manage-widget {
+    background-position: -202px -1112px;
+}
 /* hovers*/
 .dropdown-item:hover .small-icon.context.standart-download {
     background-position: -41px -499px;
@@ -1068,6 +1077,15 @@
 }
 .dropdown-item:hover .small-icon.context.shared-folder-item, .dropdown-item.opened .small-icon.context.shared-folder-item {
     background-position: -140px -331px;
+}
+.dropdown-item:hover .small-icon.context.create-widget {
+    background-position: -122px -1071px;
+}
+.dropdown-item:hover .small-icon.context.remove-widget {
+    background-position: -202px -1071px;
+}
+.dropdown-item:hover .small-icon.context.manage-widget {
+    background-position: -42px -1112px;
 }
 /* End of Context menu icons */
 .huge-icon.storage-icon {

@@ -799,11 +799,16 @@ MegaData.prototype.tfsResizeHandler = SoonFc(function() {
 });
 
 MegaData.prototype.getTransferTableLengths = function() {
+    "use strict";
+
     var te = this.getTransferElements();
+    if (!te) {
+        return false;
+    }
     var used = te.domTable.querySelectorAll('tr').length;
     var size = Math.ceil(parseInt(te.domScrollingTable.style.height) / 24);
 
-    return {size: size, used: used, left: size - used};
+    return { size: size, used: used, left: size - used };
 };
 
 MegaData.prototype.getTransferElements = function() {
@@ -1203,13 +1208,22 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
                     }
 
                     fileconflict
-                        .check(u, onChat ? u[0].target : target, 'upload', onChat ? fileconflict.KEEPBOTH : 0)
+                        .check(u, onChat ? u[0].target : target, fileversioning.dvState ? 'replace' : 'upload', onChat ? fileconflict.KEEPBOTH : 0)
                         .done(startUpload);
                 });
         });
 };
 
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
+
+    'use strict';
+
+    // If on mobile, show the upload progress in the overlay
+    if (is_mobile) {
+        mobile.uploadOverlay.showUploadProgress(ul, perc, bl, bt, bps);
+        return false;
+    }
+
     var id = ul.id;
     var $tr = $('#ul_' + id);
     if (!$tr.hasClass('transfer-started')) {
@@ -1258,7 +1272,11 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
         }
         delay('percent_megatitle', percent_megatitle, 50);
 
-        if (page.substr(0, 2) !== 'fm') {
+        if (mega.megadrop.isInit()) {
+            mega.megadrop.uiUpdateItem(id, bps, retime, perc, bl);
+        }
+
+        if (page.substr(0, 2) !== 'fm' && page.substr(0, 8) !== 'megadrop') {
             $('.widget-block').removeClass('hidden');
             $('.widget-block').show();
             $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
@@ -1280,7 +1298,12 @@ MegaData.prototype.ulerror = function(ul, error) {
 
     if (error === EOVERQUOTA) {
         ulQueue.pause();
-        M.showOverStorageQuota(100, 1, 2, {custom: 1});
+        if (mega.megadrop.isInit()) {// MEGAdrop window is active
+            mega.megadrop.overQuota();
+        }
+        else {
+            M.showOverStorageQuota(100, 1, 2, {custom: 1});
+        }
     }
     else if (error === EGOINGOVERQUOTA) {
         M.checkGoingOverStorageQuota(-1);
@@ -1316,10 +1339,20 @@ MegaData.prototype.ulerror = function(ul, error) {
             mega.ui.tpp.hide();
             ulmanager.abort(null);
             $("tr[id^='ul_'] .transfer-status").text(l[1010]);
+
+            // Inform user that upload MEGAdrop is not available anymore
+            if (page.substr(0, 8) === 'megadrop') {
+                mBroadcaster.sendMessage('MEGAdrop:overquota');
+            }
         }
     }
     else if (!overquota) {
         msgDialog('warninga', l[135], l[47], api_strerror(error));
+
+        // Inform user that upload MEGAdrop is not available anymore
+        if (page.substr(0, 8) === 'megadrop' && res === -9 || res === -11) {
+            mBroadcaster.sendMessage('MEGAdrop:disabled');
+        }
     }
 };
 
@@ -1370,7 +1403,12 @@ MegaData.prototype.ulfinalize = function(ul, status) {
         $.transferprogress['ulc'] += $.transferprogress['ul_' + id][1];
         delete $.transferprogress['ul_' + id];
     }
-    // $.transferHeader();
+
+    // If MEGAdrop windows exists and upload
+    if (id && mega.megadrop.isInit()) {
+        mega.megadrop.onItemCompletion('#ul_' + id);
+    }
+
     delay('tfscomplete', function() {
         M.resetUploadDownload();
         mega.ui.tpp.setIndex(1, 'ul');

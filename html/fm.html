@@ -21,6 +21,15 @@
     <div class="dropdown-section">
         <a class="dropdown-item preview-item"><i class="small-icon context loupe"></i>[$1899]</a>
         <a class="dropdown-item open-item"><i class="small-icon context open-folder"></i>[$865]</a>
+        <a class="dropdown-item createwidget-item">
+            <i class="small-icon context create-widget"></i><span>[$17450]</span>
+        </a>
+         <a class="dropdown-item managewidget-item">
+            <i class="small-icon context manage-widget"></i><span>[$17399]</span>
+        </a>
+        <a class="dropdown-item removewidget-item">
+            <i class="small-icon context remove-widget"></i><span>[$17400]</span>
+        </a>
         <hr />
     </div>
     <div class="dropdown-section">
@@ -412,6 +421,9 @@
                     <div class="fm-account-button notifications">
                         [$862]
                     </div>
+                    <div class="fm-account-button megadrop">
+                        [$17401]
+                    </div>
                     <div class="fm-account-button advanced">
                         [$1716]
                     </div>
@@ -474,7 +486,7 @@
                 </div>
 
                 <div class="fm-header-buttons">
-                    <!-- Please add "inactive" to "fm-files-view-icon" classname if buttons couldn't be clicked !-->
+                    <!-- Please add "inactive" to "fm-files-view-icon" classname if buttons couldnt be clicked !-->
                     <a class="fm-files-view-icon block-view" title="[$5552]"></a>
                     <a class="fm-files-view-icon listing-view active" title="[$5553]"></a>
 
@@ -1034,6 +1046,9 @@
                                                 </div>
                                                  <div class="account progress-size versioning">-</div>
                                                 <div class="clear"></div>
+                                            </div>
+                                            <div class="">
+                                                <div class="account version-settings-button">[$17580]</div>
                                             </div>
                                         </div>
                                         <div class="chart-warning red">
@@ -1990,8 +2005,31 @@
                                       </div>
                                       <!-- Use rad20 as next radio button to allow further rubsched options -->
 
-                                 </div>
-
+                                </div>
+                                <div id="enable-versioning" class="versioning-block">
+                                    <div class="fm-account-header">[$17596]
+                                    </div>
+                                    <div class="enable-version">
+                                        <label class="versioning-switch"> 
+                                          <input type="checkbox" id="versioning-status" checked="">
+                                          <span class="versioning-slider"></span>
+                                          <label class="label-heading">[$17601]</label>
+                                        </label>
+                                    </div>
+                                    <div class="account-italic-txt">
+                                        [$17597]
+                                    </div>
+                                </div>
+                                <div id="delete-all-versions" class="versioning-block">
+                                    <div class="fm-account-header">[$17598]</div>
+                                    <div class="versioning-body-text">You have <span class="versioning-text total-file-versions">345</span> file versions, taking up a total of <span class="versioning-text total-versions-size">3.5 GB</span>.</div>
+                                    <div class="delete-all-versions-block">
+                                        <div class="button default-grey-button left delete-all-versions"><span>[$17599]</span></div>
+                                    </div>
+                                    <div class="account-italic-txt">
+                                        [$17600]
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2127,6 +2165,134 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- start fm-account-widget UI for account settings | widget -->
+                <div class="fm-account-widget hidden fm-account-sections">
+                    <div class="account tabs-bl">
+                        <div class="account tab-lnk active" data-tab="widget">[$17402]</div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="account tab-content widget">
+                        <div class="account max-width-bl">
+                            <div class="all-widgets-block">
+
+                                <!-- Template Account Settings MEGAdrop collapsed PUP card -->
+                                <div id="stngs_pup_tmpl" class="widget-card hidden">
+                                    <div class="widget-header">
+                                        <div class="widget-card-left">
+                                            <div class="widget-name"><span>%name</span>
+                                                <div class="widget-maximise"></div>
+                                            </div>
+                                            <div class="widget-location-url"  data-node="">
+                                                <div class="widget-url-icon"></div><span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- END Template Account Settings MEGAdrop collapsed PUP card -->
+
+                                <!-- Template Account Settings MEGAdrop expanded PUP card -->
+                                <div id="stngs_pupexp_tmpl" class="widget-card expanded-widget hidden">
+                                    <div class="widget-header">
+                                        <div class="fm-dialog-chrome-clipboard">
+                                            <div class="selectable"></div>
+                                        </div>
+                                        <div class="widget-card-left">
+                                            <div class="widget-name"><span>%name</span>
+                                                <div class="widget-minimise"></div>
+                                            </div>
+                                            <div class="widget-location-url" data-node="">
+                                                <div class="widget-url-icon"></div><span></span></div>
+                                        </div>
+                                    </div>
+                                    <div class="fm-dialog-tab">
+                                        <div class="fm-tab-wrapper">
+                                            <div class="fm-tab tab-url-link active">
+                                                <div class="tab-icon url"></div><span>[$5622]</span>
+                                            </div>
+                                            <div class="fm-tab tab-embed-link ">
+                                                <div class="tab-icon embed"></div><span>[$17407]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget-body-wrapper embed-link hidden">
+                                        <div class="fm-body-text">
+                                            <span>[$17411]</span>
+                                        </div>
+                                        <div class="widget-code embed-code">
+                                            <span class="widget-code-wrapper">
+                                                <p class="l1"></p>
+                                                <p class="l2"></p>
+                                                <p class="l3"></p>
+                                                <p class="l4"></p>
+                                                <p class="l5"></p>
+                                                <p class="l6"></p>
+                                                <p class="l7"></p>
+                                                <p class="l8"></p>
+                                                <p class="l9"></p>
+                                                <p class="l10"></p>
+                                                <p class="l11"></p>
+                                            </span>
+                                        </div>
+                                        <div class="widget-dialog-buttons">
+                                            <div class="button default-white-button left copy-widget-dialog">
+                                                <span>[$17408]</span>
+                                            </div>
+                                            <div class="button default-white-button left preview-widget">
+                                                <span>[$17409]</span>
+                                            </div>
+                                        </div>
+                                        <div class="footer-button widget-dialog-buttons ">
+                                            <div class="button default-grey-button right delete-widget-dialog">
+                                                <span>[$83]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget-body-wrapper url-link">
+                                        <div class="fm-body-text">
+                                            <span>[$17410]</span>
+                                        </div>
+                                        <div class="widget-code url-link">
+                                            <span class="widget-code-wrapper widget-url">%url</span>
+                                        </div>
+                                        <div class="widget-dialog-buttons">
+                                            <div class="button default-white-button left copy-widget-dialog">
+                                                <span>[$1394]</span>
+                                            </div>
+                                            <div class="button default-white-button left preview-widget">
+                                                <span>[$17409]</span>
+                                            </div>
+                                        </div>
+                                        <div class="footer-button widget-dialog-buttons ">
+                                            <div class="button default-grey-button right delete-widget-dialog">
+                                                <span>[$83]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="remove-widget-container hidden">
+                                        <div class="fm-subheading">[$17400]</div>
+                                        <div class="fm-body-text">[$17403]</div>
+                                        <div class="fm-body-text">[$1756]</div>
+                                        <div class="widget-dialog-buttons">
+                                            <div class="button default-grey-button right delete-widget-embed">
+                                                <span>[$870]</span>
+                                            </div>
+                                            <div class="button default-white-button right preview-widget-embed">
+                                                <span>[$1597]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- END Template Account Settings MEGAdrop expanded PUP card -->
+
+                                <div class="widget-container half-sized">
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- END fm-account-widget, UI for settings | widget -->
 
                 <div class="fm-account-save-block hidden">
                     <div class="default-white-button right fm-account-save"><span>[$776]</span></div>
@@ -2527,7 +2693,8 @@
                                 <div class="account data-item">
                                     <div class="account data-td">
                                         <i class="semi-small-icon icons-sprite tiny-clock"></i>
-                                        <span>Previous Versions</span>
+                                        <span>[$16474]</span>
+                                        <i class="tiny-icon cog versioning-settings" title="[$17580]" alt="[$17580]"></i>
                                     </div>
                                     <div class="account data-td">
                                         0 files

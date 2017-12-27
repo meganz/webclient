@@ -207,6 +207,13 @@
                     $('.light-grey', $a1).html(l[17097]);
                     $('.light-grey', $a3).text(l[17561]);
                     break;
+                case 'replace':
+                    $('.red-header', $a1).text(l[16488]);
+                    $('.red-header', $a2).text(l[16490]);
+                    $('.red-header', $a3).text(l[17094]);
+                    $('.light-grey', $a1).text(l[17602]);
+                    $('.light-grey', $a3).text(l[16493]);
+                    break;
             }
 
             $('.file-name', $a1).text(name);

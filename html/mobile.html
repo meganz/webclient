@@ -127,9 +127,6 @@
         <div class="mobile fm-header fm-hr folder-link">
             <div class="mobile fm-icon cloud left hidden"></div>
             <div class="mobile fm-icon top-icon menu right"></div>
-            <div class="mobile fm-icon upload right hidden">
-                <input class="hidden" type="file" id="select-file" />
-            </div>
             <div class="mobile fm-icon back left hidden"></div>
             <div class="mobile fm-icon folder"></div>
             <div class="mobile fm-header-txt"><span>[$1456]...</span></div>
@@ -137,9 +134,11 @@
         </div>
     </div>
 
+    <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
         <div class="mobile fm-content">
             <div class="mobile fm-scrolling">
+                <div class="mobile folders-files-text"></div>
 
                 <!-- Template for folders -->
                 <div class="mobile fm-item folder template">
@@ -214,10 +213,97 @@
             </div>
         </div>
     </div>
-
-    <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
-        <div class="mobile fm-bottom"></div>
+        <div class="mobile bottom-action-bar">
+            <div class="mobile fm-icon scroll-to-top left"></div>
+            <div class="mobile fm-icon upload-file right">
+                <input class="upload-select-file hidden" type="file">
+            </div>
+            <div class="mobile fm-icon mobile-create-new-folder right"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Create new folder dialog -->
+<div class="mobile fm-block create-new-folder-overlay hidden">
+    <div class= "mobile center-block">
+        <div class="mobile fm-block create-new-folder-dialog">
+            <div class="mobile fm-row">
+                <div class="mobile fm-content">
+                    <div class="mobile first-message">[$17617]</div>
+                    <div class="mobile folder-input-container">
+                        <input class="mobile folder-name-input" type="text" maxlength="70" placeholder="[$157]">
+                        <div class="mobile folder-name-warning-block hidden">
+                            <div class="mobile fm-icon red-warning"></div>
+                            <div class="mobile warning-text">[$7729]</div>
+                        </div>
+                    </div>
+                    <div class="mobile buttons">
+                        <a class="mobile red-button close-button"> <i></i> <span>[$148]</span> </a>
+                        <a class="mobile red-button create-folder confirm-ok-button"> <i></i> <span>[$158]</span> </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Upload overlay !-->
+<div class="mobile main-block upload-overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
+                <div class="mobile filename"><em>[$5533]</em></div>
+                <div class="mobile file-upload-info">
+                    <div class="mobile upload-speed"></div>
+                    <div class="mobile filesize"></div>
+                    <div class="mobile upload-percents"></div>
+                </div>
+                <!-- Progress bar is hidden, adding "uploading" to body class will show it !-->
+                <!-- Set width to ".bar" block !-->
+                <a class="mobile upload-progress">
+                    <div class="mobile bar"></div>
+                    <span class="mobile text">[$6110]</span>
+                </a>
+                <a class="mobile red-button upload-another-file hidden"> <i></i> <span>[$17618]</span> </a>
+
+                <!-- This remains hidden, only used as a template so the desktop upload code works -->
+                <table class="upload-table hidden">
+                    <tr id="ul_8001" class="transfer-queued transfer-upload">
+                        <td>
+                            <div class="transfer-type upload">
+                                <ul>
+                                    <li class="right-c"><p><span></span></p></li>
+                                    <li class="left-c"><p><span></span></p></li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="transfer-filetype-icon"></span>
+                            <span class="tranfer-filetype-txt">fileName</span>
+                        </td>
+                        <td>fileName</td>
+                        <td>fileSize</td>
+                        <td>
+                            <span class="eta"></span><span class="speed">pauseTxt</span>
+                        </td>
+                        <td>
+                            <span class="transfer-status">$[7227]</span>
+                        </td>
+                        <td class="grid-url-field">
+                            <a class="grid-url-arrow"></a>
+                            <a class="clear-transfer-icon"></a>
+                        </td>
+                        <td><span class="row-number"></span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -670,33 +756,6 @@
 </div>
 
 
-<!-- Upload overlay !-->
-<div class="mobile main-block hidden" id="mobile-upload">
-    <div class="mobile content-row first">
-        <div class="mobile content-cell">
-            <a class="mobile logo"></a>
-            <div class="mobile fm-dialog-close hidden"></div>
-            <div class="mobile white-block">
-                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
-                <div class="mobile filename"><em>[$5533]</em></div>
-                <div class="mobile file-upload-info">
-                    <div class="mobile download-speed"></div>
-                    <div class="mobile filesize"></div>
-                    <div class="mobile upload-percents"></div>
-                </div>
-                <a class="mobile red-button first dl-browser"> <i></i> <span>[$5532]</span> </a>
-                <!-- Progressbar is hidden. "uploading" body class will show it !-->
-                <!-- Set width to ".bar" block !-->
-                <a class="mobile upload-progress">
-                    <div class="bar"></div>
-                    <span>[$8949]</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <!-- File delete overlay !-->
 <div class="mobile main-block hidden" id="mobile-ui-delete">
     <div class="mobile content-row first">
@@ -709,8 +768,10 @@
                 <div class="mobile file-download-info">
                     <div class="mobile filesize"></div>
                 </div>
-                <a class="mobile red-button first delete"> <i></i> <span>[$1730]</span> </a>
-                <a class="mobile red-button second cancel"> <i></i> <span>[$82]</span> </a>
+                <div class="mobile buttons inline-buttons">
+                    <a class="mobile red-button first delete"> <i></i> <span>[$1730]</span> </a>
+                    <a class="mobile red-button second cancel"> <i></i> <span>[$82]</span> </a>
+                </div>
             </div>
         </div>
     </div>
@@ -729,9 +790,11 @@
                 <div class="mobile file-download-info">
                     <div class="mobile filesize"></div>
                 </div>
-                <textarea id="mobile-public-link" class="mobile public-link hidden" readonly></textarea>
-                <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
-                <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
+                <textarea id="mobile-public-link" class="mobile public-link" readonly></textarea>
+                <div class="mobile buttons inline-buttons">
+                    <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
+                    <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
+                </div>
             </div>
         </div>
     </div>

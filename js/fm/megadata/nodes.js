@@ -963,6 +963,8 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
             }, 90);
         }
 
+        mega.megadrop.onRename(itemHandle, newItemName);
+
         // update file versioning dialog if the name of the versioned file changes.
         if (!M.d[itemHandle].t && M.d[itemHandle].tvf > 0) {
             fileversioning.updateFileVersioningDialog(itemHandle);
@@ -1145,13 +1147,13 @@ MegaData.prototype.isFavourite = function(nodesId) {
 /**
  * versioningDomUpdate
  *
- * @param {Object} node      Node object
+ * @param {Handle} fh      Node handle
  * @param {Number} versionsNumber  Number of previous versions.
  */
-MegaData.prototype.versioningDomUpdate = function(node, versionsNumber) {
-    var $nodeView = $('#' + node.h);
+MegaData.prototype.versioningDomUpdate = function(fh) {
+    var $nodeView = $('#' + fh);
 
-    if (versionsNumber) {// Add versioning
+    if (M.d[fh] && M.d[fh].tvf) {// Add versioning
         $nodeView.addClass('versioning');
     }
     else {// Remove versioning

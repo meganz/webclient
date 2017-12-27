@@ -1282,6 +1282,8 @@ var dlmanager = {
         flags = flags !== undefined ? flags : this.lmtUserFlags;
 
         if (preWarning) {
+            localStorage.seenQuotaPreWarn = Date.now();
+
             $('.msg-overquota', $dialog).addClass('hidden');
             $('.msg-prewarning', $dialog).removeClass('hidden');
 

@@ -2,6 +2,7 @@ var dlpage_key,dlpage_ph,dl_next;
 var fdl_filename, fdl_filesize, fdl_key, fdl_url, fdl_starttime;
 var dl_import=false;
 var dl_attr;
+var dl_node;
 var fdl_queue_var=false;
 var fileSize;
 var dlResumeInfo;
@@ -130,7 +131,7 @@ function dl_g(res) {
             var filenameLength = filename.length;
             var isVideo = is_video(filename);
             var prevBut = isVideo;
-            var mNode = new MegaNode({
+            dl_node = new MegaNode({
                 k: key,
                 fa: res.fa,
                 h: dlpage_ph,
@@ -140,7 +141,7 @@ function dl_g(res) {
             });
 
             mediaCollectFn = function() {
-                MediaAttribute.setAttribute(mNode)
+                MediaAttribute.setAttribute(dl_node)
                     .then(console.debug.bind(console, 'MediaAttribute'))
                     .catch(console.warn.bind(console, 'MediaAttribute'));
             };
@@ -425,7 +426,12 @@ function dl_g(res) {
 
                     $ipb.removeClass('hidden')
                         .rebind('click', function() {
-                            slideshow(mNode);
+                            slideshow(dl_node);
+
+                            if (mediaCollectFn) {
+                                onIdle(mediaCollectFn);
+                                mediaCollectFn = null;
+                            }
                         });
                 }
             };
@@ -434,7 +440,7 @@ function dl_g(res) {
                 var promise = Promise.resolve();
 
                 if (isVideo && String(res.fa).indexOf('8*') > 0) {
-                    promise = MediaAttribute.canPlayMedia(mNode);
+                    promise = MediaAttribute.canPlayMedia(dl_node);
                     prevBut = false;
                 }
                 else {
@@ -477,12 +483,17 @@ function dl_g(res) {
                         }
                     });
 
+                    var vsp = initVideoStream(dl_node, $pageScrollBlock, {autoplay: false});
+
                     $('.play-video-button', $pageScrollBlock).rebind('click', function() {
 
                         // Show Loader until video is playing
                         $pageScrollBlock.find('.viewer-pending').removeClass('hidden');
 
-                        initVideoStream(mNode, $pageScrollBlock);
+                        vsp.then(function(stream) {
+                            dl_node.stream = stream;
+                            stream.play();
+                        });
 
                         $pageScrollBlock.addClass('video-theatre-mode');
                     });
@@ -939,4 +950,17 @@ function sync_switchOS(os)
         else if (c && c.indexOf('linux') > -1) loadSubPage('sync');
         return false;
     });
+}
+
+function dlPageCleanup() {
+    if (typeof gifSlider !== 'undefined') {
+        gifSlider.clear();
+    }
+
+    if (dl_node) {
+        if (dl_node.stream) {
+            dl_node.stream.destroy();
+        }
+        dl_node = false;
+    }
 }

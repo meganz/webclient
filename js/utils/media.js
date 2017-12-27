@@ -522,8 +522,12 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         });
     };
 
-    var _initVideoStream = function(node, $wrapper, destroy) {
-        var s = Streamer(node.link || node.h, $wrapper.find('video').get(0));
+    var _initVideoStream = function(node, $wrapper, destroy, options) {
+        if (typeof destroy === 'object') {
+            options = destroy;
+            destroy = null;
+        }
+        var s = Streamer(node.link || node.h, $wrapper.find('video').get(0), options);
 
         _initVideoControls($wrapper, s);
 
@@ -552,12 +556,13 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
      * @param {MegaNode} node An ufs node
      * @param {Object} wrapper Video element wrapper
      * @param {Function} [destroy] Function to invoke when the video is destroyed
+     * @param {Object} [options] Streamer options
      * @global
      */
-    global.initVideoStream = function(node, wrapper, destroy) {
+    global.initVideoStream = function(node, wrapper, destroy, options) {
         return new MegaPromise(function(resolve, reject) {
             M.require('videostream').tryCatch(function() {
-                resolve(_initVideoStream(node, wrapper, destroy));
+                resolve(_initVideoStream(node, wrapper, destroy, options));
             }, function(ex) {
                 msgDialog('warninga', l[135], l[47], ex);
                 reject(ex);

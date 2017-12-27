@@ -2324,8 +2324,8 @@ function loadSubPage(tpage, event)
 	pagemetadata();
     tpage = getCleanSitePath(tpage);
 
-    if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {
-        gifSlider.clear();
+    if (typeof dlPageCleanup === 'function' && tpage[0] !== '!') {
+        dlPageCleanup();
     }
 
     if (silent_loading) {

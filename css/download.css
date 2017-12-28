@@ -729,6 +729,9 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     min-height: 590px;
     table-layout: fixed;
 }
+.video.resumable .download.main-pad {
+    min-height: 640px;
+}
 .video .download.transfer-wrapper {
     background-color: white;
     min-height: 507px;
@@ -830,6 +833,9 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .video .download .small-red-link {
     margin: 2px 0 0 32px;
 }
+.video.resumable .bottom-page.top-bl {
+    min-height: 732px;
+}
 .video .bottom-page.top-bl {
     min-height: 704px;
 }
@@ -841,6 +847,28 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 }
 .video .download.progress-block {
     margin-top: 17px;
+}
+.video.resumable .download.progress-block.progress-resume {
+    margin: 17px 8px 0 8px;
+}
+.video.video-theatre-mode.resumable .download.progress-block.progress-resume {
+    margin: 13px auto 0 auto;
+    max-width: 824px;
+}
+.video.resumable .download.state-text {
+    margin: 0 8px 0 8px;
+    font-size: 15px;
+}
+.video.resumable .download.buttons-block {
+    border: 0;
+}
+.video.resumable.video-theatre-mode .download.state-text {
+    padding: 5px 8px 15px 8px;
+    max-width: 840px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0 auto;
 }
 .video .download.error-text, .video .download.state-text, .video .download.main-transfer-info {
     padding-top: 5px;
@@ -912,6 +940,11 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     height: -webkit-calc(100% - 150px);
     height: -moz-calc(100% - 150px);
     height: calc(100% - 150px);
+}
+.video-theatre-mode.resumable .download.video-block {
+    height: -webkit-calc(100% - 207px);
+    height: -moz-calc(100% - 207px);
+    height: calc(100% - 207px);
 }
 .video-theatre-mode .download.video-block[data-fullscreen="true"] {
     width: 100%;
@@ -985,5 +1018,10 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 }
 .video-theatre-mode .download .pause-transfer.square {
     width: 48px;
+}
+@media only screen and (max-width: 856px) {
+    .video.video-theatre-mode.resumable .download.progress-block.progress-resume {
+        margin: 13px 8px 0 8px;
+    }
 }
 /* end of Video dl page */

@@ -126,7 +126,8 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
-            var $pageScrollBlock = $('.bottom-page.scroll-block').removeClass('video video-theatre-mode');
+            var $pageScrollBlock = $('.bottom-page.scroll-block')
+                .removeClass('video video-theatre-mode resumable');
             var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
             var isVideo = is_video(filename);
@@ -174,6 +175,7 @@ function dl_g(res) {
             var onDownloadReady = function() {
                 dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
 
+                $pageScrollBlock.addClass('resumable');
                 $('.progress-resume').removeClass('hidden');
                 $('.download.state-text.resume').addClass('hidden');
                 $('.download.state-text.save').removeClass('hidden');
@@ -209,6 +211,7 @@ function dl_g(res) {
                             else if (size === dlResumeInfo.byteOffset) {
                                 dlprogress(-0xbadf, perc, dlResumeInfo.byteOffset, fdl_filesize);
 
+                                $pageScrollBlock.addClass('resumable');
                                 $('.progress-resume').removeClass('hidden');
                                 $('.download.state-text.save').addClass('hidden');
                                 $('.download.state-text.resume').removeClass('hidden');
@@ -307,7 +310,7 @@ function dl_g(res) {
                                     $('.download.state-text.resume').addClass('hidden');
                                     $('.progress-resume').addClass('hidden');
                                     $('.download.scroll-block')
-                                        .removeClass('download-complete')
+                                        .removeClass('download-complete resumable')
                                         .addClass('downloading');
 
                                     // another tab is downloading this
@@ -587,7 +590,7 @@ function browserDownload() {
     else*/
     {
         var $downloadPage = $('.download.scroll-block');
-        $downloadPage.addClass('downloading');
+        $downloadPage.addClass('downloading').removeClass('resumable');
         $downloadPage.find('.download.state-text').addClass('hidden');
         $downloadPage.find('.img-preview-button:visible').addClass('hidden');
         $downloadPage.find('.standalone-download-message').removeClass('hidden');

@@ -448,8 +448,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             $videoContainer.attr('data-fullscreen', !!state);
 
             // Set the fullscreen button's 'data-state' which allows the correct button image to be set via CSS
-            $fullscreen
-                .attr('data-state', !!state ? 'cancel-fullscreen' : 'go-fullscreen');
+            $fullscreen.attr('data-state', state ? 'cancel-fullscreen' : 'go-fullscreen');
         };
 
         // Checks if the document is currently in fullscreen mode
@@ -461,8 +460,8 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 || document.fullscreenElement);
         };
 
-        // Fullscreen
-        var handleFullscreen = function() {
+        // Bind Fullscreen button
+        $fullscreen.rebind('click', function() {
             // If fullscreen mode is active...
             if (isFullScreen()) {
                 // ...exit fullscreen mode
@@ -484,7 +483,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             }
             else {
                 // ...otherwise enter fullscreen mode
-                var containerEl = $wrapper.get(0);
+                var containerEl = page === 'download' ? $wrapper.find('.video-block').get(0) : $wrapper.get(0);
 
                 if (containerEl.requestFullscreen) {
                     containerEl.requestFullscreen();
@@ -502,10 +501,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 $fullscreen.find('i').removeClass('fullscreen').addClass('lowscreen');
                 setFullscreenData(true);
             }
-        };
-
-        // Bind Fullscreen button
-        $fullscreen.rebind('click', handleFullscreen);
+        });
 
         // Listen for fullscreen change events (from other controls, e.g. right clicking on the video itself)
         document.addEventListener('fullscreenchange', function() {

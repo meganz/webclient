@@ -180,26 +180,13 @@
     color: white;
     width: 100%;
     bottom: 2px;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
     position: absolute;
     text-align: left;
     display: none;
+    background-color: rgba(0,0,0,0.4);
 }
 .thumb.video .video-thumb-detalis {
     display: block;
-}
-.download.thumb-block:hover .video-thumb-detalis {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
 }
 .video-thumb-detalis i {
     margin: 0 0 0 2px;

@@ -490,7 +490,7 @@ function dl_g(res) {
                         vsp.then(function(stream) {
                             if (String(res.fa).indexOf('0*') < 0 || String(res.fa).indexOf('1*') < 0) {
                                 // TODO: refactor this with similar code at imagesViewer.js
-                                var storeImage = function(ab) {debugger
+                                var storeImage = function(ab) {
                                     var n = dl_node;
                                     var aes = new sjcl.cipher.aes([
                                         n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]

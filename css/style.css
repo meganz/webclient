@@ -3347,7 +3347,7 @@ img.blog-new-logos {
     word-wrap: break-word;
 }
 .properties-name-block {
-    padding-right: 30px;
+    padding-right: 39px;
     position: relative;
     display: inline-block;
 }
@@ -5336,7 +5336,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v10.png);
+    background-image: url(../images/mega/icons-sprite_v13.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -5397,7 +5397,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-image: none;
 }
 .transfer-table td:nth-child(7), .transfer-table-header th:nth-child(7) {
-    width: 64px;
+    width: 69px;
 }
 .transfer-table td:nth-child(8), .transfer-table-header th:nth-child(8) {
     width: 0px;
@@ -6015,7 +6015,7 @@ th.grid-first-th {
 }
 .grid-url-arrow, .file-settings-icon, .clear-transfer-icon {
     height: 16px;
-    width: 16px;
+    width: 25px;
     display: block;
     cursor: pointer;
     -webkit-transition: all 50ms ease-in-out;
@@ -6039,16 +6039,19 @@ th.grid-first-th {
     opacity: 0;
 }
 .grid-url-header-nw {
-    width: 42px;
+    width: 47px;
 }
 .grid-url-header-nw .grid-url-arrow {
     top: 16px;
+    left: auto;
+    right: 11px;
 }
 .clear-transfer-icon {
-    left: 36px;
+    left: 42px;
+    width: 16px;
 }
 .own-data .grid-url-arrow {
-    left: 62px;
+    left: 57px;
 }
 .file-settings-icon {
     left: auto;
@@ -6070,31 +6073,25 @@ th.grid-first-th {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/nw-fm-sprite_v26.svg);
+    background-image: url(../images/mega/icons-sprite-v13.png);
     background-repeat: no-repeat;
-    background-position: -18px -7788px;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
+    background-position: -160px -831px;
     display: block;
-    width: 14px;
+    width: 13px;
     height: 14px;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-    -moz-opacity: 0.3;
-    -khtml-opacity: 0.3;
-    opacity: 0.3;
     margin: 1px;
+    margin: 0 auto;
 }
 .clear-transfer-icon::after {
-    background-position: 2px -4046px;
+    opacity: 0.67;
+    background-position: 1px -4045px;
+    background-image: url(../images/mega/nw-fm-sprite_v26.svg);
 }
 .hide-settings-icon {
     -moz-opacity: 0;
@@ -6102,14 +6099,6 @@ th.grid-first-th {
     opacity: 0;
     border: none;
     background-color: transparent;
-}
-.file-settings-icon:hover::after,
-.grid-url-arrow:hover::after,
-.clear-transfer-icon:hover::after {
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
 }
 .clone-of-header, .clone-of-header span, .clone-of-header, .clone-of-header th {
     height: 0;
@@ -7119,11 +7108,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v10.png);
+    background-image: url(../images/mega/icons-sprite_v13.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v10.png);
+    background-image: url(../images/mega/icons-sprite_v13.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -15826,7 +15815,7 @@ span.incoming-call-name {
     float: left;
     left: auto;
     top: auto;
-    margin: 7px 0 0 11px;
+    margin: 8px 0 0 11px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
@@ -20160,7 +20149,7 @@ div.camera-bottom-txt {
     background-position: -11px -10569px;
 }
 .fm-account-button.megadrop::before {
-    background-image: url(../images/mega/icons-sprite_v10.png);
+    background-image: url(../images/mega/icons-sprite_v13.png);
     background-position: -78px -1109px;
 }
 .fm-account-button.megadrop.active::before {
@@ -21817,6 +21806,14 @@ table.speed-table {
 }
 .ps-container {
     max-width: 100%;
+}
+.ps-container > .ps-scrollbar-y-rail {
+    right: 0 !important;
+    width: 8px;
+}
+.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+    right: 2px !important;
+    width: 6px !important;
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail, .perfectScrollbarContainer.ps-container:hover > .ps-scrollbar-y-rail,
 .megaList.ps-container > .ps-scrollbar-y-rail, .megaList.ps-container:hover > .ps-scrollbar-y-rail {

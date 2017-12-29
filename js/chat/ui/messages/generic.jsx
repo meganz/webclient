@@ -458,7 +458,7 @@ var GenericConversationMessage = React.createClass({
                             if (contact.u === u_handle) {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
-                                    icon="tiny-icon grey-down-arrow">
+                                    icon="tiny-icon icons-sprite grey-dots">
                                     <DropdownsUI.Dropdown
                                         ref={(refObj) => {
                                             self.dropdown = refObj;
@@ -524,7 +524,7 @@ var GenericConversationMessage = React.createClass({
                             else {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
-                                    icon="tiny-icon grey-down-arrow">
+                                    icon="tiny-icon icons-sprite grey-dots">
                                     <DropdownsUI.Dropdown
                                         className="white-context-menu attachments-dropdown"
                                         noArrow={true}
@@ -692,7 +692,7 @@ var GenericConversationMessage = React.createClass({
                             // OR it is a share contact, etc.
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
-                                icon="tiny-icon grey-down-arrow">
+                                icon="tiny-icon icons-sprite grey-dots">
                                 <DropdownsUI.Dropdown
                                     className="white-context-menu shared-contact-dropdown"
                                     noArrow={true}
@@ -730,7 +730,7 @@ var GenericConversationMessage = React.createClass({
                         else if (M.u[contact.u] && M.u[contact.u].c === 0) {
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
-                                icon="tiny-icon grey-down-arrow">
+                                icon="tiny-icon icons-sprite grey-dots">
                                 <DropdownsUI.Dropdown
                                     className="white-context-menu shared-contact-dropdown"
                                     noArrow={true}
@@ -962,7 +962,7 @@ var GenericConversationMessage = React.createClass({
                     ) {
                         messageActionButtons = <ButtonsUI.Button
                             className="default-white-button tiny-button"
-                            icon="tiny-icon grey-down-arrow">
+                            icon="tiny-icon icons-sprite grey-dots">
                             <DropdownsUI.Dropdown
                                 className="white-context-menu attachments-dropdown"
                                 noArrow={true}

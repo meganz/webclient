@@ -130,6 +130,10 @@ function dl_g(res) {
                 .removeClass('video video-theatre-mode resumable');
             var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
+            var filenameDotPos =  filename.lastIndexOf('.') > 0 || filenameLength;
+            var fileTitle = filename.substring(0, filenameDotPos);
+            var fileExt = filename.substring(filenameDotPos);
+            var filenameLength = filename.length;
             var isVideo = is_video(filename);
             var prevBut = isVideo;
             dl_node = new MegaNode({
@@ -349,22 +353,13 @@ function dl_g(res) {
             fileSize = bytesToSize(res.s);
 
             $('.download.top-bar').removeClass('hidden');
-            $('.file-info .download.info-txt.filename, .download.bar-filename')
-                .text(filename).attr('title', filename);
+            $('.file-info .download.info-txt.big-txt .filename').text(fileTitle);
+            $('.file-info .download.info-txt.big-txt .extension').text(fileExt);
+            $('.download.bar-filename').text(filename).attr('title', filename);
             $('.file-info .download.info-txt.small-txt, .bar-cell .download.bar-filesize')
                 .text(fileSize);
             $('.info-block .block-view-file-type, .download .bar-cell .transfer-filetype-icon')
                 .addClass(fileIcon({ name: filename }));
-
-            // XXX: remove this once all browsers support `text-overflow: ellipsis;`
-            Soon(function() {
-                while (filenameLength-- && $('.download.info-txt.filename').width() > 316) {
-                    $('.file-info .download.info-txt.filename').text(str_mtrunc(filename, filenameLength));
-                }
-                if (filenameLength < 1) {
-                    $('.file-info .download.info-txt.filename').text(str_mtrunc(filename, 37));
-                }
-            });
 
             if (dlQueue.isPaused(dlmanager.getGID(fdl_queue_var))) {
                 $('.download.scroll-block').addClass('paused');
@@ -465,7 +460,8 @@ function dl_g(res) {
                     var $video = $pageScrollBlock.find('video');
 
                     $pageScrollBlock.addClass('video');
-                    $('.file-info .download.info-txt.filename').text(filename);
+                    $('.file-info .download.info-txt.big-txt .filename').text(fileTitle);
+                    $('.file-info .download.info-txt.big-txt .extension').text(fileExt);
 
                     // Disable default video controls
                     $video.get(0).controls = false;

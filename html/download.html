@@ -60,7 +60,7 @@
                     <div class="download transfer-wrapper">
                         <!-- Video block !-->
                         <div class="download video-block">
-                             <video id="video" controls="false" preload="metadata" poster="" data-autoplayvideo="false"  data-playvideoonclick="false"></video>
+                             <video id="video" controls preload="metadata" poster="" data-autoplayvideo="false"  data-playvideoonclick="false"></video>
                             
                             <div class="viewer-pending hidden">
                                 <div class="bounce1"></div>
@@ -111,7 +111,10 @@
                             </div>
 
                             <div class="download file-info">
-                                <span class="download info-txt big-txt filename"></span>
+                                <div class="download info-txt big-txt">
+                                    <span class="filename"></span>
+                                    <span class="extension"></span>
+                                </div>
                                 <div class="download info-txt small-txt"></div>
 
                                 <div class="download transfer-buttons">

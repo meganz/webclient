@@ -533,12 +533,30 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 }
 .download.file-info {
     margin-left: 104px;
+    width: 316px;
 }
 .download.info-txt.big-txt {
+    font-size: 0;
+    line-height: 0;
+}
+.download.info-txt.big-txt span {
+    display: inline-block;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    max-width: -webkit-calc(100% - 60px);
+    max-width: -moz-calc(100% - 60px);
+    max-width: calc(100% - 60px);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     font-size: 16px;
     line-height: 20px;
     color: #333333;
     white-space: nowrap;
+}
+.download.info-txt.big-txt span.extension {
+    max-width: 60px;
 }
 .download.info-txt.small-txt {
     font-size: 14px;
@@ -784,12 +802,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     margin-left: 66px;
     padding-top: 16px;
     margin-right: 15px;
-}
-.video .download.info-txt.big-txt {
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    display: block;
+    width: auto;
 }
 .video .download.info-txt.small-txt {
     line-height: 24px;

@@ -130,10 +130,9 @@ function dl_g(res) {
                 .removeClass('video video-theatre-mode resumable');
             var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
-            var filenameDotPos =  filename.lastIndexOf('.') > 0 || filenameLength;
-            var fileTitle = filename.substring(0, filenameDotPos);
-            var fileExt = filename.substring(filenameDotPos);
-            var filenameLength = filename.length;
+            var fileExtPos =  filename.lastIndexOf('.') > 0 ? filename.lastIndexOf('.') : filenameLength;
+            var fileTitle = filename.substring(0, fileExtPos);
+            var fileExt = filename.substring(fileExtPos);
             var isVideo = is_video(filename);
             var prevBut = isVideo;
             dl_node = new MegaNode({

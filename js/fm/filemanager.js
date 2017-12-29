@@ -847,6 +847,7 @@ FileManager.prototype.updFileManagerUI = function() {
                     });
                 }
                 if (UImain) {
+                    mBroadcaster.sendMessage('mediainfo:collect');
                     $.tresizer();
                 }
 

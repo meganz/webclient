@@ -1428,7 +1428,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
     var miCollectedBytes = 0;
     var miCollectRunning = 0;
-    mBroadcaster.addListener('mega:openfolder', function() {
+    var miCollectProcess = function() {
         if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000) {
             return 0xDEAD;
         }
@@ -1448,7 +1448,22 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 console.time('mediainfo:collect');
             }
 
+            var procnodes = [];
             var finish = function() {
+                for (var i = M.viewmode && procnodes.length; i--;) {
+                    var n = procnodes[i];
+
+                    if (n.p === M.currentdirid) {
+                        var h = n.h;
+                        n = MediaAttribute(M.d[h]).data;
+
+                        if (n.playtime) {
+                            $('#' + h)
+                                .find('.data-block-bg').addClass('video')
+                                .find('.video-thumb-details span').text(secondsToTimeShort(n.playtime));
+                        }
+                    }
+                }
                 if (d) {
                     console.debug('MediaInfo collect finished.');
                     console.timeEnd('mediainfo:collect');
@@ -1459,9 +1474,12 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             MediaInfoLib.collect(M.v)
                 .then(function(res) {
                     var pending = 0;
-                    var process = function() {
+                    var process = function(n) {
+                        if (n) {
+                            procnodes.push(n);
+                        }
                         if (--pending < 1) {
-                            finish();
+                            onIdle(finish);
                         }
                     };
                     var submit = function(res) {
@@ -1471,7 +1489,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                             if (d) {
                                 console.debug('MediaInfo submit successful', res, arguments);
                             }
-                            process();
+                            process(n);
                         }).catch(function() {
                             if (d) {
                                 console.warn('MediaInfo submit error...', res, arguments);
@@ -1507,7 +1525,9 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                     finish();
                 });
         }, 4e3);
-    });
+    };
+    mBroadcaster.addListener('mega:openfolder', miCollectProcess);
+    mBroadcaster.addListener('mediainfo:collect', miCollectProcess);
 
 })(self);
 
@@ -1806,7 +1826,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 return reject(EFAILED);
             }
             var req = {a: 'pfa', fa: self.toAttributeString(res)};
-            if (self.ph) {
+            if (self.ph && (!self.u || self.u !== u_handle)) {
                 req.ph = self.ph;
             }
             else {
@@ -1817,7 +1837,23 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 console.debug('Storing media file attr for node.', req, res, self.fromAttributeString(req.fa));
             }
 
-            M.req(req).tryCatch(resolve, reject);
+            var success = function(fa) {
+                var n = M.d[req.n];
+
+                if (n) {
+                    if (n.fa) {
+                        n.fa += '/' + fa;
+                    }
+                    else {
+                        n.fa = fa;
+                    }
+                    M.nodeUpdated(n);
+                }
+
+                resolve(fa);
+            };
+
+            M.req(req).tryCatch(success, reject);
 
             if (Object(res.General).Cover_Data && !res.vcodec && req.n) {
                 var aes = new sjcl.cipher.aes([

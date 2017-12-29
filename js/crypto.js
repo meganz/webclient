@@ -1526,7 +1526,7 @@ function api_proc(q) {
                     api_proc(this.q);
                 }
                 else {
-                    if (ev.type === 'error') {
+                    if (ev && ev.type === 'error') {
                         if (logger) {
                             logger.debug("API request error - retrying");
                         }

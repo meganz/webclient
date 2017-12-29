@@ -600,7 +600,13 @@ var slideshowid;
             var $video = $overlay.find('.viewer-image-bl video');
             $video.attr('poster', '').attr('controls', false).removeClass('hidden');
 
-            if (previews[id].poster !== undefined) {
+            if ($.autoplay === id) {
+                onIdle(function() {
+                    $('.viewer-overlay .play-video-button').trigger('click');
+                });
+                delete $.autoplay;
+            }
+            else if (previews[id].poster !== undefined) {
                 $video.attr('poster', previews[id].poster);
 
                 if (previews[id].poster) {

@@ -1197,6 +1197,15 @@ FileManager.prototype.initContextUI = function() {
         slideshow($.selected[0]);
     });
 
+    $(c + '.play-item').rebind('click', function() {
+        var n = $.selected[0];
+
+        closeDialog();
+
+        $.autoplay = n;
+        slideshow(n);
+    });
+
     $(c + '.clearbin-item').rebind('click', function() {
         doClearbin(false);
     });

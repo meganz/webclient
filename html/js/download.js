@@ -351,12 +351,16 @@ function dl_g(res) {
 
             fileSize = bytesToSize(res.s);
 
+            var $fileinfoBlock = $('.download.file-info');
+
+            $fileinfoBlock.find('.big-txt').attr('title', filename);
+            $fileinfoBlock.find('.big-txt .filename').text(fileTitle);
+            $fileinfoBlock.find('.big-txt .extension').text(fileExt);
+            $fileinfoBlock.find('.small-txt').text(fileSize);
+
             $('.download.top-bar').removeClass('hidden');
-            $('.file-info .download.info-txt.big-txt .filename').text(fileTitle);
-            $('.file-info .download.info-txt.big-txt .extension').text(fileExt);
             $('.download.bar-filename').text(filename).attr('title', filename);
-            $('.file-info .download.info-txt.small-txt, .bar-cell .download.bar-filesize')
-                .text(fileSize);
+            $('.bar-cell .download.bar-filesize').text(fileSize);
             $('.info-block .block-view-file-type, .download .bar-cell .transfer-filetype-icon')
                 .addClass(fileIcon({ name: filename }));
 
@@ -459,8 +463,8 @@ function dl_g(res) {
                     var $video = $pageScrollBlock.find('video');
 
                     $pageScrollBlock.addClass('video');
-                    $('.file-info .download.info-txt.big-txt .filename').text(fileTitle);
-                    $('.file-info .download.info-txt.big-txt .extension').text(fileExt);
+                    $fileinfoBlock.find('.big-txt .filename').text(fileTitle);
+                    $fileinfoBlock.find('.big-txt .extension').text(fileExt);
 
                     // Disable default video controls
                     $video.get(0).controls = false;

@@ -6079,7 +6079,7 @@ th.grid-first-th {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite-v13.png);
+    background-image: url(../images/mega/icons-sprite_v13.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;

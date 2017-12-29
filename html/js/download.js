@@ -488,6 +488,40 @@ function dl_g(res) {
                         $pageScrollBlock.find('.viewer-pending').removeClass('hidden');
 
                         vsp.then(function(stream) {
+                            if (String(res.fa).indexOf('0*') < 0 || String(res.fa).indexOf('1*') < 0) {
+                                // TODO: refactor this with similar code at imagesViewer.js
+                                var storeImage = function(ab) {debugger
+                                    var n = dl_node;
+                                    var aes = new sjcl.cipher.aes([
+                                        n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
+                                    ]);
+                                    createnodethumbnail(n.h, aes, n.h, ab, {isVideo: true}, n.ph);
+                                };
+                                stream.on('playing', function() {
+                                    var video = this.video;
+
+                                    if (video && video.duration) {
+                                        var took = Math.round(2 * video.duration / 100);
+
+                                        if (d) {
+                                            console.debug('Video thumbnail missing, will take image at %s...',
+                                                secondsToTime(took));
+                                        }
+
+                                        this.on('timeupdate', function() {
+                                            if (video.currentTime < took) {
+                                                return true;
+                                            }
+
+                                            this.getImage().then(storeImage).catch(console.warn.bind(console));
+                                        });
+
+                                        return false;
+                                    }
+
+                                    return true;
+                                });
+                            }
                             dl_node.stream = stream;
                             stream.play();
                         });

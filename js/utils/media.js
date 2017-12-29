@@ -1600,13 +1600,18 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 case 'isom':
                 case 'M4V ':
                     if (videocodec === 'avc1') {
-                        if (String(audiocodec).startsWith('mp4a')) {
-                            audiocodec = audiocodec.replace(/-/g, '.');
+                        var mime = 'video/mp4; codecs="avc1.640029';
+
+                        if (audiocodec) {
+                            if (String(audiocodec).startsWith('mp4a')) {
+                                audiocodec = audiocodec.replace(/-/g, '.');
+                            }
+
+                            mime += ', ' + audiocodec;
                         }
 
-                        return MediaSource.isTypeSupported('video/mp4; codecs="avc1.640029, ' + audiocodec + '"');
+                        return MediaSource.isTypeSupported(mime + '"');
                     }
-                    break;
             }
 
             return false;

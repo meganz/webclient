@@ -664,6 +664,10 @@
                     props.classNames.push('file');
                     props.type = filetype(aNode.name);
                     props.size = bytesToSize(aNode.s);
+
+                    if (aNode.fa && aNode.fa.indexOf('8*') > 0) {
+                        props.playtime = MediaAttribute(aNode).data.playtime;
+                    }
                 }
                 props.name = aNode.name;
 
@@ -842,6 +846,12 @@
 
                     if (aProperties.icon) {
                         tmp.classList.add(aProperties.icon);
+                    }
+
+                    if (aProperties.playtime) {
+                        aTemplate.querySelector('.data-block-bg').classList.add('video');
+                        aTemplate.querySelector('.video-thumb-detalis span').textContent
+                            = secondsToTimeShort(aProperties.playtime);
                     }
 
                     aTemplate.querySelector('.file-block-title').textContent = aProperties.name;

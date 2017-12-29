@@ -848,7 +848,7 @@
                         tmp.classList.add(aProperties.icon);
                     }
 
-                    if (aProperties.playtime) {
+                    if (aProperties.playtime && is_video(aProperties.name)) {
                         aTemplate.querySelector('.data-block-bg').classList.add('video');
                         aTemplate.querySelector('.video-thumb-details span').textContent
                             = secondsToTimeShort(aProperties.playtime);

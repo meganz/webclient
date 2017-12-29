@@ -358,14 +358,7 @@ function dl_g(res) {
 
             // XXX: remove this once all browsers support `text-overflow: ellipsis;`
             Soon(function() {
-                var filenameWidth = 316;
-                var $infoBlock = $('.bottom-page.scroll-block');
-
-                if ($pageScrollBlock.hasClass('video')) {
-                    filenameWidth = 560;
-                }
-
-                while (filenameLength-- && $('.download.info-txt.filename').width() > filenameWidth) {
+                while (filenameLength-- && $('.download.info-txt.filename').width() > 316) {
                     $('.file-info .download.info-txt.filename').text(str_mtrunc(filename, filenameLength));
                 }
                 if (filenameLength < 1) {
@@ -472,6 +465,7 @@ function dl_g(res) {
                     var $video = $pageScrollBlock.find('video');
 
                     $pageScrollBlock.addClass('video');
+                    $('.file-info .download.info-txt.filename').text(filename);
 
                     // Disable default video controls
                     $video.get(0).controls = false;

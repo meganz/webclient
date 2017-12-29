@@ -236,6 +236,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         var $videoContainer = $video.parent();
         var $videoControls = $wrapper.find('.video-controls');
         var $document = $(document);
+        var timer;
 
         // Hide the default controls
         videoElement.controls = false;
@@ -380,8 +381,26 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 .text(secondsToTimeShort(videoElement.currentTime, 1));
         });
 
-        var timeDrag = false;
+        // play/pause on click
+        $video.rebind('click', function() {
+            $playpause.trigger('click');
+        });
+
+        // jump to full screen on double-click
+        $video.rebind('dblclick', function() {
+            $fullscreen.trigger('click');
+        });
+
+        $video.rebind('mousemove.idle', function() {
+            $wrapper.removeClass('mouse-idle');
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                $wrapper.addClass('mouse-idle');
+            }, 2600);
+        });
+
         /* Drag status */
+        var timeDrag = false;
         $progress.rebind('mousedown.videoprogress', function(e) {
             timeDrag = true;
             videoElement.pause();
@@ -515,6 +534,17 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         });
         document.addEventListener('msfullscreenchange', function() {
             setFullscreenData(!!document.msFullscreenElement);
+        });
+
+        $wrapper.rebind('video-destroy', function(ev) {
+            clearTimeout(timer);
+            $wrapper.removeClass('mouse-idle');
+            $video.unbind('mousemove.idle');
+            $document.unbind('mousemove.videoprogress');
+            $document.unbind('mouseup.videoprogress');
+            $document.unbind('mousemove.volumecontrol');
+            $document.unbind('mouseup.volumecontrol');
+            return false;
         });
     };
 

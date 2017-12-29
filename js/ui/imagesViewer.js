@@ -455,7 +455,7 @@ var slideshowid;
 
         $('.play-video-button', $wrapper).rebind('click', function() {
             var destroy = function() {
-                $wrapper.find('.viewer-pending').addClass('hidden');
+                $wrapper.find('.viewer-pending').addClass('hidden').end().trigger('video-destroy');
 
                 if (preqs[n.h] && preqs[n.h] instanceof Streamer) {
                     mBroadcaster.removeListener(preqs[n.h].ev1);

@@ -290,9 +290,24 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             changeButtonState('playpause');
         });
 
+        var playevent;
         $video.rebind('playing', function() {
             if (videoElement && videoElement.duration) {
                 $wrapper.find('.viewer-pending').addClass('hidden');
+
+                if (!playevent) {
+                    playevent = true;
+
+                    // play/pause on click
+                    $video.rebind('click', function() {
+                        $playpause.trigger('click');
+                    });
+
+                    // jump to full screen on double-click
+                    $video.rebind('dblclick', function() {
+                        $fullscreen.trigger('click');
+                    });
+                }
             }
         });
 
@@ -379,16 +394,6 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
             $wrapper.find('.video-timing.current')
                 .text(secondsToTimeShort(videoElement.currentTime, 1));
-        });
-
-        // play/pause on click
-        $video.rebind('click', function() {
-            $playpause.trigger('click');
-        });
-
-        // jump to full screen on double-click
-        $video.rebind('dblclick', function() {
-            $fullscreen.trigger('click');
         });
 
         $video.rebind('mousemove.idle', function() {

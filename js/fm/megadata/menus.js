@@ -138,7 +138,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
 
             if ((sourceRoot === M.RootID || sourceRoot === M.InboxID)
                 && u_type === 3
-                && !M.getShareNodesSync(selNode.h).length) {
+                && !M.getShareNodesSync(selNode.h).length
+                && !folderlink) {
 
                 // Create or Remove upload page context menu action
                 if (mega.megadrop.pufs[selNode.h] && mega.megadrop.pufs[selNode.h].s !== 1) {

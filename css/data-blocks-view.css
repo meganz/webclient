@@ -204,3 +204,6 @@
 .video-thumb-detalis i {
     margin: 0 0 0 2px;
 }
+.video.thumb .data-block-indicators {
+    background-color: rgba(0,0,0,0.4);
+}

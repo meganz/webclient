@@ -791,22 +791,18 @@ FileManager.prototype.updFileManagerUI = function() {
 
     MegaPromise.allDone(treePromises)
         .always(function() {
+            var renderPromise = MegaPromise.resolve();
 
             if (UImain) {
-                M.filterByParent(M.currentdirid);
-                M.sort();
-                M.renderMain(true);
-                // M.renderPath();
-                if (selnode) {
-                    Soon(function() {
-                        $.selected = [selnode];
-                        reselect(1);
-                    });
+                if (UItree || M.v.length) {
+                    M.filterByParent(M.currentdirid);
+                    M.sort();
+                    M.renderMain(true);
                 }
-                $.tresizer();
+                else {
+                    renderPromise = M.openFolder(M.currentdirid, true);
+                }
             }
-
-            var renderPromise = MegaPromise.resolve();
 
             if (UItree) {
                 if (M.currentrootid === 'shares') {
@@ -843,6 +839,15 @@ FileManager.prototype.updFileManagerUI = function() {
                 }
                 if (newpath) {
                     M.renderPath();
+                }
+                if (selnode) {
+                    Soon(function() {
+                        $.selected = [selnode];
+                        reselect(1);
+                    });
+                }
+                if (UImain) {
+                    $.tresizer();
                 }
 
                 if (u_type === 0) {

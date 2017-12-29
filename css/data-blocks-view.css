@@ -114,8 +114,8 @@
     float: none;
     position: absolute;
     z-index: 100;
-    bottom: 9px;
-    right: 9px;
+    bottom: 6px;
+    right: 6px;
     margin: 0;
 }
 .data-block-view .user-card-presence {

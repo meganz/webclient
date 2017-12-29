@@ -78,7 +78,7 @@ img.emoji, .chat-topic-block img.emoji.big, .small-info-txt img.emoji.big {
     height: 20px;
     display:inline-block;
     vertical-align: middle;
-    margin-top: -2px;
+    margin-top: -3px;
     margin-left: 2px;
     margin-right: 2px;
 }
@@ -89,7 +89,7 @@ img.emoji.big {
     display:inline-block;
     vertical-align: middle;
     margin-top: 4px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     margin-left: 2px;
     margin-right: 2px;
 }

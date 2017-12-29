@@ -42,7 +42,7 @@
                     '</span>' +
                     '<span class="block-view-file-type"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
-                    '<div class="video-thumb-detalis">' +
+                    '<div class="video-thumb-details">' +
                         '<i class="small-icon small-play-icon"></i>' +
                         '<span>00:00</span>' +
                     ' </div>' +
@@ -92,7 +92,7 @@
                     '</span>' +
                     '<span class="block-view-file-type"></span>' +
                     '<span class="file-settings-icon"></span>' +
-                    '<div class="video-thumb-detalis">' +
+                    '<div class="video-thumb-details">' +
                         '<i class="small-icon small-play-icon"></i>' +
                         '<span>00:00</span>' +
                     ' </div>' +
@@ -175,7 +175,7 @@
                     '</span>' +
                     '<span class="block-view-file-type folder-shared"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
-                    '<div class="video-thumb-detalis">' +
+                    '<div class="video-thumb-details">' +
                         '<i class="small-icon small-play-icon"></i>' +
                         '<span>00:00</span>' +
                     ' </div>' +
@@ -850,7 +850,7 @@
 
                     if (aProperties.playtime) {
                         aTemplate.querySelector('.data-block-bg').classList.add('video');
-                        aTemplate.querySelector('.video-thumb-detalis span').textContent
+                        aTemplate.querySelector('.video-thumb-details span').textContent
                             = secondsToTimeShort(aProperties.playtime);
                     }
 

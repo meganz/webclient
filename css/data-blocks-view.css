@@ -174,23 +174,25 @@
     background-color: rgba(255,255,255,0.4);
 }
 
-.video-thumb-detalis {
+.video-thumb-details {
     font-size: 12px;
     line-height: 20px;
-    color: white;
+    color: #666666;
     width: 100%;
-    bottom: 2px;
+    bottom: 0;
+    padding: 2px 0;
     position: absolute;
     text-align: left;
     display: none;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(255,255,255,0.4);
 }
-.thumb.video .video-thumb-detalis {
+.data-block-bg.video .video-thumb-details {
     display: block;
 }
-.video-thumb-detalis i {
+.video-thumb-details i {
     margin: 0 0 0 2px;
 }
-.video.thumb .data-block-indicators {
+.video.thumb .data-block-indicators, .video.thumb .video-thumb-details {
     background-color: rgba(0,0,0,0.4);
+    color: white;
 }

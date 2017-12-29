@@ -334,7 +334,7 @@
     -moz-transition: opacity 1s ease-in-out;
     -webkit-transition: opacity 1s ease-in-out;
 }
-.video-thumb-detalis {
+.video-thumb-details {
     display: none;
 }
 /* Video player */

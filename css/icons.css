@@ -818,6 +818,9 @@
 }
 .small-icon.small-play-icon {
     background-image: url(../images/mega/icons-sprite_v12.png);
+    background-position: -148px -634px;
+}
+.thumb .small-icon.small-play-icon {
     background-position: -188px -634px;
 }
 /* Context menu icons */

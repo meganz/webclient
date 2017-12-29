@@ -325,11 +325,14 @@
     line-height: 23px;
     padding: 0 5px;
 }
-.mouse-idle.fullscreen .viewer-top-bl, .mouse-idle.fullscreen .viewer-bottom-bl, .mouse-idle.fullscreen .viewer-mid-button {
+.mouse-idle .viewer-top-bl, .mouse-idle .viewer-bottom-bl, .mouse-idle .viewer-mid-button {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+    transition: opacity 1s ease-in-out;
+    -moz-transition: opacity 1s ease-in-out;
+    -webkit-transition: opacity 1s ease-in-out;
 }
 .video-thumb-detalis {
     display: none;

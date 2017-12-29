@@ -3402,7 +3402,7 @@ function api_getfa(id) {
 
     if (storedattr[id]) {
         for (var type in storedattr[id]) {
-            if (type !== 'target') {
+            if (type !== 'target' && type !== '$ph') {
                 f.push(type + '*' + storedattr[id][type]);
             }
         }
@@ -3415,12 +3415,23 @@ function api_getfa(id) {
 function api_attachfileattr(node, id) {
     'use strict';
 
+    var ph = Object(storedattr[id])['$ph'];
     var fa = api_getfa(id);
 
     storedattr[id].target = node;
 
     if (fa) {
-        M.req({a: 'pfa', n: node, fa: fa})
+        var req = {a: 'pfa', fa: fa};
+
+        if (ph) {
+            req.ph = ph;
+            storedattr[id]['$ph'] = ph;
+        }
+        else {
+            req.n = node;
+        }
+
+        M.req(req)
             .fail(function(res) {
                 if (res === EACCESS) {
                     api_pfaerror(node);

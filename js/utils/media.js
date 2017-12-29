@@ -399,6 +399,10 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             }, 2600);
         });
 
+        $videoControls.rebind('mousemove.idle', function() {
+            clearTimeout(timer);
+        });
+
         /* Drag status */
         var timeDrag = false;
         $progress.rebind('mousedown.videoprogress', function(e) {
@@ -960,7 +964,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             options = Object.assign({
                 maxAtOnce: 10,
                 chunkSize: 65536,
-                maxBytesRead: 2097152
+                maxBytesRead: 6291456
             }, options);
 
             for (var i = entries.length; i--;) {

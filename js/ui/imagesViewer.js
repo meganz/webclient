@@ -467,6 +467,10 @@ var slideshowid;
                 }
             };
 
+            if (!d) {
+                api_req({a: 'log', e: 99668, m: 'video watch'});
+            }
+
             // Show loading spinner until video is playing
             $wrapper.find('.viewer-pending').removeClass('hidden');
             $wrapper.addClass('video-theatre-mode')
@@ -589,8 +593,6 @@ var slideshowid;
         }
 
         if (String(previews[id].type).startsWith('video')) {
-            var maxWidth = Math.ceil(innerWidth * 70 / 100);
-
             $overlay.addClass('video');
             $overlay.find('.viewer-pending').addClass('hidden');
             // $overlay.find('.viewer-progress').addClass('hidden');
@@ -639,10 +641,6 @@ var slideshowid;
                 $overlay.find('.viewer-image-bl').addClass('default-state');
             }
             previews[id].poster = previews[id].poster || '';
-
-            if (!d) {
-                api_req({a: 'log', e: 99668, m: 'video watch'});
-            }
             return;
         }
 

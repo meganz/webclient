@@ -482,6 +482,13 @@ function dl_g(res) {
                     var vsp = initVideoStream(dl_node, $pageScrollBlock, {autoplay: false});
 
                     $('.play-video-button', $pageScrollBlock).rebind('click', function() {
+                        if (!d) {
+                            api_req({a: 'log', e: 99668, m: 'video watch'});
+                        }
+                        if (mediaCollectFn) {
+                            onIdle(mediaCollectFn);
+                            mediaCollectFn = null;
+                        }
 
                         // Show Loader until video is playing
                         $pageScrollBlock.find('.viewer-pending').removeClass('hidden');

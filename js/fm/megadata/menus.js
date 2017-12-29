@@ -607,11 +607,11 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     var cor;// corner, check setBordersRadius for more info
     if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
         cor = 1;
-        dPos = { 'x': x - 2, 'y': y + ico.y + 8 };// position for right-bot
+        dPos = { 'x': x , 'y': y + ico.y + 4 };// position for right-bot
 
         // draw to the left
         if (wMax > maxX) {
-            dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
+            dPos.x = x - cmW + ico.x;// additional pixels to align with -icon
             cor = 3;
         }
 
@@ -626,7 +626,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
         }
         else {
             if (hMax > maxY - TOP_MARGIN) {
-                dPos.y = y - cmH - 6;
+                dPos.y = y - cmH - 4;
                 if (dPos.y < TOP_MARGIN) {
                     dPos.y = TOP_MARGIN;
                 }

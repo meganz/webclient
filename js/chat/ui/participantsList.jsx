@@ -199,7 +199,7 @@ var ParticipantsListInner = React.createClass({
                 var dropdowns = [];
                 var privilege = null;
 
-                var dropdownIconClasses = "small-icon tiny-icon grey-down-arrow";
+                var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
 
                 if (room.type === "group" && room.members && myPresence !== 'offline') {
                     var removeParticipantButton = null;

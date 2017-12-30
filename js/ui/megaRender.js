@@ -20,7 +20,7 @@
                     '<td width="100" class="size"></td>' +
                     '<td width="130" class="type"></td>' +
                     '<td width="120" class="time"></td>' +
-                    '<td width="90" class="grid-url-field own-data">' +
+                    '<td width="93" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
                         '<span class="versioning-indicator">' +
                             '<i class="small-icon icons-sprite grey-clock"></i>' +

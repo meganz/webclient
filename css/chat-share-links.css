@@ -84,8 +84,8 @@ a.shared-link.show-more {
 	float: none;
 	position: absolute;
 	z-index: 100;
-	top: 8px;
-	right: 8px;
+	bottom: 4px;
+	right: 4px;
 	margin: 0;
 }
 

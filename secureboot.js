@@ -1838,7 +1838,7 @@ else if (!b_u) {
     jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
-    jsl.push({f:'js/utils/pictools.js', n: 'js_utils_pictools_js', j: 1});
+    jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
     jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
@@ -2163,6 +2163,7 @@ else if (!b_u) {
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
+        'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},

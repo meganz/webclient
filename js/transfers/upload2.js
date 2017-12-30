@@ -716,6 +716,13 @@ var ulmanager = {
                 ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = h || ctx.target;
                 M.ulcomplete(ul_queue[ctx.ul_queue_num], h || false, ctx.faid);
             }
+            if (MediaInfoLib.isFileSupported(h)) {
+                var mp = MediaAttribute(M.d[h]).parse(ctx.file);
+                if (d) {
+                    mp.then(console.log.bind(console, 'MediaAttribute'))
+                        .catch(console.warn.bind(console, 'MediaAttribute'));
+                }
+            }
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;
             ulmanager.ulCompletePending(ctx.target);

@@ -200,6 +200,25 @@ function time2lastSeparator(dateString, refDate) {
     }
 }
 
+/**
+ * Calculate the number of days since the given date
+ * @param {String} dateStr The date string, in YYYY-MM-DD format
+ * @returns {Number} the number of days
+ */
+function daysSince(dateStr) {
+    'use strict';
+    return moment(new Date()).diff(moment(dateStr, 'YYYY-MM-DD'), 'days');
+}
+
+/**
+ * Calculate the number of days since Jan 1, 2000
+ * @returns {Number}
+ */
+function daysSince1Jan2000() {
+    'use strict';
+    return daysSince('2000-01-01');
+}
+
 //----------------------------------------------------------------------------
 /**
  * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>

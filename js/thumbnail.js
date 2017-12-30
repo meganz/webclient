@@ -1,8 +1,5 @@
-function createnodethumbnail(node, aes, id, imagedata, opt) {
-    storedattr[id] = {};
-    storedattr[id] = {
-        target: node
-    };
+function createnodethumbnail(node, aes, id, imagedata, opt, ph) {
+    storedattr[id] = Object.assign(Object.create(null), {'$ph': ph, target: node});
     createthumbnail(false, aes, id, imagedata, node, opt);
 }
 
@@ -46,6 +43,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var t = new Date().getTime();
         var n = M.d[node];
         var fa = '' + (n && n.fa);
+        var ph = Object(storedattr[id]).$ph;
         var dataURI;
         var canvas;
         var ctx;
@@ -125,7 +123,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 ab = dataURLToAB(dataURI);
 
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
+                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
             if (node) {
@@ -134,7 +132,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
 
         // preview image:
-        if ((fa.indexOf(':1*') < 0 || onPreviewRetry) && !isVideo) {
+        if (fa.indexOf(':1*') < 0 || onPreviewRetry) {
             canvas = document.createElement('canvas');
             var preview_x = this.width,
                 preview_y = this.height;
@@ -164,10 +162,10 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     console.log('Storing preview...', n);
                 }
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
+                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
-            if (node && filetype(n) !== 'PDF Document') {
+            if (node && filetype(n) !== 'PDF Document' && !is_video(n)) {
                 previewimg(node, ab);
             }
 
@@ -345,7 +343,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             };
             if (!file) {
                 var defMime = 'image/jpeg';
-                var curMime = is_video(M.d[node]) ? defMime : filemime(M.d[node], defMime);
+                var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
                 M.neuterArrayBuffer(imagedata);
             }

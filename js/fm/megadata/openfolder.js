@@ -115,7 +115,9 @@
             }
             else {
                 for (var i = this.v.length; i--;) {
-                    if (is_image(this.v[i])) {
+                    var n = this.v[i];
+
+                    if (String(n.fa).indexOf('0*') > 0 || is_image(n) || is_video(n)) {
                         viewmode = 1;
                         break;
                     }

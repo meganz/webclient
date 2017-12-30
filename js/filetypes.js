@@ -557,7 +557,7 @@ function fileext(name) {
     else {
         ext = ext
             .replace(/<[^>]*>/g, '')
-            .replace(/\W+/g, '');
+            .replace(/[^\w+]/g, '');
 
         if (ext.length > 9) {
             ext = ext.substr(0, 9);

@@ -173,3 +173,26 @@
 .thumb .data-block-indicators {
     background-color: rgba(255,255,255,0.4);
 }
+
+.video-thumb-details {
+    font-size: 12px;
+    line-height: 20px;
+    color: #666666;
+    width: 100%;
+    bottom: 0;
+    padding: 2px 0;
+    position: absolute;
+    text-align: left;
+    display: none;
+    background-color: rgba(255,255,255,0.4);
+}
+.data-block-bg.video .video-thumb-details {
+    display: block;
+}
+.video-thumb-details i {
+    margin: 0 0 0 2px;
+}
+.video.thumb .data-block-indicators, .video.thumb .video-thumb-details {
+    background-color: rgba(0,0,0,0.4);
+    color: white;
+}

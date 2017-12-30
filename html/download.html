@@ -57,71 +57,169 @@
             <div class="bottom-page horizontal-centered-bl">
 
                 <div class="download main-pad">
+                    <div class="download transfer-wrapper">
+                        <!-- Video block !-->
+                        <div class="download video-block">
+                             <video id="video" controls preload="metadata" poster="" data-autoplayvideo="false"  data-playvideoonclick="false"></video>
+                            
+                            <div class="viewer-pending hidden">
+                                <div class="bounce1"></div>
+                                <div class="bounce2"></div>
+                                <div class="bounce3"></div>
+                            </div>
 
-                    <div class="download info-block">
-                        <div class="download file-icon-wrap">
-                            <div class="download file-map">
-                                <div class="block-view-file-type"></div>
+                            <div class="viewer-bottom-bl">
+                                <div id="video-controls" class="video-controls" data-state="hidden">
+                                    <div data-state="play" class="viewer-button left playpause">
+                                        <i class="medium-icon icons-img pause"></i>
+                                    </div>
+                                    <div class="volume-control left">
+                                        <div data-state="mute" class="viewer-button mute">
+                                            <i class="medium-icon icons-img volume"></i>
+                                        </div>
+                                        <div class="video-vol-range">
+                                            <div class="volume-bar"><span></span></div>
+                                        </div>
+                                    </div>
+                                    <div class="video-timing current left">
+                                        00:00
+                                    </div>
+                                    <div data-state="go-fullscreen" class="viewer-button right fs">
+                                        <i class="medium-icon icons-img fullscreen"></i>
+                                    </div>
+                                    <div class="video-timing duration right">
+                                        00:00
+                                    </div>
+                                    <div class="video-progress-block">
+                                        <div class="video-progress-bar">
+                                            <div class="video-time-bar"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="download play-video-button"></div>
+                         </div>
+                        <div class="download info-block">
+                            <div class="download file-icon-wrap">
+                                <div class="download file-map">
+                                    <div class="block-view-file-type"></div>
+                                </div>
+                            </div>
+                            <div class="download thumb-block">
+                                <img alt="" scr="">
+                            </div>
+
+                            <div class="download file-info">
+                                <div class="download info-txt big-txt">
+                                    <span class="filename"></span>
+                                    <span class="extension"></span>
+                                </div>
+                                <div class="download info-txt small-txt"></div>
+
+                                <div class="download transfer-buttons">
+                                    <a class="default-white-button small img-preview-button inline hidden">
+                                        <i class="semi-small-icon icons-sprite lens"></i>
+                                        <span>[$16274]</span>
+                                    </a>
+                                    <a class="default-white-button small grey-txt inline pause-transfer">
+                                        <i class="semi-small-icon icons-sprite pause"></i>
+                                        <span>[$9112]</span>
+                                    </a>
+                                    <a class="default-white-button small grey-txt inline retry-transfer hidden">
+                                        <i class="semi-small-icon icons-sprite grey-down-arrow"></i>
+                                        <span>[$1364]</span>
+                                    </a>
+                                    <a class="default-white-button small grey-txt create-account-button inline hidden">
+                                        [$16352]
+                                    </a>
+                                    <a class="default-white-button small grey-txt get-more-bonuses inline hidden">
+                                        [$16309]
+                                    </a>
+                                    <a class="default-grey-button small see-our-plans inline hidden">
+                                        [$16353]
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+
+                        <div class="download progress-block progress-resume hidden">
+                            <div class="download progress-bar"></div>
+                        </div>
+
+                        <div class="download state-text resume hidden">
+                            <span>[$17081]</span>
+                        </div>
+
+                        <div class="download state-text save hidden">
+                            <i class="semi-small-icon icons-sprite green-tick"></i>
+                            <span>[$17082]</span>
+                        </div>
+
+                        <div class="video-mode-wrapper">
+                            <div class="download checkbox-bl">
+                                <div class="checkdiv megaapp-download checkboxOff">
+                                    <input type="checkbox" name="megaapp-download" id="megaapp-download" class="checkboxOff">
+                                </div>
+                                <label for="megaapp-download" class="radio-txt">[$16671]</label>
+                                <div class="clear"></div>
+                                <a href="https://mega.nz/sync" class="small-red-link" target="_blank" rel="noopener noreferrer">
+                                    [$8742]
+                                    <i></i>
+                                </a>
+                            </div>
+
+                            <div class="download buttons-block">
+                                <div class="download big-button download-file red transition">
+                                    <i class="medium-icon icons-sprite download"></i>
+                                    <span>[$58]</span>
+                                </div>
+                                <div class="download big-button to-clouddrive transition">
+                                    <span>[$8752]</span>
+                                </div>
+                                <div class="clear"></div>
                             </div>
                         </div>
-                        <div class="download thumb-block">
-                            <img alt="" scr="">
-                        </div>
-                        <div class="download file-info">
-                            <span class="download info-txt big-txt filename"></span>
-                            <div class="download info-txt small-txt"></div>
 
-                            <div class="download transfer-buttons">
-                                <a class="default-white-button small img-preview-button inline hidden">
-                                    <i class="semi-small-icon icons-sprite lens"></i>
-                                    <span>[$16274]</span>
-                                </a>
-                                <a class="default-white-button small grey-txt inline pause-transfer">
-                                    <i class="semi-small-icon icons-sprite pause"></i>
-                                    <span>[$9112]</span>
-                                </a>
-                                <a class="default-white-button small grey-txt inline retry-transfer hidden">
-                                    <i class="semi-small-icon icons-sprite grey-down-arrow"></i>
-                                    <span>[$1364]</span>
-                                </a>
-                                <a class="default-white-button small grey-txt create-account-button inline hidden">
-                                    [$16352]
-                                </a>
-                                <a class="default-white-button small grey-txt get-more-bonuses inline hidden">
-                                    [$16309]
-                                </a>
-                                <a class="default-grey-button small see-our-plans inline hidden">
-                                    [$16353]
-                                </a>
+
+                        <div class="download in-progress">
+                            <a class="default-white-button pause-transfer square">
+                                <i class="semi-small-icon icons-sprite pause"></i>
+                            </a>
+
+                            <div class="download progress-block">
+                                <div class="download progress-bar"></div>
                             </div>
-                        </div>
-                        <div class="clear"></div>
-                    </div>
 
-                    <div class="download progress-block progress-resume hidden">
-                        <div class="download progress-bar"></div>
-                    </div>
-                    
-                    <div class="download state-text resume hidden">
-                        <span>[$17081]</span>
-                    </div>
-                    
-                    <div class="download state-text save hidden">
-                        <i class="semi-small-icon icons-sprite green-tick"></i>
-                        <span>[$17082]</span>
-                    </div>
+                            <div class="download main-transfer-info">
+                                    <span class="download speed-block left">
+                                        <i class="small-icon icons-sprite red-down-arrow"></i>
+                                        <span class="dark-numbers"></span>
+                                        <span class="light-txt"></span>
+                                    </span>
+                                <span class="download eta-block right">
+                                        <i class="small-icon clock"></i>
+                                        <span class="dark-numbers"></span>
+                                        <span class="light-txt small"></span>
+                                    </span>
 
-                    <div class="download buttons-block">
-                        <div class="download big-button download-file red transition">
-                            <i class="medium-icon icons-sprite download"></i>
-                            <span>[$58]</span>
-                        </div>
-                        <div class="download big-button to-clouddrive transition">
-                            <span>[$8752]</span>
-                        </div>
-                        <div class="clear"></div>
-                    </div>
+                                <span class="download complete-block">
+                                        <i class="semi-small-icon icons-sprite green-tick"></i>
+                                        <span class="dark-numbers">[$1418]</span>
+                                    </span>
 
+                                <div class="clear"></div>
+                            </div>
+
+                            <div class="download error-text main-transfer-error hidden">
+                                <i class="semi-small-icon icons-sprite red-cross"></i>
+                                <span>[$233]</span>
+                            </div>
+
+                            <div class="clear"></div>
+                        </div>
+                    </div>
                     <div class="download checkbox-bl">
                         <div class="checkdiv megaapp-download checkboxOff">
                             <input type="checkbox" name="megaapp-download" id="megaapp-download" class="checkboxOff">
@@ -137,38 +235,7 @@
                     <div class="download error-text message hidden">
                         [$7154]
                     </div>
-                    <div class="download in-progress">
-                        <div class="download progress-block">
-                            <div class="download progress-bar"></div>
-                        </div>
 
-                        <div class="download main-transfer-info">
-                                <span class="download speed-block left">
-                                    <i class="small-icon icons-sprite red-down-arrow"></i>
-                                    <span class="dark-numbers"></span>
-                                    <span class="light-txt"></span>
-                                </span>
-                            <span class="download eta-block right">
-                                    <i class="small-icon clock"></i>
-                                    <span class="dark-numbers"></span>
-                                    <span class="light-txt small"></span>
-                                </span>
-
-                            <span class="download complete-block">
-                                    <i class="semi-small-icon icons-sprite green-tick"></i>
-                                    <span class="dark-numbers">[$1418]</span>
-                                </span>
-
-                            <div class="clear"></div>
-                        </div>
-
-                        <div class="download error-text main-transfer-error hidden">
-                            <i class="semi-small-icon icons-sprite red-cross"></i>
-                            <span>[$233]</span>
-                        </div>
-
-                        <div class="clear"></div>
-                    </div>
                     <div class="download some-reason">
                         <div class="download error-title">[$243]</div>
                         <div class="download error-text">[$244]</div>
@@ -195,6 +262,7 @@
                 <!-- Please Change text according browser !-->
                 <span>[$16866]</span>
             </div>
+            <div class="warning-back"></div>
             ((PAGESMENU))
         </div>
     </div>

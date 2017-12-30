@@ -158,8 +158,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     items['.clearprevious-versions'] = 1;
                 }
             }
-            if (is_image(selNode) || is_video(selNode)) {
+            if (is_image(selNode)) {
                 items['.preview-item'] = 1;
+            }
+            else if (is_video(selNode)) {
+                items['.play-item'] = 1;
             }
         }
 

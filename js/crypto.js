@@ -834,6 +834,67 @@ var crypt = (function () {
     return ns;
 }());
 
+var xxtea = (function() {
+    'use strict';
+
+    // (from https://github.com/xxtea/xxtea-js/blob/master/src/xxtea.js)
+    var DELTA = 0x9E3779B9;
+    var ns = Object.create(null);
+
+    var int32 = function(i) {
+        return i & 0xFFFFFFFF;
+    };
+
+    var mx = function(sum, y, z, p, e, k) {
+        return (z >>> 5 ^ y << 2) + (y >>> 3 ^ z << 4) ^ (sum ^ y) + (k[p & 3 ^ e] ^ z);
+    };
+
+    ns.encryptUint32Array = function encryptUint32Array(v, k) {
+        var length = v.length;
+        var n = length - 1;
+        var y;
+        var z = v[n];
+        var sum = 0;
+        var e;
+        var p;
+        var q;
+        for (q = Math.floor(6 + 52 / length) | 0; q > 0; --q) {
+            sum = int32(sum + DELTA);
+            e = sum >>> 2 & 3;
+            for (p = 0; p < n; ++p) {
+                y = v[p + 1];
+                z = v[p] = int32(v[p] + mx(sum, y, z, p, e, k));
+            }
+            y = v[0];
+            z = v[n] = int32(v[n] + mx(sum, y, z, n, e, k));
+        }
+        return v;
+    };
+
+    ns.decryptUint32Array = function decryptUint32Array(v, k) {
+        var length = v.length;
+        var n = length - 1;
+        var y = v[0];
+        var z;
+        var sum;
+        var e;
+        var p;
+        var q = Math.floor(6 + 52 / length);
+        for (sum = int32(q * DELTA); sum !== 0; sum = int32(sum - DELTA)) {
+            e = sum >>> 2 & 3;
+            for (p = n; p > 0; --p) {
+                z = v[p - 1];
+                y = v[p] = int32(v[p] - mx(sum, y, z, p, e, k));
+            }
+            z = v[n];
+            y = v[0] = int32(v[0] - mx(sum, y, z, 0, e, k));
+        }
+        return v;
+    };
+
+    return Object.freeze(ns);
+}());
+
 window.URL = window.URL || window.webkitURL;
 
 var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
@@ -1465,7 +1526,7 @@ function api_proc(q) {
                     api_proc(this.q);
                 }
                 else {
-                    if (ev.type === 'error') {
+                    if (ev && ev.type === 'error') {
                         if (logger) {
                             logger.debug("API request error - retrying");
                         }
@@ -2617,7 +2678,7 @@ var faxhrfail = Object.create(null);
 var faxhrlastgood = Object.create(null);
 
 // data.byteLength & 15 must be 0
-function api_storefileattr(id, type, key, data, ctx) {
+function api_storefileattr(id, type, key, data, ctx, ph) {
     var handle = typeof ctx === 'string' && ctx;
 
     if (typeof ctx !== 'object') {
@@ -2630,11 +2691,12 @@ function api_storefileattr(id, type, key, data, ctx) {
         }
 
         ctx = {
-            callback: api_fareq,
             id: id,
+            ph: ph,
             type: type,
             data: data,
             handle: handle,
+            callback: api_fareq,
             startTime: Date.now()
         };
     }
@@ -2647,6 +2709,9 @@ function api_storefileattr(id, type, key, data, ctx) {
 
     if (M.d[ctx.handle] && M.getNodeRights(ctx.handle) > 1) {
         req.h = handle;
+    }
+    else if (ctx.ph) {
+        req.ph = ctx.ph;
     }
 
     api_req(req, ctx, pfid ? 1 : 0);
@@ -3341,7 +3406,7 @@ function api_getfa(id) {
 
     if (storedattr[id]) {
         for (var type in storedattr[id]) {
-            if (type !== 'target') {
+            if (type !== 'target' && type !== '$ph') {
                 f.push(type + '*' + storedattr[id][type]);
             }
         }
@@ -3354,12 +3419,23 @@ function api_getfa(id) {
 function api_attachfileattr(node, id) {
     'use strict';
 
+    var ph = Object(storedattr[id])['$ph'];
     var fa = api_getfa(id);
 
     storedattr[id].target = node;
 
     if (fa) {
-        M.req({a: 'pfa', n: node, fa: fa})
+        var req = {a: 'pfa', fa: fa};
+
+        if (ph) {
+            req.ph = ph;
+            storedattr[id]['$ph'] = ph;
+        }
+        else {
+            req.n = node;
+        }
+
+        M.req(req)
             .fail(function(res) {
                 if (res === EACCESS) {
                     api_pfaerror(node);

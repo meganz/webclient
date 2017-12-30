@@ -554,10 +554,22 @@
         background-position: -95px -580px;
 }
 .medium-icon.icons-img.lowscreen {
-        background-position: -141px -580px;
+    background-position: -141px -580px;
 }
 .medium-icon.icons-img.refresh {
-            background-position: -237px -347px;
+    background-position: -237px -347px;
+}
+.medium-icon.icons-img.volume {
+    background-position: -222px -777px;
+}
+.medium-icon.icons-img.volume-muted {
+    background-position: -222px -741px;
+}
+.medium-icon.icons-img.play {
+    background-position: -42px -537px;
+}
+.medium-icon.icons-img.pause {
+    background-position: -93px -630px;
 }
 .huge-white-icon.achievement {
     background-image: url(../images/mega/account-sprite_v4.png);
@@ -810,6 +822,9 @@
 }
 .small-icon.small-play-icon {
     background-image: url(../images/mega/icons-sprite_v13.png);
+    background-position: -148px -634px;
+}
+.thumb .small-icon.small-play-icon {
     background-position: -188px -634px;
 }
 /* Context menu icons */

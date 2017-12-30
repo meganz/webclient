@@ -6247,6 +6247,10 @@
         "text": "View Image",
         "context": "The title of a button which allows the user to open the image in the media \/ image viewer."
     },
+    "16275": {
+        "text": "Play Video",
+        "context": "The title of a button which allows the user to open the video in a media \/ video player."
+    },
     "16277": {
         "text": "Create your free account and get %1 of complimentary storage space, valid for %2 days.",
         "context": "%1 would be replaced with the amount and %2 would be replaced with a numeric value"

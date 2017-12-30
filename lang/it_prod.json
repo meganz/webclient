@@ -1561,6 +1561,7 @@
     "16272": "Strumento di trasferimento",
     "16273": "Mostra automaticamente il popup dei trasferimenti quando un trasferimento \u00e8 attivo.",
     "16274": "Visualizza immagine",
+    "16275": "Riproduci video",
     "16277": "Crea il tuo account gratuito ed ottieni %1 di spazio di archiviazione aggiuntivo, valido per %2 giorni.",
     "16278": "Installa MEGAsync",
     "16279": "Quando installi MEGAsync ottieni %1 di spazio aggiuntivo pi\u00f9 %2 di quota di trasferimento, entrambi validi per %3 giorni. Forniamo MEGAsync per Windows, macOS e Linux.                ",
@@ -1915,6 +1916,6 @@
     "17602": "La versione corrente del file verr\u00e0 rimpiazzata con il file che stai caricando.",
     "17617": "Crea cartella",
     "17618": "CARICA UN ALTRO FILE",
-    "17619": "MEGAdrop URL was successfully copied to clipboard.",
-    "17620": "MEGAdrop source code was successfully copied to clipboard."
+    "17619": "L'URL di MEGAdrop \u00e8 stato copiato con successo negli appunti.",
+    "17620": "Il codice sorgente di MEGAdrop \u00e8 stato copiato con successo negli appunti."
 }

@@ -1561,6 +1561,7 @@
     "16272": "Aktarma ipu\u00e7lar\u0131:",
     "16273": "Herhangi bir aktarma a\u00e7\u0131k iken aktarma ipu\u00e7lar\u0131n\u0131 g\u00f6ster.",
     "16274": "G\u00f6r\u00fcnt\u00fcy\u00fc g\u00f6ster",
+    "16275": "Video'yu oynat",
     "16277": "\u00dccretsiz hesap olu\u015fturun ve %2 g\u00fcn ge\u00e7erli %1 depolama alan\u0131 kazan\u0131n.",
     "16278": "MEGAsync y\u00fckle",
     "16279": " MEGAsync y\u00fckledi\u011finde ikisi de %3 g\u00fcn boyunca ge\u00e7erli %1 \u00fccretsiz depolama alan\u0131 ve %2 aktarma birimi kazanacaks\u0131n. MEGAsync Windows, macOS ve pek \u00e7ok Linux s\u00fcr\u00fcm\u00fcyle uyumludur.                 ",
@@ -1915,6 +1916,6 @@
     "17602": "Dosyan\u0131n ge\u00e7erli s\u00fcr\u00fcm\u00fc, y\u00fcklemekte oldu\u011funuz dosyayla de\u011fi\u015ftirilir.",
     "17617": "Klas\u00f6r Olu\u015ftur",
     "17618": "BA\u015eKA B\u0130R DOSYA Y\u00dcKLEY\u0130N",
-    "17619": "MEGAdrop URL was successfully copied to clipboard.",
-    "17620": "MEGAdrop source code was successfully copied to clipboard."
+    "17619": "MEGAdrop URL'si ba\u015far\u0131yla panoya kopyaland\u0131.",
+    "17620": "MEGAdrop kaynak kodu ba\u015far\u0131yla panoya kopyaland\u0131."
 }

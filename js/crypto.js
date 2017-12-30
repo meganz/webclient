@@ -2678,7 +2678,7 @@ var faxhrfail = Object.create(null);
 var faxhrlastgood = Object.create(null);
 
 // data.byteLength & 15 must be 0
-function api_storefileattr(id, type, key, data, ctx) {
+function api_storefileattr(id, type, key, data, ctx, ph) {
     var handle = typeof ctx === 'string' && ctx;
 
     if (typeof ctx !== 'object') {
@@ -2691,11 +2691,12 @@ function api_storefileattr(id, type, key, data, ctx) {
         }
 
         ctx = {
-            callback: api_fareq,
             id: id,
+            ph: ph,
             type: type,
             data: data,
             handle: handle,
+            callback: api_fareq,
             startTime: Date.now()
         };
     }
@@ -2708,6 +2709,9 @@ function api_storefileattr(id, type, key, data, ctx) {
 
     if (M.d[ctx.handle] && M.getNodeRights(ctx.handle) > 1) {
         req.h = handle;
+    }
+    else if (ctx.ph) {
+        req.ph = ctx.ph;
     }
 
     api_req(req, ctx, pfid ? 1 : 0);

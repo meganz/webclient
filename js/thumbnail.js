@@ -43,6 +43,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var t = new Date().getTime();
         var n = M.d[node];
         var fa = '' + (n && n.fa);
+        var ph = Object(storedattr[id]).$ph;
         var dataURI;
         var canvas;
         var ctx;
@@ -122,7 +123,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 ab = dataURLToAB(dataURI);
 
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
+                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
             if (node) {
@@ -161,7 +162,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     console.log('Storing preview...', n);
                 }
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
+                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
             if (node && filetype(n) !== 'PDF Document' && !is_video(n)) {

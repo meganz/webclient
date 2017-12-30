@@ -2436,7 +2436,7 @@ function process_f(f, cb, updateVersioning) {
             if (updateVersioning) {
                 M.d[n.h].fv = 1;
             }
-            ufsc.addNode(n);
+            ufsc.addNode(M.d[n.h]);
         }
 
         if (cb) {

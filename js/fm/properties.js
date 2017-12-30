@@ -322,8 +322,10 @@
             + singlenodeinfohtml
             + '<div class="properties-float-bl">'
             + '<div class="properties-small-gray">' + p.t8
-            + '</div><div class="propreties-dark-txt contact-list">' + p.t9
-            + '<div class="contact-list-icon"></div></div></div>'
+            + '</div><div class="propreties-dark-txt contact-list">'
+            + '<div class="contact-list-icon"></div>'
+            + p.t9
+            + '</div></div>'
             + shareinfohtml;
 
         $('.properties-txt-pad').html(html);

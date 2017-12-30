@@ -314,7 +314,12 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         // Add events for all buttons
         $playpause.rebind('click', function() {
             if (videoElement.paused || videoElement.ended) {
-                videoElement.play();
+                if (dlmanager.isOverQuota) {
+                    dlmanager.showOverQuotaDialog();
+                }
+                else {
+                    streamer.play();
+                }
             }
             else {
                 videoElement.pause();
@@ -421,7 +426,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 timeDrag = false;
                 updatebar(e.pageX);
                 if (streamer._events.indexOf('seeking') < 0) {
-                    videoElement.play();
+                    streamer.play();
                 }
             }
         });

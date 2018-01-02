@@ -425,7 +425,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             if (timeDrag) {
                 timeDrag = false;
                 updatebar(e.pageX);
-                if (streamer._events.indexOf('seeking') < 0) {
+                if (!streamer.WILL_AUTOPLAY_ONSEEK) {
                     streamer.play();
                 }
             }
@@ -576,10 +576,10 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         s.on('error', function(ev, error) {
             // <video>'s element `error` handler
             if (!$.dialog) {
-                msgDialog('warninga', l[135], l[47], error.message || error);
+                msgDialog('warninga', l[135], l[47], error.name || error.message || error);
             }
             if (d) {
-                console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime);
+                console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime, error);
             }
             destroy();
 

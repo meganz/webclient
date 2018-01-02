@@ -920,7 +920,7 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
 
         M.xhr(request).done(function(ev, response) {
 
-            data.macs = [];
+            data.macs = {};
             data.writer = [];
 
             if (!data.nonce) {

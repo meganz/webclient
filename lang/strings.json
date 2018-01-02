@@ -18047,6 +18047,10 @@
         "text": "Link error",
         "context": "The title of an error dialog while getting the sharing link of a file\/folder."
     },
+    "17565": {
+        "text": "The link cannot be managed, due to an unknown error received from server.",
+        "context": "An error message originating from the Manage Link dialog.\r\n"
+    },
     "17566": {
         "text": "Visit the Contacts tab to add or manage your contacts. [B]Invite your friends to MEGA[\/B] to allow you to [B]share[\/B] with them privately or [B]chat securely[\/B] using MEGAchat.",
         "context": "This text is shown to users who have two or more contacts."
@@ -18094,5 +18098,141 @@
     "17577": {
         "text": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu.",
         "context": "An onboarding tooltip message which is shown only once along with all other onboarding tips and only when the user doesn't have any shared folders."
+    },
+    "17578": {
+        "text": "There is already a file with the same name",
+        "context": "A tooltip message which shows when a file name is duplicated during renaming."
+    },
+    "17579": {
+        "text": "There is already a folder with the same name",
+        "context": "A tooltip message which is shown when a folder name is duplicated during renaming or creation."
+    },
+    "17580": {
+        "text": "View file versioning settings",
+        "context": "Title of the button to view settings for file versioning."
+    },
+    "17581": {
+        "text": "You are about to delete the version histories of all files. Please note that the current files will not be deleted. Would you like to proceed?",
+        "context": "A warning message to warn the user that they are about to delete all previous versions of all files."
+    },
+    "17582": {
+        "text": "You have [X1] file versions, taking up a total of [X2].\r\n",
+        "context": "A message to summarise the total number of file versions (X1) and total storage usage (X2) of the versioned files. Please keep the placeholders [X1] and [X2] as they will be replaced at runtime."
+    },
+    "17583": {
+        "text": "MEGA requires access to your photo library to add photos and videos to your device gallery",
+        "context": "This is a description of why write-only access to the user\u2019s photo library is required. To protect user privacy, Apple requires a purpose or explanation of why this functionality will be accessed."
+    },
+    "17584": {
+        "text": "Current Plan:",
+        "context": "Text shown on the upgrade account page above the current PRO plan subscription"
+    },
+    "17585": {
+        "text": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+        "context": "An alert message shown in case the user has an active subscription and is in the process of buying a higher plan (i.e. a higher level PRO account)."
+    },
+    "17587": {
+        "text": "Invite Contact",
+        "context": "Text shown when the user tries to make a call and the receiver is not a contact"
+    },
+    "17588": {
+        "text": "Invite Sent",
+        "context": "Text shown when the user sends a contact invitation"
+    },
+    "17589": {
+        "text": "Later",
+        "context": "Button title to allow the user postpone an action"
+    },
+    "17590": {
+        "text": "by %1",
+        "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
+    },
+    "17595": {
+        "text": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
+        "context": "A confirmation message when the user chooses to disable file versioning."
+    },
+    "17596": {
+        "text": "Enable or disable file versioning for your entire account:",
+        "context": "Title of the file versioning setting."
+    },
+    "17597": {
+        "text": "You may still receive file versions from shared folders if your contacts have this enabled.",
+        "context": "A note about file versioning in the file versioning settings area."
+    },
+    "17598": {
+        "text": "Delete all file versions:",
+        "context": "The title of the section about deleting file versions in the settings."
+    },
+    "17599": {
+        "text": "Delete all",
+        "context": "Text of a button which deletes all historical versions of files in the user's entire account."
+    },
+    "17600": {
+        "text": "This will permanently delete all your own file versions. Any file version shared to you from a contact will need to be deleted by them.",
+        "context": "A warning note about deleting all file versions in the settings section."
+    },
+    "17601": {
+        "text": "Enabled",
+        "context": "The label of the toggle switch to indicate that file versioning is enabled."
+    },
+    "17602": {
+        "text": "The current version of the file will be replaced with the file you are uploading.",
+        "context": "A description in the duplicate items dialog below the Upload and replace title. This option allows the user to update an existing file in the folder by replacing the current version of the file with the file they are uploading."
+    },
+    "17608": {
+        "text": "Please enter a valid value",
+        "context": "Information message shown when user introduces an invalid value"
+    },
+    "17609": {
+        "text": "Disable file versioning",
+        "context": "Checkbox label to enable\/disable file versioning feature"
+    },
+    "17610": {
+        "text": "File versions size: %1",
+        "context": "A label to indicate the total file size which is taken up by file versions. Please keep the %1 placeholder as it will be replaced at runtime with the total size."
+    },
+    "17611": {
+        "text": "A local folder with a backup of files deleted in MEGA",
+        "context": "Tooltip shown when hover local debris label."
+    },
+    "17612": {
+        "text": "A folder in MEGA with a backup of files deleted in the local computer",
+        "context": "Tooltip shown when hover remote SyncDebris label."
+    },
+    "17613": {
+        "text": "Disabling file versioning will prevent the creation and storage of new file versions. Do you want to continue?",
+        "context": "Informative text shown when user is trying to disable file versioning before proceed."
+    },
+    "17614": {
+        "text": "Remove files older than %1 days",
+        "context": "Informative label to indicate that local cleaning scheduler is active and files older than %1 days will be removed. Keep %1 placeholder, it will be replaced with the value specified by the user at runtime"
+    },
+    "17615": {
+        "text": "Remove files older than 1 day",
+        "context": "Informative label to indicate that local cleaning scheduler is active and files older than 1 day will be removed."
+    },
+    "17616": {
+        "text": "You are about to permanently remove all file versions. Would you like to proceed?",
+        "context": "Informative text asking for confirmation when user is trying to remove all file versions of the actual account. This removes the backup versions of files, but does not remove the current file itself."
+    },
+    "17617": {
+        "text": "Create Folder",
+        "context": "The title of a dialog in the mobile webclient which lets the user create a new folder (directory) to be added to their Cloud Drive"
+    },
+    "17618": {
+        "text": "UPLOAD ANOTHER FILE",
+        "context": "A button label in the mobile webclient to upload an additional file after completing a file upload already."
+    },
+    "17619": {
+        "text": "MEGAdrop URL was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop URL was copied to the clipboard."
+    },
+    "17620": {
+        "text": "MEGAdrop source code was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop source code was copied to the clipboard."
+    },
+    "17621": {
+        "text": "Sync",
+        "context": "This is a new option in the right click context menu of a folder. The button will allow synchronisation of the folder with MEGAsync."
     }
 }

@@ -344,3 +344,6 @@
 .message pre.rtf-single, .message pre.rtf-multi {
     white-space: pre-wrap;
 }
+.message.content-area .buttons-block {
+    padding: 10px 0;
+}

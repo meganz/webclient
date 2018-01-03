@@ -2019,9 +2019,8 @@ var exportExpiry = {
             exportLink.getExportLink();
         };
 
-        // If they've already agreed to the copyright warning this session
-        if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
-
+        // If they've already agreed to the copyright warning (cws = copyright warning shown)
+        if (fmconfig.cws) {
             // Go straight to Get Link dialog
             openGetLinkDialog();
             return false;
@@ -2042,8 +2041,8 @@ var exportExpiry = {
 
             // User disagrees with copyright warning
             if (!$(this).hasClass('cancel')) {
-                // User agrees, store flag in localStorage so they don't see it again for this session
-                localStorage.setItem('agreedToCopyrightWarning', '1');
+                // User agrees, store flag so they don't see it again
+                mega.config.set('cws', 1);
 
                 // Go straight to Get Link dialog
                 openGetLinkDialog();

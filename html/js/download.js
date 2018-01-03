@@ -152,13 +152,13 @@ function dl_g(res) {
 
             var checkMegaSyncDownload = function() {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
-                $('#megaapp-download').prop('checked', true);
+                $('.checkdiv.megaapp-download input').prop('checked', true);
                 $('.download.big-button.download-file span').text(l[58]);
                 $('.download.big-button.download-file i').removeClass('save resume');
             };
             var uncheckMegaSyncDownload = function() {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
-                $('#megaapp-download').prop('checked', false);
+                $('.checkdiv.megaapp-download input').prop('checked', false);
                 var $but = $('.download.big-button.download-file span');
                 if (dlResumeInfo) {
                     if (dlResumeInfo.byteLength === fdl_filesize) {
@@ -247,8 +247,8 @@ function dl_g(res) {
                 });
             });
 
-            $('#megaapp-download').rebind('change', function() {
-                if ($(this).prop("checked")) {
+            $('.checkdiv.megaapp-download input').change(function() {
+                if ($(this).prop('checked')) {
                     checkMegaSyncDownload();
                     delete localStorage.megaSyncDownloadUnchecked;
                 }
@@ -264,7 +264,7 @@ function dl_g(res) {
 
             $('.mid-button.download-file, .big-button.download-file, .mobile.dl-browser')
                 .rebind('click', function() {
-                    if ($('#megaapp-download').prop("checked")) {
+                    if ($('.checkdiv.megaapp-download input').prop('checked')) {
                         loadingDialog.show();
                         megasync.isInstalled(function(err, is) {
                             loadingDialog.hide();

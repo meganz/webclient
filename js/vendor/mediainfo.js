@@ -7,7 +7,6 @@
     root.MediaInfo = factory();
   }
 }(this, function () {
-"use strict";
 var Module = function(Module) {
   Module = Module || {};
   var Module = Module;

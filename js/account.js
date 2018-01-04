@@ -246,7 +246,6 @@ function u_logout(logout) {
 
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
-        localStorage.removeItem('agreedToCopyrightWarning');
 
         fminitialized = false;
         if (typeof mDBcls === 'function') {
@@ -902,13 +901,17 @@ function processEmailChangeActionPacket(ap) {
     var moveLegacySettings = function() {
         var prefs = [
             'dl_maxSlots', 'ul_maxSlots', 'ul_maxSpeed', 'use_ssl',
-            'ul_skipIdentical', 'font_size', 'leftPaneWidth'
+            'ul_skipIdentical', 'font_size', 'leftPaneWidth', 'agreedToCopyrightWarning'
         ];
+        var replacements = {
+            'agreedToCopyrightWarning': 'cws'
+        };
 
         prefs.forEach(function(pref) {
             if (localStorage[pref] !== undefined) {
-                if (fmconfig[pref] === undefined) {
-                    mega.config.set(pref, parseInt(localStorage[pref]) | 0);
+                var p = replacements[pref] || pref;
+                if (fmconfig[p] === undefined) {
+                    mega.config.set(p, parseInt(localStorage[pref]) | 0);
                 }
             }
         });

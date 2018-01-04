@@ -219,6 +219,10 @@
                 p.t2 = htmlentities(l[8649]);
             }
 
+            if (page.substr(0, 7) === 'fm/chat') {
+                $dialog.addClass('hidden-context');
+            }
+
             p.t4 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
             p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
             p.t8 = p.t9 ? (l[896] + ':') : '';

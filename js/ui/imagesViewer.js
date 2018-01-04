@@ -419,7 +419,7 @@ var slideshowid;
 
                 M.require('videostream').done(function() {
                     if (preqs[n.h]) {
-                        slideshow_videostream(n, '.viewer-overlay');
+                        previewimg(n.h, Array(26).join('x'), filemime(n));
                     }
                 }).fail(function() {
                     console.error('Failed to load videostream.js');
@@ -443,19 +443,15 @@ var slideshowid;
     }
 
     // start streaming a video file
-    function slideshow_videostream(n, wrapper) {
-        var $wrapper = $(wrapper);
-
-        if ($wrapper.length < 0) {
-            $wrapper = $('video').parent();
+    function slideshow_videostream(id, $overlay) {
+        if (!$overlay || !$overlay.length) {
+            $overlay = $('video:visible').parent();
         }
+        var n = slideshow_node(id, $overlay);
 
-        dlmanager.setUserFlags();
-        previewimg(n.h, Array(26).join('x'), filemime(n));
-
-        $('.play-video-button', $wrapper).rebind('click', function() {
+        $('.play-video-button', $overlay).rebind('click', function() {
             var destroy = function() {
-                $wrapper.find('.viewer-pending').addClass('hidden').end().trigger('video-destroy');
+                $overlay.find('.viewer-pending').addClass('hidden').end().trigger('video-destroy');
 
                 if (preqs[n.h] && preqs[n.h] instanceof Streamer) {
                     mBroadcaster.removeListener(preqs[n.h].ev1);
@@ -463,7 +459,7 @@ var slideshowid;
                     mBroadcaster.removeListener(preqs[n.h].ev3);
 
                     preqs[n.h].destroy();
-                    preqs[n.h] = previews[n.h] = false;
+                    preqs[n.h] = false;
                 }
             };
 
@@ -472,11 +468,11 @@ var slideshowid;
             }
 
             // Show loading spinner until video is playing
-            $wrapper.find('.viewer-pending').removeClass('hidden');
-            $wrapper.addClass('video-theatre-mode')
+            $overlay.find('.viewer-pending').removeClass('hidden');
+            $overlay.addClass('video-theatre-mode')
                 .find('.viewer-image-bl').removeClass('default-state');
 
-            initVideoStream(n, $wrapper, destroy).done(function(streamer) {
+            initVideoStream(n, $overlay, destroy).done(function(streamer) {
                 preqs[n.h] = streamer;
 
                 preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
@@ -519,6 +515,56 @@ var slideshowid;
             });
         });
 
+        $overlay.addClass('video');
+        $overlay.find('.viewer-pending').addClass('hidden');
+        // $overlay.find('.viewer-progress').addClass('hidden');
+        $overlay.find('.viewer-image-bl img').addClass('hidden');
+        $overlay.find('.viewer-image-bl').addClass('default-state').removeClass('hidden');
+
+        if (n.name) {
+            var c = MediaAttribute.getCodecStrings(n);
+            if (c) {
+                $overlay.find('.viewer-filename').attr('title', c.join("/"));
+            }
+        }
+
+        var $video = $overlay.find('.viewer-image-bl video');
+        $video.attr('poster', '').attr('controls', false).removeClass('hidden');
+
+        if (previews[id].poster !== undefined) {
+            $video.attr('poster', previews[id].poster);
+
+            if (previews[id].poster) {
+                $overlay.find('.viewer-image-bl').removeClass('default-state');
+            }
+        }
+        else if (String(n.fa).indexOf('1*') > 0) {
+            api_getfileattr([{fa: M.d[id].fa, k: M.d[id].k}], 1, function(a, b, data) {
+                if (data !== 0xDEAD) {
+                    data = mObjectURL([data.buffer || data], 'image/jpeg');
+
+                    if (data) {
+                        previews[id].poster = data;
+
+                        if (id === slideshowid) {
+                            $video.attr('poster', data);
+                            $overlay.find('.viewer-image-bl').removeClass('default-state');
+                        }
+                    }
+                }
+            });
+        }
+        else {
+            $overlay.find('.viewer-image-bl').addClass('default-state');
+        }
+        previews[id].poster = previews[id].poster || '';
+
+        if ($.autoplay === id || page === 'download') {
+            onIdle(function() {
+                $('.play-video-button', $overlay).trigger('click');
+            });
+            delete $.autoplay;
+        }
     }
 
     function isThumbnailMissing(n) {
@@ -593,55 +639,7 @@ var slideshowid;
         }
 
         if (String(previews[id].type).startsWith('video')) {
-            $overlay.addClass('video');
-            $overlay.find('.viewer-pending').addClass('hidden');
-            // $overlay.find('.viewer-progress').addClass('hidden');
-            $overlay.find('.viewer-image-bl img').addClass('hidden');
-            $overlay.find('.viewer-image-bl').addClass('default-state').removeClass('hidden');
-
-            var $video = $overlay.find('.viewer-image-bl video');
-            $video.attr('poster', '').attr('controls', false).removeClass('hidden');
-
-            if ($.autoplay === id) {
-                onIdle(function() {
-                    $('.viewer-overlay .play-video-button').trigger('click');
-                });
-                delete $.autoplay;
-            }
-            else if (previews[id].poster !== undefined) {
-                $video.attr('poster', previews[id].poster);
-
-                if (previews[id].poster) {
-                    $overlay.find('.viewer-image-bl').removeClass('default-state');
-                }
-            }
-            else if (String(Object(M.d[id]).fa).indexOf('1*') > 0) {
-                api_getfileattr([{fa: M.d[id].fa, k: M.d[id].k}], 1, function(a, b, data) {
-                    if (data !== 0xDEAD) {
-                        data = mObjectURL([data.buffer || data], 'image/jpeg');
-
-                        if (data) {
-                            previews[id].poster = data;
-
-                            if (id === slideshowid) {
-                                $video.attr('poster', data);
-                                $overlay.find('.viewer-image-bl').removeClass('default-state');
-                            }
-                        }
-                    }
-                });
-            }
-            else if (page === 'download') {
-                // autoplay if no poster available
-                onIdle(function() {
-                    $('.viewer-overlay .play-video-button').trigger('click');
-                });
-            }
-            else {
-                $overlay.find('.viewer-image-bl').addClass('default-state');
-            }
-            previews[id].poster = previews[id].poster || '';
-            return;
+            return slideshow_videostream(id, $overlay);
         }
 
         var img = new Image();

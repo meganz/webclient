@@ -1,6 +1,6 @@
-function createnodethumbnail(node, aes, id, imagedata, opt, ph) {
+function createnodethumbnail(node, aes, id, imagedata, opt, ph, file) {
     storedattr[id] = Object.assign(Object.create(null), {'$ph': ph, target: node});
-    createthumbnail(false, aes, id, imagedata, node, opt);
+    createthumbnail(file || false, aes, id, imagedata, node, opt);
 }
 
 function createthumbnail(file, aes, id, imagedata, node, opt) {

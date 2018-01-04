@@ -9,9 +9,19 @@ function is_rawimage(name, ext) {
 function is_video(n) {
     'use strict';
 
+    if (window.safari) {
+        // TODO: add streaming support for Safari
+        return false;
+    }
+
+    if (String(n.fa).indexOf('8*') > 0) {
+        // check whether it's an *streamable* video
+        return MediaAttribute.getMediaType(n) === 1;
+    }
+
     var ext = String(n && n.name || n).split('.').pop().toUpperCase();
 
-    return !window.safari && is_video.ext[ext];
+    return is_video.ext[ext];
 }
 
 is_video.ext = {
@@ -602,6 +612,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
     global.initVideoStream = function(node, wrapper, destroy, options) {
         return new MegaPromise(function(resolve, reject) {
             M.require('videostream').tryCatch(function() {
+                dlmanager.setUserFlags();
                 resolve(_initVideoStream(node, wrapper, destroy, options));
             }, function(ex) {
                 msgDialog('warninga', l[135], l[47], ex);
@@ -1458,22 +1469,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 console.time('mediainfo:collect');
             }
 
-            var procnodes = [];
             var finish = function() {
-                for (var i = M.viewmode && procnodes.length; i--;) {
-                    var n = procnodes[i];
-
-                    if (n.p === M.currentdirid) {
-                        var h = n.h;
-                        n = MediaAttribute(M.d[h]).data;
-
-                        if (n.playtime) {
-                            $('#' + h)
-                                .find('.data-block-bg').addClass('video')
-                                .find('.video-thumb-details span').text(secondsToTimeShort(n.playtime));
-                        }
-                    }
-                }
                 if (d) {
                     console.debug('MediaInfo collect finished.');
                     console.timeEnd('mediainfo:collect');
@@ -1484,10 +1480,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             MediaInfoLib.collect(M.v)
                 .then(function(res) {
                     var pending = 0;
-                    var process = function(n) {
-                        if (n) {
-                            procnodes.push(n);
-                        }
+                    var process = function() {
                         if (--pending < 1) {
                             onIdle(finish);
                         }
@@ -1499,7 +1492,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                             if (d) {
                                 console.debug('MediaInfo submit successful', res, arguments);
                             }
-                            process(n);
+                            process();
                         }).catch(function() {
                             if (d) {
                                 console.warn('MediaInfo submit error...', res, arguments);
@@ -1627,30 +1620,103 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         });
     };
 
-    MediaAttribute.canPlayMedia = function(entry) {
-        var canPlayType = function(container, videocodec, audiocodec) {
-            switch (container) {
-                case 'mp42':
-                case 'isom':
-                case 'M4V ':
-                    if (videocodec === 'avc1') {
-                        var mime = 'video/mp4; codecs="avc1.640029';
+    /**
+     * Test a media attribute's decoded properties against MediaSource.isTypeSupported()
+     * @param {String} container
+     * @param {String} [videocodec]
+     * @param {String} [audiocodec]
+     * @returns {Number} 1: is video, 2: is audio, 0: not supported
+     */
+    MediaAttribute.isTypeSupported = function(container, videocodec, audiocodec) {
+        switch ('MediaSource' in window && container) {
+            case 'mp42':
+            case 'isom':
+            case 'M4V ':
+                if (videocodec === 'avc1') {
+                    var mime = 'video/mp4; codecs="avc1.640029';
 
-                        if (audiocodec) {
-                            if (String(audiocodec).startsWith('mp4a')) {
-                                audiocodec = audiocodec.replace(/-/g, '.');
-                            }
-
-                            mime += ', ' + audiocodec;
+                    if (audiocodec) {
+                        if (String(audiocodec).startsWith('mp4a')) {
+                            audiocodec = audiocodec.replace(/-/g, '.');
                         }
 
-                        return MediaSource.isTypeSupported(mime + '"');
+                        mime += ', ' + audiocodec;
                     }
+
+                    return MediaSource.isTypeSupported(mime + '"') ? 1 : 0;
+                }
+        }
+
+        return 0;
+    };
+
+    var mediaTypeCache = Object.create(null);
+
+    /**
+     * Check whether a node is streamable, this is basically a synchronous version of canPlayMedia()
+     * @param {MegaNode|Object} n The ufs-node
+     * @returns {Number} 1: is video, 2: is audio, 0: not supported
+     */
+    MediaAttribute.getMediaType = function(n) {
+        if (mediaTypeCache[n.h] === undefined) {
+            // we won't initialize an usual MediaAttribute instance to make this as
+            // lightweight as possible as used by is_video over a whole cloud folder contents.
+            var a = MediaAttribute.prototype.fromAttributeString(n.fa, n.k);
+            var r = 0;
+
+            if (a && a.shortformat !== 0xff) {
+                a = MediaAttribute.getCodecStrings(a);
+                r = MediaAttribute.isTypeSupported.apply(null, a);
             }
 
-            return false;
-        };
+            mediaTypeCache[n.h] = r;
+        }
 
+        return mediaTypeCache[n.h];
+    };
+
+    /**
+     * Retrieve codecs/format string from decoded media attributes
+     * @param {MegaNode|Object} a The decoded media attribute, or MegaNode
+     * @param {Object} [mc] The media codecs list
+     * @returns {Array|undefined}
+     */
+    MediaAttribute.getCodecStrings = function(a, mc) {
+        mc = mc || MediaInfoLib.avflist;
+
+        if (a instanceof MegaNode) {
+            a = MediaAttribute.prototype.fromAttributeString(a.fa, a.k);
+
+            if (!a || a.shortformat === 0xff) {
+                return;
+            }
+        }
+
+        if (mc) {
+            var container = mc.container.byIdx[a.container];
+            var videocodec = mc.video.byIdx[a.videocodec];
+            var audiocodec = mc.audio.byIdx[a.audiocodec];
+
+            if (a.shortformat) {
+                var fmt = String(mc.shortformat.byIdx[a.shortformat]).split(':');
+
+                container = fmt[0];
+                videocodec = fmt[1];
+                audiocodec = fmt[2];
+            }
+
+            return [container, videocodec, audiocodec];
+        }
+
+        delay('mc:missing', console.warn.bind(console, 'Media codecs list not loaded.'));
+    };
+
+    /**
+     * Check whether can play media..
+     * @param {MegaNode|Object} entry
+     * @returns {Promise}
+     */
+    MediaAttribute.canPlayMedia = function(entry) {
         return new Promise(function(resolve, reject) {
             entry = new MediaAttribute(entry);
 
@@ -1661,20 +1727,8 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
             MediaInfoLib.getMediaCodecsList()
                 .then(function(mc) {
-
-                    var container = mc.container.byIdx[mfa.container];
-                    var videocodec = mc.video.byIdx[mfa.videocodec];
-                    var audiocodec = mc.audio.byIdx[mfa.audiocodec];
-
-                    if (mfa.shortformat) {
-                        var fmt = String(mc.shortformat.byIdx[mfa.shortformat]).split(':');
-
-                        container = fmt[0];
-                        videocodec = fmt[1];
-                        audiocodec = fmt[2];
-                    }
-
-                    resolve(canPlayType(container, videocodec, audiocodec));
+                    mfa = MediaAttribute.getCodecStrings(mfa, mc);
+                    resolve(MediaAttribute.isTypeSupported.apply(null, mfa));
                 })
                 .catch(reject);
         });
@@ -1851,16 +1905,18 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 var n = M.d[req.n];
 
                 if (n) {
-                    if (n.fa) {
-                        n.fa += '/' + fa;
-                    }
-                    else {
-                        n.fa = fa;
-                    }
+                    n.fa = fa;
                     M.nodeUpdated(n);
-                }
 
-                resolve(fa);
+                    if (res.playtime && M.viewmode && n.p === M.currentdirid) {
+                        $('#' + n.h)
+                            .find('.data-block-bg').addClass('video')
+                            .find('.video-thumb-details span').text(secondsToTimeShort(res.playtime));
+                    }
+                }
+                self.fa = fa;
+
+                resolve(self);
             };
 
             M.req(req).tryCatch(success, reject);

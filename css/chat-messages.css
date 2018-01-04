@@ -110,6 +110,11 @@
     line-height: 0;
     color: #666666;
 }
+.message.content-area::after, .typingarea-componentedit-typing-area::after {
+    content: '';
+    display: block;
+    clear: both;
+}
 .message.content-area::before {
     content: '';
     display: block;
@@ -245,7 +250,7 @@
     vertical-align: top;
     color: #666666;
 }
-.message.shared-data {
+.message.shared-data, .typingarea-componentedit-typing-area {
     padding-bottom: 6px;
 }
 .not-sent.message.body:not(.retrying) {
@@ -345,5 +350,5 @@
     white-space: pre-wrap;
 }
 .message.content-area .buttons-block {
-    padding: 10px 0;
+    padding: 10px 0 6px 0;
 }

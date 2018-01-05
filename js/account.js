@@ -329,10 +329,20 @@ function u_setrsa(rsakey) {
                                 M.req({a: 'g', p: ph}).done(function(res) {
                                     if (typeof res.at === 'string') {
                                         M.onFileManagerReady(function() {
-                                            if (d) {
-                                                console.log('Importing Welcome PDF (%s)', ph, res.at);
+                                            var doit = true;
+                                            for (var i = M.v.length; i--;) {
+                                                if (fileext(M.v[i].name) === 'pdf') {
+                                                    doit = false;
+                                                    break;
+                                                }
                                             }
-                                            M.importFileLink(ph, key, res.at);
+
+                                            if (doit) {
+                                                if (d) {
+                                                    console.log('Importing Welcome PDF (%s)', ph, res.at);
+                                                }
+                                                M.importFileLink(ph, key, res.at);
+                                            }
                                         });
                                     }
                                 });

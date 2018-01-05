@@ -1,20 +1,11 @@
-function is_rawimage(name, ext) {
-    'use strict';
-
-    ext = ext || String(name).split('.').pop().toUpperCase();
-
-    return is_image.raw[ext] && ext;
+function isMediaSourceSupported() {
+    return 'MediaSource' in window && (!window.safari || d);
 }
 
 function is_video(n) {
     'use strict';
 
-    if (window.safari) {
-        // TODO: add streaming support for Safari
-        return false;
-    }
-
-    if (String(n.fa).indexOf(':8*') > 0) {
+    if (String(n && n.fa).indexOf(':8*') > 0) {
         // check whether it's an *streamable* video
         return MediaAttribute.getMediaType(n) === 1;
     }
@@ -33,6 +24,12 @@ if (d) {
     is_video.ext.MOV = 1;
 }
 
+if (!isMediaSourceSupported()) {
+    window.is_video = function() {
+        return false;
+    };
+}
+
 function is_image(name) {
     'use strict';
 
@@ -46,6 +43,14 @@ function is_image(name) {
     }
 
     return false;
+}
+
+function is_rawimage(name, ext) {
+    'use strict';
+
+    ext = ext || String(name).split('.').pop().toUpperCase();
+
+    return is_image.raw[ext] && ext;
 }
 
 is_image.def = {
@@ -400,15 +405,17 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             updateVolumeBar();
         });
 
+        var progressBarElementStyle = $progressBar.get(0).style;
+        var videoTimingElement = $wrapper.find('.video-timing.current').get(0);
+
         // As the video is playing, update the progress bar
         $video.rebind('timeupdate', function() {
             var currentPos = videoElement.currentTime;
             var maxduration = videoElement.duration;
             var percentage = 100 * currentPos / maxduration;
-            $progressBar.css('width', percentage + '%');
 
-            $wrapper.find('.video-timing.current')
-                .text(secondsToTimeShort(videoElement.currentTime, 1));
+            progressBarElementStyle.setProperty('width', percentage + '%');
+            videoTimingElement.textContent = secondsToTimeShort(videoElement.currentTime, 1);
         });
 
         $video.rebind('mousemove.idle', function() {
@@ -427,22 +434,29 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         var timeDrag = false;
         $progress.rebind('mousedown.videoprogress', function(e) {
             timeDrag = true;
-            videoElement.pause();
-            onIdle(updatebar.bind(0, e.pageX));
+
+            if (videoElement.currentTime) {
+                videoElement.pause();
+                onIdle(updatebar.bind(0, e.pageX));
+            }
         });
 
         $document.rebind('mouseup.videoprogress', function(e) {
             if (timeDrag) {
                 timeDrag = false;
-                updatebar(e.pageX);
-                if (!streamer.WILL_AUTOPLAY_ONSEEK) {
-                    streamer.play();
+
+                if (videoElement.currentTime) {
+                    updatebar(e.pageX);
+
+                    if (!streamer.WILL_AUTOPLAY_ONSEEK) {
+                        streamer.play();
+                    }
                 }
             }
         });
 
         $document.rebind('mousemove.videoprogress', function(e) {
-            if (timeDrag) {
+            if (timeDrag && videoElement.currentTime) {
                 updatebar(e.pageX);
             }
         });
@@ -508,18 +522,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             // If fullscreen mode is active...
             if (isFullScreen()) {
                 // ...exit fullscreen mode
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-                else if (document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
-                }
-                else if (document.webkitCancelFullScreen) {
-                    document.webkitCancelFullScreen();
-                }
-                else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
+                document.exitFullscreen();
 
                 $fullscreen.find('i').removeClass('lowscreen').addClass('fullscreen');
                 setFullscreenData(false);
@@ -560,7 +563,14 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             setFullscreenData(!!document.msFullscreenElement);
         });
 
-        $wrapper.rebind('video-destroy', function(ev) {
+        $wrapper.rebind('exit-fullscreen', function() {
+            if (isFullScreen()) {
+                $fullscreen.trigger('click');
+            }
+            return false;
+        });
+
+        $wrapper.rebind('video-destroy', function() {
             clearTimeout(timer);
             $wrapper.removeClass('mouse-idle');
             $video.unbind('mousemove.idle');
@@ -583,10 +593,54 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
         destroy = destroy || s.destroy.bind(s);
 
+        s.on('inactivity', function(ev) {
+            // Event invoked when the video becomes stalled, we'll show the loading/buffering spinner
+            if (d) {
+                console.debug(ev.type, ev);
+            }
+
+            var $pinner = $wrapper.find('.viewer-pending');
+            $pinner.removeClass('hidden');
+            $pinner.find('span').text(navigator.onLine === false ? 'No internet access.' : '');
+
+            if (this.file.overquota) {
+                var videoFile = this.file;
+
+                $wrapper.trigger('exit-fullscreen');
+                dlmanager.showOverQuotaDialog(function() {
+                    dlmanager.onNolongerOverquota();
+                    videoFile.flushRetryQueue();
+                });
+            }
+
+            return true; // continue listening
+        });
+
+        s.on('activity', function(ev) {
+            // Event invoked when the video is no longer stalled
+            if (d) {
+                console.debug(ev.type, ev);
+            }
+
+            var $pinner = $wrapper.find('.viewer-pending');
+            if (this.file.playing) {
+                // only hide the spinner if we are not in the initial loading state
+                $pinner.addClass('hidden');
+            }
+            $pinner.find('span').text('');
+
+            return true; // continue listening
+        });
+
         s.on('error', function(ev, error) {
             // <video>'s element `error` handler
             if (!$.dialog) {
-                msgDialog('warninga', l[135], l[47], error.name || error.message || error);
+                var hint = error.name || error.message || error;
+                if (!hint && !window.chrome) {
+                    // Suggest Chrome...
+                    hint = l[16151] + ' ' + l[242];
+                }
+                msgDialog('warninga', l[135], l[47], hint);
             }
             if (d) {
                 console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime, error);
@@ -1732,6 +1786,26 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 })
                 .catch(reject);
         });
+    };
+
+    MediaAttribute.test = function() {
+        var n = new MegaNode({
+            h: '876543x1',
+            fa: '470:8*COXwfdF5an8',
+            k: [-989750631, -795573481, -2084370882, 1515041341, -5120575, 233480270, -727919728, 1882664925]
+        });
+        var l = MediaInfoLib.avflist;
+        var a = new MediaAttribute(n);
+        var d = a.fromAttributeString();
+        var s = MediaAttribute.getCodecStrings(d);
+
+        console.log('MediaAttribute.test', s, d, a);
+
+        d.containerid = l.container[s[0]].idx;
+        d.vcodecid = l.video[s[1]].idx;
+        d.acodecid = l.audio[s[2]].idx;
+
+        console.log('MediaAttribute.test %s', a.toAttributeString(d) === n.fa.split(':')[1] ? 'OK' : 'FAILED');
     };
 
     /**

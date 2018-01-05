@@ -787,12 +787,12 @@ function accountUI() {
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
             $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
-            var firstName = String($('#account-firstname').val().trim());
-            var lastName = String($('#account-lastname').val().trim());
-            var bDay = String($('.default-select.day .default-dropdown-item.active').attr('data-value'));
-            var bMonth = String($('.default-select.month .default-dropdown-item.active').attr('data-value'));
-            var bYear = String($('.default-select.year .default-dropdown-item.active').attr('data-value'));
-            var country = String($('.default-select.country .default-dropdown-item.active').attr('data-value'));
+            var firstName = String($('#account-firstname').val() || '').trim();
+            var lastName = String($('#account-lastname').val() || '').trim();
+            var bDay = String($('.default-select.day .default-dropdown-item.active').attr('data-value') || '');
+            var bMonth = String($('.default-select.month .default-dropdown-item.active').attr('data-value') || '');
+            var bYear = String($('.default-select.year .default-dropdown-item.active').attr('data-value') || '');
+            var country = String($('.default-select.country .default-dropdown-item.active').attr('data-value') || '');
 
             // If any of user attributes is changed then update them
             if (u_attr.firstname !== firstName
@@ -801,22 +801,27 @@ function accountUI() {
                     || u_attr.birthmonth !== bMonth
                     || u_attr.birthyear !== bYear
                     || u_attr.country !== country) {
-                u_attr.firstname = firstName;
+                u_attr.firstname = firstName || 'Nobody';
                 u_attr.lastname = lastName;
                 u_attr.birthday = bDay;
                 u_attr.birthmonth = bMonth;
                 u_attr.birthyear = bYear;
                 u_attr.country = country;
 
-                api_req({
+                var req = {
                     a: 'up',
                     firstname: base64urlencode(to8(u_attr.firstname)),
-                    lastname: base64urlencode(to8(u_attr.lastname)),
-                    birthday: base64urlencode(u_attr.birthday),
-                    birthmonth: base64urlencode(u_attr.birthmonth),
-                    birthyear: base64urlencode(u_attr.birthyear),
-                    country: base64urlencode(u_attr.country)
-                }, {
+                    lastname: base64urlencode(to8(u_attr.lastname))
+                };
+                var opt = ["country", "birthyear", "birthmonth", "birthday"];
+                for (var i = opt.length; i--;) {
+                    var n = opt[i];
+                    if (u_attr[n]) {
+                        req[n] = base64urlencode(u_attr[n]);
+                    }
+                }
+
+                api_req(req, {
                     callback: function(res) {
                         if (res === u_handle) {
                             $('.user-name').text(u_attr.name);

@@ -723,7 +723,7 @@ var ulmanager = {
                 MediaAttribute(n).parse(file)
                     .then(function() {
                         // get thumb/prev created if it wasn't already, eg. an mp4 renamed as avi/mov/etc
-                        if (is_video(n) && String(n.fa).indexOf('0*') < 0) {
+                        if (is_video(n) && String(n.fa).indexOf(':0*') < 0) {
                             var aes = new sjcl.cipher.aes([
                                 n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
                             ]);

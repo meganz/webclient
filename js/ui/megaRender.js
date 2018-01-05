@@ -665,7 +665,7 @@
                     props.type = filetype(aNode.name);
                     props.size = bytesToSize(aNode.s);
 
-                    if (aNode.fa && aNode.fa.indexOf('8*') > 0) {
+                    if (aNode.fa && aNode.fa.indexOf(':8*') > 0) {
                         props.playtime = MediaAttribute(aNode).data.playtime;
                     }
                 }

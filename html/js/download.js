@@ -433,7 +433,7 @@ function dl_g(res) {
             if (res.fa) {
                 var promise = Promise.resolve();
 
-                if (String(res.fa).indexOf('8*') > 0) {
+                if (String(res.fa).indexOf(':8*') > 0) {
                     promise = MediaAttribute.canPlayMedia(dl_node);
                     prevBut = false;
                 }
@@ -499,7 +499,7 @@ function dl_g(res) {
                         $pageScrollBlock.find('.viewer-pending').removeClass('hidden');
 
                         vsp.then(function(stream) {
-                            if (String(res.fa).indexOf('0*') < 0 || String(res.fa).indexOf('1*') < 0) {
+                            if (String(res.fa).indexOf(':0*') < 0 || String(res.fa).indexOf(':1*') < 0) {
                                 // TODO: refactor this with similar code at imagesViewer.js
                                 var storeImage = function(ab) {
                                     var n = dl_node;

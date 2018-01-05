@@ -14,7 +14,7 @@ function is_video(n) {
         return false;
     }
 
-    if (String(n.fa).indexOf('8*') > 0) {
+    if (String(n.fa).indexOf(':8*') > 0) {
         // check whether it's an *streamable* video
         return MediaAttribute.getMediaType(n) === 1;
     }
@@ -1830,7 +1830,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         var r = null;
         attrs = attrs || this.fa;
         filekey = filekey || this.k;
-        var pos = String(attrs).indexOf('8*');
+        var pos = String(attrs).indexOf(':8*');
 
         if (pos >= 0) {
             var v = new Uint32Array(base64_to_ab(attrs.substr(pos + 2, 11)), 0, 2);
@@ -1860,7 +1860,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             }
 
             if (!(r.shortformat = v[7])) {
-                pos = attrs.indexOf('9*');
+                pos = attrs.indexOf(':9*');
 
                 if (pos >= 0) {
                     v = new Uint32Array(base64_to_ab(attrs.substr(pos + 2, 11)), 0, 2);

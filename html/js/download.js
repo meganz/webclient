@@ -433,7 +433,7 @@ function dl_g(res) {
             if (res.fa) {
                 var promise = Promise.resolve();
 
-                if (isVideo && String(res.fa).indexOf('8*') > 0) {
+                if (String(res.fa).indexOf('8*') > 0) {
                     promise = MediaAttribute.canPlayMedia(dl_node);
                     prevBut = false;
                 }
@@ -478,6 +478,11 @@ function dl_g(res) {
                             }
                         }
                     });
+
+                    var c = MediaAttribute.getCodecStrings(dl_node);
+                    if (c) {
+                        $fileinfoBlock.find('.big-txt').attr('title', filename + ' (' + c.join("/") + ')');
+                    }
 
                     var vsp = initVideoStream(dl_node, $pageScrollBlock, {autoplay: false});
 

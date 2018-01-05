@@ -717,11 +717,20 @@ var ulmanager = {
                 M.ulcomplete(ul_queue[ctx.ul_queue_num], h || false, ctx.faid);
             }
             if (MediaInfoLib.isFileSupported(h)) {
-                var mp = MediaAttribute(M.d[h]).parse(ctx.file);
-                if (d) {
-                    mp.then(console.log.bind(console, 'MediaAttribute'))
-                        .catch(console.warn.bind(console, 'MediaAttribute'));
-                }
+                var n = M.d[h];
+                var file = ctx.file;
+
+                MediaAttribute(n).parse(file)
+                    .then(function() {
+                        // get thumb/prev created if it wasn't already, eg. an mp4 renamed as avi/mov/etc
+                        if (is_video(n) && String(n.fa).indexOf('0*') < 0) {
+                            var aes = new sjcl.cipher.aes([
+                                n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
+                            ]);
+                            createnodethumbnail(n.h, aes, n.h, null, {isVideo: true}, null, file);
+                        }
+                    })
+                    .catch(console.warn.bind(console, 'MediaAttribute'));
             }
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;

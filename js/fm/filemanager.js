@@ -2664,6 +2664,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             M.openFolder(h);
         }
         else if (is_image(n) || is_video(n)) {
+            if (!is_image(n)) {
+                $.autoplay = h;
+            }
             slideshow(h);
         }
         else {

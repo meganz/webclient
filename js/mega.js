@@ -1843,6 +1843,7 @@ function worker_procmsg(ev) {
 // the FM DB engine (cf. mDB.js)
 var fmdb;
 var ufsc;
+var mclp;
 
 function loadfm(force) {
     "use strict";
@@ -1919,6 +1920,9 @@ function fetchfm(sn) {
 
     // Initialize ufs size cache
     ufsc = new UFSSizeCache();
+
+    // Get the media codecs list ready
+    mclp = MediaInfoLib.getMediaCodecsList();
 
     var promise;
     if (is_mobile) {
@@ -3194,7 +3198,7 @@ function loadfm_done(mDBload) {
         watchdog.notify('loadfm_done');
     };
 
-    mega.config.ready(function() {
+    var _onConfigReady = function() {
         var promise = MegaPromise.resolve();
 
         mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
@@ -3220,7 +3224,12 @@ function loadfm_done(mDBload) {
             mega.loadReport.renderfm = -1;
         }
 
+        mclp = null;
         promise.always(_completion);
+    };
+
+    mega.config.ready(function() {
+        mclp.then(_onConfigReady).catch(_onConfigReady);
     });
 }
 

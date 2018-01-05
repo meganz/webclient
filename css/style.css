@@ -3355,6 +3355,7 @@ img.blog-new-logos {
     right: 0;
     top: -1px;
     bottom: auto;
+    z-index: 10;
 }
 .multiple .properties-name-block .file-settings-icon, .hidden-context .properties-name-block .file-settings-icon {
     display: none;
@@ -21921,7 +21922,7 @@ opacity: 1;
     width: 560px;
     height: 300px;
     margin:0 auto;
-    background-image: url(../images/mega/PUf_illustration.png);
+    background-image: url(../images/mega/PUf_illustration_v1.png);
     background-position: 0 0;
     background-repeat: no-repeat;
 }

@@ -1833,7 +1833,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         var pos = String(attrs).indexOf(':8*');
 
         if (pos >= 0) {
-            var v = new Uint32Array(base64_to_ab(attrs.substr(pos + 2, 11)), 0, 2);
+            var v = new Uint32Array(base64_to_ab(attrs.substr(pos + 3, 11)), 0, 2);
             v = xxtea.decryptUint32Array(v, xxkey(filekey));
             v = new Uint8Array(v.buffer);
 
@@ -1863,7 +1863,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 pos = attrs.indexOf(':9*');
 
                 if (pos >= 0) {
-                    v = new Uint32Array(base64_to_ab(attrs.substr(pos + 2, 11)), 0, 2);
+                    v = new Uint32Array(base64_to_ab(attrs.substr(pos + 3, 11)), 0, 2);
                     v = xxtea.decryptUint32Array(v, xxkey(filekey));
                     v = new Uint8Array(v.buffer);
 

@@ -318,36 +318,8 @@ function u_setrsa(rsakey) {
                         if (d) console.log('Account activation succeeded', user);
 
                         watchdog.notify('setrsa', [u_type, u_sid]);
-
-                        // Import welcome pdf at account creation
-                        M.req('wpdf').done(function(res) {
-                            'use strict';
-
-                            if (typeof res === 'object') {
-                                var ph = res.ph;
-                                var key = res.k;
-                                M.req({a: 'g', p: ph}).done(function(res) {
-                                    if (typeof res.at === 'string') {
-                                        M.onFileManagerReady(function() {
-                                            var doit = true;
-                                            for (var i = M.v.length; i--;) {
-                                                if (fileext(M.v[i].name) === 'pdf') {
-                                                    doit = false;
-                                                    break;
-                                                }
-                                            }
-
-                                            if (doit) {
-                                                if (d) {
-                                                    console.log('Importing Welcome PDF (%s)', ph, res.at);
-                                                }
-                                                M.importFileLink(ph, key, res.at);
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
+						
+						$.welcomePDF=true;  
                     }
                     $promise.resolve(rsakey);
                     ui_keycomplete();

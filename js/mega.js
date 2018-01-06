@@ -3231,6 +3231,37 @@ function loadfm_done(mDBload) {
     mega.config.ready(function() {
         mclp.then(_onConfigReady).catch(_onConfigReady);
     });
+	
+	// Import welcome pdf
+	if ($.welcomePDF) {
+		delete $.welcomePDF;
+		M.req('wpdf').done(function(res) {
+			'use strict';
+			if (typeof res === 'object') {
+				var ph = res.ph;
+				var key = res.k;
+				M.req({a: 'g', p: ph}).done(function(res) {
+					if (typeof res.at === 'string') {
+						M.onFileManagerReady(function() {
+							var doit = true;
+							for (var i = M.v.length; i--;) {
+								if (fileext(M.v[i].name) === 'pdf') {
+									doit = false;
+									break;
+								}
+							}
+							if (doit) {
+								if (d) {
+									console.log('Importing Welcome PDF (%s)', ph, res.at);
+								}
+								M.importFileLink(ph, key, res.at);
+							}
+						});
+					}
+				});
+			}
+		});
+	}
 }
 
 function fmtreenode(id, e)

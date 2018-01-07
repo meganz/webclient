@@ -2711,9 +2711,17 @@ else if (!b_u) {
                     }
                     else {
                         if (jsl[i].n === 'pdforiginalviewerjs') {
-                            scriptText = modifyPdfViewerScript(scriptText);
+                            if (localStorage.d === '1' && localStorage.dd === '1' && localStorage.jj === '1') {
+                                blobLink = staticpath + 'dont-deploy/pdf.viewer.debug.js';
+                            }
+                            else {
+                                scriptText = modifyPdfViewerScript(scriptText);
+                                blobLink = mObjectURL([scriptText], 'text/javascript');
+                            }
                         }
-                        blobLink = mObjectURL([scriptText], 'text/javascript');
+                        else {
+                            blobLink = mObjectURL([scriptText], 'text/javascript');
+                        }
                     }
                     window[jsl[i].n] = blobLink;
                 }

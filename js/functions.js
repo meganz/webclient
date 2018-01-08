@@ -2553,13 +2553,16 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
         .replace('defaultFilename = \'compressed.tracemonkey - pldi - 09.pdf\';',
         'defaultFilename = \'document.pdf\';');
 
+    var pdfImagesPath = 'PDFJS.imageResourcesPath = \'' + (is_extension ? '' : '/') + 'images/pdfV/\';';
+    var pdfWorkerPath = 'PDFJS.workerSrc = \'' + (is_extension ? '' : '/') + 'pdf.worker.js\';';
+
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('PDFJS.imageResourcesPath = \'./images/\';',
-        'PDFJS.imageResourcesPath = \'/images/pdfV/\';');
+        pdfImagesPath);
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('PDFJS.workerSrc = \'../build/pdf.worker.js\';',
-        'PDFJS.workerSrc = \'/pdf.worker.js\';');
+        pdfWorkerPath);
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('setTitleUsingUrl: function pdfViewSetTitleUsingUrl(url) {',

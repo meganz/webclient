@@ -142,8 +142,8 @@ ul, li {
     background-repeat: no-repeat;
     background-position: 1px 2px;
     position: absolute;
-    left: 63px;
-    top: 61px;
+    left: 20px;
+    top: 18px;
 }
 .overlay .mobile.logo {
     display: none;
@@ -857,6 +857,11 @@ ul, li {
 }
 .mobile.fm-icon.scroll-to-top {
     background-position: -250px -1709px;
+}
+.mobile.content-cell .mobile.menu.dl-page {
+    position: absolute;
+    top: 22px;
+    right: 16px;
 }
 .mobile.fm-dialog-close {
     background: url(../images/mobile/mobile-sprite_v10.png);
@@ -4642,8 +4647,8 @@ div.checkboxOn, div.checkboxOff {
         width: 50px;
         height: 50px;
         background-position: -70px -7px;
-        left: 47px;
-        top: 47px;
+        left: 20px;
+        top: 20px;
     }
     .mobile.warning-icon {
         width: 34px;
@@ -4803,8 +4808,8 @@ div.checkboxOn, div.checkboxOff {
         width: 42px;
         height: 42px;
         background-position: -209px -11px;
-        left: 40px;
-        top: 40px;
+        left: 16px;
+        top: 22px;
     }
     .mobile.red-button.disabled i {
         background-position: -200px -206px;
@@ -4823,7 +4828,7 @@ div.checkboxOn, div.checkboxOff {
         color: #888888;
     }
     .wrong-file .mobile.content-row.second {
-        height: 54.5%;
+        height: 60.5%;
     }
     .wrong-file .mobile.content-row.first {
         height: 45.5%;
@@ -5044,8 +5049,8 @@ div.checkboxOn, div.checkboxOff {
         width: 32px;
         height: 32px;
         background-position: -168px -16px;
-        left: 29px;
-        top: 29px;
+        left: 16px;
+        top: 28px;
     }
     .mobile.white-block {
         padding: 8px;

@@ -863,6 +863,9 @@ ul, li {
     top: 22px;
     right: 16px;
 }
+.mobile.overlay .mobile.content-cell .mobile.menu.dl-page {
+    display: none;
+}
 .mobile.fm-dialog-close {
     background: url(../images/mobile/mobile-sprite_v10.png);
     background-position: -76px -1138px;

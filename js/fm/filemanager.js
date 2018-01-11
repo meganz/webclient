@@ -74,7 +74,7 @@ FileManager.prototype.onFileManagerReady = function(ifMaster, callback) {
     callback = (function(callback) {
         return function() {
             if (!ifMaster || mBroadcaster.crossTab.master) {
-                callback();
+                onIdle(callback);
             }
         };
     })(callback);

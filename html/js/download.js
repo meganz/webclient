@@ -141,6 +141,7 @@ function dl_g(res) {
                 h: dlpage_ph,
                 ph: dlpage_ph,
                 name: filename,
+                s: fdl_filesize,
                 link: dlpage_ph + '!' + dlpage_key
             });
 

@@ -399,7 +399,7 @@ function init_page() {
                 return;
             }
 
-            if (fminitialized) {
+            if (fminitialized && !folderlink) {
                 // Clean up internal state in case we're navigating back to a folderlink
                 M.currentdirid = M.RootID = undefined;
                 delete $.onImportCopyNodes;

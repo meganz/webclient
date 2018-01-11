@@ -1221,7 +1221,7 @@ var dlmanager = {
                 delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
 
                 var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
-                var $dlPageCountdown = $('.download.transfer-overquota-txt');
+                var $dlPageCountdown = $('.download.transfer-overquota-txt').text(String(l[7100]).replace('%1', ''));
                 if (!$dlPageCountdown.is(':visible')) {
                     $dlPageCountdown = null;
                 }
@@ -1239,14 +1239,15 @@ var dlmanager = {
                                 $countdown.safeHTML(time);
 
                                 if ($dlPageCountdown) {
-                                    $dlPageCountdown.html(String(l[7100]).replace('%1','<span class="countdown">'+secondsToTime(timeLeft)+'</span>'));
+                                    var html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
+                                    $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
                                 }
                             }
                             else {
                                 $countdown.text('');
 
                                 if ($dlPageCountdown) {
-                                    $dlPageCountdown.text(l[7100]);
+                                    $dlPageCountdown.text(String(l[7100]).replace('%1', ''));
                                 }
                                 clearInterval(dlmanager._overQuotaTimeLeftTick);
                             }
@@ -1675,7 +1676,7 @@ var dlmanager = {
 
         M.safeShowDialog('download-overquota', function() {
             var doCloseModal = function closeModal() {
-                if (!$('.download.overquota-message span').is(':visible')) {
+                if (!$('.download.transfer-overquota-txt').is(':visible')) {
                     clearInterval(dlmanager._overQuotaTimeLeftTick);
                 }
                 $('.fm-dialog-overlay').unbind('click.dloverq');

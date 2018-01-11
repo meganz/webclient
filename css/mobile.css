@@ -135,15 +135,15 @@ ul, li {
     text-align: center;
 }
 .mobile.logo {
-    width: 68px;
-    height: 68px;
+    width: 38px;
+    height: 38px;
     display: block;
     background-image: url(../images/mobile/mobile-sprite_v10.png);
     background-repeat: no-repeat;
-    background-position: 1px 2px;
+    background-position: -94px -1073px;
     position: absolute;
-    left: 63px;
-    top: 61px;
+    left: 20px;
+    top: 22px;
 }
 .overlay .mobile.logo {
     display: none;
@@ -857,6 +857,18 @@ ul, li {
 }
 .mobile.fm-icon.scroll-to-top {
     background-position: -250px -1709px;
+}
+.mobile.content-cell .mobile.menu.dl-page {
+    position: absolute;
+    top: 20px;
+    right: 16px;
+    opacity: .6;
+}
+.mobile.logo {
+    background-position: -94px -1073px;
+}
+.mobile.overlay .mobile.content-cell .mobile.menu.dl-page {
+    display: none;
 }
 .mobile.fm-dialog-close {
     background: url(../images/mobile/mobile-sprite_v10.png);
@@ -4638,13 +4650,6 @@ div.checkboxOn, div.checkboxOff {
         padding: 0 0 0 23px;
         background-position: -247px -249px;
     }
-    .mobile.logo {
-        width: 50px;
-        height: 50px;
-        background-position: -70px -7px;
-        left: 47px;
-        top: 47px;
-    }
     .mobile.warning-icon {
         width: 34px;
         height: 34px;
@@ -4799,13 +4804,6 @@ div.checkboxOn, div.checkboxOff {
         line-height: 34px;
         padding-top: 40px;
     }
-    .mobile.logo {
-        width: 42px;
-        height: 42px;
-        background-position: -209px -11px;
-        left: 40px;
-        top: 40px;
-    }
     .mobile.red-button.disabled i {
         background-position: -200px -206px;
         width: 22px;
@@ -4823,7 +4821,7 @@ div.checkboxOn, div.checkboxOff {
         color: #888888;
     }
     .wrong-file .mobile.content-row.second {
-        height: 54.5%;
+        height: 60.5%;
     }
     .wrong-file .mobile.content-row.first {
         height: 45.5%;
@@ -4973,13 +4971,6 @@ div.checkboxOn, div.checkboxOff {
     .downloading .mobile.content-row.second, .uploading .mobile.content-row.second {
         height: 60%;
     }
-    .mobile.logo {
-        width: 38px;
-        height: 38px;
-        background-position: -125px -13px;
-        left: 36px;
-        top: 26px;
-    }
     .mobile.warning-icon {
         width: 32px;
         height: 32px;
@@ -5040,13 +5031,6 @@ div.checkboxOn, div.checkboxOff {
     }
 }
 @media only screen and (orientation:landscape) and (max-width: 570px), only screen and (orientation:portrait) and (max-height: 570px) {
-    .mobile.logo {
-        width: 32px;
-        height: 32px;
-        background-position: -168px -16px;
-        left: 29px;
-        top: 29px;
-    }
     .mobile.white-block {
         padding: 8px;
         margin: 0 0 22px 0;

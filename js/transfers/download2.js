@@ -1221,7 +1221,7 @@ var dlmanager = {
                 delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
 
                 var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
-                var $dlPageCountdown = $('.download.overquota-message span');
+                var $dlPageCountdown = $('.download.transfer-overquota-txt');
                 if (!$dlPageCountdown.is(':visible')) {
                     $dlPageCountdown = null;
                 }
@@ -1239,7 +1239,7 @@ var dlmanager = {
                                 $countdown.safeHTML(time);
 
                                 if ($dlPageCountdown) {
-                                    $dlPageCountdown.text(String(l[7100]).replace('%1', secondsToTime(timeLeft)));
+                                    $dlPageCountdown.html(String(l[7100]).replace('%1','<span class="countdown">'+secondsToTime(timeLeft)+'</span>'));
                                 }
                             }
                             else {

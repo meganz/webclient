@@ -1233,6 +1233,9 @@ var dlmanager = {
                     var $countdown = $dialog.find('.countdown').removeClass('hidden');
                     $countdown.safeHTML(secondsToTime(timeLeft, 1));
 
+                    // Acceptble or black magic Diego :) ??
+                    $playButton.addClass('active');
+
                     this._overQuotaTimeLeftTick =
                         setInterval(function() {
                             var time = secondsToTime(timeLeft--, 1);
@@ -1336,6 +1339,7 @@ var dlmanager = {
 
             $('.download.over-transfer-quota', $dlPageTW).addClass('hidden');
             $('.download.in-progress', $dlPageTW).removeClass('over-quota');
+            $('.video-theatre-mode .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
 
             $('.msg-overquota', $dialog).removeClass('hidden');
             $('.msg-prewarning', $dialog).addClass('hidden');
@@ -1368,6 +1372,7 @@ var dlmanager = {
 
                 $('.download.over-transfer-quota', $dlPageTW).removeClass('hidden');
                 $('.download.in-progress', $dlPageTW).addClass('over-quota');
+                $('.video-theatre-mode .video-mode-wrapper', $dlPageTW).addClass('over-quota');
             }
         }
 

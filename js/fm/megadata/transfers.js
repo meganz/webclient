@@ -1215,15 +1215,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 };
 
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
-
-    'use strict';
-
-    // If on mobile, show the upload progress in the overlay
-    if (is_mobile) {
-        mobile.uploadOverlay.showUploadProgress(ul, perc, bl, bt, bps);
-        return false;
-    }
-
     var id = ul.id;
     var $tr = $('#ul_' + id);
     if (!$tr.hasClass('transfer-started')) {

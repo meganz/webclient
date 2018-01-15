@@ -128,8 +128,15 @@ function mURIDecode(path) {
 
 function clickURLs() {
     $('a.clickurl').rebind('click', function() {
-        var url = $(this).attr('href') || $(this).data('fxhref');
+        var $this = $(this);
+        var url = $this.attr('href') || $this.data('fxhref');
         if (url) {
+            if (window.loadingDialog && $this.hasClass('pages-nav')) {
+                loadingDialog.quiet = true;
+                onIdle(function() {
+                    loadingDialog.quiet = false;
+                });
+            }
             loadSubPage(url.substr(1));
             return false;
         }

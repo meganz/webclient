@@ -2588,7 +2588,7 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('debuggerScriptPath: \'./debugger.js\',',
         ' ');
-
+    
     // algorithm to remove 'mozL10n.get'
     var st = 5000; // start from char 50000
 
@@ -2652,6 +2652,25 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
         loc = pdfViewerSrcCode.indexOf('mozL10n.get', loc + 1);
     }
     // end algorithm to remove 'mozL10n.get'
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('items.numPages.textContent =  \'of {{pagesCount}}\'',
+        'items.numPages.textContent = \'of \' + pagesCount');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('items.numPages.textContent =  \'({{pageNumber}} of {{pagesCount}})\'',
+        'items.numPages.textContent = pageNumber + \' of \' + pagesCount');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('return  \'{{date}}, {{time}}\'',
+        'return dateString + \',\' + timeString');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('items.customScaleOption.textContent =  \'{{scale}}%\'',
+        'items.customScaleOption.textContent = customScale + \' %\'');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('return  \'{{size_kb}} KB ({{size_b}} bytes)\'',
+        'return kb + \' KB (\' + fileSize + \' bytes)\'');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('return  \'{{size_mb}} MB ({{size_b}} bytes)\'',
+        'return (kb / 1024) + \' MB (\' + fileSize + \' bytes)\'');
 
     var finalFunctionOnViewLoad = 'function webViewerLoad() { '
         + 'var config = getViewerConfiguration(); '

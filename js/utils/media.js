@@ -565,10 +565,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             setFullscreenData(!!document.msFullscreenElement);
         });
 
-        $wrapper.rebind('exit-fullscreen', function() {
+        $wrapper.rebind('is-over-quota', function() {
             if (isFullScreen()) {
                 $fullscreen.trigger('click');
             }
+            videoElement.pause();
             return false;
         });
 
@@ -576,6 +577,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             clearTimeout(timer);
             $wrapper.removeClass('mouse-idle');
             $video.unbind('mousemove.idle');
+            $wrapper.unbind('is-over-quota');
             $document.unbind('mousemove.videoprogress');
             $document.unbind('mouseup.videoprogress');
             $document.unbind('mousemove.volumecontrol');
@@ -608,7 +610,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             if (this.file.overquota) {
                 var videoFile = this.file;
 
-                $wrapper.trigger('exit-fullscreen');
+                $wrapper.trigger('is-over-quota');
                 dlmanager.showOverQuotaDialog(function() {
                     dlmanager.onNolongerOverquota();
                     videoFile.flushRetryQueue();

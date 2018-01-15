@@ -450,12 +450,8 @@ var slideshowid;
         var n = slideshow_node(id, $overlay);
 
         $('.play-video-button', $overlay).rebind('click', function() {
-            var videoElement = $overlay.find('video').get(0);
-
-            // Play video if it was paused
-            if (videoElement.paused) {
-                videoElement.play();
-                return;
+            if (dlmanager.isOverQuota) {
+                return dlmanager.showOverQuotaDialog();
             }
 
             var destroy = function() {

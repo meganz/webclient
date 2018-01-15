@@ -1081,7 +1081,7 @@ var dlmanager = {
         if (page === 'download') {
             var $dlPageTW = $('.download.transfer-wrapper');
             $('.download.over-transfer-quota', $dlPageTW).addClass('hidden');
-            $('.download.in-progress', $dlPageTW).removeClass('over-quota');
+            $('.download.in-progress, .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
             $('.download.file-info').removeClass('overquota');
         }
         else {
@@ -1221,7 +1221,6 @@ var dlmanager = {
                 delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
 
                 var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
-                var $vPendingIcon = $('.video-block .viewer-pending');
                 var $dlPageCountdown = $('.download.transfer-overquota-txt').text(String(l[7100]).replace('%1', ''));
                 if (!$dlPageCountdown.is(':visible')) {
                     $dlPageCountdown = null;
@@ -1242,7 +1241,6 @@ var dlmanager = {
                                 if ($dlPageCountdown) {
                                     var html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
                                     $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
-                                    $vPendingIcon.addClass('hidden');
                                 }
                             }
                             else {
@@ -1332,8 +1330,7 @@ var dlmanager = {
             var $dlPageTW = $('.download.transfer-wrapper');
 
             $('.download.over-transfer-quota', $dlPageTW).addClass('hidden');
-            $('.download.in-progress', $dlPageTW).removeClass('over-quota');
-            $('.video-theatre-mode .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
+            $('.download.in-progress, .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
 
             $('.msg-overquota', $dialog).removeClass('hidden');
             $('.msg-prewarning', $dialog).addClass('hidden');
@@ -1342,6 +1339,8 @@ var dlmanager = {
 
             $('.upgrade', $dialog).rebind('click', onclick);
             $dialog.find('.reg-st3-membership-bl').rebind('click', onclick);
+
+            $('.video-theatre-mode:visible').addClass('paused');
 
             if (page === 'download') {
                 var $dtb = $('.download.transfer-buttons, .download.video-transfer-buttons');
@@ -1365,8 +1364,7 @@ var dlmanager = {
                 $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
 
                 $('.download.over-transfer-quota', $dlPageTW).removeClass('hidden');
-                $('.download.in-progress', $dlPageTW).addClass('over-quota');
-                $('.video-theatre-mode .video-mode-wrapper', $dlPageTW).addClass('over-quota');
+                $('.download.in-progress, .video-mode-wrapper', $dlPageTW).addClass('over-quota');
             }
         }
 

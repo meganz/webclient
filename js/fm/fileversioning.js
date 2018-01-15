@@ -659,24 +659,16 @@
     Object.defineProperty(global, 'fileversioning', {value: ns});
     ns = undefined;
 
-    mBroadcaster.once('fm:initialized', function() {
-        mega.attr.get(
-            u_handle,
-            'dv',
-            -2,
-            true
-        )
-        .done(function(r) {
-            if (r === "0") {
-                fileversioning.dvState = 0;
-            }
-            else if (r === "1") {
-                fileversioning.dvState = 1;
-            }
-        })
-        .fail(function (e) {
-            fileversioning.dvState = 0;
+    mBroadcaster.addListener('fm:initialized', function() {
+        if (folderlink || !u_handle) {
+            return;
+        }
+
+        mega.attr.get(u_handle, 'dv', -2, true).done(function(r) {
+            fileversioning.dvState = r === "1";
         });
+
+        return 0xDEAD;
     });
 })(this);
 

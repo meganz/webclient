@@ -391,6 +391,12 @@
 .video-theatre-mode .play-video-button {
     display: none;
 }
+.paused .play-video-button {
+    display: block;
+}
+.paused .viewer-pending  {
+    display: none;
+}
 /* controls */
 .video-controls {
     display: none;

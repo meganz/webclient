@@ -277,9 +277,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             if (type === 'playpause') {
                 if (videoElement.paused || videoElement.ended) {
                     $playpause.find('i').removeClass('pause').addClass('play');
+                    $wrapper.addClass('paused');
                 }
                 else {
                     $playpause.find('i').removeClass('play').addClass('pause');
+                    $wrapper.removeClass('paused');
                 }
             }
             // Mute button
@@ -296,7 +298,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         // Set Init Values
         changeButtonState('playpause');
         changeButtonState('mute');
-        $wrapper.find('.video-timing').text('00:00');
+        $wrapper.removeClass('paused').find('.video-timing').text('00:00');
         $progressBar.removeAttr('style');
         $volumeBar.find('style').removeAttr('style');
 

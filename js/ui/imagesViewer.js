@@ -450,6 +450,14 @@ var slideshowid;
         var n = slideshow_node(id, $overlay);
 
         $('.play-video-button', $overlay).rebind('click', function() {
+            var videoElement = $overlay.find('video').get(0);
+
+            // Play video if it was paused
+            if (videoElement.paused) {
+                videoElement.play();
+                return;
+            }
+
             var destroy = function() {
                 $overlay.find('.viewer-pending').addClass('hidden').end().trigger('video-destroy');
 

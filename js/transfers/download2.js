@@ -1221,7 +1221,6 @@ var dlmanager = {
                 delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
 
                 var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
-                var $playButton = $('.video-theatre-mode .play-video-button');
                 var $vPendingIcon = $('.video-block .viewer-pending');
                 var $dlPageCountdown = $('.download.transfer-overquota-txt').text(String(l[7100]).replace('%1', ''));
                 if (!$dlPageCountdown.is(':visible')) {
@@ -1233,9 +1232,6 @@ var dlmanager = {
                     var $countdown = $dialog.find('.countdown').removeClass('hidden');
                     $countdown.safeHTML(secondsToTime(timeLeft, 1));
 
-                    // Acceptble or black magic Diego :) ??
-                    $playButton.addClass('active');
-
                     this._overQuotaTimeLeftTick =
                         setInterval(function() {
                             var time = secondsToTime(timeLeft--, 1);
@@ -1246,7 +1242,6 @@ var dlmanager = {
                                 if ($dlPageCountdown) {
                                     var html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
                                     $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
-                                    $playButton.addClass('active');
                                     $vPendingIcon.addClass('hidden');
                                 }
                             }
@@ -1255,7 +1250,6 @@ var dlmanager = {
 
                                 if ($dlPageCountdown) {
                                     $dlPageCountdown.text(String(l[7100]).replace('%1', ''));
-                                    $playButton.removeClass('active');
                                 }
                                 clearInterval(dlmanager._overQuotaTimeLeftTick);
                             }

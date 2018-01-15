@@ -109,7 +109,7 @@ FileManager.prototype.initFileManagerUI = function() {
         // if user clicks overlay instead Yes/No or close icon 'x'
         // One situation when this is used, is when ephemeral user
         //  trying to access settings directly via url
-        if (u_type === 0) {
+        if (u_type === 0 && !folderlink) {
             loadSubPage('fm');
         }
     });

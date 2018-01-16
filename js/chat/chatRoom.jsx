@@ -906,7 +906,7 @@ ChatRoom.prototype.onUploadError = function(uid, error) {
         logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error);
     }
 
-    var ul = this.pendingUploads ? this.pendingUploads[uid] : null;
+    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
     // handle the onUploadError and if no more uploads are queued - clear any listeners
     if (ul) {
@@ -947,7 +947,7 @@ ChatRoom.prototype.onUploadStart = function(data) {
                 }
 
                 var n = M.d[handle];
-                var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
                 if (d) {
                     logger.debug('upload:completion', uid, handle, faid, ul, n);
@@ -957,15 +957,21 @@ ChatRoom.prototype.onUploadStart = function(data) {
                     // This should not happen...
                     logger.error('Invalid state error...');
                 }
-                else if (!n.fa && ul.isim) {
-                    // The fa was not yet attached to the node, wait for one of pfa:* events
-                    ul.faid = faid;
-                    ul.h = handle;
-                }
                 else {
-                    // this is not an image, attach node to chat room
-                    delete self.pendingUploads[uid];
-                    self.onUploadComplete([handle]);
+                    ul.h = handle;
+
+                    if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
+                        // The fa was not yet attached to the node, wait for fa:* events
+                        ul.faid = faid;
+
+                        if (d) {
+                            logger.debug('Waiting for file attribute to arrive.', handle, ul);
+                        }
+                    }
+                    else {
+                        // this is not a media file or the fa is already set, attach node to chat room
+                        self.onUploadComplete(ul);
+                    }
                 }
             })
         );
@@ -975,22 +981,27 @@ ChatRoom.prototype.onUploadStart = function(data) {
         self.uploadListeners.push(mBroadcaster.addListener('upload:abort', self.onUploadError.bind(self)));
 
         self.uploadListeners.push(
-            mBroadcaster.addListener('fa:error', function(faid, error, onStorage) {
-                var uid = self.lookupPendingUpload(faid);
-                var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+            mBroadcaster.addListener('fa:error', function(faid, error, onStorageAPIError, nFAiled) {
+                var uid = self.lookupPendingUpload(faid, faid);
+                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
                 if (d) {
-                    logger.debug('fa:error', faid, error, onStorage, uid, ul);
+                    logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul);
                 }
 
+                // Attaching some fa to the node failed.
+                if (ul) {
+                    // decrement the number of expected file attributes
+                    ul.efa = Math.max(0, ul.efa - nFAiled) | 0;
 
-                delete self.pendingUploads[uid];
+                    // has this upload finished?
+                    if (ul.h) {
+                        // Yes, check whether we must attach the node
+                        var n = M.d[ul.h] || false;
 
-                // Attaching the fa to the node failed permanently, handle it.
-                if (ul && ul.faid) {
-                    var n = M.d[handle];
-                    if (n) {
-                        self.onUploadComplete([handle]);
+                        if (!ul.efa || (n.fa && String(n.fa).split('/').length >= ul.efa)) {
+                            self.onUploadComplete(ul);
+                        }
                     }
                 }
             })
@@ -998,28 +1009,38 @@ ChatRoom.prototype.onUploadStart = function(data) {
 
         self.uploadListeners.push(
             mBroadcaster.addListener('fa:ready', function(handle, fa) {
-                var uid = self.lookupPendingUpload(false, handle);
-                var ul = self.pendingUploads[uid];
-                var n = M.d[handle];
+                delay('chat:fa-ready:' + handle, function() {
+                    var uid = self.lookupPendingUpload(false, handle);
+                    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
-                if (d) {
-                    logger.debug('fa:ready', handle, fa, uid, ul, n);
-                }
+                    if (d) {
+                        logger.debug('fa:ready', handle, fa, uid, ul);
+                    }
 
-                delete self.pendingUploads[uid];
-
-                // The fa is now attached to the node, add it to the chat room
-                if (n) {
-                    self.onUploadComplete([handle]);
-                }
+                    if (ul.h && String(fa).split('/').length >= ul.efa) {
+                        // The fa is now attached to the node, add it to the chat room
+                        self.onUploadComplete(ul);
+                    }
+                    else if (d) {
+                        logger.debug('Not enough file attributes yet, holding...', ul);
+                    }
+                });
             })
         );
     }
 };
 
+ChatRoom.prototype.onUploadComplete = function(ul) {
+    if (this.pendingUploads && this.pendingUploads[ul.uid]) {
+        if (d) {
+            console.debug('Attaching node to chat room...', ul.h, ul.uid, ul, M.d[ul.h]);
+        }
+        this.attachNodes([ul.h]);
+        delete this.pendingUploads[ul.uid];
 
-ChatRoom.prototype.onUploadComplete = function(uploads) {
-    this.attachNodes(uploads);
+        // let's omit this for now...
+        // delete ulmanager.ulEventData[ul.uid];
+    }
 
     this.clearUploadListeners();
 };

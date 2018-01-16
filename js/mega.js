@@ -1004,10 +1004,7 @@ scparser.$add('fa', function(a) {
         n.fa = a.fa;
         M.nodeUpdated(n);
 
-        if (String(n.fa).indexOf('/') > 0) {
-            // both thumb & prev is being set
-            mBroadcaster.sendMessage('fa:ready', a.n, a.fa);
-        }
+        mBroadcaster.sendMessage('fa:ready', a.n, a.fa);
     }
 });
 

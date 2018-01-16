@@ -353,9 +353,6 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         M.tfsdomqueue = Object.create(null);
         GlobalProgress = Object.create(null);
         delete $.transferprogress;
-        if (page !== 'download') {
-            fm_tfsupdate();
-        }
         if ($.mTransferAnalysis) {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
@@ -376,6 +373,9 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
 
     if (page === 'download') {
         delay('percent_megatitle', percent_megatitle);
+    }
+    else {
+        fm_tfsupdate();
     }
 };
 

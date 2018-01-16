@@ -157,6 +157,10 @@ function MegaData() {
             return true;
         };
 
+        this['ul' + 'progress'] = function() {
+            return mobile.uploadOverlay.showUploadProgress.apply(mobile.uploadOverlay, arguments);
+        };
+
         var tf = [
             "renderTree", "buildtree", "initTreePanelSorting", "treeSearchUI", "treePanelType", "addTreeUI",
             "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen"

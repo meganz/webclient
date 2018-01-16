@@ -1529,23 +1529,18 @@ ulQueue.canExpand = function(max) {
 };
 
 Object.defineProperty(ulQueue, 'maxActiveTransfers', {
-    get: function() {
-        'use strict';
-
-        // If on mobile, there's only 1 upload at a time and the desktop calculation below fails
-        if (is_mobile) {
+    get: is_mobile
+        ? function() {
+            // If on mobile, there's only 1 upload at a time and the desktop calculation below fails
             return 1;
         }
-        else {
+        : function() {
             return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 20);
         }
-    }
 });
 
 mBroadcaster.once('startMega', function _setupEncrypter() {
-
     'use strict';
-
     var encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
         var file = context.file;
         if (!file || !file.ul_macs) {

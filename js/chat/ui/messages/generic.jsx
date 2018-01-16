@@ -846,7 +846,7 @@ var GenericConversationMessage = React.createClass({
             }
             else {
                 // this is a text message.
-                if (message.textContents === "") {
+                if (message.textContents === "" && !message.dialogType) {
                     message.deleted = true;
                 }
                 var messageActionButtons = null;

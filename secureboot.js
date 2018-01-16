@@ -2213,6 +2213,7 @@ else if (!b_u) {
             'webrtcsdp_js': {f:'js/chat/webrtcSdp.js', n: 'webrtcsdp_js', j:1},
             'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
             'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
+            'chatdpersist_js': {f:'js/chat/chatdPersist.js', n: 'chatdpersist_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},

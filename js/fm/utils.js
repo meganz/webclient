@@ -508,9 +508,21 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                     stopsc();
                     stopapi();
 
-                    MegaPromise.allDone([
+                    var waitingPromises = [
                         M.clearFileSystemStorage()
-                    ]).then(function(r) {
+                    ];
+
+                    if (
+                        megaChat &&
+                        megaChat.plugins.chatdIntegration &&
+                        megaChat.plugins.chatdIntegration.chatd.chatdPersist
+                    ) {
+                        waitingPromises.push(
+                            megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
+                        );
+                    }
+
+                    MegaPromise.allDone(waitingPromises).then(function(r) {
                         console.debug('megaUtilsReload', r);
 
                         if (fmdb) {
@@ -819,7 +831,15 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
         loadingDialog.show();
         if (fmdb && fmconfig.dbDropOnLogout) {
             step++;
-            fmdb.drop().always(finishLogout);
+            var promises = [];
+            promises.push(fmdb.drop());
+
+            if (megaChat) {
+                promises.push(
+                    megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
+                );
+            }
+            MegaPromise.allDone(promises).always(finishLogout);
         }
         if (!megaChatIsDisabled) {
             if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {

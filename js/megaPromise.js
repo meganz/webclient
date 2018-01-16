@@ -165,6 +165,24 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
     };
 };
 
+MegaPromise.prototype.benchmark = function(uniqueDebuggingName) {
+    var self = this;
+    MegaPromise._benchmarkTimes = MegaPromise._benchmarkTimes || {};
+    MegaPromise._benchmarkTimes[uniqueDebuggingName] = Date.now();
+
+    self.always(function() {
+        console.error(
+            uniqueDebuggingName,
+            'finished in:',
+            Date.now() - MegaPromise._benchmarkTimes[uniqueDebuggingName]
+        );
+        delete MegaPromise._benchmarkTimes[uniqueDebuggingName];
+    });
+
+    // allow chaining.
+    return self;
+};
+
 /**
  * By implementing this method, MegaPromise will be compatible with .when/.all syntax.
  *

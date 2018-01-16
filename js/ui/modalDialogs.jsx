@@ -248,14 +248,28 @@ var ConfirmDialog = React.createClass({
         return {
         }
     },
+    unbindEvents: function() {
+        $(document).unbind('keyup.confirmDialog' + this.getUniqueId());
+    },
     componentDidMount: function() {
         var self = this;
 
         // since ModalDialogs can be opened in other keyup (on enter) event handlers THIS is required to be delayed a
         // bit...otherwise the dialog would open up and get immediately confirmed
         setTimeout(function() {
+            if (!self.isMounted()) {
+                // can be automatically hidden/unmounted, so this would bind the event AFTER the unbind in
+                // componentWillUnmount executed.
+                return;
+            }
             $(document).rebind('keyup.confirmDialog' + self.getUniqueId(), function(e) {
                 if (e.which === 13 || e.keyCode === 13) {
+                    if (!self.isMounted()) {
+                       // we need to be 10000% sure that the dialog is still shown, otherwise, we may trigger some
+                       // unwanted action.
+                        self.unbindEvents();
+                        return;
+                    }
                     self.onConfirmClicked();
                     return false;
                 }
@@ -264,9 +278,10 @@ var ConfirmDialog = React.createClass({
     },
     componentWillUnmount: function() {
         var self = this;
-        $(document).unbind('keyup.confirmDialog' + self.getUniqueId());
+        self.unbindEvents();
     },
     onConfirmClicked: function() {
+        this.unbindEvents();
         if (this.props.onConfirmClicked) {
             this.props.onConfirmClicked();
         }
@@ -278,6 +293,7 @@ var ConfirmDialog = React.createClass({
             if (this.props.onConfirmClicked) {
                 // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
                 setTimeout(function() {
+                    self.unbindEvents();
                     self.props.onConfirmClicked();
                 }, 75);
             }

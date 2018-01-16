@@ -11,8 +11,13 @@ var ConversationMessageMixin = {
         var chatRoom = self.props.message.chatRoom;
         var megaChat = chatRoom.megaChat;
         var contact = self.getContact();
-        if (contact && contact.addChangeListener) {
-            self._contactChangeListener = contact.addChangeListener(function() {
+        if (contact && contact.addChangeListener && !self._contactChangeListener) {
+            self._contactChangeListener = contact.addChangeListener(function(contact, oldData, k, v) {
+                if (k === "ts") {
+                    // no updates needed in case of 'ts' change
+                    // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
+                    return;
+                }
                 self.debouncedForceUpdate();
             });
         }
@@ -40,7 +45,7 @@ var ConversationMessageMixin = {
                     'u': message.meta.userId,
                     'h': message.meta.userId,
                     'c': 0,
-                }
+                };
             }
         }
         else if (message.userId) {
@@ -62,7 +67,7 @@ var ConversationMessageMixin = {
         return contact;
     },
     getTimestampAsString: function() {
-        return  unixtimeToTimeString(this.getTimestamp());
+        return unixtimeToTimeString(this.getTimestamp());
     },
     getTimestamp: function() {
         var message = this.props.message;
@@ -77,6 +82,9 @@ var ConversationMessageMixin = {
             timestampInt = unixtime();
         }
 
+        if (timestampInt && message.updated && message.updated > 0) {
+            timestampInt += message.updated;
+        }
         return timestampInt;
     },
     getParentJsp: function() {

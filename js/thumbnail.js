@@ -345,7 +345,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 var defMime = 'image/jpeg';
                 var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
-                M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
         };
@@ -427,7 +426,6 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
                 type: 'image/jpg'
             });
         }
-        M.neuterArrayBuffer(u8);
     }
 
     if (!u8 || (img.huge && img.dataSize === blob.size)) {

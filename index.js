@@ -835,8 +835,14 @@ function init_page() {
         return false;
     }
     else if (page.substr(0, 8) === 'megadrop') {
-        var pupHandle = page.substr(9, 11);
-        mega.megadrop.pupCheck(pupHandle);
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.megadrop.show();
+        }
+        else {
+            var pupHandle = page.substr(9, 11);
+            mega.megadrop.pupCheck(pupHandle);
+        }
     }
     else if (page == 'dashboard') {
         loadSubPage('fm/dashboard');

@@ -1707,6 +1707,16 @@ div.checkboxOn, div.checkboxOff {
     line-height: 1.75;
     margin-bottom: 24px;
 }
+/* MEGAdrop page currently unsupported */
+.mobile.megadrop .content{
+    padding: 20px;
+}
+.mobile.megadrop h1 {
+    font-family: 'source_sans_prolight', sans-serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: #222;
+}
 
 .mobile.overlay-info {
     min-height: 132px;

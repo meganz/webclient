@@ -1336,14 +1336,16 @@ MegaData.prototype.ulerror = function(ul, error) {
                 mBroadcaster.sendMessage('MEGAdrop:overquota');
             }
         }
+        else {
+
+            // Inform user that upload MEGAdrop is not available anymore
+            if (page.substr(0, 8) === 'megadrop' && error === ENOENT || error === EACCESS) {
+                mBroadcaster.sendMessage('MEGAdrop:disabled');
+            }
+        }
     }
     else if (!overquota) {
         msgDialog('warninga', l[135], l[47], api_strerror(error));
-
-        // Inform user that upload MEGAdrop is not available anymore
-        if (page.substr(0, 8) === 'megadrop' && res === -9 || res === -11) {
-            mBroadcaster.sendMessage('MEGAdrop:disabled');
-        }
     }
 };
 

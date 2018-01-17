@@ -1890,12 +1890,7 @@ function waitsc() {
         else if (this.waitid === waitid) {
             stopsc();
 
-            if ((Date.now() - waitbegin) < 1000) {
-                waitbackoff = Math.min(MAX_WAIT, waitbackoff << 1);
-            }
-            else {
-                waitbackoff = 250;
-            }
+            waitbackoff = 250;
 
             getsc();
         }

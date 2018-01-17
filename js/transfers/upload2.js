@@ -43,7 +43,8 @@ var uldl_hold = false;
 var ulmanager = {
     ulFaId: 0,
     ulSize: 0,
-    ulIDToNode: {},
+    ulIDToNode: Object.create(null),
+    ulEventData: Object.create(null),
     isUploading: false,
     ulSetupQueue: false,
     ulStartingPhase: false,
@@ -75,6 +76,18 @@ var ulmanager = {
 
     getGID: function UM_GetGID(ul) {
         return 'ul_' + (ul && ul.id);
+    },
+
+    getEventDataByHandle: function(h) {
+        'use strict';
+
+        for (var id in this.ulEventData) {
+            if (this.ulEventData[id].h === h) {
+                return this.ulEventData[id];
+            }
+        }
+
+        return false;
     },
 
     abort: function UM_abort(gid) {
@@ -437,7 +450,7 @@ var ulmanager = {
                 }
                 else {
                     // accelerate arrival of SC-conveyed new nodes by directly issuing a fetch
-                    delay(getsc);
+                    delay('ul:getsc', getsc, 750);
                 }
             }
         };
@@ -710,7 +723,12 @@ var ulmanager = {
                 };
 
                 if (String(n.fa).indexOf(':8*') < 0 && file.size > 16) {
-                    MediaAttribute(n).parse(file).then(done).catch(console.warn.bind(console, 'MediaAttribute'));
+                    MediaAttribute(n).parse(file).then(done).catch(function(ex) {
+                        if (d) {
+                            console.warn('MediaAttribute', ex);
+                        }
+                        mBroadcaster.sendMessage('fa:error', h, ex, 0, 1);
+                    });
                 }
                 else {
                     done();
@@ -1513,23 +1531,18 @@ ulQueue.canExpand = function(max) {
 };
 
 Object.defineProperty(ulQueue, 'maxActiveTransfers', {
-    get: function() {
-        'use strict';
-
-        // If on mobile, there's only 1 upload at a time and the desktop calculation below fails
-        if (is_mobile) {
+    get: is_mobile
+        ? function() {
+            // If on mobile, there's only 1 upload at a time and the desktop calculation below fails
             return 1;
         }
-        else {
+        : function() {
             return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 20);
         }
-    }
 });
 
 mBroadcaster.once('startMega', function _setupEncrypter() {
-
     'use strict';
-
     var encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
         var file = context.file;
         if (!file || !file.ul_macs) {

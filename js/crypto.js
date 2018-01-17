@@ -135,7 +135,7 @@ var crypt = (function () {
                     u_pubkeys[userhandle] = u_pubkeys[res.u] = pubKey;
 
                     logger.debug('Got ' + keyType + ' pub key of user '
-                                 + debugUserHandle + ': ' + JSON.stringify(pubKey));
+                                 + debugUserHandle);
 
                     if (!fromCache && attribCache) {
                         // if an email was provided, cache it using the user-handle
@@ -3164,7 +3164,7 @@ function api_faretry(ctx, error, host) {
         }, ctx.faRetryI);
     }
 
-    mBroadcaster.sendMessage('fa:error', ctx.id, error, ctx.p);
+    mBroadcaster.sendMessage('fa:error', ctx.id, error, ctx.p, 2);
     srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 

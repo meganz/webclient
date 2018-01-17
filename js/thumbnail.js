@@ -1,6 +1,17 @@
 function createnodethumbnail(node, aes, id, imagedata, opt, ph, file) {
     storedattr[id] = Object.assign(Object.create(null), {'$ph': ph, target: node});
     createthumbnail(file || false, aes, id, imagedata, node, opt);
+
+    var uled = ulmanager.getEventDataByHandle(node);
+    if (uled && !uled.thumb) {
+        // XXX: prevent this from being reached twice, e.g. an mp4 renamed as avi and containing covert art ...
+        uled.thumb = 1;
+
+        if (d) {
+            console.log('Increasing the number of expected file attributes for the chat to be aware.', uled);
+        }
+        uled.efa += 2;
+    }
 }
 
 function createthumbnail(file, aes, id, imagedata, node, opt) {
@@ -187,7 +198,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
 
         api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
-        mBroadcaster.sendMessage('fa:error', id, e);
+        mBroadcaster.sendMessage('fa:error', id, e, false, 2);
     });
 
     if (typeof FileReader !== 'undefined') {
@@ -345,7 +356,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 var defMime = 'image/jpeg';
                 var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
-                M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
         };
@@ -427,7 +437,6 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
                 type: 'image/jpg'
             });
         }
-        M.neuterArrayBuffer(u8);
     }
 
     if (!u8 || (img.huge && img.dataSize === blob.size)) {

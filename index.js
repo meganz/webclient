@@ -399,7 +399,7 @@ function init_page() {
                 return;
             }
 
-            if (fminitialized) {
+            if (fminitialized && !folderlink) {
                 // Clean up internal state in case we're navigating back to a folderlink
                 M.currentdirid = M.RootID = undefined;
                 delete $.onImportCopyNodes;
@@ -835,8 +835,14 @@ function init_page() {
         return false;
     }
     else if (page.substr(0, 8) === 'megadrop') {
-        var pupHandle = page.substr(9, 11);
-        mega.megadrop.pupCheck(pupHandle);
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.megadrop.show();
+        }
+        else {
+            var pupHandle = page.substr(9, 11);
+            mega.megadrop.pupCheck(pupHandle);
+        }
     }
     else if (page == 'dashboard') {
         loadSubPage('fm/dashboard');
@@ -1212,13 +1218,12 @@ function init_page() {
         // current object and switching UI/XHR comms/IndexedDB
 
         // switch between FM & folderlinks (completely reinitialize)
-        if ((!pfid && folderlink) || (pfid && folderlink === 0)
-            || pfkey !== oldPFKey || (pfid && folderlink && pfid === folderlink)) {
+        if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
 
             M.reset();
-            folderlink = 0;
-            fminitialized = false;
-            loadfm.loaded = false;
+            folderlink     = 0;
+            fminitialized  = false;
+            loadfm.loaded  = false;
             loadfm.loading = false;
 
             stopapi();
@@ -1993,7 +1998,9 @@ function topmenuUI() {
                         promise = fmdb.get('f')
                             .always(function(r) {
                                 for (var i = r.length; i--;) {
-                                    M.nn[r[i].h] = r[i].name;
+                                    if (!r[i].fv) {
+                                        M.nn[r[i].h] = r[i].name;
+                                    }
                                 }
                             });
                     }

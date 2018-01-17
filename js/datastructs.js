@@ -203,6 +203,12 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
                 if (window.RENDER_DEBUG) {
                     console.error("changed: ", self);
                 }
+
+                var startTime;
+                if (window.RENDER_PROFILING) {
+                    startTime = new Date();
+                }
+
                 mBroadcaster.sendMessage.apply(
                     mBroadcaster,
                     [
@@ -210,7 +216,12 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
                         self
                     ].concat(args.length > 0 ? args : [])
                 );
+
+                if (window.RENDER_PROFILING) {
+                    console.error(self._getDataChangeEventName(), args, new Date() - startTime);
+                }
             }
+
         }, TRACK_CHANGES_THROTTLING_MS);
 
 

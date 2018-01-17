@@ -128,8 +128,15 @@ function mURIDecode(path) {
 
 function clickURLs() {
     $('a.clickurl').rebind('click', function() {
-        var url = $(this).attr('href') || $(this).data('fxhref');
+        var $this = $(this);
+        var url = $this.attr('href') || $this.data('fxhref');
         if (url) {
+            if (window.loadingDialog && $this.hasClass('pages-nav')) {
+                loadingDialog.quiet = true;
+                onIdle(function() {
+                    loadingDialog.quiet = false;
+                });
+            }
             loadSubPage(url.substr(1));
             return false;
         }
@@ -2090,6 +2097,7 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.slideshow.js', n: 'mobile_slideshow_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
     }
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -2213,6 +2221,7 @@ else if (!b_u) {
             'webrtcsdp_js': {f:'js/chat/webrtcSdp.js', n: 'webrtcsdp_js', j:1},
             'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
             'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
+            'chatdpersist_js': {f:'js/chat/chatdPersist.js', n: 'chatdpersist_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
@@ -2711,9 +2720,17 @@ else if (!b_u) {
                     }
                     else {
                         if (jsl[i].n === 'pdforiginalviewerjs') {
-                            scriptText = modifyPdfViewerScript(scriptText);
+                            if (localStorage.d === '1' && localStorage.dd === '1' && localStorage.jj === '1') {
+                                blobLink = staticpath + 'dont-deploy/pdf.viewer.debug.js';
+                            }
+                            else {
+                                scriptText = modifyPdfViewerScript(scriptText);
+                                blobLink = mObjectURL([scriptText], 'text/javascript');
+                            }
                         }
-                        blobLink = mObjectURL([scriptText], 'text/javascript');
+                        else {
+                            blobLink = mObjectURL([scriptText], 'text/javascript');
+                        }
                     }
                     window[jsl[i].n] = blobLink;
                 }

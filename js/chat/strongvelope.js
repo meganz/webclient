@@ -1656,6 +1656,7 @@ var strongvelope = {};
                     parsedMessage.nonce);
                 // Bail out if decryption failed.
                 if (cleartext === false) {
+                    logger.warn("Decryption failed [1]: ", sender, keyId);
                     proxyPromise.reject(false);
                 }
                 proxyPromise.resolve(cleartext);
@@ -1663,6 +1664,7 @@ var strongvelope = {};
             return proxyPromise;
         }
         else {
+            logger.warn("Decryption failed [2]: ", sender, keyId);
             return MegaPromise.reject(false);
         }
     };

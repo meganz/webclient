@@ -33,9 +33,11 @@ MegaLogger.rootLogger = new MegaLogger(
 if (typeof loadingDialog === 'undefined') {
     var loadingDialog = Object.create(null);
     loadingDialog.show = function() {
-        $('.dark-overlay').removeClass('hidden');
-        $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
-        this.active = true;
+        if (!this.quiet) {
+            $('.dark-overlay').removeClass('hidden');
+            $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
+            this.active = true;
+        }
     };
     loadingDialog.hide = function() {
         $('.dark-overlay').addClass('hidden');
@@ -55,6 +57,7 @@ if (typeof loadingDialog === 'undefined') {
         }
         return !this.nest;
     };
+    loadingDialog.quiet = false;
 }
 if (typeof loadingInitDialog === 'undefined') {
     var loadingInitDialog = Object.create(null);
@@ -1004,10 +1007,7 @@ scparser.$add('fa', function(a) {
         n.fa = a.fa;
         M.nodeUpdated(n);
 
-        if (String(n.fa).indexOf('/') > 0) {
-            // both thumb & prev is being set
-            mBroadcaster.sendMessage('fa:ready', a.n, a.fa);
-        }
+        mBroadcaster.sendMessage('fa:ready', a.n, a.fa);
     }
 });
 

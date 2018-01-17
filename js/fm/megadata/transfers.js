@@ -1086,11 +1086,16 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
                         var f = u[i];
 
                         data[f.id] = {
+                            uid: f.id,
                             size: f.size,
                             name: f.name,
                             chat: f.chatid,
-                            isim: is_image(f.name)
+                            // store the minimal expected file attributes for this upload
+                            efa: (is_image(f) ? 2 : 0) + (MediaInfoLib.isFileSupported(f) ? 1 : 0)
                         };
+
+                        // keep a global record for possible createnodethumbnail() calls at any later stage...
+                        ulmanager.ulEventData[f.id] = data[f.id];
                     }
 
                     mBroadcaster.sendMessage('upload:start', data);
@@ -1215,15 +1220,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 };
 
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
-
-    'use strict';
-
-    // If on mobile, show the upload progress in the overlay
-    if (is_mobile) {
-        mobile.uploadOverlay.showUploadProgress(ul, perc, bl, bt, bps);
-        return false;
-    }
-
     var id = ul.id;
     var $tr = $('#ul_' + id);
     if (!$tr.hasClass('transfer-started')) {
@@ -1345,14 +1341,16 @@ MegaData.prototype.ulerror = function(ul, error) {
                 mBroadcaster.sendMessage('MEGAdrop:overquota');
             }
         }
+        else {
+
+            // Inform user that upload MEGAdrop is not available anymore
+            if (page.substr(0, 8) === 'megadrop' && error === ENOENT || error === EACCESS) {
+                mBroadcaster.sendMessage('MEGAdrop:disabled');
+            }
+        }
     }
     else if (!overquota) {
         msgDialog('warninga', l[135], l[47], api_strerror(error));
-
-        // Inform user that upload MEGAdrop is not available anymore
-        if (page.substr(0, 8) === 'megadrop' && res === -9 || res === -11) {
-            mBroadcaster.sendMessage('MEGAdrop:disabled');
-        }
     }
 };
 

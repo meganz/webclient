@@ -109,7 +109,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
 
         if (typeof result === 'function') {
             if (error) {
-                fmdb.crashed = true;
+                fmdb.crashed = 2;
                 fmdb.logger.warn('Marking DB as crashed.', error);
 
                 if (fmdb.db) {
@@ -185,7 +185,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     resolve(r[0]);
                 }
                 else if (slave) {
-                    fmdb.crashed = true;
+                    fmdb.crashed = 2;
                     resolve(false);
                 }
                 else {

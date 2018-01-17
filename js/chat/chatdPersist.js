@@ -306,7 +306,7 @@
                 self.dbLoadingPromise = new MegaPromise();
 
 
-                self.db = new Dexie("ctdb_" + u_handle + "_" + self.dbName);
+                self.db = new Dexie("$ctdb_" + u_handle + "_" + self.dbName);
 
                 self.schemaCb(self.db);
 

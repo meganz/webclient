@@ -386,8 +386,6 @@ var ulmanager = {
     },
 
     ulFinalize: function UM_ul_finalize(file, target) {
-        var p;
-
         if (d) {
             ulmanager.logger.info(file.name, "ul_finalize", file.target, target);
         }
@@ -406,33 +404,15 @@ var ulmanager = {
             hash: file.hash,
             k: file.filekey
         };
+
         if (file._replaces) {
-            if (M.d[file._replaces].fav && M.d[file._replaces].lbl) {
-                n = {
-                    name: file.name,
-                    hash: file.hash,
-                    fav: M.d[file._replaces].fav,
-                    lbl: M.d[file._replaces].lbl,
-                    k: file.filekey
-                };
+            if (M.d[file._replaces].fav) {
+                n.fav = M.d[file._replaces].fav;
             }
-            else if (M.d[file._replaces].fav) {
-                n = {
-                    name: file.name,
-                    hash: file.hash,
-                    fav: M.d[file._replaces].fav,
-                    k: file.filekey
-                };
+            if (M.d[file._replaces].lbl) {
+                n.lbl = M.d[file._replaces].lbl;
             }
-            else if (M.d[file._replaces].lbl) {
-                n = {
-                    name: file.name,
-                    hash: file.hash,
-                    lbl: M.d[file._replaces].lbl,
-                    k: file.filekey
-                };
-            }
-        };
+        }
 
         var req_type = 'p';
         var dir = target;
@@ -730,25 +710,29 @@ var ulmanager = {
                 M.ulcomplete(ul_queue[ctx.ul_queue_num], h || false, ctx.faid);
             }
             if (MediaInfoLib.isFileSupported(h)) {
-                var n = M.d[h];
+                var n = M.d[h] || false;
                 var file = ctx.file;
+                var done = function() {
+                    // get thumb/prev created if it wasn't already, eg. an mp4 renamed as avi/mov/etc
+                    if (is_video(n) && String(n.fa).indexOf(':0*') < 0) {
+                        var aes = new sjcl.cipher.aes([
+                            n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
+                        ]);
+                        createnodethumbnail(n.h, aes, n.h, null, {isVideo: true}, null, file);
+                    }
+                };
 
-                MediaAttribute(n).parse(file)
-                    .then(function() {
-                        // get thumb/prev created if it wasn't already, eg. an mp4 renamed as avi/mov/etc
-                        if (is_video(n) && String(n.fa).indexOf(':0*') < 0) {
-                            var aes = new sjcl.cipher.aes([
-                                n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
-                            ]);
-                            createnodethumbnail(n.h, aes, n.h, null, {isVideo: true}, null, file);
-                        }
-                    })
-                    .catch(function(ex) {
+                if (String(n.fa).indexOf(':8*') < 0 && file.size > 16) {
+                    MediaAttribute(n).parse(file).then(done).catch(function(ex) {
                         if (d) {
                             console.warn('MediaAttribute', ex);
                         }
                         mBroadcaster.sendMessage('fa:error', h, ex, 0, 1);
                     });
+                }
+                else {
+                    done();
+                }
             }
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;

@@ -990,8 +990,9 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
             for (var i = entries.length; i--;) {
                 var entry = new MediaAttribute(entries[i]);
+                var size = entry.s || entry.size || 0;
 
-                if (MediaInfoLib.isFileSupported(entry) && entry.weak) {
+                if (size > 16 && MediaInfoLib.isFileSupported(entry) && entry.weak) {
                     parse(entry);
                     if (++pending > options.maxAtOnce) {
                         break;
@@ -1604,7 +1605,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
             entry = new MediaAttribute(entry);
 
-            if (!MediaInfoLib.isFileSupported(entry)) {
+            if (!MediaInfoLib.isFileSupported(entry) || !((entry.s || entry.size) > 16)) {
                 resolve(ENOENT);
             }
             else if (!entry.weak) {
@@ -1750,6 +1751,10 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         var shortformat = res.shortformat;
         var filekey = this.k;
 
+        if (!Array.isArray(filekey) || filekey.length !== 8) {
+            return '';
+        }
+
         if (!(container && (vcodec && (acodec || !res.acodec) && width && height || acodec && !vcodec))) {
             shortformat = 255;
             fps = MediaInfoLib.build;
@@ -1830,6 +1835,9 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         var r = null;
         attrs = attrs || this.fa;
         filekey = filekey || this.k;
+        if (!Array.isArray(filekey) || filekey.length !== 8) {
+            attrs = null;
+        }
         var pos = String(attrs).indexOf(':8*');
 
         if (pos >= 0) {

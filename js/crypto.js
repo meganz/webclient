@@ -1859,7 +1859,7 @@ function getsc(force) {
 function waitsc() {
     "use strict";
 
-    var MAX_WAIT = 300000;
+    var MAX_WAIT = 180e3;
     var newid = ++waitid;
 
     stopsc();
@@ -1871,28 +1871,30 @@ function waitsc() {
 
     waittimeout = setTimeout(waitsc, MAX_WAIT);
 
-    waitxhr.onerror = function(ev) {
-        if (d) {
-            console.debug('waitsc.onerror', ev);
-        }
-
+    waitxhr.onloadend = function(ev) {
         if (this.waitid === waitid) {
-            clearTimeout(waittimeout);
-            waitbackoff = Math.min(MAX_WAIT, waitbackoff << 1);
-            waittimeout = setTimeout(waitsc, waitbackoff);
-        }
-    };
+            if (this.status !== 200) {
+                if (d) {
+                    console.info('waitsc(%s:%s)', this.status, ev.type, ev);
+                }
 
-    waitxhr.onload = function(ev) {
-        if (this.status !== 200) {
-            this.onerror(ev);
-        }
-        else if (this.waitid === waitid) {
-            stopsc();
+                clearTimeout(waittimeout);
+                waitbackoff = Math.min(MAX_WAIT, waitbackoff << 1);
+                waittimeout = setTimeout(waitsc, waitbackoff);
+            }
+            else {
+                // Increase backoff if we do keep receiving packets is rapid succession, so that we maintain
+                // smaller number of connections to process more data at once - backoff up to 4 seconds.
+                if (Date.now() - waitbegin < 1000) {
+                    waitbackoff = Math.min(4e3, waitbackoff << 1);
+                }
+                else {
+                    waitbackoff = 250;
+                }
 
-            waitbackoff = 250;
-
-            getsc();
+                stopsc();
+                getsc();
+            }
         }
     };
 

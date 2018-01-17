@@ -2072,7 +2072,7 @@ function dbfetchfm() {
                                 // XXX: TypeError: Cannot create property 'crashed' on boolean 'false'
                                 // ^^^ how does `fmdb` get set to `false` here ?! :-/
                                 if (fmdb) {
-                                    fmdb.crashed = 'slave';
+                                    fmdb.crashed = 666;
                                 }
                             }
 

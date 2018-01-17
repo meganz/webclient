@@ -1093,7 +1093,7 @@ function mObjectURL(data, type)
                             //if (u_handle && window.indexedDB) {
                             //    mDBstart(true);
                             //}
-                            if (Object(window.fmdb).crashed === 'slave') {
+                            if (Object(window.fmdb).crashed === 666) {
                                 fmdb.crashed = 0;
                             }
                         }

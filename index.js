@@ -1992,7 +1992,9 @@ function topmenuUI() {
                         promise = fmdb.get('f')
                             .always(function(r) {
                                 for (var i = r.length; i--;) {
-                                    M.nn[r[i].h] = r[i].name;
+                                    if (!r[i].fv) {
+                                        M.nn[r[i].h] = r[i].name;
+                                    }
                                 }
                             });
                     }

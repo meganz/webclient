@@ -35,8 +35,9 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
  */
 function SoonFc(func, ms) {
     return function __soonfc() {
-        var self = this,
-            args = arguments;
+        var self = this;
+        var args = toArray.apply(null, arguments);
+
         if (func.__sfc) {
             clearTimeout(func.__sfc);
         }

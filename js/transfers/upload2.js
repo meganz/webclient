@@ -43,7 +43,8 @@ var uldl_hold = false;
 var ulmanager = {
     ulFaId: 0,
     ulSize: 0,
-    ulIDToNode: {},
+    ulIDToNode: Object.create(null),
+    ulEventData: Object.create(null),
     isUploading: false,
     ulSetupQueue: false,
     ulStartingPhase: false,
@@ -75,6 +76,18 @@ var ulmanager = {
 
     getGID: function UM_GetGID(ul) {
         return 'ul_' + (ul && ul.id);
+    },
+
+    getEventDataByHandle: function(h) {
+        'use strict';
+
+        for (var id in this.ulEventData) {
+            if (this.ulEventData[id].h === h) {
+                return this.ulEventData[id];
+            }
+        }
+
+        return false;
     },
 
     abort: function UM_abort(gid) {
@@ -457,7 +470,7 @@ var ulmanager = {
                 }
                 else {
                     // accelerate arrival of SC-conveyed new nodes by directly issuing a fetch
-                    delay(getsc);
+                    delay('ul:getsc', getsc, 750);
                 }
             }
         };
@@ -730,7 +743,12 @@ var ulmanager = {
                             createnodethumbnail(n.h, aes, n.h, null, {isVideo: true}, null, file);
                         }
                     })
-                    .catch(console.warn.bind(console, 'MediaAttribute'));
+                    .catch(function(ex) {
+                        if (d) {
+                            console.warn('MediaAttribute', ex);
+                        }
+                        mBroadcaster.sendMessage('fa:error', h, ex, 0, 1);
+                    });
             }
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;

@@ -1086,11 +1086,16 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
                         var f = u[i];
 
                         data[f.id] = {
+                            uid: f.id,
                             size: f.size,
                             name: f.name,
                             chat: f.chatid,
-                            isim: is_image(f.name)
+                            // store the minimal expected file attributes for this upload
+                            efa: (is_image(f) ? 2 : 0) + (MediaInfoLib.isFileSupported(f) ? 1 : 0)
                         };
+
+                        // keep a global record for possible createnodethumbnail() calls at any later stage...
+                        ulmanager.ulEventData[f.id] = data[f.id];
                     }
 
                     mBroadcaster.sendMessage('upload:start', data);

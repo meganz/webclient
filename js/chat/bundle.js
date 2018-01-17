@@ -9505,7 +9505,7 @@ React.makeElement = React['createElement'];
 	                        var previewButton = null;
 
 	                        if (!attachmentMetaInfo.revoked) {
-	                            if (v.fa && is_image(v)) {
+	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
 	                                var imagesListKey = message.messageId + "_" + v.h;
 	                                if (!chatRoom.images.exists(imagesListKey)) {
 	                                    v.id = imagesListKey;
@@ -9621,7 +9621,7 @@ React.makeElement = React['createElement'];
 	                        );
 
 	                        if (M.chat && !message.revoked) {
-	                            if (v.fa && is_image(v)) {
+	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
 	                                var src = thumbnails[v.h];
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);
@@ -11380,7 +11380,7 @@ React.makeElement = React['createElement'];
 	        logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error);
 	    }
 
-	    var ul = this.pendingUploads ? this.pendingUploads[uid] : null;
+	    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
 	    if (ul) {
 	        delete this.pendingUploads[uid];
@@ -11416,7 +11416,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var n = M.d[handle];
-	            var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+	            var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
 	            if (d) {
 	                logger.debug('upload:completion', uid, handle, faid, ul, n);
@@ -11425,58 +11425,77 @@ React.makeElement = React['createElement'];
 	            if (!ul || !n) {
 
 	                logger.error('Invalid state error...');
-	            } else if (!n.fa && ul.isim) {
-
-	                ul.faid = faid;
-	                ul.h = handle;
 	            } else {
+	                ul.h = handle;
 
-	                delete self.pendingUploads[uid];
-	                self.onUploadComplete([handle]);
+	                if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
+
+	                    ul.faid = faid;
+
+	                    if (d) {
+	                        logger.debug('Waiting for file attribute to arrive.', handle, ul);
+	                    }
+	                } else {
+
+	                    self.onUploadComplete(ul);
+	                }
 	            }
 	        }));
 
 	        self.uploadListeners.push(mBroadcaster.addListener('upload:error', self.onUploadError.bind(self)));
 	        self.uploadListeners.push(mBroadcaster.addListener('upload:abort', self.onUploadError.bind(self)));
 
-	        self.uploadListeners.push(mBroadcaster.addListener('fa:error', function (faid, error, onStorage) {
-	            var uid = self.lookupPendingUpload(faid);
-	            var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+	        self.uploadListeners.push(mBroadcaster.addListener('fa:error', function (faid, error, onStorageAPIError, nFAiled) {
+	            var uid = self.lookupPendingUpload(faid, faid);
+	            var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
 	            if (d) {
-	                logger.debug('fa:error', faid, error, onStorage, uid, ul);
+	                logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul);
 	            }
 
-	            delete self.pendingUploads[uid];
+	            if (ul) {
 
-	            if (ul && ul.faid) {
-	                var n = M.d[handle];
-	                if (n) {
-	                    self.onUploadComplete([handle]);
+	                ul.efa = Math.max(0, ul.efa - nFAiled) | 0;
+
+	                if (ul.h) {
+
+	                    var n = M.d[ul.h] || false;
+
+	                    if (!ul.efa || n.fa && String(n.fa).split('/').length >= ul.efa) {
+	                        self.onUploadComplete(ul);
+	                    }
 	                }
 	            }
 	        }));
 
 	        self.uploadListeners.push(mBroadcaster.addListener('fa:ready', function (handle, fa) {
-	            var uid = self.lookupPendingUpload(false, handle);
-	            var ul = self.pendingUploads[uid];
-	            var n = M.d[handle];
+	            delay('chat:fa-ready:' + handle, function () {
+	                var uid = self.lookupPendingUpload(false, handle);
+	                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
-	            if (d) {
-	                logger.debug('fa:ready', handle, fa, uid, ul, n);
-	            }
+	                if (d) {
+	                    logger.debug('fa:ready', handle, fa, uid, ul);
+	                }
 
-	            delete self.pendingUploads[uid];
+	                if (ul.h && String(fa).split('/').length >= ul.efa) {
 
-	            if (n) {
-	                self.onUploadComplete([handle]);
-	            }
+	                    self.onUploadComplete(ul);
+	                } else if (d) {
+	                    logger.debug('Not enough file attributes yet, holding...', ul);
+	                }
+	            });
 	        }));
 	    }
 	};
 
-	ChatRoom.prototype.onUploadComplete = function (uploads) {
-	    this.attachNodes(uploads);
+	ChatRoom.prototype.onUploadComplete = function (ul) {
+	    if (this.pendingUploads && this.pendingUploads[ul.uid]) {
+	        if (d) {
+	            console.debug('Attaching node to chat room...', ul.h, ul.uid, ul, M.d[ul.h]);
+	        }
+	        this.attachNodes([ul.h]);
+	        delete this.pendingUploads[ul.uid];
+	    }
 
 	    this.clearUploadListeners();
 	};

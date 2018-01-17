@@ -442,7 +442,7 @@ var GenericConversationMessage = React.createClass({
                         var previewButton = null;
 
                         if (!attachmentMetaInfo.revoked) {
-                            if (v.fa && is_image(v)) {
+                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
                                 var imagesListKey = message.messageId + "_" + v.h;
                                 if (!chatRoom.images.exists(imagesListKey)) {
                                     v.id = imagesListKey;
@@ -558,7 +558,7 @@ var GenericConversationMessage = React.createClass({
                         </div>;
 
                         if (M.chat && !message.revoked) {
-                            if (v.fa && is_image(v)) {
+                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
                                 var src = thumbnails[v.h];
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);

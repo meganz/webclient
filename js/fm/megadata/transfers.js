@@ -1353,6 +1353,9 @@ MegaData.prototype.ulerror = function(ul, error) {
             }
         }
     }
+    else if (!overquota) {
+        msgDialog('warninga', l[135], l[47], api_strerror(error));
+    }
 };
 
 MegaData.prototype.ulcomplete = function(ul, h, faid) {

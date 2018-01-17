@@ -7674,5 +7674,17 @@
     "17620": {
         "text": "MEGAdrop source code was successfully copied to clipboard.",
         "context": "A toast notification message when the MEGAdrop source code was copied to the clipboard."
+    },
+    "17626": {
+        "text": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
+        "context": "Message dialog informs user that action Get Link\/Share on folder which contains multiple MEGAdrop descendant folders will cause cancellation of all MEGAdrop subfolders starting from the selected one."
+    },
+    "17686": {
+        "text": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
+        "context": "A message which is shown when a user attempts to access a MEGAdrop public folder link."
+    },
+    "17687": {
+        "text": "Not supported",
+        "context": "A title for the MEGAdrop public link page on mobile which is not supported."
     }
 }

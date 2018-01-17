@@ -1917,5 +1917,8 @@
     "17617": "Map cre\u00ebren",
     "17618": "EEN ANDER BESTAND UPLOADEN",
     "17619": "MEGAdrop URL was succesvol gekopieerd naar het klembord.",
-    "17620": "MEGAdrop bron code was succesvol gekopieerd naar uw klembord."
+    "17620": "MEGAdrop bron code was succesvol gekopieerd naar uw klembord.",
+    "17626": "Door dit te doen annuleert u uw MEGAdrop instelling voor meerdere mappen.",
+    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
+    "17687": "Not supported"
 }

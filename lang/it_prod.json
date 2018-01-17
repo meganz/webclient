@@ -1917,5 +1917,8 @@
     "17617": "Crea cartella",
     "17618": "CARICA UN ALTRO FILE",
     "17619": "L'URL di MEGAdrop \u00e8 stato copiato con successo negli appunti.",
-    "17620": "Il codice sorgente di MEGAdrop \u00e8 stato copiato con successo negli appunti."
+    "17620": "Il codice sorgente di MEGAdrop \u00e8 stato copiato con successo negli appunti.",
+    "17626": "Effettuando questa operazione cancellerai la tua impostazione MEGAdrop per le cartelle multiple.",
+    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
+    "17687": "Not supported"
 }

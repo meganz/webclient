@@ -333,7 +333,7 @@
     "892": "Propiedades",
     "894": "Tama\u00f1o total",
     "896": "Creado",
-    "897": "Contiene",
+    "897": "Contenido",
     "909": "Contrase\u00f1a",
     "913": "mes",
     "918": "Mensualmente",
@@ -1798,7 +1798,7 @@
     "16648": "Declaraci\u00f3n Universal de Derechos Humanos, Art\u00edculo 12.",
     "16649": "Ahorra %1",
     "16653": "Para obtener la experiencia completa, descarga nuestra aplicaci\u00f3n o usa la web desde un PC.",
-    "16664": "La nueva contrase\u00f1a tiene que ser diferente de la antigua.",
+    "16664": "La nueva contrase\u00f1a tiene que ser diferente a la anterior.",
     "16671": "Usa la aplicaci\u00f3n de escritorio para descargar m\u00e1s r\u00e1pido.",
     "16861": "Instala nuestra aplicaci\u00f3n de escritorio",
     "16862": "Mejora el rendimiento de las transferencias de archivos en tu navegador",
@@ -1917,5 +1917,8 @@
     "17617": "Crear carpeta",
     "17618": "SUBIR OTRO ARCHIVO",
     "17619": "El enlace de MEGAdrop se ha copiado con \u00e9xito al portapapeles.",
-    "17620": "El c\u00f3digo fuente de MEGAdrop se ha copiado con \u00e9xito al portapapeles."
+    "17620": "El c\u00f3digo fuente de MEGAdrop se ha copiado con \u00e9xito al portapapeles.",
+    "17626": "Al hacer esto, se cancelar\u00e1 la configuraci\u00f3n de MEGAdrop en varias carpetas.",
+    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
+    "17687": "Not supported"
 }

@@ -640,6 +640,49 @@ MegaData.prototype.syncUsersFullname = function(userId) {
     });
 };
 
+
+MegaData.prototype.syncContactEmail = function(userHash) {
+    var promise = new MegaPromise();
+
+    if (M.u[userHash]) {
+        if (!M.u[userHash].m) {
+            attribCache.getItem(userHash + "_uge")
+                .done(function (r) {
+                    M.u[userHash].m = r;
+                    promise.resolve(r);
+                })
+                .fail(function () {
+                    asyncApiReq({
+                        'a': 'uge',
+                        'u': userHash
+                    })
+                        .done(function (r) {
+                            if (r && isString(r)) {
+                                if (M.u[userHash]) {
+                                    M.u[userHash].m = r;
+                                    attribCache.setItem(userHash + "_uge", r);
+                                    promise.resolve(r);
+                                }
+                                else {
+                                    promise.reject();
+                                }
+                            }
+                            else {
+                                promise.reject();
+                            }
+                        });
+                });
+        } else {
+            promise.resolve(M.u[userHash].m);
+        }
+    }
+    else {
+        promise.reject();
+    }
+
+    return promise;
+};
+
 (function(global) {
     /**
      * Callback, that would be called when a contact is changed.

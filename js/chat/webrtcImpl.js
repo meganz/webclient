@@ -167,22 +167,6 @@
         callManager.trigger('WaitingResponseIncoming', [callManagerCall]);
         return callHandler;
     };
-    /**
-     * Called when there is an incoming call request while there is another call in
-     * the _same_ chatroom.
-     * @param {Object} callerInfo An object with information about the incoming call
-     * request:
-     property {string} chatid The chatid if the incoming call
-     property {string} fromUser The user that sent the call request
-     property {string} fromClient The client that sent the call request
-     * @returns {bool} whether to hangup the existing call and handle the incoming call (true),
-     * or send a busy signal to the incoming call (false)
-     */
-    RtcGlobalEventHandler.prototype.onAnotherCall = function (existingCall) {
-        // if there is a reverse call request in the same chatroom, and the current is not yet set up, hang up the
-        // previous one and handle the new one
-        return existingCall.state < CallState.kJoining;
-    };
 
     RtcGlobalEventHandler.prototype.isGroupChat = function () {
         // TO BE IMPLEMENTED

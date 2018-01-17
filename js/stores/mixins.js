@@ -74,7 +74,7 @@ var MegaRenderMixin = {
     },
     debouncedForceUpdate: function() {
         var self = this;
-        if (self.skippedUpdates) {
+        if (typeof(self.skippedUpdates) === 'undefined') {
             self.skippedUpdates = 0;
         }
 

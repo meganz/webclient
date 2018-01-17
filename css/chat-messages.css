@@ -131,7 +131,7 @@
     transition: background-color 200ms ease-in-out;
 }
 .message.content-area:hover::before {
-    background-color: rgba(0,0,0,0.03);   
+    background-color: rgba(0,0,0,0.03);
 }
 .message.small-rounded-avatar {
     margin: 2px 0 0 0;
@@ -349,6 +349,11 @@
 .message pre.rtf-single, .message pre.rtf-multi {
     white-space: pre-wrap;
 }
+
+.ps-container .message.body {
+    will-change: transform;
+}
+
 .message.content-area .buttons-block {
     padding: 10px 0 6px 0;
 }

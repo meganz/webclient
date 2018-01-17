@@ -38,6 +38,7 @@
 
         this.unwrapOnDone = [];
         this.eventsForUnbinding = [];
+        self.done = false;
         return this;
     };
 
@@ -125,6 +126,10 @@
         var self = this;
         var megaChat = self.megaChat;
 
+        if (self.done) {
+            return;
+        }
+
         if (!ChatdIntegration.allChatsHadLoaded) {
             return;
         }
@@ -147,9 +152,23 @@
                             chatRoom.messagesBuff.isDecrypting.state() === 'pending'
                         )
                     ) {
+                        if (
+                            chatRoom.messagesBuff.isDecrypting &&
+                            chatRoom.messagesBuff.isDecrypting.state() === 'pending'
+                        ) {
+                            chatRoom.messagesBuff.isDecrypting.always(self.sendIfChatsReady.bind(self));
+                        }
+                        else if (
+                            chatRoom.messagesBuff.$msgsHistoryLoading &&
+                            chatRoom.messagesBuff.$msgsHistoryLoading.state() === 'pending'
+                        ) {
+                            chatRoom.messagesBuff.$msgsHistoryLoading.always(self.sendIfChatsReady.bind(self));
+                        }
                         return;
                     }
                 }
+
+                self.done = true;
 
                 // send data, if any
                 if (chatIds.length === 0) {
@@ -161,8 +180,17 @@
                         1 : 0;
                     self.data['tc'] = megaChat.chats.length;
 
+                    var totalMsgs = 0;
+                    megaChat.chats.forEach(function(chat) {
+                        totalMsgs += chat.messagesBuff.messages.length;
+                    });
+                    self.data['tm'] = totalMsgs;
+
                     var result = self.aggregateAndLog();
 
+                    if (d) {
+                        console.error(JSON.stringify(result, null, 4, '\t'));
+                    }
                     api_req({a: 'log', e: 99670, m: JSON.stringify(result)});
 
                     self.cleanup();
@@ -248,7 +276,7 @@
                 var startTime = stats[0];
 
                 var messagesCount = receivedMsgs[chatId];
-                if (startTime) {
+                if (startTime && messagesCount > 0) {
                     self.data['chr#' + data.chatId] = [
                         messagesCount,
                         microtime() - startTime
@@ -278,7 +306,7 @@
                 var messagesCount = receivedMsgs[chatId];
                 var startTime = decryptionStart[chatId];
 
-                if (startTime) {
+                if (startTime && messagesCount > 0) {
                     self.data['hd#' + base64urlencode(chatId)] = [
                         messagesCount,
                         microtime() - startTime

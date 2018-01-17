@@ -104,15 +104,13 @@ var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chat
     this.isCurrentlyActive = false;
 
     // Events
-    this.bind('onStateChange', function(e, oldState, newState) {
-        self.logger.debug("Will change state from: ",
-         ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
-
-        if (newState === ChatRoom.STATE.JOINING) {
-        }
-        else if (newState === ChatRoom.STATE.READY) {
-        }
-    });
+    if (d) {
+        this.bind('onStateChange', function(e, oldState, newState) {
+            self.logger.debug("Will change state from: ",
+                ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState)
+            );
+        });
+    }
 
 
     // activity on a specific room (show, hidden, got new message, etc)
@@ -677,7 +675,6 @@ ChatRoom.prototype.appendMessage = function(message) {
     }
 
     if (self.shownMessages[message.messageId]) {
-
         return false;
     }
     if (!message.orderValue) {
@@ -1196,6 +1193,15 @@ ChatRoom.prototype.didInteraction = function(user_handle, ts) {
             setLastInteractionWith(contact.u, "1:" + ts);
         }
     }
+};
+
+ChatRoom.prototype.retrieveAllHistory = function() {
+    var self = this;
+    self.messagesBuff.retrieveChatHistory().done(function() {
+        if (self.messagesBuff.haveMoreHistory()) {
+            self.retrieveAllHistory();
+        }
+    });
 };
 
 window.ChatRoom = ChatRoom;

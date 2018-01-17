@@ -387,8 +387,12 @@ function makeObservable(kls) {
 
     aliases.forEach(function(fn) {
         target[fn] = function() {
-            var $this = $(this);
-            return $this[fn].apply($this, arguments);
+            // trying to save few ms here...
+            if (this && !this._$thisCache) {
+                this._$thisCache = $(this);
+            }
+
+            return this._$thisCache[fn].apply(this._$thisCache, arguments);
         };
     });
 
@@ -2591,7 +2595,7 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('debuggerScriptPath: \'./debugger.js\',',
         ' ');
-    
+
     // algorithm to remove 'mozL10n.get'
     var st = 5000; // start from char 50000
 

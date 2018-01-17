@@ -135,7 +135,7 @@ var crypt = (function () {
                     u_pubkeys[userhandle] = u_pubkeys[res.u] = pubKey;
 
                     logger.debug('Got ' + keyType + ' pub key of user '
-                                 + debugUserHandle + ': ' + JSON.stringify(pubKey));
+                                 + debugUserHandle);
 
                     if (!fromCache && attribCache) {
                         // if an email was provided, cache it using the user-handle

@@ -513,7 +513,7 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                     ];
 
                     if (
-                        megaChat &&
+                        typeof(megaChat) !== 'undefined' &&
                         megaChat.plugins.chatdIntegration &&
                         megaChat.plugins.chatdIntegration.chatd.chatdPersist
                     ) {
@@ -805,7 +805,12 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
             var promises = [];
             promises.push(fmdb.drop());
 
-            if (megaChat) {
+            if (
+                typeof(megaChat) !== 'undefined' &&
+                megaChat.plugins.chatdIntegration &&
+                megaChat.plugins.chatdIntegration.chatd &&
+                megaChat.plugins.chatdIntegration.chatd.chatdPersist
+            ) {
                 promises.push(
                     megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
                 );

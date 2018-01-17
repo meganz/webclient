@@ -831,7 +831,7 @@
     "1749": "Proxy sunucusu bir \u015fifre gerektir",
     "1750": "Kullan\u0131c\u0131 ad\u0131:",
     "1752": "Veri ge\u00e7ici olarak kullan\u0131m d\u0131\u015f\u0131",
-    "1753": "%3 alan\u0131n %1 (%%2) kulan\u0131ld\u0131",
+    "1753": "%3 alan\u0131n %1 (%2%) kulan\u0131ld\u0131",
     "1755": "Senkronizasyon \u00e7al\u0131\u015fmay\u0131 durduracak.",
     "1756": "Emin misiniz?",
     "1757": "Hari\u00e7 tutulacak isim",
@@ -2736,7 +2736,7 @@
     "8501": "Kamera Y\u00fcklemelerini a\u00e7\u0131n",
     "8502": "PIN kodunu s\u0131f\u0131rla",
     "8503": "10 ba\u015far\u0131s\u0131z denemeden sonra yerel dosyalar\u0131n\u0131z silinir ve oturumunuz kapat\u0131l\u0131r.",
-    "8504": "Yanl\u0131\u015f PIN kodu, l\u00fctfen tekrar deneyin. %%2dd hakk\u0131n\u0131z kald\u0131.",
+    "8504": "Yanl\u0131\u015f PIN kodu, l\u00fctfen tekrar deneyin. %2d hakk\u0131n\u0131z kald\u0131.",
     "8505": "PIN Kodlar\u0131 e\u015fle\u015fmiyor",
     "8506": "PIN Kodunu girin",
     "8507": "PIN Kodunu tekrar girin",
@@ -4605,6 +4605,6 @@
     "17676": "1 cevaps\u0131z sesli arama ve [A] cevaps\u0131z g\u00f6r\u00fcnt\u00fcl\u00fc arama",
     "17679": "[A] cevaps\u0131z sesli arama ve 1 cevaps\u0131z g\u00f6r\u00fcnt\u00fcl\u00fc arama",
     "17680": "[A] cevaps\u0131z sesli arama ve [B] cevaps\u0131z g\u00f6r\u00fcnt\u00fcl\u00fc arama",
-    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17686": "\u015eu anda mobil taray\u0131c\u0131larda MEGAdrop ba\u011flant\u0131lar\u0131n\u0131 desteklemiyoruz, l\u00fctfen desteklenen web taray\u0131c\u0131lar\u0131ndan herhangi birini kullan\u0131n.",
+    "17687": "Desteklenmiyor"
 }

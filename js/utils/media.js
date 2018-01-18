@@ -2079,7 +2079,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                     return false;
                 }
 
-                return a.fps !== MediaInfoLib.build || a.width !== MediaInfoLib.version || a.playtime < this.avflv;
+                return a.fps < MediaInfoLib.build || a.width < MediaInfoLib.version || a.playtime < this.avflv;
             }
 
             return true;

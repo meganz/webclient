@@ -1,4 +1,5 @@
 function isMediaSourceSupported() {
+    'use strict';
     return 'MediaSource' in window && (!window.safari || d);
 }
 
@@ -26,6 +27,7 @@ if (d) {
 
 if (!isMediaSourceSupported()) {
     window.is_video = function() {
+        'use strict';
         return false;
     };
 }
@@ -277,11 +279,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             if (type === 'playpause') {
                 if (videoElement.paused || videoElement.ended) {
                     $playpause.find('i').removeClass('pause').addClass('play');
-                    $wrapper.addClass('paused');
+                    // $wrapper.addClass('paused');
                 }
                 else {
                     $playpause.find('i').removeClass('play').addClass('pause');
-                    $wrapper.removeClass('paused');
+                    // $wrapper.removeClass('paused');
                 }
             }
             // Mute button
@@ -323,6 +325,10 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                     // jump to full screen on double-click
                     $video.rebind('dblclick', function() {
                         $fullscreen.trigger('click');
+                    });
+
+                    $('.play-video-button', $wrapper).rebind('click', function() {
+                        $playpause.trigger('click');
                     });
                 }
             }

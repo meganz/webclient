@@ -1017,7 +1017,7 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
         if (error) {
             onIdle(function() {
                 promise.reject(error);
-            })
+            });
         }
     }
     else {

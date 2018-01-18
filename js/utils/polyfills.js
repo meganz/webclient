@@ -19,6 +19,8 @@ mBroadcaster.once('startMega', function() {
 
 /** document.exitFullScreen polyfill */
 mBroadcaster.once('startMega', function() {
+    'use strict';
+
     if (typeof document.exitFullscreen !== 'function') {
         document.exitFullscreen = document.mozCancelFullScreen
             || document.webkitCancelFullScreen || document.msExitFullscreen || function() {};

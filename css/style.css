@@ -4348,14 +4348,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin: 0 25px 0 32px;
     font-size: 13px;
     line-height: 23px;
-    color: #666666;
+    color: #444;
     padding: 0;
     overflow: hidden;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
-.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name {
+.fm-dialog-body .nw-contact-item.selected {
+    background-color: rgba(43,166,222,0.5);
+    color: white;
+}
+.fm-dialog-body .nw-contact-item.selected .nw-contact-email, .fm-dialog-body .nw-contact-item.selected .nw-contact-group {
+    color: #fff;
+}
+.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name  {
     color: white;
 }
 .tree-item {
@@ -5905,10 +5912,6 @@ th.grid-first-th {
     background-color: rgba(43, 166, 222, 0.5);
     color: #fff;
 }
-.fm-dialog-body .nw-contact-item.active {
-    background-color: rgba(43, 166, 222, 0.75);
-    color: #fff;
-}
 .fm-dialog-body .nw-contact-email, .fm-dialog-body .nw-contact-group {
     font-size: 13px;
     line-height: 24px;
@@ -5921,12 +5924,6 @@ th.grid-first-th {
     text-overflow: ellipsis;
     width: calc(50% - 2px);
     color: #888;
-}
-.fm-dialog-body .nw-contact-group {
-    cursor: pointer;
-}
-.fm-dialog-body .nw-contact-group:hover {
-    text-decoration: underline;
 }
 .fm-dialog-body .nw-contact-item:hover .nw-contact-email {
     color: #fff;
@@ -5943,15 +5940,18 @@ th.grid-first-th {
     background-image: url(../images/mega/group_copy@2x.png);
     background-repeat: no-repeat;
     background-size: 12px 10px;
+    opacity: 0.8;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
     -o-transition: opacity 200ms ease-in-out;
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
-.fm-dialog-body .nw-contact-item:hover > .nw-contact-group-icon {
+.fm-dialog-body .nw-contact-item:hover > .nw-contact-group-icon, .fm-dialog-body .nw-contact-item.selected > .nw-contact-group-icon {
     background-image: url(../images/mega/group_copy_white@2x.png);
+    opacity: 1;
 }
+
 .fm-dialog-body .nw-contact-name.group {
     margin-left: 11px;
 }
@@ -17594,6 +17594,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .rubbish-bin .dialog-empty-icon {
     background-position: center -3118px;
+}
+.conversations .dialog-empty-icon {
+    background-position: center -2968px;
 }
 .dialog-empty-header {
     font-size: 18px;

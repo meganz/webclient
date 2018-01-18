@@ -158,7 +158,7 @@
                         namesCombine += '...';
                     }
                     groupElem += '<span class="nw-contact-name group">' + namesCombine + '</span>';
-                    groupElem += '<span class="nw-contact-group">' + nb + ' contacts</span> </span>';
+                    groupElem += '<span class="nw-contact-group">' + nb + ' chat members</span> </span>';
                     groupElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + groupElem + '</li>';
                     return groupElem;
                 }

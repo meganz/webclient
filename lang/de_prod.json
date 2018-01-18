@@ -1917,5 +1917,8 @@
     "17617": "Neuer Ordner",
     "17618": "WEITERE DATEI(EN) HOCHLADEN",
     "17619": "Der MEGAdrop-URL wurde in die Zwischenablage kopiert.",
-    "17620": "Der MEGAdrop-Code wurde in die Zwischenablage kopiert."
+    "17620": "Der MEGAdrop-Code wurde in die Zwischenablage kopiert.",
+    "17626": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
+    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
+    "17687": "Not supported"
 }

@@ -673,16 +673,7 @@ React.makeElement = React['createElement'];
 	                }));
 	                M.syncUsersFullname(contactHash);
 	                self.processNewUser(contactHash);
-	                asyncApiReq({
-	                    'a': 'uge',
-	                    'u': contactHash
-	                }).done(function (r) {
-	                    if (r && isString(r)) {
-	                        if (M.u[contactHash]) {
-	                            M.u[contactHash].m = r;
-	                        }
-	                    }
-	                });
+	                M.syncContactEmail(contactHash);
 	            }
 	        });
 	    }
@@ -2002,7 +1993,7 @@ React.makeElement = React['createElement'];
 	    },
 	    debouncedForceUpdate: function() {
 	        var self = this;
-	        if (self.skippedUpdates) {
+	        if (typeof(self.skippedUpdates) === 'undefined') {
 	            self.skippedUpdates = 0;
 	        }
 
@@ -2667,6 +2658,22 @@ React.makeElement = React['createElement'];
 
 	        if (!skipReinitialised) {
 	            this.reinitialised(true);
+	        }
+	    },
+	    disable: function disable() {
+	        if (this.isMounted()) {
+	            var $elem = $(this.findDOMNode());
+	            $elem.attr('data-scroll-disabled', true);
+	            $elem.addClass('ps-disabled');
+	            Ps.disable($elem[0]);
+	        }
+	    },
+	    enable: function enable() {
+	        if (this.isMounted()) {
+	            var $elem = $(this.findDOMNode());
+	            $elem.removeAttr('data-scroll-disabled');
+	            $elem.removeClass('ps-disabled');
+	            Ps.enable($elem[0]);
 	        }
 	    },
 	    reinitialised: function reinitialised(forced) {
@@ -3442,31 +3449,26 @@ React.makeElement = React['createElement'];
 	                    key: "view", icon: "human-profile", label: __(l[101]), onClick: function onClick() {
 	                        loadingDialog.show();
 
-	                        asyncApiReq({
-	                            'a': 'uge',
-	                            'u': contact.u
-	                        }).done(function (r) {
-	                            if (r) {
-	                                var exists = false;
-	                                Object.keys(M.opc).forEach(function (k) {
-	                                    if (!exists && M.opc[k].m === r) {
-	                                        exists = true;
-	                                        return false;
-	                                    }
-	                                });
-
-	                                if (exists) {
-	                                    closeDialog();
-	                                    msgDialog('warningb', '', l[7413]);
-	                                } else {
-	                                    M.inviteContact(M.u[u_handle].m, r);
-	                                    var title = l[150];
-
-	                                    var msg = l[5898].replace('[X]', r);
-
-	                                    closeDialog();
-	                                    msgDialog('info', title, msg);
+	                        M.syncContactEmail(contact.u).done(function (email) {
+	                            var exists = false;
+	                            Object.keys(M.opc).forEach(function (k) {
+	                                if (!exists && M.opc[k].m === email) {
+	                                    exists = true;
+	                                    return false;
 	                                }
+	                            });
+
+	                            if (exists) {
+	                                closeDialog();
+	                                msgDialog('warningb', '', l[7413]);
+	                            } else {
+	                                M.inviteContact(M.u[u_handle].m, email);
+	                                var title = l[150];
+
+	                                var msg = l[5898].replace('[X]', email);
+
+	                                closeDialog();
+	                                msgDialog('info', title, msg);
 	                            }
 	                        }).always(function () {
 	                            loadingDialog.hide();
@@ -3826,10 +3828,21 @@ React.makeElement = React['createElement'];
 
 	        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
+	        var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall;
+
+	        var startAudioCallButtonClass = "";
+	        var startVideoCallButtonClass = "";
+
+	        if (disabledCalls) {
+	            startAudioCallButtonClass = startVideoCallButtonClass = "disabled";
+	        }
+
 	        var startAudioCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button", onClick: function onClick() {
-	                    room.startAudioCall();
+	            { className: "link-button" + " " + startVideoCallButtonClass, onClick: function onClick() {
+	                    if (!disabledCalls) {
+	                        room.startAudioCall();
+	                    }
 	                } },
 	            React.makeElement("i", { className: "small-icon audio-call" }),
 	            __(l[5896])
@@ -3837,16 +3850,15 @@ React.makeElement = React['createElement'];
 
 	        var startVideoCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button", onClick: function onClick() {
-	                    room.startVideoCall();
+	            { className: "link-button" + " " + startVideoCallButtonClass, onClick: function onClick() {
+	                    if (!disabledCalls) {
+	                        room.startVideoCall();
+	                    }
 	                } },
 	            React.makeElement("i", { className: "small-icon video-call" }),
 	            __(l[5897])
 	        );
 
-	        if (room.isReadOnly() || !room.chatId) {
-	            startAudioCallButton = startVideoCallButton = null;
-	        }
 	        var endCallButton = React.makeElement(
 	            "div",
 	            { className: "link-button red" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
@@ -4719,16 +4731,24 @@ React.makeElement = React['createElement'];
 	        var isAtBottom = ps.isAtBottom();
 
 	        if (ps.isCloseToBottom(30) === true) {
-	            self.scrolledToBottom = true;
+	            if (!self.scrolledToBottom) {
+	                var chatRoom = self.props.chatRoom;
+	                var mb = chatRoom.messagesBuff;
+	                mb.detachMessages();
+	            }
+	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
 	        } else {
-	            self.scrolledToBottom = false;
+	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = false;
 	        }
 
-	        if (isAtTop || ps.getScrollPositionY() < 300 && ps.getScrollHeight() > 500) {
+	        if (isAtTop || ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500) {
 	            var chatRoom = self.props.chatRoom;
 	            var mb = chatRoom.messagesBuff;
 	            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
+	                ps.disable();
+
 	                mb.retrieveChatHistory();
+
 	                self.isRetrievingHistoryViaScrollPull = true;
 	                self.lastScrollPosition = scrollPositionY;
 
@@ -4745,6 +4765,7 @@ React.makeElement = React['createElement'];
 
 	                        self.lastScrollPosition = prevPosY;
 
+	                        ps.enable();
 	                        ps.scrollToY(prevPosY, true);
 	                        self.forceUpdate();
 	                    }, 1000);
@@ -4758,6 +4779,7 @@ React.makeElement = React['createElement'];
 	    },
 	    specificShouldComponentUpdate: function specificShouldComponentUpdate() {
 	        if (this.isRetrievingHistoryViaScrollPull || this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || !this.props.chatRoom.isCurrentlyActive) {
+
 	            return false;
 	        } else {
 	            return undefined;
@@ -4798,7 +4820,7 @@ React.makeElement = React['createElement'];
 	        if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
 	            self.loadingShown = true;
 	        } else if (room.messagesBuff.joined === true) {
-	            if (!self.isRetrievingHistoryViaScrollPull) {
+	            if (!self.isRetrievingHistoryViaScrollPull && room.messagesBuff.haveMoreHistory() === false) {
 	                var headerText = room.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
 
 	                headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
@@ -5445,7 +5467,7 @@ React.makeElement = React['createElement'];
 	                            {
 	                                onFirstInit: function onFirstInit(ps, node) {
 	                                    ps.scrollToBottom(true);
-	                                    self.scrolledToBottom = 1;
+	                                    self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = 1;
 	                                },
 	                                onReinitialise: self.onMessagesScrollReinitialise,
 	                                onUserScroll: self.onMessagesScrollUserScroll,
@@ -5458,7 +5480,8 @@ React.makeElement = React['createElement'];
 	                                messagesBuff: self.props.chatRoom.messagesBuff,
 	                                editDomElement: self.state.editDomElement,
 	                                editingMessageId: self.state.editing,
-	                                confirmDeleteDialog: self.state.confirmDeleteDialog
+	                                confirmDeleteDialog: self.state.confirmDeleteDialog,
+	                                renderedMessagesCount: messagesList.length
 	                            },
 	                            React.makeElement(
 	                                "div",
@@ -5930,12 +5953,24 @@ React.makeElement = React['createElement'];
 	    getInitialState: function getInitialState() {
 	        return {};
 	    },
+	    unbindEvents: function unbindEvents() {
+	        $(document).unbind('keyup.confirmDialog' + this.getUniqueId());
+	    },
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 
 	        setTimeout(function () {
+	            if (!self.isMounted()) {
+
+	                return;
+	            }
 	            $(document).rebind('keyup.confirmDialog' + self.getUniqueId(), function (e) {
 	                if (e.which === 13 || e.keyCode === 13) {
+	                    if (!self.isMounted()) {
+
+	                        self.unbindEvents();
+	                        return;
+	                    }
 	                    self.onConfirmClicked();
 	                    return false;
 	                }
@@ -5944,9 +5979,10 @@ React.makeElement = React['createElement'];
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;
-	        $(document).unbind('keyup.confirmDialog' + self.getUniqueId());
+	        self.unbindEvents();
 	    },
 	    onConfirmClicked: function onConfirmClicked() {
+	        this.unbindEvents();
 	        if (this.props.onConfirmClicked) {
 	            this.props.onConfirmClicked();
 	        }
@@ -5958,6 +5994,7 @@ React.makeElement = React['createElement'];
 	            if (this.props.onConfirmClicked) {
 
 	                setTimeout(function () {
+	                    self.unbindEvents();
 	                    self.props.onConfirmClicked();
 	                }, 75);
 	            }
@@ -8256,7 +8293,6 @@ React.makeElement = React['createElement'];
 	                    ":" + meta.u + ":"
 	                )
 	            );
-	            console.log(meta);
 	        }
 
 	        var categoryIcons = {
@@ -9469,7 +9505,7 @@ React.makeElement = React['createElement'];
 	                        var previewButton = null;
 
 	                        if (!attachmentMetaInfo.revoked) {
-	                            if (v.fa && is_image(v)) {
+	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
 	                                var imagesListKey = message.messageId + "_" + v.h;
 	                                if (!chatRoom.images.exists(imagesListKey)) {
 	                                    v.id = imagesListKey;
@@ -9585,7 +9621,7 @@ React.makeElement = React['createElement'];
 	                        );
 
 	                        if (M.chat && !message.revoked) {
-	                            if (v.fa && is_image(v)) {
+	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
 	                                var src = thumbnails[v.h];
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);
@@ -9892,7 +9928,7 @@ React.makeElement = React['createElement'];
 	                }
 	            } else {
 
-	                if (message.textContents === "") {
+	                if (message.textContents === "" && !message.dialogType) {
 	                    message.deleted = true;
 	                }
 	                var messageActionButtons = null;
@@ -10198,8 +10234,12 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.message.chatRoom;
 	        var megaChat = chatRoom.megaChat;
 	        var contact = self.getContact();
-	        if (contact && contact.addChangeListener) {
-	            self._contactChangeListener = contact.addChangeListener(function () {
+	        if (contact && contact.addChangeListener && !self._contactChangeListener) {
+	            self._contactChangeListener = contact.addChangeListener(function (contact, oldData, k, v) {
+	                if (k === "ts") {
+
+	                    return;
+	                }
 	                self.debouncedForceUpdate();
 	            });
 	        }
@@ -10258,6 +10298,9 @@ React.makeElement = React['createElement'];
 	            timestampInt = unixtime();
 	        }
 
+	        if (timestampInt && message.updated && message.updated > 0) {
+	            timestampInt += message.updated;
+	        }
 	        return timestampInt;
 	    },
 	    getParentJsp: function getParentJsp() {
@@ -10760,11 +10803,11 @@ React.makeElement = React['createElement'];
 
 	    this.isCurrentlyActive = false;
 
-	    this.bind('onStateChange', function (e, oldState, newState) {
-	        self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
-
-	        if (newState === ChatRoom.STATE.JOINING) {} else if (newState === ChatRoom.STATE.READY) {}
-	    });
+	    if (d) {
+	        this.bind('onStateChange', function (e, oldState, newState) {
+	            self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
+	        });
+	    }
 
 	    self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {
 	        var ts = msg.delay ? msg.delay : msg.ts;
@@ -11181,7 +11224,6 @@ React.makeElement = React['createElement'];
 	    }
 
 	    if (self.shownMessages[message.messageId]) {
-
 	        return false;
 	    }
 	    if (!message.orderValue) {
@@ -11338,7 +11380,7 @@ React.makeElement = React['createElement'];
 	        logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error);
 	    }
 
-	    var ul = this.pendingUploads ? this.pendingUploads[uid] : null;
+	    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
 	    if (ul) {
 	        delete this.pendingUploads[uid];
@@ -11374,7 +11416,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var n = M.d[handle];
-	            var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+	            var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
 	            if (d) {
 	                logger.debug('upload:completion', uid, handle, faid, ul, n);
@@ -11383,58 +11425,77 @@ React.makeElement = React['createElement'];
 	            if (!ul || !n) {
 
 	                logger.error('Invalid state error...');
-	            } else if (!n.fa && ul.isim) {
-
-	                ul.faid = faid;
-	                ul.h = handle;
 	            } else {
+	                ul.h = handle;
 
-	                delete self.pendingUploads[uid];
-	                self.onUploadComplete([handle]);
+	                if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
+
+	                    ul.faid = faid;
+
+	                    if (d) {
+	                        logger.debug('Waiting for file attribute to arrive.', handle, ul);
+	                    }
+	                } else {
+
+	                    self.onUploadComplete(ul);
+	                }
 	            }
 	        }));
 
 	        self.uploadListeners.push(mBroadcaster.addListener('upload:error', self.onUploadError.bind(self)));
 	        self.uploadListeners.push(mBroadcaster.addListener('upload:abort', self.onUploadError.bind(self)));
 
-	        self.uploadListeners.push(mBroadcaster.addListener('fa:error', function (faid, error, onStorage) {
-	            var uid = self.lookupPendingUpload(faid);
-	            var ul = self.pendingUploads ? self.pendingUploads[uid] : null;
+	        self.uploadListeners.push(mBroadcaster.addListener('fa:error', function (faid, error, onStorageAPIError, nFAiled) {
+	            var uid = self.lookupPendingUpload(faid, faid);
+	            var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
 	            if (d) {
-	                logger.debug('fa:error', faid, error, onStorage, uid, ul);
+	                logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul);
 	            }
 
-	            delete self.pendingUploads[uid];
+	            if (ul) {
 
-	            if (ul && ul.faid) {
-	                var n = M.d[handle];
-	                if (n) {
-	                    self.onUploadComplete([handle]);
+	                ul.efa = Math.max(0, ul.efa - nFAiled) | 0;
+
+	                if (ul.h) {
+
+	                    var n = M.d[ul.h] || false;
+
+	                    if (!ul.efa || n.fa && String(n.fa).split('/').length >= ul.efa) {
+	                        self.onUploadComplete(ul);
+	                    }
 	                }
 	            }
 	        }));
 
 	        self.uploadListeners.push(mBroadcaster.addListener('fa:ready', function (handle, fa) {
-	            var uid = self.lookupPendingUpload(false, handle);
-	            var ul = self.pendingUploads[uid];
-	            var n = M.d[handle];
+	            delay('chat:fa-ready:' + handle, function () {
+	                var uid = self.lookupPendingUpload(false, handle);
+	                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
 
-	            if (d) {
-	                logger.debug('fa:ready', handle, fa, uid, ul, n);
-	            }
+	                if (d) {
+	                    logger.debug('fa:ready', handle, fa, uid, ul);
+	                }
 
-	            delete self.pendingUploads[uid];
+	                if (ul.h && String(fa).split('/').length >= ul.efa) {
 
-	            if (n) {
-	                self.onUploadComplete([handle]);
-	            }
+	                    self.onUploadComplete(ul);
+	                } else if (d) {
+	                    logger.debug('Not enough file attributes yet, holding...', ul);
+	                }
+	            });
 	        }));
 	    }
 	};
 
-	ChatRoom.prototype.onUploadComplete = function (uploads) {
-	    this.attachNodes(uploads);
+	ChatRoom.prototype.onUploadComplete = function (ul) {
+	    if (this.pendingUploads && this.pendingUploads[ul.uid]) {
+	        if (d) {
+	            console.debug('Attaching node to chat room...', ul.h, ul.uid, ul, M.d[ul.h]);
+	        }
+	        this.attachNodes([ul.h]);
+	        delete this.pendingUploads[ul.uid];
+	    }
 
 	    this.clearUploadListeners();
 	};
@@ -11565,6 +11626,15 @@ React.makeElement = React['createElement'];
 	            setLastInteractionWith(contact.u, "1:" + ts);
 	        }
 	    }
+	};
+
+	ChatRoom.prototype.retrieveAllHistory = function () {
+	    var self = this;
+	    self.messagesBuff.retrieveChatHistory().done(function () {
+	        if (self.messagesBuff.haveMoreHistory()) {
+	            self.retrieveAllHistory();
+	        }
+	    });
 	};
 
 	window.ChatRoom = ChatRoom;

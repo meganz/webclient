@@ -387,8 +387,12 @@ function makeObservable(kls) {
 
     aliases.forEach(function(fn) {
         target[fn] = function() {
-            var $this = $(this);
-            return $this[fn].apply($this, arguments);
+            // trying to save few ms here...
+            if (this && !this._$thisCache) {
+                this._$thisCache = $(this);
+            }
+
+            return this._$thisCache[fn].apply(this._$thisCache, arguments);
         };
     });
 
@@ -2553,13 +2557,16 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
         .replace('defaultFilename = \'compressed.tracemonkey - pldi - 09.pdf\';',
         'defaultFilename = \'document.pdf\';');
 
+    var pdfImagesPath = 'PDFJS.imageResourcesPath = \'' + (is_extension ? '' : '/') + 'images/pdfV/\';';
+    var pdfWorkerPath = 'PDFJS.workerSrc = \'' + (is_extension ? '' : '/') + 'pdf.worker.js\';';
+
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('PDFJS.imageResourcesPath = \'./images/\';',
-        'PDFJS.imageResourcesPath = \'/images/pdfV/\';');
+        pdfImagesPath);
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('PDFJS.workerSrc = \'../build/pdf.worker.js\';',
-        'PDFJS.workerSrc = \'/pdf.worker.js\';');
+        pdfWorkerPath);
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('setTitleUsingUrl: function pdfViewSetTitleUsingUrl(url) {',
@@ -2588,7 +2595,7 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('debuggerScriptPath: \'./debugger.js\',',
         ' ');
-    
+
     // algorithm to remove 'mozL10n.get'
     var st = 5000; // start from char 50000
 

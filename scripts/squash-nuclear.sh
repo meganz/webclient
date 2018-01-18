@@ -18,11 +18,21 @@
 #
 # Now run this script e.g. ./scripts/squash-nuclear.sh.
 
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if which greadlink >/dev/null; then
+        READLINK_BINARY="greadlink"
+    else
+        echo "Found platform to be OSX, but greadlink is missing. Please do install 'greadlink'."
+        exit 1;
+    fi
+else
+    READLINK_BINARY="readlink"
+fi
 
 # Change to the path of this script, then go up a level to the main web directory. This allows the script to be
 # executed from multiple places and still capture all the code changes in the main web directory. E.g. if executed via
 # ./scripts/squash-nuclear.sh or cd scripts && ./squash-nuclear.sh they will both work.
-currentScript=$(readlink -f "$0")
+currentScript=$($READLINK_BINARY -f "$0")
 pathOfScript=$(dirname "$currentScript")
 cd "$pathOfScript"
 cd ..
@@ -30,6 +40,11 @@ cd ..
 # Find the current branch
 target_branch=develop
 current_branch=$(git symbolic-ref --short -q HEAD)
+
+remote=$(git remote -v | grep "@code.developers.mega.co.nz:web/webclient.git (push)" | awk '{print $1}')
+if [ "$remote" = "" ]; then
+    remote=origin
+fi
 
 if [ "$current_branch" = "$target_branch" ]; then
     echo "Invalid Branch!"
@@ -63,7 +78,7 @@ else
     git reset --hard HEAD^
 
     echo
-    echo "3. Reset of origin/$current_branch-squashed back to prior commit complete"
+    echo "3. Reset of $remote / $current_branch-squashed back to prior commit complete"
     echo "---"
 fi
 
@@ -83,7 +98,7 @@ read commitMessage
 
 # Commit the changes and try push as a new squashed branch
 git commit -m "$commitMessage"
-git push -u origin $current_branch-squashed
+git push -u $remote $current_branch-squashed
 
 # If the push succeeds, then the -squashed branch didn't exist on origin so all good
 if [ $? -eq 0 ]; then
@@ -97,7 +112,7 @@ else
 
     # If the push failed then the squashed branch already exists on origin so force push the changes
     # This will retain one single commit on the -squashed branch and retain the history of recent changes on GitLab
-    git push -f origin $current_branch-squashed
+    git push -f $remote $current_branch-squashed
     echo
     echo "7. Force push updated branch $current_branch-squashed. All done."
     echo "---"

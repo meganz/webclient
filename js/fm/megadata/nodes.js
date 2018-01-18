@@ -865,7 +865,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
         }
         ufsc.addToDB(n);
 
-        if (this.nn && n.name) {
+        if (this.nn && n.name && !n.fv) {
             this.nn[n.h] = n.name;
         }
 

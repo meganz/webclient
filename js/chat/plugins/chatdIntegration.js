@@ -33,7 +33,7 @@ var ChatdIntegration = function(megaChat) {
     );
 
     self.megaChat = megaChat;
-    self.chatd = new Chatd(u_handle);
+    self.chatd = new Chatd(u_handle, megaChat);
     self.waitingChatIdPromises = {};
     self.chatIdToRoomJid = {};
     self._cachedHandlers = {};
@@ -168,7 +168,6 @@ var ChatdIntegration = function(megaChat) {
  * @type {MegaPromise}
  */
 ChatdIntegration.mcfHasFinishedPromise = new MegaPromise();
-
 
 /**
  * Resolved/rejected when all chats are added to megaChat.chats, mcurls are received, etc. E.g. they are ready for
@@ -445,7 +444,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
             }
             self.decryptTopic(chatRoom);
             // handler of the same room was cached before, then restore the keys.
-            if (self._cachedHandlers[roomId]) {
+            if (self._cachedHandlers[roomId] && chatRoom.protocolHandler) {
                 chatRoom.protocolHandler.participantKeys = self._cachedHandlers[roomId].participantKeys;
             }
             if (!isMcf && actionPacket.ou === u_handle && !actionPacket.n) {
@@ -847,7 +846,11 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
     message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
     message.decrypted = true;
 
-    if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+    if (
+        textContents &&
+        textContents.substr &&
+        textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT
+    ) {
         if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
             try {
                 var attachmentMeta = JSON.parse(textContents.substr(2));
@@ -882,7 +885,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
 
                 // generate preview/icon
                 if (!attachmentMetaInfo.revoked && !message.revoked) {
-                    if (v.fa && is_image(v)) {
+                    if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
                             v.id = imagesListKey;
@@ -893,8 +896,11 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                 }
             });
         }
-        else if (textContents.substr &&
-            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+        else if (
+            textContents &&
+            textContents.substr &&
+            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT
+        ) {
             var foundRevokedNode = null;
 
             var revokedNode = textContents.substr(2, textContents.length);
@@ -1163,78 +1169,32 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             if (hist.length > 0) {
                 var _decryptSuccessCb = function(decryptedMsgs) {
                     for (var i = decryptedMsgs.length - 1; i >= 0; i--) {
-                        var failedToDecrypt = false;
                         var v = decryptedMsgs[i];
-                        var messageId = hist[i]['k'];
-                        var msgInstance = chatRoom.messagesBuff.messagesBatchFromHistory[messageId];
-                        if (v && msgInstance) {
-                            if (v.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
-                                if (typeof v.payload === 'undefined' || v.payload === null) {
-                                    v.payload = "";
-                                }
-                                msgInstance.textContents = v.payload;
-                                if (v.identity && v.references) {
-                                    var mb = chatRoom.messagesBuff;
-                                    msgInstance.references = v.references;
-                                    msgInstance.msgIdentity = v.identity;
-                                    mb.messageOrders[v.identity] = msgInstance.orderValue;
-                                    if (mb.verifyMessageOrder(v.identity, v.references) === false) {
-                                        // potential message order tampering detected.
-                                        self.logger.critical("message order tampering detected: ", messageId);
-                                    }
-                                }
-                            }
-                            else if (v.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                                if (msgInstance) {
-                                    msgInstance.meta = {
-                                        userId: v.sender,
-                                        included: v.includeParticipants,
-                                        excluded: v.excludeParticipants
-                                    };
-                                    ChatdIntegration._ensureNamesAreLoaded(v.excludeParticipants);
-                                    ChatdIntegration._ensureNamesAreLoaded(v.includeParticipants);
-                                    msgInstance.dialogType = "alterParticipants";
-                                }
-                            }
-                            else if (v.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                                msgInstance.dialogType = 'truncated';
-                                msgInstance.userId = v.sender;
-                            }
-                            else if (v.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
-                                msgInstance.meta = {
-                                    userId: v.sender,
-                                    privilege: v.privilege.charCodeAt(0),
-                                    targetUserId: v.recipients
-                                };
-                                msgInstance.dialogType = "privilegeChange";
-                            }
-                            else if (v.type === strongvelope.MESSAGE_TYPES.TOPIC_CHANGE){
-                                msgInstance.meta = {
-                                    userId: v.sender,
-                                    topic: v.payload
-                                };
-                                msgInstance.dialogType = "topicChange";
-                            }
-                            else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
-                                // this is a system message
-                                msgInstance.protocol = true;
-                            }
-                            else {
-                                failedToDecrypt = true;
-                                self.logger.error("Could not decrypt: ", v);
-                            }
-
-                            delete chatRoom.notDecryptedBuffer[messageId];
-
-                            if (!failedToDecrypt) {
-                                self._parseMessage(chatRoom, msgInstance);
-                                chatRoom.messagesBuff.messages.push(msgInstance);
-                                chatRoom.messagesBuff.messagesBatchFromHistory.remove(messageId);
-                            }
+                        if (!v) {
+                            // message failed to decrypt and decryption returned undefined.
+                            continue;
                         }
-                        else {
-                            delete chatRoom.notDecryptedBuffer[messageId];
-                            // chatRoom.messagesBuff.messagesBatchFromHistory.remove(messageId);
+                        var failedToDecrypt = false;
+                        var messageId = hist[i]['k'];
+
+                        var msgInstance = chatRoom.messagesBuff.messagesBatchFromHistory[messageId];
+
+                        if (!msgInstance) {
+                            msgInstance = chatRoom.messagesBuff.getMessageById(messageId);
+                        }
+
+                        var succeeded = self._processDecryptedMessage(chatRoom, msgInstance, v);
+                        if (!succeeded) {
+                            failedToDecrypt = true;
+                            self.logger.error("Could not decrypt: ", v, msgInstance);
+                        }
+
+                        delete chatRoom.notDecryptedBuffer[messageId];
+
+                        if (!failedToDecrypt) {
+                            self._parseMessage(chatRoom, msgInstance);
+                            chatRoom.messagesBuff.messages.push(msgInstance);
+                            chatRoom.messagesBuff.messagesBatchFromHistory.remove(messageId);
                         }
                     }
 
@@ -1375,61 +1335,20 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     return;
                                 }
 
-                                if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
-                                    if (typeof decrypted.payload === 'undefined' || decrypted.payload === null) {
-                                        decrypted.payload = "";
+                                var succeeded = self._processDecryptedMessage(
+                                    chatRoom,
+                                    msg,
+                                    decrypted
+                                );
+
+                                if (succeeded) {
+                                    mb.messagesBatchFromHistory.remove(msg.messageId);
+                                    if (msg.pendingMessageId) {
+                                        mb.messages.remove(msg.pendingMessageId);
                                     }
-                                    msg.textContents = decrypted.payload;
-
-                                    if (decrypted.identity && decrypted.references) {
-                                        msg.references = decrypted.references;
-                                        msg.msgIdentity = decrypted.identity;
-                                        mb.messageOrders[decrypted.identity] = msgObject.orderValue;
-                                        if (
-                                            mb.verifyMessageOrder(decrypted.identity, decrypted.references) === false
-                                        ) {
-                                            // potential message order tampering detected.
-                                            var l = self.logger;
-                                            l.critical("message order tampering detected: ", msgObject.messageId);
-                                        }
-                                    }
-                                } else if (decrypted.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
-                                    msg.meta = {
-                                        userId: decrypted.sender,
-                                        included: decrypted.includeParticipants,
-                                        excluded: decrypted.excludeParticipants
-                                    };
-                                    msg.dialogType = "alterParticipants";
-
-                                } else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                                    msg.dialogType = 'truncated';
-                                    msg.userId = decrypted.sender;
+                                    mb.messages.push(msg);
+                                    self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                                 }
-                                else if (decrypted.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
-                                    msg.meta = {
-                                        userId: decrypted.sender,
-                                        privilege: decrypted.privilege.charCodeAt(0),
-                                        targetUserId: decrypted.recipients
-                                    };
-                                    msg.dialogType = "privilegeChange";
-
-                                }
-                                else if (decrypted.type === strongvelope.MESSAGE_TYPES.TOPIC_CHANGE){
-                                    msg.meta = {
-                                        userId: decrypted.sender,
-                                        topic: decrypted.payload
-                                    };
-                                    msg.dialogType = "topicChange";
-                                }
-                                else if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED){
-                                    msg.protocol = true;
-                                }
-                                mb.messagesBatchFromHistory.remove(msg.messageId);
-                                if (msg.pendingMessageId) {
-                                    mb.messages.remove(msg.pendingMessageId);
-                                }
-                                mb.messages.push(msg);
-                                self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                             } else {
                                 self.logger.error('Unknown message type!');
                             }
@@ -1504,6 +1423,94 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
 
     $(chatRoom).trigger('onChatdIntegrationReady');
+
+};
+
+ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInstance, decryptedResult) {
+    var self = this;
+    if (decryptedResult && msgInstance) {
+        if (decryptedResult.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
+            if (typeof decryptedResult.payload === 'undefined' || decryptedResult.payload === null) {
+                decryptedResult.payload = "";
+            }
+            msgInstance.textContents = decryptedResult.payload;
+            if (decryptedResult.identity && decryptedResult.references) {
+                var mb = chatRoom.messagesBuff;
+                msgInstance.references = decryptedResult.references;
+                msgInstance.msgIdentity = decryptedResult.identity;
+                mb.messageOrders[decryptedResult.identity] = msgInstance.orderValue;
+                if (mb.verifyMessageOrder(decryptedResult.identity, decryptedResult.references) === false) {
+                    // potential message order tampering detected.
+                    self.logger.critical("message order tampering detected: ", chatRoom.chatId, msgInstance.messageId);
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+        }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.ALTER_PARTICIPANTS) {
+            if (msgInstance) {
+                msgInstance.meta = {
+                    userId: decryptedResult.sender,
+                    included: decryptedResult.includeParticipants,
+                    excluded: decryptedResult.excludeParticipants
+                };
+                ChatdIntegration._ensureNamesAreLoaded(decryptedResult.excludeParticipants);
+                ChatdIntegration._ensureNamesAreLoaded(decryptedResult.includeParticipants);
+                msgInstance.dialogType = "alterParticipants";
+            }
+        }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
+            msgInstance.dialogType = 'truncated';
+            msgInstance.userId = decryptedResult.sender;
+        }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.PRIVILEGE_CHANGE) {
+            msgInstance.meta = {
+                userId: decryptedResult.sender,
+                privilege: decryptedResult.privilege.charCodeAt(0),
+                targetUserId: decryptedResult.recipients
+            };
+            msgInstance.dialogType = "privilegeChange";
+        }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.TOPIC_CHANGE){
+            msgInstance.meta = {
+                userId: decryptedResult.sender,
+                topic: decryptedResult.payload
+            };
+            msgInstance.dialogType = "topicChange";
+        }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
+            // this is a system message
+            msgInstance.protocol = true;
+        }
+        else {
+            self.logger.error("Could not decrypt: ", decryptedResult);
+            return false;
+        }
+
+        if (decryptedResult.type === strongvelope.MESSAGE_TYPES.TRUNCATE && msgInstance) {
+            var messageKeys = chatRoom.messagesBuff.messages.keys();
+
+            for (var i = 0; i < messageKeys.length; i++) {
+                var v = chatRoom.messagesBuff.messages[messageKeys[i]];
+
+                if (v.orderValue < msgInstance.orderValue) {
+                    // remove the messages with orderValue < eventData.id from message buffer.
+                    chatRoom.messagesBuff.messages.removeByKey(v.messageId);
+                }
+            }
+
+            if (self.chatd.chatdPersist) {
+                self.chatd.chatdPersist.persistTruncate(chatRoom.chatId, msgInstance.orderValue);
+            }
+        }
+
+        return true;
+    }
+    else {
+        return false;
+    }
 
 };
 
@@ -1682,9 +1689,54 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
     var foundMsg;
     if (!msg) {
         msg = chatMessages.sendingbuf[msgnum & 0xffffffff];
-        if (!msg) {
-            console.error("Update message failed, msgNum  was not found in either .buf or .sendingbuf", msgnum);
-            return false;
+        if (!msg && self.chatd.chatdPersist) {
+            self.chatd.chatdPersist.getMessageByOrderValue(chatRoom.chatId, msgnum)
+                .done(function(r) {
+                    if (!r) {
+                        console.error(
+                            "Update message failed, msgNum  was not found in either .buf, .sendingbuf or messagesBuff",
+                            msgnum
+                        );
+                        return;
+                    }
+                    var msg = r[0];
+
+                    self.chatd.chatdPersist.retrieveAndLoadKeysFor(chatRoom.chatId, msg.userId, msg.keyId)
+                        .done(function() {
+
+                            chatMessages.buf[msgnum] = [
+                                // Chatd.MsgField.MSGID,
+                                base64urldecode(msg.msgId),
+                                // Chatd.MsgField.USERID,
+                                base64urldecode(msg.userId),
+                                // Chatd.MsgField.TIMESTAMP,
+                                msg.msgObject.delay,
+                                // message,
+                                "",
+                                // Chatd.MsgField.KEYID,
+                                msg.keyId,
+                                // mintimestamp - Chatd.MsgField.TIMESTAMP + 1,
+                                0,
+                                // Chatd.MsgType.EDIT
+                                0
+                            ];
+
+
+                            self.updateMessage(chatRoom, msgnum, newMessage);
+                        })
+                        .fail(function(e) {
+                            self.logger.error("Failed to retrieve key for MSGUPD, ", msgnum, msg.keyId, e);
+                        });
+
+
+                })
+                .fail(function() {
+                    console.error(
+                        "Update message failed, msgNum  was not found in either .buf, .sendingbuf or messagesBuff",
+                        msgnum
+                    );
+                });
+            return;
         }
         else {
             foundMsg = chatRoom.messagesBuff.getByInternalId(msgnum);

@@ -18,6 +18,8 @@ mega.megadrop = (function() {
         pufHandle: '',
         pupHandle: '',
         pageData: {},
+        dropList: [],
+        fldrList: [],
         req: {
             owner: {
                 a: 'uk',
@@ -48,6 +50,10 @@ mega.megadrop = (function() {
         return widgetOpts.pufHandle;
     };
 
+    var dropList = function widgetDropList() {
+        return widgetOpts.dropList;
+    };
+
     /**
      * Copy to clipboard
      * Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
@@ -73,11 +79,43 @@ mega.megadrop = (function() {
     };
 
     /**
+     * Search for MEGAdrop's in folder tree starting from rootNode
+     * @param {String} rootNodeId Folder node handle
+     * @param {Boolean} reset Perform new search
+     * @returns {String} True if MEGAdrop exists
+     */
+    var isDropExist = function isDropExist(rootNodeId, reset) {
+        var list = widgetOpts.fldrList;// MEGAdrop folders id list
+        var currNodeId = rootNodeId;
+
+        if (reset) {
+            widgetOpts.dropList = [];
+            widgetOpts.fldrList = [];
+        }
+
+        $.each(M.tree[currNodeId], function(nodeId) {
+                list.push(nodeId);
+        });
+
+        if (mega.megadrop.pufs[currNodeId]) {
+            widgetOpts.dropList.push(currNodeId);
+        }
+
+        currNodeId = list.shift();
+        if (currNodeId) {
+            isDropExist(currNodeId);
+        }
+
+        return widgetOpts.dropList.length;
+    };
+
+    /**
      * Public upload folder's (PUF) related methods and properties
      */
     puf = (function() {
 
         var pufOpts = {
+            list: [],
             items: {},
             req: {
                 create: {       // Create PUF
@@ -326,42 +364,57 @@ mega.megadrop = (function() {
 
         /**
          * Removes public upload folder (PUF)
-         * @param {String} handle Folder handle
+         * @param {Object} list MEGAdrop folders id list
+         * @param {String} selection Selected folders id
+         * @param {String} cb Callback function
          */
-        var remove = function pufRemove(handle) {
+        var remove = function pufRemove(list, selection, cb, cbParam1, cbParam2) {
             if (d) {
                 console.log('puf.remove');
             }
-            var req = {// Remove PUF
-                a: 'ul',
-                n: '',// Folder handle
-                d: 1,// Delete public upload folder
-                i: requesti
-            };
 
-            if (handle) {
+            var len = list.length;
+            var end = 0;
+            if (len) {
+
                 loadingDialog.show();
-                req.n = handle;
+                for (var k = len; k--;) {
 
-                api_req(req, {
-                    callback: function (res) {
-                        if (res < 0) {
-                            msgDialog('warninga', l[135], l[47], api_strerror(res));
+                    var req = {// Remove PUF
+                        a: 'ul',
+                        n: list[k],// Folder handle
+                        d: 1,// Delete public upload folder
+                        i: requesti
+                    };
+
+                    api_req(req, {
+                        callback: function (res) {
+                            if (res < 0) {
+                                 msgDialog('warninga', l[135], l[47], api_strerror(res));
                             if (d) {
                                 console.error('pufRemove failed ', res);
                             }
                         }
                         else {
+                            end++;
+                            if (cb && len === end) {
+                                if (cbParam1 && cbParam2) {
+                                    cb(cbParam1, cbParam2);
+                                }
+                                else {
+                                    cb(selection);
+                                }
+                            }
                             if (d) {
                                 console.log('Removal of public upload folder: ', res);
                             }
                         }
-                    }
-                });
+                    }});
+                }
             }
             else {
                 if (d) {
-                    console.warn('Removal of public upload folder: Folder handle is not provided.', handle);
+                    console.warn('Removal of public upload folder: Folder handle is not provided.');
                 }
             }
         };
@@ -1051,7 +1104,7 @@ mega.megadrop = (function() {
             var name = '';
             var nodeHandle = '';
             var handle = '';
-            var pupPath = '';
+            var pupPath = l[1687];
             var $domElem = $('#stngs_pup_tmpl').clone();
 
             if (!$('#pup_' + pupHandle).length) {
@@ -1059,12 +1112,11 @@ mega.megadrop = (function() {
                 name = item.fn;
                 nodeHandle = item.h;
                 handle = item.p;
-                pupPath = l[1687];
                 pupPath += _getPath(nodeHandle);
 
                 $domElem.attr('id', 'pup_' + handle);
                 $domElem.removeClass('hidden');
-                $domElem.find('.widget-location-url div').attr('data-node', nodeHandle);
+                $domElem.find('.widget-location-url').attr('data-node', nodeHandle);
                 $domElem.find('.widget-location-url span').text(pupPath);
                 $domElem.find('.widget-card-left span').text(name);
 
@@ -1091,7 +1143,7 @@ mega.megadrop = (function() {
             $domElem.attr('id', 'ew_' + handle);
             $domElem.removeClass('hidden');
             $domElem.find('.fm-dialog-chrome-clipboard div').attr('id', 'chromeclipboard3');
-            $domElem.find('.widget-location-url div').attr('data-node', nodeHandle);
+            $domElem.find('.widget-location-url').attr('data-node', nodeHandle);
             $domElem.find('.widget-card-left span').text(name);
             $domElem.find('.widget-location-url span').text(path);
             $domElem.find('.widget-code-wrapper.widget-url').text(url);
@@ -1150,7 +1202,7 @@ mega.megadrop = (function() {
                 var pupHandle = id.replace('ew_', '');
                 var nodeHandle = pup.items[pupHandle].h;
 
-                puf.remove(nodeHandle);
+                puf.remove([nodeHandle]);
             });
 
             // Widget expanded go to folder
@@ -1402,7 +1454,7 @@ mega.megadrop = (function() {
             var url = is_extension ? getBaseUrl() : getAppBaseUrl();
             return url + '/megadrop/';
         };
-        
+
         var _queueScroll = function _uiQueueScroll(itemsNum) {
             var SCROLL_TRIGGER = 6;
             var queueDOM = uiOpts.window.class + ' ' + uiOpts.window.queueClass;
@@ -1710,12 +1762,10 @@ mega.megadrop = (function() {
             var sData = numOfBytes(size, 1);
             var itemsNum = uiOpts.window.queueItems.number += 1;
 
-            var $tmpl = $('#md_ultmpl').clone().removeClass('hidden');
-            $tmpl
-                .attr('id', 'ul_' + id)
-                .find('.wu-queue-item-name').text(str_mtrunc(name, 37))
-                .find('.wu-queue-item-size').text(' | ' + sData.size + ' ' + sData.unit)
-                .find('.wu-queue-item-status').text(status);
+            var $tmpl = $('#md_ultmpl').clone().removeClass('hidden').attr('id', 'ul_' + id);
+            $tmpl.find('.wu-queue-item-name').text(str_mtrunc(name, 37));
+            $tmpl.find('.wu-queue-item-size').text(' | ' + sData.size + ' ' + sData.unit);
+            $tmpl.find('.wu-queue-item-status').text(status);
 
             // When scroll is added add items inside it
             if (itemsNum > 6) {
@@ -1882,7 +1932,7 @@ mega.megadrop = (function() {
         }
 
         // Context menu create widget
-        $('.dropdown.body.context .dropdown-item.createwidget-item').rebind('click.create_widget', function () {
+        $('.dropdown.body.context .dropdown-item.createwidget-item').rebind('click.create_widget', function (event) {
 
             // Go to widget creation directly don't display PUF info dialog
             if (ui.skipInfoDlg()) {
@@ -1894,7 +1944,7 @@ mega.megadrop = (function() {
         });
 
         // Context menu manage widget
-        $('.dropdown.body.context .dropdown-item.managewidget-item').rebind('click.manage_widget', function () {
+        $('.dropdown.body.context .dropdown-item.managewidget-item').rebind('click.manage_widget', function (event) {
 
             // Go to widget creation directly don't display PUF info dialog
             if (ui.skipInfoDlg()) {
@@ -1906,8 +1956,8 @@ mega.megadrop = (function() {
         });
 
         // Context menu Remove upload page
-        $('.dropdown.body.context .dropdown-item.removewidget-item').rebind('click.remove_widget', function () {
-            puf.remove($.selected[0]);
+        $('.dropdown.body.context .dropdown-item.removewidget-item').rebind('click.remove_widget', function (event) {
+            puf.remove($.selected);
         });
     });
 
@@ -2204,6 +2254,8 @@ mega.megadrop = (function() {
         onRename: onRename,
         processUPH: processUPH,
         getPufHandle: pufHandle,
+        getDropList: dropList,
+        isDropExist: isDropExist,
         getOwnersHandle: ownersHandle,
         disableDragDrop: disableDragDrop,
         overQuota: showMEGAdropOverQuota,

@@ -258,6 +258,9 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         // Hide the default controls
         videoElement.controls = false;
 
+        // Hide the volume icon until we found the video has audio track
+        $('.volume-control', $wrapper).addClass('hidden');
+
         // Obtain handles to buttons and other elements
         var $playpause = $videoControls.find('.playpause');
         var $mute = $videoControls.find('.mute');
@@ -330,6 +333,10 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                     $('.play-video-button', $wrapper).rebind('click', function() {
                         $playpause.trigger('click');
                     });
+
+                    if (streamer.hasAudio) {
+                        $('.volume-control', $wrapper).removeClass('hidden');
+                    }
                 }
             }
         });
@@ -1700,12 +1707,8 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 if (videocodec === 'avc1') {
                     var mime = 'video/mp4; codecs="avc1.640029';
 
-                    if (audiocodec) {
-                        if (String(audiocodec).startsWith('mp4a')) {
-                            audiocodec = audiocodec.replace(/-/g, '.');
-                        }
-
-                        mime += ', ' + audiocodec;
+                    if (String(audiocodec).startsWith('mp4a')) {
+                        mime += ', ' + audiocodec.replace(/-/g, '.');
                     }
 
                     return MediaSource.isTypeSupported(mime + '"') ? 1 : 0;

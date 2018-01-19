@@ -4605,6 +4605,6 @@
     "17676": "Missed audio call and [A] missed video calls",
     "17679": "[A] missed audio calls and missed video call",
     "17680": "[A] missed audio calls  and [B] missed video calls",
-    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17686": "Mobilbrowserunterst\u00fctzung f\u00fcr MEGAdrop ist noch in Arbeit. Bitte verwenden Sie vor\u00fcbergehend einen Desktop-Browser.",
+    "17687": "Noch nicht verf\u00fcgbar"
 }

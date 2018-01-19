@@ -4560,7 +4560,7 @@
     "17620": "MEGAdrop bron code was succesvol gekopieerd naar uw klembord.",
     "17621": "Sync",
     "17623": "Selecteer \u00e9\u00e9n account type:",
-    "17624": "You already have a PRO account. You will be buying a new subscription to MEGA and in case you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+    "17624": "U heeft al een PRO account. U koopt een nieuw abonnement bij MEGA en in het geval u al een automatisch vernieuwende abonnement heeft moet u deze annuleren of u wordt voor 2 abonnementen in rekening gebracht. ",
     "17625": "Bestand versies %1",
     "17626": "Door dit te doen annuleert u uw MEGAdrop instelling voor meerdere mappen.",
     "17629": "Als u uw account annulleert dan heeft u geen toegang meer tot uw gegevens, uw MEGA contacten of gesprekken. U kunt deze actie niet ongedaan maken",
@@ -4605,6 +4605,6 @@
     "17676": "Gemiste audio oproep en [A] gemiste video oproep",
     "17679": "[A] gemiste audio oproepen en gemiste video oproepen",
     "17680": "[A] gemiste audio oproepen en [B] gemiste video oproepen",
-    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17686": "Momenteel ondersteunen wij geen MEGAdrop koppelingen in mobiele browsers, gebruik elk van de ondersteunende web browsers.",
+    "17687": "Niet ondersteund"
 }

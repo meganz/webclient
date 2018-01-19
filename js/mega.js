@@ -3224,7 +3224,7 @@ function loadfm_done(mDBload) {
             mega.loadReport.renderfm = -1;
         }
 
-        mclp = null;
+        mclp = Promise.resolve();
         promise.always(_completion);
     };
 

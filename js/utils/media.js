@@ -315,7 +315,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         var playevent;
         $video.rebind('playing', function() {
             if (videoElement && videoElement.duration) {
-                $wrapper.find('.viewer-pending').addClass('hidden');
+                $wrapper.removeClass('paused').find('.viewer-pending').addClass('hidden');
 
                 if (!playevent) {
                     playevent = true;

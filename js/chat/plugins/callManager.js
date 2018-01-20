@@ -115,6 +115,7 @@ CallManager._proxyCallTo = function (prototype, listName, fnName, subpropName) {
 
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onDestroy', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteStreamAdded', 'rtcCall');
+CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteStreamRemoved', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteMute', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onLocalMute', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onCallStarted', 'rtcCall');
@@ -858,6 +859,7 @@ CallManagerCall.prototype.onCallTerminated = function () {
 CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates) {
     var self = this;
     var isIncoming = self.rtcCall.isJoiner;
+    //TODO: execute onRemoteStreamRemoved() just in case it wasn't called by the rtcModule before session destroy
     if (terminationCode === Term.kCallReqCancel) {
         if (!isIncoming) {
             self.setState(CallManagerCall.STATE.REJECTED);
@@ -930,6 +932,7 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
 CallManagerCall.prototype.onRemoteStreamAdded = function (rtcSessionEventHandler, stream) {
     var peerId = base64urlencode(rtcSessionEventHandler.rtcCallSession.peer);
     this._streams[peerId] = stream;
+    this._renderInCallUI();
 };
 CallManagerCall.prototype.onRemoteStreamRemoved = function (rtcSessionEventHandler) {
     var peerId = base64urlencode(rtcSessionEventHandler.rtcCallSession.peer);

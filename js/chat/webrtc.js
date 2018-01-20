@@ -860,7 +860,7 @@ Call.prototype._waitAllSessionsTerminated = function(code, cb) {
     })
     .fail(function() {
         if (Object.keys(sessions).length > 0) {
-            self.logger.error("Timed out waiting for all sessions to terminate, force closing them");
+            self.logger.warn("Timed out waiting for all sessions to terminate, force closing them");
             for (var sid in sessions) {
                 var sess = sessions[sid];
                 sess._destroy(code);
@@ -1201,9 +1201,6 @@ Call.prototype._notifySessionConnected = function(sess) {
     }
     this._hasConnectedSession = true;
     this._fire('onCallStarted');
-
-    if (sess.isJoiner)
-        setTimeout(() => sess.terminateAndDestroy(Term.kErrIceDisconn), 4000);
 };
 
 Call.prototype.muteUnmute = function(av) {
@@ -1417,6 +1414,7 @@ Session.prototype._createRtcConn = function() {
         // self.waitForRemoteMedia();
     };
     conn.onremovestream = function(event) {
+        self._fire("onRemoteStreamRemoved");
         self.self.remoteStream = null;
         // TODO: Do we need to generate event from this?
     };
@@ -1437,6 +1435,14 @@ Session.prototype._createRtcConn = function() {
         } else if (state === 'connected') {
             self._tsIceConn = Date.now();
             self.call._notifySessionConnected(self);
+            if (self.isJoiner)
+            {
+                setTimeout(() => {
+                    if (self.state < SessState.kTerminating) {
+                        self.terminateAndDestroy(Term.kErrIceDisconn);
+                    }
+                }, 4000);
+            }
         }
     };
     // RTC.Stats will be set to 'false' if stats are not available for this browser
@@ -1733,6 +1739,7 @@ Session.prototype._destroy = function(code, msg) {
         this.rtcConn = null;
     }
     this._setState(SessState.kDestroyed);
+    this._fire("onRemoteStreamRemoved");
     this._fire("onDestroy", code & 0x7f, !!(code & 0x80), msg);// jscs:ignore disallowImplicitTypeConversion
     this.call._removeSession(this, code);
 };

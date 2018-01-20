@@ -4605,6 +4605,6 @@
     "17676": "Chiamata audio persa e [A] ha perso una chiamata video",
     "17679": "[A] ha perso una chiamata audio e una chiamata video",
     "17680": "[A] ha perso una chiamata audio e [B] ha perso una chiamata video",
-    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17686": "Al momento non supportiamo i link MEGAdrop nei browser mobile, per favore utilizza uno qualsiasi dei browser supportati.",
+    "17687": "Non supportato"
 }

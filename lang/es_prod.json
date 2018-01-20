@@ -1427,7 +1427,7 @@
     "10644": "A menos que se disponga lo contrario por ley o por una oferta especial del servicio, todas las compras son definitivas y no reembolsables. Si crees que Mega te ha cobrado por error, ponte en contacto con nosotros en un plazo de 90 d\u00edas desde el pago. No se har\u00e1n devoluciones una vez transcurridos los 90 d\u00edas. Nos reservamos el derecho a efectuar devoluciones o cr\u00e9ditos a nuestra discreci\u00f3n. En caso de emitir un reembolso o cr\u00e9dito, no tenemos ninguna obligaci\u00f3n a hacer lo mismo en el futuro. Nuestra pol\u00edtica de devoluciones no afecta a los derechos legales que puedan aplicarse. Si has hecho un pago por error y no has utilizado los servicios proporcionados por la suscripci\u00f3n, debes ponerte en contacto con [A]support@mega.nz[\/A] en 24 horas. Estudiaremos el caso y contestaremos en un plazo de 7 d\u00edas.",
     "10645": "Cancelaci\u00f3n de la cuenta",
     "10646": "Puedes cancelar tu cuenta en [A]mega.nz\/account[\/A].",
-    "10647": "Condiciones de las suscripci\u00f3n peri\u00f3dica",
+    "10647": "Condiciones de la suscripci\u00f3n peri\u00f3dica",
     "10648": "La suscripci\u00f3n peri\u00f3dica se renovar\u00e1 autom\u00e1ticamente de forma mensual o anual en base al tipo de suscripci\u00f3n elegida, a no ser que se cancele antes de la fecha de renovaci\u00f3n. Para la suscripci\u00f3n peri\u00f3dica efectuada a trav\u00e9s de las aplicaciones de Android o iOS, deber\u00e1s consultar Google o Apple para obtener informaci\u00f3n sobre las fechas y las condiciones de la suscripci\u00f3n. Cualquier otra suscripci\u00f3n peri\u00f3dica se repetir\u00e1 el mismo d\u00eda del mes en que se estableci\u00f3, excepto en los casos en que el d\u00eda no est\u00e9 disponible debido a un mes corto, donde dicha fecha se trasladar\u00e1 al primer d\u00eda del mes siguiente.",
     "10649": "Cancelaci\u00f3n de la suscripci\u00f3n",
     "10650": "Las suscripciones peri\u00f3dicas efectuadas a trav\u00e9s de las aplicaciones de Android o iOS deben cancelarse directamente a trav\u00e9s del servicio de Google o Apple. Puedes cancelar cualquier otra suscripci\u00f3n peri\u00f3dica desde tu navegador, entrando en [A]mega.nz\/#account[\/A] y seleccionando la opci\u00f3n para cancelar tu suscripci\u00f3n. MEGA devolver\u00e1 cualquier pago que se haya procesado despu\u00e9s de que la cancelaci\u00f3n se haya hecho efectiva. Al cancelar la suscripci\u00f3n, el acceso a tu cuenta puede estar restringido o bloqueado si el nivel de uso es superior a los l\u00edmites que se aplican a las cuentas gratuitas en ese momento.",
@@ -1718,7 +1718,6 @@
     "16565": "Comprueba las credenciales cifradas de tus contactos a trav\u00e9s de otro canal para confirmar que sean aut\u00e9nticos.",
     "16566": "Llamadas y videollamadas ",
     "16567": "Comun\u00edcate f\u00e1cilmente usando nuestras llamadas y videollamadas seguras entre distintas plataformas.",
-    "16568": "\u00a1Pr\u00f3ximamente!",
     "16569": "Posibilidad de compartir archivos r\u00e1pidamente",
     "16570": "Comparte archivos directamente en un chat, tanto desde tu cuenta MEGA como desde el almacenamiento de tu dispositivo.",
     "16571": "Control del historial de conversaciones",
@@ -1919,6 +1918,6 @@
     "17619": "El enlace de MEGAdrop se ha copiado con \u00e9xito al portapapeles.",
     "17620": "El c\u00f3digo fuente de MEGAdrop se ha copiado con \u00e9xito al portapapeles.",
     "17626": "Al hacer esto, se cancelar\u00e1 la configuraci\u00f3n de MEGAdrop en varias carpetas.",
-    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17686": "Actualmente no admitimos enlaces MEGAdrop en navegadores m\u00f3viles, utiliza cualquiera de los navegadores web compatibles.",
+    "17687": "No compatible"
 }

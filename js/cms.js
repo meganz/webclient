@@ -3,7 +3,8 @@
     var signPubKey = {
         "__global": [
             "O1B2FzarfqzPUDKdOiPJvfEnx3QAc+xHW16CEItjtgg=",
-            "rRHOm8BpMsYsSnSlk1AD2xxm9vKIFd\/tMoKxc35FTXQ="
+            "rRHOm8BpMsYsSnSlk1AD2xxm9vKIFd\/tMoKxc35FTXQ=",
+            "yUSKtdxceRbOL6efsWzHviXpggxjYQQ2qedmER7gwA0="      // Hugo's
         ],
         "sync": [
             "J0K5p5rZjOjxli\/uioSP1yneQtoW2QTl3zXN\/Q3H3Mc="

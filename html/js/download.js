@@ -488,6 +488,10 @@ function dl_g(res) {
                     var vsp = initVideoStream(dl_node, $pageScrollBlock, {autoplay: false});
 
                     $('.play-video-button', $pageScrollBlock).rebind('click', function() {
+                        if (dlmanager.isOverQuota) {
+                            return dlmanager.showOverQuotaDialog();
+                        }
+
                         if (!d) {
                             api_req({a: 'log', e: 99668, m: 'video watch'});
                         }

@@ -1718,7 +1718,6 @@
     "16565": "Verifica l'impronta criptografica dei tuoi contatti attraverso un canale separato per assicurarti che siano autentiche.",
     "16566": "Chiamate audio e video",
     "16567": "Rimani connesso senza alcuno sforzo con le nostre chiamate audio e video sicure su pi\u00f9 piattaforme.",
-    "16568": "In arrivo!",
     "16569": "Condivisione di file senza link",
     "16570": "Condividi file direttamente in una chat dal tuo account MEGA o dal tuo dispositivo di archiviazione.",
     "16571": "Controllo della memorizzazione della storia",
@@ -1919,6 +1918,6 @@
     "17619": "L'URL di MEGAdrop \u00e8 stato copiato con successo negli appunti.",
     "17620": "Il codice sorgente di MEGAdrop \u00e8 stato copiato con successo negli appunti.",
     "17626": "Effettuando questa operazione cancellerai la tua impostazione MEGAdrop per le cartelle multiple.",
-    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17686": "Al momento non supportiamo i link MEGAdrop nei browser mobile, per favore utilizza uno qualsiasi dei browser supportati.",
+    "17687": "Non supportato"
 }

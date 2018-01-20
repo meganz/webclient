@@ -1416,7 +1416,6 @@ Session.prototype._createRtcConn = function() {
     conn.onremovestream = function(event) {
         self._fire("onRemoteStreamRemoved");
         self.self.remoteStream = null;
-        // TODO: Do we need to generate event from this?
     };
     conn.onsignalingstatechange = function(event) {
         var state = conn.signalingState;

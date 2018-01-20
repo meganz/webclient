@@ -318,6 +318,9 @@ RtcModule.prototype.cmdBroadcast = function(op, chatid, payload) {
     }
     if (!info.shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
         throw new Error("cmdEndpoint: Send error trying to send command " + constStateToText(RTCMD, op));
+        return false;
+    } else {
+        return true;
     }
 };
 
@@ -537,7 +540,7 @@ function Call(rtcModule, info, isGroup, isJoiner, handler) {
     if (isJoiner) {
         this._callerInfo = info; // callerInfo is actually CALLDATA, needed for answering
     }
-}
+};
 
 Call.prototype.handleMsg = function(packet) {
     var type = packet.type;
@@ -750,6 +753,7 @@ Call.prototype._clearCallOutTimer = function() {
     clearTimeout(this._callOutTimer);
     delete this._callOutTimer;
 };
+
 Call.prototype._bcastCallData = function(ringing) {
     var self = this;
     assert(self.state <= CallState.kInProgress);
@@ -763,7 +767,7 @@ Call.prototype._bcastCallData = function(ringing) {
         return false;
     }
     return true;
-}
+};
 
 Call.prototype.msgSession = function(packet) {
     var self = this;
@@ -871,7 +875,7 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
     var self = this;
     if (self.state === CallState.kDestroyed) {
         return Promise.resolve(null);
-    } else if (self.state === CallState.Terminating) {
+    } else if (self.state === CallState.kTerminating) {
         assert(self._destroyPromise);
         return self._destroyPromise;
     }
@@ -916,7 +920,7 @@ Call.prototype.cmdBroadcast = function(type, payload) {
         data += payload;
     }
     if (!self.shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
-        setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
+        setTimeout(function() { self._destroy(Term.kErrNetSignalling, false); }, 0);
         return false;
     }
     return true;
@@ -965,23 +969,27 @@ Call.prototype._stopIncallPingTimer = function() {
 Call.prototype._removeSession = function(sess, reason) {
     var self = this;
     delete self.sessions[sess.sid];
+
+// If we want to terminate the call (no matter if initiated by us or peer), we first
+// set the call's state to kTerminating. If that is not set, then it's only the session
+// that terminates for a reason that is not fatal to the call,
+// and can try re-establishing the session
     if (self.state === CallState.kTerminating) {
         return;
     }
-    // if no more sessions left, destroy call even if group
-    if (Object.keys(self.sessions).length === 0) {
-        self._destroy(reason, false);
-        return;
-    }
-    // upon session failure, we swap the offerer and answerer and retry
-    if (self.isGroup && isTermError(reason) && !sess.isJoiner) {
+    // joiner re-joins, non-joiner does nothing, just keeps the call
+    // ongoing and accepts the JOIN
+    if (sess.isJoiner) {
+        this.logger.log("Session to", base64urlencode(sess.peer), "failed, re-establishing it...");
         var endpointId = sess.peer + sess.peerClient;
         if (!self.sessRetries[endpointId]) {
             self.sessRetries[endpointId]++;
             setTimeout(function() {
-                self._join(sess.peer);
-            }, 500);
+                self.rejoinUser(sess.peer);
+            }, 0);
         }
+    } else {
+        this.logger.log("Session to ", base64urlencode(sess.peer), "failed, expecting peer to re-establish it...");
     }
 };
 Call.prototype._fire = function(evName) {
@@ -1076,6 +1084,24 @@ Call.prototype._join = function(userid) {
     }, RtcModule.kSessSetupTimeout);
     return true;
 };
+Call.prototype.rejoinUser = function(userid) {
+    var self = this;
+    assert(self.state === CallState.kInProgress);
+    // JOIN:
+    // chatid.8 userid.8 clientid.4 dataLen.2 type.1 callid.8 anonId.8
+    // if userid is not specified, join all clients in the chat, otherwise
+    // join a specific user (used when a session gets broken)
+    var data = self.chatid + userid + "\0\0\0\0" +
+        Chatd.pack16le(17) + String.fromCharCode(RTCMD.JOIN) +
+        self.id + self.manager.ownAnonId;
+    if (!self.shard.cmd(Chatd.Opcode.RTMSG_USER, data)) {
+        setTimeout(function() {
+             self._destroy(Term.kErrNetSignalling, true);
+        }, 0);
+        return false;
+    }
+    return true;
+}
 
 Call.prototype.answer = function(av) {
     var self = this;
@@ -1175,6 +1201,9 @@ Call.prototype._notifySessionConnected = function(sess) {
     }
     this._hasConnectedSession = true;
     this._fire('onCallStarted');
+
+    if (sess.isJoiner)
+        setTimeout(() => sess.terminateAndDestroy(Term.kErrIceDisconn), 4000);
 };
 
 Call.prototype.muteUnmute = function(av) {
@@ -1604,7 +1633,7 @@ Session.prototype.cmd = function(op, data) {
         self.call.chatid + self.peer + self.peerClient +
         Chatd.pack16le(payload.length) + payload)) {
         if (self.state < SessState.kTerminating) {
-            this._destroy(Term.kErrNetSignalling);
+            self.call._destroy(Term.kErrNetSignalling, false);
         }
         return false;
     }
@@ -1647,7 +1676,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
                     done(null);
                 }, 1000);
             }
-        });
+        }, 0);
     }, 0);
     return self.terminatePromise;
 };
@@ -1666,6 +1695,10 @@ Session.prototype.msgSessTerminateAck = function(packet) {
 Session.prototype.msgSessTerminate = function(packet) {
     // sid.8 termcode.1
     var self = this;
+    if (self.state === SessState.kDestroyed) {
+        self.logger.warn("Ignoring SESS_TERMINATE for a dead session");
+        return;
+    }
     assert(packet.data.length >= 1);
     self.cmd(RTCMD.SESS_TERMINATE_ACK);
 

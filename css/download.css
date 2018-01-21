@@ -1032,7 +1032,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .video-theatre-mode .download .pause-transfer.square {
     width: 48px;
 }
-.download.in-progress.over-quota {
+.download.in-progress.over-quota, .video-theatre-mode .video-mode-wrapper.over-quota {
     display: none;
 }
 .download.over-transfer-quota {
@@ -1041,12 +1041,21 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     margin: 0 -7px;
     padding: 12px 8px 8px 16px;
 }
-.download.overquota-message span {
+.download.overquota-message {
+    margin-bottom: 22px;
+}
+.download.transfer-overquota-txt {
     font-size: 14px;
     line-height: 22px;
+    color: #666666;
 }
-.download.overquota-message {
-    margin-bottom: 20px;
+.download.transfer-overquota-txt span.countdown {
+    margin: 0 2px;
+}
+.download.transfer-overquota-txt span {
+    font-size: 18px;
+    color: #444;
+    padding: 0 2px;
 }
 .video-theatre-mode .download.overquota-message-block {
     width: 55%;
@@ -1087,8 +1096,9 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     float: none;
 }
 .download.over-transfer-quota .default-white-button.small, .download.over-transfer-quota .default-grey-button.small {
-    line-height: 36px;
-    height: 36px;    
+    line-height: 34px;
+    height: 34px;
+    margin-left: 12px;
 }
 @media only screen and (max-width: 856px) {
     .video.video-theatre-mode.resumable .download.progress-block.progress-resume {

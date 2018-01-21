@@ -646,6 +646,23 @@ background-color:#1DA2E9
     -webkit-animation-delay: -0.16s;
     animation-delay: -0.16s;
 }
+.viewer-pending span {
+    color: #d90007;
+    margin-top: 16px;
+    margin-left: -14px;
+    font-weight: bold;
+    font-size: initial;
+    line-height: normal;
+    text-shadow: 2px 0 2px #000;
+    animation: blinker 1s linear infinite;
+    -webkit-animation: blinker 1s linear infinite;
+}
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+@-webkit-keyframes blinker {
+    50% { opacity: 0; }
+}
  @-webkit-keyframes sk-bouncedelay {
  0%, 80%, 100% {
 -webkit-transform: scale(0)

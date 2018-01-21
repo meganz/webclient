@@ -253,7 +253,9 @@ MegaUtils.prototype.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
         xhr.send(aData);
     }
     catch (ex) {
-        promise.reject(ex);
+        onIdle(function() {
+            promise.reject(ex);
+        });
     }
 
     xhr = options = undefined;
@@ -513,7 +515,7 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                     ];
 
                     if (
-                        megaChat &&
+                        typeof(megaChat) !== 'undefined' &&
                         megaChat.plugins.chatdIntegration &&
                         megaChat.plugins.chatdIntegration.chatd.chatdPersist
                     ) {
@@ -805,7 +807,12 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
             var promises = [];
             promises.push(fmdb.drop());
 
-            if (megaChat) {
+            if (
+                typeof(megaChat) !== 'undefined' &&
+                megaChat.plugins.chatdIntegration &&
+                megaChat.plugins.chatdIntegration.chatd &&
+                megaChat.plugins.chatdIntegration.chatd.chatdPersist
+            ) {
                 promises.push(
                     megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
                 );
@@ -955,6 +962,7 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
     if (typeof aData !== 'object') {
         var key;
         var handle;
+        var error = EARGS;
 
         // If a ufs-node's handle provided
         if (String(aData).length === 8) {
@@ -970,10 +978,7 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
             }
         }
 
-        if (!handle) {
-            promise.reject(EARGS);
-        }
-        else {
+        if (handle) {
             var callback = function(res) {
                 if (typeof res === 'object' && res.g) {
                     res.key = key;
@@ -1001,15 +1006,22 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
             }
 
             if (!Array.isArray(key) || key.length !== 8) {
-                promise.reject(EKEY);
+                error = EKEY;
             }
             else {
+                error = 0;
                 api_req(req, {callback: callback}, pfid ? 1 : 0);
             }
         }
+
+        if (error) {
+            onIdle(function() {
+                promise.reject(error);
+            });
+        }
     }
     else {
-        fetcher(aData);
+        onIdle(fetcher.bind(null, aData));
     }
 
     aData = undefined;

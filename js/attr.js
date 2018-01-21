@@ -900,7 +900,9 @@ var attribCache = false;
         };
 
         uaPacketParserHandler['^!dv'] = function() {
-            fileversioning.updateVersionInfo();
+            if (fminitialized && M.account) {
+                delay('fv:uvi^dv', fileversioning.updateVersionInfo.bind(fileversioning), 4e3);
+            }
         };
 
         if (d) {

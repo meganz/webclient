@@ -1718,7 +1718,6 @@
     "16565": "Best\u00e4tigen Sie die Echtheit Ihrer Kontakte durch Pr\u00fcfung ihres kryptographischen Fingerabdrucks durch einen separaten Kommunikationskanal",
     "16566": "Audio- und Videokommunikation",
     "16567": "Bleiben Sie in Verbindung - mit verschl\u00fcsselten ger\u00e4te\u00fcbergreifenden Audio- und Videoanrufen.",
-    "16568": "Bald!",
     "16569": "Datenfreigabe",
     "16570": "Teilen Sie Dateien mit anderen Teilnehmern - aus Ihrer Cloud oder von Ihrem Endger\u00e4t.",
     "16571": "L\u00f6schung des Chatverlaufs",
@@ -1919,6 +1918,6 @@
     "17619": "Der MEGAdrop-URL wurde in die Zwischenablage kopiert.",
     "17620": "Der MEGAdrop-Code wurde in die Zwischenablage kopiert.",
     "17626": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
-    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17686": "Mobilbrowserunterst\u00fctzung f\u00fcr MEGAdrop ist noch in Arbeit. Bitte verwenden Sie vor\u00fcbergehend einen Desktop-Browser.",
+    "17687": "Noch nicht verf\u00fcgbar"
 }

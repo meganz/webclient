@@ -450,6 +450,10 @@ var slideshowid;
         var n = slideshow_node(id, $overlay);
 
         $('.play-video-button', $overlay).rebind('click', function() {
+            if (dlmanager.isOverQuota) {
+                return dlmanager.showOverQuotaDialog();
+            }
+
             var destroy = function() {
                 $overlay.find('.viewer-pending').addClass('hidden').end().trigger('video-destroy');
 

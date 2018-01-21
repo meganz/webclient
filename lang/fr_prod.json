@@ -1718,7 +1718,6 @@
     "16565": "V\u00e9rifiez l'empreinte cryptographique de vos contacts  par un moyen de communication s\u00e9par\u00e9 afin de garantir leur l'authenticit\u00e9.",
     "16566": "Appels audio et vid\u00e9o",
     "16567": "Restez connect\u00e9 sans effort gr\u00e2ce \u00e0 nos appels audio et vid\u00e9o s\u00e9curis\u00e9s multiplateformes.",
-    "16568": "\u00c0 venir !",
     "16569": "Partage transparent de fichiers",
     "16570": "Partagez ais\u00e9ment des fichiers directement dans une conversation, dans votre compte MEGA ou de la m\u00e9moire de votre appareil.",
     "16571": "Contr\u00f4le de la r\u00e9tention de l'historique",
@@ -1919,6 +1918,6 @@
     "17619": "L\u2019URL MEGAdrop a \u00e9t\u00e9 copi\u00e9e avec succ\u00e8s dans le presse-papiers.",
     "17620": "Le code source de MEGAdrop a \u00e9t\u00e9 copi\u00e9 avec succ\u00e8s dans le presse-papiers.",
     "17626": "En faisant cela, vous annulerez votre configuration MEGAdrop pour plusieurs dossiers.",
-    "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17686": "Nous ne prenons actuellement pas en charge les liens MEGAdrop dans les navigateurs mobiles. Veuillez plut\u00f4t utiliser l\u2019un des navigateurs Web pris en charge.",
+    "17687": "Non pris en charge"
 }

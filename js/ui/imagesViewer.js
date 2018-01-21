@@ -356,7 +356,7 @@ var slideshowid;
             $dlBut.addClass('hidden');
         }
 
-        if (previews[n.h]) {
+        if (previews[n.h] && preqs[n.h]) {
             previewsrc(n.h);
             fetchnext();
         }
@@ -421,6 +421,15 @@ var slideshowid;
                     }
                     previewimg(n.h, u8, 'image/svg+xml');
                     delete previews[n.h].buffer;
+                    preqs[n.h] = 0; // to retry again
+                    if (ev && ev.target && ev.target.status === 509) {
+                        dlmanager.setUserFlags();
+                        dlmanager.showOverQuotaDialog();
+                    }
+                    else if (ev === EOVERQUOTA) {
+                        dlmanager.setUserFlags();
+                        dlmanager.showOverQuotaDialog();
+                    }
                 });
             }
             return false;

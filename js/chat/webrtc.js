@@ -532,7 +532,7 @@ function Call(rtcModule, info, isGroup, isJoiner, handler) {
     this.isGroup = isGroup;
     this.isJoiner = isJoiner; // the joiner is actually the answerer in case of new call
     this.sessions = {};
-    this.sessRetries = {};
+    this.sessRetries = { total: 0 };
     this.state = isJoiner ? CallState.kRingIn : CallState.kInitial;
     //  var level = this.manager.logger.options.minLogLevel();
     this.logger = MegaLogger.getLogger("call[" + base64urlencode(this.id) + "]",
@@ -977,18 +977,39 @@ Call.prototype._removeSession = function(sess, reason) {
     if (self.state === CallState.kTerminating) {
         return;
     }
-    // joiner re-joins, non-joiner does nothing, just keeps the call
+    var peer = sess.peer;
+    var client = sess.peerClient;
+    var endpointId = peer + client;
+    var sessRetries = self.sessRetries;
+    var totalRetries = ++sessRetries.total;
+    var retryId;
+    if (sessRetries[endpointId]) {
+        retryId = sessRetries[endpointId] = 1;
+    } else {
+        retryId = ++sessRetries[endpointId];
+    }
+    // The original joiner re-joins, the peer does nothing, just keeps the call
     // ongoing and accepts the JOIN
     if (sess.isJoiner) {
         this.logger.log("Session to", base64urlencode(sess.peer), "failed, re-establishing it...");
-        var endpointId = sess.peer + sess.peerClient;
-        if (!self.sessRetries[endpointId]) {
-            self.sessRetries[endpointId]++;
-            setTimeout(function() {
-                self.rejoinUser(sess.peer);
-            }, 0);
-        }
+        setTimeout(function() { //execute it async, to avoid re-entrancy
+            self.rejoinUser(sess.peer);
+        }, 0);
     } else {
+        // Wait for peer to re-join...
+        if (!self.isGroup) { // TODO: From group calls we would need to revise this
+            // ...but if it's the only session, set a timeout
+            setTimeout(function() {
+                if (self.state >= CallState.kTerminating
+                    || sessRetries[endpointId] > retryId) {
+                        return; // there was another retry meanwhile, this timer is not relevant anymore
+                }
+                if (!Object.keys(self.sessions).length // There are no sessions currently
+                    && sessRetries.all === totalRetries) { // There was no newer retry that we would have to wait for
+                        this.logger.warn("Timed out waiting for peer to rejoin, terminating call");
+                        self.hangup(Term.kErrSessRetryTimeout); //kErrSessSetupTimeout is about existing session not reaching kInProgress
+                }
+            }, RtcModule.kSessSetupTimeout),
         this.logger.log("Session to ", base64urlencode(sess.peer), "failed, expecting peer to re-establish it...");
     }
 };
@@ -1079,7 +1100,7 @@ Call.prototype._join = function(userid) {
     // we need another timer as well
     setTimeout(function() {
         if (self.state <= CallState.kJoining) {
-            self._destroy(Term.kErrProtoTimeout, true);
+            self._destroy(Term.kErrSessSetupTimeout, true);
         }
     }, RtcModule.kSessSetupTimeout);
     return true;
@@ -1160,8 +1181,13 @@ Call.prototype.hangup = function(reason) {
     case CallState.kJoining:
     case CallState.kInProgress:
     case CallState.kWaitLocalStream:
-        // TODO: Check if the sender is the call host and only then destroy the call
-        term = Term.kUserHangup;
+        // TODO: For group calls, check if the sender is the call host and only then destroy the call
+        if (reason == null) { // covers both 'undefined' and 'null'
+            term = Term.kUserHangup;
+        } else {
+            assert(reason === Term.kErrProtoTimeout || reason === Term.kErrSessSetupTimeout);
+            term = reason;
+        }
         break;
     case CallState.kTerminating:
     case CallState.kDestroyed:
@@ -1304,7 +1330,7 @@ function Session(call, packet) {
         call.manager._loggerOpts, call.logger);
     self.setupTimer = setTimeout(function() {
         if (self.state < SessState.kInProgress) {
-            self.terminateAndDestroy(Term.kErrProtoTimeout);
+            self.terminateAndDestroy(Term.kErrSessSetupTimeout);
         }
     }, RtcModule.kSessSetupTimeout);
 }
@@ -1965,11 +1991,13 @@ var Term = Object.freeze({
     kErrNoMedia: 28,        // < There is no media to be exchanged - both sides don't have audio/video to send
     kErrNetSignalling: 29,  // < chatd shard was disconnected
     kErrIceDisconn: 30,     // < ice-disconnect condition on webrtc connection
-    kErrIceFail: 31,        // <ice-fail condition on webrtc connection
+    kErrIceFail: 31,        // < ice-fail condition on webrtc connection
     kErrSdp: 32,            // < error generating or setting SDP description
     kErrUserOffline: 33,    // < we received a notification that that user went offline
-    kErrorLast: 33,         // < Last enum indicating call termination due to error
-    kLast: 33,              // < Last call terminate enum value
+    kErrSessSetupTimeout: 34, // < timed out waiting for session
+    kErrSessRetryTimeout: 35, // < timed out waiting for peer to retry a failed session
+    kErrorLast: 35,         // < Last enum indicating call termination due to error
+    kLast: 35,              // < Last call terminate enum value
     kPeer: 128              // < If this flag is set, the condition specified by the code happened at the peer,
     // < not at our side
 });
@@ -2062,6 +2090,74 @@ SessStateAllowedStateTransitions[SessState.kTerminating] = [
     SessState.kDestroyed
 ];
 SessStateAllowedStateTransitions[SessState.kDestroyed] = [];
+    var isIncoming = self.rtcCall.isJoiner;
+    //TODO: execute onRemoteStreamRemoved() just in case it wasn't called by the rtcModule before session destroy
+    if (terminationCode === Term.kCallReqCancel) {
+        if (!isIncoming) {
+            self.setState(CallManagerCall.STATE.REJECTED);
+            self.getCallManager().trigger('CallRejected', [self, "caller"]);
+        }
+        else {
+            self.setState(CallManagerCall.STATE.REJECTED);
+            self.getCallManager().trigger('CallRejected', [self, terminationCode]);
+        }
+    }
+    else if (terminationCode === Term.kUserHangup) {
+        if (self.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING) {
+            self.setState(CallManagerCall.STATE.MISSED);
+            self.getCallManager().trigger('CallMissed', [self, terminationCode]);
+        }
+        else if (self.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) {
+            self.setState(CallManagerCall.STATE.REJECTED);
+            self.getCallManager().trigger('CallRejected', [self, "caller"]);
+        }
+        else if (self.state === CallManagerCall.STATE.STARTED) {
+            self.setState(CallManagerCall.STATE.ENDED);
+            self.getCallManager().trigger('CallEnded', [self, terminationCode]);
+        }
+        else {
+            self.logger.warn('call failed?: ', terminationCode, "state:", self.getStateAsText());
+            self.setState(CallManagerCall.STATE.FAILED);
+            self.getCallManager().trigger('CallFailed', [self, terminationCode]);
+        }
+    }
+    else if (terminationCode === Term.kCallRejected) {
+        self.setState(CallManagerCall.STATE.REJECTED);
+        self.getCallManager().trigger('CallRejected', [self, terminationCode]);
+    }
+    else if (terminationCode === Term.kAnsElsewhere) {
+        self.setState(CallManagerCall.STATE.HANDLED_ELSEWHERE);
+        self.getCallManager().trigger('CallHandledElsewhere', [self, terminationCode]);
+    }
+    else if (terminationCode === Term.kCallReqCancel) {
+        if (self.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) {
+            self.setState(CallManagerCall.STATE.REJECTED);
+            self.getCallManager().trigger('CallRejected', [self, 'caller']);
+        }
+        else {
+            self.setState(CallManagerCall.STATE.MISSED);
+            self.getCallManager().trigger('CallMissed', [self, terminationCode]);
+        }
+    }
+    else if (
+        terminationCode === Term.kRingOutTimeout ||
+        terminationCode === Term.kAnswerTimeout
+    ) {
+        if (isIncoming) {
+            self.setState(CallManagerCall.STATE.MISSED);
+            self.getCallManager().trigger('CallMissed', [self, terminationCode]);
+        }
+        else {
+            self.setState(CallManagerCall.STATE.TIMEOUT);
+            self.getCallManager().trigger('CallTimeout', [self, terminationCode]);
+        }
+    }
+    else {
+        self.logger.debug("onDestroy, todo: parse", terminationCode, " and add UI for the state.");
+        self.setState(CallManagerCall.STATE.FAILED);
+        self.getCallManager().trigger('CallFailed', [self, terminationCode]);
+    }
+
 
 scope.RtcModule = RtcModule;
 scope.Call = Call;

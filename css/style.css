@@ -5882,8 +5882,7 @@ th.grid-first-th {
 }
 /* Ct changes for copy to conversations */
 .fm-dialog-body .nw-contact-name {
-    font-size: 13px;
-    line-height: 24px;
+    line-height: 25px;
     margin: 0 20px 0 14px;
     overflow: hidden;
     display: inline-block;
@@ -5896,7 +5895,7 @@ th.grid-first-th {
 }
 .fm-dialog-body .online .nw-contact-status, .fm-dialog-body .away .nw-contact-status, .fm-dialog-body .offline .nw-contact-status {
     border:1px solid #fff;
-    margin: 8px 0 0 14px;
+    margin: 9px 0 0 14px;
 }
 .fm-dialog-body .nw-contact-status {
     width: 8px;
@@ -5905,16 +5904,20 @@ th.grid-first-th {
 .fm-dialog-body .nw-contact-item {
     padding: 0 14px 0 14px;
     margin: 0 0;
+    height: 26px;
     background-color:rgba(0,0,0,0);
-    color: #666;
+    color: #444;
 }
 .fm-dialog-body .nw-contact-item:hover {
+    background-color: rgba(43, 166, 222, 0.4);
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-item.selected:hover {
     background-color: rgba(43, 166, 222, 0.5);
     color: #fff;
 }
 .fm-dialog-body .nw-contact-email, .fm-dialog-body .nw-contact-group {
-    font-size: 13px;
-    line-height: 24px;
+    line-height: 25px;
     margin: 0 0;
     overflow: hidden;
     display: inline-block;
@@ -5936,7 +5939,7 @@ th.grid-first-th {
     height: 10px;
     float: left;
     margin-left: 13px;
-    margin-top: 7px;
+    margin-top: 8px;
     background-image: url(../images/mega/group_copy@2x.png);
     background-repeat: no-repeat;
     background-size: 12px 10px;

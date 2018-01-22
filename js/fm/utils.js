@@ -253,7 +253,9 @@ MegaUtils.prototype.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
         xhr.send(aData);
     }
     catch (ex) {
-        promise.reject(ex);
+        onIdle(function() {
+            promise.reject(ex);
+        });
     }
 
     xhr = options = undefined;
@@ -310,6 +312,10 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
 
         if (page !== 'download') {
             mega.ui.tpp.reset('ul');
+
+            if (mega.megadrop.isInit()) {
+                mega.megadrop.onCompletion();
+            }
         }
     }
     else {
@@ -349,9 +355,6 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         M.tfsdomqueue = Object.create(null);
         GlobalProgress = Object.create(null);
         delete $.transferprogress;
-        if (page !== 'download') {
-            fm_tfsupdate();
-        }
         if ($.mTransferAnalysis) {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
@@ -372,6 +375,9 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
 
     if (page === 'download') {
         delay('percent_megatitle', percent_megatitle);
+    }
+    else {
+        fm_tfsupdate();
     }
 };
 
@@ -504,9 +510,21 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                     stopsc();
                     stopapi();
 
-                    MegaPromise.allDone([
+                    var waitingPromises = [
                         M.clearFileSystemStorage()
-                    ]).then(function(r) {
+                    ];
+
+                    if (
+                        typeof(megaChat) !== 'undefined' &&
+                        megaChat.plugins.chatdIntegration &&
+                        megaChat.plugins.chatdIntegration.chatd.chatdPersist
+                    ) {
+                        waitingPromises.push(
+                            megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
+                        );
+                    }
+
+                    MegaPromise.allDone(waitingPromises).then(function(r) {
                         console.debug('megaUtilsReload', r);
 
                         if (fmdb) {
@@ -624,35 +642,6 @@ MegaUtils.prototype.clearFileSystemStorage = function megaUtilsClearFileSystemSt
     })(0);
 
     return promise;
-};
-
-/**
- * Neuter an ArrayBuffer
- * @param {Mixed} ab ArrayBuffer/TypedArray
- */
-MegaUtils.prototype.neuterArrayBuffer = function neuter(ab) {
-    if (!(ab instanceof ArrayBuffer)) {
-        ab = ab && ab.buffer;
-    }
-    try {
-        if (typeof ArrayBuffer.transfer === 'function') {
-            ArrayBuffer.transfer(ab, 0); // ES7
-        }
-        else {
-            if (!neuter.dataWorker) {
-                neuter.dataWorker = new Worker("data:application/javascript,var%20d%3B");
-            }
-            neuter.dataWorker.postMessage(ab, [ab]);
-        }
-        if (ab.byteLength !== 0) {
-            throw new Error('Silently failed! -- ' + ua);
-        }
-    }
-    catch (ex) {
-        if (d > 1) {
-            console.warn('Cannot neuter ArrayBuffer', ab, ex);
-        }
-    }
 };
 
 /**
@@ -830,7 +819,20 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
         loadingDialog.show();
         if (fmdb && fmconfig.dbDropOnLogout) {
             step++;
-            fmdb.drop().always(finishLogout);
+            var promises = [];
+            promises.push(fmdb.drop());
+
+            if (
+                typeof(megaChat) !== 'undefined' &&
+                megaChat.plugins.chatdIntegration &&
+                megaChat.plugins.chatdIntegration.chatd &&
+                megaChat.plugins.chatdIntegration.chatd.chatdPersist
+            ) {
+                promises.push(
+                    megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
+                );
+            }
+            MegaPromise.allDone(promises).always(finishLogout);
         }
         if (!megaChatIsDisabled) {
             if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {
@@ -931,7 +933,7 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
 
         M.xhr(request).done(function(ev, response) {
 
-            data.macs = [];
+            data.macs = {};
             data.writer = [];
 
             if (!data.nonce) {
@@ -975,6 +977,7 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
     if (typeof aData !== 'object') {
         var key;
         var handle;
+        var error = EARGS;
 
         // If a ufs-node's handle provided
         if (String(aData).length === 8) {
@@ -990,10 +993,7 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
             }
         }
 
-        if (!handle) {
-            promise.reject(EARGS);
-        }
-        else {
+        if (handle) {
             var callback = function(res) {
                 if (typeof res === 'object' && res.g) {
                     res.key = key;
@@ -1021,15 +1021,22 @@ MegaUtils.prototype.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset
             }
 
             if (!Array.isArray(key) || key.length !== 8) {
-                promise.reject(EKEY);
+                error = EKEY;
             }
             else {
+                error = 0;
                 api_req(req, {callback: callback}, pfid ? 1 : 0);
             }
         }
+
+        if (error) {
+            onIdle(function() {
+                promise.reject(error);
+            });
+        }
     }
     else {
-        fetcher(aData);
+        onIdle(fetcher.bind(null, aData));
     }
 
     aData = undefined;

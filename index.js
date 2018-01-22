@@ -103,9 +103,10 @@ function topMenu(close) {
         $('.top-icon.menu').removeClass('active');
         $('.top-menu-popup').addClass('hidden');
 
+        // If on mobile, hide the menu and also remove the close click/tap handler on the dark background overlay
         if (is_mobile) {
             $('html').removeClass('overlayed');
-            $('.mobile.dark-overlay').addClass('hidden').removeClass('active');
+            $('.mobile.dark-overlay').addClass('hidden').removeClass('active').off('tap');
         }
         $(window).unbind('resize.topmenu');
     }
@@ -123,8 +124,12 @@ function topMenu(close) {
             });
         }
         else {
+            // If on mobile, show the dark backround overlay behind the menu and if it's clicked, close the menu
             $('html').addClass('overlayed');
-            $('.mobile.dark-overlay').removeClass('hidden').addClass('active');
+            $('.mobile.dark-overlay').removeClass('hidden').addClass('active').off('tap').on('tap', function() {
+                topMenu(true);
+                return false;
+            });
         }
     }
 }
@@ -330,7 +335,8 @@ function init_page() {
     }
 
     var oldPFKey = pfkey;
-    if (page.substr(0, 2) == 'F!' && page.length > 2) {
+    var pageBeginLetters = page.substr(0, 2);
+    if (pageBeginLetters === 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
 
         pfid = false;
@@ -393,7 +399,7 @@ function init_page() {
                 return;
             }
 
-            if (fminitialized) {
+            if (fminitialized && !folderlink) {
                 // Clean up internal state in case we're navigating back to a folderlink
                 M.currentdirid = M.RootID = undefined;
                 delete $.onImportCopyNodes;
@@ -416,6 +422,10 @@ function init_page() {
     }
     confirmcode = false;
     pwchangecode = false;
+
+    if (pageBeginLetters.toLowerCase() === 'n!') {
+        return invalidLinkError();
+    }
 
     if (page.substr(0, 7) === 'confirm') {
         confirmcode = page.replace("confirm", "");
@@ -441,8 +451,24 @@ function init_page() {
         closeDialog();
     }
 
-    // Do not show this dialog while entering into the downloads or Pro pages (so they can still choose plan and pay)
-    if ((page.substr(0, 1) !== '!') && (page.substr(0, 3) !== 'pro') && localStorage.awaitingConfirmationAccount) {
+    if ((page.substr(0, 1) !== '!')
+        && (page.substr(0, 3) !== 'pro')
+        && (page.substr(0, 5) !== 'start')
+        && (page.substr(0, 4) !== 'help')
+        && (page !== 'contact')
+        && (page !== 'ios')
+        && (page !== 'android')
+        && (page !== 'wp')
+        && (page !== 'extensions')
+        && (page !== 'sync')
+        && (page !== 'bird')
+        && (page !== 'cmd')
+        && (page !== 'terms')
+        && (page !== 'privacy')
+        && (page !== 'takendown')
+        && (page !== 'general')
+        && localStorage.awaitingConfirmationAccount) {
+
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
         // if visiting a #confirm link, or they confirmed it elsewhere.
@@ -454,6 +480,7 @@ function init_page() {
             if (is_mobile) {
                 parsepage(pages['mobile']);
                 mobile.register.showConfirmEmailScreen(acc);
+                topmenuUI();
                 return false;
             }
             else {
@@ -806,6 +833,16 @@ function init_page() {
     else if (page == 'account') {
         loadSubPage('fm/account');
         return false;
+    }
+    else if (page.substr(0, 8) === 'megadrop') {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.megadrop.show();
+        }
+        else {
+            var pupHandle = page.substr(9, 11);
+            mega.megadrop.pupCheck(pupHandle);
+        }
     }
     else if (page == 'dashboard') {
         loadSubPage('fm/dashboard');
@@ -1960,7 +1997,9 @@ function topmenuUI() {
                         promise = fmdb.get('f')
                             .always(function(r) {
                                 for (var i = r.length; i--;) {
-                                    M.nn[r[i].h] = r[i].name;
+                                    if (!r[i].fv) {
+                                        M.nn[r[i].h] = r[i].name;
+                                    }
                                 }
                             });
                     }
@@ -2291,8 +2330,8 @@ function loadSubPage(tpage, event)
 	pagemetadata();
     tpage = getCleanSitePath(tpage);
 
-    if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {
-        gifSlider.clear();
+    if (typeof dlPageCleanup === 'function' && tpage[0] !== '!') {
+        dlPageCleanup();
     }
 
     if (silent_loading) {
@@ -2372,7 +2411,7 @@ window.onhashchange = function() {
 
 window.onbeforeunload = function () {
     if (dlmanager.isDownloading || ulmanager.isUploading) {
-        return l[377];
+        return $.memIOSaveAttempt ? null : l[377];
     }
 
     mBroadcaster.crossTab.leave();

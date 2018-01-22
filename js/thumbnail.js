@@ -1,9 +1,17 @@
-function createnodethumbnail(node, aes, id, imagedata, opt) {
-    storedattr[id] = {};
-    storedattr[id] = {
-        target: node
-    };
-    createthumbnail(false, aes, id, imagedata, node, opt);
+function createnodethumbnail(node, aes, id, imagedata, opt, ph, file) {
+    storedattr[id] = Object.assign(Object.create(null), {'$ph': ph, target: node});
+    createthumbnail(file || false, aes, id, imagedata, node, opt);
+
+    var uled = ulmanager.getEventDataByHandle(node);
+    if (uled && !uled.thumb) {
+        // XXX: prevent this from being reached twice, e.g. an mp4 renamed as avi and containing covert art ...
+        uled.thumb = 1;
+
+        if (d) {
+            console.log('Increasing the number of expected file attributes for the chat to be aware.', uled);
+        }
+        uled.efa += 2;
+    }
 }
 
 function createthumbnail(file, aes, id, imagedata, node, opt) {
@@ -46,6 +54,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var t = new Date().getTime();
         var n = M.d[node];
         var fa = '' + (n && n.fa);
+        var ph = Object(storedattr[id]).$ph;
         var dataURI;
         var canvas;
         var ctx;
@@ -125,7 +134,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 ab = dataURLToAB(dataURI);
 
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
+                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
             if (node) {
@@ -134,7 +143,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
 
         // preview image:
-        if ((fa.indexOf(':1*') < 0 || onPreviewRetry) && !isVideo) {
+        if (fa.indexOf(':1*') < 0 || onPreviewRetry) {
             canvas = document.createElement('canvas');
             var preview_x = this.width,
                 preview_y = this.height;
@@ -164,10 +173,10 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     console.log('Storing preview...', n);
                 }
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
+                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
-            if (node && filetype(n) !== 'PDF Document') {
+            if (node && filetype(n) !== 'PDF Document' && !is_video(n)) {
                 previewimg(node, ab);
             }
 
@@ -189,7 +198,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
 
         api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
-        mBroadcaster.sendMessage('fa:error', id, e);
+        mBroadcaster.sendMessage('fa:error', id, e, false, 2);
     });
 
     if (typeof FileReader !== 'undefined') {
@@ -345,9 +354,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             };
             if (!file) {
                 var defMime = 'image/jpeg';
-                var curMime = is_video(M.d[node]) ? defMime : filemime(M.d[node], defMime);
+                var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
-                M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
         };
@@ -429,7 +437,6 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
                 type: 'image/jpg'
             });
         }
-        M.neuterArrayBuffer(u8);
     }
 
     if (!u8 || (img.huge && img.dataSize === blob.size)) {

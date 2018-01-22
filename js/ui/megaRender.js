@@ -20,7 +20,7 @@
                     '<td width="100" class="size"></td>' +
                     '<td width="130" class="type"></td>' +
                     '<td width="120" class="time"></td>' +
-                    '<td width="90" class="grid-url-field own-data">' +
+                    '<td width="93" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
                         '<span class="versioning-indicator">' +
                             '<i class="small-icon icons-sprite grey-clock"></i>' +
@@ -42,7 +42,7 @@
                     '</span>' +
                     '<span class="block-view-file-type"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
-                    '<div class="video-thumb-detalis">' +
+                    '<div class="video-thumb-details">' +
                         '<i class="small-icon small-play-icon"></i>' +
                         '<span>00:00</span>' +
                     ' </div>' +
@@ -92,7 +92,7 @@
                     '</span>' +
                     '<span class="block-view-file-type"></span>' +
                     '<span class="file-settings-icon"></span>' +
-                    '<div class="video-thumb-detalis">' +
+                    '<div class="video-thumb-details">' +
                         '<i class="small-icon small-play-icon"></i>' +
                         '<span>00:00</span>' +
                     ' </div>' +
@@ -175,7 +175,7 @@
                     '</span>' +
                     '<span class="block-view-file-type folder-shared"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
-                    '<div class="video-thumb-detalis">' +
+                    '<div class="video-thumb-details">' +
                         '<i class="small-icon small-play-icon"></i>' +
                         '<span>00:00</span>' +
                     ' </div>' +
@@ -664,6 +664,10 @@
                     props.classNames.push('file');
                     props.type = filetype(aNode.name);
                     props.size = bytesToSize(aNode.s);
+
+                    if (aNode.fa && aNode.fa.indexOf(':8*') > 0) {
+                        props.playtime = MediaAttribute(aNode).data.playtime;
+                    }
                 }
                 props.name = aNode.name;
 
@@ -844,6 +848,12 @@
                         tmp.classList.add(aProperties.icon);
                     }
 
+                    if (aProperties.playtime) {
+                        aTemplate.querySelector('.data-block-bg').classList.add('video');
+                        aTemplate.querySelector('.video-thumb-details span').textContent
+                            = secondsToTimeShort(aProperties.playtime);
+                    }
+
                     aTemplate.querySelector('.file-block-title').textContent = aProperties.name;
                 }
                 else {
@@ -890,7 +900,8 @@
                         aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
                     }
 
-                    aTemplate.querySelector('.shared-folder-info').textContent = 'by ' + aProperties.userName;
+                    aTemplate.querySelector('.shared-folder-info')
+                        .textContent = l[17590].replace('%1', aProperties.userName);
                 }
                 else {
                     tmp.textContent = aProperties.accessRightsText;

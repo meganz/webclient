@@ -353,6 +353,11 @@
                 return false;
             }
         }
+
+        if (localStorage.testMediaInfo) {
+            return MediaInfoLib.test(files);
+        }
+
         if (e.dataTransfer
                 && e.dataTransfer.items
                 && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry) {
@@ -445,12 +450,24 @@
             }
         }
 
-        document.getElementById("fmholder").addEventListener("dragover", FileDragHover, false);
-        document.getElementById("fmholder").addEventListener("dragleave", FileDragLeave, false);
-        document.getElementById("fmholder").addEventListener("drop", FileSelectHandler, false);
-        document.getElementById("startholder").addEventListener("dragover", FileDragHover, false);
-        document.getElementById("startholder").addEventListener("dragleave", FileDragLeave, false);
-        document.getElementById("startholder").addEventListener("drop", FileSelectHandler, false);
+        var fnHandler = FileSelectHandler;
+        var fnHover = FileDragHover;
+        var fnLeave = FileDragLeave;
+
+        // MEGAdrop upload
+        var elem = document.getElementById("wu_items");
+        if (elem) {
+            fnHandler = mega.megadrop.upload;
+            // fnHover= mega.megadrop.uiDragHover;
+            // fnLeave = mega.megadrop.uiDragLeave;
+            document.getElementById('fileselect5').addEventListener("change", fnHandler, false);
+        }
+        document.getElementById("fmholder").addEventListener("dragover", fnHover, false);
+        document.getElementById("fmholder").addEventListener("dragleave", fnLeave, false);
+        document.getElementById("fmholder").addEventListener("drop", fnHandler, false);
+        document.getElementById("startholder").addEventListener("dragover", fnHover, false);
+        document.getElementById("startholder").addEventListener("dragleave", fnLeave, false);
+        document.getElementById("startholder").addEventListener("drop", fnHandler, false);
 
         if (is_chrome_firefox) {
             $('input[webkitdirectory], .fm-folder-upload input').click(function(e) {

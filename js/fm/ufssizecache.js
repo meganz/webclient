@@ -34,11 +34,7 @@ UFSSizeCache.prototype.feednode = function(n) {
 
         // record parent linkage
         if (!this.cache[n.h]) {
-            if (n.fv) {
-                this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, 1];
-            } else {
-                this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, 0];
-            }
+            this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, n.fv ? 1 : 0];
         }
         else {
             this.cache[n.h][3] = n.p;

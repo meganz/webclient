@@ -105,10 +105,13 @@
     box-sizing: border-box;
 }
 .contacts-info .tiny-button {
-    margin: 10px 22px 0 0;
+    margin: 1px 0 0 0;
+    position: absolute;
+    right: -11px;
 }
-.contacts-info .tiny-button + .user-card-data {
-    padding-right: 40px;
+.contacts-info .user-card-data {
+    padding-right: 15px;
+    
 }
 .chat-right-area .buttons-block {
     border-top: 1px solid rgba(0,0,0,0.05);

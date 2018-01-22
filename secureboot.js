@@ -35,9 +35,10 @@ if (typeof process !== 'undefined') {
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&
-                        document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_chrome_web_ext = document.location.href.substr(0, 19) === 'chrome-extension://';
-var is_firefox_web_ext = document.location.href.substr(0, 16) === 'moz-extension://';
+    document.location.host === 'mega' || document.location.protocol === 'mega:';
+var location_sub = document.location.href.substr(0, 16);
+var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
+var is_firefox_web_ext = location_sub === 'moz-extension://';
 var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
@@ -127,8 +128,15 @@ function mURIDecode(path) {
 
 function clickURLs() {
     $('a.clickurl').rebind('click', function() {
-        var url = $(this).attr('href') || $(this).data('fxhref');
+        var $this = $(this);
+        var url = $this.attr('href') || $this.data('fxhref');
         if (url) {
+            if (window.loadingDialog && $this.hasClass('pages-nav')) {
+                loadingDialog.quiet = true;
+                onIdle(function() {
+                    loadingDialog.quiet = false;
+                });
+            }
             loadSubPage(url.substr(1));
             return false;
         }
@@ -1085,7 +1093,7 @@ function mObjectURL(data, type)
                             //if (u_handle && window.indexedDB) {
                             //    mDBstart(true);
                             //}
-                            if (Object(window.fmdb).crashed === 'slave') {
+                            if (Object(window.fmdb).crashed === 666) {
                                 fmdb.crashed = 0;
                             }
                         }
@@ -1837,7 +1845,8 @@ else if (!b_u) {
     jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
-    jsl.push({f:'js/utils/pictools.js', n: 'js_utils_pictools_js', j: 1});
+    jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
+    jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
     jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
@@ -1882,6 +1891,10 @@ else if (!b_u) {
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+    jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
+    jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
+    jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
+    jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
 
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
@@ -1889,10 +1902,6 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
-        jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-        jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
-        jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
-        jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
         jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
         jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
 
@@ -1923,6 +1932,9 @@ else if (!b_u) {
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
         jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
+        jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
+        jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
+        jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
     } // !is_mobile
 
     // Transfers
@@ -1970,6 +1982,7 @@ else if (!b_u) {
 
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
+    jsl.push({f:'js/fm/fileversioning.js', n: 'fm_fileversioning_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
@@ -1981,7 +1994,6 @@ else if (!b_u) {
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
-        jsl.push({f:'js/fm/fileversioning.js', n: 'fm_fileversioning_js', j:1});
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
@@ -2064,11 +2076,13 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.context-menu.js', n: 'mobile_cloud_context_menu_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.create-folder-overlay.js', n: 'mobile_create_folder_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.decryption-key-overlay.js', n: 'mobile_mobile_dec_key_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.decryption-password-overlay.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.delete-overlay.js', n: 'mobile_delete_overlay_js', j: 1, w: 1});
@@ -2083,7 +2097,8 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.slideshow.js', n: 'mobile_slideshow_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.upload.js', n: 'mobile_upload_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
     }
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -2157,6 +2172,7 @@ else if (!b_u) {
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
+        'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
@@ -2170,7 +2186,10 @@ else if (!b_u) {
         'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
         'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
-        'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 }
+        'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
+        'megadrop': { f: 'html/megadrop.html', n: 'megadrop', j: 0 },
+        'nomegadrop': { f: 'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
+        'megadrop_js': { f: 'js/megadrop.js', n: 'megadrop_js', j: 1 }
     };
 
     var jsl3 = {
@@ -2203,6 +2222,7 @@ else if (!b_u) {
             'webrtcsdp_js': {f:'js/chat/webrtcSdp.js', n: 'webrtcsdp_js', j:1},
             'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
             'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
+            'chatdpersist_js': {f:'js/chat/chatdPersist.js', n: 'chatdpersist_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
@@ -2701,9 +2721,17 @@ else if (!b_u) {
                     }
                     else {
                         if (jsl[i].n === 'pdforiginalviewerjs') {
-                            scriptText = modifyPdfViewerScript(scriptText);
+                            if (localStorage.d === '1' && localStorage.dd === '1' && localStorage.jj === '1') {
+                                blobLink = staticpath + 'dont-deploy/pdf.viewer.debug.js';
+                            }
+                            else {
+                                scriptText = modifyPdfViewerScript(scriptText);
+                                blobLink = mObjectURL([scriptText], 'text/javascript');
+                            }
                         }
-                        blobLink = mObjectURL([scriptText], 'text/javascript');
+                        else {
+                            blobLink = mObjectURL([scriptText], 'text/javascript');
+                        }
                     }
                     window[jsl[i].n] = blobLink;
                 }

@@ -387,8 +387,12 @@ function makeObservable(kls) {
 
     aliases.forEach(function(fn) {
         target[fn] = function() {
-            var $this = $(this);
-            return $this[fn].apply($this, arguments);
+            // trying to save few ms here...
+            if (this && !this._$thisCache) {
+                this._$thisCache = $(this);
+            }
+
+            return this._$thisCache[fn].apply(this._$thisCache, arguments);
         };
     });
 
@@ -1054,6 +1058,9 @@ function percent_megatitle() {
     }
     else if (ul_t) {
         t = ' \u2191 ' + x_ul + '%';
+        if (mega.megadrop.isInit()) {
+            mega.megadrop.uiUpdateTotalProgress(ul_r, ul_t, x_ul);
+        }
     }
     else {
         t = '';
@@ -2550,13 +2557,16 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
         .replace('defaultFilename = \'compressed.tracemonkey - pldi - 09.pdf\';',
         'defaultFilename = \'document.pdf\';');
 
+    var pdfImagesPath = 'PDFJS.imageResourcesPath = \'' + (is_extension ? '' : '/') + 'images/pdfV/\';';
+    var pdfWorkerPath = 'PDFJS.workerSrc = \'' + (is_extension ? '' : '/') + 'pdf.worker.js\';';
+
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('PDFJS.imageResourcesPath = \'./images/\';',
-        'PDFJS.imageResourcesPath = \'/images/pdfV/\';');
+        pdfImagesPath);
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('PDFJS.workerSrc = \'../build/pdf.worker.js\';',
-        'PDFJS.workerSrc = \'/pdf.worker.js\';');
+        pdfWorkerPath);
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('setTitleUsingUrl: function pdfViewSetTitleUsingUrl(url) {',
@@ -2650,6 +2660,25 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
     }
     // end algorithm to remove 'mozL10n.get'
 
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('items.numPages.textContent =  \'of {{pagesCount}}\'',
+        'items.numPages.textContent = \'of \' + pagesCount');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('items.numPages.textContent =  \'({{pageNumber}} of {{pagesCount}})\'',
+        'items.numPages.textContent = pageNumber + \' of \' + pagesCount');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('return  \'{{date}}, {{time}}\'',
+        'return dateString + \',\' + timeString');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('items.customScaleOption.textContent =  \'{{scale}}%\'',
+        'items.customScaleOption.textContent = customScale + \' %\'');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('return  \'{{size_kb}} KB ({{size_b}} bytes)\'',
+        'return kb + \' KB (\' + fileSize + \' bytes)\'');
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('return  \'{{size_mb}} MB ({{size_b}} bytes)\'',
+        'return (kb / 1024) + \' MB (\' + fileSize + \' bytes)\'');
+
     var finalFunctionOnViewLoad = 'function webViewerLoad() { '
         + 'var config = getViewerConfiguration(); '
         + 'var pdfRef = JSON.parse(localStorage.getItem(\'currPdfPrev2\')); '
@@ -2668,4 +2697,25 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
     pdfViewerSrcCode += finalFunctionOnViewLoad;
 
     return pdfViewerSrcCode;
+}
+
+function invalidLinkError() {
+    'use strict';
+    loadingDialog.hide();
+    loadingInitDialog.hide();
+
+    loadfm.loaded = false;
+    loadfm.loading = false;
+    if (!is_mobile) {
+        var title = l[8531];
+        var message = l[17557];
+        msgDialog('warninga', title, message, false, function () {
+            // If the user is logged-in, he'll be redirected to the cloud
+            loadSubPage('login');
+        });
+    }
+    else {
+        // Show file/folder not found overlay
+        mobile.notFoundOverlay.show();
+    }
 }

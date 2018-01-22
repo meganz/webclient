@@ -442,7 +442,7 @@ var GenericConversationMessage = React.createClass({
                         var previewButton = null;
 
                         if (!attachmentMetaInfo.revoked) {
-                            if (v.fa && is_image(v)) {
+                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
                                 var imagesListKey = message.messageId + "_" + v.h;
                                 if (!chatRoom.images.exists(imagesListKey)) {
                                     v.id = imagesListKey;
@@ -458,7 +458,7 @@ var GenericConversationMessage = React.createClass({
                             if (contact.u === u_handle) {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
-                                    icon="tiny-icon grey-down-arrow">
+                                    icon="tiny-icon icons-sprite grey-dots">
                                     <DropdownsUI.Dropdown
                                         ref={(refObj) => {
                                             self.dropdown = refObj;
@@ -524,7 +524,7 @@ var GenericConversationMessage = React.createClass({
                             else {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
-                                    icon="tiny-icon grey-down-arrow">
+                                    icon="tiny-icon icons-sprite grey-dots">
                                     <DropdownsUI.Dropdown
                                         className="white-context-menu attachments-dropdown"
                                         noArrow={true}
@@ -558,7 +558,7 @@ var GenericConversationMessage = React.createClass({
                         </div>;
 
                         if (M.chat && !message.revoked) {
-                            if (v.fa && is_image(v)) {
+                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
                                 var src = thumbnails[v.h];
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);
@@ -692,7 +692,7 @@ var GenericConversationMessage = React.createClass({
                             // OR it is a share contact, etc.
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
-                                icon="tiny-icon grey-down-arrow">
+                                icon="tiny-icon icons-sprite grey-dots">
                                 <DropdownsUI.Dropdown
                                     className="white-context-menu shared-contact-dropdown"
                                     noArrow={true}
@@ -730,7 +730,7 @@ var GenericConversationMessage = React.createClass({
                         else if (M.u[contact.u] && M.u[contact.u].c === 0) {
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
-                                icon="tiny-icon grey-down-arrow">
+                                icon="tiny-icon icons-sprite grey-dots">
                                 <DropdownsUI.Dropdown
                                     className="white-context-menu shared-contact-dropdown"
                                     noArrow={true}
@@ -846,7 +846,7 @@ var GenericConversationMessage = React.createClass({
             }
             else {
                 // this is a text message.
-                if (message.textContents === "") {
+                if (message.textContents === "" && !message.dialogType) {
                     message.deleted = true;
                 }
                 var messageActionButtons = null;
@@ -962,7 +962,7 @@ var GenericConversationMessage = React.createClass({
                     ) {
                         messageActionButtons = <ButtonsUI.Button
                             className="default-white-button tiny-button"
-                            icon="tiny-icon grey-down-arrow">
+                            icon="tiny-icon icons-sprite grey-dots">
                             <DropdownsUI.Dropdown
                                 className="white-context-menu attachments-dropdown"
                                 noArrow={true}

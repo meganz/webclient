@@ -518,12 +518,15 @@ function filetype(n) {
 }
 
 function fileIcon(node) {
-
+    "use strict";
     var icon;
 
     if (node.t) {
         if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
             icon = 'folder-shared';
+        }
+        else if ( mega.megadrop.pufs[node.h] && mega.megadrop.pufs[node.h].s !== 1) {
+            icon = 'puf-folder';
         }
         else {
             icon = 'folder';
@@ -554,7 +557,7 @@ function fileext(name) {
     else {
         ext = ext
             .replace(/<[^>]*>/g, '')
-            .replace(/\W+/g, '');
+            .replace(/[^\w+]/g, '');
 
         if (ext.length > 9) {
             ext = ext.substr(0, 9);

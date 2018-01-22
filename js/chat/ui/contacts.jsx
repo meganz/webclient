@@ -234,32 +234,27 @@ var ContactCard = React.createClass({
                         key="view" icon="human-profile" label={__(l[101])} onClick={() => {
                         loadingDialog.show();
 
-                        asyncApiReq({
-                            'a': 'uge',
-                            'u': contact.u
-                        })
-                            .done(function(r) {
-                                if (r) {
-                                    var exists = false;
-                                    Object.keys(M.opc).forEach(function (k) {
-                                        if (!exists && M.opc[k].m === r) {
-                                            exists = true;
-                                            return false;
-                                        }
-                                    });
-
-                                    if (exists) {
-                                        closeDialog();
-                                        msgDialog('warningb', '', l[7413]);
-                                    } else {
-                                        M.inviteContact(M.u[u_handle].m, r);
-                                        var title = l[150];
-
-                                        var msg = l[5898].replace('[X]', r);
-
-                                        closeDialog();
-                                        msgDialog('info', title, msg);
+                        M.syncContactEmail(contact.u)
+                            .done(function(email) {
+                                var exists = false;
+                                Object.keys(M.opc).forEach(function (k) {
+                                    if (!exists && M.opc[k].m === email) {
+                                        exists = true;
+                                        return false;
                                     }
+                                });
+
+                                if (exists) {
+                                    closeDialog();
+                                    msgDialog('warningb', '', l[7413]);
+                                } else {
+                                    M.inviteContact(M.u[u_handle].m, email);
+                                    var title = l[150];
+
+                                    var msg = l[5898].replace('[X]', email);
+
+                                    closeDialog();
+                                    msgDialog('info', title, msg);
                                 }
                             })
                             .always(function() {

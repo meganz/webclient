@@ -302,7 +302,7 @@
     box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);
 }
 .default-white-button.tiny-button {
-    width: 16px;
+    width: 25px;
     height: 16px;
     min-width: 0;
     padding: 0;
@@ -312,6 +312,11 @@
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+}
+.default-white-button.tiny-button::after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
 }
 .icon-dropdown {
     padding: 2px 13px 2px 3px;

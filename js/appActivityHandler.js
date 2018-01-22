@@ -6,7 +6,7 @@
      * (Should be > APPACTIVITYHANDLER_MOUSEMOVE_THROTTLING)
      * @type {Number}
      */
-    var APPACTIVITYHANDLER_ACTIVITY_TIMEOUT = 60000;
+    var APPACTIVITYHANDLER_ACTIVITY_TIMEOUT = 30000;
 
 
     /**
@@ -17,7 +17,7 @@
      * (Should be < APPACTIVITYHANDLER_ACTIVITY_TIMEOUT)
      * @type {Number}
      */
-    var APPACTIVITYHANDLER_MOUSEMOVE_THROTTLING = 1000;
+    var APPACTIVITYHANDLER_MOUSEMOVE_THROTTLING = APPACTIVITYHANDLER_ACTIVITY_TIMEOUT / 3;
 
     /**
      * AppActivityHandler's main goal is to provide a single, reusable and performance optimised handler for notifying

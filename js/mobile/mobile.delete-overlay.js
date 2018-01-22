@@ -85,12 +85,20 @@ mobile.deleteOverlay = {
         // Update the file/folder count in the footer and show an Empty message and icon if no files
         mobile.cloud.showEmptyCloudIfEmpty();
         mobile.cloud.countAndUpdateSubFolderTotals();
-        mobile.cloud.renderFooter();
+        mobile.cloud.renderFoldersAndFilesSubHeader();
 
-        // Re-show the file manager and re-enable scrolling, hide overlay with download button options and show a toast
+        // Re-show the file manager and re-enable scrolling, hide overlay with download button options
         mobile.deleteOverlay.$fileManagerBlock.removeClass('hidden disable-scroll');
         mobile.deleteOverlay.$overlay.addClass('hidden');
-        mobile.showToast(l[16347]);                           // File deleted
+
+        // If type folder, show toast message '1 folder moved to the Rubbish Bin'
+        if (M.d[nodeHandle].t === 1) {
+            mobile.showToast(l[7613]);
+        }
+        else {
+            // Otherwise if a file, show toast message '1 file moved to the Rubbish Bin'
+            mobile.showToast(l[7611]);
+        }
     },
 
     /**

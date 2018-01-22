@@ -231,6 +231,10 @@
         "text": "Folder Name",
         "context": "Input field description in the create folder dialog."
     },
+    "158": {
+        "text": "Create",
+        "context": "Title button for the create folder alert."
+    },
     "164": {
         "text": "Cloud Drive",
         "context": "Title of the Cloud Drive section"
@@ -757,6 +761,10 @@
     },
     "553": {
         "text": "Your payment provider is not listed? Please [A]e-mail us[\/A]",
+        "context": ""
+    },
+    "554": {
+        "text": "Complete",
         "context": ""
     },
     "555": {
@@ -1863,10 +1871,6 @@
         "text": "Today, 4000 years later, most major cloud storage providers still have not fully adopted cryptography.",
         "context": ""
     },
-    "1146": {
-        "text": "Complete your account",
-        "context": ""
-    },
     "1147": {
         "text": "Choose your account type",
         "context": ""
@@ -2771,10 +2775,6 @@
         "text": " of ",
         "context": "Showing progress of elements. Example: 2 of 10."
     },
-    "5532": {
-        "text": "Upload File",
-        "context": "Button text when uploading a file to a previously selected location in MEGA"
-    },
     "5533": {
         "text": "Loading...",
         "context": "state previous to import a file"
@@ -2823,9 +2823,21 @@
         "text": "Shared with me",
         "context": "title of the screen that shows all the folders that the user shares with other users and viceversa"
     },
+    "5622": {
+        "text": "Share link",
+        "context": "create a link of a file and send it using an app from the device"
+    },
     "5631": {
         "text": "Share folder",
         "context": "menu item"
+    },
+    "5644": {
+        "text": "Folder already exists",
+        "context": "message when trying to create a folder that already exists"
+    },
+    "5645": {
+        "text": "Folder created",
+        "context": "success message when creating a folder"
     },
     "5710": {
         "text": "Are you sure you want to abort the registration?",
@@ -3129,6 +3141,10 @@
     },
     "6089": {
         "text": "No transfers",
+        "context": ""
+    },
+    "6110": {
+        "text": "Uploading...",
         "context": ""
     },
     "6117": {
@@ -3699,9 +3715,17 @@
         "text": "Loading...",
         "context": "Label to show when an account detail request is waiting for the server response."
     },
+    "7022": {
+        "text": "Starting",
+        "context": "Label of tray icon to indicate that MEGAsync is starting."
+    },
     "7039": {
         "text": "Do not ask me again",
         "context": ""
+    },
+    "7070": {
+        "text": "Disabled",
+        "context": "Label to indicate the user if the feature of exclusion based by size is enabled\/disabled."
     },
     "7086": {
         "text": "Please select your Linux Distro",
@@ -4051,6 +4075,14 @@
         "text": "Empty folder",
         "context": "Label for the background of an empty forder page - (String as short as possible)."
     },
+    "7611": {
+        "text": "1 file moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved 1 file to the rubbish bin"
+    },
+    "7613": {
+        "text": "1 folder moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved 1 folder to the rubbish bin"
+    },
     "7645": {
         "text": "I agree",
         "context": "Button label for \"I agree to the terms and conditions\"."
@@ -4262,6 +4294,10 @@
     "7720": {
         "text": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
         "context": "Error message when a user attempts to change their email without an active login session."
+    },
+    "7729": {
+        "text": "Please enter a valid folder name",
+        "context": "An error message which is shown when a user is trying to create a folder without entering the folder name."
     },
     "7730": {
         "text": "Verify your email address",
@@ -4590,6 +4626,10 @@
     "8529": {
         "text": "Payment Issue",
         "context": "A dropdown selection item on the support page. This is for a user to make a question to the support team about a payment problem they are having e.g. missing payment."
+    },
+    "8531": {
+        "text": "Invalid link",
+        "context": "This message is displayed when the user clicks on an invalid hyperlink."
     },
     "8535": {
         "text": "MEGA will be changing its Terms of Service on the [B]20th February 2016[\/B]. Please read our anniversary blog post for more information.",
@@ -6143,6 +6183,10 @@
         "text": "Subscription Expires On",
         "context": "A label on the My Account page indicating the expiration date of a PRO account. This is shown if they do not have a recurring subscription (e.g. the purchased a one-off plan for a specific time period) or the recurring subscription was recently canceled so they still have some time remaining on their plan."
     },
+    "16176": {
+        "text": "Paste",
+        "context": "A button which allows the user to paste a file\/folder into another folder."
+    },
     "16221": {
         "text": "Add label %1",
         "context": "Information text for the user which tells them they can mark a folder or file with its own color. Example: Add label \"Red\". Please leave the %1 placeholder as it is because it will be replaced by the color name e.g. Red, Green, Blue etc."
@@ -6202,6 +6246,10 @@
     "16274": {
         "text": "View Image",
         "context": "The title of a button which allows the user to open the image in the media \/ image viewer."
+    },
+    "16275": {
+        "text": "Play Video",
+        "context": "The title of a button which allows the user to open the video in a media \/ video player."
     },
     "16277": {
         "text": "Create your free account and get %1 of complimentary storage space, valid for %2 days.",
@@ -6427,10 +6475,6 @@
         "text": "The folder you are trying to view is no longer available.",
         "context": "A message in an error dialog in the mobile web site. This error can occur when the folder link is removed or the link is subject to a takedown notice."
     },
-    "16347": {
-        "text": "File deleted",
-        "context": "A toast notification which is shown on the mobile web site to say that the file has been deleted successfully."
-    },
     "16348": {
         "text": "Failed to copy, try copying manually.",
         "context": "A toast message which is shown when the process to copy the public link failed. It asks the user to manually copy the link text."
@@ -6631,6 +6675,10 @@
         "text": "Select the file you want to keep:",
         "context": "User is able to select file version if uploading file already exists in folder."
     },
+    "16488": {
+        "text": "Upload and replace",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
+    },
     "16490": {
         "text": "Don't upload",
         "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
@@ -6678,6 +6726,10 @@
     "16501": {
         "text": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
         "context": "An error dialog message when the Cancel Subscription button is pressed in the My Account section of the website. This means that cancelling the subscription is not possible from the website, they must cancel with Apple or Google. Please leave the [A1], [A2] and [A3] tags as they will be replaced with links."
+    },
+    "16508": {
+        "text": "Completing...",
+        "context": "Label for the state of a transfer when is being completing - (String as short as possible)."
     },
     "16514": {
         "text": "The file you are moving will be renamed as:",
@@ -6822,10 +6874,6 @@
     "16567": {
         "text": "Effortlessly stay connected with our secure cross-platform audio and video calls.",
         "context": "iOS MEGAchat feature description"
-    },
-    "16568": {
-        "text": "Coming soon!",
-        "context": "Text to indicate that a feature is coming soon"
     },
     "16569": {
         "text": "Seamless File Sharing",
@@ -7363,6 +7411,66 @@
         "text": "Label",
         "context": "A menu item in the left panel drop down menu to allow sorting by label."
     },
+    "17399": {
+        "text": "Manage MEGAdrop Folder",
+        "context": "Manage MEGAdrop folder using right click menu in cloud drive tab (context menu)"
+    },
+    "17400": {
+        "text": "Cancel MEGAdrop Folder",
+        "context": "Cancel MEGAdrop folder using right click menu in cloud drive tab (context menu)"
+    },
+    "17401": {
+        "text": "MEGAdrop Folders",
+        "context": "Acccount settings page (fm\/account)  List of available MEGAdrop Folders where user can manage\/remove\/preview them"
+    },
+    "17402": {
+        "text": "MEGAdrop Folder Management",
+        "context": "Title or right panel for page (fm\/account\/widget)"
+    },
+    "17403": {
+        "text": "By doing this you will cancel your MEGAdrop setup for the folder named %1",
+        "context": "Confirmation dialog when user want to create new public link for a folder but there's a active MEGAdrop folder"
+    },
+    "17404": {
+        "text": "Upload a file directly to my MEGA cloud drive without signing up.",
+        "context": "Introductory text on public upload page window"
+    },
+    "17405": {
+        "text": "Current speed",
+        "context": "Current transfer speed during file uploading on public upload page"
+    },
+    "17406": {
+        "text": "Completion",
+        "context": "Status of uploaded file on public upload page"
+    },
+    "17407": {
+        "text": "Embed code",
+        "context": "Tab label for public upload page dialog."
+    },
+    "17408": {
+        "text": "Copy code",
+        "context": "Action in public upload page dialog"
+    },
+    "17409": {
+        "text": "Preview MEGAdrop Folder",
+        "context": "Button label for action in MEGAdrop folder dialog"
+    },
+    "17410": {
+        "text": "Copy and paste the link below to provide an easy access link to the MEGAdrop landing page.",
+        "context": "MEGAdrop folder dialog, share link tab, explanation."
+    },
+    "17411": {
+        "text": "Copy and paste the link below into your website to generate a button that users can click to open your personal MEGAdrop folder.",
+        "context": "MEGAdrop foloder dialog, embed link tab, explantion text."
+    },
+    "17412": {
+        "text": "Create MEGAdrop Folder",
+        "context": "Introduction text in make\/manage MEGAdrop folder info dialog."
+    },
+    "17413": {
+        "text": "A MEGAdrop folder allows anyone to upload files to your MEGA account, even if they don't have an account!",
+        "context": "Description text for make\/manage public upload page dialog."
+    },
     "17445": {
         "text": "Date Added",
         "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's date of encryption on the Cloud Drive (not the date of the file's creation on their local machine)."
@@ -7370,6 +7478,10 @@
     "17446": {
         "text": "Date Created",
         "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's original timestamp, when it is created on their local machine."
+    },
+    "17450": {
+        "text": "Make MEGAdrop Folder",
+        "context": "Change an existing folder into a MEGAdrop folder using the right click menu in the cloud drive tab (context menu)."
     },
     "17464": {
         "text": "Invite friends and get bonuses",
@@ -7395,6 +7507,10 @@
         "text": "view document",
         "context": "Button for the downloads page to let users preview PDF documents."
     },
+    "17490": {
+        "text": "Manage",
+        "context": "Label of action button on MEGAdrop info dialog. When user choose 'Manage MEGAdrop Folder' from context menu dialog is shown by default."
+    },
     "17517": {
         "text": "used %tq",
         "context": "Used transfer quota of the account. The placeholder represents transfer quota to give context. The amount of quota will be plural (more than 2)."
@@ -7410,6 +7526,26 @@
     "17525": {
         "text": "used %tq2",
         "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[pair] (= 2)"
+    },
+    "17533": {
+        "text": "MEGAdrop is unavailable",
+        "context": "The MEGAdrop window title when the provided URL is not valid."
+    },
+    "17534": {
+        "text": "Either the MEGAdrop link has been cancelled by the owner or the URL you have provided is incorrect.",
+        "context": "Explanation for a wrong MEGAdrop URL."
+    },
+    "17535": {
+        "text": "Account storage limit has been reached.",
+        "context": "A dialog message on the MEGAdrop overquota popup."
+    },
+    "17536": {
+        "text": "The owner of this MEGAdrop folder has reached their account storage limit and cannot accept any more uploads. Please contact them about upgrading their plan.",
+        "context": "An explanation on the MEGAdrop overquota popup."
+    },
+    "17537": {
+        "text": "This MEGAdrop is full, please try again later.",
+        "context": "An explanation on the MEGAdrop over quota window."
     },
     "17543": {
         "text": "Not achieved",
@@ -7434,5 +7570,117 @@
     "17549": {
         "text": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
         "context": "A message in a popup dialog explaining that there is an update available for the Firefox Legacy extension which works on browsers such as Pale Moon."
+    },
+    "17557": {
+        "text": "The link you are trying to access is not valid.",
+        "context": "attached, this will be the dialog content"
+    },
+    "17558": {
+        "text": "Import and update",
+        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to import the file in the destination folder by generating a new version with the file he is importing."
+    },
+    "17559": {
+        "text": "Don't import",
+        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and not replace it with the file they are importing."
+    },
+    "17560": {
+        "text": "Import and rename",
+        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and rename the file he is importing to avoid a filename conflict."
+    },
+    "17561": {
+        "text": "The file you are importing will be renamed as:",
+        "context": "A description for a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and also the file they are importing by renaming it automatically."
+    },
+    "17564": {
+        "text": "Link error",
+        "context": "The title of an error dialog while getting the sharing link of a file\/folder."
+    },
+    "17565": {
+        "text": "The link cannot be managed, due to an unknown error received from server.",
+        "context": "An error message originating from the Manage Link dialog.\r\n"
+    },
+    "17578": {
+        "text": "There is already a file with the same name",
+        "context": "A tooltip message which shows when a file name is duplicated during renaming."
+    },
+    "17579": {
+        "text": "There is already a folder with the same name",
+        "context": "A tooltip message which is shown when a folder name is duplicated during renaming or creation."
+    },
+    "17580": {
+        "text": "View file versioning settings",
+        "context": "Title of the button to view settings for file versioning."
+    },
+    "17581": {
+        "text": "You are about to delete the version histories of all files. Please note that the current files will not be deleted. Would you like to proceed?",
+        "context": "A warning message to warn the user that they are about to delete all previous versions of all files."
+    },
+    "17582": {
+        "text": "You have [X1] file versions, taking up a total of [X2].\r\n",
+        "context": "A message to summarise the total number of file versions (X1) and total storage usage (X2) of the versioned files. Please keep the placeholders [X1] and [X2] as they will be replaced at runtime."
+    },
+    "17590": {
+        "text": "by %1",
+        "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
+    },
+    "17595": {
+        "text": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
+        "context": "A confirmation message when the user chooses to disable file versioning."
+    },
+    "17596": {
+        "text": "Enable or disable file versioning for your entire account:",
+        "context": "Title of the file versioning setting."
+    },
+    "17597": {
+        "text": "You may still receive file versions from shared folders if your contacts have this enabled.",
+        "context": "A note about file versioning in the file versioning settings area."
+    },
+    "17598": {
+        "text": "Delete all file versions:",
+        "context": "The title of the section about deleting file versions in the settings."
+    },
+    "17599": {
+        "text": "Delete all",
+        "context": "Text of a button which deletes all historical versions of files in the user's entire account."
+    },
+    "17600": {
+        "text": "This will permanently delete all your own file versions. Any file version shared to you from a contact will need to be deleted by them.",
+        "context": "A warning note about deleting all file versions in the settings section."
+    },
+    "17601": {
+        "text": "Enabled",
+        "context": "The label of the toggle switch to indicate that file versioning is enabled."
+    },
+    "17602": {
+        "text": "The current version of the file will be replaced with the file you are uploading.",
+        "context": "A description in the duplicate items dialog below the Upload and replace title. This option allows the user to update an existing file in the folder by replacing the current version of the file with the file they are uploading."
+    },
+    "17617": {
+        "text": "Create Folder",
+        "context": "The title of a dialog in the mobile webclient which lets the user create a new folder (directory) to be added to their Cloud Drive"
+    },
+    "17618": {
+        "text": "UPLOAD ANOTHER FILE",
+        "context": "A button label in the mobile webclient to upload an additional file after completing a file upload already."
+    },
+    "17619": {
+        "text": "MEGAdrop URL was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop URL was copied to the clipboard."
+    },
+    "17620": {
+        "text": "MEGAdrop source code was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop source code was copied to the clipboard."
+    },
+    "17626": {
+        "text": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
+        "context": "Message dialog informs user that action Get Link\/Share on folder which contains multiple MEGAdrop descendant folders will cause cancellation of all MEGAdrop subfolders starting from the selected one."
+    },
+    "17686": {
+        "text": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
+        "context": "A message which is shown when a user attempts to access a MEGAdrop public folder link."
+    },
+    "17687": {
+        "text": "Not supported",
+        "context": "A title for the MEGAdrop public link page on mobile which is not supported."
     }
 }

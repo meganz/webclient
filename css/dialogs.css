@@ -321,7 +321,7 @@
     border-radius: 6px;
     white-space: nowrap;
     z-index: 10;
-    visibility: hidden; 
+    visibility: hidden;
     -webkit-transition: all 100ms ease-in-out;
     -moz-transition: all 100ms ease-in-out;
     -o-transition: all 100ms ease-in-out;
@@ -397,7 +397,7 @@
 }
 .fm-dialog:not(.exceeded) .reg-st3-bott-title {
     padding-bottom: 14px;
-    
+
 }
 .fm-dialog:not(.exceeded) .fm-dialog-body.centered-content {
     background: rgb(255,255,255);
@@ -481,7 +481,7 @@
 .dialog.overquota-bott-bl {
     display: none;
 }
-.not-logged .exceeded:not(.pro) .dialog.overquota-bott-bl, .logged .exceeded.achievements:not(.pro) .dialog.overquota-bott-bl, 
+.not-logged .exceeded:not(.pro) .dialog.overquota-bott-bl, .logged .exceeded.achievements:not(.pro) .dialog.overquota-bott-bl,
 .not-logged .fm-dialog:not(.exceeded) .dialog.overquota-bott-bl, .logged .fm-dialog:not(.exceeded).achievements .dialog.overquota-bott-bl {
     display: table;
     width: 100%;
@@ -1283,7 +1283,7 @@ li.token-input-token-invite .input-close {
     margin-bottom: 10px;
 }
 /* Storage dialog */
-.fm-dialog.storage-dialog {
+.fm-dialog.storage-dialog, .fm-dialog.drop-quota-dialog {
     width: 644px;
     margin: -270px 0 0 -322px;
     background-color: #FAFAFA;
@@ -1714,7 +1714,7 @@ li.token-input-token-invite .input-close {
 .megasync-info-arrow {
     width: 46px;
     height: 45px;
-    background-image: url(../images/mega/download-sprite-v7.png);
+    background-image: url(../images/mega/download-sprite-v8.png);
     background-position: -15px -2448px;
     position: absolute;
     left: 350px;
@@ -1727,7 +1727,7 @@ li.token-input-token-invite .input-close {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    background-image: url(../images/mega/download-sprite-v7.png);
+    background-image: url(../images/mega/download-sprite-v8.png);
     background-position: -1px -1178px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -1749,7 +1749,7 @@ li.token-input-token-invite .input-close {
     left: 0;
     position: absolute;
     margin: 0 0 0 0;
-    background-image: url(../images/mega/download-sprite-v7.png);
+    background-image: url(../images/mega/download-sprite-v8.png);
     background-position: 0 -2289px;
 }
 .megasync-icon.blink {
@@ -2044,7 +2044,7 @@ li.token-input-token-invite .input-close {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    
+
 }
 .fm-versioning.body {
         height: 100%;
@@ -2079,6 +2079,16 @@ li.token-input-token-invite .input-close {
 }
 .fm-versioning .jspVerticalBar {
     width: 6px;
+}
+.fm-versioning.button.settings {
+    position: absolute;
+    top: 22px;
+    left: 20px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+.fm-versioning.button.settings:hover {
+    opacity: 1;
 }
 .fm-versioning.button.close {
     position: absolute;
@@ -2121,7 +2131,7 @@ li.token-input-token-invite .input-close {
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    
+
 }
 .fm-versioning.file-name span.red {
     font-size: 14px;
@@ -2154,7 +2164,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v10.png);
+    background-image: url(../images/mega/icons-sprite_v13.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -2224,7 +2234,7 @@ li.token-input-token-invite .input-close {
 }
 .fm-versioning.file-info-row .medium-file-icon {
     margin-top: 4px;
-    
+
 }
 .fm-versioning .radio-input {
     position: absolute;
@@ -2239,7 +2249,7 @@ li.token-input-token-invite .input-close {
     font-size: 13px;
     line-height: 17px;
      color:#999999;
-    
+
 }
 .fm-versioning.modified-time {
     font-size: 14px;
@@ -2265,7 +2275,7 @@ li.token-input-token-invite .input-close {
 }
 .fm-versioning.modified-time.table-cell i.clock {
     margin-right: 6px;
-    
+
 }
 .fm-versioning.file-info .size {
     position:relative;
@@ -2300,7 +2310,7 @@ li.token-input-token-invite .input-close {
     display: inline-block;
     padding: 3px;
     margin: 0 0 0 11px;
-    
+
 }
 .fm-versioning.buttons .button i {
     margin: 0;

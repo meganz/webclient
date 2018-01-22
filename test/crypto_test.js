@@ -92,7 +92,7 @@ describe("crypto unit test", function() {
                 assert.strictEqual(rootPromise.resolve.callCount, 1);
                 assert.strictEqual(rootPromise.resolve.args[0][0], pubKey);
                 assert.strictEqual(ns._logger._log.args[0][0],
-                                   'Got RSA pub key of user you456789xw: "the key"');
+                                   'Got RSA pub key of user you456789xw');
             });
 
             it("API error on RSA key", function() {

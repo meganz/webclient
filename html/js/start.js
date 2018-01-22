@@ -20,9 +20,6 @@ function init_start() {
         });
         $('.startpage.try-mega').text(l[16535]);
 
-        // Show loading spinner because some stuff may not be rendered properly yet
-        loadingDialog.show();
-
         // Load the membership plans
         pro.loadMembershipPlans(function () {
 
@@ -31,9 +28,6 @@ function init_start() {
 
             // Check which plans are applicable or grey them out if not
             pro.proplan.checkApplicablePlans();
-
-            // Close loading spinner
-            loadingDialog.hide();
         });
 
         $('.startpage.try-mega').rebind('click', function () {

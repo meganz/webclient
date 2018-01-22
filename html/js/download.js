@@ -2,20 +2,20 @@ var dlpage_key,dlpage_ph,dl_next;
 var fdl_filename, fdl_filesize, fdl_key, fdl_url, fdl_starttime;
 var dl_import=false;
 var dl_attr;
+var dl_node;
 var fdl_queue_var=false;
 var fileSize;
 var dlResumeInfo;
+var mediaCollectFn;
 var maxDownloadSize = Math.pow(2, 53);
 
 var MOBILE_FILETYPES = {
-    "docx" : 'word',
-    "jpeg" : 'image',
-    "jpg"  : 'image',
-    "mp3"  : 'audio',
-    "mp4"  : 'video',
-    "pdf"  : 'pdf',
-    "png"  : 'image',
-    "xlsx" : 'word'
+    jpeg: 'image',
+    jpg: 'image',
+    png: 'image',
+    gif: 'image',
+    mp3: 'audio',
+    mp4: 'video'
 };
 
 function dlinfo(ph,key,next)
@@ -126,18 +126,40 @@ function dl_g(res) {
         }
         if (fdl_file)
         {
+            var $pageScrollBlock = $('.bottom-page.scroll-block')
+                .removeClass('video video-theatre-mode resumable');
             var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
+            var fileExtPos =  filename.lastIndexOf('.') > 0 ? filename.lastIndexOf('.') : filenameLength;
+            var fileTitle = filename.substring(0, fileExtPos);
+            var fileExt = filename.substring(fileExtPos);
+            var isVideo = is_video(filename);
+            var prevBut = isVideo;
+            dl_node = new MegaNode({
+                k: key,
+                fa: res.fa,
+                h: dlpage_ph,
+                ph: dlpage_ph,
+                name: filename,
+                s: fdl_filesize,
+                link: dlpage_ph + '!' + dlpage_key
+            });
+
+            mediaCollectFn = function() {
+                MediaAttribute.setAttribute(dl_node)
+                    .then(console.debug.bind(console, 'MediaAttribute'))
+                    .catch(console.warn.bind(console, 'MediaAttribute'));
+            };
 
             var checkMegaSyncDownload = function() {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
-                $('#megaapp-download').prop('checked', true);
+                $('.checkdiv.megaapp-download input').prop('checked', true);
                 $('.download.big-button.download-file span').text(l[58]);
                 $('.download.big-button.download-file i').removeClass('save resume');
             };
             var uncheckMegaSyncDownload = function() {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
-                $('#megaapp-download').prop('checked', false);
+                $('.checkdiv.megaapp-download input').prop('checked', false);
                 var $but = $('.download.big-button.download-file span');
                 if (dlResumeInfo) {
                     if (dlResumeInfo.byteLength === fdl_filesize) {
@@ -157,6 +179,7 @@ function dl_g(res) {
             var onDownloadReady = function() {
                 dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
 
+                $pageScrollBlock.addClass('resumable');
                 $('.progress-resume').removeClass('hidden');
                 $('.download.state-text.resume').addClass('hidden');
                 $('.download.state-text.save').removeClass('hidden');
@@ -192,6 +215,7 @@ function dl_g(res) {
                             else if (size === dlResumeInfo.byteOffset) {
                                 dlprogress(-0xbadf, perc, dlResumeInfo.byteOffset, fdl_filesize);
 
+                                $pageScrollBlock.addClass('resumable');
                                 $('.progress-resume').removeClass('hidden');
                                 $('.download.state-text.save').addClass('hidden');
                                 $('.download.state-text.resume').removeClass('hidden');
@@ -224,8 +248,8 @@ function dl_g(res) {
                 });
             });
 
-            $('#megaapp-download').rebind('change', function() {
-                if ($(this).prop("checked")) {
+            $('.checkdiv.megaapp-download input').change(function() {
+                if ($(this).prop('checked')) {
                     checkMegaSyncDownload();
                     delete localStorage.megaSyncDownloadUnchecked;
                 }
@@ -241,7 +265,7 @@ function dl_g(res) {
 
             $('.mid-button.download-file, .big-button.download-file, .mobile.dl-browser')
                 .rebind('click', function() {
-                    if ($('#megaapp-download').prop("checked")) {
+                    if ($('.checkdiv.megaapp-download input').prop('checked')) {
                         loadingDialog.show();
                         megasync.isInstalled(function(err, is) {
                             loadingDialog.hide();
@@ -290,7 +314,7 @@ function dl_g(res) {
                                     $('.download.state-text.resume').addClass('hidden');
                                     $('.progress-resume').addClass('hidden');
                                     $('.download.scroll-block')
-                                        .removeClass('download-complete')
+                                        .removeClass('download-complete resumable')
                                         .addClass('downloading');
 
                                     // another tab is downloading this
@@ -328,23 +352,18 @@ function dl_g(res) {
 
             fileSize = bytesToSize(res.s);
 
+            var $fileinfoBlock = $('.download.file-info');
+
+            $fileinfoBlock.find('.big-txt').attr('title', filename);
+            $fileinfoBlock.find('.big-txt .filename').text(fileTitle);
+            $fileinfoBlock.find('.big-txt .extension').text(fileExt);
+            $fileinfoBlock.find('.small-txt').text(fileSize);
+
             $('.download.top-bar').removeClass('hidden');
-            $('.file-info .download.info-txt.filename, .download.bar-filename')
-                .text(filename).attr('title', filename);
-            $('.file-info .download.info-txt.small-txt, .bar-cell .download.bar-filesize')
-                .text(fileSize);
+            $('.download.bar-filename').text(filename).attr('title', filename);
+            $('.bar-cell .download.bar-filesize').text(fileSize);
             $('.info-block .block-view-file-type, .download .bar-cell .transfer-filetype-icon')
                 .addClass(fileIcon({ name: filename }));
-
-            // XXX: remove this once all browsers support `text-overflow: ellipsis;`
-            Soon(function() {
-                while (filenameLength-- && $('.download.info-txt.filename').width() > 316) {
-                    $('.file-info .download.info-txt.filename').text(str_mtrunc(filename, filenameLength));
-                }
-                if (filenameLength < 1) {
-                    $('.file-info .download.info-txt.filename').text(str_mtrunc(filename, 37));
-                }
-            });
 
             if (dlQueue.isPaused(dlmanager.getGID(fdl_queue_var))) {
                 $('.download.scroll-block').addClass('paused');
@@ -390,46 +409,150 @@ function dl_g(res) {
             var showPreviewButton = function($infoBlock) {
                 $infoBlock = $infoBlock || $('.download.info-block');
 
-                if (is_image(filename) || is_video(filename)) {
+                if (is_image(filename) || isVideo) {
                     var $ipb = $infoBlock.find('.img-preview-button');
 
                     if (filetype(filename) === 'PDF Document') {
                         $ipb.find('span').text(l[17489]);
                     }
-                    else if (is_video(filename)) {
+                    else if (isVideo) {
                         $ipb.find('span').text('view video');
                     }
 
                     $ipb.removeClass('hidden')
                         .rebind('click', function() {
-                            slideshow({
-                                k: key,
-                                fa: res.fa,
-                                h: dlpage_ph,
-                                name: filename,
-                                link: dlpage_ph + '!' + dlpage_key
-                            });
+                            slideshow(dl_node);
+
+                            if (mediaCollectFn) {
+                                onIdle(mediaCollectFn);
+                                mediaCollectFn = null;
+                            }
                         });
                 }
             };
 
             if (res.fa) {
-                // load thumbnail
-                api_getfileattr([{fa: res.fa, k: key}], 0, function(a, b, data) {
-                    if (data !== 0xDEAD) {
-                        data = mObjectURL([data.buffer || data], 'image/jpeg');
+                var promise = Promise.resolve();
 
-                        if (data) {
-                            var $infoBlock = $('.download.info-block');
-                            $infoBlock.addClass('thumb');
-                            $infoBlock.find('img').attr('src', data);
+                if (!window.safari && String(res.fa).indexOf(':8*') > 0) {
+                    promise = MediaAttribute.canPlayMedia(dl_node);
+                    prevBut = false;
+                }
+                else {
+                    // load thumbnail
+                    api_getfileattr([{fa: res.fa, k: key}], 0, function(a, b, data) {
+                        if (data !== 0xDEAD) {
+                            data = mObjectURL([data.buffer || data], 'image/jpeg');
 
-                            showPreviewButton($infoBlock);
+                            if (data) {
+                                var $infoBlock = $('.download.info-block');
+                                $infoBlock.addClass('thumb');
+                                $infoBlock.find('img').attr('src', data);
+
+                                showPreviewButton($infoBlock);
+                            }
                         }
+                    });
+                }
+
+                promise.then(function(ok) {
+                    if (!ok) {
+                        return false;
+                    }
+
+                    // Change layout for video
+                    var $video = $pageScrollBlock.find('video');
+
+                    $pageScrollBlock.addClass('video');
+                    $fileinfoBlock.find('.big-txt .filename').text(fileTitle);
+                    $fileinfoBlock.find('.big-txt .extension').text(fileExt);
+
+                    // Disable default video controls
+                    $video.get(0).controls = false;
+
+                    api_getfileattr([{fa: res.fa, k: key}], 1, function(a, b, data) {
+                        if (data !== 0xDEAD) {
+                            data = mObjectURL([data.buffer || data], 'image/jpeg');
+
+                            if (data) {
+                                $video.attr('poster', data);
+                            }
+                        }
+                    });
+
+                    var c = MediaAttribute.getCodecStrings(dl_node);
+                    if (c) {
+                        $fileinfoBlock.find('.big-txt').attr('title', filename + ' (' + c.join("/") + ')');
+                    }
+
+                    var vsp = initVideoStream(dl_node, $pageScrollBlock, {autoplay: false});
+
+                    $('.play-video-button', $pageScrollBlock).rebind('click', function() {
+                        if (dlmanager.isOverQuota) {
+                            return dlmanager.showOverQuotaDialog();
+                        }
+
+                        if (!d) {
+                            api_req({a: 'log', e: 99668, m: 'video watch'});
+                        }
+                        if (mediaCollectFn) {
+                            onIdle(mediaCollectFn);
+                            mediaCollectFn = null;
+                        }
+
+                        // Show Loader until video is playing
+                        $pageScrollBlock.find('.viewer-pending').removeClass('hidden');
+
+                        vsp.then(function(stream) {
+                            if (String(res.fa).indexOf(':0*') < 0 || String(res.fa).indexOf(':1*') < 0) {
+                                // TODO: refactor this with similar code at imagesViewer.js
+                                var storeImage = function(ab) {
+                                    var n = dl_node;
+                                    var aes = new sjcl.cipher.aes([
+                                        n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
+                                    ]);
+                                    createnodethumbnail(n.h, aes, n.h, ab, {isVideo: true}, n.ph);
+                                };
+                                stream.on('playing', function() {
+                                    var video = this.video;
+
+                                    if (video && video.duration) {
+                                        var took = Math.round(2 * video.duration / 100);
+
+                                        if (d) {
+                                            console.debug('Video thumbnail missing, will take image at %s...',
+                                                secondsToTime(took));
+                                        }
+
+                                        this.on('timeupdate', function() {
+                                            if (video.currentTime < took) {
+                                                return true;
+                                            }
+
+                                            this.getImage().then(storeImage).catch(console.warn.bind(console));
+                                        });
+
+                                        return false;
+                                    }
+
+                                    return true;
+                                });
+                            }
+                            dl_node.stream = stream;
+                            stream.play();
+                        });
+
+                        $pageScrollBlock.addClass('video-theatre-mode');
+                    });
+                }).catch(function(ex) {
+                    if (ex) {
+                        console.warn(ex);
+                        showPreviewButton();
                     }
                 });
             }
-            else if (is_video(filename)) {
+
+            if (prevBut) {
                 showPreviewButton();
             }
         }
@@ -511,7 +634,7 @@ function browserDownload() {
     else*/
     {
         var $downloadPage = $('.download.scroll-block');
-        $downloadPage.addClass('downloading');
+        $downloadPage.addClass('downloading').removeClass('resumable');
         $downloadPage.find('.download.state-text').addClass('hidden');
         $downloadPage.find('.img-preview-button:visible').addClass('hidden');
         $downloadPage.find('.standalone-download-message').removeClass('hidden');
@@ -522,6 +645,10 @@ function browserDownload() {
 
         if (is_mobile) {
             $('body').addClass('downloading').find('.bar').width('1%');
+        }
+        else if (mediaCollectFn) {
+            onIdle(mediaCollectFn);
+            mediaCollectFn = null;
         }
 
         if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
@@ -577,8 +704,66 @@ function closedlpopup()
 
 function importFile() {
     'use strict';
+    var file = null;
 
-    M.importFileLink(dl_import[0], dl_import[1], dl_attr);
+    if (dl_import) {
+        var base64key = String(dl_import[1]).trim();
+        var dkey = base64_to_a32(base64key).slice(0, 8);
+        if (dkey.length === 8) {
+            var dl_a = base64_to_ab(dl_attr);
+            file = dec_attr(dl_a, dkey);
+            file.a = dl_attr;
+            file.size = fdl_filesize;
+            file.h = dl_import[0];
+            crypto_procattr(file, dkey);
+        }
+    }
+
+    if (file) {
+        var f = {
+            target:M.RootID,
+            t:0,
+            name:file.name,
+            size:file.size,
+            lastModified: file.mtime * 1000
+        };
+        fileconflict.check([f], M.RootID, 'import').
+        done(function (files) {
+            for (var i = 0; i < files.length; i++) {
+                var n = {
+                    name: files[i].name,
+                    hash: file.c,
+                    k: file.k
+                };
+                var ea = ab_to_base64(crypto_makeattr(n));
+                var req = {
+                    a: 'p',
+                    t: M.RootID,
+                    n: [{
+                        ph: file.h,
+                        t: 0,
+                        a: ea,
+                        k: a32_to_base64(encrypt_key(u_k_aes, file.k)),
+                    }]
+                };
+
+                if (files[i]._replaces) {
+                    req.n[0].ov = files[i]._replaces;
+                }
+
+                api_req(req, {
+                    callback: function (r) {
+                        if (typeof r === 'object') {
+                            $.onRenderNewSelectNode = r.f[0].h;
+                        }
+                        else {
+                            M.ulerror(null, r);
+                        }
+                    }
+                });
+            }
+        });
+    }
     dl_import = false;
 }
 
@@ -812,4 +997,17 @@ function sync_switchOS(os)
         else if (c && c.indexOf('linux') > -1) loadSubPage('sync');
         return false;
     });
+}
+
+function dlPageCleanup() {
+    if (typeof gifSlider !== 'undefined') {
+        gifSlider.clear();
+    }
+
+    if (dl_node) {
+        if (dl_node.stream) {
+            dl_node.stream.destroy();
+        }
+        dl_node = false;
+    }
 }

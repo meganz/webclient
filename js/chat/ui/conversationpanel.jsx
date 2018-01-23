@@ -1146,8 +1146,6 @@ var ConversationPanel = React.createClass({
                                 ps.getScrollHeight() - self.lastContentHeightBeforeHist
                             ) + self.lastScrollPosition;
 
-                            // console.error(msgsAppended, ps.getScrollHeight(), self.lastContentHeightBeforeHist, self.lastScrollPosition, prevPosY);
-
                             ps.scrollToY(
                                 prevPosY,
                                 true

@@ -5882,7 +5882,7 @@ th.grid-first-th {
 }
 /* Ct changes for copy to conversations */
 .fm-dialog-body .nw-contact-name {
-    line-height: 25px;
+    line-height: 24px;
     margin: 0 20px 0 14px;
     overflow: hidden;
     display: inline-block;
@@ -5917,7 +5917,7 @@ th.grid-first-th {
     color: #fff;
 }
 .fm-dialog-body .nw-contact-email, .fm-dialog-body .nw-contact-group {
-    line-height: 25px;
+    line-height: 24px;
     margin: 0 0;
     overflow: hidden;
     display: inline-block;
@@ -7729,7 +7729,7 @@ table {
     margin-top: -171px;
 }
 .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg {
-    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-image: url(../images/mega/empty-sprite_v4.png);
     background-repeat: no-repeat;
 }
 .fm-empty-cloud-bg {
@@ -17585,7 +17585,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .dialog-empty-icon {
     height: 128px;
-    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-image: url(../images/mega/empty-sprite_v4.png);
     background-position: center -2677px;
     background-repeat: no-repeat;
 }
@@ -17599,7 +17599,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-position: center -3118px;
 }
 .conversations .dialog-empty-icon {
-    background-position: center -2968px;
+    background-position: center -3282px;
 }
 .dialog-empty-header {
     font-size: 18px;
@@ -21102,7 +21102,7 @@ div.camera-bottom-txt {
     top: 50%;
 }
 .empty-icon {
-    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-image: url(../images/mega/empty-sprite_v4.png);
     background-repeat: no-repeat;
     height: 185px;
 }

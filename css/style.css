@@ -17527,6 +17527,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .copy-dialog .fm-dialog-body, .move-dialog .fm-dialog-body {
     padding: 14px 0 0 0;
 }
+.copy-dialog-button-block.hidden {
+    display: none;
+}
 .copy-dialog-button, .move-dialog-button  {
     height: 48px;
     width: 200px;

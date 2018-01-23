@@ -1099,35 +1099,80 @@ var ConversationPanel = React.createClass({
             if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
                 ps.disable();
 
-                mb.retrieveChatHistory();
+
 
                 self.isRetrievingHistoryViaScrollPull = true;
                 self.lastScrollPosition = scrollPositionY;
 
                 self.lastContentHeightBeforeHist = ps.getScrollHeight();
-                $(chatRoom).unbind('onHistoryDecrypted.pull');
-                $(chatRoom).one('onHistoryDecrypted.pull', function() {
-                    setTimeout(function() {
-                        // because of mousewheel animation, we would delay the re-enabling of the "pull to load
-                        // history", so that it won't re-trigger another hist retrieval request
-                        self.isRetrievingHistoryViaScrollPull = false;
+                // console.error('start:', self.lastContentHeightBeforeHist, self.lastScrolledToBottom);
 
-                        var prevPosY = (
+
+                var msgsAppended = 0;
+                $(chatRoom).unbind('onMessagesBuffAppend.pull');
+                $(chatRoom).bind('onMessagesBuffAppend.pull', function() {
+                    msgsAppended++;
+
+                    // var prevPosY = (
+                    //     ps.getScrollHeight() - self.lastContentHeightBeforeHist
+                    // ) + self.lastScrollPosition;
+                    //
+                    //
+                    // ps.scrollToY(
+                    //     prevPosY,
+                    //     true
+                    // );
+                    //
+                    // self.lastContentHeightBeforeHist = ps.getScrollHeight();
+                    // self.lastScrollPosition = prevPosY;
+                });
+
+                $(chatRoom).unbind('onHistoryDecrypted.pull');
+                $(chatRoom).one('onHistoryDecrypted.pull', function(e) {
+                    $(chatRoom).unbind('onMessagesBuffAppend.pull');
+                    var prevPosY = (
+                        ps.getScrollHeight() - self.lastContentHeightBeforeHist
+                    ) + self.lastScrollPosition;
+
+                    ps.scrollToY(
+                        prevPosY,
+                        true
+                    );
+
+                    // wait for all msgs to be rendered.
+                    chatRoom.messagesBuff.addChangeListener(function() {
+                        if (msgsAppended > 0) {
+                            var prevPosY = (
                                 ps.getScrollHeight() - self.lastContentHeightBeforeHist
                             ) + self.lastScrollPosition;
 
+                            // console.error(msgsAppended, ps.getScrollHeight(), self.lastContentHeightBeforeHist, self.lastScrollPosition, prevPosY);
+
+                            ps.scrollToY(
+                                prevPosY,
+                                true
+                            );
+
+                            self.lastScrollPosition = prevPosY;
+                        }
+
                         delete self.lastContentHeightBeforeHist;
 
-                        self.lastScrollPosition = prevPosY;
+                        return 0xDEAD;
+                    });
+
+                    setTimeout(function() {
+                        self.isRetrievingHistoryViaScrollPull = false;
+                        // because of mousewheel animation, we would delay the re-enabling of the "pull to load
+                        // history", so that it won't re-trigger another hist retrieval request
 
                         ps.enable();
-                        ps.scrollToY(
-                            prevPosY,
-                            true
-                        );
                         self.forceUpdate();
-                    }, 1000);
+                    }, 1150);
+
                 });
+
+                mb.retrieveChatHistory();
             }
         }
 
@@ -1154,7 +1199,6 @@ var ConversationPanel = React.createClass({
             ) ||
             !this.props.chatRoom.isCurrentlyActive
         ) {
-
             return false;
         }
         else {

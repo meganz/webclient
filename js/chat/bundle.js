@@ -2118,7 +2118,7 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        self._updatesDisabled = true;
 	        if (self._updatesReenableTimer) {
-	            clearTimeout(self._updatesRenableTimer);
+	            clearTimeout(self._updatesReenableTimer);
 	        }
 
 	        var timeout = forHowLong ?
@@ -4747,29 +4747,47 @@ React.makeElement = React['createElement'];
 	            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
 	                ps.disable();
 
-	                mb.retrieveChatHistory();
-
 	                self.isRetrievingHistoryViaScrollPull = true;
 	                self.lastScrollPosition = scrollPositionY;
 
 	                self.lastContentHeightBeforeHist = ps.getScrollHeight();
+
+	                var msgsAppended = 0;
+	                $(chatRoom).unbind('onMessagesBuffAppend.pull');
+	                $(chatRoom).bind('onMessagesBuffAppend.pull', function () {
+	                    msgsAppended++;
+	                });
+
 	                $(chatRoom).unbind('onHistoryDecrypted.pull');
-	                $(chatRoom).one('onHistoryDecrypted.pull', function () {
-	                    setTimeout(function () {
+	                $(chatRoom).one('onHistoryDecrypted.pull', function (e) {
+	                    $(chatRoom).unbind('onMessagesBuffAppend.pull');
+	                    var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
 
-	                        self.isRetrievingHistoryViaScrollPull = false;
+	                    ps.scrollToY(prevPosY, true);
 
-	                        var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
+	                    chatRoom.messagesBuff.addChangeListener(function () {
+	                        if (msgsAppended > 0) {
+	                            var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
+
+	                            ps.scrollToY(prevPosY, true);
+
+	                            self.lastScrollPosition = prevPosY;
+	                        }
 
 	                        delete self.lastContentHeightBeforeHist;
 
-	                        self.lastScrollPosition = prevPosY;
+	                        return 0xDEAD;
+	                    });
+
+	                    setTimeout(function () {
+	                        self.isRetrievingHistoryViaScrollPull = false;
 
 	                        ps.enable();
-	                        ps.scrollToY(prevPosY, true);
 	                        self.forceUpdate();
-	                    }, 1000);
+	                    }, 1150);
 	                });
+
+	                mb.retrieveChatHistory();
 	            }
 	        }
 
@@ -4779,7 +4797,6 @@ React.makeElement = React['createElement'];
 	    },
 	    specificShouldComponentUpdate: function specificShouldComponentUpdate() {
 	        if (this.isRetrievingHistoryViaScrollPull || this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || !this.props.chatRoom.isCurrentlyActive) {
-
 	            return false;
 	        } else {
 	            return undefined;
@@ -11227,9 +11244,10 @@ React.makeElement = React['createElement'];
 	        return false;
 	    }
 	    if (!message.orderValue) {
+	        var mb = self.messagesBuff;
 
-	        if (self.messages.length > 0) {
-	            var prevMsg = self.messagesBuff.messages.getItem(self.messages.length - 1);
+	        if (mb.messages.length > 0) {
+	            var prevMsg = mb.messages.getItem(mb.messages.length - 1);
 	            if (!prevMsg) {
 	                self.logger.error('self.messages got out of sync...maybe there are some previous JS exceptions that caused that? ' + 'note that messages may be displayed OUT OF ORDER in the UI.');
 	            } else {

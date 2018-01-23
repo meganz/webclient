@@ -231,6 +231,10 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
     };
 
 
+    obj.isUpdateDelayed = function() {
+        return !!this._dataChangeThrottlingTimer;
+    };
+
     obj._getDataChangeEventName = function() {
         return 'datastructs:change_' + this._dataChangeTrackedId;
     };
@@ -425,9 +429,7 @@ MegaDataMap.prototype.exists = function(keyValue) {
 
 MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
 
-    if (!k) { debugger; }
-
-    assert(!!k, "missing key");
+    assert(typeof(k) !== 'undefined' && k !== false, "missing key");
 
     var self = this;
 
@@ -508,21 +510,16 @@ Object.keys(MegaDataMap.prototype).forEach(function(k) {
 
 MegaDataSortedMap.prototype.replace = function(k, newValue) {
     var self = this;
+    if (self._data[k] === newValue) {
+        // already the same, save some CPU and do nothing.
+        return true;
+    }
     if (self._data[k]) {
         // cleanup
-        var old = self._data[k];
-        self._data[k] = newValue;
-        if (typeof(self._sortField) === "function") {
-            // if order had changed...do call .reorder()
-            if (self._sortField(old, newValue) !== 0) {
-                self.reorder();
-            }
+        if (newValue[self._keyField] !== k) {
+            self.removeByKey(k);
         }
-        else {
-            // maybe we should do parsing of the ._sortField if its a string and manually compare the old and new
-            // value's order property if it had changed
-            self.reorder();
-        }
+        self.push(newValue);
         return true;
     }
     else {
@@ -530,33 +527,106 @@ MegaDataSortedMap.prototype.replace = function(k, newValue) {
     }
 };
 
+MegaDataSortedMap.prototype.getComparator = function() {
+    var self = this;
+    if (self._comparatorFn) {
+        return self._comparatorFn;
+    }
+
+    if (self._sortField) {
+        if (typeof(self._sortField) === "function") {
+            self._comparatorFn = function (a, b) {
+                return self._sortField(self._data[a], self._data[b]);
+            };
+        }
+        else {
+            self._comparatorFn = function (a, b) {
+                var sortFields = self._sortField.split(",");
+                for (var i = 0; i < sortFields.length; i++) {
+                    var sortField = sortFields[i];
+                    var ascOrDesc = 1;
+                    if (sortField.substr(0, 1) === "-") {
+                        ascOrDesc = -1;
+                        sortField = sortField.substr(1);
+                    }
+
+                    if (self._data[a][sortField] && self._data[b][sortField]) {
+                        if (self._data[a][sortField] < self._data[b][sortField]) {
+                            return -1 * ascOrDesc;
+                        }
+                        else if (self._data[a][sortField] > self._data[b][sortField]) {
+                            return 1 * ascOrDesc;
+                        }
+                        else {
+                            return 0;
+                        }
+                    }
+                }
+                return 0;
+            };
+        }
+    }
+    return self._comparatorFn;
+};
+
 MegaDataSortedMap.prototype.push = function(v) {
     var self = this;
 
     var keyVal = v[self._keyField];
 
-    // if already exist, remove previously stored value (e.g. overwrite...)
     if (self._data[keyVal]) {
-        array.remove(self._sortedVals, keyVal, false);
-
-        // clean up the defineProperty
-        delete self._data[keyVal];
-        delete self[keyVal];
+        self.removeByKey(keyVal);
     }
 
     self.set(keyVal, v, true);
 
-    self._sortedVals.push(
-        keyVal
-    );
+    var minIndex = 0;
+    var maxIndex = this._sortedVals.length - 1;
+    var currentIndex;
+    var currentElement;
 
-    self.reorder();
+    var cmp = self.getComparator();
 
+    var result = false;
+    while (minIndex <= maxIndex) {
+        currentIndex = (minIndex + maxIndex) / 2 | 0;
+        currentElement = this._sortedVals[currentIndex];
+
+        var cmpResult = cmp(currentElement, keyVal);
+        if (cmpResult === -1) {
+            minIndex = currentIndex + 1;
+        }
+        else if (cmpResult === 1) {
+            maxIndex = currentIndex - 1;
+        }
+        else {
+            result = true;
+            break;
+        }
+    }
+
+    if (!result) {
+        if (!currentElement) {
+            // first
+            self._sortedVals.push(keyVal);
+        }
+        else {
+            self._sortedVals.splice(cmp(currentElement, keyVal) === -1 ? currentIndex + 1 : currentIndex, 0, keyVal);
+        }
+
+        self.trackDataChange();
+    }
+    else {
+        // found another item in the list, with the same order value, insert after
+        self._sortedVals.splice(currentIndex, 0, keyVal);
+    }
     return self._sortedVals.length;
 };
 
 MegaDataSortedMap.prototype.reorder = function(forced) {
     var self = this;
+
+    console.error('deprecated!');
 
     if (self._reorderThrottlingTimer) {
         clearTimeout(self._reorderThrottlingTimer);
@@ -565,38 +635,7 @@ MegaDataSortedMap.prototype.reorder = function(forced) {
 
     self._reorderThrottlingTimer = setTimeout(function() {
         if (self._sortField) {
-            if (typeof(self._sortField) === "function") {
-                self._sortedVals.sort(function (a, b) {
-                    return self._sortField(self._data[a], self._data[b]);
-                });
-            }
-            else {
-                var sortFields = self._sortField.split(",");
-
-                self._sortedVals.sort(function (a, b) {
-                    for (var i = 0; i < sortFields.length; i++) {
-                        var sortField = sortFields[i];
-                        var ascOrDesc = 1;
-                        if (sortField.substr(0, 1) === "-") {
-                            ascOrDesc = -1;
-                            sortField = sortField.substr(1);
-                        }
-
-                        if (self._data[a][sortField] && self._data[b][sortField]) {
-                            if (self._data[a][sortField] < self._data[b][sortField]) {
-                                return -1 * ascOrDesc;
-                            }
-                            else if (self._data[a][sortField] > self._data[b][sortField]) {
-                                return 1 * ascOrDesc;
-                            }
-                            else {
-                                return 0;
-                            }
-                        }
-                    }
-                    return 0;
-                });
-            }
+            self._sortedVals.sort(self.getComparator());
         }
 
         self.trackDataChange(self._data);
@@ -606,11 +645,12 @@ MegaDataSortedMap.prototype.reorder = function(forced) {
 
 MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
     var self = this;
+
     if (self._data[keyValue]) {
         array.remove(self._sortedVals, keyValue);
         delete self._data[keyValue];
         delete self[keyValue];
-        self.reorder();
+        self.trackDataChange();
         return true;
     }
     else {
@@ -618,29 +658,7 @@ MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
     }
 };
 
-MegaDataSortedMap.prototype.replace = function(k, newValue) {
-    var self = this;
-    if (self._data[k]) {
-        // cleanup
-        var old = self._data[k];
-        self._data[k] = newValue;
-        if (typeof(self._sortField) === "function") {
-            // if order had changed...do call .reorder()
-            if (self._sortField(old, newValue) !== 0) {
-                self.reorder();
-            }
-        }
-        else {
-            // maybe we should do parsing of the ._sortField if its a string and manually compare the old and new
-            // value's order property if it had changed
-            self.reorder();
-        }
-        return true;
-    }
-    else {
-        return false;
-    }
-};
+
 MegaDataSortedMap.prototype.exists = function(keyValue) {
     var self = this;
     if (self._data[keyValue]) {

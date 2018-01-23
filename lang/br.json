@@ -4582,6 +4582,7 @@
     "17652": "Data inv\u00e1lida",
     "17653": "Caracteres n\u00e3o permitidos",
     "17654": "Arquivo de \u00e1udio",
+    "17655": "Error. The PDF file is corrupted or does not exist.",
     "17656": "Conta de usu\u00e1rio",
     "17657": "Salvar na minha [Br] Nuvem de arquivos",
     "17658": "O chat j\u00e1 existe",
@@ -4605,6 +4606,14 @@
     "17676": "Uma chamada de \u00e1udio e [A] chamadas de v\u00eddeo perdidas",
     "17679": "[A] chamadas de \u00e1udio e uma chamada de v\u00eddeo perdida",
     "17680": "[A] chamadas de \u00e1udio e [B] chamadas de v\u00eddeo perdidas",
+    "17681": "Please give the MEGA app permission to access your microphone in your Settings.",
+    "17682": "You already have a PRO account and you will be buying a new subscription to MEGA. If you have an auto-renewable subscription, you must cancel it or you will be charged for two plans.",
+    "17683": "MEGA accesses your microphone when you capture a video or make a call inside the app.",
+    "17684": "MEGA accesses your camera when you capture a video, photo or make a call inside the app.",
+    "17685": "Error preparing downloads. Please try again.",
     "17686": "Atualmente, n\u00e3o suportamos links MEGAdrop em navegadores m\u00f3veis, mas voc\u00ea pode usar qualquer um dos navegadores web suportados.",
-    "17687": "N\u00e3o suportado"
+    "17687": "N\u00e3o suportado",
+    "17688": "Can you remember your password?",
+    "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
+    "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions."
 }

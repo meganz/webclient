@@ -18331,6 +18331,10 @@
         "text": "Audio File",
         "context": "Label shown when audio file is playing"
     },
+    "17655": {
+        "text": "Error. The PDF file is corrupted or does not exist.",
+        "context": "This error message occurs when the user opens the PDF viewer, but the PDF document that they are trying to open is damaged or does not exist."
+    },
     "17656": {
         "text": "User account",
         "context": "Label to include info of the user email in the feedback form"
@@ -18423,6 +18427,26 @@
         "text": "[A] missed audio calls  and [B] missed video calls",
         "context": "Notification text body shown when you have missed several audio calls and video calls. [A] = {number of missed audio calls}. [B] = {number of missed video calls}"
     },
+    "17681": {
+        "text": "Please give the MEGA app permission to access your microphone in your Settings.",
+        "context": "An alert message to remind the user that the MEGA app needs permission to use the microphone to make calls and record videos and it currently does not have that permission."
+    },
+    "17682": {
+        "text": "You already have a PRO account and you will be buying a new subscription to MEGA. If you have an auto-renewable subscription, you must cancel it or you will be charged for two plans.",
+        "context": "An alert message shown in case the user has an active subscription and is in the process of buying a higher PRO plan. For example if they have a PRO II subscription and they are buying a PRO III subscription then this message will show."
+    },
+    "17683": {
+        "text": "MEGA accesses your microphone when you capture a video or make a call inside the app.",
+        "context": "Microphone usage description. To protect user privacy Apple requires a purpose string explaining why will be accessed."
+    },
+    "17684": {
+        "text": "MEGA accesses your camera when you capture a video, photo or make a call inside the app.",
+        "context": "To protect user privacy, Apple requires a purpose string explaining why the camera will be accessed."
+    },
+    "17685": {
+        "text": "Error preparing downloads. Please try again.",
+        "context": "A message of the dialog which is displayed when the process to prepare files or folders for download failed."
+    },
     "17686": {
         "text": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
         "context": "A message which is shown when a user attempts to access a MEGAdrop public folder link."
@@ -18430,5 +18454,17 @@
     "17687": {
         "text": "Not supported",
         "context": "A title for the MEGAdrop public link page on mobile which is not supported."
+    },
+    "17688": {
+        "text": "Can you remember your password?",
+        "context": "A message for the Recovery Key button on the mobile webclient."
+    },
+    "17689": {
+        "text": "Tap and hold to copy the Recovery Key to the clipboard.",
+        "context": "An instruction on the mobile webclient Backup Recovery Key screen which tells the user to tap and hold on the Recovery Key to copy it to the clipboard."
+    },
+    "17690": {
+        "text": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
+        "context": "An instruction for the user on how they can recover their account using the Recovery Key."
     }
 }

@@ -4582,6 +4582,7 @@
     "17652": "Ge\u00e7ersiz tarih",
     "17653": "Ge\u00e7ersiz karakter",
     "17654": "Ses Dosyas\u0131",
+    "17655": "Error. The PDF file is corrupted or does not exist.",
     "17656": "Kullan\u0131c\u0131 hesab\u0131",
     "17657": "[Br]Bulut S\u00fcr\u00fcc\u00fcme kaydet",
     "17658": "Bu konu\u015fma zaten var",
@@ -4605,6 +4606,14 @@
     "17676": "1 cevaps\u0131z sesli arama ve [A] cevaps\u0131z g\u00f6r\u00fcnt\u00fcl\u00fc arama",
     "17679": "[A] cevaps\u0131z sesli arama ve 1 cevaps\u0131z g\u00f6r\u00fcnt\u00fcl\u00fc arama",
     "17680": "[A] cevaps\u0131z sesli arama ve [B] cevaps\u0131z g\u00f6r\u00fcnt\u00fcl\u00fc arama",
+    "17681": "Please give the MEGA app permission to access your microphone in your Settings.",
+    "17682": "You already have a PRO account and you will be buying a new subscription to MEGA. If you have an auto-renewable subscription, you must cancel it or you will be charged for two plans.",
+    "17683": "MEGA accesses your microphone when you capture a video or make a call inside the app.",
+    "17684": "MEGA accesses your camera when you capture a video, photo or make a call inside the app.",
+    "17685": "Error preparing downloads. Please try again.",
     "17686": "\u015eu anda mobil taray\u0131c\u0131larda MEGAdrop ba\u011flant\u0131lar\u0131n\u0131 desteklemiyoruz, l\u00fctfen desteklenen web taray\u0131c\u0131lar\u0131ndan herhangi birini kullan\u0131n.",
-    "17687": "Desteklenmiyor"
+    "17687": "Desteklenmiyor",
+    "17688": "Can you remember your password?",
+    "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
+    "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions."
 }

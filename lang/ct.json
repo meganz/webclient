@@ -4612,8 +4612,12 @@
     "17684": "MEGA accesses your camera when you capture a video, photo or make a call inside the app.",
     "17685": "Error preparing downloads. Please try again.",
     "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported",
-    "17688": "Can you remember your password?",
-    "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
-    "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions."
+    "17687": "\u4e0d\u652f\u63f4",
+    "17688": "\u4f60\u80fd\u8a18\u4f4f\u4f60\u7684\u5bc6\u78bc\u55ce\uff1f",
+    "17689": "\u9ede\u64ca\u4e26\u9577\u6309\uff0c\u5c07\u9084\u539f\u91d1\u9470\u8907\u88fd\u5230\u526a\u8cbc\u7c3f\u4e2d\u3002",
+    "17690": "\u6b32\u4f7f\u7528\u9084\u539f\u91d1\u9470\u5fa9\u539f\u60a8\u7684\u5e33\u6236\uff0c\u8acb\u4f7f\u7528\u96fb\u8166\u8a2d\u5099\u9032\u5165[A]https:\/\/mega.nz\/recovery[\/A]\u9801\u9762\uff0c\u4e26\u6309\u7167\u8aaa\u660e\u9032\u884c\u64cd\u4f5c\u3002",
+    "17691": "Please give the MEGA app permission to access your microphone in your Settings.",
+    "17692": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+    "17693": "Chatting with",
+    "17694": "Download key"
 }

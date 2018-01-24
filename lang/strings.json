@@ -18466,5 +18466,21 @@
     "17690": {
         "text": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
         "context": "An instruction for the user on how they can recover their account using the Recovery Key."
+    },
+    "17691": {
+        "text": "Please give the MEGA app permission to access your microphone in your Settings.",
+        "context": "An alert message to remind the user that MEGA needs permission to use the microphone to make calls and record videos and it currently does not have that permission."
+    },
+    "17692": {
+        "text": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+        "context": "An alert message which is shown when the user has an active subscription and is in the process of buying a higher plan (a higher level PRO account)."
+    },
+    "17693": {
+        "text": "Chatting with",
+        "context": "A title which is shown above the name of the people that the user is currently chatting with."
+    },
+    "17694": {
+        "text": "Download key",
+        "context": "A button label on the mobile webclient which allows the user to download the Recovery Key to a text file."
     }
 }

@@ -40,8 +40,10 @@ mobile.propay = {
 
         'use strict';
 
-        // Enabled payment providers for mobile so far are the credit card options
-        var mobileEnabledGateways = ['astropayVI', 'astropayMC', 'ecpVI', 'ecpMC', 'sabadellVI', 'sabadellMC'];
+        // Enabled payment providers for mobile so far are the credit card options and direct resellers
+        var mobileEnabledGateways = [
+            'astropayVI', 'astropayMC', 'ecpVI', 'ecpMC', 'sabadellVI', 'sabadellMC', 'directreseller'
+        ];
 
         // Filter out anything else
         var filteredGateways = gatewayOptions.filter(function(val) {

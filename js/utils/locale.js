@@ -200,6 +200,25 @@ function time2lastSeparator(dateString, refDate) {
     }
 }
 
+/**
+ * Calculate the number of days since the given date
+ * @param {String} dateStr The date string, in YYYY-MM-DD format
+ * @returns {Number} the number of days
+ */
+function daysSince(dateStr) {
+    'use strict';
+    return moment(new Date()).diff(moment(dateStr, 'YYYY-MM-DD'), 'days');
+}
+
+/**
+ * Calculate the number of days since Jan 1, 2000
+ * @returns {Number}
+ */
+function daysSince1Jan2000() {
+    'use strict';
+    return daysSince('2000-01-01');
+}
+
 //----------------------------------------------------------------------------
 /**
  * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
@@ -487,6 +506,10 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
 
+    var linktohelp = 'https://mega.nz/help/client/webclient/cloud-drive/59f13b42f1b7093a7f8b4589';
+    l[17097] =  l[17097]
+                .replace('[A]', '<a id="versionhelp" href="' + linktohelp + '" target="_blank" class="red">')
+                .replace('[/A]', '</a>');
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
         16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394

@@ -1,3 +1,32 @@
+function MegaNode(node) {
+    'use strict';
+
+    if (!node || !node.h || node.h.length !== 8) {
+        return Object(node || null);
+    }
+    Object.assign(this, node);
+}
+
+MegaNode.prototype = Object.create(null, {
+    constructor: {
+        value: MegaNode
+    },
+    toString: {
+        value: function toString() {
+            'use strict';
+
+            return this.h || '';
+        }
+    },
+    valueOf: {
+        value: function valueOf() {
+            'use strict';
+
+            return this.s || 0;
+        }
+    }
+});
+
 (function(global) {
     "use strict";
     var delInShareQueue = Object.create(null);
@@ -128,10 +157,8 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
                 this.u[n.h][k] = n[k];
             }
         }
-        n = this.u[n.h];
+        this.d[n.h] = this.u[n.h];
     }
-
-    this.d[n.h] = n;
 
     if (fminitialized) {
         newnodes.push(n);
@@ -838,7 +865,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
         }
         ufsc.addToDB(n);
 
-        if (this.nn && n.name) {
+        if (this.nn && n.name && !n.fv) {
             this.nn[n.h] = n.name;
         }
 
@@ -922,7 +949,9 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
         $('#' + itemHandle + ' .shared-folder-info-block .shared-folder-name').text(newItemName);
 
         // DOM update, right panel view during browsing shared content
-        $('.shared-details-block .shared-details-pad .shared-details-folder-name').text(newItemName);
+        if (M.currentdirid === itemHandle) {
+            $('.shared-details-block .shared-details-pad .shared-details-folder-name').text(newItemName);
+        }
 
         // DOM update, breadcrumbs in 'Shared with me' tab
         if ($('#path_' + itemHandle).length > 0) {
@@ -933,6 +962,8 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
                 M.renderPath();
             }, 90);
         }
+
+        mega.megadrop.onRename(itemHandle, newItemName);
 
         // update file versioning dialog if the name of the versioned file changes.
         if (!M.d[itemHandle].t && M.d[itemHandle].tvf > 0) {
@@ -1116,13 +1147,13 @@ MegaData.prototype.isFavourite = function(nodesId) {
 /**
  * versioningDomUpdate
  *
- * @param {Object} node      Node object
+ * @param {Handle} fh      Node handle
  * @param {Number} versionsNumber  Number of previous versions.
  */
-MegaData.prototype.versioningDomUpdate = function(node, versionsNumber) {
-    var $nodeView = $('#' + node.h);
+MegaData.prototype.versioningDomUpdate = function(fh) {
+    var $nodeView = $('#' + fh);
 
-    if (versionsNumber) {// Add versioning
+    if (M.d[fh] && M.d[fh].tvf) {// Add versioning
         $nodeView.addClass('versioning');
     }
     else {// Remove versioning

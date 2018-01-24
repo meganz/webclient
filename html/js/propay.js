@@ -903,6 +903,7 @@ pro.propay = {
 
         // Convert from boolean to integer for API
         var fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 3600000) ? 1 : 0;
+        var fromPreWarnBandwidthDialog = ((Date.now() - parseInt(localStorage.seenQuotaPreWarn)) < 2 * 36e5) ? 1 : 0;
 
         // uts = User Transaction Sale
         var utsRequest = {
@@ -913,7 +914,8 @@ pro.propay = {
             c:   currency,
             aff: affiliateId,
             m:   m,
-            bq:  fromBandwidthDialog
+            bq:  fromBandwidthDialog,
+            pbq: fromPreWarnBandwidthDialog
         };
 
         if (mega.uaoref) {

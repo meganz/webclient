@@ -85,25 +85,36 @@ var ConversationRightArea = React.createClass({
 
         var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
+        var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall;
+
+
+        var startAudioCallButtonClass = "";
+        var startVideoCallButtonClass = "";
+
+        if (disabledCalls) {
+            startAudioCallButtonClass = startVideoCallButtonClass = "disabled";
+        }
+
         var startAudioCallButton =
-                        <div className={"link-button"} onClick={() => {
-                            room.startAudioCall();
-                        }}>
-            <i className="small-icon audio-call"></i>
-            {__(l[5896])}
-        </div>;
+            <div className={"link-button" + " " + startVideoCallButtonClass} onClick={() => {
+                if (!disabledCalls) {
+                    room.startAudioCall();
+                }
+            }}>
+                <i className="small-icon audio-call"></i>
+                {__(l[5896])}
+            </div>;
 
         var startVideoCallButton =
-                    <div className={"link-button"} onClick={() => {
-                        room.startVideoCall();
-                    }}>
-            <i className="small-icon video-call"></i>
-            {__(l[5897])}
-        </div>;
+            <div className={"link-button" + " " + startVideoCallButtonClass} onClick={() => {
+                if (!disabledCalls) {
+                    room.startVideoCall();
+                }
+            }}>
+                <i className="small-icon video-call"></i>
+                {__(l[5897])}
+            </div>;
 
-        if (room.isReadOnly() || !room.chatId) {
-            startAudioCallButton = startVideoCallButton = null;
-        }
         var endCallButton =
                     <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
                         if (contact.presence && contact.presence !== "offline") {
@@ -331,6 +342,18 @@ var ConversationAudioVideoPanel = React.createClass({
             'localMediaDisplay': true
         }
     },
+    _hideBottomPanel: function() {
+        var self = this;
+        var room = self.props.chatRoom;
+        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
+            return;
+        }
+
+        var $container = $(ReactDOM.findDOMNode(self));
+
+        self.visiblePanel = false;
+        $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+    },
     componentDidUpdate: function() {
         var self = this;
         var room = self.props.chatRoom;
@@ -357,7 +380,7 @@ var ConversationAudioVideoPanel = React.createClass({
             clearTimeout(mouseoutThrottling);
             mouseoutThrottling = setTimeout(function() {
                 self.visiblePanel = false;
-                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+                self._hideBottomPanel();
                 $('.call.top-panel', $container).removeClass('visible-panel');
             }, 500);
         });
@@ -368,6 +391,9 @@ var ConversationAudioVideoPanel = React.createClass({
         var forceMouseHide = false;
         $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomId,function(ev) {
             var $this = $(this);
+            if (self._bottomPanelMouseOver) {
+                return;
+            }
             clearTimeout(idleMouseTimer);
             if (!forceMouseHide) {
                 self.visiblePanel = true;
@@ -378,8 +404,8 @@ var ConversationAudioVideoPanel = React.createClass({
                 }
                 idleMouseTimer = setTimeout(function() {
                     self.visiblePanel = false;
-                    $('.call.bottom-panel, .call.local-video, .call.local-audio', $container)
-                        .removeClass('visible-panel');
+
+                    self._hideBottomPanel();
 
                     $container.addClass('no-cursor');
                     $('.call.top-panel', $container).removeClass('visible-panel');
@@ -391,6 +417,29 @@ var ConversationAudioVideoPanel = React.createClass({
                 }, 2000);
             }
         });
+
+        $('.call.bottom-panel', $container).rebind('mouseenter.chatUI' + self.props.chatRoom.roomId,function(ev) {
+            self._bottomPanelMouseOver = true;
+            clearTimeout(idleMouseTimer);
+        });
+        $('.call.bottom-panel', $container).rebind('mouseleave.chatUI' + self.props.chatRoom.roomId,function(ev) {
+            self._bottomPanelMouseOver = false;
+
+            idleMouseTimer = setTimeout(function() {
+                self.visiblePanel = false;
+
+                self._hideBottomPanel();
+
+                $container.addClass('no-cursor');
+                $('.call.top-panel', $container).removeClass('visible-panel');
+
+                forceMouseHide = true;
+                setTimeout(function() {
+                    forceMouseHide = false;
+                }, 400);
+            }, 2000);
+        });
+
 
         $(document)
             .unbind("fullscreenchange.megaChat_" + room.roomId)
@@ -789,7 +838,7 @@ var ConversationPanel = React.createClass({
     handleKeyDown: SoonFc(function(e) {
         var self = this;
         var chatRoom = self.props.chatRoom;
-        if (self.isMounted() && chatRoom.isActive()) {
+        if (self.isMounted() && chatRoom.isActive() && !chatRoom.isReadOnly()) {
             chatRoom.trigger("onChatIsFocused");
         }
     }, 150),
@@ -1032,17 +1081,26 @@ var ConversationPanel = React.createClass({
 
         // turn on/off auto scroll to bottom.
         if (ps.isCloseToBottom(30) === true) {
-            self.scrolledToBottom = true;
+            if (!self.scrolledToBottom) {
+                var chatRoom = self.props.chatRoom;
+                var mb = chatRoom.messagesBuff;
+                mb.detachMessages();
+            }
+            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
         }
         else {
-            self.scrolledToBottom = false;
+            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = false;
         }
 
-        if (isAtTop || (ps.getScrollPositionY() < 300 && ps.getScrollHeight() > 500)) {
+
+        if (isAtTop || (ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500)) {
             var chatRoom = self.props.chatRoom;
             var mb = chatRoom.messagesBuff;
             if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
+                ps.disable();
+
                 mb.retrieveChatHistory();
+
                 self.isRetrievingHistoryViaScrollPull = true;
                 self.lastScrollPosition = scrollPositionY;
 
@@ -1062,6 +1120,7 @@ var ConversationPanel = React.createClass({
 
                         self.lastScrollPosition = prevPosY;
 
+                        ps.enable();
                         ps.scrollToY(
                             prevPosY,
                             true
@@ -1095,6 +1154,7 @@ var ConversationPanel = React.createClass({
             ) ||
             !this.props.chatRoom.isCurrentlyActive
         ) {
+
             return false;
         }
         else {
@@ -1137,27 +1197,31 @@ var ConversationPanel = React.createClass({
         ];
 
         if (
-            (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
-            self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true ||
-            self.props.chatRoom.messagesBuff.joined === false ||
             (
-                self.props.chatRoom.messagesBuff.joined === true &&
-                self.props.chatRoom.messagesBuff.haveMessages === true &&
-                self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true
+                ChatdIntegration._loadingChats[room.roomId] &&
+                ChatdIntegration._loadingChats[room.roomId].state() === 'pending'
+            ) ||
+            (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
+            room.messagesBuff.messagesHistoryIsLoading() === true ||
+            room.messagesBuff.joined === false ||
+            (
+                room.messagesBuff.joined === true &&
+                room.messagesBuff.haveMessages === true &&
+                room.messagesBuff.messagesHistoryIsLoading() === true
             ) ||
             (
-                self.props.chatRoom.messagesBuff.isDecrypting &&
-                self.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending'
+                room.messagesBuff.isDecrypting &&
+                room.messagesBuff.isDecrypting.state() === 'pending'
             )
         ) {
             self.loadingShown = true;
         }
         else if (
-            self.props.chatRoom.messagesBuff.joined === true
+            room.messagesBuff.joined === true
         ) {
-            if (!self.isRetrievingHistoryViaScrollPull) {
+            if (!self.isRetrievingHistoryViaScrollPull && room.messagesBuff.haveMoreHistory() === false) {
                 var headerText = (
-                    self.props.chatRoom.messagesBuff.messages.length === 0 ?
+                    room.messagesBuff.messages.length === 0 ?
                         __(l[8002]) :
                         __(l[8002])
                 );
@@ -1204,7 +1268,7 @@ var ConversationPanel = React.createClass({
         var lastMessageState = null;
         var grouped = false;
 
-        self.props.chatRoom.messagesBuff.messages.forEach(function(v, k) {
+        room.messagesBuff.messages.forEach(function(v, k) {
             if (!v.protocol && v.revoked !== true) {
                 var shouldRender = true;
                 if (
@@ -1342,15 +1406,18 @@ var ConversationPanel = React.createClass({
                             onUpdate={() => {
                                 self.onResizeDoUpdate();
                             }}
+                            editing={self.state.editing === v.messageId || self.state.editing === v.pendingMessageId}
                             onEditStarted={($domElement) => {
                                 self.editDomElement = $domElement;
-                                self.setState({'editing': v});
+                                self.setState({'editing': v.messageId});
                                 self.forceUpdate();
                             }}
                             onEditDone={(messageContents) => {
                                 self.editDomElement = null;
 
                                 var currentContents = v.textContents;
+
+                                v.edited = false;
 
                                 if (messageContents === false || messageContents === currentContents) {
                                     self.messagesListScrollable.scrollToBottom(true);
@@ -1407,6 +1474,7 @@ var ConversationPanel = React.createClass({
                             }}
                             onDeleteClicked={(e, msg) => {
                                 self.setState({
+                                    'editing': false,
                                     'confirmDeleteDialog': true,
                                     'messageToBeDeleted': msg
                                 });
@@ -1870,7 +1938,8 @@ var ConversationPanel = React.createClass({
                             <PerfectScrollbar
                                    onFirstInit={(ps, node) => {
                                         ps.scrollToBottom(true);
-                                        self.scrolledToBottom = 1;
+                                        self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = 1;
+
                                     }}
                                    onReinitialise={self.onMessagesScrollReinitialise}
                                    onUserScroll={self.onMessagesScrollUserScroll}
@@ -1880,7 +1949,9 @@ var ConversationPanel = React.createClass({
                                    chatRoom={self.props.chatRoom}
                                    messagesBuff={self.props.chatRoom.messagesBuff}
                                    editDomElement={self.state.editDomElement}
+                                   editingMessageId={self.state.editing}
                                    confirmDeleteDialog={self.state.confirmDeleteDialog}
+                                   renderedMessagesCount={messagesList.length}
                                 >
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
@@ -1892,6 +1963,8 @@ var ConversationPanel = React.createClass({
                                                 'left': '50%'
                                             }}></div>
                                         </div>
+                                        {/* add a naive pre-pusher that would eventually keep the the scrollbar
+                                        realistic */}
                                         {messagesList}
                                     </div>
                                 </div>
@@ -1908,7 +1981,7 @@ var ConversationPanel = React.createClass({
                                 persist={true}
                                 onUpEditPressed={() => {
                                     var foundMessage = false;
-                                    room.messagesBuff.messages.keys().reverse().forEach(function(k) {
+                                    room.messagesBuff.messages.keys().reverse().some(function(k) {
                                         if(!foundMessage) {
                                             var message = room.messagesBuff.messages[k];
 
@@ -1916,13 +1989,13 @@ var ConversationPanel = React.createClass({
                                             if (message.userId) {
                                                 if (!M.u[message.userId]) {
                                                     // data is still loading!
-                                                    return false;
+                                                    return;
                                                 }
                                                 contact = M.u[message.userId];
                                             }
                                             else {
                                                 // contact not found
-                                                return false;
+                                                return;
                                             }
 
                                             if (
@@ -1935,6 +2008,7 @@ var ConversationPanel = React.createClass({
                                                     (!message.isManagement || !message.isManagement())
                                                 ) {
                                                     foundMessage = message;
+                                                    return foundMessage;
                                             }
                                         }
                                     });
@@ -1943,7 +2017,7 @@ var ConversationPanel = React.createClass({
                                         return false;
                                     }
                                     else {
-                                        $('.message.body.' + foundMessage.messageId).trigger('onEditRequest');
+                                        self.setState({'editing': foundMessage.messageId});
                                         self.lastScrolledToBottom = false;
                                         return true;
                                     }
@@ -2004,7 +2078,13 @@ var ConversationPanels = React.createClass({
 
         var conversations = [];
 
-        if (getSitePath() === "/fm/chat") {
+        var hadLoaded = (
+            ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
+            ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending' &&
+            Object.keys(ChatdIntegration._loadingChats).length === 0
+        );
+
+        if (hadLoaded && getSitePath() === "/fm/chat") {
             // do we need to "activate" an conversation?
             var activeFound = false;
             self.props.conversations.forEach(function (chatRoom) {
@@ -2013,12 +2093,11 @@ var ConversationPanels = React.createClass({
                 }
             });
             if (self.props.conversations.length > 0 && !activeFound) {
-                self.props.conversations[self.props.conversations.keys()[0]].setActive();
-                self.props.conversations[self.props.conversations.keys()[0]].show();
+                self.props.megaChat.showLastActive();
             }
         }
 
-        self.props.conversations.forEach(function(chatRoom) {
+        hadLoaded && self.props.conversations.forEach(function(chatRoom) {
             var otherParticipants = chatRoom.getParticipantsExceptMe();
 
             var contact;
@@ -2042,8 +2121,6 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-            var hadLoaded = ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
-                ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending';
 
             if (hadLoaded) {
                 self.props.contacts.forEach(function (contact) {

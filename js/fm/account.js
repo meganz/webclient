@@ -23,6 +23,8 @@ function accountUI() {
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
     $('.account.data-block.storage-data').removeClass('exceeded');
+    $('.fm-account-save-block').addClass('hidden');
+    $('.fm-account-save').removeClass('disabled');
 
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
@@ -147,6 +149,11 @@ function accountUI() {
         else if (id === '/fm/account/reseller' && M.account.reseller) {
             $('.fm-account-reseller').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
             sectionClass = 'reseller';
+        }
+        else if (id === '/fm/account/megadrop') {
+            $('.fm-account-widget').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
+            mega.megadrop.stngsDraw();
+            sectionClass = 'megadrop';
         }
         else {
             // This is the main entry point for users who just had upgraded their accounts
@@ -352,6 +359,12 @@ function accountUI() {
         $('.tab-content .account.progress-size.versioning').text(
             bytesToSize(account.stats[M.RootID].vbytes)
         );
+
+        // Go to versioning settings.
+        $('.tab-content .version-settings-button').rebind('click', function() {
+            loadSubPage('fm/account/file-management');
+        });
+
         /* achievements */
         if (!account.maf) {
             $('.fm-right-account-block').removeClass('active-achievements');
@@ -711,12 +724,6 @@ function accountUI() {
                 texts.push($(this).val());
             });
             $newEmail.val('');
-            if (texts.join("") === "") {
-                $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            }
-            else {
-                $newEmail.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
-            }
         });
 
         // On text entry in the new email text field
@@ -724,13 +731,8 @@ function accountUI() {
             var mail = $.trim($newEmail.val());
 
             $passwords.val('');
-
-            if (mail === "") {
-                $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            }
-            else {
-                $passwords.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
-            }
+            $saveBlock.find('.fm-account-save').removeClass('disabled');
+            $saveBlock.addClass('hidden');
 
             // Show information message
             $emailInfoMessage.removeClass('hidden');
@@ -768,9 +770,8 @@ function accountUI() {
         });
 
         $cancelButton.rebind('click', function() {
-            $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             $saveBlock.addClass('hidden');
+            $saveBlock.find('.fm-account-save').removeClass('disabled');
             $personalInfoBlock.removeClass('email-confirm');
             $('#account-password').val('');
             $('#account-new-password').val('');
@@ -779,17 +780,19 @@ function accountUI() {
         });
 
         $saveButton.rebind('click', function() {
-            $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
+            if ($(this).hasClass('disabled')) {
+                return false;
+            }
+
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
             $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
-            var firstName = String($('#account-firstname').val().trim());
-            var lastName = String($('#account-lastname').val().trim());
-            var bDay = String($('.default-select.day .default-dropdown-item.active').attr('data-value'));
-            var bMonth = String($('.default-select.month .default-dropdown-item.active').attr('data-value'));
-            var bYear = String($('.default-select.year .default-dropdown-item.active').attr('data-value'));
-            var country = String($('.default-select.country .default-dropdown-item.active').attr('data-value'));
+            var firstName = String($('#account-firstname').val() || '').trim();
+            var lastName = String($('#account-lastname').val() || '').trim();
+            var bDay = String($('.default-select.day .default-dropdown-item.active').attr('data-value') || '');
+            var bMonth = String($('.default-select.month .default-dropdown-item.active').attr('data-value') || '');
+            var bYear = String($('.default-select.year .default-dropdown-item.active').attr('data-value') || '');
+            var country = String($('.default-select.country .default-dropdown-item.active').attr('data-value') || '');
 
             // If any of user attributes is changed then update them
             if (u_attr.firstname !== firstName
@@ -798,22 +801,27 @@ function accountUI() {
                     || u_attr.birthmonth !== bMonth
                     || u_attr.birthyear !== bYear
                     || u_attr.country !== country) {
-                u_attr.firstname = firstName;
+                u_attr.firstname = firstName || 'Nobody';
                 u_attr.lastname = lastName;
                 u_attr.birthday = bDay;
                 u_attr.birthmonth = bMonth;
                 u_attr.birthyear = bYear;
                 u_attr.country = country;
 
-                api_req({
+                var req = {
                     a: 'up',
                     firstname: base64urlencode(to8(u_attr.firstname)),
-                    lastname: base64urlencode(to8(u_attr.lastname)),
-                    birthday: base64urlencode(u_attr.birthday),
-                    birthmonth: base64urlencode(u_attr.birthmonth),
-                    birthyear: base64urlencode(u_attr.birthyear),
-                    country: base64urlencode(u_attr.country)
-                }, {
+                    lastname: base64urlencode(to8(u_attr.lastname))
+                };
+                var opt = ["country", "birthyear", "birthmonth", "birthday"];
+                for (var i = opt.length; i--;) {
+                    var n = opt[i];
+                    if (u_attr[n]) {
+                        req[n] = base64urlencode(u_attr[n]);
+                    }
+                }
+
+                api_req(req, {
                     callback: function(res) {
                         if (res === u_handle) {
                             $('.user-name').text(u_attr.name);
@@ -831,9 +839,13 @@ function accountUI() {
 
                 msgDialog('warninga', l[135], l[719], false, function() {
                     $('#account-password').focus();
+                    $('.fm-account-save-block').removeClass('hidden');
+                    $('.fm-account-save').addClass('disabled');
                     $('#account-password').bind('keyup.accpwd', function() {
-                        $('.fm-account-save-block').removeClass('hidden');
-                        $('#account-password').unbind('keyup.accpwd');
+                        if ($('#account-new-password').val() === $('#account-confirm-password').val()) {
+                            $('.fm-account-save').removeClass('disabled');
+                            $('#account-password').unbind('keyup.accpwd');
+                        }
                     });
                 });
             }
@@ -841,9 +853,13 @@ function accountUI() {
                 msgDialog('warninga', l[135], l[724], false, function() {
                     $('#account-password').val('');
                     $('#account-password').focus();
+                    $('.fm-account-save-block').removeClass('hidden');
+                    $('.fm-account-save').addClass('disabled');
                     $('#account-password').bind('keyup.accpwd', function() {
-                        $('.fm-account-save-block').removeClass('hidden');
-                        $('#account-password').unbind('keyup.accpwd');
+                        if ($('#account-new-password').val() === $('#account-confirm-password').val()) {
+                            $('.fm-account-save').removeClass('disabled');
+                            $('#account-password').unbind('keyup.accpwd');
+                        }
                     });
                 });
             }
@@ -852,15 +868,21 @@ function accountUI() {
                     $('#account-new-password').val('');
                     $('#account-confirm-password').val('');
                     $('#account-new-password').focus();
+                    $('.fm-account-save-block').removeClass('hidden');
+                    $('.fm-account-save').addClass('disabled');
                 });
             }
             else if ($('#account-password').val() !== ''
-                && $('#account-confirm-password').val() !== '' && $('#account-new-password').val() !== '' && (pws.score === 0 || pws.entropy < 16)) {
+                && $('#account-confirm-password').val() !== ''
+                && $('#account-new-password').val() !== ''
+                && (pws.score === 0 || pws.entropy < 16)) {
 
                 msgDialog('warninga', l[135], l[1129], false, function() {
                     $('#account-new-password').val('');
                     $('#account-confirm-password').val('');
                     $('#account-new-password').focus();
+                    $('.fm-account-save-block').removeClass('hidden');
+                    $('.fm-account-save').addClass('disabled');
                 });
             }
             else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
@@ -875,6 +897,7 @@ function accountUI() {
                                 $('#account-password').focus();
                                 $('#account-password').bind('keyup.accpwd', function() {
                                     $('.fm-account-save-block').removeClass('hidden');
+                                    $('.fm-account-save').removeClass('disabled');
                                     $('#account-password').unbind('keyup.accpwd');
                                 });
                             });
@@ -898,6 +921,8 @@ function accountUI() {
                 msgDialog('warninga', l[135], l[16664]);
                 $('#account-confirm-password').val('');
                 $('#account-new-password').val('');
+                $('.fm-account-save-block').removeClass('hidden');
+                $('.fm-account-save').addClass('disabled');
             }
             else {
                 $passwords.val('');
@@ -928,6 +953,7 @@ function accountUI() {
 
                         $('.awaiting-confirmation').removeClass('hidden');
                         $('.fm-account-save-block').addClass('hidden');
+                        $('.fm-account-save').removeClass('disabled');
 
                         localStorage.new_email = email;
                     }
@@ -937,6 +963,7 @@ function accountUI() {
             }
 
             $('.fm-account-save-block').addClass('hidden');
+            $('.fm-account-save').removeClass('disabled');
         });
 
         $('#current-email').val(u_attr.email);
@@ -1603,20 +1630,23 @@ function accountUI() {
     $('.fm-account-button').rebind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
             switch (true) {
-                case ($(this).hasClass('account-s')):
+                case $(this).hasClass('account-s'):
                     loadSubPage('fm/account');
                     break;
-                case ($(this).hasClass('advanced')):
+                case $(this).hasClass('advanced'):
                     loadSubPage('fm/account/advanced');
                     break;
-                case ($(this).hasClass('notifications')):
+                case $(this).hasClass('notifications'):
                     loadSubPage('fm/account/notifications');
                     break;
-                case ($(this).hasClass('history')):
+                case $(this).hasClass('history'):
                     loadSubPage('fm/account/history');
                     break;
-                case ($(this).hasClass('reseller')):
+                case $(this).hasClass('reseller'):
                     loadSubPage('fm/account/reseller');
+                    break;
+                case $(this).hasClass('megadrop'):
+                    loadSubPage('fm/account/megadrop');
                     break;
             }
         }
@@ -1625,6 +1655,7 @@ function accountUI() {
     $('.account.tab-lnk').rebind('click', function() {
         if (!$(this).hasClass('active')) {
             $('.fm-account-save-block').addClass('hidden');
+            $('.fm-account-save').removeClass('disabled');
             var $this = $(this);
             var $sectionBlock = $this.closest('.fm-account-sections');
             var currentTab = $this.attr('data-tab');
@@ -1666,6 +1697,14 @@ function accountUI() {
     $('#account-new-password').rebind('keyup.pwdchg', function(el) {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
         if ($(this).val() !== '') {
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-save').addClass('disabled');
+            if ($(this).val() === $('#account-confirm-password').val()) {
+                $('.fm-account-save').removeClass('disabled');
+            }
+            else {
+                $('.fm-account-save').addClass('disabled');
+            }
             var pws = zxcvbn($(this).val());
             if (pws.score > 3 && pws.entropy > 75) {
                 $('.account-pass-lines').addClass('good4');
@@ -1687,8 +1726,12 @@ function accountUI() {
 
     $('#account-confirm-password').rebind('keyup.pwdchg', function(el) {
 
+        $('.fm-account-save-block').removeClass('hidden');
         if ($(this).val() === $('#account-new-password').val()) {
-            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-save').removeClass('disabled');
+        }
+        else {
+            $('.fm-account-save').addClass('disabled');
         }
     });
 
@@ -2227,7 +2270,6 @@ accountUI.initRadio.enable = function(value, $container) {
         .removeAttr('disabled');
 };
 
-
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
     // TODO: FIXME, make accountUI elements not dependant!
     if (!megaChatIsReady) {
@@ -2369,6 +2411,60 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             })
             .val(lastValidNumber);
     }
+
+    $('.versioning-switch')
+    .rebind('click', function() {
+        var val = $('#versioning-status').prop('checked') ? 1 : 0;
+        var setVersioningAttr = function(val) {
+            showToast('settings', l[16168]);
+            mega.attr.set(
+                'dv',
+                val,
+                -2,
+                true
+            )
+            .done(
+            function(e) {
+                $('#versioning-status').prop('checked', val ? false : true);
+                $('.label-heading').text(val ? l[7070] : l[17601]);
+                fileversioning.dvState = val;
+            });
+        };
+        if ($('#versioning-status').prop('checked')) {
+            msgDialog('confirmation', l[882], l[17595], false, function(e) {
+                if (e) {
+                    setVersioningAttr(val);
+                }
+            });
+        }
+        else {
+            setVersioningAttr(val);
+        }
+    });
+    //update versioning info
+    fileversioning.updateVersionInfo();
+    $('.delete-all-versions')
+    .rebind('click', function() {
+
+        if (!$(this).hasClass('disabled')) {
+            msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
+                if (e) {
+                    loadingDialog.show();
+                    api_req({
+                            a: 'dv'
+                            }, {
+                            callback: function(res, ctx) {
+                                if (res === 0) {
+                                    M.accountData(function() {
+                                        fileversioning.updateVersionInfo();
+                                    }, false, true);
+                                }
+                            }
+                        });
+                }
+            });
+        }
+    });
 };
 
 accountUI.voucherCentering = function voucherCentering($button) {

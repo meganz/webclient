@@ -213,6 +213,22 @@ var PerfectScrollbar = React.createClass({
             this.reinitialised(true);
         }
     },
+    disable: function() {
+        if (this.isMounted()) {
+            var $elem = $(this.findDOMNode());
+            $elem.attr('data-scroll-disabled', true);
+            $elem.addClass('ps-disabled');
+            Ps.disable($elem[0]);
+        }
+    },
+    enable: function() {
+        if (this.isMounted()) {
+            var $elem = $(this.findDOMNode());
+            $elem.removeAttr('data-scroll-disabled');
+            $elem.removeClass('ps-disabled');
+            Ps.enable($elem[0]);
+        }
+    },
     reinitialised: function(forced) {
         if (this.props.onReinitialise) {
             this.props.onReinitialise(

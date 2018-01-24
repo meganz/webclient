@@ -132,7 +132,7 @@ function delete_reset_pw() {
         msgDialog('warninga', l[135], l[1129]);
         return;
     }
-    else if ($(this).hasClass('checkboxOff')) {
+    else if ($('.new-registration-checkbox .register-check').hasClass('checkboxOff')) {
         msgDialog('warninga', l[135], l[1974]);
         return;
     }

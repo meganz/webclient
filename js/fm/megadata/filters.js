@@ -1,8 +1,8 @@
-MegaData.prototype.filterBy = function(f) {
+MegaData.prototype.filterBy = function(f, omitVersions) {
     this.filter = f;
     this.v = [];
     for (var i in this.d) {
-        if (f(this.d[i])) {
+        if ((!omitVersions || !this.d[i].fv) && f(this.d[i])) {
             this.v.push(this.d[i]);
         }
     }
@@ -153,7 +153,7 @@ MegaData.prototype.filterBySearch = function(str) {
     }
 
     if (str) {
-        this.filterBy(this.getFilterBySearchFn(str));
+        this.filterBy(this.getFilterBySearchFn(str), true);
     }
 };
 

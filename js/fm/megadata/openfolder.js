@@ -114,8 +114,12 @@
                 viewmode = fmconfig.viewmodes[id];
             }
             else {
-                for (var i = this.v.length; i--;) {
-                    if (is_image(this.v[i])) {
+                for (var i = Math.min(this.v.length, 200); i--;) {
+                    var n = this.v[i];
+
+                    if (String(n.fa).indexOf(':0*') > 0 || is_image(n)
+                        || is_video(n) || MediaInfoLib.isFileSupported(n)) {
+
                         viewmode = 1;
                         break;
                     }

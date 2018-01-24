@@ -222,14 +222,20 @@ var mobile = {
 mega.ui.tpp = {
     reset: function() {},
     setTotalProgress: function() {},
-    resume: function() {}
+    resume: function() {},
+    getTime: function() {},
+    start: function() {},
+    setIndex: function() {},
+    isCached: function() {
+        'use strict';
+        return false;
+    }
 };
 
-mega.achievem = {
-    enabled: function() {
-        'use strict';
-        return MegaPromise.reject();
-    }
+mega.megadrop = {
+    pufs: false,
+    isInit: function() { return false; },
+    pufProcessDb: function() { return false; }
 };
 
 var notify = {
@@ -262,7 +268,7 @@ function fm_showoverlay() {
     'use strict';
 
     $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    $('html').addClass('overlayed');
 }
 
 function fm_hideoverlay() {
@@ -270,10 +276,12 @@ function fm_hideoverlay() {
     'use strict';
 
     $('.fm-dialog-overlay').addClass('hidden');
-    $('body').removeClass('overlayed');
+    $('html').removeClass('overlayed');
 }
 
 mega.ui.showRegisterDialog = function() {};
+
+mega.loadReport = {};
 
 function removeUInode(nodeHandle, parentHandle) {
 

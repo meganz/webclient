@@ -74,7 +74,7 @@ FileManager.prototype.onFileManagerReady = function(ifMaster, callback) {
     callback = (function(callback) {
         return function() {
             if (!ifMaster || mBroadcaster.crossTab.master) {
-                callback();
+                onIdle(callback);
             }
         };
     })(callback);
@@ -109,7 +109,7 @@ FileManager.prototype.initFileManagerUI = function() {
         // if user clicks overlay instead Yes/No or close icon 'x'
         // One situation when this is used, is when ephemeral user
         //  trying to access settings directly via url
-        if (u_type === 0) {
+        if (u_type === 0 && !folderlink) {
             loadSubPage('fm');
         }
     });
@@ -791,22 +791,18 @@ FileManager.prototype.updFileManagerUI = function() {
 
     MegaPromise.allDone(treePromises)
         .always(function() {
+            var renderPromise = MegaPromise.resolve();
 
             if (UImain) {
-                M.filterByParent(M.currentdirid);
-                M.sort();
-                M.renderMain(true);
-                // M.renderPath();
-                if (selnode) {
-                    Soon(function() {
-                        $.selected = [selnode];
-                        reselect(1);
-                    });
+                if (UItree || M.v.length) {
+                    M.filterByParent(M.currentdirid);
+                    M.sort();
+                    M.renderMain(true);
                 }
-                $.tresizer();
+                else {
+                    renderPromise = M.openFolder(M.currentdirid, true);
+                }
             }
-
-            var renderPromise = MegaPromise.resolve();
 
             if (UItree) {
                 if (M.currentrootid === 'shares') {
@@ -843,6 +839,16 @@ FileManager.prototype.updFileManagerUI = function() {
                 }
                 if (newpath) {
                     M.renderPath();
+                }
+                if (selnode) {
+                    Soon(function() {
+                        $.selected = [selnode];
+                        reselect(1);
+                    });
+                }
+                if (UImain) {
+                    mBroadcaster.sendMessage('mediainfo:collect');
+                    $.tresizer();
                 }
 
                 if (u_type === 0) {
@@ -937,12 +943,33 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.getlink-item').rebind('click', function() {
-
+        // ToDo: Selected can be more than one folder $.selected
+        // Avoid multiple referencing $.selected instead use event
+        // add new translation message '... for multiple folders.'
+        // cancel descendant MEGAdrops after copyRights are accepted
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }
         else {
-            mega.Share.initCopyrightsDialog($.selected);
+            var count = mega.megadrop.isDropExist($.selected[0], true);
+            if (count) {
+                var fldName = count > 1
+                    ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
+                    : l[17403].replace('%1', M.d[$.selected[0]].name);
+                msgDialog(
+                    'confirmation',
+                    l[1003],
+                    fldName,
+                    false, function(e) {
+                    if (e) {
+                        var list = mega.megadrop.getDropList();
+                        mega.megadrop.pufRemove(list, $.selected, mega.Share.initCopyrightsDialog);
+                    }
+                });
+            }
+            else {
+                mega.Share.initCopyrightsDialog($.selected);
+            }
         }
     });
 
@@ -967,7 +994,7 @@ FileManager.prototype.initContextUI = function() {
         }
         var $dialog = $('.fm-dialog.share-dialog');
 
-        M.safeShowDialog('share', function() {
+        var showShareDlg = function() {
             $.hideContextMenu();
             clearScrollPanel('.share-dialog');
 
@@ -998,7 +1025,27 @@ FileManager.prototype.initContextUI = function() {
             $('.token-input-input-token-mega input', $dialog).focus();
 
             return $dialog;
-        });
+        };
+
+        var count = mega.megadrop.isDropExist($.selected[0], true);
+        if (count) {
+            var fldName = count > 1
+                ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
+                : l[17403].replace('%1', M.d[$.selected[0]].name);
+            msgDialog(
+                'confirmation',
+                l[1003],
+                fldName,
+                false, function(e) {
+                if (e) {
+                    var list = mega.megadrop.getDropList();
+                    mega.megadrop.pufRemove(list, $.selected, M.safeShowDialog, 'share', showShareDlg);
+                }
+            });
+        }
+        else {
+            M.safeShowDialog('share', showShareDlg);
+        }
     });
 
     // Move Dialog
@@ -1167,6 +1214,15 @@ FileManager.prototype.initContextUI = function() {
         slideshow($.selected[0]);
     });
 
+    $(c + '.play-item').rebind('click', function() {
+        var n = $.selected[0];
+
+        closeDialog();
+
+        $.autoplay = n;
+        slideshow(n);
+    });
+
     $(c + '.clearbin-item').rebind('click', function() {
         doClearbin(false);
     });
@@ -1248,20 +1304,35 @@ FileManager.prototype.createFolderUI = function() {
     "use strict";
 
     var doCreateFolder = function() {
-        var $inputWrapper = $('.create-folder-pad');
-        var $input = $('.create-new-folder input');
+        var $inputWrapper = $('.create-new-folder.popup .create-folder-pad');
+        var $input = $inputWrapper.find('input');
+        var name = $input.val();
 
-        if ($input.val() === '') {
+        if (name === '' || !M.isSafeName(name)) {
             $inputWrapper.addClass('error');
+            $input.addClass('error');
 
-            setTimeout(function() {
+            setTimeout(function () {
                 $inputWrapper.removeClass('error');
+                $input.removeClass('error');
                 $input.focus();
-            }, 200);
+            }, 2000);
         }
         else {
+            if (duplicated(1, name)) {// Check if folder name already exists
+                $inputWrapper.addClass('duplicate');
+                $input.addClass('error');
+
+                setTimeout(function () {
+                    $inputWrapper.removeClass('duplicate');
+                    $input.removeClass('error');
+                    $input.focus();
+                }, 2000);
+
+                return;
+            }
             loadingDialog.pshow();
-            M.createFolder(M.currentdirid, $input.val(), new MegaPromise())
+            M.createFolder(M.currentdirid, name, new MegaPromise())
                 .done(function(h) {
                     if (d) {
                         console.log('Created new folder %s->%s.', M.currentdirid, h);
@@ -1454,7 +1525,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 38 &&
-            s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
@@ -1466,7 +1536,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 40 &&
-            s.length > 0 &&
             $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
@@ -2290,7 +2359,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     });
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling' +
-        ',.fm-empty-cloud,.fm-empty-folder').rebind('contextmenu.fm', function(e) {
+        ',.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content').rebind('contextmenu.fm', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         if (selectionManager) {
             selectionManager.clear_selection();
@@ -2606,6 +2675,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             M.openFolder(h);
         }
         else if (is_image(n) || is_video(n)) {
+            if (!is_image(n)) {
+                $.autoplay = h;
+            }
             slideshow(h);
         }
         else {
@@ -2980,6 +3052,14 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
     else if (id === 'account') {
         tmpId = 'account';
+
+        // ToDo: Missing layout for empty Public Upload Page
+        if (!Object.keys(mega.megadrop.pufs).length) {// Hide PUF tab
+            $('.fm-account-button.megadrop').addClass('hidden');
+        }
+        else {
+            $('.fm-account-button.megadrop').removeClass('hidden');
+        }
     }
     else if (id === 'dashboard') {
         tmpId = 'dashboard';
@@ -3150,7 +3230,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 };
 
-
 /**
  * Show storage overquota dialog
  * @param {Number} perc percent
@@ -3307,7 +3386,7 @@ FileManager.prototype.showOverStorageQuota = function(perc, cstrg, mstrg, option
 
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
-        properties: ['links', 'rename', 'copyrights', 'copy', 'move'],
+        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
         copy: ['createfolder'],
         move: ['createfolder']
     };

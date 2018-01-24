@@ -110,6 +110,11 @@ Unless otherwise noted, they were released under a [MIT License].
 [jsbn2.js]: The rest of the library, including most public BigInteger methods.
 
 ---
+[mediainfo.js]: extract metadata about video and audio files.
+
+> **This is a fork**, [Compare the changes](https://github.com/buzz/mediainfo.js/compare/master...meganz:master)
+
+---
 [megaLogger.js]: Minimalistic JavaScript logging framework, specifically usable for the browser console.
 
 ---
@@ -145,6 +150,11 @@ Unless otherwise noted, they were released under a [MIT License].
 [smartcrop.js]: Content aware image cropping.
 
 > **This is a fork**, [Compare the changes](https://github.com/jwagner/smartcrop.js/compare/master...meganz:master)
+
+---
+[videostream.js]: Play html5 video from a file-like object.
+
+> **This is a fork**, [Compare the changes](https://github.com/jhiesey/videostream/compare/master...meganz:master)
 
 ---
 [zxcvbn.js]: A realistic password strength estimator.
@@ -211,6 +221,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jquery.qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/jquery.qrcode.js>
 [jsbn.js]: <https://github.com/meganz/jsbn.js>
 [jsbn2.js]: <http://www-cs-students.stanford.edu/~tjw/jsbn/>
+[mediainfo.js]: <https://github.com/meganz/mediainfo.js>
 [megaLogger.js]: <https://github.com/meganz/megalogger>
 [megapix.js]: <https://github.com/meganz/ios-imagefile-megapixel>
 [moment.js]: <https://github.com/moment/moment/tree/2.10.6>
@@ -221,5 +232,6 @@ Unless otherwise noted, they were released under a [MIT License].
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
+[videostream.js]: <https://github.com/meganz/videostream>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/adapter.js]: <https://github.com/webrtc/adapter>

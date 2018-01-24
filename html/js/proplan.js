@@ -150,9 +150,10 @@ pro.proplan = {
      * Populate the monthly plans across the main /pro page
      */
     populateMembershipPlans: function() {
+        "use strict";
 
         // Cache selectors
-        var $stepOne = $('.membership-step1');
+        var $stepOne = $('.plans-block');
         var $pricingBoxes = $stepOne.find('.reg-st3-membership-bl');
 
         // Update each pricing block with details from the API

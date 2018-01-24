@@ -25,6 +25,7 @@ var pro = {
      * @param {Function} loadedCallback The function to call when the data is loaded
      */
     loadMembershipPlans: function(loadedCallback) {
+        "use strict";
 
         // Set default
         loadedCallback = loadedCallback || function() { };
@@ -63,7 +64,7 @@ var pro = {
             });
         }
     },
-    
+
     /**
     * Update the state when a payment has been received to show their new Pro Level
     * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}

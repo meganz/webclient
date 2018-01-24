@@ -119,14 +119,26 @@
             }
             else if (hasDownloadAttr) {
                 var blob_url = myURL.createObjectURL(blob);
+                setTimeout(function() {
+                    myURL.revokeObjectURL(blob_url);
+                    blob_url = undefined;
+                }, 7e3);
+
+                // prevent the beforeunload dispatcher from showing a dialog
+                $.memIOSaveAttempt = dl_id;
+
+                // prompt save dialog
                 var dlLinkNode = document.getElementById('dllink');
                 dlLinkNode.download = name;
                 dlLinkNode.href = blob_url;
+
+                // this click may triggers beforeunload...
                 dlLinkNode.click();
-                later(function() {
-                    myURL.revokeObjectURL(blob_url);
-                    blob_url = undefined;
-                });
+
+                // restore beforeunload behavior...
+                if ($.memIOSaveAttempt === dl_id) {
+                    delete $.memIOSaveAttempt;
+                }
             }
             else {
                 throw new Error('MemoryIO -- huh?');

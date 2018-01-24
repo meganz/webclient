@@ -1,17 +1,30 @@
-function createnodethumbnail(node, aes, id, imagedata, opt) {
-    storedattr[id] = {};
-    storedattr[id] = {
-        target: node
-    };
-    createthumbnail(false, aes, id, imagedata, node, opt);
+function createnodethumbnail(node, aes, id, imagedata, opt, ph, file) {
+    storedattr[id] = Object.assign(Object.create(null), {'$ph': ph, target: node});
+    createthumbnail(file || false, aes, id, imagedata, node, opt);
+
+    var uled = ulmanager.getEventDataByHandle(node);
+    if (uled && !uled.thumb) {
+        // XXX: prevent this from being reached twice, e.g. an mp4 renamed as avi and containing covert art ...
+        uled.thumb = 1;
+
+        if (d) {
+            console.log('Increasing the number of expected file attributes for the chat to be aware.', uled);
+        }
+        uled.efa += 2;
+    }
 }
 
 function createthumbnail(file, aes, id, imagedata, node, opt) {
+    'use strict';
 
-    var onPreviewRetry, isRawImage, thumbHandler;
+    var isVideo;
+    var isRawImage;
+    var thumbHandler;
+    var onPreviewRetry;
 
     if (typeof opt === 'object') {
         isRawImage = opt.raw;
+        isVideo = opt.isVideo;
         onPreviewRetry = opt.onPreviewRetry;
 
         if (typeof isRawImage === 'function') {
@@ -41,6 +54,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var t = new Date().getTime();
         var n = M.d[node];
         var fa = '' + (n && n.fa);
+        var ph = Object(storedattr[id]).$ph;
         var dataURI;
         var canvas;
         var ctx;
@@ -58,7 +72,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
             ab = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
-            for (var i = 0 ; i < ab.length ; i += 4) {
+            for (var i = 0; i < ab.length; i += 4) {
                 if (ab[i + 3] < 0xff) {
                     transparent = true;
                     break;
@@ -120,7 +134,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 ab = dataURLToAB(dataURI);
 
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
+                api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
             if (node) {
@@ -159,10 +173,10 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     console.log('Storing preview...', n);
                 }
                 // FIXME hack into cipher and extract key
-                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h);
+                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
-            if (node && filetype(n) !== 'PDF Document') {
+            if (node && filetype(n) !== 'PDF Document' && !is_video(n)) {
                 previewimg(node, ab);
             }
 
@@ -184,7 +198,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
 
         api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
-        mBroadcaster.sendMessage('fa:error', id, e);
+        mBroadcaster.sendMessage('fa:error', id, e, false, 2);
     });
 
     if (typeof FileReader !== 'undefined') {
@@ -284,7 +298,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                                 try {
                                     thumbData = ppmtojpeg(FS.readFile(thumb + '.ppm'));
                                 }
-                                catch (e) {}
+                                catch (e) {
+                                }
 
                                 if (d) {
                                     console.timeEnd('dcraw-conv');
@@ -337,40 +352,10 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 __render_thumb(img, u8, orientation, file, isRawImage);
                 file = imagedata = undefined;
             };
-            if (file) {
-                if (is_chrome_firefox && "blob" in file) {
-                    if (file.size > 2e6) {
-                        try {
-                            return OS.File.read(file.mozFile.path).then(function(u8) {
-                                file = new Blob([u8], {
-                                    type: file.type
-                                });
-                                M.neuterArrayBuffer(u8);
-                                ThumbFR.readAsArrayBuffer(file);
-                            }, function(ex) {
-                                if (d) {
-                                    console.error(String(ex), ex);
-                                }
-                                __render_thumb(img);
-                            });
-                        }
-                        catch (e) {}
-                    }
-
-                    try {
-                        file = file.blob();
-                    }
-                    catch (ex) {
-                        if (d) {
-                            console.error(ex);
-                        }
-                        __render_thumb(img);
-                    }
-                }
-            }
-            else {
-                file = new Blob([new Uint8Array(imagedata)], {type: filemime(M.d[node], 'image/jpeg')});
-                M.neuterArrayBuffer(imagedata);
+            if (!file) {
+                var defMime = 'image/jpeg';
+                var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
+                file = new Blob([new Uint8Array(imagedata)], {type: curMime});
             }
             ThumbFR.readAsArrayBuffer(file);
         };
@@ -388,6 +373,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 else {
                     console.error('Failed to load dcraw.js');
                 }
+            });
+        }
+        else if (isVideo && file) {
+            M.require('videostream').tryCatch(function() {
+                Streamer.getThumbnail(file).then(__render_thumb.bind(null, img)).catch(console.debug.bind(console));
             });
         }
         else {
@@ -447,7 +437,6 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
                 type: 'image/jpg'
             });
         }
-        M.neuterArrayBuffer(u8);
     }
 
     if (!u8 || (img.huge && img.dataSize === blob.size)) {
@@ -591,6 +580,7 @@ function benchmarkireq() {
             }
         }
     }
+
     eot.timeout = 5100;
 
     var n = ba_images[ba_id];

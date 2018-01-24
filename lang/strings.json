@@ -827,6 +827,10 @@
         "text": "Your payment provider is not listed? Please [A]e-mail us[\/A]",
         "context": ""
     },
+    "554": {
+        "text": "Complete",
+        "context": ""
+    },
     "555": {
         "text": "I agree with the MEGA [A]Reseller Terms of Service[\/A]",
         "context": ""
@@ -13871,6 +13875,10 @@
         "text": "Subscription Expires On",
         "context": "A label on the My Account page indicating the expiration date of a PRO account. This is shown if they do not have a recurring subscription (e.g. the purchased a one-off plan for a specific time period) or the recurring subscription was recently canceled so they still have some time remaining on their plan."
     },
+    "16176": {
+        "text": "Paste",
+        "context": "A button which allows the user to paste a file\/folder into another folder."
+    },
     "16177": {
         "text": "Remaining Downloads",
         "context": "A label to indicate the number of remaining downloads."
@@ -14607,6 +14615,10 @@
         "text": "Unlocked bonuses:",
         "context": "Header of block with achievements bonuses."
     },
+    "16406": {
+        "text": "[1]Park your MEGA account\r\n\r\n[2]It looks like you have forgotten your password and do not have a backup of your Recovery Key.\r\n\r\n[3]If you proceed, the existing account under this address will be parked (deactivated), and you will start a fresh account under your existing email address. By doing this you will lose access to your data, but the data will still be preserved for at least another 60 days. Should you remember the deactivated account's password or locate its previously exported Recovery Key, please contact [A1]support@mega.nz[\/A1] to have it restored.\r\n\r\n[4]Even if you manage to restore the deactivated account, all associated contacts and shares will remain deleted and need to be re-established.\r\n\r\n[5]Park my Account\r\n\r\n[6]Didn't work? No worries. Copy and paste this link below into your web browser:",
+        "context": "EDIT: Reworded to emphasise the word Park, to align with our website pages better.\r\n\r\nThe 'reset my account' email body received when somebody requests to park their account. MEGA needs them to click the link to confirm their password.\r\n\r\nPlease do not translate or modify anything inside square brackets (do not change [1] or [A1] )"
+    },
     "16407": {
         "text": "[1]Best regards,[BR]\u2014 Team MEGA",
         "context": "The footer for our emails. Please do not translate anything inside square brackets (do not translate the [1] or the [BR]. The [BR] corresponds to a line break and will be replaced)"
@@ -14682,6 +14694,10 @@
     "16430": {
         "text": "[1]MEGA Confirm New Email\r\n\r\n[2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:\r\n\r\n[3]Confirm New Email\r\n\r\n[4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.\r\n",
         "context": "Email body for when a user needs to confirm their new email address. It emphasises that it will not be a second email, but will replace their current one on their Mega account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16431": {
+        "text": "[1]MEGA Password Reset\r\n\r\n[2]You can easily reset your MEGA account password with your Recovery Key.\r\n\r\n[3]Reset your password\r\n\r\n[4]This request originated from IP address: [R][$cred][\/R]",
+        "context": "EDIT: Recovery changed to reset a few times.\r\n\r\nEmail body for the password reset email where the user has their Master Key (Recovery Key)\r\nPlease do not translate the text inside square brackets (i.e. leave the [1],[$cred], and [R] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16432": {
         "text": "You can also earn more free storage and transfer quota by achieving bonuses. For example, by installing our software or inviting friends to MEGA.",
@@ -17320,8 +17336,8 @@
         "context": "Description for the collaboration with others help section"
     },
     "17226": {
-        "text": "[B]Right click[\/B] on any folder or file you wish to share.",
-        "context": "Step one of how to collaborate with others on the mega.nz website"
+        "text": "[B]Right click[\/B] on any folder you wish to share.",
+        "context": "Step one of how to collaborate with others on the mega.nz website."
     },
     "17227": {
         "text": "Click on [W13][B]Sharing[\/B][\/W13] in the context menu.",
@@ -17912,7 +17928,7 @@
         "context": "The MEGAdrop window title when the provided URL is not valid."
     },
     "17534": {
-        "text": "Either the MEGAdrop link is cancelled by the owner or the URL you have provided is incorrect.",
+        "text": "Either the MEGAdrop link has been cancelled by the owner or the URL you have provided is incorrect.",
         "context": "Explanation for a wrong MEGAdrop URL."
     },
     "17535": {
@@ -17956,7 +17972,515 @@
         "context": "A message on an error dialog explaining that they already sent an invite to that email address and that the system is waiting for a response from that user."
     },
     "17546": {
-        "text": "That user already sent you an invitation.",
+        "text": "This user has already sent you an invitation.",
         "context": "An error message after just trying to send a user an invite which explains that the user already sent them an invitation first."
+    },
+    "17547": {
+        "text": "MEGA accesses your photo library to save your photos or videos in case you wish to do so.",
+        "context": "A description of why write-only access to the user\u2019s photo library is needed. To protect user privacy Apple requires a purpose string explaining why this will be accessed."
+    },
+    "17548": {
+        "text": "Are you sure you want to cancel your subscription? You will lose your PRO status at end of your current subscription period.",
+        "context": "A dialog message in the mobile webclient informing the user that their account will return to the free plan after their currenly paid for subscription runs out if they choose to confirm in cancelling their subscription."
+    },
+    "17549": {
+        "text": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
+        "context": "A message in a popup dialog explaining that there is an update available for the Firefox Legacy extension which works on browsers such as Pale Moon."
+    },
+    "17550": {
+        "text": "A folder named %1 already exists in this location.",
+        "context": "Dialog description. Informs user during copy,move or upload that a folder with the same name already exists. Please leave %1 as it is, it'll be replaced by folder name.\r\n\r\nthis is similar to files dialog [attached]"
+    },
+    "17551": {
+        "text": "Copy and merge",
+        "context": "Header of clickable block in duplicate items dialog. Allows user to merge the folder in the destination with the folder he is copying.\r\nthis is similar to 'upload and update' in files conflict dialog [attached]"
+    },
+    "17552": {
+        "text": "Merge the folder at the destination with the folder you are copying:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to merge the folder in destination with the folder he is copying.\r\nSimilar to \"The file will be updated with version history\" in attached screenshot"
+    },
+    "17553": {
+        "text": "Move and merge",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to merge the folder in destination with the folder he is moving.\r\nsimilar to \"upload and update\" in the attached screenshot."
+    },
+    "17554": {
+        "text": "Merge the folder at the destination with the folder you are moving:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to merge the folder in destination with the folder he is moving.\r\nSimilar to \"The file will be updated with version history\" in attached screenshot"
+    },
+    "17555": {
+        "text": "Upload and merge",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to merge the folder in destination with the folder he is uploading.\r\nsimilar to \"upload and update\" in the attached screenshot."
+    },
+    "17556": {
+        "text": "Select whether you want to merge the folders:",
+        "context": "Dialog sub description. Informs user during copy,move or upload that a folder with the same name already exists.\r\nhighlighted in attached example screenshot\r\n"
+    },
+    "17557": {
+        "text": "The link you are trying to access is not valid.",
+        "context": "attached, this will be the dialog content"
+    },
+    "17558": {
+        "text": "Import and update",
+        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to import the file in the destination folder by generating a new version with the file he is importing."
+    },
+    "17559": {
+        "text": "Don't import",
+        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and not replace it with the file they are importing."
+    },
+    "17560": {
+        "text": "Import and rename",
+        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and rename the file he is importing to avoid a filename conflict."
+    },
+    "17561": {
+        "text": "The file you are importing will be renamed as:",
+        "context": "A description for a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and also the file they are importing by renaming it automatically."
+    },
+    "17562": {
+        "text": "MEGA accesses your photo library to save your photos or videos in case you need to do so.",
+        "context": "A description for why write-only access to the user\u2019s photo library is required. To protect user privacy Apple requires a purpose string explaining why this will be accessed."
+    },
+    "17563": {
+        "text": "MEGA accesses Face ID to allow you to easily unlock the app's passcode in case you enable this option.",
+        "context": "A description for usage of Face ID. To protect user privacy Apple requires a purpose string explaining why will be accessed."
+    },
+    "17564": {
+        "text": "Link error",
+        "context": "The title of an error dialog while getting the sharing link of a file\/folder."
+    },
+    "17565": {
+        "text": "The link cannot be managed, due to an unknown error received from server.",
+        "context": "An error message originating from the Manage Link dialog.\r\n"
+    },
+    "17566": {
+        "text": "Visit the Contacts tab to add or manage your contacts. [B]Invite your friends to MEGA[\/B] to allow you to [B]share[\/B] with them privately or [B]chat securely[\/B] using MEGAchat.",
+        "context": "This text is shown to users who have two or more contacts."
+    },
+    "17567": {
+        "text": "Communicate securely with your family, friends and colleagues using MEGAchat. Chats and calls are end-to-end encrypted, [B]not even MEGA can read or listen to your communication[\/B].",
+        "context": "This message is shown to users who have two or more contacts and less than two chats."
+    },
+    "17568": {
+        "text": "Start uploading files to your account by using the [B]file or folder upload button[\/B], or simply [B]drag and drop[\/B] from your local computer to MEGA in the browser.",
+        "context": "Onboarding tip on how to upload new files, only shown to users with less than two files in their cloud drive (typically, they would have the welcome pdf, so that may mean that they had never uploaded files in their current folder that they are viewing)."
+    },
+    "17569": {
+        "text": "Start uploading files to your account by using the [B]file upload button[\/B], or simply [B]drag and drop[\/B] from your local computer to MEGA in the browser.",
+        "context": "Same as string 17568, but shown to browsers which only support file uploads (and no folder uploads)."
+    },
+    "17570": {
+        "text": "Items moved to the Rubbish Bin will remain there temporarily. The Rubbish Bin is periodically [B]cleaned for you automatically[\/B], and you can control its setup in your Settings.",
+        "context": "Once the user has moved an item to the Rubbish bin, we would remind him (if we never did before) that there are items that can be cleared automatically by going into their Settings."
+    },
+    "17571": {
+        "text": "Manage your transfers",
+        "context": "Title for the \"Manage your transfers\" onboarding hint."
+    },
+    "17572": {
+        "text": "You can see the progress of your transfers by placing the mouse over the Transfers tab. If you want to have more control over your transfers, just click the icon to move to the Transfer Manager.",
+        "context": "An onboarding tip which is shown once the user starts a new download. Typically this is only shown once."
+    },
+    "17573": {
+        "text": "Notifications will keep you posted regarding everything going on with your account. You can manage your notifications in your Settings.",
+        "context": "An onboarding tip shown once when the user gets a new notification."
+    },
+    "17574": {
+        "text": "Share your content",
+        "context": "The title of the \"Share your content\" onboarding tooltip. This is typically only shown once when the user doesn't have any files shared."
+    },
+    "17575": {
+        "text": "You can create a link to share your content by right clicking on the file or folder you want to share and selecting Get Link from the context menu.",
+        "context": "An onboarding tooltip message. This is typically shown only once when the user doesn't have any files shared."
+    },
+    "17576": {
+        "text": "Sharing folders",
+        "context": "The title of the \"Sharing folders\" onboarding tip. This is shown only once with all other onboarding tips and only when the user doesn't have any shared folders."
+    },
+    "17577": {
+        "text": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu.",
+        "context": "An onboarding tooltip message which is shown only once along with all other onboarding tips and only when the user doesn't have any shared folders."
+    },
+    "17578": {
+        "text": "There is already a file with the same name",
+        "context": "A tooltip message which shows when a file name is duplicated during renaming."
+    },
+    "17579": {
+        "text": "There is already a folder with the same name",
+        "context": "A tooltip message which is shown when a folder name is duplicated during renaming or creation."
+    },
+    "17580": {
+        "text": "View file versioning settings",
+        "context": "Title of the button to view settings for file versioning."
+    },
+    "17581": {
+        "text": "You are about to delete the version histories of all files. Please note that the current files will not be deleted. Would you like to proceed?",
+        "context": "A warning message to warn the user that they are about to delete all previous versions of all files."
+    },
+    "17582": {
+        "text": "You have [X1] file versions, taking up a total of [X2].\r\n",
+        "context": "A message to summarise the total number of file versions (X1) and total storage usage (X2) of the versioned files. Please keep the placeholders [X1] and [X2] as they will be replaced at runtime."
+    },
+    "17583": {
+        "text": "MEGA requires access to your photo library to add photos and videos to your device gallery",
+        "context": "This is a description of why write-only access to the user\u2019s photo library is required. To protect user privacy, Apple requires a purpose or explanation of why this functionality will be accessed."
+    },
+    "17584": {
+        "text": "Current Plan:",
+        "context": "Text shown on the upgrade account page above the current PRO plan subscription"
+    },
+    "17585": {
+        "text": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+        "context": "An alert message shown in case the user has an active subscription and is in the process of buying a higher plan (i.e. a higher level PRO account)."
+    },
+    "17587": {
+        "text": "Invite Contact",
+        "context": "Text shown when the user tries to make a call and the receiver is not a contact"
+    },
+    "17588": {
+        "text": "Invite Sent",
+        "context": "Text shown when the user sends a contact invitation"
+    },
+    "17589": {
+        "text": "Later",
+        "context": "Button title to allow the user postpone an action"
+    },
+    "17590": {
+        "text": "by %1",
+        "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
+    },
+    "17595": {
+        "text": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
+        "context": "A confirmation message when the user chooses to disable file versioning."
+    },
+    "17596": {
+        "text": "Enable or disable file versioning for your entire account:",
+        "context": "Title of the file versioning setting."
+    },
+    "17597": {
+        "text": "You may still receive file versions from shared folders if your contacts have this enabled.",
+        "context": "A note about file versioning in the file versioning settings area."
+    },
+    "17598": {
+        "text": "Delete all file versions:",
+        "context": "The title of the section about deleting file versions in the settings."
+    },
+    "17599": {
+        "text": "Delete all",
+        "context": "Text of a button which deletes all historical versions of files in the user's entire account."
+    },
+    "17600": {
+        "text": "This will permanently delete all your own file versions. Any file version shared to you from a contact will need to be deleted by them.",
+        "context": "A warning note about deleting all file versions in the settings section."
+    },
+    "17601": {
+        "text": "Enabled",
+        "context": "The label of the toggle switch to indicate that file versioning is enabled."
+    },
+    "17602": {
+        "text": "The current version of the file will be replaced with the file you are uploading.",
+        "context": "A description in the duplicate items dialog below the Upload and replace title. This option allows the user to update an existing file in the folder by replacing the current version of the file with the file they are uploading."
+    },
+    "17607": {
+        "text": "%1 cleaning scheduler",
+        "context": "Title of cleaning scheduler dialog. Keep %1 placeholder. It will be replaced at runtime. %1 is replaced at runtime with corresponding name of local cache folder name depending on operating system (`.debris` on macOS and Linux and `Rubbish` on Win)"
+    },
+    "17608": {
+        "text": "Please enter a valid value",
+        "context": "Information message shown when user introduces an invalid value"
+    },
+    "17609": {
+        "text": "Disable file versioning",
+        "context": "Checkbox label to enable\/disable file versioning feature"
+    },
+    "17610": {
+        "text": "File versions size: %1",
+        "context": "A label to indicate the total file size which is taken up by file versions. Please keep the %1 placeholder as it will be replaced at runtime with the total size."
+    },
+    "17611": {
+        "text": "A local folder with a backup of files deleted in MEGA",
+        "context": "Tooltip shown when hover local debris label."
+    },
+    "17612": {
+        "text": "A folder in MEGA with a backup of files deleted in the local computer",
+        "context": "Tooltip shown when hover remote SyncDebris label."
+    },
+    "17613": {
+        "text": "Disabling file versioning will prevent the creation and storage of new file versions. Do you want to continue?",
+        "context": "Informative text shown when user is trying to disable file versioning before proceed."
+    },
+    "17614": {
+        "text": "Remove files older than %1 days",
+        "context": "Informative label to indicate that local cleaning scheduler is active and files older than %1 days will be removed. Keep %1 placeholder, it will be replaced with the value specified by the user at runtime"
+    },
+    "17615": {
+        "text": "Remove files older than 1 day",
+        "context": "Informative label to indicate that local cleaning scheduler is active and files older than 1 day will be removed."
+    },
+    "17616": {
+        "text": "You are about to permanently remove all file versions. Would you like to proceed?",
+        "context": "Informative text asking for confirmation when user is trying to remove all file versions of the actual account. This removes the backup versions of files, but does not remove the current file itself."
+    },
+    "17617": {
+        "text": "Create Folder",
+        "context": "The title of a dialog in the mobile webclient which lets the user create a new folder (directory) to be added to their Cloud Drive"
+    },
+    "17618": {
+        "text": "UPLOAD ANOTHER FILE",
+        "context": "A button label in the mobile webclient to upload an additional file after completing a file upload already."
+    },
+    "17619": {
+        "text": "MEGAdrop URL was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop URL was copied to the clipboard."
+    },
+    "17620": {
+        "text": "MEGAdrop source code was successfully copied to clipboard.",
+        "context": "A toast notification message when the MEGAdrop source code was copied to the clipboard."
+    },
+    "17621": {
+        "text": "Sync",
+        "context": "This is a new option in the right click context menu of a folder. The button will allow synchronisation of the folder with MEGAsync."
+    },
+    "17623": {
+        "text": "Select one account type:",
+        "context": "Text that explains that you have to select the plan you want and\/or need after creating an account"
+    },
+    "17624": {
+        "text": "You already have a PRO account. You will be buying a new subscription to MEGA and in case you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+        "context": "Alert text shown in case the user has an active subscription and is in the process to buy a higher plan (An upper level of a PRO account)"
+    },
+    "17625": {
+        "text": "File versions: %1",
+        "context": "Label to indicate the total file size taken by versions. Keep %1 placeholder. It will be replaced at runtime with the total size. Keep string as short as possible."
+    },
+    "17626": {
+        "text": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
+        "context": "Message dialog informs user that action Get Link\/Share on folder which contains multiple MEGAdrop descendant folders will cause cancellation of all MEGAdrop subfolders starting from the selected one."
+    },
+    "17629": {
+        "text": "If you cancel your account you will not be able to access your account data, your MEGA contacts or conversations.\nYou will not be able to undo this action.",
+        "context": "Text shown in the alert dialog to confirm the cancellation of an account"
+    },
+    "17630": {
+        "text": "Invite friends and get rewards",
+        "context": "subtitle of the section for achievements"
+    },
+    "17631": {
+        "text": "Unlocked rewards",
+        "context": "title of the section for unlocked rewards"
+    },
+    "17632": {
+        "text": "Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage and transfer quota.",
+        "context": "first paragraph of screen to invite friends and get an achievement"
+    },
+    "17633": {
+        "text": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection. Invited contacts must install the MEGA mobile app or MEGA desktop app on their devices.",
+        "context": "second paragraph of screen to invite friends and get an achievement"
+    },
+    "17634": {
+        "text": "Encourage your friends to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your transfer quota reward.",
+        "context": "paragraph of the dialog to confirm the contact request"
+    },
+    "17636": {
+        "text": "You have received %1$s storage space as your free registration bonus.",
+        "context": "info paragraph about the completed achievement registration"
+    },
+    "17637": {
+        "text": "Android feedback",
+        "context": "mail subject"
+    },
+    "17643": {
+        "text": "Forward",
+        "context": "Item of a menu to forward a message chat to another chatroom"
+    },
+    "17644": {
+        "text": "Contact's name or email",
+        "context": "when add or share a file with a new contact, it can type by name or mail"
+    },
+    "17645": {
+        "text": "No more contacts can be added at this time",
+        "context": "when add or share a file with a new contact, message displayed to warn that the maximum number has been reached"
+    },
+    "17646": {
+        "text": "The new password cannot be the same as the old password",
+        "context": "when changing the password , the old password and new password are equals"
+    },
+    "17647": {
+        "text": "Search by date",
+        "context": "Menu item"
+    },
+    "17648": {
+        "text": "Last month",
+        "context": "title of a button to apply search by month"
+    },
+    "17649": {
+        "text": "Last year",
+        "context": "title of a button to apply search by year"
+    },
+    "17650": {
+        "text": "Set day",
+        "context": "title of a Search by date tag"
+    },
+    "17652": {
+        "text": "Date required is not valid",
+        "context": "the user can't choose this date"
+    },
+    "17653": {
+        "text": "Characters not allowed",
+        "context": "Error when the user writes a character not allowed"
+    },
+    "17654": {
+        "text": "Audio File",
+        "context": "Label shown when audio file is playing"
+    },
+    "17655": {
+        "text": "Error. The PDF file is corrupted or does not exist.",
+        "context": "This error message occurs when the user opens the PDF viewer, but the PDF document that they are trying to open is damaged or does not exist."
+    },
+    "17656": {
+        "text": "User account",
+        "context": "Label to include info of the user email in the feedback form"
+    },
+    "17657": {
+        "text": "Save to my [Br]Cloud Drive",
+        "context": "Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage"
+    },
+    "17658": {
+        "text": "The chat already exists",
+        "context": "Error message when creating a chat one to one with a contact that already has a chat"
+    },
+    "17659": {
+        "text": "The file has not been downloaded yet",
+        "context": "before sharing an image, the preview has to be downloaded"
+    },
+    "17660": {
+        "text": "Only MEGA contacts can be added",
+        "context": "Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added"
+    },
+    "17661": {
+        "text": "Chat disconnected",
+        "context": "Info label about the connectivity state of an individual chat"
+    },
+    "17662": {
+        "text": "Error. The call cannot be established",
+        "context": "Message show when a call cannot be established"
+    },
+    "17663": {
+        "text": "Are you happy with this app?",
+        "context": "Title of dialog to evaluate the app"
+    },
+    "17664": {
+        "text": "Yes, rate the app",
+        "context": "Label to show rate the app"
+    },
+    "17665": {
+        "text": "No, send feedback",
+        "context": "Label to show send feedback"
+    },
+    "17666": {
+        "text": "You already have a PRO account. You will be buying a new subscription to MEGA and if you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+        "context": "Alert text shown in case the user has an active subscription and is in the process to buy a higher plan (An upper level of a PRO account)"
+    },
+    "17667": {
+        "text": "Shared this contact:",
+        "context": "A summary message when a user sent the information of one contact through the chat."
+    },
+    "17668": {
+        "text": "Shared these contacts:",
+        "context": "A summary message when a user sent the information of some contacts at once through the chat."
+    },
+    "17669": {
+        "text": "Uploaded this file:",
+        "context": "A summary message when a user has attached one file into the chat."
+    },
+    "17670": {
+        "text": "Uploaded these files:",
+        "context": "A summary message when a user has attached many files at once into the chat."
+    },
+    "17671": {
+        "text": "Missed audio call",
+        "context": "Notification text body shown when you have missed one audio call"
+    },
+    "17672": {
+        "text": "[A] missed audio calls",
+        "context": "Notification text body shown when you have missed several audio calls. [A] = {number of missed audio calls}"
+    },
+    "17673": {
+        "text": "Missed video call",
+        "context": "Notification text body shown when you have missed one video call"
+    },
+    "17674": {
+        "text": "[A] missed video calls",
+        "context": "Notification text body shown when you have missed several video calls. [A] = {number of missed video calls}"
+    },
+    "17675": {
+        "text": "Missed audio call and missed video call",
+        "context": "Notification text body shown when you have missed one audio call and one video call"
+    },
+    "17676": {
+        "text": "Missed audio call and [A] missed video calls",
+        "context": "Notification text body shown when you have missed one audio call and several video calls. [A] = {number of missed video calls}"
+    },
+    "17679": {
+        "text": "[A] missed audio calls and missed video call",
+        "context": "Notification text body shown when you have missed several audio calls and one video call. [A] = {number of missed audio calls}"
+    },
+    "17680": {
+        "text": "[A] missed audio calls  and [B] missed video calls",
+        "context": "Notification text body shown when you have missed several audio calls and video calls. [A] = {number of missed audio calls}. [B] = {number of missed video calls}"
+    },
+    "17681": {
+        "text": "Please give the MEGA app permission to access your microphone in your Settings.",
+        "context": "An alert message to remind the user that the MEGA app needs permission to use the microphone to make calls and record videos and it currently does not have that permission."
+    },
+    "17682": {
+        "text": "You already have a PRO account and you will be buying a new subscription to MEGA. If you have an auto-renewable subscription, you must cancel it or you will be charged for two plans.",
+        "context": "An alert message shown in case the user has an active subscription and is in the process of buying a higher PRO plan. For example if they have a PRO II subscription and they are buying a PRO III subscription then this message will show."
+    },
+    "17683": {
+        "text": "MEGA accesses your microphone when you capture a video or make a call inside the app.",
+        "context": "Microphone usage description. To protect user privacy Apple requires a purpose string explaining why will be accessed."
+    },
+    "17684": {
+        "text": "MEGA accesses your camera when you capture a video, photo or make a call inside the app.",
+        "context": "To protect user privacy, Apple requires a purpose string explaining why the camera will be accessed."
+    },
+    "17685": {
+        "text": "Error preparing downloads. Please try again.",
+        "context": "A message of the dialog which is displayed when the process to prepare files or folders for download failed."
+    },
+    "17686": {
+        "text": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
+        "context": "A message which is shown when a user attempts to access a MEGAdrop public folder link."
+    },
+    "17687": {
+        "text": "Not supported",
+        "context": "A title for the MEGAdrop public link page on mobile which is not supported."
+    },
+    "17688": {
+        "text": "Can you remember your password?",
+        "context": "A message for the Recovery Key button on the mobile webclient."
+    },
+    "17689": {
+        "text": "Tap and hold to copy the Recovery Key to the clipboard.",
+        "context": "An instruction on the mobile webclient Backup Recovery Key screen which tells the user to tap and hold on the Recovery Key to copy it to the clipboard."
+    },
+    "17690": {
+        "text": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
+        "context": "An instruction for the user on how they can recover their account using the Recovery Key."
+    },
+    "17691": {
+        "text": "Please give the MEGA app permission to access your microphone in your Settings.",
+        "context": "An alert message to remind the user that MEGA needs permission to use the microphone to make calls and record videos and it currently does not have that permission."
+    },
+    "17692": {
+        "text": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+        "context": "An alert message which is shown when the user has an active subscription and is in the process of buying a higher plan (a higher level PRO account)."
+    },
+    "17693": {
+        "text": "Chatting with",
+        "context": "A title which is shown above the name of the people that the user is currently chatting with."
+    },
+    "17694": {
+        "text": "Download key",
+        "context": "A button label on the mobile webclient which allows the user to download the Recovery Key to a text file."
     }
 }

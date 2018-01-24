@@ -8,19 +8,12 @@ mobile.downloadOverlay = {
 
     /** Supported file types for download on mobile */
     supportedFileTypes: {
-        doc: 'word',
-        docx: 'word',
-        odt: 'word',
-        xls: 'excel',
-        xlsx: 'excel',
-        ods: 'excel',
         jpeg: 'image',
         jpg: 'image',
         png: 'image',
         gif: 'image',
         mp3: 'audio',
-        mp4: 'video',
-        pdf: 'pdf'
+        mp4: 'video'
     },
 
     /** Download start time in milliseconds */
@@ -343,7 +336,7 @@ mobile.downloadOverlay = {
         var bytesPerSecond = secondsElapsed ? bytesLoaded / secondsElapsed : 0;
         var speed = numOfBytes(bytesPerSecond);
         var speedSizeRounded = Math.round(speed.size);
-        var speedText = speedSizeRounded + speed.unit + '/s';
+        var speedText = speedSizeRounded + ' ' + speed.unit + '/s';
 
         // Display the download progress and speed
         $downloadPercent.text(percentCompleteRounded + '%');

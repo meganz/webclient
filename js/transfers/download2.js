@@ -1079,6 +1079,9 @@ var dlmanager = {
         }
 
         if (page === 'download') {
+            var $dlPageTW = $('.download.transfer-wrapper');
+            $('.download.over-transfer-quota', $dlPageTW).addClass('hidden');
+            $('.download.in-progress, .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
             $('.download.file-info').removeClass('overquota');
         }
         else {
@@ -1218,9 +1221,13 @@ var dlmanager = {
                 delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
 
                 var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+                var $dlPageCountdown = $('.download.transfer-overquota-txt').text(String(l[7100]).replace('%1', ''));
+                if (!$dlPageCountdown.is(':visible')) {
+                    $dlPageCountdown = null;
+                }
                 this._overquotaClickListeners($dialog);
 
-                if ($dialog.is(':visible')) {
+                if ($dialog.is(':visible') || $dlPageCountdown) {
                     var $countdown = $dialog.find('.countdown').removeClass('hidden');
                     $countdown.safeHTML(secondsToTime(timeLeft, 1));
 
@@ -1230,9 +1237,18 @@ var dlmanager = {
 
                             if (time) {
                                 $countdown.safeHTML(time);
+
+                                if ($dlPageCountdown) {
+                                    var html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
+                                    $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
+                                }
                             }
                             else {
                                 $countdown.text('');
+
+                                if ($dlPageCountdown) {
+                                    $dlPageCountdown.text(String(l[7100]).replace('%1', ''));
+                                }
                                 clearInterval(dlmanager._overQuotaTimeLeftTick);
                             }
                         }, 1000);
@@ -1282,6 +1298,8 @@ var dlmanager = {
         flags = flags !== undefined ? flags : this.lmtUserFlags;
 
         if (preWarning) {
+            localStorage.seenQuotaPreWarn = Date.now();
+
             $('.msg-overquota', $dialog).addClass('hidden');
             $('.msg-prewarning', $dialog).removeClass('hidden');
 
@@ -1309,6 +1327,11 @@ var dlmanager = {
             });
         }
         else {
+            var $dlPageTW = $('.download.transfer-wrapper');
+
+            $('.download.over-transfer-quota', $dlPageTW).addClass('hidden');
+            $('.download.in-progress, .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
+
             $('.msg-overquota', $dialog).removeClass('hidden');
             $('.msg-prewarning', $dialog).addClass('hidden');
 
@@ -1317,8 +1340,10 @@ var dlmanager = {
             $('.upgrade', $dialog).rebind('click', onclick);
             $dialog.find('.reg-st3-membership-bl').rebind('click', onclick);
 
+            $('.video-theatre-mode:visible').addClass('paused');
+
             if (page === 'download') {
-                var $dtb = $('.download.transfer-buttons');
+                var $dtb = $('.download.transfer-buttons, .download.video-transfer-buttons');
 
                 $('.create-account-button', $dtb).addClass('hidden').unbind('click');
                 $('.get-more-bonuses', $dtb).addClass('hidden').unbind('click');
@@ -1337,6 +1362,9 @@ var dlmanager = {
                 }
 
                 $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
+
+                $('.download.over-transfer-quota', $dlPageTW).removeClass('hidden');
+                $('.download.in-progress, .video-mode-wrapper', $dlPageTW).addClass('over-quota');
             }
         }
 
@@ -1543,6 +1571,13 @@ var dlmanager = {
         uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
         this._overquotaClickListeners($dialog, flags, res || true);
 
+        if (is_mobile) {
+            $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
+                $dialog.addClass('hidden');
+                fm_hideoverlay();
+            });
+        }
+
         M.safeShowDialog('download-pre-warning', $dialog);
     },
 
@@ -1634,9 +1669,18 @@ var dlmanager = {
             });
         }
 
+        if (is_mobile) {
+            $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
+                $dialog.addClass('hidden');
+                fm_hideoverlay();
+            });
+        }
+
         M.safeShowDialog('download-overquota', function() {
             var doCloseModal = function closeModal() {
-                clearInterval(dlmanager._overQuotaTimeLeftTick);
+                if (!$('.download.transfer-overquota-txt').is(':visible')) {
+                    clearInterval(dlmanager._overQuotaTimeLeftTick);
+                }
                 $('.fm-dialog-overlay').unbind('click.dloverq');
                 $dialog.unbind('dialog-closed').find('.fm-dialog-close').unbind('click.quota');
                 closeDialog();

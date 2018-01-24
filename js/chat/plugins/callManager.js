@@ -119,7 +119,6 @@ CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteMute', 'rtcCa
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onLocalMute', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onCallStarted', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onCallStarting', 'rtcCall');
-CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onCallStarting', 'rtcCall');
 
 CallManager.prototype.registerCall = function (chatRoom, rtcCall) {
     var self = this;
@@ -132,9 +131,9 @@ CallManager.prototype.registerCall = function (chatRoom, rtcCall) {
 CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
     var self = this;
 
-    if (chatRoom.callManagerCall && !chatRoom.callManagerCall.isTerminated()) {
-        chatRoom.callManagerCall.endCall('other');
-    }
+    // if (chatRoom.callManagerCall && !chatRoom.callManagerCall.isTerminated()) {
+    //     chatRoom.callManagerCall.endCall('other');
+    // }
 
     var $masterPromise = new MegaPromise();
 
@@ -156,10 +155,6 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
         return;
     }
 
-    if (chatRoom.callManagerCall && (chatRoom.callManagerCall.isStarted() || chatRoom.callManagerCall.isStarting())) {
-        chatRoom.callManagerCall.endCall();
-    }
-
     var $promise = chatRoom._retrieveTurnServerFromLoadBalancer(4000);
 
     $promise.always(function () {
@@ -169,9 +164,13 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
             Av.fromMediaOptions(mediaOptions),
             callEventHandler
         );
+        if (!callObj) {
+            // call already starte/dup call.
+            $masterPromise.reject();
+            return;
+        }
         callEventHandler.call = callObj;
         var callManagerCall = self.registerCall(chatRoom, callObj);
-        callManagerCall.closeAllExceptThis();
 
         chatRoom._resetCallStateInCall();
 
@@ -360,7 +359,7 @@ var CallManagerCall = function (chatRoom, rtcCall) {
             self.logger.debug(
                 "Room have a not started session, will terminate and replace with the the newly created session."
             );
-            self.room.callManagerCall.endCall('other');
+            // self.room.callManagerCall.endCall('other');
         } else if (self.room.callManagerCall.isStarted() === true) {
             self.logger.debug(
                 "Room have a started session, will terminate and replace with the the newly created session."
@@ -469,8 +468,6 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
         self.room.show();
         self.getCallManager().incomingCallDialog.hide();
 
-        self.closeAllExceptThis();
-
         self.rtcCall.answer(Av.fromMediaOptions(mediaOptions));
 
 
@@ -573,20 +570,6 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
     );
 };
 
-
-CallManagerCall.prototype.closeAllExceptThis = function () {
-    var self = this;
-
-    // close any started/starting sessions
-    self.getCallManager().forEachCallManagerCall(function (callManagerCall) {
-        if (callManagerCall !== self) {
-            if (!callManagerCall.isTerminated()) {
-                callManagerCall.endCall('other');
-            }
-        }
-    });
-};
-
 CallManagerCall.prototype._removeTempMessages = function () {
     var self = this;
 
@@ -612,6 +595,13 @@ CallManagerCall.prototype.onCallStarting = function () {
     var self = this;
 
     self.setState(CallManagerCall.STATE.STARTING);
+
+    if (
+        self.room.megaChat.plugins.callManager.incomingCallDialog &&
+        self.room.megaChat.plugins.callManager.incomingCallDialog.sid === self.id
+    ) {
+        self.room.megaChat.plugins.callManager.incomingCallDialog.destroy();
+    }
 
     self._removeTempMessages();
 
@@ -865,10 +855,11 @@ CallManagerCall.prototype.onCallTerminated = function () {
     self.room.trackDataChange();
 };
 
-CallManagerCall.prototype.onDestroy = function (terminationCode, wasFromPeer) {
+CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates) {
     var self = this;
-    if (terminationCode === Term.kReqCancel) {
-        if (!wasFromPeer) {
+    var isIncoming = self.rtcCall.isJoiner;
+    if (terminationCode === Term.kCallReqCancel) {
+        if (!isIncoming) {
             self.setState(CallManagerCall.STATE.REJECTED);
             self.getCallManager().trigger('CallRejected', [self, "caller"]);
         }
@@ -918,7 +909,7 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, wasFromPeer) {
         terminationCode === Term.kRingOutTimeout ||
         terminationCode === Term.kAnswerTimeout
     ) {
-        if (terminationCode === Term.kAnswerTimeout && wasFromPeer === true) {
+        if (isIncoming) {
             self.setState(CallManagerCall.STATE.MISSED);
             self.getCallManager().trigger('CallMissed', [self, terminationCode]);
         }

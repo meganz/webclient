@@ -17,7 +17,7 @@ var slideshowid;
 
         // Loop through available items and extract images
         for (var i in M.v) {
-            if (is_image(M.v[i])) {
+            if (is_image(M.v[i]) || is_video(M.v[i])) {
                 // is currently previewed item
                 if (M.v[i].h === slideshowid) {
                     ci = i;
@@ -71,8 +71,8 @@ var slideshowid;
         }
         var steps = slideshowsteps();
         if (steps.forward.length > 0) {
-            slideshow(steps.forward[0]);
             mBroadcaster.sendMessage('slideshow:next', steps);
+            slideshow(steps.forward[0]);
         }
     }
 
@@ -90,8 +90,8 @@ var slideshowid;
         }
         var steps = slideshowsteps();
         if (steps.backward.length > 0) {
-            slideshow(steps.backward[steps.backward.length - 1]);
             mBroadcaster.sendMessage('slideshow:prev', steps);
+            slideshow(steps.backward[steps.backward.length - 1]);
         }
     }
 
@@ -214,12 +214,12 @@ var slideshowid;
 
         if (close) {
             slideshowid = false;
-            $overlay.addClass('hidden');
+            $overlay.removeClass('video video-theatre-mode').addClass('hidden');
+            $document.unbind('keydown.slideshow');
             if ($document.fullScreen()) {
                 clearTimeout(fullScreenTimer);
                 $document.fullScreen(false);
                 $document.unbind('mousemove.mediaviewer');
-                $document.rebind('keydown.slideshow');
             }
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === id) {
@@ -233,10 +233,14 @@ var slideshowid;
             return false;
         }
         var n = slideshow_node(id, $overlay);
-
+        // Checking if this the first preview (not a preview navigation)
+        // then pushing fake states of history/hash
+        if (!slideshowid && !hashLogic && !location.hash) {
+            history.pushState({subpage: page}, '', '/' + page);
+        }
         // Bind keydown events
         $document.rebind('keydown.slideshow', function(e) {
-            if (e.keyCode === 37 && slideshowid) {
+            if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
                 slideshow_prev();
             }
             else if (e.keyCode === 39 && slideshowid) {
@@ -245,12 +249,29 @@ var slideshowid;
             else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
                 slideshow(slideshowid, true);
             }
+            else if (e.keyCode === 8 || e.key === 'Backspace') {
+                // since Backspace event is processed with keydown at document level for cloudBrowser.
+                // i prefered that to process it here, instead of unbind the previous handler.
+                if (hashLogic || location.hash) {
+                    slideshow(slideshowid, 1);
+                }
+                else {
+                    history.back();
+                }
+                return false;
+            }
         });
 
         // Close icon
         $overlay.find('.viewer-button.close,.viewer-error-close')
-            .rebind('click', function() {
-                slideshow(id, 1);
+            .rebind('click', function () {
+                if (hashLogic || location.hash) {
+                    slideshow(0, 1);
+                }
+                else {
+                    history.back();
+                }
+                return false;
             });
 
         // Fullscreen icon
@@ -292,6 +313,8 @@ var slideshowid;
                     slideshow_next();
                 }
             }
+
+            return false;
         });
 
         var $dlBut = $overlay.find('.viewer-button.download');
@@ -353,18 +376,8 @@ var slideshowid;
         var preview = function preview(ctx, h, u8) {
             previewimg(h, u8, ctx.type);
 
-            if (!n.fa || n.fa.indexOf(':0*') < 0) {
-                if (d) {
-                    console.log('Thumbnail found missing on preview, creating...', h, n);
-                }
-                var aes = new sjcl.cipher.aes([
-                    n.k[0] ^ n.k[4],
-                    n.k[1] ^ n.k[5],
-                    n.k[2] ^ n.k[6],
-                    n.k[3] ^ n.k[7]
-                ]);
-                var img = is_image(n);
-                createnodethumbnail(n.h, aes, h, u8, {raw: img !== 1 && img});
+            if (isThumbnailMissing(n)) {
+                createNodeThumbnail(n, u8);
             }
             if (h === slideshowid) {
                 fetchnext();
@@ -406,7 +419,7 @@ var slideshowid;
 
                 M.require('videostream').done(function() {
                     if (preqs[n.h]) {
-                        slideshow_videostream(n);
+                        previewimg(n.h, Array(26).join('x'), filemime(n));
                     }
                 }).fail(function() {
                     console.error('Failed to load videostream.js');
@@ -430,83 +443,152 @@ var slideshowid;
     }
 
     // start streaming a video file
-    function slideshow_videostream(n) {
-        dlmanager.setUserFlags();
-        previewimg(n.h, Array(26).join('x'), filemime(n));
-        preqs[n.h] = Streamer(n.link || n.h, $('.viewer-overlay video').get(0));
+    function slideshow_videostream(id, $overlay) {
+        if (!$overlay || !$overlay.length) {
+            $overlay = $('video:visible').parent();
+        }
+        var n = slideshow_node(id, $overlay);
 
-        var fullscreenElement;
-        var onFullScreenChange = function() {
-            fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement || fullscreenElement;
-
-            if (fullscreenElement && fullscreenElement.nodeName === 'VIDEO') {
-                var isFullScreen = document.fullscreen || document.webkitIsFullScreen;
-
-                if (isFullScreen) {
-                    $(fullscreenElement).css('border', 'none');
-                }
-                else {
-                    $(fullscreenElement).css('border', '12px solid #111111');
-                    fullscreenElement = null;
-                }
+        $('.play-video-button', $overlay).rebind('click', function() {
+            if (dlmanager.isOverQuota) {
+                return dlmanager.showOverQuotaDialog();
             }
-        };
-        document.addEventListener('fullscreenchange', onFullScreenChange, false);
-        document.addEventListener('webkitfullscreenchange', onFullScreenChange, false);
 
-        var destroy = function() {
-            document.removeEventListener('fullscreenchange', onFullScreenChange);
-            document.removeEventListener('webkitfullscreenchange', onFullScreenChange);
+            var destroy = function() {
+                $overlay.find('.viewer-pending').addClass('hidden').end().trigger('video-destroy');
 
-            if (preqs[n.h] instanceof Streamer) {
-                mBroadcaster.removeListener(preqs[n.h].ev1);
-                mBroadcaster.removeListener(preqs[n.h].ev2);
-                mBroadcaster.removeListener(preqs[n.h].ev3);
+                if (preqs[n.h] && preqs[n.h] instanceof Streamer) {
+                    mBroadcaster.removeListener(preqs[n.h].ev1);
+                    mBroadcaster.removeListener(preqs[n.h].ev2);
+                    mBroadcaster.removeListener(preqs[n.h].ev3);
 
-                preqs[n.h].destroy();
-                preqs[n.h] = previews[n.h] = false;
-            }
-        };
-        preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
-        preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
-        preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:close', destroy);
-
-        preqs[n.h].onplayback(function() {
-            var video = this.video;
-
-            if (video && video.duration) {
-                video.removeAttribute('style');
-                var maxWidth = innerWidth * 70 / 100;
-                var maxHeight = innerHeight * 70 / 100;
-                var ratio = Math.min(maxWidth / video.videoWidth, maxHeight / video.videoHeight);
-
-                video.width = Math.ceil(video.videoWidth * ratio);
-
-                if (maxWidth > video.videoWidth) {
-                    $(video).css({
-                        'min-width': video.videoWidth * ratio + 'px',
-                        'min-height': video.videoHeight * ratio + 'px'
-                    });
+                    preqs[n.h].destroy();
+                    preqs[n.h] = false;
                 }
+            };
 
-                return -1;
+            if (!d) {
+                api_req({a: 'log', e: 99668, m: 'video watch'});
             }
+
+            // Show loading spinner until video is playing
+            $overlay.find('.viewer-pending').removeClass('hidden');
+            $overlay.addClass('video-theatre-mode')
+                .find('.viewer-image-bl').removeClass('default-state');
+
+            initVideoStream(n, $overlay, destroy).done(function(streamer) {
+                preqs[n.h] = streamer;
+
+                preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
+                preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
+                preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:close', destroy);
+
+                // If video is playing
+                preqs[n.h].on('playing', function() {
+                    var video = this.video;
+
+                    if (video && video.duration) {
+
+                        if (isThumbnailMissing(n) && n.u === u_handle && n.f !== u_handle) {
+                            var took = Math.round(2 * video.duration / 100);
+
+                            if (d) {
+                                console.debug('Video thumbnail missing, will take image at %s...',
+                                    secondsToTime(took));
+                            }
+
+                            this.on('timeupdate', function() {
+                                if (video.currentTime < took) {
+                                    return true;
+                                }
+
+                                this.getImage().then(createNodeThumbnail.bind(null, n))
+                                    .catch(console.warn.bind(console));
+                            });
+                        }
+
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                if (d) {
+                    window.strm = preqs[n.h];
+                }
+            });
         });
 
-        preqs[n.h].onerror(function(ev, error) {
-            // <video>'s element `error` handler
-            if (!$.dialog) {
-                msgDialog('warninga', l[135], l[47], error.message || error);
-            }
-            destroy();
+        $overlay.addClass('video');
+        $overlay.find('.viewer-pending').addClass('hidden');
+        // $overlay.find('.viewer-progress').addClass('hidden');
+        $overlay.find('.viewer-image-bl img').addClass('hidden');
+        $overlay.find('.viewer-image-bl').addClass('default-state').removeClass('hidden');
 
-            if (filemime(n) !== 'video/quicktime') {
-                api_req({a: 'log', e: 99669, m: 'stream error'});
+        if (n.name) {
+            var c = MediaAttribute.getCodecStrings(n);
+            if (c) {
+                $overlay.find('.viewer-filename').attr('title', c.join("/"));
             }
-        });
+        }
 
-        if (d) {
-            window.strm = preqs[n.h];
+        var $video = $overlay.find('.viewer-image-bl video');
+        $video.attr('poster', '').attr('controls', false).removeClass('hidden');
+
+        if (previews[id].poster !== undefined) {
+            $video.attr('poster', previews[id].poster);
+
+            if (previews[id].poster) {
+                $overlay.find('.viewer-image-bl').removeClass('default-state');
+            }
+        }
+        else if (String(n.fa).indexOf(':1*') > 0) {
+            api_getfileattr([{fa: M.d[id].fa, k: M.d[id].k}], 1, function(a, b, data) {
+                if (data !== 0xDEAD) {
+                    data = mObjectURL([data.buffer || data], 'image/jpeg');
+
+                    if (data) {
+                        previews[id].poster = data;
+
+                        if (id === slideshowid) {
+                            $video.attr('poster', data);
+                            $overlay.find('.viewer-image-bl').removeClass('default-state');
+                        }
+                    }
+                }
+            });
+        }
+        else {
+            $overlay.find('.viewer-image-bl').addClass('default-state');
+        }
+        previews[id].poster = previews[id].poster || '';
+
+        if ($.autoplay === id || page === 'download') {
+            onIdle(function() {
+                $('.play-video-button', $overlay).trigger('click');
+            });
+            delete $.autoplay;
+        }
+    }
+
+    function isThumbnailMissing(n) {
+        return !n.fa || n.fa.indexOf(':0*') < 0;
+    }
+
+    function createNodeThumbnail(n, ab) {
+        if (isThumbnailMissing(n)) {
+            if (d) {
+                console.log('Thumbnail found missing on preview, creating...', n.h, n);
+            }
+            var aes = new sjcl.cipher.aes([
+                n.k[0] ^ n.k[4],
+                n.k[1] ^ n.k[5],
+                n.k[2] ^ n.k[6],
+                n.k[3] ^ n.k[7]
+            ]);
+            var img = is_image(n);
+            var vid = is_video(n);
+            createnodethumbnail(n.h, aes, n.h, ab, {raw: img !== 1 && img, isVideo: vid});
         }
     }
 
@@ -518,8 +600,14 @@ var slideshowid;
             myPage = myPage.replace('^$#^1', window['pdfviewercss']);
             myPage = myPage.replace('^$#^3', window['pdfjs2']);
             myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
-            $('#pdfpreviewdiv1').removeClass('hidden');
-            var doc = document.getElementById('pdfpreviewdiv1').contentWindow.document;
+            // remove then re-add iframe to avoid History changes [push]
+            var pdfIframe = document.getElementById('pdfpreviewdiv1');
+            var newPdfIframe = document.createElement('iframe');
+            newPdfIframe.id = 'pdfpreviewdiv1';
+            newPdfIframe.src = 'about:blank';
+            var pdfIframeParent = pdfIframe.parentNode;
+            pdfIframeParent.replaceChild(newPdfIframe, pdfIframe);
+            var doc = newPdfIframe.contentWindow.document;
             doc.open();
             doc.write(myPage);
             doc.close();
@@ -535,6 +623,7 @@ var slideshowid;
             return;
         }
 
+        $overlay.removeClass('video video-theatre-mode');
         $overlay.find('.viewer-image-bl embed').addClass('hidden');
         $overlay.find('.viewer-image-bl video').addClass('hidden');
         $overlay.find('.viewer-image-bl img').removeClass('hidden');
@@ -545,31 +634,16 @@ var slideshowid;
             $overlay.find('.viewer-progress').addClass('hidden');
             $overlay.find('.viewer-image-bl img').addClass('hidden');
             $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
-            if (ua.details.browser !== 'Edge' && ua.details.engine !== 'Trident') {
-                $overlay.find('.viewer-image-bl embed').removeClass('hidden').attr('src', src);
-            }
-            else { // some other browser
-                // to fix pdf compatibility - Bug #7796
-                localStorage.setItem('currPdfPrev2', JSON.stringify(src));
-                prepareAndViewPdfViewer();
-            }
+            // preview pdfs using pdfjs for all browsers #8036
+            // to fix pdf compatibility - Bug #7796
+            localStorage.setItem('currPdfPrev2', JSON.stringify(src));
+            prepareAndViewPdfViewer();
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }
 
         if (String(previews[id].type).startsWith('video')) {
-            var maxWidth = Math.ceil(innerWidth * 70 / 100);
-
-            $overlay.find('.viewer-pending').addClass('hidden');
-            // $overlay.find('.viewer-progress').addClass('hidden');
-            $overlay.find('.viewer-image-bl img').addClass('hidden');
-            $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
-            $overlay.find('.viewer-image-bl video')
-                .attr('width', maxWidth)
-                .css('min-width', maxWidth)
-                .removeClass('hidden');
-            api_req({a: 'log', e: 99668, m: 'video watch'});
-            return;
+            return slideshow_videostream(id, $overlay);
         }
 
         var img = new Image();

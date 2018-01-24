@@ -127,9 +127,6 @@
         <div class="mobile fm-header fm-hr folder-link">
             <div class="mobile fm-icon cloud left hidden"></div>
             <div class="mobile fm-icon top-icon menu right"></div>
-            <div class="mobile fm-icon upload right hidden">
-                <input class="hidden" type="file" id="select-file" />
-            </div>
             <div class="mobile fm-icon back left hidden"></div>
             <div class="mobile fm-icon folder"></div>
             <div class="mobile fm-header-txt"><span>[$1456]...</span></div>
@@ -137,9 +134,11 @@
         </div>
     </div>
 
+    <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
         <div class="mobile fm-content">
             <div class="mobile fm-scrolling">
+                <div class="mobile folders-files-text"></div>
 
                 <!-- Template for folders -->
                 <div class="mobile fm-item folder template">
@@ -214,10 +213,97 @@
             </div>
         </div>
     </div>
-
-    <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
-        <div class="mobile fm-bottom"></div>
+        <div class="mobile bottom-action-bar">
+            <div class="mobile fm-icon scroll-to-top left"></div>
+            <div class="mobile fm-icon upload-file right">
+                <input class="upload-select-file hidden" type="file">
+            </div>
+            <div class="mobile fm-icon mobile-create-new-folder right"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Create new folder dialog -->
+<div class="mobile fm-block create-new-folder-overlay hidden">
+    <div class= "mobile center-block">
+        <div class="mobile fm-block create-new-folder-dialog">
+            <div class="mobile fm-row">
+                <div class="mobile fm-content">
+                    <div class="mobile first-message">[$17617]</div>
+                    <div class="mobile folder-input-container">
+                        <input class="mobile folder-name-input" type="text" maxlength="70" placeholder="[$157]">
+                        <div class="mobile folder-name-warning-block hidden">
+                            <div class="mobile fm-icon red-warning"></div>
+                            <div class="mobile warning-text">[$7729]</div>
+                        </div>
+                    </div>
+                    <div class="mobile buttons">
+                        <a class="mobile red-button close-button"> <i></i> <span>[$148]</span> </a>
+                        <a class="mobile red-button create-folder confirm-ok-button"> <i></i> <span>[$158]</span> </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Upload overlay !-->
+<div class="mobile main-block upload-overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
+                <div class="mobile filename"><em>[$5533]</em></div>
+                <div class="mobile file-upload-info">
+                    <div class="mobile upload-speed"></div>
+                    <div class="mobile filesize"></div>
+                    <div class="mobile upload-percents"></div>
+                </div>
+                <!-- Progress bar is hidden, adding "uploading" to body class will show it !-->
+                <!-- Set width to ".bar" block !-->
+                <a class="mobile upload-progress">
+                    <div class="mobile bar"></div>
+                    <span class="mobile text">[$6110]</span>
+                </a>
+                <a class="mobile red-button upload-another-file hidden"> <i></i> <span>[$17618]</span> </a>
+
+                <!-- This remains hidden, only used as a template so the desktop upload code works -->
+                <table class="upload-table hidden">
+                    <tr id="ul_8001" class="transfer-queued transfer-upload">
+                        <td>
+                            <div class="transfer-type upload">
+                                <ul>
+                                    <li class="right-c"><p><span></span></p></li>
+                                    <li class="left-c"><p><span></span></p></li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="transfer-filetype-icon"></span>
+                            <span class="tranfer-filetype-txt">fileName</span>
+                        </td>
+                        <td>fileName</td>
+                        <td>fileSize</td>
+                        <td>
+                            <span class="eta"></span><span class="speed">pauseTxt</span>
+                        </td>
+                        <td>
+                            <span class="transfer-status">$[7227]</span>
+                        </td>
+                        <td class="grid-url-field">
+                            <a class="grid-url-arrow"></a>
+                            <a class="clear-transfer-icon"></a>
+                        </td>
+                        <td><span class="row-number"></span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -362,6 +448,235 @@
                 <div class="mobile account-upgrade-text">[$5814]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
+            <div class="mobile account-achievements-block hidden">
+                <div class="mobile fm-icon rocket"></div>
+                <div class="mobile achievements-heading">[$16117]</div>
+                <div class="mobile achievements-text">[$17464]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="mobile account-cancel-subscription-block hidden">
+                <div class="mobile fm-icon cancel-subscription"></div>
+                <div class="mobile subscription-heading">[$7165]</div>
+                <div class="mobile subscription-text"></div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Cancel subscription information overlay for Google/Apple subscriptions -->
+<div class="mobile main-block cancel-subscription-information-overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile white-block">
+                <div class="mobile error-messages">
+                    <div class="mobile first-message">[$7179]</div><br>
+                    <div class="mobile optional-second-message">[$16501]</div>
+                </div>
+                <a class="mobile red-button first confirm-ok-button"> <i></i> <span>[$1596]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Cancel subscription overlay for ECP/Sabadell subscriptions -->
+<div class="mobile main-block cancel-subscription-overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile white-block">
+                <div class="mobile dialog-information">
+                    <div class="mobile membership-icon free"></div>
+                    <div class="mobile first-message">[$7179]</div>
+                    <div class="mobile second-message">[$17548]</div>
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first close-button"> <i></i> <span>[$148]</span> </a>
+                    <a class="mobile red-button second confirm-ok-button"> <i></i> <span>[$870]</span> </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Main achievements page -->
+<div class="mobile main-block achievements-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$16117]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile invite-friends-block">
+                    <div class="mobile fm-icon invite"></div>
+                    <div class="mobile invite-friends-heading">[$17465]</div>
+                    <div class="mobile invite-friends-text">[$17466]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="unlocked-rewards-block">
+                    <div class="mobile unlocked-rewards-header">[$16402]</div>
+                    <div class="mobile storage-quota-block">
+                        <div class="mobile storage-amount"></div>
+                        <div class="mobile storage-unit"></div>
+                        <div class="mobile storage-text">[$16127]</div>
+                    </div>
+                    <div class="mobile transfer-quota-block">
+                        <div class="mobile transfer-amount"></div>
+                        <div class="mobile transfer-unit"></div>
+                        <div class="mobile transfer-text">[$16122]</div>
+                    </div>
+                </div>
+                <div class="mobile bonus-information-block referral inactive disabled">
+                    <div class="mobile left-block">
+                        <div class="mobile storage-bonus"></div>
+                        <div class="mobile transfer-bonus"></div>
+                    </div>
+                    <div class="mobile right-block">
+                        <div class="mobile bonus-header">[$16298]</div>
+                        <div class="mobile time-remaining">[$17543]</div>
+                        <div class="mobile fm-icon right-arrow"></div>
+                    </div>
+                </div>
+                <div class="mobile bonus-information-block install-mobile-app inactive">
+                    <div class="mobile left-block">
+                        <div class="mobile storage-bonus"></div>
+                        <div class="mobile transfer-bonus"></div>
+                    </div>
+                    <div class="mobile right-block">
+                        <div class="mobile bonus-header">[$16280]</div>
+                        <div class="mobile time-remaining">[$17543]</div>
+                        <div class="mobile fm-icon right-arrow"></div>
+                    </div>
+                </div>
+                <div class="mobile bonus-information-block registration inactive">
+                    <div class="mobile left-block">
+                        <div class="mobile storage-bonus"></div>
+                        <div class="mobile transfer-bonus"></div>
+                    </div>
+                    <div class="mobile right-block">
+                        <div class="mobile bonus-header">[$16297]</div>
+                        <div class="mobile time-remaining">[$17543]</div>
+                    </div>
+                </div>
+                <div class="mobile bonus-information-block install-mega-sync inactive">
+                    <div class="mobile left-block">
+                        <div class="mobile storage-bonus"></div>
+                        <div class="mobile transfer-bonus"></div>
+                    </div>
+                    <div class="mobile right-block">
+                        <div class="mobile bonus-header">[$16278]</div>
+                        <div class="mobile time-remaining">[$17543]</div>
+                        <div class="mobile fm-icon right-arrow"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Achievements Referral Bonuses page -->
+<div class="mobile main-block achievements-referral-bonuses-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$16298]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile total-referral-bonuses-block">
+                    <div class="mobile storage-quota-block">
+                        <div class="mobile storage-amount">0</div>
+                        <div class="mobile storage-unit">GB</div>
+                        <div class="mobile storage-text">[$16127]</div>
+                    </div>
+                    <div class="mobile transfer-quota-block">
+                        <div class="mobile transfer-amount">0</div>
+                        <div class="mobile transfer-unit">GB</div>
+                        <div class="mobile transfer-text">[$16122]</div>
+                    </div>
+                </div>
+                <div class="mobile referral-blocks">
+                    <div class="mobile referral-block template">
+                        <div class="mobile avatar-container"></div>
+                        <div class="mobile email">name@mail.com</div>
+                        <div class="mobile time-remaining">0d</div>
+                        <div class="mobile referral-row-border"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Achievements Invite Friends page -->
+<div class="mobile main-block achievements-invite-friends-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$17465]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile top-block">
+                    <div class="mobile invite-friends-block">
+                        <div class="mobile fm-icon invite"></div>
+                        <div class="mobile invite-friends-heading">[$17465]</div>
+                        <div class="mobile invite-friends-text">[$17466]</div>
+                    </div>
+                    <div class="mobile email-input-container">
+                        <input class="mobile email-input" type="email" placeholder="[$7434]">
+                        <div class="mobile email-warning-block hidden">
+                            <div class="mobile fm-icon red-warning"></div>
+                            <div class="mobile warning-text">[$1513]</div>
+                        </div>
+                        <div class="mobile success-message-block hidden">[$17544]</div>
+                    </div>
+                    <div class="mobile invite-button">
+                        <span class="label">[$8726]</span>
+                        <span class="loading-image">
+                            <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                        </span>
+                    </div>
+                </div>
+                <div class="mobile how-it-works-block">
+                    <div class="mobile fm-icon info"></div>
+                    <div class="mobile how-it-works-text">[$1070]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Achievements Invite Friends page -->
+<div class="mobile main-block achievements-how-it-works-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$1070]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile top-block">
+                    <div class="mobile fm-icon invite"></div>
+                    <div class="mobile heading how-it-works">[$1070]</div>
+                    <p>[$17476]</p>
+                    <div class="mobile heading why-is-it-not-working">Why is it not working?</div>
+                    <p>[$17477]</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -387,7 +702,8 @@
 <div class="mobile main-block hidden" id="mobile-ui-main">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
-            <a class="mobile logo"></a>
+            <a class="mobile logo" href="https://mega.nz"></a>
+            <div class="mobile fm-icon top-icon menu right dl-page"></div>
             <div class="mobile fm-dialog-close hidden"></div>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
@@ -441,33 +757,6 @@
 </div>
 
 
-<!-- Upload overlay !-->
-<div class="mobile main-block hidden" id="mobile-upload">
-    <div class="mobile content-row first">
-        <div class="mobile content-cell">
-            <a class="mobile logo"></a>
-            <div class="mobile fm-dialog-close hidden"></div>
-            <div class="mobile white-block">
-                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
-                <div class="mobile filename"><em>[$5533]</em></div>
-                <div class="mobile file-upload-info">
-                    <div class="mobile download-speed"></div>
-                    <div class="mobile filesize"></div>
-                    <div class="mobile upload-percents"></div>
-                </div>
-                <a class="mobile red-button first dl-browser"> <i></i> <span>[$5532]</span> </a>
-                <!-- Progressbar is hidden. "uploading" body class will show it !-->
-                <!-- Set width to ".bar" block !-->
-                <a class="mobile upload-progress">
-                    <div class="bar"></div>
-                    <span>[$8949]</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <!-- File delete overlay !-->
 <div class="mobile main-block hidden" id="mobile-ui-delete">
     <div class="mobile content-row first">
@@ -480,8 +769,10 @@
                 <div class="mobile file-download-info">
                     <div class="mobile filesize"></div>
                 </div>
-                <a class="mobile red-button first delete"> <i></i> <span>[$1730]</span> </a>
-                <a class="mobile red-button second cancel"> <i></i> <span>[$82]</span> </a>
+                <div class="mobile buttons inline-buttons">
+                    <a class="mobile red-button first delete"> <i></i> <span>[$1730]</span> </a>
+                    <a class="mobile red-button second cancel"> <i></i> <span>[$82]</span> </a>
+                </div>
             </div>
         </div>
     </div>
@@ -500,9 +791,11 @@
                 <div class="mobile file-download-info">
                     <div class="mobile filesize"></div>
                 </div>
-                <textarea id="mobile-public-link" class="mobile public-link hidden" readonly></textarea>
-                <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
-                <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
+                <textarea id="mobile-public-link" class="mobile public-link" readonly></textarea>
+                <div class="mobile buttons inline-buttons">
+                    <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
+                    <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
+                </div>
             </div>
         </div>
     </div>
@@ -1006,7 +1299,6 @@
 <div class="mobile main-block fm-dialog limited-bandwidth-dialog hidden">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
-            <a class="mobile logo"></a>
             <div class="mobile fm-dialog-close"></div>
             <div class="mobile white-block">
                 <div class="fm-dialog-close"></div>
@@ -1671,6 +1963,30 @@
 
                     <p>
                         Last updated 20 January 2016, effective 20 February 2016.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--MEGAdrop -->
+<div class="mobile fm-block megadrop hidden">
+    <div class="mobile fm-row">
+        <div class="mobile fm-header fm-hr">
+            <div class="mobile fm-icon top-icon menu right"></div>
+            <div class="mobile fm-icon mega left"></div>
+        </div>
+    </div>
+
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile content">
+                    <h1>[$17687]</h1>
+                    <p>
+                        <span>[$17686]</span>
                     </p>
                 </div>
             </div>

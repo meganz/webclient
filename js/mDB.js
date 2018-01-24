@@ -660,7 +660,10 @@ FMDB.prototype.stripnode = Object.freeze({
         }
 
         // Remove other garbage
-        delete f.seen; // inserted by the dynlist
+        if (f.seen) {
+            t.seen = f.seen;
+            delete f.seen; // inserted by the dynlist
+        }
 
         if (f.shares) {
             t.shares = f.shares;

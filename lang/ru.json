@@ -4582,7 +4582,7 @@
     "17652": "\u0412\u0432\u0435\u0434\u0451\u043d\u043d\u0430\u044f \u0434\u0430\u0442\u0430 \u043d\u0435\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043b\u044c\u043d\u0430",
     "17653": "\u0421\u0438\u043c\u0432\u043e\u043b\u044b \u043d\u0435 \u0440\u0430\u0437\u0440\u0435\u0448\u0435\u043d\u044b",
     "17654": "\u0410\u0443\u0434\u0438\u043e\u0444\u0430\u0439\u043b",
-    "17655": "Error. The PDF file is corrupted or does not exist.",
+    "17655": "\u041e\u0448\u0438\u0431\u043a\u0430. PDF-\u0444\u0430\u0439\u043b \u043f\u043e\u0432\u0440\u0435\u0436\u0434\u0451\u043d \u0438\u043b\u0438 \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442.",
     "17656": "\u0423\u0447\u0451\u0442\u043d\u0430\u044f \u0437\u0430\u043f\u0438\u0441\u044c \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
     "17657": "\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u043d\u0430 \u043c\u043e\u0439 [Br]\u043e\u0431\u043b\u0430\u0447\u043d\u044b\u0439 \u0434\u0438\u0441\u043a",
     "17658": "\u0427\u0430\u0442 \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442",
@@ -4610,10 +4610,14 @@
     "17682": "You already have a PRO account and you will be buying a new subscription to MEGA. If you have an auto-renewable subscription, you must cancel it or you will be charged for two plans.",
     "17683": "MEGA accesses your microphone when you capture a video or make a call inside the app.",
     "17684": "MEGA accesses your camera when you capture a video, photo or make a call inside the app.",
-    "17685": "Error preparing downloads. Please try again.",
+    "17685": "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u043f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u0438\u0442\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0443. \u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0441\u043d\u043e\u0432\u0430.",
     "17686": "\u041c\u044b \u043f\u043e\u043a\u0430 \u043d\u0435 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u043c \u0441\u0441\u044b\u043b\u043a\u0438 MEGAdrop \u0432 \u043c\u043e\u0431\u0438\u043b\u044c\u043d\u044b\u0445 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430\u0445. \u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u0432\u043e\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439\u0442\u0435\u0441\u044c \u043e\u0434\u043d\u0438\u043c \u0438\u0437 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u043c\u044b\u0445.",
     "17687": "\u041d\u0435 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u0442\u0441\u044f",
-    "17688": "Can you remember your password?",
+    "17688": "\u041f\u043e\u043c\u043d\u0438\u0442\u0435 \u0441\u0432\u043e\u0439 \u043f\u0430\u0440\u043e\u043b\u044c?",
     "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
-    "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions."
+    "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
+    "17691": "Please give the MEGA app permission to access your microphone in your Settings.",
+    "17692": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+    "17693": "Chatting with",
+    "17694": "Download key"
 }

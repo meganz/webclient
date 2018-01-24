@@ -480,7 +480,8 @@ UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, 
             delta += u;
         }
         else {
-            this.logger.warn("not sure how to handle addremovepeers(", peers, del, ");");
+            // this.logger.warn("not sure how to handle addremovepeers(", peers, del, ");");
+            // use this ^^ for debugging only.
         }
     }
 

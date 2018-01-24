@@ -623,26 +623,6 @@ MegaDataSortedMap.prototype.push = function(v) {
     return self._sortedVals.length;
 };
 
-MegaDataSortedMap.prototype.reorder = function(forced) {
-    var self = this;
-
-    console.error('deprecated!');
-
-    if (self._reorderThrottlingTimer) {
-        clearTimeout(self._reorderThrottlingTimer);
-        delete self._reorderThrottlingTimer;
-    }
-
-    self._reorderThrottlingTimer = setTimeout(function() {
-        if (self._sortField) {
-            self._sortedVals.sort(self.getComparator());
-        }
-
-        self.trackDataChange(self._data);
-    }, forced ? 0 : 75);
-};
-
-
 MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
     var self = this;
 

@@ -267,7 +267,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         ].forEach(function (fnName) {
             var origFn = self.messages[fnName];
             self.messages[fnName] = function() {
-                var res = origFn.apply(this, toArray.apply(null, arguments));
+                var res = origFn.apply(this, arguments);
                 if (!self.chatd.chatdPersist) {
                     // was disabled?
                     self.messages[fnName] = origFn;
@@ -292,7 +292,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     var origPush = self.messages.push;
     self.messages.push = function(msg) {
-        var res = origPush.apply(this, toArray.apply(null, arguments));
+        var res = origPush.apply(this, arguments);
         if (
             !(
                 msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false

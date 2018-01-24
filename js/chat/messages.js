@@ -355,7 +355,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (
             self.haveMoreHistory() &&
             (
-                self.messages.length < Chatd.MESSAGE_HISTORY_LOAD_COUNT ||
+                self.messages.length < Chatd.MESSAGE_HISTORY_LOAD_COUNT &&
                 self.messagesBatchFromHistory.length < Chatd.MESSAGE_HISTORY_LOAD_COUNT
             )
         ) {

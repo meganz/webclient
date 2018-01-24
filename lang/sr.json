@@ -4582,6 +4582,7 @@
     "17652": "Date required is not valid",
     "17653": "Characters not allowed",
     "17654": "Audio File",
+    "17655": "Error. The PDF file is corrupted or does not exist.",
     "17656": "User account",
     "17657": "Save to my [Br]Cloud Drive",
     "17658": "The chat already exists",
@@ -4605,6 +4606,18 @@
     "17676": "Missed audio call and [A] missed video calls",
     "17679": "[A] missed audio calls and missed video call",
     "17680": "[A] missed audio calls  and [B] missed video calls",
+    "17681": "Please give the MEGA app permission to access your microphone in your Settings.",
+    "17682": "You already have a PRO account and you will be buying a new subscription to MEGA. If you have an auto-renewable subscription, you must cancel it or you will be charged for two plans.",
+    "17683": "MEGA accesses your microphone when you capture a video or make a call inside the app.",
+    "17684": "MEGA accesses your camera when you capture a video, photo or make a call inside the app.",
+    "17685": "Error preparing downloads. Please try again.",
     "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17687": "Not supported",
+    "17688": "Can you remember your password?",
+    "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
+    "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
+    "17691": "Please give the MEGA app permission to access your microphone in your Settings.",
+    "17692": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+    "17693": "Chatting with",
+    "17694": "Download key"
 }

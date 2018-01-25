@@ -4358,6 +4358,102 @@ textarea.mobile.support-text-field {
 } 
 
 
+/* Grid view */
+
+.mobile.fm-block.file-manager-block.grid-view {
+    background-color: #f5f6f7;
+}
+
+.mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+    height: 48px;
+    cursor: pointer;
+    overflow: hidden;
+    width: calc((100% - 24px) / 2);
+    background-color: #fff;
+    float: left;
+    margin-left: 8px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+}
+
+.mobile.grid-view .mobile.fm-item.file {
+    height: 152px;
+}
+.mobile.grid-view .mobile.fm-item-details {
+    display: none;
+}
+
+.mobile.grid-view .mobile.fm-item.file:nth-child(even) {
+    background-color: white;
+}
+
+.mobile.grid-view .mobile.fm-item.file:nth-child(odd) {
+    background-color: white;
+}
+
+.mobile.grid-view .mobile.fm-item-info {
+    padding: 16px 28px 0 56px;
+}
+
+.mobile.grid-view .mobile.folder .mobile.fm-item-img {
+    height: 48px;
+}
+
+.mobile.grid-view .mobile.file .mobile.fm-item-img {
+    height: 106px;
+    margin: 4px 11px 0 4px;
+    overflow: hidden;
+    width: calc(100% - 8px);
+    border-radius: 2px;
+    border:1px solid #eee;
+    background-color: #fafafa;
+}
+
+.mobile.grid-view .mobile.file .mobile.fm-item-img img {
+    height: 50%;
+    position: relative;
+    width: auto;
+    vertical-align: middle;
+    display: block;
+    margin-top: 25px;
+}
+
+.mobile.grid-view .mobile.fm-item.file .fm-icon.link {
+    margin-top: 1px;
+    width: 27px;
+}
+
+.mobile.grid-view .mobile.file.thumb .mobile.fm-item-img img {
+    height: auto;
+    position: relative;
+    width: auto;
+    margin: 0 0;
+}
+
+
+.mobile.grid-view .mobile.fm-icon.open-context-menu {
+    background-position: -197px -1664px;
+    height: 100%;
+    margin: 0;
+    width: 37px;
+}
+
+.mobile.grid-view .mobile.file .mobile.fm-item-info {
+    padding: 123px 28px 0 12px;
+}
+.mobile.grid-view .mobile.file .mobile.fm-icon.open-context-menu {
+    background-position: -197px -1667px;
+    height: 100%;
+    margin: 0;
+    width: 36px;
+    height: 36px;
+}
+
+.mobile.grid-view .mobile.fm-item .fm-icon.link {
+    margin-top: 5px;
+    width: 27px;
+}
 
 /* Get support page */
 .support-form {

@@ -1343,8 +1343,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                                 if (succeeded) {
                                     mb.messagesBatchFromHistory.remove(msg.messageId);
-                                    if (msg.pendingMessageId) {
-                                        mb.messages.remove(msg.pendingMessageId);
+                                    if (msgObject.pendingMessageId) {
+                                        mb.messages.remove(msgObject.pendingMessageId);
                                     }
                                     mb.messages.push(msg);
                                     self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);

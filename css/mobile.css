@@ -741,7 +741,7 @@ ul, li {
 .mobile.fm-item.undecrypted .fm-item-details {
     color: #ffa500;
 }
-.mobile.fm-item:nth-child(even) {
+.mobile.fm-item:nth-child(odd) {
     background-color: #fff;
 }
 .mobile.fm-icon {
@@ -789,11 +789,11 @@ ul, li {
 .mobile.fm-header .fm-icon.menu {
     margin: 12px 6px 0 7px;
 }
-.mobile.fm-header .fm-icon.grid-view {
-    margin: 10px 6px 0 6px;
+.mobile.fm-header .fm-icon.view-options.grid-mode {
+    margin: 11px 6px 0 6px;
 }
-.mobile.fm-header .fm-icon.list-view {
-    margin: 10px 6px 0 6px;
+.mobile.fm-header .fm-icon.view-options.list-mode {
+    margin: 11px 6px 0 6px;
 }
 .mobile.fm-icon.plus {
     background-position: -126px -1239px;
@@ -871,10 +871,10 @@ ul, li {
 .mobile.fm-icon.broken-heart {
     background-position: -50px -1667px
 }
-.mobile.fm-icon.grid-view {
+.mobile.fm-icon.grid-mode {
     background-position: -150px -1787px
 }
-.mobile.fm-icon.list-view {
+.mobile.fm-icon.list-mode {
     background-position: -100px -1787px;
 }
 .mobile.content-cell .mobile.menu.dl-page {
@@ -4469,6 +4469,18 @@ textarea.mobile.support-text-field {
 .mobile.grid-view .mobile.fm-item .fm-icon.link {
     margin-top: 5px;
     width: 27px;
+}
+
+.mobile.grid-view .mobile.fm-item.line-break {
+    height: 48px;
+    cursor: pointer;
+    overflow: hidden;
+    width: calc((100% - 24px) / 2);
+    background-color: inherit;
+    float: left;
+    margin-left: 8px;
+    border-radius: 2px;
+    margin-bottom: 8px;
 }
 
 /* Get support page */

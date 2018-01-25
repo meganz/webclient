@@ -51,7 +51,7 @@ var isWebkit = /webkit/.test(ua);
  * @returns {Boolean}
  */
 function isMobile() {
-
+   
     // If extension, not applicable
     if (is_extension) {
         return false;

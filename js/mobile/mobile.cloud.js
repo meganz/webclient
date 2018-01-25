@@ -14,6 +14,7 @@ mobile.cloud = {
      */
     renderLayout: function() {
 
+
         'use strict';
 
         // If a public folder link and the initial folder overlay has not been shown yet
@@ -632,6 +633,26 @@ mobile.cloud = {
 
             // Prevent pre clicking one of the Open in Browser/App buttons
             return false;
+        });
+
+        var $viewButton = $('.mobile.file-manager-block .mobile.fm-icon.view-options');
+        var $fileManagerBlock = $('.mobile.file-manager-block');
+        
+        // If a folder row is tapped
+        $viewButton.off('tap').on('tap', function() {
+    
+
+            // Detect what view option is currently set
+            if ($viewButton.hasClass("list-mode")) {
+                $fileManagerBlock.addClass('grid-view');
+                $viewButton.addClass('grid-mode').removeClass('list-mode');
+            }
+
+            else if ($viewButton.hasClass("grid-mode")) {
+                $viewButton.addClass('list-mode').removeClass('grid-mode');
+                $fileManagerBlock.removeClass('grid-view');
+            }
+
         });
     },
 

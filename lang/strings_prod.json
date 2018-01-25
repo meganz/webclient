@@ -5195,6 +5195,10 @@
         "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
         "context": "A warning message which is displayed to warn the user about the reason why their download can not proceed because they would be over the bandwidth quota."
     },
+    "8836": {
+        "text": "Recovery Key copied to clipboard",
+        "context": "Message of the dialog displayed when copy the user's Recovery Key to the clipboard to be saved or exported."
+    },
     "8839": {
         "text": "Recovery Key",
         "context": "Label for any 'Recovery Key' button, link, text, title, etc. Preserve uppercase - (String as short as possible).\r\nThe Recovery Key is the new name for the account \"Master Key\", and can unlock (recover) the account if the user forgets their password."
@@ -7407,6 +7411,10 @@
         "text": "Renamed from %1",
         "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name. Please keep the placeholder %1 which will be replaced by the filename.\r\n"
     },
+    "17386": {
+        "text": "Copy key",
+        "context": "Title for a button that copies the key of the link to the clipboard"
+    },
     "17398": {
         "text": "Label",
         "context": "A menu item in the left panel drop down menu to allow sorting by label."
@@ -7682,5 +7690,21 @@
     "17687": {
         "text": "Not supported",
         "context": "A title for the MEGAdrop public link page on mobile which is not supported."
+    },
+    "17688": {
+        "text": "Can you remember your password?",
+        "context": "A message for the Recovery Key button on the mobile webclient."
+    },
+    "17689": {
+        "text": "Tap and hold to copy the Recovery Key to the clipboard.",
+        "context": "An instruction on the mobile webclient Backup Recovery Key screen which tells the user to tap and hold on the Recovery Key to copy it to the clipboard."
+    },
+    "17690": {
+        "text": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
+        "context": "An instruction for the user on how they can recover their account using the Recovery Key."
+    },
+    "17694": {
+        "text": "Download key",
+        "context": "A button label on the mobile webclient which allows the user to download the Recovery Key to a text file."
     }
 }

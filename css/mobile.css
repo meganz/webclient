@@ -3883,6 +3883,7 @@ div.checkboxOn, div.checkboxOff {
 }
 .mobile.context-menu-container .context-menu-item.delete-button {
     color: #ff0000;
+    margin-bottom: 10px;
 }
 .mobile.context-menu-container .fm-icon {
     display: inline-block;
@@ -4404,7 +4405,7 @@ textarea.mobile.support-text-field {
     height: 106px;
     margin: 4px 11px 0 4px;
     overflow: hidden;
-    width: calc(100% - 8px);
+    width: calc(100% - 10px);
     border-radius: 2px;
     border:1px solid #eee;
     background-color: #fafafa;
@@ -4428,9 +4429,8 @@ textarea.mobile.support-text-field {
     height: auto;
     position: relative;
     width: auto;
-    margin: 0 0;
+    margin: 0 0 0 -10px;
 }
-
 
 .mobile.grid-view .mobile.fm-icon.open-context-menu {
     background-position: -197px -1664px;
@@ -4448,6 +4448,10 @@ textarea.mobile.support-text-field {
     margin: 0;
     width: 36px;
     height: 36px;
+}
+
+.mobile.grid-view .mobile.fm-item.file:last-of-type {
+    margin-bottom: 32px;
 }
 
 .mobile.grid-view .mobile.fm-item .fm-icon.link {

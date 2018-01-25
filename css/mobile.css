@@ -789,6 +789,12 @@ ul, li {
 .mobile.fm-header .fm-icon.menu {
     margin: 12px 6px 0 7px;
 }
+.mobile.fm-header .fm-icon.grid-view {
+    margin: 10px 6px 0 6px;
+}
+.mobile.fm-header .fm-icon.list-view {
+    margin: 10px 6px 0 6px;
+}
 .mobile.fm-icon.plus {
     background-position: -126px -1239px;
 }
@@ -864,6 +870,12 @@ ul, li {
 }
 .mobile.fm-icon.broken-heart {
     background-position: -50px -1667px
+}
+.mobile.fm-icon.grid-view {
+    background-position: -150px -1787px
+}
+.mobile.fm-icon.list-view {
+    background-position: -100px -1787px;
 }
 .mobile.content-cell .mobile.menu.dl-page {
     position: absolute;

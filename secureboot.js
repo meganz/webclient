@@ -321,7 +321,7 @@ if (!b_u) try
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
         }
-        d = !!localStorage.d;
+        d = localStorage.d | 0;
         jj = localStorage.jj;
         dd = localStorage.dd;
         // Write test

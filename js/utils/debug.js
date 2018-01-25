@@ -139,7 +139,9 @@ mBroadcaster.once('startMega', function() {
         var intv = 60000 / +d;
         setInterval(function() {
             var now = Date.now();
-            var known = ['1:setUserAvatar', '1:previewimg', '1:procfa', '2:procfa', '3:addScript'];
+            var known = [
+                '1:setUserAvatar', '1:previewimg', '1:procfa', '2:procfa', '3:addScript', '1:MediaElementWrapper'
+            ];
             // ^ think twice before whitelisting anything new here...
 
             for (var uri in usages) {

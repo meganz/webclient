@@ -43,6 +43,137 @@ Message._mockupNonLoadedMessage = function(msgId, msg, orderValueIfNotFound) {
     }
 };
 
+Message._getTextContentsForDialogType = function(message) {
+    if (
+        !message.textContents ||
+        (
+            typeof(message.textContents.length) !== 'undefined' &&
+            message.textContents.length === 0
+        )
+    ) {
+        var textMessage = mega.ui.chat.getMessageString(message.type || message.dialogType) || "";
+
+        // if is an array.
+        var contact = Message.getContactForMessage(message);
+        var contactName = "";
+        if (contact) {
+            contactName = htmlentities(M.getNameByHandle(contact.u));
+        }
+
+        if (message.dialogType === "privilegeChange" && message.meta) {
+            textMessage = textMessage.replace("%s2", contactName);
+            var newPrivilegeText = "";
+            if (message.meta.privilege === 3) {
+                newPrivilegeText = l[8875];
+            }
+            else if (message.meta.privilege === 2) {
+                newPrivilegeText = l[8874];
+            }
+            else if (message.meta.privilege === 0) {
+                newPrivilegeText = l[8873];
+            }
+
+            contact = M.u[message.meta.targetUserId] ? M.u[message.meta.targetUserId] : {
+                'u': message.meta.targetUserId,
+                'h': message.meta.targetUserId,
+                'c': 0
+            };
+
+            contactName = htmlentities(M.getNameByHandle(contact.u));
+            textMessage = textMessage.replace("%s1", newPrivilegeText);
+        }
+        else if (message.dialogType === "alterParticipants" && message.meta) {
+            if (message.meta.excluded && message.meta.excluded.length > 0) {
+                var otherContact = M.u[message.meta.excluded[0]];
+                if (otherContact) {
+                    if (otherContact.u === contact.u) {
+                        textMessage = l[8908];
+                    }
+                    else {
+                        contact = otherContact;
+                        textMessage = l[8906].replace("%s", contactName);
+                        contactName = htmlentities(M.getNameByHandle(message.meta.excluded[0]));
+                    }
+                }
+            }
+            else if (message.meta.included && message.meta.included.length > 0) {
+                otherContact = M.u[message.meta.included[0]];
+                if (contact && otherContact) {
+                    textMessage = l[8907].replace("%s", contactName);
+                    var otherContactName = htmlentities(M.getNameByHandle(message.meta.included[0]));
+                    contact = otherContact;
+                    contactName = otherContactName;
+                }
+            }
+            else {
+                textMessage = "";
+            }
+        }
+        else if (message.dialogType === "topicChange") {
+            textMessage = l[9081].replace(
+                "%s",
+                '"' + htmlentities(message.meta.topic) + '"'
+            );
+        }
+        else if (textMessage.splice) {
+            var tmpMsg = textMessage[0].replace("[X]", contactName);
+            tmpMsg = tmpMsg.replace("%s", contactName);
+
+            if (message.currentCallCounter) {
+                tmpMsg += " " +
+                    textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
+            }
+            textMessage = tmpMsg;
+            textMessage = textMessage
+                .replace("[[ ", " ")
+                .replace("]]", "");
+        }
+        else {
+            textMessage = textMessage.replace("[X]", contactName);
+            textMessage = textMessage.replace("%s", contactName);
+        }
+
+
+        if (textMessage) {
+            return (contactName ? contactName + " " : "") + textMessage;
+        }
+        else {
+            return false;
+        }
+    }
+};
+
+Message.getContactForMessage = function(message) {
+    var contact;
+    if (message.authorContact) {
+        contact = message.authorContact;
+    }
+    else if (message.meta && message.meta.userId) {
+        contact = M.u[message.meta.userId];
+        if (!contact) {
+            return {
+                'u': message.meta.userId,
+                'h': message.meta.userId,
+                'c': 0,
+            };
+        }
+    }
+    else if (message.userId) {
+        if (!M.u[message.userId]) {
+            // data is still loading!
+            return null;
+        }
+        contact = M.u[message.userId];
+    }
+    else {
+        console.error("No idea how to get contact for: ", message);
+
+        return {};
+    }
+
+    return contact;
+};
+
 Message.prototype.getState = function() {
     var self = this;
     var mb = self.messagesBuff;
@@ -1356,8 +1487,13 @@ MessagesBuff.prototype.getLatestTextMessage = function() {
     if (this.messages.length > 0) {
         var msgs = this.messages;
         for (var i = msgs.length - 1; i >= 0; i--) {
-            if (msgs.getItem(i) && msgs.getItem(i).textContents && msgs.getItem(i).textContents.length > 0) {
-                var msg = msgs.getItem(i);
+            var msg = msgs.getItem(i);
+            if (
+                msg && (
+                    (msg.textContents && msg.textContents.length > 0) ||
+                    msg.dialogType
+                )
+            ) {
                 if (
                     (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) ||
                     msg.revoked === true

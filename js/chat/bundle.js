@@ -1192,6 +1192,8 @@ React.makeElement = React['createElement'];
 
 	            if (lastMessage.isManagement && lastMessage.isManagement()) {
 	                renderableSummary = lastMessage.getManagementMessageSummaryText();
+	            } else if (!lastMessage.textContents && lastMessage.dialogType) {
+	                renderableSummary = Message._getTextContentsForDialogType(lastMessage);
 	            }
 
 	            renderableSummary = htmlentities(renderableSummary);
@@ -8827,12 +8829,18 @@ React.makeElement = React['createElement'];
 	                'call-missed': l[7210],
 	                'call-rejected': l[5892],
 	                'call-canceled': l[5894],
-	                'call-started': l[5888]
+	                'call-started': l[5888],
+	                'alterParticipants': undefined,
+	                'privilegeChange': l[8915],
+	                'truncated': l[8905]
+
 	            };
 	        }
 	        return MESSAGE_STRINGS[type];
 	    };
 	})();
+
+	mega.ui.chat.getMessageString = getMessageString;
 
 	module.exports = {
 	    getMessageString: getMessageString
@@ -10254,35 +10262,8 @@ React.makeElement = React['createElement'];
 	    },
 	    getContact: function getContact() {
 	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
 
-	        var contact;
-	        if (message.authorContact) {
-	            contact = message.authorContact;
-	        } else if (message.meta && message.meta.userId) {
-	            contact = M.u[message.meta.userId];
-	            if (!contact) {
-	                return {
-	                    'u': message.meta.userId,
-	                    'h': message.meta.userId,
-	                    'c': 0
-	                };
-	            }
-	        } else if (message.userId) {
-	            if (!M.u[message.userId]) {
-
-	                return null;
-	            }
-	            contact = M.u[message.userId];
-	        } else if (message.getFromJid) {
-	            contact = megaChat.getContactFromJid(message.getFromJid());
-	        } else {
-	            console.error("No idea how to render this: ", this.props);
-
-	            return {};
-	        }
-
-	        return contact;
+	        return Message.getContactForMessage(message);
 	    },
 	    getTimestampAsString: function getTimestampAsString() {
 	        return unixtimeToTimeString(this.getTimestamp());

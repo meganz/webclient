@@ -26,6 +26,7 @@ mobile.account = {
         mobile.account.initUpgradeAccountButton($page);
         mobile.account.initAchievementsButton($page);
         mobile.account.fetchSubscriptionInformation($page);
+        mobile.account.initRecoveryKeyButton($page);
 
         // Initialise the top menu
         topmenuUI();
@@ -356,5 +357,22 @@ mobile.account = {
 
         // Show the Cancel Subscription button
         $cancelSubscriptionButton.removeClass('hidden');
+    },
+
+    /**
+     * Initialise the Recovery Key button so the user can view, copy and save their Recovery Key
+     * @param {String} $page The jQuery selector for the current page
+     */
+    initRecoveryKeyButton: function($page) {
+
+        'use strict';
+
+        // On clicking/tapping the Upgrade Account button
+        $page.find('.account-recovery-key-block').off('tap').on('tap', function() {
+
+            // Load the Backup page
+            loadSubPage('backup');
+            return false;
+        });
     }
 };

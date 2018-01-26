@@ -652,7 +652,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         s.on('error', function(ev, error) {
             // <video>'s element `error` handler
             if (!$.dialog) {
-                var hint = error.name || error.message || error;
+                var hint = error.name !== 'Error' && error.name || error.message || error;
                 if (!hint && !window.chrome) {
                     // Suggest Chrome...
                     hint = l[16151] + ' ' + l[242];
@@ -1055,7 +1055,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
             options = Object.assign({
                 maxAtOnce: 10,
-                chunkSize: 65536,
+                chunkSize: -1,
                 maxBytesRead: 6291456
             }, options);
 
@@ -1407,7 +1407,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                         resolve(res);
                     }
                     else {
-                        _nextChunk(self.chunkSize);
+                        _nextChunk(self.chunkSize < 0x2000 ? Math.min(0x80000, length << 1) : self.chunkSize);
                     }
                 })
                 .catch(reject);
@@ -1683,7 +1683,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 resolve(EEXIST);
             }
             else {
-                MediaInfoLib(entry.link || entry.h, 0x10000)
+                MediaInfoLib(entry.link || entry.h, -1)
                     .getMetadata()
                     .then(entry.store.bind(entry))
                     .then(resolve)
@@ -1701,13 +1701,21 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
      */
     MediaAttribute.isTypeSupported = function(container, videocodec, audiocodec) {
         switch ('MediaSource' in window && container) {
+            case 'mp41':
             case 'mp42':
             case 'isom':
+            case 'iso2':
+            case 'iso4':
+            case 'iso5':
             case 'M4V ':
+            case 'avc1': // JVT
                 if (videocodec === 'avc1') {
                     var mime = 'video/mp4; codecs="avc1.640029';
 
-                    if (String(audiocodec).startsWith('mp4a')) {
+                    if (0 && String(audiocodec).startsWith('mp4a')) {
+                        if (audiocodec === 'mp4a') {
+                            audiocodec = 'mp4a.40.2';
+                        }
                         mime += ', ' + audiocodec.replace(/-/g, '.');
                     }
 

@@ -293,9 +293,11 @@ Chatd.Shard = function(chatd, shard) {
                     // TODO: change this to use the new API method for retrieving a mcurl for a specific shard
                     // (not chat)
                     var firstChatId = Object.keys(self.chatIds)[0];
+                    connectionRetryManager.pause();
                     self.retrieveMcurlAndExecuteOnce(
                         base64urlencode(firstChatId),
                         function(mcurl) {
+                            connectionRetryManager.unpause();
                             self.url = mcurl;
                             self.reconnect();
                         },
@@ -438,7 +440,7 @@ Chatd.Shard.prototype.retrieveMcurlAndExecuteOnce = function(chatId, resolvedCb,
         })
         .always(function() {
             if (promise === self.mcurlRequests[chatId]) {
-                delete self.mcurlRequests[chatId]
+                delete self.mcurlRequests[chatId];
             }
         });
 };

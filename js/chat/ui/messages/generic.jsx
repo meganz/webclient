@@ -70,15 +70,24 @@ var GenericConversationMessage = React.createClass({
                     return;
                 }
 
-                var $block = $(e.target).parents('.message.shared-block');
-                if ($('.block-view.medium.thumb', $block).size() === 0) {
-                    // if its not a 'media' (image)
-                    Soon(function() {
-                        // a delay is needed, otherwise React would receive the same click event and close the dropdown
-                        // even before displaying it in the UI.
-                        $('.button.default-white-button.tiny-button', $block).trigger('click');
-                    });
+                var $block;
+                if ($(e.target).is('.shared-data')) {
+                    $block = $(e.target);
                 }
+                else if ($(e.target).is('.shared-info') || $(e.target).parents('.shared-info').length > 0) {
+                    $block = $(e.target).is('.shared-info') ?
+                        $(e.target).next() : $(e.target).parents('.shared-info').next();
+                }
+                else {
+                    $block = $(e.target).parents('.message.shared-data');
+                }
+
+
+                Soon(function() {
+                    // a delay is needed, otherwise React would receive the same click event and close the dropdown
+                    // even before displaying it in the UI.
+                    $('.button.default-white-button.tiny-button', $block).trigger('click');
+                });
             });
     },
     componentWillUnmount: function() {

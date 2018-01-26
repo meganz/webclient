@@ -643,14 +643,17 @@ mobile.cloud = {
     
 
             // Detect what view option is currently set
-            if ($viewButton.hasClass("list-mode")) {
-                $fileManagerBlock.removeClass('grid-view');
-                $viewButton.addClass('grid-mode').removeClass('list-mode');
+            if  ($viewButton.hasClass("grid-mode")) {
+                $fileManagerBlock.addClass('grid-view');
+                $viewButton.removeClass('grid-mode');
+                $viewButton.addClass('list-mode');
             }
 
-            else if ($viewButton.hasClass("grid-mode")) {
-                $viewButton.addClass('list-mode').removeClass('grid-mode');
-                $fileManagerBlock.addclass('grid-view');
+            else if ($viewButton.hasClass("list-mode")) {
+                $fileManagerBlock.removeClass('grid-view');
+                $viewButton.removeClass('list-mode');
+                $viewButton.addClass('grid-mode');
+                
             }
 
         });

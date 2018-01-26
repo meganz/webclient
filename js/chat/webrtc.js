@@ -1009,7 +1009,8 @@ Call.prototype._removeSession = function(sess, reason) {
                         this.logger.warn("Timed out waiting for peer to rejoin, terminating call");
                         self.hangup(Term.kErrSessRetryTimeout); //kErrSessSetupTimeout is about existing session not reaching kInProgress
                 }
-            }, RtcModule.kSessSetupTimeout),
+            }, RtcModule.kSessSetupTimeout);
+        }
         this.logger.log("Session to ", base64urlencode(sess.peer), "failed, expecting peer to re-establish it...");
     }
 };
@@ -1185,7 +1186,9 @@ Call.prototype.hangup = function(reason) {
         if (reason == null) { // covers both 'undefined' and 'null'
             term = Term.kUserHangup;
         } else {
-            assert(reason === Term.kErrProtoTimeout || reason === Term.kErrSessSetupTimeout);
+            assert(reason === Term.kUserHangup
+                || reason === Term.kErrProtoTimeout
+                || reason === Term.kErrSessSetupTimeout);
             term = reason;
         }
         break;
@@ -1198,7 +1201,6 @@ Call.prototype.hangup = function(reason) {
         this.logger.warn("Don't know what term code to send in state", constStateToText(Term, this.state));
         break;
     }
-    this.logger.warn("Sending CALL_TERMINATE on call in state", this.state);
     // in any state, we just have to send CALL_TERMINATE and that's all
     return this._destroy(term, true);
 };
@@ -1460,6 +1462,7 @@ Session.prototype._createRtcConn = function() {
         } else if (state === 'connected') {
             self._tsIceConn = Date.now();
             self.call._notifySessionConnected(self);
+/* DEBUG: Enable this to simulate session ICE disconnect
             if (self.isJoiner)
             {
                 setTimeout(() => {
@@ -1468,6 +1471,7 @@ Session.prototype._createRtcConn = function() {
                     }
                 }, 4000);
             }
+*/
         }
     };
     // RTC.Stats will be set to 'false' if stats are not available for this browser
@@ -2091,7 +2095,7 @@ SessStateAllowedStateTransitions[SessState.kTerminating] = [
 ];
 SessStateAllowedStateTransitions[SessState.kDestroyed] = [];
 
-var UICallTerm = {
+var UICallTerm = Object.freeze({
     'INITIALISED': 0,
     'WAITING_RESPONSE_OUTGOING': 10,
     'WAITING_RESPONSE_INCOMING': 20,
@@ -2103,15 +2107,8 @@ var UICallTerm = {
     'FAILED': 60,
     'MISSED': 70,
     'TIMEOUT': 80
-};
-RtcModule.getTermCodeName = function(termCode) {
-    for (var k in Term) {
-        if (termCode === Term[k]) {
-            return k;
-        }
-    }
-    return "<unknown term code>";
-}
+});
+RtcModule.UICallTerm = UICallTerm;
 
 Call.prototype.termCodeToUIState = function(terminationCode) {
     var self = this;
@@ -2136,7 +2133,7 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
                 ? UICallTerm.MISSED
                 : UICallTerm.TIMEOUT;
         default:
-            var name = RtcModule.getTermCodeName(terminationCode);
+            var name = constStateToText(Term, terminationCode);
             if (name.match(/k[^\s]+Timeout/i)) {
                return UICallTerm.TIMEOUT;
             } else if (name.match(/kErr[\s]+/)) {

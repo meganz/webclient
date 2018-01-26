@@ -47,6 +47,9 @@ mobile.cloud = {
         // Initialise context menu on each row
         mobile.cloud.contextMenu.init();
 
+        // Initialise the bottom action bar for Scroll-to-Top, Add Folder, Upload File functionality etc
+        mobile.cloud.actionBar.init();
+
         // Hide the loading progress
         loadingDialog.hide();
         loadingInitDialog.hide();
@@ -134,6 +137,9 @@ mobile.cloud = {
 
         // Initialise context menu on each row
         mobile.cloud.contextMenu.init();
+
+        // Initialise the bottom action bar for Scroll-to-Top, Add Folder, Upload File functionality etc
+        mobile.cloud.actionBar.init();
 
         // Set viewmode to show thumbnails and render thumbnails after everything else because it can take longer
         M.viewmode = 1;
@@ -337,13 +343,8 @@ mobile.cloud = {
 
             // Show the hamburger menu icon
             $menuIcon.removeClass('hidden');
-
-            // Initialise the bottom action bar for Add Folder, Upload File functionality etc
-            mobile.cloud.actionBar.init();
         }
     },
-
-
 
     /**
      * Sums up all the file sizes (including sub directories) in the folder link

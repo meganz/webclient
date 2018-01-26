@@ -176,8 +176,13 @@ var slideshowid;
     function slideshow_node(id, $overlay) {
         var n = M.getNodeByHandle(id);
 
-        if (!n && typeof id === 'object') {
-            n = id;
+        if (!n) {
+            if (typeof id === 'object') {
+                n = id;
+            }
+            else if (typeof dl_node !== 'undefined' && dl_node.h === id) {
+                n = dl_node;
+            }
         }
 
         if ($overlay) {

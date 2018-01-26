@@ -2160,7 +2160,8 @@ MegaData.prototype.getDashboardData = function() {
     var res = Object.create(null);
     var s = this.account.stats;
 
-    res.files = {cnt: s[this.RootID].files, size: s[this.RootID].bytes};
+    res.files = {cnt: s[this.RootID].files - s[this.RootID].vfiles,
+                size: s[this.RootID].bytes - s[this.RootID].vbytes};
     res.folders = {cnt: s[this.RootID].folders, size: s[this.RootID].fsize};
     res.rubbish = {cnt: s[this.RubbishID].files, size: s[this.RubbishID].bytes};
     res.ishares = {cnt: s.inshares.items, size: s.inshares.bytes, xfiles: s.inshares.files};

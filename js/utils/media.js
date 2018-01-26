@@ -1125,7 +1125,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                     }
 
                     r.fa = n.toAttributeString(r);
-                    r.a = n.fromAttributeString(r.fa);
+                    r.a = n.fromAttributeString(
+                        String(r.fa).split('/').map(function(a) {
+                            return 'cl:' + a;
+                        }).join('/')
+                    );
 
                     containers.push(r.container);
                     audiocodecs.push(r.acodec);

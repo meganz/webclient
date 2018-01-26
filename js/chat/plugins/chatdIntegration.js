@@ -1233,7 +1233,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 }
             }
             else {
-                // no new messages retrieved
+                // no new messages retrieved (from chatd!)
                 chatRoom.trigger('onHistoryDecrypted');
             }
         });

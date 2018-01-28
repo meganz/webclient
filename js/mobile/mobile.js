@@ -237,7 +237,9 @@ mega.megadrop = {
     pufs: false,
     isInit: function() { return false; },
     pufProcessDb: function() { return false; },
-    onRename: function() { return false; }
+    onRename: function() { return false; },
+    pupProcessPUP: function() { return false; },
+    pufProcessPUH:  function() { return false; }
 };
 
 var notify = {

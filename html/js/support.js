@@ -116,8 +116,11 @@ var support = (function() {
             window.onsupport = null;
         }
 
+    
+
         resizeHandler();
     };
+
 
     return ns;
 })();

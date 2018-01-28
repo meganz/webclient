@@ -868,8 +868,14 @@ function init_page() {
         init_key();
     }
     else if (page === 'support') {
-        parsepage(pages['support']);
-        support.initUI();
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.support.init();
+        }
+        else {
+            parsepage(pages['support']);
+            support.initUI();
+        }
     }
     else if (page == 'contact') {
         parsepage(pages['contact']);
@@ -904,8 +910,14 @@ function init_page() {
         init_login();
     }
     else if (page == 'backup') {
-        parsepage(pages['backup']);
-        init_backup();
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.backup.init();
+        }
+        else {
+            parsepage(pages['backup']);
+            init_backup();
+        }
     }
     else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
 

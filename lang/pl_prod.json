@@ -1298,6 +1298,7 @@
     "8820": "Podane konto MEGA nie jest w\u0142a\u015bcicielem wskazanego linku.",
     "8833": "Aby zwi\u0119kszy\u0107 ten limit, mo\u017cesz zarejestrowa\u0107 konto. Otrzymasz dodatkowy limit oraz 50 GB bezpiecznej powierzchni na pliki - [B]za darmo[\/B].",
     "8834": "Pobieranie nie mo\u017ce by\u0107 kontynuowane, poniewa\u017c przekroczsz dost\u0119pny limit przypisany do Twojego adresu IP.",
+    "8836": "Klucz zapasowy zosta\u0142\u00a0skopiowany do schowka",
     "8839": "Klucz zapasowy",
     "8840": "MEGAchat zosta\u0142 zaktualizowany  i wymaga ponownego uruchomienia. Czy chcesz uruchomi\u0107 ponownie?",
     "8841": "MEGAchat zosta\u0142 zaktualizowany i od teraz wymaga najnowszej wersji MEGA. Zaktualizuj swoje dodatki w przegl\u0105darce aby u\u017cywa\u0107 MEGAchat.",
@@ -1851,6 +1852,7 @@
     "17154": "Masz zamiar usun\u0105\u0107 wersj\u0119 zapisu 1 pliku. Pami\u0119taj, \u017ce aktualny plik nie zostanie usuni\u0119ty. Czy chcesz kontynuowa\u0107?",
     "17155": "Ca\u0142kowita powierzchnia zaj\u0119ta przez pliki:",
     "17156": "Zmienione z %1",
+    "17386": "Skopiuj klucz",
     "17398": "Etykieta",
     "17399": "Zarz\u0105dzaj katalogiem MEGAdrop",
     "17400": "Anuluj katalog MEGAdrop",
@@ -1919,5 +1921,9 @@
     "17620": "Zawarto\u015b\u0107 MEGAdrop zosta\u0142 skopiowana do schowka.",
     "17626": "Je\u017celi chcesz kontynuowa\u0107, Twoje ustawienia dla MEGAdrop zostan\u0105 anulowane.",
     "17686": "Obecnie nie wspieramy link\u00f3w MEGAdrop w przegl\u0105darkach na urz\u0105dzeniach mobilnych, prosimy u\u017cywa\u0107 tylko wspierane przegl\u0105darki.",
-    "17687": "Nie jest wspierane"
+    "17687": "Nie jest wspierane",
+    "17688": "Czy mo\u017cesz zapami\u0119ta\u0107 swoje has\u0142o?",
+    "17689": "Kliknij i przytrzymaj aby skopiowa\u0107 klucz do schowka.",
+    "17690": "Aby odzyska\u0107 dost\u0119p do konta u\u017cywaj\u0105c klucza, przejd\u017a na stron\u0119 [A]https:\/\/mega.nz\/recovery[\/A] na komputerze i post\u0119puj zgodnie z instrukcj\u0105.",
+    "17694": "Download key"
 }

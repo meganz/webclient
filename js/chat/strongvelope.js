@@ -440,6 +440,7 @@ var strongvelope = {};
                 part = (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) ?
                     tlvstore.splitSingleTlvElement(rest) : tlvstore.splitSingleTlvRecord(rest);
                 if (part === false) {
+                    logger.info(Chatd.dumpToHex(binaryMessage));
                     logger.critical('Could not parse the content, probably a broken binary.');
                     return false;
                 }
@@ -504,6 +505,7 @@ var strongvelope = {};
                 rest = part.rest;
             }
         } catch (e) {
+            logger.info(Chatd.dumpToHex(binaryMessage));
             logger.critical('Could not parse the content, probably a broken binary.');
             return false;
         }

@@ -1298,6 +1298,7 @@
     "8820": "Der angegebene MEGA-Account ist nicht der Eigent\u00fcmer des Links.",
     "8833": "Erh\u00f6hen Sie Ihr Freivolumen durch Erstellung eines [B]kostenlosen Accounts[\/B]! Sie erhalten durch Ihre Registrierung auch 50 GB sicheren Online-Speicher.",
     "8834": "Ihr Transfer kann nicht fortgesetzt werden, da er das derzeitige kostenlose Transfervolumen Ihrer IP-Adresse sprengen w\u00fcrde.",
+    "8836": "Rettungsschl\u00fcssel in die Zwischenablage kopiert",
     "8839": "Rettungsschl\u00fcssel",
     "8840": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
     "8841": "MEGAchat has been upgraded and it will now only be supported in our newly released version of MEGA. Please update your extension to continue using MEGAchat.",
@@ -1456,7 +1457,7 @@
     "12484": "Laufende Datentransfers anhalten",
     "12485": "Auch f\u00fcr [A1]Mac[\/A1] und [A2]Linux[\/A2] verf\u00fcgbar.",
     "12486": "Auch f\u00fcr [A1]Windows[\/A1] und [A2]Mac[\/A2] verf\u00fcgbar.",
-    "12487": "Auch f\u00fcr [A1]Windows[\/A1] und [A2]Mac[\/A2] verf\u00fcgbar.",
+    "12487": "Auch f\u00fcr [A1]Windows[\/A1] und [A2]Linux[\/A2] verf\u00fcgbar.",
     "12488": "Wir empfehlen die Nutzung unserer Sync-Software f\u00fcr erheblich verbesserten Durchsatz[BR] beim Upload gro\u00dfer Dateimengen. [A]MEGAsync jetzt herunterladen.[\/A]",
     "12489": "Als MEGA im Januar 2013 ans Netz ging, wurde das Konzept der Massen\u00fcberwachung durch b\u00f6swillige Regierungen unter dem Vorwand des Kampfes gegen den Terror vielfach als Hirngespinst einiger Verschw\u00f6rungstheoretiker abgetan. Doch die Snowden-Enth\u00fcllungen, die exakt 137 Tage nach der Inbetriebnahme von MEGA begannen, haben die \u00f6ffentliche Wahrnehmung nachhaltig korrigiert: Es wurde \u00fcberdeutlich, dass [I]versprochene Sicherheit[\/I] (\"wir k\u00f6nnen Ihre Daten lesen, aber wir garantieren Ihnen, dass wir nichts b\u00f6ses mit ihnen anstellen\") nie gut genug war. Nur [I]inh\u00e4rente Sicherheit[\/I] (\"wir k\u00f6nnen Ihre Daten nicht lesen, ohne dass Sie es herausfinden k\u00f6nnen\"), f\u00fcr die durchgehende Verschl\u00fcsselung zwingende Voraussetzung ist, hat das Potential, die Anforderungen der Welt nach Snowden zu erf\u00fcllen.",
     "12689": "Achtung: Benutzer mit Zugang zu Ihren Datei- und Ordnerlinks k\u00f6nnen Ihr gesamtes Kontingent aufbrauchen, wenn Sie die Begrenzung auf 100% setzen.",
@@ -1851,6 +1852,7 @@
     "17154": "Die Versionshistorie dieser Datei wird gel\u00f6scht. Die aktuelle Version bleibt erhalten. Fortfahren?",
     "17155": "Platzverbrauch \u00e4lterer Dateiversionen:",
     "17156": "Von %1 umbenannt",
+    "17386": "Copy key",
     "17398": "Label",
     "17399": "MEGAdrop-Ordner verwalten",
     "17400": "MEGAdrop-Ordner stornieren",
@@ -1919,5 +1921,9 @@
     "17620": "Der MEGAdrop-Code wurde in die Zwischenablage kopiert.",
     "17626": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
     "17686": "Mobilbrowserunterst\u00fctzung f\u00fcr MEGAdrop ist noch in Arbeit. Bitte verwenden Sie vor\u00fcbergehend einen Desktop-Browser.",
-    "17687": "Noch nicht verf\u00fcgbar"
+    "17687": "Noch nicht verf\u00fcgbar",
+    "17688": "Can you remember your password?",
+    "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
+    "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
+    "17694": "Download key"
 }

@@ -7,8 +7,9 @@ mobile.messageOverlay = {
      * Shows the error overlay
      * @param {String} firstMessage The main message to be displayed
      * @param {String} optionalSecondMessage An optional second message to be displayed after the first
+     * @param {Function} optionalSuccessCallback An optional success callback to be run after they confirm OK
      */
-    show: function(firstMessage, optionalSecondMessage) {
+    show: function(firstMessage, optionalSecondMessage, optionalSuccessCallback) {
 
         'use strict';
 
@@ -26,7 +27,7 @@ mobile.messageOverlay = {
         }
 
         // Initialise the OK/close button
-        this.initConfirmOkButton($overlay);
+        this.initConfirmOkButton($overlay, optionalSuccessCallback);
 
         // Show the error overlay
         $overlay.removeClass('hidden');
@@ -35,8 +36,9 @@ mobile.messageOverlay = {
     /**
      * Initialise the OK button to close the error overlay
      * @param {Object} $overlay A cached selector for the error overlay
+     * @param {Function} optionalSuccessCallback An optional success callback to be run after they confirm OK
      */
-    initConfirmOkButton: function($overlay) {
+    initConfirmOkButton: function($overlay, optionalSuccessCallback) {
 
         'use strict';
 
@@ -51,6 +53,11 @@ mobile.messageOverlay = {
             // Remove the loading spinner if on the Login page and came back from an error
             if (page === 'login') {
                 $('.mobile.signin-button').removeClass('loading');
+            }
+
+            // Run the success callback if requested
+            if (typeof optionalSuccessCallback === 'function') {
+                optionalSuccessCallback();
             }
 
             // Prevent clicking behind

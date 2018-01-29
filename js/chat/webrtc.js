@@ -238,7 +238,8 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
         return call;
     }
     function sendBusy() {
-        self.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, chatid, parsedCallData.callid + String.fromCharCode(Term.kBusy));
+        // Broadcast instead of send only to requestor, so that all other our clients know we rejected the call
+        self.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, parsedCallData.chatid, parsedCallData.callid + String.fromCharCode(Term.kBusy));
     }
     var keys = Object.keys(self.calls);
     if (keys.length) {
@@ -262,7 +263,7 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
             // survives, and their call request is declined. Otherwise, our existing outgoing
             // call is hung up, and theirs is answered
             if (base64urldecode(self.chatd.userId) < ci.fromUser) {
-                self.logger.warn("Another call: we don't have priority - hangup our outgoing call and answer the incoming");
+                self.logger.warn("Call received while sending outgoing call req: we don't have priority - hangup our outgoing call and answer the incoming");
                 var av = existingOutCall._callInitiateAvFlags;
                 existingOutCall.hangup()
                 .then(function() {
@@ -278,8 +279,13 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
                     }, 0);
                 });
             }  else {
-                self.logger.warn("Another call: we have a priority - decline the incoming call", base64urlencode(packet.callid));
+                self.logger.warn("Received call request during outgoing call request: outgoing has priority - ignoring the incoming call", base64urlencode(packet.callid));
             }
+            return;
+        } else {
+// Call state is either kInProgress or kTerminating
+            self.logger.log("Received call request while another call is in progress or terminating, sending busy");
+            sendBusy();
             return;
         }
     }
@@ -316,7 +322,12 @@ RtcModule.prototype.cmdBroadcast = function(op, chatid, payload) {
     if (payload) {
         data += payload;
     }
-    if (!info.shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
+    var shard = this.chatd.chatIdShard[chatid];
+    if (!shard) {
+        self.logger.error("cmdBroadcast: No shard for chatid", base64urlencode(chatid));
+        return;
+    }
+    if (!shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
         throw new Error("cmdEndpoint: Send error trying to send command " + constStateToText(RTCMD, op));
         return false;
     } else {
@@ -671,7 +682,7 @@ Call.prototype.msgCallReqDecline = function(packet) {
     if (packet.fromUser === self.manager.chatd.userId) {
         // Some other client of our user declined the call
         if (self.state !== CallState.kRingIn) {
-            self.log.warn("Ignoring CALL_REQ_DECLINE from another client of our user - the call is not in kRingIn state, but in ", constStateToText(CallState, self.state));
+            self.logger.warn("Ignoring CALL_REQ_DECLINE from another client of our user - the call is not in kRingIn state, but in ", constStateToText(CallState, self.state));
             return;
         }
         // TODO: Maybe verify the reason is not other than kCallRejected or kBusy
@@ -683,7 +694,7 @@ Call.prototype.msgCallReqDecline = function(packet) {
     }
 
     if (self.state !== CallState.kReqSent) {
-        this.log.warn("Ignoring unexpected CALL_REQ_DECLINE while in state", constStateToText(this.state));
+        this.logger.warn("Ignoring unexpected CALL_REQ_DECLINE while in state", constStateToText(this.state));
         return;
     }
     this._destroy(code | Term.kPeer, false);
@@ -882,7 +893,7 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
     if (msg) {
         self.logger.log("Destroying call due to:", msg);
     }
-
+    self.predestroyState = self.state;
     self._setState(CallState.kTerminating);
     self._clearCallOutTimer();
 
@@ -1462,7 +1473,8 @@ Session.prototype._createRtcConn = function() {
         } else if (state === 'connected') {
             self._tsIceConn = Date.now();
             self.call._notifySessionConnected(self);
-/* DEBUG: Enable this to simulate session ICE disconnect
+/*
+// DEBUG: Enable this to simulate session ICE disconnect
             if (self.isJoiner)
             {
                 setTimeout(() => {
@@ -2104,6 +2116,7 @@ var UICallTerm = Object.freeze({
     'ENDED': 40,
     'HANDLED_ELSEWHERE': 45,
     'REJECTED': 50,
+    'ABORTED': 55,
     'FAILED': 60,
     'MISSED': 70,
     'TIMEOUT': 80
@@ -2115,10 +2128,10 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
     var isIncoming = self.isJoiner;
     switch(terminationCode) {
         case Term.kUserHangup:
-            if (self.state === CallState.kRingIn) {
+            if (self.predestroyState === CallState.kRingIn) {
                 return UICallTerm.MISSED;
-            } else if (self.state === CallState.kReqSent) {
-                return UICallTerm.REJECTED; //TODO: Maybe ABORTED?
+            } else if (self.predestroyState === CallState.kReqSent) {
+                return UICallTerm.ABORTED;
             } else {
                 return UICallTerm.ENDED;
             }
@@ -2132,6 +2145,9 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             return isIncoming
                 ? UICallTerm.MISSED
                 : UICallTerm.TIMEOUT;
+        case Term.kBusy:
+            assert(!isIncoming);
+            return UICallTerm.REJECTED;
         default:
             var name = constStateToText(Term, terminationCode);
             if (name.match(/k[^\s]+Timeout/i)) {
@@ -2139,7 +2155,7 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             } else if (name.match(/kErr[\s]+/)) {
                 return UICallTerm.FAILED;
             } else {
-                self.log.warn("termCodeToUIState: Don't know how to translate term code", name, "returning FAIL");
+                self.logger.warn("termCodeToUIState: Don't know how to translate term code", name, "returning FAIL");
                 return UICallTerm.FAILED;
             }
     }

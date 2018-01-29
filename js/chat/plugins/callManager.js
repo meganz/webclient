@@ -393,7 +393,8 @@ CallManagerCall.ALLOWED_STATE_TRANSITIONS[CallManagerCall.STATE.WAITING_RESPONSE
         CallManagerCall.STATE.STARTING,
         CallManagerCall.STATE.REJECTED,
         CallManagerCall.STATE.FAILED,
-        CallManagerCall.STATE.TIMEOUT
+        CallManagerCall.STATE.TIMEOUT,
+        CallManagerCall.STATE.ABORTED
     ];
 
 CallManagerCall.ALLOWED_STATE_TRANSITIONS[CallManagerCall.STATE.WAITING_RESPONSE_INCOMING] = // ->
@@ -419,6 +420,11 @@ CallManagerCall.ALLOWED_STATE_TRANSITIONS[CallManagerCall.STATE.STARTED] = // ->
     ];
 
 CallManagerCall.ALLOWED_STATE_TRANSITIONS[CallManagerCall.STATE.REJECTED] = // ->
+    [
+        CallManagerCall.STATE.ENDED
+    ];
+
+CallManagerCall.ALLOWED_STATE_TRANSITIONS[CallManagerCall.STATE.ABORTED] = // ->
     [
         CallManagerCall.STATE.ENDED
     ];
@@ -714,29 +720,29 @@ CallManagerCall.prototype.onCallEnded = function (e, reason) {
 
 CallManagerCall.prototype.onCallRejected = function (e, reason) {
     var self = this;
-
-    if (reason === "caller") {
-        self.room.appendMessage(
-            new ChatDialogMessage({
-                messageId: 'call-ended-' + self.id,
-                type: 'call-canceled',
-                authorContact: self.getPeer(),
-                delay: unixtime(),
-            })
-        );
-    } else {
-        self.room.appendMessage(
-            new ChatDialogMessage({
-                messageId: 'call-rejected-' + self.id,
-                type: 'call-rejected',
-                authorContact: self.getPeer(),
-                delay: unixtime()
-            })
-        );
-    }
-
+    self.room.appendMessage(
+        new ChatDialogMessage({
+            messageId: 'call-rejected-' + self.id,
+            type: 'call-rejected',
+            authorContact: self.getPeer(),
+            delay: unixtime()
+        })
+    );
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
+CallManagerCall.prototype.onCallAborted = function (e, reason) {
+    var self = this;
+    self.room.appendMessage(
+        new ChatDialogMessage({
+            messageId: 'call-ended-' + self.id,
+            type: 'call-canceled',
+            authorContact: self.getPeer(),
+            delay: unixtime(),
+        })
+    );
+    self.getCallManager().trigger('CallTerminated', [self, e]);
+};
+
 CallManagerCall.prototype.onCallHandledElsewhere = function (e) {
     var self = this;
 
@@ -844,10 +850,16 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
     var callMgr = self.getCallManager();
     switch(state) {
         case CallManagerCall.STATE.REJECTED:
-            callMgr.trigger('CallRejected', [self, isIncoming ? terminationCode : "caller"]);
+            callMgr.trigger('CallRejected', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.ABORTED:
+            callMgr.trigger('CallAborted', [self, terminationCode]);
             break;
         case CallManagerCall.STATE.MISSED:
             callMgr.trigger('CallMissed', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.STARTED:
+        callMgr.trigger('CallStarted', [self, terminationCode]);
             break;
         case CallManagerCall.STATE.ENDED:
             callMgr.trigger('CallEnded', [self, terminationCode]);
@@ -881,7 +893,7 @@ CallManagerCall.prototype.onRemoteStreamRemoved = function (rtcSessionEventHandl
     if (this._streams[peerId]) {
         delete this._streams[peerId];
     }
-    this._renderInCallUI();
+    this.room.trackDataChange();
 };
 
 /**

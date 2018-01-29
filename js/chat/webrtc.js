@@ -2091,7 +2091,7 @@ SessStateAllowedStateTransitions[SessState.kTerminating] = [
 ];
 SessStateAllowedStateTransitions[SessState.kDestroyed] = [];
 
-var UICallTerm = {
+var UICallTerm = Object.freeze({
     'INITIALISED': 0,
     'WAITING_RESPONSE_OUTGOING': 10,
     'WAITING_RESPONSE_INCOMING': 20,
@@ -2103,15 +2103,7 @@ var UICallTerm = {
     'FAILED': 60,
     'MISSED': 70,
     'TIMEOUT': 80
-};
-RtcModule.getTermCodeName = function(termCode) {
-    for (var k in Term) {
-        if (termCode === Term[k]) {
-            return k;
-        }
-    }
-    return "<unknown term code>";
-}
+});
 
 Call.prototype.termCodeToUIState = function(terminationCode) {
     var self = this;

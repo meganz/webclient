@@ -165,10 +165,16 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
     }
 
     dlmanager.isMEGAsyncRunning(0x02010100)
-        .done(function(sync) {
+        .done(function (sync) {
+            var dlAuth = M.RootID;
+            if (!folderlink) {
+                var ommitedEsid = base64urldecode(u_sid);
+                ommitedEsid = ommitedEsid.substr(0, ommitedEsid.length - 6);
+                dlAuth = base64urlencode(ommitedEsid);
+            }
             var cmd = {
                 a: 'd',
-                auth: folderlink ? M.RootID : u_sid
+                auth: dlAuth
             };
             var files = [];
 

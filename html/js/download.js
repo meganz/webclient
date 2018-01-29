@@ -135,6 +135,7 @@ function dl_g(res) {
             var fileExt = filename.substring(fileExtPos);
             var isVideo = is_video(filename);
             var prevBut = isVideo;
+
             dl_node = new MegaNode({
                 k: key,
                 fa: res.fa,
@@ -456,7 +457,13 @@ function dl_g(res) {
                 }
 
                 promise.then(function(ok) {
+                    var c = MediaAttribute.getCodecStrings(dl_node);
+                    if (c) {
+                        $fileinfoBlock.find('.big-txt').attr('title', filename + ' (' + c.join("/") + ')');
+                    }
+
                     if (!ok) {
+                        // not streamable
                         return false;
                     }
 
@@ -479,11 +486,6 @@ function dl_g(res) {
                             }
                         }
                     });
-
-                    var c = MediaAttribute.getCodecStrings(dl_node);
-                    if (c) {
-                        $fileinfoBlock.find('.big-txt').attr('title', filename + ' (' + c.join("/") + ')');
-                    }
 
                     var vsp = initVideoStream(dl_node, $pageScrollBlock, {autoplay: false});
 

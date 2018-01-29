@@ -162,6 +162,19 @@ mobile.signin = {
                         // Continue to the Pro payment page
                         loadSubPage('propay_' + planNum);
                     }
+
+                    // If they were on a page and asked to login before accessing
+                    else if (login_next) {
+
+                        // Store the page temporarily
+                        var nextPageAfterLogin = login_next;
+
+                        // Clear the variable so subsequent logins work fine
+                        login_next = false;
+
+                        // Redirect back to the page
+                        loadSubPage(nextPageAfterLogin);
+                    }
                     else {
                         // Load the file manager
                         loadSubPage('fm');

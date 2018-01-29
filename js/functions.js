@@ -564,7 +564,7 @@ function createTimeoutPromise(validateFunction, tick, timeout,
     var $promise = new MegaPromise();
     resolveRejectArgs = resolveRejectArgs || [];
     if (!$.isArray(resolveRejectArgs)) {
-        resolveRejectArgs = [resolveRejectArgs]
+        resolveRejectArgs = [resolveRejectArgs];
     }
 
     $promise.verify = function() {
@@ -577,6 +577,16 @@ function createTimeoutPromise(validateFunction, tick, timeout,
             $promise.resolve.apply($promise, resolveRejectArgs);
         }
     };
+    $promise.stopTimers = function() {
+        if (tickInterval !== false) {
+            clearInterval(tickInterval);
+        }
+
+        if (timeoutTimer !== false) {
+            clearTimeout(timeoutTimer);
+        }
+    };
+
 
     var startTimerChecks = function() {
         tickInterval = setInterval(function() {
@@ -605,13 +615,7 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 
     // stop any running timers and timeouts
     $promise.always(function() {
-        if (tickInterval !== false) {
-            clearInterval(tickInterval);
-        }
-
-        if (timeoutTimer !== false) {
-            clearTimeout(timeoutTimer);
-        }
+        $promise.stopTimers();
     });
 
 

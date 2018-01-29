@@ -377,19 +377,7 @@ var CallManagerCall = function (chatRoom, rtcCall) {
 makeObservable(CallManagerCall);
 
 
-CallManagerCall.STATE = {
-    'INITIALISED': 0,
-    'WAITING_RESPONSE_OUTGOING': 10,
-    'WAITING_RESPONSE_INCOMING': 20,
-    'STARTING': 25,
-    'STARTED': 30,
-    'ENDED': 40,
-    'HANDLED_ELSEWHERE': 45,
-    'REJECTED': 50,
-    'FAILED': 60,
-    'MISSED': 70,
-    'TIMEOUT': 80
-};
+CallManagerCall.STATE = RtcModule.UICallTerm;
 
 // ES5's ugly syntax...in the future we can use ES6 to properly format this code
 CallManagerCall.ALLOWED_STATE_TRANSITIONS = {};
@@ -443,15 +431,6 @@ CallManagerCall.prototype.isActive = function () {
 /**
  * UI -> event mapping stuff
  */
-
-
-CallManagerCall._extractMediaOptionsFromEventData = function (eventData) {
-    var opts = eventData.peerMedia;
-    if (!opts) {
-        opts = eventData.callOptions;
-    }
-    return opts;
-};
 
 CallManagerCall.prototype.onWaitingResponseOutgoing = function () {
     // Unused
@@ -858,74 +837,37 @@ CallManagerCall.prototype.onCallTerminated = function () {
 
 CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates) {
     var self = this;
+    //TODO: @lp: Execute onRemoteStreamRemoved() just in case it wasn't called by the rtcModule before session destroy
     var isIncoming = self.rtcCall.isJoiner;
-    //TODO: execute onRemoteStreamRemoved() just in case it wasn't called by the rtcModule before session destroy
-    if (terminationCode === Term.kCallReqCancel) {
-        if (!isIncoming) {
-            self.setState(CallManagerCall.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self, "caller"]);
-        }
-        else {
-            self.setState(CallManagerCall.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self, terminationCode]);
-        }
+    var state = self.rtcCall.termCodeToUIState(terminationCode);
+    self.setState(state);
+    var callMgr = self.getCallManager();
+    switch(state) {
+        case CallManagerCall.STATE.REJECTED:
+            callMgr.trigger('CallRejected', [self, isIncoming ? terminationCode : "caller"]);
+            break;
+        case CallManagerCall.STATE.MISSED:
+            callMgr.trigger('CallMissed', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.ENDED:
+            callMgr.trigger('CallEnded', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.FAILED:
+            callMgr.trigger('CallFailed', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.HANDLED_ELSEWHERE:
+            callMgr.trigger('CallHandledElsewhere', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.MISSED:
+            callMgr.trigger('CallMissed', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.TIMEOUT:
+            callMgr.trigger('CallTimeout', [self, terminationCode]);
+            break;
+        default:
+            self.logger.warn("onDestroy: Unknown UI call termination state", constStateToText(CallManagerCall.STATE, state), " for termcode ", RtcModule.getTermCodeName(terminationCode));
+            break;
     }
-    else if (terminationCode === Term.kUserHangup) {
-        if (self.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING) {
-            self.setState(CallManagerCall.STATE.MISSED);
-            self.getCallManager().trigger('CallMissed', [self, terminationCode]);
-        }
-        else if (self.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) {
-            self.setState(CallManagerCall.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self, "caller"]);
-        }
-        else if (self.state === CallManagerCall.STATE.STARTED) {
-            self.setState(CallManagerCall.STATE.ENDED);
-            self.getCallManager().trigger('CallEnded', [self, terminationCode]);
-        }
-        else {
-            self.logger.warn('call failed?: ', terminationCode, "state:", self.getStateAsText());
-            self.setState(CallManagerCall.STATE.FAILED);
-            self.getCallManager().trigger('CallFailed', [self, terminationCode]);
-        }
-    }
-    else if (terminationCode === Term.kCallRejected) {
-        self.setState(CallManagerCall.STATE.REJECTED);
-        self.getCallManager().trigger('CallRejected', [self, terminationCode]);
-    }
-    else if (terminationCode === Term.kAnsElsewhere) {
-        self.setState(CallManagerCall.STATE.HANDLED_ELSEWHERE);
-        self.getCallManager().trigger('CallHandledElsewhere', [self, terminationCode]);
-    }
-    else if (terminationCode === Term.kCallReqCancel) {
-        if (self.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) {
-            self.setState(CallManagerCall.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self, 'caller']);
-        }
-        else {
-            self.setState(CallManagerCall.STATE.MISSED);
-            self.getCallManager().trigger('CallMissed', [self, terminationCode]);
-        }
-    }
-    else if (
-        terminationCode === Term.kRingOutTimeout ||
-        terminationCode === Term.kAnswerTimeout
-    ) {
-        if (isIncoming) {
-            self.setState(CallManagerCall.STATE.MISSED);
-            self.getCallManager().trigger('CallMissed', [self, terminationCode]);
-        }
-        else {
-            self.setState(CallManagerCall.STATE.TIMEOUT);
-            self.getCallManager().trigger('CallTimeout', [self, terminationCode]);
-        }
-    }
-    else {
-        self.logger.debug("onDestroy, todo: parse", terminationCode, " and add UI for the state.");
-        self.setState(CallManagerCall.STATE.FAILED);
-        self.getCallManager().trigger('CallFailed', [self, terminationCode]);
-    }
-
     this.onCallTerminated();
 };
 

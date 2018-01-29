@@ -2359,7 +2359,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     });
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling' +
-        ',.fm-empty-cloud,.fm-empty-folder').rebind('contextmenu.fm', function(e) {
+        ',.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content').rebind('contextmenu.fm', function(e) {
         $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         if (selectionManager) {
             selectionManager.clear_selection();

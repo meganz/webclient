@@ -29,6 +29,22 @@ mobile.cloud.actionBar = {
         var $scrollToTopIcon = $fileManager.find('.fm-icon.scroll-to-top');
         var $filesFoldersText = $fileManager.find('.folders-files-text');
 
+        // Hide the scroll-to-top icon by default (i.e. if opening a new folder and there's not many files)
+        $scrollToTopIcon.addClass('hidden');
+
+        // On scrolling the files/folders in the cloud drive
+        $fileManagerScrollingBlock.off('scroll').on('scroll', function() {
+
+            // Only enable the scroll-to-top icon if they have scrolled (its not useful if only a couple of files)
+            if ($fileManagerScrollingBlock.prop('scrollTop') > 0) {
+                $scrollToTopIcon.removeClass('hidden');
+            }
+            else {
+                // Hide the scroll-to-top icon if they are at the top of the cloud drive
+                $scrollToTopIcon.addClass('hidden');
+            }
+        });
+
         // On clicking the Scroll to Top button
         $scrollToTopIcon.off('tap').on('tap', function() {
 

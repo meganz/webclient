@@ -801,13 +801,9 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                     location.reload();
                 }
                 else {
-                    if (location.href.includes('search')) {
-                        if (localStorage.d === '1' && localStorage.jj === '1') {
-                            location.replace('http://' + location.host); // dev mode, http will be redirected to https @server
-                        }
-                        else {
-                            location.replace('https://' + location.host);
-                        }
+                    if (location.href.indexOf('search') > -1) {
+                        var myHost = location.href.substr(0, location.href.lastIndexOf('search') - 1);
+                        location.replace(myHost);
                     }
                     else {
                         location.reload();

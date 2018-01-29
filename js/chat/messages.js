@@ -1470,13 +1470,15 @@ MessagesBuff.prototype.detachMessages = function() {
  */
 MessagesBuff.prototype._removeMessagesBefore = function(messageId) {
     var self = this;
-    var found = false;
+    var found = self.getMessageById(messageId);
+    if (!found) {
+        return;
+    }
+    var ts = found.delay + (found.updated ? found.updated : 0);
+
     for (var i = self.messages.length - 1; i >= 0; i--) {
         var currentMessage = self.messages.getItem(i);
-        if (!found && currentMessage.messageId === messageId) {
-            found = true;
-        }
-        else if (found) {
+        if (currentMessage.delay < ts && currentMessage.dialogType !== "truncated") {
             self.messages.removeByKey(currentMessage.messageId);
         }
     }

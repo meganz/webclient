@@ -1225,5 +1225,41 @@ ChatRoom.prototype.retrieveAllHistory = function() {
     });
 };
 
+
+ChatRoom.prototype.truncate = function() {
+    var self = this;
+    var chatMessages = self.messagesBuff.messages;
+    if (chatMessages.length > 0) {
+        var lastChatMessageId = null;
+        var i = chatMessages.length - 1;
+        while (lastChatMessageId == null && i >= 0) {
+            var message = chatMessages.getItem(i);
+            if (message instanceof Message && message.dialogType !== "truncated") {
+                lastChatMessageId = message.messageId;
+            }
+            i--;
+        }
+
+        if (lastChatMessageId) {
+            asyncApiReq({
+                a: 'mct',
+                id: self.chatId,
+                m: lastChatMessageId,
+                v: Chatd.VERSION
+            })
+                .fail(function(r) {
+                    if (r === -2) {
+                        msgDialog(
+                            'warninga',
+                            l[135],
+                            __(l[8880])
+                        );
+                    }
+                });
+        }
+    }
+};
+
+
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

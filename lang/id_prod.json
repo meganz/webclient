@@ -1298,6 +1298,7 @@
     "8820": "Akun MEGA yang anda masukkan tidak sama dengan pemilik link.",
     "8833": "To enhance this limit, you can register an account. This will not only give you ample extra transfer quota but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
     "8834": "Download anda tidak dapat dilanjutkan karena itu akan melebihi alokasi transfer gratis untuk IP anda.",
+    "8836": "Recovery Key terkopi ke clipboard",
     "8839": "Recovery Key",
     "8840": "MEGAchat telah di-upgrade dan butuh reload. Apakah anda ingin me-reload halaman sekarang untuk update ke versi terakhir?",
     "8841": "MEGAchat telah di-upgrade dan itu akan hanya didukung pada versi MEGA terbaru. Harap update extensi anda untuk lanjut menggunakan MEGAchat.",
@@ -1851,6 +1852,7 @@
     "17154": "Anda akan menghapus riwayat versi 1 file. Harap dicatat bahwa file saat ini tidak akan dihapus. Apakah Anda ingin melanjutkan?",
     "17155": "Ukuran total diambil oleh versi file:",
     "17156": "Berganti nama dari %1",
+    "17386": "Copy kunci",
     "17398": "Label",
     "17399": "Manage MEGAdrop Folder",
     "17400": "Cancel MEGAdrop Folder",
@@ -1919,5 +1921,9 @@
     "17620": "MEGAdrop source code was successfully copied to clipboard.",
     "17626": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
     "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
-    "17687": "Not supported"
+    "17687": "Not supported",
+    "17688": "Can you remember your password?",
+    "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
+    "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
+    "17694": "Download key"
 }

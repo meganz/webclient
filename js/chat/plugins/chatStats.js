@@ -188,9 +188,6 @@
 
                     var result = self.aggregateAndLog();
 
-                    if (d) {
-                        console.error(JSON.stringify(result, null, 4, '\t'));
-                    }
                     api_req({a: 'log', e: 99670, m: JSON.stringify(result)});
 
                     self.cleanup();

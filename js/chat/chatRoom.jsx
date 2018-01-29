@@ -678,9 +678,10 @@ ChatRoom.prototype.appendMessage = function(message) {
         return false;
     }
     if (!message.orderValue) {
+        var mb = self.messagesBuff;
         // append at the bottom
-        if (self.messages.length > 0) {
-            var prevMsg = self.messagesBuff.messages.getItem(self.messages.length - 1);
+        if (mb.messages.length > 0) {
+            var prevMsg = mb.messages.getItem(mb.messages.length - 1);
             if (!prevMsg) {
                 self.logger.error(
                     'self.messages got out of sync...maybe there are some previous JS exceptions that caused that? ' +

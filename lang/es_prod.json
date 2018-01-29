@@ -919,8 +919,8 @@
     "6992": "Limpiar transferencias completadas",
     "6993": "Pausar todas las transferencias",
     "6994": "\u00bfSeguro que quieres continuar?",
-    "6996": "Antes de continuar y cancelar tu subscripci\u00f3n, nos gustar\u00eda saber el motivo por el que quieres cancelar tu plan.",
-    "6998": "Pulsa continuar para cancelar tu subscripci\u00f3n.",
+    "6996": "Antes de continuar y cancelar tu suscripci\u00f3n, nos gustar\u00eda saber el motivo por el que quieres cancelar tu plan.",
+    "6998": "Pulsa continuar para cancelar tu suscripci\u00f3n.",
     "6999": "Suscripci\u00f3n cancelada con \u00e9xito",
     "7001": "Solicitar un plan",
     "7002": "No hay planes adecuados para tu uso actual. Por favor, [A]contacta con soporte[\/A] para un plan a medida.",
@@ -1298,6 +1298,7 @@
     "8820": "La cuenta MEGA indicada no coincide con la del due\u00f1o del enlace.",
     "8833": "Para aumentar este l\u00edmite, puedes registrar una cuenta. Esto no s\u00f3lo te dar\u00e1 una mayor cuota de transferencia extra, sino tambi\u00e9n 50 GB de espacio de almacenamiento seguro en la nube - [B]totalmente gratis[\/B].",
     "8834": "Tu descarga no ha podido empezar porque te llevar\u00eda por encima de la cuota de transferencia gratuita permitida con tu IP.",
+    "8836": "Clave de recuperaci\u00f3n copiada al portapapeles",
     "8839": "Clave de recuperaci\u00f3n",
     "8840": "MEGAchat ha sido actualizado y necesita que se recargue la p\u00e1gina. \u00bfQuieres recargar la p\u00e1gina ahora para actualizar a la \u00faltima versi\u00f3n?",
     "8841": "MEGAchat ha sido actualizado y ahora solo es compatible con la \u00faltima versi\u00f3n de MEGA. Por favor, actualiza tu extensi\u00f3n para seguir usando MEGAchat. ",
@@ -1851,6 +1852,7 @@
     "17154": "Est\u00e1s a punto de eliminar el historial de versiones de 1 archivo. Ten en cuenta que no se eliminar\u00e1 la versi\u00f3n actual del archivo.\u00bfQuieres continuar?",
     "17155": "Espacio ocupado por las versiones de los archivos:",
     "17156": "Renombrado desde %1",
+    "17386": "Copiar clave",
     "17398": "Etiqueta",
     "17399": "Gestionar Carpeta MEGAdrop ",
     "17400": "Eliminar Carpeta MEGAdrop ",
@@ -1919,5 +1921,9 @@
     "17620": "El c\u00f3digo fuente de MEGAdrop se ha copiado con \u00e9xito al portapapeles.",
     "17626": "Al hacer esto, se cancelar\u00e1 la configuraci\u00f3n de MEGAdrop en varias carpetas.",
     "17686": "Actualmente no admitimos enlaces MEGAdrop en navegadores m\u00f3viles, utiliza cualquiera de los navegadores web compatibles.",
-    "17687": "No compatible"
+    "17687": "No compatible",
+    "17688": "\u00bfRecuerdas tu contrase\u00f1a?",
+    "17689": "Mant\u00e9n pulsado para copiar la Clave de recuperaci\u00f3n al portapapeles.",
+    "17690": "Para restaurar tu cuenta con la Clave de recuperaci\u00f3n, visita [A]https:\/\/mega.nz\/recovery[\/A] en to ordenador y sigue las instrucciones.",
+    "17694": "Descargar clave"
 }

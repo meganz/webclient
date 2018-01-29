@@ -955,7 +955,7 @@
         var orderValue = msgObject.orderValue;
         var keyId = msgObject.keyid;
 
-        if (((keyId & 0xffff0000) >>> 0) === (0xffff0000 >>> 0)) {
+        if (keyId === true || ((keyId & 0xffff0000) >>> 0) === (0xffff0000 >>> 0)) {
             self.logger.critical(".persistMessage, received a temp keyId");
             return;
         }
@@ -1068,7 +1068,7 @@
             return;
         }
 
-        var msgObject = args[0];
+        var msgObject = action === "replace" ? args[1] : args[0];
         var isEdit = args[1];
 
         if (

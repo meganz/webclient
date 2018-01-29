@@ -292,11 +292,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     var origPush = self.messages.push;
     self.messages.push = function(msg) {
-        if (msg.addChangeListener) {
-            msg.addChangeListener(function() {
-                self.messages.reorder();
-            });
-        }
         var res = origPush.apply(this, arguments);
         if (
             !(
@@ -355,8 +350,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (
             self.haveMoreHistory() &&
             (
-                self.messages.length === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL ||
-                self.messagesBatchFromHistory.length === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL
+                self.messages.length < Chatd.MESSAGE_HISTORY_LOAD_COUNT &&
+                self.messagesBatchFromHistory.length < Chatd.MESSAGE_HISTORY_LOAD_COUNT
             )
         ) {
             self.retrieveChatHistory(false);
@@ -562,7 +557,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 if (eventData.pendingid) {
                     var foundMessage = self.getByInternalId(eventData.pendingid);
 
-                    if (foundMessage.textContents) {
+                    // its ok if foundMessage is empty, e.g. it can be sent from another client
+                    if (foundMessage && foundMessage.textContents) {
                         msgObject.textContents = foundMessage.textContents;
                     }
 
@@ -1223,7 +1219,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
 
     var timeoutPromise = createTimeoutPromise(function() {
         return self.$msgsHistoryLoading.state() !== 'pending';
-    }, 100, 10000)
+    }, 75, 10000)
         .always(function() {
             self.chatdIsProcessingHistory = false;
         })
@@ -1239,6 +1235,9 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
         if (!isInitialRetrivalCall) {
             self._currentHistoryPointer += len;
         }
+    });
+    self.$msgsHistoryLoading.always(function() {
+        timeoutPromise.verify();
     });
 
 
@@ -1450,11 +1449,13 @@ MessagesBuff.prototype.detachMessages = function() {
     if (!self.chatRoom.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
         return;
     }
+    var removedAnyMessage = false;
     while (msg = self.messages.getItem(self.messages.length - Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2)) {
         self.messages.removeByKey(msg.messageId, true);
+        removedAnyMessage = true;
     }
 
-    if (self.retrievedAllMessages) {
+    if (removedAnyMessage === true && self.retrievedAllMessages) {
         self.retrievedAllMessages = false;
     }
 };

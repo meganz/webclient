@@ -2277,6 +2277,53 @@ MegaData.prototype.disableDescendantFolders = function(id, pref) {
 };
 
 /**
+ * Import welcome pdf into the current account.
+ * @returns {MegaPromise}
+ */
+MegaData.prototype.importWelcomePDF = function() {
+    'use strict';
+    var promise = new MegaPromise();
+
+    M.req('wpdf').done(function(res) {
+        if (typeof res === 'object') {
+            var ph = res.ph;
+            var key = res.k;
+            M.req({a: 'g', p: ph}).done(function(res) {
+                if (typeof res.at === 'string') {
+                    M.onFileManagerReady(function() {
+                        var doit = true;
+                        for (var i = M.v.length; i--;) {
+                            if (fileext(M.v[i].name) === 'pdf') {
+                                doit = false;
+                                break;
+                            }
+                        }
+
+                        if (doit) {
+                            if (d) {
+                                console.log('Importing Welcome PDF (%s)', ph, res.at);
+                            }
+                            promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
+                        }
+                        else {
+                            promise.reject(EEXIST);
+                        }
+                    });
+                }
+                else {
+                    promise.reject(res);
+                }
+            });
+        }
+        else {
+            promise.reject(res);
+        }
+    });
+
+    return promise;
+};
+
+/**
  * Import file link
  * @param {String} ph  Public handle
  * @param {String} key  Node key

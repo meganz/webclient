@@ -1726,35 +1726,7 @@ var ConversationPanel = React.createClass({
                     self.setState({'truncateDialog': false});
                 }}
                 onConfirmClicked={() => {
-                    var chatMessages = room.messagesBuff.messages;
-                    if (chatMessages.length > 0) {
-                        var lastChatMessageId = null;
-                        var i = chatMessages.length - 1;
-                        while(lastChatMessageId == null && i >= 0) {
-                            var message = chatMessages.getItem(i);
-                            if (message instanceof Message) {
-                                lastChatMessageId = message.messageId;
-                            }
-                            i--;
-                        }
-                        if (lastChatMessageId) {
-                            asyncApiReq({
-                                a: 'mct',
-                                id: room.chatId,
-                                m: lastChatMessageId,
-                                v: Chatd.VERSION
-                            })
-                                .fail(function(r) {
-                                    if(r === -2) {
-                                        msgDialog(
-                                            'warninga',
-                                            l[135],
-                                            __(l[8880])
-                                        );
-                                    }
-                                });
-                        }
-                    }
+                    room.truncate();
 
                     self.setState({
                         'truncateDialog': false

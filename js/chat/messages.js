@@ -841,6 +841,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                 self.messages.removeByKey(v.messageId);
                             }
                         }
+
+                        self._removeMessagesBefore(editedMessage.messageId);
                     }
 
 
@@ -1591,5 +1593,29 @@ MessagesBuff.prototype.detachMessages = function() {
 
     if (removedAnyMessage === true && self.retrievedAllMessages) {
         self.retrievedAllMessages = false;
+    }
+};
+
+/**
+ * Used to remove all messages in the sorted messages list before a specific messageId
+ * Note: This is executed after and by the regular truncate procedure which uses chatd's .buf references (which
+ * typically does not include internal/dialog type of messages as call started, etc)
+ *
+ * @param messageId {String}
+ * @private
+ */
+MessagesBuff.prototype._removeMessagesBefore = function(messageId) {
+    var self = this;
+    var found = self.getMessageById(messageId);
+    if (!found) {
+        return;
+    }
+    var ts = found.delay + (found.updated ? found.updated : 0);
+
+    for (var i = self.messages.length - 1; i >= 0; i--) {
+        var currentMessage = self.messages.getItem(i);
+        if (currentMessage.delay < ts && currentMessage.dialogType !== "truncated") {
+            self.messages.removeByKey(currentMessage.messageId);
+        }
     }
 };

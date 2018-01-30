@@ -652,7 +652,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         s.on('error', function(ev, error) {
             // <video>'s element `error` handler
             if (!$.dialog) {
-                var hint = error.name !== 'Error' && error.name || error.message || error;
+                var hint = error.message || error;
                 if (!hint && !window.chrome) {
                     // Suggest Chrome...
                     hint = l[16151] + ' ' + l[242];
@@ -1712,6 +1712,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             case 'iso4':
             case 'iso5':
             case 'M4V ':
+            // case 'dash':
             case 'avc1': // JVT
                 if (videocodec === 'avc1') {
                     var mime = 'video/mp4; codecs="avc1.640029';

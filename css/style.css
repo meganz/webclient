@@ -5893,8 +5893,8 @@ th.grid-first-th {
     width: calc(50% - 56px);
     color: inherit;
 }
-.fm-dialog-body .online .nw-contact-status, .fm-dialog-body .away .nw-contact-status, .fm-dialog-body .offline .nw-contact-status {
-    border:1px solid #fff;
+.fm-dialog-body .online .nw-contact-status, .fm-dialog-body .away .nw-contact-status, .fm-dialog-body .offline .nw-contact-status, .fm-dialog-body .busy .nw-contact-status {
+    border: 1px solid #fff;
     margin: 9px 0 0 14px;
 }
 .fm-dialog-body .nw-contact-status {

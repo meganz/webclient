@@ -828,9 +828,13 @@ ChatdIntegration._ensureNamesAreLoaded = function(users) {
                     })
                 );
                 M.syncUsersFullname(userId);
+                M.syncContactEmail(userId);
             }
             else {
                 M.syncUsersFullname(userId);
+                if (!M.u[userId].m) {
+                    M.syncContactEmail(userId);
+                }
             }
         });
     }

@@ -88,6 +88,9 @@ var ConversationsListItem = React.createClass({
             if (lastMessage.isManagement && lastMessage.isManagement()) {
                 renderableSummary = lastMessage.getManagementMessageSummaryText();
             }
+            else if (!lastMessage.textContents && lastMessage.dialogType) {
+                renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+            }
 
             renderableSummary = htmlentities(renderableSummary);
             renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);

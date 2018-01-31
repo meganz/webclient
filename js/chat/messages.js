@@ -463,7 +463,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.expectedMessagesCount
             ) {
                 self.haveMessages = true;
-                self.retrievedAllMessages = false;
+                // if the expectedMessagesCount is not 0 and < requested, then...chatd/idb returned < then the
+                // requested #, which means, that there is no more history.
+                self.retrievedAllMessages = self.expectedMessagesCount < requestedMessagesCount;
             }
 
 

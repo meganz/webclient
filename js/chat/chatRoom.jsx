@@ -435,14 +435,14 @@ ChatRoom.prototype.getParticipantsExceptMe = function(userHandles) {
  *
  * @returns {string}
  */
-ChatRoom.prototype.getRoomTitle = function() {
+ChatRoom.prototype.getRoomTitle = function(ignoreTopic) {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
         return M.getNameByHandle(participants[0]) || "";
     }
     else {
-        if (self.topic && self.topic.substr) {
+        if (!ignoreTopic && self.topic && self.topic.substr) {
             return self.topic.substr(0, 30);
         }
 

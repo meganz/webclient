@@ -4820,9 +4820,15 @@ React.makeElement = React['createElement'];
 	        var contacts = room.getParticipantsExceptMe();
 	        var contactHandle;
 	        var contact;
-	        if (contacts && contacts.length > 0) {
+	        var avatarMeta;
+	        var contactName = "";
+	        if (contacts && contacts.length === 1) {
 	            contactHandle = contacts[0];
 	            contact = M.u[contactHandle];
+	            avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
+	            contactName = avatarMeta.fullName;
+	        } else if (contacts && contacts.length > 1) {
+	            contactName = room.getRoomTitle(true);
 	        }
 
 	        var conversationPanelClasses = "conversation-panel " + room.type + "-chat";
@@ -4830,9 +4836,6 @@ React.makeElement = React['createElement'];
 	        if (!room.isCurrentlyActive) {
 	            conversationPanelClasses += " hidden";
 	        }
-
-	        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
-	        var contactName = avatarMeta.fullName;
 
 	        var messagesList = [];
 
@@ -11026,13 +11029,13 @@ React.makeElement = React['createElement'];
 	    return handlesWithoutMyself;
 	};
 
-	ChatRoom.prototype.getRoomTitle = function () {
+	ChatRoom.prototype.getRoomTitle = function (ignoreTopic) {
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
 	        return M.getNameByHandle(participants[0]) || "";
 	    } else {
-	        if (self.topic && self.topic.substr) {
+	        if (!ignoreTopic && self.topic && self.topic.substr) {
 	            return self.topic.substr(0, 30);
 	        }
 

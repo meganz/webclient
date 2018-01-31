@@ -2184,7 +2184,7 @@ mega.megadrop = (function() {
         }
         else {
             if (d) {
-                console.warn('widget.onRename, was not able to find puf for given handle: ', handle);
+                console.log('widget.onRename, was not able to find puf for given handle: ', handle);
             }
         }
     };

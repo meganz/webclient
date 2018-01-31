@@ -125,6 +125,11 @@ function blog_load() {
             }
         }
     }
+    if (a === 0) {
+        page = 'blogarticle';
+        loadSubPage('blog');
+        return;
+    }
     blogpostnum = a;
     if (m) {
         $('.privacy-page').safeHTML(blogcontent);
@@ -336,6 +341,10 @@ if (typeof mobileblog !== 'undefined') {
 
         var i = "post_" + blogid;
         var content = '';
+        if (!blogposts[i]) {
+            window.location.replace('https://mega.nz');
+            return;
+        }
         if (blogposts[i].attaches.bimg) {
             content += '<img alt="" data-img="loading_' + escapeHTML(blogposts[i].attaches.bimg)
                 + '" src="https://cms2.mega.nz/unsigned/' + escapeHTML(blogposts[i].attaches.bimg)

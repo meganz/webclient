@@ -797,7 +797,18 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
         var finishLogout = function() {
             if (--step === 0) {
                 u_logout(true);
-                location.reload();
+                if (is_extension) {
+                    location.reload();
+                }
+                else {
+                    if (location.href.indexOf('search') > -1) {
+                        var myHost = location.href.substr(0, location.href.lastIndexOf('search') - 1);
+                        location.replace(myHost);
+                    }
+                    else {
+                        location.reload();
+                    }
+                }
             }
         }, step = 1;
 

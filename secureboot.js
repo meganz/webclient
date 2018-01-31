@@ -488,6 +488,15 @@ var mega = {
                 r.sent = true;
                 clearInterval(r.aliveTimer);
             }
+            else if (r.scSent && now - r.scSent > 6e4 && (scqhead > scqtail * 2)) {
+                api_req({a: 'log', e: 99679}); // sc processing took too long
+
+                msgDialog('warninga:!^' + l[17704] + '!' + l[17705], l[882], l[17706], 0, function(yes) {
+                    if (yes) {
+                        fm_forcerefresh();
+                    }
+                });
+            }
             r.aliveTimeStamp = now;
         }, 2000);
 

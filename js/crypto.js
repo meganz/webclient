@@ -1853,6 +1853,10 @@ function getsc(force) {
         api_cancel(apixs[2]);   // retire existing XHR that may still be completing the request
         api_ready(apixs[2]);
         api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
+
+        if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
+            mega.loadReport.scSent = Date.now();
+        }
     }
 }
 

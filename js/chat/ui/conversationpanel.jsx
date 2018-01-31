@@ -1219,9 +1219,17 @@ var ConversationPanel = React.createClass({
         var contacts = room.getParticipantsExceptMe();
         var contactHandle;
         var contact;
-        if (contacts && contacts.length > 0) {
+        var avatarMeta;
+        var contactName = "";
+        if (contacts && contacts.length === 1) {
             contactHandle = contacts[0];
             contact = M.u[contactHandle];
+            avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
+            contactName = avatarMeta.fullName;
+        }
+        else if (contacts && contacts.length > 1) {
+            contactName = room.getRoomTitle(true);
+
         }
 
         var conversationPanelClasses = "conversation-panel " + room.type + "-chat";
@@ -1231,8 +1239,7 @@ var ConversationPanel = React.createClass({
         }
 
 
-        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
-        var contactName = avatarMeta.fullName;
+
 
 
         var messagesList = [

@@ -467,6 +467,7 @@ function init_page() {
         && (page !== 'privacy')
         && (page !== 'takendown')
         && (page !== 'general')
+        && (page !== 'resellers')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);

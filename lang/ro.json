@@ -4304,6 +4304,7 @@
     "17106": "E\u015fti pe cale de a permite o setare care s\u0103 permit\u0103 interceptarea comunica\u0163iilor tale. Datele tale ar fi \u00een continuare inaccesibile atacatorilor datorit\u0103 cript\u0103rii noastre cap\u0103t-la-cap\u0103t, \u00eens\u0103 ace\u015ftia ar putea s\u0103 mute orbe\u015fte fi\u015fierele \u015fi folderele tale \u00een MEGA, s\u0103 le \u015ftearg\u0103 sau s\u0103 \u00ee\u0163i refuze accesul la contul t\u0103u.",
     "17109": "Nu se poate ob\u0163ine sistemul de fi\u015fiere. Te rug\u0103m s\u0103 \u00eencerci din nou. Dac\u0103 problema persist\u0103 te rug\u0103m s\u0103 contactezi bug@mega.co.nz.",
     "17113": "Linkul nu poate fi generat deoarece fi\u015fierul este \u00eentr-un folder partajat primit sau \u00een co\u015ful de gunoi.",
+    "17117": "The new excluded file names will be taken into account after restarting the application.",
     "17121": "Reporne\u015fte",
     "17126": "Tabloul de bord este doar pentru utilizatorii \u00eenregistra\u0163i.",
     "17142": "cache",
@@ -4619,5 +4620,8 @@
     "17691": "Please give the MEGA app permission to access your microphone in your Settings.",
     "17692": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17693": "Chatting with",
-    "17694": "Download key"
+    "17694": "Download key",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

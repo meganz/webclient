@@ -4304,6 +4304,7 @@
     "17106": "Durch diese Einstellung besteht die Gefahr, dass Dritte sich in Ihre Kommunikation mit unseren Servern einklinken. Ihre Daten w\u00e4ren dann zwar immer noch unlesbar (wegen der Ende-zu-Ende-Verschl\u00fcsselung), aber der Angreifer k\u00f6nnte sie l\u00f6schen, verschieben oder Sie ganz aus Ihrem Account aussperren.",
     "17109": "Das Dateisystem kann nicht gelesen werden. Versuchen Sie es bitte noch einmal. Sollte das Problem fortbestehen, setzen Sie sich mit bug@mega.co.nz in Verbindung.",
     "17113": "Auf eine Datei in einer Ordnerfreigabe oder im Papierkorb kann kein Link exportiert werden.",
+    "17117": "The new excluded file names will be taken into account after restarting the application.",
     "17121": "Neustart",
     "17126": "Die Einstellungen sind nur f\u00fcr registrierte Benutzer zug\u00e4nglich.",
     "17142": "cache",
@@ -4619,5 +4620,8 @@
     "17691": "Bitte gew\u00e4hren Sie MEGA in den Einstellungen Zugriff auf Ihr Mikrofon.",
     "17692": "Sie haben bereits PRO-Status. Bitte stornieren Sie evtl. bestehende Abonnements, um Doppelbelastung zu vermeiden.",
     "17693": "Konversation mit",
-    "17694": "Schl\u00fcssel herunterladen"
+    "17694": "Schl\u00fcssel herunterladen",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

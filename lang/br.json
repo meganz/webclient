@@ -4304,6 +4304,7 @@
     "17106": "Voc\u00ea est\u00e1 prestes a habilitar uma op\u00e7\u00e3o que pode permitir que a sua comunica\u00e7\u00e3o seja interceptada. Os seus dados continuar\u00e3o inacess\u00edveis a hackers como resultado da nossa criptografia de ponta a ponta, mas eles poderiam mover os seus arquivos e pastas no MEGA, delet\u00e1-los ou impedir que voc\u00ea acesse a sua conta.",
     "17109": "N\u00e3o foi poss\u00edvel acessar o sistema de arquivos. Por favor, tente novamente. Se o problema persistir, entre em contato com bug@mega.nz",
     "17113": "O link n\u00e3o pode ser gerado porque o arquivo est\u00e1 em uma pasta compartilhada por outro usu\u00e1rio ou na sua lixeira.",
+    "17117": "Os novos nomes de arquivos exclu\u00eddos ser\u00e3o levados em conta assim que o aplicativo for reiniciado.",
     "17121": "Reiniciar",
     "17126": "O painel de controle somente est\u00e1 dispon\u00edvel para usu\u00e1rios registrados.",
     "17142": "cache",
@@ -4619,5 +4620,8 @@
     "17691": "Acesse as suas Configura\u00e7\u00f5es para permitir ao aplicativo do MEGA o acesso ao seu microfone.",
     "17692": "Voc\u00ea j\u00e1 tem uma conta PRO e, se continuar, estar\u00e1 fazendo uma nova assinatura do MEGA. Se voc\u00ea j\u00e1 possui uma assinatura com renova\u00e7\u00e3o autom\u00e1tica, voc\u00ea deve cancel\u00e1-la, ou ser\u00e1 cobrado por dois planos.",
     "17693": "Chat com",
-    "17694": "Fazer download da chave"
+    "17694": "Fazer download da chave",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

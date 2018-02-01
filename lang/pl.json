@@ -4304,6 +4304,7 @@
     "17106": "Masz zamiar wprowadzi\u0107 zmiany w ustawieniach, kt\u00f3re zwi\u0119ksz\u0105 ryzyko udost\u0119pnienia danych. Twoje dane nadal b\u0119d\u0105 bezpieczne dzi\u0119ki szyfrowaniu, jednak mo\u017cliwe b\u0119dzie ich przeniesienie lub usuni\u0119cie bez Twojej wiedzy. ",
     "17109": "Brak dost\u0119pu do plik\u00f3w. Spr\u00f3buj ponownie. Je\u017celi problem b\u0119dzie si\u0119 powtarza\u0107 skontaktuj si\u0119 z nami bug@mega.co.nz.",
     "17113": "Link nie mo\u017ce zosta\u0107 wygenerowany, poniewa\u017c plik jest umieszczony w udost\u0119pnionych katalogu lub umieszczony zosta\u0142 w koszu.",
+    "17117": "Nowo wybrane pliki zostan\u0105 wzi\u0119te pod uwag\u0119 przy nast\u0119pnych uruchomieniu aplikacji.",
     "17121": "Zrestartuj",
     "17126": "Panel jest dost\u0119pny tylko dla zarejestrowanych u\u017cytkownik\u00f3w.",
     "17142": "pami\u0119\u0107 podr\u0119czna",
@@ -4619,5 +4620,8 @@
     "17691": "Please give the MEGA app permission to access your microphone in your Settings.",
     "17692": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17693": "Chatting with",
-    "17694": "Download key"
+    "17694": "Download key",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

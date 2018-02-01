@@ -4304,6 +4304,7 @@
     "17106": "Est\u00e1s a punto de permitir que tus comunicaciones puedan ser interceptadas. Tus datos ser\u00edan todav\u00eda inaccesibles para posibles atacantes gracias a nuestro cifrado punto a punto, pero podr\u00edan mover tus archivos y carpetas en MEGA a ciegas, borrarlos, o denegarte el acceso a tu cuenta.",
     "17109": "No se ha podido acceder al sistema de archivos. Por favor, int\u00e9ntalo de nuevo. Si el problema persiste contacta con bug@mega.nz",
     "17113": "El enlace no se puede generar porque el archivo se encuentra en una carpeta compartida entrante o en tu papelera de MEGA",
+    "17117": "The new excluded file names will be taken into account after restarting the application.",
     "17121": "Reiniciar",
     "17126": "El panel de control est\u00e1 disponible s\u00f3lo para usuarios registrados.",
     "17142": "cach\u00e9",
@@ -4619,5 +4620,8 @@
     "17691": "Accede a lo Ajustes de tu dispositivo para permitir a la app de MEGA el acceso al micr\u00f3fono.",
     "17692": "Ya tienes una cuenta PRO y vas a comprar una nueva suscripci\u00f3n a MEGA. Si ya tienes una suscripci\u00f3n periodica activa, tendr\u00e1s que cancelarla o se te cobrar\u00e1 por ambos planes.",
     "17693": "Chateando con",
-    "17694": "Descargar clave"
+    "17694": "Descargar clave",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

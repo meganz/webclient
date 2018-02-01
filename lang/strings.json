@@ -17219,6 +17219,10 @@
         "text": "The link cannot be generated because the file is in an incoming shared folder or in your Rubbish Bin.",
         "context": "A notification error message which is shown while generating a public link of a file from an incoming shared folder or from the Rubbish Bin."
     },
+    "17117": {
+        "text": "The new excluded file names will be taken into account after restarting the application.",
+        "context": "The new excluded file names will be taken into account after restarting the application."
+    },
     "17121": {
         "text": "Restart",
         "context": "A label for the Restart button to relaunch MEGAsync."
@@ -18482,5 +18486,17 @@
     "17694": {
         "text": "Download key",
         "context": "A button label on the mobile webclient which allows the user to download the Recovery Key to a text file."
+    },
+    "17704": {
+        "text": "Wait",
+        "context": "text button to be shown in a dialog for the user to choose some operation to wait."
+    },
+    "17705": {
+        "text": "Force Reload",
+        "context": "text button to be shown in some dialog for the user to instruct a cloud's force reload, I.e. menu->reload"
+    },
+    "17706": {
+        "text": "Your login is taking longer than expected. Do you want to wait or force a reload?",
+        "context": "dialog message to be shown for the user if their cloud is taking too long to load."
     }
 }

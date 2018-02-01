@@ -4304,6 +4304,7 @@
     "17106": "You are about to allow a setting that could allow your communications to be intercepted. Your data would be still inaccessible for attackers due to our end-to-end encryption, but they could blindly move your files and folders in MEGA, delete them or deny you access to your account.",
     "17109": "Unable to get the filesystem. Please, try again. If the problem persists please contact bug@mega.co.nz.",
     "17113": "Kh\u00f4ng t\u1ea1o \u0111\u01b0\u1ee3c \u0111\u01b0\u1eddng li\u00ean k\u1ebft t\u1edbi t\u1ec7p tin, v\u00ec c\u00f3 th\u1ec3 t\u1ec7p \u0111ang n\u1eb1m trong th\u01b0 m\u1ee5c chia s\u1ebb ho\u1eb7c \u1edf trong Th\u00f9ng R\u00e1c.",
+    "17117": "Danh s\u00e1ch c\u00e1c d\u1ea1ng t\u00ean mu\u1ed1n khai tr\u1eeb kh\u1ecfi qu\u00e1 tr\u00ecnh \u0111\u1ed3ng b\u1ed9 s\u1ebd c\u00f3 hi\u1ec7u l\u1ef1c khi ch\u01b0\u01a1ng tr\u00ecnh \u0111\u01b0\u1ee3c kh\u1edfi \u0111\u1ed9ng l\u1ea1i.",
     "17121": "Kh\u1edfi \u0111\u1ed9ng l\u1ea1i MEGAsync",
     "17126": "Trang th\u00f4ng tin n\u00e0y ch\u1ec9 d\u00e0nh ng\u01b0\u1eddi d\u00f9ng c\u00f3 t\u00e0i kho\u1ea3n.",
     "17142": "b\u1ed9 nh\u1edb t\u1ea1m",
@@ -4619,5 +4620,8 @@
     "17691": "Please give the MEGA app permission to access your microphone in your Settings.",
     "17692": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17693": "Chatting with",
-    "17694": "Download key"
+    "17694": "Download key",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

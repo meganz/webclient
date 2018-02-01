@@ -4304,6 +4304,7 @@
     "17106": "U staat op het punt een instelling toe te staan die ervoor kan zorgen dat uw communicatie wordt onderbroken. Uw gegevens zijn nog steeds ontoegankelijk voor aanvallers door onze eind-tot-eind codering, maar ze kunnen blindelings uw bestanden en mappen verplaatsen in MEGA, verwijder ze of ontzeg de toegang tot uw account. ",
     "17109": "Niet in staat om het bestandssysteem te krijgen. Probeer nogmaals. Als het probleem aanhoudt neem dan contact op met bug@mega.co.nz.",
     "17113": "De koppeling kon niet worden gegenereerd omdat het bestand een binnenkomende gedeelde map is of het is in uw Prullenbak. ",
+    "17117": "De nieuwe uitgesloten bestandsnamen worden rekening mee gehouden terwijl de applicatie weer start.",
     "17121": "Herstart",
     "17126": "Het dashboard is voor alleen voor geregistreerde gebruikers.",
     "17142": "cashe",
@@ -4619,5 +4620,8 @@
     "17691": "Please give the MEGA app permission to access your microphone in your Settings.",
     "17692": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17693": "Chatting with",
-    "17694": "Download key"
+    "17694": "Download key",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

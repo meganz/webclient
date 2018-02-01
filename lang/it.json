@@ -4304,6 +4304,7 @@
     "17106": "Stai per permettere un'impostazione che potrebbe far s\u00ec che le tue comunicazioni vengano intercettate. I tuoi dati rimarrebbero comunque inaccessibili agli attaccanti a causa della nostra criptazione end-to-end, ma potrebbero spostare i tuoi file e cartelle internamente a MEGA alla cieca, cancellarli o negarti l'accesso al tuo account.",
     "17109": "Impossibile ottenere il filesystem. Per favore, riprova. Se il problema persiste contatta bug@mega.co.nz.",
     "17113": "Il link non pu\u00f2 essere generato perch\u00e9 il file \u00e8 in una cartella condivisa in entrata o nel tuo Cestino.",
+    "17117": "I nuovi nomi di file esclusi verranno portati all'interno dell'account quando l'applicazione verr\u00e0 aperta di nuovo.",
     "17121": "Riavvia",
     "17126": "La scrivania \u00e8 disponibile solo per gli utenti registrati.",
     "17142": "cache",
@@ -4619,5 +4620,8 @@
     "17691": "Per favore, dai all'app di MEGA il permesso di accedere al tuo microfono nelle Impostazioni.",
     "17692": "Hai gi\u00e0 un account PRO e stai per comprare un nuovo abbonamento a MEGA. Se hai gi\u00e0 un abbonamento auto-rinnovabile devi prima cancellarlo o ti verranno addebitati due piani.",
     "17693": "Chattando con",
-    "17694": "Chiave di download"
+    "17694": "Chiave di download",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

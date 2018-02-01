@@ -4304,6 +4304,7 @@
     "17106": "Anda akan mengizinkan sebuah setting yang memungkinkan komunikasi Anda dicegat. Data Anda akan tetap tidak dapat diakses oleh penyerang karena enkripsi end-to-end kami, namun mereka dapat secara membabi buta memindahkan file dan folder Anda di MEGA, menghapusnya atau menolak akses ke akun Anda.",
     "17109": "Tidak bisa mendapatkan filesystem. Silakan coba lagi. Jika masalah berlanjut silahkan hubungi bug@mega.co.nz.",
     "17113": "Link tidak dapat dibuat karena file berada dalam folder bersama yang masuk atau di Sampah Anda.",
+    "17117": "Nama file yang dikecualikan baru akan diperhitungkansaat aplikasi mulai lagi.",
     "17121": "Restart",
     "17126": "Dasbor hanya untuk pengguna terdaftar.",
     "17142": "cache",
@@ -4619,5 +4620,8 @@
     "17691": "Please give the MEGA app permission to access your microphone in your Settings.",
     "17692": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
     "17693": "Chatting with",
-    "17694": "Download key"
+    "17694": "Download key",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

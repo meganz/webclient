@@ -10334,6 +10334,26 @@ React.makeElement = React['createElement'];
 
 	    mixins: [ConversationMessageMixin],
 
+	    _ensureNameIsLoaded: function _ensureNameIsLoaded(h) {
+	        var self = this;
+	        var contact = M.u[h] ? M.u[h] : {
+	            'u': h,
+	            'h': h,
+	            'c': 0
+	        };
+	        var displayName = generateAvatarMeta(contact.u).fullName;
+
+	        if (!displayName) {
+	            M.u.addChangeListener(function () {
+	                displayName = generateAvatarMeta(contact.u).fullName;
+	                if (displayName) {
+	                    self.safeForceUpdate();
+
+	                    return 0xDEAD;
+	                }
+	            });
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -10373,6 +10393,7 @@ React.makeElement = React['createElement'];
 
 	            var text = __(l[8907]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
+	            self._ensureNameIsLoaded(otherContact.u);
 	            messages.push(React.makeElement(
 	                "div",
 	                { className: "message body", "data-id": "id" + message.messageId, key: h },
@@ -10400,6 +10421,8 @@ React.makeElement = React['createElement'];
 
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
 	            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+
+	            self._ensureNameIsLoaded(otherContact.u);
 
 	            var text;
 	            if (otherContact.u === contact.u) {

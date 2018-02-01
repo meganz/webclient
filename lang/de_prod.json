@@ -1925,5 +1925,8 @@
     "17688": "Erinnern Sie sich noch an Ihr Passwort?",
     "17689": "Langdruck kopiert Ihren Rettungsschl\u00fcssel in die Zwischenablage.",
     "17690": "Sie k\u00f6nnen Ihren Account auf [A]https:\/\/mega.nz\/recovery[\/A] unter Zuhilfenahme Ihres Rettungsschl\u00fcssels wiederherstellen.",
-    "17694": "Schl\u00fcssel herunterladen"
+    "17694": "Schl\u00fcssel herunterladen",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

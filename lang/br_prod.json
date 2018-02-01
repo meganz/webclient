@@ -1925,5 +1925,8 @@
     "17688": "Voc\u00ea lembra da sua senha?",
     "17689": "Mantenha pressionado para copiar a Chave de recupera\u00e7\u00e3o para a \u00e1rea de transfer\u00eancia.",
     "17690": "Para restaurar a sua conta usando a sua Chave de recupera\u00e7\u00e3o, visite [A]https:\/\/mega.nz\/recovery[\/A] no seu PC e siga as instru\u00e7\u00f5es.",
-    "17694": "Fazer download da chave"
+    "17694": "Fazer download da chave",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

@@ -270,7 +270,7 @@
     "719": "Bitte geben Sie Ihr aktuelles Passwort ein.",
     "724": "Das aktuelle Passwort, das Sie eingegeben haben, ist nicht korrekt. ",
     "725": "Ihr Passwort wurde ge\u00e4ndert.",
-    "726": "Fein",
+    "726": "OK",
     "727": "Ihr Passwort wurde ge\u00e4ndert.",
     "728": "Dieser Passwortbest\u00e4tigungslink ist abgelaufen. ",
     "729": "Dieser Link wurde bereits best\u00e4tigt.",
@@ -1922,8 +1922,8 @@
     "17626": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
     "17686": "Mobilbrowserunterst\u00fctzung f\u00fcr MEGAdrop ist noch in Arbeit. Bitte verwenden Sie vor\u00fcbergehend einen Desktop-Browser.",
     "17687": "Noch nicht verf\u00fcgbar",
-    "17688": "Can you remember your password?",
-    "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
-    "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
-    "17694": "Download key"
+    "17688": "Erinnern Sie sich noch an Ihr Passwort?",
+    "17689": "Langdruck kopiert Ihren Rettungsschl\u00fcssel in die Zwischenablage.",
+    "17690": "Sie k\u00f6nnen Ihren Account auf [A]https:\/\/mega.nz\/recovery[\/A] unter Zuhilfenahme Ihres Rettungsschl\u00fcssels wiederherstellen.",
+    "17694": "Schl\u00fcssel herunterladen"
 }

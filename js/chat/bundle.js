@@ -8307,7 +8307,7 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "div",
 	                    { className: "emoji title" },
-	                    ":" + meta.u + ":"
+	                    ":" + meta.n + ":"
 	                )
 	            );
 	        }

@@ -11542,16 +11542,16 @@ table {
     margin: 23px auto 0 auto;
 }
 .dropdown.body.popup.contacts-search {
-    width: 488px;
-    padding: 0 16px;
-    background-color: #F6F7F8;
+    width: 464px;
+    padding: 0 12px;
 }
 .dropdown.body.popup.contacts-search  .contacts-search-scroll {
     border:1px solid rgba(0,0,0,0.2);
-    border-radius: 2px; 
+    border-radius: 3px; 
 }
 .dropdown.body.popup.contacts-search .fm-dialog-footer {
     border-top: none; 
+    padding: 12px 0 16px 0;
 }
 .dropdown.body.popup.bandwidth-info {
     bottom: 34px;

@@ -42,10 +42,10 @@
     text-align: right;
 }
 .contacts-search .contacts-search-header input {
-    margin: 12px 40px 0 7px;
+    margin: 12px 72px 0 7px;
 }
 .contacts-search .contacts-search-header input:focus {
-    margin: 12px 95px 0 16px;
+    margin: 12px 116px 0 16px;
 }
 .dropdown.popup input::-webkit-input-placeholder {
 color: #666666;
@@ -106,9 +106,6 @@ color: #cccccc;
     height: 48px;
     padding: 6px 0;
     cursor: pointer;
-}
-.contacts-info.body.contacts-search:nth-child(odd) {
-    background-color: #fafafa;
 }
 .contacts-search .user-card-presence {
     margin: 14px 10px 0 14px;

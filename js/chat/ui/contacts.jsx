@@ -365,7 +365,7 @@ var ContactPickerWidget = React.createClass({
             else if (self.state.selected.length === 1) {
                 footer = <div className="contacts-search-footer">
                     <div className="fm-dialog-footer">
-                        <a href="javascript:;" className="default-white-button right" onClick={onSelectDoneCb}>
+                        <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                             {self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]}
                         </a>
                     </div>
@@ -374,7 +374,7 @@ var ContactPickerWidget = React.createClass({
             else if (self.state.selected.length > 1) {
                 footer = <div className="contacts-search-footer">
                     <div className="fm-dialog-footer">
-                        <a href="javascript:;" className="default-white-button right" onClick={onSelectDoneCb}>
+                        <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                             {
                                 self.props.multipleSelectedButtonLabel ?
                                     self.props.multipleSelectedButtonLabel

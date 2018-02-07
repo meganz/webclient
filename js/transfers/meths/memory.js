@@ -111,7 +111,6 @@
                             location.href = sblob;
                             return false;
                         });
-                    $('.mobile.download-speed, .mobile.download-percents').text('');
                 }
                 else {
                     throw new Error('MemoryIO -- huh??');

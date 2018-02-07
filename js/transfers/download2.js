@@ -55,6 +55,7 @@ var dlmanager = {
     dlLastQuotaWarning: 0,
     dlRetryInterval: 1000,
     dlMaxChunkSize: 16 * 1048576,
+    fsExpiryThreshold: 172800,
     isDownloading: false,
     dlZipID: 0,
     gotHSTS: false,
@@ -2467,8 +2468,8 @@ var dl_queue = new DownloadQueue();
 
 if (is_mobile) {
     dlmanager.ioThrottleLimit = 2;
+    dlmanager.fsExpiryThreshold = 10800;
     dlmanager.dlMaxChunkSize = 4 * 1048576;
-    dlMethod = MemoryIO;
 }
 
 mBroadcaster.once('startMega', function() {

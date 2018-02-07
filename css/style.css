@@ -11541,6 +11541,18 @@ table {
     height: 68px;
     margin: 23px auto 0 auto;
 }
+.dropdown.body.popup.contacts-search {
+    width: 488px;
+    padding: 0 16px;
+    background-color: #F6F7F8;
+}
+.dropdown.body.popup.contacts-search  .contacts-search-scroll {
+    border:1px solid rgba(0,0,0,0.2);
+    border-radius: 2px; 
+}
+.dropdown.body.popup.contacts-search .fm-dialog-footer {
+    border-top: none; 
+}
 .dropdown.body.popup.bandwidth-info {
     bottom: 34px;
     width: 400px;

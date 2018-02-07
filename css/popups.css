@@ -17,7 +17,6 @@
     position: relative;
     z-index: 10;
     padding: 0 0 0 40px;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -92,7 +91,7 @@ color: #cccccc;
     min-height: 100%;
 }
 .contacts-search-scroll .jspContainer {
-    max-height: 336px;
+    max-height: 264px;
 }
 .contacts-search-scroll .jspPane em {
     text-align: center;

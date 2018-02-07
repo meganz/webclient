@@ -131,21 +131,11 @@ var SelectionManager = function($selectable, resume) {
     /**
      * The idea of this method is to _validate_ and return the .currently-selected element.
      *
-     * @param first_or_last string ("first" or "last") by default will return the first selected element if there is
-     * not .currently-selected
-     *
-     * @returns {String} node id
+     * @returns {String|Boolean} node id
      */
-    this.get_currently_selected = function(first_or_last) {
-        // TODO: Major refactoring is required here.
+    this.get_currently_selected = function() {
         if (this.last_selected) {
             return this.last_selected;
-        }
-        else if ((first_or_last === "first" || !first_or_last) && M.v.length > 0) {
-            return SelectionManager.dynamicNodeIdRetriever(M.v[0]);
-        }
-        else if (first_or_last === "last" &&  M.v.length > 0) {
-            return SelectionManager.dynamicNodeIdRetriever(M.v[M.v.length - 1]);
         }
         else {
             return false;
@@ -290,12 +280,15 @@ var SelectionManager = function($selectable, resume) {
         });
 
 
-        var current = this.get_currently_selected("first");
+        var current = this.get_currently_selected();
         var nextIndex = currentViewIds.indexOf(current);
 
 
         if (ptr === -1) {
             // up
+
+            // allow selection to go backwards, e.g. start selecting from the end of the list
+            nextIndex = nextIndex <= 0 ? currentViewIds.length - Math.max(nextIndex, 0) : nextIndex;
 
             if (nextIndex > -1 && nextIndex - 1 >= 0) {
                 var nextId = currentViewIds[nextIndex - 1];
@@ -327,6 +320,12 @@ var SelectionManager = function($selectable, resume) {
         }
         else if (ptr === 1) {
             // down
+
+            // allow selection to go back at the start of the list if current = last selected
+            nextIndex = (
+                nextIndex + 1 >= currentViewIds.length ? -1 : nextIndex
+            );
+
             if (nextIndex + 1 < currentViewIds.length) {
                 var nextId = currentViewIds[nextIndex + 1];
 
@@ -378,7 +377,7 @@ var SelectionManager = function($selectable, resume) {
         );
 
 
-        var current = this.get_currently_selected("first");
+        var current = this.get_currently_selected();
         var current_idx = currentViewIds.indexOf(current);
 
 
@@ -414,7 +413,6 @@ var SelectionManager = function($selectable, resume) {
                 $("#" + currentViewIds[target_element_num]).addClass('ui-selected');
                 this.set_currently_selected(currentViewIds[target_element_num], scrollTo);
             }
-
         }
         else {
             // do nothing.
@@ -438,7 +436,7 @@ var SelectionManager = function($selectable, resume) {
             currentViewIds.push(SelectionManager.dynamicNodeIdRetriever(v));
         });
 
-        var current = this.get_currently_selected("first");
+        var current = this.get_currently_selected();
         var current_idx = currentViewIds.indexOf(current);
         var last_idx = currentViewIds.indexOf(lastId);
         var last_selected = this.last_selected;

@@ -261,6 +261,7 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
         contact = M.u[user_hash];
         contact.presence = presence;
         M.syncUsersFullname(user_hash);
+        M.syncContactEmail(user_hash);
     }
 
     $(self).trigger(

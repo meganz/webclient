@@ -1925,5 +1925,8 @@
     "17688": "\u015eifrenizi hat\u0131rl\u0131yor musunuz?",
     "17689": "Kurtarma Anahtar\u0131n\u0131 panoya kopyalamak i\u00e7in dokunun ve bas\u0131l\u0131 tutun.",
     "17690": "Hesab\u0131n\u0131z\u0131, Kurtarma Anahtar\u0131n\u0131zla geri y\u00fcklemek i\u00e7in masa\u00fcst\u00fc cihaz\u0131n\u0131zdan [A]https:\/\/mega.nz\/recovery[\/A] adresini ziyaret edin ve talimatlar\u0131 izleyin.",
-    "17694": "Anahtar\u0131 indir"
+    "17694": "Anahtar\u0131 indir",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

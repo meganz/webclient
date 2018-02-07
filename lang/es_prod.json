@@ -1925,5 +1925,8 @@
     "17688": "\u00bfRecuerdas tu contrase\u00f1a?",
     "17689": "Mant\u00e9n pulsado para copiar la Clave de recuperaci\u00f3n al portapapeles.",
     "17690": "Para restaurar tu cuenta con la Clave de recuperaci\u00f3n, visita [A]https:\/\/mega.nz\/recovery[\/A] en to ordenador y sigue las instrucciones.",
-    "17694": "Descargar clave"
+    "17694": "Descargar clave",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

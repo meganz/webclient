@@ -5813,7 +5813,7 @@ textarea.mobile.support-text-field {
         display: none;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .duration-options-list .payment-duration:last-child {
-        margin-left: 70px;
+        margin-left: 39px;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option {
         display: inline-block;

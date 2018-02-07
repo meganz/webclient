@@ -785,7 +785,16 @@
         var self = this;
         var promise = new MegaPromise();
         if (self._pointersCache) {
+            if (self._pointersCache[chatId + "_" + pointerName] === pointerValue) {
+                promise.reject();
+                return promise;
+            }
             self._pointersCache[chatId + "_" + pointerName] = pointerValue;
+        }
+        if (!ChatdPersist.isMasterTab()) {
+            // don't do anything if this is not the master tab!
+            promise.resolve();
+            return promise;
         }
 
         self.db['ptrs'].put({

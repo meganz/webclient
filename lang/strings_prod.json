@@ -7706,5 +7706,17 @@
     "17694": {
         "text": "Download key",
         "context": "A button label on the mobile webclient which allows the user to download the Recovery Key to a text file."
+    },
+    "17704": {
+        "text": "Wait",
+        "context": "text button to be shown in a dialog for the user to choose some operation to wait."
+    },
+    "17705": {
+        "text": "Force Reload",
+        "context": "text button to be shown in some dialog for the user to instruct a cloud's force reload, I.e. menu->reload"
+    },
+    "17706": {
+        "text": "Your login is taking longer than expected. Do you want to wait or force a reload?",
+        "context": "dialog message to be shown for the user if their cloud is taking too long to load."
     }
 }

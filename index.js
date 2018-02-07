@@ -467,6 +467,7 @@ function init_page() {
         && (page !== 'privacy')
         && (page !== 'takendown')
         && (page !== 'general')
+        && (page !== 'resellers')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -1205,7 +1206,6 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
-
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {

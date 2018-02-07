@@ -1925,5 +1925,8 @@
     "17688": "Ricordi la tua password?",
     "17689": "Clicca e tieni premuto per copiare la tua Chiave di Recupero negli appunti.",
     "17690": "Per ripristinare il tuo account con la tua Chiave di Recupero, visita [A]https:\/\/mega.nz\/recovery[\/A] sul tuo dispositivo desktop e segui le istruzioni.",
-    "17694": "Chiave di download"
+    "17694": "Chiave di download",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
 }

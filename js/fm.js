@@ -1130,6 +1130,13 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         if (extraButton[0] === '!') {
             doneButton  = l[82];
             extraButton = extraButton.substr(1);
+
+            if (extraButton[0] === '^') {
+                extraButton = extraButton.substr(1);
+                var pos = extraButton.indexOf('!');
+                doneButton = extraButton.substr(0, pos++);
+                extraButton = extraButton.substr(pos);
+            }
         }
     }
     $.msgDialog = type;

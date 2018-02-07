@@ -1192,6 +1192,8 @@ React.makeElement = React['createElement'];
 
 	            if (lastMessage.isManagement && lastMessage.isManagement()) {
 	                renderableSummary = lastMessage.getManagementMessageSummaryText();
+	            } else if (!lastMessage.textContents && lastMessage.dialogType) {
+	                renderableSummary = Message._getTextContentsForDialogType(lastMessage);
 	            }
 
 	            renderableSummary = htmlentities(renderableSummary);
@@ -4818,9 +4820,15 @@ React.makeElement = React['createElement'];
 	        var contacts = room.getParticipantsExceptMe();
 	        var contactHandle;
 	        var contact;
-	        if (contacts && contacts.length > 0) {
+	        var avatarMeta;
+	        var contactName = "";
+	        if (contacts && contacts.length === 1) {
 	            contactHandle = contacts[0];
 	            contact = M.u[contactHandle];
+	            avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
+	            contactName = avatarMeta.fullName;
+	        } else if (contacts && contacts.length > 1) {
+	            contactName = room.getRoomTitle(true);
 	        }
 
 	        var conversationPanelClasses = "conversation-panel " + room.type + "-chat";
@@ -4828,9 +4836,6 @@ React.makeElement = React['createElement'];
 	        if (!room.isCurrentlyActive) {
 	            conversationPanelClasses += " hidden";
 	        }
-
-	        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
-	        var contactName = avatarMeta.fullName;
 
 	        var messagesList = [];
 
@@ -5241,30 +5246,7 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'truncateDialog': false });
 	                    },
 	                    onConfirmClicked: function onConfirmClicked() {
-	                        var chatMessages = room.messagesBuff.messages;
-	                        if (chatMessages.length > 0) {
-	                            var lastChatMessageId = null;
-	                            var i = chatMessages.length - 1;
-	                            while (lastChatMessageId == null && i >= 0) {
-	                                var message = chatMessages.getItem(i);
-	                                if (message instanceof Message) {
-	                                    lastChatMessageId = message.messageId;
-	                                }
-	                                i--;
-	                            }
-	                            if (lastChatMessageId) {
-	                                asyncApiReq({
-	                                    a: 'mct',
-	                                    id: room.chatId,
-	                                    m: lastChatMessageId,
-	                                    v: Chatd.VERSION
-	                                }).fail(function (r) {
-	                                    if (r === -2) {
-	                                        msgDialog('warninga', l[135], __(l[8880]));
-	                                    }
-	                                });
-	                            }
-	                        }
+	                        room.truncate();
 
 	                        self.setState({
 	                            'truncateDialog': false
@@ -8844,12 +8826,18 @@ React.makeElement = React['createElement'];
 	                'call-missed': l[7210],
 	                'call-rejected': l[5892],
 	                'call-canceled': l[5894],
-	                'call-started': l[5888]
+	                'call-started': l[5888],
+	                'alterParticipants': undefined,
+	                'privilegeChange': l[8915],
+	                'truncated': l[8905]
+
 	            };
 	        }
 	        return MESSAGE_STRINGS[type];
 	    };
 	})();
+
+	mega.ui.chat.getMessageString = getMessageString;
 
 	module.exports = {
 	    getMessageString: getMessageString
@@ -10276,35 +10264,8 @@ React.makeElement = React['createElement'];
 	    },
 	    getContact: function getContact() {
 	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
 
-	        var contact;
-	        if (message.authorContact) {
-	            contact = message.authorContact;
-	        } else if (message.meta && message.meta.userId) {
-	            contact = M.u[message.meta.userId];
-	            if (!contact) {
-	                return {
-	                    'u': message.meta.userId,
-	                    'h': message.meta.userId,
-	                    'c': 0
-	                };
-	            }
-	        } else if (message.userId) {
-	            if (!M.u[message.userId]) {
-
-	                return null;
-	            }
-	            contact = M.u[message.userId];
-	        } else if (message.getFromJid) {
-	            contact = megaChat.getContactFromJid(message.getFromJid());
-	        } else {
-	            console.error("No idea how to render this: ", this.props);
-
-	            return {};
-	        }
-
-	        return contact;
+	        return Message.getContactForMessage(message);
 	    },
 	    getTimestampAsString: function getTimestampAsString() {
 	        return unixtimeToTimeString(this.getTimestamp());
@@ -10373,6 +10334,26 @@ React.makeElement = React['createElement'];
 
 	    mixins: [ConversationMessageMixin],
 
+	    _ensureNameIsLoaded: function _ensureNameIsLoaded(h) {
+	        var self = this;
+	        var contact = M.u[h] ? M.u[h] : {
+	            'u': h,
+	            'h': h,
+	            'c': 0
+	        };
+	        var displayName = generateAvatarMeta(contact.u).fullName;
+
+	        if (!displayName) {
+	            M.u.addChangeListener(function () {
+	                displayName = generateAvatarMeta(contact.u).fullName;
+	                if (displayName) {
+	                    self.safeForceUpdate();
+
+	                    return 0xDEAD;
+	                }
+	            });
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -10412,6 +10393,7 @@ React.makeElement = React['createElement'];
 
 	            var text = __(l[8907]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
+	            self._ensureNameIsLoaded(otherContact.u);
 	            messages.push(React.makeElement(
 	                "div",
 	                { className: "message body", "data-id": "id" + message.messageId, key: h },
@@ -10439,6 +10421,8 @@ React.makeElement = React['createElement'];
 
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
 	            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+
+	            self._ensureNameIsLoaded(otherContact.u);
 
 	            var text;
 	            if (otherContact.u === contact.u) {
@@ -11068,13 +11052,13 @@ React.makeElement = React['createElement'];
 	    return handlesWithoutMyself;
 	};
 
-	ChatRoom.prototype.getRoomTitle = function () {
+	ChatRoom.prototype.getRoomTitle = function (ignoreTopic) {
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
 	        return M.getNameByHandle(participants[0]) || "";
 	    } else {
-	        if (self.topic && self.topic.substr) {
+	        if (!ignoreTopic && self.topic && self.topic.substr) {
 	            return self.topic.substr(0, 30);
 	        }
 
@@ -11658,6 +11642,35 @@ React.makeElement = React['createElement'];
 	            self.retrieveAllHistory();
 	        }
 	    });
+	};
+
+	ChatRoom.prototype.truncate = function () {
+	    var self = this;
+	    var chatMessages = self.messagesBuff.messages;
+	    if (chatMessages.length > 0) {
+	        var lastChatMessageId = null;
+	        var i = chatMessages.length - 1;
+	        while (lastChatMessageId == null && i >= 0) {
+	            var message = chatMessages.getItem(i);
+	            if (message instanceof Message && message.dialogType !== "truncated") {
+	                lastChatMessageId = message.messageId;
+	            }
+	            i--;
+	        }
+
+	        if (lastChatMessageId) {
+	            asyncApiReq({
+	                a: 'mct',
+	                id: self.chatId,
+	                m: lastChatMessageId,
+	                v: Chatd.VERSION
+	            }).fail(function (r) {
+	                if (r === -2) {
+	                    msgDialog('warninga', l[135], __(l[8880]));
+	                }
+	            });
+	        }
+	    }
 	};
 
 	window.ChatRoom = ChatRoom;

@@ -275,11 +275,11 @@ function dl_g(res) {
 
                                 if (is_mobile) {
                                     var $progress = $('.mobile .download-progress span');
-                                    $progress.text(l[1649]).css('color', '#777');
+                                    $progress.text(l[1649]).addClass('resume-bttn');
 
                                     $('.download-progress').rebind('click', function() {
                                         $('.download-progress').unbind('click');
-                                        $progress.text(l[5740]).css('color', '');
+                                        $progress.text(l[5740]).removeClass('resume-bttn');
                                         browserDownload();
                                         return false;
                                     });

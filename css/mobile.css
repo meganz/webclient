@@ -411,10 +411,11 @@ ul, li {
 .mobile .download-progress span.resume-bttn {
     color: rgb(119, 119, 119);
     background-color: #fff;
-    padding: 8px 15px;
+    padding: 0px 15px;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     border: 1px solid rgba(0,0,0,0.15);
     border-radius: 3px;
+    line-height: 32px;
 }
 
 .mobile.red-button.disabled {

@@ -275,7 +275,9 @@ function dl_g(res) {
 
                                 if (is_mobile) {
                                     var $progress = $('.mobile .download-progress span');
+                                    var $dlLink = $('.mobile .dl-app-link');
                                     $progress.text(l[1649]).addClass('resume-bttn');
+                                    $dlLink.show();
 
                                     $('.download-progress').rebind('click', function() {
                                         $('.download-progress').unbind('click');

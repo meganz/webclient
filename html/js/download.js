@@ -135,6 +135,7 @@ function dl_g(res) {
             var fileExt = filename.substring(fileExtPos);
             var isVideo = is_video(filename);
             var prevBut = isVideo;
+            var onMaxSizeKnown;
 
             dl_node = new MegaNode({
                 k: key,
@@ -187,12 +188,61 @@ function dl_g(res) {
                 $('.download.transfer-buttons a').addClass('hidden');
                 $('.download.big-button.download-file span').text(l[776]);
                 $('.download.big-button.download-file i').removeClass('resume').addClass('save');
+
+                if (is_mobile) {
+                    $('body').addClass('download-complete');
+                    $('.mobile .download-progress span').text(l[776]);
+                    $('.mobile.download-speed, .mobile.download-percents').text('');
+                    $('.download-progress').rebind('click', function() {
+                        if (fdl_queue_var) {
+                            browserDownload();
+                        }
+                        return false;
+                    });
+                }
             };
             $('.download.big-button.download-file span').text(l[58]);
+
+            if (is_mobile) {
+                setMobileAppInfo();
+                $('.mobile.dl-browser, .mobile.dl-megaapp').removeClass('disabled');
+                $('.mobile.filename').text(str_mtrunc(filename, 40));
+                $('.mobile.filesize').text(bytesToSize(res.s));
+                $('.mobile.dl-megaapp').rebind('click', function() {
+
+                    // Start the download in the app
+                    mobile.downloadOverlay.redirectToApp($(this));
+                });
+
+                onMaxSizeKnown = function() {
+                    var ext = fileext(filename);
+                    var supported = dlMethod !== MemoryIO || MOBILE_FILETYPES[ext];
+
+                    $('img.filetype-img').attr({
+                        src: staticpath + 'images/mobile/extensions/' + fileIcon(dl_node) + '.png'
+                    });
+
+                    if (res.s > maxDownloadSize || !supported) {
+                        $('body').addClass('wrong-file');
+                        $('.mobile.dl-browser').addClass('disabled').unbind('click');
+
+                        // Change error message
+                        if (!supported) {
+                            $('.mobile.error-txt.file-unsupported').removeClass('hidden');
+                        }
+                        else {
+                            $('.mobile.error-txt.file-too-large').removeClass('hidden');
+                        }
+                    }
+                };
+            }
 
             dlmanager.getMaximumDownloadSize().done(function(size) {
                 maxDownloadSize = size;
 
+                if (onMaxSizeKnown) {
+                    onMaxSizeKnown();
+                }
                 var sizeOnDisk = dlmanager.getFileSizeOnDisk(dlpage_ph, filename);
 
                 dlmanager.getResumeInfo(dlpage_ph, function(aResumeInfo) {
@@ -222,6 +272,20 @@ function dl_g(res) {
                                 $('.download.state-text.resume').removeClass('hidden');
                                 $('.download.big-button.download-file span').text(l[1649]);
                                 $('.download.big-button.download-file i').removeClass('save').addClass('resume');
+
+                                if (is_mobile) {
+                                    var $progress = $('.mobile .download-progress span');
+                                    var $dlLink = $('.mobile .dl-app-link');
+                                    $progress.text(l[1649]).addClass('resume-bttn');
+                                    $dlLink.show();
+
+                                    $('.download-progress').rebind('click', function() {
+                                        $('.download-progress').unbind('click');
+                                        $progress.text(l[5740]).removeClass('resume-bttn');
+                                        browserDownload();
+                                        return false;
+                                    });
+                                }
                             }
                             else {
                                 dlResumeInfo = false;
@@ -373,40 +437,6 @@ function dl_g(res) {
                 $('.download.speed-block .light-txt').text(l[1651]).addClass('small');
             }
 
-            if (is_mobile) {
-                setMobileAppInfo();
-                $('.mobile.dl-browser, .mobile.dl-megaapp').removeClass('disabled');
-                $('.mobile.filename').text(str_mtrunc(filename, 30));
-                $('.mobile.filesize').text(bytesToSize(res.s));
-                $('.mobile.dl-megaapp').rebind('click', function() {
-
-                    // Start the download in the app
-                    mobile.downloadOverlay.redirectToApp($(this));
-                });
-
-                var ext = fileext(filename);
-                var supported = MOBILE_FILETYPES[ext];
-                var icon = supported || 'generic';
-
-                $('img.filetype-img').attr({
-                    src: staticpath + 'images/mobile/extensions/' + icon + '.png'
-                });
-
-                if (res.s > maxDownloadSize || !supported) {
-                    $('body').addClass('wrong-file');
-                    $('.mobile.dl-browser').addClass('disabled');
-                    $('.mobile.dl-browser').unbind('click');
-
-                    // Change error message
-                    if (!supported) {
-                        $('.mobile.error-txt.file-unsupported').removeClass('hidden');
-                    }
-                    else {
-                        $('.mobile.error-txt.file-too-large').removeClass('hidden');
-                    }
-                }
-            }
-
             var showPreviewButton = function($infoBlock) {
                 $infoBlock = $infoBlock || $('.download.info-block');
 
@@ -469,6 +499,11 @@ function dl_g(res) {
 
                     // Change layout for video
                     var $video = $pageScrollBlock.find('video');
+
+                    if (!$video.length) {
+                        console.warn('No video element found...');
+                        return false;
+                    }
 
                     $pageScrollBlock.addClass('video');
                     $fileinfoBlock.find('.big-txt .filename').text(fileTitle);
@@ -646,7 +681,9 @@ function browserDownload() {
         $('.download-state-text').addClass('hidden');
 
         if (is_mobile) {
-            $('body').addClass('downloading').find('.bar').width('1%');
+            if (!Object(fdl_queue_var).lastProgress) {
+                $('body').addClass('downloading').find('.bar').width('1%');
+            }
         }
         else if (mediaCollectFn) {
             onIdle(mediaCollectFn);
@@ -954,7 +991,9 @@ function dlcomplete(id)
 
     // Change button text to OPEN FILE
     if (is_mobile) {
-        $('.mobile .download-progress span').text(l[8949]);
+        $('body').addClass('download-complete');
+        $('.mobile.download-speed, .mobile.download-percents').text('');
+        $('.mobile .download-progress span').text(dlMethod === MemoryIO ? l[8949] : l[239]);
     }
 }
 

@@ -314,6 +314,27 @@ var ContactCard = React.createClass({
     }
 });
 
+var ContactItem = React.createClass({
+    mixins: [MegaRenderMixin, RenderDebugger],
+    render: function() {
+        var classString = "nw-conversations-item";
+        var contact = this.props.contact;
+
+        if (!contact) {
+            return null;
+        }
+
+        return <div>
+            <Avatar contact={contact} className="small-rounded-avatar"/>
+            <div className="user-card-data">
+                    <div className="user-card-name light">
+                        {this.props.namePrefix ? this.props.namePrefix : null}{M.getNameByHandle(contact.u)}
+                    </div>
+            </div>
+        </div>;
+    }
+});
+
 var ContactPickerWidget = React.createClass({
     mixins: [MegaRenderMixin],
     getInitialState: function() {
@@ -338,10 +359,13 @@ var ContactPickerWidget = React.createClass({
 
         var contacts = [];
 
+        var contactsSelected = [];
+
         var footer = null;
 
         if (self.props.multiple) {
             var onSelectDoneCb = (e) => {
+
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -372,7 +396,14 @@ var ContactPickerWidget = React.createClass({
                 </div>
             }
             else if (self.state.selected.length > 1) {
-                footer = <div className="contacts-search-footer">
+                self.state.selected.forEach(function(v, k) {
+                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]} />);
+                });
+                footer =
+                    <div className="contacts-search-footer">
+                        <div className="selected-contact-block">
+                            {contactsSelected}
+                        </div>
                     <div className="fm-dialog-footer">
                         <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                             {
@@ -485,8 +516,6 @@ var ContactPickerWidget = React.createClass({
 
             contacts = <em>{noContactsMsg}</em>;
         }
-
-
         return <div className={this.props.className}>
             <div className={"contacts-search-header " + this.props.headerClasses}>
                 <i className="small-icon search-icon"></i>
@@ -504,7 +533,6 @@ var ContactPickerWidget = React.createClass({
                     {contacts}
                 </div>
             </utils.JScrollPane>
-
             {footer}
         </div>;
     }

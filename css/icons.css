@@ -530,7 +530,7 @@
     width: 18px;
 }
 .medium-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v13.png);
+    background-image: url(../images/mega/icons-sprite_v14.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -561,6 +561,9 @@
 }
 .medium-icon.icons-img.volume {
     background-position: -222px -777px;
+}
+.no-audio .medium-icon.icons-img.volume {
+    background-position: -222px -817px;
 }
 .medium-icon.icons-img.volume-muted {
     background-position: -222px -741px;
@@ -813,15 +816,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v13.png);
+    background-image: url(../images/mega/icons-sprite_v14.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v13.png);
+    background-image: url(../images/mega/icons-sprite_v14.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v13.png);
+    background-image: url(../images/mega/icons-sprite_v14.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -829,7 +832,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v13.png);
+    background-image: url(../images/mega/icons-sprite_v14.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1198,7 +1201,7 @@
     background-position: -192px -781px;
 }
 i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v13.png);
+    background-image: url(../images/mega/icons-sprite_v14.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;

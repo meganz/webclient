@@ -258,8 +258,8 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         // Hide the default controls
         videoElement.controls = false;
 
-        // Hide the volume icon until we found the video has audio track
-        $('.volume-control', $wrapper).addClass('hidden');
+        // Show the volume icon until we found the video has no audio track
+        $('.volume-control', $wrapper).removeClass('no-audio');
 
         // Obtain handles to buttons and other elements
         var $playpause = $videoControls.find('.playpause');
@@ -350,8 +350,8 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                         $playpause.trigger('click');
                     });
 
-                    if (streamer.hasAudio) {
-                        $('.volume-control', $wrapper).removeClass('hidden');
+                    if (!streamer.hasAudio) {
+                        $('.volume-control', $wrapper).addClass('no-audio');
                     }
 
                     hideControls();

@@ -431,7 +431,7 @@ function dl_g(res) {
                 .addClass(fileIcon({ name: filename }));
 
             if (dlQueue.isPaused(dlmanager.getGID(fdl_queue_var))) {
-                $('.download.scroll-block').addClass('paused');
+                $('.download.scroll-block').addClass('paused-transfer');
                 $('.download.eta-block span').text('');
                 $('.download.speed-block .dark-numbers').text('');
                 $('.download.speed-block .light-txt').text(l[1651]).addClass('small');

@@ -241,7 +241,7 @@ function dl_g(res) {
                 maxDownloadSize = size;
 
                 if (onMaxSizeKnown) {
-                    onMaxSizeKnown();
+                    onIdle(onMaxSizeKnown);
                 }
                 var sizeOnDisk = dlmanager.getFileSizeOnDisk(dlpage_ph, filename);
 

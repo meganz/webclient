@@ -7574,7 +7574,6 @@ React.makeElement = React['createElement'];
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
 	            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
-
 	                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
 	            }
 	        }
@@ -7637,7 +7636,7 @@ React.makeElement = React['createElement'];
 	        var room = this.props.chatRoom;
 
 	        if (room.isCurrentlyActive && self.isMounted()) {
-	            if ($('textarea:focus,select:focus,input:focus').size() === 0) {
+	            if ($('textarea:focus,select:focus,input:focus').filter(":visible").size() === 0) {
 
 	                this.focusTypeArea();
 	            }

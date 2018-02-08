@@ -220,6 +220,12 @@ function reselect(n) {
     for (var i = ids.length; i--;) {
         $('#' + ids[i]).addClass('ui-selected');
 
+        // sync selectionManager, in case some legacy code got $.selected and selectionManager out of sync.
+        var selectedList = selectionManager.get_selected();
+        if (selectedList.indexOf(ids[i]) === -1) {
+            selectionManager.add_to_selection(ids[i]);
+        }
+
         if (n) {
             $('#' + ids[i] + ' .grid-status-icon').addClass('new');
             $('#' + ids[i] + ' .file-status-icon').addClass('new');
@@ -243,8 +249,18 @@ function reselect(n) {
         else {
             el = false;
         }
+
+        console.error(el, jsp, M.megaRender.megaList);
+
         if (el && jsp) {
             jsp.scrollToElement(el);
+        }
+        else if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
+            // still rendering.
+            Soon(function() {
+                var nodeId = el && el.data ? el.data('id') : $.selected[0];
+                nodeId && M.megaRender.megaList.scrollToItem(nodeId);
+            });
         }
     }
 }

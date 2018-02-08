@@ -906,9 +906,16 @@ function init_page() {
         dev_init('doc');
     }
     else if (page == 'backup' && !u_type) {
-        login_txt = l[1298];
-        parsepage(pages['login']);
-        init_login();
+        if (is_mobile) {
+            login_next = page;
+            loadSubPage('login');
+            return false;
+        }
+        else {
+            login_txt = l[1298];
+            parsepage(pages['login']);
+            init_login();
+        }
     }
     else if (page == 'backup') {
         if (is_mobile) {

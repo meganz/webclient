@@ -2052,7 +2052,7 @@ function fm_tfspause(gid, overquota) {
                 $('.download.file-info').addClass('overquota');
             }
             $('.download .pause-transfer span').text(l[9118]);
-            $('.download.scroll-block').addClass('paused');
+            $('.download.scroll-block').addClass('paused-transfer');
             $('.download.eta-block span').text('');
             $('.download.speed-block .dark-numbers').text('');
             $('.download.speed-block .light-txt').text(l[1651]).addClass('small');
@@ -2105,7 +2105,7 @@ function fm_tfsresume(gid) {
 
                 if (page === 'download') {
                     $('.download .pause-transfer').addClass('active');
-                    $('.download.scroll-block').addClass('paused');
+                    $('.download.scroll-block').addClass('paused-transfer');
                 }
 
                 if (dlmanager.isOverFreeQuota) {
@@ -2122,7 +2122,7 @@ function fm_tfsresume(gid) {
 
             if (page === 'download') {
                 $('.download .pause-transfer span').text(l[9112]);
-                $('.download.scroll-block').removeClass('paused');
+                $('.download.scroll-block').removeClass('paused-transfer');
                 $('.download.speed-block .light-txt').text('').removeClass('small');
             }
             else {

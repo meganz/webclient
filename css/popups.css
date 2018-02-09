@@ -48,32 +48,32 @@
     margin: 12px 116px 0 16px;
 }
 .dropdown.popup input::-webkit-input-placeholder {
-color: #666666;
+    color: #666666;
 }
 .dropdown.popup input:-moz-placeholder {
-color: #666666;
- opacity: 1;
+    color: #666666;
+    opacity: 1;
 }
 .dropdown.popup input::-moz-placeholder {
-color: #666666;
- opacity: 1;
+    color: #666666;
+    opacity: 1;
 }
 .dropdown.popup input:-ms-input-placeholder {
-color: #666666;
+    color: #666666;
 }
- .dropdown.popup input:focus::-webkit-input-placeholder {
-color: #cccccc;
+.dropdown.popup input:focus::-webkit-input-placeholder {
+    color: #cccccc;
 }
 .dropdown.popup input:-moz-placeholder {
-color: #cccccc;
- opacity: 1;
+    color: #cccccc;
+    opacity: 1;
 }
 .dropdown.popup input:focus::-moz-placeholder {
-color: #cccccc;
- opacity: 1;
+    color: #cccccc;
+    opacity: 1;
 }
 .dropdown.popup input:focus:-ms-input-placeholder {
-color: #cccccc;
+    color: #cccccc;
 }
 .contacts-search-header > i, .search-block.emoji > i {
     vertical-align: top;
@@ -123,6 +123,75 @@ color: #cccccc;
 .contacts-search .user-card-name {
     font-size: 13px;
     line-height: 19px;
+}
+.popup.contacts-search .selected-contact-block {
+    height: auto;
+    border:1px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+    background-color: rgba(0,0,0,0.02); 
+    margin-top: 8px; 
+    max-height: 72px;
+}
+.popup.contacts-search .selected-contact-block .select-contact-centre {
+    margin: 8px auto;
+    height: 56px;
+    display: table;
+}
+.popup.contacts-search .selected-contact-block .small-rounded-avatar {
+    margin: 0 auto;
+    float: none;
+    display: block;
+}
+.popup.contacts-search .selected-contact-block .user-card-data {
+    float: none;
+    display: block;
+    padding: 4px;
+    text-align: center;
+}
+.popup.contacts-search .selected-contact-block .selected-contact-card {
+    width: 54px;
+    float: left;
+    height: 54px;
+    position: relative;
+    margin-right: 8px;
+    margin-bottom: 12px;
+}
+.popup.contacts-search .selected-contact-block .selected-contact-card:last-of-type {
+    margin-right: 0px;
+}
+.popup.contacts-search .selected-contact-block .user-card-name {
+    font-size: 12px;
+}
+.popup.contacts-search .selected-contact-block .remove-contact-bttn {
+    width: 13px;
+    height: 13px;
+    background-color: #2BA6DE;
+    border-radius: 13px;
+    border: 1px solid #fff;
+    position: absolute;
+    z-index: 99;
+    top: 23px;
+    left: 31px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    cursor: pointer;
+    -webkit-transition: .2s ease-in-out;
+    -moz-transition:  .2s ease-in-out;
+    -o-transition: .2s ease-in-out;
+    transition: .2s ease-in-out;
+}
+.popup.contacts-search .selected-contact-block .remove-contact-bttn:hover {
+    box-shadow: 0 1px 2px px rgba(0,0,0,0.20);
+    top: 21px;
+    left: 29px;
+    width: 17px;
+    height: 17px;
+    -webkit-transition: .2s ease-in-out;
+    -moz-transition:  .2s ease-in-out;
+    -o-transition: .2s ease-in-out;
+    transition: .2s ease-in-out;
+}
+.popup.contacts-search .selected-contact-block .remove-contact-bttn {
+
 }
 /* End of Search contacts popup */
 

@@ -324,7 +324,13 @@ var ContactItem = React.createClass({
             return null;
         }
 
-        return <div>
+        return <div className="selected-contact-card">
+            <div className="remove-contact-bttn" onClick={(e) => {
+                            self.props.onClick(contact, e);
+                    }}>
+                <div className="remove-contact-icon">
+                </div>
+            </div>
             <Avatar contact={contact} className="small-rounded-avatar"/>
             <div className="user-card-data">
                     <div className="user-card-name light">
@@ -401,9 +407,11 @@ var ContactPickerWidget = React.createClass({
                 });
                 footer =
                     <div className="contacts-search-footer">
-                        <div className="selected-contact-block">
-                            {contactsSelected}
-                        </div>
+                        <utils.JScrollPane className="selected-contact-block" selected={this.state.selected}>
+                            <div className="select-contact-centre">
+                                {contactsSelected}
+                            </div>
+                        </utils.JScrollPane>
                     <div className="fm-dialog-footer">
                         <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                             {

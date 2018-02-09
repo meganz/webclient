@@ -8,12 +8,21 @@ mobile.downloadOverlay = {
 
     /** Supported file types for download on mobile */
     supportedFileTypes: {
+        doc: 'word',
+        docx: 'word',
+        odt: 'word',
+        txt: 'word',
+        rtf: 'word',
+        xls: 'excel',
+        xlsx: 'excel',
+        ods: 'excel',
         jpeg: 'image',
         jpg: 'image',
         png: 'image',
         gif: 'image',
         mp3: 'audio',
-        mp4: 'video'
+        mp4: 'video',
+        pdf: 'pdf'
     },
 
     /** Download start time in milliseconds */

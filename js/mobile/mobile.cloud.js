@@ -582,8 +582,8 @@ mobile.cloud = {
             var node = M.d[nodeHandle];
             var fileName = node.name;
 
-            // If this is an image, load the preview slideshow, otherwise toggle the options
-            if (is_image(fileName)) {
+            // If this is an image, load the preview slideshow
+            if (is_image(fileName) && fileext(fileName) !== 'pdf') {
                 mobile.slideshow.init(nodeHandle);
             }
             else {

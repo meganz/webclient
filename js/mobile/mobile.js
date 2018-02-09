@@ -287,6 +287,7 @@ function fm_hideoverlay() {
 mega.ui.showRegisterDialog = function() {};
 
 mega.loadReport = {};
+var previews = {};
 
 function removeUInode(nodeHandle, parentHandle) {
 

@@ -429,7 +429,16 @@ var ContactPickerWidget = React.createClass({
                 </div>;
             }
             else if (self.state.selected.length === 1) {
+                self.state.selected.forEach(function(v, k) {
+                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
+                    /> );
+                });
                 footer = <div className="contacts-search-footer">
+                        <utils.JScrollPane className="selected-contact-block" selected={this.state.selected}>
+                            <div className="select-contact-centre">
+                                {contactsSelected}
+                            </div>
+                        </utils.JScrollPane>
                     <div className="fm-dialog-footer">
                         <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                             {self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]}

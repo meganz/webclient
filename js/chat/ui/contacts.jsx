@@ -318,6 +318,7 @@ var ContactItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     render: function() {
         var classString = "nw-conversations-item";
+        var self = this;
         var contact = this.props.contact;
 
         if (!contact) {
@@ -325,8 +326,10 @@ var ContactItem = React.createClass({
         }
 
         return <div className="selected-contact-card">
-            <div className="remove-contact-bttn" onClick={(e) => {
+            <div className="remove-contact-bttn"  onClick={(e) => {
+                        if (self.props.onClick) {
                             self.props.onClick(contact, e);
+                        }
                     }}>
                 <div className="remove-contact-icon">
                 </div>
@@ -381,7 +384,40 @@ var ContactPickerWidget = React.createClass({
                     self.props.onSelectDone(self.state.selected);
                 }
             };
+            var onContactSelectDoneCb = (contact, e) => {
 
+                var contactHash = contact.u;
+
+                // differentiate between a click and a double click.
+                if (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) {
+                    // is a double click
+                    if (self.props.onSelected) {
+                        self.props.onSelected([contactHash]);
+                    }
+                    self.props.onSelectDone([contactHash]);
+                    return;
+                }
+                else {
+                    var selected = clone(self.state.selected || []);
+
+                    // is a single click
+                    if (selected.indexOf(contactHash) === -1) {
+                        selected.push(contactHash);
+                        if (self.props.onSelected) {
+                            self.props.onSelected(selected);
+                        }
+                    }
+                    else {
+                        array.remove(selected, contactHash);
+                        if (self.props.onSelected) {
+                            self.props.onSelected(selected);
+                        }
+                    }
+                    self.setState({'selected': selected});
+                }
+                self.clickTime = new Date();
+                self.lastClicked = contactHash;
+            };
             if (!self.state.selected || self.state.selected.length === 0) {
                 footer = <div className="fm-dialog-footer">
                     <div className="fm-dialog-footer-txt">{
@@ -403,7 +439,8 @@ var ContactPickerWidget = React.createClass({
             }
             else if (self.state.selected.length > 1) {
                 self.state.selected.forEach(function(v, k) {
-                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]} />);
+                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
+                    /> );
                 });
                 footer =
                     <div className="contacts-search-footer">
@@ -466,40 +503,7 @@ var ContactPickerWidget = React.createClass({
                 <ContactCard
                     contact={v}
                     className={"contacts-search " + selectedClass}
-
-                    onClick={(contact, e) => {
-                        var contactHash = contact.u;
-
-                        // differentiate between a click and a double click.
-                        if (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) {
-                            // is a double click
-                            if (self.props.onSelected) {
-                                self.props.onSelected([contactHash]);
-                            }
-                            self.props.onSelectDone([contactHash]);
-                            return;
-                        }
-                        else {
-                            var selected = clone(self.state.selected || []);
-
-                            // is a single click
-                            if (selected.indexOf(contactHash) === -1) {
-                                selected.push(contactHash);
-                                if (self.props.onSelected) {
-                                    self.props.onSelected(selected);
-                                }
-                            }
-                            else {
-                                array.remove(selected, contactHash);
-                                if (self.props.onSelected) {
-                                    self.props.onSelected(selected);
-                                }
-                            }
-                            self.setState({'selected': selected});
-                        }
-                        self.clickTime = new Date();
-                        self.lastClicked = contactHash;
-                    }}
+                    onClick={onContactSelectDoneCb}
                     noContextMenu={true}
                     key={v.u}
                 />

@@ -186,7 +186,7 @@ var SelectionManager = function($selectable, resume) {
     this.add_to_selection = function(nodeId, scrollTo, alreadySorted) {
         if (!isString(nodeId)) {
             if (nodeId && nodeId.h) {
-                noedId = nodeId.h;
+                nodeId = nodeId.h;
             }
             else if (d) {
                 console.error(".add_to_selection received a non-string as nodeId");

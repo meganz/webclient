@@ -43,6 +43,10 @@ function deleteScrollPanel(from, data) {
     var jsp = $(from).data(data);
     if (jsp) {
         jsp.destroy();
+
+        if (M.megaRender) {
+            delay('MegaRender:rebindLayout', M.megaRender.rebindLayout.bind(M.megaRender, from));
+        }
     }
 }
 

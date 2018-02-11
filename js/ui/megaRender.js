@@ -419,6 +419,42 @@
         },
 
         /**
+         * Recreates the container if detached from the DOM
+         * @param {String} selector The affected DOM node selector
+         */
+        rebindLayout: function(selector) {
+            if (this.container && this.container.parentNode === null) {
+                if (this.logger) {
+                    this.logger.debug('Container detached from the DOM...', [this.container]);
+                }
+
+                if ($(this.container).is(selector)) {
+                    var container = document.querySelector(viewModeContainers[this.section][this.viewmode]);
+
+                    if (!container) {
+                        if (this.logger) {
+                            this.logger.debug('Expected container is not yet re-attached...');
+                        }
+
+                        // TODO: ensure we don't run into an infinite loop...
+                        delay('MegaRender:rebindLayout', this.rebindLayout.bind(this, selector));
+                    }
+                    else {
+                        this.container = container;
+                        M.initShortcutsAndSelection(container);
+
+                        if (this.logger) {
+                            this.logger.debug('rebindLayout completed.', [container]);
+                        }
+                    }
+                }
+                else if (this.logger) {
+                    this.logger.debug('Not the expected selector...', selector);
+                }
+            }
+        },
+
+        /**
          * Render layout.
          * @param {Boolean} aUpdate   Whether we're updating the list
          * @param {Object}  aNodeList Optional list of nodes to process

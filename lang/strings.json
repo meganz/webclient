@@ -18498,5 +18498,13 @@
     "17706": {
         "text": "Your login is taking longer than expected. Do you want to wait or force a reload?",
         "context": "dialog message to be shown for the user if their cloud is taking too long to load."
+    },
+    "17732": {
+        "text": "View video",
+        "context": "A button that users can click to start streaming a video."
+    },
+    "17733": {
+        "text": "Open this file in the mobile app",
+        "context": "A button on the downloads page for the user to open the file-link in the mobile app."
     }
 }

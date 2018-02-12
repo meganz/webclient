@@ -1420,7 +1420,7 @@ function api_proc(q) {
                         if (!bytes) {
                             // this may throw an exception if the header doesn't exist
                             try {
-                                bytes = this.getResponseHeader('Original-Content-Length');
+                                bytes = this.getResponseHeader('Original-Content-Length') | 0;
                                 this.totalBytes = bytes;
                             }
                             catch (e) {}

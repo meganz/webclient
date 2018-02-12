@@ -64,7 +64,10 @@ var EmojiAutocomplete = React.createClass({
             else if (key === 39 || key === 40 || key === 9) {
                 // down, right, tab
                 selected = selected + 1;
-                selected = selected >= self.props.maxEmojis ? 0 : selected;
+                selected = (
+                    selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ?
+                        0 : selected
+                );
                 self.setState({'selected': selected});
                 handled = true;
             }

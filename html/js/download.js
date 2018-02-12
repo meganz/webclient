@@ -449,7 +449,7 @@ function dl_g(res) {
                         $ipb.find('span').text(l[17489]);
                     }
                     else if (isVideo) {
-                        $ipb.find('span').text('view video');
+                        $ipb.find('span').text(l[17732]);
                     }
 
                     $ipb.removeClass('hidden')

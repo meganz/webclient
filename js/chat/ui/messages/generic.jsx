@@ -10,6 +10,8 @@ var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
 var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
 
+var NODE_DOESNT_EXISTS_ANYMORE = {};
+
 var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],
     getInitialState: function() {
@@ -489,37 +491,54 @@ var GenericConversationMessage = React.createClass({
                                             var revokeButton = null;
                                             if (message.isEditable && message.isEditable()) {
                                                 revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
-                                                    label={__(l[83])} className="red" onClick={() => {
-                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
-                                                            chatRoom,
-                                                            (
-                                                                message.internalId ?
-                                                                    message.internalId : message.orderValue
-                                                            ),
-                                                            ""
-                                                        );
-                                                    }} />
+                                                                                         label={__(l[83])}
+                                                                                         className="red"
+                                                                                         onClick={() => {
+                                                    chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
+                                                        chatRoom,
+                                                        (
+                                                            message.internalId ?
+                                                                message.internalId : message.orderValue
+                                                        ),
+                                                        ""
+                                                    );
+                                                }} />
                                             }
 
-                                            self._addLinkButtons(v.h, linkButtons);
+                                            if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                                dropdown = "<span>" + l[5533] + "</span>";
+                                                dbfetch.get(v.h)
+                                                    .always(function() {
+                                                        if (!M.d[v.h]) {
+                                                            NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
+                                                            Soon(function() {
+                                                                self.safeForceUpdate();
+                                                            });
+                                                        }
+                                                    });
+                                            }
+                                            else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                                self._addLinkButtons(v.h, linkButtons);
 
-                                            firstGroupOfButtons.push(
-                                                <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
-                                                                          key="infoDialog"
-                                                                          onClick={() => {
-                                                                              $.selected = [v.h];
-                                                                              propertiesDialog();
-                                                                          }} />
-                                            );
+                                                firstGroupOfButtons.push(
+                                                    <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
+                                                                              key="infoDialog"
+                                                                              onClick={() => {
+                                                                                  $.selected = [v.h];
+                                                                                  propertiesDialog();
+                                                                              }} />
+                                                );
 
 
-                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+                                                self._addFavouriteButtons(v.h, firstGroupOfButtons);
+                                            }
 
                                             return <div>
                                                 {previewButton}
                                                 {firstGroupOfButtons}
                                                 {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
-                                                <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
+                                                <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow"
+                                                                          label={__(l[1187])}
                                                                           onClick={self._startDownload.bind(self, v)}/>
                                                 {linkButtons}
                                                 {revokeButton ? <hr /> : ""}
@@ -528,7 +547,6 @@ var GenericConversationMessage = React.createClass({
                                         }}
                                     />
                                 </ButtonsUI.Button>;
-
                             }
                             else {
                                 dropdown = <ButtonsUI.Button

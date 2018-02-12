@@ -9147,6 +9147,8 @@ React.makeElement = React['createElement'];
 
 	var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
 
+	var NODE_DOESNT_EXISTS_ANYMORE = {};
+
 	var GenericConversationMessage = React.createClass({
 	    displayName: 'GenericConversationMessage',
 
@@ -9556,21 +9558,35 @@ React.makeElement = React['createElement'];
 	                                            var revokeButton = null;
 	                                            if (message.isEditable && message.isEditable()) {
 	                                                revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross',
-	                                                    label: __(l[83]), className: 'red', onClick: function onClick() {
+	                                                    label: __(l[83]),
+	                                                    className: 'red',
+	                                                    onClick: function onClick() {
 	                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId ? message.internalId : message.orderValue, "");
 	                                                    } });
 	                                            }
 
-	                                            self._addLinkButtons(v.h, linkButtons);
+	                                            if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                                dropdown = "<span>" + l[5533] + "</span>";
+	                                                dbfetch.get(v.h).always(function () {
+	                                                    if (!M.d[v.h]) {
+	                                                        NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
+	                                                        Soon(function () {
+	                                                            self.safeForceUpdate();
+	                                                        });
+	                                                    }
+	                                                });
+	                                            } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                                self._addLinkButtons(v.h, linkButtons);
 
-	                                            firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
-	                                                key: 'infoDialog',
-	                                                onClick: function onClick() {
-	                                                    $.selected = [v.h];
-	                                                    propertiesDialog();
-	                                                } }));
+	                                                firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
+	                                                    key: 'infoDialog',
+	                                                    onClick: function onClick() {
+	                                                        $.selected = [v.h];
+	                                                        propertiesDialog();
+	                                                    } }));
 
-	                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+	                                                self._addFavouriteButtons(v.h, firstGroupOfButtons);
+	                                            }
 
 	                                            return React.makeElement(
 	                                                'div',
@@ -9578,7 +9594,8 @@ React.makeElement = React['createElement'];
 	                                                previewButton,
 	                                                firstGroupOfButtons,
 	                                                firstGroupOfButtons && firstGroupOfButtons.length > 0 ? React.makeElement('hr', null) : "",
-	                                                React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
+	                                                React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow',
+	                                                    label: __(l[1187]),
 	                                                    onClick: self._startDownload.bind(self, v) }),
 	                                                linkButtons,
 	                                                revokeButton ? React.makeElement('hr', null) : "",

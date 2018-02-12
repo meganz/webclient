@@ -95,33 +95,7 @@
 .data-block-view .thumb.video img {
     height: auto;
 }
-.data-block-view .thumb:not(.video) .block-view-file-type::before {
-    position: absolute;
-    content: '';
-    width: 156px;
-    height: 88px;
-    -webkit-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -moz-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -o-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -ms-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
-    -moz-border-radius-topright: 2px;
-    -webkit-border-top-right-radius: 2px;
-    border-top-right-radius: 2px;
-    -moz-border-radius-bottomright: 2px;
-    -webkit-border-bottom-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjMiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
-background: -moz-linear-gradient(top, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
-background: -webkit-linear-gradient(top, rgba(255,255,255,0.3) 0%,rgba(255,255,255,0) 100%);
-background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%,rgba(255,255,255,0) 100%);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    z-index: 1;
-    left: 0;
-    top: 0;
-}
+
 .data-block-view.active .data-block-bg, .data-block-view:hover .data-block-bg, .data-block-view.ui-selected .data-block-bg, .data-block-view.ui-selecting .data-block-bg, .data-block-view.dragover .data-block-bg {
     background-color: rgba(0,0,0,0.05);
 }
@@ -136,18 +110,12 @@ background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%,rgba(255,255,255
     -ms-transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
     transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
 }
-.data-block-view.active .thumb .block-view-file-type::before, .data-block-view:hover .thumb .block-view-file-type::before, .data-block-view.ui-selected .thumb .block-view-file-type::before, .data-block-view.ui-selecting .thumb .block-view-file-type::before, .data-block-view.dragover .thumb .block-view-file-type::before, .data-block-view.active .thumb .indicator, .data-block-view:hover .thumb .indicator, .data-block-view.ui-selected .thumb .indicator, .data-block-view.ui-selecting .thumb .indicator, .data-block-view.dragover .thumb .indicator {
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-}
 .data-block-view.medium .default-white-button.tiny-button {
     float: none;
     position: absolute;
     z-index: 100;
-    bottom: 9px;
-    right: 9px;
+    bottom: 6px;
+    right: 6px;
     margin: 0;
 }
 .data-block-view .user-card-presence {
@@ -161,13 +129,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     padding: 8px 6px 6px 50px;
 }
 .data-block-view .shared-folder-access {
-    position: absolute;
-    width: 22px;
-    height: 20px;
-    z-index: 10;
-    top: 3px;
-    right: 2px;
+    width: 28px;
+    height: 24px;
+    float: left;
     padding: 0;
+    background-position: -35px -241px;
+}
+.data-block-view .shared-folder-access.read-and-write {
+    background-position: -33px -289px;
+}
+.data-block-view .shared-folder-access.full-access {
+    background-position: -35px -193px;
 }
 .contacts-blocks-scrolling .nw-contact-status {
     float: none;
@@ -186,4 +158,41 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
+}
+.data-block-indicators {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 24px;
+    z-index: 10;
+    -webkit-border-bottom-left-radius: 2px;
+    -moz-border-radius-bottomleft: 2px;
+    border-bottom-left-radius: 2px;
+}
+.thumb .data-block-indicators {
+    background-color: rgba(255,255,255,0.4);
+}
+
+.video-thumb-details {
+    font-size: 12px;
+    line-height: 20px;
+    color: #666666;
+    width: 100%;
+    bottom: 0;
+    padding: 2px 0;
+    position: absolute;
+    text-align: left;
+    display: none;
+    background-color: rgba(255,255,255,0.4);
+}
+.data-block-bg.video .video-thumb-details {
+    display: block;
+}
+.video-thumb-details i {
+    margin: 0 0 0 2px;
+}
+.video.thumb .data-block-indicators, .video.thumb .video-thumb-details {
+    background-color: rgba(0,0,0,0.4);
+    color: white;
 }

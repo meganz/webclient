@@ -122,9 +122,26 @@ function removeUInode(h, parent) {
     }
 }
 
-function fmremove() {
+/**
+ * Remove nodes
+ * @param {Array|String} selectedNodes An array of node handles.
+ * @returns {MegaPromise}
+ */
+function fmremove(selectedNodes) {
+    'use strict';
+
     var promise = new MegaPromise();
-    var handles = ($.selected || []).concat();
+    var handles;
+
+    if (selectedNodes) {
+        if (!Array.isArray(selectedNodes)) {
+            selectedNodes = [selectedNodes];
+        }
+    }
+    else {
+        selectedNodes = $.selected || [];
+    }
+    handles = selectedNodes.concat();
 
     dbfetch.coll(handles)
         .always(function() {
@@ -142,7 +159,7 @@ function fmremove() {
                 promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
             }
             else {
-                fmremovesync();
+                fmremovesync(selectedNodes);
                 promise.resolve();
             }
         });
@@ -150,28 +167,35 @@ function fmremove() {
     return promise;
 }
 
-function fmremovesync() {
-    var filecnt = 0,
-        foldercnt = 0,
-        contactcnt = 0,
-        removesharecnt = 0;
+function fmremovesync(selectedNodes) {
+    'use strict';
+
+    var i = 0;
+    var filecnt = 0;
+    var foldercnt = 0;
+    var contactcnt = 0;
+    var removesharecnt = 0;
+    var widgets = [];
 
     // If on mobile we will bypass the warning dialog prompts
     if (is_mobile) {
         localStorage.skipDelWarning = '1';
     }
 
-    for (var i in $.selected) {
-        var n = M.d[$.selected[i]];
+    for (i = 0; i < selectedNodes.length; i++) {
+        var n = M.d[selectedNodes[i]];
 
         if (n && n.su) {
             removesharecnt++;
         }
-        else if (String($.selected[i]).length === 11) {
+        else if (String(selectedNodes[i]).length === 11) {
             contactcnt++;
         }
         else if (n && n.t) {
             foldercnt++;
+            if (mega.megadrop.pufs[selectedNodes[i]]) {
+                widgets.push(selectedNodes[i]);
+            }
         }
         else {
             filecnt++;
@@ -179,8 +203,8 @@ function fmremovesync() {
     }
 
     if (removesharecnt) {
-        for (var i in $.selected) {
-            M.leaveShare($.selected[i]);
+        for (i = 0; i < selectedNodes.length; i++) {
+            M.leaveShare(selectedNodes[i]);
         }
         M.openFolder('shares', true);
     }
@@ -188,7 +212,7 @@ function fmremovesync() {
     // Remove contacts from list
     else if (contactcnt) {
 
-        var c = $.selected.length;
+        var c = selectedNodes.length;
         var replaceString = '';
         var contact = '';
 
@@ -197,14 +221,15 @@ function fmremovesync() {
             contact = 'contacts';
         }
         else {
-            replaceString = '<strong>' + htmlentities(M.d[$.selected[0]].name) + '</strong>';
+            replaceString = '<strong>' + htmlentities(M.d[selectedNodes[0]].name) + '</strong>';
             contact = 'contact';
         }
 
         msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), l[7872].replace('[X]', contact),
             function(e) {
                 if (e) {
-                    $.selected.forEach(function(selected) {
+                    for (i = 0; i < selectedNodes.length; i++) {
+                        var selected = selectedNodes[i];
 
                         if (M.c[selected]) {
                             Object.keys(M.c[selected])
@@ -213,27 +238,27 @@ function fmremovesync() {
                                 });
                         }
 
-                        api_req({a: 'ur2', u: $.selected[i], l: '0', i: requesti});
+                        api_req({a: 'ur2', u: selected, l: '0', i: requesti});
                         M.handleEmptyContactGrid();
-                    });
+                    }
                 }
             });
         if (c > 1) {
             $('#msgDialog').addClass('multiple');
-            $('.fm-del-contacts-number').text($.selected.length);
+            $('.fm-del-contacts-number').text(selectedNodes.length);
             $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
             $('#msgDialog .fm-del-contact-avatar span').empty();
         }
         else {
-            var user = M.u[$.selected[0]],
-                avatar = useravatar.contact(user, 'avatar-remove-dialog');
+            var user = M.u[selectedNodes[0]];
+            var avatar = useravatar.contact(user, 'avatar-remove-dialog');
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
     }
 
     // Remove selected nodes from rubbish bin
-    else if (M.getNodeRoot($.selected[0]) === M.RubbishID) {
+    else if (M.getNodeRoot(selectedNodes[0]) === M.RubbishID) {
 
         var dlgMessage = '';
         var toastMessage = '';
@@ -276,7 +301,7 @@ function fmremovesync() {
                 var tmp = null;
                 if (String(M.currentdirid).substr(0, 7) === 'search/') {
                     tmp = M.currentdirid;
-                    M.currentdirid = M.getNodeByHandle($.selected[0]).p || M.RubbishID;
+                    M.currentdirid = M.getNodeByHandle(selectedNodes[0]).p || M.RubbishID;
                 }
                 M.clearRubbish(false)
                     .always(function() {
@@ -299,9 +324,9 @@ function fmremovesync() {
     }
 
     // Remove contacts
-    else if (M.getNodeRoot($.selected[0]) === 'contacts') {
+    else if (M.getNodeRoot(selectedNodes[0]) === 'contacts') {
         if (localStorage.skipDelWarning) {
-            M.copyNodes($.selected, M.RubbishID, true);
+            M.copyNodes(selectedNodes, M.RubbishID, true);
         }
         else {
             var title = l[1003];
@@ -309,7 +334,7 @@ function fmremovesync() {
 
             msgDialog('confirmation', title, message, false, function(e) {
                     if (e) {
-                        M.copyNodes($.selected, M.RubbishID, 1);
+                        M.copyNodes(selectedNodes, M.RubbishID, 1);
                     }
                 }, true);
         }
@@ -317,19 +342,24 @@ function fmremovesync() {
     else {
         if (localStorage.skipDelWarning) {
             if (M.currentrootid === 'shares') {
-                M.copyNodes($.selected, M.RubbishID, true);
+                M.copyNodes(selectedNodes, M.RubbishID, true);
             }
             else {
-                M.moveNodes($.selected, M.RubbishID);
+                M.moveNodes(selectedNodes, M.RubbishID);
+            }
+
+            // Remove PUF/PUP if any
+            for (var w = widgets.length - 1; w >= 0; w--) {
+                mega.megadrop.pufRemove(widgets[w]);
             }
         }
         else {
             // Contains complete directory structure of selected nodes, their ids
             var selected = [], dirTree = [];
 
-            for (var i in $.selected) {
-                selected.push($.selected[i]);
-                var nodes = M.getNodesSync($.selected[i], true);
+            for (i = 0; i < selectedNodes.length; i++) {
+                selected.push(selectedNodes[i]);
+                var nodes = M.getNodesSync(selectedNodes[i], true);
                 dirTree = dirTree.concat(nodes);
             }
 
@@ -342,10 +372,15 @@ function fmremovesync() {
             msgDialog('remove', title, message, false, function(e) {
                 if (e) {
                     if (M.currentrootid === 'shares') {
-                        M.copyNodes($.selected, M.RubbishID, true);
+                        M.copyNodes(selectedNodes, M.RubbishID, true);
                     }
                     else {
                         var delctx = {pending: 1, selected: selected};
+
+                        // Remove PUF/PUP if any
+                        for (var w = widgets.length - 1; w >= 0; w--) {
+                            mega.megadrop.pufRemove(widgets[w]);
+                        }
 
                         // Remove all shares related to selected nodes
                         for (var i = dirTree.length; i--;) {
@@ -474,8 +509,7 @@ function fmremdupes(test) {
     loadingDialog.hide();
     console.log('Found ' + f.length + ' duplicated files using a sum of ' + bytesToSize(s));
     if (!test && f.length) {
-        $.selected = f;
-        fmremove();
+        fmremove(f);
     }
     return f.length;
 }

@@ -60,9 +60,6 @@ function FMDB(plainname, schema, channelmap) {
     // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
     this.cantransact = -1;
 
-    // Backoff to throttle bulkPut & bulkDel operations.
-    this.bulkBackoff = 300;
-
     // initialise additional channels
     for (var i in this.channelmap) {
         i = this.channelmap[i];
@@ -99,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm15d_';
+    var dbpfx = 'fm18_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -112,7 +109,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
 
         if (typeof result === 'function') {
             if (error) {
-                fmdb.crashed = true;
+                fmdb.crashed = 2;
                 fmdb.logger.warn('Marking DB as crashed.', error);
 
                 if (fmdb.db) {
@@ -188,7 +185,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     resolve(r[0]);
                 }
                 else if (slave) {
-                    fmdb.crashed = true;
+                    fmdb.crashed = 2;
                     resolve(false);
                 }
                 else {
@@ -483,7 +480,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             // invalidation commit completed?
             if (fmdb.inval_ready) {
                 if (fmdb.inval_cb) {
-                    fmdb.db.close();
+                    // fmdb.db.close();
                     fmdb.inval_cb();    // caller must not reuse fmdb object
                 }
                 return;
@@ -568,8 +565,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                                 onIdle(dispatchputs);
                             }
                             else {
-                                fmdb.bulkBackoff = Math.min(1e4, fmdb.bulkBackoff << 1);
-                                setTimeout(dispatchputs, fmdb.bulkBackoff);
+                                setTimeout(dispatchputs, 2600);
                             }
                             return;
                         }
@@ -577,7 +573,6 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                     // loop back to write more pending data (or to commit the transaction)
                     fmdb.inflight = false;
-                    fmdb.bulkBackoff = 300;
                     dispatchputs();
                 }).catch(Dexie.BulkError, function(e) {
                     // TODO: retry instead?
@@ -643,9 +638,32 @@ FMDB.prototype.stripnode = Object.freeze({
     f : function(f) {
         var t = { h : f.h, t : f.t, s : f.s };
 
+        // Remove pollution from the ufs-size-cache
+        // 1. non-folder nodes does not need tb/td/tf
+        if (!f.t) {
+            delete f.tb;
+            delete f.td;
+            delete f.tf;
+        }
+        // 2. remove Zero properties from versioning nodes inserted everywhere...
+        if (f.tvb === 0) delete f.tvb;
+        if (f.tvf === 0) delete f.tvf;
+
+        // Remove properties used as indexes
         delete f.h;
         delete f.t;
         delete f.s;
+
+        if (f.hash) {
+            t.hash = f.hash;
+            delete f.hash;
+        }
+
+        // Remove other garbage
+        if (f.seen) {
+            t.seen = f.seen;
+            delete f.seen; // inserted by the dynlist
+        }
 
         if (f.shares) {
             t.shares = f.shares;
@@ -665,6 +683,17 @@ FMDB.prototype.stripnode = Object.freeze({
         return t;
     },
 
+    tree: function(f) {
+        var t = {h: f.h};
+        delete f.h;
+        if (!f.td) delete f.td;
+        if (!f.tb) delete f.tb;
+        if (!f.tf) delete f.tf;
+        if (!f.tvf) delete f.tvf;
+        if (!f.tvb) delete f.tvb;
+        return t;
+    },
+
     ua : function(ua, index) {
         delete ua.k;
     }
@@ -679,6 +708,9 @@ FMDB.prototype.restorenode = Object.freeze({
     f : function(f, index) {
         f.h = index.h;
         f.p = index.p;
+        if (index.c) {
+            f.hash = index.c;
+        }
         if (index.s < 0) f.t = -index.s;
         else {
             f.t = 0;
@@ -688,6 +720,9 @@ FMDB.prototype.restorenode = Object.freeze({
             f.ar = Object.create(null);
         }
     },
+    tree : function(f, index) {
+        f.h = index.h;
+    },
 
     ph : function(ph, index) {
         ph.h = index.h;
@@ -696,12 +731,8 @@ FMDB.prototype.restorenode = Object.freeze({
     ua : function(ua, index) {
         ua.k = index.k;
     },
-    h: function(out, index) {
-        out.h = index.h;
-        out.hash = index.c;
-    },
 
-    h : function(out, index) {
+    h: function(out, index) {
         out.h = index.h;
         out.hash = index.c;
     },
@@ -762,7 +793,8 @@ FMDB.prototype.del = function fmdb_del(table, index) {
 FMDB.prototype.get = function fmdb_get(table, key, prefix) {
     "use strict";
 
-    if (!this.up()) {
+    if (this.crashed > 1) {
+        // a read operation failed previously
         return MegaPromise.reject([]);
     }
 
@@ -780,6 +812,11 @@ FMDB.prototype.get = function fmdb_get(table, key, prefix) {
     promise.then(function(r){
         fmdb.normaliseresult(table, r);
         masterPromise.resolve(r);
+    }).catch(function(ex) {
+        fmdb.logger.error("Read operation failed, marking DB as read-crashed", ex);
+        fmdb.invalidate(function() {
+            masterPromise.reject([]);
+        }, 1);
     });
 
     return masterPromise;
@@ -839,7 +876,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, lim
 FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, limit) {
     "use strict";
 
-    if (!this.up() || anyof && !anyof[1].length) {
+    if (this.crashed > 1 || anyof && !anyof[1].length) {
         return MegaPromise.reject([]);
     }
 
@@ -1018,6 +1055,11 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
         else {
             promise.reject(r);
         }
+    }).catch(function(ex) {
+        fmdb.logger.error("Read operation failed, marking DB as read-crashed", ex);
+        fmdb.invalidate(function() {
+            promise.reject([]);
+        }, 1);
     });
 
     return promise;
@@ -1033,7 +1075,7 @@ FMDB.prototype.clone = function fmdb_clone(o) {
 };
 
 // reliably invalidate the current database (delete the sn)
-FMDB.prototype.invalidate = function fmdb_invalidate(cb) {
+FMDB.prototype.invalidate = function fmdb_invalidate(cb, readop) {
     cb = cb || this.logger.debug.bind(this.logger, 'DB Invalidation', !this.crashed);
 
     if (this.crashed) {
@@ -1056,10 +1098,13 @@ FMDB.prototype.invalidate = function fmdb_invalidate(cb) {
     this.del('_sn', 1);
 
     // prevent further reads or writes
-    this.crashed = true;
+    this.crashed = readop ? 2 : 1;
 
     // set completion callback
     this.inval_cb = cb;
+
+    // force a non-treecache on the next load
+    localStorage.force = 1;
 };
 
 // checks if crashed or being used by another tab concurrently
@@ -1588,8 +1633,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
                             for (var h in M.c[parents[i]]) {
                                 handles.push(h);
 
-                                // FIXME: with file versioning, files can have children, too!
-                                if (M.d[h].t) {
+                                // with file versioning, files can have children, too!
+                                if (M.d[h].t || M.d[h].tvf) {
                                     p.push(h);
                                 }
                             }
@@ -1729,7 +1774,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     var folders = [];
                     for (var i = handles.length; i--;) {
                         var h = handles[i];
-                        if (M.d[h] && M.d[h].t) {
+                        if (M.d[h] && (M.d[h].t || M.d[h].tf)) {
                             folders.push(h);
                         }
                     }

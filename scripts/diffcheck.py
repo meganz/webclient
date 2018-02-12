@@ -381,6 +381,12 @@ def inspectjs(file, ln, line, result):
                 result.append('{}:{}: {}\n{}^ It is recommended to use'
                     ' a namespace. '.format(file, ln, line, indent))
 
+    match = re.search(r'\$\.dialog\s*=[^=]', line)
+    if match:
+        result.append('{}:{}: {}\n{}^ Overwritting $.dialog is discouraged, handling of '
+                    'new dialogs\n{}  should be achieved through M.safeShowDialog(), see MR!1419'
+                    .format(file, ln, line, indent, indent))
+
     return fatal
 
 def reduce_validator(file_line_mapping, **extra):

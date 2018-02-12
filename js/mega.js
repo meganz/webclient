@@ -33,9 +33,11 @@ MegaLogger.rootLogger = new MegaLogger(
 if (typeof loadingDialog === 'undefined') {
     var loadingDialog = Object.create(null);
     loadingDialog.show = function() {
-        $('.dark-overlay').removeClass('hidden');
-        $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
-        this.active = true;
+        if (!this.quiet) {
+            $('.dark-overlay').removeClass('hidden');
+            $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
+            this.active = true;
+        }
     };
     loadingDialog.hide = function() {
         $('.dark-overlay').addClass('hidden');
@@ -55,6 +57,7 @@ if (typeof loadingDialog === 'undefined') {
         }
         return !this.nest;
     };
+    loadingDialog.quiet = false;
 }
 if (typeof loadingInitDialog === 'undefined') {
     var loadingInitDialog = Object.create(null);
@@ -161,7 +164,7 @@ var sc_history = [];                     // array holding the history of action-
 function sc_fqueue(handle, packet) {
     "use strict";
 
-    if (handle && !M.d[handle]) {
+    if (handle && !M.c[handle]) {
         if (scwaitnodes[packet.scqi]) {
             scwaitnodes[packet.scqi]++;
         }
@@ -240,22 +243,45 @@ function sc_fetcher() {
             $.scFetcherRunning = false;
         }
         else {
-            dbfetch.geta(bunch, new MegaPromise())
-                .always(function() {
-                    for (var i = bunch.length; i--;) {
-                        var h = bunch[i];
-                        for (var p = queue[h].length; p--;) {
-                            var scqi = queue[h][p];
-                            if (!--scwaitnodes[scqi]) {
-                                delete scwaitnodes[scqi];
-                            }
+            // finish bunch processing
+            var finish = function() {
+                for (var i = bunch.length; i--;) {
+                    var h = bunch[i];
+                    for (var p = queue[h].length; p--;) {
+                        var scqi = queue[h][p];
+                        if (!--scwaitnodes[scqi]) {
+                            delete scwaitnodes[scqi];
                         }
                     }
+                }
 
-                    onIdle(function _scfr() {
-                        resumesc();
-                        onIdle(_proc);
-                    });
+                onIdle(function _scfr() {
+                    resumesc();
+                    onIdle(_proc);
+                });
+            };
+
+            dbfetch.geta(bunch, new MegaPromise())
+                .always(function() {
+                    // Retrieve all file versions, if any, and then finish the bunch processing
+                    // FIXME: this is only needed for (redundant!) `d` packets...
+                    var versions = Object.create(null);
+
+                    for (var i = bunch.length; i--;) {
+                        var h = bunch[i];
+
+                        if (M.d[h] && !M.d[h].t && M.d[h].tf) {
+                            versions[h] = 1;
+                        }
+                    }
+                    versions = Object.keys(versions);
+
+                    if (versions.length) {
+                        dbfetch.tree(versions, -1, new MegaPromise()).always(finish);
+                    }
+                    else {
+                        finish();
+                    }
                 });
         }
     })();
@@ -469,6 +495,16 @@ scparser.$add = function(type, handler) {
     }
 };
 
+scparser.$helper.f2 = function(a, previousFile) {
+    process_f(a.t.f2, null, true);
+    if (fminitialized) {
+        var previousFileHandle = (previousFile)
+        ? previousFile.h
+        : ((a.t.f2.length > 0) ? a.t.f2[0].h : null);
+        fileversioning.updateFileVersioningDialog(previousFileHandle);
+    }
+};
+
 scparser.$helper.c = function(a) {
     // contact notification
     process_u(a.u);
@@ -500,7 +536,11 @@ scparser.$add('c', {
                 if ($.selected && ($.selected[0] === userHandle)) {
 
                     // was selected
+                    if (selectionManager) {
+                        selectionManager.clear_selection();
+                    }
                     $.selected = [];
+
                     if ($('.dropdown.body.files-menu').is(":visible")) {
                         $.hideContextMenu();
                     }
@@ -742,7 +782,7 @@ scparser.$add('t', function(a, scnodes) {
 
     var i;
     var ufsc = new UFSSizeCache();
-    var rootNode = scnodes.length && scnodes[0];
+    var rootNode = scnodes.length && scnodes[0] || false;
 
     // is this tree a new inshare with root scinshare.h? set share-relevant
     // attributes in its root node.
@@ -812,6 +852,17 @@ scparser.$add('t', function(a, scnodes) {
     if (!pfid && u_type) {
         M.checkStorageQuota();
     }
+    if (!is_mobile) {
+        // update versioning info.
+        if (a.t && a.t.f2) {
+            scparser.$helper.f2(a);
+        }
+        else {
+            if (scnodes.length === 1) {
+                fileversioning.updateFileVersioningDialog(scnodes[0].h);
+            }
+        }
+    }
 });
 
 scparser.$add('opc', {
@@ -872,6 +923,20 @@ scparser.$add('upco', {
         if (a.s != 2) {
             notify.notifyFromActionPacket(a);
         }
+    }
+});
+
+scparser.$add('puh', {
+    b: function(a) {
+        "use strict";
+        mega.megadrop.pufProcessPUH([a], false, true);
+    }
+});
+
+scparser.$add('pup', {
+    b: function(a) {
+        "use strict";
+        mega.megadrop.pupProcessPUP([a], false);
     }
 });
 
@@ -941,6 +1006,8 @@ scparser.$add('fa', function(a) {
     if (n) {
         n.fa = a.fa;
         M.nodeUpdated(n);
+
+        mBroadcaster.sendMessage('fa:ready', a.n, a.fa);
     }
 });
 
@@ -1035,14 +1102,33 @@ scparser.$add('u', function(a) {
 });
 
 scparser.$add('d', function(a) {
+    var fileDeletion = (M.d[a.n] && !M.d[a.n].t);
+    var topVersion = null;
+    if (fileDeletion) {
+        topVersion = fileversioning.getTopNodeSync(a.n);
+    }
     // node deletion
     M.delNode(a.n);
 
+    // was selected, now clear the selected array.
+    if ($.selected && ($.selected[0] === a.n)) {
+        $.selected = [];
+    }
     if (!pfid) {
         scparser.$notify(a);
 
         if (u_type) {
             M.checkStorageQuota();
+        }
+    }
+    if (!is_mobile) {
+        if (fileDeletion && !a.v) {// this is a deletion of file.
+            if (M.d[topVersion]) {
+                fileversioning.updateFileVersioningDialog(topVersion);
+            }
+            else {
+                fileversioning.closeFileVersioningDialog(a.n);
+            }
         }
     }
 });
@@ -1117,6 +1203,7 @@ scparser.$notify = function(a) {
 };
 
 scparser.$call = function(a, scnodes) {
+
     try {
         if (scparser.$common[a.a]) {
             // no matter who triggered it
@@ -1172,7 +1259,7 @@ scparser.$finalize = function() {
             }
 
             if ($.dialog === 'properties') {
-                propertiesDialog();
+                delay($.dialog, propertiesDialog.bind(this, 3));
             }
 
             if (scsharesuiupd) {
@@ -1238,12 +1325,14 @@ function execsc() {
         scparser.$call(a, scnodes);
 
         // If there is any listener waiting for acknowledge from API, dispatch it.
-        if (typeof M.scAckQueue[a.i] === 'function') {
+        var cid = M.scAckQueue[a.i] ? a.i : a.a + '.' + a.i;
+
+        if (typeof M.scAckQueue[cid] === 'function') {
             if (d) {
                 console.debug('execsc: dispatching ' + a.i);
             }
-            onIdle(M.scAckQueue[a.i]);
-            delete M.scAckQueue[a.i];
+            onIdle(M.scAckQueue[cid].bind(null, a, scnodes));
+            delete M.scAckQueue[cid];
         }
 
         if (a.a === 's' || a.a === 's2') {
@@ -1562,7 +1651,7 @@ function emplacenode(node, noc) {
         srvlog2('parent-less', node.t, node.h);
     }
 
-    M.d[node.h] = node;
+    M.d[node.h] = new MegaNode(node);
 }
 
 // this receives the node objects one by one as per the filter rule
@@ -1754,11 +1843,7 @@ function worker_procmsg(ev) {
 // the FM DB engine (cf. mDB.js)
 var fmdb;
 var ufsc;
-
-mBroadcaster.once('startMega', function() {
-    // Initialize ufs size cache
-    ufsc = new UFSSizeCache();
-});
+var mclp;
 
 function loadfm(force) {
     "use strict";
@@ -1809,6 +1894,8 @@ function loadfm(force) {
                     mcf    : '&id',            // chats - id
                     ua     : '&k',             // user attributes - key (maintained by IndexedBKVStorage)
                     _sn    : '&i',             // sn - fixed index 1
+                    puf    : '&ph',            // public upload folder - handle
+                    pup    : '&p',             // public upload page - handle
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k', // queued chat messages - k
@@ -1830,6 +1917,12 @@ function fetchfm(sn) {
     // we always intially fetch historical actionpactions
     // before showing the filemanager
     initialscfetch = true;
+
+    // Initialize ufs size cache
+    ufsc = new UFSSizeCache();
+
+    // Get the media codecs list ready
+    mclp = MediaInfoLib.getMediaCodecsList();
 
     var promise;
     if (is_mobile) {
@@ -1933,6 +2026,8 @@ function dbfetchfm() {
                             opc: processOPC,
                             ipc: processIPC,
                             ps: processPS,
+                            puf: mega.megadrop.pufProcessDb,
+                            pup: mega.megadrop.pupProcessDb,
                             tree: function(r) {
                                 for (var i = r.length; i--;) {
                                     ufsc.addTreeNode(r[i], true);
@@ -1940,6 +2035,13 @@ function dbfetchfm() {
                             },
                             mcf: 1
                         };
+
+                        // Prevent MEGAdrop tables being created for mobile
+                        if (is_mobile) {
+                            delete tables.puf;
+                            delete tables.pup;
+                        }
+
                         Object.keys(tables).forEach(function(t) {
                             promise = fmdb.get(t);
                             promise.always(function(r) {
@@ -1958,7 +2060,7 @@ function dbfetchfm() {
                         });
                         mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
 
-                        MegaPromise.allDone(promises).wait(function dbfetchfm_done() {
+                        MegaPromise.allDone(promises).always(function dbfetchfm_done() {
 
                             mega.loadReport.mode = 1;
                             mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
@@ -1970,7 +2072,7 @@ function dbfetchfm() {
                                 // XXX: TypeError: Cannot create property 'crashed' on boolean 'false'
                                 // ^^^ how does `fmdb` get set to `false` here ?! :-/
                                 if (fmdb) {
-                                    fmdb.crashed = 'slave';
+                                    fmdb.crashed = 666;
                                 }
                             }
 
@@ -2056,7 +2158,7 @@ function ddtype(ids, toid, alt) {
                 r = 'move';
             }
             else if (fromtype == 'shares') {
-                r = (toid === M.RubbishID) ? 'copydel' : 'copy';
+                r = toid === M.RubbishID ? 'copydel' : 'copy';
             }
         }
         else if (totype == 'contacts') {
@@ -2076,7 +2178,13 @@ function ddtype(ids, toid, alt) {
                         return false;
                     }
 
-                    r = (M.getNodeRights(fromid) > 1) ? 'move' : 'copy';
+                    //r = (M.getNodeRights(fromid) > 1) ? 'move' : 'copy'; //commented out by khaled - fixing Bug #7697
+                    if (M.getNodeRights(fromid) > 1) { // added by khaled
+                        r = 'move';
+                    }
+                    else {
+                        return false;  // fixing Bug #7697, dont allow drag and drop if permission <2
+                    }
                 }
                 else {
                     r = 'copy';
@@ -2315,13 +2423,24 @@ function processmove(apireq) {
     }
 }
 
-function process_f(f, cb) {
+function process_f(f, cb, updateVersioning) {
     "use strict";
 
     if (f) {
         for (var i = 0; i < f.length; i++) {
-            M.addNode(f[i]);
-            ufsc.addNode(f[i]);
+            var n = f[i];
+            if (updateVersioning) {
+                // this is a response from updating versioning, clear the previous versions first.
+                if (M.d[n.h]) {
+                    M.delNode(n.h);
+                    ufsc.delNode(n.h);
+                }
+            }
+            M.addNode(n);
+            if (updateVersioning) {
+                M.d[n.h].fv = 1;
+            }
+            ufsc.addNode(M.d[n.h]);
         }
 
         if (cb) {
@@ -2892,6 +3011,16 @@ function loadfm_callback(res) {
             processPH(res.ph);
         }
 
+        // Handle versioning nodes
+        if (res.f2) {
+            process_f(res.f2, null, true);
+        }
+
+        // This package is sent on hard refresh if owner have enabled or disabled PUF
+        if (!is_mobile && res.uph) {
+            mega.megadrop.processUPH(res.uph, false);
+        }
+
         // decrypt hitherto undecrypted nodes
         crypto_fixmissingkeys(missingkeys);
 
@@ -3018,7 +3147,10 @@ function loadfm_done(mDBload) {
                 mega.loadReport.sent = true;
 
                 var r = mega.loadReport;
+                var tick = Date.now() - r.aliveTimeStamp;
+
                 r.totalTimeSpent = Date.now() - mega.loadReport.startTime;
+
                 r = [
                     r.mode, // 1: DB, 2: API
                     r.recvNodes, r.procNodes, r.procAPs,
@@ -3048,14 +3180,20 @@ function loadfm_done(mDBload) {
                 ];
 
                 if (d) {
-                    console.debug('loadReport', r);
+                    console.debug('loadReport', r, tick, document.hidden);
                 }
-                api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+
+                if (!(tick > 2100) && !document.hidden) {
+                    api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+                }
             }
 
             if (mDBload) {
                 M.avatars();
             }
+        }
+        if ($.msgDialog) {
+            closeMsg();
         }
         clearInterval(mega.loadReport.aliveTimer);
         mega.flags &= ~window.MEGAFLAG_LOADINGCLOUD;
@@ -3063,7 +3201,7 @@ function loadfm_done(mDBload) {
         watchdog.notify('loadfm_done');
     };
 
-    mega.config.ready(function() {
+    var _onConfigReady = function() {
         var promise = MegaPromise.resolve();
 
         mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
@@ -3089,7 +3227,12 @@ function loadfm_done(mDBload) {
             mega.loadReport.renderfm = -1;
         }
 
+        mclp = Promise.resolve();
         promise.always(_completion);
+    };
+
+    mega.config.ready(function() {
+        mclp.then(_onConfigReady).catch(_onConfigReady);
     });
 }
 

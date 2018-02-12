@@ -27,7 +27,7 @@ var TopicChange = React.createClass({
 
         var displayName;
         if (contact) {
-            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+            displayName = generateAvatarMeta(contact.u).fullName;
         }
         else {
             displayName = contact;
@@ -48,7 +48,7 @@ var TopicChange = React.createClass({
                 '"</strong>'
             );
 
-        
+
         messages.push(
             <div className="message body" data-id={"id" + message.messageId} key={message.messageId}>
                 {avatar}
@@ -61,7 +61,7 @@ var TopicChange = React.createClass({
                 </div>
             </div>
         )
-        
+
 
         return <div>{messages}</div>;
     }

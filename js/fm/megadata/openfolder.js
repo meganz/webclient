@@ -26,6 +26,13 @@
      * @private
      */
     var _openFolderCompletion = function(id, newHashLocation, first, promise) {
+        // if the id is a file handle, then set the folder id as the file's folder.
+        var fid;
+        if (M.d[id] && (M.d[id].t === 0)) {
+            fid = fileversioning.getTopNodeSync(id);
+            id = M.d[fid].p;
+        }
+
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
         this.currentrootid = this.getNodeRoot(id);
@@ -107,8 +114,12 @@
                 viewmode = fmconfig.viewmodes[id];
             }
             else {
-                for (var i = this.v.length; i--;) {
-                    if (is_image(this.v[i])) {
+                for (var i = Math.min(this.v.length, 200); i--;) {
+                    var n = this.v[i];
+
+                    if (String(n.fa).indexOf(':0*') > 0 || is_image(n)
+                        || is_video(n) || MediaInfoLib.isFileSupported(n)) {
+
                         viewmode = 1;
                         break;
                     }
@@ -172,7 +183,7 @@
             }
 
             Soon(function() {
-                M.renderPath();
+                M.renderPath(fid);
             });
         }
 
@@ -332,6 +343,9 @@
             fetchshares = !M.c[id];
         }
         else if (id !== 'transfers' && id !== 'links') {
+            if (id && id.substr(0, 9) === 'versions/') {
+                id = id.substr(9);
+            }
             if (!id) {
                 id = this.RootID;
             }

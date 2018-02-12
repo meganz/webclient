@@ -165,6 +165,24 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
     };
 };
 
+MegaPromise.prototype.benchmark = function(uniqueDebuggingName) {
+    var self = this;
+    MegaPromise._benchmarkTimes = MegaPromise._benchmarkTimes || {};
+    MegaPromise._benchmarkTimes[uniqueDebuggingName] = Date.now();
+
+    self.always(function() {
+        console.error(
+            uniqueDebuggingName,
+            'finished in:',
+            Date.now() - MegaPromise._benchmarkTimes[uniqueDebuggingName]
+        );
+        delete MegaPromise._benchmarkTimes[uniqueDebuggingName];
+    });
+
+    // allow chaining.
+    return self;
+};
+
 /**
  * By implementing this method, MegaPromise will be compatible with .when/.all syntax.
  *
@@ -298,12 +316,13 @@ MegaPromise.prototype.finally = MegaPromise.prototype.wait;
 
 /**
  * Invoke promise fulfilment through try/catch and reject it if there's some exception...
- * @param {Function} resolve
- * @param {Function} reject
+ * @param {Function} resolve The function to invoke on fulfilment
+ * @param {Function} [reject] The function to invoke on rejection/caught exceptions
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.tryCatch = function(resolve, reject) {
     'use strict';
+    reject = reject || function() {};
     return this.done(tryCatch(resolve, reject)).fail(reject);
 };
 

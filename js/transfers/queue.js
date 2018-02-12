@@ -37,7 +37,7 @@
  *
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
-function MegaQueue(worker, limit, name) {
+function MegaQueue(worker, limit, name, setTimeoutValue) {
     var parentLogger;
     this._limit = limit || 5;
     this._queue = [];
@@ -46,6 +46,8 @@ function MegaQueue(worker, limit, name) {
     this._noTaskCount = 0;
     this._qpaused = {};
     this._pending = [];
+    this._setTimeoutValue = setTimeoutValue;
+
     Object.defineProperty(this, "qname", {
         value: String(name || 'unk'),
         writable: false
@@ -383,10 +385,11 @@ MegaQueue.prototype._process = function(ms, sp) {
         sp = new Error(this.qname + ' stack pointer');
     }
     var queue = this;
+
     this._later = setTimeout(function() {
         queue.process(sp);
         queue = undefined;
-    }, ms || 300);
+    }, ms || (typeof(this._setTimeoutValue) !== 'undefined' ? this._setTimeoutValue : 300));
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {
@@ -539,12 +542,12 @@ TransferQueue.prototype.push = function(cl) {
     var self = this;
     var showToast = function() {
         if (M.addDownloadToast) {
-            showTransferToast.apply(window, M.addDownloadToast);
+            M.showTransferToast.apply(M, M.addDownloadToast);
             M.addDownloadToast = null;
         }
     };
 
-    if (localStorage.ignoreLimitedBandwidth) {
+    if (localStorage.ignoreLimitedBandwidth || Object(u_attr).p || cl.dl.byteOffset === cl.dl.size) {
         showToast();
         dlmanager.setUserFlags();
         return MegaQueue.prototype.push.apply(this, arguments);
@@ -569,22 +572,26 @@ TransferQueue.prototype.push = function(cl) {
         // loadingDialog.show();
 
         // Query the size being downloaded in other tabs
-        watchdog.query('dlsize').always(function(res) {
-            var size = 0;
+        watchdog.query('qbqdata').always(function(res) {
+            // this will include currently-downloading and the ClassFiles in hold atm.
+            var qbq = dlmanager.getQBQData();
 
             // if no error (Ie, no other tabs)
             if (typeof res !== 'number') {
-                size = res.reduce(function(a, b) { return a + b; }, 0);
+                for (var i = res.length; i--;) {
+                    qbq.p = qbq.p.concat(res[i].p || []);
+                    qbq.n = qbq.n.concat(res[i].n || []);
+                    qbq.s += res[i].s;
+                }
             }
-
-            // this will include currently-downloading and the ClassFiles in hold atm.
-            size += dlmanager.getCurrentDownloadsSize();
+            qbq.a = 'qbq';
+            qbq.s *= -1;
 
             // Set user flags, registered, pro, achievements
             dlmanager.setUserFlags();
 
             // Fire "Query bandwidth quota"
-            api_req({a: 'qbq', s: size}, {
+            api_req(qbq, {
                 callback: function(res) {
                     // 0 = User has sufficient quota
                     // 1 = unregistered user, not enough quota

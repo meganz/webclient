@@ -16,7 +16,7 @@ MegaData.prototype.contactstatus = function(h, wantTimeStamp) {
                     if (n.t) {
                         folders++;
                     }
-                    else {
+                    else if (!n.fv) {
                         files++;
                     }
                 }
@@ -146,7 +146,32 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
             $('.contact-requests-grid').removeClass('hidden');
 
             initIpcGridScrolling();
-            initBindIPC();
+
+            /**
+             * Bind actions to Received Pending Conctact Request buttons
+             */
+            $('.contact-requests-grid .contact-request-button').rebind('click', function() {
+
+                var $self = $(this);
+                var $reqRow = $self.closest('tr');
+                var ipcId = $reqRow.attr('id').replace('ipc_', '');
+
+                if ($self.is('.accept')) {
+                    if (M.acceptPendingContactRequest(ipcId) === 0) {
+                        $reqRow.remove();
+                    }
+                }
+                else if ($self.is('.delete')) {
+                    if (M.denyPendingContactRequest(ipcId) === 0) {
+                        $reqRow.remove();
+                    }
+                }
+                else if ($self.is('.ignore')) {
+                    if (M.ignorePendingContactRequest(ipcId) === 0) {
+                        $reqRow.remove();
+                    }
+                }
+            });
         }
     }
 };
@@ -248,7 +273,31 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
             $('.sent-requests-grid').removeClass('hidden');
 
             initOpcGridScrolling();
-            initBindOPC();
+
+            /**
+             * Bind actions to Received pending contacts requests buttons
+             */
+
+            $('.sent-requests-grid .contact-request-button').rebind('click', function() {
+                var $self = $(this);
+                var $reqRow = $self.closest('tr');
+                var opcId = $reqRow.attr('id').replace('opc_', '');
+
+                if ($self.is('.reinvite')) {
+                    M.reinvitePendingContactRequest(M.opc[opcId].m);
+                    $reqRow.children().children('.contact-request-button.reinvite').addClass('hidden');
+                }
+                else if ($self.is('.cancel')) {
+
+                    // If successfully deleted, grey column and hide buttons
+                    if (M.cancelPendingContactRequest(M.opc[opcId].m) === 0) {
+                        $(this).addClass('hidden');
+                        $reqRow.children().children('.contact-request-button.cancel').addClass('hidden');
+                        $reqRow.children().children('.contact-request-button.reinvite').addClass('hidden');
+                        $reqRow.addClass('deleted');
+                    }
+                }
+            });
         }
     }
 };
@@ -499,6 +548,7 @@ MegaData.prototype.getContacts = function(n) {
 };
 
 MegaData.prototype.syncUsersFullname = function(userId) {
+    "use strict";
     var self = this;
 
     if (this.u[userId].firstName || this.u[userId].lastName) {
@@ -518,12 +568,13 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             .done(function(r) {
                 lastName.value = r;
             })
-    ]).done(function(results) {
+    ]).done(function() {
         if (!self.u[userId]) {
             return;
         }
 
         [firstName, lastName].forEach(function(obj) {
+
             // -1, -9, -2, etc...
             if (typeof obj.value === 'string') {
                 try {
@@ -544,11 +595,9 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
         self.u[userId].firstName = firstName;
         self.u[userId].lastName = lastName;
+        var user = self.u[userId];
 
-        if (
-            (firstName && $.trim(firstName).length > 0) ||
-            (lastName && $.trim(lastName).length > 0)
-        ) {
+        if (firstName && $.trim(firstName).length > 0 || lastName && $.trim(lastName).length > 0) {
             self.u[userId].name = "";
 
             if (firstName && $.trim(firstName).length > 0) {
@@ -557,6 +606,16 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             if (lastName && $.trim(lastName).length > 0) {
                 self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
             }
+
+            if (M.currentdirid === 'shares') {// Update right panel list and block view
+                $('.shared-grid-view .' + userId + ' .fm-chat-user').text(user.name);
+                $('.inbound-share .' + userId).next().find('.shared-folder-info')
+                    .text(l[17590].replace('%1', user.name));
+            }
+            else if (M.getNodeRoot(M.currentdirid) === 'shares') {
+                $('.shared-details-info-block .' + userId).next()
+                    .find('.fm-chat-user').text(user.name + ' <' + user.m + '>');
+            }
         }
         else {
             self.u[userId].name = "";
@@ -564,7 +623,7 @@ MegaData.prototype.syncUsersFullname = function(userId) {
 
         if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
             self.u[userId].avatar = false;
-            useravatar.loaded(userId); // FIXME: why is this needed here?
+            useravatar.loaded(userId);
         }
 
         if (userId === u_handle) {
@@ -577,13 +636,51 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             $('.membership-big-txt.name:visible').text(
                 u_attr.name
             );
-
-            // XXX: why are we invalidating avatars on first/last-name change?
-            /*if (fminitialized) {
-             M.avatars(u_handle);
-             }*/
         }
     });
+};
+
+
+MegaData.prototype.syncContactEmail = function(userHash) {
+    var promise = new MegaPromise();
+
+    if (M.u[userHash]) {
+        if (!M.u[userHash].m) {
+            attribCache.getItem(userHash + "_uge")
+                .done(function (r) {
+                    M.u[userHash].m = r;
+                    promise.resolve(r);
+                })
+                .fail(function () {
+                    asyncApiReq({
+                        'a': 'uge',
+                        'u': userHash
+                    })
+                        .done(function (r) {
+                            if (r && isString(r)) {
+                                if (M.u[userHash]) {
+                                    M.u[userHash].m = r;
+                                    attribCache.setItem(userHash + "_uge", r);
+                                    promise.resolve(r);
+                                }
+                                else {
+                                    promise.reject();
+                                }
+                            }
+                            else {
+                                promise.reject();
+                            }
+                        });
+                });
+        } else {
+            promise.resolve(M.u[userHash].m);
+        }
+    }
+    else {
+        promise.reject();
+    }
+
+    return promise;
 };
 
 (function(global) {
@@ -626,7 +723,6 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
             }
 
-
             this.u[userId].addChangeListener(onContactChanged);
 
             if (fmdb && !ignoreDB && !pfkey) {
@@ -635,9 +731,13 @@ MegaData.prototype.syncUsersFullname = function(userId) {
                 delete cleanedUpUserData.presence;
                 delete cleanedUpUserData.presenceMtime;
                 delete cleanedUpUserData.shortName;
+                delete cleanedUpUserData.firstName;
+                delete cleanedUpUserData.lastName;
                 delete cleanedUpUserData.name;
                 delete cleanedUpUserData.avatar;
                 fmdb.add('u', {u: u.u, d: cleanedUpUserData});
+                M.u[userId].firstName = '';
+                M.u[userId].lastName = '';
             }
 
             this.syncUsersFullname(userId);
@@ -743,47 +843,6 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
     }
 };
 
-
-/**
- * Check existance of contact/pending contact
- *
- *
- * @param {email} email of invited contact
- *
- * @returns {number} error code, 0 proceed with request
- *
- * -12, Owner already invited user & expiration period didn't expired, fail.
- * -12 In case expiration period passed new upc is sent, but what to do with old request?
- * Delete it as soon as opc response is received for same email (idealy use user ID, if exist)
- * -10, User already invited Owner (ToDO. how to check diff emails for one account) (Check M.opc)
- * -2, User is already in contact list (check M.u)
- *
- */
-MegaData.prototype.checkInviteContactPrerequisites = function(email) {
-    "use strict";
-
-    // Check pending invitations
-    var opc = M.opc;
-    for (var i in opc) {
-        if (this.opc[i].m === email) {
-            return 0;
-        }
-    }
-
-    // Check active contacts
-    var result = 0;
-    M.u.forEach(function(v, k) {
-
-        // Invite all except full contact users
-        if (v.m === email && v.c === 1) {
-            result = -2;
-            return false; // break;
-        }
-    });
-
-    return result;
-};
-
 /**
  * Invite contacts using email address, also known as ongoing pending contacts.
  * This uses API 2.0
@@ -795,27 +854,23 @@ MegaData.prototype.checkInviteContactPrerequisites = function(email) {
  * look at API response code table.
  */
 MegaData.prototype.inviteContact = function(owner, target, msg) {
-    if (d) console.debug('inviteContact');
-    var proceed = this.checkInviteContactPrerequisites(target);
+    "use strict";
 
-    if (proceed === 0) {
-        api_req({'a': 'upc', 'e': owner, 'u': target, 'msg': msg, 'aa': 'a', i: requesti}, {
-            callback: function(resp) {
-                if (typeof resp === 'object') {
-                    if (resp.p) {
-                        proceed = resp.p;
-                    }
+    if (d) {
+        console.debug('inviteContact');
+    }
+
+    api_req({ 'a': 'upc', 'e': owner, 'u': target, 'msg': msg, 'aa': 'a', i: requesti }, {
+        callback: function(resp) {
+            if (typeof resp === 'object' && resp.p) {
+
+                // In case of invite-dialog we will use notifications
+                if ($.dialog !== 'invite-friend') {
+                    M.inviteContactMessageHandler(resp.p);
                 }
             }
-        });
-    }
-
-    // In case of invite-dialog we will use notifications
-    if ($.dialog !== 'invite-friend') {
-        this.inviteContactMessageHandler(proceed);
-    }
-
-    return proceed;
+        }
+    });
 };
 
 /**

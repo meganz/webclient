@@ -178,24 +178,40 @@
             var $a1 = $('.action-block.a1', $dialog);
             var $a2 = $('.action-block.a2', $dialog);
             var $a3 = $('.action-block.a3', $dialog);
-
             switch (op) {
                 case 'copy':
                     $('.red-header', $a1).text(l[16496]);
                     $('.red-header', $a2).text(l[16500]);
+                    $('.red-header', $a3).text(l[17095]);
                     $('.light-grey', $a1).text(l[16498]);
                     $('.light-grey', $a3).text(l[16515]);
                     break;
                 case 'move':
                     $('.red-header', $a1).text(l[16495]);
                     $('.red-header', $a2).text(l[16499]);
+                    $('.red-header', $a3).text(l[17096]);
                     $('.light-grey', $a1).text(l[16497]);
                     $('.light-grey', $a3).text(l[16514]);
                     break;
                 case 'upload':
+                    $('.red-header', $a1).text(l[17093]);
+                    $('.red-header', $a2).text(l[16490]);
+                    $('.red-header', $a3).text(l[17094]);
+                    $('.light-grey', $a1).html(l[17097]);
+                    $('.light-grey', $a3).text(l[16493]);
+                    break;
+                case 'import':
+                    $('.red-header', $a1).text(l[17558]);
+                    $('.red-header', $a2).text(l[17559]);
+                    $('.red-header', $a3).text(l[17560]);
+                    $('.light-grey', $a1).html(l[17097]);
+                    $('.light-grey', $a3).text(l[17561]);
+                    break;
+                case 'replace':
                     $('.red-header', $a1).text(l[16488]);
                     $('.red-header', $a2).text(l[16490]);
-                    $('.light-grey', $a1).text(l[16489]);
+                    $('.red-header', $a3).text(l[17094]);
+                    $('.light-grey', $a1).text(l[17602]);
                     $('.light-grey', $a3).text(l[16493]);
                     break;
             }
@@ -211,8 +227,7 @@
             $('.file-name', $a3).text(this.findNewName(file.name, target));
 
             var done = function(file, name, action) {
-                fm_hideoverlay();
-                $dialog.addClass('hidden');
+                closeDialog();
                 promise.resolve(file, name, action, $('#duplicates-checkbox').attr('checked'));
             };
 
@@ -226,6 +241,11 @@
                 done(file, $('.file-name', this).text(), ns.KEEPBOTH);
             });
 
+            $('#versionhelp').rebind('click', function(ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                window.open(this.href, '_blank');
+            });
             $('.skip-button', $dialog).rebind('click', function() {
                 done(null, 0, ns.DONTCOPY);
             });
@@ -247,8 +267,7 @@
             }
 
             uiCheckboxes($dialog);
-            $dialog.removeClass('hidden');
-            fm_showoverlay();
+            M.safeShowDialog('fileconflict-dialog', $dialog);
 
             return promise;
         },

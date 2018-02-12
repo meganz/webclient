@@ -17,24 +17,34 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
-/** getOwnPropertyDescriptors polyfill */
+/** document.exitFullScreen polyfill */
 mBroadcaster.once('startMega', function() {
-    if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
-        Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
-            value: function getOwnPropertyDescriptors(obj) {
-                var result = {};
+    'use strict';
 
-                for (var key in obj) {
-                    if (obj.hasOwnProperty(key)) {
-                        result[key] = Object.getOwnPropertyDescriptor(obj, key);
-                    }
-                }
-
-                return result;
-            }
-        });
+    if (typeof document.exitFullscreen !== 'function') {
+        document.exitFullscreen = document.mozCancelFullScreen
+            || document.webkitCancelFullScreen || document.msExitFullscreen || function() {};
     }
 });
+
+
+/** getOwnPropertyDescriptors polyfill */
+if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
+    Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
+        value: function getOwnPropertyDescriptors(obj) {
+            'use strict';
+
+            var result = {};
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    result[key] = Object.getOwnPropertyDescriptor(obj, key);
+                }
+            }
+
+            return result;
+        }
+    });
+}
 
 if (!String.prototype.startsWith) {
     // determines whether a string begins with the characters of a specified string

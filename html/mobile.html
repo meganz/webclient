@@ -6,7 +6,7 @@
         <div class="top-menu-content">
             <div class="top-menu-item start">[$1888]</div>
             <div class="top-menu-item fm">[$164]</div>
-            <div class="top-menu-item account not-mobile-ready"><span class="right-el">[$435]</span><span>[$187]</span></div>
+            <div class="top-menu-item account"><span class="right-el">[$435]</span><span>[$187]</span></div>
             <div class="top-menu-item upgrade-your-account not-mobile-ready">[$433]</div>
             <div class="top-menu-item backup not-mobile-ready"><span class="right-el"><i class="semi-small-icon yellow-triangle"></i></span><span>[$8921]</span></div>
             <div class="top-menu-item refresh-item not-mobile-ready">[$85]</div>
@@ -16,7 +16,7 @@
             <div class="top-menu-divider"></div>
 
             <div class="top-menu-item blog blogarticle not-mobile-ready">[$389]</div>
-            <div class="top-menu-item help not-mobile-ready">[$384]</div>
+            <div class="top-menu-item help">[$384]</div>
             <div class="top-menu-item support not-mobile-ready">[$516]</div>
             <div class="top-menu-item upgrade-your-account pro">[$16111]</div>
             <div class="top-menu-item resellers not-mobile-ready">[$391]</div>
@@ -124,23 +124,21 @@
     <div class="mobile fm-row">
 
         <!-- Cloud drive / Folder link header -->
-        <div class="mobile fm-header folder-link">
+        <div class="mobile fm-header fm-hr folder-link">
             <div class="mobile fm-icon cloud left hidden"></div>
             <div class="mobile fm-icon top-icon menu right"></div>
-            <div class="mobile fm-icon upload right hidden">
-                <input class="hidden" type="file" id="select-file" />
-            </div>
             <div class="mobile fm-icon back left hidden"></div>
             <div class="mobile fm-icon folder"></div>
             <div class="mobile fm-header-txt"><span>[$1456]...</span></div>
             <div class="mobile fm-folder-size"></div>
-            <div class="mobile fm-hr"></div>
         </div>
     </div>
 
+    <!-- File manager footer, showing number of folders/files -->
     <div class="mobile fm-row">
         <div class="mobile fm-content">
             <div class="mobile fm-scrolling">
+                <div class="mobile folders-files-text"></div>
 
                 <!-- Template for folders -->
                 <div class="mobile fm-item folder template">
@@ -215,13 +213,98 @@
             </div>
         </div>
     </div>
-
-    <!-- File manager footer, showing number of folders/files -->
-    <div class="mobile fm-row">
-        <div class="mobile fm-bottom"></div>
+    <div class="mobile fm-row bottom-action-bar-container">
+        <div class="mobile bottom-action-bar">
+            <div class="mobile fm-icon scroll-to-top left hidden"></div>
+            <div class="mobile fm-icon upload-file right">
+                <input class="upload-select-file hidden" type="file">
+            </div>
+            <div class="mobile fm-icon mobile-create-new-folder right"></div>
+        </div>
     </div>
+</div>
 
 
+<!-- Create new folder dialog -->
+<div class="mobile fm-block create-new-folder-overlay hidden">
+    <div class= "mobile center-block">
+        <div class="mobile fm-block create-new-folder-dialog">
+            <div class="mobile fm-row">
+                <div class="mobile fm-content">
+                    <div class="mobile first-message">[$17617]</div>
+                    <div class="mobile folder-input-container">
+                        <input class="mobile folder-name-input" type="text" maxlength="70" placeholder="[$157]">
+                        <div class="mobile folder-name-warning-block hidden">
+                            <div class="mobile fm-icon red-warning"></div>
+                            <div class="mobile warning-text">[$7729]</div>
+                        </div>
+                    </div>
+                    <div class="mobile buttons">
+                        <a class="mobile red-button close-button"> <i></i> <span>[$148]</span> </a>
+                        <a class="mobile red-button create-folder confirm-ok-button"> <i></i> <span>[$158]</span> </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Upload overlay !-->
+<div class="mobile main-block upload-overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile white-block">
+                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
+                <div class="mobile filename"><em>[$5533]</em></div>
+                <div class="mobile file-upload-info">
+                    <div class="mobile upload-speed"></div>
+                    <div class="mobile filesize"></div>
+                    <div class="mobile upload-percents"></div>
+                </div>
+                <!-- Progress bar is hidden, adding "uploading" to body class will show it !-->
+                <!-- Set width to ".bar" block !-->
+                <a class="mobile upload-progress">
+                    <div class="mobile bar"></div>
+                    <span class="mobile text">[$6110]</span>
+                </a>
+                <a class="mobile red-button upload-another-file hidden"> <i></i> <span>[$17618]</span> </a>
+
+                <!-- This remains hidden, only used as a template so the desktop upload code works -->
+                <table class="upload-table hidden">
+                    <tr id="ul_8001" class="transfer-queued transfer-upload">
+                        <td>
+                            <div class="transfer-type upload">
+                                <ul>
+                                    <li class="right-c"><p><span></span></p></li>
+                                    <li class="left-c"><p><span></span></p></li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="transfer-filetype-icon"></span>
+                            <span class="tranfer-filetype-txt">fileName</span>
+                        </td>
+                        <td>fileName</td>
+                        <td>fileSize</td>
+                        <td>
+                            <span class="eta"></span><span class="speed">pauseTxt</span>
+                        </td>
+                        <td>
+                            <span class="transfer-status">$[7227]</span>
+                        </td>
+                        <td class="grid-url-field">
+                            <a class="grid-url-arrow"></a>
+                            <a class="clear-transfer-icon"></a>
+                        </td>
+                        <td><span class="row-number"></span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -325,6 +408,616 @@
 </div>
 
 
+<!-- My Account page -->
+<div class="mobile main-block my-account-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon account left"></div>
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-header-txt"><span>[$187]</span></div>
+    </div>
+    <div class="mobile content-row">
+        <div class="mobile content-cell">
+            <div class="mobile avatar-name-block">
+                <div class="mobile main-avatar">
+                    <div class="mobile avatar-bg"><span></span></div>
+                    <div class="mobile avatar-wrapper avatar">
+                        <img alt="" />
+                    </div>
+                </div>
+                <div class="mobile user-info">
+                    <div class="mobile user-name"></div>
+                    <div class="mobile user-email"></div>
+                </div>
+            </div>
+            <div class="mobile account-type-block">
+                <div class="mobile icon pro-mini"></div>
+                <div class="mobile account-type-text">[$17022]</div>
+                <div class="mobile pro-plan-name"></div>
+            </div>
+            <div class="mobile account-usage-block">
+                <div class="mobile fm-icon cloud"></div>
+                <div class="mobile account-usage-text">[$5799]</div>
+                <div class="mobile storage-usage">
+                    <span class="used">0 GB</span> [$5528] <span class="total">0 GB</span><br>
+                    (<span class="percentage"></span>%)
+                </div>
+                <div class="over-quota-message">[$16136]</div>
+            </div>
+            <div class="mobile account-upgrade-block">
+                <div class="mobile fm-icon credit-card"></div>
+                <div class="mobile account-upgrade-text">[$5814]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="mobile account-achievements-block hidden">
+                <div class="mobile fm-icon rocket"></div>
+                <div class="mobile achievements-heading">[$16117]</div>
+                <div class="mobile achievements-text">[$17464]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="mobile account-cancel-subscription-block hidden">
+                <div class="mobile fm-icon cancel-subscription"></div>
+                <div class="mobile subscription-heading">[$7165]</div>
+                <div class="mobile subscription-text"></div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="mobile account-recovery-key-block">
+                <div class="mobile fm-icon recovery-key"></div>
+                <div class="mobile recovery-key-heading">[$8839]</div>
+                <div class="mobile recovery-key-text">[$17688]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="mobile acount-cancellation-block hidden">
+                <div class="mobile fm-icon broken-heart"></div>
+                <div class="mobile account-upgrade-text">Cancel account</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Cancel subscription information overlay for Google/Apple subscriptions -->
+<div class="mobile main-block cancel-subscription-information-overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile white-block">
+                <div class="mobile error-messages">
+                    <div class="mobile first-message">[$7179]</div><br>
+                    <div class="mobile optional-second-message">[$16501]</div>
+                </div>
+                <a class="mobile red-button first confirm-ok-button"> <i></i> <span>[$1596]</span> </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Cancel subscription overlay for ECP/Sabadell subscriptions -->
+<div class="mobile main-block cancel-subscription-overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile white-block">
+                <div class="mobile dialog-information">
+                    <div class="mobile membership-icon free"></div>
+                    <div class="mobile first-message">[$7179]</div>
+                    <div class="mobile second-message">[$17548]</div>
+                </div>
+                <div class="mobile buttons">
+                    <a class="mobile red-button first close-button"> <i></i> <span>[$148]</span> </a>
+                    <a class="mobile red-button second confirm-ok-button"> <i></i> <span>[$870]</span> </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Check your email dialog overlay -->
+<div class="mobile fm-block check-email-overlay hidden">
+    <div class= "mobile center-block">
+        <div class="mobile fm-block check-email-dialog">
+            <div class="mobile fm-row">
+                <div class="mobile fm-content">
+                    <i class="mobile header-icon red-mega">
+                    </i>
+                </div>
+                <div class="mobile first-message">Check your email</div>
+                <div class="mobile overlay-info initial-message">
+                    <p>We have sent you and email. If you can't access your email account, you will need to contact <span class="mobile red-email">support@mega.nz"</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Cancel account page -->
+<div class="mobile main-block cancel-account hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>Cancel account</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile generic-content-block">
+                    <div class="mobile normal-body-text">
+                        Before you close your account, we would like to know why you are leaving us...
+                    </div>
+                    <div class="mobile red-heading">Please select one</div>
+                    <form class="mobile inline-labels radio-button-form">
+                        <div class="radioOn" id="res1_div"><input type="radio" name="feedback-radio" id="res1" value="1"></div>
+                        <label for="res1" class="radio-txt active">I changed my mind, I still want to use MEGA</label>
+
+                        <div class="radioOff" id="res2_div"><input type="radio" name="feedback-radio" id="res2" value="2"></div>
+                        <label for="res2" class="radio-txt">I have another MEGA account</label>
+
+                        <div class="radioOff" id="res3_div"><input type="radio" name="feedback-radio" id="res3" value="3"></div>
+                        <label for="res3" class="radio-txt">I have experienced too many problems</label>
+
+                        <div class="radioOff" id="res4_div"><input type="radio" name="feedback-radio" id="res4" value="4"></div>
+                        <label for="res4" class="radio-txt">My favourite browser is not technologically compatible and I don't want to change</label>
+
+                        <div class="radioOff" id="res5_div"><input type="radio" name="feedback-radio" id="res5" value="5"></div>
+                        <label for="res5" class="radio-txt">I find the interface too confusing to use</label>
+
+                        <div class="radioOff" id="res6_div"><input type="radio" name="feedback-radio" id="res6" value="6"></div>
+                        <label for="res6" class="radio-txt">MEGA has under delivered on its promise</label>
+
+                        <div class="radioOff" id="res7_div"><input type="radio" name="feedback-radio" id="res7" value="7"></div>
+                        <label for="res7" class="radio-txt">Other</label>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Backup Recovery Key page -->
+<div class="mobile main-block recovery-key-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$8839]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile recovery-key-block">
+                    <div class="mobile recovery-key-heading">[$1070]</div>
+                    <div class="mobile recovery-key-body-text">
+                        [$16129]
+                    </div>
+                    <div class="mobile recovery-key-string-block">
+                        <input id="mobile-backup-recovery-key-string" class="mobile recovery-key-string link" type="text" readonly>
+                    </div>
+                    <div class="mobile recovery-key-body-text form-info hidden">
+                        [$17689]
+                    </div>
+                    <div class="mobile recovery-key-copy-btn active hidden">
+                        <span class="label">[$17386]</span>
+                    </div>
+                    <div class="mobile recovery-key-download-btn active hidden">
+                        <span class="label">[$17694]</span>
+                    </div>
+                    <div class="mobile recovery-key-body-text">
+                        [$17690]
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Forgot password Page -->
+<div class="mobile main-block forgot-password-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>Forgot Password</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile forgot-password-block">
+                    <div class="mobile forgot-password-body-text">
+                        If you have a backup of your Recovery key, you can reset your password by selecting YES. No data will be lost.
+                        <br><br>
+                        You can still export your Recovery Key now if you have an active MEGA session in any other browser on this or any other computer.
+                        <br><br>
+                        If you don't, you can no longer decrypt your existing account, but you can start a new one under the same email address by selecting NO.
+                    </div>
+                    <div class="mobile forgot-password-heading">Do you have a copy of your recovery key?</div>
+                    <div class="mobile forgot-password-btn-block">
+                        <div class="mobile forgot-password-btn yes-recovey-key">
+                            <span class="label">Yes</span>
+                        </div>
+                        <div class="mobile forgot-password-btn no-recovery-key">
+                            <span class="label">No</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Recover Account - Yes I have Recovery key-->
+<div class="mobile main-block recover-account-page yes-recovey-key hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>Recover Account</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile recover-account-block">
+                    <div class="mobile r-a-heading">I have my Recovery key</div>
+                    <div class="mobile recover-account-body-text">
+                        Please enter your e-mail address below. You will receive a recovery link that will allow you to submit your Recovery Key and reset your password.
+                    </div>
+                    <div class="mobile signin-input recover-account">
+                        <span></span>
+                        <input type="email" value="" placeholder="Enter your email">
+                    </div>
+                    <div class="mobile recover-account-btn-block">
+                        <div class="mobile r-a-email-send-btn">
+                            <span class="label">Send</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Recover Account - Yes I have Recovery key-->
+<div class="mobile main-block recover-account-page add-recovery-key hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon mega left"></div>
+        <div class="mobile fm-header-txt"><span>Recover Account</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile recover-account-block add-recovery-key hidden">
+                    <div class="mobile r-a-heading">Enter your Recovery key to restore your account</div>
+                    <div class="mobile recover-account-body-text">
+                        Please provide your previously exported Recovery Key. You can still export it from any MEGA session that you may have open in another browser or on another computer.
+
+                        If you don't have a Recovery Key, you can park your existing account and start over.
+                    </div>
+                    <div class="mobile signin-input input-recovery-key">
+                        <span></span>
+                        <input type="text" value="" placeholder="Recovery key">
+                    </div>
+                    <div class="mobile recover-account-btn-block">
+                        <div class="mobile send-recovery-key">
+                            <span class="label">Send</span>
+                        </div>
+                    </div>
+                    <div class="mobile recover-account-body-text">
+                        Alternatively, you can upload your exported Recovery key txt file.
+                    </div>
+                    <div class="mobile recover-account-btn-block">
+                        <div class="mobile upload-recovery-key">
+                            <span class="label">Upload Recovery key</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile recover-account-block update-password">
+                    <div class="mobile r-a-heading">Great!</div>
+                    <div class="mobile recover-account-body-text">
+                        Your have successfully regained access to your account. Please choose a new password below:
+                    </div>
+                    <form>
+                        <div class="mobile signin-input password account-recovery">
+                            <span></span>
+                            <input type="password" value="" placeholder="[$909]" />
+                            <div class="mobile estimator-loading-icon"></div>
+                            <i class="warning-icon"></i>
+                        </div>
+                        <div class="mobile new-registration password-strength">
+                            <div class="register-pass-status-line1"></div>
+                            <div class="register-pass-status-line2"></div>
+                            <div class="register-pass-status-line3"></div>
+                            <div class="register-pass-status-line4"></div>
+                            <div class="register-pass-status-line5"></div>
+                        </div>
+                        <div class="mobile signin-input password-confirm account-recovery">
+                            <span></span>
+                            <input type="password" value="" placeholder="[$1114]" />
+                            <i class="warning-icon"></i>
+                        </div>
+                        <div class="mobile register-button account-recovery">
+                            <span class="label">Update</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Generic Dialog -->
+<div class="mobile fm-block generic-dialog-overlay hidden">
+    <div class= "mobile center-block">
+        <div class="mobile fm-block check-email-dialog">
+            <div class="mobile fm-row">
+                <div class="mobile fm-content">
+                    <!--Add icons here-->
+                    <!--Red MEGA icon === .red-mega -->
+                    <!--Gray MEGA icon === .gray-mega -->
+                    <i class="mobile header-icon gray-mega">
+                    </i>
+                </div>
+                <div class="mobile first-message">Insert heading</div>
+                <div class="mobile overlay-info initial-message">
+                    <p>Insert body text</p>
+                </div>
+                <!-- Add class inline-buttons to mobile buttons class below to show two buttons on one line -->
+                <div class="mobile buttons">
+                    <a class="mobile red-button first"> <i></i> <span>callToAction</span> </a>
+                    <a class="mobile red-button second hidden"> <i></i> <span>Secondary action</span> </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Recover Account - No I don't have Recovery key-->
+<div class="mobile main-block recover-account-page no-recovey-key hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>Recover Account</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile recover-account-block no-recovey-key ">
+                    <div class="mobile r-a-heading">I don't have my Recovery key</div>
+                    <div class="mobile recover-account-body-text">
+                        Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a backup of your Recovery Key. You can park your existing account and start a fresh one under the same e-mail address.
+                    </div>
+                    <div class="mobile signin-input recover-account">
+                        <span></span>
+                        <input type="email" value="" placeholder="Enter your email">
+                    </div>
+                    <div class="mobile recover-account-btn-block">
+                        <div class="mobile r-a-email-send-btn">
+                            <span class="label">Send</span>
+                        </div>
+                    </div>
+                    <div class="mobile recover-account-body-text">
+                        In the event that you recall your parked account's password, please contact <span class="red-email">support@mega.nz</span> for recovery assistance. Your data will be retained for at least 60 days.
+                    </div>
+                </div>
+                <!-- Remove hidden class from park-account-block so user can enter password to park account-->
+                <div class="mobile park-account-block hidden">
+                    <div class="mobile recover-account-body-text">
+                        This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. In case that you recall your parked account's password, please contact <span class="red-email"> support@mega.nz</span>.
+                    </div>
+                    <form>
+                        <div class="mobile signin-input password park-account">
+                            <span></span>
+                            <input type="password" value="" placeholder="[$909]" />
+                            <div class="mobile estimator-loading-icon"></div>
+                            <i class="warning-icon"></i>
+                        </div>
+                        <div class="mobile new-registration password-strength">
+                            <div class="register-pass-status-line1"></div>
+                            <div class="register-pass-status-line2"></div>
+                            <div class="register-pass-status-line3"></div>
+                            <div class="register-pass-status-line4"></div>
+                            <div class="register-pass-status-line5"></div>
+                        </div>
+                        <div class="mobile signin-input password-confirm park-account">
+                            <span></span>
+                            <input type="password" value="" placeholder="[$1114]" />
+                            <i class="warning-icon"></i>
+                        </div>
+                        <div class="mobile register-button park-account">
+                            <span class="label">Park account</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Main achievements page -->
+<div class="mobile main-block achievements-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$16117]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile invite-friends-block">
+                    <div class="mobile fm-icon invite"></div>
+                    <div class="mobile invite-friends-heading">[$17465]</div>
+                    <div class="mobile invite-friends-text">[$17466]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+                <div class="unlocked-rewards-block">
+                    <div class="mobile unlocked-rewards-header">[$16402]</div>
+                    <div class="mobile storage-quota-block">
+                        <div class="mobile storage-amount"></div>
+                        <div class="mobile storage-unit"></div>
+                        <div class="mobile storage-text">[$16127]</div>
+                    </div>
+                    <div class="mobile transfer-quota-block">
+                        <div class="mobile transfer-amount"></div>
+                        <div class="mobile transfer-unit"></div>
+                        <div class="mobile transfer-text">[$16122]</div>
+                    </div>
+                </div>
+                <div class="mobile bonus-information-block referral inactive disabled">
+                    <div class="mobile left-block">
+                        <div class="mobile storage-bonus"></div>
+                        <div class="mobile transfer-bonus"></div>
+                    </div>
+                    <div class="mobile right-block">
+                        <div class="mobile bonus-header">[$16298]</div>
+                        <div class="mobile time-remaining">[$17543]</div>
+                        <div class="mobile fm-icon right-arrow"></div>
+                    </div>
+                </div>
+                <div class="mobile bonus-information-block install-mobile-app inactive">
+                    <div class="mobile left-block">
+                        <div class="mobile storage-bonus"></div>
+                        <div class="mobile transfer-bonus"></div>
+                    </div>
+                    <div class="mobile right-block">
+                        <div class="mobile bonus-header">[$16280]</div>
+                        <div class="mobile time-remaining">[$17543]</div>
+                        <div class="mobile fm-icon right-arrow"></div>
+                    </div>
+                </div>
+                <div class="mobile bonus-information-block registration inactive">
+                    <div class="mobile left-block">
+                        <div class="mobile storage-bonus"></div>
+                        <div class="mobile transfer-bonus"></div>
+                    </div>
+                    <div class="mobile right-block">
+                        <div class="mobile bonus-header">[$16297]</div>
+                        <div class="mobile time-remaining">[$17543]</div>
+                    </div>
+                </div>
+                <div class="mobile bonus-information-block install-mega-sync inactive">
+                    <div class="mobile left-block">
+                        <div class="mobile storage-bonus"></div>
+                        <div class="mobile transfer-bonus"></div>
+                    </div>
+                    <div class="mobile right-block">
+                        <div class="mobile bonus-header">[$16278]</div>
+                        <div class="mobile time-remaining">[$17543]</div>
+                        <div class="mobile fm-icon right-arrow"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Achievements Referral Bonuses page -->
+<div class="mobile main-block achievements-referral-bonuses-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$16298]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile total-referral-bonuses-block">
+                    <div class="mobile storage-quota-block">
+                        <div class="mobile storage-amount">0</div>
+                        <div class="mobile storage-unit">GB</div>
+                        <div class="mobile storage-text">[$16127]</div>
+                    </div>
+                    <div class="mobile transfer-quota-block">
+                        <div class="mobile transfer-amount">0</div>
+                        <div class="mobile transfer-unit">GB</div>
+                        <div class="mobile transfer-text">[$16122]</div>
+                    </div>
+                </div>
+                <div class="mobile referral-blocks">
+                    <div class="mobile referral-block template">
+                        <div class="mobile avatar-container"></div>
+                        <div class="mobile email">name@mail.com</div>
+                        <div class="mobile time-remaining">0d</div>
+                        <div class="mobile referral-row-border"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Achievements Invite Friends page -->
+<div class="mobile main-block achievements-invite-friends-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$17465]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile top-block">
+                    <div class="mobile invite-friends-block">
+                        <div class="mobile fm-icon invite"></div>
+                        <div class="mobile invite-friends-heading">[$17465]</div>
+                        <div class="mobile invite-friends-text">[$17466]</div>
+                    </div>
+                    <div class="mobile email-input-container">
+                        <input class="mobile email-input" type="email" placeholder="[$7434]">
+                        <div class="mobile email-warning-block hidden">
+                            <div class="mobile fm-icon red-warning"></div>
+                            <div class="mobile warning-text">[$1513]</div>
+                        </div>
+                        <div class="mobile success-message-block hidden">[$17544]</div>
+                    </div>
+                    <div class="mobile invite-button">
+                        <span class="label">[$8726]</span>
+                        <span class="loading-image">
+                            <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                        </span>
+                    </div>
+                </div>
+                <div class="mobile how-it-works-block">
+                    <div class="mobile fm-icon info"></div>
+                    <div class="mobile how-it-works-text">[$1070]</div>
+                    <div class="mobile fm-icon right-arrow"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Achievements Invite Friends page -->
+<div class="mobile main-block achievements-how-it-works-page hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$1070]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile top-block">
+                    <div class="mobile fm-icon invite"></div>
+                    <div class="mobile heading how-it-works">[$1070]</div>
+                    <p>[$17476]</p>
+                    <div class="mobile heading why-is-it-not-working">Why is it not working?</div>
+                    <p>[$17477]</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- File not found overlay !-->
 <div class="mobile main-block hidden" id="mobile-ui-notFound">
     <div class="mobile content-row first">
@@ -345,7 +1038,8 @@
 <div class="mobile main-block hidden" id="mobile-ui-main">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
-            <a class="mobile logo"></a>
+            <a class="mobile logo" href="https://mega.nz"></a>
+            <div class="mobile fm-icon top-icon menu right dl-page"></div>
             <div class="mobile fm-dialog-close hidden"></div>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
@@ -361,7 +1055,7 @@
                 <!-- Set width to ".bar" block !-->
                 <a class="mobile download-progress">
                     <div class="bar"></div>
-                    <span>[$8949]</span>
+                    <span class="mobile">[$8949]</span>
                 </a>
             </div>
         </div>
@@ -383,46 +1077,22 @@
                         <div class="mobile application-txt file-manager-download-message hidden">
                             [$16107]
                         </div>
-                        <a class="mobile download-app"></a>
-                    </div>
-                </div>
-                <div class="mobile app-info bottom">
-                    <div class="mobile app-info-cell bottom-align">
-                        <div class="mobile tablet-img-wrapper">
-                            <div class="mobile tablet-img"></div>
-                        </div>
+                        <div class="mobile dl-app-link">
+                            <a class="mobile dl-megaapp"> <i></i> <span>[$17733]</span> </a>
+                       </div>
+                       <a class="mobile download-app"></a>
+                   </div>
+               </div>
+               <div class="mobile app-info bottom">
+                <div class="mobile app-info-cell bottom-align">
+                    <div class="mobile tablet-img-wrapper">
+                        <div class="mobile tablet-img"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
-<!-- Upload overlay !-->
-<div class="mobile main-block hidden" id="mobile-upload">
-    <div class="mobile content-row first">
-        <div class="mobile content-cell">
-            <a class="mobile logo"></a>
-            <div class="mobile fm-dialog-close hidden"></div>
-            <div class="mobile white-block">
-                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
-                <div class="mobile filename"><em>[$5533]</em></div>
-                <div class="mobile file-upload-info">
-                    <div class="mobile download-speed"></div>
-                    <div class="mobile filesize"></div>
-                    <div class="mobile upload-percents"></div>
-                </div>
-                <a class="mobile red-button first dl-browser"> <i></i> <span>[$5532]</span> </a>
-                <!-- Progressbar is hidden. "uploading" body class will show it !-->
-                <!-- Set width to ".bar" block !-->
-                <a class="mobile upload-progress">
-                    <div class="bar"></div>
-                    <span>[$8949]</span>
-                </a>
-            </div>
-        </div>
-    </div>
 </div>
 
 
@@ -438,8 +1108,10 @@
                 <div class="mobile file-download-info">
                     <div class="mobile filesize"></div>
                 </div>
-                <a class="mobile red-button first delete"> <i></i> <span>[$1730]</span> </a>
-                <a class="mobile red-button second cancel"> <i></i> <span>[$82]</span> </a>
+                <div class="mobile buttons inline-buttons">
+                    <a class="mobile red-button first delete"> <i></i> <span>[$1730]</span> </a>
+                    <a class="mobile red-button second cancel"> <i></i> <span>[$82]</span> </a>
+                </div>
             </div>
         </div>
     </div>
@@ -458,9 +1130,11 @@
                 <div class="mobile file-download-info">
                     <div class="mobile filesize"></div>
                 </div>
-                <textarea id="mobile-public-link" class="mobile public-link hidden" readonly></textarea>
-                <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
-                <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
+                <textarea id="mobile-public-link" class="mobile public-link" readonly></textarea>
+                <div class="mobile buttons inline-buttons">
+                    <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
+                    <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
+                </div>
             </div>
         </div>
     </div>
@@ -535,18 +1209,11 @@
 <div class="mobile signin-register-block hidden">
     <div class="mobile fm-block">
         <div class="mobile fm-row">
-            <div class="mobile fm-header sign-header">
+            <div class="mobile fm-header fm-hr sign-header">
                 <div class="mobile fm-icon top-icon menu right"></div>
                 <div class="mobile fm-icon mega left"></div>
-                <div class="mobile top-links">
-                    <div class="mobile top-link sign-in">
-                        [$171]
-                    </div>
-                    <div class="mobile top-link register">
-                        [$968]
-                    </div>
-                </div>
-                <div class="mobile fm-hr"></div>
+                <div class="mobile fm-header-txt sign-in">[$171]</div>
+                <div class="mobile fm-header-txt register">[$968]</div>
             </div>
         </div>
 
@@ -564,22 +1231,22 @@
                                 <span></span>
                                 <input type="password" value="" placeholder="[$16344]" />
                             </div>
-                            <div class="mobile signin-button">
-                                <span class="label">[$16345]</span>
-                                <span class="loading-image">
-                                    <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
-                                </span>
-                            </div>
                             <div class="mobile remember-me">
                                 <div class="checkboxOff checkboxOn square"><i></i><input class="checkbox" type="checkbox" checked="checked"></div>
                                 <div class="checkbox-label text">
                                     [$192]
                                 </div>
                             </div>
-                            <div class="first-message">
+                            <div class="mobile signin-button">
+                                <span class="label">[$16345]</span>
+                                <span class="loading-image">
+                                    <img alt="" src="{staticpath}images/mobile/button-loader.gif" />
+                                </span>
+                            </div>
+                            <div class="first-message hidden">
                                 [$16653]
                             </div>
-                            <a class="mobile download-app hidden"></a>
+                            <!--  <a class="mobile download-app hidden"></a> -->
                         </form>
                     </div>
 
@@ -626,11 +1293,19 @@
                             <div class="mobile register-button">
                                 <span class="label">[$209]</span>
                             </div>
-                            <div class="first-message">
+                            <div class="first-message hidden">
                                 [$16653]
                             </div>
-                            <a class="mobile download-app hidden"></a>
+                            <!-- <a class="mobile download-app hidden"></a> -->
                         </form>
+                    </div>
+                    <div class="mobile top-links">
+                        <div class="mobile top-link sign-in">
+                            [$171]
+                        </div>
+                        <div class="mobile top-link register">
+                            [$968]
+                        </div>
                     </div>
                 </div>
             </div>
@@ -643,15 +1318,13 @@
 <div class="mobile registration-confirm-email full-page-scrollable hidden">
     <div class="mobile fm-block">
         <div class="mobile fm-row">
-            <div class="mobile sign-header">
+            <div class="mobile fm-header sign-header fm-hr">
                 <div class="mobile fm-icon top-icon menu right"></div>
                 <div class="mobile fm-icon mega left"></div>
-                <div class="mobile top-links">
-                    <div class="mobile top-link full active">
-                        [$7732]
-                    </div>
-                </div>
-                <div class="mobile fm-hr"></div>
+                <div class="mobile fm-header-txt">[$7732]</div>
+                <!-- <div class="mobile top-link full active">
+                    [$7732]
+                </div> -->
             </div>
         </div>
 
@@ -682,14 +1355,12 @@
 <div class="mobile registration-generating-keys full-page-scrollable hidden">
     <div class="mobile fm-block">
         <div class="mobile fm-row">
-            <div class="mobile sign-header">
-                <div class="mobile fm-icon mega"></div>
-                <div class="mobile top-links">
-                    <div class="mobile top-link active">
-                        [$1796]
-                    </div>
-                </div>
-                <div class="mobile fm-hr"></div>
+            <div class="mobile sign-header fm-header fm-hr">
+                <div class="mobile fm-icon mega left"></div>
+                <div class="mobile fm-header-txt">[$1796]</div>
+                <!-- <div class="mobile top-link active">
+                    [$1796]
+                </div> -->
             </div>
         </div>
 
@@ -711,11 +1382,10 @@
 <!-- Pro page step 2 - Provider and plan options !-->
 <div class="mobile fm-block membership-step2 hidden">
     <div class="mobile fm-row">
-        <div class="mobile fm-header">
+        <div class="mobile fm-header fm-hr">
             <div class="mobile fm-icon mega left"></div>
             <div class="mobile fm-icon top-icon menu right"></div>
             <div class="mobile fm-header-txt"><span>[$16111]</span></div>
-            <div class="mobile fm-hr"></div>
         </div>
     </div>
     <div class="mobile fm-row">
@@ -784,7 +1454,7 @@
                                                         </div>
                                                         <div class="clear"></div>
                                                         <div class="save-money hidden">
-                                                            [$776] <span class="amount">10.00</span> &euro;
+                                                            [$16649] &euro;
                                                         </div>
                                                     </div>
                                                 </div>
@@ -968,7 +1638,6 @@
 <div class="mobile main-block fm-dialog limited-bandwidth-dialog hidden">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
-            <a class="mobile logo"></a>
             <div class="mobile fm-dialog-close"></div>
             <div class="mobile white-block">
                 <div class="fm-dialog-close"></div>
@@ -1071,10 +1740,9 @@
 <!-- Terms of Service -->
 <div class="mobile fm-block terms-of-service hidden">
     <div class="mobile fm-row">
-        <div class="mobile fm-header">
+        <div class="mobile fm-header fm-hr">
             <div class="mobile fm-icon top-icon menu right"></div>
             <div class="mobile fm-icon mega left"></div>
-            <div class="mobile fm-hr"></div>
         </div>
     </div>
 
@@ -1635,6 +2303,75 @@
                     <p>
                         Last updated 20 January 2016, effective 20 February 2016.
                     </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MEGAdrop public folder not supported page -->
+<div class="mobile fm-block megadrop hidden">
+    <div class="mobile fm-row">
+        <div class="mobile fm-header fm-hr">
+            <div class="mobile fm-icon top-icon menu right"></div>
+            <div class="mobile fm-icon mega left"></div>
+        </div>
+    </div>
+
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile content">
+                    <h1>[$17687]</h1>
+                    <p>
+                        <span>[$17686]</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Get Support page -->
+<div class="mobile main-block get-support hidden">
+    <div class="mobile fm-header fm-hr">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon mega left"></div>
+        <div class="mobile fm-header-txt"><span>[$516]</span></div>
+    </div>
+    <div class="mobile fm-row">
+        <div class="mobile fm-content">
+            <div class="mobile fm-scrolling">
+                <div class="mobile get-support-block">
+                    <div class="mobile normal-body-text">
+                        [$1276]<br>
+                        [$1277]
+                    </div>
+                    <form class="pad-md support-form">
+                        <label class="mobile sub-heading gray">
+                            [$8526]
+                        </label>
+                        <div class="mobile select-wrapper">
+                            <select name="subject" class="mobile dropdown-style mrgn-b-md support-type-dropdown">
+                                <option value="0">[$8527]</option>
+                                <option value="1">[$8528]</option>
+                                <option value="2">[$8529]</option>
+                                <option value="3">[$8638]</option>
+                                <option value="4">[$8639]</option>
+                                <option value="5">[$8640]</option>
+                                <option value="6">[$8641]</option>
+                                <option value="7">[$8642]</option>
+                            </select>
+                        </div>
+                        <label class="mobile sub-heading gray">
+                            [$7368]
+                        </label>
+                        <textarea placeholder="[$8525]" class="mobile support-text-field  mrgn-b-md"></textarea>
+                        <div class="mobile cta-button red support-form send-support-message-button">
+                            [$1694]
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

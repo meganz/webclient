@@ -249,3 +249,9 @@ contrib/local_config.py
 
 nbproject/
 .vscode
+/.vs
+/Words.pdf
+/webclient.sln
+/Web.config
+/koko.html
+/webclient.sln

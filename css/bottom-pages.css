@@ -203,7 +203,7 @@ html.gbot {
     height: 26px;
     display: block;
     margin: 0 auto;
-    background-image: url(../images/mega/startpage-sprite_v4.png);
+    background-image: url(../images/mega/startpage-sprite_v6.png);
     background-position: -110px 1px;
     background-repeat: no-repeat;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=64);
@@ -486,7 +486,7 @@ html.gbot {
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite_v4.png);
+    background-image: url(../images/mega/startpage-sprite_v6.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -506,7 +506,7 @@ html.gbot {
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite_v4.png);
+    background-image: url(../images/mega/startpage-sprite_v6.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -731,7 +731,7 @@ html.gbot {
     margin: 14px auto 7px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite_v4.png);
+    background-image: url(../images/mega/startpage-sprite_v6.png);
     background-position: -0px -73px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
@@ -954,6 +954,9 @@ html.gbot {
     margin-top: 65px;
     font-family: 'montserrat', 'open_sans', sans-serif;
 }
+.bottom-page .megaapp-linux:not(.hidden) + .button.default-huge-button {
+    margin-top: 18px;
+}
 .cmd-bg .top-header {
     color: #333333;
 }
@@ -1014,7 +1017,7 @@ html.gbot {
 }
 .default-dropdown-item.icon {
     padding: 0 30px 0 34px;
-    background-image: url(../images/mega/download-sprite-v7.png);
+    background-image: url(../images/mega/download-sprite-v8.png);
     background-position: 0 64px;
     background-repeat: no-repeat;
 }
@@ -1046,9 +1049,6 @@ html.gbot {
 @media only screen and (max-height: 685px) {
 .linux .bottom-page.top-header {
     padding-top: 17px;
-}
-.linux .default-select.megaapp-dropdown {
-    margin-top: 20px;
 }
 .linux .megaapp-button-info {
     padding-bottom: 60px;
@@ -1109,7 +1109,7 @@ html.gbot {
     cursor: default;
 }
 .megaapp-button-info .nautilus-lnk {
-    margin: 26px 5px -30px 0;
+    margin: 14px 5px -30px 0;
     display: block;
 }
 .megasync .vertical-centered-bl .pages-nav.content-block {
@@ -1134,9 +1134,6 @@ html.gbot {
 }
 .linux .bottom-page.img.sync-top {
     max-width: 40%;
-}
-.megaapp-button-info .nautilus-lnk {
-    margin: 26px 5px -10px 0;
 }
 }
 /* end of MEGAsync */
@@ -1555,7 +1552,7 @@ html.gbot {
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .download-megasync-dialog .icon, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow {
+.medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow {
     background-image: url(../images/mega/pages-sprite@2x.png) !important;
     background-size: 300px auto;
 }
@@ -1776,8 +1773,11 @@ html.gbot {
     width: 100%;
 }
 .bottom-page.horizontal-centered-bl, .bottom-page.horizontal-centered-bl.side-paddings, .bottom-page.half-sized-cell, .absolute-pos .bottom-page.half-sized-cell, .top-bl .bottom-page.half-sized-cell, .top-bl .bottom-page .img-description, .android .top-bl .bottom-page.half-sized-cell {
-    padding-left: 43px;
-    padding-right: 43px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.bottom-page.big-header.red {
+    font-size: 30px;
 }
 .inline-block .big-icon.top-pad {
     margin-top: 11px;

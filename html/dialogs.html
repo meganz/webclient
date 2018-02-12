@@ -180,9 +180,16 @@
 <div class="fm-dialog create-folder-dialog filled-input hidden">
     <div class="fm-dialog-close"></div>
     <div class="nw-fm-dialog-title">[$68]</div>
-    <div class="create-folder-size-icon short-size"></div>
+    <div class="create-folder-size-icon short-size">
+    </div>
     <div class="create-folder-pad">
         <div class="create-folder-input-bl">
+            <div class="transfer-filetype-icon folder">
+                <div class="duplicated-input-warning">
+                    <div class="arrow"></div>
+                    <span>[$17579]</span>
+                </div>
+            </div>
             <input name="dialog-new-folder" type="text" value="" placeholder="[$157]" autofocus/>
         </div>
         <div class="create-folder-bottom">
@@ -281,7 +288,12 @@
     </div>
     <div class="fm-dialog-body">
         <div class="rename-input-bl">
-            <div class="transfer-filetype-icon"></div>
+            <div class="transfer-filetype-icon">
+                <div class="duplicated-input-warning">
+                    <div class="arrow"></div>
+                    <span>[$17578]</span>
+                </div>
+            </div>
             <input name="dialog-rename" type="text" value="[$157]" />
         </div>
         <div class="default-dialog-bottom">
@@ -321,6 +333,7 @@
             <div class="context-menu-section">
                 <div class="sorting-menu-arrow"></div>
                 <div data-by="name" class="sorting-menu-item active">[$86]</div>
+                <div data-by="label" class="sorting-menu-item">[$17398]</div>
                 <div data-by="status" class="sorting-menu-item">[$89]</div>
                 <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
                 <div class="sorting-item-divider"></div>
@@ -397,7 +410,7 @@
             <span>[$68]</span>
         </div>
         <div class="default-white-button right dialog-copy-button">
-            <span>[$1990]</span>
+            <span>[$16176]</span>
         </div>
         <div class="default-white-button right dialog-cancel-button">
             <span>[$82]</span>
@@ -443,6 +456,7 @@
             <div class="context-menu-section">
                 <div class="sorting-menu-arrow"></div>
                 <div data-by="name" class="sorting-menu-item active">[$86]</div>
+                <div data-by="label" class="sorting-menu-item">[$17398]</div>
                 <div data-by="status" class="sorting-menu-item">[$89]</div>
                 <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
                 <div class="sorting-item-divider"></div>
@@ -790,26 +804,35 @@
            </div>
         </div>
         <span class="file-status-icon"></span>
+        <div class="dialog versioning-indicator">
+            <i class="small-icon icons-sprite grey-clock"></i>
+        </div>
         <span class="link-icon"></span>
         <div class="properties-elements-counter"><span></span></div>
         <div class="properties-file-icon">
         </div>
-        <div class="properties-txt-pad">
-            <div class="properties-small-gray">[$86]</div>
-            <div class="priperties-name-block">
-              <div class="propreties-dark-txt">Filename.ext</div>
-              <span class="file-settings-icon"><span></span></span>
+        <div class="properties-txt-wrapper">
+            <div class="properties-txt-pad">
+                <div class="properties-small-gray">[$86]</div>
+                <div class="priperties-name-block">
+                  <div class="propreties-dark-txt">Filename.ext</div>
+                  <span class="file-settings-icon"><span></span></span>
+                </div>
+                <div class="properties-float-bl">
+                    <span class="properties-small-gray">[$87]:</span>
+                    <span class="propreties-dark-txt">100kb</span>
+                </div>
+                <div class="properties-float-bl second">
+                    <span class="properties-small-gray">Versions:</span>
+                    <a class="propreties-dark-txt">10 versions</a>
+                </div>
+                <div class="properties-small-gray">[$86]</div>
+                <div class="propreties-dark-txt">Filename.ext</div>
             </div>
-            <div class="properties-float-bl">
-                <span class="properties-small-gray">[$87]:</span>
-                <span class="propreties-dark-txt">100kb</span>
+        </div>
+        <div class="properties-previous-versions">
+            <div class="grid-scrolling-table">
             </div>
-            <div class="properties-float-bl second">
-                <span class="properties-small-gray">[$87]</span>
-                <span class="propreties-dark-txt">100kb</span>
-            </div>
-            <div class="properties-small-gray">[$86]</div>
-            <div class="propreties-dark-txt">Filename.ext</div>
         </div>
         <div class="clear"></div>
     </div>
@@ -918,36 +941,17 @@
     </div>
 </div>
 
-<div class="fm-dialog download-megasync-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$1626]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-    <div class="content">
-        <div class="txt">[$7236]</div>
-        <a class="button clickurl" href="/sync">
-            <span class="icon"></span>
-            <span class="button-txt">[$5565] [$1626]</span>
-        </a>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="checkboxOff">
-            <input type="checkbox" name="megasync-checkbox" id="megasync-checkbox" class="checkboxOff">
-        </div>
-        <label for="megasync-checkbox" class="radio-txt">[$229]</label>
-        <div class="default-white-button right close-button">
-            <span>[$148]</span>
-        </div>
-        <div class="clear"></div>
-    </div>
-</div>
-
 <div class="create-new-folder dropdown body popup dropdown-arrow hidden">
     <i class="dropdown-white-arrow"></i>
     <div class="create-folder-size-icon full-size"></div>
     <div class="create-folder-pad">
         <div class="create-folder-input-bl">
+            <div class="transfer-filetype-icon folder">
+                <div class="duplicated-input-warning">
+                    <div class="arrow"></div>
+                    <span>[$17579]</span><!--  -->
+                </div>
+            </div>
             <input type="text" value="" placeholder="[$157]" autofocus/>
         </div>
         <a class="create-folder-button"><span>[$455]</span></a>
@@ -985,7 +989,7 @@
             </div>
         </div>
         <div class="multiple-input">
-            <input type="text" class="add-contact-multiple-input" name="" />
+            <input type="text" class="add-contact-multiple-input" id="add-user-dialog-input" name="" />
             <div class="clear"></div>
         </div>
 
@@ -1055,7 +1059,7 @@
             </div>
         </div>
         <div class="multiple-input">
-            <input type="text" class="share-multiple-input" name=""/>
+            <input type="text" class="share-multiple-input" id="share-multiple-input" name=""/>
             <div class="clear"></div>
         </div>
         <div class="share-message">
@@ -1159,6 +1163,7 @@
       <div class="context-menu-section hidden">
         <div class="sorting-menu-arrow"></div>
         <div data-by="name" class="sorting-menu-item active">[$86]</div>
+        <div data-by="label" class="sorting-menu-item">[$17398]</div>
         <div data-by="status" class="sorting-menu-item">[$89]</div>
         <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
         <div class="sorting-item-divider"></div>
@@ -1933,6 +1938,17 @@
                 <div class="megasync-slider-wrap">
                     <div class="megasync-slider body-block">
 
+                        <div class="megasync-slide slide0 hidden">
+                            <div class="megasync-header">
+                                That's impressive!
+                            </div>
+                            <div class="megasync-img img0">
+                                <div class="megasync-text">
+                                    It appears that you are trying to transfer a large amount of files. This can lead to performance issues when downloading with your browser. Try our app for enhanced performance on file transfers.
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="megasync-slide slide1">
                             <div class="megasync-header">
                                 [$16861]
@@ -1984,20 +2000,17 @@
 
                             </div>
                         </div>
-                        <div class="clear"></div>
                     </div>
 
                     <div class="megasync-slider button prev"></div>
                     <div class="megasync-slider button next"></div>
 
-                    <div class="megasync-controls">
-                        <div class="active" data-slidernum="1"></div>
-                        <div data-slidernum="2"></div>
-                        <div data-slidernum="3"></div>
-                    </div>
                     <div class="megasync-buttons">
                         <div class="download big-button red download-megasync transition">
-                            [$1913]
+                            <span>Download MEGA app</span>
+                        </div>
+                        <div class="download big-button continue-with-browser transition hidden">
+                            <span>Continue with browser</span>
                         </div>
                     </div>
                 </div>
@@ -2228,8 +2241,14 @@
     <div class="toast-body">
         <div class="toast-col">
             <span></span>
-            <div class="toast-button">
-                [$726]
+        </div>
+        <div class="toast-col">
+            <div class="toast-button first">
+                <span>[$726]</span>
+            </div>
+            <div class="toast-button second hidden">
+                <i class="small-icon icons-sprite cog"></i>
+                <span>[$6117]</span>
             </div>
         </div>
         <div class="toast-col">
@@ -2394,16 +2413,13 @@
         <div class="dialog header-before-icon limited">[$16164]</div>
         <div class="dialog header-before-icon exceeded">[$17]</div>
 
-        <i class="big-104px-icon speedometer almost-full dialog-top-icon"></i>
+        <i class="semi-huge-icon speedometer almost-full dialog-top-icon"></i>
         <i class="big-104px-icon speedometer full dialog-top-icon"></i>
         <i class="semi-huge-icon speedometer full dialog-top-icon"></i>
 
         <p class="dialog p-after-icon msg-overquota">[$120]</p>
         <p class="dialog p-after-icon msg-prewarning">
-            <!-- [$16356] - Your queued download exceeds the current transfer quota available for your account and may therefore be interrupted. !-->
-            <!-- [$16357] - Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. !-->
-            <span class="registered">[$16356]</span>
-            <span class="not-registered">[$16357]</span>
+            [$17090]
         </p>
 
         <div class="dialog pro-exceeded-bl">
@@ -2489,22 +2505,24 @@
                 <div class="reg-st3-membership-bl pro4 selected" data-payment="4">
                     <div class="membership-pad-bl">
                         <div class="reg-st3-bott-title title">
-                            <div class="membership-icon tiny"></div>[$6234]
+                            <div class="membership-icon tiny"></div>[$8413]
                         </div>
                         <div class="membership-gray-block">
                             <div class="reg-st3-bott-title price"><span class="num">4<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
                         </div>
-                        <div class="reg-st3-storage">
-                            <div class="pro-feature-icon"></div>
-                            <div class="reg-st3-big-txt">200 <span>GB</span></div>
-                            <div class="reg-st3-mid-txt">[$495]</div>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="reg-st3-bandwidth">
-                            <div class="pro-feature-icon bandwidth"></div>
-                            <div class="reg-st3-big-txt">1 <span>TB</span></div>
-                            <div class="reg-st3-mid-txt">[$16120]</div>
-                            <div class="clear"></div>
+                        <div class="pro-plan-descr">
+                            <div class="reg-st3-storage">
+                                <div class="pro-feature-icon"></div>
+                                <div class="reg-st3-big-txt">200 <span>GB</span></div>
+                                <div class="reg-st3-mid-txt">[$495]</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="reg-st3-bandwidth">
+                                <div class="pro-feature-icon bandwidth"></div>
+                                <div class="reg-st3-big-txt">1 <span>TB</span></div>
+                                <div class="reg-st3-mid-txt">[$16120]</div>
+                                <div class="clear"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2517,17 +2535,19 @@
                         <div class="membership-gray-block">
                             <div class="reg-st3-bott-title price"><span class="num">9<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
                         </div>
-                        <div class="reg-st3-storage">
-                            <div class="pro-feature-icon"></div>
-                            <div class="reg-st3-big-txt">1 <span>TB</span></div>
-                            <div class="reg-st3-mid-txt">[$495]</div>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="reg-st3-bandwidth">
-                            <div class="pro-feature-icon bandwidth"></div>
-                            <div class="reg-st3-big-txt">2 <span>TB</span></div>
-                            <div class="reg-st3-mid-txt">[$16120]</div>
-                            <div class="clear"></div>
+                        <div class="pro-plan-descr">
+                            <div class="reg-st3-storage">
+                                <div class="pro-feature-icon"></div>
+                                <div class="reg-st3-big-txt">1 <span>TB</span></div>
+                                <div class="reg-st3-mid-txt">[$495]</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="reg-st3-bandwidth">
+                                <div class="pro-feature-icon bandwidth"></div>
+                                <div class="reg-st3-big-txt">2 <span>TB</span></div>
+                                <div class="reg-st3-mid-txt">[$16120]</div>
+                                <div class="clear"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2540,17 +2560,19 @@
                         <div class="membership-gray-block">
                             <div class="reg-st3-bott-title price"><span class="num">19<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
                         </div>
-                        <div class="reg-st3-storage">
-                            <div class="pro-feature-icon"></div>
-                            <div class="reg-st3-big-txt">4 <span>TB</span></div>
-                            <div class="reg-st3-mid-txt">[$495]</div>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="reg-st3-bandwidth">
-                            <div class="pro-feature-icon bandwidth"></div>
-                            <div class="reg-st3-big-txt">8 <span>TB</span></div>
-                            <div class="reg-st3-mid-txt">[$16120]</div>
-                            <div class="clear"></div>
+                        <div class="pro-plan-descr">
+                            <div class="reg-st3-storage">
+                                <div class="pro-feature-icon"></div>
+                                <div class="reg-st3-big-txt">4 <span>TB</span></div>
+                                <div class="reg-st3-mid-txt">[$495]</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="reg-st3-bandwidth">
+                                <div class="pro-feature-icon bandwidth"></div>
+                                <div class="reg-st3-big-txt">8 <span>TB</span></div>
+                                <div class="reg-st3-mid-txt">[$16120]</div>
+                                <div class="clear"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2563,17 +2585,19 @@
                         <div class="membership-gray-block">
                             <div class="reg-st3-bott-title price"><span class="num">29<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
                         </div>
-                        <div class="reg-st3-storage">
-                            <div class="pro-feature-icon"></div>
-                            <div class="reg-st3-big-txt">8 <span>TB</span></div>
-                            <div class="reg-st3-mid-txt">[$495]</div>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="reg-st3-bandwidth">
-                            <div class="pro-feature-icon bandwidth"></div>
-                            <div class="reg-st3-big-txt">16 <span>TB</span></div>
-                            <div class="reg-st3-mid-txt">[$16120]</div>
-                            <div class="clear"></div>
+                        <div class="pro-plan-descr">
+                            <div class="reg-st3-storage">
+                                <div class="pro-feature-icon"></div>
+                                <div class="reg-st3-big-txt">8 <span>TB</span></div>
+                                <div class="reg-st3-mid-txt">[$495]</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="reg-st3-bandwidth">
+                                <div class="pro-feature-icon bandwidth"></div>
+                                <div class="reg-st3-big-txt">16 <span>TB</span></div>
+                                <div class="reg-st3-mid-txt">[$16120]</div>
+                                <div class="clear"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2587,6 +2611,19 @@
         <div class="dialog bottom-tips">
             <span>[$16355]</span>
             <a>[$16354]</a>
+        </div>
+
+        <div class="dialog limited-bottom">
+            <div class="download big-button continue-download red transition">
+                <i class="medium-icon icons-sprite download"></i>
+                <span>[$17091]</span>
+            </div>
+            <div class="centered-checkbox dialog-bottom">
+                <div class="checkdiv checkboxOff">
+                    <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
+                </div>
+                <label for="limit-warning-checkbox" class="radio-txt medium">[$229]</label>
+            </div>
         </div>
 
     </div>
@@ -3237,7 +3274,7 @@
         <div class="storage-dialog body-header">
             [$16360]
         </div>
-        <div class="storage-dialog body-p">
+        <div class="storage-dialog body-p long">
             [$16304]
         </div>
         <div class="button default-red-button inline big choose-plan">
@@ -3348,17 +3385,17 @@
 
         <div class="duplicate-conflict action-block a1">
             <div class="duplicate-conflict red-header">
-                [$16488]
+                [$17093]
                 <!--
-                    [$16488] - Upload and Replace
+                    [$17093] - Upload and update
                     [$16495] - Move and Replace
                     [$16496] - Copy and Replace
                 !-->
             </div>
             <div class="duplicate-conflict info-txt light-grey">
-                [$16489]
+                [$17097]
                 <!--
-                    [$16489] - Replace the file in the destination folder with the file you are uploading:
+                    [$17097] - The file will be updated with version history. [A]Learn more[/A]:
                     [$16497] - Replace the file in the destination folder with the file you are moving:
                     [$16498] - Replace the file in the destination folder with the file you are copying:
                 !-->
@@ -3436,7 +3473,7 @@
 
     </div>
     <div class="fm-notifications-bottom">
-        <div class="default-white-button right notification-button skip-button"><span>[$1379]</span></div>
+        <div class="default-white-button right notification-button skip-button hidden"><span>[$1379]</span></div>
         <div class="default-white-button right notification-button cancel-button"><span>[$82]</span></div>
         <!-- Please add "hidden" class !-->
         <div class="bottom-checkbox">
@@ -3537,14 +3574,20 @@
             <div class="clear"></div>
         </div>
 
-        <div class="viewer-image-bl hidden">
+        <div class="viewer-image-bl hidden" data-fullscreen="false" id="videoContainer">
             <img alt="" />
+            <embed type="application/pdf" class="hidden">
+            <video id="video" controls preload="metadata" poster="" data-autoplayvideo="false"  data-playvideoonclick="false"></video>
+
+            <iframe id="pdfpreviewdiv1" src="about:blank" class="hidden"></iframe>
         </div>
 
+        <div class="play-video-button"></div>
         <div class="viewer-pending hidden">
             <div class="bounce1"></div>
             <div class="bounce2"></div>
             <div class="bounce3"></div>
+            <span class="clear"></span>
         </div>
 
         <div class="viewer-error hidden">
@@ -3576,18 +3619,520 @@
         <div class="viewer-mid-button next"></div>
 
         <div class="viewer-bottom-bl">
-            <div class="viewer-images-num hidden">
-                <span class="first">0</span>
-                [$5528]
-                <span class="last">0</span>
+            <div class="img-controls">
+                <div class="viewer-images-num hidden">
+                    <span class="first">0</span>
+                    [$5528]
+                    <span class="last">0</span>
+                </div>
+                <div class="viewer-button right fullscreen">
+                    <i class="medium-icon icons-img fullscreen"></i>
+                </div>
+                <div class="clear"></div>
             </div>
-            <div class="viewer-button right fullscreen">
-                <i class="medium-icon icons-img fullscreen"></i>
+
+            <div id="video-controls" class="video-controls" data-state="hidden">
+                <div data-state="play" class="viewer-button left playpause">
+                    <i class="medium-icon icons-img pause"></i>
+                </div>
+                <div class="volume-control left">
+                    <div data-state="mute" class="viewer-button mute">
+                        <i class="medium-icon icons-img volume"></i>
+                    </div>
+                    <div class="video-vol-range">
+                        <div class="volume-bar"><span></span></div>
+                    </div>
+                </div>
+                <div class="video-timing current left">
+                    00:00
+                </div>
+                <div data-state="go-fullscreen" class="viewer-button right fs">
+                    <i class="medium-icon icons-img fullscreen"></i>
+                </div>
+                <div class="video-timing duration right">
+                    00:00
+                </div>
+                <div class="video-progress-block">
+                    <div class="video-progress-bar">
+                        <div class="video-time-bar"></div>
+                    </div>
+                </div>
             </div>
-            <div class="clear"></div>
         </div>
     </div>
 </div>
+
+<div class="fm-versioning overlay hidden">
+    <div class="fm-versioning header">
+        <div class="fm-versioning button settings" title="[$17580]">
+            <i class="small-icon icons-sprite cog "></i>
+        </div>
+        <div class="fm-versioning button close">
+            <i class="medium-icon icons-sprite big-close"></i>
+        </div>
+        <div class="fm-versioning pad">
+            <div class="fm-versioning top-column">
+                <div class="medium-file-icon"></div>
+                <div class="fm-versioning file-data">
+                    <div class="fm-versioning file-name">
+                        <span class="grey">filename1.psd</span>
+                        <span class="red">(most recent version)</span>
+                    </div>
+                    <div class="fm-versioning file-path">
+                        <span>Cloud Drive</span>
+                        <span>folder name</span>
+                    </div>
+                </div>
+            </div>
+            <div class="fm-versioning top-column right-text-align">
+                <div class="default-white-button semi-small light-grey-txt" title="[$58]">
+                    <i class="small-icon icons-sprite down-arrow"></i>
+                    <span>[$58]</span>
+                </div>
+                <div class="default-white-button semi-small light-grey-txt" title="[$16475]">
+                    <i class="small-icon icons-sprite reverted-clock"></i>
+                    <span>[$16475]</span>
+                </div>
+                <div class="default-white-button semi-small light-grey-txt" title="[$1730]">
+                    <i class="small-icon icons-sprite rubbish-bin-icon"></i>
+                    <span>[$1730]</span>
+                </div>
+                <div class="default-white-button semi-small light-grey-txt" title="[$17147]">
+                    <i class="small-icon icons-sprite clock-with-cross"></i>
+                    <span>[$17147]</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fm-versioning body">
+        <!-- TODO: Init jScrollPane !-->
+        <div class="fm-versioning scroll-bl">
+            <div class="fm-versioning content">
+
+                <!-- Modification Date !-->
+                <div class="fm-versioning data">
+                    <span>Today</span>
+                </div>
+
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOn"><input type="radio" name="versioning" class="radioOn" value="1" checked></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.20</span>
+                            <span class="size">160 KB</span>
+                            <span class="red">(Current version)</span>
+                        </div>
+                    </div>
+
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>12:30</span>
+                    </div>
+
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite refresh-arrows"></i>
+                        <span class="modified-info-txt">
+                            Edited
+                        </span>
+
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.19</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>12:30</span>
+                    </div>
+
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite mobile-device"></i>
+                        <span class="modified-info-txt">
+                            Renamed from <span class="light-grey italic">filename1.psd</span>
+                        </span>
+
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.18</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite earth"></i>
+                        <span class="modified-info-txt">
+                            Moved from <span class="fm-versioning file-path"><span>Cloud Drive</span><span>folder name</span></span>
+                        </span>
+
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.17</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite earth"></i>
+                        <span class="modified-info-txt">
+                            Edited
+                        </span>
+
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+                <!-- Modification Date !-->
+                <div class="fm-versioning data">
+                    <span>Yesterday</span>
+                </div>
+
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.16 <span class="italic">(v.8)</span></span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite reverted-light-clock"></i>
+                        <span class="modified-info-txt">
+                            reverted from <span class="strong">v. 8</span>
+                        </span>
+
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.15</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite earth"></i>
+                        <span class="modified-info-txt">
+                            Edited by <span class="strong">Lloyd Hubbard</span>
+                        </span>
+
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+                <!-- Modification Date !-->
+                <div class="fm-versioning data">
+                    <span>10 March</span>
+                </div>
+
+                <!-- File Data Row !-->
+                <div class="fm-versioning file-info-row">
+                    <div class="radio-input radioOff"><input type="radio" name="versioning" class="radioOff" value="1"></div>
+                    <div class="medium-file-icon photoshop"></div>
+                    <div class="fm-versioning file-data table-cell">
+                        <!-- File name !-->
+                        <div class="fm-versioning file-name">
+                            <span class="grey">filename1.psd</span>
+                        </div>
+                        <!-- File version amd Size !-->
+                        <div class="fm-versioning file-info">
+                            <span class="version">v.14</span>
+                            <span class="size">160 KB</span>
+                        </div>
+                    </div>
+
+                    <!-- Modification time !-->
+                    <div class="fm-versioning modified-time table-cell">
+                        <i class="small-icon icons-sprite clock"></i>
+                        <span>15:30</span>
+                    </div>
+
+                    <!-- Modification info !-->
+                    <div class="fm-versioning modified-info table-cell">
+                        <!-- Classnames: "earth", "refresh-arrows", "mobile-device", "reverted-light-clock" !-->
+                        <i class="small-icon icons-sprite earth"></i>
+                        <span class="modified-info-txt">
+                            Created
+                        </span>
+
+                        <!-- Buttons !-->
+                        <div class="fm-versioning buttons">
+                            <div class="button download-file">
+                                <i class="small-icon icons-sprite down-arrow"></i>
+                            </div>
+                            <div class="button revert-file">
+                                <i class="small-icon icons-sprite revert-small-arrow"></i>
+                            </div>
+                            <div class="button delete-file">
+                                <i class="small-icon icons-sprite filled-rubbish-bin"></i>
+                            </div>
+                        </div>
+                        <!-- End of Buttons !-->
+
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dropdown body popup dropdown-arrow pass-reminder hidden">
+    <i class="dropdown-white-arrow"></i>
+    <div class="fm-dialog-close"></div>
+    <div class="nw-fm-dialog-title big">[$16895]</div>
+    <div class="dropdown content-block">
+        <div class="content-body">
+            <div class="bottom-page big-icon pass-reminder centered"></div>
+            <div class="pass-reminder info-txt">
+                <!-- l[16900] -->
+            </div>
+            <div class="dialog input-wrapper ">
+                <!-- Please add 'wrong' class is password is incorrect !-->
+                <div class="dialog big-input-bg">
+                    <input type="password" value="" name="test-pass1" id="test-pass" placeholder="[$16896]" autocomplete="off">
+                </div>
+                <div class="dialog input-button">
+                    <div class="default-white-button semi-big grey-txt confirm-password button-prd-confirm">
+                        <span>[$6080]</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pass-reminder result-block">
+                <!-- Please remove 'hidden' class is password is correct !-->
+                <div class="pass-reminder result-txt accepted hidden">
+                    <i class="tiny-icon green-tick"></i>
+                    [$16897]
+                </div>
+                <!-- Please remove 'hidden' class is password is wrong !-->
+                <div class="pass-reminder result-txt wrong hidden">
+                    <i class="tiny-icon red-cross"></i>
+                    [$16898]
+                </div>
+            </div>
+            <div class="pass-reminder light info-txt">
+                [$16899]
+            </div>
+        </div>
+
+        <div class="dark-dialog-bottom">
+            <div class="pass-reminder big-buttons">
+                <div class="default-big-button grey-gradient button-without-outline inline button-prd-backup">
+                    <span>[$8859]</span>
+                </div>
+                <div class="default-big-button button-without-outline inline button-prd-skip">
+                    <span>[$1379]</span>
+                </div>
+            </div>
+
+            <div class="centered-checkbox dialog-bottom">
+                <div class="checkdiv checkboxOff">
+                    <input type="checkbox" name="pass-recovery-checkbox" id="pass-recovery-checkbox" class="checkboxOff">
+                </div>
+                <label for="pass-recovery-checkbox" class="radio-txt medium">[$229]</label>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+    </div>
+</div>
+
 
 <div class="fm-dialog resume-transfer hidden">
     <div class="fm-dialog-header big-pad">
@@ -3606,6 +4151,164 @@
             </div>
             <div class="download big-button transition inline cancel">
                 <span>[$82]</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create MEGAdrop introduction -->
+<div class="fm-dialog create-widget-info-dialog hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$17401]</div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="fm-dialog-body">
+        <div class="wrapper">
+            <div class="fm-widget-illustration"></div>
+            <div class="fm-widget-introduction">
+               [$17412]
+            </div>
+            <div class="fm-widget-manage">
+                [$17399]
+            </div>
+            <div class="fm-body-text">
+                [$17413]
+            </div>
+        </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="CWD_cb checkboxOff"> <input type="checkbox" name="CWD_cb" id="CWD_cb" class="checkboxOff"> </div>
+        <label for="CWD_cb" class="radio-txt">[$229]</label>
+
+        <div class="default-grey-button widget-create-button right"><span>[$158]</span></div>
+    </div>
+</div>
+
+<!-- Get MEGAdrop embed instructions -->
+<div class="fm-dialog widget-dialog hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$17401]</div>
+        <div class="fm-dialog-chrome-clipboard hidden">
+            <div id="chromeclipboard2" class="selectable"></div>
+        </div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+
+    <!-- URL & Embed Tab link -->
+    <div class="fm-dialog-tab">
+        <div class="fm-tab-wrapper">
+            <div class="fm-tab tab-url-link active">
+                <div class="tab-icon url"></div><span>[$5622]</span>
+            </div>
+            <div class="fm-tab tab-embed-link">
+                <div class="tab-icon embed"></div><span>[$17407]</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="fm-dialog-body">
+        <div class="wrapper embed-link hidden">
+                <div class="fm-body-text">
+                    <div class="widget-folder-icon"></div>
+                    <span>[$17411]</span>
+                </div>
+            <div class="widget-code">
+                <span class="widget-code-wrapper">
+                    <p class="l1"></p>
+                    <p class="l2"></p>
+                    <p class="l3"></p>
+                    <p class="l4"></p>
+                    <p class="l5"></p>
+                    <p class="l6"></p>
+                    <p class="l7"></p>
+                    <p class="l8"></p>
+                    <p class="l9"></p>
+                    <p class="l10"></p>
+                    <p class="l11"></p>
+                </span>
+            </div>
+            <div class="widget-dialog-buttons">
+                <div class="button default-white-button left copy-widget-code">
+                    <span>[$17408]</span>
+                </div>
+                <div class="button default-white-button left preview-widget">
+                    <span>[$17409]</span>
+                </div>
+            </div>
+        </div>
+        <div class="wrapper url-link">
+            <div class="fm-body-text">
+                <div class="widget-folder-icon"></div>
+                    <span>[$17410]</span>
+                </div>
+            <div class="widget-code">
+                <span class="widget-code-wrapper widget-url">
+                </span>
+            </div>
+            <div class="widget-dialog-buttons">
+                <div class="button default-white-button left copy-widget-url">
+                    <span>[$1394]</span>
+                </div>
+                <div class="button default-white-button left preview-widget">
+                    <span>[$17409]</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="default-grey-button close-button right"><span>[$148]</span></div>
+    </div>
+</div>
+
+<!-- Manage MEGAdrop embed -->
+<div class="fm-dialog manage-widget hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$17399]</div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="fm-dialog-body">
+        <div class="wrapper widget-delete-blur">
+             <div class="fm-subheading ">Live Widget</div>
+             <div class="dialog-feature-toggle widget-connect-toggle-on"><div class="dialog-feature-switch widget-connect-switch-on"></div></div>
+            <div class="fm-body-text">
+                Turning this off will not remove your widget from your website. It will only prevent people from uploading to it.
+            </div>
+            <div class="fm-subheading ">Widget embed code</div>
+            <div class="fm-body-text">[$17411]</div>
+            <div class="widget-code" id="widget-code">
+                <span class="widget-code-wrapper">src https://mega.nz/#F!IXxzmLgK parenthood that gives us a sense of history and a deeply rooted desire to send on into the next generation life.
+                </span>
+            </div>
+            <div class="widget-dialog-buttons">
+                <div class="button default-white-button left copy-widget-dialog">
+                    <span>Copy link</span>
+                </div>
+                 <div class="button default-white-button left preview-widget">
+                    <span>Preview upload page</span>
+                </div>
+                <div class="button right remove-widget-dialog">
+                    <span>Remove upload page</span>
+                </div>
+            </div>
+        </div>
+        <div class="wrapper remove-widget-container">
+             <div class="fm-subheading ">Remove upload page</div>
+            <div class="fm-body-text">[$17411]</div>
+            <div class="fm-body-text">
+                 Do you wish to continue?
+            </div>
+        </div>
+        <div class="default-dialog-bottom">
+            <div class="default-widget-buttons">
+                <div class="fm-dialog-new-folder-button default-grey-button right"><span>Close</span></div>
+                <div class="fm-dialog-new-folder-button default-white-button right"><span>More settings</span></div>
+            </div>
+            <div class="remove-widget-buttons hidden">
+                <div class="fm-dialog-new-folder-button default-grey-button right"><span>Remove</span></div>
+                <div class="fm-dialog-new-folder-button default-white-button right"><span>Cancel</span></div>
             </div>
         </div>
     </div>

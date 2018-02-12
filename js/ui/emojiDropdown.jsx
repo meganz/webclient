@@ -139,8 +139,6 @@ var DropdownEmojiSelector = React.createClass({
         </div>;
     },
     componentWillUpdate: function(nextProps, nextState) {
-        window.$emojiDropdown = this;
-
         if (
             nextState.searchValue !== this.state.searchValue ||
             nextState.browsingCategories !== this.state.browsingCategories

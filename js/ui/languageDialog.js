@@ -21,7 +21,7 @@ var langDialog = {
         // Main tier 1 languages that we support (based on usage analysis)
         var tierOneLangCodes = [
             'es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'ar',
-            'nl', 'hu', 'cn', 'jp', 'kr', 'ro', 'id', 'th', 'vi', 'pl'
+            'nl', 'cn', 'jp', 'kr', 'ro', 'id', 'th', 'vi', 'pl'
         ];
 
         // Remove all the tier 1 languages and we have only the tier 2 languages remaining

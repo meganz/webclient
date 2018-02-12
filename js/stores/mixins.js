@@ -74,7 +74,7 @@ var MegaRenderMixin = {
     },
     debouncedForceUpdate: function() {
         var self = this;
-        if (self.skippedUpdates) {
+        if (typeof(self.skippedUpdates) === 'undefined') {
             self.skippedUpdates = 0;
         }
 
@@ -173,7 +173,7 @@ var MegaRenderMixin = {
         }
         // offsetParent should NOT trigger a reflow/repaint
         if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
-            return false
+            return false;
         }
         return true;
     },
@@ -199,7 +199,7 @@ var MegaRenderMixin = {
         var self = this;
         self._updatesDisabled = true;
         if (self._updatesReenableTimer) {
-            clearTimeout(self._updatesRenableTimer);
+            clearTimeout(self._updatesReenableTimer);
         }
 
         var timeout = forHowLong ?
@@ -280,7 +280,7 @@ var MegaRenderMixin = {
         else if (v === null && rv === null) {
             return false;
         }
-        
+
         if (typeof v._dataChangeIndex !== "undefined") {
             var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() +
                                 "_" + idx;
@@ -410,7 +410,7 @@ var MegaRenderMixin = {
             }
         }
 
-        if (!this.isComponentEventuallyVisible()) {
+        if (!this.props.disableCheckingVisibility && !this.isComponentEventuallyVisible()) {
             if (window.RENDER_DEBUG) {
                 console.error(
                     "shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState

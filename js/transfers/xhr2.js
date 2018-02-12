@@ -186,6 +186,9 @@
                     self.abort(result);
                 }
             }
+            else if (readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+                self._ttfb = Date.now() - self.sendTime;
+            }
         };
 
         var progress = function(ev) {

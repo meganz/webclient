@@ -155,7 +155,7 @@
     }
 
     function clearit(storagetype, t, callback) {
-        var tsec = t || 172800;
+        var tsec = t || dlmanager.fsExpiryThreshold;
 
         function errorHandler2(e) {
             if (d) {
@@ -194,6 +194,10 @@
                                         console.log('temp file removed',
                                             file.name, bytesToSize(metadata.size));
                                     }
+
+                                    dlmanager.remResumeInfo({ph: file.name});
+                                    dlmanager.remResumeInfo({id: file.name});
+
                                     if (++del == entries.length && callback) {
                                         callback(totalsize);
                                     }
@@ -211,7 +215,8 @@
                         else {
                             if (d) {
                                 console.log('tmp file too new to remove',
-                                    file.name, bytesToSize(metadata.size));
+                                    file.name, bytesToSize(metadata.size),
+                                    'Can be removed on ' + String(new Date(deltime)));
                             }
                             if (++del == entries.length && callback) {
                                 callback(totalsize);
@@ -271,15 +276,15 @@
     var WRITERR_DIAGTITLE = l[16871];
     var chrome_write_error_msg = 0;
 
-    function free_space(callback, ms) {
+    function free_space(callback, ms, delta) {
         /* error */
-        clearit(0, 0, function(s) {
+        clearit(0, delta | 0, function(s) {
             if (d) {
                 console.log('Freed %s of temporary storage', bytesToSize(s));
             }
 
             // clear persistent files:
-            clearit(1, 0, function(s) {
+            clearit(1, delta | 0, function(s) {
                 if (d) {
                     console.log('Freed %s of persistent storage', bytesToSize(s));
                 }
@@ -411,6 +416,8 @@
         }
     }
 
+    var nosplog = true;
+
     window.FileSystemAPI = function fsIO(dl_id, dl) {
         var
             dl_fw,
@@ -497,9 +504,10 @@
                             }
                             else {
                                 logger.error('Short write (%d/%d)', dl_fw.position, targetpos, dl_fw.readyState);
+                                // debugger;
 
                                 /* try to release disk space and retry */
-                                free_space(function() {
+                                var onSpaceFreed = function() {
                                     if (!dl_fw) {
                                         logger.debug('Transfer %s cancelled while freeing space', dl_id);
                                         return;
@@ -511,6 +519,11 @@
                                             return;
                                         }
 
+                                        if (nosplog) {
+                                            nosplog = false;
+                                            api_req({a: 'log', e: 99657, m: 'Out of HTML5 Offline Storage space.'});
+                                        }
+
                                         msgDialog('warningb:' + l[103],
                                             WRITERR_DIAGTITLE,
                                             l[16890],
@@ -519,12 +532,56 @@
                                                     dlFatalError(dl, WRITERR_DIAGTITLE, false);
                                                 }
                                             });
-
-                                        srvlog('Out of HTML5 Offline Storage space (write)');
                                     }
                                     failed = true;
                                     dl_ack_write();
-                                });
+                                };
+
+                                // Before downloads resume support we were just seeking back to the write offset,
+                                // we now have to actually truncate the file so that any sudden reload will preserve
+                                // the offset as stored in the resumable storage entry... at least more chances to it.
+                                var oldOnWriteEnd = dl_fw.onwriteend;
+                                var ackWrite = function() {
+                                    dl_fw.onwriteend = oldOnWriteEnd;
+                                    free_space(onSpaceFreed, 450, chrome_write_error_msg && 300);
+                                };
+                                var onError = function() {
+                                    // Something went wrong, go back to seeking...
+                                    try {
+                                        dl_fw.seek(dl_position);
+                                        ackWrite();
+                                    }
+                                    catch (ex) {
+                                        dlFatalError(dl, ex);
+                                    }
+                                };
+
+                                dl_fw.onwriteend = tryCatch(function() {
+                                    var error = true;
+
+                                    if (dl_fw.readyState === dl_fw.DONE) {
+                                        if (dl_fw.position === dl_position) {
+                                            logger.debug('Truncation succeed at offset ' + dl_position);
+                                            error = false;
+                                        }
+                                        else {
+                                            logger.warn('Truncation failed...', dl_fw.position, dl_position);
+                                        }
+                                    }
+                                    else {
+                                        logger.warn('Invalid state on truncation...', dl_fw.readyState);
+                                    }
+
+                                    if (error) {
+                                        onError();
+                                    }
+                                    else {
+                                        ackWrite();
+                                    }
+                                }, onError);
+
+                                logger.debug('Truncating file to offset ' + dl_position);
+                                dl_fw.truncate(dl_position);
                             }
                         };
                         zfileEntry = fileEntry;
@@ -558,26 +615,17 @@
                 }
 
                 if (aFail === -1 && !isSecurityError(aEvent)) {
+                    if (!canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
+                        if (nosplog) {
+                            nosplog = false;
+                            api_req({a: 'log', e: 99658, m: 'Out of HTML5 Offline Storage space (open)'});
+                        }
 
-                    if (canSwitchDownloadMethod(dl, dl_id, zfileEntry)) {
-                        return;
+                        dlFatalError(dl, WRITERR_DIAGTITLE, false);
+                        dlmanager.showMEGASyncOverlay(1, WRITERR_DIAGTITLE);
                     }
 
-                    if (!$.msgDialog) {
-                        srvlog('Out of HTML5 Offline Storage space (open)');
-
-                        msgDialog('warningb:' + l[103], WRITERR_DIAGTITLE,
-                            l[16891],
-                            str_mtrunc(dl_filename), function(cancel) {
-                                if (cancel) {
-                                    dlFatalError(dl, WRITERR_DIAGTITLE, false);
-                                }
-                            });
-                    }
-                    wTimer = setTimeout(function() {
-                        this.fsInitOp();
-                    }.bind(this), 2801);
-                    return wTimer;
+                    return;
                 }
                 dl_storagetype = aStorageType !== 1 ? 0 : 1;
 
@@ -658,17 +706,18 @@
             if (failed) {
                 /* reset error flag */
                 failed = false;
-                /* retry */
-                try {
-                    dl_fw.seek(dl_position);
-                }
-                catch (e) {
-                    return dlFatalError(dl, e);
-                }
                 logger.warn('write error, retrying...', dl_fw.readyState);
-                return wTimer = setTimeout(function() {
-                    dl_fw.write(new Blob([dl_buffer]))
-                }, 4480);
+
+                wTimer = setTimeout(function() {
+                    try {
+                        dl_fw.write(new Blob([dl_buffer]));
+                    }
+                    catch (ex) {
+                        dlFatalError(dl, ex);
+                    }
+                }, 2100);
+
+                return;
             }
 
             if ($.msgDialog

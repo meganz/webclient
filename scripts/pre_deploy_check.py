@@ -17,7 +17,7 @@ import glob
 
 HASHING_FILE_TYPES = ['js', 'jsx', 'html', 'css']
 HASHING_CHECK_DIRS = ['js', 'html', 'css', 'lang']
-HASHING_IGNORE_FILES = ['secureboot.js', 'rsaasm.js']
+HASHING_IGNORE_FILES = ['secureboot.js', 'rsaasm.js', 'pdf.worker.js']
 
 def _get_entries(path, result_files, file_types, ignore_files,
                  check_dirs=None):

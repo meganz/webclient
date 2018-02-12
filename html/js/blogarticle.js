@@ -5,6 +5,9 @@ function init_blogarticle() {
     blog_bind_search();
 
     var post = blogposts['post_' + blogid];
+    if (!post) {
+        return loadSubPage('blog');
+    }
     for (var e in post.attaches) {
         if (post.attaches.hasOwnProperty(e)) {
             post.c = CMS.imgLoader(post.c, post.attaches[e]);

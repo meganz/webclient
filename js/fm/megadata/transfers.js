@@ -56,7 +56,7 @@ MegaData.prototype.getDownloadFolderNodes = function(n, md, nodes, paths) {
         this.makeDir(n);
     }
 
-    var subids = this.getNodesSync(n);
+    var subids = this.getNodesSync(n, false, false, true);
 
     for (var j = 0; j < subids.length; j++) {
         var p = this.getPath(subids[j]);
@@ -151,19 +151,30 @@ MegaData.prototype.addDownload = function(n, z, preview) {
 MegaData.prototype.addDownloadSync = function(n, z, preview) {
     var args = toArray.apply(null, arguments);
     var webdl = function() {
-        M.addWebDownload.apply(M, args);
-        args = undefined;
+        dlmanager.getMaximumDownloadSize()
+            .done(function(size) {
+                dlmanager.maxDownloadSize = size;
+
+                M.addWebDownload.apply(M, args);
+                args = undefined;
+            });
     };
 
-    if (z || preview || !fmconfig.dlThroughMEGAsync) {
+    if (!folderlink && (z || preview || !fmconfig.dlThroughMEGAsync)) {
         return webdl();
     }
 
     dlmanager.isMEGAsyncRunning(0x02010100)
-        .done(function(sync) {
+        .done(function (sync) {
+            var dlAuth = M.RootID;
+            if (!folderlink) {
+                var ommitedEsid = base64urldecode(u_sid);
+                ommitedEsid = ommitedEsid.substr(0, ommitedEsid.length - 6);
+                dlAuth = base64urlencode(ommitedEsid);
+            }
             var cmd = {
                 a: 'd',
-                auth: folderlink ? M.RootID : u_sid
+                auth: dlAuth
             };
             var files = [];
 
@@ -184,7 +195,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                 }
 
                 if (node.t) {
-                    foreach(M.getNodesSync(node.h));
+                    foreach(M.getNodesSync(node.h, false, false, true));
                 }
             };
 
@@ -219,10 +230,11 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
 MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     delete $.dlhash;
     var path;
-    var added = 0;
     var nodes = [];
     var paths = {};
     var zipsize = 0;
+    var entries = [];
+
     if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO)) {
         var nf = [], cbs = [];
         for (var i in n) {
@@ -284,6 +296,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
     var p = '';
     var pauseTxt = '';
+
     if (uldl_hold) {
         p = 'transfer-paused';
         pauseTxt = l[1651];
@@ -304,6 +317,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         }
         path = paths[nodes[k]] || '';
         $.totalDL += n.s;
+
         var $tr = $('.transfer-table #dl_' + htmlentities(n.h));
         if ($tr.length) {
             if (!$tr.hasClass('transfer-completed')) {
@@ -311,43 +325,51 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             }
             $tr.remove();
         }
-        dl_queue.push({
+        var entry = {
+            size: n.s,
+            nauth: n_h,
             id: n.h,
             key: n.k,
             n: n.name,
             t: n.mtime || n.ts,
+            zipid: z,
+            zipname: zipname,
+            preview: preview,
             p: path,
-            size: n.s,
-            nauth: n_h,
             onDownloadProgress: this.dlprogress.bind(this),
             onDownloadComplete: this.dlcomplete.bind(this),
             onBeforeDownloadComplete: this.dlbeforecomplete.bind(this),
             onDownloadError: this.dlerror.bind(this),
-            onDownloadStart: this.dlstart.bind(this),
-            zipid: z,
-            zipname: zipname,
-            preview: preview
-        });
-        added++;
-        zipsize += n.s;
-
-        if (!z) {
-            this.putToTransferTable(n, ttl);
-            mega.ui.tpp.setTotal(1, 'dl');
-        }
+            onDownloadStart: this.dlstart.bind(this)
+        };
+        entries.push({node: n, entry: entry});
     }
 
-    if (!added) {
+    if (!entries.length) {
         if (d) {
             dlmanager.logger.warn('Nothing to download.');
         }
         return;
     }
 
-    // If regular download using Firefox and the total download is over 1GB then show the dialog
-    // to use the extension, but not if they've seen the dialog before and ticked the checkbox
-    if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
-        later(firefoxDialog);
+    if ($.totalDL > dlmanager.maxDownloadSize) {
+        if (d) {
+            console.log('Downloads exceed max size', entries.length, entries);
+        }
+        mega.config.set('dlThroughMEGAsync', 1);
+        return dlmanager.showMEGASyncOverlay(true);
+    }
+
+    for (var e = 0; e < entries.length; e++) {
+        n = entries[e].node;
+
+        dl_queue.push(entries[e].entry);
+        zipsize += n.s;
+
+        if (!z) {
+            this.putToTransferTable(n, ttl);
+            mega.ui.tpp.setTotal(1, 'dl');
+        }
     }
 
     var flashhtml = '';
@@ -376,10 +398,12 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (uldl_hold) {
             fm_tfspause('zip_' + z);
         }
+
+        api_req({a: 'log', e: 99655, m: 'ZipIO Download started.'});
     }
 
     if (!preview) {
-        this.onDownloadAdded(added, uldl_hold, z, zipsize);
+        this.onDownloadAdded(entries.length, uldl_hold, z, zipsize);
         setupTransferAnalysis();
     }
 
@@ -395,7 +419,7 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
     if (!isZIP || zipSize) {
         this.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
     }
-    openTransfersPanel();
+    M.openTransfersPanel();
     initGridScrolling();
     initFileblocksScrolling();
     initTreeScroll();
@@ -421,7 +445,7 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
 
 MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, force) {
     var st;
-    var tmpId = id;
+
     if (dl_queue[dl_queue_num].zipid) {
         id = 'zip_' + dl_queue[dl_queue_num].zipid;
         var tl = 0;
@@ -471,22 +495,24 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
         $('.transfer-table').prepend($tr);
         delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader();
     }
+
     // var eltime = (new Date().getTime()-st)/1000;
     var bps = kbps * 1000;
     var retime = bps && (bt - bl) / bps;
-    var transferDeg = 0;
-    var $overlay = $('.viewer-overlay');
-    var $chart = $overlay.find('.viewer-progress');
-    var deg;
     if (bt) {
         // $.transferprogress[id] = Math.floor(bl/bt*100);
         $.transferprogress[id] = [bl, bt, bps];
+        dl_queue[dl_queue_num].loaded = bl;
+
         if (!uldl_hold) {
             if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) {
+                var $overlay = $('.viewer-overlay');
+                var $chart = $overlay.find('.viewer-progress');
+
                 $overlay.find('.viewer-error').addClass('hidden');
                 $overlay.find('.viewer-pending').addClass('hidden');
 
-                deg =  360 * perc / 100;
+                var deg = 360 * perc / 100;
                 if (deg <= 180) {
                     $chart.find('.left-chart p').css('transform', 'rotate(' + deg + 'deg)');
                     $chart.find('.right-chart p').removeAttr('style');
@@ -498,7 +524,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
             }
 
             $tr.find('.transfer-status').text(perc + '%');
-            transferDeg = 360 * perc / 100;
+            var transferDeg = 360 * perc / 100;
             if (transferDeg <= 180) {
                 $tr.find('.right-c p').css('transform', 'rotate(' + transferDeg + 'deg)');
             }
@@ -539,7 +565,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
                 $('.widget-block').addClass('active');
             }
             else {
-                if (mega.ui.tpp.isCached()) {
+                if (mega.ui.tpp.isCached() && mega.ui.tpp.isEnabled()) {
                     mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
                     mega.ui.tpp.updateBlock('dl');
                 }
@@ -551,13 +577,13 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
 
 MegaData.prototype.dlcomplete = function(dl) {
     var id = dl.id, z = dl.zipid;
-    var $overlay = $('.viewer-overlay');
 
     if (dl.hasResumeSupport) {
         dlmanager.remResumeInfo(dl).dump();
     }
 
     if (slideshowid == id && !previews[slideshowid]) {
+        var $overlay = $('.viewer-overlay');
         $overlay.find('.viewer-pending').addClass('hidden');
         $overlay.find('.viewer-error').addClass('hidden');
         $overlay.find('.viewer-progress p').css('transform', 'rotate(180deg)');
@@ -565,6 +591,8 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     if (z) {
         id = 'zip_' + z;
+
+        api_req({a: 'log', e: 99656, m: 'ZipIO Download completed.'});
     }
     else {
         id = 'dl_' + id;
@@ -672,6 +700,10 @@ MegaData.prototype.dlerror = function(dl, error) {
             break;
     }
 
+    // Hide TPP
+    mega.ui.tpp.hide();
+    mega.ui.tpp.reset('dl');
+
     if (window.slideshowid == dl.id && !previews[slideshowid]) {
         $overlay.find('.viewer-image-bl').addClass('hidden');
         $overlay.find('.viewer-pending').addClass('hidden');
@@ -773,11 +805,16 @@ MegaData.prototype.tfsResizeHandler = SoonFc(function() {
 });
 
 MegaData.prototype.getTransferTableLengths = function() {
+    "use strict";
+
     var te = this.getTransferElements();
+    if (!te) {
+        return false;
+    }
     var used = te.domTable.querySelectorAll('tr').length;
     var size = Math.ceil(parseInt(te.domScrollingTable.style.height) / 24);
 
-    return {size: size, used: used, left: size - used};
+    return { size: size, used: used, left: size - used };
 };
 
 MegaData.prototype.getTransferElements = function() {
@@ -789,6 +826,8 @@ MegaData.prototype.getTransferElements = function() {
     obj.domTableWrapper = obj.domTransfersBlock.querySelector('.transfer-table-wrapper');
     obj.domTransferHeader = obj.domTransfersBlock.querySelector('.fm-transfers-header');
     obj.domPanelTitle = obj.domTransferHeader.querySelector('.transfer-panel-title');
+    obj.domUploadBlock = obj.domPanelTitle.querySelector('.upload');
+    obj.domDownloadBlock = obj.domPanelTitle.querySelector('.download');
     obj.domTableEmptyTxt = obj.domTableWrapper.querySelector('.transfer-panel-empty-txt');
     obj.domTableHeader = obj.domTableWrapper.querySelector('.transfer-table-header');
     obj.domScrollingTable = obj.domTableWrapper.querySelector('.transfer-scrolling-table');
@@ -887,7 +926,7 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
 };
 
 var __ul_id = 8000;
-MegaData.prototype.addUpload = function(u, ignoreWarning) {
+MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
     var flag = 'ulMegaSyncAD';
 
     if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
@@ -967,12 +1006,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
     }
 
     if ((onChat = (String(this.currentdirid).substr(0, 4) === 'chat'))) {
-        if (!$.ulBunch) {
-            $.ulBunch = Object.create(null);
-        }
-        if (!$.ulBunch[this.currentdirid]) {
-            $.ulBunch[this.currentdirid] = Object.create(null);
-        }
         target = this.currentdirid;
     }
 
@@ -1024,7 +1057,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
 
             if (onChat) {
                 f.chatid = target;
-                $.ulBunch[f.chatid][ul_id] = 1;
             }
         }
         if (!added) {
@@ -1039,8 +1071,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
             uldl_hold = true;
         }
         else {
-            showTransferToast('u', added);
-            openTransfersPanel();
+            M.showTransferToast('u', added);
+            M.openTransfersPanel();
             delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
 
@@ -1052,6 +1084,28 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
 
             M.onFileManagerReady(function() {
                 mega.ui.tpp.started('ul');
+
+                if (mBroadcaster.hasListener('upload:start')) {
+                    var data = Object.create(null);
+
+                    for (var i = u.length; i--;) {
+                        var f = u[i];
+
+                        data[f.id] = {
+                            uid: f.id,
+                            size: f.size,
+                            name: f.name,
+                            chat: f.chatid,
+                            // store the minimal expected file attributes for this upload
+                            efa: (is_image(f) ? 2 : 0) + (MediaInfoLib.isFileSupported(f) ? 1 : 0)
+                        };
+
+                        // keep a global record for possible createnodethumbnail() calls at any later stage...
+                        ulmanager.ulEventData[f.id] = data[f.id];
+                    }
+
+                    mBroadcaster.sendMessage('upload:start', data);
+                }
             });
         }
     }.bind(this);
@@ -1070,6 +1124,12 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
 
             if (file.path) {
                 paths[file.path] = null;
+            }
+        }
+
+        if (emptyFolders) {
+            for (var x = emptyFolders.length; x--;) {
+                paths[emptyFolders[x]] = null;
             }
         }
     }
@@ -1159,7 +1219,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
                     }
 
                     fileconflict
-                        .check(u, onChat ? u[0].target : target, 'upload', onChat ? fileconflict.KEEPBOTH : 0)
+                        .check(u, onChat ? u[0].target : target, fileversioning.dvState ? 'replace' : 'upload', onChat ? fileconflict.KEEPBOTH : 0)
                         .done(startUpload);
                 });
         });
@@ -1208,13 +1268,17 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             $tr.find('.speed').addClass('unknown').text('');
         }
 
-        if (mega.ui.tpp.isCached()) {
+        if (mega.ui.tpp.isCached() && mega.ui.tpp.isEnabled()) {
             mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
             mega.ui.tpp.updateBlock('ul');
         }
         delay('percent_megatitle', percent_megatitle, 50);
 
-        if (page.substr(0, 2) !== 'fm') {
+        if (mega.megadrop.isInit()) {
+            mega.megadrop.uiUpdateItem(id, bps, retime, perc, bl);
+        }
+
+        if (page.substr(0, 2) !== 'fm' && page.substr(0, 8) !== 'megadrop') {
             $('.widget-block').removeClass('hidden');
             $('.widget-block').show();
             $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
@@ -1236,7 +1300,12 @@ MegaData.prototype.ulerror = function(ul, error) {
 
     if (error === EOVERQUOTA) {
         ulQueue.pause();
-        M.showOverStorageQuota(100, 1, 2, {custom: 1});
+        if (mega.megadrop.isInit()) {// MEGAdrop window is active
+            mega.megadrop.overQuota();
+        }
+        else {
+            M.showOverStorageQuota(100, 1, 2, {custom: 1});
+        }
     }
     else if (error === EGOINGOVERQUOTA) {
         M.checkGoingOverStorageQuota(-1);
@@ -1246,7 +1315,13 @@ MegaData.prototype.ulerror = function(ul, error) {
     }
 
     if (ul) {
+        var id = ul.id;
+
         this.ulfinalize(ul, api_strerror(error));
+
+        // Hide TPP
+        mega.ui.tpp.hide();
+        mega.ui.tpp.reset('ul');
 
         if (ul.owner) {
             ul.owner.destroy();
@@ -1254,11 +1329,30 @@ MegaData.prototype.ulerror = function(ul, error) {
         else {
             oDestroy(ul);
         }
+        mBroadcaster.sendMessage('upload:error', id, error);
 
         if (error === EOVERQUOTA) {
+            if (mBroadcaster.hasListener('upload:error')) {
+                ul_queue.filter(isQueueActive)
+                    .forEach(function(ul) {
+                        mBroadcaster.sendMessage('upload:error', ul.id, error);
+                    });
+            }
             mega.ui.tpp.hide();
             ulmanager.abort(null);
             $("tr[id^='ul_'] .transfer-status").text(l[1010]);
+
+            // Inform user that upload MEGAdrop is not available anymore
+            if (page.substr(0, 8) === 'megadrop') {
+                mBroadcaster.sendMessage('MEGAdrop:overquota');
+            }
+        }
+        else {
+
+            // Inform user that upload MEGAdrop is not available anymore
+            if (page.substr(0, 8) === 'megadrop' && error === ENOENT || error === EACCESS) {
+                mBroadcaster.sendMessage('MEGAdrop:disabled');
+            }
         }
     }
     else if (!overquota) {
@@ -1266,37 +1360,10 @@ MegaData.prototype.ulerror = function(ul, error) {
     }
 };
 
-MegaData.prototype.ulcomplete = function(ul, h, k) {
-    var id = ul.id;
+MegaData.prototype.ulcomplete = function(ul, h, faid) {
+    'use strict';
 
-    if ($.ulBunch && $.ulBunch[ul.chatid]) {
-        var ub = $.ulBunch[ul.chatid], p;
-        ub[id] = h || -0xBADF;
-
-        for (var i in ub) {
-            if (ub[i] === 1) {
-                p = true;
-                break;
-            }
-        }
-
-        if (!p) {
-            var ul_target = ul.chatid;
-            ub = Object.values(ub)
-                .filter(function(m) {
-                    return m !== -0xBADF;
-                });
-            onIdle(function() {
-                if (ub.length) {
-                    $(document).trigger('megaulcomplete', [ul_target, ub]);
-                }
-                delete $.ulBunch[ul_target];
-                if (!$.len($.ulBunch)) {
-                    delete $.ulBunch;
-                }
-            });
-        }
-    }
+    mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid, ul.chatid);
 
     if (ul.skipfile) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
@@ -1340,7 +1407,12 @@ MegaData.prototype.ulfinalize = function(ul, status) {
         $.transferprogress['ulc'] += $.transferprogress['ul_' + id][1];
         delete $.transferprogress['ul_' + id];
     }
-    // $.transferHeader();
+
+    // If MEGAdrop windows exists and upload
+    if (id && mega.megadrop.isInit()) {
+        mega.megadrop.onItemCompletion('#ul_' + id);
+    }
+
     delay('tfscomplete', function() {
         M.resetUploadDownload();
         mega.ui.tpp.setIndex(1, 'ul');
@@ -1368,46 +1440,265 @@ MegaData.prototype.ulstart = function(ul) {
     mega.ui.tpp.start(ul, 'ul');
 };
 
+MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
+    'use strict';
 
+    $.tresizer();
+    $('.nw-fm-left-icon.transfers').addClass('transfering');
+    // Start the new transfer right away even if the queue is paused?
+    // XXX: Remove fm_tfspause calls at M.addDownload/addUpload to enable this
+    /*if (uldl_hold) {
+        uldl_hold = false;
+        dlQueue.resume();
+        ulQueue.resume();
+        $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
+        $('.nw-fm-left-icon.transfers').removeClass('paused');
+    }*/
+    // $(window).trigger('resize'); // this will call initTreeScroll();
+
+    if ($('table.transfer-table tr').length > 1) {
+        $('.transfer-clear-all-icon').removeClass('hidden');
+    }
+
+    if (!$.mSortableT) {
+        $.mSortableT = $('.transfer-table tbody');
+        $.mSortableT.sortable({
+            delay: 200,
+            revert: 100,
+            start: function() {
+                $('body').addClass('dndc-sort');
+            },
+            helper: function(ev, tr) {
+                if (!tr.hasClass('ui-selected')) {
+                    tr.addClass('ui-selected');
+                }
+                this.order = fm_tfsorderupd();
+                var $selected = tr.parent().children('.ui-selected').clone();
+                tr.data('multidrag', $selected).siblings('.ui-selected').hide();
+                var $helper = $('<tr/>');
+                return $helper.append($selected);
+            },
+            stop: function(ev, ui) {
+                var cancel = false;
+                $('body').removeClass('dndc-sort');
+
+                var $selected = ui.item.data('multidrag');
+                ui.item.after($selected).remove();
+                $('.transfer-table tr.ui-selected:not(:visible)').remove();
+                $.transferHeader(); // rebind cloned trs
+
+                // var $tr = $(ui.item[0]);
+                // var id = String($tr.attr('id'));
+                // var $next = $tr.next();
+
+                /*if ($selected.hasClass('started')) {
+                    cancel = true;
+                }
+                else {
+                    var $prev = $tr.prev();
+                    var pid = $prev.attr('id');
+                    var nid = $next.attr('id');
+
+                    cancel = ((id[0] === 'u' && nid && nid[0] !== 'u')
+                            || (id[0] !== 'u' && pid && pid[0] === 'u'));
+                }*/
+                if (cancel) {
+                    $.mSortableT.sortable('cancel');
+                }
+                else {
+                    var order = fm_tfsorderupd();
+
+                    if (JSON.stringify(order) !== JSON.stringify(this.order)) {
+                        var mDL = {
+                            pos: 0,
+                            etmp: [],
+                            oQueue: [],
+                            pQueue: {},
+                            mQueue: dlQueue,
+                            m_queue: dl_queue,
+                            prop: 'dl'
+                        };
+                        var mUL = {
+                            pos: 0,
+                            etmp: [],
+                            oQueue: [],
+                            pQueue: {},
+                            mQueue: ulQueue,
+                            m_queue: ul_queue,
+                            prop: 'ul'
+                        };
+                        var id;
+                        var dst;
+                        var i = 0;
+                        var len = Object.keys(order).length / 2;
+
+                        [dl_queue, ul_queue].forEach(function(queue) {
+                            var t_queue = queue.filter(isQueueActive);
+                            if (t_queue.length !== queue.length) {
+                                var m = t_queue.length;
+                                var i = 0;
+                                while (i < m) {
+                                    (queue[i] = t_queue[i]).pos = i;
+                                    ++i;
+                                }
+                                queue.length = i;
+                                while (queue[i]) {
+                                    delete queue[i++];
+                                }
+                            }
+                        });
+
+                        while (len > i) {
+                            id = M.t[i++];
+
+                            dst = id[0] === 'u' ? mUL : mDL;
+                            var mQ = dst.mQueue.slurp(id);
+                            // for (var x in mQ) {
+                            // if (mQ.hasOwnProperty(x)) {
+                            // var entry = mQ[x][0][dst.prop];
+                            // if (dst.etmp.indexOf(entry) === -1) {
+                            // (dst.m_queue[dst.pos] = entry).pos = dst.pos;
+                            // dst.etmp.push(entry);
+                            // dst.pos++;
+                            // }
+                            // }
+                            // }
+                            dst.oQueue = dst.oQueue.concat(mQ);
+
+                            if (dst.mQueue._qpaused.hasOwnProperty(id)) {
+                                dst.pQueue[id] = dst.mQueue._qpaused[id];
+                            }
+                        }
+
+                        dlQueue._queue = mDL.oQueue;
+                        ulQueue._queue = mUL.oQueue;
+                        dlQueue._qpaused = mDL.pQueue;
+                        ulQueue._qpaused = mUL.pQueue;
+
+                        // Check for transfers moved before any started one
+                        var $prev = $('.transfer-table tr.transfer-started')
+                            .first()
+                            .prevAll()
+                            .not('.transfer-paused');
+                        // XXX: we rely on the speed field being non-numeric
+                        if ($prev.length && !$prev.find('.speed').text().replace(/\D/g, '')) {
+                            var ids = $('.transfer-table tr:not(.transfer-paused)').attrs('id');
+                            ids.forEach(fm_tfspause);
+                            if (dlQueue._queue.length || ulQueue._queue.length) {
+                                dlmanager.logger.error('The move operation should have cleared the queues.');
+                            }
+                            ids.forEach(fm_tfsresume);
+                            i = 0;
+                            mDL.pQueue = {};
+                            mUL.pQueue = {};
+                            while (len > i) {
+                                id = M.t[i++];
+                                dst = id[0] === 'u' ? mUL : mDL;
+                                if (dst.mQueue._qpaused.hasOwnProperty(id)) {
+                                    dst.pQueue[id] = dst.mQueue._qpaused[id];
+                                }
+                            }
+                            dlQueue._qpaused = mDL.pQueue;
+                            ulQueue._qpaused = mUL.pQueue;
+                        }
+                    }
+                }
+
+                $('.transfer-table tr.ui-selected').removeClass('ui-selected');
+            }
+        });
+    }
+};
+
+MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_length, isPaused) {
+    'use strict';
+
+    if (M.currentdirid !== 'transfers' && fmconfig.tpp === false) {
+        var $toast;
+        var $second_toast;
+        var timer = 0;
+        var nt_txt;
+
+        if (t_type !== 'u') {
+            $toast = $('.toast-notification.download');
+            $second_toast = $('.toast-notification.upload');
+            if (t_length > 1) {
+                nt_txt = l[12481].replace('%1', t_length);
+            }
+            else {
+                nt_txt = l[7222];
+            }
+        }
+        else {
+            $toast = $('.toast-notification.upload');
+            $second_toast = $('.toast-notification.download');
+            if (t_length > 1) {
+                nt_txt = l[12480].replace('%1', t_length);
+            }
+            else {
+                nt_txt = l[7223];
+            }
+        }
+        if (uldl_hold || isPaused) {
+            nt_txt += '<b> (' + l[1651] + ') </b>';
+        }
+
+        $toast.find('.toast-col:first-child span').safeHTML(nt_txt);
+
+        if ($second_toast.hasClass('visible')) {
+            $second_toast.addClass('second');
+        }
+
+        clearTimeout(timer);
+        $toast.removeClass('second hidden').addClass('visible');
+        timer = setTimeout(function() {
+            M.hideTransferToast($toast);
+        }, 5000);
+
+        $('.transfer .toast-button').rebind('click', function() {
+            $('.toast-notification').removeClass('visible second');
+            if (!$('.viewer-overlay').hasClass('hidden')) {
+                $('.viewer-overlay').addClass('hidden');
+            }
+            // M.openFolder('transfers', true);
+            $('.nw-fm-left-icon.transfers').click();
+        });
+
+        $('.toast-close-button', $toast).rebind('click', function() {
+            $(this).closest('.toast-notification').removeClass('visible');
+            $('.toast-notification').removeClass('second');
+        });
+
+        $toast.rebind('mouseover', function() {
+            clearTimeout(timer);
+        });
+        $toast.rebind('mouseout', function() {
+            timer = setTimeout(function() {
+                M.hideTransferToast($toast);
+            }, 5000);
+        });
+    }
+};
+
+MegaData.prototype.hideTransferToast = function hideTransferToast($toast) {
+    'use strict';
+
+    $toast.removeClass('visible');
+    $('.toast-notification').removeClass('second');
+};
+
+// report a transient upload error
 function onUploadError(ul, errorstr, reason, xhr) {
-    var hn = hostname(ul.posturl);
-
-    /*if (!d && (!xhr || xhr.readyState < 2 || xhr.status)) {
-     var details = [
-     browserdetails(ua).name,
-     String(reason)
-     ];
-     if (xhr || reason === 'peer-err') {
-     if (xhr && xhr.readyState > 1) {
-     details.push(xhr.status);
-     }
-     details.push(hn);
-     }
-     if (details[1].indexOf('mtimeout') == -1 && -1 == details[1].indexOf('BRFS [l:Unk]')) {
-     srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
-     }
-     }*/
+    'use strict';
 
     if (d) {
-        ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
+        ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hostname(ul.posturl));
     }
 
     $('.transfer-table #ul_' + ul.id).addClass('transfer-error');
     $('.transfer-table #ul_' + ul.id + ' .transfer-status').text(errorstr);
 }
 
-function addupload(u) {
-    M.addUpload(u);
-}
-function onUploadStart(id) {
-    M.ulstart(id);
-}
-function onUploadProgress(id, p, bl, bt, speed) {
-    M.ulprogress(id, p, bl, bt, speed);
-}
-function onUploadSuccess(id, bl, bt) {
-    M.ulcomplete(id, bl, bt);
-}
 
 function fm_chromebar(height) {
     if (window.navigator.userAgent.toLowerCase().indexOf('mac') >= 0 || localStorage.chromeDialog == 1) {

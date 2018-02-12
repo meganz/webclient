@@ -42,7 +42,7 @@ RtcModule.NotSupportedError.prototype.constructor = RtcModule.NotSupportedError;
 // timeouts
 RtcModule.kApiTimeout = 20000;
 RtcModule.kCallAnswerTimeout = 40000;
-RtcModule.kRingOutTimeout = 6000;
+RtcModule.kRingOutTimeout = 30000;
 RtcModule.kIncallPingInterval = 4000;
 RtcModule.kMediaGetTimeout = 20000;
 RtcModule.kSessSetupTimeout = 20000;
@@ -84,7 +84,7 @@ RtcModule.prototype.setupLogger = function() {
         },
         transport: function(level, args) {
             if (level === MegaLogger.LEVELS.ERROR || level === MegaLogger.LEVELS.CRITICAL) {
-                console.error.call(console, args);
+                console.error.apply(console, args);
                 self.logToServer('e', args.join(' '));
                 return;
             }
@@ -163,13 +163,6 @@ RtcModule.prototype.handleMessage = function(shard, msg, len) {
             data: msg.substr(24, len - 24) // actual length of msg string may be more than len,
         };                               // if there are other commands appended
 
-
-        // this is the only command that is not handled by an existing call
-        if (type === RTCMD.CALL_REQUEST) {
-            assert(op === Chatd.Opcode.RTMSG_BROADCAST);
-            this.msgCallRequest(packet);
-            return;
-        }
         var call = this.calls[chatid];
         if (!call) {
             this.logger.warn("Received " + constStateToText(RTCMD, type) +
@@ -182,42 +175,116 @@ RtcModule.prototype.handleMessage = function(shard, msg, len) {
         this.logger.error("rtMsgHandler: exception:", e);
     }
 };
+RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
+    // (Chatd.OPCODE.CALLDATA chatid.8 userid.8 clientid.4 len.2) (payload.len)
+    // payloadLen is the length of the 'user' data of the CALLDATA
+    var self = this;
+    try {
+        if (payloadLen < 10) {
+            self.logger.error("Ignoring short CALLDATA packet");
+            return;
+        }
+        var ringing = msg.charCodeAt(31);
+        if (!ringing) {
+            return;
+        }
+        var chatid = msg.substr(1, 8);
+        var chat = self.chatd.chatIdMessages[chatid];
+        if (!chat) {
+            self.logger.error(
+                "Received CALLDATA for unknown chatid " + chatid + ". Ignoring"
+            );
+            return;
+        }
+        // get userid and clientid
+        var userid = msg.substr(9, 8);
+        var clientid = msg.substr(17, 4);
+        if (userid === self.chatd.userId && clientid === shard.clientId) {
+            console.error("Ignoring CALLDATA sent back to sender");
+            return;
+        }
+        // leave only the payload, we don't need the headers anymore
+        var parsedCallData = {
+            chatid: chatid,
+            fromUser: userid,
+            fromClient: clientid,
+            shard: shard,
+            data: msg.substr(23, payloadLen) // actual length of msg string may be more than len,
+        };                                   // if there are other commands appended
+        self.msgCallData(parsedCallData);
+    } catch(e) {
+        self.logger.error("handleCallData: Exception:", e);
+    }
+}
 
 RtcModule.prototype.onUserJoinLeave = function(chatid, userid, priv) {
 };
 
-RtcModule.prototype.msgCallRequest = function(packet) {
+RtcModule.prototype.msgCallData = function(parsedCallData) {
     var self = this;
-    if (packet.fromUser === self.chatd.userId) {
+    if (parsedCallData.fromUser === self.chatd.userId) {
         self.logger.log("Ignoring call request from another client of our user");
         return;
     }
-    packet.callid = packet.data;
-    assert(packet.callid);
-    var chatid = packet.chatid;
+    parsedCallData.callid = parsedCallData.data.substr(0, 8);
+    assert(parsedCallData.callid);
+    var chatid = parsedCallData.chatid;
+    function createNewCall() {
+        var call = new Call(self, parsedCallData, self.handler.isGroupChat(chatid), true);
+        self.calls[chatid] = call;
+        call.handler = self.handler.onCallIncoming(call);
+        assert(call.handler);
+        assert(call.state === CallState.kRingIn);
+        return call;
+    }
+    function sendBusy() {
+        self.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, chatid, parsedCallData.callid + String.fromCharCode(Term.kBusy));
+    }
     var keys = Object.keys(self.calls);
     if (keys.length) {
         assert(keys.length === 1);
         var existingChatid = keys[0];
-        var existingCall = self.calls[existingChatid];
-        if (existingChatid === chatid && existingCall.state < CallState.kTerminating) {
-            assert(self.handler.onAnotherCall);
-            var answer = self.handler.onAnotherCall(existingCall, packet);
-            if (answer) {
-                existingCall.hangup();
-                delete self.calls[existingCall.chatid];
-            }  else {
-                self.cmdEndpoint(RTCMD.CALL_REQ_DECLINE, packet, packet.callid + String.fromCharCode(Term.kBusy));
+        var existingOutCall = self.calls[existingChatid];
+        if (existingOutCall.state < CallState.kJoining) {
+            var ci = existingOutCall._callerInfo;
+            if (ci) {
+                if (ci.fromUser === parsedCallData.fromUser && ci.fromClient === parsedCallData.fromClient &&
+                    ci.data === parsedCallData.data) {
+                    //chatd sends duplicate CALLDATAs to immediately notify about incoming calls before the login and history fetch completes
+                    return;
+                }
+                //existing call and this call are both incoming, we don't support this
+                self.logger.warn("Another incoming call during an incoming call");
+                sendBusy();
                 return;
             }
+            // If our user handle is greater than the calldata sender's, our outgoing call
+            // survives, and their call request is declined. Otherwise, our existing outgoing
+            // call is hung up, and theirs is answered
+            if (base64urldecode(self.chatd.userId) < ci.fromUser) {
+                self.logger.warn("Another call: we don't have priority - hangup our outgoing call and answer the incoming");
+                var av = existingOutCall._callInitiateAvFlags;
+                existingOutCall.hangup()
+                .then(function() {
+                    assert(!self.calls[existingChatid]);
+                    // Make sure that possible async messages from the hangup
+                    // are processed by the app before creating the new call
+                    setTimeout(function() {
+                        //create an incoming call from the packet, and auto answer it
+                        var incomingCall = createNewCall();
+                        setTimeout(function() {
+                            incomingCall.answer(av);
+                        }, 0);
+                    }, 0);
+                });
+            }  else {
+                self.logger.warn("Another call: we have a priority - decline the incoming call", base64urlencode(packet.callid));
+            }
+            return;
         }
     }
-    var call = new Call(self, packet, self.handler.isGroupChat(chatid), true);
-    self.calls[chatid] = call;
-    call.handler = self.handler.onCallIncoming(call);
-    assert(call.handler);
-    assert(call.state === CallState.kRingIn);
-    self.cmdEndpoint(RTCMD.CALL_RINGING, packet, packet.callid);
+    var call = createNewCall();
+    self.cmdEndpoint(RTCMD.CALL_RINGING, parsedCallData, parsedCallData.callid);
     setTimeout(function() {
         if (call.state !== CallState.kRingIn) {
             return;
@@ -241,10 +308,26 @@ RtcModule.prototype.cmdEndpoint = function(type, info, payload) {
     }
 };
 
+RtcModule.prototype.cmdBroadcast = function(op, chatid, payload) {
+    assert(chatid);
+    var len = payload ? payload.length + 1 : 1;
+
+    var data = chatid+'\0\0\0\0\0\0\0\0\0\0\0\0' + Chatd.pack16le(len) + String.fromCharCode(op);
+    if (payload) {
+        data += payload;
+    }
+    if (!info.shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
+        throw new Error("cmdEndpoint: Send error trying to send command " + constStateToText(RTCMD, op));
+    }
+};
+
 RtcModule.prototype._removeCall = function(call) {
     var chatid = call.chatid;
     var existing = this.calls[chatid];
-    assert(existing);
+    if (!existing) {
+        this.logger.debug("removeCall: Call already removed");
+        return;
+    }
     if (existing.id !== call.id || call !== existing) {
         this.logger.debug("removeCall: Call has been replaced, not removing");
         return;
@@ -357,10 +440,13 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin) {
         throw new Error("startOrJoinCall: Unknown chatid " + base64urlencode(chatid));
     }
     var existing = self.calls[chatid];
-    if (existing) {
-        self.logger.warn("There is already a call in this chatroom, destroying it");
-        existing.hangup();
-        delete self.calls[chatid];
+    if (!existing && Object.keys(self.calls).length) {
+        self.logger.warn("Not starting a call - there is already a call in another chatroom");
+        return null;
+    }
+    if (existing && existing.state <= CallState.kInProgress) {
+        self.logger.warn("There is already a call in this chatroom, not starting a new one");
+        return null;
     }
     var call = new Call(
         this, {
@@ -370,7 +456,7 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin) {
         }, isGroup, isJoin, handler);
 
     self.calls[chatid] = call;
-    call._startOrJoin(av, isJoin);
+    call._startOrJoin(av);
     return call;
 };
 
@@ -449,7 +535,7 @@ function Call(rtcModule, info, isGroup, isJoiner, handler) {
     this.logger = MegaLogger.getLogger("call[" + base64urlencode(this.id) + "]",
             rtcModule._loggerOpts, rtcModule.logger);
     if (isJoiner) {
-        this._callerInfo = info; // needed for answering
+        this._callerInfo = info; // callerInfo is actually CALLDATA, needed for answering
     }
 }
 
@@ -523,12 +609,12 @@ Call.prototype._getLocalStream = function(av) {
     // getLocalStream currently never fails - if there is error, stream is a string with the error message
     return self.manager._getLocalStream(av)
         .catch(function(err) {
-            assert(false, "RtcModule._getLocalStream promise failed, and it should not. Error:"+err);
-            return err;
+            assert(false, "RtcModule._getLocalStream promise failed, and it should not. Error: "+err);
+            return Promise.reject(err);
         })
         .then(function(stream) {
             if (self.state > CallState.kInProgress) {
-                return Promise.reject("Call killed");
+                return Promise.reject("getLocalStream: Call killed (or went into state "+constStateToText(CallState, this.state)+") while obtaining local stream");
             }
             self._setState(CallState.kHasLocalStream);
         });
@@ -541,40 +627,81 @@ Call.prototype.msgCallTerminate = function(packet) {
     }
     var code = packet.data.charCodeAt(0);
     var sessions = this.sessions;
+    var ci = this._callerInfo;
     var isCallParticipant = false;
-    for (var sid in sessions) {
-        var sess = sessions[sid];
-        if (sess.peer === packet.fromUser && sess.peerClient === packet.fromClient) {
-            isCallParticipant = true;
-            break;
+    if (Object.keys(sessions).length) { // Call is in progress, look in sessions
+        for (var sid in sessions) {
+            var sess = sessions[sid];
+            if (sess.peer === packet.fromUser && sess.peerClient === packet.fromClient) {
+                isCallParticipant = true;
+                break;
+            }
         }
+    } else if (this.state <= CallState.kJoining
+        && ci
+        && ci.fromUser === packet.fromUser
+        && ci.fromClient === packet.fromClient) { // call is in setup phase, only call initiator can abort it
+            isCallParticipant = true;
     }
+
     if (!isCallParticipant) {
         this.logger.warn("Received CALL_TERMINATE from a client that is not in the call, ignoring");
         return;
     }
     this._destroy(code | Term.kPeer, false);
 };
+
 Call.prototype.msgCallReqDecline = function(packet) {
     // callid.8 termcode.1
+    var self = this;
     assert(packet.data.length >= 9);
-    var code = packet.data.charCodeAt(8);
-    if (code === Term.kCallRejected) {
-        this._handleReject(packet);
-    } else if (code === Term.kBusy) {
-        this._handleBusy(packet);
-    } else {
-        this.logger.warn("Ingoring CALL_REQ_DECLINE with unexpected termnation code", constStateToText(code));
+    var callid = packet.data.substr(0, 8);
+    if (callid !== self.id) {
+        self.logger.warn("Ignoring CALL_REQ_DECLINE for unknown call id");
+        return;
     }
+    var code = packet.data.charCodeAt(8);
+    if (code !== Term.kCallRejected && code !== Term.kBusy) {
+        self.logger.warn("CALL_REQ_DECLINE with unexpected reason code", constStateToText(code));
+    }
+
+    if (packet.fromUser === self.manager.chatd.userId) {
+        // Some other client of our user declined the call
+        if (self.state !== CallState.kRingIn) {
+            self.log.warn("Ignoring CALL_REQ_DECLINE from another client of our user - the call is not in kRingIn state, but in ", constStateToText(CallState, self.state));
+            return;
+        }
+        // TODO: Maybe verify the reason is not other than kCallRejected or kBusy
+        self._destroy(code, false);
+        return;
+    }
+    if (self.isGroup) { // group call requests can't be rejected
+        return;
+    }
+
+    if (self.state !== CallState.kReqSent) {
+        this.log.warn("Ignoring unexpected CALL_REQ_DECLINE while in state", constStateToText(this.state));
+        return;
+    }
+    this._destroy(code | Term.kPeer, false);
 };
+
 Call.prototype.msgCallReqCancel = function(packet) {
+    var callid = packet.data.substr(0, 8);
+    if (callid !== this.id) {
+        this.logger.warn("Ignoring CALL_REQ_CANCEL for another (possibly previous) call in the same chatroom");
+        return;
+    }
+    var cinfo = this._callerInfo;
+    if (!cinfo) {
+        this.logger.warn("Ignoring CALL_REQ_CANCEL for a call that is not incoming");
+        return;
+    }
     if (this.state >= CallState.kInProgress) {
         this.logger.warn("Ignoring unexpected CALL_REQ_CANCEL while in state", constStateToText(this.state));
         return;
     }
     // CALL_REQ_CANCEL callid.8 reason.1
-    var cinfo = this._callerInfo;
-    assert(cinfo);
     if (cinfo.fromUser !== packet.fromUser || cinfo.fromClient !== packet.fromClient) {
         this.logger.warn("Ignoring CALL_REQ_CANCEL from a client that did not send the call request");
         return;
@@ -589,16 +716,6 @@ Call.prototype.msgCallReqCancel = function(packet) {
     this._destroy(term | Term.kPeer, false);
 };
 
-Call.prototype._handleReject = function(packet) {
-    if (this.state !== CallState.kReqSent && this.state !== CallState.kInProgress) {
-        this.log.warn("ingoring unexpected CALL_REJECT while in state", constStateToText(this.state));
-        return;
-    }
-    if (this.isGroup || Object.keys(this.sessions).length > 0) {
-        return;
-    }
-    this._destroy(Term.kCallRejected | Term.kPeer, false);
-};
 
 Call.prototype.msgRinging = function(packet) {
     var self = this;
@@ -615,6 +732,7 @@ Call.prototype.msgRinging = function(packet) {
             if (self.state !== CallState.kReqSent) {
                 return;
             }
+            self.logger.log("Answer timeout, cancelling call request");
             self.hangup(Term.kAnswerTimeout); // TODO: differentiate whether peer has sent us RINGING or not
         }, RtcModule.kCallAnswerTimeout);
     } else {
@@ -632,25 +750,34 @@ Call.prototype._clearCallOutTimer = function() {
     clearTimeout(this._callOutTimer);
     delete this._callOutTimer;
 };
-Call.prototype._handleBusy = function(packet) {
-    if (this.state !== CallState.kReqSent && this.state !== CallState.kInProgress) {
-        this.log.warn("Ignoring unexpected BUSY when in state", constStateToText(this.state));
-        return;
+Call.prototype._bcastCallData = function(ringing) {
+    var self = this;
+    assert(self.state <= CallState.kInProgress);
+    assert(self._callInitiateAvFlags);
+    var cmd = self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0'+
+    Chatd.pack16le(10) + self.id +
+    String.fromCharCode(ringing?1:0) +
+    String.fromCharCode(self._callInitiateAvFlags);
+    if (!self.shard.cmd(Chatd.Opcode.CALLDATA, cmd)) {
+        setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
+        return false;
     }
-    if (!this.isGroup && Object.keys(this.sessions).length < 1) {
-        this._destroy(Term.kBusy | Term.kPeer, false);
-    } else {
-        this.logger.warn("Ignoring incoming BUSY for a group call or one with already existing session(s)");
-    }
-};
+    return true;
+}
 
 Call.prototype.msgSession = function(packet) {
     var self = this;
-    if (self.state !== CallState.kJoining && self.state !== CallState.kInProgress) {
-        this.logger.warn("Ignoring unexpected SESSION");
+    var callid = packet.data.substr(0, 8);
+    if (callid !== self.id) {
+        this.logger.log("Ignoring SESSION for another callid");
         return;
     }
-    self._setState(CallState.kInProgress);
+    if (self.state === CallState.kJoining) {
+        self._setState(CallState.kInProgress);
+    } else if (self.state !== CallState.kInProgress) {
+        this.logger.warn("Ignoring unexpected SESSION while in call state "+constStateToText(CallState, self.state));
+        return;
+    }
     var sid = packet.data.substr(8, 8);
     var sess = self.sessions[sid] = new Session(self, packet);
     self._notifyNewSession(sess);
@@ -671,6 +798,7 @@ Call.prototype._notifyNewSession = function(sess) {
 };
 
 Call.prototype.msgJoin = function(packet) {
+    var self = this;
     if (this.state === CallState.kRingIn && packet.fromUser === this.manager.chatd.userId) {
         this._destroy(Term.kAnsElsewhere, false);
     } else if (this.state === CallState.kInProgress || this.state === CallState.kReqSent) {
@@ -678,6 +806,11 @@ Call.prototype.msgJoin = function(packet) {
         assert(packet.callid);
         if (this.state === CallState.kReqSent) {
             this._setState(CallState.kInProgress);
+            if (this._callInitiateAvFlags) { //if we are the caller
+                if (!this._bcastCallData(false)) {
+                    return;
+                }
+            }
         }
         // create session to this peer
         var sess = new Session(this, packet);
@@ -762,6 +895,9 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         }
     });
     self._destroyPromise = pms.then(function() {
+        if (self.state >= CallState.kDestroyed) {
+            return;
+        }
         assert(Object.keys(self.sessions).length === 0);
         self._stopIncallPingTimer();
         self._setState(CallState.kDestroyed);
@@ -793,8 +929,8 @@ Call.prototype._broadcastCallReq = function() {
         return;
     }
     assert(self.state === CallState.kHasLocalStream);
-    if (!self.cmdBroadcast(RTCMD.CALL_REQUEST, self.id)) {
-        return false;
+    if (!self._bcastCallData(true)) {
+        return;
     }
 
     self._setState(CallState.kReqSent);
@@ -803,7 +939,8 @@ Call.prototype._broadcastCallReq = function() {
         if (self.state !== CallState.kReqSent) {
             return;
         }
-        self._destroy(Term.kRingOutTimeout, true);
+        self.logger.log("Timed out waiting for ring confirmation, cancelling call request");
+        self.hangup(Term.kRingOutTimeout);
     }, RtcModule.kRingOutTimeout);
     return true;
 };
@@ -870,15 +1007,16 @@ Call.prototype._fire = function(evName) {
         logger.error("Event handler '" + evName + "' threw exception:\n" + e, "\n", e.stack);
     }
 };
-Call.prototype._startOrJoin = function(av, isJoin) {
+Call.prototype._startOrJoin = function(av) {
     var self = this;
+    self._callInitiateAvFlags = av;
     self._getLocalStream(av)
     .catch(function(err) {
         self._destroy(Term.kErrLocalMedia, true, err);
-        return err;
+        return Promise.reject(err);
     })
     .then(function() {
-        if (isJoin) {
+        if (self.isJoiner) {
             self._join();
         } else {
             self._broadcastCallReq();
@@ -941,27 +1079,45 @@ Call.prototype._join = function(userid) {
 
 Call.prototype.answer = function(av) {
     var self = this;
+    assert(self.isJoiner);
     if (self.state !== CallState.kRingIn) {
         self.logger.warn("answer: Not in kRingIn state, nothing to answer");
         return false;
     }
-    return self._startOrJoin(av, true);
+    var calls = self.manager.calls;
+    if (Object.keys(calls).length <= 1) {
+        return self._startOrJoin(av);
+    }
+    // There is another ongoing call, terminate it first
+    var promises = [];
+    for (var k in calls) {
+        var call = calls[k];
+        if (call !== self) {
+            promises.push(call.hangup());
+        }
+    }
+    self.logger.log("answer: Waiting for other call(s) to terminate first...");
+    return Promise.all(promises)
+    .then(function() {
+        self.logger.log("answer: Other call(s) terminated, answering");
+        return self._startOrJoin(av);
+    });
 };
 
 Call.prototype.hangup = function(reason) {
     var term;
-    switch (this.state)
-    {
+    switch (this.state) {
     case CallState.kReqSent:
         if (typeof reason === 'undefined') {
-            reason = Term.kCallReqCancel;
+            reason = Term.kUserHangup;
         } else {
-            assert(reason === Term.kCallReqCancel || reason === Term.kAnswerTimeout,
-                   "Invalid reason for hangup of outgoing call request");
+            assert(reason === Term.kUserHangup
+                || reason === Term.kAnswerTimeout
+                || reason === Term.kRingOutTimeout,
+                "Invalid reason "+reason+" for hangup of outgoing call request");
         }
         this._cmd(RTCMD.CALL_REQ_CANCEL, 0, 0, this.id+String.fromCharCode(reason));
-        this._destroy(reason, false);
-        return;
+        return this._destroy(reason, false);
     case CallState.kRingIn:
         if (typeof reason === 'undefined') {
             term = Term.kCallRejected;
@@ -973,9 +1129,8 @@ Call.prototype.hangup = function(reason) {
         var cinfo = this._callerInfo;
         assert(cinfo);
         assert(Object.keys(this.sessions).length === 0);
-        this._cmd(RTCMD.CALL_REQ_DECLINE, cinfo.fromUser, cinfo.fromClient, cinfo.callid + String.fromCharCode(term));
-        this._destroy(term, false);
-        return;
+        this.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, cinfo.callid + String.fromCharCode(term));
+        return this._destroy(term, false);
     case CallState.kJoining:
     case CallState.kInProgress:
     case CallState.kWaitLocalStream:
@@ -985,27 +1140,22 @@ Call.prototype.hangup = function(reason) {
     case CallState.kTerminating:
     case CallState.kDestroyed:
         this.logger.debug("hangup: Call already terminating/terminated");
-        return;
+        return Promise.resolve();
     default:
         term = Term.kUserHangup;
         this.logger.warn("Don't know what term code to send in state", constStateToText(Term, this.state));
         break;
     }
+    this.logger.warn("Sending CALL_TERMINATE on call in state", this.state);
     // in any state, we just have to send CALL_TERMINATE and that's all
-    this._destroy(term, true);
-};
-
-Call.prototype.hangupAllCalls = function() {
-    var calls = this.calls;
-    for (var id in calls) {
-        calls[id].hangup();
-    }
+    return this._destroy(term, true);
 };
 
 Call.prototype._onUserOffline = function(userid, clientid) {
-    if (this.state === CallState.kRingIn) {
-        this._destroy(Term.kCallReqCancel, false);
-        return;
+    if (this.state === CallState.kRingIn && userid === this._callerInfo.fromUser
+        && clientid === this._callerInfo.fromClient) {
+            this._destroy(Term.kUserHangup, false);
+            return;
     }
     for (var sid in this.sessions) {
         var sess = this.sessions[sid];
@@ -1048,13 +1198,14 @@ Call.prototype.localAv = function() {
 };
 
 /** Protocol flow:
-    C(aller): broadcast RTCMD.CALL_REQUEST callid.8 avflags.1
+    C(aller): broadcast RTCMD.CALLDATA payloadLen.2 callid.8 callState.1 avflags.1
        => state: CallState.kReqSent
     A(nswerer): send RINGING
        => state: CallState.kRingIn
     C: may send RTCMD.CALL_REQ_CANCEL callid.8 reason.1 if caller aborts the call request.
-       The reason is normally Term.kCallReqCancel or Term.kAnswerTimeout
-    A: may send RTCMD.CALL_REQ_DECLINE callid.8 reason.1 if answerer rejects the call
+       The reason is normally Term.kUserHangup or Term.kAnswerTimeout
+    A: may broadcast RTCMD.CALL_REQ_DECLINE callid.8 reason.1 if answerer rejects the call.
+       When other clients of the same user receive the CALL_REQ_DECLINE, they should stop ringing.
     == (from here on we can join an already ongoing group call) ==
     A: broadcast JOIN callid.8 anonId.8
         => state: CallState.kJoining
@@ -1091,7 +1242,7 @@ Call.prototype.localAv = function() {
         the peer from thinking that the webrtc connection was closed
         due to error
         => state: Sess.kDestroyed
-@note avflags of caller are duplicated in RTCMD.CALL_REQUEST and RTCMD.SDP_OFFER
+@note avflags of caller are duplicated in RTCMD.CALLDATA and RTCMD.SDP_OFFER
 The first is purely informative, to make the callee aware what type of
 call the caller is requesting - audio or video.
 This is not available when joining an existing call.
@@ -1126,7 +1277,7 @@ function Session(call, packet) {
     self.logger = MegaLogger.getLogger("sess[" + base64urlencode(this.sid) + "]",
         call.manager._loggerOpts, call.logger);
     self.setupTimer = setTimeout(function() {
-        if (self._state < SessState.kInProgress) {
+        if (self.state < SessState.kInProgress) {
             self.terminateAndDestroy(Term.kErrProtoTimeout);
         }
     }, RtcModule.kSessSetupTimeout);
@@ -1474,7 +1625,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
     }
 
     if (msg) {
-        self.logger.warn("Terminating due to:", msg);
+        self.logger.error("Terminating due to:", msg);
     }
     self._setState(SessState.kTerminating);
     self.terminatePromise = new Promise(function(resolve, reject) {
@@ -1504,6 +1655,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
 Session.prototype.msgSessTerminateAck = function(packet) {
     if (this.state !== SessState.kTerminating) {
         this.logger.warn("Ignoring unexpected TERMINATE_ACK");
+        return;
     }
     assert(this.terminateAckCallback);
     var cb = this.terminateAckCallback;
@@ -1628,7 +1780,7 @@ Session.prototype.msgIceCandidate = function(packet) {
     return self.rtcConn.addIceCandidate(cand)
         .catch(function(err) {
             self.terminateAndDestroy(Term.kErrProtocol, err);
-            return err;
+            return Promise.reject(err);
         });
 };
 
@@ -1733,7 +1885,7 @@ Av.applyToStream = function(stream, av) {
     return result;
 };
 var RTCMD = Object.freeze({
-    CALL_REQUEST: 0, // initiate new call, receivers start ringing
+//  CALL_REQUEST: 0, // initiate new call, receivers start ringing
     CALL_RINGING: 1, // notifies caller that there is a receiver and it is ringing
     CALL_REQ_DECLINE: 2, // decline incoming call request, with specified Term code
     // (can be only kBusy and kCallRejected)
@@ -1752,7 +1904,7 @@ var RTCMD = Object.freeze({
 
 var Term = Object.freeze({
     kUserHangup: 0,         // < Normal user hangup
-    kCallReqCancel: 1,      // < Call request was canceled before call was answered
+//  kCallReqCancel: 1,      // < deprecated, now we have CALL_REQ_CANCEL specially for call requests
     kCallRejected: 2,       // < Outgoing call has been rejected by the peer OR incoming call has been rejected by
     // <another client of our user
     kAnsElsewhere: 3,       // < Call was answered on another device of ours

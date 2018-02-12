@@ -46,9 +46,7 @@
         // Check existance of sub-menu
         if ($('#csb_' + id + ' > .dropdown-item').length !== folders.length) {
             // sort by name is default in the tree
-            folders.sort(function(a, b) {
-                return M.compareStrings(a.name, b.name, 1);
-            });
+            folders.sort(M.getSortByNameFn2(1));
 
             for (var i = 0; i < folders.length; i++) {
                 cs = '';
@@ -74,6 +72,8 @@
 
                 $('#csb_' + id).append(html);
             }
+
+            M.disableCircularTargets('#fi_');
         }
     };
 })(this);
@@ -135,9 +135,35 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             if (sourceRoot === M.RootID && !folderlink) {
                 items['.sh4r1ng-item'] = 1;
             }
+
+            if ((sourceRoot === M.RootID || sourceRoot === M.InboxID)
+                && u_type === 3
+                && !M.getShareNodesSync(selNode.h).length
+                && !folderlink) {
+
+                // Create or Remove upload page context menu action
+                if (mega.megadrop.pufs[selNode.h] && mega.megadrop.pufs[selNode.h].s !== 1) {
+                    items['.removewidget-item'] = 1;
+                    items['.managewidget-item'] = 1;
+                }
+                else {
+                    items['.createwidget-item'] = 1;
+                }
+            }
         }
-        else if (is_image(selNode)) {
-            items['.preview-item'] = 1;
+        else {
+            if ((selNode.tvf > 0) && !folderlink) {
+                items['.properties-versions'] = 1;
+                if (M.getNodeRights(selNode.h) > 1) {
+                    items['.clearprevious-versions'] = 1;
+                }
+            }
+            if (is_image(selNode)) {
+                items['.preview-item'] = 1;
+            }
+            else if (is_video(selNode)) {
+                items['.play-item'] = 1;
+            }
         }
 
         if (M.getNodeRights(selNode.h) > 1) {
@@ -195,6 +221,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.copy-item'];
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
         items['.import-item'] = 1;
     }
 
@@ -210,13 +238,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
     "use strict";
 
     var flt;
-    var async = false;
+    var asyncShow = false;
     var m = $('.dropdown.body.files-menu');
 
     // Selection of first child level ONLY of .dropdown-item in .dropdown.body
     var menuCMI = '.dropdown.body.files-menu .dropdown-section > .dropdown-item';
-    var currNodeClass = $(e.currentTarget).attr('class');
-    var id = $(e.currentTarget).attr('id');
 
     // is contextmenu disabled
     if (localStorage.contextmenu) {
@@ -260,10 +286,15 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (M.getNodeRights(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.dropdown-item').hide();
-            $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
+            if (M.currentrootid === 'contacts') {
+                $(menuCMI).filter('.addcontact-item').show();
+            }
+            else {
+                $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
-            if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
-                $(menuCMI).filter('.folderupload-item').show();
+                if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
+                    $(menuCMI).filter('.folderupload-item').show();
+                }
             }
         }
         else {
@@ -279,7 +310,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
 
-        async = true;
+        asyncShow = true;
         M.menuItems()
             .done(function(items) {
 
@@ -308,7 +339,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // Hide all menu-items
         $(menuCMI).hide();
 
-        id = $(e.currentTarget).attr('id');
+        var id = $(e.currentTarget).attr('id');
+        var currNodeClass = $(e.currentTarget).attr('class');
 
         if (id) {
 
@@ -385,7 +417,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             || currNodeClass.indexOf('fm-tree-folder') > -1)
             || String(id).length === 8) {
 
-            async = true;
+            asyncShow = true;
             M.menuItems()
                 .done(function(items) {
                     for (var item in items) {
@@ -421,7 +453,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         }
     }
 
-    if (!async) {
+    if (!asyncShow) {
         showContextMenu();
     }
 
@@ -452,9 +484,9 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
         }
     }
 
-    // If all the selected nodes have existing public links, set text to 'Update links' or 'Update link'
+    // If all the selected nodes have existing public links, set text to 'Manage links' or 'Manage link'
     if (numOfSelectedNodes === numOfExistingPublicLinks) {
-        getLinkText = (numOfSelectedNodes > 1) ? l[8733] : l[8732];
+        getLinkText = numOfSelectedNodes > 1 ? l[17520] : l[6909];
     }
     else {
         // Otherwise change text to 'Get links' or 'Get link' if there are selected nodes without links
@@ -579,11 +611,11 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     var cor;// corner, check setBordersRadius for more info
     if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
         cor = 1;
-        dPos = { 'x': x - 2, 'y': y + ico.y + 8 };// position for right-bot
+        dPos = { 'x': x , 'y': y + ico.y + 4 };// position for right-bot
 
         // draw to the left
         if (wMax > maxX) {
-            dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
+            dPos.x = x - cmW + ico.x;// additional pixels to align with -icon
             cor = 3;
         }
 
@@ -598,7 +630,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
         }
         else {
             if (hMax > maxY - TOP_MARGIN) {
-                dPos.y = y - cmH - 6;
+                dPos.y = y - cmH - 4;
                 if (dPos.y < TOP_MARGIN) {
                     dPos.y = TOP_MARGIN;
                 }

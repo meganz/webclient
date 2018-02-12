@@ -212,10 +212,14 @@ Object.defineProperty(mega, 'achievem', {
  * @returns {MegaPromise}
  */
 mega.achievem.enabled = function achievementsEnabled() {
+    'use strict';
+
+    var self = this;
     var promise = new MegaPromise();
+    var status = 'ach' + u_type + u_handle;
+
     var notify = function(res) {
-        achievementsEnabled.status = res;
-        achievementsEnabled.pending = null;
+        self.achStatus[status] = res | 0;
 
         if ((res | 0) > 0) {
             return promise.resolve();
@@ -223,22 +227,23 @@ mega.achievem.enabled = function achievementsEnabled() {
         promise.reject();
     };
 
-    if (achievementsEnabled.status) {
-        notify(achievementsEnabled.status);
+    if (typeof this.achStatus[status] === 'number') {
+        notify(this.achStatus[status]);
     }
     else if (u_type && u_attr !== undefined) {
         notify(u_attr.flags && u_attr.flags.ach);
     }
-    else if (achievementsEnabled.pending) {
-        promise = achievementsEnabled.pending;
+    else if (this.achStatus[status] instanceof MegaPromise) {
+        promise = this.achStatus[status];
     }
     else {
-        achievementsEnabled.pending = promise;
+        this.achStatus[status] = promise;
         M.req('ach').always(notify);
     }
 
     return promise;
 };
+mega.achievem.achStatus = Object.create(null);
 
 /**
  * Show achievement dialog
@@ -249,14 +254,10 @@ mega.achievem.achievementDialog = function achievementDialog(title, close) {
     var headerTxt, descriptionTxt, storageSpace, transferQuota, monthNumber;
     var $dialog = $('.fm-dialog.achievement-dialog')
     if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $dialog.addClass('hidden');
+        closeDialog();
         return true;
     }
-    $.dialog = 'achievement';
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
+    M.safeShowDialog('achievement', $dialog);
 
     $('.achievement-dialog .button.continue,.achievement-dialog .fm-dialog-close').rebind('click', function() {
         mega.achievem.achievementDialog(title, 1);
@@ -310,9 +311,6 @@ mega.achievem.achievementDialog = function achievementDialog(title, close) {
             monthNumber = 2;
             break;
     }
-    if (!descriptionTxt) {
-        descriptionTxt = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
-    }
     $dialog.find('.fm-dialog-title').text(headerTxt);
     $dialog.find('.storage .reward-txt span').text(storageSpace);
     if (transferQuota) {
@@ -330,11 +328,6 @@ mega.achievem.achievementDialog = function achievementDialog(title, close) {
  * @param {Function} [onDialogClosed] function to invoke when the [x] is clicked
  */
 mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogClosed) {
-    var $dialog = $('.fm-dialog.achievements-list-dialog');
-    var $scrollBlock = $dialog.find('.achievements-scroll');
-    var bodyHeight = $('body').height();
-    var $contentBlock;
-
     if (!M.maf) {
         loadingDialog.show();
 
@@ -344,19 +337,20 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
             if (M.maf) {
                 achievementsListDialog(onDialogClosed);
             }
+            else if (onDialogClosed) {
+                onIdle(onDialogClosed);
+            }
         });
         return true;
     }
-    $.dialog = 'achievements';
+    var $dialog = $('.fm-dialog.achievements-list-dialog');
 
     $dialog.find('.fm-dialog-close')
         .rebind('click', function() {
             if (onDialogClosed) {
-                Soon(onDialogClosed);
+                onIdle(onDialogClosed);
             }
-            $.dialog = false;
-            fm_hideoverlay();
-            $dialog.addClass('hidden');
+            closeDialog();
             return false;
         });
 
@@ -445,25 +439,30 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
     maf = ach = undefined;
 
     // Show dialog
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
+    M.safeShowDialog('achievements', function() {
+        $dialog.removeClass('hidden');
 
-    // Init scroll
-    $contentBlock = $dialog.find('.achievements-list');
+        // Init scroll
+        var $contentBlock = $dialog.find('.achievements-list');
+        var $scrollBlock = $dialog.find('.achievements-scroll');
+        var bodyHeight = $('body').height();
 
-    if ($dialog.outerHeight() > bodyHeight) {
-        $scrollBlock.css('max-height', bodyHeight - 60);
-        $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    }
-    else if ($contentBlock.outerHeight() > 666) {
-        $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    }
-    else {
-        deleteScrollPanel($scrollBlock, 'jsp');
-    }
+        if ($dialog.outerHeight() > bodyHeight) {
+            $scrollBlock.css('max-height', bodyHeight - 60);
+            $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+        }
+        else if ($contentBlock.outerHeight() > 666) {
+            $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+        }
+        else {
+            deleteScrollPanel($scrollBlock, 'jsp');
+        }
 
-    // Dialog aligment
-    $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
+        // Dialog aligment
+        $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
+
+        return $dialog;
+    });
 };
 
 /**
@@ -474,12 +473,9 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     var $dialog = $('.fm-dialog.invite-dialog');
 
     if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $dialog.addClass('hidden');
+        closeDialog();
         return true;
     }
-    $.dialog = 'invite-friend';
 
     $dialog.find('.fm-dialog-close').rebind('click', mega.achievem.inviteFriendDialog);
 
@@ -491,10 +487,6 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     $('.header.default', $dialog).safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
     $('.info-body p:first', $dialog).safeHTML(l[16317].replace('[S]', '<strong>').replace('[/S]', '</strong>'));
-
-    if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
-        mega.achievem.initInviteDialogMultiInputPlugin();
-    }
 
     // Remove all previously added emails
     $('.fm-dialog.invite-dialog .share-added-contact.token-input-token-invite').remove();
@@ -508,8 +500,17 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
     $('.button.status', $dialog).addClass('hidden');
 
     // Show dialog
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
+    M.safeShowDialog('invite-friend', function() {
+        'use strict';
+
+        $dialog.removeClass('hidden');
+
+        if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
+            mega.achievem.initInviteDialogMultiInputPlugin();
+        }
+
+        return $dialog;
+    });
 
     // Remove unfinished user inputs
     $('#token-input-ach-invite-dialog-input', $dialog).val('');
@@ -685,15 +686,17 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
 
     // Invite dialog send button click event handler
     $('.fm-dialog.invite-dialog .button.send').rebind('click', function() {
+        'use strict';
 
         // Text message
         var emailText = l[5878];
 
         // List of email address planned for addition
         var $mails = $('.token-input-list-invite .token-input-token-invite');
-        var mailNum = M.u[u_handle] && $mails.length;
+        var mailNum = $mails.length;
 
         if (mailNum) {
+            var error = false;
 
             // Loop through new email list
             $mails.each(function(index, value) {
@@ -701,26 +704,28 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
                 // Extract email addresses one by one
                 var email = $(value).text().replace(',', '');
 
-                M.inviteContact(M.u[u_handle].m, email, emailText);
+                if (M.u[u_handle]) {
+                    M.inviteContact(M.u[u_handle].m, email, emailText);
+                }
+                else if (u_type && typeof u_attr === 'object') {
+                    M.req({'a': 'upc', 'e': u_attr.email, 'u': email, 'msg': emailText, 'aa': 'a', i: requesti})
+                        .dump();
+                }
+                else {
+                    error = true;
+                }
             });
 
-            // Singular or plural
-            if (mailNum === 1) {
-                title = l[150]; // Contact invited
-
-                // Extract email address
-                email = $($mails).text().replace(',', '');
-
-                // The user [X] has been invited and will appear in your contact list once accepted.
-                msg = l[5898].replace('[X]', email);
+            if (!error) {
+                $('.fm-dialog.invite-dialog').addClass('success');
+                $('.fm-dialog.invite-dialog button.back').removeClass('hidden');
             }
             else {
-                title = l[165] + ' ' + l[5859]; // Contacts Invited
-                msg = l[5899]; // The users have been invited and will appear in your contact list once accepted
+                console.warn('Unable to send invitation(s), no account access.');
             }
-
-            $('.fm-dialog.invite-dialog').addClass('success');
-            $('.fm-dialog.invite-dialog button.back').removeClass('hidden');
+        }
+        else {
+            console.warn('Unable to send invitation(s), no emails found.');
         }
     });
 }
@@ -734,12 +739,9 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     var $scrollBlock = $dialog.find('.table-scroll');
 
     if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $dialog.addClass('hidden');
+        closeDialog();
         return true;
     }
-    $.dialog = 'invitations';
     var $table = $scrollBlock.find('.table');
 
     if (!invitationStatusDialog.$tmpl) {
@@ -911,8 +913,7 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     }
 
     // Show dialog
-    fm_showoverlay();
-    $dialog.removeClass('hidden');
+    M.safeShowDialog('invitations', $dialog);
 
     // Init scroll
     var $contentBlock = $dialog.find('.table-bg');

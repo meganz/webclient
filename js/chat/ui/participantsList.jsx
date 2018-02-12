@@ -199,18 +199,21 @@ var ParticipantsListInner = React.createClass({
                 var dropdowns = [];
                 var privilege = null;
 
-                var dropdownIconClasses = "small-icon tiny-icon grey-down-arrow";
+                var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
 
                 if (room.type === "group" && room.members && myPresence !== 'offline') {
-                    var removeParticipantButton = <DropdownsUI.DropdownItem
-                        key="remove" icon="rounded-stop" label={__(l[8867])} onClick={() => {
-                        $(room).trigger('onRemoveUserRequest', [contactHash]);
-                    }}/>;
+                    var removeParticipantButton = null;
+
+                    if (room.iAmOperator() && contactHash !== u_handle) {
+                        removeParticipantButton = <DropdownsUI.DropdownItem
+                            key="remove" icon="rounded-stop" label={__(l[8867])} onClick={() => {
+                            $(room).trigger('onRemoveUserRequest', [contactHash]);
+                        }}/>;
+                    }
 
 
                     if (room.iAmOperator() || contactHash === u_handle) {
                         // operator
-
 
                         dropdowns.push(
                             <div key="setPermLabel" className="dropdown-items-info">
@@ -287,7 +290,7 @@ var ParticipantsListInner = React.createClass({
                         // should not happen.
                     }
 
-                    if (contactHash !== u_handle) {
+                    if (contactHash !== u_handle && room.iAmOperator()) {
                         dropdowns.push(
                             removeParticipantButton
                         );
@@ -304,7 +307,7 @@ var ParticipantsListInner = React.createClass({
                         dropdownPositionMy="right top"
                         dropdownPositionAt="right bottom"
                         dropdowns={dropdowns}
-                        dropdownDisabled={!room.iAmOperator() || contactHash === u_handle}
+                        dropdownDisabled={contactHash === u_handle}
                         dropdownButtonClasses={
                             room.type == "group" &&
                             myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button"

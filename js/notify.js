@@ -9,25 +9,24 @@
  */
 var notify = {
 
-    // The current notifications
+    /** The current notifications **/
     notifications: [],
 
-    // Number of notifications to fetch in the 'c=100' API request.
-    // This is reduced to 50 for fast rendering.
+    /** Number of notifications to fetch in the 'c=100' API request. This is reduced to 50 for fast rendering. */
     numOfNotifications: 50,
 
-    // Locally cached emails and pending contact emails
+    /** Locally cached emails and pending contact emails */
     userEmails: {},
 
-    // jQuery objects for faster lookup
+    /** jQuery objects for faster lookup */
     $popup: null,
     $popupIcon: null,
     $popupNum: null,
 
-    // A flag for if the initial loading of notifications is complete
+    /** A flag for if the initial loading of notifications is complete */
     initialLoadComplete: false,
 
-    // A list of already rendered pending contact request IDs (multiple can exist with reminders)
+    /** A list of already rendered pending contact request IDs (multiple can exist with reminders) */
     renderedContactRequests: [],
 
     /**
@@ -77,6 +76,7 @@ var notify = {
                 if (notifications) {
                     for (var i = 0; i < notifications.length; i++) {
 
+                        // Check that the user has enabled notifications of this type or skip it
                         if (notify.isUnwantedNotification(notifications[i])) {
                             continue;
                         }
@@ -119,26 +119,33 @@ var notify = {
             return false;
         }
 
-        var notification = actionPacket;                // The action packet
-        var id = makeid(10);                            // Make random ID
-        var type = notification.a;                      // Type of notification e.g. share
-        var currentTime = unixtime();                   // Get the current timestamps in seconds
-        var seen = false;                               // New notification, so mark as unread
-        var userHandle = notification.u || notification.ou;// User handle e.g. new share from this user
-
-        // Add notifications to start of the list
-        notify.notifications.unshift({
-            data: notification,                         // The full notification object
-            id: id,
-            seen: seen,
-            timeDelta: 0,
-            timestamp: currentTime,
-            type: type,
-            userHandle: userHandle
-        });
+        // Construct the notification object
+        var newNotification = {
+            data: actionPacket,                             // The action packet
+            id: makeid(10),                                 // Make random ID
+            seen: false,                                    // New notification, so mark as unread
+            timeDelta: 0,                                   // Time since notification was sent
+            timestamp: unixtime(),                          // Get the current timestamps in seconds
+            type: actionPacket.a,                           // Type of notification e.g. share
+            userHandle: actionPacket.u || actionPacket.ou   // User handle e.g. new share from this user
+        };
 
         // Update store of user emails that it knows about if a contact request was recently accepted
         notify.addUserEmails();
+
+        // If the user handle is not known to the local state we need to fetch the email from the API. This happens in
+        // some sharing scenarios where a user is part of a share then another user adds files to the share but they
+        // are not contacts with that other user so the local state has no information about them and would display a
+        // broken notification if the email is not known.
+        if (newNotification.type === 'put' && typeof notify.userEmails[newNotification.userHandle] === 'undefined') {
+
+            // Once the email is fetched it will re-call the notifyFromActionPacket function with the same actionPacket
+            notify.fetchUserEmailFromApi(newNotification.userHandle, actionPacket);
+            return false;
+        }
+
+        // Combines the current new notification with the previous one if it meets certain criteria
+        notify.combineNewNotificationWithPrevious(newNotification);
 
         // Show the new notification icon
         notify.countAndShowNewNotifications();
@@ -147,6 +154,35 @@ var notify = {
         if (!notify.$popup.hasClass('hidden')) {
             notify.renderNotifications();
         }
+    },
+
+    /**
+     * Fetches the user's email address from the API based on the user handle
+     * @param {String} userHandle The user handle to fetch the email address for e.g. 555wupYjkMU
+     * @param {Object} actionPacket An action packet which will be resent to the notifyFromActionPacket function after
+     *                              the user's email has been returned. An example 'put' action packet for testing is:
+     *                              {"a":"put","n":"U8oHEL7Q","u":"555wupYjkMU","f":[{"h":"F5QQSDJR","t":0}]}
+     */
+    fetchUserEmailFromApi: function(userHandle, actionPacket) {
+
+        'use strict';
+
+        // Make User Get Email (uge) request to get the user's email address from the user handle
+        api_req({ a: 'uge', 'u': userHandle }, {
+            callback: function(result) {
+
+                // Exit if there was an API error
+                if (typeof result === 'number' && result < 0) {
+                    return false;
+                }
+
+                // Update the local state with the user's email
+                notify.userEmails[userHandle] = result;
+
+                // Re-call the notify function with the action packet now that the email has been stored
+                notify.notifyFromActionPacket(actionPacket);
+            }
+        });
     },
 
     /**
@@ -218,6 +254,79 @@ var notify = {
                 break;
         }
         return false;
+    },
+
+    /**
+     * For incoming action packets, this combines the current new notification with the previous one if it meets
+     * certain criteria. To be combined:
+     * - There must be a previous notification to actually combine with
+     * - It must be a new folder/file added to a share
+     * - The user must be the same (same user handle)
+     * - The previous notification must be less than 5 minutes old, and
+     * - The new notification must be added to the same folder as the previous one.
+     * An example put node:
+     * {"a":"put","n":"U8oHEL7Q","u":"555wupYjkMU","f":[{"h":"F5QQSDJR","t":0}]}
+     * @param {Object} currentNotification The current notification object
+     */
+    combineNewNotificationWithPrevious: function(currentNotification) {
+
+        'use strict';
+
+        // If there are no previous notifications, nothing can be combined,
+        // so add it to start of the list without modification and exit
+        if (notify.notifications.length === 0) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // Get the previous notification (list is already sorted by most recent at the top)
+        var previousNotification = notify.notifications[0];
+
+        // If the new notification or the previous notification is not a new folder/file (put) notification, then they
+        // can't be combined (need to be the same), so add it to start of the list without modification and exit
+        if (currentNotification.type !== 'put' || previousNotification.type !== 'put') {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // If the current notification is not from the same user it cannot be combined
+        // so add it to start of the list without modification and exit
+        if (previousNotification.userHandle !== currentNotification.userHandle) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // If time difference is older than 5 minutes it's a separate event and not worth combining,
+        // so add it to start of the list without modification and exit
+        if (previousNotification.timestamp - currentNotification.timestamp > 300) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // Get details about the current notification
+        var currentNotificationParentHandle = currentNotification.data.n;
+        var currentNotificationNodes = currentNotification.data.f;
+
+        // Get details about the previous notification
+        var previousNotificationParentHandle = previousNotification.data.n;
+        var previousNotificationNodes = previousNotification.data.f;
+
+        // If parent folders are not the same, they cannot be combined, so
+        // add it to start of the list without modification and exit
+        if (currentNotificationParentHandle !== previousNotificationParentHandle) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // Combine the folder/file nodes from the current notification to the previous one
+        var combinedNotificationNodes = previousNotificationNodes.concat(currentNotificationNodes);
+
+        // Replace the current notification's nodes with the combined nodes
+        currentNotification.data.f = combinedNotificationNodes;
+
+        // Remove the previous notification and add the current notification with combined nodes from the previous
+        notify.notifications.shift();
+        notify.notifications.unshift(currentNotification);
     },
 
     /**
@@ -354,7 +463,7 @@ var notify = {
     /**
      * Populates the user emails into a list which can be looked up later for incoming
      * notifications where there is no known contact handle e.g. pending shares/contacts
-     * @param {Array} pendingContactUsers The
+     * @param {Array} pendingContactUsers An array of objects (with user handle and email) for the pending contacts
      */
     addUserEmails: function(pendingContactUsers) {
 
@@ -619,7 +728,9 @@ var notify = {
         }
 
         // Use the email address in the notification/action packet if the contact doesn't exist locally
-        else if ((typeof M.u[userHandle] === 'undefined') && (typeof notification.data.m !== 'undefined')) {
+        // or if it was populated partially locally (i.e from chat, without email)
+        else if ((typeof M.u[userHandle] === 'undefined' || !M.u[userHandle].m)
+            && (typeof notification.data.m !== 'undefined')) {
             userEmail = notification.data.m;
         }
 
@@ -1173,7 +1284,7 @@ var notify = {
             M.u.forEach(function(contact) {
 
                 // If the email is found
-                if ((contact.m === email) && contact.firstName && contact.lastName) {
+                if (contact.m === email && contact.firstName && contact.lastName) {
 
                     // Set the name and email
                     displayName = contact.firstName + ' ' + contact.lastName + ' (' + email + ')';

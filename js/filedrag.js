@@ -130,31 +130,60 @@
 
     var dir_inflight = 0;
     var filedrag_u = [];
+    var filedrag_paths = Object.create(null);
 
     function pushUpload() {
         if (!--dir_inflight && $.dostart) {
-            addupload(filedrag_u);
+            var emptyFolders = Object.keys(filedrag_paths)
+                .filter(function(p) {
+                    return filedrag_paths[p] < 1;
+                });
+
+            M.addUpload(filedrag_u, false, emptyFolders);
             filedrag_u = [];
+            filedrag_paths = Object.create(null);
+
             if (page === 'start') {
                 start_upload();
             }
         }
     }
 
-    function traverseFileTree(item, path) {
+    function pushFile(file, path) {
+        'use strict';
+
+        if (d > 1) {
+            console.warn('Adding file %s', file.name, file);
+        }
+        if (file) {
+            file.path = path;
+            filedrag_u.push(file);
+        }
+        pushUpload();
+    }
+
+    function traverseFileTree(item, path, symlink) {
+        'use strict';
+
         path = path || "";
+
         if (item.isFile) {
             dir_inflight++;
             item.file(function(file) {
-                if (d > 1) {
-                    console.log(file);
+                pushFile(file, path);
+            }, function(error) {
+                if (d) {
+                    var fn = symlink ? 'debug' : 'warn';
+
+                    console[fn]('Failed to get File from FileEntry for "%s", %s',
+                        item.name, Object(error).name, error, item);
                 }
-                file.path = path;
-                filedrag_u.push(file);
-                pushUpload();
+                pushFile(symlink, path);
             });
         }
         else if (item.isDirectory) {
+            var newPath = path + item.name + "/";
+            filedrag_paths[newPath] = 0;
             dir_inflight++;
             var dirReader = item.createReader();
             var dirReaderIterator = function() {
@@ -162,14 +191,20 @@
                     if (entries.length) {
                         var i = entries.length;
                         while (i--) {
-                            traverseFileTree(entries[i], path + item.name + "/");
+                            traverseFileTree(entries[i], newPath);
                         }
+                        filedrag_paths[newPath] += entries.length;
 
                         dirReaderIterator();
                     }
                     else {
                         pushUpload();
                     }
+                }, function(error) {
+                    console.warn('Unable to traverse folder "%s", %s',
+                        item.name, Object(error).name, error, item);
+
+                    pushUpload();
                 });
             };
             dirReaderIterator();
@@ -193,7 +228,7 @@
                         uldl_hold = false;
 
                         if (ul_queue.length > 0) {
-                            showTransferToast('u', ul_queue.length);
+                            M.showTransferToast('u', ul_queue.length);
                         }
                     });
                 }
@@ -318,6 +353,20 @@
                 return false;
             }
         }
+
+        if (localStorage.testMediaInfo) {
+            return MediaInfoLib.test(files);
+        }
+        if (localStorage.testStreamerThumbnail) {
+            return M.require('videostream').tryCatch(function() {
+                Streamer.getThumbnail(files[0])
+                    .then(function(ab) {
+                        console.info('Streamer.getThumbnail result', mObjectURL([ab], 'image/jpeg'));
+                    })
+                    .catch(console.debug.bind(console));
+            });
+        }
+
         if (e.dataTransfer
                 && e.dataTransfer.items
                 && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry) {
@@ -330,7 +379,7 @@
                         if (i == items.length - 1) {
                             $.dostart = true;
                         }
-                        traverseFileTree(item);
+                        traverseFileTree(item, '', item.isFile && items[i].getAsFile());
                     }
                 }
             }
@@ -376,9 +425,12 @@
                 }
                 if (f.name != '.') {
                     u.push(f);
+                    if (Math.floor(f.lastModified / 1000) === Math.floor(Date.now() / 1000)) {
+                        api_req({a: 'log', e: 99659, m: 'file modification time uses current time for uploading.'});
+                    }
                 }
             }
-            addupload(u);
+            M.addUpload(u);
             if (page == 'start') {
                 start_upload();
             }
@@ -407,12 +459,24 @@
             }
         }
 
-        document.getElementById("fmholder").addEventListener("dragover", FileDragHover, false);
-        document.getElementById("fmholder").addEventListener("dragleave", FileDragLeave, false);
-        document.getElementById("fmholder").addEventListener("drop", FileSelectHandler, false);
-        document.getElementById("startholder").addEventListener("dragover", FileDragHover, false);
-        document.getElementById("startholder").addEventListener("dragleave", FileDragLeave, false);
-        document.getElementById("startholder").addEventListener("drop", FileSelectHandler, false);
+        var fnHandler = FileSelectHandler;
+        var fnHover = FileDragHover;
+        var fnLeave = FileDragLeave;
+
+        // MEGAdrop upload
+        var elem = document.getElementById("wu_items");
+        if (elem) {
+            fnHandler = mega.megadrop.upload;
+            // fnHover= mega.megadrop.uiDragHover;
+            // fnLeave = mega.megadrop.uiDragLeave;
+            document.getElementById('fileselect5').addEventListener("change", fnHandler, false);
+        }
+        document.getElementById("fmholder").addEventListener("dragover", fnHover, false);
+        document.getElementById("fmholder").addEventListener("dragleave", fnLeave, false);
+        document.getElementById("fmholder").addEventListener("drop", fnHandler, false);
+        document.getElementById("startholder").addEventListener("dragover", fnHover, false);
+        document.getElementById("startholder").addEventListener("dragleave", fnLeave, false);
+        document.getElementById("startholder").addEventListener("drop", fnHandler, false);
 
         if (is_chrome_firefox) {
             $('input[webkitdirectory], .fm-folder-upload input').click(function(e) {

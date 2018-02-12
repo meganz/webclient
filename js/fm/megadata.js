@@ -112,7 +112,8 @@ function MegaData() {
         'access': this.sortByAccess.bind(this),
         'status': this.sortByStatus.bind(this),
         'fav': this.sortByFav.bind(this),
-        'email': this.sortByEmail.bind(this)
+        'email': this.sortByEmail.bind(this),
+        'label': this.sortByLabel.bind(this)
     };
 
     /** EventListener interface. */
@@ -154,6 +155,10 @@ function MegaData() {
                 mobile.cloud.renderLayout();
             }
             return true;
+        };
+
+        this['ul' + 'progress'] = function() {
+            return mobile.uploadOverlay.showUploadProgress.apply(mobile.uploadOverlay, arguments);
         };
 
         var tf = [

@@ -17,6 +17,11 @@
 var SelectionManager = function($selectable, resume) {
     var self = this;
 
+    var idx = window._selectionManagerIdx = window._selectionManagerIdx ? window._selectionManagerIdx + 1 : 1;
+
+    self.idx = idx;
+
+    var debugMode = !!localStorage.selectionManagerDebug;
 
     /**
      * Store all selected items in an _ordered_ array.
@@ -39,12 +44,61 @@ var SelectionManager = function($selectable, resume) {
      */
     this._ensure_selectable_is_available = function() {
         var targetScope = $selectable && $selectable[0];
-        if (!targetScope || !targetScope.parentNode) {
+        if (
+            !targetScope ||
+            !targetScope.parentNode ||
+            $(targetScope).is(".hidden") ||
+            !$(targetScope).is(":visible")
+        ) {
             // because MegaRender is providing a DOM node, which later on is being removed, we can't cache
             // the $selectable in this case, so lets try to use $.selectddUIgrid and do a brand new jq Sizzle query
             $selectable = $($.selectddUIgrid + ":visible");
         }
         return $selectable;
+    };
+
+    /**
+     * Called to bind the (currently active) selectionManager to the currently active .ui-selectable target
+     *
+     * @param target
+     */
+    this.bindSelectable = function(target) {
+        var $jqSelectable = $(target);
+
+        if (debugMode) {
+            console.error("(re)bindselectable", target, self);
+        }
+
+        $jqSelectable.unbind('selectableselecting.sm' + idx + ' selectableselected.sm' + idx);
+        $jqSelectable.unbind('selectableunselecting.sm' + idx + ' selectableunselected.sm' + idx);
+
+        /**
+         * Push the last selected item to the end of the selected_list array.
+         */
+        $jqSelectable.bind('selectableselecting.sm' + idx + ' selectableselected.sm' + idx, function (e, data) {
+            var $selected = $(data.selecting || data.selected);
+            var id = $selected.attr('id');
+            if (id) {
+                // dont use 'this/self' but the current/global selectionManager
+                selectionManager.add_to_selection(id);
+            }
+        });
+
+        /**
+         * Remove any unselected element from the selected_list array.
+         */
+        $jqSelectable.bind('selectableunselecting.sm' + idx + ' selectableunselected.sm' + idx, function (e, data) {
+            var $unselected = $(data.unselecting || data.unselected);
+            var unselectedId = $unselected.attr('id');
+            if (unselectedId) {
+                // dont use 'this/self' but the current/global selectionManager
+                selectionManager.remove_from_selection(unselectedId);
+            }
+        });
+
+        if (selectionManager) {
+            selectionManager._$jqSelectable = $jqSelectable;
+        }
     };
 
     /**
@@ -74,31 +128,14 @@ var SelectionManager = function($selectable, resume) {
         this.clear_last_selected();
     };
 
-    if (!resume) {
-        this.clear_selection(); // remove ANY old .currently-selected values.
-    }
-    else {
-        this.clear_last_selected();
-    }
-
     /**
      * The idea of this method is to _validate_ and return the .currently-selected element.
      *
-     * @param first_or_last string ("first" or "last") by default will return the first selected element if there is
-     * not .currently-selected
-     *
-     * @returns {String} node id
+     * @returns {String|Boolean} node id
      */
-    this.get_currently_selected = function(first_or_last) {
-        // TODO: Major refactoring is required here.
+    this.get_currently_selected = function() {
         if (this.last_selected) {
             return this.last_selected;
-        }
-        else if ((first_or_last === "first" || !first_or_last) && M.v.length > 0) {
-            return SelectionManager.dynamicNodeIdRetriever(M.v[0]);
-        }
-        else if (first_or_last === "last" &&  M.v.length > 0) {
-            return SelectionManager.dynamicNodeIdRetriever(M.v[M.v.length - 1]);
         }
         else {
             return false;
@@ -147,6 +184,16 @@ var SelectionManager = function($selectable, resume) {
     };
 
     this.add_to_selection = function(nodeId, scrollTo, alreadySorted) {
+        if (!isString(nodeId)) {
+            if (nodeId && nodeId.h) {
+                noedId = nodeId.h;
+            }
+            else if (d) {
+                console.error(".add_to_selection received a non-string as nodeId");
+                return;
+            }
+        }
+
         if (this.selected_list.indexOf(nodeId) === -1) {
             this.selected_list.push(nodeId);
             $selectable = this._ensure_selectable_is_available();
@@ -176,6 +223,9 @@ var SelectionManager = function($selectable, resume) {
             }
         }
         $.selected = this.selected_list;
+        if (debugMode) {
+            console.error("commit: ", JSON.stringify(this.selected_list), self);
+        }
     };
 
     this.remove_from_selection = function(nodeId) {
@@ -191,6 +241,14 @@ var SelectionManager = function($selectable, resume) {
                 this.last_selected = null;
             }
             $.selected = this.selected_list;
+            if (debugMode) {
+                console.error("commit: ", JSON.stringify(this.selected_list));
+            }
+        }
+        else {
+            if (debugMode) {
+                console.error("can't remove:", nodeId, JSON.stringify(this.selected_list), JSON.stringify($.selected));
+            }
         }
     };
 
@@ -222,12 +280,15 @@ var SelectionManager = function($selectable, resume) {
         });
 
 
-        var current = this.get_currently_selected("first");
+        var current = this.get_currently_selected();
         var nextIndex = currentViewIds.indexOf(current);
 
 
         if (ptr === -1) {
             // up
+
+            // allow selection to go backwards, e.g. start selecting from the end of the list
+            nextIndex = nextIndex <= 0 ? currentViewIds.length - Math.max(nextIndex, 0) : nextIndex;
 
             if (nextIndex > -1 && nextIndex - 1 >= 0) {
                 var nextId = currentViewIds[nextIndex - 1];
@@ -259,6 +320,12 @@ var SelectionManager = function($selectable, resume) {
         }
         else if (ptr === 1) {
             // down
+
+            // allow selection to go back at the start of the list if current = last selected
+            nextIndex = (
+                nextIndex + 1 >= currentViewIds.length ? -1 : nextIndex
+            );
+
             if (nextIndex + 1 < currentViewIds.length) {
                 var nextId = currentViewIds[nextIndex + 1];
 
@@ -310,7 +377,7 @@ var SelectionManager = function($selectable, resume) {
         );
 
 
-        var current = this.get_currently_selected("first");
+        var current = this.get_currently_selected();
         var current_idx = currentViewIds.indexOf(current);
 
 
@@ -346,7 +413,6 @@ var SelectionManager = function($selectable, resume) {
                 $("#" + currentViewIds[target_element_num]).addClass('ui-selected');
                 this.set_currently_selected(currentViewIds[target_element_num], scrollTo);
             }
-
         }
         else {
             // do nothing.
@@ -370,7 +436,7 @@ var SelectionManager = function($selectable, resume) {
             currentViewIds.push(SelectionManager.dynamicNodeIdRetriever(v));
         });
 
-        var current = this.get_currently_selected("first");
+        var current = this.get_currently_selected();
         var current_idx = currentViewIds.indexOf(current);
         var last_idx = currentViewIds.indexOf(lastId);
         var last_selected = this.last_selected;
@@ -394,7 +460,7 @@ var SelectionManager = function($selectable, resume) {
             }
         }
 
-        if (isMouseClick) {
+        if (isMouseClick && last_selected) {
             this.set_currently_selected(last_selected, false);
         }
 
@@ -408,40 +474,52 @@ var SelectionManager = function($selectable, resume) {
     };
 
 
-    $('.fm-right-files-block').undelegate('.ui-selectable', 'selectablecreate.sm');
+    this.destroy = function() {
+        if (this._$jqSelectable) {
+            this._$jqSelectable.unbind('selectableunselecting.sm' + this.idx + ' selectableunselected.sm' + this.idx);
+            this._$jqSelectable.unbind('selectableselecting.sm' + this.idx + ' selectableselected.sm' + this.idx);
+        }
+        $('.fm-right-files-block').undelegate('selectablecreate.sm');
+    };
+
+
+    if (!resume) {
+        this.clear_selection(); // remove ANY old .currently-selected values.
+    }
+    else {
+        if (debugMode) {
+            console.error('resuming:', JSON.stringify($.selected));
+        }
+        this.selected_list = [];
+
+        $.selected.forEach(function(entry) {
+            self.selected_list.push(entry);
+        });
+
+        // ensure the current 'resume' selection list is matching the current M.v
+        $.selected.forEach(function(nodeId) {
+            if (!M.c[M.currentdirid] || !M.c[M.currentdirid][nodeId]) {
+                self.remove_from_selection(nodeId);
+            }
+        });
+
+        this.clear_last_selected();
+    }
+
+    var $uiSelectable = $('.fm-right-files-block .ui-selectable:visible:not(.hidden)');
+
+    if ($uiSelectable.length === 1) {
+        this.bindSelectable($uiSelectable);
+    }
+
+    $('.fm-right-files-block').undelegate('selectablecreate.sm');
 
     $('.fm-right-files-block').delegate('.ui-selectable', 'selectablecreate.sm', function(e) {
-        var $jqSelectable = $(e.target);
-
-        /**
-         * Push the last selected item to the end of the selected_list array.
-         */
-        $jqSelectable.bind('selectableselecting', function (e, data) {
-            var $selected = $(data.selecting);
-            var id = $selected.attr('id');
-            if (id) {
-                self.add_to_selection(id);
-            }
-        });
-
-        /**
-         * Remove any unselected element from the selected_list array.
-         */
-        $jqSelectable.bind('selectableunselecting', function (e, data) {
-            var $unselected = $(data.unselecting);
-            var unselectedId = $unselected.attr('id');
-            if (unselectedId) {
-                self.remove_from_selection(unselectedId);
-            }
-        });
-
+        selectionManager.bindSelectable(e.target);
     });
 
 
-
-
     if (localStorage.selectionManagerDebug) {
-        var self = this;
         Object.keys(self).forEach(function(k) {
             if (typeof(self[k]) === 'function') {
                 var old = self[k];
@@ -457,6 +535,7 @@ var SelectionManager = function($selectable, resume) {
 
     return this;
 };
+
 
 /**
  * Helper function that would retrieve the DOM Node ID from `n` and convert it to DOM node ID

@@ -440,6 +440,7 @@ var strongvelope = {};
                 part = (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) ?
                     tlvstore.splitSingleTlvElement(rest) : tlvstore.splitSingleTlvRecord(rest);
                 if (part === false) {
+                    logger.info(Chatd.dumpToHex(binaryMessage));
                     logger.critical('Could not parse the content, probably a broken binary.');
                     return false;
                 }
@@ -504,6 +505,7 @@ var strongvelope = {};
                 rest = part.rest;
             }
         } catch (e) {
+            logger.info(Chatd.dumpToHex(binaryMessage));
             logger.critical('Could not parse the content, probably a broken binary.');
             return false;
         }
@@ -1256,12 +1258,6 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype.encryptTo = function(message, refs) {
         var encryptedMessages = new Array();
 
-        if (this.otherParticipants.size === 0) {
-            logger.warn('No destinations or other participants to send to.');
-
-            return false;
-        }
-
         // Assemble main message body.
         var trackedParticipants = new Set(this.otherParticipants);
         trackedParticipants.add(this.ownHandle);
@@ -1662,6 +1658,7 @@ var strongvelope = {};
                     parsedMessage.nonce);
                 // Bail out if decryption failed.
                 if (cleartext === false) {
+                    logger.warn("Decryption failed [1]: ", sender, keyId);
                     proxyPromise.reject(false);
                 }
                 proxyPromise.resolve(cleartext);
@@ -1669,6 +1666,7 @@ var strongvelope = {};
             return proxyPromise;
         }
         else {
+            logger.warn("Decryption failed [2]: ", sender, keyId);
             return MegaPromise.reject(false);
         }
     };
@@ -1869,9 +1867,6 @@ var strongvelope = {};
     strongvelope.ProtocolHandler.prototype.getKeyBlob = function(senderKey, trackedParticipants) {
         var self = this;
 
-        if (self.otherParticipants.size === 0) {
-            return false;
-        }
         if (!senderKey) {
             return false;
         }

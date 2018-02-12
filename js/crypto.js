@@ -135,7 +135,7 @@ var crypt = (function () {
                     u_pubkeys[userhandle] = u_pubkeys[res.u] = pubKey;
 
                     logger.debug('Got ' + keyType + ' pub key of user '
-                                 + debugUserHandle + ': ' + JSON.stringify(pubKey));
+                                 + debugUserHandle);
 
                     if (!fromCache && attribCache) {
                         // if an email was provided, cache it using the user-handle
@@ -834,6 +834,67 @@ var crypt = (function () {
     return ns;
 }());
 
+var xxtea = (function() {
+    'use strict';
+
+    // (from https://github.com/xxtea/xxtea-js/blob/master/src/xxtea.js)
+    var DELTA = 0x9E3779B9;
+    var ns = Object.create(null);
+
+    var int32 = function(i) {
+        return i & 0xFFFFFFFF;
+    };
+
+    var mx = function(sum, y, z, p, e, k) {
+        return (z >>> 5 ^ y << 2) + (y >>> 3 ^ z << 4) ^ (sum ^ y) + (k[p & 3 ^ e] ^ z);
+    };
+
+    ns.encryptUint32Array = function encryptUint32Array(v, k) {
+        var length = v.length;
+        var n = length - 1;
+        var y;
+        var z = v[n];
+        var sum = 0;
+        var e;
+        var p;
+        var q;
+        for (q = Math.floor(6 + 52 / length) | 0; q > 0; --q) {
+            sum = int32(sum + DELTA);
+            e = sum >>> 2 & 3;
+            for (p = 0; p < n; ++p) {
+                y = v[p + 1];
+                z = v[p] = int32(v[p] + mx(sum, y, z, p, e, k));
+            }
+            y = v[0];
+            z = v[n] = int32(v[n] + mx(sum, y, z, n, e, k));
+        }
+        return v;
+    };
+
+    ns.decryptUint32Array = function decryptUint32Array(v, k) {
+        var length = v.length;
+        var n = length - 1;
+        var y = v[0];
+        var z;
+        var sum;
+        var e;
+        var p;
+        var q = Math.floor(6 + 52 / length);
+        for (sum = int32(q * DELTA); sum !== 0; sum = int32(sum - DELTA)) {
+            e = sum >>> 2 & 3;
+            for (p = n; p > 0; --p) {
+                z = v[p - 1];
+                y = v[p] = int32(v[p] - mx(sum, y, z, p, e, k));
+            }
+            z = v[n];
+            y = v[0] = int32(v[0] - mx(sum, y, z, 0, e, k));
+        }
+        return v;
+    };
+
+    return Object.freeze(ns);
+}());
+
 window.URL = window.URL || window.webkitURL;
 
 var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
@@ -1031,6 +1092,58 @@ function crypto_rsagenkey() {
     return $promise;
 }
 
+function ApiQueue() { // double storage
+    'use strict';
+    this._head = 0;
+    this._tail = 0;
+    this._storage1 = Object.create(null);
+    this._storage2 = Object.create(null);
+}
+ApiQueue.prototype.size = function () {
+    'use strict';
+    return this._tail - this._head;
+};
+ApiQueue.prototype.sneak = function () {
+    'use strict';
+    if (this._head !== this._tail) {
+        return { st1: this._storage1[this._head], st2: this._storage2[this._head] };
+    }
+};
+ApiQueue.prototype.enqueue = function (data1, data2) {
+    'use strict';
+    // reset to 0 index, we dont want indexes to keep getting bigger
+    // this is very safe, since it takes place during enqueue,
+    // and it is not possible to have another undergoing dequeue(because head=tail)
+    if (this._head === this._tail) {
+        this._head = 0;
+        this._tail = 0;
+    }
+    this._storage1[this._tail] = data1;
+    this._storage2[this._tail++] = data2;
+};
+ApiQueue.prototype.clear = function () {
+    'use strict';
+    this._head = 0;
+    this._tail = 0;
+    this._storage1 = Object.create(null);
+    this._storage2 = Object.create(null);
+};
+ApiQueue.prototype.dequeue = function (onlySingle) {
+    'use strict';
+    if (this._head !== this._tail) {
+        var data1 = this._storage1[this._head];
+        if (onlySingle && data1.length) {
+            return null;
+        }
+        var data2 = this._storage2[this._head];
+        delete this._storage1[this._head];
+        delete this._storage2[this._head++];
+
+        return { st1: data1, st2: data2 };
+    }
+};
+
+
 /**
  * Converts a Unicode string to a UTF-8 cleanly encoded string.
  *
@@ -1095,7 +1208,7 @@ function api_setsid(sid) {
 
                     if (!dlmanager.isOverFreeQuota) {
                         dlmanager.uqFastTrack = 1;
-                        dlmanager._overquotaInfo();
+                        delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
                     }
                 }
 
@@ -1135,8 +1248,9 @@ function stopapi() {
 
     for (var i = apixs.length; i--;) {
         api_cancel(apixs[i]);
-        apixs[i].cmds = [[], []];
-        apixs[i].ctxs = [[], []];
+        apixs[i].cmdsQueue.clear();
+        apixs[i].cmdsBuffer = [];
+        apixs[i].ctxsBuffer = [];
     }
 }
 
@@ -1166,8 +1280,9 @@ function api_init(channel, service, split) {
 
     apixs[channel] = {
         c: channel,                 // channel
-        cmds: [[], []],             // queued/executing commands (double-buffered)
-        ctxs: [[], []],             // associated command contexts
+        cmdsQueue: new ApiQueue(),    // queued executing commands + contexts
+        cmdsBuffer: [],               // pulled cmds from queue (under processing)
+        ctxsBuffer: [],               // pulled ctxs from queue
         i: 0,                       // currently executing buffer
         seqno: -Math.floor(Math.random() * 0x100000000), // unique request start ID
         xhr: false,                 // channel XMLHttpRequest
@@ -1199,8 +1314,7 @@ function api_req(request, context, channel) {
 
     var q = apixs[channel];
 
-    q.cmds[q.i ^ 1].push(request);
-    q.ctxs[q.i ^ 1].push(context);
+    q.cmdsQueue.enqueue(request, context);
 
     if (!q.setimmediate) {
         q.setimmediate = setTimeout(api_proc, 0, q);
@@ -1213,7 +1327,7 @@ function api_req(request, context, channel) {
 // FIXME: check for fetch on !Firefox, not just on Chrome
 var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
 
-if (typeof Uint8Array.prototype.indexOf !== 'function') {
+if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
     if (d) {
         console.debug('No chunked method on this browser: ' + ua);
     }
@@ -1235,7 +1349,7 @@ function chunkedfetch(xhr, uri, postdata) {
                 if (r.done) {
                     // signal completion through .onload()
                     xhr.response = null;
-                    xhr.onload();
+                    xhr.onloadend();
                 }
                 else {
                     // feed received chunk to JSONSplitter via .onprogress()
@@ -1264,11 +1378,28 @@ function api_proc(q) {
         q.setimmediate = false;
     }
 
-    if (q.ctxs[q.i].length || !q.ctxs[q.i ^ 1].length) {
+    if (q.cmdsQueue.size() === 0 || q.cmdsBuffer.length && q.cmdsBuffer.length > 0) {
         return;
     }
+    var currCmd = [];
+    var currCtx = [];
+    var element = q.cmdsQueue.dequeue(); // only first element alone
+    if (element && element !== null) {
+        currCmd.push(element.st1);
+        currCtx.push(element.st2);
+        if (!element.st1.length) { // we will distinguish String + array of CMDs
+            element = q.cmdsQueue.dequeue(true);
+            while (element && element !== null) {
+                currCmd.push(element.st1);
+                currCtx.push(element.st2);
+                element = q.cmdsQueue.dequeue(true);
+            }
+        }
+    }
 
-    q.i ^= 1;
+    q.cmdsBuffer = currCmd;
+    q.ctxsBuffer = currCtx;
+
 
     if (!q.xhr) {
         // we need a real XHR only if we don't use fetch for this channel
@@ -1276,36 +1407,27 @@ function api_proc(q) {
 
         q.xhr.q = q;
 
-        q.xhr.onerror = function () {
-            if (!this.cancelled) {
-                if (logger) {
-                    logger.debug("API request error - retrying");
-                }
-                api_reqerror(q, EAGAIN, this.status);
-            }
-        };
-
         // JSON splitters are keen on processing the data as soon as it arrives,
         // so route .onprogress to it.
         if (q.split) {
             q.xhr.onprogress = function(evt) {
                 if (!this.cancelled) {
                     // caller wants progress updates? give caller progress updates!
-                    if (this.q.ctxs[this.q.i][0] && this.q.ctxs[this.q.i][0].progress) {
+                    if (this.q.ctxsBuffer[0] && this.q.ctxsBuffer[0].progress) {
                         var progressPercent = 0;
                         var bytes = evt.total || this.totalBytes;
 
                         if (!bytes) {
                             // this may throw an exception if the header doesn't exist
                             try {
-                                bytes = this.getResponseHeader('Original-Content-Length');
+                                bytes = this.getResponseHeader('Original-Content-Length') | 0;
                                 this.totalBytes = bytes;
                             }
                             catch (e) {}
                         }
 
                         if (evt.loaded > 0 && bytes) {
-                            this.q.ctxs[this.q.i][0].progress(evt.loaded / bytes * 100);
+                            this.q.ctxsBuffer[0].progress(evt.loaded / bytes * 100);
                         }
                     }
 
@@ -1336,7 +1458,7 @@ function api_proc(q) {
             };
         }
 
-        q.xhr.onload = function onAPIProcXHRLoad() {
+        q.xhr.onloadend = function onAPIProcXHRLoad(ev) {
             if (!this.cancelled) {
                 var t;
                 var status = this.status;
@@ -1389,7 +1511,7 @@ function api_proc(q) {
                 }
 
                 if (typeof t === 'object') {
-                    var ctxs = this.q.ctxs[this.q.i];
+                    var ctxs = this.q.ctxsBuffer;
 
                     for (var i = 0; i < ctxs.length; i++) {
                         var ctx = ctxs[i];
@@ -1404,6 +1526,11 @@ function api_proc(q) {
                     api_proc(this.q);
                 }
                 else {
+                    if (ev && ev.type === 'error') {
+                        if (logger) {
+                            logger.debug("API request error - retrying");
+                        }
+                    }
                     api_reqerror(this.q, t, status);
                 }
             }
@@ -1418,12 +1545,18 @@ function api_proc(q) {
               + '&lang=' + lang         // selected language
               + mega.urlParams();       // additional parameters
 
-        if (typeof q.cmds[q.i][0] === 'string') {
-            q.url += '&' + q.cmds[q.i][0];
+        if (typeof q.cmdsBuffer[0] === 'string') {
+            q.url += '&' + q.cmdsBuffer[0];
             q.rawreq = '';
         }
         else {
-            q.rawreq = JSON.stringify(q.cmds[q.i]);
+            if (q.cmdsBuffer.length === 1 && q.cmdsBuffer[0].length) {
+                q.url += '&bc=1';
+                q.rawreq = JSON.stringify(q.cmdsBuffer[0]);
+            }
+            else {
+                q.rawreq = JSON.stringify(q.cmdsBuffer);
+            }
         }
     }
 
@@ -1515,8 +1648,8 @@ function api_reqerror(q, e, status) {
 function api_ready(q) {
     q.rawreq = false;
     q.backoff = 0; // request succeeded - reset backoff timer
-    q.cmds[q.i] = [];
-    q.ctxs[q.i] = [];
+    q.cmdsBuffer = [];
+    q.ctxsBuffer = [];
 }
 
 var apiFloorCap = 3000;
@@ -1556,8 +1689,9 @@ function api_reqfailed(c, e) {
     else if (e == EBLOCKED) {
         var queue = apixs[c];
         queue.rawreq = false;
-        queue.cmds = [[], []];
-        queue.ctxs = [[], []];
+        cmdsQueue.clear();
+        cmdsBuffer = [];
+        ctxsBuffer = [];
         queue.setimmediate = false;
 
         api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reasonCode) {
@@ -1584,6 +1718,9 @@ function api_reqfailed(c, e) {
                 }
             );
         }});
+    }
+    else {
+        api_reqerror(apixs[c], EAGAIN, 0);
     }
 }
 
@@ -1716,13 +1853,17 @@ function getsc(force) {
         api_cancel(apixs[2]);   // retire existing XHR that may still be completing the request
         api_ready(apixs[2]);
         api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
+
+        if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
+            mega.loadReport.scSent = Date.now();
+        }
     }
 }
 
 function waitsc() {
     "use strict";
 
-    var MAX_WAIT = 300000;
+    var MAX_WAIT = 180e3;
     var newid = ++waitid;
 
     stopsc();
@@ -1734,33 +1875,30 @@ function waitsc() {
 
     waittimeout = setTimeout(waitsc, MAX_WAIT);
 
-    waitxhr.onerror = function(ev) {
-        if (d) {
-            console.debug('waitsc.onerror', ev);
-        }
-
+    waitxhr.onloadend = function(ev) {
         if (this.waitid === waitid) {
-            clearTimeout(waittimeout);
-            waitbackoff = Math.min(MAX_WAIT, waitbackoff << 1);
-            waittimeout = setTimeout(waitsc, waitbackoff);
-        }
-    };
+            if (this.status !== 200) {
+                if (d) {
+                    console.info('waitsc(%s:%s)', this.status, ev.type, ev);
+                }
 
-    waitxhr.onload = function(ev) {
-        if (this.status !== 200) {
-            this.onerror(ev);
-        }
-        else if (this.waitid === waitid) {
-            stopsc();
-
-            if ((Date.now() - waitbegin) < 1000) {
+                clearTimeout(waittimeout);
                 waitbackoff = Math.min(MAX_WAIT, waitbackoff << 1);
+                waittimeout = setTimeout(waitsc, waitbackoff);
             }
             else {
-                waitbackoff = 250;
-            }
+                // Increase backoff if we do keep receiving packets is rapid succession, so that we maintain
+                // smaller number of connections to process more data at once - backoff up to 4 seconds.
+                if (Date.now() - waitbegin < 1000) {
+                    waitbackoff = Math.min(4e3, waitbackoff << 1);
+                }
+                else {
+                    waitbackoff = 250;
+                }
 
-            getsc();
+                stopsc();
+                getsc();
+            }
         }
     };
 
@@ -2541,7 +2679,7 @@ var faxhrfail = Object.create(null);
 var faxhrlastgood = Object.create(null);
 
 // data.byteLength & 15 must be 0
-function api_storefileattr(id, type, key, data, ctx) {
+function api_storefileattr(id, type, key, data, ctx, ph) {
     var handle = typeof ctx === 'string' && ctx;
 
     if (typeof ctx !== 'object') {
@@ -2554,11 +2692,12 @@ function api_storefileattr(id, type, key, data, ctx) {
         }
 
         ctx = {
-            callback: api_fareq,
             id: id,
+            ph: ph,
             type: type,
             data: data,
             handle: handle,
+            callback: api_fareq,
             startTime: Date.now()
         };
     }
@@ -2571,6 +2710,9 @@ function api_storefileattr(id, type, key, data, ctx) {
 
     if (M.d[ctx.handle] && M.getNodeRights(ctx.handle) > 1) {
         req.h = handle;
+    }
+    else if (ctx.ph) {
+        req.ph = ctx.ph;
     }
 
     api_req(req, ctx, pfid ? 1 : 0);
@@ -3023,6 +3165,7 @@ function api_faretry(ctx, error, host) {
         }, ctx.faRetryI);
     }
 
+    mBroadcaster.sendMessage('fa:error', ctx.id, error, ctx.p, 2);
     srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 
@@ -3264,7 +3407,7 @@ function api_getfa(id) {
 
     if (storedattr[id]) {
         for (var type in storedattr[id]) {
-            if (type !== 'target') {
+            if (type !== 'target' && type !== '$ph') {
                 f.push(type + '*' + storedattr[id][type]);
             }
         }
@@ -3275,19 +3418,37 @@ function api_getfa(id) {
 }
 
 function api_attachfileattr(node, id) {
+    'use strict';
+
+    var ph = Object(storedattr[id])['$ph'];
     var fa = api_getfa(id);
 
     storedattr[id].target = node;
 
     if (fa) {
-        api_req({ a: 'pfa', n: node, fa: fa }, {
-            callback: function(res) {
+        var req = {a: 'pfa', fa: fa};
+
+        if (ph) {
+            req.ph = ph;
+            storedattr[id]['$ph'] = ph;
+        }
+        else {
+            req.n = node;
+        }
+
+        M.req(req)
+            .fail(function(res) {
                 if (res === EACCESS) {
                     api_pfaerror(node);
                 }
-            }
-        });
+                mBroadcaster.sendMessage('pfa:error', id, node, res);
+            })
+            .done(function() {
+                mBroadcaster.sendMessage('pfa:complete', id, node, fa);
+            });
     }
+
+    return fa;
 }
 
 /** handle ufa/pfa EACCESS error */
@@ -3725,333 +3886,3 @@ function api_strerror(errno) {
     }
     return "Unknown error (" + errno + ")";
 }
-
-// JSON parser/splitter
-// (this is tailored to processing what the API actually generates
-// i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...)
-// accepts string and Uint8Array input, but not a mixture of the two
-(function() {
-    "use strict";
-
-    var JSONSplitter = function json_splitter(filters, ctx, format_uint8array) {
-        if (!(this instanceof json_splitter)) {
-            return new json_splitter(filters, ctx, format_uint8array);
-        }
-
-        // position in source string
-        this.p = 0;
-
-        // remaining part of previous chunk (chunked feeding only)
-        this.rem = false;
-
-        // enclosing object stack at current position (type + name)
-        this.stack = [];
-
-        // 0: no value expected, 1: optional value expected, -1: compulsory value expected
-        this.expectvalue = -1;
-
-        // last hash name seen
-        this.lastname = '';
-
-        // hash of exfiltration vector callbacks
-        this.filters = filters;
-
-        // bucket stack
-        this.buckets = [];
-        this.lastpos = 0;
-
-        // optional callee scope
-        this.ctx = ctx;
-
-        if (format_uint8array) {
-            // extraction/manipulation helpers for Uint8Array inputs
-
-            // convert input Uint8Array to string
-            this.tostring = function(u8) {
-                var b = '';
-
-                for (var i = 0; i < u8.length; i++) {
-                    b = b + String.fromCharCode(u8[i]);
-                }
-
-                return b;
-            };
-
-            // convert char to Uint8Array element (number)
-            this.fromchar = function(c) {
-                return c.charCodeAt(0);
-            };
-
-            // convert Uint8Array element (number) to char
-            this.tochar = function(c) {
-                return String.fromCharCode(c);
-            };
-
-            // concatenate two Uint8Arrays (a can be false - relies on boolean.length to be undefined)
-            this.concat = function(a, b) {
-                var t = new Uint8Array(a.length+b.length);
-                if (a) t.set(a, 0);
-                t.set(b, a.length+0);
-                return t;
-            };
-
-            // sub-Uint8Array of a Uint8Array given position p and optional length l
-            this.sub = function(s, p, l) {
-                return l >= 0 ? new Uint8Array(s.buffer, p, l)
-                              : new Uint8Array(s.buffer, p);
-            }
-        }
-        else {
-            // extraction/manipulation helpers (mostly no-ops) for string inputs
-
-            // convert input string to string
-            this.tostring = function(s) {
-                return s;
-            };
-
-            // convert char to string element (char)
-            this.fromchar = function(c) {
-                return c;
-            };
-
-            // convert string element (char) to char
-            this.tochar = function(c) {
-                return c;
-            };
-
-            // concatenate two strings (a can be false)
-            this.concat = function(a, b) {
-                return a ? a+b : b;
-            };
-
-            // substring
-            this.sub = function(s, p, l) {
-                return s.substr(p, l);
-            }
-        }
-
-        // console logging
-        this.logger = MegaLogger.getLogger('JSONSplitter');
-    };
-
-    // returns the position after the end of the JSON string at o or -1 if none found
-    // (does not perform a full validity check on the string)
-    JSONSplitter.prototype.strend = function strend(s, o) {
-        var oo = o;
-
-        // find non-escaped "
-        while ((oo = s.indexOf(this.fromchar('"'), oo+1)) >= 0) {
-            for (var e = oo; this.tochar(s[--e]) == '\\'; );
-
-            if ((oo-e) & 1) {
-                return oo+1;
-            }
-        }
-
-        return -1;
-    };
-
-    // returns the position after the end of the JSON number at o or -1 if none found
-    JSONSplitter.prototype.numberre = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/;
-
-    JSONSplitter.prototype.numend = function numend(s, o) {
-        var oo = o;
-
-        // (we do not set lastIndex due to the potentially enormous length of s)
-        while ('0123456789-+eE.'.indexOf(this.tochar(s[oo])) >= 0) oo++;
-
-        if (oo > o) {
-            var r = this.numberre.exec(this.tostring(this.sub(s, o, oo-o)));
-
-            if (r) {
-                return o+r[0].length;
-            }
-        }
-
-        return -1;
-    };
-
-    // process a JSON chunk (of a stream of chunks, if the browser supports it)
-    // FIXME: rewrite without large string concatenation
-    JSONSplitter.prototype.chunkproc = function json_chunkproc(chunk, inputcomplete) {
-        // we are not receiving responses incrementally: process as growing buffer
-        if (!chunked_method) return this.proc(chunk, inputcomplete);
-
-        // otherwise, we just retain the data that is still going to be needed in the
-        // next round... enabling infinitely large accounts to be "streamed" to IndexedDB
-        // (in theory)
-        if (this.rem.length) {
-            // append to previous residue
-            if (chunk) {
-                this.rem = this.concat(this.rem, chunk);
-            }
-            chunk = this.rem;
-        }
-
-        // process combined residue + new chunk
-        var r = this.proc(chunk, inputcomplete);
-
-        if (r >= 0) {
-            // processing ended
-            this.rem = false;
-            return r;
-        }
-
-        if (this.lastpos) {
-            // remove processed data
-            this.rem = this.sub(chunk, this.lastpos);
-
-            this.p -= this.lastpos;
-            this.lastpos = 0;
-        }
-        else {
-            // no data was processed: store entire chunk
-            this.rem = chunk;
-        }
-
-        return r;
-    };
-
-    // returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
-    JSONSplitter.prototype.proc = function json_proc(json, inputcomplete) {
-        while (this.p < json.length) {
-            var c = this.tochar(json[this.p]);
-
-            if (c == '[' || c == '{') {
-                if (!this.expectvalue) {
-                    this.logger.error("Malformed JSON - unexpected object or array");
-                    return 0;
-                }
-
-                this.stack.push(this.tochar(json[this.p]) + this.lastname);
-
-                if (this.filters[this.stack.join('')]) {
-                    // a filter is configured for this path - recurse
-                    this.buckets[0] += this.tostring(this.sub(json, this.lastpos, this.p-this.lastpos));
-                    this.lastpos = this.p;
-                    this.buckets.unshift('');
-                }
-
-                this.p++;
-                this.lastname = '';
-                this.expectvalue = c == '[';
-            }
-            else if (c == ']' || c == '}') {
-                if (this.expectvalue < 0) {
-                    this.logger.error("Malformed JSON - premature array closure");
-                    return 0;
-                }
-
-                if (!this.stack.length || "]}".indexOf(c) != "[{".indexOf(this.stack[this.stack.length-1][0])) {
-                    this.logger.error("Malformed JSON - mismatched close");
-                    return 0;
-                }
-
-                this.lastname = '';
-
-                // check if this concludes an exfiltrated object and return it if so
-                var callback = this.filters[this.stack.join('')];
-                this.p++;
-
-                if (callback) {
-                    // we have a filter configured for this object
-                    try {
-                        // pass filtrate to application and empty bucket
-                        callback.call(this.ctx,
-                            JSON.parse(this.buckets[0]+this.tostring(this.sub(json, this.lastpos, this.p-this.lastpos)))
-                        );
-                    } catch (e) {
-                        this.logger.error("Malformed JSON - parse error in filter element " + callback.name, e);
-                        return 0;
-                    }
-
-                    this.buckets.shift();
-                    this.lastpos = this.p;
-                }
-
-                this.stack.pop();
-                this.expectvalue = 0;
-            }
-            else if (c == ',') {
-                if (this.expectvalue) {
-                    this.logger.error("Malformed JSON - stray comma");
-                    return 0;
-                }
-                if (this.lastpos == this.p) {
-                    this.lastpos++;
-                }
-                this.p++;
-                this.expectvalue = this.stack[this.stack.length-1][0] == '[';
-            }
-            else if (c == '"') {
-                var t = this.strend(json, this.p);
-                if (t < 0) {
-                    break;
-                }
-
-                if (this.expectvalue) {
-                    this.p = t;
-                    this.expectvalue = false;
-                }
-                else {
-                    // (need at least one char after end of property string)
-                    if (t == json.length) {
-                        break;
-                    }
-
-                    if (this.tochar(json[t]) != ':') {
-                        this.logger.error("Malformed JSON - no : found after property name");
-                        return 0;
-                    }
-
-                    this.lastname = this.tostring(this.sub(json, this.p+1, t-this.p-2));
-                    this.expectvalue = -1;
-                    this.p = t+1;
-                }
-            }
-            else if (c >= '0' && c <= '9' || c == '.' || c == '-') {
-                if (!this.expectvalue) {
-                    this.logger.error("Malformed JSON - unexpected number");
-                    return 0;
-                }
-
-                var t = this.numend(json, this.p);
-
-                if (t == json.length) {
-                    // numbers, on the face of them, do not tell whether they are complete yet
-                    // fortunately, we have the "inputcomplete" flag to assist
-                    if (inputcomplete && !this.stack.length) {
-                        // this is a stand-alone number, do we have a callback for them?
-                        callback = this.filters['#'];
-                        if (callback) {
-                            callback.call(this.ctx, this.tostring(json));
-                        }
-                        return 1;
-                    }
-                    break;
-                }
-
-                if (t < 0) {
-                    break;
-                }
-
-                this.p = t;
-                this.expectvalue = false;
-            }
-            else if (c == ' ') {
-                // a concession to the API team's aesthetic sense
-                // FIXME: also support tab, CR, LF
-                this.p++;
-            }
-            else {
-                this.logger.error("Malformed JSON - bogus char at position " + this.p);
-                return 0;
-            }
-        }
-
-        return (!this.expectvalue && !this.stack.length) ? 1 : (inputcomplete ? (json === false) : -1);
-    };
-    Object.freeze(JSONSplitter.prototype);
-
-    window.JSONSplitter = JSONSplitter;
-})();

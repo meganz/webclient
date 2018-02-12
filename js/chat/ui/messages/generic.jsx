@@ -8,18 +8,21 @@ var TypingAreaUI = require('./../typingArea.jsx');
 /* 1h as confirmed by Mathias */
 var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
+var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
+
 var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],
     getInitialState: function() {
         return {
-            'editing': false
+            'editing': this.props.editing
         };
     },
-    componentWillUpdate: function(nextProps, nextState) {
+    isBeingEdited: function() {
+        return this.state.editing === true || this.props.editing === true;
     },
     componentDidUpdate: function(oldProps, oldState) {
         var self = this;
-        if (self.state.editing === true && self.isMounted()) {
+        if (self.isBeingEdited() && self.isMounted()) {
             var $generic = $(self.findDOMNode());
             var $textarea = $('textarea', $generic);
             if ($textarea.size() > 0 && !$textarea.is(":focus")) {
@@ -32,26 +35,11 @@ var GenericConversationMessage = React.createClass({
                 }
             }
         }
-        else if (self.isMounted() && self.state.editing === false && oldState.editing === true) {
+        else if (self.isMounted() && !self.isBeingEdited() && oldState.editing === true) {
             if (self.props.onUpdate) {
                 self.props.onUpdate();
             }
         }
-        var $node = $(self.findDOMNode());
-        $node.rebind('onEditRequest.genericMessage', function(e) {
-            if (self.state.editing === false) {
-                self.setState({'editing': true});
-
-                Soon(function() {
-                    var $generic = $(self.findDOMNode());
-                    var $textarea = $('textarea', $generic);
-                    if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-                        $textarea.focus();
-                        moveCursortoToEnd($textarea[0]);
-                    }
-                });
-            }
-        });
         $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
             Soon(function() {
                 if (self.isMounted()) {
@@ -60,11 +48,68 @@ var GenericConversationMessage = React.createClass({
             });
         });
     },
+    componentDidMount: function() {
+        var self = this;
+        var $node = $(self.findDOMNode());
+
+        if (self.isBeingEdited() && self.isMounted()) {
+            var $generic = $(self.findDOMNode());
+            var $textarea = $('textarea', $generic);
+            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
+                $textarea.focus();
+                moveCursortoToEnd($textarea[0]);
+            }
+        }
+
+        $node.delegate(
+            CLICKABLE_ATTACHMENT_CLASSES,
+            'click.dropdownShortcut',
+            function(e){
+                if (e.target.classList.contains('button')) {
+                    // prevent recursion
+                    return;
+                }
+
+                var $block;
+                if ($(e.target).is('.shared-data')) {
+                    $block = $(e.target);
+                }
+                else if ($(e.target).is('.shared-info') || $(e.target).parents('.shared-info').length > 0) {
+                    $block = $(e.target).is('.shared-info') ?
+                        $(e.target).next() : $(e.target).parents('.shared-info').next();
+                }
+                else {
+                    $block = $(e.target).parents('.message.shared-data');
+                }
+
+
+                Soon(function() {
+                    // a delay is needed, otherwise React would receive the same click event and close the dropdown
+                    // even before displaying it in the UI.
+                    $('.button.default-white-button.tiny-button', $block).trigger('click');
+                });
+            });
+    },
     componentWillUnmount: function() {
         var self = this;
         var $node = $(self.findDOMNode());
-        $node.unbind('onEditRequest.genericMessage');
+
         $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
+        $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
+    },
+    _nodeUpdated: function(h) {
+        var self = this;
+        // because it seems the webclient can trigger stuff before the actual
+        // change is done on the node, this function would need to be queued
+        // using Soon, so that its executed after the node modify code
+        Soon(function() {
+            if (self.isMounted() && self.isComponentVisible()) {
+                self.forceUpdate();
+                if (self.dropdown) {
+                    self.dropdown.forceUpdate();
+                }
+            }
+        });
     },
     doDelete: function(e, msg) {
         e.preventDefault(e);
@@ -107,6 +152,117 @@ var GenericConversationMessage = React.createClass({
 
 
     },
+    _favourite: function(h) {
+        var newFavState = Number(!M.isFavourite(h));
+        M.favourite([h], newFavState);
+    },
+    _addFavouriteButtons: function(h, arr) {
+        var self = this;
+
+        if (M.getNodeRights(h) > 1) {
+            var isFav = M.isFavourite(h);
+
+            arr.push(
+                <DropdownsUI.DropdownItem icon={"context " + (isFav ? "broken-heart" : "heart")}
+                                          label={isFav ? l[5872] : l[5871]}
+                                          isFav={isFav}
+                                          key="fav"
+                                          onClick={(e) => {
+                                              self._favourite(h);
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              return false;
+                                          }}/>
+            );
+            return isFav;
+        }
+        else {
+            return false;
+        }
+    },
+    _isNodeHavingALink: function(h) {
+        return M.getNodeShare(h) !== false;
+    },
+    _addLinkButtons: function(h, arr) {
+        var self = this;
+
+        var haveLink = self._isNodeHavingALink(h) === true;
+
+        var getManageLinkText = haveLink ? l[6909] : l[59];
+
+        arr.push(
+            <DropdownsUI.DropdownItem icon="icons-sprite chain"
+                                      key="getLinkButton"
+                                      label={getManageLinkText}
+                                      onClick={self._getLink.bind(self, h)}
+            />);
+
+        if (haveLink) {
+            arr.push(
+                <DropdownsUI.DropdownItem icon="context remove-link"
+                                          key="removeLinkButton"
+                                          label={__(l[6821])}
+                                          onClick={self._removeLink.bind(self, h)}
+                />);
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+    _startDownload: function(v) {
+        M.addDownload([v]);
+    },
+    _addToCloudDrive: function(v) {
+        M.injectNodes(v, M.RootID, function(res) {
+            if (res === 0) {
+                msgDialog(
+                    'info',
+                    __(l[8005]),
+                    __(l[8006])
+                );
+            }
+        });
+    },
+
+    _getLink: function(h, e) {
+        if (u_type === 0) {
+            ephemeralDialog(l[1005]);
+        }
+        else {
+            mega.Share.initCopyrightsDialog([h]);
+        }
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    },
+    _removeLink: function(h, e) {
+        if (u_type === 0) {
+            ephemeralDialog(l[1005]);
+        }
+        else {
+            var exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': [h]});
+            exportLink.removeExportLink();
+        }
+
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    },
+
+    _startPreview: function(v, e) {
+        var chatRoom = this.props.message.chatRoom;
+        assert(M.chat, 'Not in chat.');
+        M.v = chatRoom.images.values();
+        slideshow(v.h);
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    },
+
     render: function () {
         var self = this;
 
@@ -209,7 +365,7 @@ var GenericConversationMessage = React.createClass({
                                 clearTimeout(self._rerenderTimer);
                             }
                             self._rerenderTimer = setTimeout(function () {
-                                if (message.sending === true) {
+                                if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
                                     chatRoom.messagesBuff.trackDataChange();
                                     if (self.isMounted()) {
                                         self.forceUpdate();
@@ -241,7 +397,7 @@ var GenericConversationMessage = React.createClass({
 
             var displayName;
             if (contact) {
-                displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+                displayName = generateAvatarMeta(contact.u).fullName;
             }
             else {
                 displayName = contact;
@@ -262,10 +418,10 @@ var GenericConversationMessage = React.createClass({
 
                     var files = [];
 
+                    self.attachments = [];
+
                     attachmentMeta.forEach(function(v, attachmentKey) {
-                        var startDownload = function() {
-                            M.addDownload([v]);
-                        };
+                        self.attachments.push(v);
 
                         var attachmentMetaInfo;
                         // cache ALL current attachments, so that we can revoke them later on in an ordered way.
@@ -284,93 +440,113 @@ var GenericConversationMessage = React.createClass({
                             }
                         }
 
-                        var addToCloudDrive = function() {
-                            M.injectNodes(v, M.RootID, function(res) {
-                                if (res === 0) {
-                                    msgDialog(
-                                        'info',
-                                        __(l[8005]),
-                                        __(l[8006])
-                                    );
-                                }
-                            });
-                        };
 
-                        var startPreview = function(e) {
-                            assert(M.chat, 'Not in chat.');
-                            M.v = chatRoom.images.values();
-                            slideshow(v.h);
-                            if (e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        };
+
+
 
                         // generate preview/icon
                         var icon = fileIcon(v);
 
                         var dropdown = null;
-                        var previewButtons = null;
+                        var previewButton = null;
 
                         if (!attachmentMetaInfo.revoked) {
-                            if (v.fa && (icon === "graphic" || icon === "image")) {
+                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
                                 var imagesListKey = message.messageId + "_" + v.h;
                                 if (!chatRoom.images.exists(imagesListKey)) {
                                     v.id = imagesListKey;
                                     v.delay = message.delay;
                                     chatRoom.images.push(v);
                                 }
-                                previewButtons = <span>
+                                previewButton = <span key="previewButton">
                                     <DropdownsUI.DropdownItem icon="search-icon" label={__(l[1899])}
-                                                              onClick={startPreview}/>
+                                                              onClick={self._startPreview.bind(self, v)}/>
                                     <hr/>
-                                </span>
+                                </span>;
                             }
                             if (contact.u === u_handle) {
-                                var revokeButton = null;
-
-                                if (message.isEditable && message.isEditable()) {
-                                    revokeButton = <DropdownsUI.DropdownItem icon="red-cross" label={__(l[8909])}
-                                                className="red" onClick={() => {
-                                                    chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
-                                                        chatRoom,
-                                                        message.internalId ? message.internalId : message.orderValue,
-                                                    ""
-                                                    );
-                                              }} />
-                                }
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
-                                    icon="tiny-icon grey-down-arrow">
+                                    icon="tiny-icon icons-sprite grey-dots">
                                     <DropdownsUI.Dropdown
+                                        ref={(refObj) => {
+                                            self.dropdown = refObj;
+                                        }}
                                         className="white-context-menu attachments-dropdown"
                                         noArrow={true}
-                                        positionMy="left bottom"
-                                        positionAt="right bottom"
-                                        horizOffset={4}
-                                    >
-                                        {previewButtons}
-                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
-                                                                  onClick={startDownload}/>
+                                        positionMy="left top"
+                                        positionAt="left bottom"
+                                        horizOffset={-4}
+                                        vertOffset={3}
+                                        onBeforeActiveChange={(newState) => {
+                                            if (newState === true) {
+                                                self.forceUpdate();
+                                            }
+                                        }}
+                                        dropdownItemGenerator={function(dd) {
+                                            var linkButtons = [];
+                                            var firstGroupOfButtons = [];
+                                            var revokeButton = null;
+                                            if (message.isEditable && message.isEditable()) {
+                                                revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
+                                                    label={__(l[83])} className="red" onClick={() => {
+                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
+                                                            chatRoom,
+                                                            (
+                                                                message.internalId ?
+                                                                    message.internalId : message.orderValue
+                                                            ),
+                                                            ""
+                                                        );
+                                                    }} />
+                                            }
 
-                                        {revokeButton ? <hr /> : ""}
-                                        {revokeButton}
+                                            self._addLinkButtons(v.h, linkButtons);
 
-                                    </DropdownsUI.Dropdown>
+                                            firstGroupOfButtons.push(
+                                                <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
+                                                                          key="infoDialog"
+                                                                          onClick={() => {
+                                                                              $.selected = [v.h];
+                                                                              propertiesDialog();
+                                                                          }} />
+                                            );
+
+
+                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+
+                                            return <div>
+                                                {previewButton}
+                                                {firstGroupOfButtons}
+                                                {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
+                                                <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
+                                                                          onClick={self._startDownload.bind(self, v)}/>
+                                                {linkButtons}
+                                                {revokeButton ? <hr /> : ""}
+                                                {revokeButton}
+                                            </div>;
+                                        }}
+                                    />
                                 </ButtonsUI.Button>;
+
                             }
                             else {
                                 dropdown = <ButtonsUI.Button
                                     className="default-white-button tiny-button"
-                                    icon="tiny-icon grey-down-arrow">
+                                    icon="tiny-icon icons-sprite grey-dots">
                                     <DropdownsUI.Dropdown
-                                        className="attachments-dropdown"
+                                        className="white-context-menu attachments-dropdown"
+                                        noArrow={true}
+                                        positionMy="left top"
+                                        positionAt="left bottom"
+                                        horizOffset={-4}
+                                        vertOffset={3}
                                     >
-                                        {previewButtons}
+                                        {previewButton}
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
-                                                                  onClick={startDownload}/>
+                                                                  onClick={self._startDownload.bind(self, v)}/>
                                         <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
-                                                                  onClick={addToCloudDrive}/>
+                                                                  onClick={self._addToCloudDrive.bind(self, v)}/>
                                     </DropdownsUI.Dropdown>
                                 </ButtonsUI.Button>;
                             }
@@ -391,7 +567,7 @@ var GenericConversationMessage = React.createClass({
                         </div>;
 
                         if (M.chat && !message.revoked) {
-                            if (v.fa && (icon === "graphic" || icon === "image")) {
+                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
                                 var src = thumbnails[v.h];
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);
@@ -409,8 +585,8 @@ var GenericConversationMessage = React.createClass({
                                 }
 
                                 preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
-                                    <div className="img-overlay" onClick={startPreview}></div>
-                                    <div className="button overlay-button" onClick={startPreview}>
+                                    <div className="img-overlay" onClick={self._startPreview.bind(self, v)}></div>
+                                    <div className="button overlay-button" onClick={self._startPreview.bind(self, v)}>
                                         <i className="huge-white-icon loupe"></i>
                                     </div>
 
@@ -419,7 +595,7 @@ var GenericConversationMessage = React.createClass({
                                     <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
                                          width="156"
                                          height="156"
-                                         onClick={startPreview}
+                                         onClick={self._startPreview.bind(self, v)}
                                     />
                                 </div>) :  preview);
                             }
@@ -497,7 +673,7 @@ var GenericConversationMessage = React.createClass({
                         ) {
                             deleteButtonOptional = <DropdownsUI.DropdownItem
                                 icon="red-cross"
-                                label={__(l[1730])}
+                                label={l[83]}
                                 className="red"
                                 onClick={(e) => {
                                         self.doDelete(e, message);
@@ -525,7 +701,7 @@ var GenericConversationMessage = React.createClass({
                             // OR it is a share contact, etc.
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
-                                icon="tiny-icon grey-down-arrow">
+                                icon="tiny-icon icons-sprite grey-dots">
                                 <DropdownsUI.Dropdown
                                     className="white-context-menu shared-contact-dropdown"
                                     noArrow={true}
@@ -563,7 +739,7 @@ var GenericConversationMessage = React.createClass({
                         else if (M.u[contact.u] && M.u[contact.u].c === 0) {
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
-                                icon="tiny-icon grey-down-arrow">
+                                icon="tiny-icon icons-sprite grey-dots">
                                 <DropdownsUI.Dropdown
                                     className="white-context-menu shared-contact-dropdown"
                                     noArrow={true}
@@ -594,8 +770,7 @@ var GenericConversationMessage = React.createClass({
                                                 var title = l[150];
 
                                                 // The user [X] has been invited and will appear in your contact list
-                                                // once
-                                                // accepted."
+                                                // once accepted."
                                                 var msg = l[5898].replace('[X]', contactEmail);
 
 
@@ -680,7 +855,7 @@ var GenericConversationMessage = React.createClass({
             }
             else {
                 // this is a text message.
-                if (message.textContents === "") {
+                if (message.textContents === "" && !message.dialogType) {
                     message.deleted = true;
                 }
                 var messageActionButtons = null;
@@ -695,7 +870,7 @@ var GenericConversationMessage = React.createClass({
                             </div>;
                         }
                         else {
-                            if (self.state.editing !== true) {
+                            if (self.isBeingEdited()  !== true) {
                                 messageNotSendIndicator = <div className="not-sent-indicator">
                                         <span className="tooltip-trigger"
                                               key="retry"
@@ -733,7 +908,7 @@ var GenericConversationMessage = React.createClass({
                 }
 
                 var messageDisplayBlock;
-                if (self.state.editing === true) {
+                if (self.isBeingEdited() === true) {
                     var msgContents = message.textContents;
                     msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
 
@@ -758,7 +933,9 @@ var GenericConversationMessage = React.createClass({
                                     };
                                     megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
                                     self.props.onEditDone(tmpMessageObj.textContents);
-                                    self.forceUpdate();
+                                    if (self.isMounted()) {
+                                        self.forceUpdate();
+                                    }
                                 });
                             }
 
@@ -788,13 +965,13 @@ var GenericConversationMessage = React.createClass({
                     if (
                         contact && contact.u === u_handle &&
                         (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
-                        self.state.editing !== true &&
+                        self.isBeingEdited() !== true &&
                         chatRoom.isReadOnly() === false &&
                         !message.requiresManualRetry
                     ) {
                         messageActionButtons = <ButtonsUI.Button
                             className="default-white-button tiny-button"
-                            icon="tiny-icon grey-down-arrow">
+                            icon="tiny-icon icons-sprite grey-dots">
                             <DropdownsUI.Dropdown
                                 className="white-context-menu attachments-dropdown"
                                 noArrow={true}
@@ -852,8 +1029,7 @@ var GenericConversationMessage = React.createClass({
             textMessage = getMessageString(message.type);
             if (!textMessage) {
                 console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
-                debugger;
-                throw new Error("boom");
+                return;
             }
             // if is an array.
             if (textMessage.splice) {

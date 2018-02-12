@@ -234,9 +234,8 @@ var exportPassword = {
                 // Reinit link body scrolling
                 exportPassword.encrypt.reInitScrolling();
 
-                // Reposition the dialog, and re-initialise the scrolling so it scrolls all the way to the bottom
+                // Reposition the dialog
                 exportPassword.encrypt.repositionDialog();
-                exportPassword.encrypt.reInitScrolling();
             });
         },
 
@@ -258,10 +257,7 @@ var exportPassword = {
          */
         reInitScrolling: function() {
             var $scrollBlock = this.$dialog.find('.export-link-body');
-            var jsp = $scrollBlock.data('jsp');
-            if (jsp) {
-                jsp.destroy();
-            }
+
             $scrollBlock.jScrollPane({
                 showArrows: true,
                 arrowSize: 5
@@ -1321,9 +1317,7 @@ var exportExpiry = {
         deleteScrollPanel(scroll, 'jsp');
 
         if (close) {
-            $.dialog = false;
-            fm_hideoverlay();
-            $linksDialog.addClass('hidden');
+            closeDialog();
             $('.export-links-warning').addClass('hidden');
             if (window.onCopyEventHandler) {
                 document.removeEventListener('copy', window.onCopyEventHandler, false);
@@ -1332,14 +1326,16 @@ var exportExpiry = {
             return true;
         }
 
-        $.dialog = 'links';
-
         $linksDialog.addClass('file-keys-view');
 
         // Generate content
         html = itemExportLink();
 
         // Fill with content
+        if (!html.length) { // some how we dont have a link
+            msgDialog('warninga', l[17564], l[17565]);
+            return true;
+        }
         $linksDialog.find('.export-link-body').safeHTML(html);
 
         // Reset state from previous dialog opens and pre-select the 'Link with key' option by default
@@ -1347,21 +1343,24 @@ var exportExpiry = {
         $linkButtons.removeClass('selected');
         $linksDialog.find('.link-handle-and-key').addClass('selected');
 
-        fm_showoverlay();
+        M.safeShowDialog('links', function() {
+            fm_showoverlay();
+            $linksDialog.removeClass('hidden');
+            $('.export-links-warning').removeClass('hidden');
 
-        $linksDialog.removeClass('hidden');
-        $('.export-links-warning').removeClass('hidden');
+            $(scroll).jScrollPane({showArrows: true, arrowSize: 5});
+            jScrollFade(scroll);
 
-        $(scroll).jScrollPane({ showArrows: true, arrowSize: 5 });
-        jScrollFade(scroll);
+            $linksDialog.css('margin-top', $linksDialog.outerHeight() / 2 * -1);
 
-        $linksDialog.css('margin-top', ($linksDialog.outerHeight() / 2) * -1);
+            setTimeout(function() {
+                $('.file-link-info').rebind('click', function() {
+                    $('.file-link-info').select();
+                });
+            }, 300);
 
-        setTimeout(function() {
-            $('.file-link-info').rebind('click', function() {
-                $('.file-link-info').select();
-            });
-        }, 300);
+            return $linksDialog;
+        });
 
         // Setup toast notification
         toastTxt = l[7654];
@@ -1531,7 +1530,7 @@ var exportExpiry = {
         var key;
         var type;
         var links = [];
-        var handles = $.selected;
+        var handles = $.itemExport;
         var $dialog = $('.export-links-dialog .export-content-block');
         var modeFull = $dialog.hasClass('full-link');
         var modePublic = $dialog.hasClass('public-handle');
@@ -1755,6 +1754,7 @@ var exportExpiry = {
             self.logger.debug('getExportLink');
 
             $.each(self.options.nodesToProcess, function(index, nodeId) {
+                // ToDo: Improve conditions use .getNodeByHandle()
                 if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
                     self._getFolderExportLinkRequest(nodeId);
                 }
@@ -2000,10 +2000,64 @@ var exportExpiry = {
         return false;
     };
 
+    /**
+     * Shows the copyright warning dialog.
+     *
+     * @param {Array} nodesToProcess Array of strings, node ids
+     */
+    var initCopyrightsDialog = function(nodesToProcess) {
+        'use strict';
+
+        $.itemExport = nodesToProcess;
+
+        var openGetLinkDialog = function() {
+            var exportLink = new mega.Share.ExportLink({
+                'showExportLinkDialog': true,
+                'updateUI': true,
+                'nodesToProcess': nodesToProcess
+            });
+            exportLink.getExportLink();
+        };
+
+        // If they've already agreed to the copyright warning (cws = copyright warning shown)
+        if (fmconfig.cws) {
+            // Go straight to Get Link dialog
+            openGetLinkDialog();
+            return false;
+        }
+
+        // Cache selector
+        var $copyrightDialog = $('.copyrights-dialog');
+
+        // Otherwise show the copyright warning dialog
+        M.safeShowDialog('copyrights', function() {
+            $.copyrightsDialog = 'copyrights';
+            return $copyrightDialog;
+        });
+
+        // Init click handler for 'I agree' / 'I disagree' buttons
+        $copyrightDialog.find('.default-white-button').rebind('click', function() {
+            closeDialog();
+
+            // User disagrees with copyright warning
+            if (!$(this).hasClass('cancel')) {
+                // User agrees, store flag so they don't see it again
+                mega.config.set('cws', 1);
+
+                // Go straight to Get Link dialog
+                openGetLinkDialog();
+            }
+        });
+
+        // Init click handler for 'Close' button
+        $copyrightDialog.find('.fm-dialog-close').rebind('click', closeDialog);
+    };
+
     // export
     scope.mega = scope.mega || {};
     scope.mega.Share = scope.mega.Share || {};
     scope.mega.Share.ExportLink = ExportLink;
+    scope.mega.Share.initCopyrightsDialog = initCopyrightsDialog;
 })(jQuery, window);
 
 
@@ -2032,9 +2086,10 @@ var exportExpiry = {
         var $nodeId = $('#' + nodeId);
         var $tree = $('#treea_' + nodeId);
 
-        if ($nodeId.length === 0) {
+        if ($nodeId.length === 0 && M.currentdirid.indexOf('chat') === -1) {
+
             // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
-            if (M.megaRender.hasDOMNode(nodeId)) {
+            if (M.megaRender && M.megaRender.hasDOMNode(nodeId)) {
                 $nodeId = $(M.megaRender.getDOMNode(nodeId, M.d[nodeId]));
             }
         }
@@ -2073,7 +2128,7 @@ var exportExpiry = {
         var $node = $('#' + nodeId);
         if ($node.length === 0) {
             // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
-            if (M.megaRender.hasDOMNode(nodeId)) {
+            if (M.megaRender && M.megaRender.hasDOMNode(nodeId)) {
                 $node = $(M.megaRender.getDOMNode(nodeId, M.d[nodeId]));
             }
         }

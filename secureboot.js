@@ -34,9 +34,12 @@ if (typeof process !== 'undefined') {
 }
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
-var is_chrome_firefox = document.location.protocol === 'chrome:'
-    && document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
+var is_chrome_firefox = document.location.protocol === 'chrome:' &&
+    document.location.host === 'mega' || document.location.protocol === 'mega:';
+var location_sub = document.location.href.substr(0, 16);
+var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
+var is_firefox_web_ext = location_sub === 'moz-extension://';
+var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 var is_android = /android/.test(ua);
@@ -125,8 +128,15 @@ function mURIDecode(path) {
 
 function clickURLs() {
     $('a.clickurl').rebind('click', function() {
-        var url = $(this).attr('href') || $(this).data('fxhref');
+        var $this = $(this);
+        var url = $this.attr('href') || $this.data('fxhref');
         if (url) {
+            if (window.loadingDialog && $this.hasClass('pages-nav')) {
+                loadingDialog.quiet = true;
+                onIdle(function() {
+                    loadingDialog.quiet = false;
+                });
+            }
             loadSubPage(url.substr(1));
             return false;
         }
@@ -311,7 +321,7 @@ if (!b_u) try
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
         }
-        d = !!localStorage.d;
+        d = localStorage.d | 0;
         jj = localStorage.jj;
         dd = localStorage.dd;
         // Write test
@@ -477,6 +487,15 @@ var mega = {
                 // the later and do not send this report.
                 r.sent = true;
                 clearInterval(r.aliveTimer);
+            }
+            else if (r.scSent && now - r.scSent > 6e4 && (scqhead > scqtail * 2)) {
+                api_req({a: 'log', e: 99679}); // sc processing took too long
+
+                msgDialog('warninga:!^' + l[17704] + '!' + l[17705], l[882], l[17706], 0, function(yes) {
+                    if (yes) {
+                        fm_forcerefresh();
+                    }
+                });
             }
             r.aliveTimeStamp = now;
         }, 2000);
@@ -787,6 +806,16 @@ function mObjectURL(data, type)
     },
 
     /**
+     * Check whether someone is listening for an event
+     * @param {String} topic A string representing the event type we may be listening for.
+     * @returns {Boolean}
+     */
+    hasListener: function mBroadcaster_hasListener(topic) {
+        'use strict';
+        return Boolean(this._topics[topic]);
+    },
+
+    /**
      * Remove all broadcast events for an specific topic.
      * @param {String} topic The string representing the event type we were listening for.
      * @returns {Boolean} Whether the event was found.
@@ -1073,7 +1102,7 @@ function mObjectURL(data, type)
                             //if (u_handle && window.indexedDB) {
                             //    mDBstart(true);
                             //}
-                            if (Object(window.fmdb).crashed === 'slave') {
+                            if (Object(window.fmdb).crashed === 666) {
                                 fmdb.crashed = 0;
                             }
                         }
@@ -1196,12 +1225,11 @@ else {
 }
 
 function siteLoadError(error, filename) {
-    var message = ['An error occurred while loading MEGA.'];
-
+    'use strict';
+    var message = ['MEGA failed to load because of '];
     if (location.host !== 'mega.nz') {
         message[0] += '..';
     }
-
     if (error === 1) {
         message.push('The file "' + filename + '" is corrupt.');
     }
@@ -1211,18 +1239,17 @@ function siteLoadError(error, filename) {
     else {
         message.push('Filename: ' + filename + "\nException: " + error);
     }
-
-    if (!is_extension) {
-        message.push('Please try again later. We apologize for the inconvenience.');
-    }
-    message.push("If the problem persist, please try disabling all third-party browser "
-                + "extensions and reload your browser. If that doesn't help, contact support@mega.nz");
-
+    message.push('Please click OK to refresh and try again.');
+    message.push("If the problem persists, please try disabling all third-party browser extensions,"
+        + " update your browser and MEGA browser extension to the latest version.If that does not help, "
+        + "contact support@mega.nz");
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
-
-
+    message.push('Static server: ' + staticpath);
     contenterror = 1;
-    alert(message.join("\n\n"));
+    // showing a confirm dialog containing the message, and if 'OK' pressed it will reload
+    if (confirm(message.join("\n\n")) === true) {
+        location.reload(true);
+    }
 }
 
 
@@ -1301,12 +1328,12 @@ if (is_ios) {
 
 /**
  * Some legacy secureboot mobile code that has been refactored to keep just the blog working and also redirect to the
- * app if any cancel, verify, fm/ipc, newsignup, recover, account or backup links are clicked in the app
+ * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
  * because the new mobile site is not designed for those yet.
  */
 if (m && (page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
     page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
-    page.substr(0, 4) === 'blog' || page.substr(0, 6) === 'backup')) {
+    page.substr(0, 4) === 'blog')) {
 
     var app;
     var mobileblog;
@@ -1687,7 +1714,7 @@ else if (!b_u) {
                 var version = buildVersion.website;
 
                 if (is_extension) {
-                    if (is_chrome_firefox) {
+                    if (is_chrome_firefox || is_firefox_web_ext) {
                         version = buildVersion.firefox;
                     }
                     else if (window.chrome) {
@@ -1821,13 +1848,14 @@ else if (!b_u) {
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
 
+    jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
     jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
     jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
-    jsl.push({f:'js/utils/pictools.js', n: 'js_utils_pictools_js', j: 1});
-    jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+    jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
+    jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
     jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
@@ -1872,6 +1900,10 @@ else if (!b_u) {
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+    jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
+    jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
+    jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
+    jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
 
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
@@ -1879,10 +1911,6 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
-        jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-        jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
-        jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
-        jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
         jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
         jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
 
@@ -1901,7 +1929,6 @@ else if (!b_u) {
 
         // UI Elements
         jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
-        jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
         jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
@@ -1911,8 +1938,12 @@ else if (!b_u) {
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
+        jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
         jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
+        jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
+        jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
+        jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
     } // !is_mobile
 
     // Transfers
@@ -1959,6 +1990,8 @@ else if (!b_u) {
     jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
 
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
+    jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
+    jsl.push({f:'js/fm/fileversioning.js', n: 'fm_fileversioning_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
@@ -1966,10 +1999,11 @@ else if (!b_u) {
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionmanager.js', n: 'fm_selectionmanager_js', j:1, w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1, w:12});
-        jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
+        jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
         jsl.push({f:'html/key.html', n: 'key', j:0});
@@ -2044,10 +2078,38 @@ else if (!b_u) {
     // Load files common to all mobile pages
     if (is_mobile) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
-        jsl.push({f:'js/ui/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
+        jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.backup.js', n: 'mobile_backup_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.cloud.context-menu.js', n: 'mobile_cloud_context_menu_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.create-folder-overlay.js', n: 'mobile_create_folder_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.decryption-key-overlay.js', n: 'mobile_mobile_dec_key_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.decryption-password-overlay.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.delete-overlay.js', n: 'mobile_delete_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.download-overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.link-overlay.js', n: 'mobile_link_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.not-found-overlay.js', n: 'mobile_not_found_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.pro-signup-prompt.js', n: 'mobile_pro_signup_prompt_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.propay.js', n: 'mobile_propay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.register.js', n: 'mobile_register_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.slideshow.js', n: 'mobile_slideshow_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
     }
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -2057,10 +2119,6 @@ else if (!b_u) {
 
     jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
     jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
-
-    if (is_extension) {
-        jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
-    }
 
     if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
@@ -2073,6 +2131,7 @@ else if (!b_u) {
 
     var jsl2 =
     {
+        'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'megasync_js': {f:'html/js/megasync.js', n: 'megasync_js', j:1},
@@ -2122,6 +2181,9 @@ else if (!b_u) {
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
+        'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
+        'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
+        'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
@@ -2131,7 +2193,14 @@ else if (!b_u) {
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
         'ios': {f:'html/ios.html', n: 'ios', j:0},
         'android': {f:'html/android.html', n: 'android', j:0},
-        'wp': {f:'html/wp.html', n: 'wp', j:0}
+        'wp': {f:'html/wp.html', n: 'wp', j:0},
+        'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
+        'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
+        'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
+        'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
+        'megadrop': { f: 'html/megadrop.html', n: 'megadrop', j: 0 },
+        'nomegadrop': { f: 'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
+        'megadrop_js': { f: 'js/megadrop.js', n: 'megadrop_js', j: 1 }
     };
 
     var jsl3 = {
@@ -2164,6 +2233,7 @@ else if (!b_u) {
             'webrtcsdp_js': {f:'js/chat/webrtcSdp.js', n: 'webrtcsdp_js', j:1},
             'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
             'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
+            'chatdpersist_js': {f:'js/chat/chatdPersist.js', n: 'chatdpersist_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
@@ -2171,10 +2241,12 @@ else if (!b_u) {
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
             'emoticonsFilter_js': {f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1},
+            'rtfFilter_js': {f:'js/chat/plugins/rtfFilter.js', n: 'rtfFilter_js', j:1},
             'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
             'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
+            'chatStats_js': {f:'js/chat/plugins/chatStats.js', n: 'chatStats_js', j:1, w:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
@@ -2543,7 +2615,9 @@ else if (!b_u) {
             if (localStorage.dd) url += '?t=' + Date.now();
             xhr_stack[xhri].open("GET", bootstaticpath + url, true);
             xhr_stack[xhri].timeout = xhr_timeout;
-            if (is_chrome_firefox) xhr_stack[xhri].overrideMimeType('text/plain');
+            if (is_chrome_firefox || is_firefox_web_ext) {
+                xhr_stack[xhri].overrideMimeType('text/plain');
+            }
             xhr_stack[xhri].send(null);
         }
     }
@@ -2648,6 +2722,31 @@ else if (!b_u) {
                     throw new Error('Error parsing language file '+lang+'.json');
                 }
             }
+            else if (jsl[i].j === 4) { // new type to distinguish files to be used on iframes
+                if (!window[jsl[i].n]) {
+                    var scriptText = jsl[i].text;
+                    var blobLink;
+                    if ((jsl[i].n || '').indexOf('css') > -1) {
+                        scriptText = scriptText.replace(/\.\.\//g, staticpath).replace(new RegExp("\\/en\\/", "g"), '/' + lang + '/');
+                        blobLink = mObjectURL([scriptText], 'text/css');
+                    }
+                    else {
+                        if (jsl[i].n === 'pdforiginalviewerjs') {
+                            if (localStorage.d === '1' && localStorage.dd === '1' && localStorage.jj === '1') {
+                                blobLink = staticpath + 'dont-deploy/pdf.viewer.debug.js';
+                            }
+                            else {
+                                scriptText = modifyPdfViewerScript(scriptText);
+                                blobLink = mObjectURL([scriptText], 'text/javascript');
+                            }
+                        }
+                        else {
+                            blobLink = mObjectURL([scriptText], 'text/javascript');
+                        }
+                    }
+                    window[jsl[i].n] = blobLink;
+                }
+            }
             else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {
                 try {
                     var templates = JSON.parse(jsl[i].text);
@@ -2705,8 +2804,12 @@ else if (!b_u) {
     }
 
     var istaticpath = staticpath;
-    if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
-    else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
+    if (is_chrome_web_ext || is_firefox_web_ext) {
+        istaticpath = '../';
+    }
+    else if (is_chrome_firefox) {
+        istaticpath = 'chrome://mega/content/';
+    }
 
     mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;position: fixed;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: 0 0;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4@2x.png);    background-size: 222px auto;}}';
 
@@ -2904,7 +3007,7 @@ if (!window.setImmediate && window.requestIdleCallback) {
         'use strict';
 
         // XXX: nothing from the code depends on the args
-        return window.requestIdleCallback(callback);
+        return window.requestIdleCallback(callback, {timeout: 20});
     };
 
     window.clearImmediate = function _clearImmediate(pid) {
@@ -2914,7 +3017,7 @@ if (!window.setImmediate && window.requestIdleCallback) {
     };
 }
 
-var onIdle = window.requestIdleCallback || function(handler) {
+var onIdle = function(handler) {
         var startTime = Date.now();
 
         return setTimeout(function() {
@@ -2926,6 +3029,14 @@ var onIdle = window.requestIdleCallback || function(handler) {
             });
         }, 1);
     };
+
+if (window.requestIdleCallback) {
+    onIdle = function onIdle(callback) {
+        'use strict';
+
+        return window.requestIdleCallback(callback, {timeout: 20});
+    };
+}
 
 function makeUUID(a) {
     'use strict';

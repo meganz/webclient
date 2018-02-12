@@ -17,7 +17,7 @@ var slideshowid;
 
         // Loop through available items and extract images
         for (var i in M.v) {
-            if (is_image(M.v[i])) {
+            if (is_image(M.v[i]) || is_video(M.v[i])) {
                 // is currently previewed item
                 if (M.v[i].h === slideshowid) {
                     ci = i;
@@ -71,6 +71,7 @@ var slideshowid;
         }
         var steps = slideshowsteps();
         if (steps.forward.length > 0) {
+            mBroadcaster.sendMessage('slideshow:next', steps);
             slideshow(steps.forward[0]);
         }
     }
@@ -89,6 +90,7 @@ var slideshowid;
         }
         var steps = slideshowsteps();
         if (steps.backward.length > 0) {
+            mBroadcaster.sendMessage('slideshow:prev', steps);
             slideshow(steps.backward[steps.backward.length - 1]);
         }
     }
@@ -174,8 +176,13 @@ var slideshowid;
     function slideshow_node(id, $overlay) {
         var n = M.getNodeByHandle(id);
 
-        if (!n && typeof id === 'object') {
-            n = id;
+        if (!n) {
+            if (typeof id === 'object') {
+                n = id;
+            }
+            else if (typeof dl_node !== 'undefined' && dl_node.h === id) {
+                n = dl_node;
+            }
         }
 
         if ($overlay) {
@@ -191,7 +198,7 @@ var slideshowid;
                             ephemeralDialog(l[1005]);
                         }
                         else {
-                            initCopyrightsDialog([slideshowid]);
+                            mega.Share.initCopyrightsDialog([slideshowid]);
                         }
                     });
             }
@@ -202,6 +209,7 @@ var slideshowid;
 
     function slideshow(id, close) {
         var $overlay = $('.viewer-overlay');
+        var $document = $(document);
 
         $overlay.removeClass('fullscreen mouse-idle');
 
@@ -211,11 +219,12 @@ var slideshowid;
 
         if (close) {
             slideshowid = false;
-            $overlay.addClass('hidden');
-            if ($(document).fullScreen()) {
+            $overlay.removeClass('video video-theatre-mode').addClass('hidden');
+            $document.unbind('keydown.slideshow');
+            if ($document.fullScreen()) {
                 clearTimeout(fullScreenTimer);
-                $(document).fullScreen(false);
-                $(document).unbind('mousemove.mediaviewer');
+                $document.fullScreen(false);
+                $document.unbind('mousemove.mediaviewer');
             }
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === id) {
@@ -225,14 +234,49 @@ var slideshowid;
                     break;
                 }
             }
+            mBroadcaster.sendMessage('slideshow:close');
             return false;
         }
         var n = slideshow_node(id, $overlay);
+        // Checking if this the first preview (not a preview navigation)
+        // then pushing fake states of history/hash
+        if (!slideshowid && !hashLogic && !location.hash) {
+            history.pushState({subpage: page}, '', '/' + page);
+        }
+        // Bind keydown events
+        $document.rebind('keydown.slideshow', function(e) {
+            if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
+                slideshow_prev();
+            }
+            else if (e.keyCode === 39 && slideshowid) {
+                slideshow_next();
+            }
+            else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
+                slideshow(slideshowid, true);
+            }
+            else if (e.keyCode === 8 || e.key === 'Backspace') {
+                // since Backspace event is processed with keydown at document level for cloudBrowser.
+                // i prefered that to process it here, instead of unbind the previous handler.
+                if (hashLogic || location.hash) {
+                    slideshow(slideshowid, 1);
+                }
+                else {
+                    history.back();
+                }
+                return false;
+            }
+        });
 
         // Close icon
         $overlay.find('.viewer-button.close,.viewer-error-close')
-            .rebind('click', function() {
-                slideshow(id, 1);
+            .rebind('click', function () {
+                if (hashLogic || location.hash) {
+                    slideshow(0, 1);
+                }
+                else {
+                    history.back();
+                }
+                return false;
             });
 
         // Fullscreen icon
@@ -274,20 +318,25 @@ var slideshowid;
                     slideshow_next();
                 }
             }
+
+            return false;
         });
 
         var $dlBut = $overlay.find('.viewer-button.download');
         $dlBut.rebind('click', function() {
-
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                     dl_queue[i].preview = false;
-                    openTransfersPanel();
+                    M.openTransfersPanel();
                     return;
                 }
             }
 
-            if (M.d[slideshowid]) {
+            // TODO: adapt the above code to work on the downloads page if we need to download the original
+            if (page === 'download') {
+                $('.big-button.download-file').click();
+            }
+            else if (M.d[slideshowid]) {
                 M.addDownload([slideshowid]);
             }
             else {
@@ -295,7 +344,7 @@ var slideshowid;
             }
         });
 
-        if (n.p) {
+        if (n.p || M.chat || page === 'download') {
             $dlBut.removeClass('hidden');
         }
         else {
@@ -303,7 +352,7 @@ var slideshowid;
         }
 
         if (previews[n.h]) {
-            previewsrc(previews[n.h].src);
+            previewsrc(n.h);
             fetchnext();
         }
         else if (!preqs[n.h]) {
@@ -329,11 +378,61 @@ var slideshowid;
             delete pfails[id];
             M.addDownload([id], false, err ? -1 : true);
         }
+
         eot.timeout = 8500;
+
+        var preview = function preview(ctx, h, u8) {
+            previewimg(h, u8, ctx.type);
+
+            if (isThumbnailMissing(n)) {
+                createNodeThumbnail(n, u8);
+            }
+            if (h === slideshowid) {
+                fetchnext();
+            }
+        };
 
         var n = slideshow_node(id);
         if (!n) {
-            console.error('handle "%s" not found...', id);
+            console.error('Node "%s" not found...', id);
+            return false;
+        }
+
+        if (filetype(n) === 'PDF Document') {
+            if (!preqs[n.h]) {
+                preqs[n.h] = 1;
+
+                M.gfsfetch(n.link || n.h, 0, -1).done(function(data) {
+                    preview({type: 'application/pdf'}, n.h, data.buffer);
+                }).fail(function(ev) {
+                    if (d) {
+                        console.warn('Failed to retrieve PDF, failing back to broken eye image...', ev);
+                    }
+
+                    var svg = decodeURIComponent(noThumbURI.substr(noThumbURI.indexOf(',') + 1));
+                    var u8 = new Uint8Array(svg.length);
+                    for (var i = svg.length; i--;) {
+                        u8[i] = svg.charCodeAt(i);
+                    }
+                    previewimg(n.h, u8, 'image/svg+xml');
+                    delete previews[n.h].buffer;
+                });
+            }
+            return false;
+        }
+
+        if (is_video(n)) {
+            if (!preqs[n.h]) {
+                preqs[n.h] = 1;
+
+                M.require('videostream').done(function() {
+                    if (preqs[n.h]) {
+                        previewimg(n.h, Array(26).join('x'), filemime(n));
+                    }
+                }).fail(function() {
+                    console.error('Failed to load videostream.js');
+                });
+            }
             return false;
         }
 
@@ -348,30 +447,214 @@ var slideshowid;
         var treq = Object.create(null);
         preqs[n.h] = 1;
         treq[n.h] = {fa: n.fa, k: n.k};
-        api_getfileattr(treq, 1, function(ctx, h, uint8arr) {
-            previewimg(h, uint8arr);
-
-            if (!n.fa || n.fa.indexOf(':0*') < 0) {
-                if (d) {
-                    console.log('Thumbnail found missing on preview, creating...', h, n);
-                }
-                var aes = new sjcl.cipher.aes([
-                    n.k[0] ^ n.k[4],
-                    n.k[1] ^ n.k[5],
-                    n.k[2] ^ n.k[6],
-                    n.k[3] ^ n.k[7]
-                ]);
-                createnodethumbnail(n.h, aes, h, uint8arr);
-            }
-            if (h === slideshowid) {
-                fetchnext();
-            }
-        }, eot);
+        api_getfileattr(treq, 1, preview, eot);
     }
 
-    function previewsrc(src) {
-        var img = new Image();
+    // start streaming a video file
+    function slideshow_videostream(id, $overlay) {
+        if (!$overlay || !$overlay.length) {
+            $overlay = $('video:visible').parent();
+        }
+        var n = slideshow_node(id, $overlay);
+
+        $('.play-video-button', $overlay).rebind('click', function() {
+            if (dlmanager.isOverQuota) {
+                return dlmanager.showOverQuotaDialog();
+            }
+
+            var destroy = function() {
+                $overlay.find('.viewer-pending').addClass('hidden').end().trigger('video-destroy');
+
+                if (preqs[n.h] && preqs[n.h] instanceof Streamer) {
+                    mBroadcaster.removeListener(preqs[n.h].ev1);
+                    mBroadcaster.removeListener(preqs[n.h].ev2);
+                    mBroadcaster.removeListener(preqs[n.h].ev3);
+
+                    preqs[n.h].destroy();
+                    preqs[n.h] = false;
+                }
+            };
+
+            if (!d) {
+                api_req({a: 'log', e: 99668, m: 'video watch'});
+            }
+
+            // Show loading spinner until video is playing
+            $overlay.find('.viewer-pending').removeClass('hidden');
+            $overlay.addClass('video-theatre-mode')
+                .find('.viewer-image-bl').removeClass('default-state');
+
+            initVideoStream(n, $overlay, destroy).done(function(streamer) {
+                preqs[n.h] = streamer;
+
+                preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
+                preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
+                preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:close', destroy);
+
+                // If video is playing
+                preqs[n.h].on('playing', function() {
+                    var video = this.video;
+
+                    if (video && video.duration) {
+
+                        if (isThumbnailMissing(n) && n.u === u_handle && n.f !== u_handle) {
+                            var took = Math.round(2 * video.duration / 100);
+
+                            if (d) {
+                                console.debug('Video thumbnail missing, will take image at %s...',
+                                    secondsToTime(took));
+                            }
+
+                            this.on('timeupdate', function() {
+                                if (video.currentTime < took) {
+                                    return true;
+                                }
+
+                                this.getImage().then(createNodeThumbnail.bind(null, n))
+                                    .catch(console.warn.bind(console));
+                            });
+                        }
+
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                if (d) {
+                    window.strm = preqs[n.h];
+                }
+            });
+        });
+
+        $overlay.addClass('video');
+        $overlay.find('.viewer-pending').addClass('hidden');
+        // $overlay.find('.viewer-progress').addClass('hidden');
+        $overlay.find('.viewer-image-bl img').addClass('hidden');
+        $overlay.find('.viewer-image-bl').addClass('default-state').removeClass('hidden');
+
+        if (n.name) {
+            var c = MediaAttribute.getCodecStrings(n);
+            if (c) {
+                $overlay.find('.viewer-filename').attr('title', c.join("/"));
+            }
+        }
+
+        var $video = $overlay.find('.viewer-image-bl video');
+        $video.attr('poster', '').attr('controls', false).removeClass('hidden');
+
+        if (previews[id].poster !== undefined) {
+            $video.attr('poster', previews[id].poster);
+
+            if (previews[id].poster) {
+                $overlay.find('.viewer-image-bl').removeClass('default-state');
+            }
+        }
+        else if (String(n.fa).indexOf(':1*') > 0) {
+            api_getfileattr([{fa: M.d[id].fa, k: M.d[id].k}], 1, function(a, b, data) {
+                if (data !== 0xDEAD) {
+                    data = mObjectURL([data.buffer || data], 'image/jpeg');
+
+                    if (data) {
+                        previews[id].poster = data;
+
+                        if (id === slideshowid) {
+                            $video.attr('poster', data);
+                            $overlay.find('.viewer-image-bl').removeClass('default-state');
+                        }
+                    }
+                }
+            });
+        }
+        else {
+            $overlay.find('.viewer-image-bl').addClass('default-state');
+        }
+        previews[id].poster = previews[id].poster || '';
+
+        if ($.autoplay === id || page === 'download') {
+            onIdle(function() {
+                $('.play-video-button', $overlay).trigger('click');
+            });
+            delete $.autoplay;
+        }
+    }
+
+    function isThumbnailMissing(n) {
+        return !n.fa || n.fa.indexOf(':0*') < 0;
+    }
+
+    function createNodeThumbnail(n, ab) {
+        if (isThumbnailMissing(n)) {
+            if (d) {
+                console.log('Thumbnail found missing on preview, creating...', n.h, n);
+            }
+            var aes = new sjcl.cipher.aes([
+                n.k[0] ^ n.k[4],
+                n.k[1] ^ n.k[5],
+                n.k[2] ^ n.k[6],
+                n.k[3] ^ n.k[7]
+            ]);
+            var img = is_image(n);
+            var vid = is_video(n);
+            createnodethumbnail(n.h, aes, n.h, ab, {raw: img !== 1 && img, isVideo: vid});
+        }
+    }
+
+    // a method to fetch scripts and files needed to run pdfviewer
+    // and then excute them on iframe element [#pdfpreviewdiv1]
+    function prepareAndViewPdfViewer() {
+        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdforiginalviewerjs').done(function() {
+            var myPage = pages['pdfviewer'];
+            myPage = myPage.replace('^$#^1', window['pdfviewercss']);
+            myPage = myPage.replace('^$#^3', window['pdfjs2']);
+            myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
+            // remove then re-add iframe to avoid History changes [push]
+            var pdfIframe = document.getElementById('pdfpreviewdiv1');
+            var newPdfIframe = document.createElement('iframe');
+            newPdfIframe.id = 'pdfpreviewdiv1';
+            newPdfIframe.src = 'about:blank';
+            var pdfIframeParent = pdfIframe.parentNode;
+            pdfIframeParent.replaceChild(newPdfIframe, pdfIframe);
+            var doc = newPdfIframe.contentWindow.document;
+            doc.open();
+            doc.write(myPage);
+            doc.close();
+        });
+    }
+
+    function previewsrc(id) {
         var $overlay = $('.viewer-overlay');
+
+        var src = Object(previews[id]).src;
+        if (!src) {
+            console.error('Cannot preview %s', id);
+            return;
+        }
+
+        $overlay.removeClass('video video-theatre-mode');
+        $overlay.find('.viewer-image-bl embed').addClass('hidden');
+        $overlay.find('.viewer-image-bl video').addClass('hidden');
+        $overlay.find('.viewer-image-bl img').removeClass('hidden');
+        $('#pdfpreviewdiv1').addClass('hidden');
+
+        if (previews[id].type === 'application/pdf') {
+            $overlay.find('.viewer-pending').addClass('hidden');
+            $overlay.find('.viewer-progress').addClass('hidden');
+            $overlay.find('.viewer-image-bl img').addClass('hidden');
+            $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
+            // preview pdfs using pdfjs for all browsers #8036
+            // to fix pdf compatibility - Bug #7796
+            localStorage.setItem('currPdfPrev2', JSON.stringify(src));
+            prepareAndViewPdfViewer();
+            api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
+            return;
+        }
+
+        if (String(previews[id].type).startsWith('video')) {
+            return slideshow_videostream(id, $overlay);
+        }
+
+        var img = new Image();
         img.onload = function() {
             var w = this.width;
             var h = this.height;
@@ -386,29 +669,38 @@ var slideshowid;
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
         };
+        img.onerror = function(ev) {
+            console.error('Preview image error', ev);
+        };
         img.src = src;
     }
 
-    function previewimg(id, uint8arr) {
+    function previewimg(id, uint8arr, type) {
         var blob;
 
+        type = typeof type === 'string' && type || 'image/jpeg';
+
         try {
-            blob = new Blob([uint8arr], {type: 'image/jpeg'});
+            blob = new Blob([uint8arr], {type: type});
         }
-        catch (err) {
+        catch (ex) {
         }
         if (!blob || blob.size < 25) {
-            blob = new Blob([uint8arr.buffer]);
+            blob = new Blob([uint8arr.buffer], {type: type});
         }
-        previews[id] =
-            {
-                blob: blob,
-                src: myURL.createObjectURL(blob),
-                time: new Date().getTime()
-            };
+
+        previews[id] = {
+            blob: blob,
+            type: type,
+            time: Date.now(),
+            src: myURL.createObjectURL(blob),
+            buffer: uint8arr.buffer || uint8arr
+        };
+
         if (id === slideshowid) {
-            previewsrc(previews[id].src);
+            previewsrc(id);
         }
+
         if (Object.keys(previews).length === 1) {
             $(window).unload(function() {
                 for (var id in previews) {

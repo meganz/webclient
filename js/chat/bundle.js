@@ -58,15 +58,15 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var ConversationsUI = __webpack_require__(4);
-	var ChatRoom = __webpack_require__(26);
+	var ChatRoom = __webpack_require__(28);
 
 	var EMOJI_DATASET_VERSION = 2;
 
-	var chatui;
+	var _chatui;
 	var webSocketsSupport = typeof WebSocket !== 'undefined';
 
 	(function () {
-	    chatui = function chatui(id) {
+	    _chatui = function chatui(id) {
 	        var roomOrUserHash = id.replace("chat/", "");
 
 	        var roomType = false;
@@ -74,7 +74,15 @@ React.makeElement = React['createElement'];
 	        if (roomOrUserHash.substr(0, 2) === "g/") {
 	            roomType = "group";
 	            roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
+
 	            if (!megaChat.chats[roomOrUserHash]) {
+
+	                if (ChatdIntegration._loadingChats[roomOrUserHash] && ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.state() === 'pending') {
+	                    ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.done(function () {
+	                        _chatui(id);
+	                    });
+	                    return;
+	                }
 
 	                setTimeout(function () {
 	                    loadSubPage('fm/chat');
@@ -94,7 +102,7 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 
-	        hideEmptyGrids();
+	        M.hideEmptyGrids();
 
 	        $('.fm-files-view-icon').addClass('hidden');
 	        $('.fm-blocks-view').addClass('hidden');
@@ -163,6 +171,7 @@ React.makeElement = React['createElement'];
 	        },
 	        filePickerOptions: {},
 	        'plugins': {
+	            'chatStats': ChatStats,
 	            'chatdIntegration': ChatdIntegration,
 	            'callManager': CallManager,
 	            'urlFilter': UrlFilter,
@@ -170,7 +179,8 @@ React.makeElement = React['createElement'];
 	            'emoticonsFilter': EmoticonsFilter,
 	            'callFeedback': CallFeedback,
 	            'presencedIntegration': PresencedIntegration,
-	            'persistedTypeArea': PersistedTypeArea
+	            'persistedTypeArea': PersistedTypeArea,
+	            'rtfFilter': RtfFilter
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {
@@ -393,18 +403,6 @@ React.makeElement = React['createElement'];
 	        }
 	    });
 
-	    $(document).rebind('megaulcomplete.megaChat', function (e, ul_target, uploads) {
-	        if (ul_target.indexOf("chat/") > -1) {
-	            var chatRoom = megaChat.getRoomFromUrlHash(ul_target);
-
-	            if (!chatRoom) {
-	                return;
-	            }
-
-	            chatRoom.attachNodes(uploads);
-	        }
-	    });
-
 	    $(document.body).delegate('.tooltip-trigger', 'mouseover.notsentindicator', function () {
 	        var $this = $(this),
 	            $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
@@ -422,6 +420,22 @@ React.makeElement = React['createElement'];
 
 	        var $notification = $('.tooltip');
 	        $notification.addClass('hidden').removeAttr('style');
+	    });
+
+	    mBroadcaster.addListener('upload:start', function (data) {
+	        if (d) {
+	            MegaLogger.getLogger('onUploadEvent').debug('upload:start', data);
+	        }
+
+	        for (var k in data) {
+	            if (data[k].chat) {
+	                var roomId = data[k].chat.replace("g/", "").split("/")[1];
+	                if (self.chats[roomId]) {
+	                    self.chats[roomId].onUploadStart(data);
+	                    break;
+	                }
+	            }
+	        }
 	    });
 
 	    self.trigger("onInit");
@@ -659,6 +673,7 @@ React.makeElement = React['createElement'];
 	                }));
 	                M.syncUsersFullname(contactHash);
 	                self.processNewUser(contactHash);
+	                M.syncContactEmail(contactHash);
 	            }
 	        });
 	    }
@@ -688,11 +703,37 @@ React.makeElement = React['createElement'];
 	        self.currentlyOpenedChat = null;
 	    }
 
+	    if (!chatId && ChatdIntegration._loadingChats[roomId]) {
+
+	        ChatdIntegration._loadingChats[roomId].loadingPromise.done(function () {
+
+	            if (self.chats[roomId]) {
+	                return;
+	            }
+	            var res = self.openChat(userHandles, ap.g === 1 ? "group" : "private", ap.id, ap.cs, ap.url, setAsActive);
+
+	            $promise.linkDoneAndFailTo(res[2]);
+	        }).fail(function () {
+	            $promise.reject(arguments[0]);
+	        });
+
+	        if (setAsActive) {
+
+	            ChatdIntegration._loadingChats[roomId].setAsActive = true;
+	        }
+
+	        return [roomId, undefined, $promise];
+	    }
+
 	    var room = new ChatRoom(self, roomId, type, userHandles, unixtime(), undefined, chatId, chatShard, chatdUrl);
 
 	    self.chats.set(room.roomId, room);
 
 	    if (setAsActive && !self.currentlyOpenedChat) {
+	        room.show();
+	    }
+
+	    if (setAsActive === false && chatId && ChatdIntegration._loadingChats[roomId] && ChatdIntegration._loadingChats[roomId].setAsActive) {
 	        room.show();
 	    }
 
@@ -816,7 +857,7 @@ React.makeElement = React['createElement'];
 
 	    self.hideAllChats();
 
-	    hideEmptyGrids();
+	    M.hideEmptyGrids();
 
 	    $('.files-grid-view').addClass('hidden');
 	    $('.fm-blocks-view').addClass('hidden');
@@ -829,7 +870,7 @@ React.makeElement = React['createElement'];
 
 	    M.onSectionUIOpen('conversations');
 
-	    if (Object.keys(self.chats).length === 0) {
+	    if (Object.keys(self.chats).length === 0 || Object.keys(ChatdIntegration._loadingChats).length !== 0) {
 	        $('.fm-empty-conversations').removeClass('hidden');
 	    } else {
 	        $('.fm-empty-conversations').addClass('hidden');
@@ -840,21 +881,48 @@ React.makeElement = React['createElement'];
 	            self.chats[self.lastOpenedChat].show();
 	            return self.chats[self.lastOpenedChat];
 	        } else {
-
-	            var sortedConversations = obj_values(self.chats.toJS());
-
-	            sortedConversations.sort(M.sortObjFn("lastActivity", -1));
-
-	            if (sortedConversations.length > 0) {
-	                var room = sortedConversations[0];
-	                room.setActive();
-	                room.show();
-	                return room;
+	            if (self.chats.length > 0) {
+	                return self.showLastActive();
 	            } else {
 	                $('.fm-empty-conversations').removeClass('hidden');
 	            }
 	        }
 	    }
+	};
+
+	Chat.prototype.showLastActive = function () {
+	    var self = this;
+
+	    if (self.chats.length > 0 && self.allChatsHadLoadedHistory()) {
+	        var sortedConversations = obj_values(self.chats.toJS());
+
+	        sortedConversations.sort(M.sortObjFn("lastActivity", -1));
+
+	        var room = sortedConversations[0];
+	        if (!room.isActive()) {
+	            room.setActive();
+	            room.show();
+	        }
+
+	        return room;
+	    } else {
+	        return false;
+	    }
+	};
+
+	Chat.prototype.allChatsHadLoadedHistory = function () {
+	    var self = this;
+
+	    var chatIds = self.chats.keys();
+
+	    for (var i = 0; i < chatIds.length; i++) {
+	        var room = self.chats[chatIds[i]];
+	        if (room.isLoading()) {
+	            return false;
+	        }
+	    }
+
+	    return true;
 	};
 
 	Chat.prototype.getPrivateRoom = function (h) {
@@ -868,7 +936,7 @@ React.makeElement = React['createElement'];
 	};
 
 	Chat.prototype.createAndShowPrivateRoomFor = function (h) {
-	    chatui(h);
+	    _chatui(h);
 	    return this.getPrivateRoom(h);
 	};
 
@@ -960,7 +1028,7 @@ React.makeElement = React['createElement'];
 	};
 
 	Chat.prototype.getPresence = function (user_handle) {
-	    if (this.plugins.presencedIntegration) {
+	    if (user_handle && this.plugins.presencedIntegration) {
 	        return this.plugins.presencedIntegration.getPresence(user_handle);
 	    } else {
 	        return;
@@ -1010,11 +1078,11 @@ React.makeElement = React['createElement'];
 	};
 
 	window.Chat = Chat;
-	window.chatui = chatui;
+	window.chatui = _chatui;
 
 	module.exports = {
 	    Chat: Chat,
-	    chatui: chatui
+	    chatui: _chatui
 	};
 
 /***/ }),
@@ -1124,10 +1192,13 @@ React.makeElement = React['createElement'];
 
 	            if (lastMessage.isManagement && lastMessage.isManagement()) {
 	                renderableSummary = lastMessage.getManagementMessageSummaryText();
+	            } else if (!lastMessage.textContents && lastMessage.dialogType) {
+	                renderableSummary = Message._getTextContentsForDialogType(lastMessage);
 	            }
 
 	            renderableSummary = htmlentities(renderableSummary);
 	            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+	            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
 
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
 
@@ -1137,7 +1208,7 @@ React.makeElement = React['createElement'];
 	            var iso = msgDate.toISOString();
 	            if (todayOrYesterday(iso)) {
 
-	                curTimeMarker = time2lastSeparator(iso) + ", " + msgDate.getHours() + ":" + msgDate.getMinutes();
+	                curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
 	            } else {
 
 	                curTimeMarker = acc_time2date(timestamp, true);
@@ -1365,7 +1436,7 @@ React.makeElement = React['createElement'];
 	            var megaChat = self.props.megaChat;
 	            if (megaChat.currentlyOpenedChat) {
 
-	                if ($(e.target).is(".messages-textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $('.fm-dialog:visible,.dropdown:visible').length > 0 || $('input:focus,textarea:focus,select:focus').length > 0) {
+	                if (megaChat.currentlyOpenedChat && megaChat.getCurrentRoom().isReadOnly() || $(e.target).is(".messages-textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $('.fm-dialog:visible,.dropdown:visible').length > 0 || $('input:focus,textarea:focus,select:focus').length > 0) {
 	                    return;
 	                }
 
@@ -1487,6 +1558,53 @@ React.makeElement = React['createElement'];
 	            leftPanelStyles.width = self.state.leftPaneWidth;
 	        }
 
+	        var loadingOrEmpty = null;
+	        var megaChat = this.props.megaChat;
+
+	        if (megaChat.chats.length === 0) {
+	            loadingOrEmpty = React.makeElement(
+	                "div",
+	                { className: "fm-empty-messages hidden" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "fm-empty-pad" },
+	                    React.makeElement("div", { className: "fm-empty-messages-bg" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "fm-empty-cloud-txt" },
+	                        l[6870]
+	                    ),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "fm-not-logged-text" },
+	                        React.makeElement("div", { className: "fm-not-logged-description", dangerouslySetInnerHTML: {
+	                                __html: __(l[8762]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
+	                            } }),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "fm-not-logged-button create-account" },
+	                            __(l[968])
+	                        )
+	                    )
+	                )
+	            );
+	        } else if (megaChat.allChatsHadLoadedHistory() === false && !megaChat.currentlyOpenedChat) {
+	            loadingOrEmpty = React.makeElement(
+	                "div",
+	                { className: "fm-empty-messages" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "loading-spinner js-messages-loading light manual-management", style: { "top": "50%" } },
+	                    React.makeElement("div", { className: "main-loader", style: {
+	                            "position": "fixed",
+	                            "top": "50%",
+	                            "left": "50%",
+	                            "marginLeft": "72px"
+	                        } })
+	                )
+	            );
+	        }
+
 	        return React.makeElement(
 	            "div",
 	            { className: "conversationsApp", key: "conversationsApp" },
@@ -1540,32 +1658,7 @@ React.makeElement = React['createElement'];
 	            React.makeElement(
 	                "div",
 	                { className: "fm-right-files-block" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-empty-messages hidden" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "fm-empty-pad" },
-	                        React.makeElement("div", { className: "fm-empty-messages-bg" }),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "fm-empty-cloud-txt" },
-	                            __(l[6870])
-	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "fm-not-logged-text" },
-	                            React.makeElement("div", { className: "fm-not-logged-description", dangerouslySetInnerHTML: {
-	                                    __html: __(l[8762]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
-	                                } }),
-	                            React.makeElement(
-	                                "div",
-	                                { className: "fm-not-logged-button create-account" },
-	                                __(l[968])
-	                            )
-	                        )
-	                    )
-	                ),
+	                loadingOrEmpty,
 	                React.makeElement(ConversationPanelUI.ConversationPanels, _extends({}, this.props, {
 	                    conversations: this.props.megaChat.chats
 	                }))
@@ -1902,7 +1995,7 @@ React.makeElement = React['createElement'];
 	    },
 	    debouncedForceUpdate: function() {
 	        var self = this;
-	        if (self.skippedUpdates) {
+	        if (typeof(self.skippedUpdates) === 'undefined') {
 	            self.skippedUpdates = 0;
 	        }
 
@@ -2001,7 +2094,7 @@ React.makeElement = React['createElement'];
 	        }
 	        // offsetParent should NOT trigger a reflow/repaint
 	        if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
-	            return false
+	            return false;
 	        }
 	        return true;
 	    },
@@ -2027,7 +2120,7 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        self._updatesDisabled = true;
 	        if (self._updatesReenableTimer) {
-	            clearTimeout(self._updatesRenableTimer);
+	            clearTimeout(self._updatesReenableTimer);
 	        }
 
 	        var timeout = forHowLong ?
@@ -2108,7 +2201,7 @@ React.makeElement = React['createElement'];
 	        else if (v === null && rv === null) {
 	            return false;
 	        }
-	        
+
 	        if (typeof v._dataChangeIndex !== "undefined") {
 	            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() +
 	                                "_" + idx;
@@ -2238,7 +2331,7 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 
-	        if (!this.isComponentEventuallyVisible()) {
+	        if (!this.props.disableCheckingVisibility && !this.isComponentEventuallyVisible()) {
 	            if (window.RENDER_DEBUG) {
 	                console.error(
 	                    "shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState
@@ -2569,6 +2662,22 @@ React.makeElement = React['createElement'];
 	            this.reinitialised(true);
 	        }
 	    },
+	    disable: function disable() {
+	        if (this.isMounted()) {
+	            var $elem = $(this.findDOMNode());
+	            $elem.attr('data-scroll-disabled', true);
+	            $elem.addClass('ps-disabled');
+	            Ps.disable($elem[0]);
+	        }
+	    },
+	    enable: function enable() {
+	        if (this.isMounted()) {
+	            var $elem = $(this.findDOMNode());
+	            $elem.removeAttr('data-scroll-disabled');
+	            $elem.removeClass('ps-disabled');
+	            Ps.enable($elem[0]);
+	        }
+	    },
 	    reinitialised: function reinitialised(forced) {
 	        if (this.props.onReinitialise) {
 	            this.props.onReinitialise(this, $(this.findDOMNode()), forced ? forced : false);
@@ -2797,9 +2906,12 @@ React.makeElement = React['createElement'];
 	    displayName: "Dropdown",
 
 	    mixins: [MegaRenderMixin],
+	    getInitialState: function getInitialState() {
+	        return {};
+	    },
 	    getDefaultProps: function getDefaultProps() {
 	        return {
-	            requiresUpdateOnResize: true
+	            'requiresUpdateOnResize': true
 	        };
 	    },
 	    componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
@@ -2809,6 +2921,9 @@ React.makeElement = React['createElement'];
 	    },
 	    specificShouldComponentUpdate: function specificShouldComponentUpdate(nextProps, nextState) {
 	        if (this.props.active != nextProps.active) {
+	            if (this.props.onBeforeActiveChange) {
+	                this.props.onBeforeActiveChange(nextProps.active);
+	            }
 	            return true;
 	        } else if (this.props.focused != nextProps.focused) {
 	            return true;
@@ -2898,13 +3013,12 @@ React.makeElement = React['createElement'];
 	        }.bind(this));
 	    },
 	    render: function render() {
-	        var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
-
 	        if (this.props.active !== true) {
-	            classes += " hidden";
 
 	            return null;
 	        } else {
+	            var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
+
 	            var styles;
 
 	            if (this.getOwnerElement()) {
@@ -2916,6 +3030,20 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var self = this;
+
+	            var child = null;
+
+	            if (this.props.children) {
+	                child = React.makeElement(
+	                    "div",
+	                    null,
+	                    self.renderChildren()
+	                );
+	            } else if (this.props.dropdownItemGenerator) {
+	                child = this.props.dropdownItemGenerator(this);
+	            } else {
+	                child = null;
+	            }
 
 	            return React.makeElement(
 	                utils.RenderTo,
@@ -2930,7 +3058,7 @@ React.makeElement = React['createElement'];
 	                    "div",
 	                    null,
 	                    !this.props.noArrow ? React.makeElement("i", { className: "dropdown-white-arrow" }) : null,
-	                    this.renderChildren()
+	                    child
 	                )
 	            );
 	        }
@@ -3315,6 +3443,39 @@ React.makeElement = React['createElement'];
 	                    key: "view", icon: "human-profile", label: __(l[8866]), onClick: function onClick() {
 	                        loadSubPage('fm/' + contact.u);
 	                    } }));
+	            } else if (contact.c === 0) {
+	                if (moreDropdowns.length > 0) {
+	                    moreDropdowns.unshift(React.makeElement("hr", { key: "separator" }));
+	                }
+	                moreDropdowns.unshift(React.makeElement(DropdownsUI.DropdownItem, {
+	                    key: "view", icon: "human-profile", label: __(l[101]), onClick: function onClick() {
+	                        loadingDialog.show();
+
+	                        M.syncContactEmail(contact.u).done(function (email) {
+	                            var exists = false;
+	                            Object.keys(M.opc).forEach(function (k) {
+	                                if (!exists && M.opc[k].m === email) {
+	                                    exists = true;
+	                                    return false;
+	                                }
+	                            });
+
+	                            if (exists) {
+	                                closeDialog();
+	                                msgDialog('warningb', '', l[7413]);
+	                            } else {
+	                                M.inviteContact(M.u[u_handle].m, email);
+	                                var title = l[150];
+
+	                                var msg = l[5898].replace('[X]', email);
+
+	                                closeDialog();
+	                                msgDialog('info', title, msg);
+	                            }
+	                        }).always(function () {
+	                            loadingDialog.hide();
+	                        });
+	                    } }));
 	            }
 
 	            if (moreDropdowns.length > 0) {
@@ -3323,7 +3484,7 @@ React.makeElement = React['createElement'];
 	                    {
 	                        className: self.props.dropdownButtonClasses,
 	                        icon: self.props.dropdownIconClasses,
-	                        disabled: self.props.dropdownDisabled },
+	                        disabled: moreDropdowns.length === 0 || self.props.dropdownDisabled },
 	                    React.makeElement(
 	                        DropdownsUI.Dropdown,
 	                        { className: "contact-card-dropdown",
@@ -3362,13 +3523,13 @@ React.makeElement = React['createElement'];
 	                { className: "user-card-data" },
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-name small" },
+	                    { className: "user-card-name light" },
 	                    this.props.namePrefix ? this.props.namePrefix : null,
 	                    M.getNameByHandle(contact.u)
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "user-card-email small" },
+	                    { className: "user-card-email" },
 	                    contact.m
 	                )
 	            )
@@ -3597,20 +3758,21 @@ React.makeElement = React['createElement'];
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ButtonsUI = __webpack_require__(8);
 	var ModalDialogsUI = __webpack_require__(12);
+	var CloudBrowserModalDialog = __webpack_require__(15);
 	var DropdownsUI = __webpack_require__(9);
 	var ContactsUI = __webpack_require__(10);
 	var ConversationsUI = __webpack_require__(4);
-	var TypingAreaUI = __webpack_require__(15);
-	var WhosTyping = __webpack_require__(17).WhosTyping;
-	var getMessageString = __webpack_require__(18).getMessageString;
+	var TypingAreaUI = __webpack_require__(16);
+	var WhosTyping = __webpack_require__(19).WhosTyping;
+	var getMessageString = __webpack_require__(20).getMessageString;
 	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
-	var ParticipantsList = __webpack_require__(19).ParticipantsList;
+	var ParticipantsList = __webpack_require__(21).ParticipantsList;
 
-	var GenericConversationMessage = __webpack_require__(20).GenericConversationMessage;
-	var AlterParticipantsConversationMessage = __webpack_require__(22).AlterParticipantsConversationMessage;
-	var TruncatedMessage = __webpack_require__(23).TruncatedMessage;
-	var PrivilegeChange = __webpack_require__(24).PrivilegeChange;
-	var TopicChange = __webpack_require__(25).TopicChange;
+	var GenericConversationMessage = __webpack_require__(22).GenericConversationMessage;
+	var AlterParticipantsConversationMessage = __webpack_require__(24).AlterParticipantsConversationMessage;
+	var TruncatedMessage = __webpack_require__(25).TruncatedMessage;
+	var PrivilegeChange = __webpack_require__(26).PrivilegeChange;
+	var TopicChange = __webpack_require__(27).TopicChange;
 
 	var ConversationRightArea = React.createClass({
 	    displayName: "ConversationRightArea",
@@ -3668,10 +3830,21 @@ React.makeElement = React['createElement'];
 
 	        var myPresence = room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
+	        var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall;
+
+	        var startAudioCallButtonClass = "";
+	        var startVideoCallButtonClass = "";
+
+	        if (disabledCalls) {
+	            startAudioCallButtonClass = startVideoCallButtonClass = "disabled";
+	        }
+
 	        var startAudioCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button", onClick: function onClick() {
-	                    room.startAudioCall();
+	            { className: "link-button" + " " + startVideoCallButtonClass, onClick: function onClick() {
+	                    if (!disabledCalls) {
+	                        room.startAudioCall();
+	                    }
 	                } },
 	            React.makeElement("i", { className: "small-icon audio-call" }),
 	            __(l[5896])
@@ -3679,16 +3852,15 @@ React.makeElement = React['createElement'];
 
 	        var startVideoCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button", onClick: function onClick() {
-	                    room.startVideoCall();
+	            { className: "link-button" + " " + startVideoCallButtonClass, onClick: function onClick() {
+	                    if (!disabledCalls) {
+	                        room.startVideoCall();
+	                    }
 	                } },
 	            React.makeElement("i", { className: "small-icon video-call" }),
 	            __(l[5897])
 	        );
 
-	        if (room.isReadOnly() || !room.chatId) {
-	            startAudioCallButton = startVideoCallButton = null;
-	        }
 	        var endCallButton = React.makeElement(
 	            "div",
 	            { className: "link-button red" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
@@ -3882,6 +4054,18 @@ React.makeElement = React['createElement'];
 	            'localMediaDisplay': true
 	        };
 	    },
+	    _hideBottomPanel: function _hideBottomPanel() {
+	        var self = this;
+	        var room = self.props.chatRoom;
+	        if (!room.callManagerCall || !room.callManagerCall.isActive()) {
+	            return;
+	        }
+
+	        var $container = $(ReactDOM.findDOMNode(self));
+
+	        self.visiblePanel = false;
+	        $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        var self = this;
 	        var room = self.props.chatRoom;
@@ -3907,7 +4091,7 @@ React.makeElement = React['createElement'];
 	            clearTimeout(mouseoutThrottling);
 	            mouseoutThrottling = setTimeout(function () {
 	                self.visiblePanel = false;
-	                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+	                self._hideBottomPanel();
 	                $('.call.top-panel', $container).removeClass('visible-panel');
 	            }, 500);
 	        });
@@ -3916,6 +4100,9 @@ React.makeElement = React['createElement'];
 	        var forceMouseHide = false;
 	        $container.rebind('mousemove.chatUI' + self.props.chatRoom.roomId, function (ev) {
 	            var $this = $(this);
+	            if (self._bottomPanelMouseOver) {
+	                return;
+	            }
 	            clearTimeout(idleMouseTimer);
 	            if (!forceMouseHide) {
 	                self.visiblePanel = true;
@@ -3926,7 +4113,8 @@ React.makeElement = React['createElement'];
 	                }
 	                idleMouseTimer = setTimeout(function () {
 	                    self.visiblePanel = false;
-	                    $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).removeClass('visible-panel');
+
+	                    self._hideBottomPanel();
 
 	                    $container.addClass('no-cursor');
 	                    $('.call.top-panel', $container).removeClass('visible-panel');
@@ -3937,6 +4125,28 @@ React.makeElement = React['createElement'];
 	                    }, 400);
 	                }, 2000);
 	            }
+	        });
+
+	        $('.call.bottom-panel', $container).rebind('mouseenter.chatUI' + self.props.chatRoom.roomId, function (ev) {
+	            self._bottomPanelMouseOver = true;
+	            clearTimeout(idleMouseTimer);
+	        });
+	        $('.call.bottom-panel', $container).rebind('mouseleave.chatUI' + self.props.chatRoom.roomId, function (ev) {
+	            self._bottomPanelMouseOver = false;
+
+	            idleMouseTimer = setTimeout(function () {
+	                self.visiblePanel = false;
+
+	                self._hideBottomPanel();
+
+	                $container.addClass('no-cursor');
+	                $('.call.top-panel', $container).removeClass('visible-panel');
+
+	                forceMouseHide = true;
+	                setTimeout(function () {
+	                    forceMouseHide = false;
+	                }, 400);
+	            }, 2000);
 	        });
 
 	        $(document).unbind("fullscreenchange.megaChat_" + room.roomId).bind("fullscreenchange.megaChat_" + room.roomId, function () {
@@ -4019,10 +4229,33 @@ React.makeElement = React['createElement'];
 	        if (room.megaChat.rtc && room.megaChat.rtc.gLocalStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
 	            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
 	        }
+
+	        $(room).rebind('toggleMessages.av', function () {
+	            self.toggleMessages();
+	        });
+
+	        room.messagesBlockEnabled = self.state.messagesBlockEnabled;
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        var room = self.props.chatRoom;
+
+	        var $container = $(ReactDOM.findDOMNode(self));
+	        if ($container) {
+	            $container.unbind('mouseover.chatUI' + self.props.chatRoom.roomId);
+	            $container.unbind('mouseout.chatUI' + self.props.chatRoom.roomId);
+	            $container.unbind('mousemove.chatUI' + self.props.chatRoom.roomId);
+	        }
+
+	        $(document).unbind("fullscreenchange.megaChat_" + room.roomId);
+	        $(window).unbind('resize.chatUI_' + room.roomId);
+	        $(room).unbind('toggleMessages.av');
 	    },
 	    toggleMessages: function toggleMessages(e) {
-	        e.preventDefault();
-	        e.stopPropagation();
+	        if (e) {
+	            e.preventDefault();
+	            e.stopPropagation();
+	        }
 
 	        if (this.props.onMessagesToggle) {
 	            this.props.onMessagesToggle(!this.state.messagesBlockEnabled);
@@ -4265,7 +4498,7 @@ React.makeElement = React['createElement'];
 	    },
 
 	    uploadFromComputer: function uploadFromComputer() {
-	        $('#fileselect1').trigger('click');
+	        this.props.chatRoom.uploadFromComputer();
 	    },
 	    refreshUI: function refreshUI() {
 	        var self = this;
@@ -4293,7 +4526,7 @@ React.makeElement = React['createElement'];
 	    handleKeyDown: SoonFc(function (e) {
 	        var self = this;
 	        var chatRoom = self.props.chatRoom;
-	        if (self.isMounted() && chatRoom.isActive()) {
+	        if (self.isMounted() && chatRoom.isActive() && !chatRoom.isReadOnly()) {
 	            chatRoom.trigger("onChatIsFocused");
 	        }
 	    }, 150),
@@ -4500,36 +4733,63 @@ React.makeElement = React['createElement'];
 	        var isAtBottom = ps.isAtBottom();
 
 	        if (ps.isCloseToBottom(30) === true) {
-	            self.scrolledToBottom = true;
+	            if (!self.scrolledToBottom) {
+	                var chatRoom = self.props.chatRoom;
+	                var mb = chatRoom.messagesBuff;
+	                mb.detachMessages();
+	            }
+	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
 	        } else {
-	            self.scrolledToBottom = false;
+	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = false;
 	        }
 
-	        if (isAtTop || ps.getScrollPositionY() < 300 && ps.getScrollHeight() > 500) {
+	        if (isAtTop || ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500) {
 	            var chatRoom = self.props.chatRoom;
 	            var mb = chatRoom.messagesBuff;
 	            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
-	                mb.retrieveChatHistory();
+	                ps.disable();
+
 	                self.isRetrievingHistoryViaScrollPull = true;
 	                self.lastScrollPosition = scrollPositionY;
 
 	                self.lastContentHeightBeforeHist = ps.getScrollHeight();
+
+	                var msgsAppended = 0;
+	                $(chatRoom).unbind('onMessagesBuffAppend.pull');
+	                $(chatRoom).bind('onMessagesBuffAppend.pull', function () {
+	                    msgsAppended++;
+	                });
+
 	                $(chatRoom).unbind('onHistoryDecrypted.pull');
-	                $(chatRoom).one('onHistoryDecrypted.pull', function () {
-	                    setTimeout(function () {
+	                $(chatRoom).one('onHistoryDecrypted.pull', function (e) {
+	                    $(chatRoom).unbind('onMessagesBuffAppend.pull');
+	                    var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
 
-	                        self.isRetrievingHistoryViaScrollPull = false;
+	                    ps.scrollToY(prevPosY, true);
 
-	                        var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
+	                    chatRoom.messagesBuff.addChangeListener(function () {
+	                        if (msgsAppended > 0) {
+	                            var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
+
+	                            ps.scrollToY(prevPosY, true);
+
+	                            self.lastScrollPosition = prevPosY;
+	                        }
 
 	                        delete self.lastContentHeightBeforeHist;
 
-	                        self.lastScrollPosition = prevPosY;
+	                        return 0xDEAD;
+	                    });
 
-	                        ps.scrollToY(prevPosY, true);
+	                    setTimeout(function () {
+	                        self.isRetrievingHistoryViaScrollPull = false;
+
+	                        ps.enable();
 	                        self.forceUpdate();
-	                    }, 1000);
+	                    }, 1150);
 	                });
+
+	                mb.retrieveChatHistory();
 	            }
 	        }
 
@@ -4560,9 +4820,15 @@ React.makeElement = React['createElement'];
 	        var contacts = room.getParticipantsExceptMe();
 	        var contactHandle;
 	        var contact;
-	        if (contacts && contacts.length > 0) {
+	        var avatarMeta;
+	        var contactName = "";
+	        if (contacts && contacts.length === 1) {
 	            contactHandle = contacts[0];
 	            contact = M.u[contactHandle];
+	            avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
+	            contactName = avatarMeta.fullName;
+	        } else if (contacts && contacts.length > 1) {
+	            contactName = room.getRoomTitle(true);
 	        }
 
 	        var conversationPanelClasses = "conversation-panel " + room.type + "-chat";
@@ -4571,16 +4837,13 @@ React.makeElement = React['createElement'];
 	            conversationPanelClasses += " hidden";
 	        }
 
-	        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
-	        var contactName = avatarMeta.fullName;
-
 	        var messagesList = [];
 
-	        if (self.isRetrievingHistoryViaScrollPull && !self.loadingShown || self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true || self.props.chatRoom.messagesBuff.joined === false || self.props.chatRoom.messagesBuff.joined === true && self.props.chatRoom.messagesBuff.haveMessages === true && self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true || self.props.chatRoom.messagesBuff.isDecrypting && self.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending') {
+	        if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
 	            self.loadingShown = true;
-	        } else if (self.props.chatRoom.messagesBuff.joined === true) {
-	            if (!self.isRetrievingHistoryViaScrollPull) {
-	                var headerText = self.props.chatRoom.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
+	        } else if (room.messagesBuff.joined === true) {
+	            if (!self.isRetrievingHistoryViaScrollPull && room.messagesBuff.haveMoreHistory() === false) {
+	                var headerText = room.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
 
 	                headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
 
@@ -4623,7 +4886,7 @@ React.makeElement = React['createElement'];
 	        var lastMessageState = null;
 	        var grouped = false;
 
-	        self.props.chatRoom.messagesBuff.messages.forEach(function (v, k) {
+	        room.messagesBuff.messages.forEach(function (v, k) {
 	            if (!v.protocol && v.revoked !== true) {
 	                var shouldRender = true;
 	                if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false || v.deleted === true) {
@@ -4740,15 +5003,18 @@ React.makeElement = React['createElement'];
 	                        onUpdate: function onUpdate() {
 	                            self.onResizeDoUpdate();
 	                        },
+	                        editing: self.state.editing === v.messageId || self.state.editing === v.pendingMessageId,
 	                        onEditStarted: function onEditStarted($domElement) {
 	                            self.editDomElement = $domElement;
-	                            self.setState({ 'editing': v });
+	                            self.setState({ 'editing': v.messageId });
 	                            self.forceUpdate();
 	                        },
 	                        onEditDone: function onEditDone(messageContents) {
 	                            self.editDomElement = null;
 
 	                            var currentContents = v.textContents;
+
+	                            v.edited = false;
 
 	                            if (messageContents === false || messageContents === currentContents) {
 	                                self.messagesListScrollable.scrollToBottom(true);
@@ -4786,6 +5052,7 @@ React.makeElement = React['createElement'];
 	                        },
 	                        onDeleteClicked: function onDeleteClicked(e, msg) {
 	                            self.setState({
+	                                'editing': false,
 	                                'confirmDeleteDialog': true,
 	                                'messageToBeDeleted': msg
 	                            });
@@ -4799,7 +5066,7 @@ React.makeElement = React['createElement'];
 	        var attachCloudDialog = null;
 	        if (self.state.attachCloudDialog === true) {
 	            var selected = [];
-	            attachCloudDialog = React.makeElement(ModalDialogsUI.CloudBrowserDialog, {
+	            attachCloudDialog = React.makeElement(CloudBrowserModalDialog.CloudBrowserDialog, {
 	                folderSelectNotAllowed: true,
 	                onClose: function onClose() {
 	                    self.setState({ 'attachCloudDialog': false });
@@ -4979,30 +5246,7 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'truncateDialog': false });
 	                    },
 	                    onConfirmClicked: function onConfirmClicked() {
-	                        var chatMessages = room.messagesBuff.messages;
-	                        if (chatMessages.length > 0) {
-	                            var lastChatMessageId = null;
-	                            var i = chatMessages.length - 1;
-	                            while (lastChatMessageId == null && i >= 0) {
-	                                var message = chatMessages.getItem(i);
-	                                if (message instanceof Message) {
-	                                    lastChatMessageId = message.messageId;
-	                                }
-	                                i--;
-	                            }
-	                            if (lastChatMessageId) {
-	                                asyncApiReq({
-	                                    a: 'mct',
-	                                    id: room.chatId,
-	                                    m: lastChatMessageId,
-	                                    v: Chatd.VERSION
-	                                }).fail(function (r) {
-	                                    if (r === -2) {
-	                                        msgDialog('warninga', l[135], __(l[8880]));
-	                                    }
-	                                });
-	                            }
-	                        }
+	                        room.truncate();
 
 	                        self.setState({
 	                            'truncateDialog': false
@@ -5222,7 +5466,7 @@ React.makeElement = React['createElement'];
 	                            {
 	                                onFirstInit: function onFirstInit(ps, node) {
 	                                    ps.scrollToBottom(true);
-	                                    self.scrolledToBottom = 1;
+	                                    self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = 1;
 	                                },
 	                                onReinitialise: self.onMessagesScrollReinitialise,
 	                                onUserScroll: self.onMessagesScrollUserScroll,
@@ -5234,7 +5478,9 @@ React.makeElement = React['createElement'];
 	                                chatRoom: self.props.chatRoom,
 	                                messagesBuff: self.props.chatRoom.messagesBuff,
 	                                editDomElement: self.state.editDomElement,
-	                                confirmDeleteDialog: self.state.confirmDeleteDialog
+	                                editingMessageId: self.state.editing,
+	                                confirmDeleteDialog: self.state.confirmDeleteDialog,
+	                                renderedMessagesCount: messagesList.length
 	                            },
 	                            React.makeElement(
 	                                "div",
@@ -5270,7 +5516,7 @@ React.makeElement = React['createElement'];
 	                                persist: true,
 	                                onUpEditPressed: function onUpEditPressed() {
 	                                    var foundMessage = false;
-	                                    room.messagesBuff.messages.keys().reverse().forEach(function (k) {
+	                                    room.messagesBuff.messages.keys().reverse().some(function (k) {
 	                                        if (!foundMessage) {
 	                                            var message = room.messagesBuff.messages[k];
 
@@ -5278,16 +5524,17 @@ React.makeElement = React['createElement'];
 	                                            if (message.userId) {
 	                                                if (!M.u[message.userId]) {
 
-	                                                    return false;
+	                                                    return;
 	                                                }
 	                                                contact = M.u[message.userId];
 	                                            } else {
 
-	                                                return false;
+	                                                return;
 	                                            }
 
 	                                            if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && !message.requiresManualRetry && !message.deleted && (!message.type || message instanceof Message) && (!message.isManagement || !message.isManagement())) {
 	                                                foundMessage = message;
+	                                                return foundMessage;
 	                                            }
 	                                        }
 	                                    });
@@ -5295,7 +5542,7 @@ React.makeElement = React['createElement'];
 	                                    if (!foundMessage) {
 	                                        return false;
 	                                    } else {
-	                                        $('.message.body.' + foundMessage.messageId).trigger('onEditRequest');
+	                                        self.setState({ 'editing': foundMessage.messageId });
 	                                        self.lastScrolledToBottom = false;
 	                                        return true;
 	                                    }
@@ -5360,7 +5607,9 @@ React.makeElement = React['createElement'];
 
 	        var conversations = [];
 
-	        if (getSitePath() === "/fm/chat") {
+	        var hadLoaded = ChatdIntegration.allChatsHadLoaded.state() !== 'pending' && ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending' && Object.keys(ChatdIntegration._loadingChats).length === 0;
+
+	        if (hadLoaded && getSitePath() === "/fm/chat") {
 
 	            var activeFound = false;
 	            self.props.conversations.forEach(function (chatRoom) {
@@ -5369,12 +5618,11 @@ React.makeElement = React['createElement'];
 	                }
 	            });
 	            if (self.props.conversations.length > 0 && !activeFound) {
-	                self.props.conversations[self.props.conversations.keys()[0]].setActive();
-	                self.props.conversations[self.props.conversations.keys()[0]].show();
+	                self.props.megaChat.showLastActive();
 	            }
 	        }
 
-	        self.props.conversations.forEach(function (chatRoom) {
+	        hadLoaded && self.props.conversations.forEach(function (chatRoom) {
 	            var otherParticipants = chatRoom.getParticipantsExceptMe();
 
 	            var contact;
@@ -5395,8 +5643,6 @@ React.makeElement = React['createElement'];
 	        if (conversations.length === 0) {
 	            var contactsList = [];
 	            var contactsListOffline = [];
-
-	            var hadLoaded = ChatdIntegration.allChatsHadLoaded.state() !== 'pending' && ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending';
 
 	            if (hadLoaded) {
 	                self.props.contacts.forEach(function (contact) {
@@ -5495,6 +5741,8 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        $(document.body).addClass('overlayed');
 	        $('.fm-dialog-overlay').removeClass('hidden');
+
+	        $('textarea:focus').blur();
 
 	        document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 	        document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
@@ -5614,502 +5862,6 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
-	var BrowserCol = React.createClass({
-	    displayName: "BrowserCol",
-
-	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'hideable': true
-	        };
-	    },
-
-	    render: function render() {
-	        var self = this;
-
-	        var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
-
-	        if (self.props.sortBy[0] === self.props.id) {
-	            classes += " " + self.props.sortBy[1];
-	        }
-	        return React.makeElement(
-	            "th",
-	            { onClick: function onClick(e) {
-	                    e.preventDefault();
-	                    e.stopPropagation();
-	                    self.props.onClick(self.props.id);
-	                } },
-	            React.makeElement(
-	                "span",
-	                { className: "arrow " + classes },
-	                self.props.label
-	            )
-	        );
-	    }
-	});
-	var BrowserEntries = React.createClass({
-	    displayName: "BrowserEntries",
-
-	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'hideable': true
-	        };
-	    },
-
-	    getInitialState: function getInitialState() {
-	        return {
-	            'highlighted': [],
-	            'selected': []
-	        };
-	    },
-	    onEntryClick: function onEntryClick(e, node) {
-	        e.stopPropagation();
-	        e.preventDefault();
-
-	        this.setState({ 'highlighted': [node.h] });
-	        if (this.props.onHighlighted) {
-	            this.props.onHighlighted([node.h]);
-	        }
-
-	        if (this.props.folderSelectNotAllowed === true && node.t) {
-	            this.setState({ 'selected': [] });
-	            this.props.onSelected([]);
-	        } else {
-	            this.setState({ 'selected': [node.h] });
-	            this.props.onSelected([node.h]);
-	        }
-	    },
-	    onEntryDoubleClick: function onEntryDoubleClick(e, node) {
-	        var self = this;
-
-	        e.stopPropagation();
-	        e.preventDefault();
-
-	        if (node.t) {
-
-	            self.setState({ 'selected': [], 'highlighted': [] });
-	            self.props.onSelected([]);
-	            self.props.onHighlighted([]);
-	            self.props.onExpand(node);
-	            self.forceUpdate();
-	        } else {
-	            self.onEntryClick(e, node);
-	            self.props.onSelected(self.state.selected);
-	            self.props.onAttachClicked(self.state.selected);
-	        }
-	    },
-	    render: function render() {
-	        var self = this;
-
-	        var items = [];
-
-	        var entry = self.props.entries;
-	        self.props.entries.forEach(function (node) {
-	            if (node.t !== 0 && node.t !== 1) {
-
-	                return;
-	            }
-	            if (!node.name) {
-
-	                return;
-	            }
-
-	            var isFolder = node.t;
-	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
-
-	            var tooltipElement = null;
-
-	            var icon = React.makeElement(
-	                "span",
-	                { className: "transfer-filetype-icon " + fileIcon(node) },
-	                " "
-	            );
-
-	            if (fileIcon(node) === "graphic" && node.fa) {
-	                var src = thumbnails[node.h];
-	                if (!src) {
-	                    src = M.getNodeByHandle(node.h);
-
-	                    M.v.push(node);
-	                    if (!node.seen) {
-	                        node.seen = 1;
-	                    }
-	                    delay('thumbnails', fm_thumbnails, 90);
-	                    src = window.noThumbURI || '';
-	                }
-	                icon = React.makeElement(
-	                    Tooltips.Tooltip,
-	                    { withArrow: true },
-	                    React.makeElement(
-	                        Tooltips.Handler,
-	                        { className: "transfer-filetype-icon " + fileIcon(node) },
-	                        " "
-	                    ),
-	                    React.makeElement(
-	                        Tooltips.Contents,
-	                        { className: "img-preview" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "dropdown img-wrapper img-block", id: node.h },
-	                            React.makeElement("img", { alt: "",
-	                                className: "thumbnail-placeholder " + node.h,
-	                                src: src,
-	                                width: "156",
-	                                height: "156"
-	                            })
-	                        )
-	                    )
-	                );
-	            }
-
-	            items.push(React.makeElement(
-	                "tr",
-	                {
-	                    className: (isFolder ? " folder" : "") + (isHighlighted ? " ui-selected" : ""),
-	                    onClick: function onClick(e) {
-	                        self.onEntryClick(e, node);
-	                    },
-	                    onDoubleClick: function onDoubleClick(e) {
-	                        self.onEntryDoubleClick(e, node);
-	                    },
-	                    key: node.h
-	                },
-	                React.makeElement(
-	                    "td",
-	                    null,
-	                    React.makeElement("span", { className: "grid-status-icon" + (node.fav ? " star" : "") })
-	                ),
-	                React.makeElement(
-	                    "td",
-	                    null,
-	                    icon,
-	                    React.makeElement(
-	                        "span",
-	                        { className: "tranfer-filetype-txt" },
-	                        node.name
-	                    )
-	                ),
-	                React.makeElement(
-	                    "td",
-	                    null,
-	                    !isFolder ? bytesToSize(node.s) : ""
-	                )
-	            ));
-	        });
-	        if (items.length > 0) {
-	            return React.makeElement(
-	                utils.JScrollPane,
-	                { className: "fm-dialog-grid-scroll",
-	                    selected: this.state.selected,
-	                    highlighted: this.state.highlighted,
-	                    entries: this.props.entries
-	                },
-	                React.makeElement(
-	                    "table",
-	                    { className: "grid-table fm-dialog-table" },
-	                    React.makeElement(
-	                        "tbody",
-	                        null,
-	                        items
-	                    )
-	                )
-	            );
-	        } else {
-	            return React.makeElement(
-	                "div",
-	                { className: "dialog-empty-block dialog-fm folder" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "dialog-empty-pad" },
-	                    React.makeElement("div", { className: "dialog-empty-icon" }),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dialog-empty-header" },
-	                        __(l[782])
-	                    )
-	                )
-	            );
-	        }
-	    }
-	});
-	var CloudBrowserDialog = React.createClass({
-	    displayName: "CloudBrowserDialog",
-
-	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'selectLabel': __(l[8023]),
-	            'openLabel': __(l[1710]),
-	            'cancelLabel': __(l[82]),
-	            'hideable': true
-	        };
-	    },
-	    getInitialState: function getInitialState() {
-	        return {
-	            'sortBy': ['name', 'asc'],
-	            'selected': [],
-	            'highlighted': [],
-	            'currentlyViewedEntry': M.RootID
-	        };
-	    },
-	    toggleSortBy: function toggleSortBy(colId) {
-	        if (this.state.sortBy[0] === colId) {
-	            this.setState({ 'sortBy': [colId, this.state.sortBy[1] === "asc" ? "desc" : "asc"] });
-	        } else {
-	            this.setState({ 'sortBy': [colId, "asc"] });
-	        }
-	    },
-	    resizeBreadcrumbs: function resizeBreadcrumbs() {
-	        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
-	        var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
-
-	        setTimeout(function () {
-	            var breadcrumbsWidth = $breadcrumbs.outerWidth();
-	            var $el = $breadcrumbs.find('.right-arrow-bg');
-	            var i = 0;
-	            var j = 0;
-	            $el.removeClass('short-foldername ultra-short-foldername invisible');
-
-	            while ($breadcrumbsWrapper.outerWidth() > breadcrumbsWidth) {
-	                if (i < $el.length - 1) {
-	                    $($el[i]).addClass('short-foldername');
-	                    i++;
-	                } else if (j < $el.length - 1) {
-	                    $($el[j]).addClass('ultra-short-foldername');
-	                    j++;
-	                } else if (!$($el[j]).hasClass('short-foldername')) {
-	                    $($el[j]).addClass('short-foldername');
-	                } else {
-	                    $($el[j]).addClass('ultra-short-foldername');
-	                    break;
-	                }
-	            }
-	        }, 0);
-	    },
-	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
-	        if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
-	            this.resizeBreadcrumbs();
-
-	            var handle = this.state.currentlyViewedEntry;
-	            if (!M.d[handle] || M.d[handle].t && !M.c[handle]) {
-	                var self = this;
-
-	                dbfetch.get(handle).always(function () {
-	                    self.setState({ entries: self.getEntries() });
-	                });
-	                return;
-	            }
-	        }
-
-	        this.setState({ entries: null });
-	    },
-	    getEntries: function getEntries() {
-	        var self = this;
-	        var order = self.state.sortBy[1] === "asc" ? 1 : -1;
-	        var entries = Object.keys(M.c[self.state.currentlyViewedEntry] || {}).map(function (h) {
-	            return M.d[h];
-	        });
-	        var sortFunc;
-
-	        if (self.state.sortBy[0] === "name") {
-	            sortFunc = M.getSortByNameFn();
-	        } else if (self.state.sortBy[0] === "size") {
-	            sortFunc = M.getSortBySizeFn();
-	        } else {
-	            sortFunc = M.getSortByFavFn();
-	        }
-
-	        entries.sort(function (a, b) {
-	            return sortFunc(a, b, order);
-	        });
-
-	        var folders = [];
-
-	        for (var i = entries.length; i--;) {
-	            if (entries[i].t) {
-	                folders.unshift(entries[i]);
-	                entries.splice(i, 1);
-	            }
-	        }
-
-	        return folders.concat(entries);
-	    },
-	    onSelected: function onSelected(nodes) {
-	        this.setState({ 'selected': nodes });
-	        this.props.onSelected(nodes);
-	    },
-	    onHighlighted: function onHighlighted(nodes) {
-	        this.setState({ 'highlighted': nodes });
-
-	        if (this.props.onHighlighted) {
-	            this.props.onHighlighted(nodes);
-	        }
-	    },
-	    onAttachClicked: function onAttachClicked() {
-	        this.props.onAttachClicked();
-	    },
-	    onPopupDidMount: function onPopupDidMount(elem) {
-	        this.domNode = elem;
-	    },
-	    render: function render() {
-	        var self = this;
-
-	        var entries = self.state.entries || self.getEntries();
-
-	        var classes = "add-from-cloud " + self.props.className;
-
-	        var folderIsHighlighted = false;
-
-	        var breadcrumb = [];
-
-	        var p = M.d[self.state.currentlyViewedEntry];
-	        do {
-	            var breadcrumbClasses = "";
-	            if (p.h === M.RootID) {
-	                breadcrumbClasses += " cloud-drive";
-
-	                if (self.state.currentlyViewedEntry !== M.RootID) {
-	                    breadcrumbClasses += " has-next-button";
-	                }
-	            } else {
-	                breadcrumbClasses += " folder";
-	            }
-
-	            (function (p) {
-	                if (self.state.currentlyViewedEntry !== p.h) {
-	                    breadcrumbClasses += " has-next-button";
-	                }
-	                breadcrumb.unshift(React.makeElement(
-	                    "a",
-	                    { className: "fm-breadcrumbs contains-directories " + breadcrumbClasses, key: p.h, onClick: function onClick(e) {
-	                            e.preventDefault();
-	                            e.stopPropagation();
-	                            self.setState({ 'currentlyViewedEntry': p.h, 'selected': [] });
-	                            self.onSelected([]);
-	                            self.onHighlighted([]);
-	                        } },
-	                    React.makeElement(
-	                        "span",
-	                        { className: "right-arrow-bg invisible" },
-	                        React.makeElement(
-	                            "span",
-	                            null,
-	                            p.h === M.RootID ? __(l[164]) : p.name
-	                        )
-	                    )
-	                ));
-	            })(p);
-	        } while (p = M.d[M.d[p.h].p]);
-
-	        self.state.highlighted.forEach(function (nodeId) {
-	            if (M.d[nodeId] && M.d[nodeId].t === 1) {
-	                folderIsHighlighted = true;
-	            }
-	        });
-
-	        var buttons = [];
-
-	        if (!folderIsHighlighted) {
-	            buttons.push({
-	                "label": self.props.selectLabel,
-	                "key": "select",
-	                "className": "default-grey-button " + (self.state.selected.length === 0 ? "disabled" : null),
-	                "onClick": function onClick(e) {
-	                    if (self.state.selected.length > 0) {
-	                        self.props.onSelected(self.state.selected);
-	                        self.props.onAttachClicked();
-	                    }
-	                    e.preventDefault();
-	                    e.stopPropagation();
-	                }
-	            });
-	        } else if (folderIsHighlighted) {
-	            buttons.push({
-	                "label": self.props.openLabel,
-	                "key": "select",
-	                "className": "default-grey-button",
-	                "onClick": function onClick(e) {
-	                    if (self.state.highlighted.length > 0) {
-	                        self.setState({ 'currentlyViewedEntry': self.state.highlighted[0]
-	                        });
-	                        self.onSelected([]);
-	                        self.onHighlighted([]);
-	                        self.browserEntries.setState({
-	                            'selected': [],
-	                            'highlighted': []
-	                        });
-	                    }
-	                    e.preventDefault();
-	                    e.stopPropagation();
-	                }
-	            });
-	        }
-
-	        buttons.push({
-	            "label": self.props.cancelLabel,
-	            "key": "cancel",
-	            "onClick": function onClick(e) {
-	                self.props.onClose(self);
-	                e.preventDefault();
-	                e.stopPropagation();
-	            }
-	        });
-
-	        return React.makeElement(
-	            ModalDialog,
-	            {
-	                title: __(l[8011]),
-	                className: classes,
-	                onClose: function onClose() {
-	                    self.props.onClose(self);
-	                },
-	                popupDidMount: self.onPopupDidMount,
-	                buttons: buttons },
-	            React.makeElement(
-	                "div",
-	                { className: "fm-breadcrumbs-block add-from-cloud" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "breadcrumbs-wrapper" },
-	                    breadcrumb,
-	                    React.makeElement("div", { className: "clear" })
-	                )
-	            ),
-	            React.makeElement(
-	                "table",
-	                { className: "grid-table-header fm-dialog-table" },
-	                React.makeElement(
-	                    "tbody",
-	                    null,
-	                    React.makeElement(
-	                        "tr",
-	                        null,
-	                        React.makeElement(BrowserCol, { id: "grid-header-star", sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
-	                        React.makeElement(BrowserCol, { id: "name", label: __(l[86]), sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
-	                        React.makeElement(BrowserCol, { id: "size", label: __(l[87]), sortBy: self.state.sortBy, onClick: self.toggleSortBy })
-	                    )
-	                )
-	            ),
-	            React.makeElement(BrowserEntries, {
-	                entries: entries,
-	                onExpand: function onExpand(node) {
-	                    self.onSelected([]);
-	                    self.onHighlighted([]);
-	                    self.setState({ 'currentlyViewedEntry': node.h });
-	                },
-	                folderSelectNotAllowed: self.props.folderSelectNotAllowed,
-	                onSelected: self.onSelected,
-	                onHighlighted: self.onHighlighted,
-	                onAttachClicked: self.onAttachClicked,
-	                ref: function ref(browserEntries) {
-	                    self.browserEntries = browserEntries;
-	                }
-	            })
-	        );
-	    }
-	});
-
 	var SelectContactDialog = React.createClass({
 	    displayName: "SelectContactDialog",
 
@@ -6200,7 +5952,36 @@ React.makeElement = React['createElement'];
 	    getInitialState: function getInitialState() {
 	        return {};
 	    },
+	    unbindEvents: function unbindEvents() {
+	        $(document).unbind('keyup.confirmDialog' + this.getUniqueId());
+	    },
+	    componentDidMount: function componentDidMount() {
+	        var self = this;
+
+	        setTimeout(function () {
+	            if (!self.isMounted()) {
+
+	                return;
+	            }
+	            $(document).rebind('keyup.confirmDialog' + self.getUniqueId(), function (e) {
+	                if (e.which === 13 || e.keyCode === 13) {
+	                    if (!self.isMounted()) {
+
+	                        self.unbindEvents();
+	                        return;
+	                    }
+	                    self.onConfirmClicked();
+	                    return false;
+	                }
+	            });
+	        }, 75);
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        self.unbindEvents();
+	    },
 	    onConfirmClicked: function onConfirmClicked() {
+	        this.unbindEvents();
 	        if (this.props.onConfirmClicked) {
 	            this.props.onConfirmClicked();
 	        }
@@ -6212,6 +5993,7 @@ React.makeElement = React['createElement'];
 	            if (this.props.onConfirmClicked) {
 
 	                setTimeout(function () {
+	                    self.unbindEvents();
 	                    self.props.onConfirmClicked();
 	                }, 75);
 	            }
@@ -6270,7 +6052,7 @@ React.makeElement = React['createElement'];
 	                                }
 	                            }
 	                        },
-	                        l['7039']
+	                        l[7039]
 	                    )
 	                )
 	            )
@@ -6280,7 +6062,6 @@ React.makeElement = React['createElement'];
 
 	module.exports = window.ModalDialogUI = {
 	    ModalDialog: ModalDialog,
-	    CloudBrowserDialog: CloudBrowserDialog,
 	    SelectContactDialog: SelectContactDialog,
 	    ConfirmDialog: ConfirmDialog,
 	    ExtraFooterElement: ExtraFooterElement
@@ -6561,6 +6342,885 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var Tooltips = __webpack_require__(13);
+	var ModalDialogsUI = __webpack_require__(12);
+
+	var BrowserCol = React.createClass({
+	    displayName: "BrowserCol",
+
+	    mixins: [MegaRenderMixin],
+	    getDefaultProps: function getDefaultProps() {
+	        return {
+	            'hideable': true
+	        };
+	    },
+	    render: function render() {
+	        var self = this;
+
+	        var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
+
+	        if (self.props.sortBy[0] === self.props.id) {
+	            var ordClass = self.props.sortBy[1] == "desc" ? "asc" : "desc";
+	            classes = classes + " " + ordClass;
+	        }
+	        return React.makeElement(
+	            "th",
+	            { onClick: function onClick(e) {
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                    self.props.onClick(self.props.id);
+	                } },
+	            React.makeElement(
+	                "span",
+	                { className: "arrow " + classes },
+	                self.props.label
+	            )
+	        );
+	    }
+	});
+	var BrowserEntries = React.createClass({
+	    displayName: "BrowserEntries",
+
+	    mixins: [MegaRenderMixin],
+	    getDefaultProps: function getDefaultProps() {
+	        return {
+	            'hideable': true
+	        };
+	    },
+	    getInitialState: function getInitialState() {
+	        return {
+	            'highlighted': [],
+	            'selected': []
+	        };
+	    },
+	    componentWillMount: function componentWillMount() {
+	        this.lastCursor = false;
+	        this.lastCharKeyPressed = false;
+	        this.lastCharKeyIndex = -1;
+	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        var self = this;
+
+	        if (!self.lastCursor || self.lastCursor !== self.state.cursor) {
+	            self.lastCursor = self.state.cursor;
+	            var tr = self.findDOMNode().querySelector('tr.node_' + self.lastCursor);
+	            var $jsp = $(tr).parents('.jspScrollable').data('jsp');
+	            if (tr && $jsp) {
+	                $jsp.scrollToElement(tr, undefined, false);
+	            }
+	        }
+	    },
+	    componentDidMount: function componentDidMount() {
+	        this.bindEvents();
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        this.unbindEvents();
+	    },
+	    getNodesInIndexRange: function getNodesInIndexRange(firstIndex, lastIndex) {
+	        var self = this;
+	        return self.props.entries.filter(function (node, index) {
+	            return index >= firstIndex && index <= lastIndex && (!self.props.folderSelectNotAllowed ? true : node.t === 0);
+	        }).map(function (node) {
+	            return node.h;
+	        });
+	    },
+	    getIndexByNodeId: function getIndexByNodeId(nodeId, notFoundValue) {
+	        var self = this;
+	        var foundIndex = typeof notFoundValue === 'undefined' ? -1 : notFoundValue;
+	        self.props.entries.find(function (r, index) {
+	            if (r.h === nodeId) {
+	                foundIndex = index;
+	                return true;
+	            }
+	        });
+	        return foundIndex;
+	    },
+	    setSelectedAndHighlighted: function setSelectedAndHighlighted(highlighted, cursor) {
+	        var self = this;
+
+	        var currentViewOrderMap = {};
+	        self.props.entries.forEach(function (v, k) {
+	            currentViewOrderMap[v.h] = k;
+	        });
+
+	        highlighted.sort(function (a, b) {
+	            var aa = currentViewOrderMap[a];
+	            var bb = currentViewOrderMap[b];
+	            if (aa < bb) {
+	                return -1;
+	            }
+	            if (aa > bb) {
+	                return 1;
+	            }
+
+	            return 0;
+	        });
+
+	        self.setState({ 'highlighted': highlighted, 'cursor': cursor });
+	        self.props.onHighlighted(highlighted);
+
+	        var selected = highlighted.filter(function (nodeId) {
+	            var node = M.getNodeByHandle(nodeId);
+	            return !self.props.folderSelectNotAllowed || node && node.t === 0;
+	        });
+
+	        self.setState({ 'selected': selected });
+	        self.props.onSelected(selected);
+	    },
+	    bindEvents: function bindEvents() {
+	        var self = this;
+
+	        var KEY_A = 65;
+	        var KEY_UP = 38;
+	        var KEY_DOWN = 40;
+	        var KEY_ENTER = 13;
+	        var KEY_BACKSPACE = 8;
+
+	        $(document.body).rebind('keydown.cloudBrowserModalDialog', function (e) {
+	            var charTyped = false;
+	            var keyCode = e.which || e.keyCode;
+	            var selectionIncludeShift = e.shiftKey;
+
+	            if (keyCode === KEY_A && (e.ctrlKey || e.metaKey)) {
+
+	                var newCursor = false;
+
+	                var highlighted = [];
+	                if (self.props.entries && self.props.entries.length > 0) {
+	                    var firstIndex = 0;
+	                    var lastIndex = self.props.entries.length - 1;
+	                    newCursor = self.props.entries[lastIndex].h;
+	                    highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
+	                }
+
+	                self.setSelectedAndHighlighted(highlighted, newCursor);
+	                e.preventDefault();
+	                e.stopPropagation();
+	            } else if (e.metaKey && keyCode === KEY_UP || keyCode === KEY_BACKSPACE) {
+
+	                var currentFolder = M.getNode(self.props.currentlyViewedEntry);
+	                if (currentFolder.p) {
+	                    self.expandFolder(currentFolder.p);
+	                }
+	            } else if (!e.metaKey && (keyCode === KEY_UP || keyCode === KEY_DOWN)) {
+
+	                var dir = keyCode === KEY_UP ? -1 : 1;
+
+	                var lastHighlighted = self.state.cursor || false;
+	                if (!self.state.cursor && self.state.highlighted && self.state.highlighted.length > 0) {
+	                    lastHighlighted = self.state.highlighted[self.state.highlighted.length - 1];
+	                }
+
+	                var currentIndex = self.getIndexByNodeId(lastHighlighted, -1);
+
+	                var targetIndex = currentIndex + dir;
+
+	                while (selectionIncludeShift && self.props.folderSelectNotAllowed && self.props.entries && self.props.entries[targetIndex] && self.props.entries[targetIndex].t === 1) {
+	                    targetIndex = targetIndex + dir;
+	                    if (targetIndex < 0) {
+	                        return;
+	                    }
+	                }
+
+	                if (targetIndex >= self.props.entries.length) {
+	                    if (selectionIncludeShift) {
+
+	                        return;
+	                    } else {
+	                        targetIndex = self.props.entries.length - 1;
+	                    }
+	                }
+
+	                if (targetIndex < 0 || !self.props.entries[targetIndex]) {
+	                    targetIndex = Math.min(0, currentIndex);
+	                }
+
+	                if (self.props.entries.length === 0 || !self.props.entries[targetIndex]) {
+	                    return;
+	                }
+
+	                var highlighted;
+
+	                if (selectionIncludeShift) {
+	                    var firstIndex;
+	                    var lastIndex;
+	                    if (targetIndex < currentIndex) {
+
+	                        if (self.state.highlighted && self.state.highlighted.length > 0) {
+
+	                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+
+	                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+	                                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 2], self.state.highlighted.length - 2);
+	                            } else {
+	                                firstIndex = targetIndex;
+	                                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], -1);
+	                            }
+	                        } else {
+	                            firstIndex = targetIndex;
+	                            lastIndex = currentIndex;
+	                        }
+	                    } else {
+
+	                        if (self.state.highlighted && self.state.highlighted.length > 0) {
+
+	                            if (self.state.highlighted.indexOf(self.props.entries[targetIndex].h) > -1) {
+
+	                                firstIndex = self.getIndexByNodeId(self.state.highlighted[1], 1);
+	                                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], self.state.highlighted.length - 1);
+	                            } else {
+
+	                                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+	                                lastIndex = targetIndex;
+	                            }
+	                        } else {
+	                            firstIndex = currentIndex;
+	                            lastIndex = targetIndex;
+	                        }
+	                    }
+
+	                    highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
+
+	                    self.setSelectedAndHighlighted(highlighted, self.props.entries[targetIndex].h);
+	                } else {
+	                    highlighted = [self.props.entries[targetIndex].h];
+	                    self.setSelectedAndHighlighted(highlighted, highlighted[0]);
+	                }
+	            } else if (keyCode >= 48 && keyCode <= 57 || keyCode >= 65 && keyCode <= 123 || keyCode > 255) {
+	                charTyped = String.fromCharCode(keyCode).toLowerCase();
+
+	                var foundMatchingNodes = self.props.entries.filter(function (node, index) {
+	                    return node.name && node.name.substr(0, 1).toLowerCase() === charTyped;
+	                });
+
+	                if (self.lastCharKeyPressed === charTyped) {
+	                    self.lastCharKeyIndex++;
+	                }
+
+	                self.lastCharKeyPressed = charTyped;
+
+	                if (foundMatchingNodes.length > 0) {
+	                    if (!foundMatchingNodes[self.lastCharKeyIndex]) {
+
+	                        self.lastCharKeyIndex = 0;
+	                    }
+	                    var foundNode = foundMatchingNodes[self.lastCharKeyIndex];
+
+	                    self.setSelectedAndHighlighted([foundNode.h], foundNode.h);
+	                }
+	            } else if (keyCode === KEY_ENTER || e.metaKey && keyCode === KEY_DOWN) {
+	                var selectedNodes = [];
+
+	                if (self.props.folderSelectNotAllowed === true) {
+
+	                    self.state.highlighted.forEach(function (h) {
+	                        var node = self.props.entries.find(function (entry) {
+	                            return entry.h === h;
+	                        });
+
+	                        if (node && node.t === 0) {
+	                            selectedNodes.push(h);
+	                        }
+	                    });
+
+	                    if (selectedNodes.length === 0) {
+	                        var cursorNode = self.state.cursor && M.getNodeByHandle(self.state.cursor);
+	                        if (cursorNode.t === 1) {
+	                            self.expandFolder(cursorNode.h);
+	                            return;
+	                        } else if (self.state.highlighted.length > 0) {
+
+	                            var firstNodeId = self.state.highlighted[0];
+	                            self.expandFolder(firstNodeId);
+	                            return;
+	                        } else {
+
+	                            return;
+	                        }
+	                    }
+	                } else {
+	                    selectedNodes = self.state.highlighted;
+	                }
+
+	                self.setState({ 'selected': selectedNodes });
+	                self.props.onSelected(selectedNodes);
+	                self.props.onAttachClicked(selectedNodes);
+	            } else {}
+
+	            if (!charTyped) {
+	                self.lastCharKeyPressed = false;
+	                self.lastCharKeyIndex = -1;
+	            }
+	        });
+	    },
+	    unbindEvents: function unbindEvents() {
+	        $(document.body).unbind('keydown.cloudBrowserModalDialog');
+	    },
+	    onEntryClick: function onEntryClick(e, node) {
+	        var self = this;
+
+	        self.lastCharKeyPressed = false;
+	        self.lastCharKeyIndex = -1;
+
+	        e.stopPropagation();
+	        e.preventDefault();
+
+	        if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
+	            self.setSelectedAndHighlighted([node.h], node.h);
+	        } else if (e.shiftKey) {
+
+	            var targetIndex = self.getIndexByNodeId(node.h, 0);
+	            var firstIndex = 0;
+	            if (self.state.highlighted && self.state.highlighted.length > 0) {
+	                firstIndex = self.getIndexByNodeId(self.state.highlighted[0], 0);
+	            }
+	            var lastIndex = 0;
+	            if (self.state.highlighted && self.state.highlighted.length > 0) {
+	                lastIndex = self.getIndexByNodeId(self.state.highlighted[self.state.highlighted.length - 1], 0);
+	            }
+
+	            if (targetIndex < firstIndex) {
+	                firstIndex = targetIndex;
+	            }
+	            if (targetIndex > lastIndex) {
+	                lastIndex = targetIndex;
+	            }
+	            var highlighted = self.getNodesInIndexRange(firstIndex, lastIndex);
+
+	            self.setSelectedAndHighlighted(highlighted, node.h);
+	        } else if (e.ctrlKey || e.metaKey) {
+
+	            if (!self.state.highlighted || self.state.highlighted.indexOf(node.h) === -1) {
+	                var highlighted = clone(self.state.highlighted || []);
+	                if (self.props.folderSelectNotAllowed) {
+	                    if (node.t === 1 && highlighted.length > 0) {
+	                        return;
+	                    } else if (highlighted.filter(function (nodeId) {
+	                        var node = M.getNodeByHandle(nodeId);
+	                        return node && node.t === 1;
+	                    }).length > 0) {
+
+	                        highlighted = [];
+	                    }
+	                }
+	                highlighted.push(node.h);
+	                self.setSelectedAndHighlighted(highlighted, node.h);
+	            } else if (self.state.highlighted && self.state.highlighted.indexOf(node.h) !== -1) {
+	                var highlighted = clone(self.state.highlighted || []);
+	                if (self.props.folderSelectNotAllowed) {
+	                    if (node.t === 1) {
+	                        return;
+	                    } else if (highlighted.filter(function (nodeId) {
+	                        var node = M.getNodeByHandle(nodeId);
+	                        return node && node.t === 1;
+	                    }).length > 0) {
+
+	                        highlighted = [];
+	                    }
+	                }
+	                array.remove(highlighted, node.h);
+	                self.setSelectedAndHighlighted(highlighted, highlighted.length == 0 ? false : highlighted[0]);
+	            }
+	        }
+	    },
+	    expandFolder: function expandFolder(nodeId) {
+	        var self = this;
+	        var node = M.getNodeByHandle(nodeId);
+	        if (node) {
+
+	            self.lastCharKeyPressed = false;
+	            self.lastCharKeyIndex = -1;
+
+	            self.setState({ 'selected': [], 'highlighted': [], 'cursor': false });
+	            self.props.onSelected([]);
+	            self.props.onHighlighted([]);
+	            self.props.onExpand(node);
+	            self.forceUpdate();
+	        }
+	    },
+
+	    onEntryDoubleClick: function onEntryDoubleClick(e, node) {
+	        var self = this;
+
+	        self.lastCharKeyPressed = false;
+	        self.lastCharKeyIndex = -1;
+
+	        e.stopPropagation();
+	        e.preventDefault();
+
+	        if (node.t) {
+
+	            self.setState({ 'selected': [], 'highlighted': [], 'cursor': false });
+	            self.props.onSelected([]);
+	            self.props.onHighlighted([]);
+	            self.props.onExpand(node);
+	            self.forceUpdate();
+	        } else {
+	            self.onEntryClick(e, node);
+	            self.props.onSelected(self.state.selected);
+	            self.props.onAttachClicked(self.state.selected);
+	        }
+	    },
+	    render: function render() {
+	        var self = this;
+
+	        var items = [];
+
+	        var entry = self.props.entries;
+	        self.props.entries.forEach(function (node) {
+	            if (node.t !== 0 && node.t !== 1) {
+
+	                return;
+	            }
+	            if (!node.name) {
+
+	                return;
+	            }
+
+	            var isFolder = node.t;
+	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
+
+	            var tooltipElement = null;
+
+	            var icon = React.makeElement(
+	                "span",
+	                {
+	                    className: "transfer-filetype-icon " + (isFolder ? " folder " : "") + fileIcon(node) },
+	                " "
+	            );
+
+	            if (is_image(node) && node.fa) {
+	                var src = thumbnails[node.h];
+	                if (!src) {
+	                    M.v.push(node);
+	                    if (!node.seen) {
+	                        node.seen = 1;
+	                    }
+	                    delay('thumbnails', fm_thumbnails, 90);
+	                    src = window.noThumbURI || '';
+	                }
+	                icon = React.makeElement(
+	                    Tooltips.Tooltip,
+	                    { withArrow: true },
+	                    React.makeElement(
+	                        Tooltips.Handler,
+	                        { className: "transfer-filetype-icon " + fileIcon(node) },
+	                        " "
+	                    ),
+	                    React.makeElement(
+	                        Tooltips.Contents,
+	                        { className: "img-preview" },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "dropdown img-wrapper img-block", id: node.h },
+	                            React.makeElement("img", { alt: "",
+	                                className: "thumbnail-placeholder " + node.h,
+	                                src: src,
+	                                width: "156",
+	                                height: "156"
+	                            })
+	                        )
+	                    )
+	                );
+	            }
+
+	            items.push(React.makeElement(
+	                "tr",
+	                { className: "node_" + node.h + " " + (isFolder ? " folder" : "") + (isHighlighted ? " ui-selected" : ""),
+	                    onClick: function onClick(e) {
+	                        self.onEntryClick(e, node);
+	                    },
+	                    onDoubleClick: function onDoubleClick(e) {
+	                        self.onEntryDoubleClick(e, node);
+	                    },
+	                    key: node.h
+	                },
+	                React.makeElement(
+	                    "td",
+	                    null,
+	                    React.makeElement("span", { className: "grid-status-icon" + (node.fav ? " star" : "") })
+	                ),
+	                React.makeElement(
+	                    "td",
+	                    null,
+	                    icon,
+	                    React.makeElement(
+	                        "span",
+	                        { className: "tranfer-filetype-txt" },
+	                        node.name
+	                    )
+	                ),
+	                React.makeElement(
+	                    "td",
+	                    null,
+	                    !isFolder ? bytesToSize(node.s) : ""
+	                ),
+	                React.makeElement(
+	                    "td",
+	                    null,
+	                    time2date(node.ts)
+	                )
+	            ));
+	        });
+	        if (items.length > 0) {
+	            return React.makeElement(
+	                utils.JScrollPane,
+	                { className: "fm-dialog-grid-scroll",
+	                    selected: this.state.selected,
+	                    highlighted: this.state.highlighted,
+	                    entries: this.props.entries,
+	                    ref: function ref(jsp) {
+	                        self.jsp = jsp;
+	                    }
+	                },
+	                React.makeElement(
+	                    "table",
+	                    { className: "grid-table fm-dialog-table" },
+	                    React.makeElement(
+	                        "tbody",
+	                        null,
+	                        items
+	                    )
+	                )
+	            );
+	        } else if (self.props.isLoading) {
+	            return React.makeElement(
+	                "div",
+	                { className: "dialog-empty-block dialog-fm folder" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "dialog-empty-pad" },
+	                    React.makeElement("div", { className: "dialog-empty-icon" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dialog-empty-header" },
+	                        __(l[5533])
+	                    )
+	                )
+	            );
+	        } else {
+	            return React.makeElement(
+	                "div",
+	                { className: "dialog-empty-block dialog-fm folder" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "dialog-empty-pad" },
+	                    React.makeElement("div", { className: "dialog-empty-icon" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dialog-empty-header" },
+	                        self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782]
+	                    )
+	                )
+	            );
+	        }
+	    }
+	});
+	var CloudBrowserDialog = React.createClass({
+	    displayName: "CloudBrowserDialog",
+
+	    mixins: [MegaRenderMixin],
+	    getDefaultProps: function getDefaultProps() {
+	        return {
+	            'selectLabel': __(l[8023]),
+	            'openLabel': __(l[1710]),
+	            'cancelLabel': __(l[82]),
+	            'hideable': true
+	        };
+	    },
+	    getInitialState: function getInitialState() {
+	        return {
+	            'sortBy': ['name', 'asc'],
+	            'selected': [],
+	            'highlighted': [],
+	            'currentlyViewedEntry': M.RootID
+	        };
+	    },
+	    toggleSortBy: function toggleSortBy(colId) {
+	        if (this.state.sortBy[0] === colId) {
+	            this.setState({ 'sortBy': [colId, this.state.sortBy[1] === "asc" ? "desc" : "asc"] });
+	        } else {
+	            this.setState({ 'sortBy': [colId, "asc"] });
+	        }
+	    },
+	    resizeBreadcrumbs: function resizeBreadcrumbs() {
+	        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
+	        var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
+
+	        setTimeout(function () {
+	            var breadcrumbsWidth = $breadcrumbs.outerWidth();
+	            var $el = $breadcrumbs.find('.right-arrow-bg');
+	            var i = 0;
+	            var j = 0;
+	            $el.removeClass('short-foldername ultra-short-foldername invisible');
+
+	            while ($breadcrumbsWrapper.outerWidth() > breadcrumbsWidth) {
+	                if (i < $el.length - 1) {
+	                    $($el[i]).addClass('short-foldername');
+	                    i++;
+	                } else if (j < $el.length - 1) {
+	                    $($el[j]).addClass('ultra-short-foldername');
+	                    j++;
+	                } else if (!$($el[j]).hasClass('short-foldername')) {
+	                    $($el[j]).addClass('short-foldername');
+	                } else {
+	                    $($el[j]).addClass('ultra-short-foldername');
+	                    break;
+	                }
+	            }
+	        }, 0);
+	    },
+	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+	        if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
+	            this.resizeBreadcrumbs();
+
+	            var handle = this.state.currentlyViewedEntry;
+	            if (!M.d[handle] || M.d[handle].t && !M.c[handle]) {
+	                var self = this;
+	                self.setState({ 'isLoading': true });
+	                dbfetch.get(handle).always(function () {
+	                    self.setState({ 'isLoading': false });
+	                    self.setState({ entries: self.getEntries() });
+	                });
+	                return;
+	            }
+	        }
+
+	        this.setState({ entries: null });
+	    },
+	    getEntries: function getEntries() {
+	        var self = this;
+	        var order = self.state.sortBy[1] === "asc" ? 1 : -1;
+	        var entries = Object.keys(M.c[self.state.currentlyViewedEntry] || {}).map(function (h) {
+	            return M.d[h];
+	        });
+	        var sortFunc;
+
+	        if (self.state.sortBy[0] === "name") {
+	            sortFunc = M.getSortByNameFn();
+	        } else if (self.state.sortBy[0] === "size") {
+	            sortFunc = M.getSortBySizeFn();
+	        } else if (self.state.sortBy[0] === "ts") {
+	            sortFunc = M.getSortByDateTimeFn();
+	        } else {
+	            sortFunc = M.getSortByFavFn();
+	        }
+
+	        var folders = [];
+
+	        for (var i = entries.length; i--;) {
+	            if (entries[i].t) {
+	                folders.unshift(entries[i]);
+	                entries.splice(i, 1);
+	            }
+	        }
+
+	        folders.sort(function (a, b) {
+	            return sortFunc(a, b, order);
+	        });
+
+	        entries.sort(function (a, b) {
+	            return sortFunc(a, b, order);
+	        });
+
+	        return folders.concat(entries);
+	    },
+	    onSelected: function onSelected(nodes) {
+	        this.setState({ 'selected': nodes });
+	        this.props.onSelected(nodes);
+	    },
+	    onHighlighted: function onHighlighted(nodes) {
+	        this.setState({ 'highlighted': nodes });
+
+	        if (this.props.onHighlighted) {
+	            this.props.onHighlighted(nodes);
+	        }
+	    },
+	    onAttachClicked: function onAttachClicked() {
+	        this.props.onAttachClicked();
+	    },
+	    onPopupDidMount: function onPopupDidMount(elem) {
+	        this.domNode = elem;
+	    },
+	    render: function render() {
+	        var self = this;
+
+	        var entries = self.state.entries || self.getEntries();
+
+	        var classes = "add-from-cloud " + self.props.className;
+
+	        var folderIsHighlighted = false;
+
+	        var breadcrumb = [];
+
+	        var p = M.d[self.state.currentlyViewedEntry];
+	        do {
+	            var breadcrumbClasses = "";
+	            if (p.h === M.RootID) {
+	                breadcrumbClasses += " cloud-drive";
+
+	                if (self.state.currentlyViewedEntry !== M.RootID) {
+	                    breadcrumbClasses += " has-next-button";
+	                }
+	            } else {
+	                breadcrumbClasses += " folder";
+	            }
+
+	            (function (p) {
+	                if (self.state.currentlyViewedEntry !== p.h) {
+	                    breadcrumbClasses += " has-next-button";
+	                }
+	                breadcrumb.unshift(React.makeElement(
+	                    "a",
+	                    { className: "fm-breadcrumbs contains-directories " + breadcrumbClasses, key: p.h,
+	                        onClick: function onClick(e) {
+	                            e.preventDefault();
+	                            e.stopPropagation();
+	                            self.setState({ 'currentlyViewedEntry': p.h, 'selected': [] });
+	                            self.onSelected([]);
+	                            self.onHighlighted([]);
+	                        } },
+	                    React.makeElement(
+	                        "span",
+	                        { className: "right-arrow-bg invisible" },
+	                        React.makeElement(
+	                            "span",
+	                            null,
+	                            p.h === M.RootID ? __(l[164]) : p.name
+	                        )
+	                    )
+	                ));
+	            })(p);
+	        } while (p = M.d[M.d[p.h].p]);
+
+	        self.state.highlighted.forEach(function (nodeId) {
+	            if (M.d[nodeId] && M.d[nodeId].t === 1) {
+	                folderIsHighlighted = true;
+	            }
+	        });
+
+	        var buttons = [];
+
+	        if (!folderIsHighlighted) {
+	            buttons.push({
+	                "label": self.props.selectLabel,
+	                "key": "select",
+	                "className": "default-grey-button " + (self.state.selected.length === 0 ? "disabled" : null),
+	                "onClick": function onClick(e) {
+	                    if (self.state.selected.length > 0) {
+	                        self.props.onSelected(self.state.selected);
+	                        self.props.onAttachClicked();
+	                    }
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                }
+	            });
+	        } else if (folderIsHighlighted) {
+	            buttons.push({
+	                "label": self.props.openLabel,
+	                "key": "select",
+	                "className": "default-grey-button",
+	                "onClick": function onClick(e) {
+	                    if (self.state.highlighted.length > 0) {
+	                        self.setState({ 'currentlyViewedEntry': self.state.highlighted[0]
+	                        });
+	                        self.onSelected([]);
+	                        self.onHighlighted([]);
+	                        self.browserEntries.setState({
+	                            'selected': [],
+	                            'highlighted': []
+	                        });
+	                    }
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                }
+	            });
+	        }
+
+	        buttons.push({
+	            "label": self.props.cancelLabel,
+	            "key": "cancel",
+	            "onClick": function onClick(e) {
+	                self.props.onClose(self);
+	                e.preventDefault();
+	                e.stopPropagation();
+	            }
+	        });
+
+	        return React.makeElement(
+	            ModalDialogsUI.ModalDialog,
+	            {
+	                title: __(l[8011]),
+	                className: classes,
+	                onClose: function onClose() {
+	                    self.props.onClose(self);
+	                },
+	                popupDidMount: self.onPopupDidMount,
+	                buttons: buttons },
+	            React.makeElement(
+	                "div",
+	                { className: "fm-breadcrumbs-block add-from-cloud" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "breadcrumbs-wrapper" },
+	                    breadcrumb,
+	                    React.makeElement("div", { className: "clear" })
+	                )
+	            ),
+	            React.makeElement(
+	                "table",
+	                { className: "grid-table-header fm-dialog-table" },
+	                React.makeElement(
+	                    "tbody",
+	                    null,
+	                    React.makeElement(
+	                        "tr",
+	                        null,
+	                        React.makeElement(BrowserCol, { id: "grid-header-star", sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
+	                        React.makeElement(BrowserCol, { id: "name", label: __(l[86]), sortBy: self.state.sortBy,
+	                            onClick: self.toggleSortBy }),
+	                        React.makeElement(BrowserCol, { id: "size", label: __(l[87]), sortBy: self.state.sortBy,
+	                            onClick: self.toggleSortBy }),
+	                        React.makeElement(BrowserCol, { id: "ts", label: __(l[16169]), sortBy: self.state.sortBy,
+	                            onClick: self.toggleSortBy })
+	                    )
+	                )
+	            ),
+	            React.makeElement(BrowserEntries, {
+	                isLoading: self.state.isLoading,
+	                currentlyViewedEntry: self.state.currentlyViewedEntry,
+	                entries: entries,
+	                onExpand: function onExpand(node) {
+	                    self.onSelected([]);
+	                    self.onHighlighted([]);
+	                    self.setState({ 'currentlyViewedEntry': node.h });
+	                },
+	                folderSelectNotAllowed: self.props.folderSelectNotAllowed,
+	                onSelected: self.onSelected,
+	                onHighlighted: self.onHighlighted,
+	                onAttachClicked: self.onAttachClicked,
+	                ref: function ref(browserEntries) {
+	                    self.browserEntries = browserEntries;
+	                }
+	            })
+	        );
+	    }
+	});
+
+	module.exports = window.CloudBrowserModalDialogUI = {
+	    CloudBrowserDialog: CloudBrowserDialog
+	};
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var utils = __webpack_require__(5);
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ButtonsUI = __webpack_require__(8);
@@ -6568,12 +7228,14 @@ React.makeElement = React['createElement'];
 	var DropdownsUI = __webpack_require__(9);
 	var ContactsUI = __webpack_require__(10);
 	var ConversationsUI = __webpack_require__(4);
-	var DropdownEmojiSelector = __webpack_require__(16).DropdownEmojiSelector;
+	var DropdownEmojiSelector = __webpack_require__(17).DropdownEmojiSelector;
+	var EmojiAutocomplete = __webpack_require__(18).EmojiAutocomplete;
 
 	var TypingArea = React.createClass({
 	    displayName: "TypingArea",
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
+	    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gi"),
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'textareaMaxHeight': "40%"
@@ -6583,6 +7245,7 @@ React.makeElement = React['createElement'];
 	        var initialText = this.props.initialText;
 
 	        return {
+	            emojiSearchQuery: false,
 	            typedMessage: initialText ? initialText : "",
 	            textareaHeight: 20
 	        };
@@ -6727,7 +7390,14 @@ React.makeElement = React['createElement'];
 	        var element = e.target;
 	        var val = $.trim(element.value);
 
+	        if (self.state.emojiSearchQuery) {
+	            return;
+	        }
 	        if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+
+	            if (e.isPropagationStopped() || e.isDefaultPrevented()) {
+	                return;
+	            }
 
 	            if (self.onConfirmTrigger(val) !== true) {
 	                self.setState({ typedMessage: "" });
@@ -6755,6 +7425,9 @@ React.makeElement = React['createElement'];
 	            e.stopPropagation();
 	            return;
 	        } else if (key === 13) {
+	            if (self.state.emojiSearchQuery) {
+	                return;
+	            }
 
 	            if (e.altKey) {
 	                var content = element.value;
@@ -6768,6 +7441,10 @@ React.makeElement = React['createElement'];
 	                e.preventDefault();
 	            }
 	        } else if (key === 38) {
+	            if (self.state.emojiSearchQuery) {
+	                return;
+	            }
+
 	            if ($.trim(val).length === 0) {
 	                if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
 	                    e.preventDefault();
@@ -6775,10 +7452,65 @@ React.makeElement = React['createElement'];
 	                }
 	            }
 	        } else if (key === 27) {
+	            if (self.state.emojiSearchQuery) {
+	                return;
+	            }
+
 	            if (self.props.showButtons === true) {
 	                e.preventDefault();
 	                self.onCancelClicked(e);
 	                return;
+	            }
+	        } else {
+	            var char = String.fromCharCode(key);
+	            if (key === 16 || key === 17 || key === 18 || key === 91 || key === 8 || key === 37 || key === 39 || key === 40 || key === 38 || key === 9 || char.match(self.validEmojiCharacters)) {
+	                var currentContent = element.value;
+	                var currentCursorPos = self.getCursorPosition(element) - 1;
+
+	                var startPos = false;
+	                var endPos = false;
+
+	                var matchedWord = "";
+	                var currentChar;
+	                for (var x = currentCursorPos; x >= 0; x--) {
+	                    currentChar = currentContent.substr(x, 1);
+	                    if (currentChar && currentChar.match(self.validEmojiCharacters)) {
+	                        matchedWord = currentChar + matchedWord;
+	                    } else {
+	                        startPos = x + 1;
+	                        break;
+	                    }
+	                }
+
+	                for (var x = currentCursorPos + 1; x < currentContent.length; x++) {
+	                    currentChar = currentContent.substr(x, 1);
+	                    if (currentChar && currentChar.match(self.validEmojiCharacters)) {
+	                        matchedWord = matchedWord + currentChar;
+	                    } else {
+	                        endPos = x;
+	                        break;
+	                    }
+	                }
+
+	                if (matchedWord && matchedWord.length > 2 && matchedWord.substr(0, 1) === ":" && matchedWord.substr(-1) !== ":") {
+	                    self.setState({
+	                        'emojiSearchQuery': matchedWord,
+	                        'emojiStartPos': startPos ? startPos : 0,
+	                        'emojiEndPos': endPos ? endPos : startPos + matchedWord.length
+	                    });
+	                    return;
+	                } else {
+	                    if (self.state.emojiSearchQuery) {
+	                        self.setState({
+	                            'emojiSearchQuery': false,
+	                            'emojiStartPos': false,
+	                            'emojiEndPos': false
+	                        });
+	                    }
+	                }
+	            }
+	            if (self.state.emojiSearchQuery) {
+	                self.setState({ 'emojiSearchQuery': false });
 	            }
 	        }
 
@@ -6792,6 +7524,17 @@ React.makeElement = React['createElement'];
 	        }
 
 	        var self = this;
+
+	        if (self.state.emojiSearchQuery) {
+
+	            setTimeout(function () {
+	                self.setState({
+	                    'emojiSearchQuery': false,
+	                    'emojiStartPos': false,
+	                    'emojiEndPos': false
+	                });
+	            }, 300);
+	        }
 	    },
 	    onTypeAreaChange: function onTypeAreaChange(e) {
 	        if (this.props.disabled) {
@@ -6830,9 +7573,8 @@ React.makeElement = React['createElement'];
 
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
-	            if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
-
-	                moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
+	            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
+	                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
 	            }
 	        }
 	    },
@@ -6894,7 +7636,7 @@ React.makeElement = React['createElement'];
 	        var room = this.props.chatRoom;
 
 	        if (room.isCurrentlyActive && self.isMounted()) {
-	            if ($('textarea:focus,select:focus,input:focus').size() === 0) {
+	            if ($('textarea:focus,select:focus,input:focus').filter(":visible").size() === 0) {
 
 	                this.focusTypeArea();
 	            }
@@ -6908,7 +7650,7 @@ React.makeElement = React['createElement'];
 	        }
 	        if (self.onUpdateCursorPosition) {
 	            var $container = $(ReactDOM.findDOMNode(this));
-	            var el = $('.chat-textarea:visible textarea:visible', $container)[0];
+	            var el = $('.chat-textarea:visible:first textarea:visible', $container)[0];
 	            el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
 	            self.onUpdateCursorPosition = false;
 	        }
@@ -6995,11 +7737,11 @@ React.makeElement = React['createElement'];
 	            $textareaScrollBlock.jScrollPane({
 	                enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false
 	            });
-	            var textareaWasFocused = $textarea.is(":focus");
+	            var textareaIsFocused = $textarea.is(":focus");
 	            jsp = $textareaScrollBlock.data('jsp');
 
-	            if (textareaWasFocused) {
-	                moveCursortoToEnd($('textarea:first', $node)[0]);
+	            if (!textareaIsFocused) {
+	                moveCursortoToEnd($('textarea:visible:first', $node)[0]);
 	            }
 	        }
 
@@ -7008,7 +7750,21 @@ React.makeElement = React['createElement'];
 
 	        $textareaScrollBlock.height(Math.min(textareaCloneHeight, textareaMaxHeight));
 
+	        var textareaWasFocusedBeforeReinit = $textarea.is(":focus");
+	        var selectionPos = false;
+	        if (textareaWasFocusedBeforeReinit) {
+	            selectionPos = [$textarea[0].selectionStart, $textarea[0].selectionEnd];
+	        }
+
 	        jsp.reinitialise();
+
+	        $textarea = $('textarea:first', $node);
+
+	        if (textareaWasFocusedBeforeReinit) {
+
+	            $textarea[0].selectionStart = selectionPos[0];
+	            $textarea[0].selectionEnd = selectionPos[1];
+	        }
 
 	        if (textareaCloneHeight > textareaMaxHeight && textareaCloneSpanHeight < textareaMaxHeight) {
 	            jsp.scrollToY(0);
@@ -7101,12 +7857,40 @@ React.makeElement = React['createElement'];
 	            height: Math.min(self.state.textareaHeight, self.getTextareaMaxHeight())
 	        };
 
+	        var emojiAutocomplete = null;
+	        if (self.state.emojiSearchQuery) {
+	            emojiAutocomplete = React.makeElement(EmojiAutocomplete, {
+	                emojiSearchQuery: self.state.emojiSearchQuery,
+	                onSelect: function onSelect(e, emojiAlias) {
+	                    if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
+	                        var msg = self.state.typedMessage;
+	                        var pre = msg.substr(0, self.state.emojiStartPos);
+	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+	                        self.setState({
+	                            'typedMessage': pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " "),
+	                            'emojiSearchQuery': false,
+	                            'emojiStartPos': false,
+	                            'emojiEndPos': false
+	                        });
+	                    }
+	                },
+	                onCancel: function onCancel() {
+	                    self.setState({
+	                        'emojiSearchQuery': false,
+	                        'emojiStartPos': false,
+	                        'emojiEndPos': false
+	                    });
+	                }
+	            });
+	        }
+
 	        return React.makeElement(
 	            "div",
 	            { className: "typingarea-component" + self.props.className },
 	            React.makeElement(
 	                "div",
 	                { className: "chat-textarea " + self.props.className },
+	                emojiAutocomplete,
 	                React.makeElement("i", { className: self.props.iconClass ? self.props.iconClass : "small-icon conversations" }),
 	                React.makeElement(
 	                    "div",
@@ -7157,7 +7941,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7276,8 +8060,6 @@ React.makeElement = React['createElement'];
 	        );
 	    },
 	    componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
-	        window.$emojiDropdown = this;
-
 	        if (nextState.searchValue !== this.state.searchValue || nextState.browsingCategories !== this.state.browsingCategories) {
 	            this._cachedNodes = {};
 	            if (this.scrollableArea) {
@@ -7661,7 +8443,234 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 17 */
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ButtonsUI = __webpack_require__(8);
+
+	var EmojiAutocomplete = React.createClass({
+	    displayName: "EmojiAutocomplete",
+
+	    mixins: [MegaRenderMixin],
+	    data_emojis: null,
+	    getDefaultProps: function getDefaultProps() {
+	        return {
+	            'requiresUpdateOnResize': true,
+	            'emojiSearchQuery': false,
+	            'disableCheckingVisibility': true,
+	            'maxEmojis': 12
+	        };
+	    },
+	    getInitialState: function getInitialState() {
+	        return {
+	            'selected': 0
+	        };
+	    },
+
+	    preload_emojis: function preload_emojis() {
+	        var self = this;
+	        if (!self.loadingPromise) {
+	            self.loadingPromise = megaChat.getEmojiDataSet('emojis').done(function (emojis) {
+	                Soon(function () {
+	                    self.data_emojis = emojis;
+	                    self.safeForceUpdate();
+	                });
+	            });
+	        };
+	    },
+	    unbindKeyEvents: function unbindKeyEvents() {
+	        $(document).unbind('keydown.emojiAutocomplete' + this.getUniqueId());
+	    },
+	    bindKeyEvents: function bindKeyEvents() {
+	        var self = this;
+	        $(document).rebind('keydown.emojiAutocomplete' + self.getUniqueId(), function (e) {
+	            if (!self.props.emojiSearchQuery) {
+	                self.unbindKeyEvents();
+	                return;
+	            }
+
+	            var key = e.keyCode || e.which;
+
+	            if (!$(e.target).is("textarea")) {
+	                console.error("this should never happen.");
+	                return;
+	            }
+
+	            var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
+	            var handled = false;
+	            if (key === 37 || key === 38) {
+
+	                selected = selected - 1;
+	                selected = selected < 0 ? self.maxFound - 1 : selected;
+	                self.setState({ 'selected': selected });
+	                handled = true;
+	            } else if (key === 39 || key === 40 || key === 9) {
+
+	                selected = selected + 1;
+	                selected = selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ? 0 : selected;
+	                self.setState({ 'selected': selected });
+	                handled = true;
+	            } else if (key === 13) {
+
+	                self.unbindKeyEvents();
+	                self.props.onSelect(false, ":" + self.found[selected].n + ":");
+	                handled = true;
+	            } else if (key === 27) {
+
+	                self.unbindKeyEvents();
+	                self.props.onCancel();
+	                handled = true;
+	            }
+
+	            if (handled) {
+	                e.preventDefault();
+	                e.stopPropagation();
+	                return false;
+	            }
+	        });
+	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        if (!this.props.emojiSearchQuery) {
+	            this.unbindKeyEvents();
+	        } else {
+	            this.bindKeyEvents();
+	        }
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        this.unbindKeyEvents();
+	    },
+	    render: function render() {
+	        var self = this;
+	        if (!self.props.emojiSearchQuery) {
+	            return null;
+	        }
+
+	        self.preload_emojis();
+
+	        if (self.loadingPromise && self.loadingPromise.state() === 'pending') {
+	            return React.makeElement(
+	                "div",
+	                { className: "textarea-autofill-bl" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "textarea-autofill-info" },
+	                    l[5533]
+	                )
+	            );
+	        }
+
+	        var q = self.props.emojiSearchQuery.substr(1, self.props.emojiSearchQuery.length);
+
+	        var exactMatch = [];
+	        var partialMatch = [];
+	        var emojis = self.data_emojis || [];
+	        for (var i = 0; i < emojis.length; i++) {
+	            var emoji = emojis[i];
+	            var match = emoji.n.indexOf(q);
+	            if (match !== -1) {
+	                if (match === 0) {
+	                    exactMatch.push(emoji);
+	                } else if (partialMatch.length < self.props.maxEmojis - exactMatch.length) {
+	                    partialMatch.push(emoji);
+	                }
+	            }
+	            if (exactMatch.length >= self.props.maxEmojis) {
+	                break;
+	            }
+	        };
+
+	        var found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
+
+	        exactMatch = partialMatch = null;
+
+	        this.maxFound = found.length;
+	        this.found = found;
+
+	        if (!found || found.length === 0) {
+	            return null;
+	        }
+
+	        var emojisDomList = [];
+
+	        for (var i = 0; i < found.length; i++) {
+	            var meta = found[i];
+	            var filename = twemoji.convert.toCodePoint(meta.u);
+
+	            emojisDomList.push(React.makeElement(
+	                "div",
+	                { className: "emoji-preview shadow " + (this.state.selected === i ? "active" : ""),
+	                    key: meta.n + "_" + (this.state.selected === i ? "selected" : "inselected"),
+	                    title: ":" + meta.n + ":",
+	                    onClick: function onClick(e) {
+	                        self.props.onSelect(e, e.target.title);
+	                        self.unbindKeyEvents();
+	                    } },
+	                React.makeElement("img", {
+	                    width: "20",
+	                    height: "20",
+	                    className: "emoji emoji-loading",
+	                    draggable: "false",
+	                    alt: meta.u,
+	                    onLoad: function onLoad(e) {
+	                        e.target.classList.remove('emoji-loading');
+	                    },
+	                    onError: function onError(e) {
+	                        e.target.classList.remove('emoji-loading');
+	                        e.target.classList.add('emoji-loading-error');
+	                    },
+	                    src: staticpath + "images/mega/twemojis/2_v2/72x72/" + filename + ".png"
+	                }),
+	                React.makeElement(
+	                    "div",
+	                    { className: "emoji title" },
+	                    ":" + meta.n + ":"
+	                )
+	            ));
+	        }
+
+	        return React.makeElement(
+	            "div",
+	            { className: "textarea-autofill-bl" },
+	            React.makeElement(
+	                "div",
+	                { className: "textarea-autofill-info" },
+	                React.makeElement(
+	                    "strong",
+	                    null,
+	                    "tab"
+	                ),
+	                " or  ",
+	                React.makeElement("i", { className: "small-icon tab-icon" }),
+	                " to navigate",
+	                React.makeElement("i", { className: "small-icon enter-icon left-pad" }),
+	                " to select ",
+	                React.makeElement(
+	                    "strong",
+	                    { className: "left-pad" },
+	                    "esc"
+	                ),
+	                "to dismiss"
+	            ),
+	            React.makeElement(
+	                "div",
+	                { className: "textarea-autofill-emoji" },
+	                emojisDomList
+	            )
+	        );
+	    }
+	});
+
+	module.exports = {
+	    EmojiAutocomplete: EmojiAutocomplete
+	};
+
+/***/ }),
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7737,8 +8746,13 @@ React.makeElement = React['createElement'];
 
 	        if (Object.keys(self.state.currentlyTyping).length > 0) {
 	            var names = Object.keys(self.state.currentlyTyping).map(function (u_h) {
-	                var avatarMeta = generateAvatarMeta(u_h);
-	                return avatarMeta.fullName.split(" ")[0];
+	                var contact = M.u[u_h];
+	                if (contact && contact.firstName) {
+	                    return contact.firstName;
+	                } else {
+	                    var avatarMeta = generateAvatarMeta(u_h);
+	                    return avatarMeta.fullName.split(" ")[0];
+	                }
 	            });
 
 	            var namesDisplay = "";
@@ -7787,7 +8801,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -7811,19 +8825,25 @@ React.makeElement = React['createElement'];
 	                'call-missed': l[7210],
 	                'call-rejected': l[5892],
 	                'call-canceled': l[5894],
-	                'call-started': l[5888]
+	                'call-started': l[5888],
+	                'alterParticipants': undefined,
+	                'privilegeChange': l[8915],
+	                'truncated': l[8905]
+
 	            };
 	        }
 	        return MESSAGE_STRINGS[type];
 	    };
 	})();
 
+	mega.ui.chat.getMessageString = getMessageString;
+
 	module.exports = {
 	    getMessageString: getMessageString
 	};
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8012,13 +9032,17 @@ React.makeElement = React['createElement'];
 	                var dropdowns = [];
 	                var privilege = null;
 
-	                var dropdownIconClasses = "small-icon tiny-icon grey-down-arrow";
+	                var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
 
 	                if (room.type === "group" && room.members && myPresence !== 'offline') {
-	                    var removeParticipantButton = React.makeElement(DropdownsUI.DropdownItem, {
-	                        key: "remove", icon: "rounded-stop", label: __(l[8867]), onClick: function onClick() {
-	                            $(room).trigger('onRemoveUserRequest', [contactHash]);
-	                        } });
+	                    var removeParticipantButton = null;
+
+	                    if (room.iAmOperator() && contactHash !== u_handle) {
+	                        removeParticipantButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                            key: "remove", icon: "rounded-stop", label: __(l[8867]), onClick: function onClick() {
+	                                $(room).trigger('onRemoveUserRequest', [contactHash]);
+	                            } });
+	                    }
 
 	                    if (room.iAmOperator() || contactHash === u_handle) {
 
@@ -8068,7 +9092,7 @@ React.makeElement = React['createElement'];
 	                        dropdownIconClasses = "small-icon eye-icon";
 	                    } else {}
 
-	                    if (contactHash !== u_handle) {
+	                    if (contactHash !== u_handle && room.iAmOperator()) {
 	                        dropdowns.push(removeParticipantButton);
 	                    }
 	                }
@@ -8081,7 +9105,7 @@ React.makeElement = React['createElement'];
 	                    dropdownPositionMy: "right top",
 	                    dropdownPositionAt: "right bottom",
 	                    dropdowns: dropdowns,
-	                    dropdownDisabled: !room.iAmOperator() || contactHash === u_handle,
+	                    dropdownDisabled: contactHash === u_handle,
 	                    dropdownButtonClasses: room.type == "group" && myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button",
 	                    dropdownIconClasses: dropdownIconClasses,
 	                    style: {
@@ -8107,19 +9131,21 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(2);
 	var utils = __webpack_require__(5);
-	var getMessageString = __webpack_require__(18).getMessageString;
-	var ConversationMessageMixin = __webpack_require__(21).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
 	var ContactsUI = __webpack_require__(10);
-	var TypingAreaUI = __webpack_require__(15);
+	var TypingAreaUI = __webpack_require__(16);
 
 	var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
+
+	var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
 
 	var GenericConversationMessage = React.createClass({
 	    displayName: 'GenericConversationMessage',
@@ -8127,13 +9153,15 @@ React.makeElement = React['createElement'];
 	    mixins: [ConversationMessageMixin],
 	    getInitialState: function getInitialState() {
 	        return {
-	            'editing': false
+	            'editing': this.props.editing
 	        };
 	    },
-	    componentWillUpdate: function componentWillUpdate(nextProps, nextState) {},
+	    isBeingEdited: function isBeingEdited() {
+	        return this.state.editing === true || this.props.editing === true;
+	    },
 	    componentDidUpdate: function componentDidUpdate(oldProps, oldState) {
 	        var self = this;
-	        if (self.state.editing === true && self.isMounted()) {
+	        if (self.isBeingEdited() && self.isMounted()) {
 	            var $generic = $(self.findDOMNode());
 	            var $textarea = $('textarea', $generic);
 	            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
@@ -8145,26 +9173,11 @@ React.makeElement = React['createElement'];
 	                    self.props.onEditStarted($generic);
 	                }
 	            }
-	        } else if (self.isMounted() && self.state.editing === false && oldState.editing === true) {
+	        } else if (self.isMounted() && !self.isBeingEdited() && oldState.editing === true) {
 	            if (self.props.onUpdate) {
 	                self.props.onUpdate();
 	            }
 	        }
-	        var $node = $(self.findDOMNode());
-	        $node.rebind('onEditRequest.genericMessage', function (e) {
-	            if (self.state.editing === false) {
-	                self.setState({ 'editing': true });
-
-	                Soon(function () {
-	                    var $generic = $(self.findDOMNode());
-	                    var $textarea = $('textarea', $generic);
-	                    if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-	                        $textarea.focus();
-	                        moveCursortoToEnd($textarea[0]);
-	                    }
-	                });
-	            }
-	        });
 	        $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function () {
 	            Soon(function () {
 	                if (self.isMounted()) {
@@ -8173,11 +9186,58 @@ React.makeElement = React['createElement'];
 	            });
 	        });
 	    },
+	    componentDidMount: function componentDidMount() {
+	        var self = this;
+	        var $node = $(self.findDOMNode());
+
+	        if (self.isBeingEdited() && self.isMounted()) {
+	            var $generic = $(self.findDOMNode());
+	            var $textarea = $('textarea', $generic);
+	            if ($textarea.size() > 0 && !$textarea.is(":focus")) {
+	                $textarea.focus();
+	                moveCursortoToEnd($textarea[0]);
+	            }
+	        }
+
+	        $node.delegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut', function (e) {
+	            if (e.target.classList.contains('button')) {
+
+	                return;
+	            }
+
+	            var $block;
+	            if ($(e.target).is('.shared-data')) {
+	                $block = $(e.target);
+	            } else if ($(e.target).is('.shared-info') || $(e.target).parents('.shared-info').length > 0) {
+	                $block = $(e.target).is('.shared-info') ? $(e.target).next() : $(e.target).parents('.shared-info').next();
+	            } else {
+	                $block = $(e.target).parents('.message.shared-data');
+	            }
+
+	            Soon(function () {
+
+	                $('.button.default-white-button.tiny-button', $block).trigger('click');
+	            });
+	        });
+	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;
 	        var $node = $(self.findDOMNode());
-	        $node.unbind('onEditRequest.genericMessage');
+
 	        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
+	        $node.undelegate(CLICKABLE_ATTACHMENT_CLASSES, 'click.dropdownShortcut');
+	    },
+	    _nodeUpdated: function _nodeUpdated(h) {
+	        var self = this;
+
+	        Soon(function () {
+	            if (self.isMounted() && self.isComponentVisible()) {
+	                self.forceUpdate();
+	                if (self.dropdown) {
+	                    self.dropdown.forceUpdate();
+	                }
+	            }
+	        });
 	    },
 	    doDelete: function doDelete(e, msg) {
 	        e.preventDefault(e);
@@ -8210,6 +9270,105 @@ React.makeElement = React['createElement'];
 	            self.safeForceUpdate();
 	        });
 	    },
+	    _favourite: function _favourite(h) {
+	        var newFavState = Number(!M.isFavourite(h));
+	        M.favourite([h], newFavState);
+	    },
+	    _addFavouriteButtons: function _addFavouriteButtons(h, arr) {
+	        var self = this;
+
+	        if (M.getNodeRights(h) > 1) {
+	            var isFav = M.isFavourite(h);
+
+	            arr.push(React.makeElement(DropdownsUI.DropdownItem, { icon: "context " + (isFav ? "broken-heart" : "heart"),
+	                label: isFav ? l[5872] : l[5871],
+	                isFav: isFav,
+	                key: 'fav',
+	                onClick: function onClick(e) {
+	                    self._favourite(h);
+	                    e.stopPropagation();
+	                    e.preventDefault();
+	                    return false;
+	                } }));
+	            return isFav;
+	        } else {
+	            return false;
+	        }
+	    },
+	    _isNodeHavingALink: function _isNodeHavingALink(h) {
+	        return M.getNodeShare(h) !== false;
+	    },
+	    _addLinkButtons: function _addLinkButtons(h, arr) {
+	        var self = this;
+
+	        var haveLink = self._isNodeHavingALink(h) === true;
+
+	        var getManageLinkText = haveLink ? l[6909] : l[59];
+
+	        arr.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'icons-sprite chain',
+	            key: 'getLinkButton',
+	            label: getManageLinkText,
+	            onClick: self._getLink.bind(self, h)
+	        }));
+
+	        if (haveLink) {
+	            arr.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context remove-link',
+	                key: 'removeLinkButton',
+	                label: __(l[6821]),
+	                onClick: self._removeLink.bind(self, h)
+	            }));
+	            return true;
+	        } else {
+	            return false;
+	        }
+	    },
+	    _startDownload: function _startDownload(v) {
+	        M.addDownload([v]);
+	    },
+	    _addToCloudDrive: function _addToCloudDrive(v) {
+	        M.injectNodes(v, M.RootID, function (res) {
+	            if (res === 0) {
+	                msgDialog('info', __(l[8005]), __(l[8006]));
+	            }
+	        });
+	    },
+
+	    _getLink: function _getLink(h, e) {
+	        if (u_type === 0) {
+	            ephemeralDialog(l[1005]);
+	        } else {
+	            mega.Share.initCopyrightsDialog([h]);
+	        }
+	        if (e) {
+	            e.preventDefault();
+	            e.stopPropagation();
+	        }
+	    },
+	    _removeLink: function _removeLink(h, e) {
+	        if (u_type === 0) {
+	            ephemeralDialog(l[1005]);
+	        } else {
+	            var exportLink = new mega.Share.ExportLink({ 'updateUI': true, 'nodesToProcess': [h] });
+	            exportLink.removeExportLink();
+	        }
+
+	        if (e) {
+	            e.preventDefault();
+	            e.stopPropagation();
+	        }
+	    },
+
+	    _startPreview: function _startPreview(v, e) {
+	        var chatRoom = this.props.message.chatRoom;
+	        assert(M.chat, 'Not in chat.');
+	        M.v = chatRoom.images.values();
+	        slideshow(v.h);
+	        if (e) {
+	            e.preventDefault();
+	            e.stopPropagation();
+	        }
+	    },
+
 	    render: function render() {
 	        var self = this;
 
@@ -8287,7 +9446,7 @@ React.makeElement = React['createElement'];
 	                                clearTimeout(self._rerenderTimer);
 	                            }
 	                            self._rerenderTimer = setTimeout(function () {
-	                                if (message.sending === true) {
+	                                if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
 	                                    chatRoom.messagesBuff.trackDataChange();
 	                                    if (self.isMounted()) {
 	                                        self.forceUpdate();
@@ -8313,7 +9472,7 @@ React.makeElement = React['createElement'];
 
 	            var displayName;
 	            if (contact) {
-	                displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	                displayName = generateAvatarMeta(contact.u).fullName;
 	            } else {
 	                displayName = contact;
 	            }
@@ -8333,10 +9492,10 @@ React.makeElement = React['createElement'];
 
 	                    var files = [];
 
+	                    self.attachments = [];
+
 	                    attachmentMeta.forEach(function (v, attachmentKey) {
-	                        var startDownload = function startDownload() {
-	                            M.addDownload([v]);
-	                        };
+	                        self.attachments.push(v);
 
 	                        var attachmentMetaInfo;
 
@@ -8349,91 +9508,106 @@ React.makeElement = React['createElement'];
 	                            }
 	                        }
 
-	                        var addToCloudDrive = function addToCloudDrive() {
-	                            M.injectNodes(v, M.RootID, function (res) {
-	                                if (res === 0) {
-	                                    msgDialog('info', __(l[8005]), __(l[8006]));
-	                                }
-	                            });
-	                        };
-
-	                        var startPreview = function startPreview(e) {
-	                            assert(M.chat, 'Not in chat.');
-	                            M.v = chatRoom.images.values();
-	                            slideshow(v.h);
-	                            if (e) {
-	                                e.preventDefault();
-	                                e.stopPropagation();
-	                            }
-	                        };
-
 	                        var icon = fileIcon(v);
 
 	                        var dropdown = null;
-	                        var previewButtons = null;
+	                        var previewButton = null;
 
 	                        if (!attachmentMetaInfo.revoked) {
-	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
 	                                var imagesListKey = message.messageId + "_" + v.h;
 	                                if (!chatRoom.images.exists(imagesListKey)) {
 	                                    v.id = imagesListKey;
 	                                    v.delay = message.delay;
 	                                    chatRoom.images.push(v);
 	                                }
-	                                previewButtons = React.makeElement(
+	                                previewButton = React.makeElement(
 	                                    'span',
-	                                    null,
+	                                    { key: 'previewButton' },
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: __(l[1899]),
-	                                        onClick: startPreview }),
+	                                        onClick: self._startPreview.bind(self, v) }),
 	                                    React.makeElement('hr', null)
 	                                );
 	                            }
 	                            if (contact.u === u_handle) {
-	                                var revokeButton = null;
-
-	                                if (message.isEditable && message.isEditable()) {
-	                                    revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __(l[8909]),
-	                                        className: 'red', onClick: function onClick() {
-	                                            chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId ? message.internalId : message.orderValue, "");
-	                                        } });
-	                                }
 	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
 	                                        className: 'default-white-button tiny-button',
-	                                        icon: 'tiny-icon grey-down-arrow' },
-	                                    React.makeElement(
-	                                        DropdownsUI.Dropdown,
-	                                        {
-	                                            className: 'white-context-menu attachments-dropdown',
-	                                            noArrow: true,
-	                                            positionMy: 'left bottom',
-	                                            positionAt: 'right bottom',
-	                                            horizOffset: 4
+	                                        icon: 'tiny-icon icons-sprite grey-dots' },
+	                                    React.makeElement(DropdownsUI.Dropdown, {
+	                                        ref: function ref(refObj) {
+	                                            self.dropdown = refObj;
 	                                        },
-	                                        previewButtons,
-	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
-	                                            onClick: startDownload }),
-	                                        revokeButton ? React.makeElement('hr', null) : "",
-	                                        revokeButton
-	                                    )
+	                                        className: 'white-context-menu attachments-dropdown',
+	                                        noArrow: true,
+	                                        positionMy: 'left top',
+	                                        positionAt: 'left bottom',
+	                                        horizOffset: -4,
+	                                        vertOffset: 3,
+	                                        onBeforeActiveChange: function onBeforeActiveChange(newState) {
+	                                            if (newState === true) {
+	                                                self.forceUpdate();
+	                                            }
+	                                        },
+	                                        dropdownItemGenerator: function dropdownItemGenerator(dd) {
+	                                            var linkButtons = [];
+	                                            var firstGroupOfButtons = [];
+	                                            var revokeButton = null;
+	                                            if (message.isEditable && message.isEditable()) {
+	                                                revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross',
+	                                                    label: __(l[83]), className: 'red', onClick: function onClick() {
+	                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId ? message.internalId : message.orderValue, "");
+	                                                    } });
+	                                            }
+
+	                                            self._addLinkButtons(v.h, linkButtons);
+
+	                                            firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
+	                                                key: 'infoDialog',
+	                                                onClick: function onClick() {
+	                                                    $.selected = [v.h];
+	                                                    propertiesDialog();
+	                                                } }));
+
+	                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+
+	                                            return React.makeElement(
+	                                                'div',
+	                                                null,
+	                                                previewButton,
+	                                                firstGroupOfButtons,
+	                                                firstGroupOfButtons && firstGroupOfButtons.length > 0 ? React.makeElement('hr', null) : "",
+	                                                React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
+	                                                    onClick: self._startDownload.bind(self, v) }),
+	                                                linkButtons,
+	                                                revokeButton ? React.makeElement('hr', null) : "",
+	                                                revokeButton
+	                                            );
+	                                        }
+	                                    })
 	                                );
 	                            } else {
 	                                dropdown = React.makeElement(
 	                                    ButtonsUI.Button,
 	                                    {
 	                                        className: 'default-white-button tiny-button',
-	                                        icon: 'tiny-icon grey-down-arrow' },
+	                                        icon: 'tiny-icon icons-sprite grey-dots' },
 	                                    React.makeElement(
 	                                        DropdownsUI.Dropdown,
 	                                        {
-	                                            className: 'attachments-dropdown'
+	                                            className: 'white-context-menu attachments-dropdown',
+	                                            noArrow: true,
+	                                            positionMy: 'left top',
+	                                            positionAt: 'left bottom',
+	                                            horizOffset: -4,
+	                                            vertOffset: 3
 	                                        },
-	                                        previewButtons,
+	                                        previewButton,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
-	                                            onClick: startDownload }),
+	                                            onClick: self._startDownload.bind(self, v) }),
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[8005]),
-	                                            onClick: addToCloudDrive })
+	                                            onClick: self._addToCloudDrive.bind(self, v) })
 	                                    )
 	                                );
 	                            }
@@ -8456,7 +9630,7 @@ React.makeElement = React['createElement'];
 	                        );
 
 	                        if (M.chat && !message.revoked) {
-	                            if (v.fa && (icon === "graphic" || icon === "image")) {
+	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
 	                                var src = thumbnails[v.h];
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);
@@ -8476,17 +9650,17 @@ React.makeElement = React['createElement'];
 	                                preview = src ? React.makeElement(
 	                                    'div',
 	                                    { id: v.imgId, className: 'shared-link img-block' },
-	                                    React.makeElement('div', { className: 'img-overlay', onClick: startPreview }),
+	                                    React.makeElement('div', { className: 'img-overlay', onClick: self._startPreview.bind(self, v) }),
 	                                    React.makeElement(
 	                                        'div',
-	                                        { className: 'button overlay-button', onClick: startPreview },
+	                                        { className: 'button overlay-button', onClick: self._startPreview.bind(self, v) },
 	                                        React.makeElement('i', { className: 'huge-white-icon loupe' })
 	                                    ),
 	                                    dropdown,
 	                                    React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
 	                                        width: '156',
 	                                        height: '156',
-	                                        onClick: startPreview
+	                                        onClick: self._startPreview.bind(self, v)
 	                                    })
 	                                ) : preview;
 	                            }
@@ -8575,7 +9749,7 @@ React.makeElement = React['createElement'];
 	                        if (message.userId === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT) {
 	                            deleteButtonOptional = React.makeElement(DropdownsUI.DropdownItem, {
 	                                icon: 'red-cross',
-	                                label: __(l[1730]),
+	                                label: l[83],
 	                                className: 'red',
 	                                onClick: function onClick(e) {
 	                                    self.doDelete(e, message);
@@ -8601,7 +9775,7 @@ React.makeElement = React['createElement'];
 	                                ButtonsUI.Button,
 	                                {
 	                                    className: 'default-white-button tiny-button',
-	                                    icon: 'tiny-icon grey-down-arrow' },
+	                                    icon: 'tiny-icon icons-sprite grey-dots' },
 	                                React.makeElement(
 	                                    DropdownsUI.Dropdown,
 	                                    {
@@ -8636,7 +9810,7 @@ React.makeElement = React['createElement'];
 	                                ButtonsUI.Button,
 	                                {
 	                                    className: 'default-white-button tiny-button',
-	                                    icon: 'tiny-icon grey-down-arrow' },
+	                                    icon: 'tiny-icon icons-sprite grey-dots' },
 	                                React.makeElement(
 	                                    DropdownsUI.Dropdown,
 	                                    {
@@ -8763,7 +9937,7 @@ React.makeElement = React['createElement'];
 	                }
 	            } else {
 
-	                if (message.textContents === "") {
+	                if (message.textContents === "" && !message.dialogType) {
 	                    message.deleted = true;
 	                }
 	                var messageActionButtons = null;
@@ -8779,7 +9953,7 @@ React.makeElement = React['createElement'];
 	                                React.makeElement('i', { className: 'small-icon yellow-triangle' })
 	                            );
 	                        } else {
-	                            if (self.state.editing !== true) {
+	                            if (self.isBeingEdited() !== true) {
 	                                messageNotSendIndicator = React.makeElement(
 	                                    'div',
 	                                    { className: 'not-sent-indicator' },
@@ -8830,7 +10004,7 @@ React.makeElement = React['createElement'];
 	                }
 
 	                var messageDisplayBlock;
-	                if (self.state.editing === true) {
+	                if (self.isBeingEdited() === true) {
 	                    var msgContents = message.textContents;
 	                    msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
 
@@ -8855,7 +10029,9 @@ React.makeElement = React['createElement'];
 	                                    };
 	                                    megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
 	                                    self.props.onEditDone(tmpMessageObj.textContents);
-	                                    self.forceUpdate();
+	                                    if (self.isMounted()) {
+	                                        self.forceUpdate();
+	                                    }
 	                                });
 	                            }
 
@@ -8879,12 +10055,12 @@ React.makeElement = React['createElement'];
 	                    }
 	                }
 	                if (!message.deleted) {
-	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
+	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.isBeingEdited() !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
 	                        messageActionButtons = React.makeElement(
 	                            ButtonsUI.Button,
 	                            {
 	                                className: 'default-white-button tiny-button',
-	                                icon: 'tiny-icon grey-down-arrow' },
+	                                icon: 'tiny-icon icons-sprite grey-dots' },
 	                            React.makeElement(
 	                                DropdownsUI.Dropdown,
 	                                {
@@ -8940,8 +10116,7 @@ React.makeElement = React['createElement'];
 	            textMessage = getMessageString(message.type);
 	            if (!textMessage) {
 	                console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
-	                debugger;
-	                throw new Error("boom");
+	                return;
 	            }
 
 	            if (textMessage.splice) {
@@ -9050,7 +10225,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9068,8 +10243,12 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.message.chatRoom;
 	        var megaChat = chatRoom.megaChat;
 	        var contact = self.getContact();
-	        if (contact && contact.addChangeListener) {
-	            self._contactChangeListener = contact.addChangeListener(function () {
+	        if (contact && contact.addChangeListener && !self._contactChangeListener) {
+	            self._contactChangeListener = contact.addChangeListener(function (contact, oldData, k, v) {
+	                if (k === "ts") {
+
+	                    return;
+	                }
 	                self.debouncedForceUpdate();
 	            });
 	        }
@@ -9084,35 +10263,8 @@ React.makeElement = React['createElement'];
 	    },
 	    getContact: function getContact() {
 	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
 
-	        var contact;
-	        if (message.authorContact) {
-	            contact = message.authorContact;
-	        } else if (message.meta && message.meta.userId) {
-	            contact = M.u[message.meta.userId];
-	            if (!contact) {
-	                return {
-	                    'u': message.meta.userId,
-	                    'h': message.meta.userId,
-	                    'c': 0
-	                };
-	            }
-	        } else if (message.userId) {
-	            if (!M.u[message.userId]) {
-
-	                return null;
-	            }
-	            contact = M.u[message.userId];
-	        } else if (message.getFromJid) {
-	            contact = megaChat.getContactFromJid(message.getFromJid());
-	        } else {
-	            console.error("No idea how to render this: ", this.props);
-
-	            return {};
-	        }
-
-	        return contact;
+	        return Message.getContactForMessage(message);
 	    },
 	    getTimestampAsString: function getTimestampAsString() {
 	        return unixtimeToTimeString(this.getTimestamp());
@@ -9128,6 +10280,9 @@ React.makeElement = React['createElement'];
 	            timestampInt = unixtime();
 	        }
 
+	        if (timestampInt && message.updated && message.updated > 0) {
+	            timestampInt += message.updated;
+	        }
 	        return timestampInt;
 	    },
 	    getParentJsp: function getParentJsp() {
@@ -9160,7 +10315,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9170,14 +10325,34 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(10);
-	var ConversationMessageMixin = __webpack_require__(21).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(18).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
 
 	var AlterParticipantsConversationMessage = React.createClass({
 	    displayName: "AlterParticipantsConversationMessage",
 
 	    mixins: [ConversationMessageMixin],
 
+	    _ensureNameIsLoaded: function _ensureNameIsLoaded(h) {
+	        var self = this;
+	        var contact = M.u[h] ? M.u[h] : {
+	            'u': h,
+	            'h': h,
+	            'c': 0
+	        };
+	        var displayName = generateAvatarMeta(contact.u).fullName;
+
+	        if (!displayName) {
+	            M.u.addChangeListener(function () {
+	                displayName = generateAvatarMeta(contact.u).fullName;
+	                if (displayName) {
+	                    self.safeForceUpdate();
+
+	                    return 0xDEAD;
+	                }
+	            });
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -9198,7 +10373,7 @@ React.makeElement = React['createElement'];
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	            displayName = generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }
@@ -9213,10 +10388,11 @@ React.makeElement = React['createElement'];
 	            };
 
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
-	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
+	            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
 	            var text = __(l[8907]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
+	            self._ensureNameIsLoaded(otherContact.u);
 	            messages.push(React.makeElement(
 	                "div",
 	                { className: "message body", "data-id": "id" + message.messageId, key: h },
@@ -9243,7 +10419,9 @@ React.makeElement = React['createElement'];
 	            };
 
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
-	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
+	            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+
+	            self._ensureNameIsLoaded(otherContact.u);
 
 	            var text;
 	            if (otherContact.u === contact.u) {
@@ -9283,7 +10461,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9293,8 +10471,8 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(10);
-	var ConversationMessageMixin = __webpack_require__(21).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(18).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
 
 	var TruncatedMessage = React.createClass({
 	    displayName: "TruncatedMessage",
@@ -9321,7 +10499,7 @@ React.makeElement = React['createElement'];
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	            displayName = generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }
@@ -9372,7 +10550,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9382,8 +10560,8 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(10);
-	var ConversationMessageMixin = __webpack_require__(21).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(18).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
 
 	var PrivilegeChange = React.createClass({
 	    displayName: "PrivilegeChange",
@@ -9410,7 +10588,7 @@ React.makeElement = React['createElement'];
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	            displayName = generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }
@@ -9424,7 +10602,7 @@ React.makeElement = React['createElement'];
 	        };
 
 	        var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
-	        var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
+	        var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
 	        var newPrivilegeText = "";
 	        if (message.meta.privilege === 3) {
@@ -9467,7 +10645,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9477,8 +10655,8 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(10);
-	var ConversationMessageMixin = __webpack_require__(21).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(18).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
 
 	var TopicChange = React.createClass({
 	    displayName: "TopicChange",
@@ -9505,7 +10683,7 @@ React.makeElement = React['createElement'];
 
 	        var displayName;
 	        if (contact) {
-	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
+	            displayName = generateAvatarMeta(contact.u).fullName;
 	        } else {
 	            displayName = contact;
 	        }
@@ -9548,12 +10726,12 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var utils = __webpack_require__(27);
+	var utils = __webpack_require__(29);
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(11);
 
@@ -9630,11 +10808,11 @@ React.makeElement = React['createElement'];
 
 	    this.isCurrentlyActive = false;
 
-	    this.bind('onStateChange', function (e, oldState, newState) {
-	        self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
-
-	        if (newState === ChatRoom.STATE.JOINING) {} else if (newState === ChatRoom.STATE.READY) {}
-	    });
+	    if (d) {
+	        this.bind('onStateChange', function (e, oldState, newState) {
+	            self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
+	        });
+	    }
 
 	    self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {
 	        var ts = msg.delay ? msg.delay : msg.ts;
@@ -9873,13 +11051,13 @@ React.makeElement = React['createElement'];
 	    return handlesWithoutMyself;
 	};
 
-	ChatRoom.prototype.getRoomTitle = function () {
+	ChatRoom.prototype.getRoomTitle = function (ignoreTopic) {
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
 	        return M.getNameByHandle(participants[0]) || "";
 	    } else {
-	        if (self.topic && self.topic.substr) {
+	        if (!ignoreTopic && self.topic && self.topic.substr) {
 	            return self.topic.substr(0, 30);
 	        }
 
@@ -9951,6 +11129,9 @@ React.makeElement = React['createElement'];
 	    var self = this;
 
 	    if (self.isCurrentlyActive) {
+	        if (!self.messagesBlockEnabled && self.callManagerCall && self.getUnreadCount() > 0) {
+	            $(self).trigger('toggleMessages');
+	        }
 	        return false;
 	    }
 	    self.megaChat.hideAllChats();
@@ -9979,6 +11160,12 @@ React.makeElement = React['createElement'];
 
 	    self.trigger('activity');
 	    self.trigger('onChatShown');
+
+	    Soon(function () {
+	        if (megaChat.$conversationsAppInstance) {
+	            megaChat.$conversationsAppInstance.safeForceUpdate();
+	        }
+	    });
 	};
 
 	ChatRoom.prototype.isActive = function () {
@@ -9991,6 +11178,12 @@ React.makeElement = React['createElement'];
 	    Soon(function () {
 	        loadSubPage(self.getRoomUrl());
 	    });
+	};
+
+	ChatRoom.prototype.isLoading = function () {
+	    var self = this;
+	    var mb = self.messagesBuff;
+	    return mb.messagesHistoryIsLoading() || mb.isDecrypting && mb.isDecrypting.state() === 'pending';
 	};
 
 	ChatRoom.prototype.getRoomUrl = function () {
@@ -10036,13 +11229,13 @@ React.makeElement = React['createElement'];
 	    }
 
 	    if (self.shownMessages[message.messageId]) {
-
 	        return false;
 	    }
 	    if (!message.orderValue) {
+	        var mb = self.messagesBuff;
 
-	        if (self.messages.length > 0) {
-	            var prevMsg = self.messagesBuff.messages.getItem(self.messages.length - 1);
+	        if (mb.messages.length > 0) {
+	            var prevMsg = mb.messages.getItem(mb.messages.length - 1);
 	            if (!prevMsg) {
 	                self.logger.error('self.messages got out of sync...maybe there are some previous JS exceptions that caused that? ' + 'note that messages may be displayed OUT OF ORDER in the UI.');
 	            } else {
@@ -10173,6 +11366,160 @@ React.makeElement = React['createElement'];
 	    return $masterPromise;
 	};
 
+	ChatRoom.prototype.lookupPendingUpload = function (faid, handle) {
+	    if (!this.pendingUploads) {
+	        return;
+	    }
+	    assert(faid || handle, 'lookupPendingUpload is missing both faid and handle args.');
+
+	    for (var uid in this.pendingUploads) {
+	        if (faid && this.pendingUploads[uid].faid === faid || handle && this.pendingUploads[uid].h === handle) {
+	            return uid;
+	        }
+	    }
+	};
+
+	ChatRoom.prototype.onUploadError = function (uid, error) {
+
+	    if (d) {
+	        var logger = MegaLogger.getLogger('onUploadEvent[' + this.roomId + ']');
+	        logger.debug(error === -0xDEADBEEF ? 'upload:abort' : 'upload.error', uid, error);
+	    }
+
+	    var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+
+	    if (ul) {
+	        delete this.pendingUploads[uid];
+	        if (Object.keys(this.pendingUploads).length === 0) {
+	            this.clearUploadListeners();
+	        }
+	    }
+	};
+
+	ChatRoom.prototype.onUploadStart = function (data) {
+	    var self = this;
+	    if (!self.pendingUploads) {
+	        self.pendingUploads = Object.create(null);
+	    }
+
+	    Object.assign(self.pendingUploads, data);
+
+	    if (!self.uploadListeners) {
+	        self.uploadListeners = [];
+	    }
+
+	    if (self.uploadListeners.length === 0) {
+	        var logger = d && MegaLogger.getLogger('onUploadEvent[' + self.roomId + ']');
+
+	        self.uploadListeners.push(mBroadcaster.addListener('upload:completion', function (uid, handle, faid, chat) {
+	            if (!chat) {
+	                return;
+	            }
+	            if (chat.indexOf("/" + self.roomId) === -1) {
+	                if (d) {
+	                    logger.debug('ignoring upload:completion that is unrelated to this chat.');
+	                }
+	            }
+
+	            var n = M.d[handle];
+	            var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+
+	            if (d) {
+	                logger.debug('upload:completion', uid, handle, faid, ul, n);
+	            }
+
+	            if (!ul || !n) {
+
+	                logger.error('Invalid state error...');
+	            } else {
+	                ul.h = handle;
+
+	                if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
+
+	                    ul.faid = faid;
+
+	                    if (d) {
+	                        logger.debug('Waiting for file attribute to arrive.', handle, ul);
+	                    }
+	                } else {
+
+	                    self.onUploadComplete(ul);
+	                }
+	            }
+	        }));
+
+	        self.uploadListeners.push(mBroadcaster.addListener('upload:error', self.onUploadError.bind(self)));
+	        self.uploadListeners.push(mBroadcaster.addListener('upload:abort', self.onUploadError.bind(self)));
+
+	        self.uploadListeners.push(mBroadcaster.addListener('fa:error', function (faid, error, onStorageAPIError, nFAiled) {
+	            var uid = self.lookupPendingUpload(faid, faid);
+	            var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+
+	            if (d) {
+	                logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul);
+	            }
+
+	            if (ul) {
+
+	                ul.efa = Math.max(0, ul.efa - nFAiled) | 0;
+
+	                if (ul.h) {
+
+	                    var n = M.d[ul.h] || false;
+
+	                    if (!ul.efa || n.fa && String(n.fa).split('/').length >= ul.efa) {
+	                        self.onUploadComplete(ul);
+	                    }
+	                }
+	            }
+	        }));
+
+	        self.uploadListeners.push(mBroadcaster.addListener('fa:ready', function (handle, fa) {
+	            delay('chat:fa-ready:' + handle, function () {
+	                var uid = self.lookupPendingUpload(false, handle);
+	                var ul = self.pendingUploads && self.pendingUploads[uid] || false;
+
+	                if (d) {
+	                    logger.debug('fa:ready', handle, fa, uid, ul);
+	                }
+
+	                if (ul.h && String(fa).split('/').length >= ul.efa) {
+
+	                    self.onUploadComplete(ul);
+	                } else if (d) {
+	                    logger.debug('Not enough file attributes yet, holding...', ul);
+	                }
+	            });
+	        }));
+	    }
+	};
+
+	ChatRoom.prototype.onUploadComplete = function (ul) {
+	    if (this.pendingUploads && this.pendingUploads[ul.uid]) {
+	        if (d) {
+	            console.debug('Attaching node to chat room...', ul.h, ul.uid, ul, M.d[ul.h]);
+	        }
+	        this.attachNodes([ul.h]);
+	        delete this.pendingUploads[ul.uid];
+	    }
+
+	    this.clearUploadListeners();
+	};
+
+	ChatRoom.prototype.clearUploadListeners = function () {
+	    if (!this.pendingUploads || Object.keys(this.pendingUploads).length === 0) {
+	        for (var i = 0; i < this.uploadListeners.length; i++) {
+	            var listenerId = this.uploadListeners[i];
+	            mBroadcaster.removeListener(listenerId);
+	        }
+	        this.uploadListeners = [];
+	    }
+	};
+
+	ChatRoom.prototype.uploadFromComputer = function () {
+	    $('#fileselect1').trigger('click');
+	};
+
 	ChatRoom.prototype.attachContacts = function (ids) {
 	    var self = this;
 
@@ -10287,11 +11634,49 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
+	ChatRoom.prototype.retrieveAllHistory = function () {
+	    var self = this;
+	    self.messagesBuff.retrieveChatHistory().done(function () {
+	        if (self.messagesBuff.haveMoreHistory()) {
+	            self.retrieveAllHistory();
+	        }
+	    });
+	};
+
+	ChatRoom.prototype.truncate = function () {
+	    var self = this;
+	    var chatMessages = self.messagesBuff.messages;
+	    if (chatMessages.length > 0) {
+	        var lastChatMessageId = null;
+	        var i = chatMessages.length - 1;
+	        while (lastChatMessageId == null && i >= 0) {
+	            var message = chatMessages.getItem(i);
+	            if (message instanceof Message && message.dialogType !== "truncated") {
+	                lastChatMessageId = message.messageId;
+	            }
+	            i--;
+	        }
+
+	        if (lastChatMessageId) {
+	            asyncApiReq({
+	                a: 'mct',
+	                id: self.chatId,
+	                m: lastChatMessageId,
+	                v: Chatd.VERSION
+	            }).fail(function (r) {
+	                if (r === -2) {
+	                    msgDialog('warninga', l[135], __(l[8880]));
+	                }
+	            });
+	        }
+	    }
+	};
+
 	window.ChatRoom = ChatRoom;
 	module.exports = ChatRoom;
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports) {
 
 	'use strict';

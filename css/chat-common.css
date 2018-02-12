@@ -105,10 +105,13 @@
     box-sizing: border-box;
 }
 .contacts-info .tiny-button {
-    margin: 10px 22px 0 0;
+    margin: 1px 0 0 0;
+    position: absolute;
+    right: -11px;
 }
-.contacts-info .tiny-button + .user-card-data {
-    padding-right: 40px;
+.contacts-info .user-card-data {
+    padding-right: 15px;
+    
 }
 .chat-right-area .buttons-block {
     border-top: 1px solid rgba(0,0,0,0.05);
@@ -155,6 +158,12 @@
 .contacts-info .icon-dropdown {
     margin: 5px 4px 0 0;
 }
+.contacts-info .icon-dropdown i {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
+    -moz-opacity: 0.73;
+    -khtml-opacity: 0.73;
+    opacity: 0.73;
+}
 .contacts-info .icon-dropdown + .user-card-data {
     padding-right: 46px;
 }
@@ -188,7 +197,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -o-transition: background-color 200ms ease-in-out;
     -ms-transition: background-color 200ms ease-in-out;
     transition: background-color 200ms ease-in-out;
-    background-image: url(../images/mega/nw-fm-sprite_v23.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v26.svg);
     background-position: 0 -2516px;
     background-repeat: no-repeat;
 }

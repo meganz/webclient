@@ -23,8 +23,6 @@ During development it's essential that your set the following
 ``localStorage`` parameters:
 
 ```
-// Path of your local development host.
-localStorage.staticpath = 'http://localhost/mega/';
 // Disables the cryptographic hash verification logic.
 localStorage.dd = 1;
 ```
@@ -40,6 +38,77 @@ localStorage.minLogLevel = 0;
 // Allows you to disable the context menu in the FM for element inspection.
 localStorage.contextmenu = 1;
 ```
+
+
+Local webclient setup instructions for Ubuntu (for MEGAchat see INSTALL.md)
+---------------------------------------------------------------------------
+
+1. Install Apache2:
+```
+sudo apt-get install apache2
+```
+
+2. Create a new virtual host configuration file:
+```
+sudo nano /etc/apache2/sites-available/webclient.conf
+```
+
+3. Edit the configuration file:
+```
+sudo nano /etc/apache2/sites-available/webclient.conf
+```
+
+4. Add the following and save the file:
+
+```
+<VirtualHost *:80>
+    ServerName webclient.local
+    ServerAdmin webmaster@webclient.local
+    DocumentRoot /var/www/html/webclient.local
+    ErrorLog /var/log/apache2/webclient.local.error.log
+    CustomLog /var/log/apache2/webclient.local.access.log combined
+    LogLevel warn
+
+    <Directory "/var/www/html/webclient.local">
+        AllowOverride All
+    </Directory>
+</VirtualHost>
+```
+
+5. Enable the config, also the rewrite and headers modules:
+```
+sudo a2ensite webclient.conf
+sudo a2enmod rewrite
+```
+
+6. Edit the hosts file:
+```
+sudo nano /etc/hosts
+```
+
+7. Add the following and save the file:
+```
+127.0.0.1       webclient.local
+```
+
+8. Restart the web server:
+```
+sudo systemctl restart apache2
+```
+
+9. Clone the repository:
+```
+cd /var/www/html/
+git clone git@code.developers.mega.co.nz:web/webclient.git webclient.local
+```
+
+10. Set permissions:
+```
+sudo chgrp -R www-data /var/www/html/
+sudo chown -R <your-username> /var/www/html/
+```
+
+11. Visit http://webclient.local in your browser.
 
 
 Directories

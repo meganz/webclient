@@ -17,8 +17,20 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         if (roomOrUserHash.substr(0, 2) === "g/") {
             roomType = "group";
             roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
+
             if (!megaChat.chats[roomOrUserHash]) {
                 // chat not found
+                // is it still loading?
+                if (
+                    ChatdIntegration._loadingChats[roomOrUserHash] &&
+                    ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.state() === 'pending'
+                ) {
+                    ChatdIntegration._loadingChats[roomOrUserHash].loadingPromise.done(function() {
+                        chatui(id);
+                    });
+                    return;
+                }
+
                 setTimeout(function () {
                     loadSubPage('fm/chat');
                     M.openFolder('chat');
@@ -39,7 +51,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
         }
         // XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
-        hideEmptyGrids();
+        M.hideEmptyGrids();
 
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
@@ -140,6 +152,7 @@ var Chat = function() {
          * Really simple plugin architecture
          */
         'plugins': {
+            'chatStats': ChatStats,
             'chatdIntegration': ChatdIntegration,
             'callManager': CallManager,
             'urlFilter': UrlFilter,
@@ -147,7 +160,8 @@ var Chat = function() {
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
             'presencedIntegration': PresencedIntegration,
-            'persistedTypeArea': PersistedTypeArea
+            'persistedTypeArea': PersistedTypeArea,
+            'rtfFilter': RtfFilter
         },
         'chatNotificationOptions': {
             'textMessages': {
@@ -410,19 +424,6 @@ Chat.prototype.init = function() {
         }
     });
 
-
-    $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {
-        if (ul_target.indexOf("chat/") > -1) {
-            var chatRoom = megaChat.getRoomFromUrlHash(ul_target);
-
-            if (!chatRoom) {
-                return;
-            }
-
-            chatRoom.attachNodes(uploads);
-        }
-    });
-
     $(document.body).delegate('.tooltip-trigger', 'mouseover.notsentindicator', function() {
         var $this = $(this),
             $notification = $('.tooltip.' + $(this).attr('data-tooltip')),
@@ -444,6 +445,23 @@ Chat.prototype.init = function() {
         // hide all tooltips
         var $notification = $('.tooltip');
         $notification.addClass('hidden').removeAttr('style');
+    });
+
+
+    mBroadcaster.addListener('upload:start', function(data) {
+        if (d) {
+            MegaLogger.getLogger('onUploadEvent').debug('upload:start', data);
+        }
+
+        for (var k in data) {
+            if (data[k].chat) {
+                var roomId = data[k].chat.replace("g/", "").split("/")[1];
+                if (self.chats[roomId]) {
+                    self.chats[roomId].onUploadStart(data);
+                    break;
+                }
+            }
+        }
     });
 
     self.trigger("onInit");
@@ -782,6 +800,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                 );
                 M.syncUsersFullname(contactHash);
                 self.processNewUser(contactHash);
+                M.syncContactEmail(contactHash);
             }
         });
     }
@@ -821,6 +840,44 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         self.currentlyOpenedChat = null;
     }
 
+    // chatRoom is still loading from mcf/fmdb
+    if (!chatId && ChatdIntegration._loadingChats[roomId]) {
+        // wait for it to load
+        ChatdIntegration._loadingChats[roomId].loadingPromise
+            .done(function() {
+                // already initialized ? other mcc action packet triggered init with the latest data for that chat?
+                if (self.chats[roomId]) {
+                    return;
+                }
+                var res = self.openChat(
+                    userHandles,
+                    ap.g === 1 ? "group" : "private",
+                    ap.id,
+                    ap.cs,
+                    ap.url,
+                    setAsActive
+                );
+
+                $promise.linkDoneAndFailTo(
+                    res[2]
+                );
+            })
+            .fail(function() {
+                $promise.reject(arguments[0]);
+            });
+
+        if (setAsActive) {
+            // store a flag, that would trigger a "setAsActive" for when the loading finishes
+            // e.g. cover the case of the user reloading on a group chat that is readonly now
+            ChatdIntegration._loadingChats[roomId].setAsActive = true;
+        }
+
+        return [roomId, undefined, $promise];
+    }
+
+
+    // chat room not found, create a new one
+
 
     var room = new ChatRoom(
         self,
@@ -840,6 +897,17 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
     );
 
     if (setAsActive && !self.currentlyOpenedChat) {
+        room.show();
+    }
+
+    // this is retry call, coming when the chat had just finished loading, with a previous call to .openChat with
+    // `setAsActive` === true
+    if (
+        setAsActive === false &&
+        chatId &&
+        ChatdIntegration._loadingChats[roomId] &&
+        ChatdIntegration._loadingChats[roomId].setAsActive
+    ) {
         room.show();
     }
 
@@ -1041,7 +1109,7 @@ Chat.prototype.renderListing = function() {
 
     self.hideAllChats();
 
-    hideEmptyGrids();
+    M.hideEmptyGrids();
 
     //$('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
     //$('.fm-tree-panel > .nw-tree-panel-header').hide();
@@ -1059,7 +1127,7 @@ Chat.prototype.renderListing = function() {
     M.onSectionUIOpen('conversations');
 
 
-    if (Object.keys(self.chats).length === 0) {
+    if (Object.keys(self.chats).length === 0 || Object.keys(ChatdIntegration._loadingChats).length !== 0) {
         $('.fm-empty-conversations').removeClass('hidden');
     }
     else {
@@ -1076,23 +1144,55 @@ Chat.prototype.renderListing = function() {
             return self.chats[self.lastOpenedChat];
         }
         else {
-            // show first chat from the conv. list
-
-            var sortedConversations = obj_values(self.chats.toJS());
-
-            sortedConversations.sort(M.sortObjFn("lastActivity", -1));
-
-            if (sortedConversations.length > 0) {
-                var room = sortedConversations[0];
-                room.setActive();
-                room.show();
-                return room;
+            if (self.chats.length > 0) {
+                return self.showLastActive();
             }
             else {
                 $('.fm-empty-conversations').removeClass('hidden');
             }
         }
     }
+};
+
+/**
+ * Show the last active chat room
+ * @returns {*}
+ */
+Chat.prototype.showLastActive = function() {
+    var self = this;
+
+    if (self.chats.length > 0 && self.allChatsHadLoadedHistory()) {
+        var sortedConversations = obj_values(self.chats.toJS());
+
+        sortedConversations.sort(M.sortObjFn("lastActivity", -1));
+
+        var room = sortedConversations[0];
+        if (!room.isActive()) {
+            room.setActive();
+            room.show();
+        }
+
+        return room;
+    }
+    else {
+        return false;
+    }
+};
+
+
+Chat.prototype.allChatsHadLoadedHistory = function() {
+    var self = this;
+
+    var chatIds = self.chats.keys();
+
+    for (var i = 0; i < chatIds.length; i++) {
+        var room = self.chats[chatIds[i]];
+        if (room.isLoading()) {
+            return false;
+        }
+    }
+
+    return true;
 };
 
 /**
@@ -1242,7 +1342,7 @@ Chat.prototype.getMyPresence = function() {
  * @returns {Number|undefined} UserPresence.PRESENCE.* or undefined for offline/unknown presence
  */
 Chat.prototype.getPresence = function(user_handle) {
-    if (this.plugins.presencedIntegration) {
+    if (user_handle && this.plugins.presencedIntegration) {
         return this.plugins.presencedIntegration.getPresence(user_handle);
     }
     else {

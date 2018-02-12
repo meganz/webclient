@@ -1204,12 +1204,9 @@ function api_setsid(sid) {
         if (typeof dlmanager === 'object') {
 
             if (!dlmanager.onOverquotaWithAchievements) {
-                if (dlmanager.isOverQuota) {
-
-                    if (!dlmanager.isOverFreeQuota) {
-                        dlmanager.uqFastTrack = 1;
-                        delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
-                    }
+                if (dlmanager.isOverQuota && !dlmanager.isOverFreeQuota) {
+                    dlmanager.uqFastTrack = !Object(u_attr).p;
+                    delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
                 }
 
                 if (typeof dlmanager.onLimitedBandwidth === 'function') {

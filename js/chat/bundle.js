@@ -5896,7 +5896,7 @@ React.makeElement = React['createElement'];
 	        return React.makeElement(
 	            ModalDialog,
 	            {
-	                title: __("Send Contact"),
+	                title: l[8628],
 	                className: classes,
 	                selected: self.state.selected,
 	                onClose: function onClose() {
@@ -7972,13 +7972,14 @@ React.makeElement = React['createElement'];
 	    },
 	    categoryLabels: {
 	        'people': l[8016],
-	        'objects': __('Objects'),
+	        'objects': l[17735],
 	        'activity': l[8020],
 	        'nature': l[8017],
 	        'travel': l[8021],
-	        'symbols': __('Symbols'),
+	        'symbols': l[17736],
 	        'food': l[8018],
-	        'flags': __('Flags')
+	        'flags': l[17703],
+	        'frequently_used': l[17737]
 	    },
 	    getDefaultProps: function getDefaultProps() {
 	        return {
@@ -8190,6 +8191,8 @@ React.makeElement = React['createElement'];
 	        if (emojis.length > 0) {
 	            var totalHeight = self.heightDefs.categoryTitleHeight + Math.ceil(totalEmojis / self.heightDefs.numberOfEmojisPerRow) * self.heightDefs.emojiRowHeight;
 
+	            var categoryLabel = self.categoryLabels[categoryName] ? self.categoryLabels[categoryName] : categoryName;
+
 	            return self._cachedNodes[categoryId] = [totalHeight, React.makeElement(
 	                "div",
 	                {
@@ -8204,7 +8207,7 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "div",
 	                    { className: "emoji-type-txt" },
-	                    self.categoryLabels[categoryName] ? self.categoryLabels[categoryName] : categoryName
+	                    categoryLabel
 	                ),
 	                React.makeElement("div", { className: "clear" }),
 	                emojis,
@@ -8353,7 +8356,7 @@ React.makeElement = React['createElement'];
 	                    { className: "search-block emoji" },
 	                    React.makeElement("i", { className: "small-icon search-icon" }),
 	                    React.makeElement("input", { type: "search",
-	                        placeholder: __(l[102]),
+	                        placeholder: l[102],
 	                        ref: "emojiSearchField",
 	                        onChange: this.onSearchChange,
 	                        value: this.state.searchValue })

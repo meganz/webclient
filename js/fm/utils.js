@@ -296,7 +296,9 @@ MegaUtils.prototype.getStack = function megaUtilsGetStack() {
  *  @return {Boolean}
  */
 MegaUtils.prototype.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
-    return ((fminitialized && ulmanager.isUploading) || dlmanager.isDownloading);
+    'use strict';
+
+    return ((fminitialized && ulmanager.isUploading) || dlmanager.isDownloading || dlmanager.isStreaming);
 };
 
 /**
@@ -408,6 +410,10 @@ MegaUtils.prototype.abortTransfers = function megaUtilsAbortTransfers() {
                         if (ulmanager.isUploading) {
                             ulmanager.abort(null);
                         }
+                        if (typeof dlmanager.isStreaming === 'object') {
+                            dlmanager.isStreaming.abort();
+                        }
+                        dlmanager.isStreaming = false;
 
                         M.resetUploadDownload();
                         loadingDialog.show();

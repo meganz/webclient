@@ -231,7 +231,7 @@ var DropdownContactsSelector = React.createClass({
                 >
                 <ContactsUI.ContactPickerWidget
                     active={this.props.active}
-                    className="popup contacts-search"
+                    className="popup contacts-search main-blur-block"
                     contacts={this.props.contacts}
                     megaChat={this.props.megaChat}
                     exclude={this.props.exclude}

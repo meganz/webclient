@@ -365,6 +365,7 @@ var ContactPickerWidget = React.createClass({
         self.setState({searchValue: e.target.value});
     },
     componentDidUpdate: function() {
+
         var self = this;
         if (self.scrollToLastSelected && self.jspSelected) {
             // set the flag back to false, so on next updates we won't scroll to the last item again.
@@ -400,6 +401,23 @@ var ContactPickerWidget = React.createClass({
             var clearSearch = (e) => {
                 self.setState({searchValue: ''});
                 self.refs.contactSearchField.focus();
+            };
+            var onAddContact = (e) => {
+                $('.add-user-popup .import-contacts-dialog').fadeOut(0);
+                $('.import-contacts-link').removeClass('active');
+
+                $('.add-user-popup')
+                    .addClass('dialog')
+                    .removeClass('hidden');
+                fm_showoverlay();
+                $('.add-user-size-icon')
+                    .removeClass('full-size')
+                    .addClass('short-size');
+                $('.fm-add-user').removeClass('active');
+                $('.add-user-popup-button.add').addClass('disabled');
+                var $tokenInput = $('#token-input-');
+                $tokenInput
+                    .focus();
             };
             var onContactSelectDoneCb = (contact, e) => {
 
@@ -439,9 +457,13 @@ var ContactPickerWidget = React.createClass({
                 self.clickTime = new Date();
                 self.lastClicked = contactHash;
             };
+            var selectedWidth = self.state.selected.length * 60;
             if (!self.state.selected || self.state.selected.length === 0) {
                 footer = <div className="fm-dialog-footer">
-                    <div className="fm-dialog-footer-txt">{
+                    <a href="javascript:;" className="default-white-button left" onClick={onAddContact}>
+                        {l[71]}
+                    </a>
+                    <div className="fm-dialog-footer-txt right">{
                         self.props.nothingSelectedButtonLabel ?
                             self.props.nothingSelectedButtonLabel
                             :
@@ -457,11 +479,14 @@ var ContactPickerWidget = React.createClass({
                 });
                 footer = <div className="contacts-search-footer">
                         <PerfectScrollbar className="selected-contact-block" selected={this.state.selected}>
-                            <div className="select-contact-centre">
+                            <div className="select-contact-centre" style={{width : selectedWidth}}>
                                 {contactsSelected}
                             </div>
                         </PerfectScrollbar>
                     <div className="fm-dialog-footer">
+                        <span className="selected-contact-amount">
+                            {self.state.selected.length} contacts selected
+                        </span>
                         <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                             {self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]}
                         </a>
@@ -474,7 +499,6 @@ var ContactPickerWidget = React.createClass({
                                                        key={v}
                     /> );
                 });
-                var selectedWidth = (self.state.selected.length > 7) ?  self.state.selected.length * 60 : 0;
 
                 footer =
                     <div className="contacts-search-footer">
@@ -544,7 +568,43 @@ var ContactPickerWidget = React.createClass({
                 <ContactCard
                     contact={v}
                     className={"contacts-search " + selectedClass}
-                    onClick={onContactSelectDoneCb}
+                    onClick={(contact, e) => {
+                        var contactHash = contact.u;
+
+                        // differentiate between a click and a double click.
+                        if (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) {
+                            // is a double click
+                            if (self.props.onSelected) {
+                                self.props.onSelected([contactHash]);
+                            }
+                            self.props.onSelectDone([contactHash]);
+                            return;
+                        }
+                        else {
+                            var selected = clone(self.state.selected || []);
+
+                            // is a single click
+                            if (selected.indexOf(contactHash) === -1) {
+                                selected.push(contactHash);
+                                // only set the scrollToLastSelected if a contact was added,
+                                // so that the user can scroll left/right and remove contacts
+                                // form the list using the X buttons in the UI.
+                                self.scrollToLastSelected = true;
+                                if (self.props.onSelected) {
+                                    self.props.onSelected(selected);
+                                }
+                            }
+                            else {
+                                array.remove(selected, contactHash);
+                                if (self.props.onSelected) {
+                                    self.props.onSelected(selected);
+                                }
+                            }
+                            self.setState({'selected': selected});
+                        }
+                        self.clickTime = new Date();
+                        self.lastClicked = contactHash;
+                    }}
                     noContextMenu={true}
                     key={v.u}
                 />
@@ -570,7 +630,7 @@ var ContactPickerWidget = React.createClass({
             contacts = <em>{noContactsMsg}</em>;
         }
         var displayStyle = (self.state.searchValue && self.state.searchValue.length > 0) ? "" : "none";
-        return <div className={this.props.className}>
+        return <div className={this.props.className + " " }>
             <div className={"contacts-search-header " + this.props.headerClasses}>
                 <i className="small-icon search-icon"></i>
                 <input

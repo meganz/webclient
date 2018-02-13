@@ -21,6 +21,9 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.contacts-search-header:not(.search-result-clear):hover {
+    opacity: 0.6;
+}
 .contacts-search-header input, .search-block.emoji input {
     font-size: 14px;
     line-height: 24px;
@@ -169,25 +172,30 @@
     font-size: 12px;
 }
 .popup.contacts-search .selected-contact-block .remove-contact-bttn {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     background-color: #2BA6DE;
     border-radius: 13px;
     border: 1px solid #fff;
     position: absolute;
     z-index: 99;
-    top: 20px;
-    left: 29px;
+    top: 22px;
+    left: 32px;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v13@2x.png);
-    background-repeat: no-repeat;
-    background-position: 1px -533px;
-    background-size:262px 1258px;
     -webkit-transition: .2s ease-in-out;
     -moz-transition:  .2s ease-in-out;
     -o-transition: .2s ease-in-out;
     transition: .2s ease-in-out;
+}
+.popup.contacts-search .selected-contact-block .remove-contact-icon {
+    background-image: url(../images/mega/remove_icon@2x.png);
+    background-repeat: no-repeat;
+    background-size:6px;
+    width: 6px;
+    height: 6px;
+    margin: 3px auto;
+    display: block;
 }
 .popup.contacts-search .selected-contact-block .remove-contact-bttn:hover {
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.20);
@@ -198,16 +206,27 @@
     transition: .2s ease-in-out;
 }
 .popup.contacts-search .search-result-clear {
-    display: none;
+    background-image: url(../images/mega/clear_all@2x.png);
+    background-repeat: no-repeat;
+    background-size:18px 14px;
+    width: 18px;
+    height: 14px;
+    margin: 3px auto;
+    display: block;
+    opacity: 0.8;
+    cursor: pointer;
 }
 .popup.contacts-search .contacts-search-header input ~ .search-result-clear  {
     display: block;
     position: absolute;
-    right: 24px;
-    top: 0px;
+    right: 50px;
+    top: 14px;
     text-align: right;
     font-size: 12px;
     color: #939DA3;
+}
+.popup.contacts-search .search-result-clear:hover {
+    opacity: 1;
 }
 .popup.contacts-search .selected-contact-amount {
     line-height: 32px;

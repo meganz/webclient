@@ -580,7 +580,7 @@ var ContactPickerWidget = React.createClass({
                     onChange={this.onSearchChange}
                     value={this.state.searchValue}
                 />
-                <div className="search-result-clear" style={{display : displayStyle}} onClick={clearSearch}>Clear</div>
+                <div className="search-result-clear" style={{display : displayStyle}} onClick={clearSearch}></div>
             </div>
 
             <utils.JScrollPane className="contacts-search-scroll" selected={this.state.selected}>

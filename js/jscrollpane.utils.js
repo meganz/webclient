@@ -202,6 +202,11 @@ function clearScrollPanel(from) {
 //----------------------------------------------------------------------------
 
 function reselect(n) {
+    'use strict';
+
+    if (d) {
+        console.debug('reselect(%s)', n, [selectionManager]);
+    }
     $('.ui-selected').removeClass('ui-selected');
 
     if (!Array.isArray($.selected)) {
@@ -218,6 +223,9 @@ function reselect(n) {
     });
 
     for (var i = ids.length; i--;) {
+        if (selectionManager) {
+            selectionManager.add_to_selection(ids[i], n, i);
+        }
         $('#' + ids[i]).addClass('ui-selected');
 
         if (n) {
@@ -243,6 +251,7 @@ function reselect(n) {
         else {
             el = false;
         }
+
         if (el && jsp) {
             jsp.scrollToElement(el);
         }

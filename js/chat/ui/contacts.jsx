@@ -434,6 +434,7 @@ var ContactPickerWidget = React.createClass({
             else if (self.state.selected.length === 1) {
                 self.state.selected.forEach(function(v, k) {
                     contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
+                                                       key={v}
                     /> );
                 });
                 footer = <div className="contacts-search-footer">
@@ -452,6 +453,7 @@ var ContactPickerWidget = React.createClass({
             else if (self.state.selected.length > 1) {
                 self.state.selected.forEach(function(v, k) {
                     contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
+                                                       key={v}
                     /> );
                 });
                 var selectedWidth = (self.state.selected.length > 7) ?  self.state.selected.length * 60 : 0;

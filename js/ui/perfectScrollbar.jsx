@@ -158,6 +158,20 @@ var PerfectScrollbar = React.createClass({
         this._lastKnownScrollHeight = res;
         return res;
     },
+    getScrollWidth: function() {
+        var $elem = $(this.findDOMNode());
+        var outerWidthContainer = $elem.children(":first").outerWidth();
+        var outerWidthScrollable = $elem.outerWidth();
+
+        var res = outerWidthContainer - outerWidthScrollable;
+
+        if (res <= 0) {
+            // can happen if the element is now hidden.
+            return this._lastKnownScrollWidth ? this._lastKnownScrollWidth : 0;
+        }
+        this._lastKnownScrollWidth = res;
+        return res;
+    },
     getContentHeight: function() {
         var $elem = $(this.findDOMNode());
         return $elem.children(":first").outerHeight();
@@ -179,9 +193,22 @@ var PerfectScrollbar = React.createClass({
     },
     scrollToPercentY: function(posPerc, skipReinitialised) {
         var $elem = $(this.findDOMNode());
-        var targetPx = 100/this.getScrollHeight() * posPerc;
+        var targetPx = this.getScrollHeight()/100 * posPerc;
         if ($elem[0].scrollTop !== targetPx) {
             $elem[0].scrollTop = targetPx;
+            this.isUserScroll = false;
+            Ps.update($elem[0]);
+            this.isUserScroll = true;
+            if (!skipReinitialised) {
+                this.reinitialised(true);
+            }
+        }
+    },
+    scrollToPercentX: function(posPerc, skipReinitialised) {
+        var $elem = $(this.findDOMNode());
+        var targetPx = this.getScrollWidth()/100 * posPerc;
+        if ($elem[0].scrollLeft !== targetPx) {
+            $elem[0].scrollLeft = targetPx;
             this.isUserScroll = false;
             Ps.update($elem[0]);
             this.isUserScroll = true;

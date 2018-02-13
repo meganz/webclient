@@ -2,6 +2,7 @@ var React = require("react");
 var MegaRenderMixin = require("../../stores/mixins.js").MegaRenderMixin;
 var RenderDebugger = require("../../stores/mixins.js").RenderDebugger;
 var utils = require("../../ui/utils.jsx");
+var PerfectScrollbar = require("../../ui/perfectScrollbar.jsx").PerfectScrollbar;
 
 
 var ContactsListItem = React.createClass({
@@ -363,6 +364,18 @@ var ContactPickerWidget = React.createClass({
         var self = this;
         self.setState({searchValue: e.target.value});
     },
+    componentDidUpdate: function() {
+        var self = this;
+        if (self.scrollToLastSelected && self.jspSelected) {
+            // set the flag back to false, so on next updates we won't scroll to the last item again.
+            self.scrollToLastSelected = false;
+            var $jsp = $(self.jspSelected.findDOMNode()).data('jsp');
+            if ($jsp) {
+                $jsp.scrollToPercentX(1, false);
+            }
+        }
+
+    },
     render: function() {
         var self = this;
 
@@ -406,6 +419,10 @@ var ContactPickerWidget = React.createClass({
                     // is a single click
                     if (selected.indexOf(contactHash) === -1) {
                         selected.push(contactHash);
+                        // only set the scrollToLastSelected if a contact was added, so that the user can scroll
+                        // left/right and remove contacts form the list using the X buttons in the UI
+                        self.scrollToLastSelected = true;
+
                         if (self.props.onSelected) {
                             self.props.onSelected(selected);
                         }
@@ -438,11 +455,11 @@ var ContactPickerWidget = React.createClass({
                     /> );
                 });
                 footer = <div className="contacts-search-footer">
-                        <utils.JScrollPane className="selected-contact-block" selected={this.state.selected}>
+                        <PerfectScrollbar className="selected-contact-block" selected={this.state.selected}>
                             <div className="select-contact-centre">
                                 {contactsSelected}
                             </div>
-                        </utils.JScrollPane>
+                        </PerfectScrollbar>
                     <div className="fm-dialog-footer">
                         <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                             {self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]}
@@ -457,26 +474,32 @@ var ContactPickerWidget = React.createClass({
                     /> );
                 });
                 var selectedWidth = (self.state.selected.length > 7) ?  self.state.selected.length * 60 : 0;
-                var selectedLeft = (self.state.selected.length > 7) ?  438 - self.state.selected.length * 60 : 0;
+
                 footer =
                     <div className="contacts-search-footer">
-                        <utils.JScrollPane  className="selected-contact-block horizontal-only" style= {{left: selectedLeft}} selected={this.state.selected}>
+                        <utils.JScrollPane className="selected-contact-block horizontal-only"
+                                          selected={this.state.selected}
+                                          ref={function(jspSelected) {
+                                              self.jspSelected = jspSelected;
+                                          }}>
                             <div className="select-contact-centre" style={{width : selectedWidth}}>
                                 {contactsSelected}
                             </div>
                         </utils.JScrollPane>
-                    <div className="fm-dialog-footer">
-                        <span className="selected-contact-amount">{self.state.selected.length} Contacts selected</span>
-                        <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
-                            {
-                                self.props.multipleSelectedButtonLabel ?
-                                    self.props.multipleSelectedButtonLabel
-                                    :
-                                    __(l[8890])
-                            }
-                        </a>
-                    </div>
-                </div>
+                        <div className="fm-dialog-footer">
+                            <span className="selected-contact-amount">
+                                {self.state.selected.length} Contacts selected
+                            </span>
+                            <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
+                                {
+                                    self.props.multipleSelectedButtonLabel ?
+                                        self.props.multipleSelectedButtonLabel
+                                        :
+                                        __(l[8890])
+                                }
+                            </a>
+                        </div>
+                    </div>;
             }
         }
 

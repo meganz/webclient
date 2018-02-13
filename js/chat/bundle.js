@@ -2607,6 +2607,20 @@ React.makeElement = React['createElement'];
 	        this._lastKnownScrollHeight = res;
 	        return res;
 	    },
+	    getScrollWidth: function getScrollWidth() {
+	        var $elem = $(this.findDOMNode());
+	        var outerWidthContainer = $elem.children(":first").outerWidth();
+	        var outerWidthScrollable = $elem.outerWidth();
+
+	        var res = outerWidthContainer - outerWidthScrollable;
+
+	        if (res <= 0) {
+
+	            return this._lastKnownScrollWidth ? this._lastKnownScrollWidth : 0;
+	        }
+	        this._lastKnownScrollWidth = res;
+	        return res;
+	    },
 	    getContentHeight: function getContentHeight() {
 	        var $elem = $(this.findDOMNode());
 	        return $elem.children(":first").outerHeight();
@@ -2628,9 +2642,22 @@ React.makeElement = React['createElement'];
 	    },
 	    scrollToPercentY: function scrollToPercentY(posPerc, skipReinitialised) {
 	        var $elem = $(this.findDOMNode());
-	        var targetPx = 100 / this.getScrollHeight() * posPerc;
+	        var targetPx = this.getScrollHeight() / 100 * posPerc;
 	        if ($elem[0].scrollTop !== targetPx) {
 	            $elem[0].scrollTop = targetPx;
+	            this.isUserScroll = false;
+	            Ps.update($elem[0]);
+	            this.isUserScroll = true;
+	            if (!skipReinitialised) {
+	                this.reinitialised(true);
+	            }
+	        }
+	    },
+	    scrollToPercentX: function scrollToPercentX(posPerc, skipReinitialised) {
+	        var $elem = $(this.findDOMNode());
+	        var targetPx = this.getScrollWidth() / 100 * posPerc;
+	        if ($elem[0].scrollLeft !== targetPx) {
+	            $elem[0].scrollLeft = targetPx;
 	            this.isUserScroll = false;
 	            Ps.update($elem[0]);
 	            this.isUserScroll = true;
@@ -3216,6 +3243,7 @@ React.makeElement = React['createElement'];
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var utils = __webpack_require__(5);
+	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
 
 	var ContactsListItem = React.createClass({
 	    displayName: "ContactsListItem",
@@ -3537,6 +3565,46 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
+	var ContactItem = React.createClass({
+	    displayName: "ContactItem",
+
+	    mixins: [MegaRenderMixin, RenderDebugger],
+	    render: function render() {
+	        var classString = "nw-conversations-item";
+	        var self = this;
+	        var contact = this.props.contact;
+
+	        if (!contact) {
+	            return null;
+	        }
+
+	        return React.makeElement(
+	            "div",
+	            { className: "selected-contact-card" },
+	            React.makeElement(
+	                "div",
+	                { className: "remove-contact-bttn", onClick: function onClick(e) {
+	                        if (self.props.onClick) {
+	                            self.props.onClick(contact, e);
+	                        }
+	                    } },
+	                React.makeElement("div", { className: "remove-contact-icon" })
+	            ),
+	            React.makeElement(Avatar, { contact: contact, className: "small-rounded-avatar" }),
+	            React.makeElement(
+	                "div",
+	                { className: "user-card-data" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "user-card-name light" },
+	                    this.props.namePrefix ? this.props.namePrefix : null,
+	                    M.getNameByHandle(contact.u)
+	                )
+	            )
+	        );
+	    }
+	});
+
 	var ContactPickerWidget = React.createClass({
 	    displayName: "ContactPickerWidget",
 
@@ -3558,15 +3626,29 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        self.setState({ searchValue: e.target.value });
 	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        var self = this;
+	        if (self.scrollToLastSelected && self.jspSelected) {
+
+	            self.scrollToLastSelected = false;
+	            var $jsp = $(self.jspSelected.findDOMNode()).data('jsp');
+	            if ($jsp) {
+	                $jsp.scrollToPercentX(1, false);
+	            }
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 
 	        var contacts = [];
 
+	        var contactsSelected = [];
+
 	        var footer = null;
 
 	        if (self.props.multiple) {
 	            var onSelectDoneCb = function onSelectDoneCb(e) {
+
 	                e.preventDefault();
 	                e.stopPropagation();
 
@@ -3576,7 +3658,43 @@ React.makeElement = React['createElement'];
 	                    self.props.onSelectDone(self.state.selected);
 	                }
 	            };
+	            var clearSearch = function clearSearch(e) {
+	                self.setState({ searchValue: '' });
+	                self.refs.contactSearchField.focus();
+	            };
+	            var onContactSelectDoneCb = function onContactSelectDoneCb(contact, e) {
 
+	                var contactHash = contact.u;
+
+	                if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
+
+	                    if (self.props.onSelected) {
+	                        self.props.onSelected([contactHash]);
+	                    }
+	                    self.props.onSelectDone([contactHash]);
+	                    return;
+	                } else {
+	                    var selected = clone(self.state.selected || []);
+
+	                    if (selected.indexOf(contactHash) === -1) {
+	                        selected.push(contactHash);
+
+	                        self.scrollToLastSelected = true;
+
+	                        if (self.props.onSelected) {
+	                            self.props.onSelected(selected);
+	                        }
+	                    } else {
+	                        array.remove(selected, contactHash);
+	                        if (self.props.onSelected) {
+	                            self.props.onSelected(selected);
+	                        }
+	                    }
+	                    self.setState({ 'selected': selected });
+	                }
+	                self.clickTime = new Date();
+	                self.lastClicked = contactHash;
+	            };
 	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
@@ -3588,29 +3706,69 @@ React.makeElement = React['createElement'];
 	                    )
 	                );
 	            } else if (self.state.selected.length === 1) {
+	                self.state.selected.forEach(function (v, k) {
+	                    contactsSelected.push(React.makeElement(ContactItem, { contact: self.props.contacts[v], onClick: onContactSelectDoneCb,
+	                        key: v
+	                    }));
+	                });
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
+	                    React.makeElement(
+	                        PerfectScrollbar,
+	                        { className: "selected-contact-block", selected: this.state.selected },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "select-contact-centre" },
+	                            contactsSelected
+	                        )
+	                    ),
 	                    React.makeElement(
 	                        "div",
 	                        { className: "fm-dialog-footer" },
 	                        React.makeElement(
 	                            "a",
-	                            { href: "javascript:;", className: "default-white-button right", onClick: onSelectDoneCb },
+	                            { href: "javascript:;", className: "default-grey-button right", onClick: onSelectDoneCb },
 	                            self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]
 	                        )
 	                    )
 	                );
 	            } else if (self.state.selected.length > 1) {
+	                self.state.selected.forEach(function (v, k) {
+	                    contactsSelected.push(React.makeElement(ContactItem, { contact: self.props.contacts[v], onClick: onContactSelectDoneCb,
+	                        key: v
+	                    }));
+	                });
+	                var selectedWidth = self.state.selected.length > 7 ? self.state.selected.length * 60 : 0;
+
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
 	                    React.makeElement(
+	                        utils.JScrollPane,
+	                        { className: "selected-contact-block horizontal-only",
+	                            selected: this.state.selected,
+	                            ref: function ref(jspSelected) {
+	                                self.jspSelected = jspSelected;
+	                            } },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "select-contact-centre", style: { width: selectedWidth } },
+	                            contactsSelected
+	                        )
+	                    ),
+	                    React.makeElement(
 	                        "div",
 	                        { className: "fm-dialog-footer" },
 	                        React.makeElement(
+	                            "span",
+	                            { className: "selected-contact-amount" },
+	                            self.state.selected.length,
+	                            " contacts selected"
+	                        ),
+	                        React.makeElement(
 	                            "a",
-	                            { href: "javascript:;", className: "default-white-button right", onClick: onSelectDoneCb },
+	                            { href: "javascript:;", className: "default-grey-button right", onClick: onSelectDoneCb },
 	                            self.props.multipleSelectedButtonLabel ? self.props.multipleSelectedButtonLabel : __(l[8890])
 	                        )
 	                    )
@@ -3650,36 +3808,7 @@ React.makeElement = React['createElement'];
 	            contacts.push(React.makeElement(ContactCard, {
 	                contact: v,
 	                className: "contacts-search " + selectedClass,
-
-	                onClick: function onClick(contact, e) {
-	                    var contactHash = contact.u;
-
-	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
-
-	                        if (self.props.onSelected) {
-	                            self.props.onSelected([contactHash]);
-	                        }
-	                        self.props.onSelectDone([contactHash]);
-	                        return;
-	                    } else {
-	                        var selected = clone(self.state.selected || []);
-
-	                        if (selected.indexOf(contactHash) === -1) {
-	                            selected.push(contactHash);
-	                            if (self.props.onSelected) {
-	                                self.props.onSelected(selected);
-	                            }
-	                        } else {
-	                            array.remove(selected, contactHash);
-	                            if (self.props.onSelected) {
-	                                self.props.onSelected(selected);
-	                            }
-	                        }
-	                        self.setState({ 'selected': selected });
-	                    }
-	                    self.clickTime = new Date();
-	                    self.lastClicked = contactHash;
-	                },
+	                onClick: onContactSelectDoneCb,
 	                noContextMenu: true,
 	                key: v.u
 	            }));
@@ -3706,7 +3835,7 @@ React.makeElement = React['createElement'];
 	                noContactsMsg
 	            );
 	        }
-
+	        var displayStyle = self.state.searchValue && self.state.searchValue.length > 0 ? "" : "none";
 	        return React.makeElement(
 	            "div",
 	            { className: this.props.className },
@@ -3720,7 +3849,8 @@ React.makeElement = React['createElement'];
 	                    ref: "contactSearchField",
 	                    onChange: this.onSearchChange,
 	                    value: this.state.searchValue
-	                })
+	                }),
+	                React.makeElement("div", { className: "search-result-clear", style: { display: displayStyle }, onClick: clearSearch })
 	            ),
 	            React.makeElement(
 	                utils.JScrollPane,

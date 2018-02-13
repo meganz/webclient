@@ -398,8 +398,8 @@ var ContactPickerWidget = React.createClass({
                 }
             };
             var clearSearch = (e) => {
-                console.error(e);
                 self.setState({searchValue: ''});
+                self.refs.contactSearchField.focus();
             };
             var onContactSelectDoneCb = (contact, e) => {
 

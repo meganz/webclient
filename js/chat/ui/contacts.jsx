@@ -569,6 +569,7 @@ var ContactPickerWidget = React.createClass({
 
             contacts = <em>{noContactsMsg}</em>;
         }
+        var displayStyle = (self.state.searchValue && self.state.searchValue.length > 0) ? "" : "none";
         return <div className={this.props.className}>
             <div className={"contacts-search-header " + this.props.headerClasses}>
                 <i className="small-icon search-icon"></i>
@@ -579,7 +580,7 @@ var ContactPickerWidget = React.createClass({
                     onChange={this.onSearchChange}
                     value={this.state.searchValue}
                 />
-                <div className="search-result-clear" onClick={clearSearch}>Clear</div>
+                <div className="search-result-clear" style={{display : displayStyle}} onClick={clearSearch}>Clear</div>
             </div>
 
             <utils.JScrollPane className="contacts-search-scroll" selected={this.state.selected}>

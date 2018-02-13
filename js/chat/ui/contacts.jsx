@@ -384,6 +384,9 @@ var ContactPickerWidget = React.createClass({
                     self.props.onSelectDone(self.state.selected);
                 }
             };
+            var clearSearch = (e) => {
+                this.setState({searchValue: ''});
+            };
             var onContactSelectDoneCb = (contact, e) => {
 
                 var contactHash = contact.u;
@@ -451,10 +454,12 @@ var ContactPickerWidget = React.createClass({
                     contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
                     /> );
                 });
+                var selectedWidth = (self.state.selected.length > 7) ?  self.state.selected.length * 62 : 0;
+                var selectedLeft = (self.state.selected.length > 7) ?  438 - self.state.selected.length * 62 : 0;
                 footer =
                     <div className="contacts-search-footer">
-                        <utils.JScrollPane className="selected-contact-block" selected={this.state.selected}>
-                            <div className="select-contact-centre">
+                        <utils.JScrollPane  className="selected-contact-block horizontal-only" style= {{left: selectedLeft}} selected={this.state.selected}>
+                            <div className="select-contact-centre" style={{width : selectedWidth}}>
                                 {contactsSelected}
                             </div>
                         </utils.JScrollPane>
@@ -547,7 +552,7 @@ var ContactPickerWidget = React.createClass({
                     onChange={this.onSearchChange}
                     value={this.state.searchValue}
                 />
-                <div className="search-result-clear">Clear</div>
+                <div className="search-result-clear" onclick={clearSearch}>Clear</div>
             </div>
 
             <utils.JScrollPane className="contacts-search-scroll" selected={this.state.selected}>

@@ -131,10 +131,15 @@
     background-color: rgba(0,0,0,0.02); 
     margin-top: 8px; 
     max-height: 72px;
+    overflow: auto;
+}
+.popup.contacts-search .horizontal-only {
+	height: auto;
+	max-height: 200px;
 }
 .popup.contacts-search .selected-contact-block .select-contact-centre {
-    margin: 8px auto;
-    height: 56px;
+    margin: 4px auto;
+    height: 66px;
     display: table;
 }
 .popup.contacts-search .selected-contact-block .small-rounded-avatar {

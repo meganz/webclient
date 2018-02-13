@@ -454,8 +454,8 @@ var ContactPickerWidget = React.createClass({
                     contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
                     /> );
                 });
-                var selectedWidth = (self.state.selected.length > 7) ?  self.state.selected.length * 62 : 0;
-                var selectedLeft = (self.state.selected.length > 7) ?  438 - self.state.selected.length * 62 : 0;
+                var selectedWidth = (self.state.selected.length > 7) ?  self.state.selected.length * 60 : 0;
+                var selectedLeft = (self.state.selected.length > 7) ?  438 - self.state.selected.length * 60 : 0;
                 footer =
                     <div className="contacts-search-footer">
                         <utils.JScrollPane  className="selected-contact-block horizontal-only" style= {{left: selectedLeft}} selected={this.state.selected}>
@@ -464,6 +464,7 @@ var ContactPickerWidget = React.createClass({
                             </div>
                         </utils.JScrollPane>
                     <div className="fm-dialog-footer">
+                        <span className="selected-contact-amount">{self.state.selected.length} Contacts selected</span>
                         <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                             {
                                 self.props.multipleSelectedButtonLabel ?

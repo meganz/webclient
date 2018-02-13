@@ -712,6 +712,7 @@
     "5710": "Voulez-vous vraiment annuler l\u2019inscription\u2009?",
     "5737": "Aucun contact",
     "5738": "Corbeille",
+    "5740": "T\u00e9l\u00e9chargement...",
     "5775": "Utilis\u00e9s",
     "5799": "Utilisation",
     "5814": "Surclasser le compte",
@@ -1926,7 +1927,7 @@
     "17689": "Toucher longuement pour copier la cl\u00e9 de r\u00e9cup\u00e9ration dans le presse-papiers.",
     "17690": "Pour restaurer votre compte avec votre cl\u00e9 de r\u00e9cup\u00e9ration, rendez-vous sur [A]https:\/\/mega.nz\/recovery[\/A] \u00e0 partir de votre ordinateur et suivez les instructions.",
     "17694": "T\u00e9l\u00e9charger la cl\u00e9",
-    "17704": "Wait",
-    "17705": "Force Reload",
-    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
+    "17704": "Attendre",
+    "17705": "Forcer le rechargement",
+    "17706": "Votre connexion prend plus de temps que pr\u00e9vu. Souhaitez-vous attendre ou forcer le rechargement\u2009? "
 }

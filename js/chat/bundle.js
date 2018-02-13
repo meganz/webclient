@@ -7574,7 +7574,6 @@ React.makeElement = React['createElement'];
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
 	            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
-
 	                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
 	            }
 	        }
@@ -7637,7 +7636,7 @@ React.makeElement = React['createElement'];
 	        var room = this.props.chatRoom;
 
 	        if (room.isCurrentlyActive && self.isMounted()) {
-	            if ($('textarea:focus,select:focus,input:focus').size() === 0) {
+	            if ($('textarea:focus,select:focus,input:focus').filter(":visible").size() === 0) {
 
 	                this.focusTypeArea();
 	            }
@@ -8289,7 +8288,7 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "div",
 	                    { className: "emoji title" },
-	                    ":" + meta.u + ":"
+	                    ":" + meta.n + ":"
 	                )
 	            );
 	        }
@@ -8513,7 +8512,7 @@ React.makeElement = React['createElement'];
 	            } else if (key === 39 || key === 40 || key === 9) {
 
 	                selected = selected + 1;
-	                selected = selected >= self.props.maxEmojis ? 0 : selected;
+	                selected = selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ? 0 : selected;
 	                self.setState({ 'selected': selected });
 	                handled = true;
 	            } else if (key === 13) {
@@ -9324,7 +9323,7 @@ React.makeElement = React['createElement'];
 	        }
 	    },
 	    _startDownload: function _startDownload(v) {
-	        M.addDownload([v]);
+	        M.addDownload([v.h || v]);
 	    },
 	    _addToCloudDrive: function _addToCloudDrive(v) {
 	        M.injectNodes(v, M.RootID, function (res) {

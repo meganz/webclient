@@ -4621,7 +4621,9 @@
     "17692": "Sie haben bereits PRO-Status. Bitte stornieren Sie evtl. bestehende Abonnements, um Doppelbelastung zu vermeiden.",
     "17693": "Konversation mit",
     "17694": "Schl\u00fcssel herunterladen",
-    "17704": "Wait",
-    "17705": "Force Reload",
-    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
+    "17704": "Abwarten",
+    "17705": "Neu laden",
+    "17706": "Ihr Login dauert ungew\u00f6hnlich lange. M\u00f6chten Sie weiter abwarten oder Ihren Account komplett neu laden?",
+    "17732": "View video",
+    "17733": "Open this file in the mobile app"
 }

@@ -712,6 +712,7 @@
     "5710": "Sei sicuro di voler interrompere la registrazione?",
     "5737": "Nessun contatto",
     "5738": "Cestino",
+    "5740": "Scaricando...",
     "5775": "Usato",
     "5799": "Utilizzo",
     "5814": "Incrementa spazio",
@@ -1926,7 +1927,7 @@
     "17689": "Clicca e tieni premuto per copiare la tua Chiave di Recupero negli appunti.",
     "17690": "Per ripristinare il tuo account con la tua Chiave di Recupero, visita [A]https:\/\/mega.nz\/recovery[\/A] sul tuo dispositivo desktop e segui le istruzioni.",
     "17694": "Chiave di download",
-    "17704": "Wait",
-    "17705": "Force Reload",
-    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
+    "17704": "Aspetta",
+    "17705": "Forza il ricaricamento",
+    "17706": "Il tuo login sta prendendo pi\u00f9 tempo del dovuto. Vuoi aspettare o forzare il ricaricamento?"
 }

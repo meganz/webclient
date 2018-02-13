@@ -211,7 +211,7 @@ var GenericConversationMessage = React.createClass({
         }
     },
     _startDownload: function(v) {
-        M.addDownload([v]);
+        M.addDownload([v.h || v]);
     },
     _addToCloudDrive: function(v) {
         M.injectNodes(v, M.RootID, function(res) {

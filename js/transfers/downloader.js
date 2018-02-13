@@ -440,7 +440,7 @@ ClassFile.prototype.destroy = function() {
                 this.dl.pos
             );
 
-            this.dl.onBeforeDownloadComplete(this.dl.pos);
+            this.dl.onBeforeDownloadComplete(this.dl);
             if (!this.dl.preview) {
                 this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p || '');
             }

@@ -230,7 +230,8 @@ mega.ui.tpp = {
         'use strict';
         return false;
     },
-    statusPaused: function() {}
+    statusPaused: function() {},
+    hide: function() {}
 };
 
 mega.megadrop = {
@@ -286,6 +287,7 @@ function fm_hideoverlay() {
 mega.ui.showRegisterDialog = function() {};
 
 mega.loadReport = {};
+var previews = {};
 
 function removeUInode(nodeHandle, parentHandle) {
 

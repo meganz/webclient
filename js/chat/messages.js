@@ -527,7 +527,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
 
         if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.lastSeen = eventData.messageId;
+            self.setLastSeen(eventData.messageId);
             self.trackDataChange();
         }
     });
@@ -1262,6 +1262,10 @@ MessagesBuff.prototype.setLastSeen = function(msgId) {
 
         if (!self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
             self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
+        }
+        if (ChatdPersist.isMasterTab() && self.chatdInt.chatd.chatdPersist) {
+            var chatdPersist = self.chatdInt.chatd.chatdPersist;
+            chatdPersist.setPointer(self.chatRoom.chatId, 'ls', msgId);
         }
 
         // check if last recv needs to be updated

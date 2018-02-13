@@ -2851,6 +2851,10 @@
         "text": "Rubbish bin",
         "context": "\"Trash\" or \"recycle bin\""
     },
+    "5740": {
+        "text": "Downloading...",
+        "context": "Title show when a file is being downloaded"
+    },
     "5775": {
         "text": "Used",
         "context": "Title for \"Used\" MEGA space."
@@ -7709,7 +7713,7 @@
     },
     "17704": {
         "text": "Wait",
-        "context": "text button to be shown in a dialog for the user to choose some operation to wait."
+        "context": "text button to be shown in a dialog for the user to choose some operation to wait. (E.g. if an operation such as decryption takes usually less then one minute, and we detect it does exceed that time, we give the user the chance to abort it or to continue waiting)"
     },
     "17705": {
         "text": "Force Reload",

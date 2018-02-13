@@ -211,7 +211,9 @@ function uplpad(number, length) {
 }
 
 function secondsToTime(secs, html_format) {
-    if (isNaN(secs)) {
+    'use strict';
+
+    if (isNaN(secs) || secs === Infinity) {
         return '--:--:--';
     }
     if (secs < 0) {

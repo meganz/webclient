@@ -712,6 +712,7 @@
     "5710": "\u60a8\u786e\u5b9a\u8981\u4e2d\u6b62\u6ce8\u518c\u5417?",
     "5737": "\u6ca1\u6709\u8054\u7cfb\u4eba",
     "5738": "\u5783\u573e\u6876",
+    "5740": "\u6b63\u5728\u4e0b\u8f7d...",
     "5775": "\u5df2\u7528",
     "5799": "\u7528\u91cf",
     "5814": "\u5347\u7ea7\u5e10\u6237",
@@ -1926,7 +1927,7 @@
     "17689": "\u70b9\u51fb\u540e\u957f\u6309\u4f1a\u5c06\u6062\u590d\u91d1\u5319\u590d\u5236\u5230\u526a\u8d34\u677f",
     "17690": "\u8981\u4f7f\u7528\u8fd8\u539f\u91d1\u94a5\u6062\u590d\u60a8\u7684\u5e10\u6237\uff0c\u8bf7\u5728\u7535\u8111\u4e0a\u8bbf\u95ee[A] https:\/\/mega.nz\/recovery [\/A]\u5e76\u6309\u7167\u8bf4\u660e\u8fdb\u884c\u64cd\u4f5c\u3002",
     "17694": "\u4e0b\u8f7d\u91d1\u94a5",
-    "17704": "Wait",
-    "17705": "Force Reload",
-    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
+    "17704": "\u7a0d\u5019",
+    "17705": "\u5f3a\u5236\u91cd\u8f7d",
+    "17706": "\u60a8\u7684\u767b\u5f55\u65f6\u95f4\u6bd4\u9884\u671f\u7684\u8981\u957f\u3002\u60a8\u60f3\u7b49\u5f85\u8fd8\u662f\u5f3a\u5236\u91cd\u8f7d\uff1f"
 }

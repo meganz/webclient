@@ -262,7 +262,7 @@
     "670": "Langue",
     "671": "Parlez-vous plusieurs langues?",
     "672": "Aidez-nous \u00e0 traduire !",
-    "676": "MEGA est un espace de stockage nuagique offrant une protection robuste des donn\u00e9es personnelles, en tout temps",
+    "676": "MEGA, le stockage nuagique qui prot\u00e8ge vos donn\u00e9es personnelles en tout temps",
     "677": "MEGA fournit un stockage nuagique robuste offrant une protection des donn\u00e9es personnelles pratique et puissante, en tout temps. MEGA croit en votre droit \u00e0 la vie priv\u00e9e et vous offre les outils technologiques vous permettant de la prot\u00e9ger. C\u2019est ce que nous appelons le chiffrement contr\u00f4l\u00e9 par l\u2019utilisateur, ou CCU, et ce chiffrement est automatique.",
     "678": "Qu\u2019est-ce que le chiffrement contr\u00f4l\u00e9 par l\u2019utilisateur de MEGA\u2009?",
     "679": "Tous les fichiers stock\u00e9s sur MEGA sont chiffr\u00e9s. Toutes les donn\u00e9es qui transf\u00e8rent de et vers MEGA sont chiffr\u00e9es. Et bien que la plupart des fournisseurs de stockage nuagique peuvent en faire autant et pr\u00e9tendent le faire, MEGA est diff\u00e9rent. Contrairement \u00e0 la norme de l\u2019industrie qui veut que le fournisseur de stockage nuagique d\u00e9tienne la cl\u00e9 de chiffrement, avec MEGA vous contr\u00f4lez le chiffrement, vous d\u00e9tenez les cl\u00e9s et vous d\u00e9cidez \u00e0 qui vous donner ou retirer l\u2019acc\u00e8s \u00e0 vos fichiers, sans avoir \u00e0 installer des logiciels risqu\u00e9s. Tout s\u2019effectue dans votre navigateur Web\u2009!",
@@ -3450,7 +3450,7 @@
     "16151": "Conseils et astuces :",
     "16152": "Nos conseils et astuces vous aident \u00e0 conna\u00eetre MEGA et toutes ses fonctions. Il est difficile de tout apprendre d'un coup, et vous pouvez r\u00e9initialiser ces conseils et astuces n'importe quand.",
     "16153": "R\u00e9initialiser les conseils et astuces",
-    "16154": "Supprimer les fichiers plus anciens que",
+    "16154": "Supprimer les fichiers de plus de",
     "16155": "Garder la corbeille sous",
     "16156": "Attribuer votre quota de transfert aux utilisateurs qui t\u00e9l\u00e9chargent vos liens :",
     "16157": "Le pourcentage maximal de votre quota de transfert  disponible pour les utilisateurs qui t\u00e9l\u00e9chargent vos liens.",
@@ -4621,7 +4621,9 @@
     "17692": "Vous d\u00e9tenez d\u00e9j\u00e0 un compte PRO et vous ach\u00e8terez un nouvel abonnement \u00e0 MEGA. Si vous d\u00e9tenez d\u00e9j\u00e0 un abonnement \u00e0 renouvellement automatique, vous devez l\u2019annuler ou deux abonnements vous seront factur\u00e9s.",
     "17693": "Conversation avec",
     "17694": "T\u00e9l\u00e9charger la cl\u00e9",
-    "17704": "Wait",
-    "17705": "Force Reload",
-    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
+    "17704": "Attendre",
+    "17705": "Forcer le rechargement",
+    "17706": "Votre connexion prend plus de temps que pr\u00e9vu. Souhaitez-vous attendre ou forcer le rechargement\u2009? ",
+    "17732": "View video",
+    "17733": "Open this file in the mobile app"
 }

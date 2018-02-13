@@ -200,7 +200,7 @@
 .popup.contacts-search .search-result-clear {
     display: none;
 }
-.popup.contacts-search .contacts-search-header input:focus ~ .search-result-clear  {
+.popup.contacts-search .contacts-search-header input ~ .search-result-clear  {
     display: block;
     position: absolute;
     right: 24px;

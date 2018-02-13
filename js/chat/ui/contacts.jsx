@@ -489,7 +489,7 @@ var ContactPickerWidget = React.createClass({
                         </utils.JScrollPane>
                         <div className="fm-dialog-footer">
                             <span className="selected-contact-amount">
-                                {self.state.selected.length} Contacts selected
+                                {self.state.selected.length} contacts selected
                             </span>
                             <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                                 {

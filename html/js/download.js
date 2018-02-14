@@ -272,6 +272,7 @@ function dl_g(res) {
                         }
                     }
                 };
+
             }
 
             dlmanager.getMaximumDownloadSize().done(function(size) {
@@ -517,6 +518,7 @@ function dl_g(res) {
                     $pageScrollBlock.addClass('video');
                     $fileinfoBlock.find('.big-txt .filename').text(fileTitle);
                     $fileinfoBlock.find('.big-txt .extension').text(fileExt);
+                    $('.mobile.filetype-img').addClass('hidden');
 
                 }).catch(function(ex) {
                     if (ex) {

@@ -43,7 +43,7 @@
 .viewer-bottom-bl {
     top: auto;
     bottom: 0;
-    padding: 8px 11px;
+    padding: 5px 11px;
     height: 54px;
 }
 .viewer-filename {

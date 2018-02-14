@@ -14127,6 +14127,10 @@
         "text": "Scriptable",
         "context": "A title on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
     },
+    "16268": {
+        "text": "Import contacts...",
+        "context": "Button label, allows user to import contacts from other services"
+    },
     "16270": {
         "text": "Automatically backup your photos to the Cloud Drive",
         "context": "Some text shown to explain what 'Enable Camera Uploads' means."
@@ -18487,6 +18491,38 @@
         "text": "Download key",
         "context": "A button label on the mobile webclient which allows the user to download the Recovery Key to a text file."
     },
+    "17695": {
+        "text": "days",
+        "context": "This is a setting to configure the Rubbish-Bin Cleaning Scheduler to run after a certain number of days.\r\n\r\n"
+    },
+    "17696": {
+        "text": "GB",
+        "context": "This is a setting to configure the Rubbish-Bin Cleaning Scheduler to keep the rubbish bin under a certain number of gigabytes."
+    },
+    "17697": {
+        "text": "YYYY",
+        "context": "Expected year in 4-digit format to be picked from drop down menu for the user's year of birth."
+    },
+    "17698": {
+        "text": "MM",
+        "context": "Pick 2-digit month from drop down list for the user's month of birth."
+    },
+    "17699": {
+        "text": "DD",
+        "context": "Pick 2-digit day from drop down list for the user's date of birth."
+    },
+    "17700": {
+        "text": "Your message here... (optional)",
+        "context": "Some placeholder text on a text input field on the Feedback dialog to let the user know they can type a message there."
+    },
+    "17701": {
+        "text": "Click here to see [B]the exact information[\/B] that will be sent to our servers.",
+        "context": "A hover tooltip message on the Feedback dialog's Question icon\/button. This explains to the user that the information they will send to the server is exactly what is seen in the dialog (if they click the button to see the information), no more, no less."
+    },
+    "17703": {
+        "text": "Flags",
+        "context": "The title of the category in the emoji picker dialog which allows picking a flag emoji to be added to the message."
+    },
     "17704": {
         "text": "Wait",
         "context": "text button to be shown in a dialog for the user to choose some operation to wait. (E.g. if an operation such as decryption takes usually less then one minute, and we detect it does exceed that time, we give the user the chance to abort it or to continue waiting)"
@@ -18506,5 +18542,33 @@
     "17733": {
         "text": "Open this file in the mobile app",
         "context": "A button on the downloads page for the user to open the file-link in the mobile app."
+    },
+    "17735": {
+        "text": "Objects",
+        "context": "This is used in the emoji picker dialog as a title for a category of physical object related emojis e.g. phones, computers, TV etc)."
+    },
+    "17736": {
+        "text": "Symbols",
+        "context": "This is used in the emoji picker dialog as a title of a category of symbol related emojis e.g. the heart emoji."
+    },
+    "17737": {
+        "text": "Frequently Used",
+        "context": "This is used in the emoji picker dialog as the title for the category of frequently used emojis. Please translate the text in the case as seen here, not the screenshot where the website automatically uppercases it."
+    },
+    "17738": {
+        "text": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+        "context": "This string is shown inside the Add Contact dialog and is sent to a user in an email."
+    },
+    "17739": {
+        "text": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
+        "context": "Warning dialog appears to uses trying to merge folders with sharing (or link) is activated on one of the merged folders."
+    },
+    "17742": {
+        "text": "Drop to [S]upload[\/S]",
+        "context": "A header of a dialog which allows dragging external files into the MEGA browser. Please leave the placeholders [S] and [\/S] which will be used to bolden the text."
+    },
+    "17743": {
+        "text": "This file has a video codec that is unsupported by your browser.",
+        "context": "An error message which is shown to the user when there is a problem streaming a video file as a result of an unsupported codec. https:\/\/en.wikipedia.org\/wiki\/Codec"
     }
 }

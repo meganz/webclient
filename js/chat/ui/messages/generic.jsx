@@ -489,6 +489,8 @@ var GenericConversationMessage = React.createClass({
                                             var linkButtons = [];
                                             var firstGroupOfButtons = [];
                                             var revokeButton = null;
+                                            var downloadButton = null;
+
                                             if (message.isEditable && message.isEditable()) {
                                                 revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
                                                                                          label={__(l[83])}
@@ -518,6 +520,11 @@ var GenericConversationMessage = React.createClass({
                                                     });
                                             }
                                             else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                                downloadButton = <DropdownsUI.DropdownItem
+                                                    icon="rounded-grey-down-arrow"
+                                                    label={__(l[1187])}
+                                                    onClick={self._startDownload.bind(self, v)}/>;
+
                                                 self._addLinkButtons(v.h, linkButtons);
 
                                                 firstGroupOfButtons.push(
@@ -537,11 +544,9 @@ var GenericConversationMessage = React.createClass({
                                                 {previewButton}
                                                 {firstGroupOfButtons}
                                                 {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
-                                                <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow"
-                                                                          label={__(l[1187])}
-                                                                          onClick={self._startDownload.bind(self, v)}/>
+                                                {downloadButton}
                                                 {linkButtons}
-                                                {revokeButton ? <hr /> : ""}
+                                                {revokeButton && downloadButton ? <hr /> : ""}
                                                 {revokeButton}
                                             </div>;
                                         }}

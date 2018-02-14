@@ -9556,6 +9556,8 @@ React.makeElement = React['createElement'];
 	                                            var linkButtons = [];
 	                                            var firstGroupOfButtons = [];
 	                                            var revokeButton = null;
+	                                            var downloadButton = null;
+
 	                                            if (message.isEditable && message.isEditable()) {
 	                                                revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross',
 	                                                    label: __(l[83]),
@@ -9576,6 +9578,11 @@ React.makeElement = React['createElement'];
 	                                                    }
 	                                                });
 	                                            } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                                downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                                                    icon: 'rounded-grey-down-arrow',
+	                                                    label: __(l[1187]),
+	                                                    onClick: self._startDownload.bind(self, v) });
+
 	                                                self._addLinkButtons(v.h, linkButtons);
 
 	                                                firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
@@ -9594,11 +9601,9 @@ React.makeElement = React['createElement'];
 	                                                previewButton,
 	                                                firstGroupOfButtons,
 	                                                firstGroupOfButtons && firstGroupOfButtons.length > 0 ? React.makeElement('hr', null) : "",
-	                                                React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow',
-	                                                    label: __(l[1187]),
-	                                                    onClick: self._startDownload.bind(self, v) }),
+	                                                downloadButton,
 	                                                linkButtons,
-	                                                revokeButton ? React.makeElement('hr', null) : "",
+	                                                revokeButton && downloadButton ? React.makeElement('hr', null) : "",
 	                                                revokeButton
 	                                            );
 	                                        }

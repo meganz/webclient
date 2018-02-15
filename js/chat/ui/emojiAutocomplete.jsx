@@ -17,7 +17,7 @@ var EmojiAutocomplete = React.createClass({
     },
     getInitialState: function() {
         return {
-            'selected': 0
+            'selected': -1
         };
     },
 
@@ -58,23 +58,37 @@ var EmojiAutocomplete = React.createClass({
                 // up/left
                 selected = selected - 1;
                 selected = selected < 0 ? self.maxFound - 1 : selected;
-                self.setState({'selected': selected});
+                self.setState({
+                    'selected': selected,
+                    'prefilled': true
+                });
+
+                self.props.onPrefill(false, ":" + self.found[selected].n + ":");
                 handled = true;
             }
             else if (key === 39 || key === 40 || key === 9) {
                 // down, right, tab
-                selected = selected + 1;
+                selected = selected + (key === 9 ? (e.shiftKey ? -1 : 1): 1);
+                // support for shift+tab (left/back)
+                selected = selected < 0 ? Object.keys(self.found).length - 1 : selected;
+
                 selected = (
                     selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ?
                         0 : selected
                 );
-                self.setState({'selected': selected});
+                self.setState({
+                    'selected': selected,
+                    'prefilled': true
+                });
+
+                self.props.onPrefill(false, ":" + self.found[selected].n + ":");
+
                 handled = true;
             }
             else if (key === 13) {
                 // enter
                 self.unbindKeyEvents();
-                self.props.onSelect(false, ":" + self.found[selected].n + ":");
+                self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
                 handled = true;
             }
             else if (key === 27) {
@@ -88,6 +102,9 @@ var EmojiAutocomplete = React.createClass({
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
+            }
+            else {
+                self.setState({'prefilled': false});
             }
         });
     },

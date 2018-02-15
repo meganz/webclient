@@ -7500,13 +7500,14 @@ React.makeElement = React['createElement'];
 	                    });
 	                    return;
 	                } else {
-	                    if (self.state.emojiSearchQuery) {
+	                    if (!element.value || element.value.length <= 2) {
 	                        self.setState({
 	                            'emojiSearchQuery': false,
 	                            'emojiStartPos': false,
 	                            'emojiEndPos': false
 	                        });
 	                    }
+	                    return;
 	                }
 	            }
 	            if (self.state.emojiSearchQuery) {
@@ -7861,17 +7862,34 @@ React.makeElement = React['createElement'];
 	        if (self.state.emojiSearchQuery) {
 	            emojiAutocomplete = React.makeElement(EmojiAutocomplete, {
 	                emojiSearchQuery: self.state.emojiSearchQuery,
-	                onSelect: function onSelect(e, emojiAlias) {
+	                onPrefill: function onPrefill(e, emojiAlias) {
 	                    if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
 	                        var msg = self.state.typedMessage;
 	                        var pre = msg.substr(0, self.state.emojiStartPos);
 	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
 	                        self.setState({
 	                            'typedMessage': pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " "),
+	                            'emojiEndPos': self.state.emojiStartPos + emojiAlias.length + (post ? post.substr(0, 1) !== " " ? 1 : 0 : 1)
+	                        });
+	                    }
+	                },
+	                onSelect: function onSelect(e, emojiAlias, forceSend) {
+	                    if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
+	                        var msg = self.state.typedMessage;
+	                        var pre = msg.substr(0, self.state.emojiStartPos);
+	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+	                        var val = pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " ");
+	                        self.setState({
+	                            'typedMessage': val,
 	                            'emojiSearchQuery': false,
 	                            'emojiStartPos': false,
 	                            'emojiEndPos': false
 	                        });
+	                        if (forceSend) {
+	                            if (self.onConfirmTrigger($.trim(val)) !== true) {
+	                                self.setState({ typedMessage: "" });
+	                            }
+	                        }
 	                    }
 	                },
 	                onCancel: function onCancel() {
@@ -8468,7 +8486,7 @@ React.makeElement = React['createElement'];
 	    },
 	    getInitialState: function getInitialState() {
 	        return {
-	            'selected': 0
+	            'selected': -1
 	        };
 	    },
 
@@ -8507,18 +8525,32 @@ React.makeElement = React['createElement'];
 
 	                selected = selected - 1;
 	                selected = selected < 0 ? self.maxFound - 1 : selected;
-	                self.setState({ 'selected': selected });
+	                self.setState({
+	                    'selected': selected,
+	                    'prefilled': true
+	                });
+
+	                self.props.onPrefill(false, ":" + self.found[selected].n + ":");
 	                handled = true;
 	            } else if (key === 39 || key === 40 || key === 9) {
 
-	                selected = selected + 1;
+	                selected = selected + (key === 9 ? e.shiftKey ? -1 : 1 : 1);
+
+	                selected = selected < 0 ? Object.keys(self.found).length - 1 : selected;
+
 	                selected = selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ? 0 : selected;
-	                self.setState({ 'selected': selected });
+	                self.setState({
+	                    'selected': selected,
+	                    'prefilled': true
+	                });
+
+	                self.props.onPrefill(false, ":" + self.found[selected].n + ":");
+
 	                handled = true;
 	            } else if (key === 13) {
 
 	                self.unbindKeyEvents();
-	                self.props.onSelect(false, ":" + self.found[selected].n + ":");
+	                self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
 	                handled = true;
 	            } else if (key === 27) {
 
@@ -8531,6 +8563,8 @@ React.makeElement = React['createElement'];
 	                e.preventDefault();
 	                e.stopPropagation();
 	                return false;
+	            } else {
+	                self.setState({ 'prefilled': false });
 	            }
 	        });
 	    },

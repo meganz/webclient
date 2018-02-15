@@ -2152,7 +2152,11 @@ function topmenuUI() {
 
     if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
         $topHeader.find('.top-search-bl').addClass('contains-value');
-        $topHeader.find('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
+        var searchVal = M.currentdirid.substr(7);
+        if (hashLogic) {
+            searchVal = decodeURIComponent(searchVal);
+        }
+        $topHeader.find('.top-search-bl input').val(searchVal);
     }
 
     // Initialise the header icon for mobile

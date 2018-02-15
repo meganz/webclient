@@ -687,15 +687,23 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         s.on('error', function(ev, error) {
             // <video>'s element `error` handler
 
-            var info = (MediaAttribute.getCodecStrings(node) || []).concat(s.hasVideo, s.hasAudio, ua.details.prod);
+            var info = [2].concat(MediaAttribute.getCodecStrings(node)).concat(s.hasVideo, s.hasAudio);
 
             if (!$.dialog) {
                 var hint = error.message || error;
+                info.push(String(hint || 'na'));
+
                 if (!hint && !window.chrome) {
                     // Suggest Chrome...
                     hint = l[16151] + ' ' + l[242];
                 }
-                msgDialog('warninga', l[135], l[47], hint);
+
+                if (String(hint) === 'The provided type is not supported') {
+                    msgDialog('warninga', l[135], l[17743]);
+                }
+                else {
+                    msgDialog('warninga', l[135], l[47], hint);
+                }
             }
             if (d) {
                 console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime, error, info);

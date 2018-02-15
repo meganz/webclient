@@ -512,6 +512,9 @@ mBroadcaster.once('startMega', function populate_l() {
                 .replace('[/A]', '</a>');
     l[17690] = l[17690].replace('[A]', '<a href="https://mega.nz/recovery" target="_blank" class="red">')
                        .replace('[/A]', '</a>');
+    if (l[17742]) {
+        l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>')
+    }
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

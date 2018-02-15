@@ -1,32 +1,5 @@
 (function(scope) {
 
-    function FileDragHover(e) {
-        if (d) {
-            console.log('hover', $.dragging);
-        }
-        // if (folderlink) return false;
-        $.dragging = Date.now();
-        e.stopPropagation();
-        e.preventDefault();
-        $('.drag-n-drop.overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
-    }
-
-    function FileDragLeave(e) {
-        if (d) {
-            console.log(e);
-        }
-        // if (folderlink || M.getNodeRights(M.currentdirid) < 1) return false;
-        e.stopPropagation();
-        e.preventDefault();
-        setTimeout(function() {
-            if (page == 'start'
-                    && e && (e.pageX < 6 || e.pageY < 6) && $.dragging && $.dragging + 500 < Date.now()) {
-                $.dragging = false;
-            }
-        }, 500);
-    }
-
     var dir_inflight = 0;
     var filedrag_u = [];
     var filedrag_paths = Object.create(null);
@@ -151,7 +124,32 @@
         }, true);
     }
 
-    // file selection
+    function FileDragEnter(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        // Set first entered element
+        dragElement = e.target;
+        $('.drag-n-drop.overlay').removeClass('hidden');
+        $('body').addClass('overlayed');
+    }
+
+    function FileDragHover(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    function FileDragLeave(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (dragElement === e.target) {
+            $('.drag-n-drop.overlay').addClass('hidden');
+            $('body').removeClass('overlayed');   
+        }
+    }
+
+    // on Drop event
     function FileSelectHandler(e) {
         if (e.stopPropagation) {
             e.stopPropagation();
@@ -162,6 +160,9 @@
 
         var target = $(e.target);
         var currentDir = M.currentdirid;
+
+        // Clear drag element
+        dragElement = 0;
 
         $('.drag-n-drop.overlay').addClass('hidden');
         $('body').removeClass('overlayed');
@@ -300,9 +301,13 @@
             }
         }
 
+        var dragElement;
         var fnHandler = FileSelectHandler;
+        var fnEnter = FileDragEnter;
         var fnHover = FileDragHover;
         var fnLeave = FileDragLeave;
+
+        dragElement = 0;
 
         // MEGAdrop upload
         var elem = document.getElementById("wu_items");
@@ -312,9 +317,12 @@
             // fnLeave = mega.megadrop.uiDragLeave;
             document.getElementById('fileselect5').addEventListener("change", fnHandler, false);
         }
+
+        document.getElementsByTagName("body")[0].addEventListener("dragenter", fnEnter, false);
         document.getElementsByTagName("body")[0].addEventListener("dragover", fnHover, false);
         document.getElementsByTagName("body")[0].addEventListener("dragleave", fnLeave, false);
         document.getElementsByTagName("body")[0].addEventListener("drop", fnHandler, false);
+
 
         if (is_chrome_firefox) {
             $('input[webkitdirectory], .fm-folder-upload input').click(function(e) {

@@ -939,6 +939,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
  */
 MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
     if (fminitialized) {
+        var n = M.d[itemHandle] || false;
 
         // DOM update, left and right panel in 'Cloud Drive' tab
         $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newItemName);
@@ -966,8 +967,16 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
         mega.megadrop.onRename(itemHandle, newItemName);
 
         // update file versioning dialog if the name of the versioned file changes.
-        if (!M.d[itemHandle].t && M.d[itemHandle].tvf > 0) {
+        if (!n.t && n.tvf > 0) {
             fileversioning.updateFileVersioningDialog(itemHandle);
+        }
+
+        if (n.p === M.currentdirid) {
+            delay('onRenameUIUpdate:' + n.p, function() {
+                if (n.p === M.currentdirid) {
+                    M.openFolder(n.p, true).done(reselect);
+                }
+            }, 50);
         }
     }
 };

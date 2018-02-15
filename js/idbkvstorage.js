@@ -57,6 +57,7 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
 
     delete this.delcache[k];
     this.newcache[k] = v;
+    this.saveState();
 
     promise.resolve([k, v]);
 
@@ -90,8 +91,6 @@ IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
 
 // check if item exists
 IndexedDBKVStorage.prototype.hasItem = function __IDBKVHasItem(k) {
-    var promise = new MegaPromise();
-
     if (!this.delcache[k] && (typeof(this.newcache[k]) != 'undefined' || typeof(this.dbcache[k]) != 'undefined')) {
         return MegaPromise.resolve();
     }
@@ -105,10 +104,25 @@ IndexedDBKVStorage.prototype.hasItem = function __IDBKVHasItem(k) {
 IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
     this.delcache[k] = true;
     delete this.newcache[k];
+    this.saveState();
 
-    var promise = new MegaPromise();
-    promise.resolve();
-    return promise;
+    return MegaPromise.resolve();
+};
+
+// enqueue explicit flush
+IndexedDBKVStorage.prototype.saveState = function() {
+    'use strict';
+    var self = this;
+
+    delay('attribcache:savestate', function() {
+        if (d) {
+            self.logger.debug('saveState(%s)...', currsn, fminitialized);
+        }
+
+        if (currsn) {
+            setsn(currsn);
+        }
+    }, 2600);
 };
 
 // iterate over all items, with prefix

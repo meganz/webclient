@@ -7730,5 +7730,9 @@
     "17733": {
         "text": "Open this file in the mobile app",
         "context": "A button on the downloads page for the user to open the file-link in the mobile app."
+    },
+    "17743": {
+        "text": "This file has a video codec that is unsupported by your browser.",
+        "context": "An error message which is shown to the user when there is a problem streaming a video file as a result of an unsupported codec. https:\/\/en.wikipedia.org\/wiki\/Codec"
     }
 }

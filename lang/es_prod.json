@@ -1931,5 +1931,6 @@
     "17705": "Recargar",
     "17706": "Tu inicio de sesi\u00f3n est\u00e1 tardando m\u00e1s de lo esperado. \u00bfQuieres esperar o recargar?",
     "17732": "View video",
-    "17733": "Open this file in the mobile app"
+    "17733": "Open this file in the mobile app",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

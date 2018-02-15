@@ -1931,5 +1931,6 @@
     "17705": "Neu laden",
     "17706": "Ihr Login dauert ungew\u00f6hnlich lange. M\u00f6chten Sie weiter abwarten oder Ihren Account komplett neu laden?",
     "17732": "View video",
-    "17733": "Open this file in the mobile app"
+    "17733": "Open this file in the mobile app",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

@@ -460,8 +460,9 @@ var GenericConversationMessage = React.createClass({
                                     v.delay = message.delay;
                                     chatRoom.images.push(v);
                                 }
+                                var previewLabel = is_video(v) ? l[17732] : l[1899];
                                 previewButton = <span key="previewButton">
-                                    <DropdownsUI.DropdownItem icon="search-icon" label={__(l[1899])}
+                                    <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
                                                               onClick={self._startPreview.bind(self, v)}/>
                                     <hr/>
                                 </span>;

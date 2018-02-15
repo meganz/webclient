@@ -513,7 +513,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[17690] = l[17690].replace('[A]', '<a href="https://mega.nz/recovery" target="_blank" class="red">')
                        .replace('[/A]', '</a>');
     if (l[17742]) {
-        l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>')
+        l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     }
 
     var common = [

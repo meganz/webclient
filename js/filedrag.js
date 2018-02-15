@@ -145,7 +145,7 @@
 
         if (dragElement === e.target) {
             $('.drag-n-drop.overlay').addClass('hidden');
-            $('body').removeClass('overlayed');   
+            $('body').removeClass('overlayed');
         }
     }
 
@@ -158,7 +158,6 @@
             e.preventDefault();
         }
 
-        var target = $(e.target);
         var currentDir = M.currentdirid;
 
         // Clear drag element

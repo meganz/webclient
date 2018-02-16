@@ -2145,7 +2145,7 @@ var UICallTerm = Object.freeze({
 RtcModule.UICallTerm = UICallTerm;
 RtcModule.termCodeIsError = function(termCode, name) {
     if (!name) {
-        name = constStateToText(Term, terminationCode);
+        name = constStateToText(Term, termCode);
     }
     return !!name.match(/kErr+/i);
 }
@@ -2153,7 +2153,7 @@ RtcModule.termCodeIsError = function(termCode, name) {
 // Not all timeouts are errors, i.e. kAnswerTimeout
 RtcModule.termCodeIsTimeout = function(termCode, name) {
     if (!name) {
-        name = constStateToText(Term, terminationCode);
+        name = constStateToText(Term, termCode);
     }
     return !!name.match(/k[^\s]+Timeout/i);
 }
@@ -2185,10 +2185,10 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             return UICallTerm.REJECTED;
         default:
             var name = constStateToText(Term, terminationCode);
-            if (RtcModule.termCodeIsTimeout(terminationCode, name)) {
-               return UICallTerm.TIMEOUT;
-            } else if (RtcModule.termCodeIsError(terminationCode, name)) {
+            if (RtcModule.termCodeIsError(terminationCode, name)) {
                 return UICallTerm.FAILED;
+            } else if (RtcModule.termCodeIsTimeout(terminationCode, name)) {
+                return UICallTerm.TIMEOUT;
             } else {
                 self.logger.warn("termCodeToUIState: Don't know how to translate term code", name, "returning FAIL");
                 return UICallTerm.FAILED;

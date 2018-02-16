@@ -635,13 +635,14 @@ Call.prototype._getLocalStream = function(av) {
 };
 
 Call.prototype.msgCallTerminate = function(packet) {
+    var self = this;
     if (packet.data.length < 1) {
-        this.logger.error("Ignoring CALL_TERMINATE without reason code");
+        self.logger.error("Ignoring CALL_TERMINATE without reason code");
         return;
     }
     var code = packet.data.charCodeAt(0);
-    var sessions = this.sessions;
-    var ci = this._callerInfo;
+    var sessions = self.sessions;
+    var ci = self._callerInfo;
     var isCallParticipant = false;
     if (Object.keys(sessions).length) { // Call is in progress, look in sessions
         for (var sid in sessions) {
@@ -651,18 +652,24 @@ Call.prototype.msgCallTerminate = function(packet) {
                 break;
             }
         }
-    } else if (this.state <= CallState.kJoining
+    } else if (self.state <= CallState.kJoining
         && ci
         && ci.fromUser === packet.fromUser
         && ci.fromClient === packet.fromClient) { // call is in setup phase, only call initiator can abort it
             isCallParticipant = true;
+    } else {
+        var retry = self.sessRetries[ci.fromUser+ci.fromClient];
+        if (retry && (Date.now() - retry.active <= RtcModule.kSessSetupTimeout)) {
+            // no session to this peer at the moment, but we are in the process of reconnecting to them
+            isCallParticipant = true;
+        }
     }
 
     if (!isCallParticipant) {
-        this.logger.warn("Received CALL_TERMINATE from a client that is not in the call, ignoring");
+        self.logger.warn("Received CALL_TERMINATE from a client that is not in the call, ignoring");
         return;
     }
-    this._destroy(code | Term.kPeer, false);
+    self._destroy(code | Term.kPeer, false);
 };
 
 Call.prototype.msgCallReqDecline = function(packet) {
@@ -994,36 +1001,49 @@ Call.prototype._removeSession = function(sess, reason) {
     var sessRetries = self.sessRetries;
     var totalRetries = ++sessRetries.total;
     var retryId;
-    if (sessRetries[endpointId]) {
-        retryId = sessRetries[endpointId] = 1;
+    var retry = sessRetries[endpointId];
+    // The retry.active flag is not cleared when the session is actually restored. Only the
+    // combination of .active + no session to this peer + no newer retry means that this particular
+    // retry is in progress
+    if (retry) {
+        retry.active = Date.now();
+        retryId = ++retry.cnt;
     } else {
-        retryId = ++sessRetries[endpointId];
+        sessRetries[endpointId] = {cnt: 1, active: Date.now() };
+        retryId = 1;
     }
+
     // The original joiner re-joins, the peer does nothing, just keeps the call
     // ongoing and accepts the JOIN
     if (sess.isJoiner) {
-        this.logger.log("Session to", base64urlencode(sess.peer), "failed, re-establishing it...");
+        self.logger.log("Session to", base64urlencode(sess.peer), "failed, re-establishing it...");
         setTimeout(function() { //execute it async, to avoid re-entrancy
             self.rejoinUser(sess.peer);
         }, 0);
     } else {
-        // Wait for peer to re-join...
-        if (!self.isGroup) { // TODO: From group calls we would need to revise this
-            // ...but if it's the only session, set a timeout
-            setTimeout(function() {
-                if (self.state >= CallState.kTerminating
-                    || sessRetries[endpointId] > retryId) {
-                        return; // there was another retry meanwhile, this timer is not relevant anymore
-                }
-                if (!Object.keys(self.sessions).length // There are no sessions currently
-                    && sessRetries.all === totalRetries) { // There was no newer retry that we would have to wait for
-                        this.logger.warn("Timed out waiting for peer to rejoin, terminating call");
-                        self.hangup(Term.kErrSessRetryTimeout); //kErrSessSetupTimeout is about existing session not reaching kInProgress
-                }
-            }, RtcModule.kSessSetupTimeout);
-        }
-        this.logger.log("Session to ", base64urlencode(sess.peer), "failed, expecting peer to re-establish it...");
+        // Else wait for peer to re-join...
+        self.logger.log("Session to ", base64urlencode(sess.peer), "failed, expecting peer to re-establish it...");
     }
+    // set a timeout for the session recovery
+    setTimeout(function() {
+        var retry = sessRetries[endpointId];
+        assert(retry);
+        if (retry.cnt !== retryId) { // there was another retry on this session meanwhile
+            return;
+        }
+        delete retry.active;
+        if ((sessRetries.all > totalRetries) // there was a newer retry on another session
+         || (self.state >= CallState.kTerminating)) { // call already terminating
+            return; //timer is not relevant anymore
+        }
+
+        if (!self.isGroup && !Object.keys(self.sessions).length) {
+            // There are no sessions currently
+            // TODO: For group calls we would need to revise this
+            self.logger.warn("Timed out waiting for peer to rejoin, terminating call");
+            self.hangup(Term.kErrSessRetryTimeout); //kErrSessSetupTimeout is about existing session not reaching kInProgress
+        }
+    }, RtcModule.kSessSetupTimeout);
 };
 Call.prototype._fire = function(evName) {
     var self = this;
@@ -1197,9 +1217,7 @@ Call.prototype.hangup = function(reason) {
         if (reason == null) { // covers both 'undefined' and 'null'
             term = Term.kUserHangup;
         } else {
-            assert(reason === Term.kUserHangup
-                || reason === Term.kErrProtoTimeout
-                || reason === Term.kErrSessSetupTimeout);
+            assert(reason === Term.kUserHangup || RtcModule.termCodeIsError(reason));
             term = reason;
         }
         break;
@@ -1752,6 +1770,9 @@ Session.prototype.msgSessTerminate = function(packet) {
     if (self.state === SessState.kTerminating && this.terminateAckCallback) {
         // handle terminate as if it were an ack - in both cases the peer is terminating
         self.msgSessTerminateAck(packet);
+        if (self.state === SessState.kDestroyed) { // the ack handler destroyed it
+            return;
+        }
     }
     self._setState(SessState.kTerminating);
     self._destroy(packet.data.charCodeAt(8) | Term.kPeer);
@@ -2122,6 +2143,20 @@ var UICallTerm = Object.freeze({
     'TIMEOUT': 80
 });
 RtcModule.UICallTerm = UICallTerm;
+RtcModule.termCodeIsError = function(termCode, name) {
+    if (!name) {
+        name = constStateToText(Term, terminationCode);
+    }
+    return !!name.match(/kErr+/i);
+}
+
+// Not all timeouts are errors, i.e. kAnswerTimeout
+RtcModule.termCodeIsTimeout = function(termCode, name) {
+    if (!name) {
+        name = constStateToText(Term, terminationCode);
+    }
+    return !!name.match(/k[^\s]+Timeout/i);
+}
 
 Call.prototype.termCodeToUIState = function(terminationCode) {
     var self = this;
@@ -2150,9 +2185,9 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             return UICallTerm.REJECTED;
         default:
             var name = constStateToText(Term, terminationCode);
-            if (name.match(/k[^\s]+Timeout/i)) {
+            if (RtcModule.termCodeIsTimeout(terminationCode, name)) {
                return UICallTerm.TIMEOUT;
-            } else if (name.match(/kErr[\s]+/)) {
+            } else if (RtcModule.termCodeIsError(terminationCode, name)) {
                 return UICallTerm.FAILED;
             } else {
                 self.logger.warn("termCodeToUIState: Don't know how to translate term code", name, "returning FAIL");

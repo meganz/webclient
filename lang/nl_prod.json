@@ -1926,8 +1926,11 @@
     "17688": "Kunt u uw wachtwoord herinneren?",
     "17689": "Tik en hou vast om de Herstelsleutel te kopi\u00ebren naar het klembord.",
     "17690": "Om uw account te herstellen met uw Herstelsleutel, bezoek [A]https:\/\/mega.nz\/recovery[\/A] op uw desktop apparaat en volg de instructies,",
-    "17694": "Download key",
-    "17704": "Wait",
-    "17705": "Force Reload",
-    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
+    "17694": "Download sleutel",
+    "17704": "Wacht",
+    "17705": "Herladen Forceren",
+    "17706": "Uw login duurt langer dan verwacht. Wilt u wachten of een herlading forceren.",
+    "17732": "Video weergeven",
+    "17733": "Open dit bestand in de mobiele applicatie",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

@@ -10,6 +10,8 @@ var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
 var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
 
+var NODE_DOESNT_EXISTS_ANYMORE = {};
+
 var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],
     getInitialState: function() {
@@ -211,7 +213,7 @@ var GenericConversationMessage = React.createClass({
         }
     },
     _startDownload: function(v) {
-        M.addDownload([v]);
+        M.addDownload([v.h || v]);
     },
     _addToCloudDrive: function(v) {
         M.injectNodes(v, M.RootID, function(res) {
@@ -487,48 +489,69 @@ var GenericConversationMessage = React.createClass({
                                             var linkButtons = [];
                                             var firstGroupOfButtons = [];
                                             var revokeButton = null;
+                                            var downloadButton = null;
+
                                             if (message.isEditable && message.isEditable()) {
                                                 revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
-                                                    label={__(l[83])} className="red" onClick={() => {
-                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
-                                                            chatRoom,
-                                                            (
-                                                                message.internalId ?
-                                                                    message.internalId : message.orderValue
-                                                            ),
-                                                            ""
-                                                        );
-                                                    }} />
+                                                                                         label={__(l[83])}
+                                                                                         className="red"
+                                                                                         onClick={() => {
+                                                    chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
+                                                        chatRoom,
+                                                        (
+                                                            message.internalId ?
+                                                                message.internalId : message.orderValue
+                                                        ),
+                                                        ""
+                                                    );
+                                                }} />
                                             }
 
-                                            self._addLinkButtons(v.h, linkButtons);
+                                            if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                                dropdown = "<span>" + l[5533] + "</span>";
+                                                dbfetch.get(v.h)
+                                                    .always(function() {
+                                                        if (!M.d[v.h]) {
+                                                            NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
+                                                            Soon(function() {
+                                                                self.safeForceUpdate();
+                                                            });
+                                                        }
+                                                    });
+                                            }
+                                            else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                                downloadButton = <DropdownsUI.DropdownItem
+                                                    icon="rounded-grey-down-arrow"
+                                                    label={__(l[1187])}
+                                                    onClick={self._startDownload.bind(self, v)}/>;
 
-                                            firstGroupOfButtons.push(
-                                                <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
-                                                                          key="infoDialog"
-                                                                          onClick={() => {
-                                                                              $.selected = [v.h];
-                                                                              propertiesDialog();
-                                                                          }} />
-                                            );
+                                                self._addLinkButtons(v.h, linkButtons);
+
+                                                firstGroupOfButtons.push(
+                                                    <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
+                                                                              key="infoDialog"
+                                                                              onClick={() => {
+                                                                                  $.selected = [v.h];
+                                                                                  propertiesDialog();
+                                                                              }} />
+                                                );
 
 
-                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+                                                self._addFavouriteButtons(v.h, firstGroupOfButtons);
+                                            }
 
                                             return <div>
                                                 {previewButton}
                                                 {firstGroupOfButtons}
                                                 {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
-                                                <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
-                                                                          onClick={self._startDownload.bind(self, v)}/>
+                                                {downloadButton}
                                                 {linkButtons}
-                                                {revokeButton ? <hr /> : ""}
+                                                {revokeButton && downloadButton ? <hr /> : ""}
                                                 {revokeButton}
                                             </div>;
                                         }}
                                     />
                                 </ButtonsUI.Button>;
-
                             }
                             else {
                                 dropdown = <ButtonsUI.Button

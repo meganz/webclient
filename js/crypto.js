@@ -1204,12 +1204,9 @@ function api_setsid(sid) {
         if (typeof dlmanager === 'object') {
 
             if (!dlmanager.onOverquotaWithAchievements) {
-                if (dlmanager.isOverQuota) {
-
-                    if (!dlmanager.isOverFreeQuota) {
-                        dlmanager.uqFastTrack = 1;
-                        delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
-                    }
+                if (dlmanager.isOverQuota && !dlmanager.isOverFreeQuota) {
+                    dlmanager.uqFastTrack = !Object(u_attr).p;
+                    delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
                 }
 
                 if (typeof dlmanager.onLimitedBandwidth === 'function') {
@@ -1347,7 +1344,7 @@ function chunkedfetch(xhr, uri, postdata) {
         function chunkedread() {
             return reader.read().then(function(r) {
                 if (r.done) {
-                    // signal completion through .onload()
+                    // signal completion through .onloadend()
                     xhr.response = null;
                     xhr.onloadend();
                 }
@@ -1364,7 +1361,7 @@ function chunkedfetch(xhr, uri, postdata) {
         chunkedread();
     }).catch(function(err) {
         console.error("Fetch error: ", err);
-        xhr.onerror();
+        xhr.onloadend();
     });
 }
 
@@ -1432,7 +1429,7 @@ function api_proc(q) {
                     }
 
                     // update number of bytes received in .onprogress() for subsequent check
-                    // in .onload() whether it contains more data
+                    // in .onloadend() whether it contains more data
 
                     var chunk = this.response;
 

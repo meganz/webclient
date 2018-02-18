@@ -1926,8 +1926,11 @@
     "17688": "Czy mo\u017cesz zapami\u0119ta\u0107 swoje has\u0142o?",
     "17689": "Kliknij i przytrzymaj aby skopiowa\u0107 klucz do schowka.",
     "17690": "Aby odzyska\u0107 dost\u0119p do konta u\u017cywaj\u0105c klucza, przejd\u017a na stron\u0119 [A]https:\/\/mega.nz\/recovery[\/A] na komputerze i post\u0119puj zgodnie z instrukcj\u0105.",
-    "17694": "Download key",
-    "17704": "Wait",
-    "17705": "Force Reload",
-    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
+    "17694": "Pobierz klucz",
+    "17704": "Prosz\u0119 czeka\u0107",
+    "17705": "Wymu\u015b prze\u0142adowanie",
+    "17706": "Logowanie trwa d\u0142u\u017cej ni\u017c planowano. Czy chcesz czeka\u0107 czy wymusi\u0107 prze\u0142adowanie strony?",
+    "17732": "Zobacz wideo",
+    "17733": "Otw\u00f3rz ten plik w aplikacji mobilnej",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

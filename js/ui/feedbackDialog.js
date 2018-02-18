@@ -46,7 +46,7 @@
                     }
                 },
                 {
-                    'label': 'SUBMIT YOUR FEEDBACK',
+                    'label': 'SUBMIT YOUR FEEDBACK',// l[7237]
                     'className': "feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
@@ -74,9 +74,9 @@
                             id: reportId,
                             d: dump
                         });
-                        
+
                         $('.feedback-dialog-body').addClass('hidden');
-                        $('.feedback-result-pad').removeClass('hidden');    
+                        $('.feedback-result-pad').removeClass('hidden');
 
                         $('.feedback-result-button', self.$dialog).rebind('click.feedbackDialog', function() {
                             self.hide();
@@ -108,7 +108,7 @@
                 .val('')
                 .next()
                 .text('');
- 
+
             initTextareaScrolling($('.feedback-dialog-scr textarea'), 80);
 
             $('.collected-data', self.$dialog)
@@ -145,7 +145,7 @@
             $('input[name="contact_me"]', self.$dialog)
                 .attr('checked', false)
                 .trigger('change');
-                
+
         });
 
         self.bind("onHide", function() {
@@ -168,7 +168,7 @@
 
             $('.feedback-button-send, .feedback-button-cancel', self.$dialog).removeClass('disabled');
         });
-        
+
         initTextareaScrolling($('.feedback-dialog-scr textarea'), 80);
 
         $('.stats-button', self.$dialog).rebind('click.feedbackDialog', function() {
@@ -203,10 +203,10 @@
             }
 
             dialog.show();
-            
+
             collectedData = '<li>' + JSON.stringify(self._report, null, 2).replace(/\n/g, '</li> <li>');
             $('.collected-data', dialog.$dialog).html(collectedData);
-            
+
             // Content render fix for correct scrolling
             var renderTimer = setInterval(function(){
                     $('.collected-data-textarea').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});

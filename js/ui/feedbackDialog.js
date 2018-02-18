@@ -46,7 +46,7 @@
                     }
                 },
                 {
-                    'label': 'SUBMIT YOUR FEEDBACK',// l[7237]
+                    'label': l[7237],
                     'className': "feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();

@@ -4641,5 +4641,6 @@
     "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
     "17739": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
     "17742": "Drop to [S]upload[\/S]",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17743": "\u0412\u0438\u0434\u0435\u043e\u043a\u043e\u0434\u0435\u043a \u044d\u0442\u043e\u0433\u043e \u0444\u0430\u0439\u043b\u0430 \u043d\u0435 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u0442\u0441\u044f \u0432\u0430\u0448\u0438\u043c \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u043e\u043c.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

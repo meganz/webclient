@@ -4641,5 +4641,6 @@
     "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
     "17739": "Katalogi nie mog\u0105 zosta\u0107 po\u0142\u0105czone ze wzgl\u0119du na obecno\u015b\u0107 udost\u0119pnionych link\u00f3w. Je\u017celi chcesz je po\u0142\u0105czy\u0107 musisz najpierw usun\u0105\u0107 udost\u0119pnienia z tych katalog\u00f3w.",
     "17742": "Drop to [S]upload[\/S]",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17743": "Ten plik wideo zawiera format, kt\u00f3ry jest nie obs\u0142ugiwany przez Twoj\u0105 przegl\u0105dark\u0119.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

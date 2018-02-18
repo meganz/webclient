@@ -176,8 +176,13 @@ var slideshowid;
     function slideshow_node(id, $overlay) {
         var n = M.getNodeByHandle(id);
 
-        if (!n && typeof id === 'object') {
-            n = id;
+        if (!n) {
+            if (typeof id === 'object') {
+                n = id;
+            }
+            else if (typeof dl_node !== 'undefined' && dl_node.h === id) {
+                n = dl_node;
+            }
         }
 
         if ($overlay) {
@@ -319,7 +324,6 @@ var slideshowid;
 
         var $dlBut = $overlay.find('.viewer-button.download');
         $dlBut.rebind('click', function() {
-
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                     dl_queue[i].preview = false;
@@ -328,7 +332,11 @@ var slideshowid;
                 }
             }
 
-            if (M.d[slideshowid]) {
+            // TODO: adapt the above code to work on the downloads page if we need to download the original
+            if (page === 'download') {
+                $('.big-button.download-file').click();
+            }
+            else if (M.d[slideshowid]) {
                 M.addDownload([slideshowid]);
             }
             else {
@@ -336,7 +344,7 @@ var slideshowid;
             }
         });
 
-        if (n.p || M.chat) {
+        if (n.p || M.chat || page === 'download') {
             $dlBut.removeClass('hidden');
         }
         else {

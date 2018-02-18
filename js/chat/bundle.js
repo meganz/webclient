@@ -1192,6 +1192,8 @@ React.makeElement = React['createElement'];
 
 	            if (lastMessage.isManagement && lastMessage.isManagement()) {
 	                renderableSummary = lastMessage.getManagementMessageSummaryText();
+	            } else if (!lastMessage.textContents && lastMessage.dialogType) {
+	                renderableSummary = Message._getTextContentsForDialogType(lastMessage);
 	            }
 
 	            renderableSummary = htmlentities(renderableSummary);
@@ -2118,7 +2120,7 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        self._updatesDisabled = true;
 	        if (self._updatesReenableTimer) {
-	            clearTimeout(self._updatesRenableTimer);
+	            clearTimeout(self._updatesReenableTimer);
 	        }
 
 	        var timeout = forHowLong ?
@@ -4747,29 +4749,47 @@ React.makeElement = React['createElement'];
 	            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
 	                ps.disable();
 
-	                mb.retrieveChatHistory();
-
 	                self.isRetrievingHistoryViaScrollPull = true;
 	                self.lastScrollPosition = scrollPositionY;
 
 	                self.lastContentHeightBeforeHist = ps.getScrollHeight();
+
+	                var msgsAppended = 0;
+	                $(chatRoom).unbind('onMessagesBuffAppend.pull');
+	                $(chatRoom).bind('onMessagesBuffAppend.pull', function () {
+	                    msgsAppended++;
+	                });
+
 	                $(chatRoom).unbind('onHistoryDecrypted.pull');
-	                $(chatRoom).one('onHistoryDecrypted.pull', function () {
-	                    setTimeout(function () {
+	                $(chatRoom).one('onHistoryDecrypted.pull', function (e) {
+	                    $(chatRoom).unbind('onMessagesBuffAppend.pull');
+	                    var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
 
-	                        self.isRetrievingHistoryViaScrollPull = false;
+	                    ps.scrollToY(prevPosY, true);
 
-	                        var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
+	                    chatRoom.messagesBuff.addChangeListener(function () {
+	                        if (msgsAppended > 0) {
+	                            var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
+
+	                            ps.scrollToY(prevPosY, true);
+
+	                            self.lastScrollPosition = prevPosY;
+	                        }
 
 	                        delete self.lastContentHeightBeforeHist;
 
-	                        self.lastScrollPosition = prevPosY;
+	                        return 0xDEAD;
+	                    });
+
+	                    setTimeout(function () {
+	                        self.isRetrievingHistoryViaScrollPull = false;
 
 	                        ps.enable();
-	                        ps.scrollToY(prevPosY, true);
 	                        self.forceUpdate();
-	                    }, 1000);
+	                    }, 1150);
 	                });
+
+	                mb.retrieveChatHistory();
 	            }
 	        }
 
@@ -4779,7 +4799,6 @@ React.makeElement = React['createElement'];
 	    },
 	    specificShouldComponentUpdate: function specificShouldComponentUpdate() {
 	        if (this.isRetrievingHistoryViaScrollPull || this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || !this.props.chatRoom.isCurrentlyActive) {
-
 	            return false;
 	        } else {
 	            return undefined;
@@ -4801,9 +4820,15 @@ React.makeElement = React['createElement'];
 	        var contacts = room.getParticipantsExceptMe();
 	        var contactHandle;
 	        var contact;
-	        if (contacts && contacts.length > 0) {
+	        var avatarMeta;
+	        var contactName = "";
+	        if (contacts && contacts.length === 1) {
 	            contactHandle = contacts[0];
 	            contact = M.u[contactHandle];
+	            avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
+	            contactName = avatarMeta.fullName;
+	        } else if (contacts && contacts.length > 1) {
+	            contactName = room.getRoomTitle(true);
 	        }
 
 	        var conversationPanelClasses = "conversation-panel " + room.type + "-chat";
@@ -4811,9 +4836,6 @@ React.makeElement = React['createElement'];
 	        if (!room.isCurrentlyActive) {
 	            conversationPanelClasses += " hidden";
 	        }
-
-	        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
-	        var contactName = avatarMeta.fullName;
 
 	        var messagesList = [];
 
@@ -5224,30 +5246,7 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'truncateDialog': false });
 	                    },
 	                    onConfirmClicked: function onConfirmClicked() {
-	                        var chatMessages = room.messagesBuff.messages;
-	                        if (chatMessages.length > 0) {
-	                            var lastChatMessageId = null;
-	                            var i = chatMessages.length - 1;
-	                            while (lastChatMessageId == null && i >= 0) {
-	                                var message = chatMessages.getItem(i);
-	                                if (message instanceof Message) {
-	                                    lastChatMessageId = message.messageId;
-	                                }
-	                                i--;
-	                            }
-	                            if (lastChatMessageId) {
-	                                asyncApiReq({
-	                                    a: 'mct',
-	                                    id: room.chatId,
-	                                    m: lastChatMessageId,
-	                                    v: Chatd.VERSION
-	                                }).fail(function (r) {
-	                                    if (r === -2) {
-	                                        msgDialog('warninga', l[135], __(l[8880]));
-	                                    }
-	                                });
-	                            }
-	                        }
+	                        room.truncate();
 
 	                        self.setState({
 	                            'truncateDialog': false
@@ -7575,7 +7574,6 @@ React.makeElement = React['createElement'];
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
 	            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
-
 	                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
 	            }
 	        }
@@ -7638,7 +7636,7 @@ React.makeElement = React['createElement'];
 	        var room = this.props.chatRoom;
 
 	        if (room.isCurrentlyActive && self.isMounted()) {
-	            if ($('textarea:focus,select:focus,input:focus').size() === 0) {
+	            if ($('textarea:focus,select:focus,input:focus').filter(":visible").size() === 0) {
 
 	                this.focusTypeArea();
 	            }
@@ -8290,7 +8288,7 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "div",
 	                    { className: "emoji title" },
-	                    ":" + meta.u + ":"
+	                    ":" + meta.n + ":"
 	                )
 	            );
 	        }
@@ -8514,7 +8512,7 @@ React.makeElement = React['createElement'];
 	            } else if (key === 39 || key === 40 || key === 9) {
 
 	                selected = selected + 1;
-	                selected = selected >= self.props.maxEmojis ? 0 : selected;
+	                selected = selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ? 0 : selected;
 	                self.setState({ 'selected': selected });
 	                handled = true;
 	            } else if (key === 13) {
@@ -8827,12 +8825,18 @@ React.makeElement = React['createElement'];
 	                'call-missed': l[7210],
 	                'call-rejected': l[5892],
 	                'call-canceled': l[5894],
-	                'call-started': l[5888]
+	                'call-started': l[5888],
+	                'alterParticipants': undefined,
+	                'privilegeChange': l[8915],
+	                'truncated': l[8905]
+
 	            };
 	        }
 	        return MESSAGE_STRINGS[type];
 	    };
 	})();
+
+	mega.ui.chat.getMessageString = getMessageString;
 
 	module.exports = {
 	    getMessageString: getMessageString
@@ -10259,35 +10263,8 @@ React.makeElement = React['createElement'];
 	    },
 	    getContact: function getContact() {
 	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
 
-	        var contact;
-	        if (message.authorContact) {
-	            contact = message.authorContact;
-	        } else if (message.meta && message.meta.userId) {
-	            contact = M.u[message.meta.userId];
-	            if (!contact) {
-	                return {
-	                    'u': message.meta.userId,
-	                    'h': message.meta.userId,
-	                    'c': 0
-	                };
-	            }
-	        } else if (message.userId) {
-	            if (!M.u[message.userId]) {
-
-	                return null;
-	            }
-	            contact = M.u[message.userId];
-	        } else if (message.getFromJid) {
-	            contact = megaChat.getContactFromJid(message.getFromJid());
-	        } else {
-	            console.error("No idea how to render this: ", this.props);
-
-	            return {};
-	        }
-
-	        return contact;
+	        return Message.getContactForMessage(message);
 	    },
 	    getTimestampAsString: function getTimestampAsString() {
 	        return unixtimeToTimeString(this.getTimestamp());
@@ -10356,6 +10333,26 @@ React.makeElement = React['createElement'];
 
 	    mixins: [ConversationMessageMixin],
 
+	    _ensureNameIsLoaded: function _ensureNameIsLoaded(h) {
+	        var self = this;
+	        var contact = M.u[h] ? M.u[h] : {
+	            'u': h,
+	            'h': h,
+	            'c': 0
+	        };
+	        var displayName = generateAvatarMeta(contact.u).fullName;
+
+	        if (!displayName) {
+	            M.u.addChangeListener(function () {
+	                displayName = generateAvatarMeta(contact.u).fullName;
+	                if (displayName) {
+	                    self.safeForceUpdate();
+
+	                    return 0xDEAD;
+	                }
+	            });
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -10395,6 +10392,7 @@ React.makeElement = React['createElement'];
 
 	            var text = __(l[8907]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
+	            self._ensureNameIsLoaded(otherContact.u);
 	            messages.push(React.makeElement(
 	                "div",
 	                { className: "message body", "data-id": "id" + message.messageId, key: h },
@@ -10422,6 +10420,8 @@ React.makeElement = React['createElement'];
 
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
 	            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+
+	            self._ensureNameIsLoaded(otherContact.u);
 
 	            var text;
 	            if (otherContact.u === contact.u) {
@@ -11051,13 +11051,13 @@ React.makeElement = React['createElement'];
 	    return handlesWithoutMyself;
 	};
 
-	ChatRoom.prototype.getRoomTitle = function () {
+	ChatRoom.prototype.getRoomTitle = function (ignoreTopic) {
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
 	        return M.getNameByHandle(participants[0]) || "";
 	    } else {
-	        if (self.topic && self.topic.substr) {
+	        if (!ignoreTopic && self.topic && self.topic.substr) {
 	            return self.topic.substr(0, 30);
 	        }
 
@@ -11232,9 +11232,10 @@ React.makeElement = React['createElement'];
 	        return false;
 	    }
 	    if (!message.orderValue) {
+	        var mb = self.messagesBuff;
 
-	        if (self.messages.length > 0) {
-	            var prevMsg = self.messagesBuff.messages.getItem(self.messages.length - 1);
+	        if (mb.messages.length > 0) {
+	            var prevMsg = mb.messages.getItem(mb.messages.length - 1);
 	            if (!prevMsg) {
 	                self.logger.error('self.messages got out of sync...maybe there are some previous JS exceptions that caused that? ' + 'note that messages may be displayed OUT OF ORDER in the UI.');
 	            } else {
@@ -11640,6 +11641,35 @@ React.makeElement = React['createElement'];
 	            self.retrieveAllHistory();
 	        }
 	    });
+	};
+
+	ChatRoom.prototype.truncate = function () {
+	    var self = this;
+	    var chatMessages = self.messagesBuff.messages;
+	    if (chatMessages.length > 0) {
+	        var lastChatMessageId = null;
+	        var i = chatMessages.length - 1;
+	        while (lastChatMessageId == null && i >= 0) {
+	            var message = chatMessages.getItem(i);
+	            if (message instanceof Message && message.dialogType !== "truncated") {
+	                lastChatMessageId = message.messageId;
+	            }
+	            i--;
+	        }
+
+	        if (lastChatMessageId) {
+	            asyncApiReq({
+	                a: 'mct',
+	                id: self.chatId,
+	                m: lastChatMessageId,
+	                v: Chatd.VERSION
+	            }).fail(function (r) {
+	                if (r === -2) {
+	                    msgDialog('warninga', l[135], __(l[8880]));
+	                }
+	            });
+	        }
+	    }
 	};
 
 	window.ChatRoom = ChatRoom;

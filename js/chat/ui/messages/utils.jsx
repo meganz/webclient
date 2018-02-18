@@ -20,12 +20,18 @@ var getMessageString;
                 'call-missed': l[7210],
                 'call-rejected': l[5892],
                 'call-canceled': l[5894],
-                'call-started': l[5888]
+                'call-started': l[5888],
+                'alterParticipants': undefined,
+                'privilegeChange': l[8915],
+                'truncated': l[8905]
+
             };
         }
         return MESSAGE_STRINGS[type];
-    }
+    };
 })();
+
+mega.ui.chat.getMessageString = getMessageString;
 
 module.exports = {
     getMessageString

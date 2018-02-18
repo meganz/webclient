@@ -1420,7 +1420,7 @@ function api_proc(q) {
                         if (!bytes) {
                             // this may throw an exception if the header doesn't exist
                             try {
-                                bytes = this.getResponseHeader('Original-Content-Length');
+                                bytes = this.getResponseHeader('Original-Content-Length') | 0;
                                 this.totalBytes = bytes;
                             }
                             catch (e) {}
@@ -1853,6 +1853,10 @@ function getsc(force) {
         api_cancel(apixs[2]);   // retire existing XHR that may still be completing the request
         api_ready(apixs[2]);
         api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
+
+        if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
+            mega.loadReport.scSent = Date.now();
+        }
     }
 }
 

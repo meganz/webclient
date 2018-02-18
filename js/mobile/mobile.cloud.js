@@ -36,6 +36,7 @@ mobile.cloud = {
 
         // Render the file manager header, folders, files and footer
         this.renderHeader();
+        this.sortViewAlphabeticallyAscending();
         this.renderFoldersAndFiles();
         this.renderFoldersAndFilesSubHeader();
         this.showEmptyCloudIfEmpty();
@@ -46,6 +47,9 @@ mobile.cloud = {
 
         // Initialise context menu on each row
         mobile.cloud.contextMenu.init();
+
+        // Initialise the bottom action bar for Scroll-to-Top, Add Folder, Upload File functionality etc
+        mobile.cloud.actionBar.init();
 
         // Hide the loading progress
         loadingDialog.hide();
@@ -67,73 +71,22 @@ mobile.cloud = {
 
         'use strict';
 
-        // jQuery selectors
-        var $fileManager = $('.mobile.file-manager-block');
-        var $fileManagerRows = $fileManager.find('.fm-row .fm-scrolling');
-        var $folderTemplateSelector = $fileManagerRows.find('.folder.template');
-        var $fileTemplateSelector = $fileManagerRows.find('.file.template');
-
-        var newNodesOutput = '';
-
-        // Loop through new nodes
-        for (var i = 0; i < newnodes.length; i++) {
-
-            var node = newnodes[i];
-            var nodeHandle = node.h;
-            var nodeName = node.name;
-            var nodeType = node.t;
-            var nodeParentHandle = node.p;
-
-            // If the new node does not have a parent handle that is the same as the current
-            // view's node handle, then it's for a subfolder or something else so skip it
-            if (M.currentdirid !== nodeParentHandle) {
-                continue;
-            }
-
-            var $nodeTemplate = null;
-            var $existingNode = $('#' + nodeHandle);
-
-            // If folder type, render a folder
-            if (nodeType === 1) {
-                $nodeTemplate = this.updateFolderTemplate($folderTemplateSelector, node);
-            }
-            else {
-                // Otherwise render a file
-                $nodeTemplate = this.updateFileTemplate($fileTemplateSelector, node);
-            }
-
-            // Render common items
-            $nodeTemplate.find('.fm-item-name').text(nodeName);
-            $nodeTemplate.attr('data-handle', nodeHandle);
-            $nodeTemplate.attr('id', nodeHandle);
-
-            // If the node is already rendered and this is an update of it
-            if ($existingNode.length > 0) {
-
-                // Insert the updated node before the existing one, then remove the existing node
-                $nodeTemplate.insertBefore($existingNode);
-                $existingNode.remove();
-            }
-            else {
-                // Otherwise append to the current output
-                newNodesOutput += $nodeTemplate.prop('outerHTML');
-            }
-        }
-
-        // Render the new nodes at the end of the existing ones
-        $fileManagerRows.append(newNodesOutput);
-
-        // Render the footer to update number of files/folders in the current folder, if empty show an icon and message
-        this.showEmptyCloudIfEmpty();
-        this.countAndUpdateSubFolderTotals();
+        // Render the file manager header, folders, files and footer
+        this.renderHeader();
+        this.sortViewAlphabeticallyAscending();
+        this.renderFoldersAndFiles();
         this.renderFoldersAndFilesSubHeader();
+        this.showEmptyCloudIfEmpty();
 
-        // Re-initialise click handlers
+        // Init folder and file row handlers
         this.initFileRowClickHandler();
         this.initFolderRowClickHandler();
 
         // Initialise context menu on each row
         mobile.cloud.contextMenu.init();
+
+        // Initialise the bottom action bar for Scroll-to-Top, Add Folder, Upload File functionality etc
+        mobile.cloud.actionBar.init();
 
         // Set viewmode to show thumbnails and render thumbnails after everything else because it can take longer
         M.viewmode = 1;
@@ -337,13 +290,8 @@ mobile.cloud = {
 
             // Show the hamburger menu icon
             $menuIcon.removeClass('hidden');
-
-            // Initialise the bottom action bar for Add Folder, Upload File functionality etc
-            mobile.cloud.actionBar.init();
         }
     },
-
-
 
     /**
      * Sums up all the file sizes (including sub directories) in the folder link
@@ -360,6 +308,46 @@ mobile.cloud = {
         var fileSizesTotalFormattedText = fileSizesTotalFormatted.size + ' ' + fileSizesTotalFormatted.unit;
 
         return fileSizesTotalFormattedText;
+    },
+
+    /**
+     * Sorts the current view alphabetically with A at the top of the cloud drive and Z at the bottom
+     */
+    sortViewAlphabeticallyAscending: function() {
+
+        'use strict';
+
+        var folders = [];
+        var files = [];
+
+        // Loop through top level nodes in the current view (M.v)
+        for (var i = 0; i < M.v.length; i++) {
+
+            var node = M.v[i];
+            var nodeType = node.t;
+
+            // If folder type, group with the folders
+            if (nodeType === 1) {
+                folders.push(node);
+            }
+            else {
+                // Otherwise add to the files group
+                files.push(node);
+            }
+        }
+
+        // Sort folders ascending alphabetically
+        folders.sort(function(nodeA, nodeB) {
+            return nodeA.name.localeCompare(nodeB.name);
+        });
+
+        // Sort files ascending alphabetically
+        files.sort(function(nodeA, nodeB) {
+            return nodeA.name.localeCompare(nodeB.name);
+        });
+
+        // Join the folders and files into an array with folders at the top and update the main view array
+        M.v = folders.concat(files);
     },
 
     /**
@@ -594,8 +582,8 @@ mobile.cloud = {
             var node = M.d[nodeHandle];
             var fileName = node.name;
 
-            // If this is an image, load the preview slideshow, otherwise toggle the options
-            if (is_image(fileName)) {
+            // If this is an image, load the preview slideshow
+            if (is_image(fileName) && fileext(fileName) !== 'pdf') {
                 mobile.slideshow.init(nodeHandle);
             }
             else {

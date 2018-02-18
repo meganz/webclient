@@ -467,6 +467,7 @@ function init_page() {
         && (page !== 'privacy')
         && (page !== 'takendown')
         && (page !== 'general')
+        && (page !== 'resellers')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -868,8 +869,14 @@ function init_page() {
         init_key();
     }
     else if (page === 'support') {
-        parsepage(pages['support']);
-        support.initUI();
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.support.init();
+        }
+        else {
+            parsepage(pages['support']);
+            support.initUI();
+        }
     }
     else if (page == 'contact') {
         parsepage(pages['contact']);
@@ -899,13 +906,26 @@ function init_page() {
         dev_init('doc');
     }
     else if (page == 'backup' && !u_type) {
-        login_txt = l[1298];
-        parsepage(pages['login']);
-        init_login();
+        if (is_mobile) {
+            login_next = page;
+            loadSubPage('login');
+            return false;
+        }
+        else {
+            login_txt = l[1298];
+            parsepage(pages['login']);
+            init_login();
+        }
     }
     else if (page == 'backup') {
-        parsepage(pages['backup']);
-        init_backup();
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.backup.init();
+        }
+        else {
+            parsepage(pages['backup']);
+            init_backup();
+        }
     }
     else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
 
@@ -1193,7 +1213,6 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
-
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {

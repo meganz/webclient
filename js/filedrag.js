@@ -357,6 +357,15 @@
         if (localStorage.testMediaInfo) {
             return MediaInfoLib.test(files);
         }
+        if (localStorage.testStreamerThumbnail) {
+            return M.require('videostream').tryCatch(function() {
+                Streamer.getThumbnail(files[0])
+                    .then(function(ab) {
+                        console.info('Streamer.getThumbnail result', mObjectURL([ab], 'image/jpeg'));
+                    })
+                    .catch(console.debug.bind(console));
+            });
+        }
 
         if (e.dataTransfer
                 && e.dataTransfer.items

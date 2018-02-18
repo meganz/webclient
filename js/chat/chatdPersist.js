@@ -785,7 +785,16 @@
         var self = this;
         var promise = new MegaPromise();
         if (self._pointersCache) {
+            if (self._pointersCache[chatId + "_" + pointerName] === pointerValue) {
+                promise.reject();
+                return promise;
+            }
             self._pointersCache[chatId + "_" + pointerName] = pointerValue;
+        }
+        if (!ChatdPersist.isMasterTab()) {
+            // don't do anything if this is not the master tab!
+            promise.resolve();
+            return promise;
         }
 
         self.db['ptrs'].put({
@@ -955,7 +964,7 @@
         var orderValue = msgObject.orderValue;
         var keyId = msgObject.keyid;
 
-        if (((keyId & 0xffff0000) >>> 0) === (0xffff0000 >>> 0)) {
+        if (keyId === true || ((keyId & 0xffff0000) >>> 0) === (0xffff0000 >>> 0)) {
             self.logger.critical(".persistMessage, received a temp keyId");
             return;
         }
@@ -1068,7 +1077,7 @@
             return;
         }
 
-        var msgObject = args[0];
+        var msgObject = action === "replace" ? args[1] : args[0];
         var isEdit = args[1];
 
         if (

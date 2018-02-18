@@ -8,7 +8,7 @@ function is_video(n) {
 
     if (String(n && n.fa).indexOf(':8*') > 0) {
         // check whether it's an *streamable* video
-        return MediaAttribute.getMediaType(n) === 1;
+        return MediaAttribute.getMediaType(n) > 0;
     }
 
     var ext = String(n && n.name || n).split('.').pop().toUpperCase();
@@ -258,8 +258,8 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         // Hide the default controls
         videoElement.controls = false;
 
-        // Hide the volume icon until we found the video has audio track
-        $('.volume-control', $wrapper).addClass('hidden');
+        // Show the volume icon until we found the video has no audio track
+        $('.volume-control', $wrapper).removeClass('no-audio');
 
         // Obtain handles to buttons and other elements
         var $playpause = $videoControls.find('.playpause');
@@ -300,6 +300,22 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             }
         };
 
+        var hideControls = function() {
+            $wrapper.removeClass('mouse-idle');
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                $wrapper.addClass('mouse-idle');
+            }, 2600);
+        };
+
+        var getTimeOffset = function(x) {
+            var maxduration = videoElement.duration;
+            var position = x - $progress.offset().left; // Click pos
+            var percentage = Math.max(0, Math.min(100, 100 * position / $progress.width()));
+            var selectedTime = Math.round(maxduration * percentage / 100);
+            return {time: selectedTime | 0, percent: percentage};
+        };
+
         // Set Init Values
         changeButtonState('playpause');
         changeButtonState('mute');
@@ -334,11 +350,27 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                         $playpause.trigger('click');
                     });
 
-                    if (streamer.hasAudio) {
-                        $('.volume-control', $wrapper).removeClass('hidden');
+                    if (!streamer.hasAudio) {
+                        $('.volume-control', $wrapper).addClass('no-audio');
                     }
+
+                    hideControls();
+                    $document.rebind('mousemove.idle', hideControls);
                 }
             }
+        });
+
+        $videoControls.rebind('mousemove.idle', function() {
+            onIdle(function() {
+                clearTimeout(timer);
+            });
+        });
+
+        $video.rebind('ended.idle pause.idle', function() {
+            clearTimeout(timer);
+            $wrapper.removeClass('mouse-idle');
+            $document.unbind('mousemove.idle');
+            playevent = false;
         });
 
         // Add events for all buttons
@@ -348,6 +380,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                     dlmanager.showOverQuotaDialog();
                 }
                 else {
+                    later(hideControls);
                     streamer.play();
                 }
             }
@@ -375,6 +408,19 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             if (volumeDrag) {
                 updateVolumeBar(e.pageY);
             }
+        });
+
+        $('.volume-control', $wrapper).rebind('mousewheel.volumecontrol', function(e) {
+            var delta = Math.max(-1, Math.min(1, (e.wheelDelta || e.deltaY || -e.detail)));
+
+            if (delta > 0 && videoElement.volume < 1.0) {
+                videoElement.volume += 0.1;
+            }
+            if (delta < 0 && videoElement.volume > 0.1) {
+                videoElement.volume -= 0.1;
+            }
+            $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
+            return false;
         });
 
         // update Volume Bar control
@@ -433,18 +479,6 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             videoTimingElement.textContent = secondsToTimeShort(videoElement.currentTime, 1);
         });
 
-        $video.rebind('mousemove.idle', function() {
-            $wrapper.removeClass('mouse-idle');
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                $wrapper.addClass('mouse-idle');
-            }, 2600);
-        });
-
-        $videoControls.rebind('mousemove.idle', function() {
-            clearTimeout(timer);
-        });
-
         /* Drag status */
         var timeDrag = false;
         $progress.rebind('mousedown.videoprogress', function(e) {
@@ -476,28 +510,20 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             }
         });
 
+        $progress.rebind('mousemove.videoprogress', function(e) {
+            this.setAttribute('title', secondsToTimeShort(getTimeOffset(e.pageX).time, 1));
+        });
+
         // Update Progress Bar control
         var updatebar = function(x) {
-            var maxduration = videoElement.duration; //Video duraiton
-            var position = x - $progress.offset().left; //Click pos
-            var percentage = 100 * position / $progress.width();
-
-            //Check within range
-            if (percentage > 100) {
-                percentage = 100;
-            }
-            else if (percentage < 0) {
-                percentage = 0;
-            }
-            var selectedTime = Math.round(maxduration * percentage / 100);
+            var o = getTimeOffset(x);
 
             //Update progress bar and video currenttime
-            $progressBar.css('width', percentage + '%');
-            $wrapper.find('.video-timing.current')
-                .text(secondsToTimeShort(selectedTime, 1));
+            $progressBar.css('width', o.percent + '%');
+            $wrapper.find('.video-timing.current').text(secondsToTimeShort(o.time, 1));
 
             if (!timeDrag) {
-                videoElement.currentTime = selectedTime | 0;
+                videoElement.currentTime = o.time;
             }
         };
 
@@ -651,8 +677,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
         s.on('error', function(ev, error) {
             // <video>'s element `error` handler
+
+            var info = (MediaAttribute.getCodecStrings(node) || []).concat(s.hasVideo, s.hasAudio, ua.details.prod);
+
             if (!$.dialog) {
-                var hint = error.name || error.message || error;
+                var hint = error.message || error;
                 if (!hint && !window.chrome) {
                     // Suggest Chrome...
                     hint = l[16151] + ' ' + l[242];
@@ -660,12 +689,12 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 msgDialog('warninga', l[135], l[47], hint);
             }
             if (d) {
-                console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime, error);
+                console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime, error, info);
             }
             destroy();
 
-            if (filemime(node) !== 'video/quicktime' && !d) {
-                api_req({a: 'log', e: 99669, m: 'stream error'});
+            if (!d) {
+                api_req({a: 'log', e: 99669, m: JSON.stringify(info)});
             }
         });
 
@@ -1055,7 +1084,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
             options = Object.assign({
                 maxAtOnce: 10,
-                chunkSize: 65536,
+                chunkSize: -1,
                 maxBytesRead: 6291456
             }, options);
 
@@ -1125,7 +1154,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                     }
 
                     r.fa = n.toAttributeString(r);
-                    r.a = n.fromAttributeString(r.fa);
+                    r.a = n.fromAttributeString(
+                        String(r.fa).split('/').map(function(a) {
+                            return 'cl:' + a;
+                        }).join('/')
+                    );
 
                     containers.push(r.container);
                     audiocodecs.push(r.acodec);
@@ -1407,7 +1440,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                         resolve(res);
                     }
                     else {
-                        _nextChunk(self.chunkSize);
+                        _nextChunk(self.chunkSize < 0x2000 ? Math.min(0x80000, length << 1) : self.chunkSize);
                     }
                 })
                 .catch(reject);
@@ -1683,7 +1716,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 resolve(EEXIST);
             }
             else {
-                MediaInfoLib(entry.link || entry.h, 0x10000)
+                MediaInfoLib(entry.link || entry.h, -1)
                     .getMetadata()
                     .then(entry.store.bind(entry))
                     .then(resolve)
@@ -1701,17 +1734,40 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
      */
     MediaAttribute.isTypeSupported = function(container, videocodec, audiocodec) {
         switch ('MediaSource' in window && container) {
+            case 'mp41':
             case 'mp42':
             case 'isom':
+            case 'iso2':
+            case 'iso4':
+            case 'iso5':
             case 'M4V ':
+            // case 'dash':
+            case 'avc1': // JVT
                 if (videocodec === 'avc1') {
                     var mime = 'video/mp4; codecs="avc1.640029';
 
-                    if (String(audiocodec).startsWith('mp4a')) {
+                    if (0 && String(audiocodec).startsWith('mp4a')) {
+                        if (audiocodec === 'mp4a') {
+                            audiocodec = 'mp4a.40.2';
+                        }
                         mime += ', ' + audiocodec.replace(/-/g, '.');
                     }
 
                     return MediaSource.isTypeSupported(mime + '"') ? 1 : 0;
+                }
+
+                if (d && videocodec === undefined && audiocodec) {
+                    audiocodec = String(audiocodec).replace(/-/g, '.').toLowerCase(); // fLaC
+
+                    if (String(audiocodec).startsWith('mp4a')) {
+                        var swap = {'mp4a': 'mp4a.40.2', 'mp4a.69': 'mp3', 'mp4a.6b': 'mp3'};
+                        audiocodec = swap[audiocodec] || audiocodec;
+                    }
+                    var amime = 'audio/mp4; codecs="' + audiocodec + '"';
+                    if (window.chrome && audiocodec === 'mp3') {
+                        amime = 'audio/mpeg';
+                    }
+                    return MediaSource.isTypeSupported(amime) ? 2 : 0;
                 }
         }
 

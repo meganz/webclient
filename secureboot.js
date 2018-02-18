@@ -321,7 +321,7 @@ if (!b_u) try
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
         }
-        d = !!localStorage.d;
+        d = localStorage.d | 0;
         jj = localStorage.jj;
         dd = localStorage.dd;
         // Write test
@@ -487,6 +487,15 @@ var mega = {
                 // the later and do not send this report.
                 r.sent = true;
                 clearInterval(r.aliveTimer);
+            }
+            else if (r.scSent && now - r.scSent > 6e4 && (scqhead > scqtail * 2)) {
+                api_req({a: 'log', e: 99679}); // sc processing took too long
+
+                msgDialog('warninga:!^' + l[17704] + '!' + l[17705], l[882], l[17706], 0, function(yes) {
+                    if (yes) {
+                        fm_forcerefresh();
+                    }
+                });
             }
             r.aliveTimeStamp = now;
         }, 2000);
@@ -1319,12 +1328,12 @@ if (is_ios) {
 
 /**
  * Some legacy secureboot mobile code that has been refactored to keep just the blog working and also redirect to the
- * app if any cancel, verify, fm/ipc, newsignup, recover, account or backup links are clicked in the app
+ * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
  * because the new mobile site is not designed for those yet.
  */
 if (m && (page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
     page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
-    page.substr(0, 4) === 'blog' || page.substr(0, 6) === 'backup')) {
+    page.substr(0, 4) === 'blog')) {
 
     var app;
     var mobileblog;
@@ -2079,6 +2088,7 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.backup.js', n: 'mobile_backup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.context-menu.js', n: 'mobile_cloud_context_menu_js', j: 1, w: 1});
@@ -2096,6 +2106,7 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.register.js', n: 'mobile_register_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.slideshow.js', n: 'mobile_slideshow_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});

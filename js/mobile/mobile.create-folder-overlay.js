@@ -82,15 +82,14 @@ mobile.createFolderOverlay = {
                 M.createFolder(M.currentdirid, trimmedFolderName, promise)
                     .always(function(result) {
 
+                        // Hide the loading dialog
+                        loadingDialog.hide();
+
                         // If there was an error, hide loading dialog and show error message
                         if (typeof result === 'number') {
                             mobile.messageOverlay.show(l[135], l[47] + ' ' + api_strerror(result));
-                            loadingDialog.hide();
                         }
                         else {
-                            // Hide the loading dialog
-                            loadingDialog.hide();
-
                             // Hide the Create Folder dialog and show the Cloud Drive again
                             $fileManagerBlock.removeClass('hidden');
                             $overlay.addClass('hidden');

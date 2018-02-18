@@ -1099,35 +1099,78 @@ var ConversationPanel = React.createClass({
             if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
                 ps.disable();
 
-                mb.retrieveChatHistory();
+
 
                 self.isRetrievingHistoryViaScrollPull = true;
                 self.lastScrollPosition = scrollPositionY;
 
                 self.lastContentHeightBeforeHist = ps.getScrollHeight();
-                $(chatRoom).unbind('onHistoryDecrypted.pull');
-                $(chatRoom).one('onHistoryDecrypted.pull', function() {
-                    setTimeout(function() {
-                        // because of mousewheel animation, we would delay the re-enabling of the "pull to load
-                        // history", so that it won't re-trigger another hist retrieval request
-                        self.isRetrievingHistoryViaScrollPull = false;
+                // console.error('start:', self.lastContentHeightBeforeHist, self.lastScrolledToBottom);
 
-                        var prevPosY = (
+
+                var msgsAppended = 0;
+                $(chatRoom).unbind('onMessagesBuffAppend.pull');
+                $(chatRoom).bind('onMessagesBuffAppend.pull', function() {
+                    msgsAppended++;
+
+                    // var prevPosY = (
+                    //     ps.getScrollHeight() - self.lastContentHeightBeforeHist
+                    // ) + self.lastScrollPosition;
+                    //
+                    //
+                    // ps.scrollToY(
+                    //     prevPosY,
+                    //     true
+                    // );
+                    //
+                    // self.lastContentHeightBeforeHist = ps.getScrollHeight();
+                    // self.lastScrollPosition = prevPosY;
+                });
+
+                $(chatRoom).unbind('onHistoryDecrypted.pull');
+                $(chatRoom).one('onHistoryDecrypted.pull', function(e) {
+                    $(chatRoom).unbind('onMessagesBuffAppend.pull');
+                    var prevPosY = (
+                        ps.getScrollHeight() - self.lastContentHeightBeforeHist
+                    ) + self.lastScrollPosition;
+
+                    ps.scrollToY(
+                        prevPosY,
+                        true
+                    );
+
+                    // wait for all msgs to be rendered.
+                    chatRoom.messagesBuff.addChangeListener(function() {
+                        if (msgsAppended > 0) {
+                            var prevPosY = (
                                 ps.getScrollHeight() - self.lastContentHeightBeforeHist
                             ) + self.lastScrollPosition;
 
+                            ps.scrollToY(
+                                prevPosY,
+                                true
+                            );
+
+                            self.lastScrollPosition = prevPosY;
+                        }
+
                         delete self.lastContentHeightBeforeHist;
 
-                        self.lastScrollPosition = prevPosY;
+                        return 0xDEAD;
+                    });
+
+                    setTimeout(function() {
+                        self.isRetrievingHistoryViaScrollPull = false;
+                        // because of mousewheel animation, we would delay the re-enabling of the "pull to load
+                        // history", so that it won't re-trigger another hist retrieval request
 
                         ps.enable();
-                        ps.scrollToY(
-                            prevPosY,
-                            true
-                        );
                         self.forceUpdate();
-                    }, 1000);
+                    }, 1150);
+
                 });
+
+                mb.retrieveChatHistory();
             }
         }
 
@@ -1154,7 +1197,6 @@ var ConversationPanel = React.createClass({
             ) ||
             !this.props.chatRoom.isCurrentlyActive
         ) {
-
             return false;
         }
         else {
@@ -1177,9 +1219,17 @@ var ConversationPanel = React.createClass({
         var contacts = room.getParticipantsExceptMe();
         var contactHandle;
         var contact;
-        if (contacts && contacts.length > 0) {
+        var avatarMeta;
+        var contactName = "";
+        if (contacts && contacts.length === 1) {
             contactHandle = contacts[0];
             contact = M.u[contactHandle];
+            avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
+            contactName = avatarMeta.fullName;
+        }
+        else if (contacts && contacts.length > 1) {
+            contactName = room.getRoomTitle(true);
+
         }
 
         var conversationPanelClasses = "conversation-panel " + room.type + "-chat";
@@ -1189,8 +1239,7 @@ var ConversationPanel = React.createClass({
         }
 
 
-        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
-        var contactName = avatarMeta.fullName;
+
 
 
         var messagesList = [
@@ -1684,35 +1733,7 @@ var ConversationPanel = React.createClass({
                     self.setState({'truncateDialog': false});
                 }}
                 onConfirmClicked={() => {
-                    var chatMessages = room.messagesBuff.messages;
-                    if (chatMessages.length > 0) {
-                        var lastChatMessageId = null;
-                        var i = chatMessages.length - 1;
-                        while(lastChatMessageId == null && i >= 0) {
-                            var message = chatMessages.getItem(i);
-                            if (message instanceof Message) {
-                                lastChatMessageId = message.messageId;
-                            }
-                            i--;
-                        }
-                        if (lastChatMessageId) {
-                            asyncApiReq({
-                                a: 'mct',
-                                id: room.chatId,
-                                m: lastChatMessageId,
-                                v: Chatd.VERSION
-                            })
-                                .fail(function(r) {
-                                    if(r === -2) {
-                                        msgDialog(
-                                            'warninga',
-                                            l[135],
-                                            __(l[8880])
-                                        );
-                                    }
-                                });
-                        }
-                    }
+                    room.truncate();
 
                     self.setState({
                         'truncateDialog': false

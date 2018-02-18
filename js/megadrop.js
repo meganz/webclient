@@ -1651,6 +1651,7 @@ mega.megadrop = (function() {
 
             var source = code[0] + code[1] + code[2] + url + code[3] + params[0];
             source += params[1] + code[4] + code[5] + code[6] + code[7];
+            source = source.replace('/[\t\n\s]+/g', '');// Minimize
 
             return source;
         };
@@ -2183,7 +2184,7 @@ mega.megadrop = (function() {
         }
         else {
             if (d) {
-                console.warn('widget.onRename, was not able to find puf for given handle: ', handle);
+                console.log('widget.onRename, was not able to find puf for given handle: ', handle);
             }
         }
     };

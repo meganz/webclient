@@ -199,7 +199,7 @@ var MegaRenderMixin = {
         var self = this;
         self._updatesDisabled = true;
         if (self._updatesReenableTimer) {
-            clearTimeout(self._updatesRenableTimer);
+            clearTimeout(self._updatesReenableTimer);
         }
 
         var timeout = forHowLong ?

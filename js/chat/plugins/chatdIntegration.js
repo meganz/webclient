@@ -828,9 +828,13 @@ ChatdIntegration._ensureNamesAreLoaded = function(users) {
                     })
                 );
                 M.syncUsersFullname(userId);
+                M.syncContactEmail(userId);
             }
             else {
                 M.syncUsersFullname(userId);
+                if (!M.u[userId].m) {
+                    M.syncContactEmail(userId);
+                }
             }
         });
     }
@@ -1233,7 +1237,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 }
             }
             else {
-                // no new messages retrieved
+                // no new messages retrieved (from chatd!)
                 chatRoom.trigger('onHistoryDecrypted');
             }
         });
@@ -1343,8 +1347,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                                 if (succeeded) {
                                     mb.messagesBatchFromHistory.remove(msg.messageId);
-                                    if (msg.pendingMessageId) {
-                                        mb.messages.remove(msg.pendingMessageId);
+                                    if (msgObject.pendingMessageId) {
+                                        mb.messages.remove(msgObject.pendingMessageId);
                                     }
                                     mb.messages.push(msg);
                                     self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);

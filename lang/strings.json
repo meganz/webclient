@@ -18570,5 +18570,9 @@
     "17743": {
         "text": "This file uses a video codec that is not supported by your browser.",
         "context": "An error message which is shown to the user when there is a problem streaming a video file as a result of an unsupported codec. https:\/\/en.wikipedia.org\/wiki\/Codec"
+    },
+    "17744": {
+        "text": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels.",
+        "context": "An overlay message when the main menu is displaced outside of the window"
     }
 }

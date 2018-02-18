@@ -4641,5 +4641,6 @@
     "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
     "17739": "\u7531\u65bc\u5df2\u6709\u5171\u4eab\u8a2d\u5b9a\u6216\u5206\u4eab\u9023\u7d50\uff0c\u8cc7\u6599\u593e\u7121\u6cd5\u5408\u4f75\u3002\u5982\u679c\u4f60\u60f3\u5408\u4f75\u9019\u4e9b\u8cc7\u6599\u593e\uff0c\u8acb\u522a\u9664\u5171\u4eab\u8a2d\u5b9a\u6216\u5206\u4eab\u9023\u7d50\u5f8c\u518d\u91cd\u8a66\u3002",
     "17742": "Drop to [S]upload[\/S]",
-    "17743": "This file uses a video codec that is not supported by your browser."
+    "17743": "This file uses a video codec that is not supported by your browser.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

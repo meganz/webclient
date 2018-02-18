@@ -4641,5 +4641,6 @@
     "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
     "17739": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
     "17742": "Drop to [S]upload[\/S]",
-    "17743": "Este archivo tiene un c\u00f3dec de v\u00eddeo que no es compatible con tu navegador."
+    "17743": "Este archivo tiene un c\u00f3dec de v\u00eddeo que no es compatible con tu navegador.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

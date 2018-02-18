@@ -4641,5 +4641,6 @@
     "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
     "17739": "Les dossiers ne peuvent pas \u00eatre fusionn\u00e9s en raison de la pr\u00e9sence d\u2019un partage ou d\u2019un lien. Si vous souhaitez fusionner ces dossiers, vous devrez supprimer le partage ou le lien et ressayer.",
     "17742": "Drop to [S]upload[\/S]",
-    "17743": "Ce fichier utilise un codec vid\u00e9o qui n\u2019est pas pris en charge par votre navigateur.                                "
+    "17743": "Ce fichier utilise un codec vid\u00e9o qui n\u2019est pas pris en charge par votre navigateur.                                ",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

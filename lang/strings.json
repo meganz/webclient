@@ -18568,7 +18568,7 @@
         "context": "A header of a dialog which allows dragging external files into the MEGA browser. Please leave the placeholders [S] and [\/S] which will be used to bolden the text."
     },
     "17743": {
-        "text": "This file has a video codec that is unsupported by your browser.",
+        "text": "This file uses a video codec that is not supported by your browser.",
         "context": "An error message which is shown to the user when there is a problem streaming a video file as a result of an unsupported codec. https:\/\/en.wikipedia.org\/wiki\/Codec"
     }
 }

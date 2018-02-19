@@ -2311,8 +2311,8 @@ function parsepage(pagehtml, pp) {
             translate(pages['transferwidget']) + pagehtml)
         .show();
 
-    $(window).rebind('resize.subpage', function (e) {
-        M.chrome110ZoomLevelNotification();
+    $(window).rebind('resize.subpage', function () {
+        M.zoomLevelNotification();
     });
 
     $('body').addClass('bottom-pages');

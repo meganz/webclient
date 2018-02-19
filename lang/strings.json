@@ -8360,7 +8360,7 @@
         "context": "Title of the dialog displayed in cases that the user types some data with a wrong format - (String as short as possible)."
     },
     "7274": {
-        "text": "The subscription has not been canceled correctly. Please contact support@mega.nz to cancel your subscription.",
+        "text": "The subscription has not been canceled successfully. Please contact support@mega.nz to cancel your subscription.",
         "context": "Message of the dialog displayed when the process\/request to cancel a subscription failed."
     },
     "7275": {
@@ -12728,7 +12728,7 @@
         "context": "Message when an error ocurred when changing an user attribute"
     },
     "8999": {
-        "text": "Your account data has been correctly updated.",
+        "text": "Your account data has been successfully updated.",
         "context": "Message when an user attribute has been changed successfully"
     },
     "9000": {
@@ -12744,7 +12744,7 @@
         "context": "The title of the alert dialog to change the email associated to an account."
     },
     "9003": {
-        "text": "Your email has been correctly updated.",
+        "text": "Your email has been successfully updated.",
         "context": "Message when the user email has been changed successfully"
     },
     "9004": {
@@ -15720,7 +15720,7 @@
         "context": "Message to confirm if the user wants to delete a multiple contacts from a shared folder. The %d variable will be replaced by the number of contacts to be removed."
     },
     "16700": {
-        "text": "%d contacts removed correctly from the shared folder",
+        "text": "%d contacts removed successfully from the shared folder",
         "context": "success message when removing a contact from a shared folder. %d will be replaced with the number of contacts removed."
     },
     "16701": {
@@ -15784,7 +15784,7 @@
         "context": "Message show when the history of a chat has been successfully deleted"
     },
     "16717": {
-        "text": "Error. The history of the chat has not been cleared correctly",
+        "text": "Error. The history of the chat has not been cleared successfully",
         "context": "Message show when the history of a chat hasn't been successfully deleted"
     },
     "16718": {
@@ -15884,7 +15884,7 @@
         "context": "Message show when a participant hasn't been successfully invited to a group chat"
     },
     "16744": {
-        "text": "%d participants were correctly invited",
+        "text": "%d participants were successfully invited",
         "context": "success message when inviting multiple contacts to a group chat. Please do not change or translate the %d placeholder as it will be replaced by the number of participants invited."
     },
     "16745": {
@@ -15948,7 +15948,7 @@
         "context": "Title of the error dialog when opening a chat"
     },
     "16765": {
-        "text": "The chat could not be opened correctly",
+        "text": "The chat could not be opened successfully",
         "context": "Message of the error dialog when opening a chat"
     },
     "16766": {
@@ -16660,7 +16660,7 @@
         "context": "Ask for confirmation before removing all the elements of the rubbish bin"
     },
     "16966": {
-        "text": "Request correctly sent to %s. The status can be consulted in the Sent Requests tab.",
+        "text": "Request successfully sent to %s. The status can be consulted in the Sent Requests tab.",
         "context": "success message when sending a contact request. Please do not modify the %s placeholder."
     },
     "16967": {
@@ -17072,7 +17072,7 @@
         "context": "Message when an error ocurred when changing an user attribute"
     },
     "17069": {
-        "text": "Your name has been correctly updated",
+        "text": "Your name has been successfully updated",
         "context": "Message when an user attribute has been changed successfully"
     },
     "17070": {

@@ -4641,5 +4641,6 @@
     "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
     "17739": "Mappen kunnen niet samengevoegd worden door de aanwezigheid van een gedeeld of koppeling. Als u deze mappen wilt samenvoegen moet u het gedeelde of de koppeling verwijderen en nogmaals proberen.",
     "17742": "Drop to [S]upload[\/S]",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17743": "Dit bestand heeft een video codec die is niet ondersteund door uw browser.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

@@ -4641,5 +4641,6 @@
     "17738": "Ciao, unisciti a me su MEGA e ottieni l'accesso ad un archivio e ad una comunicazione criptata.",
     "17739": "Le cartelle non possono essere unite a causa della presenza di una condivisione o di un link. Se desideri unire queste cartelle devi prima rimuovere la condivisione o il link \u00e8 riprovare.",
     "17742": "Rilascia per [S]caricare[\/S]",
-    "17743": "Questo file utilizza un codec video che non \u00e8 supportato dal tuo browser."
+    "17743": "Questo file utilizza un codec video che non \u00e8 supportato dal tuo browser.                                ",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

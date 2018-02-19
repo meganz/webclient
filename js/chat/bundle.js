@@ -9523,10 +9523,11 @@ React.makeElement = React['createElement'];
 	                                    v.delay = message.delay;
 	                                    chatRoom.images.push(v);
 	                                }
+	                                var previewLabel = is_video(v) ? l[17732] : l[1899];
 	                                previewButton = React.makeElement(
 	                                    'span',
 	                                    { key: 'previewButton' },
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: __(l[1899]),
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
 	                                        onClick: self._startPreview.bind(self, v) }),
 	                                    React.makeElement('hr', null)
 	                                );

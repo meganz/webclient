@@ -1071,9 +1071,11 @@ MegaUtils.prototype.getSiteVersion = function() {
 };
 
 /*
- * Alert about 110% zoom level in Chrome/Chromium
+ * Alert about broken layout caused by zoom level
  */
-MegaUtils.prototype.chrome110ZoomLevelNotification = function() {
+/* jshint -W074 */
+MegaUtils.prototype.zoomLevelNotification = function() {
+    "use strict";
 
     var dpr = window.devicePixelRatio;
     var pf = navigator.platform.toUpperCase();
@@ -1084,42 +1086,74 @@ MegaUtils.prototype.chrome110ZoomLevelNotification = function() {
         0.6660000085830688,// 67% non-retian, 33% retina
         0.3330000042915344// 33% non-retina
     ];
+    var $menu = $('.top-icon.menu');
+    var WIDTH = 24;// .top-icon.menu width in px
+    var pos = $menu.length ? $menu.position().left + WIDTH : 0 ;
+    var $exc = {};
+    var $over = {};
 
-    if (window.chrome) {
+    $exc = $('.nw-dark-overlay.zoom-exceeded-overlay');
+    $over = $('.nw-dark-overlay.zoom-overlay');
+
+    // Alert about broken layout, main (hamburger) menu is displaced and exceeding window width
+    if (window.innerWidth < pos) {
+        $('.nw-dark-overlay').removeClass('mac');
+        $exc.removeClass('zoom-67 zoom-33');
+
+        if (pf.indexOf('MAC') >= 0) {
+            $('.nw-dark-overlay').addClass('mac');
+        }
+
+        if ($exc.not(':visible')) {
+            $exc.fadeIn(400);
+        }
+
+        return;
+    }
+    else if ($exc.is(':visible')) {
+        $exc.fadeOut(200);
+    }
+
+    // Chrome specific broken layout tested on versions <= 62
+    if (window.chrome && dpr === 2.200000047683716 || dpr === 1.100000023841858
+        || dpr === 1.3320000171661377 || dpr === 0.6660000085830688 || dpr === 0.3330000042915344) {
 
         $('.nw-dark-overlay').removeClass('mac');
-        $('.nw-dark-overlay.zoom-overlay').removeClass('zoom-67 zoom-33');
+        $over.removeClass('zoom-67 zoom-33');
 
         if (pf.indexOf('MAC') >= 0) {
             $('.nw-dark-overlay').addClass('mac');
         }
 
         // zoom level110%
-        if ((dpr === 2.200000047683716) || (dpr === 1.100000023841858)) {
-            $('.nw-dark-overlay.zoom-overlay').fadeIn(400);
+        if (dpr === 2.200000047683716 || dpr === 1.100000023841858) {
+            $over.fadeIn(400);
         }
 
         // 67% both or 33% retina
-        if ((dpr === 1.3320000171661377) || (dpr === 0.6660000085830688)) {
-            $('.nw-dark-overlay.zoom-overlay')
+        if (dpr === 1.3320000171661377 || dpr === 0.6660000085830688) {
+            $over
                 .addClass('zoom-67')
                 .fadeIn(400);
         }
 
         // 33% non-retina
         if (dpr === 0.3330000042915344) {
-            $('.nw-dark-overlay.zoom-overlay')
+            $over
                 .addClass('zoom-33')
                 .fadeIn(400);
         }
 
-        if (brokenRatios.indexOf(dpr) === -1) {
-            $('.nw-dark-overlay.zoom-overlay').fadeOut(200);
-        }
+    }
+    else if (brokenRatios.indexOf(dpr) === -1 && $over.is(':visible')) {
+        $over.fadeOut(200);
     }
 };
+/* jshint +W074 */
+
 mBroadcaster.once('startMega', function() {
-    onIdle(M.chrome110ZoomLevelNotification);
+    "use strict";
+    onIdle(M.zoomLevelNotification);
 });
 
 /**

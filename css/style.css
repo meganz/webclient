@@ -21220,7 +21220,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     width: 160px;
     height: 160px;
     margin: 0 auto;
-    background: url(../images/mega/zoom-sprite.png) 0px 0px no-repeat;
+    background: url(../images/mega/zoom-sprite_v1.png) 0px 0px no-repeat;
 }
 .zoom-overlay-txt {
     padding: 58px 0 38px 0;
@@ -21273,7 +21273,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     border: 1px solid rgba(255,255,255,0.1);
-    background: url(../images/mega/zoom-sprite.png) center -363px no-repeat;
+    background: url(../images/mega/zoom-sprite_v1.png) center -363px no-repeat;
+}
+.zoom-overlay-key.minus::after {
+    background-position: -111px -364px;
 }
 .zoom-overlay-key.ctrl::after {
     background-position: -25px -171px;

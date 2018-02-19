@@ -1824,7 +1824,7 @@ mega.megadrop = (function() {
 
         // Widget upload window event listeners
         var _winEventListeners = function _uiWinEventListeners() {
-            $('.widget-upload .wu-empty-upload,.widget-upload .wu-btn').rebind('click.widget_upload', function() {
+            $('.widget-upload .wu-items,.widget-upload .wu-btn').rebind('click.widget_upload', function() {
                 $('#fileselect5').click();
             });
 
@@ -2102,7 +2102,10 @@ mega.megadrop = (function() {
             }
         }
         ulmanager.isUploading = Boolean(ul_queue.length);
-        InitFileDrag();
+
+        // Hide Drop to Upload dialog, no need to call InitFileDrag on every upload
+        $('.drag-n-drop.overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
     };/* jshint +W074 */
 
     var isInit = function widgetIsInit() {

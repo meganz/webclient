@@ -5463,7 +5463,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .versioning-block .fm-account-header {
     margin-bottom: 16px;
 }
-.tab-content .versioning-switch {    
+.tab-content .versioning-switch {
   position: relative;
   display: inline-block;
   width: 40px;
@@ -11424,7 +11424,7 @@ table {
 }
 .account.data-item  .tiny-icon.cog:hover {
     opacity: 1;
-} 
+}
 .account.bonuses-block {
     float: left;
     width: 50%;
@@ -22523,7 +22523,6 @@ opacity: 1;
 }
 .wu-main .wu-items {
 	height: 350px;
-    cursor: pointer;
 	width: inherit;
     background-color: #FFFFFF;
     border-bottom: 1px solid #eee;
@@ -22866,6 +22865,7 @@ opacity: 1;
 }
 .wu-main .wu-items:hover {
     /* background-color: #f5f7f9; */
+    cursor: pointer;
     background-color: #FFFFFF;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;

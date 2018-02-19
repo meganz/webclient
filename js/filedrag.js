@@ -312,9 +312,7 @@
         var elem = document.getElementById("wu_items");
         if (elem) {
             fnHandler = mega.megadrop.upload;
-            // fnHover= mega.megadrop.uiDragHover;
-            // fnLeave = mega.megadrop.uiDragLeave;
-            document.getElementById('fileselect5').addEventListener("change", fnHandler, false);
+            document.getElementById("fileselect5").addEventListener("change", fnHandler, false);
         }
 
         document.getElementsByTagName("body")[0].addEventListener("dragenter", fnEnter, false);

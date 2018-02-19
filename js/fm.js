@@ -623,7 +623,7 @@ function contactAddDialog() {
     $('.add-user-popup .import-contacts-service').rebind('click', function() {
 
         // NOT imported
-        if (!$(this).is('.imported')) {alert(1);
+        if (!$(this).is('.imported')) {
             var contacts = new mega.GContacts({'where': 'contacts'});
 
             // NOT failed

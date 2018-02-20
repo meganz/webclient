@@ -1929,5 +1929,8 @@
     "17694": "Download key",
     "17704": "Wait",
     "17705": "Force Reload",
-    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?"
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?",
+    "17732": "View video",
+    "17733": "Open this file in the mobile app",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

@@ -3144,7 +3144,7 @@ React.makeElement = React['createElement'];
 	            },
 	            React.makeElement(ContactsUI.ContactPickerWidget, {
 	                active: this.props.active,
-	                className: "popup contacts-search",
+	                className: "popup contacts-search main-blur-block",
 	                contacts: this.props.contacts,
 	                megaChat: this.props.megaChat,
 	                exclude: this.props.exclude,
@@ -3627,6 +3627,10 @@ React.makeElement = React['createElement'];
 	        self.setState({ searchValue: e.target.value });
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	        var self = this;
 	        if (self.scrollToLastSelected && self.jspSelected) {
 
@@ -3662,11 +3666,27 @@ React.makeElement = React['createElement'];
 	                self.setState({ searchValue: '' });
 	                self.refs.contactSearchField.focus();
 	            };
+<<<<<<< HEAD
+=======
+	            var onAddContact = function onAddContact(e) {
+	                $('.add-user-popup .import-contacts-dialog').fadeOut(0);
+	                $('.import-contacts-link').removeClass('active');
+
+	                $('.add-user-popup').addClass('dialog').removeClass('hidden');
+	                fm_showoverlay();
+	                $('.add-user-size-icon').removeClass('full-size').addClass('short-size');
+	                $('.fm-add-user').removeClass('active');
+	                $('.add-user-popup-button.add').addClass('disabled');
+	                var $tokenInput = $('#token-input-');
+	                $tokenInput.focus();
+	            };
+>>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	            var onContactSelectDoneCb = function onContactSelectDoneCb(contact, e) {
 
 	                var contactHash = contact.u;
 
 	                if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
+<<<<<<< HEAD
 
 	                    if (self.props.onSelected) {
 	                        self.props.onSelected([contactHash]);
@@ -3676,6 +3696,17 @@ React.makeElement = React['createElement'];
 	                } else {
 	                    var selected = clone(self.state.selected || []);
 
+=======
+
+	                    if (self.props.onSelected) {
+	                        self.props.onSelected([contactHash]);
+	                    }
+	                    self.props.onSelectDone([contactHash]);
+	                    return;
+	                } else {
+	                    var selected = clone(self.state.selected || []);
+
+>>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	                    if (selected.indexOf(contactHash) === -1) {
 	                        selected.push(contactHash);
 
@@ -3695,13 +3726,22 @@ React.makeElement = React['createElement'];
 	                self.clickTime = new Date();
 	                self.lastClicked = contactHash;
 	            };
+<<<<<<< HEAD
+=======
+	            var selectedWidth = self.state.selected.length * 60;
+>>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "fm-dialog-footer" },
 	                    React.makeElement(
+	                        "a",
+	                        { href: "javascript:;", className: "default-white-button left", onClick: onAddContact },
+	                        l[71]
+	                    ),
+	                    React.makeElement(
 	                        "div",
-	                        { className: "fm-dialog-footer-txt" },
+	                        { className: "fm-dialog-footer-txt right" },
 	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __(l[8889])
 	                    )
 	                );
@@ -3719,13 +3759,23 @@ React.makeElement = React['createElement'];
 	                        { className: "selected-contact-block", selected: this.state.selected },
 	                        React.makeElement(
 	                            "div",
+<<<<<<< HEAD
 	                            { className: "select-contact-centre" },
+=======
+	                            { className: "select-contact-centre", style: { width: selectedWidth } },
+>>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	                            contactsSelected
 	                        )
 	                    ),
 	                    React.makeElement(
 	                        "div",
 	                        { className: "fm-dialog-footer" },
+	                        React.makeElement(
+	                            "span",
+	                            { className: "selected-contact-amount" },
+	                            self.state.selected.length,
+	                            " contacts selected"
+	                        ),
 	                        React.makeElement(
 	                            "a",
 	                            { href: "javascript:;", className: "default-grey-button right", onClick: onSelectDoneCb },
@@ -3739,7 +3789,10 @@ React.makeElement = React['createElement'];
 	                        key: v
 	                    }));
 	                });
+<<<<<<< HEAD
 	                var selectedWidth = self.state.selected.length > 7 ? self.state.selected.length * 60 : 0;
+=======
+>>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 
 	                footer = React.makeElement(
 	                    "div",
@@ -3808,7 +3861,41 @@ React.makeElement = React['createElement'];
 	            contacts.push(React.makeElement(ContactCard, {
 	                contact: v,
 	                className: "contacts-search " + selectedClass,
+<<<<<<< HEAD
 	                onClick: onContactSelectDoneCb,
+=======
+	                onClick: function onClick(contact, e) {
+	                    var contactHash = contact.u;
+
+	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
+
+	                        if (self.props.onSelected) {
+	                            self.props.onSelected([contactHash]);
+	                        }
+	                        self.props.onSelectDone([contactHash]);
+	                        return;
+	                    } else {
+	                        var selected = clone(self.state.selected || []);
+
+	                        if (selected.indexOf(contactHash) === -1) {
+	                            selected.push(contactHash);
+
+	                            self.scrollToLastSelected = true;
+	                            if (self.props.onSelected) {
+	                                self.props.onSelected(selected);
+	                            }
+	                        } else {
+	                            array.remove(selected, contactHash);
+	                            if (self.props.onSelected) {
+	                                self.props.onSelected(selected);
+	                            }
+	                        }
+	                        self.setState({ 'selected': selected });
+	                    }
+	                    self.clickTime = new Date();
+	                    self.lastClicked = contactHash;
+	                },
+>>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	                noContextMenu: true,
 	                key: v.u
 	            }));
@@ -3838,7 +3925,7 @@ React.makeElement = React['createElement'];
 	        var displayStyle = self.state.searchValue && self.state.searchValue.length > 0 ? "" : "none";
 	        return React.makeElement(
 	            "div",
-	            { className: this.props.className },
+	            { className: this.props.className + " " },
 	            React.makeElement(
 	                "div",
 	                { className: "contacts-search-header " + this.props.headerClasses },
@@ -9277,6 +9364,8 @@ React.makeElement = React['createElement'];
 
 	var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
 
+	var NODE_DOESNT_EXISTS_ANYMORE = {};
+
 	var GenericConversationMessage = React.createClass({
 	    displayName: 'GenericConversationMessage',
 
@@ -9651,10 +9740,11 @@ React.makeElement = React['createElement'];
 	                                    v.delay = message.delay;
 	                                    chatRoom.images.push(v);
 	                                }
+	                                var previewLabel = is_video(v) ? l[17732] : l[1899];
 	                                previewButton = React.makeElement(
 	                                    'span',
 	                                    { key: 'previewButton' },
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: __(l[1899]),
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
 	                                        onClick: self._startPreview.bind(self, v) }),
 	                                    React.makeElement('hr', null)
 	                                );
@@ -9684,23 +9774,44 @@ React.makeElement = React['createElement'];
 	                                            var linkButtons = [];
 	                                            var firstGroupOfButtons = [];
 	                                            var revokeButton = null;
+	                                            var downloadButton = null;
+
 	                                            if (message.isEditable && message.isEditable()) {
 	                                                revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross',
-	                                                    label: __(l[83]), className: 'red', onClick: function onClick() {
+	                                                    label: __(l[83]),
+	                                                    className: 'red',
+	                                                    onClick: function onClick() {
 	                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId ? message.internalId : message.orderValue, "");
 	                                                    } });
 	                                            }
 
-	                                            self._addLinkButtons(v.h, linkButtons);
+	                                            if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                                dropdown = "<span>" + l[5533] + "</span>";
+	                                                dbfetch.get(v.h).always(function () {
+	                                                    if (!M.d[v.h]) {
+	                                                        NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
+	                                                        Soon(function () {
+	                                                            self.safeForceUpdate();
+	                                                        });
+	                                                    }
+	                                                });
+	                                            } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                                downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                                                    icon: 'rounded-grey-down-arrow',
+	                                                    label: __(l[1187]),
+	                                                    onClick: self._startDownload.bind(self, v) });
 
-	                                            firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
-	                                                key: 'infoDialog',
-	                                                onClick: function onClick() {
-	                                                    $.selected = [v.h];
-	                                                    propertiesDialog();
-	                                                } }));
+	                                                self._addLinkButtons(v.h, linkButtons);
 
-	                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+	                                                firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
+	                                                    key: 'infoDialog',
+	                                                    onClick: function onClick() {
+	                                                        $.selected = [v.h];
+	                                                        propertiesDialog();
+	                                                    } }));
+
+	                                                self._addFavouriteButtons(v.h, firstGroupOfButtons);
+	                                            }
 
 	                                            return React.makeElement(
 	                                                'div',
@@ -9708,10 +9819,9 @@ React.makeElement = React['createElement'];
 	                                                previewButton,
 	                                                firstGroupOfButtons,
 	                                                firstGroupOfButtons && firstGroupOfButtons.length > 0 ? React.makeElement('hr', null) : "",
-	                                                React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
-	                                                    onClick: self._startDownload.bind(self, v) }),
+	                                                downloadButton,
 	                                                linkButtons,
-	                                                revokeButton ? React.makeElement('hr', null) : "",
+	                                                revokeButton && downloadButton ? React.makeElement('hr', null) : "",
 	                                                revokeButton
 	                                            );
 	                                        }

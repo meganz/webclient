@@ -356,6 +356,8 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
                     hideControls();
                     $document.rebind('mousemove.idle', hideControls);
+
+                    dlmanager.isStreaming = streamer;
                 }
             }
         });
@@ -621,8 +623,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             $document.unbind('mouseup.videoprogress');
             $document.unbind('mousemove.volumecontrol');
             $document.unbind('mouseup.volumecontrol');
+            dlmanager.isStreaming = false;
             return false;
         });
+
+        dlmanager.isStreaming = true;
     };
 
     var _initVideoStream = function(node, $wrapper, destroy, options) {
@@ -634,7 +639,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
         _initVideoControls($wrapper, s);
 
-        destroy = destroy || s.destroy.bind(s);
+        destroy = destroy || function() {
+            s.destroy();
+            $wrapper.trigger('video-destroy');
+        };
+        s.abort = destroy;
 
         s.on('inactivity', function(ev) {
             // Event invoked when the video becomes stalled, we'll show the loading/buffering spinner
@@ -678,15 +687,23 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         s.on('error', function(ev, error) {
             // <video>'s element `error` handler
 
-            var info = (MediaAttribute.getCodecStrings(node) || []).concat(s.hasVideo, s.hasAudio, ua.details.prod);
+            var info = [2].concat(MediaAttribute.getCodecStrings(node)).concat(s.hasVideo, s.hasAudio);
 
             if (!$.dialog) {
                 var hint = error.message || error;
+                info.push(String(hint || 'na'));
+
                 if (!hint && !window.chrome) {
                     // Suggest Chrome...
                     hint = l[16151] + ' ' + l[242];
                 }
-                msgDialog('warninga', l[135], l[47], hint);
+
+                if (String(hint) === 'The provided type is not supported') {
+                    msgDialog('warninga', l[135], l[17743]);
+                }
+                else {
+                    msgDialog('warninga', l[135], l[47], hint);
+                }
             }
             if (d) {
                 console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime, error, info);

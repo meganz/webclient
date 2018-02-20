@@ -9331,6 +9331,8 @@ React.makeElement = React['createElement'];
 
 	var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.medium';
 
+	var NODE_DOESNT_EXISTS_ANYMORE = {};
+
 	var GenericConversationMessage = React.createClass({
 	    displayName: 'GenericConversationMessage',
 
@@ -9705,10 +9707,11 @@ React.makeElement = React['createElement'];
 	                                    v.delay = message.delay;
 	                                    chatRoom.images.push(v);
 	                                }
+	                                var previewLabel = is_video(v) ? l[17732] : l[1899];
 	                                previewButton = React.makeElement(
 	                                    'span',
 	                                    { key: 'previewButton' },
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: __(l[1899]),
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
 	                                        onClick: self._startPreview.bind(self, v) }),
 	                                    React.makeElement('hr', null)
 	                                );
@@ -9738,23 +9741,44 @@ React.makeElement = React['createElement'];
 	                                            var linkButtons = [];
 	                                            var firstGroupOfButtons = [];
 	                                            var revokeButton = null;
+	                                            var downloadButton = null;
+
 	                                            if (message.isEditable && message.isEditable()) {
 	                                                revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross',
-	                                                    label: __(l[83]), className: 'red', onClick: function onClick() {
+	                                                    label: __(l[83]),
+	                                                    className: 'red',
+	                                                    onClick: function onClick() {
 	                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId ? message.internalId : message.orderValue, "");
 	                                                    } });
 	                                            }
 
-	                                            self._addLinkButtons(v.h, linkButtons);
+	                                            if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                                dropdown = "<span>" + l[5533] + "</span>";
+	                                                dbfetch.get(v.h).always(function () {
+	                                                    if (!M.d[v.h]) {
+	                                                        NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
+	                                                        Soon(function () {
+	                                                            self.safeForceUpdate();
+	                                                        });
+	                                                    }
+	                                                });
+	                                            } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                                downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                                                    icon: 'rounded-grey-down-arrow',
+	                                                    label: __(l[1187]),
+	                                                    onClick: self._startDownload.bind(self, v) });
 
-	                                            firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
-	                                                key: 'infoDialog',
-	                                                onClick: function onClick() {
-	                                                    $.selected = [v.h];
-	                                                    propertiesDialog();
-	                                                } }));
+	                                                self._addLinkButtons(v.h, linkButtons);
 
-	                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+	                                                firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
+	                                                    key: 'infoDialog',
+	                                                    onClick: function onClick() {
+	                                                        $.selected = [v.h];
+	                                                        propertiesDialog();
+	                                                    } }));
+
+	                                                self._addFavouriteButtons(v.h, firstGroupOfButtons);
+	                                            }
 
 	                                            return React.makeElement(
 	                                                'div',
@@ -9762,10 +9786,9 @@ React.makeElement = React['createElement'];
 	                                                previewButton,
 	                                                firstGroupOfButtons,
 	                                                firstGroupOfButtons && firstGroupOfButtons.length > 0 ? React.makeElement('hr', null) : "",
-	                                                React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
-	                                                    onClick: self._startDownload.bind(self, v) }),
+	                                                downloadButton,
 	                                                linkButtons,
-	                                                revokeButton ? React.makeElement('hr', null) : "",
+	                                                revokeButton && downloadButton ? React.makeElement('hr', null) : "",
 	                                                revokeButton
 	                                            );
 	                                        }

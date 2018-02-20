@@ -2621,10 +2621,7 @@ function fm_resize_handler(force) {
         console.time('fm_resize_handler');
     }
 
-    if (window.chrome) {
-        // XXX: Seems this 110% zoom bug got fixed as of Chrome 54?
-        M.chrome110ZoomLevelNotification();
-    }
+    M.zoomLevelNotification();
 
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         var tfse = M.getTransferElements();

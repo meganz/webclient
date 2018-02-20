@@ -60,8 +60,12 @@
                 }
 
                 sharedFolder = 'folder-item';
+
                 if (folders[i].t & M.IS_SHARED) {
                     sharedFolder += ' shared-folder-item';
+                }  
+                else if (mega.megadrop.pufs[fid] && mega.megadrop.pufs[fid].s !== 1) {
+                    sharedFolder += ' puf-folder';
                 }
 
                 nodeName = missingkeys[fid] ? l[8686] : folders[i].name;

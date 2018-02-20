@@ -331,6 +331,7 @@ var slideshowid;
                     return;
                 }
             }
+            
 
             // TODO: adapt the above code to work on the downloads page if we need to download the original
             if (page === 'download') {
@@ -338,6 +339,7 @@ var slideshowid;
             }
             else if (M.d[slideshowid]) {
                 M.addDownload([slideshowid]);
+                //showToast('download', l[7448], 'dd');
             }
             else {
                 M.addDownload([n]);

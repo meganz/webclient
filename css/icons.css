@@ -530,7 +530,7 @@
     width: 18px;
 }
 .medium-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -816,15 +816,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -832,7 +832,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -968,7 +968,10 @@
     background-position: -100px -291px;
 }
 .small-icon.context.shared-folder-item {
-    background-position: -100px -331px;
+    background-position: 0px -260px;
+}
+.small-icon.context.puf-folder {
+    background-position: -150px -911px;
 }
 .small-icon.context.create-widget {
     background-position: -82px -1071px;
@@ -1086,7 +1089,13 @@
     background-position: -140px -291px;
 }
 .dropdown-item:hover .small-icon.context.shared-folder-item, .dropdown-item.opened .small-icon.context.shared-folder-item {
-    background-position: -140px -331px;
+    background-position: -40px -260px;
+}
+.dropdown-item:hover .small-icon.context.puf-folder, .dropdown-item.opened .small-icon.context.puf-folder {
+    background-position: -190px -911px;
+}
+.small-icon.context.puf-folder {
+    background-position: -150px -911px;
 }
 .dropdown-item:hover .small-icon.context.create-widget {
     background-position: -122px -1071px;
@@ -1201,7 +1210,7 @@
     background-position: -192px -781px;
 }
 i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;

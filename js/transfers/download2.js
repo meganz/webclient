@@ -347,7 +347,7 @@ var dlmanager = {
         var promise = new MegaPromise();
 
         var max = function() {
-            promise.resolve(Math.pow(2, 53));
+            promise.resolve(Math.pow(2, 32));
         };
 
         if (dlMethod === FileSystemAPI) {

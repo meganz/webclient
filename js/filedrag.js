@@ -169,6 +169,7 @@
         if (
             (
                 folderlink ||
+                currentDir === 'contacts' ||
                 (
                     currentDir !== 'dashboard' &&
                     currentDir !== 'transfers' &&

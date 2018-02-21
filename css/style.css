@@ -8371,7 +8371,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-dialog.dlkey-dialog {
     min-width: 440px;
-    margin: -77px 0 0 -300px;
+    max-width: 440px;
+    margin: -120px 0 0 -220px;
+}
+
+.fm-dialog.dlkey-dialog .fm-dialog-new-folder-pad {
+        margin: 0 36px 0 0;
 }
 /* Decryption key dialog */
 .dlkey-dialog .wrapper, .fm-dialog.network-testing .wrapper {
@@ -8400,7 +8405,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 24px;
 }
 .dlkey-dialog .decryption-key input {
-    text-indent: 36px;
+    text-indent: 0px;
+    margin-left: 36px;
+    margin-right: 36px;
 }
 /* Password decryption dialog */
 .password-dialog .wrapper {

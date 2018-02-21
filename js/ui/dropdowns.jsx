@@ -222,7 +222,7 @@ var DropdownContactsSelector = React.createClass({
     render: function() {
         var self = this;
 
-        return <Dropdown className={"popup contacts-search " + this.props.className + " main-blur-block"}
+        return <Dropdown className={"popup contacts-search " + this.props.className + " tooltip-blur"}
                          active={this.props.active}
                          closeDropdown={this.props.closeDropdown}
                          ref="dropdown"
@@ -231,7 +231,7 @@ var DropdownContactsSelector = React.createClass({
                 >
                 <ContactsUI.ContactPickerWidget
                     active={this.props.active}
-                    className="popup contacts-search main-blur-block"
+                    className="popup contacts-search tooltip-blur"
                     contacts={this.props.contacts}
                     megaChat={this.props.megaChat}
                     exclude={this.props.exclude}

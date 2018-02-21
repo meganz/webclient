@@ -222,7 +222,7 @@ var DropdownContactsSelector = React.createClass({
     render: function() {
         var self = this;
 
-        return <Dropdown className={"popup contacts-search " + this.props.className}
+        return <Dropdown className={"popup contacts-search " + this.props.className + " main-blur-block"}
                          active={this.props.active}
                          closeDropdown={this.props.closeDropdown}
                          ref="dropdown"

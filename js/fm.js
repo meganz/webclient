@@ -507,15 +507,6 @@ function contactAddDialog() {
         else {
             var $textarea = $('.add-user-popup .add-user-textarea textarea');
 
-            // Change textarea placeholder if achievents are enabled
-            mega.achievem.enabled()
-                .done(function() {
-                    $textarea.attr('placeholder', l[17738]);
-                })
-                .fail(function() {
-                    $textarea.attr('placeholder', l[5878]);
-                });
-
             $textarea.val('');
             $('.add-user-popup .import-contacts-dialog').fadeOut(0);
             $('.import-contacts-link').removeClass('active');

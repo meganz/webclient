@@ -3135,7 +3135,7 @@ React.makeElement = React['createElement'];
 
 	        return React.makeElement(
 	            Dropdown,
-	            { className: "popup contacts-search " + this.props.className,
+	            { className: "popup contacts-search " + this.props.className + " tooltip-blur",
 	                active: this.props.active,
 	                closeDropdown: this.props.closeDropdown,
 	                ref: "dropdown",
@@ -3144,7 +3144,7 @@ React.makeElement = React['createElement'];
 	            },
 	            React.makeElement(ContactsUI.ContactPickerWidget, {
 	                active: this.props.active,
-	                className: "popup contacts-search main-blur-block",
+	                className: "popup contacts-search tooltip-blur",
 	                contacts: this.props.contacts,
 	                megaChat: this.props.megaChat,
 	                exclude: this.props.exclude,
@@ -3627,10 +3627,7 @@ React.makeElement = React['createElement'];
 	        self.setState({ searchValue: e.target.value });
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
-<<<<<<< HEAD
-=======
 
->>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	        var self = this;
 	        if (self.scrollToLastSelected && self.jspSelected) {
 
@@ -3666,8 +3663,6 @@ React.makeElement = React['createElement'];
 	                self.setState({ searchValue: '' });
 	                self.refs.contactSearchField.focus();
 	            };
-<<<<<<< HEAD
-=======
 	            var onAddContact = function onAddContact(e) {
 	                $('.add-user-popup .import-contacts-dialog').fadeOut(0);
 	                $('.import-contacts-link').removeClass('active');
@@ -3680,13 +3675,11 @@ React.makeElement = React['createElement'];
 	                var $tokenInput = $('#token-input-');
 	                $tokenInput.focus();
 	            };
->>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	            var onContactSelectDoneCb = function onContactSelectDoneCb(contact, e) {
 
 	                var contactHash = contact.u;
 
 	                if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
-<<<<<<< HEAD
 
 	                    if (self.props.onSelected) {
 	                        self.props.onSelected([contactHash]);
@@ -3696,17 +3689,6 @@ React.makeElement = React['createElement'];
 	                } else {
 	                    var selected = clone(self.state.selected || []);
 
-=======
-
-	                    if (self.props.onSelected) {
-	                        self.props.onSelected([contactHash]);
-	                    }
-	                    self.props.onSelectDone([contactHash]);
-	                    return;
-	                } else {
-	                    var selected = clone(self.state.selected || []);
-
->>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	                    if (selected.indexOf(contactHash) === -1) {
 	                        selected.push(contactHash);
 
@@ -3726,10 +3708,7 @@ React.makeElement = React['createElement'];
 	                self.clickTime = new Date();
 	                self.lastClicked = contactHash;
 	            };
-<<<<<<< HEAD
-=======
 	            var selectedWidth = self.state.selected.length * 60;
->>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
@@ -3759,11 +3738,7 @@ React.makeElement = React['createElement'];
 	                        { className: "selected-contact-block", selected: this.state.selected },
 	                        React.makeElement(
 	                            "div",
-<<<<<<< HEAD
-	                            { className: "select-contact-centre" },
-=======
 	                            { className: "select-contact-centre", style: { width: selectedWidth } },
->>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	                            contactsSelected
 	                        )
 	                    ),
@@ -3789,10 +3764,6 @@ React.makeElement = React['createElement'];
 	                        key: v
 	                    }));
 	                });
-<<<<<<< HEAD
-	                var selectedWidth = self.state.selected.length > 7 ? self.state.selected.length * 60 : 0;
-=======
->>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 
 	                footer = React.makeElement(
 	                    "div",
@@ -3861,9 +3832,6 @@ React.makeElement = React['createElement'];
 	            contacts.push(React.makeElement(ContactCard, {
 	                contact: v,
 	                className: "contacts-search " + selectedClass,
-<<<<<<< HEAD
-	                onClick: onContactSelectDoneCb,
-=======
 	                onClick: function onClick(contact, e) {
 	                    var contactHash = contact.u;
 
@@ -3895,7 +3863,6 @@ React.makeElement = React['createElement'];
 	                    self.clickTime = new Date();
 	                    self.lastClicked = contactHash;
 	                },
->>>>>>> 7b67cce264da07d007d99734f55bc6b2545c368d
 	                noContextMenu: true,
 	                key: v.u
 	            }));

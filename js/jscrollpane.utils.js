@@ -214,7 +214,7 @@ function reselect(n) {
     $('.ui-selected').removeClass('ui-selected');
 
     if (!Array.isArray($.selected)) {
-        if (selectionManager) {
+        if (window.selectionManager) {
             selectionManager.clear_selection();
         }
         $.selected = [];
@@ -227,7 +227,7 @@ function reselect(n) {
     });
 
     for (var i = ids.length; i--;) {
-        if (selectionManager) {
+        if (window.selectionManager) {
             selectionManager.add_to_selection(ids[i], n, i);
         }
         $('#' + ids[i]).addClass('ui-selected');

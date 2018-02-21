@@ -51,8 +51,11 @@ mBroadcaster.once('startMega', function() {
     if (!hashLogic) {
         $(window).rebind('popstate.mega', function(event) {
             var state = event.originalEvent.state || {};
-
-            loadSubPage(state.subpage || state.fmpage || location.hash, event);
+            var add = '';
+            if (state.searchString) {
+                add = state.searchString;
+            }
+            loadSubPage((state.subpage || state.fmpage || location.hash) + add, event);
         });
     }
 });
@@ -2402,7 +2405,15 @@ function loadSubPage(tpage, event)
         document.location.hash = '#' + page;
     }
     else if (!event || event.type !== 'popstate') {
-        history.pushState({ subpage: page }, "", "/"+page);
+        var isSearch = page.indexOf('fm/search/');
+        if (isSearch >= 0) {
+            var searchString = page.substring(isSearch + 10);
+            var tempPage = page.substring(0, isSearch + 10);
+            history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
+        }
+        else {
+            history.pushState({ subpage: page }, "", "/" + page);
+        }
     }
 
     if (jsl.length > 0) {

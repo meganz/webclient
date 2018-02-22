@@ -826,7 +826,6 @@
     "6240": "Aplikace pro Windows Phone",
     "6690": "P\u0159ejd\u011bte do M\u016fj \u00fa\u010det",
     "6771": "Odstran\u011bn\u00e9 slo\u017eky",
-    "6772": "\u017d\u00e1dn\u00e9 konverzace",
     "6773": "Vzestupn\u011b",
     "6774": "Sestupn\u011b",
     "6775": "Sd\u00edlet slo\u017eky",
@@ -1932,5 +1931,8 @@
     "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?",
     "17732": "View video",
     "17733": "Open this file in the mobile app",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "This file uses a video codec that is not supported by your browser.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

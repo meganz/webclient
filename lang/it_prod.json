@@ -826,7 +826,6 @@
     "6240": "Windows Phone App",
     "6690": "Vai al Mio Account",
     "6771": "Elimina cartelle",
-    "6772": "Nessuna Conversazione",
     "6773": "Crescente",
     "6774": "Discendente",
     "6775": "Condividi Cartelle",
@@ -1932,5 +1931,8 @@
     "17706": "Il tuo login sta prendendo pi\u00f9 tempo del dovuto. Vuoi aspettare o forzare il ricaricamento?",
     "17732": "Visualizza video",
     "17733": "Apri questo file nell'app mobile",
-    "17743": "Questo file utilizza un codec video che non \u00e8 supportato dal tuo browser."
+    "17738": "Ciao, unisciti a me su MEGA e ottieni l'accesso ad un archivio e ad una comunicazione criptata.",
+    "17742": "Rilascia per [S]caricare[\/S]",
+    "17743": "Questo file utilizza un codec video che non \u00e8 supportato dal tuo browser.                                ",
+    "17744": "MEGA non pu\u00f2 essere utilizzato con questo livello di zoom. Per favore, massimizza la grandezza della finestra del browser o zoomma di meno premendo Ctrl \/ \u2318 - nello stesso momento per ripristinare lo zoom a dei livelli accettabili."
 }

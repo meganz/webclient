@@ -826,7 +826,6 @@
     "6240": "Windows Phone Uygulamas\u0131",
     "6690": "Hesab\u0131m'a git",
     "6771": "Silinen klas\u00f6rler",
-    "6772": "Konu\u015fma yok",
     "6773": "Artan",
     "6774": "Azalan",
     "6775": "Klas\u00f6r Payla\u015f",
@@ -1932,5 +1931,8 @@
     "17706": "Giri\u015finiz tahmin edilenden uzun s\u00fcr\u00fcyor. Bekleyebilirsiniz veya yeniden y\u00fcklemeye zorlayabilirsiniz.",
     "17732": "Video's g\u00f6r\u00fcnt\u00fcle ",
     "17733": "Bu dosyay\u0131 mobil uygulamada a\u00e7 ",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "Bu dosya taray\u0131c\u0131n\u0131z taraf\u0131ndan desteklenmeyen bir video \u00e7\u00f6z\u00fcc\u00fcs\u00fc kullanmaktad\u0131r.",
+    "17744": "MEGA bu yak\u0131nla\u015ft\u0131rma d\u00fczeyinde kullan\u0131lamaz. L\u00fctfen yak\u0131nla\u015ft\u0131rmay\u0131 kabul edilebilir seviyelere getirmek i\u00e7in taray\u0131c\u0131 penceresini ekran\u0131 kaplayacak \u015fekilde b\u00fcy\u00fct\u00fcn veya Ctrl \/ \u2318 ard\u0131ndan - d\u00fc\u011fmesine ayn\u0131 anda basarak yak\u0131nla\u015ft\u0131r\u0131n."
 }

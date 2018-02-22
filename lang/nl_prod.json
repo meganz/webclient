@@ -826,7 +826,6 @@
     "6240": "Windows Phone App",
     "6690": "Ga naar Mijn Account",
     "6771": "Verwijder mappen",
-    "6772": "Geen Gesprekken",
     "6773": "Oplopend",
     "6774": "Aflopend",
     "6775": "Deel Bestanden",
@@ -1932,5 +1931,8 @@
     "17706": "Uw login duurt langer dan verwacht. Wilt u wachten of een herlading forceren.",
     "17732": "Video weergeven",
     "17733": "Open dit bestand in de mobiele applicatie",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "Dit bestand gebruikt een video codec die niet ondersteund wordt door uw browser.",
+    "17744": "MEGA kan niet gebruikt worden op deze zoom waarde. Maximaliseer het browser venster of zoom uit door op Ctrl\/ \u2318 te drukken - op hetzelfde moment om de zoom te herstellen naar acceptabele waardes."
 }

@@ -3307,10 +3307,6 @@
         "text": "Deleted folders",
         "context": "FM description of rubbish bin"
     },
-    "6772": {
-        "text": "No Conversations",
-        "context": "Empty Conversations section"
-    },
     "6773": {
         "text": "Ascending",
         "context": "Sorting params"
@@ -5448,12 +5444,12 @@
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhile downloading through the mobile browser, this message is shown to users to encourage installing our app.\r\n\r\n[S] is replaced with <span> and the text within turns red."
     },
     "8951": {
-        "text": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50 GB cloud storage![\/S]",
-        "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the filesize exceeds an stated limit. \r\n\r\n[S] is replaced with <span> and the text within turns red."
+        "text": "This file is too large to open in your mobile browser. Please use our mobile app for [S]unlimited file size support and free 50 GB cloud storage![\/S]",
+        "context": "This is used on the downloads page on the mobile webclient when viewing a download link through the mobile browser and the filesize exceeds an stated limit. Leave the [S] and [\/S] tags which will be used to turn the text red."
     },
     "8952": {
-        "text": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50 GB cloud storage![\/S]",
-        "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the file-type cannot be handled through the mobile browser itself. (The message is shown BEFORE trying to download the file)\r\n\r\n[S] is replaced with <span> and the text within turns red."
+        "text": "This file could not be opened in your mobile browser. Please use our mobile app for [S]unlimited file size, unlimited file types and free 50 GB cloud storage![\/S]",
+        "context": "This is used on the downloads page in the mobile webclient when viewing a download link through the mobile browser and the file-type cannot be handled through the mobile browser itself. The message is shown BEFORE trying to download the file. Leave the [S] and [\/S] tags which will turn the text red."
     },
     "8953": {
         "text": "Set an expiry date",
@@ -7731,8 +7727,20 @@
         "text": "Open this file in the mobile app",
         "context": "A button on the downloads page for the user to open the file-link in the mobile app."
     },
+    "17738": {
+        "text": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+        "context": "This string is shown inside the Add Contact dialog and is sent to a user in an email."
+    },
+    "17742": {
+        "text": "Drop to [S]upload[\/S]",
+        "context": "A header of a dialog which allows dragging external files into the MEGA browser. Please leave the placeholders [S] and [\/S] which will be used to bolden the text."
+    },
     "17743": {
-        "text": "This file has a video codec that is unsupported by your browser.",
+        "text": "This file uses a video codec that is not supported by your browser.",
         "context": "An error message which is shown to the user when there is a problem streaming a video file as a result of an unsupported codec. https:\/\/en.wikipedia.org\/wiki\/Codec"
+    },
+    "17744": {
+        "text": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels.",
+        "context": "An overlay message when the main menu is displaced outside of the window"
     }
 }

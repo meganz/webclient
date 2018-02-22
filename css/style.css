@@ -11548,6 +11548,18 @@ table {
     height: 68px;
     margin: 23px auto 0 auto;
 }
+.dropdown.body.popup.contacts-search {
+    width: 464px;
+    padding: 0 12px;
+}
+.dropdown.body.popup.contacts-search  .contacts-search-scroll {
+    border:1px solid rgba(0,0,0,0.2);
+    border-radius: 3px; 
+}
+.dropdown.body.popup.contacts-search .fm-dialog-footer {
+    border-top: none; 
+    padding: 12px 0 16px 0;
+}
 .dropdown.body.popup.bandwidth-info {
     bottom: 34px;
     width: 400px;
@@ -17603,6 +17615,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .main-blur-block {
     height: 100%;
+}
+.overlayed .tooltip-blur {
+    filter: blur(0.25em);
+    -webkit-filter: blur(0.25em);
 }
 /**
  * MegaDialog.js

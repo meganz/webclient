@@ -826,7 +826,6 @@
     "6240": "Windows Phone App",
     "6690": "Menj a 'Fi\u00f3kom'-ba",
     "6771": "T\u00f6r\u00f6ld k\u00f6nyvt\u00e1rak",
-    "6772": "Nincsenek besz\u00e9lget\u00e9sek",
     "6773": "N\u00f6vekv\u0151",
     "6774": "Cs\u00f6kken\u0151",
     "6775": "K\u00f6nyvt\u00e1rak Megoszt\u00e1sa",
@@ -1361,8 +1360,8 @@
     "8948": "OPEN IN MEGA APP",
     "8949": "OPEN FILE",
     "8950": "Install our mobile app to get [S]free 50 GB encrypted cloud storage![\/S]",
-    "8951": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50 GB cloud storage![\/S]",
-    "8952": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50 GB cloud storage![\/S]",
+    "8951": "This file is too large to open in your mobile browser. Please use our mobile app for [S]unlimited file size support and free 50 GB cloud storage![\/S]",
+    "8952": "This file could not be opened in your mobile browser. Please use our mobile app for [S]unlimited file size, unlimited file types and free 50 GB cloud storage![\/S]",
     "8953": "Set an expiry date",
     "8982": "An error occurred, please try again.",
     "9000": "Error. This email address is already in use.",
@@ -1932,5 +1931,8 @@
     "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?",
     "17732": "View video",
     "17733": "Open this file in the mobile app",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "This file uses a video codec that is not supported by your browser.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

@@ -826,7 +826,6 @@
     "6240": "\u05d0\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d9\u05ea \u05d5\u05d5\u05d9\u05e0\u05d3\u05d5\u05e1 \u05e4\u05d5\u05df",
     "6690": "\u05e2\u05d1\u05d5\u05e8 \u05d0\u05dc \u05d4\u05d7\u05e9\u05d1\u05d5\u05df \u05e9\u05dc\u05d9",
     "6771": "\u05ea\u05d9\u05e7\u05d9\u05d5\u05ea \u05e9\u05e0\u05de\u05d7\u05e7\u05d5",
-    "6772": "\u05d0\u05d9\u05df \u05e9\u05d9\u05d7\u05d5\u05ea",
     "6773": "\u05e2\u05d5\u05dc\u05d4",
     "6774": "\u05d9\u05d5\u05e8\u05d3",
     "6775": "\u05e9\u05ea\u05e3 \u05ea\u05d9\u05e7\u05d9\u05d5\u05ea",
@@ -1932,5 +1931,8 @@
     "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?",
     "17732": "View video",
     "17733": "Open this file in the mobile app",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "This file uses a video codec that is not supported by your browser.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

@@ -2089,7 +2089,7 @@
     "7270": "Veuillez remplir tous les champs exig\u00e9s et ressayer.",
     "7271": "Les num\u00e9ro de carte de cr\u00e9dit, mois\/ann\u00e9e d'expiration et code de s\u00e9curit\u00e9 doivent \u00eatre des chiffres. Veuillez v\u00e9rifier que tout est en ordre et ressayer.",
     "7272": "Format de donn\u00e9es erron\u00e9",
-    "7274": "L'abonnement n'a pas \u00e9t\u00e9 annul\u00e9 correctement. Veuillez contacter support@mega.nz pour annuler votre abonnement.",
+    "7274": "L\u2019abonnement n\u2019a pas \u00e9t\u00e9 annul\u00e9 avec succ\u00e8s. Veuillez contacter support@mega.nz pour annuler votre abonnement.",
     "7275": "\u00c9chec d'annulation de l'abonnement",
     "7276": "L'abonnement a \u00e9t\u00e9 annul\u00e9.",
     "7277": "L'abonnement a \u00e9t\u00e9 annul\u00e9",
@@ -3945,7 +3945,7 @@
     "16714": "Son des notifications",
     "16715": "Une fois qu'elle sera effac\u00e9e, ni %s ni vous ne pourrez voir les messages de cette conversation.",
     "16716": "L'historique de la conversation a \u00e9t\u00e9 effac\u00e9",
-    "16717": "Erreur. L'historique de la conversation n'a pas \u00e9t\u00e9 effac\u00e9 correctement",
+    "16717": "Erreur. L\u2019historique de la conversation n\u2019a pas \u00e9t\u00e9 effac\u00e9 avec succ\u00e8s",
     "16718": "Ajouter des participants",
     "16719": "Supprimer un participant",
     "16720": "Prot\u00e8ge votre conversation avec un chiffrement de bout en bout (contr\u00f4l\u00e9 par l\u2019utilisateur), fournissant des garanties de s\u00e9curit\u00e9 essentielles\u00a0:",
@@ -3986,7 +3986,7 @@
     "16762": "%1$s a quitt\u00e9 la conversation de groupe",
     "16763": "Copi\u00e9 vers le presse-papiers",
     "16764": "Erreur de conversation\u2009!",
-    "16765": "La conversation n'a pas pu \u00eatre ouverte correctement",
+    "16765": "La conversation n\u2019a pas pu \u00eatre ouverte avec succ\u00e8s",
     "16766": "Choisir un contact",
     "16767": "%1$d contact",
     "16768": "%1$d contacts",
@@ -4164,7 +4164,7 @@
     "16963": "Pr\u00e9paration du fichier",
     "16964": "Cr\u00e9ation du dossier",
     "16965": "Tous les \u00e9l\u00e9ments se trouvant dans votre corbeille seront supprim\u00e9s.",
-    "16966": "La demande a bien \u00e9t\u00e9 envoy\u00e9e \u00e0 %s. L\u2019\u00e9tat de la demande peut \u00eatre consult\u00e9 dans l\u2019onglet Demandes envoy\u00e9es.",
+    "16966": "La demande a \u00e9t\u00e9 envoy\u00e9e \u00e0 %s avec succ\u00e8s. L\u2019\u00e9tat peut \u00eatre consult\u00e9 dans l\u2019onglet Demandes envoy\u00e9es.",
     "16967": "%s est d\u00e9j\u00e0 un contact",
     "16968": "Vous n'avez pas le droit d'envoyer ce fichier",
     "16969": "Veuillez choisir un dossier de destination",
@@ -4642,5 +4642,5 @@
     "17739": "Les dossiers ne peuvent pas \u00eatre fusionn\u00e9s en raison de la pr\u00e9sence d\u2019un partage ou d\u2019un lien. Si vous souhaitez fusionner ces dossiers, vous devrez supprimer le partage ou le lien et ressayer.",
     "17742": "Drop to [S]upload[\/S]",
     "17743": "Ce fichier utilise un codec vid\u00e9o qui n\u2019est pas pris en charge par votre navigateur.                                ",
-    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
+    "17744": "MEGA ne peut pas \u00eatre utilis\u00e9 \u00e0 ce niveau de zoom. Veuillez maximiser la fen\u00eatre du navigateur ou zoomer arri\u00e8re en appuyant sur Ctrl\/\u2318 et - en m\u00eame temps pour ramener le zoom \u00e0 des niveaux acceptables."
 }

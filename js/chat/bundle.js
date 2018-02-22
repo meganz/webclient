@@ -3664,6 +3664,10 @@ React.makeElement = React['createElement'];
 	                self.refs.contactSearchField.focus();
 	            };
 	            var onAddContact = function onAddContact(e) {
+
+	                e.preventDefault();
+	                e.stopPropagation();
+
 	                $('.add-user-popup .import-contacts-dialog').fadeOut(0);
 	                $('.import-contacts-link').removeClass('active');
 
@@ -10942,7 +10946,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(11);
 
-	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl,noUI) {
+	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
 	    var self = this;
 
 	    this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -11110,23 +11114,22 @@ React.makeElement = React['createElement'];
 	        if (contact) {
 	            getLastInteractionWith(contact.u);
 	        }
-        });
-        if (!noUI) {
-            self.megaChat.trigger('onRoomCreated', [self]);
-        }
+	    });
+	    if (!noUI) {
+	        self.megaChat.trigger('onRoomCreated', [self]);
+	    }
 
-        $(window).rebind("focus." + self.roomId, function () {
-            if (self.isCurrentlyActive) {
-                self.trigger("onChatShown");
-            }
-        });
+	    $(window).rebind("focus." + self.roomId, function () {
+	        if (self.isCurrentlyActive) {
+	            self.trigger("onChatShown");
+	        }
+	    });
 
-        self.megaChat.rebind("onRoomDestroy." + self.roomId, function (e, room) {
-            if (room.roomId == self.roomId) {
-                $(window).unbind("focus." + self.roomId);
-            }
-        });
-
+	    self.megaChat.rebind("onRoomDestroy." + self.roomId, function (e, room) {
+	        if (room.roomId == self.roomId) {
+	            $(window).unbind("focus." + self.roomId);
+	        }
+	    });
 
 	    return this;
 	};

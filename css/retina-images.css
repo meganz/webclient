@@ -99,8 +99,8 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 36px auto;
 }
 .empty-icon, .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg, .dialog-empty-icon {
-    background-image: url(../images/mega/empty-sprite_v3@2x.png);
-    background-size: 294px auto;
+    background-image: url(../images/mega/empty-sprite_v4@2x.png);
+    background-size: 292px auto;
 }
 .blog-article li, .blog-new-full ul li, .sync li, .affiliate li, .pro li {
     background-image: url(../images/mega/dev-point-new.png);

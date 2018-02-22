@@ -4276,7 +4276,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -khtml-opacity: 0.7;
     opacity: 0.7;
 }
-.nw-conversations-item, .fm-tree-panel .nw-contact-item {
+.nw-conversations-item, .fm-tree-panel .nw-contact-item, .fm-dialog-body .nw-contact-item {
     height: 24px;
     padding-right: 12px;
     overflow: hidden;
@@ -4344,18 +4344,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(43,166,222,0.5);
     color: white;
 }
-.nw-conversations-name, .fm-tree-panel .nw-contact-name {
+.nw-conversations-name, .fm-tree-panel .nw-contact-name, .fm-dialog-body .nw-contact-item {
     margin: 0 25px 0 32px;
     font-size: 13px;
     line-height: 23px;
-    color: #666666;
+    color: #444;
     padding: 0;
     overflow: hidden;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
-.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name {
+.fm-dialog-body .nw-contact-item.selected {
+    background-color: rgba(43,166,222,0.5);
+    color: white;
+}
+.fm-dialog-body .nw-contact-item.selected .nw-contact-email, .fm-dialog-body .nw-contact-item.selected .nw-contact-group {
+    color: #fff;
+}
+.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name  {
     color: white;
 }
 .tree-item {
@@ -5872,6 +5879,84 @@ th.grid-first-th {
 }
 .fm-blocks-view.shared-view .block-view-file-type.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder, .block-view-file-type.folder.inbound-share, .contact-details-view .block-view-file-type.folder-shared {
     background-position: center -9747px;
+}
+/* Ct changes for copy to conversations */
+.fm-dialog-body .nw-contact-name {
+    line-height: 24px;
+    margin: 0 20px 0 14px;
+    overflow: hidden;
+    display: inline-block;
+    padding: 0 0 0 0;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    width: calc(50% - 56px);
+    color: inherit;
+}
+.fm-dialog-body .online .nw-contact-status, .fm-dialog-body .away .nw-contact-status, .fm-dialog-body .offline .nw-contact-status, .fm-dialog-body .busy .nw-contact-status {
+    border: 1px solid #fff;
+    margin: 9px 0 0 14px;
+}
+.fm-dialog-body .nw-contact-status {
+    width: 8px;
+    height: 8px;
+}
+.fm-dialog-body .nw-contact-item {
+    padding: 0 14px 0 14px;
+    margin: 0 0;
+    height: 26px;
+    background-color:rgba(0,0,0,0);
+    color: #444;
+}
+.fm-dialog-body .nw-contact-item:hover {
+    background-color: rgba(43, 166, 222, 0.4);
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-item.selected:hover {
+    background-color: rgba(43, 166, 222, 0.5);
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-email, .fm-dialog-body .nw-contact-group {
+    line-height: 24px;
+    margin: 0 0;
+    overflow: hidden;
+    display: inline-block;
+    padding: 0 0;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    width: calc(50% - 2px);
+    color: #888;
+}
+.fm-dialog-body .nw-contact-item:hover .nw-contact-email {
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-item:hover .nw-contact-group {
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-group-icon {
+    width: 12px;
+    height: 10px;
+    float: left;
+    margin-left: 13px;
+    margin-top: 8px;
+    background-image: url(../images/mega/group_copy@2x.png);
+    background-repeat: no-repeat;
+    background-size: 12px 10px;
+    opacity: 0.8;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.fm-dialog-body .nw-contact-item:hover > .nw-contact-group-icon, .fm-dialog-body .nw-contact-item.selected > .nw-contact-group-icon {
+    background-image: url(../images/mega/group_copy_white@2x.png);
+    opacity: 1;
+}
+
+.fm-dialog-body .nw-contact-name.group {
+    margin-left: 11px;
 }
 .file-icon-area {
     width: 120px;
@@ -7644,7 +7729,7 @@ table {
     margin-top: -171px;
 }
 .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg {
-    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-image: url(../images/mega/empty-sprite_v4.png);
     background-repeat: no-repeat;
 }
 .fm-empty-cloud-bg {
@@ -7777,7 +7862,7 @@ table {
     top: 34px;
 }
 .dialog-sorting-menu {
-    left: 466px;
+    left: 590px;
     top: 103px;
 }
 .context-menu-divider, .pause-item-divider, .sorting-item-divider {
@@ -8451,8 +8536,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     margin: 0;
 }
 .fm-dialog.copy-dialog, .fm-dialog.move-dialog {
-    width: 480px;
-    margin: -200px 0 0 -240px;
+    width: 604px;
+    margin: -220px 0 0 -302px;
 }
 .fm-dialog.arrange-to-back, div.overlay.arrange-to-back {
     z-index: 900;
@@ -17461,21 +17546,30 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .copy-dialog .fm-dialog-body, .move-dialog .fm-dialog-body {
     padding: 14px 0 0 0;
 }
-.copy-dialog-button, .move-dialog-button {
+.copy-dialog-button-block.hidden {
+    display: none;
+}
+.copy-dialog-button, .move-dialog-button  {
     height: 48px;
-    width: 244px;
+    width: 200px;
     float: left;
     background-color: rgba(0,0,0,0.15);
     background-image: url(../images/mega/nw-fm-sprite_v26.svg);
     background-repeat: no-repeat;
     cursor: pointer;
 }
+.copy-dialog .fm-dialog-body.two-tabs .copy-dialog-button.conversations {
+    display: none;
+}
+.copy-dialog .fm-dialog-body.two-tabs .copy-dialog-button {
+    width: 300px;
+}
 .copy-dialog-button.cloud-drive, .move-dialog-button.cloud-drive {
     background-position: center 8px;
 }
 .copy-dialog-button.shared-with-me, .move-dialog-button.shared-with-me {
     background-position: center -87px;
-    width: 232px;
+    width: 200px;
 }
 .copy-dialog-button.conversations, .move-dialog-button.conversations {
     background-position: center -184px;
@@ -17496,7 +17590,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-color: rgba(49,181,0,1);
 }
 .dialog-empty-block {
-    height: 240px;
+    height: 280px;
     position: relative;
     display: none;
     background-color: #FAFAFA;
@@ -17506,14 +17600,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     display: block;
 }
 .move-dialog-button {
-    width: 158px;
+    width: 200px;
 }
 .move-dialog-button.shared-with-me {
-    width: 160px;
+    width: 200px;
 }
 .dialog-empty-icon {
     height: 128px;
-    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-image: url(../images/mega/empty-sprite_v4.png);
     background-position: center -2677px;
     background-repeat: no-repeat;
 }
@@ -17525,6 +17619,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .rubbish-bin .dialog-empty-icon {
     background-position: center -3118px;
+}
+.conversations .dialog-empty-icon {
+    background-position: center -3282px;
 }
 .dialog-empty-header {
     font-size: 18px;
@@ -17551,8 +17648,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     border: 0;
 }
 .copy-dialog-tree-panel, .move-dialog-tree-panel {
-    height: 240px;
-    overflow: hidden;
+    height: 280px;
     display: none;
 }
 .share-dialog-tree-panel {
@@ -17578,7 +17674,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     top: 11px;
 }
 .dialog-tree-panel-scroll {
-    height: 168px;
+    height: 232px;
     min-width: 100%;
 }
 .fm-dialog-body .nw-conversations-item {
@@ -21032,7 +21128,7 @@ div.camera-bottom-txt {
     top: 50%;
 }
 .empty-icon {
-    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-image: url(../images/mega/empty-sprite_v4.png);
     background-repeat: no-repeat;
     height: 185px;
 }

@@ -182,6 +182,20 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         }
     }
 
+    // view send to chat if all selected items are files
+    if ($.selected.length) {
+        var viewChat = true;
+        for (var e = 0; e < $.selected.length; e++) {
+            if (M.d[$.selected[e]].t !== 0) {
+                viewChat = false;
+                break;
+            }
+        }
+        if (viewChat) {
+            items['.send-to-contact-item'] = 1;
+        }
+    }
+
     if ((sourceRoot === M.RootID) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;

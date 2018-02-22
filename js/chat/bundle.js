@@ -8520,6 +8520,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
+
 	            var handled = false;
 	            if (key === 37 || key === 38) {
 
@@ -8550,8 +8551,25 @@ React.makeElement = React['createElement'];
 	            } else if (key === 13) {
 
 	                self.unbindKeyEvents();
-	                self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
-	                handled = true;
+	                if (selected === -1) {
+	                    if (self.found.length > 0) {
+	                        for (var i = 0; i < self.found.length; i++) {
+	                            if (":" + self.found[i].n + ":" === self.props.emojiSearchQuery + ":") {
+
+	                                self.props.onSelect(false, ":" + self.found[0].n + ":", self.state.prefilled);
+	                                handled = true;
+	                            }
+	                        }
+	                    }
+
+	                    if (!handled && key === 13) {
+	                        self.props.onCancel();
+	                    }
+	                    return;
+	                } else {
+	                    self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
+	                    handled = true;
+	                }
 	            } else if (key === 27) {
 
 	                self.unbindKeyEvents();

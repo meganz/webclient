@@ -18,7 +18,7 @@
         clearTimeout(toastTimeout);
         toastTimeout = setTimeout(function() {
             hideToast();
-        }, 7000);
+        }, 4000);
 
         var closeSelector = '.toast-close-button';
         if (buttonLabel) {

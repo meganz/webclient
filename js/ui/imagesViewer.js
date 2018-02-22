@@ -252,7 +252,12 @@ var slideshowid;
                 slideshow_next();
             }
             else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
-                slideshow(slideshowid, true);
+                if ($.dialog) {
+                    closeDialog($.dialog);
+                }
+                else {
+                    slideshow(slideshowid, true);
+                }
             }
             else if (e.keyCode === 8 || e.key === 'Backspace') {
                 // since Backspace event is processed with keydown at document level for cloudBrowser.

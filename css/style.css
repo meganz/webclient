@@ -56,11 +56,12 @@
 }
 @font-face {
     font-family: 'Open Sans Italic';
-    src: url('../fonts/opensansitalic.eot');
-    src: url('../fonts/opensansitalic.eot?#iefix') format('embedded-opentype'), url('../fonts/opensansitalic.woff2') format('woff2'), url('../fonts/opensansitalic.woff') format('woff'), url('../fonts/opensansitalic.ttf') format('truetype'), url('../fonts/opensansitalic.svg#open_sansitalic') format('svg');
+    src: url('../fonts/opensans-italic-webfont.eot');
+    src: url('../fonts/opensans-italic-webfont.eot?#iefix') format('embedded-opentype'),  url('../fonts/opensans-italic-webfont.woff2') format('woff2'),  url('../fonts/opensans-italic-webfont.woff') format('woff'),  url('../fonts/opensans-italic-webfont.ttf') format('truetype'),  url('../fonts/opensans-italic-webfont.svg#open_sansitalic') format('svg');
     font-weight: normal;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'source_code_proregular';
     src: url('../fonts/sourcecodepro-regular-webfont.eot');
@@ -5344,7 +5345,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v15.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -5469,7 +5470,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .versioning-block .fm-account-header {
     margin-bottom: 16px;
 }
-.tab-content .versioning-switch {    
+.tab-content .versioning-switch {
   position: relative;
   display: inline-block;
   width: 40px;
@@ -6165,7 +6166,7 @@ th.grid-first-th {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -7194,11 +7195,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v15.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v15.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -7880,13 +7881,13 @@ table {
 .dropdown.body.add-user-popup {
     max-width: 90%;
     z-index: 100;
-    width: 400px !important;
+    width: 416px !important;
 }
 .dropdown.body.add-user-popup.dialog {
     z-index: 1200;
     left: 50% !important;
     top: 50% !important;
-    margin: -108px 0 0 -200px;
+    margin: -108px 0 0 -208px;
 }
 .dialog .add-user-size-icon.short-size {
     display: none;
@@ -11515,7 +11516,7 @@ table {
 }
 .account.data-item  .tiny-icon.cog:hover {
     opacity: 1;
-} 
+}
 .account.bonuses-block {
     float: left;
     width: 50%;
@@ -16526,7 +16527,7 @@ color: #D90007 !important;
 }
 div.token-input-dropdown-mega {
     position: absolute;
-    /*width: 456px !important;*/
+    width: 342px !important;
     background-color: #fff;
     overflow: hidden;
     border: 2px solid rgba(0,0,0,0.1);
@@ -20277,7 +20278,7 @@ div.camera-bottom-txt {
     background-position: -11px -10569px;
 }
 .fm-account-button.megadrop::before {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v15.png);
     background-position: -78px -1109px;
 }
 .fm-account-button.megadrop.active::before {
@@ -22644,7 +22645,6 @@ opacity: 1;
 }
 .wu-main .wu-items {
 	height: 350px;
-    cursor: pointer;
 	width: inherit;
     background-color: #FFFFFF;
     border-bottom: 1px solid #eee;
@@ -22987,6 +22987,7 @@ opacity: 1;
 }
 .wu-main .wu-items:hover {
     /* background-color: #f5f7f9; */
+    cursor: pointer;
     background-color: #FFFFFF;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;

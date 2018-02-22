@@ -505,7 +505,9 @@ function contactAddDialog() {
 
         // Show
         else {
-            $('.add-user-popup .add-user-textarea textarea').val('');
+            var $textarea = $('.add-user-popup .add-user-textarea textarea');
+
+            $textarea.val('');
             $('.add-user-popup .import-contacts-dialog').fadeOut(0);
             $('.import-contacts-link').removeClass('active');
             clearScrollPanel('.add-user-popup');
@@ -518,7 +520,7 @@ function contactAddDialog() {
 
             topPopupAlign(this, '.add-user-popup');
 
-            initTextareaScrolling($('.add-user-textarea textarea'), 39);
+            initTextareaScrolling($textarea, 39);
             $('.add-user-popup .token-input-input-token-mega input').focus();
             focusOnInput();
         }

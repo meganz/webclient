@@ -712,6 +712,7 @@
     "5710": "Haluatko varmasti keskeytt\u00e4\u00e4 rekister\u00f6innin?",
     "5737": "Ei kontakteja",
     "5738": "Roskakori",
+    "5740": "Downloading...",
     "5775": "K\u00e4ytetty",
     "5799": "K\u00e4ytt\u00f6",
     "5814": "P\u00e4ivit\u00e4 tili",
@@ -1925,5 +1926,11 @@
     "17688": "Can you remember your password?",
     "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
     "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
-    "17694": "Download key"
+    "17694": "Download key",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?",
+    "17732": "View video",
+    "17733": "Open this file in the mobile app",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

@@ -40,9 +40,12 @@ pro.propay = {
         // Preload loading/transferring/processing animation
         pro.propay.preloadAnimation();
 
-        // If somehow they reached the Pro pay page and they're not logged in, go back to the Pro Select page (step 1).
-        // Ephemeral / non-confirmed accounts are allowed to reach this step e.g. if they registered on Pro step 1.
-        if (!u_handle) {
+        // If somehow the user reached the Pro Pay page (step 2) and they're not logged in, go back to the Pro Plan
+        // selection page (step 1). Also, ephemeral accounts (not registered at all but have a few files in the cloud
+        // drive) are *not* allowed to reach the Pro Pay page as we can't track their payment (no email address).
+        // Accounts that have registered but have not confirmed their email address yet *are* allowed to reach the Pro
+        // Pay page e.g. if they registered on the Pro Plan selection page page first (this gets more conversions).
+        if (u_type === false || (u_type === 0 && typeof localStorage.awaitingConfirmationAccount === 'undefined')) {
             loadSubPage('pro');
             return;
         }

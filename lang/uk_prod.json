@@ -712,6 +712,7 @@
     "5710": "\u0412\u0438 \u0432\u043f\u0435\u0432\u043d\u0435\u043d\u0456, \u0449\u043e \u0445\u043e\u0447\u0435\u0442\u0435 \u043f\u0440\u0438\u043f\u0438\u043d\u0438\u0442\u0438 \u0440\u0435\u0454\u0441\u0442\u0440\u0430\u0446\u0456\u044e?",
     "5737": "\u041d\u0435\u043c\u0430\u0454 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u0456\u0432",
     "5738": "\u0421\u043c\u0456\u0442\u0442\u044f",
+    "5740": "Downloading...",
     "5775": "\u0412\u0438\u043a\u043e\u0440\u0438\u0441\u0442\u043e\u0432\u0443\u0454\u0442\u044c\u0441\u044f",
     "5799": "\u0412\u0438\u043a\u043e\u0440\u0438\u0441\u0442\u0430\u043d\u043d\u044f",
     "5814": "\u041e\u043d\u043e\u0432\u0438\u0442\u0438 \u0430\u043a\u0430\u0443\u043d\u0442",
@@ -1925,5 +1926,11 @@
     "17688": "Can you remember your password?",
     "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
     "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
-    "17694": "Download key"
+    "17694": "Download key",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?",
+    "17732": "View video",
+    "17733": "Open this file in the mobile app",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

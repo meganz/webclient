@@ -712,6 +712,7 @@
     "5710": "Weet u zeker dat u de registratie wilt afbreken?",
     "5737": "Geen contacten",
     "5738": "Prullenbak",
+    "5740": "Downloaden...",
     "5775": "Gebruikt",
     "5799": "Gebruik",
     "5814": "Upgrade Account",
@@ -1925,5 +1926,11 @@
     "17688": "Kunt u uw wachtwoord herinneren?",
     "17689": "Tik en hou vast om de Herstelsleutel te kopi\u00ebren naar het klembord.",
     "17690": "Om uw account te herstellen met uw Herstelsleutel, bezoek [A]https:\/\/mega.nz\/recovery[\/A] op uw desktop apparaat en volg de instructies,",
-    "17694": "Download key"
+    "17694": "Download sleutel",
+    "17704": "Wacht",
+    "17705": "Herladen Forceren",
+    "17706": "Uw login duurt langer dan verwacht. Wilt u wachten of een herlading forceren.",
+    "17732": "Video weergeven",
+    "17733": "Open dit bestand in de mobiele applicatie",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

@@ -712,6 +712,7 @@
     "5710": "B\u1ea1n c\u00f3 ch\u1eafc mu\u1ed1n h\u1ee7y b\u1ecf vi\u1ec7c \u0111\u0103ng k\u00fd?",
     "5737": "Danh b\u1ea1 tr\u1ed1ng",
     "5738": "Th\u00f9ng r\u00e1c",
+    "5740": "\u0110ang t\u1ea3i v\u1ec1...",
     "5775": "\u0110\u00e3 D\u00f9ng",
     "5799": "L\u01b0\u1ee3ng D\u00f9ng",
     "5814": "N\u00e2ng C\u1ea5p T\u00e0i Kho\u1ea3n",
@@ -1925,5 +1926,11 @@
     "17688": "Can you remember your password?",
     "17689": "Tap and hold to copy the Recovery Key to the clipboard.",
     "17690": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
-    "17694": "Download key"
+    "17694": "Download key",
+    "17704": "Wait",
+    "17705": "Force Reload",
+    "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?",
+    "17732": "View video",
+    "17733": "Open this file in the mobile app",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

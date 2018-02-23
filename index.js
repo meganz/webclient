@@ -467,6 +467,7 @@ function init_page() {
         && (page !== 'privacy')
         && (page !== 'takendown')
         && (page !== 'general')
+        && (page !== 'resellers')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -905,9 +906,16 @@ function init_page() {
         dev_init('doc');
     }
     else if (page == 'backup' && !u_type) {
-        login_txt = l[1298];
-        parsepage(pages['login']);
-        init_login();
+        if (is_mobile) {
+            login_next = page;
+            loadSubPage('login');
+            return false;
+        }
+        else {
+            login_txt = l[1298];
+            parsepage(pages['login']);
+            init_login();
+        }
     }
     else if (page == 'backup') {
         if (is_mobile) {
@@ -1205,7 +1213,6 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
-
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
@@ -2304,8 +2311,8 @@ function parsepage(pagehtml, pp) {
             translate(pages['transferwidget']) + pagehtml)
         .show();
 
-    $(window).rebind('resize.subpage', function (e) {
-        M.chrome110ZoomLevelNotification();
+    $(window).rebind('resize.subpage', function () {
+        M.zoomLevelNotification();
     });
 
     $('body').addClass('bottom-pages');

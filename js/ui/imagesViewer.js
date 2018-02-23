@@ -324,7 +324,6 @@ var slideshowid;
 
         var $dlBut = $overlay.find('.viewer-button.download');
         $dlBut.rebind('click', function() {
-
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                     dl_queue[i].preview = false;
@@ -333,7 +332,11 @@ var slideshowid;
                 }
             }
 
-            if (M.d[slideshowid]) {
+            // TODO: adapt the above code to work on the downloads page if we need to download the original
+            if (page === 'download') {
+                $('.big-button.download-file').click();
+            }
+            else if (M.d[slideshowid]) {
                 M.addDownload([slideshowid]);
             }
             else {
@@ -341,7 +344,7 @@ var slideshowid;
             }
         });
 
-        if (n.p || M.chat) {
+        if (n.p || M.chat || page === 'download') {
             $dlBut.removeClass('hidden');
         }
         else {

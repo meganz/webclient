@@ -133,8 +133,8 @@
     "419": "Dezembro",
     "425": "Renomear Pasta",
     "426": "Renomear Arquivo",
-    "429": "Hist\u00f3rico de Sess\u00f5es",
-    "430": "Hist\u00f3rico de Compras",
+    "429": "Hist\u00f3rico de sess\u00f5es",
+    "430": "Hist\u00f3rico de compras",
     "431": "Hist\u00f3rico de transa\u00e7\u00f5es",
     "432": "Tipo de conta:",
     "433": "Upgrade",
@@ -712,6 +712,7 @@
     "5710": "Tem certeza que deseja cancelar o cadastro?",
     "5737": "Sem contatos",
     "5738": "Lixeira",
+    "5740": "Baixando...",
     "5775": "Utilizado",
     "5799": "Utiliza\u00e7\u00e3o",
     "5814": "Upgrade",
@@ -1925,5 +1926,11 @@
     "17688": "Voc\u00ea lembra da sua senha?",
     "17689": "Mantenha pressionado para copiar a Chave de recupera\u00e7\u00e3o para a \u00e1rea de transfer\u00eancia.",
     "17690": "Para restaurar a sua conta usando a sua Chave de recupera\u00e7\u00e3o, visite [A]https:\/\/mega.nz\/recovery[\/A] no seu PC e siga as instru\u00e7\u00f5es.",
-    "17694": "Fazer download da chave"
+    "17694": "Fazer download da chave",
+    "17704": "Espere",
+    "17705": "For\u00e7ar o recarregamento",
+    "17706": "O login est\u00e1 demorando mais do que o esperado. Voc\u00ea quer esperar ou for\u00e7ar o recarregamento?",
+    "17732": "View video",
+    "17733": "Open this file in the mobile app",
+    "17743": "This file has a video codec that is unsupported by your browser."
 }

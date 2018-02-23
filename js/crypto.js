@@ -1204,12 +1204,9 @@ function api_setsid(sid) {
         if (typeof dlmanager === 'object') {
 
             if (!dlmanager.onOverquotaWithAchievements) {
-                if (dlmanager.isOverQuota) {
-
-                    if (!dlmanager.isOverFreeQuota) {
-                        dlmanager.uqFastTrack = 1;
-                        delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
-                    }
+                if (dlmanager.isOverQuota && !dlmanager.isOverFreeQuota) {
+                    dlmanager.uqFastTrack = !Object(u_attr).p;
+                    delay('overquota:uqft', dlmanager._overquotaInfo.bind(dlmanager), 900);
                 }
 
                 if (typeof dlmanager.onLimitedBandwidth === 'function') {
@@ -1347,7 +1344,7 @@ function chunkedfetch(xhr, uri, postdata) {
         function chunkedread() {
             return reader.read().then(function(r) {
                 if (r.done) {
-                    // signal completion through .onload()
+                    // signal completion through .onloadend()
                     xhr.response = null;
                     xhr.onloadend();
                 }
@@ -1364,7 +1361,7 @@ function chunkedfetch(xhr, uri, postdata) {
         chunkedread();
     }).catch(function(err) {
         console.error("Fetch error: ", err);
-        xhr.onerror();
+        xhr.onloadend();
     });
 }
 
@@ -1420,7 +1417,7 @@ function api_proc(q) {
                         if (!bytes) {
                             // this may throw an exception if the header doesn't exist
                             try {
-                                bytes = this.getResponseHeader('Original-Content-Length');
+                                bytes = this.getResponseHeader('Original-Content-Length') | 0;
                                 this.totalBytes = bytes;
                             }
                             catch (e) {}
@@ -1432,7 +1429,7 @@ function api_proc(q) {
                     }
 
                     // update number of bytes received in .onprogress() for subsequent check
-                    // in .onload() whether it contains more data
+                    // in .onloadend() whether it contains more data
 
                     var chunk = this.response;
 
@@ -1853,6 +1850,10 @@ function getsc(force) {
         api_cancel(apixs[2]);   // retire existing XHR that may still be completing the request
         api_ready(apixs[2]);
         api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
+
+        if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
+            mega.loadReport.scSent = Date.now();
+        }
     }
 }
 

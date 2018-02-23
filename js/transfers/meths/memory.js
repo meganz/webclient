@@ -69,9 +69,13 @@
 
         this.download = function(name, path) {
             var blob = this.getBlob(name);
-            this.completed = true;
 
-            if (is_chrome_firefox) {
+            if (this.completed) {
+                if (d) {
+                    console.log('Transfer already completed...', dl);
+                }
+            }
+            else if (is_chrome_firefox) {
                 requestFileSystem(0, blob.size, function(fs) {
                     var opt = {
                         create: !0,
@@ -87,35 +91,6 @@
             }
             else if (msie) {
                 navigator.msSaveOrOpenBlob(blob, name);
-            }
-            else if (is_mobile) {
-                if (page === 'download') {
-                    var sblob = myURL.createObjectURL(blob);
-                    $('body')
-                        .addClass('download-complete')
-                        .find('.download-progress')
-                        .rebind('click', function() {
-
-                            // Store a log for statistics
-                            api_req({ a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient' });
-
-                            if (navigator.userAgent.match(/CriOS/i)) {
-                                var reader = new FileReader();
-                                reader.onload = function(e) {
-                                    window.open(reader.result, '_blank');
-                                };
-                                return reader.readAsDataURL(blob);
-                            }
-
-                            // Redirect to object URL to download the file to the client
-                            location.href = sblob;
-                            return false;
-                        });
-                    $('.mobile.download-speed, .mobile.download-percents').text('');
-                }
-                else {
-                    throw new Error('MemoryIO -- huh??');
-                }
             }
             else if (hasDownloadAttr) {
                 var blob_url = myURL.createObjectURL(blob);
@@ -141,9 +116,10 @@
                 }
             }
             else {
-                throw new Error('MemoryIO -- huh?');
+                location.href = myURL.createObjectURL(blob);
             }
 
+            this.completed = true;
             this.abort();
         };
 
@@ -187,9 +163,12 @@
             if (msie) {
                 return dblob.getBlob();
             }
-            return new Blob(dblob, {
-                type: filemime(name)
-            });
+            try {
+                return new File(dblob, name, {type: filemime(name)});
+            }
+            catch (ex) {
+            }
+            return new Blob(dblob, {type: filemime(name)});
         };
     }
 

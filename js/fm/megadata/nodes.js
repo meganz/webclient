@@ -939,6 +939,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
  */
 MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
     if (fminitialized) {
+        var n = M.d[itemHandle] || false;
 
         // DOM update, left and right panel in 'Cloud Drive' tab
         $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newItemName);
@@ -966,8 +967,16 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
         mega.megadrop.onRename(itemHandle, newItemName);
 
         // update file versioning dialog if the name of the versioned file changes.
-        if (!M.d[itemHandle].t && M.d[itemHandle].tvf > 0) {
+        if (!n.t && n.tvf > 0) {
             fileversioning.updateFileVersioningDialog(itemHandle);
+        }
+
+        if (n.p === M.currentdirid) {
+            delay('onRenameUIUpdate:' + n.p, function() {
+                if (n.p === M.currentdirid) {
+                    M.openFolder(n.p, true).done(reselect);
+                }
+            }, 50);
         }
     }
 };
@@ -2274,6 +2283,53 @@ MegaData.prototype.disableDescendantFolders = function(id, pref) {
             $(pref + h).addClass('disabled');
         }
     }
+};
+
+/**
+ * Import welcome pdf into the current account.
+ * @returns {MegaPromise}
+ */
+MegaData.prototype.importWelcomePDF = function() {
+    'use strict';
+    var promise = new MegaPromise();
+
+    M.req('wpdf').done(function(res) {
+        if (typeof res === 'object') {
+            var ph = res.ph;
+            var key = res.k;
+            M.req({a: 'g', p: ph}).done(function(res) {
+                if (typeof res.at === 'string') {
+                    M.onFileManagerReady(function() {
+                        var doit = true;
+                        for (var i = M.v.length; i--;) {
+                            if (fileext(M.v[i].name) === 'pdf') {
+                                doit = false;
+                                break;
+                            }
+                        }
+
+                        if (doit) {
+                            if (d) {
+                                console.log('Importing Welcome PDF (%s)', ph, res.at);
+                            }
+                            promise.linkDoneAndFailTo(M.importFileLink(ph, key, res.at));
+                        }
+                        else {
+                            promise.reject(EEXIST);
+                        }
+                    });
+                }
+                else {
+                    promise.reject(res);
+                }
+            });
+        }
+        else {
+            promise.reject(res);
+        }
+    });
+
+    return promise;
 };
 
 /**

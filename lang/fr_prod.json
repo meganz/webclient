@@ -826,7 +826,6 @@
     "6240": "Appli pour Windows Phone",
     "6690": "Aller \u00e0 Mon Compte",
     "6771": "Dossiers supprim\u00e9s",
-    "6772": "Aucune conversation",
     "6773": "Croissant",
     "6774": "D\u00e9croissant",
     "6775": "Partager les dossiers",
@@ -1932,5 +1931,8 @@
     "17706": "Votre connexion prend plus de temps que pr\u00e9vu. Souhaitez-vous attendre ou forcer le rechargement\u2009? ",
     "17732": "Voir la vid\u00e9o",
     "17733": "Ouvrir ce fichier dans l\u2019appli mobile",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "Ce fichier utilise un codec vid\u00e9o qui n\u2019est pas pris en charge par votre navigateur.                                ",
+    "17744": "MEGA ne peut pas \u00eatre utilis\u00e9 \u00e0 ce niveau de zoom. Veuillez maximiser la fen\u00eatre du navigateur ou zoomer arri\u00e8re en appuyant sur Ctrl\/\u2318 et - en m\u00eame temps pour ramener le zoom \u00e0 des niveaux acceptables."
 }

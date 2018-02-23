@@ -16,7 +16,7 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
+var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
     var self = this;
 
     this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -214,7 +214,9 @@ var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chat
             getLastInteractionWith(contact.u);
         }
     });
-    self.megaChat.trigger('onRoomCreated', [self]);
+    if (!noUI) {
+        self.megaChat.trigger('onRoomCreated', [self]);
+    }
 
     $(window).rebind("focus." + self.roomId, function() {
         if (self.isCurrentlyActive) {

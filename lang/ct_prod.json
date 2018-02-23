@@ -826,7 +826,6 @@
     "6240": "Windows\u624b\u6a5f\u61c9\u7528\u7a0b\u5f0f",
     "6690": "\u5230\u6211\u7684\u5e33\u6236",
     "6771": "\u522a\u9664\u7684\u8cc7\u6599\u593e",
-    "6772": "\u7121\u5c0d\u8a71(\u5df2\u6e05\u7a7a)",
     "6773": "\u5347\u5e8f",
     "6774": "\u964d\u5e8f",
     "6775": "\u5206\u4eab\u8cc7\u6599\u593e",
@@ -1932,5 +1931,8 @@
     "17706": "\u60a8\u767b\u5165\u7684\u6642\u9593\u6bd4\u9810\u671f\u7684\u9577\u3002\u8acb\u554f\u60a8\u60f3\u7e7c\u7e8c\u7b49\u5f85\u6216\u5f37\u5236\u91cd\u65b0\u8f09\u5165\u5462\uff1f",
     "17732": "\u89c0\u770b\u5f71\u7247",
     "17733": "\u5728\u624b\u6a5f\u61c9\u7528\u7a0b\u5f0f\u4e2d\u958b\u555f\u6b64\u6a94\u6848",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "This file uses a video codec that is not supported by your browser.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

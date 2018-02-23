@@ -795,12 +795,12 @@ function accountUI() {
             var country = String($('.default-select.country .default-dropdown-item.active').attr('data-value') || '');
 
             // If any of user attributes is changed then update them
-            if (u_attr.firstname !== firstName
-                    || u_attr.lastname !== lastName
-                    || u_attr.birthday !== bDay
-                    || u_attr.birthmonth !== bMonth
-                    || u_attr.birthyear !== bYear
-                    || u_attr.country !== country) {
+            if ((u_attr.firstname && u_attr.firstname !== firstName)
+                    || (u_attr.lastname && u_attr.lastname !== lastName)
+                    || (u_attr.birthday && u_attr.birthday !== bDay)
+                    || (u_attr.birthmonth && u_attr.birthmonth !== bMonth)
+                    || (u_attr.birthyear && u_attr.birthyear !== bYear)
+                    || (u_attr.country && u_attr.country !== country)) {
                 u_attr.firstname = firstName || 'Nobody';
                 u_attr.lastname = lastName;
                 u_attr.birthday = bDay;

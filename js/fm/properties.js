@@ -201,11 +201,16 @@
                 p.t5 = '';
             }
             p.t1 = l[86] + ':';
+
+            // Hide context menu button
+            if (n.h === M.RootID) {
+                $dialog.addClass('hidden-context');
+            }
+
             if (n.name) {
                 p.t2 = htmlentities(n.name);
             }
             else if (n.h === M.RootID) {
-                $dialog.addClass('hidden-context');
                 p.t2 = htmlentities(l[164]);
             }
             else if (n.h === M.InboxID) {

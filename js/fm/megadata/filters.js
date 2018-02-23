@@ -75,8 +75,13 @@ MegaData.prototype.filterByParent = function(id) {
     }
 };
 
-MegaData.prototype.filterBySearch = function(str) {
-    str = decodeURIComponent(String(str || '').replace('search/', '')).toLowerCase();
+MegaData.prototype.filterBySearch = function (str) {
+    if (hashLogic) {
+        str = decodeURIComponent(String(str || '').replace('search/', '')).toLowerCase();
+    }
+    else {
+        str = String(str || '').replace('search/', '').toLowerCase();
+    }
 
     if (str[0] === '~') {
         var command = str.substr(1);

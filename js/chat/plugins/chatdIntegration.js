@@ -451,14 +451,26 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
                 }
-                loadSubPage(chatRoom.getRoomUrl());
+                if (!chatRoom.inCpyDialog) {
+                    loadSubPage(chatRoom.getRoomUrl());
+                }
+                else {
+                    chatRoom.inCpyDialog();
+                    delete chatRoom.inCpyDialog;
+                }
             }
             if (!chatRoom.lastActivity && actionPacket.ts) {
                 chatRoom.lastActivity = actionPacket.ts;
             }
 
             if (wasActive) {
-                loadSubPage(chatRoom.getRoomUrl());
+                if (!chatRoom.inCpyDialog) {
+                    loadSubPage(chatRoom.getRoomUrl());
+                }
+                else {
+                    chatRoom.inCpyDialog();
+                    delete chatRoom.inCpyDialog;
+                }
             }
         }
         else {

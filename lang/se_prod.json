@@ -826,7 +826,6 @@
     "6240": "Windows Phone App",
     "6690": "G\u00e5 till mitt konto",
     "6771": "Borttagna mappar",
-    "6772": "Inga konversationer",
     "6773": "Stigande",
     "6774": "Fallande",
     "6775": "Dela mappar",
@@ -1361,8 +1360,8 @@
     "8948": "\u00d6PPNA I MEGA APP",
     "8949": "\u00d6PPNA FIL",
     "8950": "Install our mobile app to get [S]free 50 GB encrypted cloud storage![\/S]",
-    "8951": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50 GB cloud storage![\/S]",
-    "8952": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50 GB cloud storage![\/S]",
+    "8951": "This file is too large to open in your mobile browser. Please use our mobile app for [S]unlimited file size support and free 50 GB cloud storage![\/S]",
+    "8952": "This file could not be opened in your mobile browser. Please use our mobile app for [S]unlimited file size, unlimited file types and free 50 GB cloud storage![\/S]",
     "8953": "Ange utg\u00e5ngsdatum",
     "8982": "Ett fel uppstod, f\u00f6rs\u00f6k igen. ",
     "9000": "Fel! Angiven e-mail anv\u00e4nds redan.",
@@ -1932,5 +1931,8 @@
     "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?",
     "17732": "View video",
     "17733": "Open this file in the mobile app",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "This file uses a video codec that is not supported by your browser.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

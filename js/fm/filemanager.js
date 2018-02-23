@@ -1191,6 +1191,10 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
+    $(c + '.send-to-contact-item').rebind('click', function () {
+        openCopyDialog('conversations');
+    });
+
     $('.labels .dropdown-colour-item').rebind('click', function() {
         var labelId = parseInt(this.dataset.labelId);
 

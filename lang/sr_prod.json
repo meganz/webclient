@@ -826,7 +826,6 @@
     "6240": "Windows Phone \u0410\u043f\u043b\u0438\u043a\u0430\u0446\u0438\u0458\u0430",
     "6690": "\u0418\u0434\u0438\u0442\u0435 \u043d\u0430 \u041c\u043e\u0458 \u041d\u0430\u043b\u043e\u0433",
     "6771": "\u041e\u0431\u0440\u0438\u0441\u0430\u043d\u0438 \u0444\u043e\u043b\u0434\u0435\u0440\u0438",
-    "6772": "\u041d\u0435\u043c\u0430 \u043a\u043e\u043d\u0432\u0435\u0440\u0437\u0430\u0446\u0438\u0458\u0430",
     "6773": "\u0420\u0430\u0441\u0442\u0443\u045b\u0435",
     "6774": "\u041e\u043f\u0430\u0434\u0430\u0458\u0443\u045b\u0435",
     "6775": "\u041f\u043e\u0434\u0435\u043b\u0438 \u0424\u043e\u043b\u0434\u0435\u0440\u0435",
@@ -1932,5 +1931,8 @@
     "17706": "Your login is taking longer than expected. Do you want to wait or force a reload?",
     "17732": "View video",
     "17733": "Open this file in the mobile app",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "This file uses a video codec that is not supported by your browser.",
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
 }

@@ -826,7 +826,6 @@
     "6240": "Windows Phone App",
     "6690": "Przejd\u017a do konta",
     "6771": "Usu\u0144 katalogi",
-    "6772": "Brak rozm\u00f3w",
     "6773": "Rosn\u0105co",
     "6774": "Malej\u0105co",
     "6775": "Udost\u0119pnione katalogi",
@@ -1932,5 +1931,8 @@
     "17706": "Logowanie trwa d\u0142u\u017cej ni\u017c planowano. Czy chcesz czeka\u0107 czy wymusi\u0107 prze\u0142adowanie strony?",
     "17732": "Zobacz wideo",
     "17733": "Otw\u00f3rz ten plik w aplikacji mobilnej",
-    "17743": "This file has a video codec that is unsupported by your browser."
+    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17742": "Drop to [S]upload[\/S]",
+    "17743": "Ten plik wideo zawiera format, kt\u00f3ry jest nie obs\u0142ugiwany przez Twoj\u0105 przegl\u0105dark\u0119.                                ",
+    "17744": "MEGA nie mo\u017ce by\u0107 u\u017cywana na tym poziomie powi\u0119kszenia. Spr\u00f3buj otworzy\u0107 okno przegl\u0105darki do maksimum lub zmniejszy\u0107 naciskaj\u0105c Ctrl \/ \u2318 - w tym samym czasie, aby przywr\u00f3ci\u0107 zoom do dopuszczalnego poziomu."
 }

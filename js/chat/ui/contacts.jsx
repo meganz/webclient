@@ -2,6 +2,7 @@ var React = require("react");
 var MegaRenderMixin = require("../../stores/mixins.js").MegaRenderMixin;
 var RenderDebugger = require("../../stores/mixins.js").RenderDebugger;
 var utils = require("../../ui/utils.jsx");
+var PerfectScrollbar = require("../../ui/perfectScrollbar.jsx").PerfectScrollbar;
 
 
 var ContactsListItem = React.createClass({
@@ -314,6 +315,36 @@ var ContactCard = React.createClass({
     }
 });
 
+var ContactItem = React.createClass({
+    mixins: [MegaRenderMixin, RenderDebugger],
+    render: function() {
+        var classString = "nw-conversations-item";
+        var self = this;
+        var contact = this.props.contact;
+
+        if (!contact) {
+            return null;
+        }
+
+        return <div className="selected-contact-card">
+            <div className="remove-contact-bttn"  onClick={(e) => {
+                        if (self.props.onClick) {
+                            self.props.onClick(contact, e);
+                        }
+                    }}>
+                <div className="remove-contact-icon">
+                </div>
+            </div>
+            <Avatar contact={contact} className="small-rounded-avatar"/>
+            <div className="user-card-data">
+                    <div className="user-card-name light">
+                        {this.props.namePrefix ? this.props.namePrefix : null}{M.getNameByHandle(contact.u)}
+                    </div>
+            </div>
+        </div>;
+    }
+});
+
 var ContactPickerWidget = React.createClass({
     mixins: [MegaRenderMixin],
     getInitialState: function() {
@@ -333,15 +364,31 @@ var ContactPickerWidget = React.createClass({
         var self = this;
         self.setState({searchValue: e.target.value});
     },
+    componentDidUpdate: function() {
+
+        var self = this;
+        if (self.scrollToLastSelected && self.jspSelected) {
+            // set the flag back to false, so on next updates we won't scroll to the last item again.
+            self.scrollToLastSelected = false;
+            var $jsp = $(self.jspSelected.findDOMNode()).data('jsp');
+            if ($jsp) {
+                $jsp.scrollToPercentX(1, false);
+            }
+        }
+
+    },
     render: function() {
         var self = this;
 
         var contacts = [];
 
+        var contactsSelected = [];
+
         var footer = null;
 
         if (self.props.multiple) {
             var onSelectDoneCb = (e) => {
+
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -351,10 +398,72 @@ var ContactPickerWidget = React.createClass({
                     self.props.onSelectDone(self.state.selected);
                 }
             };
+            var clearSearch = (e) => {
+                self.setState({searchValue: ''});
+                self.refs.contactSearchField.focus();
+            };
+            var onAddContact = (e) => {
+                $('.add-user-popup .import-contacts-dialog').fadeOut(0);
+                $('.import-contacts-link').removeClass('active');
 
+                $('.add-user-popup')
+                    .addClass('dialog')
+                    .removeClass('hidden');
+                fm_showoverlay();
+                $('.add-user-size-icon')
+                    .removeClass('full-size')
+                    .addClass('short-size');
+                $('.fm-add-user').removeClass('active');
+                $('.add-user-popup-button.add').addClass('disabled');
+                var $tokenInput = $('#token-input-');
+                $tokenInput
+                    .focus();
+            };
+            var onContactSelectDoneCb = (contact, e) => {
+
+                var contactHash = contact.u;
+
+                // differentiate between a click and a double click.
+                if (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) {
+                    // is a double click
+                    if (self.props.onSelected) {
+                        self.props.onSelected([contactHash]);
+                    }
+                    self.props.onSelectDone([contactHash]);
+                    return;
+                }
+                else {
+                    var selected = clone(self.state.selected || []);
+
+                    // is a single click
+                    if (selected.indexOf(contactHash) === -1) {
+                        selected.push(contactHash);
+                        // only set the scrollToLastSelected if a contact was added, so that the user can scroll
+                        // left/right and remove contacts form the list using the X buttons in the UI
+                        self.scrollToLastSelected = true;
+
+                        if (self.props.onSelected) {
+                            self.props.onSelected(selected);
+                        }
+                    }
+                    else {
+                        array.remove(selected, contactHash);
+                        if (self.props.onSelected) {
+                            self.props.onSelected(selected);
+                        }
+                    }
+                    self.setState({'selected': selected});
+                }
+                self.clickTime = new Date();
+                self.lastClicked = contactHash;
+            };
+            var selectedWidth = self.state.selected.length * 60;
             if (!self.state.selected || self.state.selected.length === 0) {
                 footer = <div className="fm-dialog-footer">
-                    <div className="fm-dialog-footer-txt">{
+                    <a href="javascript:;" className="default-white-button left" onClick={onAddContact}>
+                        {l[71]}
+                    </a>
+                    <div className="fm-dialog-footer-txt right">{
                         self.props.nothingSelectedButtonLabel ?
                             self.props.nothingSelectedButtonLabel
                             :
@@ -363,27 +472,59 @@ var ContactPickerWidget = React.createClass({
                 </div>;
             }
             else if (self.state.selected.length === 1) {
+                self.state.selected.forEach(function(v, k) {
+                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
+                                                       key={v}
+                    /> );
+                });
                 footer = <div className="contacts-search-footer">
+                        <PerfectScrollbar className="selected-contact-block" selected={this.state.selected}>
+                            <div className="select-contact-centre" style={{width : selectedWidth}}>
+                                {contactsSelected}
+                            </div>
+                        </PerfectScrollbar>
                     <div className="fm-dialog-footer">
-                        <a href="javascript:;" className="default-white-button right" onClick={onSelectDoneCb}>
+                        <span className="selected-contact-amount">
+                            {self.state.selected.length} contacts selected
+                        </span>
+                        <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
                             {self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]}
                         </a>
                     </div>
                 </div>
             }
             else if (self.state.selected.length > 1) {
-                footer = <div className="contacts-search-footer">
-                    <div className="fm-dialog-footer">
-                        <a href="javascript:;" className="default-white-button right" onClick={onSelectDoneCb}>
-                            {
-                                self.props.multipleSelectedButtonLabel ?
-                                    self.props.multipleSelectedButtonLabel
-                                    :
-                                    __(l[8890])
-                            }
-                        </a>
-                    </div>
-                </div>
+                self.state.selected.forEach(function(v, k) {
+                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
+                                                       key={v}
+                    /> );
+                });
+
+                footer =
+                    <div className="contacts-search-footer">
+                        <utils.JScrollPane className="selected-contact-block horizontal-only"
+                                          selected={this.state.selected}
+                                          ref={function(jspSelected) {
+                                              self.jspSelected = jspSelected;
+                                          }}>
+                            <div className="select-contact-centre" style={{width : selectedWidth}}>
+                                {contactsSelected}
+                            </div>
+                        </utils.JScrollPane>
+                        <div className="fm-dialog-footer">
+                            <span className="selected-contact-amount">
+                                {self.state.selected.length} contacts selected
+                            </span>
+                            <a href="javascript:;" className="default-grey-button right" onClick={onSelectDoneCb}>
+                                {
+                                    self.props.multipleSelectedButtonLabel ?
+                                        self.props.multipleSelectedButtonLabel
+                                        :
+                                        __(l[8890])
+                                }
+                            </a>
+                        </div>
+                    </div>;
             }
         }
 
@@ -427,7 +568,6 @@ var ContactPickerWidget = React.createClass({
                 <ContactCard
                     contact={v}
                     className={"contacts-search " + selectedClass}
-
                     onClick={(contact, e) => {
                         var contactHash = contact.u;
 
@@ -446,6 +586,10 @@ var ContactPickerWidget = React.createClass({
                             // is a single click
                             if (selected.indexOf(contactHash) === -1) {
                                 selected.push(contactHash);
+                                // only set the scrollToLastSelected if a contact was added,
+                                // so that the user can scroll left/right and remove contacts
+                                // form the list using the X buttons in the UI.
+                                self.scrollToLastSelected = true;
                                 if (self.props.onSelected) {
                                     self.props.onSelected(selected);
                                 }
@@ -485,9 +629,8 @@ var ContactPickerWidget = React.createClass({
 
             contacts = <em>{noContactsMsg}</em>;
         }
-
-
-        return <div className={this.props.className}>
+        var displayStyle = (self.state.searchValue && self.state.searchValue.length > 0) ? "" : "none";
+        return <div className={this.props.className + " " }>
             <div className={"contacts-search-header " + this.props.headerClasses}>
                 <i className="small-icon search-icon"></i>
                 <input
@@ -497,6 +640,7 @@ var ContactPickerWidget = React.createClass({
                     onChange={this.onSearchChange}
                     value={this.state.searchValue}
                 />
+                <div className="search-result-clear" style={{display : displayStyle}} onClick={clearSearch}></div>
             </div>
 
             <utils.JScrollPane className="contacts-search-scroll" selected={this.state.selected}>
@@ -504,7 +648,6 @@ var ContactPickerWidget = React.createClass({
                     {contacts}
                 </div>
             </utils.JScrollPane>
-
             {footer}
         </div>;
     }

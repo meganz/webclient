@@ -359,8 +359,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .img-preview .dropdown.img-wrapper {
     width: 176px;
 }
-.dropdown.body.download.context, .dropdown.body.submenu.download {
+.dropdown.body.download.context {
     width: 188px;
+}
+.dropdown.body.submenu.download {
+    width: 214px;
 }
 .dropdown.body.dropdown-arrow.wide-dropdown {
     margin-bottom: 16px;

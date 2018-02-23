@@ -463,9 +463,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
         // Bind Mute button
         $mute.rebind('click', function() {
-            videoElement.muted = !videoElement.muted;
-            changeButtonState('mute');
-            updateVolumeBar();
+            if (!$(this).parent('.volume-control').hasClass('no-audio')) {
+                videoElement.muted = !videoElement.muted;
+                changeButtonState('mute');
+                updateVolumeBar();
+            }
         });
 
         var progressBarElementStyle = $progressBar.get(0).style;

@@ -2794,8 +2794,7 @@ FileManager.prototype.addTreeUI = function() {
         '.shared-with-me tr,' +
         '.nw-conversations-item,' +
         'ul.conversations-pane > li,' +
-        '.messages-block,' +
-        '.nw-contact-item'
+        '.messages-block'
     ).filter(":visible").droppable({
         tolerance: 'pointer',
         drop: function(e, ui) {

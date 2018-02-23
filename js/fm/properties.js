@@ -157,7 +157,7 @@
                 showToast('clipboard', notificationText);
             }
             var star = '';
-            if (n.fav) {
+            if (n.fav && !folderlink) {
                 star = ' star';
             }
             $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);

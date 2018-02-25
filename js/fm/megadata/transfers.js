@@ -208,8 +208,15 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                     }
                 }
             };
-
-            foreach(n);
+            try {
+                foreach(n);
+            }
+            catch (exx) {
+                if (d) {
+                    dlmanager.logger.error('Failed to load all nodes to pass to megaSync', exx);
+                }
+                return webdl();
+            }
 
             if (!files.length) {
                 console.error('No files');

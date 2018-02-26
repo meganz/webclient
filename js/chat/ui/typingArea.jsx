@@ -319,13 +319,14 @@ var TypingArea = React.createClass({
                     return;
                 }
                 else {
-                    if (self.state.emojiSearchQuery) {
+                    if (!element.value || element.value.length <= 2) {
                         self.setState({
                             'emojiSearchQuery': false,
                             'emojiStartPos': false,
                             'emojiEndPos': false
                         });
                     }
+                    return;
                 }
             }
             if (self.state.emojiSearchQuery) {
@@ -749,7 +750,7 @@ var TypingArea = React.createClass({
         if (self.state.emojiSearchQuery) {
             emojiAutocomplete = <EmojiAutocomplete
                 emojiSearchQuery={self.state.emojiSearchQuery}
-                onSelect={function (e, emojiAlias) {
+                onPrefill={function(e, emojiAlias) {
                     if (
                         $.isNumeric(self.state.emojiStartPos) &&
                         $.isNumeric(self.state.emojiEndPos)
@@ -761,10 +762,34 @@ var TypingArea = React.createClass({
                             'typedMessage': pre + emojiAlias + (
                                 post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
                             ),
+                            'emojiEndPos': self.state.emojiStartPos + emojiAlias.length + (
+                                post ? (post.substr(0, 1) !== " " ? 1 : 0) : 1
+                            )
+                        });
+                    }
+                }}
+                onSelect={function (e, emojiAlias, forceSend) {
+                    if (
+                        $.isNumeric(self.state.emojiStartPos) &&
+                        $.isNumeric(self.state.emojiEndPos)
+                    ) {
+                        var msg = self.state.typedMessage;
+                        var pre = msg.substr(0, self.state.emojiStartPos);
+                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+                        var val = pre + emojiAlias + (
+                            post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
+                        );
+                        self.setState({
+                            'typedMessage': val,
                             'emojiSearchQuery': false,
                             'emojiStartPos': false,
                             'emojiEndPos': false
                         });
+                        if (forceSend) {
+                            if (self.onConfirmTrigger($.trim(val)) !== true) {
+                                self.setState({typedMessage: ""});
+                            }
+                        }
                     }
                 }}
                 onCancel={function () {

@@ -2974,7 +2974,7 @@ React.makeElement = React['createElement'];
 	                var $element = $(this.popupElement);
 	                var positionToElement = $('.button.active:visible');
 	                var offsetLeft = 0;
-	                var $container = positionToElement.closest('.ps-container');
+	                var $container = positionToElement.closest('.messages.scroll-area');
 
 	                if ($container.size() == 0) {
 	                    $container = $(document.body);

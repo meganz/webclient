@@ -63,7 +63,7 @@ var Dropdown = React.createClass({
                     of: positionToElement,
                     my: self.props.positionMy ? self.props.positionMy : "center top",
                     at: self.props.positionAt ? self.props.positionAt : "center bottom",
-                    collision: "flip flip",
+                    collision: "flipfit",
                     within: $container,
                     using: function (obj, info) {
                         var vertOffset = 0;

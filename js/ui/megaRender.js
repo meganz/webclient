@@ -756,7 +756,7 @@
                     }
 
                     // Colour label
-                    if (aNode.lbl) {
+                    if (aNode.lbl && !folderlink) {
                         var colourLabel = M.getColourClassFromId(aNode.lbl);
                         props.classNames.push('colour-label');
                         props.classNames.push(colourLabel);
@@ -819,7 +819,7 @@
                 }
 
                 // Colour label
-                if (aNode.lbl && (aNode.su !== u_handle)) {
+                if (aNode.lbl && !folderlink && (aNode.su !== u_handle)) {
                     var colourLabel = M.getColourClassFromId(aNode.lbl);
                     props.classNames.push('colour-label');
                     props.classNames.push(colourLabel);
@@ -870,7 +870,7 @@
             'cloud-drive': function(aNode, aProperties, aTemplate) {
                 var tmp;
 
-                if (aNode.fav) {
+                if (aNode.fav && !folderlink) {
                     var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
                     aTemplate.querySelector(selector).classList.add('star');
                 }
@@ -913,7 +913,7 @@
             },
             'shares': function(aNode, aProperties, aTemplate) {
 
-                if (aNode.fav) {
+                if (aNode.fav && !folderlink) {
                     var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
                     aTemplate.querySelector(selector).classList.add('star');
                 }

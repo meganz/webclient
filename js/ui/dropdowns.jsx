@@ -51,7 +51,7 @@ var Dropdown = React.createClass({
                 var $element = $(this.popupElement);
                 var positionToElement = $('.button.active:visible');
                 var offsetLeft = 0;
-                var $container = $element.closest('.jspPane:first');
+                var $container = positionToElement.closest('.ps-container');
 
                 if ($container.size() == 0) {
                     $container = $(document.body);

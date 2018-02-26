@@ -344,7 +344,6 @@ var slideshowid;
             }
             else if (M.d[slideshowid]) {
                 M.addDownload([slideshowid]);
-                //showToast('download', l[7448], 'dd');
             }
             else {
                 M.addDownload([n]);

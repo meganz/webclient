@@ -5820,18 +5820,20 @@ textarea.mobile.support-text-field {
         margin-top: 0;
         height: 80px;
         vertical-align: middle;
+        width: 154px
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration.template {
         display: none;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .duration-options-list .payment-duration:last-child {
-        margin-left: 39px;
+        margin-left: 0;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option {
         display: inline-block;
+        width: 154px
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option:last-child {
-        margin-left: 110px;
+        margin-left: 0;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .option-question.renewal {
         margin-top: 30px;

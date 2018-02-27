@@ -9561,7 +9561,7 @@ React.makeElement = React['createElement'];
 	        }
 	    },
 	    _startDownload: function _startDownload(v) {
-	        M.addDownload([v.h || v]);
+	        M.addDownload([v]);
 	    },
 	    _addToCloudDrive: function _addToCloudDrive(v) {
 	        M.injectNodes(v, M.RootID, function (res) {

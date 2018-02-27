@@ -899,6 +899,10 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 function dlstart(id,name,filesize)
 {
     dlmanager.isDownloading = true;
+
+    if (slideshow) {
+        M.showTransferToast.apply(M, M.addDownloadToast);
+    }
 }
 
 function start_import()

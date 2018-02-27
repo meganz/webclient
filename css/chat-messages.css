@@ -207,6 +207,9 @@
     padding: 36px 0 10px 71px;
     font-family: 'source_sans_prosemibold';
 }
+.message.shared-block {
+    position: relative;
+}
 .message.shared-info {
     white-space: nowrap;
     padding: 17px 0 4px 0;
@@ -301,7 +304,7 @@
 }
 .message.content-area > .default-white-button.tiny-button {
     position: absolute;
-    top: 1px;
+    top: 2px;
     right: 11px;
     float: none;
     margin: 2px 0 0 0;
@@ -335,17 +338,26 @@
 }
 .message pre.rtf-single, .message pre.rtf-multi {
     margin: 0;
-    display: inline;
-    border: 1px solid #ccc;
-    padding: 1px 6px;
+    display: inline-block;
+    padding: 0px 4px;
     background-color: #f1f1f1;
     border-radius: 3px;
+    font-size: 14px;
+    letter-spacing: -0.7px;
+    font-family: 'source_code_proregular';
+    -webkit-box-shadow: inset 0px 0px 0px 1px #ccc;
+    -moz-box-shadow: inset 0px 0px 0px 1px #ccc;
+    box-shadow: inset 0px 0px 0px 1px #ccc;
 }
 .message pre.rtf-multi {
     display: block;
     width: auto;
 }
-
+.message pre.rtf-single:last-child, .message pre.rtf-multi:last-child {
+    content: '';
+    display: block;
+    margin-bottom: 2px;
+}
 .message pre.rtf-single, .message pre.rtf-multi {
     white-space: pre-wrap;
 }

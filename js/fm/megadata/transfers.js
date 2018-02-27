@@ -1613,7 +1613,7 @@ MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
 MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_length, isPaused) {
     'use strict';
 
-    if (M.currentdirid !== 'transfers' && fmconfig.tpp === false) {
+    if ((M.currentdirid !== 'transfers' && fmconfig.tpp === false) || slideshowid) {
         var $toast;
         var $second_toast;
         var timer = 0;
@@ -1653,7 +1653,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
         $toast.removeClass('second hidden').addClass('visible');
         timer = setTimeout(function() {
             M.hideTransferToast($toast);
-        }, 5000);
+        }, 4000);
 
         $('.transfer .toast-button').rebind('click', function() {
             $('.toast-notification').removeClass('visible second');
@@ -1675,7 +1675,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
         $toast.rebind('mouseout', function() {
             timer = setTimeout(function() {
                 M.hideTransferToast($toast);
-            }, 5000);
+            }, 4000);
         });
     }
 };

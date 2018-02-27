@@ -905,9 +905,8 @@
             }
             else if (section === 'conversations') {
                 if (megaChat.chats[$.mcselected]) {
-                    megaChat.chats[$.mcselected].attachNodes($.selected);
-                    showToast('send-chat', 'File' + (($.selected.length > 1) ?
-                        's ' : ' ') + 'sent to chat.');
+                    megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
+                    showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
                 }
                 else {
                     var userHandles = [u_handle, $.mcselected];
@@ -918,8 +917,7 @@
                     // [the only stopped behavior is: openning the chat room page]
                     var sendAttachments = function _sendAttachments() {
                         megaChat.chats[room.roomId].attachNodes($.selected);
-                        showToast('send-chat', 'File' + (($.selected.length > 1) ?
-                            's ' : ' ') + 'sent to chat.');
+                        showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
                     };
                     room.inCpyDialog = sendAttachments;
                     megaChat.plugins.chatdIntegration._attachToChatRoom(room);

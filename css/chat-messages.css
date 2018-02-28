@@ -336,7 +336,7 @@
     color: #333333;
     position: static;
 }
-.message pre.rtf-single, .message pre.rtf-multi {
+.message pre.rtf-single, .message pre.rtf-multi, .message pre.rtf-quote {
     margin: 0;
     display: inline-block;
     padding: 0px 4px;
@@ -360,6 +360,10 @@
 }
 .message pre.rtf-single, .message pre.rtf-multi {
     white-space: pre-wrap;
+}
+
+.message pre.rtf-quote {
+    white-space: normal;
 }
 
 .ps-container .message.body {

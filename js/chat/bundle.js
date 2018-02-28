@@ -3664,6 +3664,10 @@ React.makeElement = React['createElement'];
 	                self.refs.contactSearchField.focus();
 	            };
 	            var onAddContact = function onAddContact(e) {
+
+	                e.preventDefault();
+	                e.stopPropagation();
+
 	                $('.add-user-popup .import-contacts-dialog').fadeOut(0);
 	                $('.import-contacts-link').removeClass('active');
 

@@ -403,6 +403,10 @@ var ContactPickerWidget = React.createClass({
                 self.refs.contactSearchField.focus();
             };
             var onAddContact = (e) => {
+
+                e.preventDefault();
+                e.stopPropagation();
+
                 $('.add-user-popup .import-contacts-dialog').fadeOut(0);
                 $('.import-contacts-link').removeClass('active');
 

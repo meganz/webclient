@@ -4353,7 +4353,7 @@
     "17241": "Mac",
     "17242": "Windows",
     "17243": "No iOS, toque no \u00edcone [W13][B]Compartilhar[\/B][\/W13] e selecione [B]Obter link[\/B]. [Br]No Android, selecione [B][W11]Obter[\/W11] link[\/B] no menu.",
-    "17244": "Usando o navegador do seu computador, voc\u00ea pode fazer uma chamada de voz ou v\u00eddeo segura com um \u00fanico contato ou um chat de texto em grupo com v\u00e1rios contatos. Voc\u00ea tamb\u00e9m pode enviar arquivos da sua Nuvem no MEGA para outros membros do chat de grupo enquanto as mensagens est\u00e3o sendo enviadas. [Br]O chat de texto seguro tamb\u00e9m est\u00e1 dispon\u00edvel nos aplicativos Android e iOS (as chamadas de voz e v\u00eddeo criptografadas estar\u00e3o dispon\u00edveis para celular em breve).",
+    "17244": "Usando o navegador do seu computador, um dispositivo Android ou iOS, voc\u00ea pode fazer uma chamada segura de voz ou de v\u00eddeo com um \u00fanico contato ou criar um chat de texto com v\u00e1rios contatos ao mesmo tempo. Voc\u00ea tamb\u00e9m pode enviar arquivos da sua Nuvem no MEGA para outros membros do chat enquanto as mensagens est\u00e3o sendo enviadas.",
     "17245": "[H1]Agora voc\u00ea j\u00e1 conhece as informa\u00e7\u00f5es b\u00e1sicas [Br]sobre a sua conta MEGA.[\/H1]",
     "17246": "[H1]Parab\u00e9ns![\/H1]",
     "17251": "Fa\u00e7a login em [A]https:\/\/mega.nz[\/A]",
@@ -4638,9 +4638,13 @@
     "17735": "Objects",
     "17736": "Symbols",
     "17737": "Frequently Used",
-    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17738": "Ol\u00e1, junte-se a mim no MEGA e tenha acesso a armazenamento e comunica\u00e7\u00e3o criptografados.",
     "17739": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
-    "17742": "Drop to [S]upload[\/S]",
+    "17742": "Arraste aqui para fazer o [S]upload[\/S]",
     "17743": "Este arquivo usar um codec de v\u00eddeo n\u00e3o suportado pelo seu navegador.",
-    "17744": "O MEGA n\u00e3o pode ser usado com este n\u00edvel de zoom. Maximize a janela do navegador ou diminua o zoom pressionando ao mesmo tempo Ctrl\/\u2318 e -, para restaurar o zoom a n\u00edveis aceit\u00e1veis."
+    "17744": "O MEGA n\u00e3o pode ser usado com este n\u00edvel de zoom. Maximize a janela do navegador ou diminua o zoom pressionando ao mesmo tempo Ctrl\/\u2318 e -, para restaurar o zoom a n\u00edveis aceit\u00e1veis.",
+    "17764": "Send to chat",
+    "17765": "My chats",
+    "17766": "File sent to chat",
+    "17767": "Files sent to chat"
 }

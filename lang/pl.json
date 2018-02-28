@@ -4353,7 +4353,7 @@
     "17241": "Mac",
     "17242": "Windows",
     "17243": "Na iOS kliknij ikon\u0119 [W13][B]Udost\u0119pnij[\/B][\/W13] i wybierz [B]Pobierz link.[\/B] Na Adroid wybierz [B] [W11]Pobierz[\/W11] link[\/B] z menu.",
-    "17244": "Korzystaj\u0105c z przegl\u0105darki internetowej, masz dost\u0119p do bezpiecznych rozm\u00f3w i video czatu z dowolnym kontaktem lub grup\u0105 kontakt\u00f3w. Mo\u017cesz r\u00f3wnie\u017c przesy\u0142a\u0107 pliki z MEGA Cloud Drive do innych grup na czacie.[Br]Bezpieczny czat jest r\u00f3wnie\u017c dost\u0119pny na Adroid i iOS (bezpieczne rozmowy i video czat b\u0119d\u0105 niebawem dost\u0119pne).",
+    "17244": "Korzystaj\u0105c z przegl\u0105darki internetowej, urz\u0105dze\u0144 z  Android lub iOS, mo\u017cesz prowadzi\u0107 bezpieczne rozmowy i czat ze znajomymi. Mo\u017cesz r\u00f3wnie\u017c\u00a0wysy\u0142a\u0107 pliki ze swojego MEGA Cloud Drive do innych uczestnik\u00f3w rozmowy.",
     "17245": "[H1]Teraz ju\u017c znasz podstawy dzia\u0142ania Twojego konta na MEGA.[\/H1]",
     "17246": "[H1]Gratulacje![\/H1]",
     "17251": "Zaloguj si\u0119 na [A]https:\/\/mega.nz\/[\/A]",
@@ -4638,9 +4638,13 @@
     "17735": "Objects",
     "17736": "Symbols",
     "17737": "Frequently Used",
-    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17738": "Witaj, do\u0142\u0105cz do mnie na MEGA i uzyskaj dost\u0119p do bezpiecznej powierzchni na pliki i narz\u0119dzie do komunikacji.",
     "17739": "Katalogi nie mog\u0105 zosta\u0107 po\u0142\u0105czone ze wzgl\u0119du na obecno\u015b\u0107 udost\u0119pnionych link\u00f3w. Je\u017celi chcesz je po\u0142\u0105czy\u0107 musisz najpierw usun\u0105\u0107 udost\u0119pnienia z tych katalog\u00f3w.",
-    "17742": "Drop to [S]upload[\/S]",
+    "17742": "Przenie\u015b aby [S]wgra\u0107[\/S]",
     "17743": "Ten plik wideo zawiera format, kt\u00f3ry jest nie obs\u0142ugiwany przez Twoj\u0105 przegl\u0105dark\u0119.                                ",
-    "17744": "MEGA nie mo\u017ce by\u0107 u\u017cywana na tym poziomie powi\u0119kszenia. Spr\u00f3buj otworzy\u0107 okno przegl\u0105darki do maksimum lub zmniejszy\u0107 naciskaj\u0105c Ctrl \/ \u2318 - w tym samym czasie, aby przywr\u00f3ci\u0107 zoom do dopuszczalnego poziomu."
+    "17744": "MEGA nie mo\u017ce by\u0107 u\u017cywana na tym poziomie powi\u0119kszenia. Spr\u00f3buj otworzy\u0107 okno przegl\u0105darki do maksimum lub zmniejszy\u0107 naciskaj\u0105c Ctrl \/ \u2318 - w tym samym czasie, aby przywr\u00f3ci\u0107 zoom do dopuszczalnego poziomu.",
+    "17764": "Wy\u015blij do czatu",
+    "17765": "Moje czaty",
+    "17766": "Plik wys\u0142any do czatu",
+    "17767": "PlikI wys\u0142ane do czatu"
 }

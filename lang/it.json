@@ -4353,7 +4353,7 @@
     "17241": "Mac",
     "17242": "Windows",
     "17243": "Per iOS clicca sull'icona [W13][B]Condividi[\/B][\/W13] e seleziona [B]Ottieni link.[\/B] Su Android seleziona l'opzione [B][W11]Ottieni link[\/W11][\/B] dal men\u00f9.",
-    "17244": "Utilizzando il browser dal tuo desktop, puoi avere una chiamata vocale o video sicura con un singolo contatto o avere una chat di gruppo con pi\u00f9 contatti partecipanti. Puoi anche mandare file dal tuo Cloud Drive di MEGA agli altri membri della chat mentre vengono scambiati messaggi.[Br]Le chat sicure sono disponibili anche sulle nostre app Android e iOS (le chiamate voce e video criptate arriveranno su mobile a breve).",
+    "17244": "Utilizzando il browser dal tuo desktop, dal tuo dispositivo Android o dal tuo dispositivo iOS, puoi avere una chiamata vocale o video sicura con un singolo contatto o avere una chat di gruppo con pi\u00f9 contatti partecipanti. Puoi anche mandare file dal tuo Cloud Drive di MEGA agli altri membri della chat mentre vengono scambiati messaggi. ",
     "17245": "[H1]Adesso sai le basi per utilizzare al meglio il tuo account MEGA.[\/H1]",
     "17246": "[H1]Congratulazioni![\/H1]",
     "17251": "Effettua il log in su [A]https:\/\/mega.nz[\/A]",
@@ -4642,5 +4642,9 @@
     "17739": "Le cartelle non possono essere unite a causa della presenza di una condivisione o di un link. Se desideri unire queste cartelle devi prima rimuovere la condivisione o il link \u00e8 riprovare.",
     "17742": "Rilascia per [S]caricare[\/S]",
     "17743": "Questo file utilizza un codec video che non \u00e8 supportato dal tuo browser.                                ",
-    "17744": "MEGA non pu\u00f2 essere utilizzato con questo livello di zoom. Per favore, massimizza la grandezza della finestra del browser o zoomma di meno premendo Ctrl \/ \u2318 - nello stesso momento per ripristinare lo zoom a dei livelli accettabili."
+    "17744": "MEGA non pu\u00f2 essere utilizzato con questo livello di zoom. Per favore, massimizza la grandezza della finestra del browser o zoomma di meno premendo Ctrl \/ \u2318 - nello stesso momento per ripristinare lo zoom a dei livelli accettabili.",
+    "17764": "Invia alla chat",
+    "17765": "Le mie chat",
+    "17766": "Il file \u00e8 stato inviato alla chat",
+    "17767": "I file sono stati inviati alla chat"
 }

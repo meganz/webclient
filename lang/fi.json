@@ -4353,7 +4353,7 @@
     "17241": "Mac",
     "17242": "Windows",
     "17243": "For iOS tap the [W13][B]Share[\/B][\/W13] icon and select [B]Get link.[\/B] [Br]On Android select the[B] [W11]Get[\/W11] link[\/B] option on the menu.",
-    "17244": "Using your desktop browser, you can have a secure voice or video call with a single contact or have a group text chat with several contacts participating. You can also send files from your MEGA Cloud Drive to other members of the group chat while messages are flowing. [Br]Secure text chat is also available on Android and iOS applications (encrypted voice and video calls are coming to mobile soon).",
+    "17244": "Using your desktop browser, Android or iOS device, you can have a secure voice or video call with a single contact or have a group text chat with several contacts participating. You can also send files from your MEGA Cloud Drive to other members of the group chat while messages are flowing.",
     "17245": "[H1]You now know the basics of your MEGA account.[\/H1]",
     "17246": "[H1]Congratulations![\/H1]",
     "17251": "Log in at [A]https:\/\/mega.nz\/[\/A]",
@@ -4642,5 +4642,9 @@
     "17739": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
     "17742": "Drop to [S]upload[\/S]",
     "17743": "This file uses a video codec that is not supported by your browser.",
-    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels.",
+    "17764": "Send to chat",
+    "17765": "My chats",
+    "17766": "File sent to chat",
+    "17767": "Files sent to chat"
 }

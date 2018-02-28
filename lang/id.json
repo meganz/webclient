@@ -4642,5 +4642,9 @@
     "17739": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
     "17742": "Drop to [S]upload[\/S]",
     "17743": "This file uses a video codec that is not supported by your browser.",
-    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels."
+    "17744": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels.",
+    "17764": "Send to chat",
+    "17765": "My chats",
+    "17766": "File sent to chat",
+    "17767": "Files sent to chat"
 }

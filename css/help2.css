@@ -971,7 +971,7 @@
     float: left;
     display: inline-block;
     margin-left: 16px;
-    line-height: 44px;
+    line-height: 40px;
     transition-property: color;
     -moz-transition-property: color; /* Firefox 4 */
     -webkit-transition-property: color; /* Safari and Chrome */
@@ -1048,14 +1048,13 @@
     padding-right: 8px;
     overflow: hidden;
     background-color: #fafafa;
-    line-height: 20px;
+    line-height: 18px;
     overflow-x: hidden;
     overflow-y: hidden;
     padding-bottom: 7px;
     padding-top: 7px;
     text-overflow: ellipsis;
-    max-height: 64px;
-    font-size: 14px;
+    font-size: 13px;
     margin-bottom: 1px;
     transition-property: background-color;
     -moz-transition-property: background-color; /* Firefox 4 */
@@ -1216,8 +1215,8 @@
     font-family: 'source_sans_prolight';
     color: #666F75;
     padding-top: 56px;
-    font-size: 32px;
-    line-height: 46px;
+    font-size: 28px;
+    line-height: 40px;
 }
 #help2-main .d-section-items li {
     color: #666;
@@ -2552,7 +2551,7 @@
     background-position: -124px -416px;
     width: 16px;
     cursor: pointer;
-    margin: 16px 16px 0 0;
+    margin: 14px 16px 0 0;
     -webkit-transition: margin-right 200ms ease-in-out;
     -moz-transition: margin-right 200ms ease-in-out;
     -o-transition: margin-right 200ms ease-in-out;

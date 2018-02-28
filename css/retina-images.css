@@ -30,8 +30,8 @@ body.pro:after {
     background-image: url(../images/mega/download-sprite-v8@2x.png);
     background-size: 257px auto;
 }
-.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before, .dropdown-item.do-sort.selected i, .fm-dialog:not(exceeded) .pro-plan-descr::after {
-    background-image: url(../images/mega/top-login-sprite_v7@2x.png);
+.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before, .dropdown-item.do-sort.selected i, .fm-dialog:not(exceeded) .pro-plan-descr::after, .dropdown.close-button {
+    background-image: url(../images/mega/top-login-sprite_v9@2x.png);
     background-size: 48px auto;
 }
 .reg-success-icon, .reg-st3-save-icon, .toast-icon, .resend-email-button, .reg-st3-storage::before, .reg-st3-bandwidth::before, .pro-icon, .pro-bottom-info-header::before, .toast-close-button, .small-icon.green-arrow, .small-icon.blue-arrow, .fm-dialog-close.small, .reg-st5-info-icon {
@@ -169,5 +169,18 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 .drag-n-drop.header, .drag-n-drop hr, .drag-n-drop.info-block i {
     background-image: url(../images/mega/overlay-sprite@2x.png);
     background-size: 400px auto;
+}
+.dropdown.hint-thumb {
+    background-image: url(../images/mega/hints-sprite@2x.png);
+    background-size: 660px auto;
+}
+.es .dropdown.hint-thumb {
+    background-image: url(../images/mega/hints-sprite-es@2x.png);
+}
+.br .dropdown.hint-thumb {
+    background-image: url(../images/mega/hints-sprite-pt@2x.png);
+}
+.cn .dropdown.hint-thumb {
+    background-image: url(../images/mega/hints-sprite-cn@2x.png);
 }
 }

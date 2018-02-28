@@ -2015,6 +2015,7 @@ else if (!b_u) {
         jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
     }
 
     jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2044,9 +2045,6 @@ else if (!b_u) {
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
-
-        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
-        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
     } // !is_mobile
 
     // do not change the order...
@@ -2250,7 +2248,10 @@ else if (!b_u) {
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
-            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
+            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1},
+
+            /* misc */
+            'onboarding_js': {f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1}
         }
     };
 

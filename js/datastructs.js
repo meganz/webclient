@@ -955,22 +955,20 @@ MegaDataBitMap.prototype.get = function(key, defaultVal) {
 };
 
 /**
- * Merge the current MegaDataBitMap value with a {String} `base64str`.
+ * Merge the current MegaDataBitMap value with a {String} `str`.
  * Merging is done the following way:
- * - IF a value of a key, passed by `base64str` differs from the one in the current instance:
+ * - IF a value of a key, passed by `str` differs from the one in the current instance:
  *  a) if was marked as 'dirty' (not commited, via the update mask) it would not be merged (its assumed that any data,
  *  stored in 'dirty' state and not commited is the most up to date one)
  *  b) the local value for that key would be updated, following a change event
  *
- * @param {String} base64str String, similar to 'AAAA', containing the data that you want to merge with the current
- * MegaDataBitMap instance
+ * @param {String} str String, containing 0 and 1 chars to be parsed as Uint8Array with 0 and 1s
  * @param {Boolean} requiresCommit Pass true, to mark all changes in the update mask (e.g. they would be schedulled for
  * sending to the server on the next .commit() call)
  */
-MegaDataBitMap.prototype.mergeFrom = function(base64str, requiresCommit) {
+MegaDataBitMap.prototype.mergeFrom = function(str, requiresCommit) {
     var self = this;
 
-    var str = base64urldecode(base64str);
     var targetLength = str.length;
     if (self._keys.length > str.length) {
         targetLength = self._keys.length;
@@ -1072,72 +1070,79 @@ MegaDataBitMap.prototype.isPublic = function() {
  *
  * @returns {MegaPromise}
  */
-MegaDataBitMap.prototype.commit = SoonFc(function() {
+MegaDataBitMap.prototype.commit = function() {
     var self = this;
-    if (this._commitPromise) {
-        // commit is already in progress, create a proxy promise that would execute after the current commit op and
-        // return it
-        var tmpPromise = new MegaPromise();
-        this._commitPromise.always(function() {
-            tmpPromise.linkDoneAndFailTo(self.commit());
-        });
-        return tmpPromise;
+    var masterPromise = new MegaPromise();
+    if (self._commitTimer) {
+        clearTimeout(self._commitTimer);
     }
-
-    this._commitPromise = new MegaPromise();
-
-    this._commitPromise.always(function() {
-        delete self._commitPromise;
-    });
-
-    // check if we really need to commit anything (e.g. mask is not full of zeroes)
-    var foundOnes = false;
-    for (var i = 0; i < this._updatedMask.length; i++) {
-        if (this._updatedMask[i] === 1) {
-            foundOnes = true;
-            break;
+    self._commitTimer = setTimeout(function() {
+        if (self._commitPromise) {
+            // commit is already in progress, create a proxy promise that would execute after the current commit op and
+            // return it
+            self._commitPromise.always(function () {
+                masterPromise.linkDoneAndFailTo(self.commit());
+            });
+            return;
         }
-    }
 
-    // no need to commit anything.
-    if (foundOnes === false) {
-        var commitPromise = this._commitPromise;
-        this._commitPromise.resolve(false);
-        return commitPromise;
-    }
-    var attributeFullName = (this.isPublic() ? "+!" : "^!") + this.name;
+        self._commitPromise = new MegaPromise();
+        masterPromise.linkDoneAndFailTo(self._commitPromise);
 
-    var cacheKey = u_handle + "_" + attributeFullName;
-    attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
+        self._commitPromise.always(function () {
+            delete self._commitPromise;
+        });
 
-    api_req(
-        {
-            "a": "usma",
-            "n": attributeFullName,
-            "ua": this.toString(),
-            "m": this.maskToString()
-        },
-        {
-            callback: function megaDataBitMapCommitCalback(response) {
-                if (typeof(response) === 'number') {
-                    self._commitPromise.reject(response);
-                }
-                else {
-                    if (response.ua && response.ua !== self.toString()) {
-                        self.mergeFrom(response.ua);
-                        attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
-                    }
-                    if (response.v) {
-                        self.setVersion(response.v);
-                    }
-                    self.commited();
-                    self._commitPromise.resolve(response);
-                }
+        // check if we really need to commit anything (e.g. mask is not full of zeroes)
+        var foundOnes = false;
+        for (var i = 0; i < self._updatedMask.length; i++) {
+            if (self._updatedMask[i] === 1) {
+                foundOnes = true;
+                break;
             }
         }
-    );
-    return this._commitPromise;
-}, 100);
+
+        // no need to commit anything.
+        if (foundOnes === false) {
+            var commitPromise = self._commitPromise;
+            self._commitPromise.resolve(false);
+            return;
+        }
+        var attributeFullName = (self.isPublic() ? "+!" : "^!") + self.name;
+
+        var cacheKey = u_handle + "_" + attributeFullName;
+        attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
+
+        api_req(
+            {
+                "a": "usma",
+                "n": attributeFullName,
+                "ua": self.toString(),
+                "m": self.maskToString()
+            },
+            {
+                callback: function megaDataBitMapCommitCalback(response) {
+                    if (typeof(response) === 'number') {
+                        self._commitPromise.reject(response);
+                    }
+                    else {
+                        if (response.ua && response.ua !== self.toString()) {
+                            self.mergeFrom(base64urldecode(response.ua));
+                            attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
+                        }
+                        if (response.v) {
+                            self.setVersion(response.v);
+                        }
+                        self.commited();
+                        self._commitPromise.resolve(response);
+                    }
+                }
+            }
+        );
+    }, 100);
+
+    return masterPromise;
+};
 
 /**
  * Initialise a new MegaDataBitMap from string

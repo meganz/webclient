@@ -476,6 +476,11 @@ input[type="checkbox"] {
     position: relative;
     z-index: 1;
 }
+.checkboxOn.small, .checkboxOff.small {
+    width: 14px;
+    height: 14px;
+    margin: 9px 11px 0 0;
+}
 .checkdiv.right {
     float: right;
 }
@@ -484,8 +489,8 @@ input[type="checkbox"] {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    width: 16px;
-    height: 16px;
+    width: 100%;
+    height: 100%;
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
@@ -497,17 +502,21 @@ input[type="checkbox"] {
     -moz-box-shadow: none;
     box-shadow: none;
     background-position: -34px -395px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
-    width: 16px;
-    height: 16px;
+    width: 100%;
+    height: 100%;
     position: absolute;
     top: 0;
 }
 .checkboxOn::after {
     background-position: -34px -445px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
-    background-repeat: no-repeat;
+}
+.checkboxOff::after {
+    display: none;
+}
+.small.checkboxOn::after {
+    background-position: -35px -446px;
 }
 .fm-dialog .checkboxOff, .fm-dialog .checkboxOn {
     margin: 20px 12px 0 7px;
@@ -4619,7 +4628,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 37px;
     height: 56px;
     background-position: -5px -1974px;
-    background-image: url(../images/mega/top-login-sprite_v7@2x.png);
+    background-image: url(../images/mega/top-login-sprite_v9@2x.png);
     background-repeat: no-repeat;
     margin: 0 auto;
 }
@@ -4770,7 +4779,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: right -1769px;
     background-repeat: no-repeat;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -9426,7 +9435,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     min-width: 168px;
 }
 .fm-share-permissions.active, .account-history-drop-items.active {
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
 }
 .fm-notification-body {
     padding: 7px 20px 20px 20px;
@@ -10382,7 +10391,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-arrow {
     height: 6px;
     background-position: center -2060px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
     height: 5px;
     width: 10px;
@@ -10487,7 +10496,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     background-image: none;
 }
 .dropdown-item.do-sort.selected i {
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -30px -1810px;
     background-repeat: no-repeat;
 }
@@ -11816,7 +11825,7 @@ table {
     width: 20px;
     height: 20px;
     float: right;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 1px 4px;
     background-repeat: no-repeat;
     margin: 8px 12px 5px 0;
@@ -11841,7 +11850,7 @@ table {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     margin-bottom: 10px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 6px -73px;
     background-repeat: no-repeat;
     padding: 1px 11px 1px 31px;
@@ -11919,7 +11928,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 13px;
     height: 14px;
     cursor: pointer;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -3px -237px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -11938,7 +11947,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     float: left;
     width: 55px;
     height: 57px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -2px -289px;
     background-repeat: no-repeat;
 }
@@ -11953,7 +11962,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     padding-top: 5px;
 }
 .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff {
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -2px -392px;
     background-repeat: no-repeat;
     background-size: auto;
@@ -11989,7 +11998,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 5px;
     height: 26px;
     position: relative;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -3px -554px;
     background-repeat: no-repeat;
     margin-left: -13px;
@@ -11997,7 +12006,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .login-notification-icon {
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 0 -1497px;
     background-repeat: no-repeat;
     position: absolute;
@@ -12022,7 +12031,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     font-size: 13px;
     color: rgb(153,153,153);
     line-height: 21px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 0 -1582px;
     background-repeat: no-repeat;
     float: right;
@@ -12043,7 +12052,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 13px;
     height: 5px;
     position: absolute;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 0 -912px;
     background-repeat: no-repeat;
     margin: 0 0 -10px -6px;
@@ -12188,7 +12197,7 @@ h5.main-italic-header {
     -webkit-border-radius: 5px;
     border-radius: 5px;
     margin-bottom: 20px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 9px -69px;
     background-repeat: no-repeat;
     padding: 0 10px 0 35px;
@@ -12283,7 +12292,7 @@ h5.main-italic-header {
     float: left;
     padding-right: 20px;
     cursor: pointer;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: right -772px;
     background-repeat: no-repeat;
     margin-bottom: 20px;
@@ -12301,7 +12310,7 @@ h5.main-italic-header {
     -webkit-border-top-left-radius: 5px;
     -moz-border-radius-topleft: 5px;
     border-top-left-radius: 5px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: right -662px;
     background-repeat: no-repeat;
 }
@@ -12377,7 +12386,7 @@ h5.main-italic-header {
 .password-status-icon {
     height: 36px;
     width: 30px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 2px -1000px;
     background-repeat: no-repeat;
     position: absolute;
@@ -13326,7 +13335,7 @@ span.browsers-update {
 .account-warning-icon {
     width: 19px;
     margin-left: 3px;
-    background-image: url(../images/mega/top-login-sprite_v7@2x.png);
+    background-image: url(../images/mega/top-login-sprite_v9@2x.png);
     background-position: 3px -1888px;
     position: relative;
     display: none;
@@ -17825,7 +17834,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     font-size: 13px;
     color: #999999;
     line-height: 21px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 0 -1582px;
     background-repeat: no-repeat;
     float: right;

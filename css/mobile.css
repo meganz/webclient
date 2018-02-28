@@ -5812,7 +5812,7 @@ textarea.mobile.support-text-field {
         width: 153px;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .provider-details .provider-name {
-        width: 97px;
+        width: 96px;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration {
         display: inline-block;

@@ -350,7 +350,7 @@
 .fm-dialog:not(.exceeded) .pro-plan-descr::after {
     content: '';
     display: block;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -24px -2256px;
     position: absolute;

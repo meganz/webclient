@@ -20,7 +20,7 @@
 # Change to the path of this script, then go up a level to the main web directory. This allows the script to be
 # executed from multiple places and still capture all the code changes in the main web directory. E.g. if executed via
 # ./scripts/squash-advanced.sh or cd scripts && ./squash-advanced.sh they will both work.
-currentScript=$(readlink -f "$0")
+currentScript=$(stat -f "$0")
 pathOfScript=$(dirname "$currentScript")
 cd "$pathOfScript"
 cd ..

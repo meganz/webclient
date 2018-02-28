@@ -36,8 +36,6 @@
     position: relative;
     z-index: 448;
 }
-
-
 .onboarding .outer {
     background-color: rgba(204, 204, 204, 0.38);
     margin: 0 auto;
@@ -57,13 +55,11 @@
     animation-direction: normal;
     animation-timing-function: ease-out;
 }
-
 @keyframes hint {
     from {
         transform: scale(0.8) translate3d(0, 0, 0);
         background-color: rgba(204, 204, 204, 0.30);
     }
-
     70% {
         transform: scale(1.15) translate3d(0, 0px, 0);
         background-color: rgba(204, 204, 204, 0.6);
@@ -73,13 +69,10 @@
         background-color: rgba(204, 204, 204, 0.0);
     }
     to {
-        transform: scale(1) translate3d(0, 0, 0);
-        background-color: rgba(204, 204, 204, 0.0);
+    transform: scale(1) translate3d(0, 0, 0);
+    background-color: rgba(204, 204, 204, 0.0);
     }
 }
-
-
-
 .onboarding:hover .outer, .onboarding.active .outer {
     animation-duration: 0.2s;
     animation-name: hint-hover;
@@ -88,9 +81,6 @@
     animation-timing-function: ease-in;
     cursor: pointer;
 }
-
-
-
 @keyframes hint-hover {
     from {
         width: 30px;
@@ -122,7 +112,6 @@
     animation-name: hint-hover-inner;
     animation-timing-function: linear;
 }
-
 @keyframes hint-hover-inner {
     from {
         transform: scale(1.2);
@@ -152,63 +141,12 @@
     animation-timing-function: linear;
     animation-direction: alternate-reverse;
 }
-
 /**
  * Dialogs
  */
 .onboarding-dialog {
     position: absolute;
-
-    width: 522px;
-    height: auto;
-
-    border: 1px solid rgba(0,0,0,0.15);
-    box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.10);
-    padding: 20px 24px;
-    border-radius: 4px;
     animation-name: none;
-}
-.onboarding-dialog img.left {
-    display: inline-block;
-    margin-right: 24px;
-    border: 1px solid rgba(0,0,0,0.10);
-}
-.onboarding-dialog h3 {
-    color: #FF333A;
-    font-size: 18px;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 8px;
-    margin-top: 4px;
-    font-weight: normal;
-}
-.onboarding-dialog p {
-    padding: 0;
-    margin: 0;
-    font-size: 14px;
-    line-height: 24px;
-    color: #333333;
-}
-
-.onboarding-dialog label.radio-txt {
-    font-size: 14px;
-}
-
-.onboarding-dialog .checkdiv {
-    margin-left: 0px;
-}
-.onboarding-dialog .checkbox-block {
-    position: absolute;
-    bottom: 20px;
-    left: 228px;
-}
-
-
-.onboarding-dialog.long-content .checkbox-block {
-    left: 23px;
-}
-.onboarding-dialog.long-content {
-    padding-bottom: 40px;
 }
 /**
  * toggle animations
@@ -224,7 +162,6 @@
     animation-name: onboarding-dialog-active-flipped;
     animation-timing-function: ease-in;
 }
-
 @keyframes onboarding-dialog-active {
     from {
         max-width: 0;
@@ -235,7 +172,6 @@
         max-width: 30%;
         max-height: 30%;
         opacity: 0.8;
-
     }
     60% {
         max-width: 80%;
@@ -247,26 +183,22 @@
         opacity: 1;
     }
 }
-
 @keyframes onboarding-dialog-active-flipped {
     from {
         opacity: 0.6;
     }
     20% {
         opacity: 0.8;
-
     }
     to {
         opacity: 1;
     }
 }
-
 .onboarding-dialog.animate-in > * {
     animation-duration: 0.6s;
     animation-name: onboarding-dialog-active-late-fadein;
     animation-timing-function: ease-in;
 }
-
 @keyframes onboarding-dialog-active-late-fadein {
     from {
         opacity: 0;
@@ -278,7 +210,6 @@
         opacity: 1;
     }
 }
-
 .onboarding-dialog.animate-out {
     animation-duration: 0.3s;
     animation-name: onboarding-dialog-active;
@@ -297,7 +228,6 @@
     animation-timing-function: ease-in;
     animation-direction: alternate-reverse;
 }
-
 .onboarding.animate-hide {
     animation-duration: 0.6s;
     animation-name: onboarding-hide;
@@ -312,12 +242,10 @@
         transform: scale(1);
         opacity: 1;
     }
-
     80% {
         transform: scale(1);
         opacity: 0.2;
     }
-
     100% {
         transform: scale(3);
         opacity: 0;

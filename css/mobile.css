@@ -5809,7 +5809,7 @@ textarea.mobile.support-text-field {
 @media only screen and (min-width: 400px) {
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-options-list .payment-method {
         float: left;
-        width: 154px;
+        width: 153px;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .provider-details .provider-name {
         width: 97px;
@@ -5820,7 +5820,7 @@ textarea.mobile.support-text-field {
         margin-top: 0;
         height: 80px;
         vertical-align: middle;
-        width: 154px
+        width: 153px
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration.template {
         display: none;
@@ -5830,7 +5830,7 @@ textarea.mobile.support-text-field {
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option {
         display: inline-block;
-        width: 154px
+        width: 153px
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option:last-child {
         margin-left: 0;
@@ -5838,6 +5838,7 @@ textarea.mobile.support-text-field {
     body:not(.fr):not(.ru) .mobile.membership-step2 .option-question.renewal {
         margin-top: 30px;
     }
+
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {

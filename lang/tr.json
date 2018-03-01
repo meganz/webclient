@@ -4353,7 +4353,7 @@
     "17241": "Mac",
     "17242": "Windows",
     "17243": "iOS i\u00e7in [W13][B]Payla\u015f[\/B][\/W13] ikonuna ve sonras\u0131nda [B]Ba\u011flant\u0131y\u0131 Al[\/B]'a bas\u0131n. Android'de men\u00fcden [B] [W11]Ba\u011flant\u0131y\u0131[\/W11] al[\/B] ayar\u0131n\u0131 se\u00e7in.",
-    "17244": "Masa\u00fcst\u00fc taray\u0131c\u0131n\u0131z\u0131 kullanarak, tek bir ki\u015fiyle g\u00fcvenli bir sesli veya g\u00f6r\u00fcnt\u00fcl\u00fc g\u00f6r\u00fc\u015fme yapabilir veya kat\u0131lan \u00e7e\u015fitli ki\u015filerle grup sohbeti yapabilirsiniz. \u0130letileriniz akarken MEGA Cloud Drive'\u0131n\u0131zdan di\u011fer grup \u00fcyelerine de dosya g\u00f6nderebilirsiniz. [Br]G\u00fcvenli metin sohbeti, Android ve iOS uygulamalar\u0131nda da mevcuttur (\u015fifreli sesli ve g\u00f6r\u00fcnt\u00fcl\u00fc arama yak\u0131nda mobil cihazlara gelecektir).",
+    "17244": "Masa\u00fcst\u00fc taray\u0131c\u0131n\u0131z\u0131, Android veya iOS cihaz\u0131n\u0131z\u0131 kullanarak, tek bir ki\u015fiyle g\u00fcvenli bir sesli veya g\u00f6r\u00fcnt\u00fcl\u00fc g\u00f6r\u00fc\u015fme yapabilir veya bir grubun kat\u0131l\u0131mc\u0131lar\u0131yla grup sohbeti yapabilirsiniz. \u0130letileriniz akarken MEGA Bulut S\u00fcr\u00fcc\u00fcn\u00fcz'den di\u011fer grup \u00fcyelerine dosya da g\u00f6nderebilirsiniz.",
     "17245": "[H1]Art\u0131k MEGA hesab\u0131n\u0131z\u0131n temellerini biliyorsunuz.[\/H1]",
     "17246": "[H1]Tebrikler![\/H1]",
     "17251": "[A]https:\/\/mega.nz\/[\/A] adresinden giri\u015f yap\u0131n.",
@@ -4638,9 +4638,13 @@
     "17735": "Objects",
     "17736": "Symbols",
     "17737": "Frequently Used",
-    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17738": "Merhaba, bana MEGA'da e\u015flik edin ve \u015fifreli depolama alan\u0131 ve ileti\u015fim kurma imkan\u0131n\u0131z olsun.",
     "17739": "Bir payla\u015f\u0131m\u0131n veya bir ba\u011flant\u0131n\u0131n bulunmas\u0131 nedeniyle klas\u00f6rler birle\u015ftirilemez. Bu klas\u00f6rleri birle\u015ftirmek isterseniz payla\u015f\u0131m\u0131 veya ba\u011flant\u0131y\u0131 kald\u0131rman\u0131z ve tekrar denemeniz gerekecektir.",
-    "17742": "Drop to [S]upload[\/S]",
+    "17742": "[S]y\u00fckleme[\/S]ye b\u0131rak",
     "17743": "Bu dosya taray\u0131c\u0131n\u0131z taraf\u0131ndan desteklenmeyen bir video \u00e7\u00f6z\u00fcc\u00fcs\u00fc kullanmaktad\u0131r.",
-    "17744": "MEGA bu yak\u0131nla\u015ft\u0131rma d\u00fczeyinde kullan\u0131lamaz. L\u00fctfen yak\u0131nla\u015ft\u0131rmay\u0131 kabul edilebilir seviyelere getirmek i\u00e7in taray\u0131c\u0131 penceresini ekran\u0131 kaplayacak \u015fekilde b\u00fcy\u00fct\u00fcn veya Ctrl \/ \u2318 ard\u0131ndan - d\u00fc\u011fmesine ayn\u0131 anda basarak yak\u0131nla\u015ft\u0131r\u0131n."
+    "17744": "MEGA bu yak\u0131nla\u015ft\u0131rma d\u00fczeyinde kullan\u0131lamaz. L\u00fctfen yak\u0131nla\u015ft\u0131rmay\u0131 kabul edilebilir seviyelere getirmek i\u00e7in taray\u0131c\u0131 penceresini ekran\u0131 kaplayacak \u015fekilde b\u00fcy\u00fct\u00fcn veya Ctrl \/ \u2318 ard\u0131ndan - d\u00fc\u011fmesine ayn\u0131 anda basarak yak\u0131nla\u015ft\u0131r\u0131n.",
+    "17764": "Sohbete g\u00f6nder",
+    "17765": "Sohbetlerim",
+    "17766": "Dosya sohbete g\u00f6nderildi",
+    "17767": "Dosyalar sohbete g\u00f6nderildi"
 }

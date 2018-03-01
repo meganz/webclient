@@ -17416,7 +17416,7 @@
         "context": "Step two of how to share with others on iOS or Android"
     },
     "17244": {
-        "text": "Using your desktop browser, you can have a secure voice or video call with a single contact or have a group text chat with several contacts participating. You can also send files from your MEGA Cloud Drive to other members of the group chat while messages are flowing. [Br]Secure text chat is also available on Android and iOS applications (encrypted voice and video calls are coming to mobile soon).",
+        "text": "Using your desktop browser, Android or iOS device, you can have a secure voice or video call with a single contact or have a group text chat with several contacts participating. You can also send files from your MEGA Cloud Drive to other members of the group chat while messages are flowing.",
         "context": "MEGAchat introduction and description for new users"
     },
     "17245": {
@@ -18574,5 +18574,21 @@
     "17744": {
         "text": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels.",
         "context": "An overlay message when the main menu is displaced outside of the window"
+    },
+    "17764": {
+        "text": "Send to chat",
+        "context": "Send to chat [copy dialog] Tab header"
+    },
+    "17765": {
+        "text": "My chats",
+        "context": "Column header of my contacts\/chats at copy dialog"
+    },
+    "17766": {
+        "text": "File sent to chat",
+        "context": "Toast text upon sending a single file to chat"
+    },
+    "17767": {
+        "text": "Files sent to chat",
+        "context": "Toast text upon sending multiple files to chat"
     }
 }

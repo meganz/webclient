@@ -4353,7 +4353,7 @@
     "17241": "Mac",
     "17242": "Windows",
     "17243": "Voor iOS tik de [W13][B]Deel[\/B][\/W13] icoon en selecteer [B]Haal de koppeling op.[\/B] Voor Android selecteer de [B] [W11]Haal de[\/W11]koppeling op[\/B] optie op het menu.",
-    "17244": "Gebruik uw desktop browser, u kunt een veilig bel of video gesprek met \u00e9\u00e9n contact of een groep tekst chat met enkele contacten die deelnemen maken. U kunt ook bestanden verzenden van uw MEGA Cloud Schijf naar andere leden van de groep chat terwijl berichten worden verzonden.[Br] Veilige chat is ook beschikbaar op Android en iOS applicaties (gecodeerde bel en video gesprekken komen binnenkort naar mobiel).",
+    "17244": "Door gebruik van uw desktop browser, Android of iOS apparaat, kunt u een veilig bel of video gesprek voeren met een enkele contact of een groep tekst gesprek met meerdere contacten die meedoen. U kunt ook bestanden verzenden vanaf uw MEGA Cloud Schijf naar andere leden van de groep gesprek terwijl gesprekken gevoerd worden. ",
     "17245": "[H1]U weet nu de basis van uw MEGA account[\/H1]",
     "17246": "[H1]Gefeliciteerd![\/H1]",
     "17251": "Login bij [A]https:\/\/mega.nz\/[\/A]",
@@ -4638,9 +4638,13 @@
     "17735": "Objects",
     "17736": "Symbols",
     "17737": "Frequently Used",
-    "17738": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+    "17738": "Hallo, doe mee met mij op MEGA en krijg toegang tot versleutelde opslag en communicatie.",
     "17739": "Mappen kunnen niet samengevoegd worden door de aanwezigheid van een gedeeld of koppeling. Als u deze mappen wilt samenvoegen moet u het gedeelde of de koppeling verwijderen en nogmaals proberen.",
-    "17742": "Drop to [S]upload[\/S]",
+    "17742": "Sleep om te [S]uploaden[\/S]",
     "17743": "Dit bestand gebruikt een video codec die niet ondersteund wordt door uw browser.",
-    "17744": "MEGA kan niet gebruikt worden op deze zoom waarde. Maximaliseer het browser venster of zoom uit door op Ctrl\/ \u2318 te drukken - op hetzelfde moment om de zoom te herstellen naar acceptabele waardes."
+    "17744": "MEGA kan niet gebruikt worden op deze zoom waarde. Maximaliseer het browser venster of zoom uit door op Ctrl\/ \u2318 te drukken - op hetzelfde moment om de zoom te herstellen naar acceptabele waardes.",
+    "17764": "Verstuur naar gesprek",
+    "17765": "Mijn gesprekken",
+    "17766": "Bestand verstuurd naar gesprek",
+    "17767": "Bestanden verstuurd naar gesprek"
 }

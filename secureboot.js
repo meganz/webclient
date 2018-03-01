@@ -638,7 +638,7 @@ var ln2 = {};
 // Native language names
 ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español';
 ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português'; ln.vi = 'Tiếng Việt';
-ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.he = 'עברית';
+ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語';
 ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi';
 ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';
 ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски';
@@ -647,7 +647,7 @@ ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارس
 // Language names in English
 ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish';
 ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Portuguese'; ln2.vi = 'Vietnamese';
-ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.he = 'Hebrew';
+ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese';
 ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish';
 ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish';
 ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian';
@@ -1461,7 +1461,7 @@ else if (!b_u) {
         'en':['en','en-'], 'es':['es','es-'], 'fr':['fr','fr-'], 'de':['de','de-'], 'it':['it','it-'],
         'nl':['nl','nl-'], 'br':['pt-br','pt'], 'se':['sv'], 'fi':['fi'], 'pl':['pl'], 'cz':['cz','cs','cz-'],
         'sk':['sk','sk-'], 'sl':['sl','sl-'], 'hu':['hu','hu-'], 'jp':['ja'], 'cn':['zh','zh-cn'],
-        'ct':['zh-hk','zh-sg','zh-tw'], 'kr':['ko'], 'ru':['ru','ru-mo'], 'ar':['ar','ar-'], 'he':['he'],
+        'ct':['zh-hk','zh-sg','zh-tw'], 'kr':['ko'], 'ru':['ru','ru-mo'], 'ar':['ar','ar-'],
         'id':['id'], 'sg':[], 'tr':['tr','tr-'], 'ro':['ro','ro-'], 'uk':['||'], 'sr':['||'], 'th':['||'],
         'fa':['||'], 'bg':['bg'], 'tl':['en-ph'], 'vi':['vn', 'vi']
     };

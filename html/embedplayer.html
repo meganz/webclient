@@ -1,0 +1,165 @@
+<div class="bottom-page scroll-block download embedplayer video">
+
+    <div class="download main-pad">
+        <div class="download transfer-wrapper">
+            <!-- Video block !-->
+            <div class="download video-block">
+                <!-- Sharing options -->
+                <div class="sharefile-container hidden">
+                    <div class="sharefile-aligner">
+                        <div class="sharefile-option-wrapper">
+                            <div class="sharefile-tabs">
+                                <div class="tab-link share-link">Share link
+                                </div>
+                                <div class="tab-link share-embed-code active">Embed code
+                                </div>
+                            </div>
+                            <div class="sharefile-sections">
+                                <div class="tab-content share-link">iframe src="https://player.mega.co.nz/video/256668685" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen>
+                                </div>
+                                <div class="tab=-content share-embed-code">
+                                </div>
+                            </div>
+                            <div class="sharefile-buttons">
+                                <div class="button default-red-button right">Copy
+                                </div>
+                                <div class="button default-transparent-button right">Cancel
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Transfer limitation overlay -->
+                <div class="transfer-limitation-container hidden">
+                    <div class="transfer-limitation-aligner">
+                        <div class="transfer-limitation-wrapper">
+                            <div class="transfer-heading">Limited transfer quota available</div>
+                            <div class="transfer-body">Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Create a PRO account in order to substantially raise your transfer quota.</div>
+                            <div class="transfer-buttons">
+                                <div class="upgrade-option hidden">
+                                    <div class="button default-red-button">Upgrade your PRO account</div>
+                                    <div class="button default-link-button">Continue anyways</div>
+                                </div>
+                                <div class="signin-register-option">
+                                    <div class="button default-transparent-button inline login">Login</div>
+                                    <div class="button default-red-button inline sign up">Sign Up</div>
+                                    <div class="button default-link-button">Continue anyways</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- File Removed -->
+                <div class="file-removed-container hidden">
+                    <div class="file-removed-aligner">
+                        <div class="file-removed-wrapper">
+                            <div class="file-removed-heading">File has been removed</div>
+                            <div class="file-removed-body">Some explanation if needed?</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dropdown/context menu 
+                Add class "mobile-mode" to the dropdown when viewing the iframe video on mobile devices -->
+                <div class="dropdown body files-menu context hidden" style="height: auto; border-radius: 8px;">
+                    <div class="dropdown-aligner">
+                        <div class="dropdown-wrapper">
+                            <div class="dropdown-section">
+                                <a class="dropdown-item getlink-item" style="display: block;">
+                                    <i class="small-icon context mega"></i><span>Log in</span>
+                                </a>
+                                <hr>
+                            </div>
+                            <div class="dropdown-section">
+                                <a class="dropdown-item getlink-item" style="display: block;">
+                                    <i class="small-icon context get-link"></i><span>Get link</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-section">
+                                <a class="dropdown-item getlink-item" style="display: block;">
+                                    <i class="small-icon context get-link"></i><span>Embed code</span>
+                                </a>
+                                <hr>
+                            </div>
+                            <div class="dropdown-section">
+                                <a class="dropdown-item getlink-item" style="display: block;">
+                                    <i class="small-icon context mega"></i><span>View on MEGA</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add main-blur-block to video-wrapper when any overlay is visible.
+                Pause the video as well when an overlay is visible -->
+                <div class="video-wrapper">
+                    <!-- Video Header -->
+                    <div class="viewer-top-bl">
+                        <div class="viewer-filename" title="mp42/avc1/mp4a-40-2">
+                            <div class="download file-info">
+                                <div class="download info-txt big-txt">
+                                    <span class="filename"></span>
+                                    <span class="extension"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="viewer-button right moreoptions">
+                            <i class="medium-icon icons-img "></i>
+                        </div>
+                        <div class="viewer-button right useravatar">
+                         <div data-color="color4" class="avatar-wrapper nw-contact-avatar DjQDnzGDufo color4"><span>C</span></div>
+                     </div>
+                     <!-- Will Replace with a more appropriate share icon -->
+                     <div class="viewer-button right getlink">
+                        <i class="medium-icon icons-img chain"></i>
+                    </div>
+                    <div class="viewer-button right embedvideo">
+                        <i class="medium-icon icons-img embed"></i>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <video id="video" controls preload="metadata" poster="" data-autoplayvideo="false"  data-playvideoonclick="false"></video>
+
+                <div class="download play-video-button"></div>
+                <div class="viewer-pending hidden">
+                    <div class="bounce1"></div>
+                    <div class="bounce2"></div>
+                    <div class="bounce3"></div>
+                </div>
+                <!-- Will add soon. This button should direct you to the dl page for the file -->
+                <div class="logo-container">
+                    <div class="logo-icon">
+                    </div>
+                </div>
+                <!-- Video Footer -->
+                <div class="viewer-bottom-bl">
+                    <div id="video-controls" class="video-controls" data-state="hidden">
+                        <div data-state="play" class="viewer-button left playpause">
+                            <i class="medium-icon icons-img pause"></i>
+                        </div>
+                        <div class="volume-control left">
+                            <div data-state="mute" class="viewer-button mute">
+                                <i class="medium-icon icons-img volume"></i>
+                            </div>
+                            <div class="video-vol-range">
+                                <div class="volume-bar"><span></span></div>
+                            </div>
+                        </div>
+                        <div class="video-timing current left">
+                            00:00
+                        </div>
+                        <div data-state="go-fullscreen" class="viewer-button right fs">
+                            <i class="medium-icon icons-img fullscreen"></i>
+                        </div>
+                        <div class="video-timing duration right">
+                            00:00
+                        </div>
+                        <div class="video-progress-block">
+                            <div class="video-progress-bar">
+                                <div class="video-time-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

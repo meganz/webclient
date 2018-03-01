@@ -919,12 +919,12 @@
 }
 
 @media only screen and (max-height:  740px) {
-.achievements-scroll {
-    max-height: 448px;
-}
-.fm-dialog.achievements-list-dialog {
-    margin-top: -314px;
-}
+    .achievements-scroll {
+        max-height: 448px;
+    }
+    .fm-dialog.achievements-list-dialog {
+        margin-top: -314px;
+    }
 }
 /* End of Achievements list dialog */
 
@@ -1526,7 +1526,7 @@ li.token-input-token-invite .input-close {
 .fm-dialog-close.big {
     background-image: url(../images/mega/download-dialog_v1.png);
     background-position: -368px 7px;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
@@ -1534,10 +1534,10 @@ li.token-input-token-invite .input-close {
     top: 17px;
 }
 .fm-dialog-close.big:hover {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
-    -moz-opacity: 0.8;
-    -khtml-opacity: 0.8;
-    opacity: 0.8;
+   filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+   -moz-opacity: 0.8;
+   -khtml-opacity: 0.8;
+   opacity: 0.8;
 }
 .megasync-content.slider {
     width: 768px;
@@ -1620,7 +1620,7 @@ li.token-input-token-invite .input-close {
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
@@ -1637,11 +1637,11 @@ li.token-input-token-invite .input-close {
     display: block;
 }
 .megasync-slide.current {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    visibility: visible;
+   filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+   -moz-opacity: 1;
+   -khtml-opacity: 1;
+   opacity: 1;
+   visibility: visible;
 }
 .megasync-slide.slide2 {
     text-align: left;
@@ -1950,8 +1950,8 @@ li.token-input-token-invite .input-close {
     -webkit-text-security: disc;
 }
 .dialog.big-input-bg input:-webkit-autofill, .dialog.big-input-bg input:-webkit-autofill:focus {
- -webkit-box-shadow: 0 0 0 50px #FAFAFA inset;
- -webkit-text-fill-color: #777777;
+   -webkit-box-shadow: 0 0 0 50px #FAFAFA inset;
+   -webkit-text-fill-color: #777777;
 }
 .wrong .dialog.big-input-bg {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(217,0,7,0.4);
@@ -1974,18 +1974,18 @@ li.token-input-token-invite .input-close {
     box-shadow: 0px 0px 0px 1px rgba(236,82,87,1);
 }
 .dialog.big-input-bg input::-webkit-input-placeholder {
- color:#777777;
+   color:#777777;
 }
 .dialog.big-input-bg input:-moz-placeholder {
- color:#777777;
- opacity: 1;
+   color:#777777;
+   opacity: 1;
 }
 .dialog.big-input-bg input::-moz-placeholder {
- color:#777777;
- opacity: 1;
+   color:#777777;
+   opacity: 1;
 }
 .dialog.big-input-bg input:-ms-input-placeholder {
- color:#777777;
+   color:#777777;
 }
 .dialog.input-button {
     display: table-cell;
@@ -2047,7 +2047,7 @@ li.token-input-token-invite .input-close {
 
 }
 .fm-versioning.body {
-        height: 100%;
+    height: 100%;
     height: -webkit-calc(100% -64x);
     height: -moz-calc(100% - 64px);
     height: calc(100% - 64px);
@@ -2111,7 +2111,7 @@ li.token-input-token-invite .input-close {
 }
 .fm-versioning .medium-file-icon {
     position:absolute;
-        margin: 13px 0 0 37px;
+    margin: 13px 0 0 37px;
 }
 .fm-versioning.file-data {
     padding: 14px 0 0 87px;
@@ -2193,7 +2193,7 @@ li.token-input-token-invite .input-close {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     position:relative;
-        -webkit-transition: all 200ms ease-in-out;
+    -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
@@ -2210,7 +2210,7 @@ li.token-input-token-invite .input-close {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-        white-space: nowrap;
+    white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -2248,7 +2248,7 @@ li.token-input-token-invite .input-close {
 .fm-versioning.file-info {
     font-size: 13px;
     line-height: 17px;
-     color:#999999;
+    color:#999999;
 
 }
 .fm-versioning.modified-time {
@@ -2433,3 +2433,182 @@ li.token-input-token-invite .input-close {
     vertical-align: top;
 }
 /* end of Drag and Drop overlay */
+
+/* Start of embed and share file dialog */
+.fm-dialog.export-embed-player {
+    width: 564px;
+    margin: -150px 0 0 -282px;
+}
+.fm-dialog.share-dialog-dl-page {
+    width: 564px;
+    margin: -180px 0 0 -282px;
+}
+.fm-dialog.export-embed-player.preview-embed-player, .fm-dialog.share-dialog-dl-page.preview-embed-player {
+    width: 644px;
+    margin: -320px 0 0 -322px;
+}
+.fm-dialog.export-embed-player .video-player-container, .fm-dialog.share-dialog-dl-page .video-player-container {
+    display: none;
+}
+.fm-dialog.export-embed-player.preview-embed-player .file-information-container, .fm-dialog.share-dialog-dl-page.preview-embed-player .file-information-container {
+    display: none;
+}
+.fm-dialog.export-embed-player.preview-embed-player .video-thumbnail-container, .fm-dialog.share-dialog-dl-page.preview-embed-player .video-thumbnail-container {
+    display: none;
+}
+.fm-dialog.export-embed-player.preview-embed-player .video-player-container, .fm-dialog.share-dialog-dl-page.preview-embed-player .video-player-container {
+    display: block;
+    margin-left: -24px;
+    margin-top: -24px;
+}
+.fm-dialog.export-embed-player .fm-dialog-body, .fm-dialog.share-dialog-dl-page .fm-dialog-body {
+    background-color: #F6F7F8;
+    margin-top: 16px;
+    padding-bottom: 16px;
+}
+.fm-dialog.share-dialog-dl-page .fm-dialog-body {
+    margin-top: 0;
+}
+.fm-dialog.export-embed-player .video-thumbnail-container, .fm-dialog.share-dialog-dl-page .video-thumbnail-container {
+    width: 128px;
+    height: 72px;
+    background-color: #000;
+    display: table-cell;
+    position: relative;
+}
+.fm-dialog.export-embed-player .file-information-container, .fm-dialog.share-dialog-dl-page .file-information-container {
+    display: table-cell;
+    padding-left: 14px;
+    padding-right: 14px;
+    vertical-align: middle;
+}
+.fm-dialog.export-embed-player .video-thumbnail, .fm-dialog.share-dialog-dl-page .video-thumbnail {
+    display: block;
+    margin:0 auto;
+    width:100%;
+    height: auto;
+    vertical-align: middle;  
+}
+.fm-dialog.export-embed-player .video-filename, .fm-dialog.share-dialog-dl-page .video-filename {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #333;
+    font-family: 'source_sans_prosemibold';
+    line-height: 24px;
+}
+.fm-dialog.export-embed-player .video-attributes, .fm-dialog.share-dialog-dl-page .video-attributes {
+    font-size: 13px;
+    color: #888;
+    position: relative;
+}
+.fm-dialog.export-embed-player .wrapper.embed-video, .fm-dialog.share-dialog-dl-page .wrapper.embed-video {
+    height: 72px;
+    display: table;
+    width: 100%;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 12px;
+}
+.fm-dialog.export-embed-player .embed-code-field, .fm-dialog.share-dialog-dl-page .link-code-field{
+    background: #FFF;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 2px;
+    padding: 12px 12px;
+}
+.fm-dialog.export-embed-player .embed-code-field span, .fm-dialog.share-dialog-dl-page .link-code-field span {
+    line-height: 20px;
+    color: #444;
+    font-size: 13px;
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+.fm-dialog.export-embed-player .wrapper.embed-code-container, .fm-dialog.share-dialog-dl-page .wrapper.link-code-container {
+    width: 100%;
+    margin-top: 12px;
+}
+.fm-dialog.export-embed-player .information-container, .fm-dialog.share-dialog-dl-page .information-container {
+    opacity: 0.7;
+    font-size: 12px;
+    color: #777E82;
+    letter-spacing: 0;
+    margin-top: 12px;
+}
+.fm-dialog.export-embed-player .bullet-point, .fm-dialog.share-dialog-dl-page .bullet-point {
+    height: 3px;
+    width: 3px;
+    border-radius: 6px;
+    background-color: #888;
+    display: inline-block;
+}
+.fm-dialog.export-embed-player .video-attributes span, .fm-dialog.share-dialog-dl-page .video-attributes span {
+    margin-right: 8px;
+    vertical-align: middle;
+    letter-spacing: 0.4px;
+}
+.share-dialog-dl-page .fm-dialog-tab {
+    background-image: linear-gradient(-180deg, rgba(249,249,249,0.05) 0%, rgba(238,238,238,0.10) 100%);
+    width: 100%;
+    height: 48px;
+    border-bottom: 1px solid #eee;
+    margin-top: 8px;
+}
+.share-dialog-dl-page .fm-dialog-tab .fm-tab-wrapper  {
+    display: flex;
+    margin:0 auto;
+    width: auto;
+    align-items: center;
+    justify-content: center;
+}
+.share-dialog-dl-page .fm-dialog-tab .fm-tab {
+    height: 48px;
+    line-height: 48px;
+    font-size: 14px;
+    color: #333333;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    opacity: 0.4;
+    margin-top: -1px;
+    padding: 0 20px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition:  all 200ms ease-in-out;
+    -ms-transition:  all 200ms ease-in-out;
+    transition:  all 200ms ease-in-out;
+}
+.share-dialog-dl-page .fm-dialog-tab .fm-tab:hover {
+    opacity: 0.6;
+    border-bottom: 2px solid #ff5555;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition:  all 200ms ease-in-out;
+    -ms-transition:  all 200ms ease-in-out;
+    transition:  all 200ms ease-in-out;
+}
+.share-dialog-dl-page .fm-dialog-tab .fm-tab.active {
+    height: 48px;
+    line-height: 48px;
+    opacity: 1;
+    padding: 0 20px;
+    border-bottom: 2px solid #eb4444;
+    font-family: 'source_sans_prosemibold';
+}
+.share-dialog-dl-page .fm-dialog-tab .tab-icon{
+    width: 20px;
+    height: 16px;
+    margin-right: 8px;
+    float: left;
+    display: inline-block;
+    margin-top: 16px;
+}
+.share-dialog-dl-page .tab-icon.url {
+    background-image: url(../images/mega/dialogs-sprite_v14.svg);
+    background-position: -128px -5818px;
+}
+.share-dialog-dl-page .tab-icon.embed {
+    background-image: url(../images/mega/dialogs-sprite_v14.svg);
+    background-position: -88px -5818px;
+}

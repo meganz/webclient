@@ -17719,6 +17719,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .overlayed .main-blur-block, .overlayed .bottom-page.scroll-block {
     filter: blur(0.25em);
     -webkit-filter: blur(0.25em);
+    overflow: hidden;
 }
 .main-blur-block {
     height: 100%;

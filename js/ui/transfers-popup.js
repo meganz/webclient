@@ -139,8 +139,10 @@ mega.ui.tpp = function () {
         var enabled = isEnabled();
 
         if (isCached() && enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
-            opts.dlg.$.show(opts.duration);
-            setStatus(true);
+            if (getTotal('ul') > 0 || getTotal('dl') > 0) {
+                opts.dlg.$.show(opts.duration);
+                setStatus(true);
+            }
         }
     };
 

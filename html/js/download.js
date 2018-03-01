@@ -900,8 +900,8 @@ function dlstart(id,name,filesize)
 {
     dlmanager.isDownloading = true;
 
-    if (slideshow) {
-        M.showTransferToast.apply(M, M.addDownloadToast);
+    if (window.slideshowid) {
+        M.showTransferToast();
     }
 }
 

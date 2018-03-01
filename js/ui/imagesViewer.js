@@ -241,7 +241,15 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         // then pushing fake states of history/hash
         if (!slideshowid && !hashLogic && !location.hash) {
-            history.pushState({subpage: page}, '', '/' + page);
+            var isSearch = page.indexOf('fm/search/');
+            if (isSearch >= 0) {
+                var searchString = page.substring(isSearch + 10);
+                var tempPage = page.substring(0, isSearch + 10);
+                history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
+            }
+            else {
+                history.pushState({ subpage: page }, '', '/' + page);
+            }
         }
         // Bind keydown events
         $document.rebind('keydown.slideshow', function(e) {

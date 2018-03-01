@@ -60,7 +60,7 @@ var slideshowid;
     function slideshow_next() {
         var valid = true;
         $.each(dl_queue || [], function(id, file) {
-            if (file.id === slideshowid) {
+            if (file.id === slideshowid && file.preview) {
                 valid = false;
                 return false;
                 /* break loop */
@@ -79,7 +79,7 @@ var slideshowid;
     function slideshow_prev() {
         var valid = true;
         $.each(dl_queue || [], function(id, file) {
-            if (file.id === slideshowid) {
+            if (file.id === slideshowid && file.preview) {
                 valid = false;
                 return false;
                 /* break loop */

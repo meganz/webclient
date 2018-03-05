@@ -820,6 +820,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         if (eventData.ts) {
                             editedMessage.delay = eventData.ts;
                         }
+                        chatRoom.protocolHandler.clearKeyId();
                     }
 
                     chatRoom.megaChat.plugins.chatdIntegration._parseMessage(

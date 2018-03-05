@@ -1444,6 +1444,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
 ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInstance, decryptedResult) {
     var self = this;
+
     if (decryptedResult && msgInstance) {
         if (decryptedResult.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
             if (typeof decryptedResult.payload === 'undefined' || decryptedResult.payload === null) {

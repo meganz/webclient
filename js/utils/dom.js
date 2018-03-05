@@ -47,11 +47,55 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     // failed, in such case we try to mimic it using jQuery.parseHTML
     var fragment = doc.createDocumentFragment();
 
-    markup = String(markup).replace(/(?!\<[a-z][^>]+)\son[a-z]+\s*=/gi, ' data-dummy=');
+    // console.time('parseHTML');
+
+    markup = String(markup).replace(/<!--[\s\S]*?-->/g, '');
+
+    if (doc === document) {
+        try {
+            var sandbox = document.implementation.createHTMLDocument("");
+            var base = sandbox.createElement("base");
+            base.href = document.location.href;
+            sandbox.head.appendChild(base);
+            doc = sandbox;
+        }
+        catch (ex) {
+            console.warn(ex);
+        }
+    }
+
+    var dumb = {'SCRIPT': 1, 'STYLE': 1, 'SVG': 1, 'XML': 1, 'OBJECT': 1};
+
     $.parseHTML(markup, doc)
         .forEach(function(node) {
-            fragment.appendChild(node);
+            // console.debug(node.nodeName, node.outerHTML, node.data, [node]);
+
+            var content = String(node.outerHTML).replace(/[\s\x00-\x19]+/g, '');
+            var invalid = /<[^>]+script:/i.test(content);
+
+            if (!invalid) {
+                invalid = domNodeForEach(node, function(n) {
+                    // console.warn('domNodeForEach(%s)', n.nodeName, [n]);
+
+                    var nn = n.nodeName.substr(n.nodeName.indexOf(':') + 1);
+                    return dumb[nn] || domAttributeForEach(n, function(a) {
+                        // console.warn('domAttrForEach(%s:%s)', a.name, a.value, [a], [n]);
+
+                        return a.name[0] === 'o' && a.name[1] === 'n';
+                    });
+                });
+            }
+
+            if (invalid) {
+                console.error('Invalid content passed to parseHTML...', [node]);
+            }
+            else {
+                fragment.appendChild(node);
+            }
         });
+
+    // console.timeEnd('parseHTML');
+
     return fragment;
 }
 parseHTML.baseURIs = Object.create(null);
@@ -159,4 +203,51 @@ function htmlentities(value) {
         return '';
     }
     return $('<div/>').text(value).html();
+}
+
+/**
+ * Traverses a DOM Node hierarchy
+ * @param {Object} node the parent node
+ * @param {Function} callback Function to invoke for each node
+ * @param {*} [irn] Ignore root node
+ * @returns {Boolean} The callback result
+ */
+function domNodeForEach(node, callback, irn) {
+    'use strict';
+
+    var len = node.childNodes && node.childNodes.length;
+    while (len--) {
+        var n = node.childNodes[len];
+
+        if (n.nodeType === 1 && callback(n)) {
+            return true;
+        }
+
+        if (n.hasChildNodes() && domNodeForEach(n, callback, 1)) {
+            return true;
+        }
+    }
+
+    return irn ? false : callback(node, true);
+}
+
+/**
+ * Traverses a DOM Node's attributes
+ * @param {Object} node the parent node
+ * @param {Function} callback Function to invoke for each node
+ * @returns {Boolean} The callback result
+ */
+function domAttributeForEach(node, callback) {
+    'use strict';
+
+    var len = node.attributes && node.attributes.length;
+    while (len--) {
+        var a = node.attributes.item(len);
+
+        if (callback(a, node)) {
+            return true;
+        }
+    }
+
+    return false;
 }

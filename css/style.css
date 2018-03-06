@@ -6816,7 +6816,7 @@ table {
 .dragger-icon.font, .export-icon.font, .share-folder-icon div.font {
     background-position: center -4455px;
 }
-.dragger-icon.folder, .share-folder-icon div.folder {
+.dragger-icon.folder, .share-folder-icon div.folder, .export-icon.folderConflict {
     background-position: center -4535px;
 }
 .dragger-icon.folder-shared, .share-folder-icon div.folder-shared {

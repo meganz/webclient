@@ -23039,11 +23039,17 @@ opacity: 1;
 .investors-pdf-block {
     margin-bottom: 12px
 }
+.investors-pdf-block:first-of-type {
+    margin-top: 12px;
+}
+.investors-pdf-block:last-of-type {
+    margin-bottom: 0;
+}  
 .investors-pdf-block a {
     float: right;
     color: #eb4444;
     font-size: 14px;
-    line-height: 40px;
+    line-height: 44px;
 }
 .investors-pdf-title {
     font-size: 16px;

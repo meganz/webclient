@@ -23036,3 +23036,22 @@ opacity: 1;
 .widget-card .footer-button.widget-dialog-buttons {
     padding-top: 16px;
 }
+.investors-pdf-block {
+    margin-bottom: 12px
+}
+.investors-pdf-block a {
+    float: right;
+    color: #eb4444;
+    font-size: 14px;
+    line-height: 40px;
+}
+.investors-pdf-title {
+    font-size: 16px;
+    line-height: 24px;
+    color: #333;
+}
+.investors-pdf-date {
+    font-size: 13px;
+    line-height: 20px;
+    color: #999;
+}

@@ -1000,15 +1000,28 @@ function fm_showoverlay() {
  * Looking for a already existing name of URL (M.v)
  * @param {Integer} nodeType file:0 folder:1
  * @param {String} value New file/folder name
+ * @param {String} target {optional}Target handle to check the duplication inside. if not provided M.v will be used
  */
-function duplicated(nodeType, value) {
+function duplicated(nodeType, value, target) {
     "use strict";
+    if (!target) {
+        var items = M.v.filter(function (item) {
+            return item.name === value && item.t === nodeType;
+        });
 
-    var items = M.v.filter(function(item) {
-        return item.name === value && item.t === nodeType;
-    });
-
-    return items.length !== 0;
+        return items.length !== 0;
+    }
+    else {
+        if (M.c[target]) {
+            // Check if a folder/file with the same name already exists.
+            for (var handle in M.c[target]) {
+                if (M.d[handle] && M.d[handle].t === nodeType && M.d[handle].name === value) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
 
 function renameDialog() {
@@ -2258,7 +2271,11 @@ function createFolderDialog(close) {
             return;
         }
         else {
-            if (duplicated(1, v)) {
+            var specifyTarget = null;
+            if ($.cftarget) {
+                specifyTarget = $.cftarget;
+            }
+            if (duplicated(1, v, specifyTarget)) {
                 $dialog.addClass('duplicate');
                 $input.addClass('error');
 

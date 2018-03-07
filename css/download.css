@@ -827,6 +827,11 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     padding: 0 7px 0 18px;
     min-width: 10px;
     margin-left: 10px;
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    -ms-transition: none;
+    transition: none;
 }
 .video .download.big-button.red {
     padding: 0 18px;

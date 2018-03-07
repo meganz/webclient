@@ -47,6 +47,7 @@
      * @private
      */
     var disableFolders = function(dialogPrefix) {
+        var promiseToSyncCalls = new MegaPromise();
         $('*[id^="mctreea_"]').removeClass('disabled');
 
         if (dialogPrefix === 'move') {
@@ -62,7 +63,9 @@
         dbfetch.geta(Object.keys(M.c.shares || {}))
             .always(function () {
                 disableReadOnlySharedFolders(dialogPrefix);
+                promiseToSyncCalls.resolve();
             });
+        return promiseToSyncCalls;
     };
 
     /**
@@ -586,7 +589,7 @@
                 selectDialogTabRoot(section);
 
                 if (section === 'cloud-drive' || section === 'folder-link') {
-                    handleDialogContent(section, 'ul', true, type, move ? l[62] : $.mcImport ? l[236] : l[63]);
+                    handleDialogContent(section, 'ul', true, type, move ? l[62] : $.mcImport ? l[236] : l[16176]);
                 }
                 else if (section === 'shared-with-me') {
                     handleDialogContent(section, 'ul', false, type, $.mcImport ? l[236] :l[1344]); // Share
@@ -721,6 +724,7 @@
         $dialog.on('click', '.nw-fm-tree-item', function(e) {
 
             var old = $.mcselected;
+            var mySelf = this;
 
             $.mcselected = $(this).attr('id').replace('mctreea_', '');
             M.buildtree({h: $.mcselected});
@@ -734,60 +738,61 @@
                 $('#mctreesub_' + $.mcselected).html(markup);
             }
 
-            disableFolders(type);
+            disableFolders(type).always(function () {
+                var c = $(e.target).attr('class');
 
-            var c = $(e.target).attr('class');
+                // Sub-folder exist?
+                if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
 
-            // Sub-folder exist?
-            if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
+                    c = $(mySelf).attr('class');
 
-                c = $(this).attr('class');
-
-                // Sub-folder expanded
-                if (c && c.indexOf('expanded') > -1) {
-                    $(this).removeClass('expanded');
-                    $('#mctreesub_' + $.mcselected).removeClass('opened');
-                }
-                else {
-                    $(this).addClass('expanded');
-                    $('#mctreesub_' + $.mcselected).addClass('opened');
-                }
-            }
-            else {
-
-                c = $(this).attr('class');
-
-                if (c && c.indexOf('selected') > -1) {
+                    // Sub-folder expanded
                     if (c && c.indexOf('expanded') > -1) {
-                        $(this).removeClass('expanded');
+                        $(mySelf).removeClass('expanded');
                         $('#mctreesub_' + $.mcselected).removeClass('opened');
                     }
                     else {
-                        $(this).addClass('expanded');
+                        $(mySelf).addClass('expanded');
                         $('#mctreesub_' + $.mcselected).addClass('opened');
                     }
                 }
-            }
+                else {
 
-            if (!$(this).is('.disabled')) {
-                // unselect previously selected item
-                $('.nw-fm-tree-item', $dialog).removeClass('selected');
-                $(this).addClass('selected');
-                $btn.removeClass('disabled');
-            }
-            else if ($('#mctreea_' + old + ':visible').length) {
-                $.mcselected = old;
-                $('#mctreea_' + old).addClass('selected');
-            }
-            else {
-                $.mcselected = undefined;
-            }
+                    c = $(mySelf).attr('class');
 
-            // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
-            dialogScroll('.dialog-tree-panel-scroll');
+                    if (c && c.indexOf('selected') > -1) {
+                        if (c && c.indexOf('expanded') > -1) {
+                            $(mySelf).removeClass('expanded');
+                            $('#mctreesub_' + $.mcselected).removeClass('opened');
+                        }
+                        else {
+                            $(mySelf).addClass('expanded');
+                            $('#mctreesub_' + $.mcselected).addClass('opened');
+                        }
+                    }
+                }
 
-            // Disable action button if there is no selected items
-            setDialogButtonState($btn);
+                if (!$(mySelf).is('.disabled')) {
+                    // unselect previously selected item
+                    $('.nw-fm-tree-item', $dialog).removeClass('selected');
+                    $(mySelf).addClass('selected');
+                    $btn.removeClass('disabled');
+                }
+                else if ($('#mctreea_' + old + ':visible').length) {
+                    $.mcselected = old;
+                    $('#mctreea_' + old).addClass('selected');
+                }
+                else {
+                    $.mcselected = undefined;
+                }
+
+                // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
+                dialogScroll('.dialog-tree-panel-scroll');
+
+                // Disable action button if there is no selected items
+                setDialogButtonState($btn);
+            });
+
         });
 
         $swm.off('mouseenter', '.nw-fm-tree-item');

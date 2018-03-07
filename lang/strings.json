@@ -247,6 +247,10 @@
         "text": "Add",
         "context": "Button title to \"Add\" the contact to your contacts list"
     },
+    "156": {
+        "text": "Cancel",
+        "context": "Button"
+    },
     "157": {
         "text": "Folder Name",
         "context": "Input field description in the create folder dialog."
@@ -270,6 +274,10 @@
     "167": {
         "text": "Rubbish Bin",
         "context": "Title of one of the Settings sections where you can see your MEGA \"Rubbish Bin\""
+    },
+    "168": {
+        "text": "Rubbish Bin",
+        "context": "The title of the trash bin in the tree of the file manager."
     },
     "169": {
         "text": "Menu",
@@ -295,8 +303,16 @@
         "text": "My Account",
         "context": "Title of My Account section. There you can see your account details"
     },
+    "190": {
+        "text": "Login",
+        "context": "Title of the login page"
+    },
     "192": {
         "text": "Remember me",
+        "context": ""
+    },
+    "193": {
+        "text": "Login",
         "context": ""
     },
     "195": {
@@ -305,6 +321,10 @@
     },
     "197": {
         "text": "Please enter your e-mail address.",
+        "context": "Warning dialog"
+    },
+    "198": {
+        "text": "Please enter a valid e-mail address.",
         "context": "Warning dialog"
     },
     "199": {
@@ -330,6 +350,10 @@
     "208": {
         "text": "I agree with the MEGA [A]Terms of Service[\/A]",
         "context": ""
+    },
+    "209": {
+        "text": "Register",
+        "context": "Register button"
     },
     "212": {
         "text": "Please enter your name.",
@@ -362,6 +386,10 @@
     "229": {
         "text": "Do not show again",
         "context": "message with checkbox for dialog not to be shown again."
+    },
+    "230": {
+        "text": "Upgrade to PRO",
+        "context": ""
     },
     "233": {
         "text": "Temporary error, retrying.",
@@ -599,6 +627,10 @@
         "text": "Top up",
         "context": ""
     },
+    "455": {
+        "text": "Create",
+        "context": "Button"
+    },
     "456": {
         "text": "Redeem voucher:",
         "context": "Regular users can redeem vouchers in \"my account\"."
@@ -687,6 +719,10 @@
         "text": "Voucher code",
         "context": ""
     },
+    "488": {
+        "text": "Status",
+        "context": ""
+    },
     "489": {
         "text": "Unused",
         "context": ""
@@ -753,6 +789,10 @@
     },
     "519": {
         "text": "Our legal department is standing by to respond to your enquiry.",
+        "context": ""
+    },
+    "520": {
+        "text": "Copyright",
         "context": ""
     },
     "521": {
@@ -843,12 +883,24 @@
         "text": "Skip identical files when uploading:",
         "context": ""
     },
+    "577": {
+        "text": "Yes",
+        "context": ""
+    },
+    "578": {
+        "text": "No",
+        "context": ""
+    },
     "579": {
         "text": "Use SSL for file transfers:",
         "context": "SSL stands for secure socket layer (http:\/\/en.wikipedia.org\/wiki\/Secure_Sockets_Layer)"
     },
     "580": {
         "text": "Disabling SSL improves performance and does not decrease security.",
+        "context": ""
+    },
+    "593": {
+        "text": "Awesome",
         "context": ""
     },
     "620": {
@@ -892,7 +944,7 @@
         "context": ""
     },
     "637": {
-        "text": "The information in this notification is accurate, and I state under penalty of[Br] perjury that I am authorized to act on behalf of the copyright owner. ",
+        "text": "The information in this notification is accurate, and I state under penalty of\r\n perjury that I am authorized to act on behalf of the copyright owner. ",
         "context": ""
     },
     "638": {
@@ -971,6 +1023,10 @@
         "text": "Please supply your e-mail address.",
         "context": ""
     },
+    "664": {
+        "text": "Please enter a valid e-mail address.",
+        "context": ""
+    },
     "665": {
         "text": "Please confirm that you have good faith belief that the sharing of copyrighted material at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as fair use).",
         "context": ""
@@ -1020,7 +1076,7 @@
         "context": ""
     },
     "694": {
-        "text": "1. Disable one link (\"URL\") per file - the file(s) will remain the user's[Br] account",
+        "text": "1. Disable one link (\"URL\") per file - the file(s) will remain the user's\n account",
         "context": ""
     },
     "695": {
@@ -1101,6 +1157,10 @@
     },
     "726": {
         "text": "Done",
+        "context": ""
+    },
+    "727": {
+        "text": "Your password has been changed.",
         "context": ""
     },
     "728": {
@@ -1263,6 +1323,10 @@
         "text": "[X] files",
         "context": "[X] will be replaced by a number (always plural)"
     },
+    "834": {
+        "text": "1 folder",
+        "context": ""
+    },
     "835": {
         "text": "1 file",
         "context": ""
@@ -1403,6 +1467,10 @@
         "text": "month",
         "context": ""
     },
+    "918": {
+        "text": "Monthly",
+        "context": ""
+    },
     "919": {
         "text": "Annually",
         "context": ""
@@ -1427,17 +1495,41 @@
         "text": "Our support team will be happy to assist you.",
         "context": ""
     },
+    "927": {
+        "text": "City",
+        "context": ""
+    },
     "930": {
         "text": "day",
+        "context": ""
+    },
+    "931": {
+        "text": "month",
         "context": ""
     },
     "932": {
         "text": "year",
         "context": ""
     },
+    "933": {
+        "text": "Address",
+        "context": ""
+    },
     "939": {
         "text": "Bank name",
         "context": ""
+    },
+    "949": {
+        "text": "Inbox",
+        "context": "Section name for the \"Messages\" section.\nPreferably one word. There is little space for this word."
+    },
+    "950": {
+        "text": "Contacts",
+        "context": "Section name for the \"Contacts\" section.\nPreferably one word. There is little space for this word."
+    },
+    "951": {
+        "text": "My Account",
+        "context": "Section name for the \"My Account\" section.\nPreferably one or two words. There is little space for this."
     },
     "952": {
         "text": "Most devices can't download files greater than 4 GB. Your download will probably fail.",
@@ -1739,6 +1831,10 @@
         "text": "Create an account",
         "context": ""
     },
+    "1080": {
+        "text": "Mobile Apps",
+        "context": ""
+    },
     "1082": {
         "text": "The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.",
         "context": ""
@@ -1806,6 +1902,10 @@
     "1107": {
         "text": "Passwords do not match.",
         "context": ""
+    },
+    "1108": {
+        "text": "Create Account",
+        "context": "caption of the button that creates the account after filling in the web form"
     },
     "1109": {
         "text": "Your password is your master encryption key.",
@@ -1967,6 +2067,10 @@
         "text": "Uploading",
         "context": ""
     },
+    "1156": {
+        "text": "Downloading",
+        "context": ""
+    },
     "1158": {
         "text": "for Windows",
         "context": "Windows is a name of the operating system, so please do not translate literally!"
@@ -2045,6 +2149,14 @@
     },
     "1186": {
         "text": "You can conveniently purchase your MEGA PRO membership from one of our authorized resellers below:",
+        "context": ""
+    },
+    "1187": {
+        "text": "Download",
+        "context": ""
+    },
+    "1189": {
+        "text": "Import",
         "context": ""
     },
     "1190": {
@@ -2255,6 +2367,10 @@
         "text": "Waiting",
         "context": "Label of tray icon to indicate that MEGAsync is in a waiting state."
     },
+    "1331": {
+        "text": "E-mail",
+        "context": ""
+    },
     "1332": {
         "text": "Confirm registration",
         "context": ""
@@ -2459,6 +2575,14 @@
         "text": "I agree with the",
         "context": ""
     },
+    "1467": {
+        "text": "Terms of Service",
+        "context": ""
+    },
+    "1470": {
+        "text": "Logging in",
+        "context": "Text displayed while the user is logging in"
+    },
     "1472": {
         "text": "Try again",
         "context": ""
@@ -2639,6 +2763,10 @@
         "text": "Add synchronized folder",
         "context": ""
     },
+    "1578": {
+        "text": "Error",
+        "context": ""
+    },
     "1579": {
         "text": "Please select a local folder and a MEGA folder",
         "context": "Message displayed when an user is adding a synchronized folder an either local or remote folder are empty."
@@ -2657,6 +2785,10 @@
     },
     "1584": {
         "text": "Full account syncing is only possible without any selective syncs",
+        "context": ""
+    },
+    "1585": {
+        "text": "Warning",
         "context": ""
     },
     "1587": {
@@ -2683,8 +2815,20 @@
         "text": "Import to my cloud drive",
         "context": "Label to indicate if the user wants to import the selected MEGA link(s) to his cloud drive."
     },
+    "1596": {
+        "text": "OK",
+        "context": "Dialog button to proceed"
+    },
+    "1597": {
+        "text": "Cancel",
+        "context": "Dialog button to cancel the operation"
+    },
     "1599": {
         "text": "Select local folder",
+        "context": ""
+    },
+    "1600": {
+        "text": "Decryption error",
         "context": ""
     },
     "1603": {
@@ -2727,6 +2871,10 @@
         "text": "Cancel all downloads",
         "context": "Label to cancel all pending downloads.(String as short as possible)"
     },
+    "1615": {
+        "text": "Cancel download",
+        "context": "Option to cancel a download"
+    },
     "1616": {
         "text": "Cancel all uploads",
         "context": "Label to cancel all pending uploads.(String as short as possible)"
@@ -2759,6 +2907,14 @@
         "text": "Total Remaining:",
         "context": ""
     },
+    "1624": {
+        "text": "Downloading",
+        "context": ""
+    },
+    "1625": {
+        "text": "Uploading",
+        "context": ""
+    },
     "1626": {
         "text": "MEGAsync",
         "context": "Name of the application, should be exactly the same in most languages (except probably languages like Chinese and perhaps some others)"
@@ -2772,7 +2928,7 @@
         "context": "Notification message launched when a sync is disabled due to the remote folder has been deleted. Keep \"%1\" code because it will be filled with the folder name."
     },
     "1632": {
-        "text": "Your sync \"%1\" has been disabled[Br]because the local folder doesn't exist",
+        "text": "Your sync \"%1\" has been disabled\nbecause the local folder doesn't exist",
         "context": ""
     },
     "1642": {
@@ -2786,6 +2942,14 @@
     "1644": {
         "text": "Exit",
         "context": "Label to indicate the Exit option for the application (MAX 20 characters)"
+    },
+    "1645": {
+        "text": "About",
+        "context": "Menu option"
+    },
+    "1646": {
+        "text": "Settings",
+        "context": "Menu option"
     },
     "1647": {
         "text": "Pause",
@@ -2821,6 +2985,10 @@
     },
     "1656": {
         "text": "No error",
+        "context": ""
+    },
+    "1657": {
+        "text": "Internal error",
         "context": ""
     },
     "1658": {
@@ -2919,6 +3087,14 @@
         "text": "New folder",
         "context": ""
     },
+    "1686": {
+        "text": "Cancel",
+        "context": ""
+    },
+    "1687": {
+        "text": "Cloud Drive",
+        "context": "Has to be consistent with how cloud drive has been translated elsewhere within MEGA."
+    },
     "1688": {
         "text": "Enter the new folder name:",
         "context": "Label to indicate the user for the name of the new folder wich will be created at the Cloud Drive."
@@ -2951,9 +3127,21 @@
         "text": "%1 seconds ago",
         "context": "Label to inform the user how many second ago was updated the indicated file. Keep %1 code because it will be filled with the name of the updated file."
     },
+    "1701": {
+        "text": "1 minute ago",
+        "context": ""
+    },
     "1702": {
         "text": "%1 minutes ago",
         "context": "Label to inform the user how many minutes ago was updated the indicated file. Keep %1 code because it will be filled with the name of the updated file."
+    },
+    "1703": {
+        "text": "1 hour ago",
+        "context": ""
+    },
+    "1704": {
+        "text": "1 day ago",
+        "context": ""
     },
     "1705": {
         "text": "%1 days ago",
@@ -2975,12 +3163,20 @@
         "text": "%1 years ago",
         "context": "Label to inform the user how many years ago was updated the indicated file. Keep %1 code because it will be filled with the name of the updated file."
     },
+    "1710": {
+        "text": "Open",
+        "context": "menu option to open a file"
+    },
     "1711": {
         "text": "Show in folder",
         "context": "Label to let the user open the selected file using the specific file browser.String as short as possible."
     },
     "1712": {
         "text": "General",
+        "context": ""
+    },
+    "1713": {
+        "text": "Account",
         "context": ""
     },
     "1714": {
@@ -2991,8 +3187,16 @@
         "text": "Bandwidth",
         "context": ""
     },
+    "1716": {
+        "text": "Advanced",
+        "context": ""
+    },
     "1717": {
         "text": "Help",
+        "context": ""
+    },
+    "1718": {
+        "text": "Cancel",
         "context": ""
     },
     "1719": {
@@ -3011,13 +3215,29 @@
         "text": "Update automatically",
         "context": "Label to let the user enable automatic updates with a checkbox."
     },
+    "1723": {
+        "text": "Language",
+        "context": ""
+    },
     "1724": {
         "text": "Details",
         "context": ""
     },
+    "1725": {
+        "text": "FREE",
+        "context": ""
+    },
+    "1726": {
+        "text": "Logout",
+        "context": "button to log out from the account"
+    },
     "1727": {
         "text": "Storage space",
         "context": "Label of the amount of storage the user has used & available"
+    },
+    "1728": {
+        "text": "Upgrade",
+        "context": "Caption of a button to upgrade the account to Pro status"
     },
     "1729": {
         "text": "Synced folders",
@@ -3025,6 +3245,10 @@
     },
     "1730": {
         "text": "Delete",
+        "context": ""
+    },
+    "1731": {
+        "text": "Add",
         "context": ""
     },
     "1732": {
@@ -3199,6 +3423,14 @@
         "text": "will be automatically synchronized.",
         "context": ""
     },
+    "1781": {
+        "text": "Back",
+        "context": "button to go back"
+    },
+    "1782": {
+        "text": "Next",
+        "context": "Button to go next"
+    },
     "1783": {
         "text": "User already exists",
         "context": "Message displayed when a user is trying to create an account with the name of an existing user."
@@ -3265,6 +3497,10 @@
     },
     "1813": {
         "text": "MEGA synced folder",
+        "context": ""
+    },
+    "1815": {
+        "text": "Are you sure?",
         "context": ""
     },
     "1817": {
@@ -3755,6 +3991,10 @@
         "text": "Copy Recovery Key to clipboard",
         "context": "A title of an action that lets the user copy his 22 character master encryption key (now renamed to \"Recovery Key\") from a text field to his clipboard"
     },
+    "1990": {
+        "text": "Copy",
+        "context": "Caption of the button that will copy the master key to his clipboard"
+    },
     "1992": {
         "text": "Do not store it on the Internet (at least not without encryption).",
         "context": ""
@@ -3924,15 +4164,15 @@
         "context": ""
     },
     "2426": {
-        "text": "The name \"%1\" is already in use for another sync[Br]Please enter a different name to identify this synced folder:",
+        "text": "The name \"%1\" is already in use for another sync\nPlease enter a different name to identify this synced folder:",
         "context": "Detailed message displayed when a user is using a name for a local folder that is already used. Preserve \"%1\" code because is used to indicate the local folder at runtime."
     },
     "2435": {
-        "text": "Your sync \"%1\" has been disabled[Br]because the remote folder doesn't exist",
+        "text": "Your sync \"%1\" has been disabled\nbecause the remote folder doesn't exist",
         "context": ""
     },
     "2436": {
-        "text": "Your sync \"%1\" has been disabled[Br]because the remote folder is in the rubbish bin",
+        "text": "Your sync \"%1\" has been disabled\nbecause the remote folder is in the rubbish bin",
         "context": ""
     },
     "2438": {
@@ -3944,15 +4184,15 @@
         "context": ""
     },
     "2440": {
-        "text": "Synchronization will stop.[Br]Deletions that occur while it is not running will not be propagated.[Br][Br]Exit anyway?",
+        "text": "Synchronization will stop.\nDeletions that occur while it is not running will not be propagated.\n\nExit anyway?",
         "context": "Do not translate. This string is not being used since a long time ago."
     },
     "2443": {
-        "text": "The destination folder is synced and you already have a file [Br]inside it with the same name (%1).[Br]If you continue the upload, the previous file will be overwritten.[Br]Are you sure?",
+        "text": "The destination folder is synced and you already have a file \ninside it with the same name (%1).\nIf you continue the upload, the previous file will be overwritten.\nAre you sure?",
         "context": "Message displayed when a user tries to upload a file to a synced folder wich already contains it  Ask for confirmation. Keep  (%1) code because it will be filled with name of the file. String as short as possible."
     },
     "2445": {
-        "text": "The root folder can't be synced.[Br]Please, select a subfolder.",
+        "text": "The root folder can't be synced.\nPlease, select a subfolder.",
         "context": "Message displayed when a user is creating incompatible synchronizations."
     },
     "2447": {
@@ -4007,12 +4247,16 @@
         "text": "File import failed",
         "context": "Message of the dialog displayed when fails the process\/request to import an image."
     },
+    "2508": {
+        "text": "File import failed",
+        "context": "Title of the dialog displayed when fails the process\/request to import an image - (String as short as possible)."
+    },
     "2531": {
         "text": "Save image to photos",
         "context": "Title of the dialog displayed when a user want to save a image to the 'saved pictures' album, asking for confirmation to do it - (String as short as possible)."
     },
     "5526": {
-        "text": "MEGA is a secure cloud storage service that gives you 50 GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.[Br]Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.[Br]The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.[Br]Search, store, download, stream, view, share, rename or delete your files. It's all there - in the palm of your hands.[Br]For more info, please check our website: https:\/\/mega.nz\/",
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\r\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\r\nSearch, store, download, stream, view, share, rename or delete your files. It's all there - in the palm of your hands.\r\nFor more info, please check our website: https:\/\/mega.nz\/",
         "context": "Full description text of the app in the Google Play page of the app"
     },
     "5527": {
@@ -4090,6 +4334,14 @@
     "5546": {
         "text": "Upload to",
         "context": "Button text when choosing the destination location in MEGA"
+    },
+    "5547": {
+        "text": "Refresh",
+        "context": "Menu item"
+    },
+    "5548": {
+        "text": "Help",
+        "context": "Menu item"
     },
     "5549": {
         "text": "Upgrade account",
@@ -4210,6 +4462,10 @@
     "5585": {
         "text": "Already have an account?",
         "context": "Question to focus the user to the zone of the app where he\/she can go to login"
+    },
+    "5586": {
+        "text": "You have to accept our Terms of Service.",
+        "context": "warning dialog"
     },
     "5587": {
         "text": "Passwords do not match",
@@ -4383,6 +4639,10 @@
         "text": "Send link",
         "context": "get the link and send it"
     },
+    "5631": {
+        "text": "Share folder",
+        "context": "menu item"
+    },
     "5632": {
         "text": "View shared folders",
         "context": "open a shared folder"
@@ -4406,6 +4666,10 @@
     "5637": {
         "text": "Phone Contacts",
         "context": "when sharing a folder, the user chan choose a contact from the device"
+    },
+    "5638": {
+        "text": "Delete",
+        "context": "menu item"
     },
     "5639": {
         "text": "Contact added",
@@ -4675,6 +4939,10 @@
         "text": "Password too short",
         "context": "error when the user's password has too few letters"
     },
+    "5708": {
+        "text": "You have to accept our Terms of Service",
+        "context": "warning the user that they need to accept MEGA's terms to use the application"
+    },
     "5709": {
         "text": "Remain logged in",
         "context": "Text shown next to a switch button on login, which if it's enabled keeps you logged after the app is closed. Otherwise you will be logged out as soon as the app's gets out of the memory"
@@ -4727,6 +4995,10 @@
         "text": "Capture",
         "context": "Menu option from the `Add` section that allows the user to capture a video or a photo and upload it directly to MEGA."
     },
+    "5722": {
+        "text": "Choose",
+        "context": "Choose photo or video"
+    },
     "5723": {
         "text": "Files shared",
         "context": "The number of files that are shared"
@@ -4734,6 +5006,10 @@
     "5724": {
         "text": "No files in the Cloud Drive",
         "context": "The cloud drive is empty. There are no files"
+    },
+    "5725": {
+        "text": "Empty Folder",
+        "context": "Title shown when a folder doesn't have any files"
     },
     "5726": {
         "text": "Restore",
@@ -4951,6 +5227,10 @@
         "text": "Use TouchID",
         "context": "Use the fingerprint\/biometric ID. TouchID is the Apple name."
     },
+    "5781": {
+        "text": "Change passcode",
+        "context": "Prompt the user to change the passcode"
+    },
     "5782": {
         "text": "Erase all local data",
         "context": "If a passcode is incorrect, erase all local data and logout"
@@ -5030,6 +5310,10 @@
     "5806": {
         "text": "Local cache",
         "context": "The temporary files stored to speed up the application (as it doesn't need to download them over the network)"
+    },
+    "5807": {
+        "text": "Cache",
+        "context": "The header for local storage, temporary files for speeding up the application"
     },
     "5808": {
         "text": "Local storage",
@@ -5136,7 +5420,7 @@
         "context": "Message shown on the app's start animation to explain what MEGA ACCESS means"
     },
     "5835": {
-        "text": "With PhotoSync, the photos you take with your iPhone will be automatically backed up to MEGA.[Br]You can use WiFi or cellular connection and by enabling Background mode the app will upload photos when your location changes significantly.[Br][Br]Passcode lock adds a new layer of security by requiring a four-digit passcode to be entered every time the app is launched. This will protect your files even if your iPhone falls into the wrong hands. There is also an option to erase all data and logout if the wrong password is entered over 10 times.[Br][Br]Various bug fixes and speed improvements.[Br][Br]Your feedback is very important to us and, although we might not answer every email, we read each and every one.[Br][Br]Also, your 5-stars rating in the AppStore is always appreciated.",
+        "text": "With PhotoSync, the photos you take with your iPhone will be automatically backed up to MEGA.\nYou can use WiFi or cellular connection and by enabling Background mode the app will upload photos when your location changes significantly.\n\nPasscode lock adds a new layer of security by requiring a four-digit passcode to be entered every time the app is launched. This will protect your files even if your iPhone falls into the wrong hands. There is also an option to erase all data and logout if the wrong password is entered over 10 times.\n\nVarious bug fixes and speed improvements.\n\nYour feedback is very important to us and, although we might not answer every email, we read each and every one.\n\nAlso, your 5-stars rating in the AppStore is always appreciated.",
         "context": "MEGA description. Please adjust the new line position accordingly"
     },
     "5836": {
@@ -5272,7 +5556,7 @@
         "context": ""
     },
     "5884": {
-        "text": "End call ...[Br]",
+        "text": "End call ...\r\n",
         "context": "end a phonecall"
     },
     "5885": {
@@ -5280,7 +5564,7 @@
         "context": "start a chat\/conversation"
     },
     "5888": {
-        "text": "Call with [X] started.[Br]",
+        "text": "Call with [X] started.\n",
         "context": "Leave [X] as it will be replaced with an email address"
     },
     "5889": {
@@ -5481,6 +5765,10 @@
     },
     "5948": {
         "text": "Failed to get link",
+        "context": ""
+    },
+    "5949": {
+        "text": "Link creation failed",
         "context": ""
     },
     "5950": {
@@ -5808,7 +6096,7 @@
         "context": ""
     },
     "6033": {
-        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card?[Br]Please try to save\/copy the file to your device's internal memory instead.",
+        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card?\r\nPlease try to save\/copy the file to your device's internal memory instead.",
         "context": "A dialog message which is displayed when the process\/request to copy a file failed because the app or the user does not have write permission to copy into the destination (i.e. copy an unsupported file type into an SD card)."
     },
     "6034": {
@@ -5894,6 +6182,10 @@
     "6055": {
         "text": "Creating account...",
         "context": "Label displayed when the account is being created."
+    },
+    "6056": {
+        "text": "Creating folder...",
+        "context": ""
     },
     "6057": {
         "text": "Deleting '{0}'...",
@@ -5999,6 +6291,10 @@
         "text": "registration",
         "context": ""
     },
+    "6086": {
+        "text": "Downloading...",
+        "context": ""
+    },
     "6087": {
         "text": "your e-mail address",
         "context": ""
@@ -6071,8 +6367,16 @@
         "text": "Type a new name:",
         "context": ""
     },
+    "6106": {
+        "text": "Save",
+        "context": "A label for any Save button, link or title for saving a setting, image, etc."
+    },
     "6107": {
         "text": "share",
+        "context": ""
+    },
+    "6108": {
+        "text": "Size:",
         "context": ""
     },
     "6109": {
@@ -6122,6 +6426,10 @@
     "6120": {
         "text": "Pausing...",
         "context": ""
+    },
+    "6121": {
+        "text": "About",
+        "context": "Label for the title of the \"About\" section where show the app version, the SDK version, etc. - (String as short as possible)."
     },
     "6122": {
         "text": "We want to special thank the following companies\/people for making this app possible:",
@@ -6202,6 +6510,14 @@
     "6141": {
         "text": "acknowledgements",
         "context": ""
+    },
+    "6142": {
+        "text": "Always ask for download location",
+        "context": ""
+    },
+    "6143": {
+        "text": "Cache",
+        "context": "A label for any Cache button, link, text, title, etc. Cache mean cache memory."
     },
     "6144": {
         "text": "cancel all",
@@ -6459,6 +6775,10 @@
         "text": "I find the interface too confusing to use",
         "context": "Account closure, feedback dialog."
     },
+    "6234": {
+        "text": "PRO Lite",
+        "context": "The new LITE payment plan. This means it is a light or lightweight payment plan compared to the full \/ heavyweight plans with lots of bandwidth and storage (PRO I, PRO II, PRO III)."
+    },
     "6240": {
         "text": "Windows Phone App",
         "context": ""
@@ -6476,7 +6796,7 @@
         "context": ""
     },
     "6690": {
-        "text": "Go to My Account[Br]",
+        "text": "Go to My Account\r\n",
         "context": ""
     },
     "6771": {
@@ -6548,7 +6868,7 @@
         "context": "Title of the button to empty the Rubbish Bin (action!)"
     },
     "6795": {
-        "text": "Are you sure you want to permanently remove all items from your rubbish bin?[Br]You cannot undo this action.",
+        "text": "Are you sure you want to permanently remove all items from your rubbish bin?\r\nYou cannot undo this action.",
         "context": "Warn the user that by emptying the Rubbish Bin the files will be permanently deleted and the action cannot be reversed!"
     },
     "6796": {
@@ -6622,6 +6942,10 @@
     "6822": {
         "text": "Subscription cancellation",
         "context": ""
+    },
+    "6826": {
+        "text": "Continue",
+        "context": "\"Next\" button in a dialog"
     },
     "6831": {
         "text": "Caution! You have elected to close your MEGA account. The account under this email address will be permanently closed and this can not be undone.",
@@ -6863,8 +7187,12 @@
         "text": "Import folder",
         "context": "Item menu option upon right click on one or multiple files."
     },
+    "6915": {
+        "text": "Used Space",
+        "context": "Headline for the amount of storage space is used"
+    },
     "6916": {
-        "text": "You're running out of space![Br]Do you want to upgrade your account?",
+        "text": "You're running out of space!\r\nDo you want to upgrade your account?",
         "context": "Warning in Cloud Drive when the user is running out of space"
     },
     "6917": {
@@ -7143,8 +7471,12 @@
         "text": "Please enter the reason below",
         "context": "Asks the user to enter the reason why they cancelled their subscription."
     },
+    "7006": {
+        "text": "Loading...",
+        "context": "Label to show when an account detail request is waiting for the server response."
+    },
     "7007": {
-        "text": "Local folder too large (this version is limited to %1 folders or %2 files.[Br]Please, select another folder.",
+        "text": "Local folder too large (this version is limited to %1 folders or %2 files.\nPlease, select another folder.",
         "context": ""
     },
     "7009": {
@@ -7164,7 +7496,7 @@
         "context": "Label to indicate the type of installation. Preserve $(^NameDA)  and $(^ClickNext) codes."
     },
     "7019": {
-        "text": "There was a problem installing the update. Please try again later or download the last version from:[Br]https:\/\/mega.nz\/#sync",
+        "text": "There was a problem installing the update. Please try again later or download the last version from:\r\nhttps:\/\/mega.nz\/#sync",
         "context": "Notification message launched when a problem occurs during the installation of an update. Keep \"\n\" codes."
     },
     "7020": {
@@ -7172,7 +7504,7 @@
         "context": "Notification message launched when a user is cheking if there are any available updates."
     },
     "7021": {
-        "text": "Synchronization will stop.[Br][Br]Exit anyway?",
+        "text": "Synchronization will stop.\n\nExit anyway?",
         "context": "Message displayed when a user is exiting the application while there are any active synchronization. Keep \"\n\" codes and capital letters."
     },
     "7022": {
@@ -7180,7 +7512,7 @@
         "context": "Label of tray icon to indicate that MEGAsync is starting."
     },
     "7023": {
-        "text": "Unable to get the filesystem.[Br]Please, try again. If the problem persists please contact bug@mega.nz",
+        "text": "Unable to get the filesystem.\r\nPlease, try again. If the problem persists please contact bug@mega.nz",
         "context": "Message displayed when an error occurs while fetching nodes from the server."
     },
     "7025": {
@@ -7248,11 +7580,11 @@
         "context": "Label to indicate the user that remote folders are being retrieving to be displayed (String short as possible)"
     },
     "7042": {
-        "text": "You have %1 in this folder.[Br]Are you sure you want to sync it?",
+        "text": "You have %1 in this folder.\nAre you sure you want to sync it?",
         "context": ""
     },
     "7043": {
-        "text": "Invalid folder for synchronization.[Br]Please, ensure that you don't use characters like '' '\/' or ':' in your folder names.",
+        "text": "Invalid folder for synchronization.\r\nPlease, ensure that you don't use characters like '' '\/' or ':' in your folder names.",
         "context": "Message displayed when a user is trying to create a synchronization using not allowed characthers. Keep  '\\' '\/' and ':' codes."
     },
     "7044": {
@@ -7292,7 +7624,7 @@
         "context": ""
     },
     "7054": {
-        "text": "Enter a name to exclude from synchronization.[Br](wildcards * and ? are allowed):",
+        "text": "Enter a name to exclude from synchronization.\n(wildcards * and ? are allowed):",
         "context": "Label to let the user add a new excluded file name. Keep colon."
     },
     "7055": {
@@ -7348,7 +7680,7 @@
         "context": "Label displayed while the application is retrieving all file list from the server."
     },
     "7075": {
-        "text": "You have %1 in your Cloud Drive.[Br]Are you sure you want to sync your entire Cloud Drive?",
+        "text": "You have %1 in your Cloud Drive.\nAre you sure you want to sync your entire Cloud Drive?",
         "context": ""
     },
     "7077": {
@@ -7700,7 +8032,7 @@
         "context": "upload to. Then choose a file which is not an Image, an Audio or a Video"
     },
     "7183": {
-        "text": "You can be a PRO user![Br]Do you want to upgrade your account?",
+        "text": "You can be a PRO user!\r\nDo you want to upgrade your account?",
         "context": "Message to promote Pro accounts"
     },
     "7184": {
@@ -8079,6 +8411,10 @@
         "text": "Error adding contact",
         "context": "Error message shown when it hasn't been posible to add a contact"
     },
+    "7287": {
+        "text": "Contact added",
+        "context": "Message of the dialog displayed when add a contact successfully."
+    },
     "7288": {
         "text": "Background agents for MEGA have been disabled by the user",
         "context": "Message of the dialog displayed in cases when the user has disabled background agents for this application"
@@ -8179,6 +8515,10 @@
         "text": "{85DBF3E5-51E8-40BB-968C-8857B4FC6EF4}",
         "context": ""
     },
+    "7314": {
+        "text": "Rubbish bin",
+        "context": "Label for any 'Rubbish bin' button, link, text, etc. - (String as short as possible)."
+    },
     "7315": {
         "text": "Start",
         "context": "Label for any 'Start' button, link, text, title, etc. - (String as short as possible)."
@@ -8246,6 +8586,10 @@
     "7331": {
         "text": "Sort",
         "context": "Label for any 'Sort' button, link, text, etc. - (String as short as possible)."
+    },
+    "7332": {
+        "text": "Empty rubbish bin",
+        "context": "Label for any 'Empty rubbish' button, link, text, etc. - (String as short as possible).This indicates an action to clear rubbish bin."
     },
     "7333": {
         "text": "Ok",
@@ -8731,6 +9075,10 @@
         "text": "Generating link...",
         "context": "Message shown when a link to the file is being generated"
     },
+    "7485": {
+        "text": "The link has been removed",
+        "context": "Message shown when the link to a file has been removed"
+    },
     "7486": {
         "text": "1 file moved",
         "context": "Success message shown when you have moved 1 file"
@@ -8855,6 +9203,10 @@
         "text": "%lu photo",
         "context": "Title shown on the Camera Uploads section that specifies the number of photos uploaded during a month. \"{1} photo\""
     },
+    "7520": {
+        "text": "Camera Uploads enabled",
+        "context": "Success message shown when Camera Uploads has been enabled"
+    },
     "7521": {
         "text": "%lu item selected",
         "context": "Title shown on the Camera Uploads section when the edit mode is enabled and you have selected one photo"
@@ -8878,6 +9230,10 @@
     "7526": {
         "text": "Add from contacts",
         "context": "Item menu option to add a contact through your device app Contacts"
+    },
+    "7527": {
+        "text": "Contact added",
+        "context": "Success message shown when a contact has been added"
     },
     "7528": {
         "text": "Are you sure you want to remove %@ from your contact list?",
@@ -9099,6 +9455,10 @@
         "text": "Clean up transfers",
         "context": "Label for any 'Clean up transfers' button, link, text, title, etc. - (String as short as possible, MAX 15 characters)."
     },
+    "7601": {
+        "text": "Clear cache",
+        "context": "Label for any 'Clean cache' button, link, text, title, etc. - (String as short as possible)."
+    },
     "7602": {
         "text": "Clear selection",
         "context": "Label for any 'Clear selection' button, link, text, title, etc. - (String as short as possible)."
@@ -9135,6 +9495,14 @@
         "text": "Create one",
         "context": "Button that brings you to a section where you can create an account."
     },
+    "7611": {
+        "text": "1 file moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved 1 file to the rubbish bin"
+    },
+    "7612": {
+        "text": "%d files moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved {1+} files to the rubbish bin"
+    },
     "7613": {
         "text": "1 folder moved to the Rubbish Bin",
         "context": "Success message shown when you have moved 1 folder to the rubbish bin"
@@ -9158,6 +9526,14 @@
     "7618": {
         "text": "[A] files and [B] folders moved to the Rubbish Bin",
         "context": "Success message shown when you have moved [A] = {1+} files and [B] = {1+} folders to the rubbish bin"
+    },
+    "7619": {
+        "text": "1 file removed from MEGA",
+        "context": "Success message shown when 1 file has been removed from MEGA."
+    },
+    "7620": {
+        "text": "%d files removed from MEGA",
+        "context": "Success message shown when 1 or more files have been removed from MEGA."
     },
     "7621": {
         "text": "1 folder removed from MEGA",
@@ -9288,7 +9664,7 @@
         "context": "Button text to hide the less popular languages that are available in the language selection dialog."
     },
     "7659": {
-        "text": "You have been suspended due to excess data usage. [Br]Please contact support@mega.nz to get your account reinstated.",
+        "text": "You have been suspended due to excess data usage. \r\nPlease contact support@mega.nz to get your account reinstated.",
         "context": "Error message when a given user with a suspended account tries to login. The user is suspended due excess of data usage. "
     },
     "7660": {
@@ -9727,6 +10103,10 @@
         "text": "In-App Purchases is disabled, please enable it in the iOS Settings",
         "context": "Error message shown the In-App Purchase is disabled in the iOS Settings"
     },
+    "7868": {
+        "text": "Upload",
+        "context": "Title of the Upload button."
+    },
     "7869": {
         "text": "This email address has already been registered. Please choose an alternative email address to proceed.",
         "context": "A message in an error dialog when the user is trying to change email address. It informs the user that the new email address they entered is already in use and that they must enter a different one."
@@ -10030,6 +10410,10 @@
     "8039": {
         "text": "Servers too busy. Please wait\u2026",
         "context": "Message displayed when servers are too busy. Please translate it using strings as short as possible."
+    },
+    "8040": {
+        "text": "Item successfully removed",
+        "context": "Message of the dialog displayed when the program successfully removed a node from the rubbish bin."
     },
     "8041": {
         "text": "Do you want to remove the contact {0}?",
@@ -10343,6 +10727,10 @@
         "text": "Are you sure you want to delete these items permanently?",
         "context": "Confirmation message for removing files\/folders."
     },
+    "8448": {
+        "text": "Please confirm",
+        "context": "Confirmation message before removing a file."
+    },
     "8450": {
         "text": "Please log in to share with MEGA.",
         "context": "Error message displayed when the user tries to share something to MEGA without logging in."
@@ -10366,6 +10754,10 @@
     "8455": {
         "text": "Share Permissions",
         "context": "Title of the dialog to choose permissions when sharing."
+    },
+    "8456": {
+        "text": "Link without key",
+        "context": "This is button text on the Get Link dialog. This lets the user get a public file\/folder link without the decryption key e.g. https:\/\/mega.nz\/#!Qo12lSpT."
     },
     "8457": {
         "text": "Transferring\u2026",
@@ -11215,6 +11607,10 @@
         "text": "PRO Only",
         "context": "A label to indicate that this is a PRO only feature. For example, the user needs a PRO account to set an expiry date on their public link."
     },
+    "8696": {
+        "text": "Upgrade to PRO",
+        "context": "A button label which when clicked will take the user to the PRO page to purchase a PRO plan."
+    },
     "8697": {
         "text": "Select date",
         "context": "A text label inside the date picker to tell the user to select the date."
@@ -11883,6 +12279,10 @@
         "text": "%1 and %2 are typing",
         "context": "Two participants are typing at the same time and this hint in chat tells us that. Please keep %1 and %2 within your translation as they are replaced with the names of the participants."
     },
+    "8873": {
+        "text": "Read-only",
+        "context": "The read only permission in chat."
+    },
     "8874": {
         "text": "Standard",
         "context": "The Standard permission level in chat. With the standard permissions a participant can read and type messages in a chat."
@@ -12055,6 +12455,10 @@
         "text": "No pending requests",
         "context": "Title shown when there's no pending contact requests"
     },
+    "8921": {
+        "text": "Export Recovery Key",
+        "context": "Title shown when you try to export your MEGA Recovery Key"
+    },
     "8922": {
         "text": "Recovery Key exported",
         "context": "Alert title shown when you have exported your MEGA Recovery Key"
@@ -12083,9 +12487,17 @@
         "text": "Backup Key",
         "context": "Button label to export recovery key of the current user. String as short as possible."
     },
+    "8929": {
+        "text": "Backup Recovery Key",
+        "context": "Title of dialog to backup the recovery key for the current user."
+    },
     "8930": {
         "text": "Always keep physical control of your Recovery Key (e.g. on a client device, external storage, or print).",
         "context": "Label to inform the user to keep physical control of the recovery key."
+    },
+    "8931": {
+        "text": "Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.",
+        "context": "Advising the user to keep the user's recovery key safe."
     },
     "8937": {
         "text": "Failed to import folder. Please try again.",
@@ -12179,6 +12591,10 @@
         "text": "Backup your Recovery Key",
         "context": "Title of the screen to backup the master key"
     },
+    "8964": {
+        "text": "Your password unlocks your Recovery Key",
+        "context": "Subtitle of the screen to backup the master key"
+    },
     "8965": {
         "text": "Copy the Recovery Key to clipboard or save it as text file",
         "context": "Sentence to inform the user the available actions in the screen to backup the master key"
@@ -12210,6 +12626,10 @@
     "8972": {
         "text": "If you don't, you can still export your Recovery Key now in this MEGA session. Please, go back and backup your recovery key.",
         "context": "Second paragraph of the screen when the password has been forgotten and the user is still logged in"
+    },
+    "8973": {
+        "text": "Do you have a backup of your Recovery Key?",
+        "context": "Sentence to ask to the user if he has the master key in the screen when the password has been forgotten"
     },
     "8974": {
         "text": "email goes here",
@@ -12347,6 +12767,10 @@
         "text": "The key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
         "context": "Alert when the user introduces his master key to reset pass incorrectly"
     },
+    "9009": {
+        "text": "Invalid Recovery Key",
+        "context": "An alert title where the user provided the incorrect Recovery Key."
+    },
     "9010": {
         "text": "No pictures uploaded",
         "context": "A message that indicates that no pictures have been uploaded to the Camera Uploads section."
@@ -12468,7 +12892,7 @@
         "context": "Small text to make clear the Network Diagnostic tools do not support folder links at the moment."
     },
     "9041": {
-        "text": "You have not selected a default download location for your files.[Br][Br]To proceed with the download, please select a destination folder or go to settings in order to set up your default download location.",
+        "text": "You have not selected a default download location for your files.\r\n\r\nTo proceed with the download, please select a destination folder or go to settings in order to set up your default download location.",
         "context": "Message of the dialog displayed when a user want to download some nodes and the app doesn't have configured a default download location. Asks the user to select a location for this download or configure a default location."
     },
     "9042": {
@@ -13403,12 +13827,16 @@
         "text": "File Management",
         "context": "A section header which contains the file management settings. These settings allow users to remove duplicate files etc."
     },
+    "16161": {
+        "text": "Transfer quota exceeded",
+        "context": "Free users have limited transfer quota and when exceeded this message will be shown during the download. If you have difficulty translating the word \"quota\" you could also translate \"Transfer limit exceeded\" or \"Data limit exceeded\"."
+    },
     "16164": {
         "text": "Limited available transfer quota",
         "context": "A warning header\/title. This informs the user that their transfer quota is limited for the current membership plan."
     },
     "16165": {
-        "text": "Your transfer may be interrupted.[BR][Br][S]Get a PRO account[\/S] for increased transfer quota.",
+        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a PRO account[\/S] for increased transfer quota.",
         "context": "This informs the user that their transfer quota is limited for their current membership plan. The user can buy a PRO plan to increase their transfer quota. Please leave the [BR], [S] and [\/S] tags."
     },
     "16166": {
@@ -13836,7 +14264,7 @@
         "context": "Dialog header. Informs user that he\u2019ve reached the full capacity of Cloud Drive for Free accounts."
     },
     "16304": {
-        "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. [Br]PRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
+        "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. \r\nPRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
         "context": "A dialog message indicating what you can get with a PRO plan. Please leave the placeholders [A], [\/A], [S], [\/S] as they are."
     },
     "16305": {
@@ -14031,6 +14459,10 @@
         "text": "See our plans",
         "context": "A button label which leads to page where the user can buy a PRO plan."
     },
+    "16354": {
+        "text": "Learn more",
+        "context": "A link which leads to the help center where the user can get more information."
+    },
     "16355": {
         "text": "Tip: This limit is dynamic and depends on the amount of unused bandwidth we have available.",
         "context": "An information message about limited transfer quota."
@@ -14092,7 +14524,7 @@
         "context": "Paragraph 4 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
     },
     "16373": {
-        "text": "For more info, please check our website:[Br]Mobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html[Br]Desktop - https:\/\/mega.nz\/",
+        "text": "For more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/",
         "context": "Paragraph 6 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone. Please keep the multiple line format."
     },
     "16374": {
@@ -14188,7 +14620,7 @@
         "context": "Header of block with achievements bonuses."
     },
     "16406": {
-        "text": "[1]Park your MEGA account[Br][Br][2]It looks like you have forgotten your password and do not have a backup of your Recovery Key.[Br][Br][3]If you proceed, the existing account under this address will be parked (deactivated), and you will start a fresh account under your existing email address. By doing this you will lose access to your data, but the data will still be preserved for at least another 60 days. Should you remember the deactivated account's password or locate its previously exported Recovery Key, please contact [A1]support@mega.nz[\/A1] to have it restored.[Br][Br][4]Even if you manage to restore the deactivated account, all associated contacts and shares will remain deleted and need to be re-established.[Br][Br][5]Park my Account[Br][Br][6]Didn't work? No worries. Copy and paste this link below into your web browser:",
+        "text": "[1]Park your MEGA account\r\n\r\n[2]It looks like you have forgotten your password and do not have a backup of your Recovery Key.\r\n\r\n[3]If you proceed, the existing account under this address will be parked (deactivated), and you will start a fresh account under your existing email address. By doing this you will lose access to your data, but the data will still be preserved for at least another 60 days. Should you remember the deactivated account's password or locate its previously exported Recovery Key, please contact [A1]support@mega.nz[\/A1] to have it restored.\r\n\r\n[4]Even if you manage to restore the deactivated account, all associated contacts and shares will remain deleted and need to be re-established.\r\n\r\n[5]Park my Account\r\n\r\n[6]Didn't work? No worries. Copy and paste this link below into your web browser:",
         "context": "EDIT: Reworded to emphasise the word Park, to align with our website pages better.\r\n\r\nThe 'reset my account' email body received when somebody requests to park their account. MEGA needs them to click the link to confirm their password.\r\n\r\nPlease do not translate or modify anything inside square brackets (do not change [1] or [A1] )"
     },
     "16407": {
@@ -14200,23 +14632,23 @@
         "context": "A line of text within an email that guides the user to click on the link that follows, or to copy and paste it into their browser."
     },
     "16410": {
-        "text": "[1]MEGA Account Expiry Warning[Br][Br][2]We noticed that there hasn't been any activity on your MEGA account since [B][$month] [$day], [$year][\/B].[Br][Br][3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A1]Terms of Service[\/A1]) if you don\u2019t log in at [A2]mega.nz[\/A2] within the next 30 (thirty) days[\/B].[Br][Br][4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.[Br][Br][5]Login at MEGA",
+        "text": "[1]MEGA Account Expiry Warning\r\n\r\n[2]We noticed that there hasn't been any activity on your MEGA account since [B][$month] [$day], [$year][\/B].\r\n\r\n[3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A1]Terms of Service[\/A1]) if you don\u2019t log in at [A2]mega.nz[\/A2] within the next 30 (thirty) days[\/B].\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.\r\n\r\n[5]Login at MEGA",
         "context": "Update: The words 'close your account' have been removed.\r\n\r\nEmail body for Account expiry email. This is sent to users when they have been inactive for a long time.\r\nPlease do not translate anything inside the square brackets, just leave them alone and in the same place (i.e. do not change [1] or [A1] etc)."
     },
     "16412": {
-        "text": "[1]MEGA Account Expiry Final Warning[Br][Br][2][B]Your [A1]$megaemail[\/A1] MEGA account is due to expire in 7 days[\/B] as there has not been any activity on it since [$month] [$day], [$year].[Br][Br][3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A2]Terms of Service[\/A2]) if you don\u2019t log in at [A3]mega.nz[\/A3] within the next 7 (seven) days[\/B][Br][Br][4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.",
+        "text": "[1]MEGA Account Expiry Final Warning\r\n\r\n[2][B]Your [A1]$megaemail[\/A1] MEGA account is due to expire in 7 days[\/B] as there has not been any activity on it since [$month] [$day], [$year].\r\n\r\n[3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A2]Terms of Service[\/A2]) if you don\u2019t log in at [A3]mega.nz[\/A3] within the next 7 (seven) days[\/B]\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.",
         "context": "Update: The words 'close your account' have been removed\r\n\r\nEmail body of the final warning email we send to users who have been inactive too long.\r\n\r\nPlease do not translate the text inside the square brackets (i.e Do not change the [1], [A1] tags etc).\r\nThey will be replaced by links."
     },
     "16413": {
-        "text": "[1]MEGA Bonus Unlocked[Br][Br][2]Congratulations, we have just activated your mobile app install achievement bonus. You have earned [$storageearnedgb] storage quota and [$transferearnedgb] transfer quota, which will be valid for [$durationdays] days.[Br][Br][3]Need more storage or transfer quota? Let others know about the benefits of end-to-end encrypted cloud storage and invite them to MEGA![Br][Br][4]Achieve More[Br][Br][5]To view the status of your achievements or achieve more, click below:",
+        "text": "[1]MEGA Bonus Unlocked\r\n\r\n[2]Congratulations, we have just activated your mobile app install achievement bonus. You have earned [$storageearnedgb] storage quota and [$transferearnedgb] transfer quota, which will be valid for [$durationdays] days.\r\n\r\n[3]Need more storage or transfer quota? Let others know about the benefits of end-to-end encrypted cloud storage and invite them to MEGA!\r\n\r\n[4]Achieve More\r\n\r\n[5]To view the status of your achievements or achieve more, click below:",
         "context": "Email body of the email sent to users who have just had their mobile app achievement activated.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16414": {
-        "text": "[1]MEGA Install Bonus[Br][Br][2]Great, thanks for installing the MEGA mobile app! It can take a few days for your installation achievement bonus to be authorised. Please note that you will not receive an achievement credit if you have used a different MEGA account in the past.[Br][Br][3]Achievements",
+        "text": "[1]MEGA Install Bonus\r\n\r\n[2]Great, thanks for installing the MEGA mobile app! It can take a few days for your installation achievement bonus to be authorised. Please note that you will not receive an achievement credit if you have used a different MEGA account in the past.\r\n\r\n[3]Achievements",
         "context": "Email body of the email sent when users install the MEGA mobile app.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16415": {
-        "text": "[1]MEGA Invitation[Br][Br][2]The user with the email [R][$cred][\/R] has sent you an invitation to join MEGA.[Br][Br][3]Join [R][$cred][\/R] on MEGA by clicking below:[Br][Br][4]Create Account[Br]",
+        "text": "[1]MEGA Invitation\r\n\r\n[2]The user with the email [R][$cred][\/R] has sent you an invitation to join MEGA.\r\n\r\n[3]Join [R][$cred][\/R] on MEGA by clicking below:\r\n\r\n[4]Create Account\r\n",
         "context": "Email body sent to unregistered users when other user invites them.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16416": {
@@ -14228,23 +14660,23 @@
         "context": "Phrase used in emails, that appears after a button. If the button didn't work the user is encouraged to try the link below directly, or copied into their browser"
     },
     "16421": {
-        "text": "[1]MEGA Invitation[Br][Br][2]The user with the email [R][$cred][\/R] has sent you a contact invitation.[Br][Br][3]Head to MEGA to accept the invite and get connected with [R][$cred][\/R][Br][Br][4]Take me to MEGA[Br]",
+        "text": "[1]MEGA Invitation\r\n\r\n[2]The user with the email [R][$cred][\/R] has sent you a contact invitation.\r\n\r\n[3]Head to MEGA to accept the invite and get connected with [R][$cred][\/R]\r\n\r\n[4]Take me to MEGA\r\n",
         "context": "(edit:Mega changed to MEGA)\r\n\r\nEmail body sent to registered users when other user invites them.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16422": {
-        "text": "[1]MEGA[Br][Br][2]The user with the email [R][$cred][\/R] is waiting for you to join MEGA.[Br][Br][3]It's free and easy to set up and you will get a generous free storage allocation on the world's most secure cloud storage service.[Br][Br][4]Join MEGA[Br]",
+        "text": "[1]MEGA\r\n\r\n[2]The user with the email [R][$cred][\/R] is waiting for you to join MEGA.\r\n\r\n[3]It's free and easy to set up and you will get a generous free storage allocation on the world's most secure cloud storage service.\r\n\r\n[4]Join MEGA\r\n",
         "context": "Email body sent to remind unregistered users that other user invites them and they haven't signed up yet.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16423": {
-        "text": "[1]MEGA Invitation[Br][Br][2][R][$cred][\/R] wants to share a folder with you.[Br][Br][3]To receive shared folders from MEGA users, you will need a MEGA account. It's free and easy to set up, and you will get a generous free storage allocation on the world's most secure major cloud storage service.[Br][Br][4]Join MEGA[Br][Br][5]Please note that the shared folder will only appear if its owner is connected to MEGA during or after your signup. This is because our end-to-end encryption paradigm requires the folder owner to transmit the secret folder key to you securely using asymmetric cryptography so that nobody can intercept it, not even MEGA.[Br][Br][6]Click below to get started with MEGA:[Br]",
+        "text": "[1]MEGA Invitation\r\n\r\n[2][R][$cred][\/R] wants to share a folder with you.\r\n\r\n[3]To receive shared folders from MEGA users, you will need a MEGA account. It's free and easy to set up, and you will get a generous free storage allocation on the world's most secure major cloud storage service.\r\n\r\n[4]Join MEGA\r\n\r\n[5]Please note that the shared folder will only appear if its owner is connected to MEGA during or after your signup. This is because our end-to-end encryption paradigm requires the folder owner to transmit the secret folder key to you securely using asymmetric cryptography so that nobody can intercept it, not even MEGA.\r\n\r\n[6]Click below to get started with MEGA:\r\n",
         "context": "[4]Join Mega has been changed to [4]Join MEGA\r\n\r\nEmail body sent to unregistered users when another user invites them and has a folder to share.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are)\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16424": {
-        "text": "[1]MEGA Invitation[Br][Br][2][R][$cred][\/R] wants to share a folder with you.[Br][Br][3]Head to MEGA to accept the invite and get started with [R][$cred][\/R][Br][Br][4]Take me to MEGA[Br]",
+        "text": "[1]MEGA Invitation\r\n\r\n[2][R][$cred][\/R] wants to share a folder with you.\r\n\r\n[3]Head to MEGA to accept the invite and get started with [R][$cred][\/R]\r\n\r\n[4]Take me to MEGA\r\n",
         "context": "Email body sent to registered users when another user invites them and has a folder to share.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16425": {
-        "text": "[1]MEGA Email Verification Required[Br][Br][2]You have one more step remaining to activate your MEGA account.[Br][Br][3]Click on the button below to verify your email address:[Br][Br][4]Verify my email[Br][Br][5]Click on the link below to verify your email address:",
+        "text": "[1]MEGA Email Verification Required\r\n\r\n[2]You have one more step remaining to activate your MEGA account.\r\n\r\n[3]Click on the button below to verify your email address:\r\n\r\n[4]Verify my email\r\n\r\n[5]Click on the link below to verify your email address:",
         "context": "Email body of signup confirmation email when the user needs to click the link to verify their email in order to register their account and get started properly using Mega.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [2] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
     },
     "16426": {
@@ -14252,23 +14684,23 @@
         "context": "Text for the ios signup confirmation email, that helps users try the ios-specific link format below this text."
     },
     "16427": {
-        "text": "[1]MEGA Account Closed[Br][Br][2]You have closed your [R][$megaemail][\/R] MEGA account. If you did not initiate this closure, please contact [A1]support@mega.nz[\/A1][Br][Br][3]We would like to thank you once more for using MEGA. You are welcome back any time.",
+        "text": "[1]MEGA Account Closed\r\n\r\n[2]You have closed your [R][$megaemail][\/R] MEGA account. If you did not initiate this closure, please contact [A1]support@mega.nz[\/A1]\r\n\r\n[3]We would like to thank you once more for using MEGA. You are welcome back any time.",
         "context": "Email body for the confirmation email sent when a user closes their account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1], [$megaemail], and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16428": {
-        "text": "[1]MEGAchat Notification[Br][Br][2]You have received new encrypted chat messages on MEGAchat while you were offline.[Br][Br][3]Chat securely at MEGA",
+        "text": "[1]MEGAchat Notification\r\n\r\n[2]You have received new encrypted chat messages on MEGAchat while you were offline.\r\n\r\n[3]Chat securely at MEGA",
         "context": "Edit: \"MEGA chat\" changed to \"MEGAchat\".\r\n\r\nEmail body for notification email sent when a user has received a chat message while they were inactive or offline.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [2] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
     },
     "16429": {
-        "text": "[1]MEGA Account Closure[Br][Br][2]Caution: You have elected to close your MEGA account. The account under this email address will be permanently closed and your data deleted. This can not be undone.[Br][Br][3]By completing this action, you will lose access to all your uploaded data, shares, and contacts. Any remaining account balance or PRO quota will be voided.[Br][Br][4]If you have a paid MEGA subscription with [A1]Apple[\/A1] or [A2]Google[\/A2], then you must cancel it separately at Apple iTunes or Google Play, as MEGA is not able to cancel it for you.[Br][Br][5]Close my Account",
+        "text": "[1]MEGA Account Closure\r\n\r\n[2]Caution: You have elected to close your MEGA account. The account under this email address will be permanently closed and your data deleted. This can not be undone.\r\n\r\n[3]By completing this action, you will lose access to all your uploaded data, shares, and contacts. Any remaining account balance or PRO quota will be voided.\r\n\r\n[4]If you have a paid MEGA subscription with [A1]Apple[\/A1] or [A2]Google[\/A2], then you must cancel it separately at Apple iTunes or Google Play, as MEGA is not able to cancel it for you.\r\n\r\n[5]Close my Account",
         "context": "Email body of email sent when a user is starting the process to close their account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16430": {
-        "text": "[1]MEGA Confirm New Email[Br][Br][2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:[Br][Br][3]Confirm New Email[Br][Br][4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.[Br]",
+        "text": "[1]MEGA Confirm New Email\r\n\r\n[2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:\r\n\r\n[3]Confirm New Email\r\n\r\n[4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.\r\n",
         "context": "Email body for when a user needs to confirm their new email address. It emphasises that it will not be a second email, but will replace their current one on their Mega account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16431": {
-        "text": "[1]MEGA Password Reset[Br][Br][2]You can easily reset your MEGA account password with your Recovery Key.[Br][Br][3]Reset your password[Br][Br][4]This request originated from IP address: [R][$cred][\/R]",
+        "text": "[1]MEGA Password Reset\r\n\r\n[2]You can easily reset your MEGA account password with your Recovery Key.\r\n\r\n[3]Reset your password\r\n\r\n[4]This request originated from IP address: [R][$cred][\/R]",
         "context": "EDIT: Recovery changed to reset a few times.\r\n\r\nEmail body for the password reset email where the user has their Master Key (Recovery Key)\r\nPlease do not translate the text inside square brackets (i.e. leave the [1],[$cred], and [R] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16432": {
@@ -14276,31 +14708,31 @@
         "context": "Paragraph in an email related to how a user can use the MEGA achievement program to get more storage and transfer quota."
     },
     "16433": {
-        "text": "[1]Visit [A1]mega.nz\/account[\/A1] to see a breakdown of your usage. Please note your rubbish counts toward your usage, and may need to be cleared to free up space.[Br][Br][2]To continue to use MEGA, please upgrade to one of our paid plans, or buy a larger plan. [B]You have 7 days left to take action[\/B]. If the account remains over quota after [R][$lastdate][\/R], MEGA will automatically clear your rubbish bin in an attempt to remedy the situation for your convenience.[Br]",
+        "text": "[1]Visit [A1]mega.nz\/account[\/A1] to see a breakdown of your usage. Please note your rubbish counts toward your usage, and may need to be cleared to free up space.\r\n\r\n[2]To continue to use MEGA, please upgrade to one of our paid plans, or buy a larger plan. [B]You have 7 days left to take action[\/B]. If the account remains over quota after [R][$lastdate][\/R], MEGA will automatically clear your rubbish bin in an attempt to remedy the situation for your convenience.\r\n",
         "context": "Email body for email sent when user has been over their storage quota limit for nearly 30 days. This is the final warning before Mega will clear their rubbish bin.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate.\r\n"
     },
     "16435": {
-        "text": "[1]MEGA Password Change[Br][Br][2]Click on the button below to change your password.[Br][Br][3]Click on the link below to change your password. [Br][Br][4]You will need to enter your current password before you can choose a new one.[Br][Br][5]Change Password[Br][Br][6]If you didn't make this request, you can ignore and delete this email. If you need more assistance, please contact our support team at [A1]support@mega.nz[\/A1]",
+        "text": "[1]MEGA Password Change\r\n\r\n[2]Click on the button below to change your password.\r\n\r\n[3]Click on the link below to change your password. \r\n\r\n[4]You will need to enter your current password before you can choose a new one.\r\n\r\n[5]Change Password\r\n\r\n[6]If you didn't make this request, you can ignore and delete this email. If you need more assistance, please contact our support team at [A1]support@mega.nz[\/A1]",
         "context": "Email body for the change password confirmation step.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16436": {
-        "text": "[1]MEGA Password Has Been Changed[Br][Br][2]Your MEGA account's password has been changed. If you didn't make this request, please contact our support team at [A1]support@mega.nz[\/A1][Br]",
+        "text": "[1]MEGA Password Has Been Changed\r\n\r\n[2]Your MEGA account's password has been changed. If you didn't make this request, please contact our support team at [A1]support@mega.nz[\/A1]\r\n",
         "context": "Email body text for the email sent after the user has changed their password on MEGA.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16437": {
-        "text": "[1]MEGA Account Suspended - Repeat Infringer[Br][Br][2]YOUR ACCOUNT HAS BEEN SUSPENDED OVER REPEATED ALLEGATIONS OF COPYRIGHT INFRINGEMENTS.[Br][Br][3]Please do not hesitate to contact us at [A1]legal@mega.nz[\/A1] if you believe the allegations are false.[Br][Br][4]Please be reminded that MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.[Br][Br][5]Pursuant to our Terms of Service, accounts found to be repeat infringers are subject to termination. Full details, including how to file a counter notification, are specified in MEGA's [A2]Terms of Service[\/A2], [A3]Copyright[\/A3] and [A4]Takedown Guidance[\/A4]",
+        "text": "[1]MEGA Account Suspended - Repeat Infringer\r\n\r\n[2]YOUR ACCOUNT HAS BEEN SUSPENDED OVER REPEATED ALLEGATIONS OF COPYRIGHT INFRINGEMENTS.\r\n\r\n[3]Please do not hesitate to contact us at [A1]legal@mega.nz[\/A1] if you believe the allegations are false.\r\n\r\n[4]Please be reminded that MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.\r\n\r\n[5]Pursuant to our Terms of Service, accounts found to be repeat infringers are subject to termination. Full details, including how to file a counter notification, are specified in MEGA's [A2]Terms of Service[\/A2], [A3]Copyright[\/A3] and [A4]Takedown Guidance[\/A4]",
         "context": "Email body of suspension email, sent to users who have repeatedly infringed upon copyrighted materials.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16438": {
-        "text": "[1]MEGA Claim of Alleged Infringement \/ Takedown[Br][Br][2]We are in receipt of a takedown notice affecting the following public link in your account:[Br][Br][3]Link:[Br][Br][4]Submitter of notice:[Br][Br][5]Pursuant to our Terms of Service, accounts found to be repeat infringers are subject to termination. Full details, including more information on the counter-notification process, are specified in MEGA's [A1]Terms of Service[\/A1], [A2]Copyright[\/A2] and [A3]Takedown Guidance[\/A3][Br][Br][6]If you believe that your content has been wrongly disabled because you have rights to the material, then you may file a counter-notice at our [A4]dispute page[\/A4].[Br]",
+        "text": "[1]MEGA Claim of Alleged Infringement \/ Takedown\r\n\r\n[2]We are in receipt of a takedown notice affecting the following public link in your account:\r\n\r\n[3]Link:\r\n\r\n[4]Submitter of notice:\r\n\r\n[5]Pursuant to our Terms of Service, accounts found to be repeat infringers are subject to termination. Full details, including more information on the counter-notification process, are specified in MEGA's [A1]Terms of Service[\/A1], [A2]Copyright[\/A2] and [A3]Takedown Guidance[\/A3]\r\n\r\n[6]If you believe that your content has been wrongly disabled because you have rights to the material, then you may file a counter-notice at our [A4]dispute page[\/A4].\r\n",
         "context": "Email body for takedown warning email when a user has had infringing content taken down due to a complaint.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16439": {
-        "text": "[1]Welcome to MEGA[Br][Br][2]Hi [$username], thanks for joining MEGA, your free account is ready and you can start using MEGA now.[Br][Br][3][B]Warning:[\/B] Due to our advanced end-to-end encryption, it is mathematically impossible for us to recover or reset your password. If you lose your password, you will lose access to the data in your MEGA account. We highly recommend you make a backup of your Recovery Key now:[Br][Br][4]Back up Recovery Key[Br][Br][5]You can back up your Recovery Key later in your Dashboard or Account Settings[Br][Br][6]You have just joined many millions of like-minded users on the world's safest cloud collaboration platform.[Br][Br][7]Visit Mega.nz",
+        "text": "[1]Welcome to MEGA\r\n\r\n[2]Hi [$username], thanks for joining MEGA, your free account is ready and you can start using MEGA now.\r\n\r\n[3][B]Warning:[\/B] Due to our advanced end-to-end encryption, it is mathematically impossible for us to recover or reset your password. If you lose your password, you will lose access to the data in your MEGA account. We highly recommend you make a backup of your Recovery Key now:\r\n\r\n[4]Back up Recovery Key\r\n\r\n[5]You can back up your Recovery Key later in your Dashboard or Account Settings\r\n\r\n[6]You have just joined many millions of like-minded users on the world's safest cloud collaboration platform.\r\n\r\n[7]Visit Mega.nz",
         "context": "Primary email body of welcome email sent to new users.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [$username] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [$username], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16440": {
-        "text": "[1]About MEGA[Br][Br][2]Privacy[Br][Br][3]Unlike most other cloud storage providers, only you control who has access to your data. Not even MEGA can access your data![Br][Br][4]Encryption[Br][Br][5]Your data is encrypted on your device using your password as the encryption key. Secure collaboration with others is guaranteed through asymmetric cryptography, which means that only the end points have access.[Br][Br][6]Space[Br][Br][7]Not only is MEGA more secure than its major competitors, MEGA is also very generous in providing a whopping 50GB for free![Br][Br][8]Not only is MEGA more secure than its major competitors, MEGA provides a very generous amount of free storage and transfer quota, and easy ways to [A1]achieve[\/A1] even more for free!",
+        "text": "[1]About MEGA\r\n\r\n[2]Privacy\r\n\r\n[3]Unlike most other cloud storage providers, only you control who has access to your data. Not even MEGA can access your data!\r\n\r\n[4]Encryption\r\n\r\n[5]Your data is encrypted on your device using your password as the encryption key. Secure collaboration with others is guaranteed through asymmetric cryptography, which means that only the end points have access.\r\n\r\n[6]Space\r\n\r\n[7]Not only is MEGA more secure than its major competitors, MEGA is also very generous in providing a whopping 50GB for free!\r\n\r\n[8]Not only is MEGA more secure than its major competitors, MEGA provides a very generous amount of free storage and transfer quota, and easy ways to [A1]achieve[\/A1] even more for free!",
         "context": "(UPDATE: this new version includes [A1] tags around the word achieve in the final sentence)\r\nSecondary email body of welcome email sent to new users.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
     },
     "16442": {
@@ -14416,7 +14848,7 @@
         "context": "Title of the dialog displayed when trying to open a link of an internal node and this node is not found in the account in which the user is logged in - (String as short as possible)."
     },
     "16471": {
-        "text": "The provided key is invalid.[Br]",
+        "text": "The provided key is invalid.\r\n",
         "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is the error message shown when the decryption key entered is not correct."
     },
     "16472": {
@@ -14424,7 +14856,7 @@
         "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is a second message which is shown when the decryption key entered is not correct."
     },
     "16473": {
-        "text": "[1]MEGA Achievement Expired[Br][Br][2]One of your achievements has expired today. Don't worry though, you can always achieve more or upgrade to a PRO account.[Br][Br][3]To upgrade your account to PRO, click below:",
+        "text": "[1]MEGA Achievement Expired\r\n\r\n[2]One of your achievements has expired today. Don't worry though, you can always achieve more or upgrade to a PRO account.\r\n\r\n[3]To upgrade your account to PRO, click below:",
         "context": ""
     },
     "16474": {
@@ -14987,6 +15419,10 @@
         "text": "Not only are we more secure than our major competitors, we also provide a more generous amount of free storage.",
         "context": "Feature description for the startpage"
     },
+    "16621": {
+        "text": "Live Encrypted Backup",
+        "context": "Feature headline for the startpage. 'Live' implying it is always on and fully automatic"
+    },
     "16622": {
         "text": "With our real-time file synchronisation and versioning features, your data is always safe and recoverable.",
         "context": "Feature description for the startpage"
@@ -15128,11 +15564,11 @@
         "context": "An alert message which is shown when the DEBUG mode is enabled. The .log file name does not need to be translated."
     },
     "16657": {
-        "text": "This could be due to the following reasons:[Br]- The folder link has been removed because of a ToS\/AUP violation.[Br]- Invalid URL \u2013 the link you are trying to access does not exist.[Br]- The folder link has been deleted by the user.",
+        "text": "This could be due to the following reasons:\r\n- The folder link has been removed because of a ToS\/AUP violation.\r\n- Invalid URL \u2013 the link you are trying to access does not exist.\r\n- The folder link has been deleted by the user.",
         "context": "An error message which is shown when a folder link doesn't exist."
     },
     "16658": {
-        "text": "This could be due to the following reasons:[Br]- The file has been removed because of a ToS\/AUP violation.[Br]- Invalid URL \u2013 the link you are trying to access does not exist.[Br]- The file has been deleted by the user.",
+        "text": "This could be due to the following reasons:\r\n- The file has been removed because of a ToS\/AUP violation.\r\n- Invalid URL \u2013 the link you are trying to access does not exist.\r\n- The file has been deleted by the user.",
         "context": "An error message which is shown when you open a file link and it's no longer available. It explains the reasons that could be causing it."
     },
     "16659": {
@@ -15140,7 +15576,7 @@
         "context": "Footer text to explain the meaning of the functionaly 'Auto-away' of your chat status."
     },
     "16660": {
-        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.[Br]PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.[Br]PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.[Br]PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
         "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
     },
     "16664": {
@@ -15759,6 +16195,10 @@
         "text": "Email sent",
         "context": "Text shown after the confirmation email has been sent to the new email address"
     },
+    "16828": {
+        "text": "You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, email, link to, transmit or otherwise make available any files, data or content that infringes any copyright or other proprietary rights of any person or entity.",
+        "context": "text_copyright_alert_second_paragraph"
+    },
     "16829": {
         "text": "Disagree",
         "context": "text of the Disagree button"
@@ -16024,7 +16464,7 @@
         "context": "Finder context menu option to view previous versions of a file within your MEGA account through the web browser."
     },
     "16909": {
-        "text": "There was a problem installing the update. Please try again later or download the last version from:[Br]https:\/\/mega.co.nz\/#sync",
+        "text": "There was a problem installing the update. Please try again later or download the last version from:\r\nhttps:\/\/mega.co.nz\/#sync",
         "context": "A notification message which is launched when a problem occurs during the installation of an update."
     },
     "16910": {
@@ -16050,6 +16490,10 @@
     "16919": {
         "text": "Export Key",
         "context": "A button label to export the Recovery Key of the current user."
+    },
+    "16920": {
+        "text": "Export Recovery Key",
+        "context": "A dialog title to export the Recovery Key for the current user."
     },
     "16923": {
         "text": "When you finish this assistant, you will be able to sync additional folders using the settings dialog",
@@ -16086,6 +16530,14 @@
     "16933": {
         "text": "You are removing the previously exported Recovery Key file",
         "context": "confirmation message before removing the previously downloaded MasterKey file"
+    },
+    "16934": {
+        "text": "Backup Recovery Key",
+        "context": "Menu item to let the user export the MasterKey"
+    },
+    "16935": {
+        "text": "Remove Recovery Key",
+        "context": "Menu item to let the user remove the MasterKey (previously downloaded)"
     },
     "16936": {
         "text": "The Recovery Key file has been removed",
@@ -16391,6 +16843,18 @@
         "text": "Import from device",
         "context": "import from phone option"
     },
+    "17012": {
+        "text": "Enable Camera Uploads",
+        "context": "settings option"
+    },
+    "17013": {
+        "text": "Turn on Camera Uploads",
+        "context": "settings option"
+    },
+    "17014": {
+        "text": "Disable Camera Uploads",
+        "context": "settings option"
+    },
     "17015": {
         "text": "Enable Secondary Media uploads",
         "context": "The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization."
@@ -16435,6 +16899,14 @@
         "text": "The credit card information was not correct. The credit card will not be charged",
         "context": "Message shown when the credit card information is not correct"
     },
+    "17026": {
+        "text": "4 digit PIN",
+        "context": "PIN with 4 digits"
+    },
+    "17027": {
+        "text": "6 digit PIN",
+        "context": "PIN with 6 digits"
+    },
     "17028": {
         "text": "Lite Account",
         "context": "Label in My Account section to show user account type"
@@ -16451,13 +16923,37 @@
         "text": "PRO III Account",
         "context": "Label in My Account section to show user account type"
     },
+    "17032": {
+        "text": "Backup your Recovery Key",
+        "context": "Title of the screen to backup the master key"
+    },
+    "17033": {
+        "text": "Your password unlocks your Recovery Key",
+        "context": "Subtitle of the screen to backup the master key"
+    },
     "17034": {
         "text": "Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your master key can no longer be decrypted, and you can no longer decrypt your data.",
         "context": "First paragraph of the screen to backup the master key"
     },
+    "17035": {
+        "text": "Copy the Recovery Key to clipboard or save it as text file",
+        "context": "Sentence to inform the user the available actions in the screen to backup the master key"
+    },
+    "17036": {
+        "text": "The Recovery Key has been successfully copied",
+        "context": "Alert message when the master key has been successfully copied to the ClipBoard"
+    },
+    "17037": {
+        "text": "If you have a backup of your Recovery Key, you can reset your password by selecting YES. No data will be lost.",
+        "context": "First paragraph of the screen when the password has been forgotten"
+    },
     "17038": {
         "text": "You can still export your Recovery Key now if you have an active MEGA session in another browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
         "context": "Second paragraph of the screen when the password has been forgotten"
+    },
+    "17039": {
+        "text": "Do you have a backup of your Recovery Key?",
+        "context": "Sentence to ask to the user if he has the master key in the screen when the password has been forgotten"
     },
     "17040": {
         "text": "Please enter your email address below. You will receive a recovery link that will allow you to submit your Recovery Key and reset your password.",
@@ -16470,6 +16966,10 @@
     "17042": {
         "text": "Please enter your Recovery Key below",
         "context": "Text of the dialog to write MK after opening the recovery link"
+    },
+    "17043": {
+        "text": "Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a backup of your Recovery Key.",
+        "context": "First paragraph of the screen to park an account"
     },
     "17044": {
         "text": "Please enter your email address below. You will receive a recovery link that will allow you to park your account.",
@@ -16494,6 +16994,14 @@
     "17049": {
         "text": "The Recovery Key has been backed up into: %1s.[A]While the file remains in this path, you will find it at the Saved for Offline Section.[A]Note: It will be deleted if you log out, please store it in a safe place.",
         "context": "success message when the Recovery Key file has been downloaded\r\n[A] will be newline breaks."
+    },
+    "17050": {
+        "text": "The key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
+        "context": "Alert when the user introduces his MK to reset pass incorrectly"
+    },
+    "17051": {
+        "text": "Invalid Recovery Key",
+        "context": "Title of the alert when the user introduces his MK to reset pass incorrectly"
     },
     "17052": {
         "text": "Getting info\u2026",
@@ -16627,6 +17135,14 @@
         "text": "Open folder",
         "context": "The label text for a button which opens a folder in the cloud drive."
     },
+    "17087": {
+        "text": "The process is taking longer than expected. Please wait...",
+        "context": "A message which is shown when the user opens the app and while it is logging in they don't receive a server response quickly. Thus means that it may take some time until they log in."
+    },
+    "17088": {
+        "text": "You will need to restart MEGA after changing the language",
+        "context": "An alert message text which is shown when the user is about to change the language of the app."
+    },
     "17089": {
         "text": "Before you close your account, we would like to know why you are leaving us...",
         "context": "A message on the account cancellation dialog before a list of options the user can select to explain why they want to cancel their account."
@@ -16698,6 +17214,14 @@
     "17106": {
         "text": "You are about to allow a setting that could allow your communications to be intercepted. Your data would be still inaccessible for attackers due to our end-to-end encryption, but they could blindly move your files and folders in MEGA, delete them or deny you access to your account.",
         "context": "Information for the user about the consequences of disabling a security check of MEGAsync."
+    },
+    "17109": {
+        "text": "Unable to get the filesystem. Please, try again. If the problem persists please contact bug@mega.co.nz.",
+        "context": "A message which is displayed when an error occurs while fetching nodes from the server."
+    },
+    "17113": {
+        "text": "The link cannot be generated because the file is in an incoming shared folder or in your Rubbish Bin.",
+        "context": "A notification error message which is shown while generating a public link of a file from an incoming shared folder or from the Rubbish Bin."
     },
     "17117": {
         "text": "The new excluded file names will be taken into account after restarting the application.",
@@ -17063,6 +17587,10 @@
         "text": "You have not selected a default download location for your files.To proceed with the download, please select a destination folder or go to settings in order to set up your default download location.",
         "context": "Message of the dialog displayed when a user want to download some nodes and the app doesn't have configured a default download location. Asks the user to select a location for this download or configure a default location."
     },
+    "17428": {
+        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card? Please try to save\/copy the file to your device's internal memory instead.",
+        "context": "Message of the dialog displayed when the process\/request to copy a file failed because the app or the user don't have write permission to copy into the destination (i.e. copy into a SD card an unsupported file type)."
+    },
     "17429": {
         "text": "Failed to clear folder. Please try again.",
         "context": "Message of the dialog displayed when the process\/request to clear a folder failed."
@@ -17098,6 +17626,10 @@
     "17445": {
         "text": "Date Added",
         "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's date of encryption on the Cloud Drive (not the date of the file's creation on their local machine)."
+    },
+    "17446": {
+        "text": "Date Created",
+        "context": "This is used as a column name in the Cloud Drive (list view) right panel. It represents the file's original timestamp, when it is created on their local machine."
     },
     "17447": {
         "text": "Select contacts from your phone\u2019s contact list or enter multiple email addresses.",
@@ -17166,6 +17698,10 @@
     "17463": {
         "text": "Downloaded %1$d of %2$d files",
         "context": "Plural, as in \"Downloaded 1 of 3 files\""
+    },
+    "17464": {
+        "text": "Invite friends and get bonuses",
+        "context": "subtitle of the section for achievements"
     },
     "17465": {
         "text": "Invite friends",
@@ -17363,6 +17899,10 @@
         "text": "Invite friends and get Bonuses",
         "context": "Subtitle show on My Account view under the 'Achievements' title to give more details of the section that will appear if tapped 2\/2"
     },
+    "17523": {
+        "text": "Select contacts from your phone's contact list or enter multiple email addresses.",
+        "context": "Some text shown to explain how and where you can invite friends."
+    },
     "17524": {
         "text": "used %tq1",
         "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[Singular] (=1)\r\n"
@@ -17370,6 +17910,14 @@
     "17525": {
         "text": "used %tq2",
         "context": "used transfer quota of the account - the placeholder represents transfer quota to give context \r\n[pair] (= 2)"
+    },
+    "17526": {
+        "text": "You do not have permission to copy this file type to the destination folder. Are you trying to save\/copy a file of an unsupported type to an SD card? Please try to save\/copy the file to your device's internal memory instead.",
+        "context": "A dialog message which is displayed when the process\/request to copy a file failed because the app or the user don't have write permission to copy into the destination (i.e. copy an unsupported file type into an SD card)."
+    },
+    "17527": {
+        "text": "Failed to open the internal file\/folder of the link. Please try again.",
+        "context": "The title of a dialog which is displayed when there was a failure trying to open the link of an internal node."
     },
     "17528": {
         "text": "Failed to open the internal file\/folder",
@@ -17495,6 +18043,10 @@
         "text": "The file you are importing will be renamed as:",
         "context": "A description for a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and also the file they are importing by renaming it automatically."
     },
+    "17562": {
+        "text": "MEGA accesses your photo library to save your photos or videos in case you need to do so.",
+        "context": "A description for why write-only access to the user\u2019s photo library is required. To protect user privacy Apple requires a purpose string explaining why this will be accessed."
+    },
     "17563": {
         "text": "MEGA accesses Face ID to allow you to easily unlock the app's passcode in case you enable this option.",
         "context": "A description for usage of Face ID. To protect user privacy Apple requires a purpose string explaining why will be accessed."
@@ -17572,7 +18124,7 @@
         "context": "A warning message to warn the user that they are about to delete all previous versions of all files."
     },
     "17582": {
-        "text": "You have [X1] file versions, taking up a total of [X2].[Br]",
+        "text": "You have [X1] file versions, taking up a total of [X2].\r\n",
         "context": "A message to summarise the total number of file versions (X1) and total storage usage (X2) of the versioned files. Please keep the placeholders [X1] and [X2] as they will be replaced at runtime."
     },
     "17583": {
@@ -17712,7 +18264,7 @@
         "context": "Message dialog informs user that action Get Link\/Share on folder which contains multiple MEGAdrop descendant folders will cause cancellation of all MEGAdrop subfolders starting from the selected one."
     },
     "17629": {
-        "text": "If you cancel your account you will not be able to access your account data, your MEGA contacts or conversations.[Br]You will not be able to undo this action.",
+        "text": "If you cancel your account you will not be able to access your account data, your MEGA contacts or conversations.\nYou will not be able to undo this action.",
         "context": "Text shown in the alert dialog to confirm the cancellation of an account"
     },
     "17630": {
@@ -17734,6 +18286,10 @@
     "17634": {
         "text": "Encourage your friends to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your transfer quota reward.",
         "context": "paragraph of the dialog to confirm the contact request"
+    },
+    "17636": {
+        "text": "You have received %1$s storage space as your free registration bonus.",
+        "context": "info paragraph about the completed achievement registration"
     },
     "17637": {
         "text": "Android feedback",
@@ -17919,6 +18475,10 @@
         "text": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
         "context": "An instruction for the user on how they can recover their account using the Recovery Key."
     },
+    "17691": {
+        "text": "Please give the MEGA app permission to access your microphone in your Settings.",
+        "context": "An alert message to remind the user that MEGA needs permission to use the microphone to make calls and record videos and it currently does not have that permission."
+    },
     "17692": {
         "text": "You already have a PRO account and you will be buying a new subscription to MEGA. If you already have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
         "context": "An alert message which is shown when the user has an active subscription and is in the process of buying a higher plan (a higher level PRO account)."
@@ -17930,6 +18490,10 @@
     "17694": {
         "text": "Download key",
         "context": "A button label on the mobile webclient which allows the user to download the Recovery Key to a text file."
+    },
+    "17695": {
+        "text": "days",
+        "context": "This is a setting to configure the Rubbish-Bin Cleaning Scheduler to run after a certain number of days.\r\n\r\n"
     },
     "17696": {
         "text": "GB",
@@ -17988,7 +18552,7 @@
         "context": "Alert message to notify that MEGA video calls needs the Camera permission and the call will end"
     },
     "17711": {
-        "text": "MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.[Br][Br]Upload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.[Br][Br]End-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.[Br][Br]MEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:[Br][Br][Br]PRO LITE subscription: 4.99 \u20ac per month or 49.99 \u20ac per year gives you 200 GB of storage space and 1 TB of transfer quota per month.[Br]PRO I subscription: 9.99 \u20ac per month or 99.99 \u20ac per year gives you 1 TB of storage space and 2 TB of transfer quota per month.[Br]PRO II subscription: 19.99 \u20ac per month or 199.99 \u20ac per year gives you 4 TB of storage space and 8 TB of transfer quota per month.[Br]PRO III subscription: 29.99 \u20ac per month or 299.99 \u20ac per year gives you 8 TB of storage space and 16 TB of transfer quota per month.[Br][Br]Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven't already done so) and then click on the MEGA app. You'll be able to manage your subscription there.[Br][Br]App Permissions:[Br]WRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA[Br]CAMERA -> Take a picture and upload your photos to MEGA[Br]READ_CONTACTS -> Easily add contacts from your device as MEGA contacts[Br]RECORD_AUDIO & CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio\/video calls[Br][Br][Br]To enhance users' confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https:\/\/github.com\/meganz\/android[Br][Br]For more info, please check our website:[Br]See https:\/\/mega.nz\/terms[Br][Br][Br]Desktop - https:\/\/mega.nz\/",
+        "text": "MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 \u20ac per month or 49.99 \u20ac per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 \u20ac per month or 99.99 \u20ac per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 \u20ac per month or 199.99 \u20ac per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 \u20ac per month or 299.99 \u20ac per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven't already done so) and then click on the MEGA app. You'll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO & CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio\/video calls\n\n\nTo enhance users' confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https:\/\/github.com\/meganz\/android\n\nFor more info, please check our website:\nSee https:\/\/mega.nz\/terms\n\n\nDesktop - https:\/\/mega.nz\/",
         "context": "Full description text of the app in the Google Play page of the app"
     },
     "17712": {
@@ -18139,6 +18703,18 @@
         "text": "Your name has been correctly updated",
         "context": "Message when an user attribute has been changed successfully"
     },
+    "17751": {
+        "text": "If you cancel your account you will not be able to access your account data, your MEGA contacts or conversations.[Br]You will not be able to undo this action.",
+        "context": "Text shown in the alert dialog to confirm the cancellation of an account"
+    },
+    "17752": {
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.[Br]PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.[Br]PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.[Br]PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
+        "context": "Paragraph 5 of the general description of MEGA shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "17753": {
+        "text": "For more info, please check our website:[Br]Mobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html[Br]Desktop - https:\/\/mega.nz\/",
+        "context": "Paragraph 6 of the general description of MEGA shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
     "17754": {
         "text": "QR Code",
         "context": "QR Code label, used in Settings as title. String as short as possible"
@@ -18266,10 +18842,6 @@
     "17785": {
         "text": "Original",
         "context": "the options of what to upload."
-    },
-    "17786": {
-        "text": "Annual subscription is 17% cheaper than 12 monthly payments",
-        "context": "Text shown in the purchase plan view to explain that annual subscription is 17% cheaper than 12 monthly payments"
     },
     "17788": {
         "text": "%1$s has accepted your contact request.",

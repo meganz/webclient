@@ -4390,18 +4390,16 @@ textarea.mobile.support-text-field {
 }
 
 .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+    border: 1px solid #eee;
+    box-sizing: border-box;
     height: 48px;
     cursor: pointer;
     overflow: hidden;
-    width: calc((100% - 24px) / 2);
     background-color: #fff;
     float: left;
-    margin-left: 8px;
-    border-radius: 2px;
-    margin-bottom: 8px;
-    border: 1px solid #eee;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15);
-    box-sizing: border-box;
+    margin-left: 12px;
+    border-radius: 4px;
+    margin-bottom: 12px;
 }
 
 .mobile.grid-view .mobile.fm-item.file {
@@ -4428,7 +4426,7 @@ textarea.mobile.support-text-field {
 }
 
 .mobile.grid-view .mobile.file .mobile.fm-item-img {
-    height: 106px;
+    height: auto;
     margin: 4px 11px 0 4px;
     overflow: hidden;
     width: calc(100% - 10px);
@@ -4445,16 +4443,18 @@ textarea.mobile.support-text-field {
     display: block;
     margin-top: 25px;
 }
-
+.mobile.fm-item-links {
+    display: none;
+}
 .mobile.grid-view .mobile.fm-item.file .fm-icon.link {
     margin-top: -1px;
     width: 27px;
 }
 .mobile.grid-view .mobile.file.thumb .mobile.fm-item-img img {
-    height: auto;
     position: relative;
-    width: auto;
-    margin: 0 0 0 -10px;
+    margin: 0 0;
+    width: 100%;
+    height: 100%;
 }
 .mobile.grid-view .mobile.fm-icon.open-context-menu {
     background-position: -197px -1664px;
@@ -5280,7 +5280,7 @@ textarea.mobile.support-text-field {
         padding: 10px;
         margin: 0 0 14px 0;
     }
-    .mobile.file-download-info, mobile.file-upload-info {
+    .mobile.file-download-info, .mobile.file-upload-info {
         margin: 0 auto;
     }
     .mobile.filename {
@@ -5372,9 +5372,32 @@ textarea.mobile.support-text-field {
         line-height: 28px;
         padding: 0 20px 20px 20px;
     }
+    /* Grid view */
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        height: 48px;
+        cursor: pointer;
+        overflow: hidden;
+        width: calc((100% - 60px) / 4);
+        background-color: #fff;
+        float: left;
+        margin-left: 12px;
+        border-radius: 4px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    }
+    .mobile.grid-view .mobile.fm-item.file {
+        height: 212px;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-img {
+        height: auto;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-info {
+        padding: 182px 28px 0 12px
+    }
 }
 
 @media only screen and (orientation:portrait) and (max-height: 1280px) {
+
     .wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block {
         bottom: -62px;
         margin: 0;
@@ -5394,28 +5417,6 @@ textarea.mobile.support-text-field {
     }
     .mobile.tablet-img {
         margin-top: 90px;
-    }
-    /* Grid view */
-    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
-        height: 48px;
-        cursor: pointer;
-        overflow: hidden;
-        width: calc((100% - 36px) / 3);
-        background-color: #fff;
-        float: left;
-        margin-left: 12px;
-        border-radius: 4px;
-        margin-bottom: 12px;
-        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
-    }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 220px;
-    }
-    .mobile.grid-view .mobile.file .mobile.fm-item-img {
-        height: 172px;
-    }
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 189px 28px 0 12px;
     }
 }
 
@@ -5555,6 +5556,28 @@ textarea.mobile.support-text-field {
         line-height: 28px;
         padding: 0 18px 18px 18px;
         margin: -32px 0 0 0;
+    }
+    /* Grid view */
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        height: 48px;
+        cursor: pointer;
+        overflow: hidden;
+        width: calc((100% - 36px) / 2);
+        background-color: #fff;
+        float: left;
+        margin-left: 12px;
+        border-radius: 4px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    }
+    .mobile.grid-view .mobile.fm-item.file {
+        height: 226px;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-img {
+        height: auto;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-info {
+        padding: 194px 28px 0 12px;
     }
 
 }
@@ -5716,6 +5739,28 @@ textarea.mobile.support-text-field {
         letter-spacing: 0.2px;
         padding: 0 18px 14px 18px;
         margin: -28px 0 0 0;
+    }
+    /* Grid view */
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        height: 48px;
+        cursor: pointer;
+        overflow: hidden;
+        width: calc((100% - 36px) / 2);
+        background-color: #fff;
+        float: left;
+        margin-left: 12px;
+        border-radius: 4px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    }
+    .mobile.grid-view .mobile.fm-item.file {
+        height: 206px;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-img {
+        height: auto;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-info {
+        padding: 176px 28px 0 12px
     }
 }
 
@@ -5947,6 +5992,38 @@ textarea.mobile.support-text-field {
         padding: 17px 0;
         margin-left: 24px;
         margin-right: 24px;
+    }
+}
+
+@media only screen and (orientation:landscape) and (min-width: 801px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 740px) and (max-height: 800px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 60px) / 5);
+    }
+    .mobile.grid-view .mobile.fm-item.file {
+        height: 230px;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-info {
+        padding: 197px 28px 0 12px;
+    }
+}
+
+@media only screen and (orientation:landscape) and (max-width: 800px), only screen and (orientation:portrait) and (max-height: 420px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 60px) / 4);
+    }
+    .mobile.grid-view .mobile.fm-item.file {
+        height: 206px;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-info {
+        padding: 174px 28px 0 12px;
+    }
+}
+@media only screen and (orientation:landscape) and (min-width: 667px) and (max-width: 700px), only screen and (orientation:portrait) and (min-height: 370px) and (max-height: 400px) {
+    .mobile.grid-view .mobile.file .mobile.fm-item-info {
+        padding: 155px 28px 0 12px;
+    }
+    .mobile.grid-view .mobile.fm-item.file {
+        height: 186px;
     }
 }
 

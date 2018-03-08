@@ -27,6 +27,22 @@ var astroPayDialog = {
      */
     init: function(selectedProvider) {
 
+        /* Testing stub for different AstroPay tax validation
+        selectedProvider = {
+            displayName: 'AstroPay Visa',
+            gatewayId: 11,
+            gatewayName: 'astropayVI',
+            supportsAnnualPayment: 1,
+            supportsExpensivePlans: 1,
+            supportsMonthlyPayment: 1,
+            supportsRecurring: 1,
+            type: "subgateway",
+            extra: {
+                taxIdLabel: 'CPF'
+            }
+        };
+        //*/
+
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.astropay-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
@@ -160,10 +176,135 @@ var astroPayDialog = {
                 return false;
             }
 
+            // If the tax number is invalid, show an error dialog
+            if (!astroPayDialog.taxNumberIsValid()) {
+
+                msgDialog('warninga', l[6958], l[17789], '', function() {
+                    astroPayDialog.showBackgroundOverlay();
+                });
+
+                return false;
+            }
+
             // Try redirecting to payment provider
             astroPayDialog.hideDialog();
             pro.propay.sendPurchaseToApi();
         });
+    },
+
+    /**
+     * Checks if the tax number provided is valid for that tax label
+     * @returns {Boolean} Returns true if valid, false if not
+     */
+    taxNumberIsValid: function() {
+
+        'use strict';
+
+        // Use the tax label from the API and the tax number entered by the user
+        var taxLabel = astroPayDialog.selectedProvider.extra.taxIdLabel;
+        var taxNum = astroPayDialog.taxNumber;
+
+        // Remove special characters and check the length
+        var taxNumCleaned = taxNum.replace(/([~!@#$%^&*()_+=`{}\[\]\-|\\:;'<>,.\/? ])+/g, '');
+        var taxNumLength = taxNumCleaned.length;
+
+        // Check for Peru (between 8 and 9) and Argentina (between 7 and 9 or 11)
+        if (taxLabel === 'DNI' && taxNumLength >= 7 && taxNumLength <= 11) {
+            return true;
+        }
+
+        // Check for Mexico (between 10 and 18)
+        else if (taxLabel === 'CURP / RFC / IFE' && taxNumLength >= 10 && taxNumLength <= 18) {
+            return true;
+        }
+
+        // Check for Colombia (between 6 and 10)
+        else if (taxLabel === 'NUIP / CC / RUT' && taxNumLength >= 6 && taxNumLength <= 10) {
+            return true;
+        }
+
+        // Check for Uruguay (between 6 and 8)
+        else if (taxLabel === 'CI' && taxNumLength >= 6 && taxNumLength <= 8) {
+            return true;
+        }
+
+        // Check for Chile (between 8 and 9)
+        else if (taxLabel === 'RUT' && taxNumLength >= 8 && taxNumLength <= 9) {
+            return true;
+        }
+
+        // Check for Brazil
+        else if (taxLabel === 'CPF' && astroPayDialog.cpfIsValid(taxNumCleaned)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+
+    /**
+     * Validate the Brazillian CPF number (Cadastrado de Pessoas Fisicas) is the equivalent of a Brazilian tax
+     * registration number. CPF numbers have 11 digits in total: 9 numbers followed by 2 check numbers that are being
+     * used for validation. Code from:
+     * http://nadikun.com/how-to-validate-cpf-number-using-custom-method-in-jquery-validate-plugin/
+     *
+     * @param {String} taxNum The tax number entered by the user (which contains only numbers, no hyphens etc)
+     * @returns {Boolean} Returns true if the CPF is valid
+     */
+    cpfIsValid: function(taxNum) {
+
+        'use strict';
+
+        // Checking value to have 11 digits only
+        if (taxNum.length !== 11) {
+            return false;
+        }
+
+        var firstCheckNum = parseInt(taxNum.substring(9, 10), 10);
+        var secondCheckNum = parseInt(taxNum.substring(10, 11), 10);
+
+        var checkResult = function(sum, checkNum) {
+            var result = (sum * 10) % 11;
+            if ((result === 10) || (result === 11)) {
+                result = 0;
+            }
+            return (result === checkNum);
+        };
+
+        // Checking for dump data
+        if (taxNum === '' ||
+                taxNum === '00000000000' ||
+                taxNum === '11111111111' ||
+                taxNum === '22222222222' ||
+                taxNum === '33333333333' ||
+                taxNum === '44444444444' ||
+                taxNum === '55555555555' ||
+                taxNum === '66666666666' ||
+                taxNum === '77777777777' ||
+                taxNum === '88888888888' ||
+                taxNum === '99999999999'
+                ) {
+
+            return false;
+        }
+
+        var sum = 0;
+
+        // Step 1 - using first Check Number:
+        for (var i = 1; i <= 9; i++) {
+            sum = sum + parseInt(taxNum.substring(i - 1, i), 10) * (11 - i);
+        }
+
+        // If first Check Number is valid, move to Step 2 - using second Check Number:
+        if (checkResult(sum, firstCheckNum)) {
+            sum = 0;
+            for (var j = 1; j <= 10; j++) {
+                sum = sum + parseInt(taxNum.substring(j - 1, j), 10) * (12 - j);
+            }
+            return checkResult(sum, secondCheckNum);
+        }
+
+        return false;
     },
 
     /**

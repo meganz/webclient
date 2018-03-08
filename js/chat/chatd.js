@@ -767,11 +767,18 @@ Chatd.Shard.prototype.join = function(chatId) {
     var chat = self.chatd.chatIdMessages[chatId];
     assert(chat);
 
+    var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(chatId));
+
     // reset chat state before join
     chat.callParticipants = {}; // map of userid->array[clientid]
 
     // send a `JOIN` (if no local messages are buffered) or a `JOINRANGEHIST` (if local messages are buffered)
-    if (Object.keys(chat.buf).length === 0) {
+    if (
+        Object.keys(chat.buf).length === 0 &&
+        (!chatRoom.messagesBuff || chatRoom.messagesBuff.messages.length === 0)
+    ) {
+        // if the buff is empty and (messagesBuff not initialized (chat is initializing for the first time) OR its
+        // empty)
         if (self.chatd.chatdPersist) {
             self.hist(chatId, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1, true);
         }
@@ -811,6 +818,8 @@ Chatd.Shard.prototype._sendHist = function(chatId, count) {
 Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
     var self = this;
     var promise = new MegaPromise();
+    var megaChat = self.chatd.megaChat;
+    var chatRoom;
 
     if (self.histRequests[chatId] && self.histRequests[chatId].always) {
         // queue
@@ -839,6 +848,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
             count * -1
         )
             .done(function(result) {
+                chatRoom = megaChat.getChatById(base64urlencode(chatId));
                 var messages = result[0];
                 var keys = result[1];
                 var highnum = result[3];
@@ -862,8 +872,6 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                     });
                 }
 
-                var megaChat = self.chatd.megaChat;
-                var chatRoom = megaChat.getChatById(base64urlencode(chatId));
                 var chatIdMessagesObj = self.chatd.chatIdMessages[chatId];
 
                 if (chatRoom && chatIdMessagesObj) {
@@ -926,6 +934,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                         // do JOINRANGE after our buffer is filled
                         self.chatd.chatdPersist.getLowHighIds(base64urlencode(chatId))
                             .done(function(result) {
+
                                 var chatIdMessagesObj = self.chatd.chatIdMessages[chatId];
                                 if (chatIdMessagesObj) {
                                     if (result[2]) {
@@ -952,7 +961,6 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                                     chatdPersist: true
                                 });
 
-                                var chatRoom = self.chatd.megaChat.getChatById(chatId);
                                 if (chatRoom) {
                                     $(chatRoom).trigger('onHistoryDecrypted');
                                 }
@@ -976,7 +984,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                                 chatId: base64urlencode(chatId),
                                 chatdPersist: true
                             });
-                            var chatRoom = self.chatd.megaChat.getChatById(chatId);
+
                             if (chatRoom) {
                                 $(chatRoom).trigger('onHistoryDecrypted');
                             }
@@ -1819,6 +1827,53 @@ Chatd.Messages.prototype.resend = function(restore) {
     }
 };
 
+/**
+ * Same as .joinrangehist, but would be internally called by joinrangehist in case buff is empty,
+ * but there are messages in the UI (in which case, this func would get the low/highnums from the UI and trigger the
+ * JOINRANGEHIST with those)
+ *
+ * @param chatId
+ */
+Chatd.Messages.prototype.joinrangehistViaMessagesBuff = function(chatId) {
+    var self = this;
+    var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(chatId));
+
+    var firstLast;
+    if (chatRoom && chatRoom.messagesBuff && chatRoom.messagesBuff.messages.length > 0) {
+        firstLast = chatRoom.messagesBuff.getLowHighIds();
+        if (firstLast) {
+            // queued this as last to execute after this current .done cb.
+            self.chatd.trigger('onMessagesHistoryRequest', {
+                count: 0,
+                chatId: base64urlencode(chatId)
+            });
+
+            self.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId,
+                base64urldecode(firstLast[0]) + base64urldecode(firstLast[1]));
+        }
+    }
+
+    if (!firstLast) {
+        if (d) {
+            console.warn("JOINRANGEHIST failed, getLowHighIds, returned err. Doing a regular .JOIN", e);
+        }
+
+        self.chatd.cmd(
+            Chatd.Opcode.JOIN,
+            chatId,
+            self.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE)
+        );
+        if (chatRoom && chatRoom.messagesBuff && chatRoom.messagesBuff.messages.length > 0) {
+            console.error("clear the buffer, would need a full resync.");
+        }
+        self.chatd.trigger('onMessagesHistoryRequest', {
+            count: Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL,
+            chatId: base64urlencode(chatId)
+        });
+        self.chatd.chatIdShard[chatId]._sendHist(chatId, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);
+    }
+};
+
 // after a reconnect, we tell the chatd the oldest and newest buffered message
 Chatd.Messages.prototype.joinrangehist = function(chatId) {
     var self = this;
@@ -1850,14 +1905,18 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
                     base64urldecode(result[0]) + base64urldecode(result[1]));
             })
             .fail(function(e) {
-                if (d) {
-                    console.error("JOINRANGEHIST failed, getLowHighIds, returned err.", e);
-                }
+                // This may be triggered by chatdPersist crashing and causing a re-connection + re-hist sync. In this
+                // case, we need to run JOINRANGEHIST otherwise, it would cause the client to (eventually) move
+                // existing msgs to lownum IDs (e.g. back to the top of the list of msgs)
+
+                self.joinrangehistViaMessagesBuff(chatId);
+
             });
     }
     else {
         var low;
         var high;
+        var requested = false;
 
         for (low = this.lownum; low <= this.highnum; low++) {
             if (
@@ -1880,8 +1939,13 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
                     count: Chatd.MESSAGE_HISTORY_LOAD_COUNT,
                     chatId: base64urlencode(chatId)
                 });
+                requested = true;
                 break;
             }
+        }
+
+        if (!requested) {
+            self.joinrangehistViaMessagesBuff(chatId);
         }
     }
 };
@@ -2004,6 +2068,7 @@ Chatd.prototype.setRtcHandler = function(handler) {
 Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
     var self = this;
 
+    console.error("onJoinRangeHistReject", base64urlencode(chatIdBin), shardId);
     var promises = [];
     if (self.chatdPersist) {
         promises.push(self.chatdPersist.clearChatHistoryForChat(base64urlencode(chatIdBin)));
@@ -2012,10 +2077,21 @@ Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
     MegaPromise.allDone(promises)
         .always(function() {
             // clear any old messages
-            self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, chatIdBin);
-            var chatRoom = self.megaChat.getChatById(base64urlencode(chatIdBin));
-            chatRoom.messagesBuff.messageOrders = {};
+            console.error("FIXME, TESTME, NOT TESTED YET");
 
+            // FIXME TESTME
+            var chatRoom = self.megaChat.getChatById(base64urlencode(chatIdBin));
+            var chatdInt = chatRoom.messagesBuff.chatdInt;
+            chatRoom.messagesBuff.messages.clear();
+            chatRoom.messagesBuff.messageOrders = {};
+            delete chatRoom.messagesBuff;
+
+            chatRoom.messagesBuff = new MessagesBuff(
+                chatRoom,
+                chatdInt
+            );
+
+            self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, chatIdBin);
             self.shards[shardId]._sendHist(chatIdBin, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);
         });
 };

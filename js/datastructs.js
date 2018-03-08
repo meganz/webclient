@@ -695,6 +695,9 @@ MegaDataSortedMap.prototype.remove = function(k) {
 MegaDataSortedMap.prototype.clear = function() {
     this._data = {};
     this._sortedVals = [];
+    if (this.trackDataChange) {
+        this.trackDataChange();
+    }
 };
 
 testMegaDataSortedMap = function() {

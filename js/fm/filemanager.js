@@ -768,8 +768,11 @@ FileManager.prototype.updFileManagerUI = function() {
         if (newNode.su) {
             newshare = true;
         }
-        if (newNode.p && newNode.t) {
+        if (newNode.p && (newNode.t || newNode.needUiUpdate)) {
             treebuild[newNode.p] = 1;
+            if (newNode.needUiUpdate) {
+                delete newNode.needUiUpdate;
+            }
         }
         if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
             UImain = true;

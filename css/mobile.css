@@ -4399,7 +4399,9 @@ textarea.mobile.support-text-field {
     margin-left: 8px;
     border-radius: 2px;
     margin-bottom: 8px;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15);
+    box-sizing: border-box;
 }
 
 .mobile.grid-view .mobile.fm-item.file {
@@ -5393,6 +5395,28 @@ textarea.mobile.support-text-field {
     .mobile.tablet-img {
         margin-top: 90px;
     }
+    /* Grid view */
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        height: 48px;
+        cursor: pointer;
+        overflow: hidden;
+        width: calc((100% - 36px) / 3);
+        background-color: #fff;
+        float: left;
+        margin-left: 12px;
+        border-radius: 4px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    }
+    .mobile.grid-view .mobile.fm-item.file {
+        height: 220px;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-img {
+        height: 172px;
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-info {
+        padding: 189px 28px 0 12px;
+    }
 }
 
 @media only screen and (orientation:landscape) and (max-width: 800px), only screen and (orientation:portrait) and (max-height: 800px) {
@@ -5532,6 +5556,7 @@ textarea.mobile.support-text-field {
         padding: 0 18px 18px 18px;
         margin: -32px 0 0 0;
     }
+
 }
 
 @media only screen and (orientation:landscape) and (max-width: 800px) {

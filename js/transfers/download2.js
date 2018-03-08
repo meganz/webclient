@@ -55,6 +55,7 @@ var dlmanager = {
     dlLastQuotaWarning: 0,
     dlRetryInterval: 1000,
     dlMaxChunkSize: 16 * 1048576,
+    fsExpiryThreshold: 172800,
     isDownloading: false,
     dlZipID: 0,
     gotHSTS: false,
@@ -346,7 +347,7 @@ var dlmanager = {
         var promise = new MegaPromise();
 
         var max = function() {
-            promise.resolve(Math.pow(2, 53));
+            promise.resolve(Math.pow(2, 32));
         };
 
         if (dlMethod === FileSystemAPI) {
@@ -2051,7 +2052,7 @@ function fm_tfspause(gid, overquota) {
                 $('.download.file-info').addClass('overquota');
             }
             $('.download .pause-transfer span').text(l[9118]);
-            $('.download.scroll-block').addClass('paused');
+            $('.download.scroll-block').addClass('paused-transfer');
             $('.download.eta-block span').text('');
             $('.download.speed-block .dark-numbers').text('');
             $('.download.speed-block .light-txt').text(l[1651]).addClass('small');
@@ -2104,7 +2105,7 @@ function fm_tfsresume(gid) {
 
                 if (page === 'download') {
                     $('.download .pause-transfer').addClass('active');
-                    $('.download.scroll-block').addClass('paused');
+                    $('.download.scroll-block').addClass('paused-transfer');
                 }
 
                 if (dlmanager.isOverFreeQuota) {
@@ -2121,7 +2122,7 @@ function fm_tfsresume(gid) {
 
             if (page === 'download') {
                 $('.download .pause-transfer span').text(l[9112]);
-                $('.download.scroll-block').removeClass('paused');
+                $('.download.scroll-block').removeClass('paused-transfer');
                 $('.download.speed-block .light-txt').text('').removeClass('small');
             }
             else {
@@ -2467,8 +2468,8 @@ var dl_queue = new DownloadQueue();
 
 if (is_mobile) {
     dlmanager.ioThrottleLimit = 2;
+    dlmanager.fsExpiryThreshold = 10800;
     dlmanager.dlMaxChunkSize = 4 * 1048576;
-    dlMethod = MemoryIO;
 }
 
 mBroadcaster.once('startMega', function() {

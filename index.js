@@ -51,8 +51,11 @@ mBroadcaster.once('startMega', function() {
     if (!hashLogic) {
         $(window).rebind('popstate.mega', function(event) {
             var state = event.originalEvent.state || {};
-
-            loadSubPage(state.subpage || state.fmpage || location.hash, event);
+            var add = '';
+            if (state.searchString) {
+                add = state.searchString;
+            }
+            loadSubPage((state.subpage || state.fmpage || location.hash) + add, event);
         });
     }
 });
@@ -467,6 +470,7 @@ function init_page() {
         && (page !== 'privacy')
         && (page !== 'takendown')
         && (page !== 'general')
+        && (page !== 'resellers')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -905,9 +909,16 @@ function init_page() {
         dev_init('doc');
     }
     else if (page == 'backup' && !u_type) {
-        login_txt = l[1298];
-        parsepage(pages['login']);
-        init_login();
+        if (is_mobile) {
+            login_next = page;
+            loadSubPage('login');
+            return false;
+        }
+        else {
+            login_txt = l[1298];
+            parsepage(pages['login']);
+            init_login();
+        }
     }
     else if (page == 'backup') {
         if (is_mobile) {
@@ -1205,7 +1216,6 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
-
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
@@ -1472,7 +1482,12 @@ function loginDialog(close) {
 
 
     $('.dropdown.top-login-popup').removeClass('hidden');
-    topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
+    if ($('body').hasClass('logged')) {
+        topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 40);
+    }
+    else {
+        topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
+    }
     if (is_chrome_firefox) {
         mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
     }
@@ -2142,7 +2157,11 @@ function topmenuUI() {
 
     if (String(M.currentdirid).substr(0, 7) === 'search/' && M.currentdirid[7] !== '~') {
         $topHeader.find('.top-search-bl').addClass('contains-value');
-        $topHeader.find('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
+        var searchVal = M.currentdirid.substr(7);
+        if (hashLogic) {
+            searchVal = decodeURIComponent(searchVal);
+        }
+        $topHeader.find('.top-search-bl input').val(searchVal);
     }
 
     // Initialise the header icon for mobile
@@ -2304,8 +2323,8 @@ function parsepage(pagehtml, pp) {
             translate(pages['transferwidget']) + pagehtml)
         .show();
 
-    $(window).rebind('resize.subpage', function (e) {
-        M.chrome110ZoomLevelNotification();
+    $(window).rebind('resize.subpage', function () {
+        M.zoomLevelNotification();
     });
 
     $('body').addClass('bottom-pages');
@@ -2395,7 +2414,15 @@ function loadSubPage(tpage, event)
         document.location.hash = '#' + page;
     }
     else if (!event || event.type !== 'popstate') {
-        history.pushState({ subpage: page }, "", "/"+page);
+        var isSearch = page.indexOf('fm/search/');
+        if (isSearch >= 0) {
+            var searchString = page.substring(isSearch + 10);
+            var tempPage = page.substring(0, isSearch + 10);
+            history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
+        }
+        else {
+            history.pushState({ subpage: page }, "", "/" + page);
+        }
     }
 
     if (jsl.length > 0) {

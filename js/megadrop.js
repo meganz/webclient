@@ -1651,6 +1651,7 @@ mega.megadrop = (function() {
 
             var source = code[0] + code[1] + code[2] + url + code[3] + params[0];
             source += params[1] + code[4] + code[5] + code[6] + code[7];
+            source = source.replace('/[\t\n\s]+/g', '');// Minimize
 
             return source;
         };
@@ -1823,7 +1824,7 @@ mega.megadrop = (function() {
 
         // Widget upload window event listeners
         var _winEventListeners = function _uiWinEventListeners() {
-            $('.widget-upload .wu-empty-upload,.widget-upload .wu-btn').rebind('click.widget_upload', function() {
+            $('.widget-upload .wu-items,.widget-upload .wu-btn').rebind('click.widget_upload', function() {
                 $('#fileselect5').click();
             });
 
@@ -2101,7 +2102,10 @@ mega.megadrop = (function() {
             }
         }
         ulmanager.isUploading = Boolean(ul_queue.length);
-        InitFileDrag();
+
+        // Hide Drop to Upload dialog, no need to call InitFileDrag on every upload
+        $('.drag-n-drop.overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
     };/* jshint +W074 */
 
     var isInit = function widgetIsInit() {
@@ -2183,7 +2187,7 @@ mega.megadrop = (function() {
         }
         else {
             if (d) {
-                console.warn('widget.onRename, was not able to find puf for given handle: ', handle);
+                console.log('widget.onRename, was not able to find puf for given handle: ', handle);
             }
         }
     };

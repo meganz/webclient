@@ -60,8 +60,12 @@
                 }
 
                 sharedFolder = 'folder-item';
+
                 if (folders[i].t & M.IS_SHARED) {
                     sharedFolder += ' shared-folder-item';
+                }  
+                else if (mega.megadrop.pufs[fid] && mega.megadrop.pufs[fid].s !== 1) {
+                    sharedFolder += ' puf-folder';
                 }
 
                 nodeName = missingkeys[fid] ? l[8686] : folders[i].name;
@@ -179,6 +183,20 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
 
             M.colourLabelcmUpdate(selNode);
+        }
+    }
+
+    // view send to chat if all selected items are files
+    if ($.selected.length) {
+        var viewChat = true;
+        for (var e = 0; e < $.selected.length; e++) {
+            if (M.d[$.selected[e]].t !== 0) {
+                viewChat = false;
+                break;
+            }
+        }
+        if (viewChat) {
+            items['.send-to-contact-item'] = 1;
         }
     }
 

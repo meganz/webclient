@@ -319,13 +319,14 @@ var TypingArea = React.createClass({
                     return;
                 }
                 else {
-                    if (self.state.emojiSearchQuery) {
+                    if (!element.value || element.value.length <= 2) {
                         self.setState({
                             'emojiSearchQuery': false,
                             'emojiStartPos': false,
                             'emojiEndPos': false
                         });
                     }
+                    return;
                 }
             }
             if (self.state.emojiSearchQuery) {
@@ -405,7 +406,6 @@ var TypingArea = React.createClass({
         var $container = $(ReactDOM.findDOMNode(this));
         if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
             if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
-
                 moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
             }
         }
@@ -480,7 +480,7 @@ var TypingArea = React.createClass({
         var room = this.props.chatRoom;
 
         if (room.isCurrentlyActive && self.isMounted()) {
-            if ($('textarea:focus,select:focus,input:focus').size() === 0) {
+            if ($('textarea:focus,select:focus,input:focus').filter(":visible").size() === 0) {
                 // no other element is focused...
                 this.focusTypeArea();
             }
@@ -750,7 +750,7 @@ var TypingArea = React.createClass({
         if (self.state.emojiSearchQuery) {
             emojiAutocomplete = <EmojiAutocomplete
                 emojiSearchQuery={self.state.emojiSearchQuery}
-                onSelect={function (e, emojiAlias) {
+                onPrefill={function(e, emojiAlias) {
                     if (
                         $.isNumeric(self.state.emojiStartPos) &&
                         $.isNumeric(self.state.emojiEndPos)
@@ -762,10 +762,34 @@ var TypingArea = React.createClass({
                             'typedMessage': pre + emojiAlias + (
                                 post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
                             ),
+                            'emojiEndPos': self.state.emojiStartPos + emojiAlias.length + (
+                                post ? (post.substr(0, 1) !== " " ? 1 : 0) : 1
+                            )
+                        });
+                    }
+                }}
+                onSelect={function (e, emojiAlias, forceSend) {
+                    if (
+                        $.isNumeric(self.state.emojiStartPos) &&
+                        $.isNumeric(self.state.emojiEndPos)
+                    ) {
+                        var msg = self.state.typedMessage;
+                        var pre = msg.substr(0, self.state.emojiStartPos);
+                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+                        var val = pre + emojiAlias + (
+                            post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
+                        );
+                        self.setState({
+                            'typedMessage': val,
                             'emojiSearchQuery': false,
                             'emojiStartPos': false,
                             'emojiEndPos': false
                         });
+                        if (forceSend) {
+                            if (self.onConfirmTrigger($.trim(val)) !== true) {
+                                self.setState({typedMessage: ""});
+                            }
+                        }
                     }
                 }}
                 onCancel={function () {

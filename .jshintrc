@@ -21,7 +21,6 @@
     "nocomma": true,
     "nonbsp": true,
     "nonew": true,
-    "singleGroups": true,
     "sub": true,
     "typed": true,
     "unused": true,

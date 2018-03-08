@@ -407,6 +407,21 @@ ul, li {
 .mobile.red-button, .mobile.download-progress.complete, .mobile.upload-progress.complete {
     cursor: pointer;
 }
+
+.mobile .download-progress span.resume-bttn {
+    color: rgb(119, 119, 119);
+    background-color: #fff;
+    padding: 0px 15px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 3px;
+    line-height: 30px;
+}
+.mobile .dl-app-link {
+    margin-bottom: 96px;
+    text-decoration: underline;
+    color: #939DA3;
+}
 .mobile.red-button.disabled {
     background: #CCCCCC;
     cursor: default;
@@ -431,9 +446,6 @@ ul, li {
 .mobile.red-button span, .mobile.download-progress span, .mobile.upload-progress span {
     vertical-align: middle;
     position: relative;
-}
-.mobile.download-progress span, .mobile.upload-progress span {
-    text-transform: uppercase;
 }
 .mobile.content-row.second {
     display: none;
@@ -5917,10 +5929,10 @@ textarea.mobile.support-text-field {
 @media only screen and (min-width: 400px) {
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-options-list .payment-method {
         float: left;
-        width: 154px;
+        width: 153px;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .provider-details .provider-name {
-        width: 97px;
+        width: 96px;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration {
         display: inline-block;
@@ -5928,22 +5940,25 @@ textarea.mobile.support-text-field {
         margin-top: 0;
         height: 80px;
         vertical-align: middle;
+        width: 153px
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration.template {
         display: none;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .duration-options-list .payment-duration:last-child {
-        margin-left: 70px;
+        margin-left: 0;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option {
         display: inline-block;
+        width: 153px
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option:last-child {
-        margin-left: 110px;
+        margin-left: 0;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .option-question.renewal {
         margin-top: 30px;
     }
+
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {

@@ -231,6 +231,10 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
     };
 
 
+    obj.isUpdateDelayed = function() {
+        return !!this._dataChangeThrottlingTimer;
+    };
+
     obj._getDataChangeEventName = function() {
         return 'datastructs:change_' + this._dataChangeTrackedId;
     };
@@ -425,9 +429,7 @@ MegaDataMap.prototype.exists = function(keyValue) {
 
 MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
 
-    if (!k) { debugger; }
-
-    assert(!!k, "missing key");
+    assert(typeof(k) !== 'undefined' && k !== false, "missing key");
 
     var self = this;
 
@@ -508,26 +510,63 @@ Object.keys(MegaDataMap.prototype).forEach(function(k) {
 
 MegaDataSortedMap.prototype.replace = function(k, newValue) {
     var self = this;
+    if (self._data[k] === newValue) {
+        // already the same, save some CPU and do nothing.
+        return true;
+    }
     if (self._data[k]) {
         // cleanup
-        var old = self._data[k];
-        self._data[k] = newValue;
-        if (typeof(self._sortField) === "function") {
-            // if order had changed...do call .reorder()
-            if (self._sortField(old, newValue) !== 0) {
-                self.reorder();
-            }
+        if (newValue[self._keyField] !== k) {
+            self.removeByKey(k);
         }
-        else {
-            // maybe we should do parsing of the ._sortField if its a string and manually compare the old and new
-            // value's order property if it had changed
-            self.reorder();
-        }
+        self.push(newValue);
         return true;
     }
     else {
         return false;
     }
+};
+
+MegaDataSortedMap.prototype.getComparator = function() {
+    var self = this;
+    if (self._comparatorFn) {
+        return self._comparatorFn;
+    }
+
+    if (self._sortField) {
+        if (typeof(self._sortField) === "function") {
+            self._comparatorFn = function (a, b) {
+                return self._sortField(self._data[a], self._data[b]);
+            };
+        }
+        else {
+            self._comparatorFn = function (a, b) {
+                var sortFields = self._sortField.split(",");
+                for (var i = 0; i < sortFields.length; i++) {
+                    var sortField = sortFields[i];
+                    var ascOrDesc = 1;
+                    if (sortField.substr(0, 1) === "-") {
+                        ascOrDesc = -1;
+                        sortField = sortField.substr(1);
+                    }
+
+                    if (self._data[a][sortField] && self._data[b][sortField]) {
+                        if (self._data[a][sortField] < self._data[b][sortField]) {
+                            return -1 * ascOrDesc;
+                        }
+                        else if (self._data[a][sortField] > self._data[b][sortField]) {
+                            return 1 * ascOrDesc;
+                        }
+                        else {
+                            return 0;
+                        }
+                    }
+                }
+                return 0;
+            };
+        }
+    }
+    return self._comparatorFn;
 };
 
 MegaDataSortedMap.prototype.push = function(v) {
@@ -535,82 +574,63 @@ MegaDataSortedMap.prototype.push = function(v) {
 
     var keyVal = v[self._keyField];
 
-    // if already exist, remove previously stored value (e.g. overwrite...)
     if (self._data[keyVal]) {
-        array.remove(self._sortedVals, keyVal, false);
-
-        // clean up the defineProperty
-        delete self._data[keyVal];
-        delete self[keyVal];
+        self.removeByKey(keyVal);
     }
 
     self.set(keyVal, v, true);
 
-    self._sortedVals.push(
-        keyVal
-    );
+    var minIndex = 0;
+    var maxIndex = this._sortedVals.length - 1;
+    var currentIndex;
+    var currentElement;
 
-    self.reorder();
+    var cmp = self.getComparator();
 
+    var result = false;
+    while (minIndex <= maxIndex) {
+        currentIndex = (minIndex + maxIndex) / 2 | 0;
+        currentElement = this._sortedVals[currentIndex];
+
+        var cmpResult = cmp(currentElement, keyVal);
+        if (cmpResult === -1) {
+            minIndex = currentIndex + 1;
+        }
+        else if (cmpResult === 1) {
+            maxIndex = currentIndex - 1;
+        }
+        else {
+            result = true;
+            break;
+        }
+    }
+
+    if (!result) {
+        if (!currentElement) {
+            // first
+            self._sortedVals.push(keyVal);
+        }
+        else {
+            self._sortedVals.splice(cmp(currentElement, keyVal) === -1 ? currentIndex + 1 : currentIndex, 0, keyVal);
+        }
+
+        self.trackDataChange();
+    }
+    else {
+        // found another item in the list, with the same order value, insert after
+        self._sortedVals.splice(currentIndex, 0, keyVal);
+    }
     return self._sortedVals.length;
 };
 
-MegaDataSortedMap.prototype.reorder = function(forced) {
-    var self = this;
-
-    if (self._reorderThrottlingTimer) {
-        clearTimeout(self._reorderThrottlingTimer);
-        delete self._reorderThrottlingTimer;
-    }
-
-    self._reorderThrottlingTimer = setTimeout(function() {
-        if (self._sortField) {
-            if (typeof(self._sortField) === "function") {
-                self._sortedVals.sort(function (a, b) {
-                    return self._sortField(self._data[a], self._data[b]);
-                });
-            }
-            else {
-                var sortFields = self._sortField.split(",");
-
-                self._sortedVals.sort(function (a, b) {
-                    for (var i = 0; i < sortFields.length; i++) {
-                        var sortField = sortFields[i];
-                        var ascOrDesc = 1;
-                        if (sortField.substr(0, 1) === "-") {
-                            ascOrDesc = -1;
-                            sortField = sortField.substr(1);
-                        }
-
-                        if (self._data[a][sortField] && self._data[b][sortField]) {
-                            if (self._data[a][sortField] < self._data[b][sortField]) {
-                                return -1 * ascOrDesc;
-                            }
-                            else if (self._data[a][sortField] > self._data[b][sortField]) {
-                                return 1 * ascOrDesc;
-                            }
-                            else {
-                                return 0;
-                            }
-                        }
-                    }
-                    return 0;
-                });
-            }
-        }
-
-        self.trackDataChange(self._data);
-    }, forced ? 0 : 75);
-};
-
-
 MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
     var self = this;
+
     if (self._data[keyValue]) {
         array.remove(self._sortedVals, keyValue);
         delete self._data[keyValue];
         delete self[keyValue];
-        self.reorder();
+        self.trackDataChange();
         return true;
     }
     else {
@@ -618,29 +638,7 @@ MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
     }
 };
 
-MegaDataSortedMap.prototype.replace = function(k, newValue) {
-    var self = this;
-    if (self._data[k]) {
-        // cleanup
-        var old = self._data[k];
-        self._data[k] = newValue;
-        if (typeof(self._sortField) === "function") {
-            // if order had changed...do call .reorder()
-            if (self._sortField(old, newValue) !== 0) {
-                self.reorder();
-            }
-        }
-        else {
-            // maybe we should do parsing of the ._sortField if its a string and manually compare the old and new
-            // value's order property if it had changed
-            self.reorder();
-        }
-        return true;
-    }
-    else {
-        return false;
-    }
-};
+
 MegaDataSortedMap.prototype.exists = function(keyValue) {
     var self = this;
     if (self._data[keyValue]) {
@@ -957,22 +955,20 @@ MegaDataBitMap.prototype.get = function(key, defaultVal) {
 };
 
 /**
- * Merge the current MegaDataBitMap value with a {String} `base64str`.
+ * Merge the current MegaDataBitMap value with a {String} `str`.
  * Merging is done the following way:
- * - IF a value of a key, passed by `base64str` differs from the one in the current instance:
+ * - IF a value of a key, passed by `str` differs from the one in the current instance:
  *  a) if was marked as 'dirty' (not commited, via the update mask) it would not be merged (its assumed that any data,
  *  stored in 'dirty' state and not commited is the most up to date one)
  *  b) the local value for that key would be updated, following a change event
  *
- * @param {String} base64str String, similar to 'AAAA', containing the data that you want to merge with the current
- * MegaDataBitMap instance
+ * @param {String} str String, containing 0 and 1 chars to be parsed as Uint8Array with 0 and 1s
  * @param {Boolean} requiresCommit Pass true, to mark all changes in the update mask (e.g. they would be schedulled for
  * sending to the server on the next .commit() call)
  */
-MegaDataBitMap.prototype.mergeFrom = function(base64str, requiresCommit) {
+MegaDataBitMap.prototype.mergeFrom = function(str, requiresCommit) {
     var self = this;
 
-    var str = base64urldecode(base64str);
     var targetLength = str.length;
     if (self._keys.length > str.length) {
         targetLength = self._keys.length;
@@ -1074,72 +1070,79 @@ MegaDataBitMap.prototype.isPublic = function() {
  *
  * @returns {MegaPromise}
  */
-MegaDataBitMap.prototype.commit = SoonFc(function() {
+MegaDataBitMap.prototype.commit = function() {
     var self = this;
-    if (this._commitPromise) {
-        // commit is already in progress, create a proxy promise that would execute after the current commit op and
-        // return it
-        var tmpPromise = new MegaPromise();
-        this._commitPromise.always(function() {
-            tmpPromise.linkDoneAndFailTo(self.commit());
-        });
-        return tmpPromise;
+    var masterPromise = new MegaPromise();
+    if (self._commitTimer) {
+        clearTimeout(self._commitTimer);
     }
-
-    this._commitPromise = new MegaPromise();
-
-    this._commitPromise.always(function() {
-        delete self._commitPromise;
-    });
-
-    // check if we really need to commit anything (e.g. mask is not full of zeroes)
-    var foundOnes = false;
-    for (var i = 0; i < this._updatedMask.length; i++) {
-        if (this._updatedMask[i] === 1) {
-            foundOnes = true;
-            break;
+    self._commitTimer = setTimeout(function() {
+        if (self._commitPromise) {
+            // commit is already in progress, create a proxy promise that would execute after the current commit op and
+            // return it
+            self._commitPromise.always(function () {
+                masterPromise.linkDoneAndFailTo(self.commit());
+            });
+            return;
         }
-    }
 
-    // no need to commit anything.
-    if (foundOnes === false) {
-        var commitPromise = this._commitPromise;
-        this._commitPromise.resolve(false);
-        return commitPromise;
-    }
-    var attributeFullName = (this.isPublic() ? "+!" : "^!") + this.name;
+        self._commitPromise = new MegaPromise();
+        masterPromise.linkDoneAndFailTo(self._commitPromise);
 
-    var cacheKey = u_handle + "_" + attributeFullName;
-    attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
+        self._commitPromise.always(function () {
+            delete self._commitPromise;
+        });
 
-    api_req(
-        {
-            "a": "usma",
-            "n": attributeFullName,
-            "ua": this.toString(),
-            "m": this.maskToString()
-        },
-        {
-            callback: function megaDataBitMapCommitCalback(response) {
-                if (typeof(response) === 'number') {
-                    self._commitPromise.reject(response);
-                }
-                else {
-                    if (response.ua && response.ua !== self.toString()) {
-                        self.mergeFrom(response.ua);
-                        attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
-                    }
-                    if (response.v) {
-                        self.setVersion(response.v);
-                    }
-                    self.commited();
-                    self._commitPromise.resolve(response);
-                }
+        // check if we really need to commit anything (e.g. mask is not full of zeroes)
+        var foundOnes = false;
+        for (var i = 0; i < self._updatedMask.length; i++) {
+            if (self._updatedMask[i] === 1) {
+                foundOnes = true;
+                break;
             }
         }
-    );
-    return this._commitPromise;
-}, 100);
+
+        // no need to commit anything.
+        if (foundOnes === false) {
+            var commitPromise = self._commitPromise;
+            self._commitPromise.resolve(false);
+            return;
+        }
+        var attributeFullName = (self.isPublic() ? "+!" : "^!") + self.name;
+
+        var cacheKey = u_handle + "_" + attributeFullName;
+        attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
+
+        api_req(
+            {
+                "a": "usma",
+                "n": attributeFullName,
+                "ua": self.toString(),
+                "m": self.maskToString()
+            },
+            {
+                callback: function megaDataBitMapCommitCalback(response) {
+                    if (typeof(response) === 'number') {
+                        self._commitPromise.reject(response);
+                    }
+                    else {
+                        if (response.ua && response.ua !== self.toString()) {
+                            self.mergeFrom(base64urldecode(response.ua));
+                            attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
+                        }
+                        if (response.v) {
+                            self.setVersion(response.v);
+                        }
+                        self.commited();
+                        self._commitPromise.resolve(response);
+                    }
+                }
+            }
+        );
+    }, 100);
+
+    return masterPromise;
+};
 
 /**
  * Initialise a new MegaDataBitMap from string

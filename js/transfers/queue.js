@@ -548,7 +548,7 @@ TransferQueue.prototype.push = function(cl) {
     };
 
     if (localStorage.ignoreLimitedBandwidth || Object(u_attr).p || cl.dl.byteOffset === cl.dl.size) {
-        showToast();
+        delay('show_toast', showToast);
         dlmanager.setUserFlags();
         return MegaQueue.prototype.push.apply(this, arguments);
     }

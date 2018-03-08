@@ -582,7 +582,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     background-color: #F0373A;
     width: 0%;
 }
-.paused .download.progress-bar, .download-complete .download.progress-bar {
+.paused-transfer .download.progress-bar, .download-complete .download.progress-bar {
     background-color: #FF5C61;
 }
 .download.error-title {
@@ -723,7 +723,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .downloading .megasync-close, .downloading .megasync-close-txt, .megasync-overlay.linux .megasync-dropdown, .thumb .download.thumb-block {
     display: block;
 }
-.downloading .download.buttons-block, .download-complete .download.buttons-block, .downloading .download.checkbox-bl, .downloading .download.bar-buttons, .download-complete .download.pause-button, .download-complete .download.bar-buttons, .download-complete .progress-cell.mid-pause, .download-complete .download.bar-buttons, .download-complete .download.checkbox-bl, .download-complete .download.speed-block, .download-complete .download.eta-block, .paused .download.eta-block i, .download-complete .download.progress-cell i, .default-white-button.pause-transfer.inline {
+.downloading .download.buttons-block, .download-complete .download.buttons-block, .downloading .download.checkbox-bl, .downloading .download.bar-buttons, .download-complete .download.pause-button, .download-complete .download.bar-buttons, .download-complete .progress-cell.mid-pause, .download-complete .download.bar-buttons, .download-complete .download.checkbox-bl, .download-complete .download.speed-block, .download-complete .download.eta-block, .paused-transfer .download.eta-block i, .download-complete .download.progress-cell i, .default-white-button.pause-transfer.inline {
     display: none;
 }
 .downloading .default-white-button.pause-transfer.inline, .downloading .download.bar-transfer-info, .download-complete .download bar-transfer-info, .download-complete .complete-block {
@@ -827,6 +827,11 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     padding: 0 7px 0 18px;
     min-width: 10px;
     margin-left: 10px;
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    -ms-transition: none;
+    transition: none;
 }
 .video .download.big-button.red {
     padding: 0 18px;

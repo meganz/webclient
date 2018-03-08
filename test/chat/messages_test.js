@@ -157,9 +157,6 @@ describe("chat messages unit test", function () {
         }
         messagesBuff.initialStates = bef;
 
-        // wait for the reordering of the messages
-        messagesBuff.messages.reorder();
-
         return messagesBuff;
     };
 

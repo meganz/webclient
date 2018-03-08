@@ -16,7 +16,7 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
+var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
     var self = this;
 
     this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -214,7 +214,9 @@ var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chat
             getLastInteractionWith(contact.u);
         }
     });
-    self.megaChat.trigger('onRoomCreated', [self]);
+    if (!noUI) {
+        self.megaChat.trigger('onRoomCreated', [self]);
+    }
 
     $(window).rebind("focus." + self.roomId, function() {
         if (self.isCurrentlyActive) {
@@ -435,14 +437,14 @@ ChatRoom.prototype.getParticipantsExceptMe = function(userHandles) {
  *
  * @returns {string}
  */
-ChatRoom.prototype.getRoomTitle = function() {
+ChatRoom.prototype.getRoomTitle = function(ignoreTopic) {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
         return M.getNameByHandle(participants[0]) || "";
     }
     else {
-        if (self.topic && self.topic.substr) {
+        if (!ignoreTopic && self.topic && self.topic.substr) {
             return self.topic.substr(0, 30);
         }
 
@@ -678,9 +680,10 @@ ChatRoom.prototype.appendMessage = function(message) {
         return false;
     }
     if (!message.orderValue) {
+        var mb = self.messagesBuff;
         // append at the bottom
-        if (self.messages.length > 0) {
-            var prevMsg = self.messagesBuff.messages.getItem(self.messages.length - 1);
+        if (mb.messages.length > 0) {
+            var prevMsg = mb.messages.getItem(mb.messages.length - 1);
             if (!prevMsg) {
                 self.logger.error(
                     'self.messages got out of sync...maybe there are some previous JS exceptions that caused that? ' +
@@ -1224,6 +1227,42 @@ ChatRoom.prototype.retrieveAllHistory = function() {
         }
     });
 };
+
+
+ChatRoom.prototype.truncate = function() {
+    var self = this;
+    var chatMessages = self.messagesBuff.messages;
+    if (chatMessages.length > 0) {
+        var lastChatMessageId = null;
+        var i = chatMessages.length - 1;
+        while (lastChatMessageId == null && i >= 0) {
+            var message = chatMessages.getItem(i);
+            if (message instanceof Message && message.dialogType !== "truncated") {
+                lastChatMessageId = message.messageId;
+            }
+            i--;
+        }
+
+        if (lastChatMessageId) {
+            asyncApiReq({
+                a: 'mct',
+                id: self.chatId,
+                m: lastChatMessageId,
+                v: Chatd.VERSION
+            })
+                .fail(function(r) {
+                    if (r === -2) {
+                        msgDialog(
+                            'warninga',
+                            l[135],
+                            __(l[8880])
+                        );
+                    }
+                });
+        }
+    }
+};
+
 
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

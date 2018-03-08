@@ -43,6 +43,10 @@ function deleteScrollPanel(from, data) {
     var jsp = $(from).data(data);
     if (jsp) {
         jsp.destroy();
+
+        if (M.megaRender) {
+            delay('MegaRender:rebindLayout', M.megaRender.rebindLayout.bind(M.megaRender, from));
+        }
     }
 }
 
@@ -202,10 +206,15 @@ function clearScrollPanel(from) {
 //----------------------------------------------------------------------------
 
 function reselect(n) {
+    'use strict';
+
+    if (d) {
+        console.debug('reselect(%s)', n, [selectionManager]);
+    }
     $('.ui-selected').removeClass('ui-selected');
 
     if (!Array.isArray($.selected)) {
-        if (selectionManager) {
+        if (window.selectionManager) {
             selectionManager.clear_selection();
         }
         $.selected = [];
@@ -218,6 +227,9 @@ function reselect(n) {
     });
 
     for (var i = ids.length; i--;) {
+        if (window.selectionManager) {
+            selectionManager.add_to_selection(ids[i], n, i);
+        }
         $('#' + ids[i]).addClass('ui-selected');
 
         if (n) {
@@ -243,6 +255,7 @@ function reselect(n) {
         else {
             el = false;
         }
+
         if (el && jsp) {
             jsp.scrollToElement(el);
         }

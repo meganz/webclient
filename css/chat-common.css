@@ -121,6 +121,14 @@
 .chat-right-area .buttons-block .link-button {
     margin: 6px 0;
     padding: 5px 0;
+    white-space: normal;
+}
+.chat-right-area .buttons-block .link-button i {
+    float: left;
+}
+.chat-right-area .buttons-block .link-button span {
+    padding-left: 29px;
+    display: block;
 }
 .chat-right-area .big-button {
     margin: 25px 23px 0 23px;

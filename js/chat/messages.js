@@ -43,6 +43,137 @@ Message._mockupNonLoadedMessage = function(msgId, msg, orderValueIfNotFound) {
     }
 };
 
+Message._getTextContentsForDialogType = function(message) {
+    if (
+        !message.textContents ||
+        (
+            typeof(message.textContents.length) !== 'undefined' &&
+            message.textContents.length === 0
+        )
+    ) {
+        var textMessage = mega.ui.chat.getMessageString(message.type || message.dialogType) || "";
+
+        // if is an array.
+        var contact = Message.getContactForMessage(message);
+        var contactName = "";
+        if (contact) {
+            contactName = htmlentities(M.getNameByHandle(contact.u));
+        }
+
+        if (message.dialogType === "privilegeChange" && message.meta) {
+            textMessage = textMessage.replace("%s2", contactName);
+            var newPrivilegeText = "";
+            if (message.meta.privilege === 3) {
+                newPrivilegeText = l[8875];
+            }
+            else if (message.meta.privilege === 2) {
+                newPrivilegeText = l[8874];
+            }
+            else if (message.meta.privilege === 0) {
+                newPrivilegeText = l[8873];
+            }
+
+            contact = M.u[message.meta.targetUserId] ? M.u[message.meta.targetUserId] : {
+                'u': message.meta.targetUserId,
+                'h': message.meta.targetUserId,
+                'c': 0
+            };
+
+            contactName = htmlentities(M.getNameByHandle(contact.u));
+            textMessage = textMessage.replace("%s1", newPrivilegeText);
+        }
+        else if (message.dialogType === "alterParticipants" && message.meta) {
+            if (message.meta.excluded && message.meta.excluded.length > 0) {
+                var otherContact = M.u[message.meta.excluded[0]];
+                if (otherContact) {
+                    if (otherContact.u === contact.u) {
+                        textMessage = l[8908];
+                    }
+                    else {
+                        contact = otherContact;
+                        textMessage = l[8906].replace("%s", contactName);
+                        contactName = htmlentities(M.getNameByHandle(message.meta.excluded[0]));
+                    }
+                }
+            }
+            else if (message.meta.included && message.meta.included.length > 0) {
+                otherContact = M.u[message.meta.included[0]];
+                if (contact && otherContact) {
+                    textMessage = l[8907].replace("%s", contactName);
+                    var otherContactName = htmlentities(M.getNameByHandle(message.meta.included[0]));
+                    contact = otherContact;
+                    contactName = otherContactName;
+                }
+            }
+            else {
+                textMessage = "";
+            }
+        }
+        else if (message.dialogType === "topicChange") {
+            textMessage = l[9081].replace(
+                "%s",
+                '"' + htmlentities(message.meta.topic) + '"'
+            );
+        }
+        else if (textMessage.splice) {
+            var tmpMsg = textMessage[0].replace("[X]", contactName);
+            tmpMsg = tmpMsg.replace("%s", contactName);
+
+            if (message.currentCallCounter) {
+                tmpMsg += " " +
+                    textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
+            }
+            textMessage = tmpMsg;
+            textMessage = textMessage
+                .replace("[[ ", " ")
+                .replace("]]", "");
+        }
+        else {
+            textMessage = textMessage.replace("[X]", contactName);
+            textMessage = textMessage.replace("%s", contactName);
+        }
+
+
+        if (textMessage) {
+            return (contactName ? contactName + " " : "") + textMessage;
+        }
+        else {
+            return false;
+        }
+    }
+};
+
+Message.getContactForMessage = function(message) {
+    var contact;
+    if (message.authorContact) {
+        contact = message.authorContact;
+    }
+    else if (message.meta && message.meta.userId) {
+        contact = M.u[message.meta.userId];
+        if (!contact) {
+            return {
+                'u': message.meta.userId,
+                'h': message.meta.userId,
+                'c': 0,
+            };
+        }
+    }
+    else if (message.userId) {
+        if (!M.u[message.userId]) {
+            // data is still loading!
+            return null;
+        }
+        contact = M.u[message.userId];
+    }
+    else {
+        console.error("No idea how to get contact for: ", message);
+
+        return {};
+    }
+
+    return contact;
+};
+
 Message.prototype.getState = function() {
     var self = this;
     var mb = self.messagesBuff;
@@ -292,11 +423,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     var origPush = self.messages.push;
     self.messages.push = function(msg) {
-        if (msg.addChangeListener) {
-            msg.addChangeListener(function() {
-                self.messages.reorder();
-            });
-        }
         var res = origPush.apply(this, arguments);
         if (
             !(
@@ -355,8 +481,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (
             self.haveMoreHistory() &&
             (
-                self.messages.length === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL ||
-                self.messagesBatchFromHistory.length === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL
+                self.messages.length < Chatd.MESSAGE_HISTORY_LOAD_COUNT &&
+                self.messagesBatchFromHistory.length < Chatd.MESSAGE_HISTORY_LOAD_COUNT
             )
         ) {
             self.retrieveChatHistory(false);
@@ -401,7 +527,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         }
 
         if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.lastSeen = eventData.messageId;
+            self.setLastSeen(eventData.messageId);
             self.trackDataChange();
         }
     });
@@ -468,7 +594,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.expectedMessagesCount
             ) {
                 self.haveMessages = true;
-                self.retrievedAllMessages = false;
+                // if the expectedMessagesCount is not 0 and < requested, then...chatd/idb returned < then the
+                // requested #, which means, that there is no more history.
+                self.retrievedAllMessages = self.expectedMessagesCount < requestedMessagesCount;
             }
 
 
@@ -562,7 +690,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 if (eventData.pendingid) {
                     var foundMessage = self.getByInternalId(eventData.pendingid);
 
-                    if (foundMessage.textContents) {
+                    // its ok if foundMessage is empty, e.g. it can be sent from another client
+                    if (foundMessage && foundMessage.textContents) {
                         msgObject.textContents = foundMessage.textContents;
                     }
 
@@ -691,6 +820,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         if (eventData.ts) {
                             editedMessage.delay = eventData.ts;
                         }
+                        chatRoom.protocolHandler.clearKeyId();
                     }
 
                     chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
@@ -714,6 +844,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                 self.messages.removeByKey(v.messageId);
                             }
                         }
+
+                        self._removeMessagesBefore(editedMessage.messageId);
                     }
 
 
@@ -1132,6 +1264,10 @@ MessagesBuff.prototype.setLastSeen = function(msgId) {
         if (!self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
             self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
         }
+        if (ChatdPersist.isMasterTab() && self.chatdInt.chatd.chatdPersist) {
+            var chatdPersist = self.chatdInt.chatd.chatdPersist;
+            chatdPersist.setPointer(self.chatRoom.chatId, 'ls', msgId);
+        }
 
         // check if last recv needs to be updated
         var lastRecvMessage = self.messages[self.lastDelivered];
@@ -1221,7 +1357,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
 
     var timeoutPromise = createTimeoutPromise(function() {
         return self.$msgsHistoryLoading.state() !== 'pending';
-    }, 100, 10000)
+    }, 75, 10000)
         .always(function() {
             self.chatdIsProcessingHistory = false;
         })
@@ -1237,6 +1373,9 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
         if (!isInitialRetrivalCall) {
             self._currentHistoryPointer += len;
         }
+    });
+    self.$msgsHistoryLoading.always(function() {
+        timeoutPromise.verify();
     });
 
 
@@ -1356,8 +1495,13 @@ MessagesBuff.prototype.getLatestTextMessage = function() {
     if (this.messages.length > 0) {
         var msgs = this.messages;
         for (var i = msgs.length - 1; i >= 0; i--) {
-            if (msgs.getItem(i) && msgs.getItem(i).textContents && msgs.getItem(i).textContents.length > 0) {
-                var msg = msgs.getItem(i);
+            var msg = msgs.getItem(i);
+            if (
+                msg && (
+                    (msg.textContents && msg.textContents.length > 0) ||
+                    msg.dialogType
+                )
+            ) {
                 if (
                     (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) ||
                     msg.revoked === true
@@ -1448,11 +1592,37 @@ MessagesBuff.prototype.detachMessages = function() {
     if (!self.chatRoom.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
         return;
     }
+    var removedAnyMessage = false;
     while (msg = self.messages.getItem(self.messages.length - Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2)) {
         self.messages.removeByKey(msg.messageId, true);
+        removedAnyMessage = true;
     }
 
-    if (self.retrievedAllMessages) {
+    if (removedAnyMessage === true && self.retrievedAllMessages) {
         self.retrievedAllMessages = false;
+    }
+};
+
+/**
+ * Used to remove all messages in the sorted messages list before a specific messageId
+ * Note: This is executed after and by the regular truncate procedure which uses chatd's .buf references (which
+ * typically does not include internal/dialog type of messages as call started, etc)
+ *
+ * @param messageId {String}
+ * @private
+ */
+MessagesBuff.prototype._removeMessagesBefore = function(messageId) {
+    var self = this;
+    var found = self.getMessageById(messageId);
+    if (!found) {
+        return;
+    }
+    var ts = found.delay + (found.updated ? found.updated : 0);
+
+    for (var i = self.messages.length - 1; i >= 0; i--) {
+        var currentMessage = self.messages.getItem(i);
+        if (currentMessage.delay < ts && currentMessage.dialogType !== "truncated") {
+            self.messages.removeByKey(currentMessage.messageId);
+        }
     }
 };

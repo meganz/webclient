@@ -155,7 +155,7 @@
     }
 
     function clearit(storagetype, t, callback) {
-        var tsec = t || 172800;
+        var tsec = t || dlmanager.fsExpiryThreshold;
 
         function errorHandler2(e) {
             if (d) {

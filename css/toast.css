@@ -87,6 +87,12 @@
 .settings .toast-button {
     display: none;
 }
+.send-chat .toast-icon {
+    background-image: url(../images/mega/top-sprite_v4@2x.png);
+    background-position:-82px -151px;
+    background-size: 38px 1574px;
+    opacity: 0.8;
+}
 .toast-body {
     display: table;
     width: 100%;
@@ -103,7 +109,6 @@
 .toast-col:nth-child(1) span {
     display: inline-block;
     vertical-align: middle;
-    padding-right: 20px;
 }
 .toast-col:nth-child(1) {
     padding: 0 0 4px 0;
@@ -197,13 +202,16 @@
     display: inline-block;
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/icons-sprite_v13.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     vertical-align: top;
     margin: 2px 9px 0 1px;
     background-position: -198px -1240px;
 }
 .megasync-transfer.upload .toast-col:nth-child(1) span::before {
     background-position: -228px -1240px;
+}
+.megasync-transfer .toast-col:nth-child(1) span {
+    padding-right: 20px;
 }
 /* end of Megasync transfer */
 

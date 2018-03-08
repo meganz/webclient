@@ -225,12 +225,14 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        if (ids && ids.length && t) {
-            dd = ddtype(ids, t, e.altKey);
-            if (dd === 'move' && e.altKey) {
-                dd = 'copy';
+        var setDDType = function() {
+            if (ids && ids.length && t) {
+                dd = ddtype(ids, t, e.altKey);
+                if (dd === 'move' && e.altKey) {
+                    dd = 'copy';
+                }
             }
-        }
+        };
 
         if (a !== 'noop') {
             if ($.liTimerK) {
@@ -239,7 +241,9 @@ FileManager.prototype.initFileManagerUI = function() {
             $('body').removeClassWith('dndc-');
             $('.hide-settings-icon').removeClass('hide-settings-icon');
         }
-        if (a == 'drop' || a == 'out' || a == 'noop') {
+        setDDType();
+
+        if (a === 'drop' || a === 'out' || a === 'noop') {
             $(e.target).removeClass('dragover');
             // if (a !== 'noop') $('.dragger-block').addClass('drag');
         }
@@ -252,7 +256,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
             $.currentOver = id;
             setTimeout(function() {
-                if ($.currentOver == id) {
+                if ($.currentOver === id) {
                     var h;
                     if (id.indexOf('treea_') > -1) {
                         h = id.replace('treea_', '');
@@ -307,7 +311,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
                 else if (~c.indexOf('cloud-drive')) {
                     $.draggingClass = ('dndc-to-conversations');
-                }// TODO: cursor, please?
+                }
                 else {
                     c = null;
                 }
@@ -324,9 +328,8 @@ FileManager.prototype.initFileManagerUI = function() {
             else if (dd === 'chat-attach') {
                 $.draggingClass = ('dndc-to-conversations');
             }
-            // else $('.dragger-block').addClass('drag');
             else {
-                $.draggingClass = ('dndc-warning');
+                $.draggingClass = M.d[t] ? 'dndc-warning' : 'dndc-move';
             }
 
             $('body').addClass($.draggingClass);
@@ -340,14 +343,11 @@ FileManager.prototype.initFileManagerUI = function() {
         // if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
 
-        if ((a === 'drop') && dd) {
+        var onMouseDrop = function() {
             if (dd === 'nw-fm-left-icon') {
                 // do nothing
             }
-            else if (
-                $(e.target).hasClass('nw-conversations-item') ||
-                dd === 'chat-attach'
-            ) {
+            else if ($(e.target).hasClass('nw-conversations-item') || dd === 'chat-attach') {
                 nRevert();
 
                 // drop over a chat window
@@ -398,7 +398,10 @@ FileManager.prototype.initFileManagerUI = function() {
                             if (error === EOVERQUOTA) {
                                 return msgDialog('warninga', l[135], l[8435]);
                             }
-                            return msgDialog('warninga', l[135], l[47], api_strerror(error));
+                            // Tell the user there was an error unless he cancelled the file-conflict dialog
+                            if (error !== EINCOMPLETE) {
+                                msgDialog('warninga', l[135], l[47], api_strerror(error));
+                            }
                         });
                 }, 50);
             }
@@ -408,6 +411,15 @@ FileManager.prototype.initFileManagerUI = function() {
                 M.addDownload(ids, as_zip);
             }
             $('.dragger-block').hide();
+        };
+
+        if (a === 'drop' && dd !== undefined) {
+            dbfetch.get(t).always(function() {
+                setDDType();
+                if (dd) {
+                    onMouseDrop();
+                }
+            });
         }
     };
     InitFileDrag();
@@ -756,8 +768,11 @@ FileManager.prototype.updFileManagerUI = function() {
         if (newNode.su) {
             newshare = true;
         }
-        if (newNode.p && newNode.t) {
+        if (newNode.p && (newNode.t || newNode.needUiUpdate)) {
             treebuild[newNode.p] = 1;
+            if (newNode.needUiUpdate) {
+                delete newNode.needUiUpdate;
+            }
         }
         if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
             UImain = true;
@@ -1177,6 +1192,10 @@ FileManager.prototype.initContextUI = function() {
         else {
             $('.grid-table.fm tr').removeClass('ui-selected');
         }
+    });
+
+    $(c + '.send-to-contact-item').rebind('click', function () {
+        openCopyDialog('conversations');
     });
 
     $('.labels .dropdown-colour-item').rebind('click', function() {
@@ -2778,8 +2797,7 @@ FileManager.prototype.addTreeUI = function() {
         '.shared-with-me tr,' +
         '.nw-conversations-item,' +
         'ul.conversations-pane > li,' +
-        '.messages-block,' +
-        '.nw-contact-item'
+        '.messages-block'
     ).filter(":visible").droppable({
         tolerance: 'pointer',
         drop: function(e, ui) {

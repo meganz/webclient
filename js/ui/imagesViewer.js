@@ -60,7 +60,7 @@ var slideshowid;
     function slideshow_next() {
         var valid = true;
         $.each(dl_queue || [], function(id, file) {
-            if (file.id === slideshowid) {
+            if (file.id === slideshowid && file.preview) {
                 valid = false;
                 return false;
                 /* break loop */
@@ -79,7 +79,7 @@ var slideshowid;
     function slideshow_prev() {
         var valid = true;
         $.each(dl_queue || [], function(id, file) {
-            if (file.id === slideshowid) {
+            if (file.id === slideshowid && file.preview) {
                 valid = false;
                 return false;
                 /* break loop */
@@ -241,7 +241,15 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         // then pushing fake states of history/hash
         if (!slideshowid && !hashLogic && !location.hash) {
-            history.pushState({subpage: page}, '', '/' + page);
+            var isSearch = page.indexOf('fm/search/');
+            if (isSearch >= 0) {
+                var searchString = page.substring(isSearch + 10);
+                var tempPage = page.substring(0, isSearch + 10);
+                history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
+            }
+            else {
+                history.pushState({ subpage: page }, '', '/' + page);
+            }
         }
         // Bind keydown events
         $document.rebind('keydown.slideshow', function(e) {
@@ -252,7 +260,12 @@ var slideshowid;
                 slideshow_next();
             }
             else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
-                slideshow(slideshowid, true);
+                if ($.dialog) {
+                    closeDialog($.dialog);
+                }
+                else {
+                    slideshow(slideshowid, true);
+                }
             }
             else if (e.keyCode === 8 || e.key === 'Backspace') {
                 // since Backspace event is processed with keydown at document level for cloudBrowser.
@@ -324,7 +337,6 @@ var slideshowid;
 
         var $dlBut = $overlay.find('.viewer-button.download');
         $dlBut.rebind('click', function() {
-
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                     dl_queue[i].preview = false;
@@ -332,8 +344,13 @@ var slideshowid;
                     return;
                 }
             }
+            
 
-            if (M.d[slideshowid]) {
+            // TODO: adapt the above code to work on the downloads page if we need to download the original
+            if (page === 'download') {
+                $('.big-button.download-file').click();
+            }
+            else if (M.d[slideshowid]) {
                 M.addDownload([slideshowid]);
             }
             else {
@@ -341,14 +358,14 @@ var slideshowid;
             }
         });
 
-        if (n.p || M.chat) {
+        if (n.p || M.chat || page === 'download') {
             $dlBut.removeClass('hidden');
         }
         else {
             $dlBut.addClass('hidden');
         }
 
-        if (previews[n.h]) {
+        if (previews[n.h] && preqs[n.h]) {
             previewsrc(n.h);
             fetchnext();
         }
@@ -413,6 +430,15 @@ var slideshowid;
                     }
                     previewimg(n.h, u8, 'image/svg+xml');
                     delete previews[n.h].buffer;
+                    preqs[n.h] = 0; // to retry again
+                    if (ev && ev.target && ev.target.status === 509) {
+                        dlmanager.setUserFlags();
+                        dlmanager.showOverQuotaDialog();
+                    }
+                    else if (ev === EOVERQUOTA) {
+                        dlmanager.setUserFlags();
+                        dlmanager.showOverQuotaDialog();
+                    }
                 });
             }
             return false;

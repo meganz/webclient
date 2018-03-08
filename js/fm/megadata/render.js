@@ -169,7 +169,20 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
                 }
             });
 
-            $('.shared-details-info-block .fm-share-copy').rebind('click', openCopyDialog);
+            $('.shared-details-info-block .fm-share-copy').rebind('click', function () {
+                if (!$.selected || !$.selected.length) {
+                    var $selectedFromTree = $('#treesub_shares' + ' .nw-fm-tree-item.selected');
+                    if ($selectedFromTree && $selectedFromTree.length) {
+                        var tempTree = [];
+                        for (var i = 0; i < $selectedFromTree.length; i++) {
+                            var selectedElement = $selectedFromTree[i].id;
+                            tempTree.push(selectedElement.replace('treea_', ''));
+                        }
+                        $.selected = tempTree;
+                    }
+                }
+                openCopyDialog();
+            });
 
             // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
             $('.shared-details-info-block .fm-leave-share').rebind('click', function(e) {

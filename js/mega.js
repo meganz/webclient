@@ -3192,6 +3192,9 @@ function loadfm_done(mDBload) {
                 M.avatars();
             }
         }
+        if ($.msgDialog) {
+            closeMsg();
+        }
         clearInterval(mega.loadReport.aliveTimer);
         mega.flags &= ~window.MEGAFLAG_LOADINGCLOUD;
 

@@ -229,13 +229,18 @@ mega.ui.tpp = {
     isCached: function() {
         'use strict';
         return false;
-    }
+    },
+    statusPaused: function() {},
+    hide: function() {}
 };
 
 mega.megadrop = {
     pufs: false,
     isInit: function() { return false; },
-    pufProcessDb: function() { return false; }
+    pufProcessDb: function() { return false; },
+    onRename: function() { return false; },
+    pupProcessPUP: function() { return false; },
+    pufProcessPUH:  function() { return false; }
 };
 
 var notify = {
@@ -282,6 +287,7 @@ function fm_hideoverlay() {
 mega.ui.showRegisterDialog = function() {};
 
 mega.loadReport = {};
+var previews = {};
 
 function removeUInode(nodeHandle, parentHandle) {
 

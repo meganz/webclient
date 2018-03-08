@@ -32,39 +32,8 @@ var ConversationMessageMixin = {
     },
     getContact: function() {
         var message = this.props.message;
-        var megaChat = this.props.message.chatRoom.megaChat;
 
-        var contact;
-        if (message.authorContact) {
-            contact = message.authorContact;
-        }
-        else if (message.meta && message.meta.userId) {
-            contact = M.u[message.meta.userId];
-            if (!contact) {
-                return {
-                    'u': message.meta.userId,
-                    'h': message.meta.userId,
-                    'c': 0,
-                };
-            }
-        }
-        else if (message.userId) {
-            if (!M.u[message.userId]) {
-                // data is still loading!
-                return null;
-            }
-            contact = M.u[message.userId];
-        }
-        else if (message.getFromJid) {
-            contact = megaChat.getContactFromJid(message.getFromJid());
-        }
-        else {
-            console.error("No idea how to render this: ", this.props);
-
-            return {};
-        }
-
-        return contact;
+        return Message.getContactForMessage(message);
     },
     getTimestampAsString: function() {
         return unixtimeToTimeString(this.getTimestamp());

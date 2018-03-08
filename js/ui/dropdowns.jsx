@@ -51,7 +51,7 @@ var Dropdown = React.createClass({
                 var $element = $(this.popupElement);
                 var positionToElement = $('.button.active:visible');
                 var offsetLeft = 0;
-                var $container = $element.closest('.jspPane:first');
+                var $container = positionToElement.closest('.messages.scroll-area');
 
                 if ($container.size() == 0) {
                     $container = $(document.body);
@@ -63,7 +63,7 @@ var Dropdown = React.createClass({
                     of: positionToElement,
                     my: self.props.positionMy ? self.props.positionMy : "center top",
                     at: self.props.positionAt ? self.props.positionAt : "center bottom",
-                    collision: "flip flip",
+                    collision: "flipfit",
                     within: $container,
                     using: function (obj, info) {
                         var vertOffset = 0;
@@ -222,7 +222,7 @@ var DropdownContactsSelector = React.createClass({
     render: function() {
         var self = this;
 
-        return <Dropdown className={"popup contacts-search " + this.props.className}
+        return <Dropdown className={"popup contacts-search " + this.props.className + " tooltip-blur"}
                          active={this.props.active}
                          closeDropdown={this.props.closeDropdown}
                          ref="dropdown"
@@ -231,7 +231,7 @@ var DropdownContactsSelector = React.createClass({
                 >
                 <ContactsUI.ContactPickerWidget
                     active={this.props.active}
-                    className="popup contacts-search"
+                    className="popup contacts-search tooltip-blur"
                     contacts={this.props.contacts}
                     megaChat={this.props.megaChat}
                     exclude={this.props.exclude}

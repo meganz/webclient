@@ -4433,44 +4433,38 @@ textarea.mobile.support-text-field {
 }
 
 .mobile.grid-view .mobile.fm-item.file .fm-icon.link {
-    margin-top: 1px;
+    margin-top: -1px;
     width: 27px;
 }
-
 .mobile.grid-view .mobile.file.thumb .mobile.fm-item-img img {
     height: auto;
     position: relative;
     width: auto;
     margin: 0 0 0 -10px;
 }
-
 .mobile.grid-view .mobile.fm-icon.open-context-menu {
     background-position: -197px -1664px;
     height: 100%;
     margin: 0;
     width: 37px;
 }
-
 .mobile.grid-view .mobile.file .mobile.fm-item-info {
     padding: 123px 28px 0 12px;
 }
 .mobile.grid-view .mobile.file .mobile.fm-icon.open-context-menu {
-    background-position: -197px -1667px;
+    background-position: -197px -1669px;
     height: 100%;
     margin: 0;
     width: 36px;
     height: 36px;
 }
-
 .mobile.grid-view .mobile.fm-item.file:last-of-type {
     margin-bottom: 32px;
 }
-
 .mobile.grid-view .mobile.fm-item .fm-icon.link {
     margin-top: 5px;
     width: 27px;
 }
-
 .mobile.grid-view .mobile.fm-item.line-break {
     height: 48px;
     cursor: pointer;
@@ -4482,7 +4476,9 @@ textarea.mobile.support-text-field {
     border-radius: 2px;
     margin-bottom: 8px;
 }
-
+.mobile.grid-view  .mobile.fm-item-name {
+    font-size: 14px;
+}
 /* Get support page */
 .support-form {
     position:relative;

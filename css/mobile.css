@@ -753,7 +753,7 @@ ul, li {
 .mobile.fm-item.undecrypted .fm-item-details {
     color: #ffa500;
 }
-.mobile.fm-item:nth-child(odd) {
+.mobile.fm-item:nth-child(even) {
     background-color: #fff;
 }
 .mobile.fm-icon {
@@ -4490,7 +4490,7 @@ textarea.mobile.support-text-field {
     border-radius: 2px;
     margin-bottom: 8px;
 }
-.mobile.grid-view  .mobile.fm-item-name {
+.mobile.grid-view .mobile.fm-item-name {
     font-size: 14px;
 }
 /* Get support page */
@@ -4520,7 +4520,6 @@ textarea.mobile.support-text-field {
     border-image: initial;
     border-radius: 100%;
 }
-
 .mobile.main-block form.inline-labels div.radioOn {
     border-width: 1px;
     border-style: solid;

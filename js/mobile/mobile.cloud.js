@@ -41,7 +41,8 @@ mobile.cloud = {
         this.renderFoldersAndFiles();
         this.renderFoldersAndFilesSubHeader();
         this.showEmptyCloudIfEmpty();
-
+        this.initGridViewToggleHandler();
+        
         // Init folder and file row handlers
         this.initFileRowClickHandler();
         this.initFolderRowClickHandler();
@@ -621,13 +622,15 @@ mobile.cloud = {
             // Prevent pre clicking one of the Open in Browser/App buttons
             return false;
         });
+    },
+
+    initGridViewToggleHandler: function() {
 
         var $viewButton = $('.mobile.file-manager-block .mobile.fm-icon.view-options');
         var $fileManagerBlock = $('.mobile.file-manager-block');
         
-        // If a folder row is tapped
+        // If the Grid/list view icon is tapped
         $viewButton.off('tap').on('tap', function() {
-    
 
             // Detect what view option is currently set
             if  ($viewButton.hasClass("grid-mode")) {
@@ -635,14 +638,12 @@ mobile.cloud = {
                 $viewButton.removeClass('grid-mode');
                 $viewButton.addClass('list-mode');
             }
-
             else if ($viewButton.hasClass("list-mode")) {
                 $fileManagerBlock.removeClass('grid-view');
                 $viewButton.removeClass('list-mode');
                 $viewButton.addClass('grid-mode');
                 
             }
-
         });
     },
 

@@ -970,7 +970,7 @@ FileManager.prototype.initContextUI = function() {
             if (count) {
                 var fldName = count > 1
                     ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
-                    : l[17403].replace('%1', M.d[$.selected[0]].name);
+                    : l[17403].replace('%1', escapeHTML(M.d[$.selected[0]].name));
                 msgDialog(
                     'confirmation',
                     l[1003],
@@ -1046,7 +1046,7 @@ FileManager.prototype.initContextUI = function() {
         if (count) {
             var fldName = count > 1
                 ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
-                : l[17403].replace('%1', M.d[$.selected[0]].name);
+                : l[17403].replace('%1', escapeHTML(M.d[$.selected[0]].name));
             msgDialog(
                 'confirmation',
                 l[1003],

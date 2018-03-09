@@ -412,7 +412,7 @@ mobile.cloud = {
         }
 
         // Remove files and folders but not the templates so that it can be re-rendered
-        $fileManager.find('.fm-item').not('.template').remove();
+        $fileManager.find('.fm-item, .clear').not('.template').remove();
 
         // Render the output all at once
         $fileManagerRows.append(output);

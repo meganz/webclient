@@ -751,7 +751,10 @@ ul, li {
 .mobile.fm-item.undecrypted .fm-item-details {
     color: #ffa500;
 }
-.mobile.fm-item:nth-child(even) {
+.mobile.fm-item.folder:nth-child(odd) {
+    background-color: #fff;
+}
+.mobile.fm-item.file:nth-child(even) {
     background-color: #fff;
 }
 .mobile.fm-icon {

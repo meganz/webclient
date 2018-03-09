@@ -944,6 +944,7 @@ ul, li {
 }
 .folder-link .mobile.fm-header-txt {
     padding: 14px 20px 0 20px;
+    overflow: initial;
 }
 .folder-link .mobile.fm-header-txt span {
     font-size: 18px;

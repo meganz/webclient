@@ -245,7 +245,6 @@ mobile.cloud = {
         // Reset header to blank slate so only buttons/items are enabled as needed
         $backButton.addClass('hidden');
         $cloudIcon.addClass('hidden');
-        $menuIcon.addClass('hidden');
         $fileManagerHeader.removeClass('folder-link');
         $folderIcon.addClass('hidden');
         $folderName.text('');
@@ -289,9 +288,6 @@ mobile.cloud = {
                 // Show the folder name
                 $folderName.text(currentFolder.name);
             }
-
-            // Show the hamburger menu icon
-            $menuIcon.removeClass('hidden');
         }
     },
 

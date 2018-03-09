@@ -297,7 +297,6 @@ ul, li {
     color: #444;
     word-break: break-all;
     white-space: normal;
-    letter-spacing: 0.2px;
     padding: 0 0 0 0;
     margin: -32px 15px 0 15px;
     font-family: 'source_sans_prosemibold';
@@ -317,7 +316,6 @@ ul, li {
 .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
     font-size: 19px;
     line-height: 24px;
-    letter-spacing: 1.9px;
     color: #AAAAAA;
     padding: 0 23px;
     margin: 8px 0 18px 0;
@@ -5291,11 +5289,10 @@ textarea.mobile.support-text-field {
         line-height: 20px;
     }
     .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
-        font-size: 15px;
+        font-size: 14px;
         line-height: 19px;
         margin: 6px 0 15px 0;
         padding: 0 18px;
-        letter-spacing: 1px;
     }
     .mobile.inline-buttons .mobile.red-button {
         line-height: 40px;
@@ -5472,10 +5469,10 @@ textarea.mobile.support-text-field {
     }
     .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
         margin: 3px 0 13px 0;
-        font-size: 16px;
+        font-size: 14px;
     }
     .mobile.filename {
-        font-size: 17px;
+        font-size: 15px;
         line-height: 20px;
         white-space: nowrap;
         overflow: hidden;

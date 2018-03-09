@@ -38,11 +38,11 @@ mobile.cloud = {
         // Render the file manager header, folders, files and footer
         this.renderHeader();
         this.sortViewAlphabeticallyAscending();
+        this.initGridViewToggleHandler();
         this.renderFoldersAndFiles();
         this.renderFoldersAndFilesSubHeader();
         this.showEmptyCloudIfEmpty();
-        this.initGridViewToggleHandler();
-        
+
         // Init folder and file row handlers
         this.initFileRowClickHandler();
         this.initFolderRowClickHandler();
@@ -624,27 +624,77 @@ mobile.cloud = {
         });
     },
 
+    /**
+     * Initialise the button to toggle the list-view / grid-view in the cloud drive
+     */
     initGridViewToggleHandler: function() {
 
-        var $viewButton = $('.mobile.file-manager-block .mobile.fm-icon.view-options');
+        // Cache selectors
+        var $changeViewButton = $('.mobile.file-manager-block .mobile.fm-icon.view-options');
         var $fileManagerBlock = $('.mobile.file-manager-block');
-        
-        // If the Grid/list view icon is tapped
-        $viewButton.off('tap').on('tap', function() {
 
-            // Detect what view option is currently set
-            if  ($viewButton.hasClass("grid-mode")) {
-                $fileManagerBlock.addClass('grid-view');
-                $viewButton.removeClass('grid-mode');
-                $viewButton.addClass('list-mode');
-            }
-            else if ($viewButton.hasClass("list-mode")) {
-                $fileManagerBlock.removeClass('grid-view');
-                $viewButton.removeClass('list-mode');
-                $viewButton.addClass('grid-mode');
-                
-            }
+        // If they have previously set the grid mode to be enabled and just done a refresh/reload then enable it again
+        if (localStorage.getItem('mobileGridViewModeEnabled') === '1') {
+            mobile.cloud.enableGridView($fileManagerBlock, $changeViewButton);
+        }
+        else {
+            // Otherwise enable the list view
+            mobile.cloud.enableListView($fileManagerBlock, $changeViewButton);
+        }
+
+        // If the Grid/list view icon is tapped
+        $changeViewButton.off('tap').on('tap', function() {
+
+            // Toggle the display
+            mobile.cloud.toggleGridView($fileManagerBlock, $changeViewButton);
         });
+    },
+
+    /**
+     * Toggles between list view and grid view
+     * @param {Object} $fileManagerBlock The cached jQuery selector for the file manager
+     * @param {Object} $changeViewButton The cached jQuery selector for the Change View icon
+     */
+    toggleGridView: function($fileManagerBlock, $changeViewButton) {
+
+        // If grid view is set already, enable list view
+        if ($fileManagerBlock.hasClass('grid-view')) {
+            mobile.cloud.enableListView($fileManagerBlock, $changeViewButton);
+        }
+        else {
+            // Otherwise if list view is set already, enable grid view
+            mobile.cloud.enableGridView($fileManagerBlock, $changeViewButton);
+        }
+    },
+
+    /**
+     * Enables the grid view
+     * @param {Object} $fileManagerBlock The cached jQuery selector for the file manager
+     * @param {Object} $changeViewButton The cached jQuery selector for the Change View icon
+     */
+    enableGridView: function($fileManagerBlock, $changeViewButton) {
+
+        $fileManagerBlock.addClass('grid-view');
+        $changeViewButton.removeClass('grid-icon');
+        $changeViewButton.addClass('list-icon');
+
+        // Save current grid view state for page refreshes/reloads
+        localStorage.setItem('mobileGridViewModeEnabled', '1');
+    },
+
+    /**
+     * Enables the list view
+     * @param {Object} $fileManagerBlock The cached jQuery selector for the file manager
+     * @param {Object} $changeViewButton The cached jQuery selector for the Change View icon
+     */
+    enableListView: function($fileManagerBlock, $changeViewButton) {
+
+        $fileManagerBlock.removeClass('grid-view');
+        $changeViewButton.removeClass('list-icon');
+        $changeViewButton.addClass('grid-icon');
+
+        // Save current list view state for page refreshes/reloads
+        localStorage.setItem('mobileGridViewModeEnabled', '0');
     },
 
     /**

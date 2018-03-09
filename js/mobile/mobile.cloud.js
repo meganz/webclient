@@ -364,8 +364,10 @@ mobile.cloud = {
         var $fileManagerRows = $fileManager.find('.fm-row .fm-scrolling');
         var $folderTemplateSelector = $fileManagerRows.find('.folder.template');
         var $fileTemplateSelector = $fileManagerRows.find('.file.template');
+        var $clearFixTemplateSelector = $fileManagerRows.find('.clear.template');
 
         var output = '';
+        var firstFileRendered = false;
 
         // Loop through top level nodes in the current view (M.v)
         for (var i = 0; i < M.v.length; i++) {
@@ -382,7 +384,15 @@ mobile.cloud = {
                 $nodeTemplate = this.updateFolderTemplate($folderTemplateSelector, node);
             }
             else {
-                // Otherwise render a file
+                // If the first file hasn't been rendered yet (i.e. all the folders have finished rendering) then add a
+                // clearfix Cloud Drive item which in grid-view mode clears the floating folders thus rendering the
+                // files below them and giving a better appearance.
+                if (!firstFileRendered) {
+                    output += $clearFixTemplateSelector.clone().removeClass('template').prop('outerHTML');
+                    firstFileRendered = true;
+                }
+
+                // Render a file
                 $nodeTemplate = this.updateFileTemplate($fileTemplateSelector, node);
             }
 

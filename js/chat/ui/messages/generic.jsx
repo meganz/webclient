@@ -257,7 +257,18 @@ var GenericConversationMessage = React.createClass({
     _startPreview: function(v, e) {
         var chatRoom = this.props.message.chatRoom;
         assert(M.chat, 'Not in chat.');
-        M.v = chatRoom.images.values();
+        var imagesList = [];
+        chatRoom.images.values().forEach(function(v) {
+            var msg = chatRoom.messagesBuff.getMessageById(v.messageId);
+            if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
+                chatRoom.images.removeByKey(v.id);
+                return;
+            }
+            imagesList.push(v);
+        });
+
+        M.v = imagesList;
+
         slideshow(v.h);
         if (e) {
             e.preventDefault();
@@ -457,7 +468,8 @@ var GenericConversationMessage = React.createClass({
                                 var imagesListKey = message.messageId + "_" + v.h;
                                 if (!chatRoom.images.exists(imagesListKey)) {
                                     v.id = imagesListKey;
-                                    v.delay = message.delay;
+                                    v.orderValue = message.orderValue;
+                                    v.messageId = message.messageId;
                                     chatRoom.images.push(v);
                                 }
                                 var previewLabel = is_video(v) ? l[17732] : l[1899];

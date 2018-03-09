@@ -4419,7 +4419,7 @@ textarea.mobile.support-text-field {
 }
 
 .mobile.grid-view .mobile.fm-item-info {
-    padding: 16px 28px 0 56px;
+    padding: 15px 28px 0 56px;
 }
 
 .mobile.grid-view .mobile.folder .mobile.fm-item-img {
@@ -4458,7 +4458,7 @@ textarea.mobile.support-text-field {
     height: 100%;
 }
 .mobile.grid-view .mobile.fm-icon.open-context-menu {
-    background-position: -197px -1664px;
+    background-position: -196px -1664px;
     height: 100%;
     margin: 0;
     width: 37px;

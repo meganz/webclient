@@ -2183,6 +2183,8 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
         case Term.kBusy:
             assert(!isIncoming);
             return UICallTerm.REJECTED;
+        case Term.kAppTerminating:
+            return UICallTerm.ENDED;
         default:
             var name = constStateToText(Term, terminationCode);
             if (RtcModule.termCodeIsError(terminationCode, name)) {

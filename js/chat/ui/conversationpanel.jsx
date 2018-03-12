@@ -853,6 +853,13 @@ var ConversationPanel = React.createClass({
             self.callJustEnded = true;
         });
 
+        self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
+            self.scrolledToBottom = true;
+            if (self.messagesListScrollable) {
+                self.messagesListScrollable.scrollToBottom();
+            }
+        });
+
         self.eventuallyInit();
     },
     eventuallyInit: function(doResize) {

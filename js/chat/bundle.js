@@ -4729,6 +4729,13 @@ React.makeElement = React['createElement'];
 	            self.callJustEnded = true;
 	        });
 
+	        self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
+	            self.scrolledToBottom = true;
+	            if (self.messagesListScrollable) {
+	                self.messagesListScrollable.scrollToBottom();
+	            }
+	        });
+
 	        self.eventuallyInit();
 	    },
 	    eventuallyInit: function eventuallyInit(doResize) {
@@ -11581,6 +11588,8 @@ React.makeElement = React['createElement'];
 	        'delay': unixtime(),
 	        'sent': Message.STATE.NOT_SENT
 	    });
+
+	    self.trigger('onSendMessage');
 
 	    self.appendMessage(msgObject);
 

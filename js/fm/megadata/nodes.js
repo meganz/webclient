@@ -775,8 +775,13 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                                 setsn(currsn);
 
                                 if (is_mobile) {
+                                    // In Mobile we can currently only move/delete one file/folder to one destination
+                                    var keys = Object.keys(ctx.handle);
+                                    var targetHandle = keys[0];
+                                    var nodeHandle = ctx.handle[targetHandle][0];
+
                                     // A hook for the mobile web to remove the node from the view and close the dialog
-                                    mobile.deleteOverlay.completeDeletionProcess(ctx.handle);
+                                    mobile.deleteOverlay.completeDeletionProcess(nodeHandle);
                                 }
                                 else {
                                     renderPromise = M.updFileManagerUI();

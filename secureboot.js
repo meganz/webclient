@@ -2064,6 +2064,7 @@ else if (!b_u) {
     jsl.push({f:'js/fm/megadata/sort.js', n: 'fm_megadata_sort_js', j: 1});
     jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
     jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
+    jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2132,7 +2133,6 @@ else if (!b_u) {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
-        'megasync_js': {f:'html/js/megasync.js', n: 'megasync_js', j:1},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
         'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
@@ -2271,7 +2271,7 @@ else if (!b_u) {
         'register': ['register','register_js', 'zxcvbn_js'],
         'newsignup': ['register','register_js', 'zxcvbn_js'],
         'resellers': ['resellers'],
-        '!': ['download','download_js', 'megasync_js'],
+        '!': ['download','download_js'],
         'dispute': ['dispute'],
         'disputenotice': ['disputenotice', 'disputenotice_js'],
         'copyright': ['copyright'],
@@ -2279,7 +2279,7 @@ else if (!b_u) {
         'privacy': ['privacy','privacycompany'],
         'mega': ['mega'],
         'takedown': ['takedown'],
-        'sync': ['sync', 'sync_js', 'megasync_js'],
+        'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],

@@ -202,6 +202,9 @@ MegaUtils.prototype.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
     method = options.method || (aData && 'POST') || 'GET';
 
     xhr = getxhr();
+    if (options.timeout) {
+        xhr.timeout = options.timeout;
+    }
 
     if (typeof options.prepare === 'function') {
         options.prepare(xhr);

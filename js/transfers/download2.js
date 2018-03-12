@@ -1770,7 +1770,7 @@ var dlmanager = {
      * @return {MegaPromise}
      */
     isMEGAsyncRunning: function(minVersion, getVersionInfo) {
-        var timeout = 200;
+        var timeout = 400;
         var logger = this.logger;
         var promise = new MegaPromise();
 
@@ -1909,7 +1909,7 @@ var dlmanager = {
     showMEGASyncOverlay: function(onSizeExceed, dlStateError) {
         'use strict';
 
-        M.require('megasync_js').dump();
+        //M.require('megasync_js').dump();
 
         var $overlay = $('.megasync-overlay');
         var $body = $('body');

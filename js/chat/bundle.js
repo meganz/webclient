@@ -8674,7 +8674,7 @@ React.makeElement = React['createElement'];
 	    },
 	    getInitialState: function getInitialState() {
 	        return {
-	            'selected': -1
+	            'selected': 0
 	        };
 	    },
 

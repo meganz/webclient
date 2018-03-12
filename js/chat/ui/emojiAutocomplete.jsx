@@ -17,7 +17,7 @@ var EmojiAutocomplete = React.createClass({
     },
     getInitialState: function() {
         return {
-            'selected': -1
+            'selected': 0
         };
     },
 

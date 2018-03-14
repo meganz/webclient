@@ -18,7 +18,8 @@ var EmoticonsFilter = function(megaChat) {
                 self.map[meta.n.toLowerCase()] = meta.u;
             });
         });
-
+    self.reservedEmotions = {};
+    self.reservedEmotions["tm"] = '\u2122';
 
     megaChat.bind("onBeforeRenderMessage", function(e, eventData) {
         self.processMessage(e, eventData);
@@ -96,6 +97,11 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
         foundSlug = foundSlug.substr(1).substr(0, foundSlug.length - 2);
 
         var utf = self.map[foundSlug];
+        if (self.reservedEmotions[foundSlug]) {
+            return '<img class="emoji" draggable="false" alt="' + self.reservedEmotions[foundSlug] + '" src="' +
+                    staticpath + 'images/mega/twemojis/2_v2/' + twemoji.size + '/' +
+                    twemoji.convert.toCodePoint(self.reservedEmotions[foundSlug]) + twemoji.ext + '"/>';
+        }
         if (!utf) {
             return match;
         }
@@ -157,7 +163,7 @@ EmoticonsFilter.prototype.processOutgoingMessage = function(e, messageObject) {
 
         var utf = self.map[foundSlug];
 
-        if (utf) {
+        if (utf && !self.reservedEmotions[foundSlug]) {
             return match.replace(origSlug, utf);
         } else {
             return match;
@@ -176,6 +182,9 @@ EmoticonsFilter.prototype.fromUtfToShort = function(s) {
         }
         var found = false;
         Object.keys(self.map).forEach(function(slug) {
+            if (self.reservedEmotions[slug]) {
+                return false;
+            }
             var utf = self.map[slug];
             cached[utf] = slug;
 

@@ -4686,6 +4686,8 @@ React.makeElement = React['createElement'];
 	    },
 
 	    uploadFromComputer: function uploadFromComputer() {
+	        this.scrolledToBottom = true;
+
 	        this.props.chatRoom.uploadFromComputer();
 	    },
 	    refreshUI: function refreshUI() {
@@ -4725,6 +4727,13 @@ React.makeElement = React['createElement'];
 
 	        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
 	            self.callJustEnded = true;
+	        });
+
+	        self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
+	            self.scrolledToBottom = true;
+	            if (self.messagesListScrollable) {
+	                self.messagesListScrollable.scrollToBottom();
+	            }
 	        });
 
 	        self.eventuallyInit();
@@ -5266,6 +5275,8 @@ React.makeElement = React['createElement'];
 	                onAttachClicked: function onAttachClicked() {
 	                    self.setState({ 'attachCloudDialog': false });
 
+	                    self.scrolledToBottom = true;
+
 	                    room.attachNodes(selected);
 	                }
 	            });
@@ -5383,6 +5394,8 @@ React.makeElement = React['createElement'];
 	                            });
 	                        } catch (e) {}
 
+	                        self.scrolledToBottom = true;
+
 	                        M.addUpload([meta[0]]);
 
 	                        self.setState({
@@ -5434,6 +5447,8 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'truncateDialog': false });
 	                    },
 	                    onConfirmClicked: function onConfirmClicked() {
+	                        self.scrolledToBottom = true;
+
 	                        room.truncate();
 
 	                        self.setState({
@@ -5455,6 +5470,8 @@ React.makeElement = React['createElement'];
 	        if (self.state.renameDialog === true) {
 	            var onEditSubmit = function onEditSubmit(e) {
 	                if ($.trim(self.state.renameDialogValue).length > 0 && self.state.renameDialogValue !== self.props.chatRoom.getRoomTitle()) {
+	                    self.scrolledToBottom = true;
+
 	                    var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
 	                    var promises = [];
 	                    promises.push(ChatdIntegration._ensureKeysAreLoaded(undefined, participants));
@@ -5575,6 +5592,8 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'attachCloudDialog': true });
 	                    },
 	                    onAddParticipantSelected: function onAddParticipantSelected(contactHashes) {
+	                        self.scrolledToBottom = true;
+
 	                        if (self.props.chatRoom.type == "private") {
 	                            var megaChat = self.props.chatRoom.megaChat;
 
@@ -5741,7 +5760,23 @@ React.makeElement = React['createElement'];
 	                                },
 	                                onConfirm: function onConfirm(messageContents) {
 	                                    if (messageContents && messageContents.length > 0) {
-	                                        self.props.chatRoom.sendMessage(messageContents);
+	                                        if (!self.scrolledToBottom) {
+	                                            self.scrolledToBottom = true;
+	                                            self.lastScrollPosition = 0;
+
+	                                            $(self.props.chatRoom).bind('onMessagesBuffAppend.pull', function () {
+	                                                self.messagesListScrollable.scrollToBottom(false);
+	                                                setTimeout(function () {
+	                                                    self.messagesListScrollable.enable();
+	                                                }, 1500);
+	                                            });
+
+	                                            self.props.chatRoom.sendMessage(messageContents);
+	                                            self.messagesListScrollable.disable();
+	                                            self.messagesListScrollable.scrollToBottom(true);
+	                                        } else {
+	                                            self.props.chatRoom.sendMessage(messageContents);
+	                                        }
 	                                    }
 	                                }
 	                            },
@@ -11565,6 +11600,8 @@ React.makeElement = React['createElement'];
 	        'delay': unixtime(),
 	        'sent': Message.STATE.NOT_SENT
 	    });
+
+	    self.trigger('onSendMessage');
 
 	    self.appendMessage(msgObject);
 

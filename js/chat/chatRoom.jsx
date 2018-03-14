@@ -766,6 +766,8 @@ ChatRoom.prototype.sendMessage = function(message) {
     );
 
 
+    self.trigger('onSendMessage');
+
     self.appendMessage(msgObject);
 
     self._sendMessageToTransport(msgObject)

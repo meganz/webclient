@@ -913,19 +913,23 @@ FileManager.prototype.initContextUI = function() {
         }
 
         currentId = $this.attr('id');
+        var clearedId;
         if (currentId) {
-            M.buildSubMenu(currentId.replace('fi_', ''));
+            clearedId = currentId.replace('fi_', '');
+            M.buildSubMenu(clearedId);
         }
 
         // Show necessary submenu
         if (!$this.hasClass('opened') && $this.hasClass('contains-submenu')) {
-            menuPos = M.reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
+            if (!clearedId || $('#csb_' + clearedId + ' > .dropdown-item').length > 0) {
+                menuPos = M.reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
 
-            $this.next('.submenu')
-                .css({'top': menuPos.top})
-                .addClass('active');
+                $this.next('.submenu')
+                    .css({'top': menuPos.top})
+                    .addClass('active');
 
-            $this.addClass('opened');
+                $this.addClass('opened');
+            }
         }
     });
 

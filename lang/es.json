@@ -4663,7 +4663,7 @@
     "17736": "Symbols",
     "17737": "Frequently Used",
     "17738": "Hola, \u00fanete a MEGA y obt\u00e9n acceso a almacenamiento y comunicaci\u00f3n cifrados.",
-    "17739": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
+    "17739": "Las carpetas no se pueden combinar porqu\u00e9 est\u00e1n compartidas o tienen un enlace asociado. Si quieres combinarlas tendr\u00e1s que eliminar la compartici\u00f3n o el enlace y volver a intentarlo.",
     "17740": "Hemos cerrado tu cuenta debido a un incumplimiento de los T\u00e9rminos de servicio de MEGA, como el abuso de los derechos de terceros, la compartici\u00f3n y\/o importaci\u00f3n de datos ilegales o el abuso del sistema.",
     "17741": "Tu cuenta ha sido suspendida debido a infracciones m\u00faltiples de los T\u00e9rminos de servicio de MEGA. Por favor revisa la bandeja de entrada de tu correo electr\u00f3nico.",
     "17742": "Arrastra aqu\u00ed para [S]subir[\/S]",
@@ -4711,5 +4711,8 @@
     "17784": "Calidad multimedia del chat",
     "17785": "Original",
     "17788": "%1$s has accepted your contact request.",
-    "17789": "The entered tax number is invalid."
+    "17789": "El n\u00famero de identificaci\u00f3n tributaria no es v\u00e1lido.",
+    "17791": "Filtro",
+    "17792": "Tu disco principal est\u00e1 lleno. Por favor libera espacio y prueba de nuevo. ",
+    "17793": "Desgraciadamente Chrome s\u00f3lo permite que MEGA use una parte del espacio disponible en tu disco que actualmente es insuficiente. Instala [A1]la aplicaci\u00f3n de escritorio[\/A1] o nuestra [A2]extensi\u00f3n de Chrome[\/A2], o [A3]libera espacio[\/A3]."
 }

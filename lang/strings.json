@@ -18850,5 +18850,17 @@
     "17789": {
         "text": "The entered tax number is invalid.",
         "context": "An error dialog message explaining that the tax number (CPF, RUT, DNI, etc) the user entered is invalid for that country."
+    },
+    "17791": {
+        "text": "Filter",
+        "context": "Label of block with filter parameters. User is able filter folders by color label."
+    },
+    "17792": {
+        "text": "Your primary disk volume is full. Please free up some space and try again.",
+        "context": "Message shown to Chrome Extension users when running out of disk space when attempting to download something."
+    },
+    "17793": {
+        "text": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3].",
+        "context": "Message shown to Chrome users when running out of disk space when attempting to download something."
     }
 }

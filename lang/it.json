@@ -2292,7 +2292,7 @@
     "7508": "Sei sicuro di voler spostare 1 file e %d cartelle nel Cestino?",
     "7509": "Sei sicuro di voler spostare %d files e 1 cartella nel Cestino?",
     "7511": "1 file mosso nel Cestino",
-    "7512": "%d file spostati nel Cestino!",
+    "7512": "%d file spostati nel Cestino",
     "7513": "Errori di permessi",
     "7514": "Controllare le autorizzazioni per questa cartella",
     "7515": "Cartella condivisa",
@@ -2326,8 +2326,8 @@
     "7547": "Stai per rimuovere in modo permanente 1 file e 1 cartella. Vuoi continuare? (Non \u00e8 possibile annullare questa azione.)",
     "7548": "Stai per rimuovere in modo permanente 1 file e %d cartelle. Vuoi continuare? (Non \u00e8 possibile annullare questa azione.)",
     "7549": "Stai per rimuovere in modo permanente %d file e 1 cartella. Vuoi continuare? (Non \u00e8 possibile annullare questa azione.)",
-    "7551": "1 file rimosso da MEGA!",
-    "7552": "%d files rimossi da MEGA!",
+    "7551": "1 file rimosso da MEGA",
+    "7552": "%d files rimossi da MEGA",
     "7553": "La nuova e la vecchia password non possono corrispondere.",
     "7554": "Passcode semplice",
     "7555": "Cancella dati locali",
@@ -4711,5 +4711,8 @@
     "17784": "Qualit\u00e0 dei media della chat",
     "17785": "Originale",
     "17788": "%1$s ha accettato la tua richiesta di contatto.",
-    "17789": "Il codice fiscale inserito non \u00e8 valido."
+    "17789": "Il codice fiscale inserito non \u00e8 valido.",
+    "17791": "Filtro",
+    "17792": "Lo spazio del tuo disco principale \u00e8 pieno. Per favore, libera un po' di spazio e riprova.",
+    "17793": "Sfortunatamente, Chrome permette che MEGA utilizzi solo una parte dello spazio disponibile sul disco, che \u00e8 insufficiente. Per favore, installa [A1]l'app per desktop di MEGA[\/A1] o la nostra [A2]estensione per Chrome[\/A2], oppure prova a [A3]liberare un po' di spazio[\/A3]."
 }

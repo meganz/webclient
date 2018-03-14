@@ -2326,8 +2326,8 @@
     "7547": "Est\u00e1 prestes a remover permanentemente 1 ficheiro e 1 pasta. Pretende continuar? (Esta a\u00e7\u00e3o \u00e9 irrevers\u00edvel.)",
     "7548": "Est\u00e1 prestes a remover permanentemente  1 ficheiro e %d pastas. Pretende continuar? (Esta a\u00e7\u00e3o \u00e9 irrevers\u00edvel.)",
     "7549": "Est\u00e1 prestes a remover permanentemente  %d ficheiros e 1 pasta. Pretende continuar? (Esta a\u00e7\u00e3o \u00e9 irrevers\u00edvel.)",
-    "7551": "1 ficheiro removido da MEGA!",
-    "7552": "%d ficheiros removidos da MEGA!",
+    "7551": "1 ficheiro removido da MEGA",
+    "7552": "%d ficheiros removidos da MEGA",
     "7553": "A nova e a antiga palavra-passe n\u00e3o podem ser iguais.",
     "7554": "C\u00f3digo de acesso simples",
     "7555": "Apagar dados locais",
@@ -4711,5 +4711,8 @@
     "17784": "Chat media quality",
     "17785": "Original",
     "17788": "%1$s has accepted your contact request.",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17791": "Filter",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

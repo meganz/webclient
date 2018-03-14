@@ -555,7 +555,7 @@
     "1233": "PayPal",
     "1262": "Veuillez saisir votre ville",
     "1272": "MEGA a \u00e9t\u00e9 con\u00e7u par des humains et n'est donc pas parfait. Si vous rencontrez un bogue, nous aimerions le savoir afin de le corriger. Plus vous fournirez de d\u00e9tails, mieux ce sera.",
-    "1273": "Nous prenons les droits de propri\u00e9t\u00e9 intellectuelle au s\u00e9rieux et nous appliquons une politique forte de retrait et de violations r\u00e9p\u00e9t\u00e9es.",
+    "1273": "Nous prenons les droits de propri\u00e9t\u00e9 intellectuelle au s\u00e9rieux. Nous appliquons une politique stricte de contr\u00f4le des retraits et violations r\u00e9p\u00e9t\u00e9es.",
     "1274": "Pour plus d'informations, lire nos [A]informations sur les retraits[\/A].",
     "1275": "Vous pouvez envoyer un avis de retrait gr\u00e2ce \u00e0 notre [A]formulaire en ligne[\/A] ou par courriel.",
     "1276": "Avez-vous des pr\u00e9occupations ou des id\u00e9es\u2009? Voulez-vous en apprendre davantage sur nos produits\u2009?",
@@ -2357,7 +2357,7 @@
     "7591": "Vous avez s\u00e9lectionn\u00e9 plus de {0} \u00e9l\u00e9ments ({1}) \u00e0 t\u00e9l\u00e9charger. Voulez-vous poursuivre?",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
-    "7595": "R\u00e9cup\u00e9ration des fichiers et dossiers\u2026 [{0}]",
+    "7595": "R\u00e9cup\u00e9ration des fichiers et dossiers... [{0}]",
     "7596": "D\u00e9placement vers la corbeille...",
     "7597": "Dossier vide",
     "7598": "Non d\u00e9marr\u00e9",
@@ -4711,5 +4711,8 @@
     "17784": "Qualit\u00e9 des fichiers multim\u00e9dias pour les discussions",
     "17785": "Original",
     "17788": "%1$s has accepted your contact request.",
-    "17789": "Le num\u00e9ro d\u2019identification fiscale saisi est invalide."
+    "17789": "Le num\u00e9ro d\u2019identification fiscale saisi est invalide.",
+    "17791": "Filtre",
+    "17792": "Votre volume de stockage principal est plein. Veuillez lib\u00e9rer de l\u2019espace et ressayer.",
+    "17793": "Malheureusement, Chrome ne permet \u00e0 MEGA de n\u2019utiliser qu\u2019une partie de l\u2019espace disque libre, qui est actuellement insuffisant. Veuillez installer l\u2019[A1]appli MEGA pour ordinateur[\/A1] ou notre [A2]extension Chrome[\/A2], ou encore essayer de [A3]lib\u00e9rer de l\u2019espace[\/A3]."
 }

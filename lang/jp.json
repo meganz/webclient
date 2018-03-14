@@ -4711,5 +4711,8 @@
     "17784": "\u30c1\u30e3\u30c3\u30c8\u30e1\u30c7\u30a3\u30a2\u306e\u54c1\u8cea",
     "17785": "\u30aa\u30ea\u30b8\u30ca\u30eb",
     "17788": "%1$s has accepted your contact request.",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17791": "Filter",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

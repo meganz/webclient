@@ -2291,8 +2291,8 @@
     "7507": "Ali ste prepri\u010dani, da \u017eelite premakniti 1 datoteko in 1 mapo v ko\u0161?",
     "7508": "Ali ste prepri\u010dani, da \u017eelite premakniti 1 datoteko in %d map v ko\u0161?",
     "7509": "Ali ste prepri\u010dani, da \u017eelite premakniti %d datotek in 1 mapo v ko\u0161?",
-    "7511": "1 datoteka premaknjena v ko\u0161!",
-    "7512": "%d datotek premaknjenih v ko\u0161!",
+    "7511": "1 datoteka premaknjena v ko\u0161",
+    "7512": "%d datotek premaknjenih v ko\u0161",
     "7513": "Te\u017eave z dovoljenji",
     "7514": "Preverite svoje pravice na tej mapi",
     "7515": "Mapa deljena!",
@@ -2326,8 +2326,8 @@
     "7547": "Nameravate trajno odstraniti 1 datoteko in 1 mapo. Ali \u017eelite nadaljevati? (Tega postopka ne morete povrniti)",
     "7548": "Nameravate trajno odstraniti 1 datoteko in %d map. Ali \u017eelite nadaljevati? (Tega postopka ne morete povrniti)",
     "7549": "Nameravate trajno odstraniti %d datotek in 1 mapo. Ali \u017eelite nadaljevati? (Tega postopka ne morete povrniti)",
-    "7551": "1 datoteka odstranjena z MEGA!",
-    "7552": "%d datotek odstranjenih z MEGA!",
+    "7551": "1 datoteka odstranjena z MEGA",
+    "7552": "%d datotek odstranjenih z MEGA",
     "7553": "Staro in novo geslo ne smeta biti enaki.",
     "7554": "Preprosta koda",
     "7555": "Izbri\u0161i lokalne podatke",
@@ -4711,5 +4711,8 @@
     "17784": "Chat media quality",
     "17785": "Original",
     "17788": "%1$s has accepted your contact request.",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17791": "Filter",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

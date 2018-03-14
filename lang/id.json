@@ -2291,8 +2291,8 @@
     "7507": "Anda yakin ingin memindahkan 1 file dan 1 folder ke Sampah?",
     "7508": "Anda yakin ingin memindahkan 1 file dan %d folder ke Sampah?",
     "7509": "Anda yakin ingin memindahkan %d file dan 1 folder ke Sampah?",
-    "7511": "1 file dipindahkan ke Sampah!",
-    "7512": "%d file dipindahkan ke Sampah!",
+    "7511": "1 file dipindahkan ke Sampah",
+    "7512": "%d file dipindahkan ke Sampah",
     "7513": "Permissions error",
     "7514": "Cek permission anda untuk folder ini",
     "7515": "Folder dibagikan",
@@ -2326,8 +2326,8 @@
     "7547": "Anda sedang akan menghapus 1 file dan 1 folder. Apakah anda ingin melanjutkan? (Anda tidak dapat membalikan aksi ini.)",
     "7548": "Anda sedang akan menghapus 1 file dan %d folder secara permanen. Apakah anda ingin melanjutkan? (Anda tidak dapat membalikan aksi ini.)",
     "7549": "Anda sedang akan menghapus %d file dan 1 folder. Apakah anda ingin melanjutkan? (Anda tidak dapat membalikan aksi ini.)",
-    "7551": "1 file dihapuskan dari MEGA!",
-    "7552": "%d file dihapus dari MEGA!",
+    "7551": "1 file dihapuskan dari MEGA",
+    "7552": "%d file dihapus dari MEGA",
     "7553": "Password baru dan lama tidak sama.",
     "7554": "Passcode sederhana",
     "7555": "Hapus data lokal",
@@ -4711,5 +4711,8 @@
     "17784": "Chat media quality",
     "17785": "Original",
     "17788": "%1$s has accepted your contact request.",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17791": "Filter",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

@@ -2291,8 +2291,8 @@
     "7507": "Opravdu chcete p\u0159esunout 1 soubor a 1 slo\u017eku do ko\u0161e?",
     "7508": "Opravdu chcete p\u0159esunout 1 soubor a %d slo\u017eek do ko\u0161e?",
     "7509": "Opravdu chcete p\u0159esunout %d soubor\u016f a 1 slo\u017eku do ko\u0161e?",
-    "7511": "1 soubor p\u0159esunut do ko\u0161e!",
-    "7512": "%d soubor\u016f p\u0159esunuto do ko\u0161e!",
+    "7511": "1 soubor p\u0159esunut do ko\u0161e",
+    "7512": "%d soubor\u016f p\u0159esunuto do ko\u0161e",
     "7513": "Chyba opr\u00e1vn\u011bn\u00ed",
     "7514": "Zkontrolujte sv\u00e1 opr\u00e1vn\u011bn\u00ed u t\u00e9to slo\u017eky",
     "7515": "Slo\u017eka sd\u00edlena!",
@@ -2326,8 +2326,8 @@
     "7547": "Chyst\u00e1te se trvale odebrat 1 soubor a 1 slo\u017eku. Chcete pokra\u010dovat? (Tuto akci nem\u016f\u017eete vr\u00e1tit zp\u011bt.)",
     "7548": "Chyst\u00e1te se trvale odebrat 1 soubor a %d slo\u017eek. Chcete pokra\u010dovat? (Tuto akci nem\u016f\u017eete vr\u00e1tit zp\u011bt.)",
     "7549": "Chyst\u00e1te se trvale odebrat %d soubor\u016f a 1 slo\u017eku. Chcete pokra\u010dovat? (Tuto akci nem\u016f\u017eete vr\u00e1tit zp\u011bt.)",
-    "7551": "1 soubor odebr\u00e1n z MEGA!",
-    "7552": "%d soubor\u016f odebr\u00e1no z MEGA!",
+    "7551": "1 soubor odebr\u00e1n z MEGA",
+    "7552": "%d soubor\u016f odebr\u00e1no z MEGA",
     "7553": "Nov\u00e9 a star\u00e9 heslo se nemohou shodovat.",
     "7554": "Jednoduch\u00e9 heslo",
     "7555": "Smazat m\u00edstn\u00ed data",
@@ -4711,5 +4711,8 @@
     "17784": "Chat media quality",
     "17785": "Original",
     "17788": "%1$s has accepted your contact request.",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17791": "Filter",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

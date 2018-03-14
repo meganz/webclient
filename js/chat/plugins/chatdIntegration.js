@@ -905,7 +905,8 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
                             v.id = imagesListKey;
-                            v.delay = message.delay;
+                            v.orderValue = message.orderValue;
+                            v.messageId = message.messageId;
                             chatRoom.images.push(v);
                         }
                     }

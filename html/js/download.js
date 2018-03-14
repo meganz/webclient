@@ -531,9 +531,6 @@ function dl_g(res) {
                             return dlmanager.showOverQuotaDialog();
                         }
 
-                        if (!d) {
-                            api_req({a: 'log', e: 99668, m: 'video watch'});
-                        }
                         if (mediaCollectFn) {
                             onIdle(mediaCollectFn);
                             mediaCollectFn = null;
@@ -543,6 +540,13 @@ function dl_g(res) {
                         $pageScrollBlock.find('.viewer-pending').removeClass('hidden');
 
                         vsp.then(function(stream) {
+                            if (stream.error) {
+                                onIdle(function() {
+                                    $pageScrollBlock.removeClass('video-theatre-mode video');
+                                });
+                                return msgDialog('warninga', l[135], l[47], stream.error);
+                            }
+
                             if (String(res.fa).indexOf(':0*') < 0 || String(res.fa).indexOf(':1*') < 0) {
                                 // TODO: refactor this with similar code at imagesViewer.js
                                 var storeImage = function(ab) {

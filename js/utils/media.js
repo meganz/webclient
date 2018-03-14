@@ -637,6 +637,10 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             options = destroy;
             destroy = null;
         }
+        var c = MediaAttribute.getCodecStrings(node);
+        if (c) {
+            options = Object.assign(Object.create(null), {type: c && c[0]}, options);
+        }
         var s = Streamer(node.link || node.h, $wrapper.find('video').get(0), options);
 
         _initVideoControls($wrapper, s);
@@ -689,6 +693,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         s.on('error', function(ev, error) {
             // <video>'s element `error` handler
 
+            var emsg;
             var info = [2].concat(MediaAttribute.getCodecStrings(node)).concat(s.hasVideo, s.hasAudio);
 
             if (!$.dialog) {
@@ -700,21 +705,28 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                     hint = l[16151] + ' ' + l[242];
                 }
 
-                if (String(hint) === 'The provided type is not supported') {
-                    msgDialog('warninga', l[135], l[17743]);
+                emsg = String(hint) === 'The provided type is not supported' ? l[17743] : hint;
+
+                if (s.options.autoplay) {
+                    msgDialog('warninga', l[135], l[47], emsg);
                 }
                 else {
-                    msgDialog('warninga', l[135], l[47], hint);
+                    // $wrapper.removeClass('video-theatre-mode video');
                 }
             }
             if (d) {
                 console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime, error, info);
             }
             destroy();
+            s.error = emsg;
 
-            if (!d) {
-                api_req({a: 'log', e: 99669, m: JSON.stringify(info)});
+            if (!d && String(Object.entries).indexOf('native') > 0) {
+                eventlog(99669, JSON.stringify(info));
             }
+        });
+
+        s.on('playing', function() {
+            eventlog(s.options.type === 'WebM' ? 99681 : 99668);
         });
 
         return s;
@@ -1788,6 +1800,16 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                     }
                     return MediaSource.isTypeSupported(amime) ? 2 : 0;
                 }
+                break;
+
+            case 'WebM':
+                switch (window.chrome && videocodec) {
+                    case 'V_VP8':
+                    case 'V_VP9':
+                        var codec = videocodec.substr(2).toLowerCase();
+                        return MediaSource.isTypeSupported('video/webm; codecs="' + codec + '"') ? 1 : 0;
+                }
+                break;
         }
 
         return 0;

@@ -781,10 +781,34 @@ function srvlog2(type /*, ...*/) {
         }
         args.unshift((is_extension ? 'e' : 'w') + (version || '-'));
 
-        api_req({a: 'log', e: 99666, m: JSON.stringify(args)});
+        eventlog(99666, JSON.stringify(args));
     }
 }
 
+// fire an event log
+function eventlog(id, msg, once) {
+    if ((id = parseInt(id)) >= 99600) {
+        var req = {a: 'log', e: id};
+
+        if (msg === true) {
+            once = true;
+            msg = 0;
+        }
+
+        if (msg) {
+            req.m = String(msg);
+        }
+
+        if (!once || !eventlog.sent[id]) {
+            eventlog.sent[id] = [Date.now(), M.getStack()];
+            api_req(req);
+        }
+    }
+    else {
+        console.error('Invalid event log.', arguments);
+    }
+}
+eventlog.sent = Object.create(null);
 
 function oDestroy(obj) {
     if (window.d) {

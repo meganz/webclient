@@ -490,6 +490,11 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
     l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
     l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
+    l[17793] = escapeHTML(l[17793])
+        .replace('[A1]', '<a href="/sync" class="clickurl">').replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
+        .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
+
     // l[] = escapeHTML(l[]).replace('', '');
 
     // carefully replace various strings to adhere to the new pro quotas:

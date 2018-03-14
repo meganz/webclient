@@ -4538,6 +4538,8 @@
     "17588": "Invite Sent",
     "17589": "Later",
     "17590": "by %1",
+    "17592": "Downloading with MEGAsync ...",
+    "17593": "Download is queued in MEGAsync ...",
     "17595": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
     "17596": "Enable or disable file versioning for your entire account:",
     "17597": "You may still receive file versions from shared folders if your contacts have this enabled.",
@@ -4710,9 +4712,14 @@
     "17783": "Chat uploading",
     "17784": "Chat media quality",
     "17785": "Original",
+    "17786": "An annual subscription is 17% cheaper than 12 monthly payments",
     "17788": "%1$s has accepted your contact request.",
     "17789": "The entered tax number is invalid.",
     "17791": "Filter",
     "17792": "Your primary disk volume is full. Please free up some space and try again.",
-    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3].",
+    "17794": "Initialising...",
+    "17795": "MEGAsync stopped responding, it could be closed or too busy.",
+    "17796": "Do you want to re-initialise the connection with MEGAsync and turn it off if MEGAsync does not respond?",
+    "17797": "Download sent to MEGASync"
 }

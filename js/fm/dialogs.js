@@ -378,7 +378,7 @@
             if ($.selected.length) {
                 allowConversationTab = true;
                 for (var e = 0; e < $.selected.length; e++) {
-                    if (M.d[$.selected[e]].t !== 0) {
+                    if (!M.d[$.selected[e]] || M.d[$.selected[e]].t !== 0) {
                         allowConversationTab = false;
                         break;
                     }

@@ -18155,6 +18155,14 @@
         "text": "by %1",
         "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
     },
+    "17592": {
+        "text": "Downloading with MEGAsync ...",
+        "context": "Download status description of a file download."
+    },
+    "17593": {
+        "text": "Download is queued in MEGAsync ...",
+        "context": "Download status description for while downloading a file with MEGASync (from a file link)\r\nScreenshot contains the place of this status."
+    },
     "17595": {
         "text": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
         "context": "A confirmation message when the user chooses to disable file versioning."
@@ -18843,6 +18851,10 @@
         "text": "Original",
         "context": "the options of what to upload."
     },
+    "17786": {
+        "text": "An annual subscription is 17% cheaper than 12 monthly payments",
+        "context": "This text is shown in the purchase plan view to explain that an annual subscription is 17% cheaper than 12 individual monthly payments."
+    },
     "17788": {
         "text": "%1$s has accepted your contact request.",
         "context": "Message that will be received as a push notification to the user's phone, to inform them that one of their contact invites that they have sent out has been accepted. The %1$s is a placeholder for the accepting user's name."
@@ -18850,5 +18862,33 @@
     "17789": {
         "text": "The entered tax number is invalid.",
         "context": "An error dialog message explaining that the tax number (CPF, RUT, DNI, etc) the user entered is invalid for that country."
+    },
+    "17791": {
+        "text": "Filter",
+        "context": "Label of block with filter parameters. User is able filter folders by color label."
+    },
+    "17792": {
+        "text": "Your primary disk volume is full. Please free up some space and try again.",
+        "context": "Message shown to Chrome Extension users when running out of disk space when attempting to download something."
+    },
+    "17793": {
+        "text": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3].",
+        "context": "Message shown to Chrome users when running out of disk space when attempting to download something."
+    },
+    "17794": {
+        "text": "Initialising...",
+        "context": "Initialising status which appears at the beginning of downloading a file through MEGAsync via a public file link."
+    },
+    "17795": {
+        "text": "MEGAsync stopped responding, it could be closed or too busy.",
+        "context": "A dialog box message warning which appears when MEGAsync stops responding."
+    },
+    "17796": {
+        "text": "Do you want to re-initialise the connection with MEGAsync and turn it off if MEGAsync does not respond?",
+        "context": "A dialog warning box sub-message which appears if MEGAsync stopped responding.\r\n"
+    },
+    "17797": {
+        "text": "Download sent to MEGASync",
+        "context": "A toast appears when the user download something while integrating with MEGASync"
     }
 }

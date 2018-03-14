@@ -768,8 +768,11 @@ FileManager.prototype.updFileManagerUI = function() {
         if (newNode.su) {
             newshare = true;
         }
-        if (newNode.p && newNode.t) {
+        if (newNode.p && (newNode.t || newNode.needUiUpdate)) {
             treebuild[newNode.p] = 1;
+            if (newNode.needUiUpdate) {
+                delete newNode.needUiUpdate;
+            }
         }
         if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
             UImain = true;
@@ -967,7 +970,7 @@ FileManager.prototype.initContextUI = function() {
             if (count) {
                 var fldName = count > 1
                     ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
-                    : l[17403].replace('%1', M.d[$.selected[0]].name);
+                    : l[17403].replace('%1', escapeHTML(M.d[$.selected[0]].name));
                 msgDialog(
                     'confirmation',
                     l[1003],
@@ -1043,7 +1046,7 @@ FileManager.prototype.initContextUI = function() {
         if (count) {
             var fldName = count > 1
                 ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
-                : l[17403].replace('%1', M.d[$.selected[0]].name);
+                : l[17403].replace('%1', escapeHTML(M.d[$.selected[0]].name));
             msgDialog(
                 'confirmation',
                 l[1003],

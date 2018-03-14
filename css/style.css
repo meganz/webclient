@@ -6816,7 +6816,7 @@ table {
 .dragger-icon.font, .export-icon.font, .share-folder-icon div.font {
     background-position: center -4455px;
 }
-.dragger-icon.folder, .share-folder-icon div.folder {
+.dragger-icon.folder, .share-folder-icon div.folder, .export-icon.folderConflict {
     background-position: center -4535px;
 }
 .dragger-icon.folder-shared, .share-folder-icon div.folder-shared {
@@ -23035,4 +23035,29 @@ opacity: 1;
 }
 .widget-card .footer-button.widget-dialog-buttons {
     padding-top: 16px;
+}
+.investors-pdf-block {
+    margin-bottom: 12px
+}
+.investors-pdf-block:first-of-type {
+    margin-top: 12px;
+}
+.investors-pdf-block:last-of-type {
+    margin-bottom: 0;
+}  
+.investors-pdf-block a {
+    float: right;
+    color: #eb4444;
+    font-size: 14px;
+    line-height: 44px;
+}
+.investors-pdf-title {
+    font-size: 16px;
+    line-height: 24px;
+    color: #333;
+}
+.investors-pdf-date {
+    font-size: 13px;
+    line-height: 20px;
+    color: #999;
 }

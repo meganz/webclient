@@ -1910,6 +1910,15 @@ var strongvelope = {};
     };
 
     /**
+     * Set key Id to be null, so it will rotate the key next time it tries to send out a message.
+     *
+     * @method
+     */
+    strongvelope.ProtocolHandler.prototype.clearKeyId = function() {
+        this.keyId = null;
+    };
+
+    /**
      * Set the assigned key Id from chatd based on the temporary key Id.
      *
      * @method

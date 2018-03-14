@@ -3,6 +3,7 @@
     var dir_inflight = 0;
     var filedrag_u = [];
     var filedrag_paths = Object.create(null);
+    var touchedElement = 0;
 
     function pushUpload() {
         if (!--dir_inflight && $.dostart) {
@@ -127,11 +128,14 @@
     function FileDragEnter(e) {
         e.stopPropagation();
         e.preventDefault();
-
-        // Set first entered element
-        dragElement = e.target;
-        $('.drag-n-drop.overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
+        if (localStorage.d > 1) {
+            console.info('----- ENTER event :' + e.target.className);
+        }
+        touchedElement++;
+        if (touchedElement === 1) {
+            $('.drag-n-drop.overlay').removeClass('hidden');
+            $('body').addClass('overlayed');
+        }
     }
 
     function FileDragHover(e) {
@@ -142,10 +146,21 @@
     function FileDragLeave(e) {
         e.stopPropagation();
         e.preventDefault();
+        if (localStorage.d > 1) {
+            console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
+        }
 
-        if (dragElement === e.target) {
+        // below condition is due to firefox bug. https://developer.mozilla.org/en-US/docs/Web/Events/dragenter
+        if (typeof e.target.className === 'undefined') {
+            touchedElement = 0;
+        }
+        else {
+            touchedElement--;
+        }
+        if (touchedElement <= 0) {
             $('.drag-n-drop.overlay').addClass('hidden');
             $('body').removeClass('overlayed');
+            touchedElement = 0;
         }
     }
 
@@ -161,7 +176,7 @@
         var currentDir = M.currentdirid;
 
         // Clear drag element
-        dragElement = 0;
+        touchedElement = 0;
 
         $('.drag-n-drop.overlay').addClass('hidden');
         $('body').removeClass('overlayed');
@@ -301,13 +316,12 @@
             }
         }
 
-        var dragElement;
         var fnHandler = FileSelectHandler;
         var fnEnter = FileDragEnter;
         var fnHover = FileDragHover;
         var fnLeave = FileDragLeave;
 
-        dragElement = 0;
+        touchedElement = 0;
 
         // MEGAdrop upload
         var elem = document.getElementById("wu_items");

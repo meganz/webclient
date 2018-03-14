@@ -7583,25 +7583,37 @@
         "text": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
         "context": "A message in a popup dialog explaining that there is an update available for the Firefox Legacy extension which works on browsers such as Pale Moon."
     },
+    "17550": {
+        "text": "A folder named %1 already exists in this location.",
+        "context": "Dialog description. Informs user during copy,move or upload that a folder with the same name already exists. Please leave %1 as it is, it'll be replaced by folder name.\r\n\r\nthis is similar to files dialog [attached]"
+    },
+    "17551": {
+        "text": "Copy and merge",
+        "context": "Header of clickable block in duplicate items dialog. Allows user to merge the folder in the destination with the folder he is copying.\r\nthis is similar to 'upload and update' in files conflict dialog [attached]"
+    },
+    "17552": {
+        "text": "Merge the folder at the destination with the folder you are copying:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to merge the folder in destination with the folder he is copying.\r\nSimilar to \"The file will be updated with version history\" in attached screenshot"
+    },
+    "17553": {
+        "text": "Move and merge",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to merge the folder in destination with the folder he is moving.\r\nsimilar to \"upload and update\" in the attached screenshot."
+    },
+    "17554": {
+        "text": "Merge the folder at the destination with the folder you are moving:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to merge the folder in destination with the folder he is moving.\r\nSimilar to \"The file will be updated with version history\" in attached screenshot"
+    },
+    "17555": {
+        "text": "Upload and merge",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to merge the folder in destination with the folder he is uploading.\r\nsimilar to \"upload and update\" in the attached screenshot."
+    },
+    "17556": {
+        "text": "Select whether you want to merge the folders:",
+        "context": "Dialog sub description. Informs user during copy,move or upload that a folder with the same name already exists.\r\nhighlighted in attached example screenshot\r\n"
+    },
     "17557": {
         "text": "The link you are trying to access is not valid.",
         "context": "attached, this will be the dialog content"
-    },
-    "17558": {
-        "text": "Import and update",
-        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to import the file in the destination folder by generating a new version with the file he is importing."
-    },
-    "17559": {
-        "text": "Don't import",
-        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and not replace it with the file they are importing."
-    },
-    "17560": {
-        "text": "Import and rename",
-        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and rename the file he is importing to avoid a filename conflict."
-    },
-    "17561": {
-        "text": "The file you are importing will be renamed as:",
-        "context": "A description for a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and also the file they are importing by renaming it automatically."
     },
     "17564": {
         "text": "Link error",
@@ -7783,6 +7795,10 @@
         "text": "Hello, join me on MEGA and get access to encrypted storage and communication.",
         "context": "This string is shown inside the Add Contact dialog and is sent to a user in an email."
     },
+    "17739": {
+        "text": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
+        "context": "Warning dialog appears to uses trying to merge folders with sharing (or link) is activated on one of the merged folders."
+    },
     "17742": {
         "text": "Drop to [S]upload[\/S]",
         "context": "A header of a dialog which allows dragging external files into the MEGA browser. Please leave the placeholders [S] and [\/S] which will be used to bolden the text."
@@ -7810,5 +7826,9 @@
     "17767": {
         "text": "Files sent to chat",
         "context": "Toast text upon sending multiple files to chat"
+    },
+    "17789": {
+        "text": "The entered tax number is invalid.",
+        "context": "An error dialog message explaining that the tax number (CPF, RUT, DNI, etc) the user entered is invalid for that country."
     }
 }

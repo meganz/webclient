@@ -1646,7 +1646,7 @@ MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
     do {
         msg = self.messages.getItem(i++);
     }
-    while (!(msg instanceof Message) && msg.messageId.length !== 11);
+    while (!(msg instanceof Message) || msg.messageId.length !== 11);
 
     foundFirst = msg ? msg : foundFirst;
     msg = false;
@@ -1655,7 +1655,7 @@ MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
     do {
         msg = self.messages.getItem(last--);
     }
-    while (!(msg instanceof Message) && msg.messageId.length !== 11);
+    while (!(msg instanceof Message) || msg.messageId.length !== 11);
 
     foundLast = msg ? msg : foundLast;
 

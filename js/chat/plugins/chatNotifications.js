@@ -82,7 +82,11 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     var n;
 
                     // halt if already seen.
-                    if (!message.getState || message.getState() === Message.STATE.SEEN || message.revoked === true) {
+                    if (
+                        !message.getState ||
+                        message.getState() === Message.STATE.SEEN ||
+                        message.revoked === true
+                    ) {
                         return;
                     }
 

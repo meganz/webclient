@@ -476,33 +476,13 @@
             var shard = shards[shardId];
             var chatIds = shard.chatIds;
             Object.keys(chatIds).forEach(function(chatIdBin) {
-                var oldChatIdMessages = self.chatd.chatIdMessages[chatIdBin];
-                var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(chatIdBin));
-                var cdr = self.chatd.chatIdMessages[chatIdBin] = new Chatd.Messages(self.chatd, chatIdBin);
-                chatRoom.messagesBuff.messageOrders = {};
-
-                if (oldChatIdMessages) {
-                    [
-                        'lownum',
-                        'highnum',
-                        'sendingnum',
-                        'sending',
-                        'sentid',
-                        'receivedid',
-                        'seenid',
-                        'sendingbuf',
-                        'sending',
-                        'sendingList',
-                        'expired',
-                    ].forEach(function (k) {
-                        cdr[k] = oldChatIdMessages[k];
-                    });
-                }
+                self.chatd._reinitChatIdHistory(base64urlencode(chatIdBin));
             });
             shard.s.close();
         });
 
     };
+
 
     ChatdPersist.prototype.onDbCrashOnOpen = function() {
         var self = this;
@@ -510,8 +490,9 @@
         self.logger.warn('DB crashed, disabling chatdPersist (is this an FF incognito?)');
     };
 
-    ChatdPersist.prototype.onDbCrashCritical = SoonFc(function() {
+    ChatdPersist.prototype._stopChatdPersist = function() {
         var self = this;
+
         // already destroying/destroyed?
         if (!self.chatd.chatdPersist) {
             return;
@@ -520,11 +501,27 @@
         self._destroy();
         self._reinitWithoutChardPersist();
 
-        self.db.close();
-        // using Soon, since db.close's promise is not reliable.
-        Soon(function() {
-            ChatdPersist.forceDrop();
-        });
+        if (ChatdPersist.isMasterTab()) {
+            self.db.close();
+        }
+    };
+
+    ChatdPersist.prototype.onDbCrashCritical = SoonFc(function() {
+        var self = this;
+
+        // already destroying/destroyed?
+        if (!self.chatd.chatdPersist) {
+            return;
+        }
+
+        self._stopChatdPersist();
+
+        if (ChatdPersist.isMasterTab()) {
+            // using Soon, since db.close's promise is not reliable.
+            Soon(function () {
+                ChatdPersist.forceDrop();
+            });
+        }
 
         self.logger.error('DB crashed, disabling chatdPersist (out of IDB space? broken indexedDB data?)');
     }, 500);
@@ -1329,6 +1326,7 @@
 
         var lownum = 0;
         var highnum = self.chatd.chatIdMessages[base64urldecode(chatId)].highnum;
+
 
         var chatRoom = self.chatd.megaChat.getChatById(chatId);
         if (chatRoom && chatRoom.messagesBuff.messages.length > 0) {

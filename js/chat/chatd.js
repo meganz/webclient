@@ -472,7 +472,12 @@ Chatd.Shard.prototype.reconnect = function() {
     if (self.s) {
         self.disconnect();
     }
-    self.s = new WebSocket(this.url+'/1');
+
+    var chatdTag = (localStorage.chatdTag ? localStorage.chatdTag : '1');
+    if (this.url.indexOf("mcd270n314") === -1) {
+        chatdTag = '1';
+    }
+    self.s = new WebSocket(this.url + '/' + chatdTag);
     self.s.binaryType = "arraybuffer";
 
     self.s.onopen = function() {
@@ -2065,34 +2070,55 @@ Chatd.prototype.setRtcHandler = function(handler) {
 };
 
 
+Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
+    var self = this;
+    var chatIdBin = base64urldecode(chatId);
+
+    var oldChatIdMessages = self.chatIdMessages[chatIdBin];
+    var chatRoom = self.megaChat.getChatById(base64urlencode(chatIdBin));
+    var cdr = self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, chatIdBin);
+    chatRoom.messagesBuff.messageOrders = {};
+
+    if (oldChatIdMessages) {
+        [
+            'lownum',
+            'highnum',
+            'sendingnum',
+            'sending',
+            'sentid',
+            'receivedid',
+            'seenid',
+            'sendingbuf',
+            'sending',
+            'sendingList',
+            'expired',
+        ].forEach(function (k) {
+            if (resetNums && (k === "lownum" || k === "highnum")) {
+                // skip and use "initial" nums.
+                return;
+            }
+            cdr[k] = oldChatIdMessages[k];
+        });
+    }
+
+};
 Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
     var self = this;
 
-    console.error("onJoinRangeHistReject", base64urlencode(chatIdBin), shardId);
+    console.error("TO BE IMPLEMENTED, onJoinRangeHistReject", base64urlencode(chatIdBin), shardId);
     var promises = [];
-    if (self.chatdPersist) {
+    if (self.chatdPersist && ChatdPersist.isMasterTab()) {
         promises.push(self.chatdPersist.clearChatHistoryForChat(base64urlencode(chatIdBin)));
     }
 
     MegaPromise.allDone(promises)
         .always(function() {
             // clear any old messages
-            console.error("FIXME, TESTME, NOT TESTED YET");
 
-            // FIXME TESTME
-            var chatRoom = self.megaChat.getChatById(base64urlencode(chatIdBin));
-            var chatdInt = chatRoom.messagesBuff.chatdInt;
-            chatRoom.messagesBuff.messages.clear();
-            chatRoom.messagesBuff.messageOrders = {};
-            delete chatRoom.messagesBuff;
+            self._reinitChatIdHistory(base64urlencode(chatIdBin), true);
 
-            chatRoom.messagesBuff = new MessagesBuff(
-                chatRoom,
-                chatdInt
-            );
-
-            self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, chatIdBin);
-            self.shards[shardId]._sendHist(chatIdBin, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);
+            var shard = self.shards[shardId];
+            shard._sendHist(chatIdBin, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);
         });
 };
 

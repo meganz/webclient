@@ -896,6 +896,10 @@ function mObjectURL(data, type)
                     rc = ev.callback.apply(ev.scope, args);
                 } catch (ex) {
                     if (d) console.error(ex);
+
+                    onIdle(function() {
+                        throw ex;
+                    });
                 }
                 if (ev.once || rc === 0xDEAD)
                     idr.push(id);

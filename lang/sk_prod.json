@@ -1316,7 +1316,7 @@
     "8852": "Ned\u00e1vno sme spravili na na\u0161ej str\u00e1nke p\u00e1r zmien, chcete inovova\u0165 na najnov\u0161iu verziu?",
     "8853": "Vyskytol sa probl\u00e9m pri dek\u00f3dovan\u00ed v\u00e1\u0161ho priv\u00e1tneho RSA k\u013e\u00fa\u010du, pros\u00edm kontaktujte support@mega.nz pre da\u013e\u0161iu pomoc.",
     "8854": "Pokia\u013e ste si predt\u00fdm predplatili PRO bal\u00ed\u010dek cez Google Play alebo cez Apple Itunes, pros\u00edm manu\u00e1lne zru\u0161te toto predplatn\u00e9, nako\u013eko toto nie je s\u00fa\u010das\u0165ou procesu ru\u0161enia \u00fa\u010dtu.",
-    "8855": "Pr\u00edli\u0161 ve\u013ea kr\u00e1t ste sa pok\u00fasili prihl\u00e1si\u0165. [BR]Pros\u00edm po\u010dkajte do %1 a sk\u00faste to znovu.",
+    "8855": "Pr\u00edli\u0161 ve\u013ea kr\u00e1t ste sa pok\u00fasili prihl\u00e1si\u0165. [Br][BR]Pros\u00edm po\u010dkajte do %1 a sk\u00faste to znovu.",
     "8859": "Z\u00e1lohova\u0165 k\u013e\u00fa\u010d pre obnovu",
     "8866": "Zobrazi\u0165 profil",
     "8867": "Odstr\u00e1ni\u0165 \u00fa\u010dastn\u00edka",
@@ -1956,5 +1956,7 @@
     "17765": "My chats",
     "17766": "File sent to chat",
     "17767": "Files sent to chat",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

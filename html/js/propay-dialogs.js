@@ -233,8 +233,9 @@ var astroPayDialog = {
             return true;
         }
 
-        // Check for Brazil
-        else if (taxLabel === 'CPF' && astroPayDialog.cpfIsValid(taxNumCleaned)) {
+        // Check for Brazil (CPF and CPNJ)
+        else if (taxLabel === 'CPF' &&
+                (astroPayDialog.cpfIsValid(taxNumCleaned) || astroPayDialog.cpnjIsValid(taxNumCleaned))) {
             return true;
         }
         else {
@@ -243,9 +244,9 @@ var astroPayDialog = {
     },
 
     /**
-     * Validate the Brazillian CPF number (Cadastrado de Pessoas Fisicas) is the equivalent of a Brazilian tax
+     * Validate the Brazillian CPF number (Cadastrado de Pessoas Fisicas) is the equivalent of a personal Brazilian tax
      * registration number. CPF numbers have 11 digits in total: 9 numbers followed by 2 check numbers that are being
-     * used for validation. Code from:
+     * used for validation. Validation code from:
      * http://nadikun.com/how-to-validate-cpf-number-using-custom-method-in-jquery-validate-plugin/
      *
      * @param {String} taxNum The tax number entered by the user (which contains only numbers, no hyphens etc)
@@ -305,6 +306,92 @@ var astroPayDialog = {
         }
 
         return false;
+    },
+
+    /**
+     * Validate the Brazillian CPNJ number (Cadastro Nacional da Pessoa Juridica) is the equivalent of a
+     * company/organisation/non-personal Brazilian tax registration number. The CNPJ consists of a 14-digit number
+     * formatted as 00.000.000/0001-00 - The first eight digits identify the company, the four digits after the slash
+     * identify the branch or subsidiary ("0001" defaults to the headquarters), and the last two are check digits.
+     * Validation code from:
+     * https://github.com/fnando/cpf_cnpj.js/blob/master/lib/cnpj.js
+     *
+     * @param {String} taxNum The tax number entered by the user (which contains only numbers, no hyphens etc)
+     * @returns {Boolean} Returns true if the CPNJ is valid
+     */
+    cpnjIsValid: function(taxNum) {
+
+        'use strict';
+
+        // Blacklist common values
+        var BLACKLIST = [
+            '00000000000000',
+            '11111111111111',
+            '22222222222222',
+            '33333333333333',
+            '44444444444444',
+            '55555555555555',
+            '66666666666666',
+            '77777777777777',
+            '88888888888888',
+            '99999999999999'
+        ];
+
+        var STRICT_STRIP_REGEX = /[-\/.]/g;
+        var LOOSE_STRIP_REGEX = /[^\d]/g;
+
+        var verifierDigit = function (numbers) {
+
+            var index = 2;
+            var reverse = numbers.split("").reduce(function(buffer, number) {
+                return [parseInt(number, 10)].concat(buffer);
+            }, []);
+
+            var sum = reverse.reduce(function(buffer, number) {
+                buffer += number * index;
+                index = (index === 9 ? 2 : index + 1);
+                return buffer;
+            }, 0);
+
+            var mod = sum % 11;
+
+            return (mod < 2 ? 0 : 11 - mod);
+        };
+
+        var strip = function(number, strict) {
+
+            var regex = strict ? STRICT_STRIP_REGEX : LOOSE_STRIP_REGEX;
+
+            return (number || "").toString().replace(regex, "");
+        };
+
+        var isValid = function(number, strict) {
+
+            var stripped = strip(number, strict);
+
+            // CNPJ must be defined
+            if (!stripped) {
+                return false;
+            }
+
+            // CNPJ must have 14 chars
+            if (stripped.length !== 14) {
+                return false;
+            }
+
+            // CNPJ can't be blacklisted
+            if (BLACKLIST.indexOf(stripped) >= 0) {
+                return false;
+            }
+
+            var numbers = stripped.substr(0, 12);
+            numbers += verifierDigit(numbers);
+            numbers += verifierDigit(numbers);
+
+            return numbers.substr(-2) === stripped.substr(-2);
+        };
+
+        return isValid(taxNum);
     },
 
     /**

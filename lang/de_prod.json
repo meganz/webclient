@@ -1956,5 +1956,7 @@
     "17765": "Meine Chats",
     "17766": "Datei an den Chat gesendet",
     "17767": "Dateien an den Chat gesendet",
-    "17789": "Die eingegebene Steuernummer ist ung\u00fcltig."
+    "17789": "Die eingegebene Steuernummer ist ung\u00fcltig.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

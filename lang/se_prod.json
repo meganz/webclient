@@ -926,7 +926,7 @@
     "6998": "Klicka forts\u00e4tta att avsluta din prenumeration.",
     "6999": "Abonnemangs Avbokning Framg\u00e5ngsrik",
     "7001": "Fr\u00e5ga efter en plan",
-    "7002": "There are no plans suitable for your current usage. Please [A]contact support[\/A] for a custom plan.",
+    "7002": "Det finns inga planer l\u00e4mpar sig f\u00f6r din nuvarande anv\u00e4ndning. V\u00e4nligen [A] kontakta supporten [\/A] f\u00f6r en anpassad plan.",
     "7003": "Nuvarande utrymme",
     "7004": "Tack f\u00f6r din feedback.",
     "7005": "Var v\u00e4nlig och ange anledningen nedanf\u00f6r",
@@ -1512,7 +1512,7 @@
     "16130": "Data",
     "16131": "Alla Filer",
     "16132": "Alla Mappar",
-    "16135": "Ditt moln utrymme h\u00e5ller p\u00e5 att ta slut. [BR] V\u00e4nligen \u00f6verv\u00e4g att uppgradera din kontoplan.",
+    "16135": "Ditt moln utrymme h\u00e5ller p\u00e5 att ta slut. [BR] V\u00e4nligen \u00f6verv\u00e4g att uppgradera din kontoplan.[Br]",
     "16136": "Your account has exceeded its allowed storage quota. Free space on your Cloud Drive or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
     "16137": "Your account has exceeded its allowed transfer quota. You can wait until you have enough transfer quota available or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
     "16138": "Your account has exceeded its allowed storage & transfer quota. You can free up space on your Cloud Drive and wait until you have enough transfer quota available or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
@@ -1956,5 +1956,7 @@
     "17765": "My chats",
     "17766": "File sent to chat",
     "17767": "Files sent to chat",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

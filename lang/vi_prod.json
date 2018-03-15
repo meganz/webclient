@@ -1539,7 +1539,7 @@
     "16159": "Qu\u1ea3n L\u00fd T\u1ec7p Tin",
     "16161": "Qu\u00e1 h\u1ea1n m\u1ee9c truy\u1ec1n t\u1ea3i",
     "16164": "H\u1ea1n m\u1ee9c truy\u1ec1n t\u1ea3i c\u00f3 gi\u1edbi h\u1ea1n",
-    "16165": "Phi\u00ean truy\u1ec1n t\u1ea3i c\u00f3 th\u1ec3 s\u1ebd b\u1ecb gi\u00e1n \u0111o\u1ea1n.[BR][S]Mua m\u1ed9t t\u00e0i kho\u1ea3n PRO[\/S] \u0111\u1ec3 nh\u1eadn th\u00eam b\u0103ng th\u00f4ng truy\u1ec1n t\u1ea3i.",
+    "16165": "Phi\u00ean truy\u1ec1n t\u1ea3i c\u00f3 th\u1ec3 s\u1ebd b\u1ecb gi\u00e1n \u0111o\u1ea1n.[BR][Br][S]Mua m\u1ed9t t\u00e0i kho\u1ea3n PRO[\/S] \u0111\u1ec3 nh\u1eadn th\u00eam b\u0103ng th\u00f4ng truy\u1ec1n t\u1ea3i.",
     "16166": "G\u00f3i c\u01b0\u1edbc",
     "16167": "Ng\u01b0\u1eddi d\u00f9ng c\u00f3 th\u1ec3 thanh to\u00e1n b\u1eb1ng nhi\u1ec1u c\u00e1ch, th\u00f4ng qua CH Play Google, Apple App Store, Microsoft Store ho\u1eb7c th\u00f4ng qua t\u00e0i kho\u1ea3n \u0111i\u1ec7n tho\u1ea1i c\u1ee7a nh\u00e0 m\u1ea1ng (Android) khi d\u00f9ng [A]MEGA apps[\/A].",
     "16168": "\u0110ang l\u01b0u l\u1ea1I c\u00e1c thi\u1ebft \u0111\u1eb7t...",
@@ -1956,5 +1956,7 @@
     "17765": "My chats",
     "17766": "File sent to chat",
     "17767": "Files sent to chat",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

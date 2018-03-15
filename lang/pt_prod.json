@@ -1316,7 +1316,7 @@
     "8852": "Fizemos recentemente alguns melhoramentos \u00e0 nossa p\u00e1gina; gostaria de actualizar para a vers\u00e3o mais recente?",
     "8853": "Falha ao descodificar a sua chave privada RSA. Por favor contacte support@mega.nz para mais assist\u00eancia.",
     "8854": "Se voc\u00ea subscreveu anteriormente um plano PRO com o Google Play ou o iTunes da Apple, por favor cancele as suas subscri\u00e7\u00f5es com ambos porque n\u00e3o fazem parte do processo de cancelamento desta conta.",
-    "8855": "Voc\u00ea tentou inciar sess\u00e3o demasiadas vezes.[BR]Por favor aguarde at\u00e9 %1 e tente novamente.",
+    "8855": "Voc\u00ea tentou inciar sess\u00e3o demasiadas vezes.[Br][BR]Por favor aguarde at\u00e9 %1 e tente novamente.",
     "8859": "Chave de recupera\u00e7\u00e3o da c\u00f3pia de seguran\u00e7a",
     "8866": "Ver Perfil",
     "8867": "Remover Participante",
@@ -1956,5 +1956,7 @@
     "17765": "My chats",
     "17766": "File sent to chat",
     "17767": "Files sent to chat",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

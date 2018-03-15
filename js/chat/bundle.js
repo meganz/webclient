@@ -9810,14 +9810,16 @@ React.makeElement = React['createElement'];
 	                                    v.messageId = message.messageId;
 	                                    chatRoom.images.push(v);
 	                                }
-	                                var previewLabel = is_video(v) ? l[17732] : l[1899];
-	                                previewButton = React.makeElement(
-	                                    'span',
-	                                    { key: 'previewButton' },
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
-	                                        onClick: self._startPreview.bind(self, v) }),
-	                                    React.makeElement('hr', null)
-	                                );
+	                                if (is_image(v) || is_video(v)) {
+	                                    var previewLabel = is_video(v) ? l[17732] : l[1899];
+	                                    previewButton = React.makeElement(
+	                                        'span',
+	                                        { key: 'previewButton' },
+	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
+	                                            onClick: self._startPreview.bind(self, v) }),
+	                                        React.makeElement('hr', null)
+	                                    );
+	                                }
 	                            }
 	                            if (contact.u === u_handle) {
 	                                dropdown = React.makeElement(
@@ -9956,23 +9958,26 @@ React.makeElement = React['createElement'];
 
 	                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
 	                                }
-
-	                                preview = src ? React.makeElement(
-	                                    'div',
-	                                    { id: v.imgId, className: 'shared-link img-block' },
-	                                    React.makeElement('div', { className: 'img-overlay', onClick: self._startPreview.bind(self, v) }),
-	                                    React.makeElement(
+	                                var previewable = is_image(v) || is_video(v);
+	                                if (previewable) {
+	                                    preview = src ? React.makeElement(
 	                                        'div',
-	                                        { className: 'button overlay-button', onClick: self._startPreview.bind(self, v) },
-	                                        React.makeElement('i', { className: 'huge-white-icon loupe' })
-	                                    ),
-	                                    dropdown,
-	                                    React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
-	                                        width: '156',
-	                                        height: '156',
-	                                        onClick: self._startPreview.bind(self, v)
-	                                    })
-	                                ) : preview;
+	                                        { id: v.imgId, className: 'shared-link img-block' },
+	                                        React.makeElement('div', { className: 'img-overlay', onClick: self._startPreview.bind(self, v) }),
+	                                        React.makeElement(
+	                                            'div',
+	                                            { className: 'button overlay-button',
+	                                                onClick: self._startPreview.bind(self, v) },
+	                                            React.makeElement('i', { className: 'huge-white-icon loupe' })
+	                                        ),
+	                                        dropdown,
+	                                        React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
+	                                            width: '156',
+	                                            height: '156',
+	                                            onClick: self._startPreview.bind(self, v)
+	                                        })
+	                                    ) : preview;
+	                                }
 	                            }
 	                        }
 

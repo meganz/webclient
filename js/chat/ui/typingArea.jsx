@@ -305,16 +305,17 @@ var TypingArea = React.createClass({
                     }
                 }
 
-                if (
-                    matchedWord &&
-                    matchedWord.length > 2 &&
-                    matchedWord.substr(0, 1) === ":" &&
-                    matchedWord.substr(-1) !== ":"
-                ) {
+                if (matchedWord && matchedWord.length > 2 && matchedWord.substr(0, 1) === ":") {
+                    endPos = endPos ? endPos : startPos + matchedWord.length;
+
+                    if (matchedWord.substr(-1) === ":") {
+                        matchedWord = matchedWord.substr(0, matchedWord.length - 1);
+                    }
+
                     self.setState({
                         'emojiSearchQuery': matchedWord,
                         'emojiStartPos': startPos ? startPos : 0,
-                        'emojiEndPos': endPos ? endPos : startPos + matchedWord.length,
+                        'emojiEndPos': endPos
                     });
                     return;
                 }

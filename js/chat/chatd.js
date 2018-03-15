@@ -1312,7 +1312,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.chatd.trigger('onBroadcast', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
                     userId: base64urlencode(cmd.substr(9, 8)),
-                    bCastCode: cmd.substr(17, 1)
+                    bCastCode: cmd.substr(17, 1).charCodeAt(0)
                 });
 
                 len = 18;

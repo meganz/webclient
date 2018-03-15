@@ -56,6 +56,19 @@ var TypingArea = React.createClass({
         }, 100);
     },
 
+    stoppedTyping: function () {
+        if (this.props.disabled) {
+            return;
+        }
+        var self = this;
+        var room = this.props.chatRoom;
+
+        self.iAmTyping = false;
+
+        delete self.lastTypingStamp;
+
+        room.trigger('stoppedTyping');
+    },
     typing: function () {
         if (this.props.disabled) {
             return;
@@ -70,8 +83,7 @@ var TypingArea = React.createClass({
 
         self.stoppedTypingTimeout = setTimeout(function() {
             if (room && self.iAmTyping) {
-                self.iAmTyping = false;
-                delete self.lastTypingStamp;
+                self.stoppedTyping();
             }
         }, 4000);
 
@@ -124,6 +136,9 @@ var TypingArea = React.createClass({
     onCancelClicked: function(e) {
         var self = this;
         self.setState({typedMessage: ""});
+        if (self.props.chatRoom && self.iAmTyping) {
+            self.stoppedTyping();
+        }
         self.onConfirmTrigger(false);
         self.triggerOnUpdate();
     },
@@ -139,6 +154,9 @@ var TypingArea = React.createClass({
 
         if (self.onConfirmTrigger(val) !== true) {
             self.setState({typedMessage: ""});
+        }
+        if (self.props.chatRoom && self.iAmTyping) {
+            self.stoppedTyping();
         }
         self.triggerOnUpdate();
     },
@@ -190,6 +208,9 @@ var TypingArea = React.createClass({
             }
             e.preventDefault();
             e.stopPropagation();
+            if (self.props.chatRoom && self.iAmTyping) {
+                self.stoppedTyping();
+            }
             return;
         }
     },
@@ -372,6 +393,9 @@ var TypingArea = React.createClass({
 
         if ($.trim(e.target.value).length > 0) {
             self.typing();
+        }
+        else {
+            self.stoppedTyping();
         }
 
         // persist typed values

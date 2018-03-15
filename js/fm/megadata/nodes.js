@@ -519,32 +519,34 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     var promiseResolves = -1;
 
     var onCopyNodesDone = function () {
-        var delMove = [];
-        var delDel = [];
-        for (var e = 0; e < todel.length; e++) {
-            if (treetype(todel[e]) === 'shares') {
-                delDel.push(todel[e]);
+        if (todel) {
+            var delMove = [];
+            var delDel = [];
+            for (var e = 0; e < todel.length; e++) {
+                if (treetype(todel[e]) === 'shares') {
+                    delDel.push(todel[e]);
+                }
+                else {
+                    delMove.push(todel[e]);
+                }
             }
-            else {
-                delMove.push(todel[e]);
-            }
-        }
-       
-        if (delMove.length) {
-            M.moveNodes(delMove, M.RubbishID, true);
-        }
-        if (delDel.length) {
-            for (var d = 0; d < delDel.length; d++) {
-                api_req({ a: 'd', n: delDel[d] }, {
-                    deletedNode: delDel[d],
-                    callback: function (res, ctx) {
-                        if (typeof res === 'number' && res < 0) {
-                            return;
-                        }
-                        M.delNode(ctx.deletedNode, true);
-                    }
-                });
 
+            if (delMove.length) {
+                M.moveNodes(delMove, M.RubbishID, true);
+            }
+            if (delDel.length) {
+                for (var d = 0; d < delDel.length; d++) {
+                    api_req({ a: 'd', n: delDel[d] }, {
+                        deletedNode: delDel[d],
+                        callback: function (res, ctx) {
+                            if (typeof res === 'number' && res < 0) {
+                                return;
+                            }
+                            M.delNode(ctx.deletedNode, true);
+                        }
+                    });
+
+                }
             }
         }
 

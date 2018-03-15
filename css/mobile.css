@@ -952,11 +952,11 @@ ul, li {
     text-align: center;
 }
 .mobile.fm-item-img {
-    float: left;
     margin: 0 0 0 12px;
-    text-align: center;
+    text-align: left;
     position: relative;
     height: 56px;
+    float: left;
 }
 .mobile.fm-item-img.folder {
     margin: 7px 0 0 10px;
@@ -4405,7 +4405,7 @@ textarea.mobile.support-text-field {
 }
 
 .mobile.grid-view .mobile.fm-item.file {
-    height: 152px;
+    height: auto;
 }
 .mobile.grid-view .mobile.fm-item-details {
     display: none;
@@ -4418,17 +4418,20 @@ textarea.mobile.support-text-field {
 .mobile.grid-view .mobile.fm-item.file:nth-child(odd) {
     background-color: white;
 }
-
 .mobile.grid-view .mobile.fm-item-info {
-    padding: 15px 28px 0 56px;
+    padding: 0 0;
 }
-
+.mobile.grid-view .folder .mobile.fm-item-info {
+    padding: 0 0;
+}
 .mobile.grid-view .mobile.folder .mobile.fm-item-img {
     height: 48px;
+    width: 36px;
+    text-align: left;
+    margin: 0 4px  0 12px;
+    float: left;
 }
-
-.mobile.grid-view .mobile.file .mobile.fm-item-img {
-    height: calc(100% - 46px);
+.mobile.grid-view .file.thumb .fm-item-img {
     margin: 4px 11px 0 4px;
     overflow: hidden;
     width: calc(100% - 10px);
@@ -4436,14 +4439,21 @@ textarea.mobile.support-text-field {
     border:1px solid #eee;
     background-color: #fafafa;
 }
-
-.mobile.grid-view .mobile.file .mobile.fm-item-img img {
+.mobile.grid-view .file .fm-item-img {
+    height:100%;
+    margin: 4px 11px 0 4px;
+    overflow: hidden;
+    width: calc(100% - 10px);
+    border-radius: 2px;
+    border:1px solid #eee;
+    background-color: #fafafa;
+}
+.mobile.grid-view .file .fm-item-img img {
     height: 50%;
     position: relative;
     width: auto;
     vertical-align: middle;
     display: block;
-    margin-top: 25%;
 }
 .mobile.fm-item-links {
     display: none;
@@ -4451,8 +4461,9 @@ textarea.mobile.support-text-field {
 .mobile.grid-view .mobile.fm-item.file .fm-icon.link {
     margin-top: -1px;
     width: 27px;
+    height: 36px;
 }
-.mobile.grid-view .mobile.file.thumb .mobile.fm-item-img img {
+.mobile.grid-view .file.thumb .fm-item-img img {
     position: relative;
     margin: 0 0;
     width: 100%;
@@ -4465,7 +4476,7 @@ textarea.mobile.support-text-field {
     width: 37px;
 }
 .mobile.grid-view .mobile.file .mobile.fm-item-info {
-    padding: 123px 28px 0 12px;
+    padding: 0 0;
 }
 .mobile.grid-view .mobile.file .mobile.fm-icon.open-context-menu {
     background-position: -197px -1669px;
@@ -4494,6 +4505,12 @@ textarea.mobile.support-text-field {
 }
 .mobile.grid-view .mobile.fm-item-name {
     font-size: 14px;
+    line-height: 36px;
+    padding-left: 10px;
+}
+.mobile.grid-view .folder .mobile.fm-item-name {
+    line-height: 48px;
+    padding-left: 6px;
 }
 /* Get support page */
 .support-form {
@@ -5374,22 +5391,7 @@ textarea.mobile.support-text-field {
     }
     /* Grid view */
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
-        height: 48px;
-        cursor: pointer;
-        overflow: hidden;
         width: calc((100% - 60px) / 4);
-        background-color: #fff;
-        float: left;
-        margin-left: 12px;
-        border-radius: 4px;
-        margin-bottom: 12px;
-        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
-    }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 212px;
-    }
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 182px 28px 0 12px
     }
 }
 
@@ -5558,13 +5560,6 @@ textarea.mobile.support-text-field {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 36px) / 2);
     }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 226px;
-    }
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 194px 28px 0 12px;
-    }
-
 }
 
 @media only screen and (orientation:landscape) and (max-width: 800px) {
@@ -5727,22 +5722,7 @@ textarea.mobile.support-text-field {
     }
     /* Grid view */
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
-        height: 48px;
-        cursor: pointer;
-        overflow: hidden;
         width: calc((100% - 36px) / 2);
-        background-color: #fff;
-        float: left;
-        margin-left: 12px;
-        border-radius: 4px;
-        margin-bottom: 12px;
-        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
-    }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 206px;
-    }
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 176px 28px 0 12px
     }
 }
 
@@ -5981,11 +5961,8 @@ textarea.mobile.support-text-field {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 60px) / 5);
     }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 230px;
-    }
     .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 197px 28px 0 12px;
+        padding: 0 0;
     }
 }
 
@@ -5993,44 +5970,17 @@ textarea.mobile.support-text-field {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 60px) / 4);
     }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 206px;
-    }
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 174px 28px 0 12px;
-    }
-}
-@media only screen and (orientation:landscape) and (min-width: 667px) and (max-width: 700px), only screen and (orientation:portrait) and (min-height: 370px) and (max-height: 400px) {
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 155px 28px 0 12px;
-    }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 186px;
-    }
 }
 /* iPhone X Portrait styles go here */
 @media only screen and (orientation:landscape) and (max-width: 376px), only screen and (orientation:portrait) and (min-height: 801px) and (max-height: 813px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 36px) / 2);
     }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 206px;
-    }
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 174px 28px 0 12px;
-    }
 }
 /*iphone se portrait styles */
 @media only screen and (orientation:landscape) and (max-width: 321px), only screen and (orientation:portrait) and (max-height: 569px) {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 36px) / 2);
-    }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 178px;
-    }
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 148px 28px 0 12px;
-    }
 }
 
 /*iphone se landscape styles */
@@ -6038,32 +5988,10 @@ textarea.mobile.support-text-field {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 60px) / 3);
     }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 202px;
-    }
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 170px 28px 0 12px;
-    }
-}
-
-/* iPhone X Landscape styles go here */
-@media only screen and (orientation:landscape) and (min-width: 801px) and (max-width: 812px), only screen and (orientation:portrait) and (max-height: 376px) {
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 190px 28px 0 12px;
-    }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 222px;
-    }
 }
 
 /* Large tablets Landscape styles go here */ 
 @media only screen and (orientation:landscape) and (min-width: 1280px) and (max-width: 1440px), only screen and (orientation:portrait) and (min-height: 1025px) and (max-height: 1025px) {
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 186px 28px 0 12px;
-    }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 217px
-    }
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 96px) / 7)
     }
@@ -6071,12 +5999,6 @@ textarea.mobile.support-text-field {
 
 /* Large tablets Portrait styles go here */ 
 @media only screen and (orientation:landscape) and (min-width:900px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 1281px) and (max-height: 1366px) {
-    .mobile.grid-view .mobile.file .mobile.fm-item-info {
-        padding: 196px 28px 0 12px;
-    }
-    .mobile.grid-view .mobile.fm-item.file {
-        height: 226px;
-    }
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 72px) / 5);
     }

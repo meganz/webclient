@@ -18139,6 +18139,10 @@
         "text": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
         "context": "An alert message shown in case the user has an active subscription and is in the process of buying a higher plan (i.e. a higher level PRO account)."
     },
+    "17586": {
+        "text": "Downloading canceled in MEGAsync",
+        "context": "Downloading status text which appears when a download gets canceled in MEGAsync."
+    },
     "17587": {
         "text": "Invite Contact",
         "context": "Text shown when the user tries to make a call and the receiver is not a contact"
@@ -18155,6 +18159,10 @@
         "text": "by %1",
         "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
     },
+    "17591": {
+        "text": "Cannot get downloading status from MEGAsync",
+        "context": "Download status text which appears when MEGAsync stops sending status updates. This is possibly due to a crash in MEGAsync. We don't have a screenshot for this case (it's a rare one). However the attached screenshot will show the location of this text."
+    },
     "17592": {
         "text": "Downloading with MEGAsync ...",
         "context": "Download status description of a file download."
@@ -18162,6 +18170,10 @@
     "17593": {
         "text": "Download is queued in MEGAsync ...",
         "context": "Download status description for while downloading a file with MEGASync (from a file link)\r\nScreenshot contains the place of this status."
+    },
+    "17594": {
+        "text": "Download is paused in MEGAsync",
+        "context": "Download status text which appears when a download is paused from MEGAsync."
     },
     "17595": {
         "text": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
@@ -18194,6 +18206,22 @@
     "17602": {
         "text": "The current version of the file will be replaced with the file you are uploading.",
         "context": "A description in the duplicate items dialog below the Upload and replace title. This option allows the user to update an existing file in the folder by replacing the current version of the file with the file they are uploading."
+    },
+    "17603": {
+        "text": "Download retrying in MEGAsync",
+        "context": "Download status text which appears when MEGAsync for some reason is forced to retry downloading (rare case). The attached screenshot shows the location of this text."
+    },
+    "17604": {
+        "text": "Download completing in MEGAsync",
+        "context": "Download status text which appears when the download is in its final stage at MEGAsync. Usually this is a very quick stage and wont be noticed unless the user was on a very slow PC. The screenshot shows the text location."
+    },
+    "17605": {
+        "text": "Downloading failed in MEGAsync",
+        "context": "Downloading status text which appears if the download failed somehow on the MEGAsync side. The screenshot shows the text location."
+    },
+    "17606": {
+        "text": "No response from MEGAsync",
+        "context": "Downloading status text which appears when MEGAsync stops responding. "
     },
     "17607": {
         "text": "%1 cleaning scheduler",

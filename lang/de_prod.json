@@ -1587,9 +1587,9 @@
     "16299": "PRO-Speicherplatz",
     "16300": "%1 Basisspeicher + %2",
     "16302": "Speicherplatz ersch\u00f6pft",
-    "16304": "[A]Wechseln Sie jetzt[\/A] und profitieren Sie weiterhin von sicherem, Ende-zu-Ende-verschl\u00fcsseltem Cloud-Speicher. PRO-Accounts erhalten [S]bis zu 4 TB (4096 GB) Speicherplatz[\/S] und 8 TB Transfervolumen, das optional Dritten zur Verf\u00fcgung gestellt werden k\u00f6nnen, die die freigegebenen Daten des PRO-Accounts herunterladen.                ",
+    "16304": "[A]Wechseln Sie jetzt[\/A] und profitieren Sie weiterhin von sicherem, Ende-zu-Ende-verschl\u00fcsseltem Cloud-Speicher. [Br]PRO-Accounts erhalten [S]bis zu 4 TB (4096 GB) Speicherplatz[\/S] und 8 TB Transfervolumen, das optional Dritten zur Verf\u00fcgung gestellt werden k\u00f6nnen, die die freigegebenen Daten des PRO-Accounts herunterladen.[Br]                ",
     "16306": "L\u00f6schen Sie nicht mehr ben\u00f6tigte Dateien und [A]leeren Sie Ihren Papierkorb[\/A].",
-    "16308": "Erhalten Sie zus\u00e4tzliche Speicher- und Transferboni - ganz einfach, indem Sie unsere Produkte nutzen.",
+    "16308": "Erhalten Sie zus\u00e4tzliche Speicher- und Transferboni -[Br] ganz einfach, indem Sie unsere Produkte nutzen.",
     "16309": "Boni verdienen",
     "16310": "Hinweis: Pr\u00fcfen Sie Ihre verf\u00fcgbaren Boni in der [A]Bonusverwaltung[\/A] oder klicken Sie [I]",
     "16311": "Ihr Cloudspeicher ist fast voll",
@@ -1956,5 +1956,7 @@
     "17765": "Meine Chats",
     "17766": "Datei an den Chat gesendet",
     "17767": "Dateien an den Chat gesendet",
-    "17789": "Die eingegebene Steuernummer ist ung\u00fcltig."
+    "17789": "Die eingegebene Steuernummer ist ung\u00fcltig.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

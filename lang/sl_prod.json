@@ -1539,7 +1539,7 @@
     "16159": "Urejanje datotek",
     "16161": "Prenosna kvota prese\u017eena",
     "16164": "Omejena razpolo\u017eljiva prenosna kvota",
-    "16165": "Va\u0161 prenos bo lahko prekinjen.[BR][S]Pridobite PRO ra\u010dun[\/S] za pove\u010dano prenosno kvoto.",
+    "16165": "Va\u0161 prenos bo lahko prekinjen.[BR][Br][S]Pridobite PRO ra\u010dun[\/S] za pove\u010dano prenosno kvoto.",
     "16166": "Plan",
     "16167": "Pla\u010date lahko tudi preko Google Play Store, Apple App Store, Microsoft Store ali Android mobilnega pla\u010devanja, ko uporabljate na\u0161e [A]MEGA appe[\/A].",
     "16168": "Shranjujem nastavitve...",
@@ -1956,5 +1956,7 @@
     "17765": "My chats",
     "17766": "File sent to chat",
     "17767": "Files sent to chat",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

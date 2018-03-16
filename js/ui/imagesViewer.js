@@ -344,7 +344,7 @@ var slideshowid;
                     return;
                 }
             }
-            
+
 
             // TODO: adapt the above code to work on the downloads page if we need to download the original
             if (page === 'download') {
@@ -497,10 +497,6 @@ var slideshowid;
                     preqs[n.h] = false;
                 }
             };
-
-            if (!d) {
-                api_req({a: 'log', e: 99668, m: 'video watch'});
-            }
 
             // Show loading spinner until video is playing
             $overlay.find('.viewer-pending').removeClass('hidden');

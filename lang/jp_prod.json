@@ -1956,5 +1956,7 @@
     "17765": "\u79c1\u306e\u30c1\u30e3\u30c3\u30c8",
     "17766": "\u30d5\u30a1\u30a4\u30eb\u304c\u30c1\u30e3\u30c3\u30c8\u306b\u9001\u4fe1\u3055\u308c\u307e\u3057\u305f",
     "17767": "\u30d5\u30a1\u30a4\u30eb\u304c\u30c1\u30e3\u30c3\u30c8\u306b\u9001\u4fe1\u3055\u308c\u307e\u3057\u305f",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

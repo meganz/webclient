@@ -1539,7 +1539,7 @@
     "16159": "\u6a94\u6848\u7ba1\u7406",
     "16161": "\u5df2\u8d85\u904e\u50b3\u8f38\u914d\u984d",
     "16164": "\u53ef\u7528\u50b3\u8f38\u914d\u984d\u6709\u9650",
-    "16165": "\u60a8\u7684\u6587\u4ef6\u50b3\u8f38\u53ef\u80fd\u6703\u88ab\u4e2d\u65b7\u3002[BR][S][\u7372\u7a6b]\u53d6\u5c08\u696d\u7248\u7528\u6236[\/S] \u4f86\u63d0\u9ad8\u60a8\u7684\u50b3\u8f38\u984d\u5ea6\u3002",
+    "16165": "\u60a8\u7684\u6587\u4ef6\u50b3\u8f38\u53ef\u80fd\u6703\u88ab\u4e2d\u65b7\u3002[BR][Br][S][\u7372\u7a6b]\u53d6\u5c08\u696d\u7248\u7528\u6236[\/S] \u4f86\u63d0\u9ad8\u60a8\u7684\u50b3\u8f38\u984d\u5ea6\u3002",
     "16166": "\u6703\u54e1\u65b9\u6848",
     "16167": "\u60a8\u9084\u53ef\u4ee5\u4e0b\u8f09[A]MEGA\u61c9\u7528[\/A]\uff0c\u901a\u904e\u8c37\u6b4cPlay Store\u3001\u860b\u679c\u61c9\u7528\u5546\u5e97\u3001\u5fae\u8edf\u61c9\u7528\u5546\u5e97\u6216\u5b89\u5353\u624b\u6a5f\u79fb\u52d5\u4f9b\u61c9\u5546\u8a08\u8cbb\u7684\u65b9\u5f0f\u4f86\u7c3d\u7d04\u5c08\u696d\u7248\u3002",
     "16168": "\u5132\u5b58\u8a2d\u5b9a\u4e2d...",
@@ -1956,5 +1956,7 @@
     "17765": "\u6211\u7684\u804a\u5929",
     "17766": "\u6a94\u6848\u5df2\u767c\u9001\u81f3\u804a\u5929\u5c0d\u8a71\u4e2d",
     "17767": "\u6a94\u6848\u5df2\u767c\u9001\u81f3\u804a\u5929\u5c0d\u8a71\u4e2d",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

@@ -1956,5 +1956,7 @@
     "17765": "Le mie chat",
     "17766": "Il file \u00e8 stato inviato alla chat",
     "17767": "I file sono stati inviati alla chat",
-    "17789": "Il codice fiscale inserito non \u00e8 valido."
+    "17789": "Il codice fiscale inserito non \u00e8 valido.",
+    "17792": "Lo spazio del tuo disco principale \u00e8 pieno. Per favore, libera un po' di spazio e riprova.",
+    "17793": "Sfortunatamente, Chrome permette che MEGA utilizzi solo una parte dello spazio disponibile sul disco, che \u00e8 insufficiente. Per favore, installa [A1]l'app per desktop di MEGA[\/A1] o la nostra [A2]estensione per Chrome[\/A2], oppure prova a [A3]liberare un po' di spazio[\/A3]."
 }

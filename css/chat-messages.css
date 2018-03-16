@@ -336,7 +336,7 @@
     color: #333333;
     position: static;
 }
-.message pre.rtf-single, .message pre.rtf-multi {
+.message pre.rtf-multi {
     margin: 0;
     display: inline-block;
     padding: 0px 4px;
@@ -353,23 +353,29 @@
     display: block;
     width: auto;
 }
-.message pre.rtf-single:last-child, .message pre.rtf-multi:last-child {
+.message pre.rtf-multi:last-child {
     content: '';
     display: block;
     margin-bottom: 2px;
 }
-.message pre.rtf-single, .message pre.rtf-multi {
+.message pre.rtf-multi {
     white-space: pre-wrap;
 }
 
-.message pre.rtf-quote {
+.message pre.rtf-quote, .message pre.rtf-single {
     margin: 0;
     display: inline;
     border: 1px solid #ccc;
-    padding: 1px 6px;
+    padding: 0px 4px;
     background-color: #f1f1f1;
     border-radius: 3px;
+    font-size: 14px;
+    letter-spacing: -0.7px;
     white-space: normal;
+    font-family: 'source_code_proregular';
+}
+.message pre.rtf-single {
+    color: #d72b3f;
 }
 
 .ps-container .message.body {

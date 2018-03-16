@@ -63,7 +63,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.callIsActive = false;
     this.shownMessages = {};
     this.attachments = new MegaDataMap(this);
-    this.images = new MegaDataSortedMap("id", "delay", this);
+    this.images = new MegaDataSortedMap("id", "orderValue", this);
 
     self.members = {};
 
@@ -767,6 +767,8 @@ ChatRoom.prototype.sendMessage = function(message) {
     );
 
 
+    self.trigger('onSendMessage');
+
     self.appendMessage(msgObject);
 
     self._sendMessageToTransport(msgObject)
@@ -1263,7 +1265,6 @@ ChatRoom.prototype.truncate = function() {
         }
     }
 };
-
 
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

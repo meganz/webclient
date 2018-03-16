@@ -347,7 +347,7 @@ var dlmanager = {
         var promise = new MegaPromise();
 
         var max = function() {
-            promise.resolve(Math.pow(2, 32));
+            promise.resolve(Math.pow(2, is_mobile ? 32 : 53));
         };
 
         if (dlMethod === FileSystemAPI) {
@@ -1885,8 +1885,45 @@ var dlmanager = {
                 if (window.Incognito) {
                     text = text.replace('%2', '(' + l[16869] + ')');
                 }
-                else {
+                else if (message) {
                     text = text.replace('%2', '');
+                }
+                else if (is_extension) {
+                    text = l[17792];
+                }
+                else {
+                    text = l[17793];
+
+                    onIdle(function() {
+                        $('.freeupdiskspace').rebind('click', function() {
+                            var $dialog = $('.megasync-overlay');
+                            $('.megasync-close, .fm-dialog-close', $dialog).click();
+
+                            msgDialog('warningb', l[882], l[7157], 0, function(yes) {
+                                if (yes) {
+                                    var logged = false;
+
+                                    loadingDialog.show();
+                                    M.req({a: 'log', e: 99682}).always(function() { logged = true; });
+
+                                    M.clearFileSystemStorage()
+                                        .always(function() {
+                                            var reload = function() {
+                                                location.reload(true);
+                                            };
+
+                                            if (logged) {
+                                                reload();
+                                            }
+                                            else {
+                                                setTimeout(reload, 3000);
+                                            }
+                                        });
+                                }
+                            });
+                            return false;
+                        });
+                    });
                 }
             }
             else {

@@ -1539,7 +1539,7 @@
     "16159": "Spr\u00e1va soubor\u016f",
     "16161": "Kv\u00f3ta p\u0159enosu p\u0159ekro\u010dena",
     "16164": "Omezen\u00e1 dostupn\u00e1 kv\u00f3ta p\u0159enosu",
-    "16165": "V\u00e1\u0161 p\u0159enos m\u016f\u017ee b\u00fdt p\u0159eru\u0161en.[BR][S]Z\u00edskejte \u00fa\u010det PRO[\/S] kv\u016fli zv\u00fd\u0161en\u00ed kv\u00f3ty p\u0159enosu.",
+    "16165": "V\u00e1\u0161 p\u0159enos m\u016f\u017ee b\u00fdt p\u0159eru\u0161en.[BR][Br][S]Z\u00edskejte \u00fa\u010det PRO[\/S] kv\u016fli zv\u00fd\u0161en\u00ed kv\u00f3ty p\u0159enosu.",
     "16166": "Pl\u00e1n",
     "16167": "M\u016f\u017eete tak\u00e9 platit prost\u0159ednictv\u00edm obchod\u016f Google Play, Apple App, Microsoft nebo vy\u00fa\u010dtov\u00e1n\u00ed mobiln\u00edho oper\u00e1tora pro v\u00e1\u0161 telefon Android, kdy\u017e pou\u017e\u00edv\u00e1te na\u0161e [A]aplikace MEGA[\/A].",
     "16168": "Ukl\u00e1d\u00e1n\u00ed nastaven\u00ed...",
@@ -1956,5 +1956,7 @@
     "17765": "My chats",
     "17766": "File sent to chat",
     "17767": "Files sent to chat",
-    "17789": "The entered tax number is invalid."
+    "17789": "The entered tax number is invalid.",
+    "17792": "Your primary disk volume is full. Please free up some space and try again.",
+    "17793": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3]."
 }

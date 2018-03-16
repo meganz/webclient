@@ -498,9 +498,6 @@ Chatd.Shard.prototype.reconnect = function() {
         self.chatd.trigger('onOpen', {
             shard: self
         });
-        // Resending of pending message should be done via the integration code, since it have more info and a direct
-        // relation with the UI related actions on pending messages (persistence, user can click resend/cancel/etc).
-        self.resendpending();
 
         self.chatd.trigger('onOpen', {
             shard: self
@@ -1339,6 +1336,10 @@ Chatd.Shard.prototype.exec = function(a) {
                 if (self.loggerIsEnabled) {
                     self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1, 8)));
                 }
+                // Resending of pending message should be done via the integration code,
+                // since it have more info and a direct relation with the UI related actions on pending messages
+                // (persistence, user can click resend/cancel/etc).
+                self.resendpending();
                 self.restoreIfNeeded(cmd.substr(1, 8));
 
                 self.chatd.trigger('onMessagesHistoryDone',

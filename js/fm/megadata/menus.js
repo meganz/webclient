@@ -187,7 +187,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     }
 
     // view send to chat if all selected items are files
-    if ($.selected.length) {
+    if (!folderlink && $.selected.length) {
         var viewChat = true;
         for (var e = 0; e < $.selected.length; e++) {
             if (M.d[$.selected[e]].t !== 0) {

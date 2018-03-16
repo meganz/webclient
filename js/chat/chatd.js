@@ -916,6 +916,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                             }
                         });
 
+                        msg.source = Message.SOURCE.IDB;
                         chatRoom.messagesBuff.restoreMessage(msg);
                     });
 

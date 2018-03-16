@@ -236,6 +236,13 @@ Message.STATE = {
     'SEEN': 40,
     'DELETED': 8,
 };
+
+Message.SOURCE = {
+    'IDB': 0,
+    'CHATD': 1,
+    'SENT': 2,
+};
+
 Message.MANAGEMENT_MESSAGE_TYPES = {
     "MANAGEMENT": "\0",
     "ATTACHMENT": "\x10",
@@ -1262,7 +1269,13 @@ MessagesBuff.prototype.setLastSeen = function(msgId) {
         self.lastSeen = msgId;
 
         if (!self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
-            self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
+            if (self._lastSeenThrottling) {
+                clearTimeout(self._lastSeenThrottling);
+            }
+            self._lastSeenThrottling = setTimeout(function() {
+                delete self._lastSeenThrottling;
+                self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
+            }, 160);
         }
         if (ChatdPersist.isMasterTab() && self.chatdInt.chatd.chatdPersist) {
             var chatdPersist = self.chatdInt.chatd.chatdPersist;

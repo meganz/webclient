@@ -11556,6 +11556,8 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 
+	    message.source = Message.SOURCE.SENT;
+
 	    self.trigger('onMessageAppended', message);
 	    self.messagesBuff.messages.push(message);
 

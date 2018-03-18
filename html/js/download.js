@@ -468,7 +468,7 @@ function dl_g(res) {
                 var promise = Promise.resolve();
 
                 if (!window.safari && String(res.fa).indexOf(':8*') > 0) {
-                    promise = MediaAttribute.canPlayMedia(dl_node);
+                    promise = iniVideoStreamLayout(dl_node, $pageScrollBlock);
                     prevBut = false;
                 }
                 else {
@@ -489,104 +489,16 @@ function dl_g(res) {
                 }
 
                 promise.then(function(ok) {
-                    var c = MediaAttribute.getCodecStrings(dl_node);
-                    if (c) {
-                        $fileinfoBlock.find('.big-txt').attr('title', filename + ' (' + c.join("/") + ')');
-                    }
-
                     if (!ok) {
                         // not streamable
                         return false;
                     }
 
                     // Change layout for video
-                    var $video = $pageScrollBlock.find('video');
-
-                    if (!$video.length) {
-                        console.warn('No video element found...');
-                        return false;
-                    }
-
                     $pageScrollBlock.addClass('video');
                     $fileinfoBlock.find('.big-txt .filename').text(fileTitle);
                     $fileinfoBlock.find('.big-txt .extension').text(fileExt);
 
-                    // Disable default video controls
-                    $video.get(0).controls = false;
-
-                    api_getfileattr([{fa: res.fa, k: key}], 1, function(a, b, data) {
-                        if (data !== 0xDEAD) {
-                            data = mObjectURL([data.buffer || data], 'image/jpeg');
-
-                            if (data) {
-                                $video.attr('poster', data);
-                            }
-                        }
-                    });
-
-                    var vsp = initVideoStream(dl_node, $pageScrollBlock, {autoplay: false});
-
-                    $('.play-video-button', $pageScrollBlock).rebind('click', function() {
-                        if (dlmanager.isOverQuota) {
-                            return dlmanager.showOverQuotaDialog();
-                        }
-
-                        if (mediaCollectFn) {
-                            onIdle(mediaCollectFn);
-                            mediaCollectFn = null;
-                        }
-
-                        // Show Loader until video is playing
-                        $pageScrollBlock.find('.viewer-pending').removeClass('hidden');
-
-                        vsp.then(function(stream) {
-                            if (stream.error) {
-                                onIdle(function() {
-                                    $pageScrollBlock.removeClass('video-theatre-mode video');
-                                });
-                                return msgDialog('warninga', l[135], l[47], stream.error);
-                            }
-
-                            if (String(res.fa).indexOf(':0*') < 0 || String(res.fa).indexOf(':1*') < 0) {
-                                // TODO: refactor this with similar code at imagesViewer.js
-                                var storeImage = function(ab) {
-                                    var n = dl_node;
-                                    var aes = new sjcl.cipher.aes([
-                                        n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
-                                    ]);
-                                    createnodethumbnail(n.h, aes, n.h, ab, {isVideo: true}, n.ph);
-                                };
-                                stream.on('playing', function() {
-                                    var video = this.video;
-
-                                    if (video && video.duration) {
-                                        var took = Math.round(2 * video.duration / 100);
-
-                                        if (d) {
-                                            console.debug('Video thumbnail missing, will take image at %s...',
-                                                secondsToTime(took));
-                                        }
-
-                                        this.on('timeupdate', function() {
-                                            if (video.currentTime < took) {
-                                                return true;
-                                            }
-
-                                            this.getImage().then(storeImage).catch(console.warn.bind(console));
-                                        });
-
-                                        return false;
-                                    }
-
-                                    return true;
-                                });
-                            }
-                            dl_node.stream = stream;
-                            stream.play();
-                        });
-
-                        $pageScrollBlock.addClass('video-theatre-mode');
-                    });
                 }).catch(function(ex) {
                     if (ex) {
                         console.warn(ex);

@@ -1380,29 +1380,8 @@ var exportExpiry = {
             }
 
             $('.copy-to-clipboard').rebind('click', function() {
-                success = true;
-                links = $.trim(getClipboardLinks());
-
-                // If extension, use the native extension method
-                if (is_chrome_firefox) {
-                    mozSetClipboard(links);
-                }
-                else {
-                    // Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
-                    $('#chromeclipboard').html(links);
-                    selectText('chromeclipboard');
-                    try {
-                        success = document.execCommand('copy');
-                    }
-                    catch (e) {
-                        console.error(e);
-                        success = false;
-                    }
-                }
-
-                if (success) {
-                    showToast('clipboard', toastTxt);
-                }
+                copyToClipboard($.trim(getClipboardLinks()), toastTxt);
+                return false;
             });
         }
         else if (flashIsEnabled()) {

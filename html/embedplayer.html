@@ -1,5 +1,4 @@
 <div class="bottom-page scroll-block download embedplayer video">
-
     <div class="download main-pad">
         <div class="download transfer-wrapper">
             <!-- Video block !-->
@@ -15,10 +14,11 @@
                                 </div>
                             </div>
                             <div class="sharefile-sections">
-                                <div class="tab-content share-link">iframe src="https://player.mega.co.nz/video/256668685" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen>
+                                <div class="tab-content share-link">&lt;iframe
+                                    src="https://player.mega.co.nz/video/256668685" width="640" height="360"
+                                    frameborder="0" allowfullscreen&gt;
                                 </div>
-                                <div class="tab=-content share-embed-code">
-                                </div>
+                                <div class="tab=-content share-embed-code"></div>
                             </div>
                             <div class="sharefile-buttons">
                                 <div class="button default-red-button right">Copy
@@ -54,11 +54,11 @@
                     <div class="file-removed-aligner">
                         <div class="file-removed-wrapper">
                             <div class="file-removed-heading">File has been removed</div>
-                            <div class="file-removed-body">Some explanation if needed?</div>
+                            <div class="file-removed-body hidden">Some explanation if needed?</div>
                         </div>
                     </div>
                 </div>
-                <!-- Dropdown/context menu 
+                <!-- Dropdown/context menu
                 Add class "mobile-mode" to the dropdown when viewing the iframe video on mobile devices -->
                 <div class="dropdown body files-menu context hidden" style="height: auto; border-radius: 8px;">
                     <div class="dropdown-aligner">
@@ -104,57 +104,58 @@
                         <div class="viewer-button right moreoptions">
                             <i class="medium-icon icons-img "></i>
                         </div>
-                        <div class="viewer-button right useravatar">
-                         <div data-color="color4" class="avatar-wrapper nw-contact-avatar DjQDnzGDufo color4"><span>C</span></div>
-                     </div>
-                     <!-- Will Replace with a more appropriate share icon -->
-                     <div class="viewer-button right getlink">
-                        <i class="medium-icon icons-img chain"></i>
+                        <div class="viewer-button right useravatar hidden">
+                            <div data-color="color4" class="avatar-wrapper avatar"><span>C</span></div>
+                        </div>
+                        <!-- Will Replace with a more appropriate share icon -->
+                        <div class="viewer-button right getlink">
+                            <i class="medium-icon icons-img chain"></i>
+                        </div>
+                        <div class="viewer-button right embedvideo">
+                            <i class="medium-icon icons-img embed"></i>
+                        </div>
+                        <div class="clear"></div>
                     </div>
-                    <div class="viewer-button right embedvideo">
-                        <i class="medium-icon icons-img embed"></i>
-                    </div>
-                    <div class="clear"></div>
-                </div>
-                <video id="video" controls preload="metadata" poster="" data-autoplayvideo="false"  data-playvideoonclick="false"></video>
+                    <video id="video" controls preload="metadata" data-autoplayvideo="false"
+                           data-playvideoonclick="false"></video>
 
-                <div class="download play-video-button"></div>
-                <div class="viewer-pending hidden">
-                    <div class="bounce1"></div>
-                    <div class="bounce2"></div>
-                    <div class="bounce3"></div>
-                </div>
-                <!-- Will add soon. This button should direct you to the dl page for the file -->
-                <div class="logo-container">
-                    <div class="logo-icon">
+                    <div class="download play-video-button"></div>
+                    <div class="viewer-pending hidden">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
                     </div>
-                </div>
-                <!-- Video Footer -->
-                <div class="viewer-bottom-bl">
-                    <div id="video-controls" class="video-controls" data-state="hidden">
-                        <div data-state="play" class="viewer-button left playpause">
-                            <i class="medium-icon icons-img pause"></i>
-                        </div>
-                        <div class="volume-control left">
-                            <div data-state="mute" class="viewer-button mute">
-                                <i class="medium-icon icons-img volume"></i>
+                    <!-- Will add soon. This button should direct you to the dl page for the file -->
+                    <div class="logo-container">
+                        <div class="logo-icon"></div>
+                    </div>
+                    <!-- Video Footer -->
+                    <div class="viewer-bottom-bl">
+                        <div id="video-controls" class="video-controls" data-state="hidden">
+                            <div data-state="play" class="viewer-button left playpause">
+                                <i class="medium-icon icons-img pause"></i>
                             </div>
-                            <div class="video-vol-range">
-                                <div class="volume-bar"><span></span></div>
+                            <div class="volume-control left">
+                                <div data-state="mute" class="viewer-button mute">
+                                    <i class="medium-icon icons-img volume"></i>
+                                </div>
+                                <div class="video-vol-range">
+                                    <div class="volume-bar"><span></span></div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="video-timing current left">
-                            00:00
-                        </div>
-                        <div data-state="go-fullscreen" class="viewer-button right fs">
-                            <i class="medium-icon icons-img fullscreen"></i>
-                        </div>
-                        <div class="video-timing duration right">
-                            00:00
-                        </div>
-                        <div class="video-progress-block">
-                            <div class="video-progress-bar">
-                                <div class="video-time-bar"></div>
+                            <div class="video-timing current left">
+                                00:00
+                            </div>
+                            <div data-state="go-fullscreen" class="viewer-button right fs">
+                                <i class="medium-icon icons-img fullscreen"></i>
+                            </div>
+                            <div class="video-timing duration right">
+                                00:00
+                            </div>
+                            <div class="video-progress-block">
+                                <div class="video-progress-bar">
+                                    <div class="video-time-bar"></div>
+                                </div>
                             </div>
                         </div>
                     </div>

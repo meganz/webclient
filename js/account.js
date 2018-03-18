@@ -205,7 +205,7 @@ function u_checklogin3a(res, ctx) {
             r = 3;      // Fully registered
         }
 
-        if (r == 3) {
+        if (r > 2 && !is_embed) {
             return mBroadcaster.crossTab.initialize(function() {
                 ctx.checkloginresult(ctx, r);
             });
@@ -261,9 +261,11 @@ function u_logout(logout) {
             watchdog.notify('logout');
         }
 
-        // The slideshow and notifications are not applicable for the mobile website
-        if (!is_mobile) {
+        if (typeof slideshow === 'function') {
             slideshow(0, 1);
+        }
+
+        if (typeof notify === 'object') {
             notify.notifications = [];
         }
 
@@ -273,9 +275,8 @@ function u_logout(logout) {
         u_sharekeys = {};
         u_type = false;
         loggedout = true;
-        $('#fmholder').html('');
-        $('#fmholder').attr('class', 'fmholder');
-        M = new MegaData();
+        $('#fmholder').text('').attr('class', 'fmholder');
+        M = window.MegaData ? new MegaData() : Object.create(null);
         $.hideContextMenu = function () {};
         api_reset();
         if (waitxhr) {

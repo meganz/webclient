@@ -856,7 +856,7 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, limit) {
     'use strict';
 
-    if (!window.chrome || !anyof || !Object.keys(this.pending[0]).length) {
+    if (!mega.chrome || !anyof || !Object.keys(this.pending[0]).length) {
         return this.getbykey1.apply(this, arguments);
     }
 

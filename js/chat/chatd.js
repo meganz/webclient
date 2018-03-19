@@ -758,7 +758,7 @@ Chatd.Shard.prototype.restoreIfNeeded = function(chatId) {
 // @deprecated
 Chatd.Shard.prototype.resendpending = function(chatId) {
     var self = this;
-    var chatIdMessages = self.chatd.chatIdMessages[chatId][chatId];
+    var chatIdMessages = self.chatd.chatIdMessages[chatId];
     if (chatIdMessages) {
         chatIdMessages.resend();
     }

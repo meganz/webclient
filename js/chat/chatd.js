@@ -756,9 +756,9 @@ Chatd.Shard.prototype.restoreIfNeeded = function(chatId) {
 
 // resend all unconfirmed messages (this is mandatory)
 // @deprecated
-Chatd.Shard.prototype.resendpending = function() {
+Chatd.Shard.prototype.resendpending = function(chatId) {
     var self = this;
-    for (var chatId in this.chatIds) {
+    if (self.chatd.chatIdMessages[chatId]) {
         self.chatd.chatIdMessages[chatId].resend();
     }
 };
@@ -1339,7 +1339,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 // Resending of pending message should be done via the integration code,
                 // since it have more info and a direct relation with the UI related actions on pending messages
                 // (persistence, user can click resend/cancel/etc).
-                self.resendpending();
+                self.resendpending(cmd.substr(1, 8));
                 self.restoreIfNeeded(cmd.substr(1, 8));
 
                 self.chatd.trigger('onMessagesHistoryDone',

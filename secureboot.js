@@ -445,6 +445,7 @@ var mega = {
     flags: 0,
     utils: {},
     updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt',
+    chrome: typeof window.chrome === 'object' && window.chrome.webstore !== undefined,
     browserBrand: [
         0, 'Torch', 'Epic'
     ],

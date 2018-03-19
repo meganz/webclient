@@ -109,7 +109,7 @@
             }
 
             // https://code.google.com/p/chromium/issues/detail?id=375297
-            if (!window.chrome || parseInt(ua.details.version) < 58) {
+            if (!mega.chrome || parseInt(ua.details.version) < 58) {
                 MemoryIO.fileSizeLimit = 496 * 1024 * 1024;
             }
 

@@ -1085,7 +1085,7 @@ MegaUtils.prototype.getSiteVersion = function() {
 
         // If an extension use the version of that (because sometimes there are independent deployments of extensions)
         if (is_extension) {
-            version = (window.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
+            version = (mega.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
         }
     }
 
@@ -1137,7 +1137,7 @@ MegaUtils.prototype.zoomLevelNotification = function() {
     }
 
     // Chrome specific broken layout tested on versions <= 62
-    if (window.chrome && dpr === 2.200000047683716 || dpr === 1.100000023841858
+    if (mega.chrome && dpr === 2.200000047683716 || dpr === 1.100000023841858
         || dpr === 1.3320000171661377 || dpr === 0.6660000085830688 || dpr === 0.3330000042915344) {
 
         $('.nw-dark-overlay').removeClass('mac');

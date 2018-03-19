@@ -5859,7 +5859,7 @@ React.makeElement = React['createElement'];
 	                messagesBuff: chatRoom.messagesBuff,
 	                contacts: M.u,
 	                contact: contact,
-	                key: chatRoom.roomId
+	                key: chatRoom.roomId + "_" + chatRoom.instanceIndex
 	            }));
 	        });
 
@@ -11075,6 +11075,7 @@ React.makeElement = React['createElement'];
 	    }, true);
 
 	    this.roomId = roomId;
+	    this.instanceIndex = ChatRoom.INSTANCE_INDEX++;
 	    this.type = type;
 	    this.ctime = ctime;
 	    this.lastActivity = lastActivity ? lastActivity : 0;
@@ -11249,6 +11250,8 @@ React.makeElement = React['createElement'];
 
 	    'LEFT': 250
 	};
+
+	ChatRoom.INSTANCE_INDEX = 0;
 
 	ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
 	    var self = this;

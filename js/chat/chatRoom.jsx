@@ -50,6 +50,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     );
 
     this.roomId = roomId;
+    this.instanceIndex = ChatRoom.INSTANCE_INDEX++;
     this.type = type;
     this.ctime = ctime;
     this.lastActivity = lastActivity ? lastActivity : 0;
@@ -264,6 +265,8 @@ ChatRoom.STATE = {
 
     'LEFT': 250
 };
+
+ChatRoom.INSTANCE_INDEX = 0;
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
     var self = this;

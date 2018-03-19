@@ -4728,5 +4728,8 @@
     "17794": "Initialising...",
     "17795": "MEGAsync stopped responding, it could be closed or too busy.",
     "17796": "Do you want to re-initialise the connection with MEGAsync and turn it off if MEGAsync does not respond?",
-    "17797": "Download sent to MEGASync"
+    "17797": "Download sent to MEGASync",
+    "17799": "folders containing a total of",
+    "17800": "file was added to the transfer manager",
+    "17801": "files were added to the transfer manager"
 }

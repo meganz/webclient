@@ -18918,5 +18918,17 @@
     "17797": {
         "text": "Download sent to MEGASync",
         "context": "A toast appears when the user download something while integrating with MEGASync"
+    },
+    "17799": {
+        "text": "folders containing a total of",
+        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync.\r\n[PLURAL] "
+    },
+    "17800": {
+        "text": "file was added to the transfer manager",
+        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync.\r\n[SINGULAR] \r\n"
+    },
+    "17801": {
+        "text": "files were added to the transfer manager",
+        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync. \r\n[PLURAL] "
     }
 }

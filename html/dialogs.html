@@ -4441,7 +4441,7 @@
         </div>
         <div class="wrapper link-code-container">
             <div class="link-code-field">
-                <span class=""><iframe width="640" height="360" frameborder="0" allowfullscreen></iframe></span>
+                <span class=""></span>
             </div>
             <div class="embed-information-container">
                 <div class="">This video will be embedded at 640px wide
@@ -4470,10 +4470,10 @@
     <div class="fm-dialog-tab">
         <div class="fm-tab-wrapper">
             <div class="fm-tab tab-url-link active">
-                <div class="tab-icon url"></div><span>[$5622]</span>
+                <span>[$5622]</span>
             </div>
             <div class="fm-tab tab-embed-link">
-                <div class="tab-icon embed"></div><span>[$17407]</span>
+                <span>[$17407]</span>
             </div>
         </div>
     </div>
@@ -4501,18 +4501,29 @@
         </div>
         <div class="wrapper link-code-container">
             <div class="link-code-field">
-                <span class=""><iframe width="640" height="360" frameborder="0" allowfullscreen></iframe></span>
+                <!-- Toggle between the URL and Embed icon by toggling the classes url & embed in tab-icon -->
+                <div class="tab-icon url"></div><span class=""></span>
             </div>
-            <div class="information-container">
+            <div class="settings-container">
+                <div class="settings-row">
+                    <div class="checkbox-item">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" name="" id="" class="checkboxOff" checked="">
+                        </div>
+                        <label for="transfers-tooltip" class="radio-txt">Start video at</label><div class="start-at-time"><input type="text" value="time" id=""></div>
+                    </div>
+                </div>
+            </div>
+            <div class="information-container hidden">
                 <div class="">This video will be embedded at 640px wide
                 </div>
             </div>
         </div>
     </div>
     <div class="fm-notifications-bottom">
-            <div class="default-widget-buttons">
-                <div class="fm-dialog-new-folder-button default-grey-button right"><span>Copy</span></div>
-                <div class="fm-dialog-new-folder-button default-white-button left"><span>Preview</span></div>
-            </div>
+        <div class="default-widget-buttons">
+            <div class="fm-dialog-new-folder-button default-grey-button right"><span>Copy</span></div>
+            <div class="fm-dialog-new-folder-button default-white-button left"><span>Preview</span></div>
         </div>
+    </div>
 </div>

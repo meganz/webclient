@@ -4,57 +4,80 @@
             <!-- Video block !-->
             <div class="download video-block">
                 <!-- Sharing options -->
-                <div class="sharefile-container hidden">
-                    <div class="sharefile-aligner">
-                        <div class="sharefile-option-wrapper">
-                            <div class="sharefile-tabs">
-                                <div class="tab-link share-link">Share link
+                <div class="sharefile-block">
+                    <div class="sharefile-container">
+                        <div class="close-overlay right">
+                            <i class="medium-icon icons-img close-icon"></i>
+                        </div>
+                        <div class="sharefile-aligner">
+                            <div class="sharefile-option-wrapper">
+                                <div class="sharefile-tabs">
+                                    <div class="tab-link share-link active">Share link
+                                    </div>
+                                    <div class="tab-link share-embed-code">Embed code
+                                    </div>
                                 </div>
-                                <div class="tab-link share-embed-code active">Embed code
+                                <div class="sharefile-sections">
+                                    <div class="tab-content share-link">&lt;iframe
+                                        src="https://player.mega.co.nz/video/256668685" width="640" height="360"
+                                        frameborder="0" allowfullscreen&gt;
+                                    </div>
+                                    <div class="tab-content share-embed-code">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="sharefile-sections">
-                                <div class="tab-content share-link">&lt;iframe
-                                    src="https://player.mega.co.nz/video/256668685" width="640" height="360"
-                                    frameborder="0" allowfullscreen&gt;
+                                <div class="sharefile-settings">
+                                    <div class="settings-row">
+                                        <div class="checkbox-item">
+                                            <div class="checkdiv checkboxOff">
+                                                <input type="checkbox" name="" id="" class="checkboxOff" checked="">
+                                            </div>
+                                            <label for="transfers-tooltip" class="radio-txt">Start video at</label><div class="start-at-time"><input type="text" value="00:00" id=""></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="tab=-content share-embed-code"></div>
-                            </div>
-                            <div class="sharefile-buttons">
-                                <div class="button default-red-button right">Copy
-                                </div>
-                                <div class="button default-transparent-button right">Cancel
+                                <div class="sharefile-buttons hidden">
+                                    <div class="button default-red-button right">Copy
+                                    </div>
+                                    <div class="button default-transparent-button right">Cancel
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- Transfer limitation overlay -->
-                <div class="transfer-limitation-container hidden">
-                    <div class="transfer-limitation-aligner">
-                        <div class="transfer-limitation-wrapper">
-                            <div class="transfer-heading">Limited transfer quota available</div>
-                            <div class="transfer-body">Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Create a PRO account in order to substantially raise your transfer quota.</div>
-                            <div class="transfer-buttons">
-                                <div class="upgrade-option hidden">
-                                    <div class="button default-red-button">Upgrade your PRO account</div>
-                                    <div class="button default-link-button">Continue anyways</div>
-                                </div>
-                                <div class="signin-register-option">
-                                    <div class="button default-transparent-button inline login">Login</div>
-                                    <div class="button default-red-button inline sign up">Sign Up</div>
-                                    <div class="button default-link-button">Continue anyways</div>
+                <div class="transfer-limitation-block hidden">
+                    <div class="transfer-limitation-container">
+                        <div class="close-overlay right">
+                            <i class="medium-icon icons-img close-icon"></i>
+                        </div>
+                        <div class="transfer-limitation-aligner">
+                            <div class="transfer-limitation-wrapper">
+                                <div class="transfer-heading">Limited transfer quota available</div>
+                                <div class="transfer-body">Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. Create a PRO account in order to substantially raise your transfer quota.</div>
+                                <div class="transfer-buttons">
+                                    <div class="upgrade-option hidden">
+                                        <div class="button default-red-button">Upgrade your PRO account</div>
+                                        <div class="button default-link-button">Continue anyways</div>
+                                    </div>
+                                    <div class="signin-register-option">
+                                        <div class="button default-transparent-button inline login">Login</div>
+                                        <div class="button default-red-button inline sign up">Sign Up</div>
+                                        <div class="button default-link-button">Continue anyways</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- File Removed -->
-                <div class="file-removed-container hidden">
-                    <div class="file-removed-aligner">
-                        <div class="file-removed-wrapper">
-                            <div class="file-removed-heading">File has been removed</div>
-                            <div class="file-removed-body hidden">Some explanation if needed?</div>
+                <div class="file-removed-block hidden">
+                    <div class="file-removed-container">
+                        <div class="file-removed-aligner">
+                            <div class="file-removed-wrapper">
+                                <div class="file-removed-heading">File has been removed</div>
+                                <div class="file-removed-body hidden">Some explanation if needed?</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -65,7 +88,7 @@
                         <div class="dropdown-wrapper">
                             <div class="dropdown-section">
                                 <a class="dropdown-item getlink-item" style="display: block;">
-                                    <i class="small-icon context mega"></i><span>Log in</span>
+                                    <i class="small-icon context login"></i><span>Log in</span>
                                 </a>
                                 <hr>
                             </div>
@@ -76,7 +99,7 @@
                             </div>
                             <div class="dropdown-section">
                                 <a class="dropdown-item getlink-item" style="display: block;">
-                                    <i class="small-icon context get-link"></i><span>Embed code</span>
+                                    <i class="small-icon context embed-code"></i><span>Embed code</span>
                                 </a>
                                 <hr>
                             </div>
@@ -102,22 +125,19 @@
                             </div>
                         </div>
                         <div class="viewer-button right moreoptions">
-                            <i class="medium-icon icons-img "></i>
+                            <i class="medium-icon icons-img three-dots"></i>
                         </div>
                         <div class="viewer-button right useravatar hidden">
                             <div data-color="color4" class="avatar-wrapper avatar"><span>C</span></div>
                         </div>
                         <!-- Will Replace with a more appropriate share icon -->
                         <div class="viewer-button right getlink">
-                            <i class="medium-icon icons-img chain"></i>
-                        </div>
-                        <div class="viewer-button right embedvideo">
-                            <i class="medium-icon icons-img embed"></i>
+                            <i class="medium-icon icons-img share-generic"></i>
                         </div>
                         <div class="clear"></div>
                     </div>
                     <video id="video" controls preload="metadata" data-autoplayvideo="false"
-                           data-playvideoonclick="false"></video>
+                    data-playvideoonclick="false"></video>
 
                     <div class="download play-video-button"></div>
                     <div class="viewer-pending hidden">

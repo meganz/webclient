@@ -210,7 +210,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v18.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
@@ -485,7 +485,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v18.png);
     background-position: 2px -532px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;

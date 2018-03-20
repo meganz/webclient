@@ -653,6 +653,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
             self.haveMessages = true;
 
+            if (chatRoom.chatId === "iNfQncIviRE") {
+                debugger;
+            }
+
             var msgObject = new Message(
                 chatRoom,
                 self,
@@ -1026,6 +1030,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             );
 
             outgoingMessage.internalId = eventData.id;
+            debugger;
             outgoingMessage.orderValue = eventData.id;
             outgoingMessage.requiresManualRetry = true;
             outgoingMessage.userId = eventData.userId;
@@ -1527,6 +1532,7 @@ MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references
     for (var i = 0; i < references.length; i++) {
         if (this.messageOrders[references[i]] && this.messageOrders[references[i]] > msgOrder) {
             // There might be a potential message order tampering.It should raise an event to UI.
+            debugger;
             return false;
         }
     }

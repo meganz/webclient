@@ -313,7 +313,7 @@ function init_page() {
 
     // If on the plugin page, show the page with the relevant extension for their current browser
     if (page == 'plugin') {
-        page = (window.chrome) ? 'chrome' : 'firefox';
+        page = (mega.chrome) ? 'chrome' : 'firefox';
     }
 
     if (localStorage.signupcode && u_type !== false) {

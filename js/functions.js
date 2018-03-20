@@ -772,7 +772,7 @@ function srvlog2(type /*, ...*/) {
             else if (is_firefox_web_ext) {
                 version = buildVersion.firefox;
             }
-            else if (window.chrome) {
+            else if (mega.chrome) {
                 version = buildVersion.chrome;
             }
             else {

@@ -756,10 +756,11 @@ Chatd.Shard.prototype.restoreIfNeeded = function(chatId) {
 
 // resend all unconfirmed messages (this is mandatory)
 // @deprecated
-Chatd.Shard.prototype.resendpending = function() {
+Chatd.Shard.prototype.resendpending = function(chatId) {
     var self = this;
-    for (var chatId in this.chatIds) {
-        self.chatd.chatIdMessages[chatId].resend();
+    var chatIdMessages = self.chatd.chatIdMessages[chatId];
+    if (chatIdMessages) {
+        chatIdMessages.resend();
     }
 };
 
@@ -1339,7 +1340,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 // Resending of pending message should be done via the integration code,
                 // since it have more info and a direct relation with the UI related actions on pending messages
                 // (persistence, user can click resend/cancel/etc).
-                self.resendpending();
+                self.resendpending(cmd.substr(1, 8));
                 self.restoreIfNeeded(cmd.substr(1, 8));
 
                 self.chatd.trigger('onMessagesHistoryDone',
@@ -1483,11 +1484,12 @@ Chatd.prototype.leave = function(chatId) {
     if (this.chatIdShard[chatId]) {
         var shard = this.chatIdShard[chatId];
 
-        shard.destroyed = true;
 
         // do some cleanup now...
         delete shard.joinedChatIds[chatId];
+        delete shard.chatIds[chatId];
         if (Object.keys(shard.joinedChatIds).length === 0) {
+            shard.destroyed = true;
             // close shard if no more joined chatIds are left...
             shard.disconnect();
             var self = this;

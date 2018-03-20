@@ -1858,7 +1858,7 @@ var dlmanager = {
         else if (window.safari) {
             $elm.addClass('safari');
         }
-        else if (window.chrome) {
+        else if (mega.chrome) {
             $elm.addClass('chrome');
         }
         else if (window.opr) {
@@ -1881,7 +1881,7 @@ var dlmanager = {
                 text = l[1676] + ': ' + message + '<br/>' + l[16870] + ' %2';
             }
 
-            if (window.chrome) {
+            if (mega.chrome) {
                 if (window.Incognito) {
                     text = text.replace('%2', '(' + l[16869] + ')');
                 }

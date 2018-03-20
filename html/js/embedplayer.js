@@ -64,10 +64,57 @@ function init_embed(ph, key, time, g) {
     add_layout();
 
     if (node) {
+        var link = '#!' + ph + '!' + key;
 
-        $('.play-video-button').rebind('click', function() {
-            open(getAppBaseUrl() + '/#!' + ph + '!' + key);
+        $('.play-video-button, .viewonmega-item').rebind('click', function() {
+            open(getAppBaseUrl() + '/' + link);
             return false;
+        });
+
+        $('.embedcode-item, .getlink-item').rebind('click', function() {
+            var playing = false;
+            var timeoffset = 0;
+            var $block = $('.sharefile-block');
+            var url = getBaseUrl() + '/embed' + link;
+            var embed = '<iframe src="%" width="640" height="360" frameborder="0" allowfullscreen></iframe>';
+
+            $('.close-overlay, .sharefile-buttons .cancel', $block).rebind('click', function() {
+                playing = false;
+                $block.addClass('hidden');
+            });
+
+            $('.sharefile-buttons .copy', $block).rebind('click', function() {
+                var content = String($('.tab-content', $block).text());
+                if (playing && document.getElementById('timecheckbox').checked) {
+                    content = content.replace(/![\w-]{8}![^"]+/, '$&!' + timeoffset + 's');
+                }
+                copyToClipboard(content);
+            });
+
+            (function _() {
+                $('.tab-link', $block).removeClass('active').rebind('click', _);
+
+                if ($(this).is('.getlink-item, .share-link')) {
+                    $('.tab-link.share-link', $block).addClass('active');
+                    $('.tab-content', $block).text(url);
+                }
+                else {
+                    $('.tab-link.share-embed-code', $block).addClass('active');
+                    $('.tab-content', $block).text(embed.replace('%', url));
+                }
+            }).call(this);
+
+            if (node.stream) {
+                playing = true;
+                var elm = document.getElementById('timeoffset');
+                node.stream.on('timeupdate', function() {
+                    timeoffset = this.video.currentTime | 0;
+                    elm.value = secondsToTimeShort(timeoffset);
+                    return playing;
+                });
+            }
+
+            $block.removeClass('hidden');
         });
 
         iniVideoStreamLayout(node, $('body'));
@@ -107,12 +154,14 @@ function topmenuUI() {
     ];
 
     if (u_type === 3) {
-        var name = u_attr.name || u_attr.firstname;
+        var name = $.trim(u_attr.name || (u_attr.firstname + ' ' + u_attr.lastname));
+        var fl = String(name && name[0] || '').toUpperCase();
         var color = UH64(u_handle).mod(_colors.length);
+        var $ddi = $('.dropdown-item.login-item');
 
         $useravatar.removeClass('hidden');
-        $avatarwrapper.css('background-color', _colors[color])
-            .find('span').text(String(name && name[0] || '').toUpperCase());
+        $avatarwrapper.css('background-color', _colors[color]).find('span').text(fl);
+        $ddi.find('i').css('background-color', _colors[color]).text(fl).end().find('span').text(name);
 
         api_req({"a": "uga", "u": u_handle, "ua": "+a"}, {
             callback: tryCatch(function(res) {
@@ -123,6 +172,18 @@ function topmenuUI() {
             })
         });
     }
+
+    $('body').rebind('click.bodyw', function() {
+        $('.files-menu.context').addClass('hidden');
+    });
+
+    $('.moreoptions').rebind('click', function() {
+        var $cm = $('.files-menu.context').removeClass('hidden');
+        var top = $('.viewer-top-bl').height();
+        var left = $cm.outerWidth();
+        $cm.css({'top': top, 'left': innerWidth - left - 4});
+        return false;
+    });
 }
 
 // Setup desktop variant stubs
@@ -209,6 +270,9 @@ mBroadcaster.once('startMega', function() {
 
 })(self);
 
+function getBaseUrl() {
+    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.nz');
+}
 function getAppBaseUrl() {
     var l = location;
     var base = (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname));

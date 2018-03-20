@@ -9650,7 +9650,7 @@ React.makeElement = React['createElement'];
 
 	        M.v = imagesList;
 
-	        slideshow(v.h);
+	        slideshow(v.h, undefined, true);
 	        if (e) {
 	            e.preventDefault();
 	            e.stopPropagation();

@@ -6,7 +6,7 @@
     var touchedElement = 0;
 
     function pushUpload() {
-        if (!--dir_inflight) {
+        if (!--dir_inflight && $.dostart) {
             var emptyFolders = Object.keys(filedrag_paths)
                 .filter(function(p) {
                     return filedrag_paths[p] < 1;
@@ -326,6 +326,9 @@
                     var item = items[i].webkitGetAsEntry();
                     if (item) {
                         filedrag_u = [];
+                        if (i == items.length - 1) {
+                            $.dostart = true;
+                        }
                         traverseFileTree(item, '', item.isFile && items[i].getAsFile());
                     }
                 }
@@ -337,6 +340,9 @@
                     var file = e.dataTransfer.mozGetDataAt("application/x-moz-file", i);
                     if (file instanceof Ci.nsIFile) {
                         filedrag_u = [];
+                        if (i == m - 1) {
+                            $.dostart = true;
+                        }
                         traverseFileTree(new mozDirtyGetAsEntry(file /*,e.dataTransfer*/ ));
                     }
                     else {

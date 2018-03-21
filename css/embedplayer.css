@@ -1703,11 +1703,11 @@ input, textarea {
 }
 .contextmenu.useravatar {
 	float:left;
-	margin: 6px 12px 0 -2px
+	margin: 2px 12px 0 -2px
 }
 .login-item.with-avatar {
 	height: 40px;
-}	
+}
 .dropdown-item.with-avatar {
 	line-height: 39px;
 }

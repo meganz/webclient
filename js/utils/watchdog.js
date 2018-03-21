@@ -8,11 +8,13 @@ var watchdog = Object.freeze({
     // ID to identify tab's origin
     wdID: (Math.random() * Date.now()),
     // Hols promises waiting for a query reply
-    queryQueue: {},
+    queryQueue: Object.create(null),
     // Holds query replies if cached
-    replyCache: {},
+    replyCache: Object.create(null),
     // waiting queries
-    waitingQueries: {},
+    waitingQueries: Object.create(null),
+    // event overriders
+    overrides: Object.create(null),
 
     /** setup watchdog/webstorage listeners */
     setup: function() {
@@ -112,6 +114,23 @@ var watchdog = Object.freeze({
         return promise;
     },
 
+    /**
+     * Register event handling overrider
+     * @param {String} event The event name
+     * @param {Function|*} callback
+     */
+    registerOverrider: function(event, callback) {
+        this.overrides[event] = callback;
+    },
+
+    /**
+     * Unregister event handling overrider
+     * @param {String} event The event name
+     */
+    unregisterOverrider: function(event) {
+        delete this.overrides[event];
+    },
+
     /** Handle watchdog/webstorage event */
     handleEvent: function(ev) {
         if (String(ev.key).indexOf(this.eTag) !== 0) {
@@ -127,6 +146,19 @@ var watchdog = Object.freeze({
         if (!strg || strg.origin === this.wdID) {
             if (d) {
                 console.log('Ignoring mWatchDog event', msg, strg);
+            }
+            return;
+        }
+
+        if (this.overrides['*'] || this.overrides[msg]) {
+            if (d) {
+                console.debug('watchdog overrider for ' + msg, strg);
+            }
+            if (typeof this.overrides[msg] === 'function') {
+                tryCatch(this.overrides[msg])(msg, strg);
+            }
+            else {
+                mBroadcaster.sendMessage("watchdog:" + msg, strg);
             }
             return;
         }
@@ -195,14 +227,13 @@ var watchdog = Object.freeze({
                 break;
 
             case 'setsid':
-                if (typeof dlmanager === 'object'
-                    && dlmanager.isOverQuota) {
+                if (typeof dlmanager === 'object' && dlmanager.isOverQuota) {
 
                     // another tab fired a login/register while this one has an overquota state
                     var sid = strg.data;
                     delay('watchdog:setsid', function() {
                         // the other tab must have sent the new sid
-                        assert(sid, 'sid not set');
+                        console.assert(sid, 'sid not set');
                         api_setsid(sid);
                     }, 2000);
                 }

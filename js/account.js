@@ -276,7 +276,9 @@ function u_logout(logout) {
         u_type = false;
         loggedout = true;
         $('#fmholder').text('').attr('class', 'fmholder');
-        M = window.MegaData ? new MegaData() : Object.create(null);
+        if (window.MegaData) {
+            M = new MegaData();
+        }
         $.hideContextMenu = function () {};
         api_reset();
         if (waitxhr) {

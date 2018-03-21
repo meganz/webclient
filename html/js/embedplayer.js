@@ -66,40 +66,31 @@ function init_embed(ph, key, time, g) {
     if (node) {
         var link = '#!' + ph + '!' + key;
 
-        $('.play-video-button, .viewonmega-item, .download.info-txt.big-txt').rebind('click', function() {
+        $('.play-video-button, .viewonmega-item, .filename').rebind('click', function() {
             open(getAppBaseUrl() + '/' + link);
             return false;
         });
 
-        $('.login-item.with-avatar, useravatar').rebind('click', function() {
-            open(getAppBaseUrl() + '/' + 'fm');
-            return false;
-        });
-
         $('.login-item').rebind('click', function() {
-            open(getAppBaseUrl() + '/' + 'login');
-            return false;
+            open(getBaseUrl() + '/login');
         });
 
-        $('.logo-container').rebind('click', function() {
-            open(getAppBaseUrl());
-            return false;
+        $('.logo-container, .login-item.with-avatar, .useravatar').rebind('click', function() {
+            open(getBaseUrl());
         });
 
         $('.embedcode-item, .getlink-item, .share-generic').rebind('click', function() {
             var playing = false;
             var timeoffset = 0;
             var $block = $('.sharefile-block');
-            var $videoBlock = $('.video-wrapper');
+            var $wrapper = $('.video-wrapper');
             var url = getBaseUrl() + '/embed' + link;
             var embed = '<iframe src="%" width="640" height="360" frameborder="0" allowfullscreen></iframe>';
-            var $toast = $('.toast-notification');
 
             $('.close-overlay, .sharefile-buttons .cancel', $block).rebind('click', function() {
                 playing = false;
                 $block.addClass('hidden');
-                $videoBlock.removeClass('main-blur-block');
-                $toast.removeClass('visible second');
+                $wrapper.removeClass('main-blur-block');
             });
 
             $('.sharefile-buttons .copy', $block).rebind('click', function() {
@@ -107,8 +98,7 @@ function init_embed(ph, key, time, g) {
                 if (playing && document.getElementById('timecheckbox').checked) {
                     content = content.replace(/![\w-]{8}![^"]+/, '$&!' + timeoffset + 's');
                 }
-                copyToClipboard(content);
-                $toast.addClass('visible second');
+                copyToClipboard(content, 1);
             });
 
             (function _() {
@@ -135,10 +125,45 @@ function init_embed(ph, key, time, g) {
             }
 
             $block.removeClass('hidden');
-            $videoBlock.addClass('main-blur-block');
+            $wrapper.addClass('main-blur-block');
         });
 
-        iniVideoStreamLayout(node, $('body'));
+        watchdog.registerOverrider('login', function() {
+            watchdog.registerOverrider('setsid', function(ev, strg) {
+                var sid = strg.data;
+                api_setsid(sid);
+
+                u_storage = init_storage(localStorage);
+                u_storage.sid = sid;
+
+                u_checklogin({
+                    checkloginresult: function(ctx, r) {
+                        u_type = r;
+                        topmenuUI();
+                    }
+                });
+                watchdog.unregisterOverrider('setsid');
+            });
+        });
+        watchdog.registerOverrider('logout', function() {
+            u_logout(-0xDEADF);
+            topmenuUI();
+        });
+
+        iniVideoStreamLayout(node, $('body'))
+            .then(function(stream) {
+                if (stream instanceof Streamer) {
+                    stream.on('activity', function() {
+                        if (dlmanager.isOverQuota) {
+                            dlmanager.isOverQuota = false;
+                            dlmanager.isOverFreeQuota = false;
+                            $('.transfer-limitation-block .close-overlay').trigger('click');
+                            clearInterval($.quotaTimer);
+                        }
+                        return true;
+                    });
+                }
+            });
     }
     else {
         console.info(404, arguments);
@@ -167,8 +192,7 @@ function add_layout() {
 function topmenuUI() {
     'use strict';
     var $useravatar = $('.viewer-button.useravatar');
-    var $useravatarMenu = $('.login-item .useravatar');
-    var $avatarwrapper = $('.avatar-wrapper', $useravatar);
+    var $avatarwrapper = $('.avatar-wrapper');
     var _colors = [
         "#69F0AE", "#13E03C", "#31B500", "#00897B", "#00ACC1",
         "#61D2FF", "#2BA6DE", "#FFD300", "#FFA500", "#FF6F00",
@@ -179,11 +203,13 @@ function topmenuUI() {
         var name = $.trim(u_attr.name || (u_attr.firstname + ' ' + u_attr.lastname));
         var fl = String(name && name[0] || '').toUpperCase();
         var color = UH64(u_handle).mod(_colors.length);
-        var $ddi = $('.dropdown-item.login-item');
 
-        ($useravatar.removeClass('hidden') && $useravatarMenu.removeClass('hidden'));
+        $useravatar.removeClass('hidden');
         $avatarwrapper.css('background-color', _colors[color]).find('span').text(fl);
-        $ddi.addClass('with-avatar').find('i').addClass('hidden').text(fl).end().find('.login-text').text(name).end();
+        $('.contextmenu.useravatar').removeClass('hidden')
+            .find('span').text(fl).end()
+            .parent().find('i').addClass('hidden').end()
+            .find('.login-text').text(name);
 
         api_req({"a": "uga", "u": u_handle, "ua": "+a"}, {
             callback: tryCatch(function(res) {
@@ -193,6 +219,10 @@ function topmenuUI() {
                 }
             })
         });
+    }
+    else {
+        $('.useravatar').addClass('hidden');
+        $('.dropdown-item.login-item').find('i').removeClass('hidden').end().find('.login-text').text(l[16345]);
     }
 
     $('body').rebind('click.bodyw', function() {
@@ -226,22 +256,76 @@ mBroadcaster.once('startMega', function() {
     M.hasPendingTransfers = dummy;
 
     dlmanager = Object.create(null);
+    dlmanager._quotaTasks = [];
     dlmanager.logger = new MegaLogger();
+    dlmanager.getQBQData = dummy;
     dlmanager.setUserFlags = dummy;
+    dlmanager._overquotaInfo = dummy;
+    dlmanager.getCurrentDownloads = dummy;
+    dlmanager.onNolongerOverquota = dummy;
+    dlmanager.getCurrentDownloadsSize = dummy;
+    dlmanager.showOverQuotaDialog = function(task) {
+        var $wrapper = $('.video-wrapper').addClass('main-blur-block');
+        var $block = $('.transfer-limitation-block').removeClass('hidden');
 
+        if (typeof task === 'function') {
+            this._quotaTasks.push(tryCatch(task));
+        }
+        this.isOverQuota = true;
+
+        if (u_type) {
+            if (u_attr.p) {
+                $('.upgrade-option .button', $block).text(l[16386]);
+            }
+            else {
+                $('.upgrade-option .button', $block).text(l[129]);
+            }
+            $('.transfer-body', $block).text(l[17084]);
+            $('.upgrade-option', $block).removeClass('hidden');
+            $('.signin-register-option', $block).addClass('hidden');
+        }
+        else {
+            this.isOverFreeQuota = true;
+            $('.transfer-body', $block).text(l[7098]);
+            $('.upgrade-option', $block).addClass('hidden');
+            $('.signin-register-option', $block).removeClass('hidden');
+        }
+
+        $('.close-overlay', $block).rebind('click', function() {
+            $block.addClass('hidden');
+            $wrapper.removeClass('main-blur-block');
+        });
+
+        var toPage = function(page) {
+            open(getBaseUrl() + '/' + page);
+            return false;
+        };
+
+        $('.button.login', $block).rebind('click', toPage.bind(this, 'login'));
+        $('.button.signup', $block).rebind('click', toPage.bind(this, 'register'));
+        $('.upgrade-option .button', $block).rebind('click', toPage.bind(this, 'pro'));
+
+        // FIXME: ...
+        $.quotaTimer = setInterval(this._onQuotaRetry.bind(this), 4e4);
+    };
+    dlmanager._onQuotaRetry = function() {
+        for (var i = 0; i < this._quotaTasks.length; i++) {
+            this._quotaTasks[i]();
+        }
+        this._quotaTasks = [];
+    };
 });
 
 (function(global) {
     'use strict';
 
     function MegaLogger(n, o) {
-        this._name = String(n);
         this.options = Object(o);
     }
 
     function expand(p, m) {
         return function(a, b) {
-            p[m](a, b);
+            p[m](a, b || console.debug.bind(console, m));
             return p;
         };
     }
@@ -302,4 +386,12 @@ function getAppBaseUrl() {
         base += l.pathname;
     }
     return base;
+}
+
+function showToast() {
+    var $toast = $('.toast-notification');
+    $toast.addClass('visible second');
+    setTimeout(function() {
+        $toast.removeClass('visible second');
+    }, 2000);
 }

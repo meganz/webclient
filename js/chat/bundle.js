@@ -8800,9 +8800,11 @@ React.makeElement = React['createElement'];
 	                        self.props.onCancel();
 	                    }
 	                    return;
-	                } else {
+	                } else if (self.found.length > 0 && self.found[selected]) {
 	                    self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
 	                    handled = true;
+	                } else {
+	                    self.props.onCancel();
 	                }
 	            } else if (key === 27) {
 
@@ -8816,7 +8818,9 @@ React.makeElement = React['createElement'];
 	                e.stopPropagation();
 	                return false;
 	            } else {
-	                self.setState({ 'prefilled': false });
+	                if (self.isMounted()) {
+	                    self.setState({ 'prefilled': false });
+	                }
 	            }
 	        });
 	    },

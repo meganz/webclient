@@ -2323,10 +2323,6 @@ function parsepage(pagehtml, pp) {
             translate(pages['transferwidget']) + pagehtml)
         .show();
 
-    $(window).rebind('resize.subpage', function () {
-        M.zoomLevelNotification();
-    });
-
     $('body').addClass('bottom-pages');
     $('body, html, .bottom-pages .fmholder').stop().animate({
         scrollTop: 0
@@ -2470,4 +2466,8 @@ mBroadcaster.once('boot_done', function() {
     M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', {murSeed: 0x800F0002});
     attribCache.bitMapsManager = new MegaDataBitMapManager();
+
+    $(window).rebind('resize.subpage', function() {
+        M.zoomLevelNotification();
+    });
 });

@@ -44,7 +44,7 @@ var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
-var isWebkit = /webkit/.test(ua);
+var is_embed = location.pathname === '/embed' || getCleanSitePath().substr(0, 2) === 'E!';
 
 /**
  * Check if the user is coming from a mobile device
@@ -103,7 +103,8 @@ function getCleanSitePath(path) {
 function isPublicLink(page) {
     page = mURIDecode(page).replace(/^[/#]+/, '');
 
-    return (page[0] === '!' || page.substr(0, 2) === 'F!' || page.substr(0, 2) === 'P!') ? page : false;
+    var types = {'F!': 1, 'P!': 1, 'E!': 1};
+    return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
 }
 
 // Safer wrapper around decodeURIComponent
@@ -1554,7 +1555,7 @@ else if (!b_u) {
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
-            dump.m = (is_mobile ? '[mobile] ' : '') + dump.m.replace(/\s+/g, ' ');
+            dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : '') + dump.m.replace(/\s+/g, ' ');
 
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
@@ -1855,11 +1856,15 @@ else if (!b_u) {
 
     jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+    jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
     jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
+    jsl.push({f:'js/utils/crypt.js', n: 'js_utils_crypt_js', j: 1});
     jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
+    jsl.push({f:'js/utils/events.js', n: 'js_utils_events_js', j: 1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
+    jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
     jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
     jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
@@ -1899,6 +1904,10 @@ else if (!b_u) {
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -1959,16 +1968,13 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
     jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
-    jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
-
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
-        is_chrome_firefox |= 4;
-        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j:1,w:3});
-    }
-
+    // jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
     jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j:1,w:3});
+    jsl.push({f:'js/transfers/decrypter.js', n: 'dl_decrypter', j: 1, w: 3});
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
+    jsl.push({f:'js/transfers/meths.js', n: 'dl_meths', j: 1, w: 3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
+    jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
@@ -2021,13 +2027,7 @@ else if (!b_u) {
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
-    }
 
-    jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
-
-    if (!is_mobile) {
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2036,11 +2036,7 @@ else if (!b_u) {
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
-    }
 
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
-
-    if (!is_mobile) {
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2049,7 +2045,6 @@ else if (!b_u) {
         jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
-        jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
     } // !is_mobile
 
     // do not change the order...
@@ -2120,6 +2115,38 @@ else if (!b_u) {
     // different browsers. Hence, do NOT add more jsl entries after this block,
     // unless they're optional (such as polyfills) or third-party resources.
 
+    if (is_embed) {
+        jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
+        jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
+        jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
+        jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});
+
+        jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+        jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+        jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
+        jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
+        jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
+        jsl.push({f:'js/utils/events.js', n: 'js_utils_events_js', j: 1});
+        jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
+        jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
+        jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
+        jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
+        jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
+        jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
+
+        jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
+        jsl.push({f:'js/account.js', n: 'user_js', j: 1});
+
+        jsl.push({f:'js/transfers/queue.js', n: 'queue', j: 1, w: 4});
+        jsl.push({f:'js/transfers/decrypter.js', n: 'dl_downloader', j: 1, w: 3});
+        jsl.push({f:'js/vendor/videostream.js', n: 'videostream', j: 1, w: 3});
+
+        jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
+        jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
+    }
+
     jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
     jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
 
@@ -2130,6 +2157,11 @@ else if (!b_u) {
     // only used on beta
     if (onBetaW) {
         jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+    }
+
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
+        is_chrome_firefox |= 4;
+        jsl.push({f: 'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
     }
 
     var jsl2 =
@@ -2920,17 +2952,13 @@ else if (!b_u) {
         else u_checklogin({checkloginresult:boot_auth},false);
     }
 
-    if (page.substr(0,1) == '!' && page.length > 1)
-    {
+    if ((page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2) {
         dl_res = true;
         var dlxhr = getxhr();
-        dlxhr.onload = function()
-        {
+        dlxhr.onload = function() {
             dl_res = false;
-            if (this.status == 200)
-            {
-                try
-                {
+            if (this.status === 200) {
+                try {
                     dl_res = this.response || this.responseText;
                     if (dl_res[0] == '[') dl_res = JSON.parse(dl_res);
                     if (dl_res[0]) dl_res = dl_res[0];
@@ -2939,15 +2967,14 @@ else if (!b_u) {
             }
             boot_done();
         };
-        dlxhr.onerror = function()
-        {
+        dlxhr.onerror = function() {
             dl_res= false;
             boot_done();
         };
         var esid='';
         if (u_storage.sid) esid = u_storage.sid;
         dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-        dlxhr.send(JSON.stringify([{a: 'g', p: page.substr(1, 8), 'ad': showAd(), 'esid': esid}]));
+        dlxhr.send(JSON.stringify([{a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': esid}]));
     }
 }
 
@@ -3050,4 +3077,14 @@ function makeUUID(a) {
     return a
         ? (a ^ Math.random() * 16 >> a / 4).toString(16)
         : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, makeUUID);
+}
+
+function inherits(target, source) {
+    'use strict';
+
+    target.prototype = Object.create(source.prototype || source);
+    Object.defineProperty(target.prototype, 'constructor', {
+        value: target,
+        enumerable: false
+    });
 }

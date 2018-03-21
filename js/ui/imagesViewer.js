@@ -539,10 +539,6 @@ var slideshowid;
 
                     return true;
                 });
-
-                if (d) {
-                    window.strm = preqs[n.h];
-                }
             });
         });
 

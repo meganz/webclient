@@ -14,7 +14,7 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
 
     var worker = [];
     var instances = [];
-    var wid = mRandomToken(url);
+    var wid = url + '!' + rand(1e11);
 
     var terminator = function() {
         delay('createworkers:terminator:' + wid,

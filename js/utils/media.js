@@ -242,10 +242,46 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
 // ---------------------------------------------------------------------------------------------------------------
 
+
 (function _initVideoStream(global) {
     'use strict';
 
-    // Init custom video controls
+    // @private Make thumb/preview images if missing
+    var _makethumb = function(n, stream) {
+        if (String(n.fa).indexOf(':0*') < 0 || String(n.fa).indexOf(':1*') < 0) {
+            var storeImage = function(ab) {
+                var aes = new sjcl.cipher.aes([
+                    n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
+                ]);
+                createnodethumbnail(n.h, aes, n.h, ab, {isVideo: true}, n.ph);
+            };
+            stream.on('playing', function() {
+                var video = this.video;
+
+                if (video && video.duration) {
+                    var took = Math.round(2 * video.duration / 100);
+
+                    if (d) {
+                        console.debug('Video thumbnail missing, will take image at %s...', secondsToTime(took));
+                    }
+
+                    this.on('timeupdate', function() {
+                        if (video.currentTime < took) {
+                            return true;
+                        }
+
+                        this.getImage().then(storeImage).catch(console.warn.bind(console));
+                    });
+
+                    return false;
+                }
+
+                return true;
+            });
+        }
+    };
+
+    // @private Init custom video controls
     var _initVideoControls = function(wrapper, streamer) {
         var $wrapper = $(wrapper);
         var $video = $wrapper.find('video');
@@ -632,6 +668,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         dlmanager.isStreaming = true;
     };
 
+    // @private Launch video streaming
     var _initVideoStream = function(node, $wrapper, destroy, options) {
         if (typeof destroy === 'object') {
             options = destroy;
@@ -738,19 +775,105 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
      * @param {Object} wrapper Video element wrapper
      * @param {Function} [destroy] Function to invoke when the video is destroyed
      * @param {Object} [options] Streamer options
+     * @returns {MegaPromise}
      * @global
      */
     global.initVideoStream = function(node, wrapper, destroy, options) {
+        var _init = function() {
+            dlmanager.setUserFlags();
+            return _initVideoStream(node, wrapper, destroy, options);
+        };
         return new MegaPromise(function(resolve, reject) {
+            if (typeof Streamer !== 'undefined') {
+                return resolve(_init());
+            }
             M.require('videostream').tryCatch(function() {
-                dlmanager.setUserFlags();
-                resolve(_initVideoStream(node, wrapper, destroy, options));
+                resolve(_init());
             }, function(ex) {
                 msgDialog('warninga', l[135], l[47], ex);
                 reject(ex);
             });
         });
     };
+
+    /**
+     * Initialize common video player layout for the downloads and embed pages
+     * @param {MegaNode} node An ufs node
+     * @param {Object} $wrapper Video element wrapper
+     * @returns {MegaPromise}
+     * @global
+     */
+    global.iniVideoStreamLayout = function(node, $wrapper) {
+        var $fileinfoBlock = $('.download.file-info', $wrapper);
+        var $fn = $('.big-txt', $fileinfoBlock);
+
+        if (!$.trim($fn.text())) {
+            $fn.text(node.name);
+        }
+
+        return new MegaPromise(function(resolve, reject) {
+            MediaAttribute.canPlayMedia(node).then(function(yup) {
+                var c = MediaAttribute.getCodecStrings(node);
+                if (c) {
+                    $fn.attr('title', node.name + ' (' + c.join("/") + ')');
+                }
+
+                if (!yup) {
+                    return resolve(false);
+                }
+                var $video = $wrapper.find('video');
+                if (!$video.length) {
+                    return reject(new Error('No video element found...'));
+                }
+
+                // Disable default video controls
+                $video.get(0).controls = false;
+
+                api_getfileattr([{fa: node.fa, k: node.k}], 1, function(a, b, data) {
+                    if (data !== 0xDEAD) {
+                        data = mObjectURL([data.buffer || data], 'image/jpeg');
+
+                        if (data) {
+                            $video.attr('poster', data);
+                        }
+                    }
+                });
+
+                var vsp = initVideoStream(node, $wrapper, {autoplay: false});
+
+                $('.play-video-button', $wrapper).rebind('click', function() {
+                    if (dlmanager.isOverQuota) {
+                        return dlmanager.showOverQuotaDialog();
+                    }
+
+                    if (typeof mediaCollectFn === 'function') {
+                        onIdle(mediaCollectFn);
+                        mediaCollectFn = null;
+                    }
+
+                    // Show Loader until video is playing
+                    $wrapper.find('.viewer-pending').removeClass('hidden');
+
+                    vsp.done(function(stream) {
+                        if (stream.error) {
+                            onIdle(function() {
+                                $wrapper.removeClass('video-theatre-mode video');
+                            });
+                            return msgDialog('warninga', l[135], l[47], stream.error);
+                        }
+
+                        _makethumb(node, stream);
+                        node.stream = stream;
+                        stream.play();
+                    }).fail(console.warn.bind(console));
+
+                    $wrapper.addClass('video-theatre-mode');
+                });
+                resolve(vsp);
+            }).catch(reject);
+        });
+    };
+
 })(self);
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -970,11 +1093,10 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         }
 
         mediaCodecs = new Promise(function(resolve, reject) {
+            var db;
             var timer;
-            var dbname = '$mcv1';
-            var db = new Dexie(dbname);
             var apiReq = function() {
-                M.req('mc').fail(reject).done(function(res) {
+                var prc = function(res) {
                     if (!Array.isArray(res) || res.length !== 2) {
                         if (d) {
                             console.warn('Unexpected response, will keep using cached codecs..if any', res);
@@ -1025,9 +1147,12 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
                     mediaCodecs = data;
                     data.version = res[0] | 0;
-                    db.kv.put({k: 'l', t: Date.now(), v: data});
+                    if (db) {
+                        db.kv.put({k: 'l', t: Date.now(), v: data});
+                    }
                     resolve(mediaCodecs);
-                });
+                };
+                api_req({a: 'mc'}, {callback: tryCatch(prc, reject)});
             };
             var read = function() {
                 db.kv.get('l').then(function(r) {
@@ -1057,12 +1182,19 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                 };
             })(reject);
 
-            db.version(1).stores({kv: '&k'});
-            db.open().then(read).catch(console.warn.bind(console, dbname));
-            timer = setTimeout(apiReq, 800);
+            if (typeof Dexie !== 'undefined') {
+                var dbname = '$mcv1';
+                db = new Dexie(dbname);
+                db.version(1).stores({kv: '&k'});
+                db.open().then(read).catch(console.warn.bind(console, dbname));
+                timer = setTimeout(apiReq, 800);
 
-            // save the db name for our getDatabaseNames polyfill
-            localStorage['_$mdb$' + dbname] = 1;
+                // save the db name for our getDatabaseNames polyfill
+                localStorage['_$mdb$' + dbname] = 1;
+            }
+            else {
+                apiReq();
+            }
         });
 
         return mediaCodecs;

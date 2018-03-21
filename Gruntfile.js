@@ -1,6 +1,6 @@
 var fs = require('fs');
 var RJSON = require('relaxed-json');
-var fileLimit = 512*1024;
+var fileLimit = 555*1024;
 var useHtmlMin = false;
 
 var Secureboot = function() {
@@ -38,13 +38,14 @@ var Secureboot = function() {
                     line = line.replace(/else(\s*if)?/, 'if (true)');
                     line = line.replace(/\(.+\)/, '(true)');
                 }
-                lines.push(line);
+                lines.push(line.replace('jsl =', 'z$&'));
                 // detect any } OR } // comment to break the current group
                 if (line.trim()[0] == "}") {
                     lines.push('jsl.push({f:"\0.jsx"})');
                 }
             }
         }
+        var langFilepath = '';
         var is_chrome_firefox = 0;
         var is_mobile = 0;
 
@@ -98,7 +99,7 @@ var Secureboot = function() {
                 } else if (cssgroup.indexOf(file) == -1) {
                     lines.push(content[i]);
                 }
-            } else if (content[i].match(/jsl\.push.+html/)) {
+            } else if (content[i].match(/jsl\.push.+html/) && content[i].indexOf('embedplayer') < 0) {
                 if (!addedHtml) {
                     lines.push("    jsl.push({f:'html/templates.json', n: 'templates', j: 0, w: " + getWeight("html/templates.json") +  "});");
                 }
@@ -284,11 +285,14 @@ var Secureboot = function() {
     ns.getJSGroups = function() {
         var groups = [];
         var size = 0;
+        var sjcl = -1;
+        var limit = fileLimit;
         this.getJS().forEach(function(f) {
             if (f.f == "\0.jsx") {
                 groups.push(null);
                 size = 0;
             } else {
+                // if (f.f === 'sjcl.js' && ++sjcl) fileLimit = 78e4; // bigger files for embed player
                 var fsize = fs.statSync(f.f)['size'];
                 if (size + fsize > fileLimit) {
                     size = 0;
@@ -310,6 +314,7 @@ var Secureboot = function() {
             groups.splice(0, 1);
         }
 
+        fileLimit = limit;
         return files;
     };
 

@@ -143,7 +143,104 @@
         e.stopPropagation();
         e.preventDefault();
     }
+    var useMegaSync = -1;
+    var usageMegaSync = 0;
 
+
+    function FileSelectHandlerMegaSyncClick(e) {
+        if (useMegaSync === -1) {
+            e.preventDefault();
+            e.stopPropagation();
+            megasync.isInstalled(function (err, is) {
+                if (!err || is) {
+                    if (megasync.currUser === u_handle) {
+                        useMegaSync = 2;
+                    }
+                    else {
+                        useMegaSync = 3;
+                    }
+                }
+                else {
+                    useMegaSync = 3;
+                }
+            });
+            return false;
+        }
+        else if (useMegaSync === 3) {
+            useMegaSync = -1
+            return true;
+        }
+        else if (useMegaSync === 2) {
+            e.preventDefault();
+            e.stopPropagation();
+            var target;
+            if ($.onDroppedTreeFolder) {
+                target = $.onDroppedTreeFolder;
+                delete $.onDroppedTreeFolder;
+            }
+            else if (String(M.currentdirid).length !== 8) {
+                target = M.lastSeenCloudFolder || M.RootID;
+            }
+            else {
+                target = M.currentdirid;
+            }
+            if ((onChat = (String(M.currentdirid).substr(0, 4) === 'chat'))) {
+                target = M.currentdirid;
+            }
+
+            var uploadCmdIsFine = function _uploadCmdIsFine(error, response) {
+                if (error) {
+                    useMegaSync = 3;
+                }
+            };
+
+            //var elem = $('#' + e.toElement.id)[0];
+            var elem = e.target;
+            if (elem.hasAttribute('webkitdirectory') || elem.hasAttribute('mozdirectory')
+                || elem.hasAttribute('msdirectory') || elem.hasAttribute('odirectory')
+                || elem.hasAttribute('directory')) {
+                megasync.uploadFolder(target, uploadCmdIsFine);
+            }
+            else {
+                megasync.uploadFile(target, uploadCmdIsFine);
+            }
+            return false;
+        }
+        else {
+            if (localStorage.dd && localStorage.jj && localStorage.d) {
+                console.warn('Strange value of UseMegaSync found = ' + useMegaSync);
+            }
+            return true;
+        }
+    }
+    function FileSelectHandlerMegaSyncMouse(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (useMegaSync === -1) {
+            megasync.isInstalled(function (err, is) {
+                if (!err || is) {
+                    if (megasync.currUser === u_handle) {
+                        useMegaSync = 2;
+                    }
+                    else {
+                        useMegaSync = 3;
+                    }
+                }
+                else {
+                    useMegaSync = 3;
+                }
+            });
+            return false;
+        }
+        else if (useMegaSync === 2 && ++usageMegaSync > 3) {
+            useMegaSync = -1;
+            usageMegaSync = 0;
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
     function FileDragLeave(e) {
         e.stopPropagation();
         e.preventDefault();
@@ -161,6 +258,7 @@
 
     // on Drop event
     function FileSelectHandler(e) {
+        useMegaSync = -1;
         if (e.stopPropagation) {
             e.stopPropagation();
         }
@@ -302,6 +400,10 @@
             var o = document.getElementById(i ? 'fileselect' + i : 'start-upload');
             if (o) {
                 o.addEventListener("change", FileSelectHandler, false);
+                if (!is_mobile) {
+                    o.addEventListener("click", FileSelectHandlerMegaSyncClick, true);
+                    o.addEventListener("mouseover", FileSelectHandlerMegaSyncMouse, true);
+                }
             }
         }
 

@@ -5,6 +5,18 @@ var megasync = (function() {
     var enabled = false;
     var version = 0;
     var lastDownload;
+    var queuedCounter = 0; // a counter to count how many times we got [queued] status from MEGAsync
+    var unknownCounter = 0; // a counter to count how many times we got [res=0] status from MEGAsync
+    var canceledCounter = 0; // a counter to count how many times we got [res=7] status from MEGAsync
+    var currStatus = l[17794]; // 'Initializing…'; // download status from MEGAsync
+    var lastCheckTime;
+    var lastCheckStatus;
+    var defaultStatusThreshold = 15; // minutes
+    var currBid = -1;
+    function getNewBid() {
+        currBid = Math.random().toString().substr(2);
+        return currBid;
+    }
     var retryTimer;
     var clients = {
         windows: 'https://mega.nz/MEGAsyncSetup.exe',
@@ -209,14 +221,37 @@ var megasync = (function() {
                 lastDownload = null;
             }
         },
-        error: function(next, ev) {
-
+        error: function (next, ev) {
             enabled = false;
             next = (typeof next === "function") ? next : function() {};
             next(ev || new Error("Internal error"));
-            return showDownloadDialog();
+            megaSyncIsNotResponding();
         }
     };
+
+    function megaSyncIsNotResponding(nextIfYes) {
+        if (lastCheckStatus && lastCheckTime) {
+            msgDialog('confirmation', 'MEGASync is not responding',
+                l[17795],
+                // 'MEGASync stopped responding, it could be closed or too busy',
+                l[17796],
+                // 'Do you want to re-initialize connection with MEGASync, ' +
+                // 'and turn it off if MEGASync did not respond?',
+                function (disableMsync) {
+                    if (disableMsync) {
+                        lastCheckStatus = null;
+                        lastCheckTime = null;
+                        if (nextIfYes && typeof nextIfYes === 'function') {
+                            nextIfYes();
+                        }
+                    }
+
+                });
+        }
+        else {
+            showDownloadDialog();
+        }
+    }
 
     /**
      * Perform an http request to the running MEGAsync instance.
@@ -227,7 +262,7 @@ var megasync = (function() {
      * @return {MegaPromise}
      */
     function megaSyncRequest(args, resolve, reject) {
-
+        var timeout = (args.a === 'v') ? 250 : 0;
         try {
             args = JSON.stringify(args);
         }
@@ -241,7 +276,8 @@ var megasync = (function() {
         var promise = M.xhr({
             url: megasyncUrl,
             data: args,
-            type: 'json'
+            type: 'json'  ,
+            timeout: timeout // fasten the no-response cases
         });
 
         if (typeof resolve === 'function') {
@@ -270,40 +306,228 @@ var megasync = (function() {
     function SyncAPI(args, next) {
 
         megaSyncRequest(args, function(ev, response) {
-            api_handle(next, response);
+            api_handle(next, response, args);
         }, function(ev) {
             handler.error(next, ev);
         });
     }
 
-    function api_handle(next, response) {
+    function api_handle(next, response, requestArgs) {
+        "use strict";
+        next = (typeof next === "function") ? next : function () { };
+        var _uploadTick = function _upTick() {
+            if (currBid === requestArgs.bid) {
+                megasync.uploadStatus(requestArgs.bid);
+            }
+        };
+        var _statusTick = function _stTick() {
+            megasync.downloadStatus(requestArgs.h);
+        };
 
-        next = (typeof next === "function") ? next : function() {};
         if (response === 0) {
-            // It means "OK". Most likely a "download" API call
-            // was successfully handled.
-            clearInterval(retryTimer);
-            $('body').unbind('keyup.ssd');
-            showToast('megasync', 'Download added to MEGAsync', 'Open');
-            $('.button.with-megasync .big-txt').safeHTML(l[258]);
-            $('.button.with-megasync').addClass('downloading');
-            $('body').removeClass('overlayed');
-            return $('.megasync-overlay').addClass('hidden').removeClass('downloading');
-        }
+            if (requestArgs.a === "l" ) {
+                if (page === "download") {
+                    // Download added to MEGAsync
+                    showToast('megasync-transfer', l[8635], l[865], null, ns.transferManager);
+                    currStatus = l[17794]; // 'Initializing…';
+                    queuedCounter = 0;
+                    unknownCounter = 0;
+                    canceledCounter = 0;
+                    return megasync.downloadStatus(requestArgs.h);
+                }
+                else {
+                    showToast('megasync-transfer upload',
+                        // 'Download sent to MEGASync',
+                        l[17797],
+                        l[865], l[823], ns.transferManager,
+                        function () { loadSubPage('fm/account/transfers'); }); // Download added to MEGAsync
+                }
+            }
+            else if (requestArgs.a === "ufi" || requestArgs.a === "ufo") { // is upload file MEGAsync request
+                return _uploadTick();
+            }
+            else if (requestArgs.a === "sp") {
+                return next(null, response);
+            }
+            else if (requestArgs.a === "s") {
+                // Below commented Toast was showing a toast that the sync is Done.
+                // it's commented due to Bram request.
 
-        if (typeof response !== "object") {
-            return handler.error(next);
-        }
-
-        for (var property in response) {
-            if (response.hasOwnProperty(property) && handler[property]) {
-                handler[property](response[property]);
+                // showToast('megasync-transfer sync',
+                //    'Sync operation is sent to MEGAsync', 'Open', 'Settings',
+                //    ns.transferManager, function () { loadSubPage('fm/account/transfers'); });
+                // Sync done with MEGAsync
+                return next(null, response);
             }
         }
+        // else if ($.isNumeric(response)){
+        //    // error handling, i dont know what to do with, since we dont have API Specification for failed ops
+        //    // in case of non-object response (.e.g 0: means OK, -1: may mean something else)
+        //    return handler.error(next);
+        // }
+        else if (requestArgs.a === "sp" && $.isNumeric(response)) {
+            return next(null, response);
+        }
+        else if (typeof response !== "object") {
+            lastDownload = null;
+            return handler.error(next);
+        }
+        else {
+            if (requestArgs.a === "t") { // is get status request
 
+                if (localStorage.jj && localStorage.d) {
+                    console.info("status: " + response.s + " progress: " + response.p + "  total: " + response.t
+                        + "  speed: " + response.v);
+                }
+
+                if (response.s && response.s == 2) { // allow implied convert
+                    // this means we are in status [STATE_ACTIVE = 2] which is not final
+                    // then send a new update status request after a 1 sec
+                    var prec = (response.p * 100) / response.t;
+                    dlprogress(requestArgs.h, prec.toPrecision(3), response.p, response.t, response.v);
+                    if (currStatus !== l[17592]) { // 'Downloading with MEGAsync ...'
+                        currStatus = l[17592]; // 'Downloading with MEGAsync ...'
+                        var infoContainer = $('.download.main-transfer-info');
+                        $('.download.speed-block .light-txt', infoContainer).text(currStatus);
+                        $('.download.scroll-block').removeClass('paused'); // in case any
+                    }
+                    setTimeout(_statusTick, 1000);
+                }
+                else if (response.s && response.s == 1) { // allow implied convert
+                    // STATE_QUEUED = 1
+                    // we will wait for 2 sec x 2 times.
+                    // then if we found that this is queued down in a list in megaSync then we update UI
+                    // and stop fetching status.
+                    if (queuedCounter++ < 2) {
+                        setTimeout(_statusTick, 2000);
+                    }
+                    else {
+                        if (currStatus !== l[17593]) { // 'Download is queued in MEGAsync ...'
+                            $('.download.progress-bar').width('100%');
+                            $('.download.scroll-block').removeClass('downloading').addClass('download-complete');
+                            currStatus = l[17593]; // 'Download is queued in MEGAsync ...'
+                            var infoContainer = $('.download.main-transfer-info');
+                            $('.download.complete-block .dark-numbers', infoContainer).text(currStatus);
+                        }
+                    }
+                }
+                else if (response.s && response.s == 0) { // allow implied convert
+                    // unknow STATE
+                    // we will wait for 5 sec x 10 times.
+                    // then if we kept getting this Res, we update UI and stop fetching status.
+                    if (unknownCounter++ < 10) {
+                        setTimeout(_statusTick, 5000);
+                    }
+                    else {
+                        setTransferStatus(0, l[17591]);// 'Can not get downloading status from MEGAsync '
+                    }
+                }
+                else if (response.s && response.s == 6) { // allow implied convert
+                    // STATE_COMPLETED = 6
+                    dlprogress(-0xbadf, 100, response.t, response.t);
+                    $('.download.scroll-block').removeClass('paused');
+                    $('.download.progress-bar').width('100%');
+                    $('.download.scroll-block').removeClass('downloading').addClass('download-complete');
+                    var $pageScrollBlock = $('.bottom-page.scroll-block');
+                    $pageScrollBlock.addClass('resumable');
+                }
+                else if (response.s && response.s == 7) {
+                    setTransferStatus(0, l[17586]);// 'Downloading canceled in MEGAsync'
+                    // give it one more try, since if user opened the a file link to download and this file
+                    // is already getting downloaded, then the first response is 7 then it's OK
+                    // because MEGAsync means that the new download is canceled.
+                    if (canceledCounter++ < 1) {
+                        setTimeout(_statusTick, 1000);
+                    }
+                }
+                else if (response.s && response.s == 3) { // allow implied convert
+                    // this means we are in status [STATE_PAUSED = 3] which is not final (PAUSED)
+                    // then send a new update status request after longer timeout 3 sec
+                    if (currStatus !== l[17594]) { // 'Download-Paused in MEGAsync !'
+                        currStatus = l[17594]; // 'Download-Paused in MEGAsync !'
+                        var infoContainer = $('.download.main-transfer-info');
+                        $('.download.scroll-block').addClass('paused');
+                        $('.download.speed-block .light-txt', infoContainer).text(currStatus);
+                    }
+                    setTimeout(_statusTick, 3000);
+                }
+                else if (response.s && response.s == 4) { // allow implied convert
+                    // this means we are in status [STATE_RETRYING = 4] which is not final (retry)
+                    // then send a new update status request after longer timeout 3 sec
+                    if (currStatus !== l[17603]) { // 'Download retrying in MEGAsync !'
+                        currStatus = l[17603]; // 'Download retrying in MEGAsync !'
+                        var infoContainer = $('.download.main-transfer-info');
+                        $('.download.scroll-block').addClass('paused');
+                        $('.download.speed-block .light-txt', infoContainer).text(currStatus);
+                    }
+                    setTimeout(_statusTick, 3000);
+                }
+                else if (response.s && response.s == 5) { // allow implied convert
+                    // this means we are in status [STATE_COMPLETING = 5] which is not final
+                    // then send a new update status request
+                    if (currStatus !== l[17604]) { // 'Download completing in MEGAsync ...'
+                        currStatus = l[17604]; // 'Download completing in MEGAsync ...'
+                        var infoContainer = $('.download.main-transfer-info');
+                        $('.download.scroll-block').addClass('paused');
+                        $('.download.speed-block .light-txt', infoContainer).text(currStatus);
+                    }
+                    setTimeout(_statusTick, 1000);
+                }
+                else if (response.s && response.s == 8) { // allow implied convert
+                    // this means we are in status [STATE_FAILED = 8] which is final
+                    // then stop
+                    setTransferStatus(0, l[17605]);// 'Downloading failed in MEGAsync'
+                }
+                else {
+                    // no response !! ,or value out of range [0,8]
+                    // we will wait for 5 sec x 10 times.
+                    // then if we kept getting this Res, we update UI and stop fetching status.
+                    if (unknownCounter++ < 10) {
+                        setTimeout(_statusTick, 5000);
+                    }
+                    else {
+                        setTransferStatus(0, l[17606]);// 'No response from MEGAsync'
+                    }
+                }
+            }
+            else if (requestArgs.a === "v") { // is get version MEGAsync request
+                 if (response.u) {
+                    ns.currUser = response.u;
+                }
+                 lastCheckStatus = response;
+                 lastCheckTime = Date.now();
+            }
+            else if (requestArgs.a === "uss") { // is get upload status MEGAsync request
+                var response = (response.length) ? response[0] : response;
+                if (response.s && response.s == 1) { // selection done
+                    var toastTxt = '';
+                    if (response.fo) {
+                        if (response.fo > 1) {
+                            toastTxt += '' + response.fo + ' ' + l[17799] + ' ';
+                        }
+                        else {
+                            toastTxt += '' + response.fo + ' ' + l[17798] + ' ';
+                        }
+                    }
+                    if (response.fi > 1) {
+                        toastTxt += '' + response.fi + ' ' + l[17801];
+                    }
+                    else {
+                        toastTxt += '' + response.fi + ' ' + l[17800];
+                    }
+
+                    showToast('megasync-transfer upload', toastTxt, l[865], l[823],
+                        ns.transferManager,
+                        function () { loadSubPage('fm/account/transfers'); }); // Upload added toMEGAsync
+                }
+                else if (response.s == 0) { // selection not done yet
+                    setTimeout(_uploadTick, 2000);
+                }
+            }
+            
+        }
         return next(null, response);
     }
-    // }}}
 
     ns.getLinuxReleases = function(next) {
         if (linuxClients) next(linuxClients);
@@ -363,27 +587,53 @@ var megasync = (function() {
         return true;
     };
 
-    ns.isInstalled = function(next) {
-        SyncAPI({a: "v"}, next);
+    ns.isInstalled = function (next) {
+        if (!lastCheckStatus || !lastCheckTime) {
+            SyncAPI({ a: "v" }, next);
+        }
+        else {
+            var myNow = Date.now();
+            var diff = myNow - lastCheckTime;
+            if (diff >= (defaultStatusThreshold * 60000)) {
+                SyncAPI({ a: "v" }, next);
+            }
+            else {
+                if (typeof next === "function") {
+                    next(null, lastCheckStatus);
+                }
+            }
+
+        }
     };
 	
-	ns.uploadFile = function(handle,next) {
-        SyncAPI({a: "ufi",h:handle}, next);
+    ns.uploadFile = function (handle, next) {
+        SyncAPI({ a: "ufi", h: handle, bid: getNewBid() }, next);
     };
 	
 	ns.uploadFolder = function(handle,next) {
-        SyncAPI({a: "ufo",h:handle}, next);
+        SyncAPI({ a: "ufo", h: handle, bid: getNewBid() }, next);
     };
 	
 	ns.syncFolder = function(handle,next) {
         SyncAPI({a: "s",h:handle}, next);
     };
+    ns.syncPossible = function (handle, next) {
+        SyncAPI({ a: "sp", h: handle }, next);
+    };
 	
 	ns.downloadStatus = function(handle,next) {
         SyncAPI({"a":"t","h":handle}, next);
     };
+    ns.uploadStatus = function (bid, next) {
+        SyncAPI({ a: "uss", bid: bid }, next);
+    };
+    ns.transferManager = function (next) {
+        SyncAPI({ a: "tm", t: 0 }, next);
+    };
 
     ns.megaSyncRequest = megaSyncRequest;
+    ns.megaSyncIsNotResponding = megaSyncIsNotResponding;
+    
 
     return ns;
 })();

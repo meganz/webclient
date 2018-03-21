@@ -138,14 +138,14 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
     }
 };
 
-MegaData.prototype.addDownload = function(n, z, preview) {
+MegaData.prototype.addDownload = function (n, z, preview) {
     var args = toArray.apply(null, arguments);
-
     // fetch all nodes needed by M.getNodesSync
     dbfetch.coll(n)
-        .always(function() {
+        .always(function () {
             M.addDownloadSync.apply(M, args);
         });
+
 };
 
 MegaData.prototype.addDownloadSync = function(n, z, preview) {
@@ -202,8 +202,13 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             var foreach = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
                     var node = M.d[nodes[i]];
-
-                    if (node) {
+                    if (!node) {
+                        if (nodes[i].h && nodes[i].name) {
+                            node = nodes[i];
+                            addNode(node);
+                        }
+                    }
+                    else {
                         addNode(node);
                     }
                 }
@@ -227,9 +232,15 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
 
             sync.megaSyncRequest(cmd)
                 .done(function() {
-                    showToast('megasync', l[8635], 'Open');
+                    //showToast('megasync', l[8635], 'Open');
+                    showToast('megasync-transfer', l[8635]); // Download added to MEGAsync
                 })
-                .fail(webdl);
+                .fail(
+                function () {
+                    sync.megaSyncIsNotResponding(webdl);
+                    
+                }
+                );
         })
         .fail(webdl);
 };

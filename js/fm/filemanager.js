@@ -575,9 +575,12 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     var fmTabState;
+    var isMegaSyncTransfer = true;
     $('.nw-fm-left-icon').rebind('click', function() {
         treesearch = false;
-        var clickedClass = $(this).attr('class');
+        var mySelf = $(this);
+        var clickedClass = mySelf.attr('class');
+        
         if (!clickedClass) {
             return;
         }
@@ -594,6 +597,37 @@ FileManager.prototype.initFileManagerUI = function() {
                 'inbox':           {root: M.InboxID,   prev: null},
                 'rubbish-bin':     {root: M.RubbishID, prev: null}
             };
+        }
+
+        if ((ul_queue && ul_queue.length) || (dl_queue && dl_queue.length)) {
+            isMegaSyncTransfer = false;
+        }
+        if (clickedClass.indexOf('transfers') > -1) {
+            if (isMegaSyncTransfer) {
+                // if we need to check megaSync - true defualt
+                megasync.isInstalled(function (err, is) {
+                    if (!err || is) {
+                        if (megasync.currUser === u_handle) {
+                            megasync.transferManager();
+                            return;
+                        }
+                        else {
+                            isMegaSyncTransfer = false;
+                        }
+                    }
+                    else {
+                        isMegaSyncTransfer = false;
+                    }
+                    mySelf.click();
+                    
+                });
+                return false;
+            }
+            else {
+                // reset - to ckeck again next time
+                isMegaSyncTransfer = true;
+            }
+            
         }
 
         var activeClass = ('' + $('.nw-fm-left-icon.active:visible')
@@ -948,7 +982,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.download-item').rebind('click', function(event) {
         var c = $(event.target).attr('class');
-        if (c && c.indexOf('contains-submenu') > -1) {
+        if (c && (c.indexOf('contains-submenu') > -1 || c.indexOf('msync-found') > -1)) {
             M.addDownload($.selected);
         }
     });
@@ -959,6 +993,22 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.zipdownload-item').rebind('click', function() {
         M.addDownload($.selected, true);
+    });
+
+
+    $(c + '.syncmegasync-item').rebind('click', function () {
+        //M.addDownload($.selected, true);
+        megasync.isInstalled(function (err, is) {
+            if (!err || is) {
+                if (megasync.currUser === u_handle) {
+                    // i know the selection is 1 item [otherwise option in menu wont be visible]
+                    megasync.syncFolder($.selected[0]);
+                }
+            }
+                // no need to do anything, something wierd happened, next time
+                // the option wont be visible.
+        });
+        $.hideContextMenu();
     });
 
     $(c + '.getlink-item').rebind('click', function() {

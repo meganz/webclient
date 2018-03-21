@@ -4731,5 +4731,17 @@
     "17797": "Download sent to MEGASync",
     "17799": "folders containing a total of",
     "17800": "file was added to the transfer manager",
-    "17801": "files were added to the transfer manager"
+    "17801": "files were added to the transfer manager",
+    "17802": "Slideshow",
+    "17803": "Fullscreen",
+    "17804": "Check your email",
+    "17805": "We have sent you an email. If you cannot access your email account, you will need to contact [A]support@mega.nz[\/A].",
+    "17806": "Forgot Password",
+    "17807": "Recover Account",
+    "17808": "I have my Recovery Key",
+    "17809": "Enter your Recovery Key to restore your account",
+    "17810": "Alternatively, you can upload your exported Recovery Key text file.",
+    "17811": "Upload Recovery Key",
+    "17812": "Transfer with MEGAsync if it is running",
+    "17813": "I do not have my Recovery Key"
 }

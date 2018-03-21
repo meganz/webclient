@@ -4731,5 +4731,17 @@
     "17797": "Download sent to MEGASync",
     "17799": "This is so hard to keep the original syntax in Japanese...Back-translation: folders contain the following number of files:\"33 folders containing a total of 8 files\" (in the screenshot) will be actually translated as \"\u5408\u8a088\u30d5\u30a1\u30a4\u30eb\u3092\u542b\u308033\u30d5\u30a9\u30eb\u30c0\". In Japanese syntax, the order of the words translated is kind of reverse this case. More specifically (with order for translation):33 folders containing a total of 8 files1. a total of2. 8 files3 . containing4. 33 folders",
     "17800": "\u30d5\u30a1\u30a4\u30eb\u304c\u8ee2\u9001\u30de\u30cd\u30fc\u30b8\u30e3\u306b\u8ffd\u52a0\u3055\u308c\u307e\u3057\u305f",
-    "17801": "\u30d5\u30a1\u30a4\u30eb\u304c\u8ee2\u9001\u30de\u30cd\u30fc\u30b8\u30e3\u306b\u8ffd\u52a0\u3055\u308c\u307e\u3057\u305f"
+    "17801": "\u30d5\u30a1\u30a4\u30eb\u304c\u8ee2\u9001\u30de\u30cd\u30fc\u30b8\u30e3\u306b\u8ffd\u52a0\u3055\u308c\u307e\u3057\u305f",
+    "17802": "Slideshow",
+    "17803": "Fullscreen",
+    "17804": "Check your email",
+    "17805": "We have sent you an email. If you cannot access your email account, you will need to contact [A]support@mega.nz[\/A].",
+    "17806": "Forgot Password",
+    "17807": "Recover Account",
+    "17808": "I have my Recovery Key",
+    "17809": "Enter your Recovery Key to restore your account",
+    "17810": "Alternatively, you can upload your exported Recovery Key text file.",
+    "17811": "Upload Recovery Key",
+    "17812": "Transfer with MEGAsync if it is running",
+    "17813": "I do not have my Recovery Key"
 }

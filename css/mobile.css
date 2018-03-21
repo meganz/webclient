@@ -1271,7 +1271,7 @@ ul, li {
 .signin-register-block .tab-block.register .signin-input.password {
     position: relative;
 }
-.signin-register-block .estimator-loading-icon {
+.signin-register-block .estimator-loading-icon, .recover-account-page .estimator-loading-icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader-gray.gif") no-repeat scroll 0 0 / 16px 16px;
     display: none;
     height: 16px;
@@ -1281,7 +1281,7 @@ ul, li {
     width: 16px;
     z-index: 1;
 }
-.signin-register-block .estimator-loading-icon.loading {
+.signin-register-block .estimator-loading-icon.loading, .recover-account-page .estimator-loading-icon.loading {
     display: block;
 }
 /* Prevent Chrome displaying the default checkbox */
@@ -1358,6 +1358,17 @@ input[type='checkbox'] {
 }
 .mobile.sign-in .download-app, .mobile.register .download-app {
     margin: 15px auto 0 auto;
+}
+.mobile.sign-in .forgot-password-button {
+    color: #888;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 15px;
+    letter-spacing: 0.2px;
+    margin-top: 16px;
+    text-decoration: underline;
+    text-align: center;
+    width: 100%;
 }
 .mobile.confirm-terms {
     background-color: #fff;
@@ -2712,6 +2723,10 @@ div.checkboxOn, div.checkboxOff {
 .mobile.cancel-account-dialog .overlay-info {
     margin: 0;
     padding: 0;
+}
+.mobile.generic-dialog-overlay .initial-message a {
+    font-family: 'source_sans_prosemibold';
+    color: #eb4444;
 }
 .mobile.check-email-dialog,
 .mobile.cancel-account-dialog {
@@ -4479,6 +4494,9 @@ textarea.mobile.support-text-field {
     line-height: 24px;
     margin: 20px 24px;
 }
+.mobile.recover-account-body-text a {
+    color: #eb4444;
+}
 .mobile.recovery-key-page .mobile.recovery-key-string-block{
     margin: 16px 24px 4px;
 }
@@ -4522,7 +4540,7 @@ textarea.mobile.support-text-field {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(http://localhost/images/mobile/mobile-sprite_v10.png);
+    background-image: url(../images/mobile/mobile-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: -164px -1149px;
     position: absolute;
@@ -4531,8 +4549,8 @@ textarea.mobile.support-text-field {
 }
 .mobile.recovery-key-page .mobile.recovery-key-copy-btn, 
 .mobile.recovery-key-page .mobile.recovery-key-download-btn,
-.mobile.recover-account-page .mobile.r-a-email-send-btn,
-.mobile.send-recovery-key,
+.mobile.recover-account-page .mobile.recover-account-email-send-btn,
+.mobile.verify-recovery-key-btn,
 .mobile.upload-recovery-key {
     background-color: #f44;
     padding: 0;
@@ -4552,30 +4570,34 @@ textarea.mobile.support-text-field {
     opacity: 0.3;
     border-radius: 2px;
 }
+.mobile.upload-recovery-key {
+	display: block;
+}
 .mobile.recovery-key-page .mobile.recovery-key-download-btn {
     margin-top: 8px;
 }
-.mobile.recovery-key-page .mobile.recovery-key-copy-btn.active,
-.mobile.recovery-key-page .mobile.recovery-key-download-btn.active,
-.mobile.recover-account-page .mobile.r-a-email-send-btn.active,
-.mobile.send-recovery-key.active ,
+.mobile.recovery-key-page .recovery-key-copy-btn.active,
+.mobile.recovery-key-page .recovery-key-download-btn.active,
+.mobile.recover-account-page .recover-account-email-send-btn.active,
+.mobile.verify-recovery-key-btn.active ,
 .mobile.upload-recovery-key.active {
     opacity: 1;
 }
 .mobile.buttons {
     text-align: center;
 }
-.mobile.send-recovery-key ,
+.mobile.verify-recovery-key-btn ,
 .mobile.upload-recovery-key{
     opacity: 1;
 }
 .mobile.recover-account-btn-block {
-    display: block;
-    margin:8px 0;
+	display: block;
+	margin: 8px 0 25px 0;
 }
 .mobile.forgot-password-btn-block {
     display: block;
     margin: 24px 24px;
+    overflow: auto;
 }
 .mobile.forgot-password-btn {
     background-color: #f44;
@@ -4612,7 +4634,6 @@ textarea.mobile.support-text-field {
 }
 .mobile.update-password .mobile.register-button.account-recovery, .mobile.park-account-block .park-account {
     margin: 8px 24px;
-
 }
 
 /* Achievements page */
@@ -5122,6 +5143,11 @@ textarea.mobile.support-text-field {
 .mobile.cancel-subscription-overlay .red-button.confirm-ok-button {
     border-radius: 2px;
     margin-left: 2px;
+}
+
+/* Make sure Free plan is shown after registration */
+body.key .reg-st3-membership-bl.free.hidden {
+    display: inline-block !important;
 }
 
 /* Only media queries after here */

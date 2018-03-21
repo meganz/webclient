@@ -136,6 +136,7 @@
             $('.drag-n-drop.overlay').removeClass('hidden');
             $('body').addClass('overlayed');
         }
+
     }
 
     function FileDragHover(e) {
@@ -149,15 +150,9 @@
         if (localStorage.d > 1) {
             console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
         }
-
+        touchedElement--;
         // below condition is due to firefox bug. https://developer.mozilla.org/en-US/docs/Web/Events/dragenter
-        if (typeof e.target.className === 'undefined') {
-            touchedElement = 0;
-        }
-        else {
-            touchedElement--;
-        }
-        if (touchedElement <= 0) {
+        if ((touchedElement <= 0) || (touchedElement === 1 && ua.details.browser === 'Firefox')) {
             $('.drag-n-drop.overlay').addClass('hidden');
             $('body').removeClass('overlayed');
             touchedElement = 0;

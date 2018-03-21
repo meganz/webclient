@@ -66,21 +66,40 @@ function init_embed(ph, key, time, g) {
     if (node) {
         var link = '#!' + ph + '!' + key;
 
-        $('.play-video-button, .viewonmega-item').rebind('click', function() {
+        $('.play-video-button, .viewonmega-item, .download.info-txt.big-txt').rebind('click', function() {
             open(getAppBaseUrl() + '/' + link);
             return false;
         });
 
-        $('.embedcode-item, .getlink-item').rebind('click', function() {
+        $('.login-item.with-avatar, useravatar').rebind('click', function() {
+            open(getAppBaseUrl() + '/' + 'fm');
+            return false;
+        });
+
+        $('.login-item').rebind('click', function() {
+            open(getAppBaseUrl() + '/' + 'login');
+            return false;
+        });
+
+        $('.logo-container').rebind('click', function() {
+            open(getAppBaseUrl());
+            return false;
+        });
+
+        $('.embedcode-item, .getlink-item, .share-generic').rebind('click', function() {
             var playing = false;
             var timeoffset = 0;
             var $block = $('.sharefile-block');
+            var $videoBlock = $('.video-wrapper');
             var url = getBaseUrl() + '/embed' + link;
             var embed = '<iframe src="%" width="640" height="360" frameborder="0" allowfullscreen></iframe>';
+            var $toast = $('.toast-notification');
 
             $('.close-overlay, .sharefile-buttons .cancel', $block).rebind('click', function() {
                 playing = false;
                 $block.addClass('hidden');
+                $videoBlock.removeClass('main-blur-block');
+                $toast.removeClass('visible second');
             });
 
             $('.sharefile-buttons .copy', $block).rebind('click', function() {
@@ -89,6 +108,7 @@ function init_embed(ph, key, time, g) {
                     content = content.replace(/![\w-]{8}![^"]+/, '$&!' + timeoffset + 's');
                 }
                 copyToClipboard(content);
+                $toast.addClass('visible second');
             });
 
             (function _() {
@@ -115,6 +135,7 @@ function init_embed(ph, key, time, g) {
             }
 
             $block.removeClass('hidden');
+            $videoBlock.addClass('main-blur-block');
         });
 
         iniVideoStreamLayout(node, $('body'));
@@ -122,7 +143,7 @@ function init_embed(ph, key, time, g) {
     else {
         console.info(404, arguments);
         $('.video-wrapper').addClass('hidden');
-        $('.file-removed-container').removeClass('hidden');
+        $('.file-removed-block').removeClass('hidden');
     }
 }
 
@@ -146,6 +167,7 @@ function add_layout() {
 function topmenuUI() {
     'use strict';
     var $useravatar = $('.viewer-button.useravatar');
+    var $useravatarMenu = $('.login-item .useravatar');
     var $avatarwrapper = $('.avatar-wrapper', $useravatar);
     var _colors = [
         "#69F0AE", "#13E03C", "#31B500", "#00897B", "#00ACC1",
@@ -159,9 +181,9 @@ function topmenuUI() {
         var color = UH64(u_handle).mod(_colors.length);
         var $ddi = $('.dropdown-item.login-item');
 
-        $useravatar.removeClass('hidden');
+        ($useravatar.removeClass('hidden') && $useravatarMenu.removeClass('hidden'));
         $avatarwrapper.css('background-color', _colors[color]).find('span').text(fl);
-        $ddi.find('i').css('background-color', _colors[color]).text(fl).end().find('span').text(name);
+        $ddi.addClass('with-avatar').find('i').addClass('hidden').text(fl).end().find('.login-text').text(name).end();
 
         api_req({"a": "uga", "u": u_handle, "ua": "+a"}, {
             callback: tryCatch(function(res) {

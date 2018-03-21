@@ -37,6 +37,11 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="toast-notification">
+                            <div class="toast-message">
+                                Link copied to clipboard or Embed code copied to clipboard
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- Transfer limitation overlay -->
@@ -70,9 +75,12 @@
                         <div class="file-removed-aligner">
                             <div class="file-removed-wrapper">
                                 <div class="file-removed-heading">File has been removed</div>
-                                <div class="file-removed-body hidden">Some explanation if needed?</div>
+                                <div class="file-removed-body">Some explanation if needed?</div>
                             </div>
                         </div>
+                    </div>
+                    <div class="logo-container">
+                        <div class="logo-icon"></div>
                     </div>
                 </div>
                 <!-- Dropdown/context menu
@@ -82,7 +90,11 @@
                         <div class="dropdown-wrapper">
                             <div class="dropdown-section">
                                 <a class="dropdown-item login-item" style="display: block;">
-                                    <i class="small-icon context login"></i><span>Log in</span>
+                                    <i class="small-icon context login"></i>
+                                    <div class="contextmenu useravatar hidden">
+                                        <div data-color="color4" class="avatar-wrapper avatar" style="background-color: rgb(43, 166, 222);"><span>C</span></div>
+                                    </div>
+                                    <span class="login-text">Log in</span>
                                 </a>
                                 <hr>
                             </div>
@@ -125,7 +137,7 @@
                             <div data-color="color4" class="avatar-wrapper avatar"><span>C</span></div>
                         </div>
                         <!-- Will Replace with a more appropriate share icon -->
-                        <div class="viewer-button right getlink">
+                        <div class="viewer-button right share">
                             <i class="medium-icon icons-img share-generic"></i>
                         </div>
                         <div class="clear"></div>

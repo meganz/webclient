@@ -131,8 +131,8 @@ input, textarea {
 	height: 60px;
 }
 .video-theatre-mode .viewer-bottom-bl {
-	background-image: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.10) 97%)
-	background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.10) 97%)
+	background-image: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.10) 97%);
+	background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.10) 97%);
 }
 .embedplayer.video .viewer-filename {
 	position: absolute;
@@ -159,6 +159,57 @@ input, textarea {
 	right: 12px;
 	top: 12px;
 	cursor: pointer;
+}
+.embedplayer.video .toast-notification {
+    width: 100%;
+    position: fixed;
+    bottom: 8px;
+    left: 0;
+    margin: 0 0 -72px 0;
+    background-color: rgba(0,0,0,.3);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 12px 12px;
+    z-index: 2000;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    line-height: 18px;
+    -webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    -moz-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    -o-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    -ms-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    cursor: default;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    visibility: hidden;
+}
+.embedplayer.video  .toast-notification::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: inherit;
+}
+.embedplayer.video .toast-notification.visible {
+    margin-bottom: 0;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-toast-notification: 1;
+    opacity: 1;
+    visibility: visible;
+}
+.embedplayer.video .toast-notification.second {
+    margin-bottom: 0px;
+    bottom: 0px;
 }
 .viewer-button i, .close-overlay i {
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -466,7 +517,7 @@ input, textarea {
 	z-index: 10;
 	cursor: pointer;
 	background-color: #F52929;
-	background-position: 20px -166px;
+	background-position: -14px -179px;
 	transition: background-color .5s ease-in-out;
 	-moz-transition: background-color .5s ease-in-out;
 	-webkit-transition: background-color .5s ease-in-out;
@@ -657,6 +708,15 @@ input, textarea {
 /* End Viewer Controls */
 
 /* Buttons */
+
+.embedplayer.video .sharefile-buttons .button {
+	width: 49%;
+	display: inline-block;
+	margin: 0 0;
+}
+.embedplayer.video .sharefile-buttons .button:nth-of-type(2) {
+	float: left;
+}
 .default-white-button, .default-grey-button, .embedplayer.video  .default-red-button, .embedplayer.video  .default-transparent-button, .embedplayer.video .default-link-button {
 	display: block;
 	font-size: 14px;
@@ -1148,19 +1208,31 @@ input, textarea {
 	display: table-cell;
 	vertical-align: middle;
 }
-.embedplayer.video .sharefile-block, .embedplayer.video .transfer-limitation-block, .embedplayer.video .file-removed-block {
+.embedplayer.video .sharefile-block, .embedplayer.video .transfer-limitation-block {
 	position: absolute;
 	z-index: 99;
 	width: 100%;
 	height: 100%;
 	background-color: rgba(0,0,0,0.70);
 }
+
+.embedplayer.video .file-removed-block {
+	position: fixed;
+	z-index: 99;
+	width: 100%;
+	height: 100%;
+	bottom: 0;
+	top: 0;
+	left: 0;
+	right: 0;
+	background-color: rgba(0,0,0,1);
+}
 .embedplayer.video .sharefile-tabs {
 	color: #fff;
 	overflow: auto;
 }
 .embedplayer.video .tab-link {
-	font-size: 16px;
+	font-size: 15px;
 	text-align: center;
 	line-height: 40px;
 	float: left;
@@ -1191,13 +1263,14 @@ input, textarea {
 	max-height:80px;
 }
 .embedplayer.video .tab-content {
-	max-height: 40px;
+	max-height: 80px;
 	overflow: auto;
+	word-break: break-all;
 }
 .embedplayer.video .settings-row {
 	overflow: auto;
 	line-height: 36px;
-	margin: 12px 0;
+	margin: 8px 0 12px;
 }
 .embedplayer.video .checkboxOff, .embedplayer.video .checkboxOn {
 	float: left;
@@ -1241,11 +1314,12 @@ input, textarea {
 	max-width: 56px;
 }
 .embedplayer.video .transfer-heading, .embedplayer.video .file-removed-heading {
-	font-size: 24px;
-	font-weight: bolder;
+	font-size: 21px;
+	font-weight: bold;
 	margin-bottom: 12px;
 	line-height: 36px;
 	color: rgba(255,255,255,0.9);
+	letter-spacing: .4px
 }
 .embedplayer.video .transfer-body, .embedplayer.video .file-removed-body {
 	opacity: 0.8;
@@ -1256,8 +1330,8 @@ input, textarea {
 	margin-bottom: 18px;
 }
 .embedplayer.video .video-wrapper.main-blur-block {
-	filter: blur(0.25em);
-	-webkit-filter: blur(0.25em);
+	filter: blur(0.45em);
+	-webkit-filter: blur(0.45em);
 	overflow: hidden;
 }
 .main-blur-block {
@@ -1273,9 +1347,6 @@ input, textarea {
 	overflow: hidden;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
-	max-width: -webkit-calc(100% - 60px);
-	max-width: -moz-calc(100% - 60px);
-	max-width: calc(100% - 60px);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -1408,6 +1479,12 @@ input, textarea {
 	position: absolute;
 	bottom: 18px;
 	right: 32px;
+	z-index: 11;
+	cursor: pointer;
+	opacity: 0.9;
+}
+.embedplayer .logo-container:hover {
+	opacity: 1;
 }
 /* Bounce animation */
 .viewer-pending {
@@ -1519,6 +1596,9 @@ input, textarea {
 .medium-icon.icons-img.lowscreen {
 	background-position: -40px -76px;
 }
+.medium-icon.icons-img.share-generic {
+	background-position: -112px -184px;
+}
 .medium-icon.icons-img.three-dots {
 	background-position: -112px -112px;
 }
@@ -1591,6 +1671,7 @@ input, textarea {
 	border-radius: 50%;
 	width: 24px;
 	height: 24px;
+	text-align: center;
 }
 
 .useravatar .avatar span {
@@ -1619,4 +1700,21 @@ input, textarea {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
+}
+.contextmenu.useravatar {
+	float:left;
+	margin: 6px 12px 0 -2px
+}
+.login-item.with-avatar {
+	height: 40px;
+}	
+.dropdown-item.with-avatar {
+	line-height: 39px;
+}
+@media only screen and (orientation:portrait) and (max-width: 360px) {
+	.embedplayer.video .tab-content {
+		max-height: 40px;
+		overflow: auto;
+	}
+	.embedplayer.video .viewer-filename
 }

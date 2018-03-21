@@ -1148,7 +1148,7 @@ ul, li {
 }
 .mobile.empty-icon {
     width: 145px;
-    height: 108px;
+    height: 109px;
     margin: 0 auto 20px auto;
     background-image: url(../images/mobile/mobile-sprite_v10.png);
     background-repeat: no-repeat;
@@ -1157,7 +1157,7 @@ ul, li {
     background-position: -3px -1442px;
 }
 .mobile.empty-folder .empty-icon {
-    background-position: -3px -1299px;
+    background-position: -3px -1356px;
 }
 .mobile.empty-txt span {
     color: #777777;

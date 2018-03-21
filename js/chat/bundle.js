@@ -7500,6 +7500,19 @@ React.makeElement = React['createElement'];
 	        }, 100);
 	    },
 
+	    stoppedTyping: function stoppedTyping() {
+	        if (this.props.disabled) {
+	            return;
+	        }
+	        var self = this;
+	        var room = this.props.chatRoom;
+
+	        self.iAmTyping = false;
+
+	        delete self.lastTypingStamp;
+
+	        room.trigger('stoppedTyping');
+	    },
 	    typing: function typing() {
 	        if (this.props.disabled) {
 	            return;
@@ -7514,8 +7527,7 @@ React.makeElement = React['createElement'];
 
 	        self.stoppedTypingTimeout = setTimeout(function () {
 	            if (room && self.iAmTyping) {
-	                self.iAmTyping = false;
-	                delete self.lastTypingStamp;
+	                self.stoppedTyping();
 	            }
 	        }, 4000);
 
@@ -7563,6 +7575,9 @@ React.makeElement = React['createElement'];
 	    onCancelClicked: function onCancelClicked(e) {
 	        var self = this;
 	        self.setState({ typedMessage: "" });
+	        if (self.props.chatRoom && self.iAmTyping) {
+	            self.stoppedTyping();
+	        }
 	        self.onConfirmTrigger(false);
 	        self.triggerOnUpdate();
 	    },
@@ -7578,6 +7593,9 @@ React.makeElement = React['createElement'];
 
 	        if (self.onConfirmTrigger(val) !== true) {
 	            self.setState({ typedMessage: "" });
+	        }
+	        if (self.props.chatRoom && self.iAmTyping) {
+	            self.stoppedTyping();
 	        }
 	        self.triggerOnUpdate();
 	    },
@@ -7627,6 +7645,9 @@ React.makeElement = React['createElement'];
 	            }
 	            e.preventDefault();
 	            e.stopPropagation();
+	            if (self.props.chatRoom && self.iAmTyping) {
+	                self.stoppedTyping();
+	            }
 	            return;
 	        }
 	    },
@@ -7775,6 +7796,8 @@ React.makeElement = React['createElement'];
 
 	        if ($.trim(e.target.value).length > 0) {
 	            self.typing();
+	        } else {
+	            self.stoppedTyping();
 	        }
 
 	        if (this.props.persist) {
@@ -8968,7 +8991,7 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.chatRoom;
 	        var megaChat = self.props.chatRoom.megaChat;
 
-	        chatRoom.bind("onParticipantTyping.whosTyping", function (e, user_handle) {
+	        chatRoom.bind("onParticipantTyping.whosTyping", function (e, user_handle, bCastCode) {
 	            if (!self.isMounted()) {
 	                return;
 	            }
@@ -8990,19 +9013,19 @@ React.makeElement = React['createElement'];
 	                clearTimeout(currentlyTyping[u_h][1]);
 	            }
 
-	            var timer = setTimeout(function () {
-	                if (self.state.currentlyTyping[u_h]) {
-	                    var newState = clone(self.state.currentlyTyping);
-	                    delete newState[u_h];
-	                    self.setState({ currentlyTyping: newState });
-	                }
-	            }, 5000);
+	            if (bCastCode === 1) {
+	                var timer = setTimeout(function (u_h) {
+	                    self.stoppedTyping(u_h);
+	                }, 5000, u_h);
 
-	            currentlyTyping[u_h] = [unixtime(), timer];
+	                currentlyTyping[u_h] = [unixtime(), timer];
 
-	            self.setState({
-	                currentlyTyping: currentlyTyping
-	            });
+	                self.setState({
+	                    currentlyTyping: currentlyTyping
+	                });
+	            } else {
+	                self.stoppedTyping(u_h);
+	            }
 
 	            self.forceUpdate();
 	        });
@@ -9013,6 +9036,17 @@ React.makeElement = React['createElement'];
 	        var megaChat = chatRoom.megaChat;
 
 	        chatRoom.unbind("onParticipantTyping.whosTyping");
+	    },
+	    stoppedTyping: function stoppedTyping(u_h) {
+	        var self = this;
+	        if (self.state.currentlyTyping[u_h]) {
+	            var newState = clone(self.state.currentlyTyping);
+	            if (newState[u_h]) {
+	                clearTimeout(newState[u_h][1]);
+	            }
+	            delete newState[u_h];
+	            self.setState({ currentlyTyping: newState });
+	        }
 	    },
 	    render: function render() {
 	        var self = this;

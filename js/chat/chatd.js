@@ -1017,7 +1017,7 @@ Chatd.Shard.prototype.exec = function(a) {
     var self = this;
 
     // TODO: find more optimised way of doing this...fromCharCode may also cause exceptions if too big array is passed
-    var cmd = String.fromCharCode.apply(null, a);
+    var cmd = ab_to_str(a);
 
     if (self.loggerIsEnabled) {
         self.logger.log("recv:", Chatd.cmdToString(cmd, false));

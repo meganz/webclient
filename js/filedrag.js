@@ -4,20 +4,33 @@
     var filedrag_u = [];
     var filedrag_paths = Object.create(null);
     var touchedElement = 0;
+    var startUploading = false;
+    var tempFileDrag = [];
 
     function pushUpload() {
-        if (!--dir_inflight && $.dostart) {
+        if (!--dir_inflight && startUploading) {
             var emptyFolders = Object.keys(filedrag_paths)
                 .filter(function(p) {
                     return filedrag_paths[p] < 1;
                 });
-
+            filedrag_u = filedrag_u.concat(tempFileDrag);
             M.addUpload(filedrag_u, false, emptyFolders);
             filedrag_u = [];
+            tempFileDrag = [];
+            startUploading = false;
             filedrag_paths = Object.create(null);
 
             if (page === 'start') {
                 start_upload();
+            }
+        }
+        else {
+            if (!dir_inflight && !startUploading) {
+                // This means that the controle flow arrived to FileSystemFileEntry.file()
+                //  success handler before finishing iterating on items at FileSelectHandler(e).
+                // The above behavior found on Edge, discovered on March 2018.
+                // Probably all other browers may chage this at some point, since this API is still experimental.
+                tempFileDrag = tempFileDrag.concat(filedrag_u);
             }
         }
     }
@@ -267,6 +280,8 @@
         }
 
         var currentDir = M.currentdirid;
+        startUploading = false;
+        tempFileDrag = [];
 
         // Clear drag element
         touchedElement = 0;
@@ -327,7 +342,7 @@
                     if (item) {
                         filedrag_u = [];
                         if (i == items.length - 1) {
-                            $.dostart = true;
+                            startUploading = true;
                         }
                         traverseFileTree(item, '', item.isFile && items[i].getAsFile());
                     }
@@ -341,7 +356,7 @@
                     if (file instanceof Ci.nsIFile) {
                         filedrag_u = [];
                         if (i == m - 1) {
-                            $.dostart = true;
+                            startUploading = true;
                         }
                         traverseFileTree(new mozDirtyGetAsEntry(file /*,e.dataTransfer*/ ));
                     }

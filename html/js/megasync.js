@@ -8,7 +8,7 @@ var megasync = (function() {
     var queuedCounter = 0; // a counter to count how many times we got [queued] status from MEGAsync
     var unknownCounter = 0; // a counter to count how many times we got [res=0] status from MEGAsync
     var canceledCounter = 0; // a counter to count how many times we got [res=7] status from MEGAsync
-    var currStatus = l[17794]; // 'Initializing…'; // download status from MEGAsync
+    var currStatus = l[17794]; // 'Initializing'; // download status from MEGAsync
     var lastCheckTime;
     var lastCheckStatus;
     var defaultStatusThreshold = 15; // minutes
@@ -329,7 +329,7 @@ var megasync = (function() {
                 if (page === "download") {
                     // Download added to MEGAsync
                     showToast('megasync-transfer', l[8635], l[865], null, ns.transferManager);
-                    currStatus = l[17794]; // 'Initializing…';
+                    currStatus = l[17794]; // 'Initializing';
                     queuedCounter = 0;
                     unknownCounter = 0;
                     canceledCounter = 0;
@@ -385,8 +385,8 @@ var megasync = (function() {
                     // then send a new update status request after a 1 sec
                     var prec = (response.p * 100) / response.t;
                     dlprogress(requestArgs.h, prec.toPrecision(3), response.p, response.t, response.v);
-                    if (currStatus !== l[17592]) { // 'Downloading with MEGAsync ...'
-                        currStatus = l[17592]; // 'Downloading with MEGAsync ...'
+                    if (currStatus !== l[17592]) { // 'Downloading with MEGAsync .'
+                        currStatus = l[17592]; // 'Downloading with MEGAsync .'
                         var infoContainer = $('.download.main-transfer-info');
                         $('.download.speed-block .light-txt', infoContainer).text(currStatus);
                         $('.download.scroll-block').removeClass('paused'); // in case any
@@ -402,10 +402,10 @@ var megasync = (function() {
                         setTimeout(_statusTick, 2000);
                     }
                     else {
-                        if (currStatus !== l[17593]) { // 'Download is queued in MEGAsync ...'
+                        if (currStatus !== l[17593]) { // 'Download is queued in MEGAsync .'
                             $('.download.progress-bar').width('100%');
                             $('.download.scroll-block').removeClass('downloading').addClass('download-complete');
-                            currStatus = l[17593]; // 'Download is queued in MEGAsync ...'
+                            currStatus = l[17593]; // 'Download is queued in MEGAsync .'
                             var infoContainer = $('.download.main-transfer-info');
                             $('.download.complete-block .dark-numbers', infoContainer).text(currStatus);
                         }
@@ -465,8 +465,8 @@ var megasync = (function() {
                 else if (response.s && response.s == 5) { // allow implied convert
                     // this means we are in status [STATE_COMPLETING = 5] which is not final
                     // then send a new update status request
-                    if (currStatus !== l[17604]) { // 'Download completing in MEGAsync ...'
-                        currStatus = l[17604]; // 'Download completing in MEGAsync ...'
+                    if (currStatus !== l[17604]) { // 'Download completing in MEGAsync .'
+                        currStatus = l[17604]; // 'Download completing in MEGAsync .'
                         var infoContainer = $('.download.main-transfer-info');
                         $('.download.scroll-block').addClass('paused');
                         $('.download.speed-block .light-txt', infoContainer).text(currStatus);

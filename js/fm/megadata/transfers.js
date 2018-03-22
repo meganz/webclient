@@ -100,6 +100,9 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         state = 'transfer-paused';
         pauseTxt = l[1651];
     }
+    if (dlmanager.isOverQuota) {
+        pauseTxt = '';
+    }
 
     var flashhtml = '';
     if (dlMethod === FlashIO) {
@@ -453,8 +456,11 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
             if (typeof fdl_queue_var !== 'undefined' && Object(fdl_queue_var).ph) {
                 var gid = dlmanager.getGID(fdl_queue_var);
 
-                if (dlQueue.isPaused(gid)) {
+                if (dlQueue.isPaused(gid) && !dlmanager.isOverQuota) {
                     mega.ui.tpp.pause(gid, 'dl');
+                }
+                else if (dlmanager.isOverQuota) {
+                    mega.ui.tpp.hide();
                 }
             }
         });

@@ -50,6 +50,7 @@ var dlmanager = {
     // How many queue IO we want before pausing the XHR fetching,
     // useful when we have internet faster than our IO
     ioThrottleLimit: 6,
+    isOverQuota : false,
     ioThrottlePaused: false,
     fetchingFile: false,
     dlLastQuotaWarning: 0,
@@ -2081,6 +2082,9 @@ function fm_tfspause(gid, overquota) {
         }
         else {
             dlQueue.pause(gid);
+        }
+        if (typeof overquota === 'undefined') {
+            overquota = dlmanager.isOverQuota;
         }
 
         if (page === 'download') {

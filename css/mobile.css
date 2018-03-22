@@ -1157,7 +1157,7 @@ ul, li {
     background-position: -3px -1442px;
 }
 .mobile.empty-folder .empty-icon {
-    background-position: -3px -1356px;
+    background-position: -3px -1300px;
 }
 .mobile.empty-txt span {
     color: #777777;
@@ -6011,121 +6011,121 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 36px) / 2);
     }
-
-    /*iphone se landscape styles */
-    @media only screen and (orientation:portrait) and (max-height: 321px), only screen and (orientation:landscape) and (max-width: 569px) {
-        .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
-            width: calc((100% - 60px) / 3);
-        }
+}
+/*iphone se landscape styles */
+@media only screen and (orientation:portrait) and (max-height: 321px), only screen and (orientation:landscape) and (max-width: 569px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 60px) / 3);
     }
+}
 
-    /* Large tablets Landscape styles go here */
-    @media only screen and (orientation:landscape) and (min-width: 1280px) and (max-width: 1440px), only screen and (orientation:portrait) and (min-height: 1025px) and (max-height: 1025px) {
-        .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
-            width: calc((100% - 96px) / 7)
-        }
+/* Large tablets Landscape styles go here */
+@media only screen and (orientation:landscape) and (min-width: 1280px) and (max-width: 1440px), only screen and (orientation:portrait) and (min-height: 1025px) and (max-height: 1025px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 96px) / 7)
     }
+}
 
-    /* Large tablets Portrait styles go here */
-    @media only screen and (orientation:landscape) and (min-width:900px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 1281px) and (max-height: 1366px) {
-        .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
-            width: calc((100% - 72px) / 5);
-        }
+/* Large tablets Portrait styles go here */
+@media only screen and (orientation:landscape) and (min-width:900px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 1281px) and (max-height: 1366px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 72px) / 5);
     }
+}
 
-    /* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */
-    @media only screen and (min-width: 400px) {
-        body:not(.fr):not(.ru) .mobile.membership-step2 .payment-options-list .payment-method {
-            float: left;
-            width: 153px;
-        }
-        body:not(.fr):not(.ru) .mobile.membership-step2 .provider-details .provider-name {
-            width: 96px;
-        }
-        body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration {
-            display: inline-block;
-            margin-bottom: 0;
-            margin-top: 0;
-            height: 80px;
-            vertical-align: middle;
-            width: 153px
-        }
-        body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration.template {
-            display: none;
-        }
-        body:not(.fr):not(.ru) .mobile.membership-step2 .duration-options-list .payment-duration:last-child {
-            margin-left: 0;
-        }
-        body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option {
-            display: inline-block;
-            width: 153px
-        }
-        body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option:last-child {
-            margin-left: 0;
-        }
-        body:not(.fr):not(.ru) .mobile.membership-step2 .option-question.renewal {
-            margin-top: 30px;
-        }
-
+/* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */
+@media only screen and (min-width: 400px) {
+    body:not(.fr):not(.ru) .mobile.membership-step2 .payment-options-list .payment-method {
+        float: left;
+        width: 153px;
+    }
+    body:not(.fr):not(.ru) .mobile.membership-step2 .provider-details .provider-name {
+        width: 96px;
+    }
+    body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration {
+        display: inline-block;
+        margin-bottom: 0;
+        margin-top: 0;
+        height: 80px;
+        vertical-align: middle;
+        width: 153px
+    }
+    body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration.template {
+        display: none;
+    }
+    body:not(.fr):not(.ru) .mobile.membership-step2 .duration-options-list .payment-duration:last-child {
+        margin-left: 0;
+    }
+    body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option {
+        display: inline-block;
+        width: 153px
+    }
+    body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option:last-child {
+        margin-left: 0;
+    }
+    body:not(.fr):not(.ru) .mobile.membership-step2 .option-question.renewal {
+        margin-top: 30px;
     }
 
-    @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-        .mobile.tablet-img {
-            background-image: url(../images/mobile/ipad-big@2x.png);
-        }
-        .android .mobile.tablet-img {
-            background-image: url(../images/mobile/android@2x.png);
-        }
-        .mobile.logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after {
-            background-image: url(../images/mobile/mobile-sprite_v10@2x.png);
-            background-size: 280px auto;
-        }
-        .mobile.registration-confirm-email .email-icon {
-            background-image: url(../images/mega/register-big-sprite-v15@2x.png);
-            background-size: 200px auto;
-        }
-    }
+}
 
-    @keyframes rotate-loading {
-        0% {
-            transform: rotate(0deg);
-            -ms-transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-            -ms-transform: rotate(360deg);
-        }
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+    .mobile.tablet-img {
+        background-image: url(../images/mobile/ipad-big@2x.png);
     }
-    @keyframes rotate-loading {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
+    .android .mobile.tablet-img {
+        background-image: url(../images/mobile/android@2x.png);
     }
-    @-moz-keyframes rotate-loading {
-        0% {
-            -moz-transform: rotate(0deg);
-        }
-        100% {
-            -moz-transform: rotate(360deg);
-        }
+    .mobile.logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after {
+        background-image: url(../images/mobile/mobile-sprite_v10@2x.png);
+        background-size: 280px auto;
     }
-    @-webkit-keyframes rotate-loading {
-        0% {
-            -webkit-transform: rotate(0deg);
-        }
-        100% {
-            -webkit-transform: rotate(360deg);
-        }
+    .mobile.registration-confirm-email .email-icon {
+        background-image: url(../images/mega/register-big-sprite-v15@2x.png);
+        background-size: 200px auto;
     }
-    @-o-keyframes rotate-loading {
-        0% {
-            -o-transform: rotate(0deg);
-        }
-        100% {
-            -o-transform: rotate(360deg);
-        }
+}
+
+@keyframes rotate-loading {
+    0% {
+        transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
     }
+    100% {
+        transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+    }
+}
+@keyframes rotate-loading {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+@-moz-keyframes rotate-loading {
+    0% {
+        -moz-transform: rotate(0deg);
+    }
+    100% {
+        -moz-transform: rotate(360deg);
+    }
+}
+@-webkit-keyframes rotate-loading {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+@-o-keyframes rotate-loading {
+    0% {
+        -o-transform: rotate(0deg);
+    }
+    100% {
+        -o-transform: rotate(360deg);
+    }
+}
 

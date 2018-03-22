@@ -588,7 +588,7 @@ var slideshowid;
             }
         }
         else if (String(n.fa).indexOf(':1*') > 0) {
-            api_getfileattr([{fa: M.d[id].fa, k: M.d[id].k}], 1, function(a, b, data) {
+            api_getfileattr([{fa: n.fa, k: n.k}], 1, function(a, b, data) {
                 if (data !== 0xDEAD) {
                     data = mObjectURL([data.buffer || data], 'image/jpeg');
 

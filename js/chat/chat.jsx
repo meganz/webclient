@@ -493,7 +493,7 @@ Chat.prototype.getRoomFromUrlHash = function(urlHash) {
 };
 
 
-Chat.prototype.updateSectionUnreadCount = function() {
+Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
     var self = this;
 
     if (!self.favico) {
@@ -542,7 +542,7 @@ Chat.prototype.updateSectionUnreadCount = function() {
 
         self.updateDashboard();
     }
-};
+}, 100);
 
 /**
  * Destroy this MegaChat instance (leave all rooms then disconnect)

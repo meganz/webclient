@@ -102,7 +102,7 @@
                 vsize += (n.tvb) ? n.tvb : 0;
                 svfilecnt += (n.tvf) ? n.tvf : 0;
             }
-        };
+        };console.log($.selected);
         // stupid code, but with optimized performance.
         if ($.selected.length && $.selected.length > 1) {
             for (var i = $.selected.length; i--;) {

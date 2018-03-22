@@ -2,11 +2,14 @@ var previews = Object.create(null);
 var preqs = Object.create(null);
 var pfails = Object.create(null);
 var slideshowid;
+var slideshowplay;
 
 (function _imageViewerSlideShow(global) {
     "use strict";
 
     var fullScreenTimer = null;
+    var mouseIdleTimer;
+    var slideshowTimer;
 
     function slideshowsteps() {
         var $stepsBlock = $('.viewer-overlay .viewer-images-num');
@@ -96,47 +99,87 @@ var slideshowid;
     }
 
     function slideshow_fullscreen($overlay) {
-        var $fullScreenIcon = $overlay.find('.viewer-button.fullscreen');
+        var $button = $overlay.find('.viewer-button.fs');
 
-        if ($(document).fullScreen() === null) {
-            $fullScreenIcon.addClass('hidden');
+        // Check if the browser supports the Fullscreen mode
+        var fullScreenEnabled = !!(document.fullscreenEnabled
+            || document.mozFullScreenEnabled
+            || document.msFullscreenEnabled
+            || document.webkitSupportsFullscreen
+            || document.webkitFullscreenEnabled
+            || document.createElement('video').webkitRequestFullScreen);
+
+        // If the browser doesn't support the Fulscreen then hide the fullscreen button
+        if (fullScreenEnabled) {
+            $button.removeClass('hidden');
         }
         else {
-            $fullScreenIcon.removeClass('hidden').rebind('click', function() {
-                if ($(document).fullScreen()) {
-                    $(document).fullScreen(false);
-                }
-                else {
-                    $(document).fullScreen(true);
-                }
-            });
-
-            $(document).rebind('fullscreenchange.mediaviewer', function() {
-                if (!$(document).fullScreen()) {
-                    clearTimeout(fullScreenTimer);
-
-                    $(document).unbind('mousemove.mediaviewer');
-                    $overlay.find('.viewer-button.fullscreen i').switchClass('lowscreen', 'fullscreen');
-                    $overlay.removeClass('fullscreen mouse-idle');
-                }
-                else {
-                    $overlay.addClass('fullscreen');
-                    $overlay.find('.viewer-button.fullscreen i').switchClass('fullscreen', 'lowscreen');
-
-                    // Hide buttons for mouse idle
-                    $(document).bind('mousemove.mediaviewer', function() {
-                        clearTimeout(fullScreenTimer);
-                        $overlay.removeClass('mouse-idle');
-
-                        if ($overlay.hasClass('fullscreen')) {
-                            fullScreenTimer = setTimeout(function() {
-                                $overlay.addClass('mouse-idle');
-                            }, 3000);
-                        }
-                    });
-                }
-            });
+            $button.addClass('hidden');
+            return false;
         }
+
+        // Set the video container's fullscreen state
+        var setFullscreenData = function(state) {
+            if (state) {
+                $button.find('i').removeClass('fullscreen').addClass('lowscreen');
+            }
+            else {
+                $button.find('i').removeClass('lowscreen').addClass('fullscreen');
+            }
+        };
+
+        // Checks if the document is currently in fullscreen mode
+        var isFullScreen = function() {
+            return !!(document.fullScreen
+                || document.webkitIsFullScreen
+                || document.mozFullScreen
+                || document.msFullscreenElement
+                || document.fullscreenElement);
+        };
+
+        // Bind Fullscreen button
+        $button.rebind('click', function() {
+            // If fullscreen mode is active...
+            if (isFullScreen()) {
+                // ...exit fullscreen mode
+                document.exitFullscreen();
+
+                setFullscreenData(false);
+            }
+            else {
+                // ...otherwise enter fullscreen mode
+                var containerEl = page === 'download' ? $('.video-block').get(0) : $overlay.get(0);
+
+                if (containerEl.requestFullscreen) {
+                    containerEl.requestFullscreen();
+                }
+                else if (containerEl.mozRequestFullScreen) {
+                    containerEl.mozRequestFullScreen();
+                }
+                else if (containerEl.webkitRequestFullScreen) {
+                    containerEl.webkitRequestFullScreen();
+                }
+                else if (containerEl.msRequestFullscreen) {
+                    containerEl.msRequestFullscreen();
+                }
+
+                setFullscreenData(true);
+            }
+        });
+
+        // Listen for fullscreen change events (from other controls, e.g. right clicking on the video itself)
+        document.addEventListener('fullscreenchange', function() {
+            setFullscreenData(!!(document.fullScreen || document.fullscreenElement));
+        });
+        document.addEventListener('webkitfullscreenchange', function() {
+            setFullscreenData(document.webkitIsFullScreen);
+        });
+        document.addEventListener('mozfullscreenchange', function() {
+            setFullscreenData(!!document.mozFullScreen);
+        });
+        document.addEventListener('msfullscreenchange', function() {
+            setFullscreenData(!!document.msFullscreenElement);
+        });
     }
 
     function slideshow_favourite(n, $overlay) {
@@ -207,11 +250,90 @@ var slideshowid;
         return n || false;
     }
 
+    // Hide viewer top and bottom controls
+    function viewer_hidecontrols($overlay) {
+        var $wrapper = page === 'download' ? $('.download.video-block:visible') : $overlay;
+
+        $wrapper.removeClass('mouse-idle');
+        clearTimeout(mouseIdleTimer);
+        mouseIdleTimer = setTimeout(function() {
+            $overlay.addClass('mouse-idle');
+        }, 4000);
+    }
+
+    // Init Slideshow viewer mode
+    function slideshowMode(close) {
+        var $overlay = $('.viewer-overlay');
+        var $controls = $overlay.find('.viewer-slideshow-controls');
+        var $startButton = $overlay.find('.viewer-button.slideshow');
+        var $pauseButton = $overlay.find('.viewer-big-button.pause');
+        var $prevButton = $overlay.find('.viewer-big-button.prev');
+        var $nextButton = $overlay.find('.viewer-big-button.next');
+
+        if (close) {
+            $overlay.removeClass('slideshow');
+            slideshowplay = false;
+            $pauseButton.attr('data-state', 'pause');
+            $pauseButton.find('i').removeClass('play').addClass('pause');
+            clearInterval(slideshowTimer);
+        }
+        
+        var resetTimer = function() {
+            clearInterval(slideshowTimer);
+            slideshowTimer = setInterval(function() {
+                slideshow_next();
+            }, 4000);
+        }
+
+        // Bind Slideshow Mode button
+        $startButton.rebind('click', function() {
+            $overlay.addClass('slideshow');
+            slideshowplay = true;
+            resetTimer();
+        });
+
+        // Bind Slideshow Pause button
+        $pauseButton.rebind('click', function() {
+            var $this = $(this);
+
+            if ($(this).attr('data-state') === 'pause') {
+                clearInterval(slideshowTimer);
+                $this.attr('data-state', 'play');
+                $this.find('i').removeClass('pause').addClass('play');
+            }
+            else {
+                $this.attr('data-state', 'pause');
+                $this.find('i').removeClass('play').addClass('pause');
+
+                slideshowTimer = setInterval(function() {
+                    slideshow_next();
+                }, 4000);
+            }
+        });
+
+        // Bind Slideshow Prev button
+        $prevButton.rebind('click', function() {
+            slideshow_prev();
+            resetTimer();
+        });
+
+        // Bind Slideshow Next button
+        $nextButton.rebind('click', function() {
+            slideshow_next();
+            resetTimer();
+        });
+
+        // Bind Slideshow Close button
+        $controls.find('.viewer-big-button.close').rebind('click', function() {
+            slideshowMode(1);
+        });  
+    }
+
+    // Viewer Init
     function slideshow(id, close) {
         var $overlay = $('.viewer-overlay');
+        var $controls = $overlay.find('.viewer-top-bl, .viewer-bottom-bl, .viewer-slideshow-controls');
         var $document = $(document);
-
-        $overlay.removeClass('fullscreen mouse-idle');
 
         if (d) {
             console.log('slideshow', id, close, slideshowid);
@@ -219,12 +341,14 @@ var slideshowid;
 
         if (close) {
             slideshowid = false;
-            $overlay.removeClass('video video-theatre-mode').addClass('hidden');
-            $document.unbind('keydown.slideshow');
+            slideshowplay = false;
+            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow')
+                .addClass('hidden');
+            $document.unbind('keydown.slideshow mousemove.idle');
+            $overlay.find('.viewer-image-bl .img-wrap').attr('data-count', '');
+            $overlay.find('.viewer-image-bl img').attr('src', '');
             if ($document.fullScreen()) {
-                clearTimeout(fullScreenTimer);
-                $document.fullScreen(false);
-                $document.unbind('mousemove.mediaviewer');
+                document.exitFullscreen();
             }
             for (var i in dl_queue) {
                 if (dl_queue[i] && dl_queue[i].id === id) {
@@ -251,64 +375,91 @@ var slideshowid;
                 history.pushState({ subpage: page }, '', '/' + page);
             }
         }
-        // Bind keydown events
-        $document.rebind('keydown.slideshow', function(e) {
-            if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
-                slideshow_prev();
-            }
-            else if (e.keyCode === 39 && slideshowid) {
-                slideshow_next();
-            }
-            else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
-                if ($.dialog) {
-                    closeDialog($.dialog);
-                }
-                else {
-                    slideshow(slideshowid, true);
-                }
-            }
-            else if (e.keyCode === 8 || e.key === 'Backspace') {
-                // since Backspace event is processed with keydown at document level for cloudBrowser.
-                // i prefered that to process it here, instead of unbind the previous handler.
-                if (hashLogic || location.hash) {
-                    slideshow(slideshowid, 1);
-                }
-                else {
-                    history.back();
-                }
-                return false;
-            }
-        });
-
-        // Close icon
-        $overlay.find('.viewer-button.close,.viewer-error-close')
-            .rebind('click', function () {
-                if (hashLogic || location.hash) {
-                    slideshow(0, 1);
-                }
-                else {
-                    history.back();
-                }
-                return false;
-            });
-
-        // Fullscreen icon
-        slideshow_fullscreen($overlay);
-
-        // Favourite Icon
-        slideshow_favourite(n, $overlay);
 
         if (!n) {
             return;
         }
         slideshowid = n.h;
+        $.selected = [n.h];
+
+       // Bind static events is viewer is not in slideshow mode
+        if (!slideshowplay) {
+            $overlay.removeClass('fullscreen mouse-idle slideshow');
+
+            // Bind keydown events
+            $document.rebind('keydown.slideshow', function(e) {
+                if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey) {
+                    slideshow_prev();
+                }
+                else if (e.keyCode === 39 && slideshowid) {
+                    slideshow_next();
+                }
+                else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
+                    if ($.dialog) {
+                        closeDialog($.dialog);
+                    }
+                    else if (slideshowplay) {
+                        slideshowMode(1);
+                    }
+                    else {
+                        slideshow(slideshowid, true);
+                    }
+                }
+                else if (e.keyCode === 8 || e.key === 'Backspace') {
+                    // since Backspace event is processed with keydown at document level for cloudBrowser.
+                    // i prefered that to process it here, instead of unbind the previous handler.
+                    if (hashLogic || location.hash) {
+                        slideshow(slideshowid, 1);
+                    }
+                    else {
+                        history.back();
+                    }
+                    return false;
+                }
+            });
+
+            // Close icon
+            $overlay.find('.viewer-button.close,.viewer-error-close')
+                .rebind('click', function () {
+                    if (hashLogic || location.hash) {
+                        slideshow(0, 1);
+                    }
+                    else {
+                        history.back();
+                    }
+                    return false;
+                });
+
+            // Properties icon
+            $overlay.find('.viewer-button.info').rebind('click', function() {
+                propertiesDialog();
+            });
+
+            // Fullscreen icon
+            slideshow_fullscreen($overlay);
+
+            // Slideshow Mode Init
+            slideshowMode();
+
+            // Autohide controls
+            viewer_hidecontrols($overlay)
+            $document.rebind('mousemove.idle', function() {
+                viewer_hidecontrols($overlay);
+            })
+            $controls.rebind('mousemove.idle', function() {
+                onIdle(function() {
+                    clearTimeout(mouseIdleTimer);
+                });
+            });
+        }
+        
+        // Favourite Icon
+        slideshow_favourite(n, $overlay);
 
         $overlay.find('.viewer-filename').text(n.name);
-        $overlay.find('.viewer-image-bl img').attr('src', '');
         $overlay.find('.viewer-pending').removeClass('hidden');
         $overlay.find('.viewer-progress').addClass('hidden');
         $overlay.find('.viewer-error').addClass('hidden');
-        $overlay.find('.viewer-image-bl').addClass('hidden');
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
         $overlay.find('.viewer-progress p').removeAttr('style');
 
@@ -547,9 +698,10 @@ var slideshowid;
         });
 
         $overlay.addClass('video');
+        $overlay.find('video').removeClass('hidden');
         $overlay.find('.viewer-pending').addClass('hidden');
         // $overlay.find('.viewer-progress').addClass('hidden');
-        $overlay.find('.viewer-image-bl img').addClass('hidden');
+        $overlay.find('.viewer-image-bl .img-wrap').addClass('hidden');
         $overlay.find('.viewer-image-bl').addClass('default-state').removeClass('hidden');
 
         if (n.name) {
@@ -643,6 +795,9 @@ var slideshowid;
 
     function previewsrc(id) {
         var $overlay = $('.viewer-overlay');
+        var $imgCount = $overlay.find('.viewer-image-bl .img-wrap');
+        var imgCountVal = $imgCount.attr('data-count');
+        var imgClass = '';
 
         var src = Object(previews[id]).src;
         if (!src) {
@@ -653,14 +808,14 @@ var slideshowid;
         $overlay.removeClass('video video-theatre-mode');
         $overlay.find('.viewer-image-bl embed').addClass('hidden');
         $overlay.find('.viewer-image-bl video').addClass('hidden');
-        $overlay.find('.viewer-image-bl img').removeClass('hidden');
+        $overlay.find('.viewer-image-bl .img-wrap').removeClass('hidden');
         $('#pdfpreviewdiv1').addClass('hidden');
 
         if (previews[id].type === 'application/pdf') {
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
-            $overlay.find('.viewer-image-bl img').addClass('hidden');
-            $overlay.find('.viewer-image-bl').removeClass('default-state hidden');
+            $overlay.find('.viewer-image-bl .img-wrap').addClass('hidden');
+            $overlay.find('.viewer-image-bl').removeClass('default-state');
             // preview pdfs using pdfjs for all browsers #8036
             // to fix pdf compatibility - Bug #7796
             localStorage.setItem('currPdfPrev2', JSON.stringify(src));
@@ -673,18 +828,20 @@ var slideshowid;
             return slideshow_videostream(id, $overlay);
         }
 
+        // Choose img to set src for Slideshow transition effect
+        if (imgCountVal === '' || imgCountVal === 'img2') {
+            imgClass = 'img1';
+        }
+        else {
+            imgClass = 'img2';
+        }
+
         var img = new Image();
         img.onload = function() {
-            var w = this.width;
-            var h = this.height;
-            if (w < 960 && w < $(window).width() - 382 && h < 522 && h < $(window).height() - 222) {
-                $overlay.find('.viewer-image-bl').addClass('default-state');
-            }
-            else {
-                $overlay.find('.viewer-image-bl').removeClass('default-state');
-            }
-            $overlay.find('.viewer-image-bl img').attr('src', this.src);
-            $overlay.find('.viewer-image-bl').removeClass('hidden');
+            $imgCount.find('img').removeClass('active');
+            $imgCount.find('.' + imgClass).attr('src', this.src).addClass('active');
+            $imgCount.attr('data-count', imgClass);
+            $overlay.find('.viewer-image-bl').removeClass('default-state');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
         };

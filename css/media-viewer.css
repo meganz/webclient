@@ -27,18 +27,24 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     z-index: 10;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
     background-color: rgba(34,34,34,0.8);
+    -webkit-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    visibility:visible;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
 }
 .viewer-bottom-bl {
     top: auto;
     bottom: 0;
     padding: 8px 11px;
     height: 64px;
+    background-color: transparent;
 }
 .viewer-filename {
     position: absolute;
@@ -62,6 +68,7 @@
     margin: 10px;
     cursor: pointer;
     position: relative;
+    z-index: 1;
 }
 .viewer-button.inline {
     vertical-align: top;
@@ -76,7 +83,9 @@
     margin: 0 10px 0 10px;
 }
  .viewer-button-label {
-     margin: 10px -4px 0 -4px;
+     margin: 10px -6px 0 -6px;
+     min-width: 40px;
+     text-align: center;
  }
 .viewer-button i {
     -webkit-transition: opacity 200ms ease-in-out;
@@ -124,7 +133,7 @@
     height: 100%;
     background-color: black;
 }
-.viewer-image-bl img, .viewer-image-bl embed, .viewer-image-bl iframe, .viewer-image-bl:not(.default-state) video {
+.viewer-image-bl:not(.default-state) video {
     max-width: -webkit-calc(100% - 342px);
     max-width: -moz-calc(100% - 342px);
     max-width: calc(100% - 342px);
@@ -179,10 +188,37 @@
     height: -moz-calc(100% - 182px);
     height: calc(100% - 182px);
 }
-.viewer-image-bl.default-state img, .fullscreen .viewer-image-bl img {
-    max-width: 100%;
-    max-height: 100%;
+.viewer-image-bl img {
+    width: 200%;
+    height: 200%;
     border: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: auto;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.viewer-image-bl img.active {
+     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.slideshow .viewer-image-bl img {
+    -webkit-transition: opacity 900ms ease-in-out;
+    -moz-transition: opacity 900ms ease-in-out;
+    -o-transition: opacity 900ms ease-in-out;
+    -ms-transition: opacity 900ms ease-in-out;
+    transition: opacity 900ms ease-in-out;
+}
+.slideshow .viewer-image-bl img.active {
+     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
 }
 .fullscreen .viewer-image-bl, .fullscreen .viewer-image-bl.default-state {
     width: 100%;
@@ -198,17 +234,17 @@
     vertical-align: top;
     background-image: url(../images/mega/icons-sprite_v18.png);
     background-position: 2px -1393px;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
     display: none;
     cursor: pointer;
+    -webkit-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
 }
 .viewer-mid-button.active {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -225,6 +261,16 @@
 }
 .viewer-mid-button.next {
     background-position: -28px -1393px;
+}
+.viewer-big-button {
+    padding: 2px;
+    display: inline-block;
+    vertical-align: top;
+    margin: 14px 9px 14px 8px;
+    cursor: pointer;
+}
+.viewer-big-button.left-pad {
+    margin-left: 38px;
 }
 .viewer-error-header {
     color: white;
@@ -345,37 +391,75 @@
 .viewer-counter-bl span.first {
     padding: 0 9px 0 0;
 }
-.viewer-short-controls {
+.viewer-short-controls, .viewer-slideshow-controls {
     display: inline-block;
     vertical-align: top;
-    height: 48px;
+    min-height: 48px;
     font-size: 0;
     padding: 0 6px;
     background-color: #222222;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
-.mouse-idle .viewer-top-bl, .mouse-idle .viewer-bottom-bl, .mouse-idle .viewer-mid-button {
+.viewer-short-controls .medium-icon.fullscreen {
+    margin-left: 2px;
+}
+.viewer-short-controls .viewer-button {
+    margin-left: 24px;
+}
+.viewer-slideshow-controls {
+    position: absolute;
+    left: 50%;
+    margin: 0 0 0 -136px;
+    bottom: 8px;
+    z-index: 20;
+    padding: 0 15px;
+    visibility: hidden;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    -webkit-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+}
+.slideshow .viewer-slideshow-controls {
+    visibility: visible;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.viewer-button.def-pad {
+    margin: 10px;
+}
+.mouse-idle .viewer-top-bl, .mouse-idle .viewer-bottom-bl, .mouse-idle .viewer-mid-button, .slideshow .viewer-top-bl, .slideshow .viewer-bottom-bl,  .mouse-idle .viewer-slideshow-controls {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
-    transition: opacity 1s ease-in-out;
-    -moz-transition: opacity 1s ease-in-out;
-    -webkit-transition: opacity 1s ease-in-out;
+    visibility: hidden;
+       
 }
 .video-thumb-details {
     display: none;
 }
 /* Video player */
+.video .viewer-bottom-bl {
+    background-color: rgba(34,34,34,0.8);
+}
 .viewer-overlay.video-theatre-mode, .video-theatre-mode .viewer-body {
     display: block;
     background-color: black;
 }
 .video-theatre-mode .viewer-bottom-bl, .video-theatre-mode .viewer-top-bl {
-    /*background-color: rgba(0,0,0,0.5);*/
-    background-color: rgba(34,34,34,0.8);
+    background-color: rgba(0,0,0,0.5);
 }
 .video .viewer-image-bl.default-state {
     /* height: auto; */

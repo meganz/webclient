@@ -529,7 +529,7 @@
     background-position: 0 -712px;
     width: 18px;
 }
-.medium-icon.icons-img {
+.medium-icon.icons-img, .semi-big-icon.icons-img {
     background-image: url(../images/mega/icons-sprite_v18.png);
 }
 .medium-icon.icons-img.close {
@@ -582,6 +582,21 @@
 }
 .medium-icon.icons-img.pause {
     background-position: -93px -630px;
+}
+.semi-big-icon.icons-img.pause {
+    background-position: 2px -1440px;
+}
+.semi-big-icon.icons-img.play {
+    background-position: -208px -1440px;
+}
+.semi-big-icon.icons-img.cross {
+    background-position: -158px -1439px;
+}
+.semi-big-icon.icons-img.prev {
+    background-position: -48px -1440px;
+}
+.semi-big-icon.icons-img.next {
+    background-position: -108px -1440px;
 }
 .huge-white-icon.achievement {
     background-image: url(../images/mega/account-sprite_v4.png);

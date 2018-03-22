@@ -355,14 +355,13 @@ var slideshowid;
 
         var $dlBut = $overlay.find('.viewer-button.download');
         $dlBut.rebind('click', function() {
-            for (var i in dl_queue) {
-                if (dl_queue[i] && dl_queue[i].id === slideshowid) {
+            for (var i = dl_queue.length; i--;) {
+                if (dl_queue[i] && dl_queue[i].id === slideshowid && dl_queue[i].preview) {
                     dl_queue[i].preview = false;
                     M.openTransfersPanel();
                     return;
                 }
             }
-
 
             // TODO: adapt the above code to work on the downloads page if we need to download the original
             if (page === 'download') {

@@ -715,11 +715,17 @@ var dlmanager = {
             dl.onDownloadError(dl, code);
         }
 
-        if (code === EKEY) {
+        var eekey = code === EKEY;
+        if (eekey || code === EACCESS) {
             // TODO: Check if other codes should raise abort()
             later(function() {
-                dlmanager.abort(dl, true);
+                dlmanager.abort(dl, eekey);
             });
+
+            if (M.chat) {
+                $('.toast-notification').removeClass('visible');
+                showToast('download', eekey ? l[24] : l[23]);
+            }
         }
     },
 

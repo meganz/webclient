@@ -692,7 +692,7 @@ var slideshowid;
         }
 
         var img = new Image();
-        img.onload = function() {
+        img.onload = img.onerror = function(ev) {
             var w = this.width;
             var h = this.height;
             if (w < 960 && w < $(window).width() - 382 && h < 522 && h < $(window).height() - 222) {
@@ -701,13 +701,14 @@ var slideshowid;
             else {
                 $overlay.find('.viewer-image-bl').removeClass('default-state');
             }
-            $overlay.find('.viewer-image-bl img').attr('src', this.src);
+            $overlay.find('.viewer-image-bl img').attr('src', ev.type === 'error' ? noThumbURI : this.src);
             $overlay.find('.viewer-image-bl').removeClass('hidden');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
-        };
-        img.onerror = function(ev) {
-            console.error('Preview image error', ev);
+
+            if (d && ev.type === 'error') {
+                console.debug('Failed to preview image...', src, ev);
+            }
         };
         img.src = src;
     }

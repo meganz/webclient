@@ -2205,9 +2205,9 @@ else if (!b_u) {
         'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
         'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
-        'megadrop': { f:'html/megadrop.html', n: 'megadrop', j: 0 },
-        'nomegadrop': { f:'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
-        'megadrop_js': { f:'js/megadrop.js', n: 'megadrop_js', j: 1 }
+        'megadrop': {f:'html/megadrop.html', n: 'megadrop', j: 0 },
+        'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
+        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 }
     };
 
     var jsl3 = {

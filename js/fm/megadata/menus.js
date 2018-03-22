@@ -173,7 +173,9 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 && !folderlink) {
 
                 // Create or Remove upload page context menu action
-                if (mega.megadrop.pufs[selNode.h] && mega.megadrop.pufs[selNode.h].s !== 1) {
+                if (mega.megadrop.pufs[selNode.h]
+                    && mega.megadrop.pufs[selNode.h].s !== 1
+                    && mega.megadrop.pufs[selNode.h].p) {
                     items['.removewidget-item'] = 1;
                     items['.managewidget-item'] = 1;
                 }

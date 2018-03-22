@@ -1350,6 +1350,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 };
 
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
+
+    'use strict';
+
     var id = ul.id;
     var $tr = $('#ul_' + id);
     if (!$tr.hasClass('transfer-started')) {

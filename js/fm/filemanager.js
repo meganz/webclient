@@ -1020,19 +1020,20 @@ FileManager.prototype.initContextUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var count = mega.megadrop.isDropExist($.selected[0], true);
-            if (count) {
-                var fldName = count > 1
-                    ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
-                    : l[17403].replace('%1', escapeHTML(M.d[$.selected[0]].name));
+            var mdList = mega.megadrop.isDropExist($.selected);
+            if (mdList.length) {
+                var fldName = mdList.length > 1
+                    ? l[17626]
+                    : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
                 msgDialog(
                     'confirmation',
                     l[1003],
                     fldName,
                     false, function(e) {
                     if (e) {
-                        var list = mega.megadrop.getDropList();
-                        mega.megadrop.pufRemove(list, $.selected, mega.Share.initCopyrightsDialog);
+                        mega.megadrop.pufRemove(mdList).always(function() {
+                            mega.Share.initCopyrightsDialog($.selected);
+                        });
                     }
                 });
             }
@@ -1096,19 +1097,20 @@ FileManager.prototype.initContextUI = function() {
             return $dialog;
         };
 
-        var count = mega.megadrop.isDropExist($.selected[0], true);
-        if (count) {
-            var fldName = count > 1
-                ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
-                : l[17403].replace('%1', escapeHTML(M.d[$.selected[0]].name));
+        var mdList = mega.megadrop.isDropExist($.selected);
+        if (mdList.length) {
+            var fldName = mdList.length > 1
+                ? l[17626]
+                : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
             msgDialog(
                 'confirmation',
                 l[1003],
                 fldName,
                 false, function(e) {
                 if (e) {
-                    var list = mega.megadrop.getDropList();
-                    mega.megadrop.pufRemove(list, $.selected, M.safeShowDialog, 'share', showShareDlg);
+                    mega.megadrop.pufRemove(mdList).always(function() {
+                        M.safeShowDialog('share', showShareDlg);
+                    });
                 }
             });
         }

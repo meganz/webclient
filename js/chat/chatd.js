@@ -1017,7 +1017,7 @@ Chatd.Shard.prototype.exec = function(a) {
     var self = this;
 
     // TODO: find more optimised way of doing this...fromCharCode may also cause exceptions if too big array is passed
-    var cmd = String.fromCharCode.apply(null, a);
+    var cmd = ab_to_str(a);
 
     if (self.loggerIsEnabled) {
         self.logger.log("recv:", Chatd.cmdToString(cmd, false));
@@ -1326,7 +1326,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.chatd.trigger('onBroadcast', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
                     userId: base64urlencode(cmd.substr(9, 8)),
-                    bCastCode: cmd.substr(17, 1)
+                    bCastCode: cmd.substr(17, 1).charCodeAt(0)
                 });
 
                 len = 18;

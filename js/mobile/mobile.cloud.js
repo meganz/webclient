@@ -14,6 +14,7 @@ mobile.cloud = {
      */
     renderLayout: function() {
 
+
         'use strict';
 
         // If a public folder link and the initial folder overlay has not been shown yet
@@ -37,6 +38,7 @@ mobile.cloud = {
         // Render the file manager header, folders, files and footer
         this.renderHeader();
         this.sortViewAlphabeticallyAscending();
+        this.initGridViewToggleHandler();
         this.renderFoldersAndFiles();
         this.renderFoldersAndFilesSubHeader();
         this.showEmptyCloudIfEmpty();
@@ -243,7 +245,6 @@ mobile.cloud = {
         // Reset header to blank slate so only buttons/items are enabled as needed
         $backButton.addClass('hidden');
         $cloudIcon.addClass('hidden');
-        $menuIcon.addClass('hidden');
         $fileManagerHeader.removeClass('folder-link');
         $folderIcon.addClass('hidden');
         $folderName.text('');
@@ -287,9 +288,6 @@ mobile.cloud = {
                 // Show the folder name
                 $folderName.text(currentFolder.name);
             }
-
-            // Show the hamburger menu icon
-            $menuIcon.removeClass('hidden');
         }
     },
 
@@ -362,8 +360,10 @@ mobile.cloud = {
         var $fileManagerRows = $fileManager.find('.fm-row .fm-scrolling');
         var $folderTemplateSelector = $fileManagerRows.find('.folder.template');
         var $fileTemplateSelector = $fileManagerRows.find('.file.template');
+        var $clearFixTemplateSelector = $fileManagerRows.find('.clear.template');
 
         var output = '';
+        var firstFileRendered = false;
 
         // Loop through top level nodes in the current view (M.v)
         for (var i = 0; i < M.v.length; i++) {
@@ -380,7 +380,15 @@ mobile.cloud = {
                 $nodeTemplate = this.updateFolderTemplate($folderTemplateSelector, node);
             }
             else {
-                // Otherwise render a file
+                // If the first file hasn't been rendered yet (i.e. all the folders have finished rendering) then add a
+                // clearfix Cloud Drive item which in grid-view mode clears the floating folders thus rendering the
+                // files below them and giving a better appearance.
+                if (!firstFileRendered) {
+                    output += $clearFixTemplateSelector.clone().removeClass('template').prop('outerHTML');
+                    firstFileRendered = true;
+                }
+
+                // Render a file
                 $nodeTemplate = this.updateFileTemplate($fileTemplateSelector, node);
             }
 
@@ -400,7 +408,7 @@ mobile.cloud = {
         }
 
         // Remove files and folders but not the templates so that it can be re-rendered
-        $fileManager.find('.fm-item').not('.template').remove();
+        $fileManager.find('.fm-item, .clear').not('.template').remove();
 
         // Render the output all at once
         $fileManagerRows.append(output);
@@ -620,6 +628,79 @@ mobile.cloud = {
             // Prevent pre clicking one of the Open in Browser/App buttons
             return false;
         });
+    },
+
+    /**
+     * Initialise the button to toggle the list-view / grid-view in the cloud drive
+     */
+    initGridViewToggleHandler: function() {
+
+        // Cache selectors
+        var $changeViewButton = $('.mobile.file-manager-block .mobile.fm-icon.view-options');
+        var $fileManagerBlock = $('.mobile.file-manager-block');
+
+        // If they have previously set the grid mode to be enabled and just done a refresh/reload then enable it again
+        if (localStorage.getItem('mobileGridViewModeEnabled') === '1') {
+            mobile.cloud.enableGridView($fileManagerBlock, $changeViewButton);
+        }
+        else {
+            // Otherwise enable the list view
+            mobile.cloud.enableListView($fileManagerBlock, $changeViewButton);
+        }
+
+        // If the Grid/list view icon is tapped
+        $changeViewButton.off('tap').on('tap', function() {
+
+            // Toggle the display
+            mobile.cloud.toggleGridView($fileManagerBlock, $changeViewButton);
+        });
+    },
+
+    /**
+     * Toggles between list view and grid view
+     * @param {Object} $fileManagerBlock The cached jQuery selector for the file manager
+     * @param {Object} $changeViewButton The cached jQuery selector for the Change View icon
+     */
+    toggleGridView: function($fileManagerBlock, $changeViewButton) {
+
+        // If grid view is set already, enable list view
+        if ($fileManagerBlock.hasClass('grid-view')) {
+            mobile.cloud.enableListView($fileManagerBlock, $changeViewButton);
+        }
+        else {
+            // Otherwise if list view is set already, enable grid view
+            mobile.cloud.enableGridView($fileManagerBlock, $changeViewButton);
+        }
+    },
+
+    /**
+     * Enables the grid view
+     * @param {Object} $fileManagerBlock The cached jQuery selector for the file manager
+     * @param {Object} $changeViewButton The cached jQuery selector for the Change View icon
+     */
+    enableGridView: function($fileManagerBlock, $changeViewButton) {
+
+        $fileManagerBlock.addClass('grid-view');
+        $changeViewButton.removeClass('grid-icon');
+        $changeViewButton.addClass('list-icon');
+
+        // Save current grid view state for page refreshes/reloads
+        localStorage.setItem('mobileGridViewModeEnabled', '1');
+    },
+
+    /**
+     * Enables the list view
+     * @param {Object} $fileManagerBlock The cached jQuery selector for the file manager
+     * @param {Object} $changeViewButton The cached jQuery selector for the Change View icon
+     */
+    enableListView: function($fileManagerBlock, $changeViewButton) {
+
+        $fileManagerBlock.removeClass('grid-view');
+        $changeViewButton.removeClass('list-icon');
+        $changeViewButton.addClass('grid-icon');
+
+        // Save current list view state for page refreshes/reloads
+        localStorage.setItem('mobileGridViewModeEnabled', '0');
     },
 
     /**

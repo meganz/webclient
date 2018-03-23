@@ -1921,7 +1921,7 @@ accountUI.fillCharts = function(account, onDashboard) {
 
     // Maximum bandwidth
     b2 = bytesToSize(account.tfsq.max, 0).split(' ');
-    var usedB = bytesToSize(account.tfsq.used, 0);
+    var usedB = bytesToSize(account.tfsq.used);
     $bandwidthChart.find('.chart.data .size-txt').text(usedB);
     $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
     $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));

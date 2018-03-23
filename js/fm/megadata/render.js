@@ -160,8 +160,15 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
                 e.clientY = $this.offset().top + $this.height()
 
                 if (!$(this).hasClass('active')) {
-                    M.contextMenuUI(e, 3);
-                    $(this).addClass('active');
+                    megasync.isInstalled(function (err, is) {
+                        if (!err || is) {
+                            M.addDownload($.selected);
+                        }
+                        else {
+                            M.contextMenuUI(e, 3);
+                        }
+                        $(this).addClass('active');
+                    });
                 }
                 else {
                     $.hideContextMenu();

@@ -84,6 +84,7 @@ function init_embed(ph, key, time, g) {
             var timeoffset = 0;
             var $block = $('.sharefile-block');
             var $wrapper = $('.video-wrapper');
+            var $cntmnu = $('.files-menu.context');
             var url = getBaseUrl() + '/embed' + link;
             var embed = '<iframe src="%" width="640" height="360" frameborder="0" allowfullscreen></iframe>';
 
@@ -126,6 +127,7 @@ function init_embed(ph, key, time, g) {
 
             $block.removeClass('hidden');
             $wrapper.addClass('main-blur-block');
+            $cntmnu.addClass('hidden').removeClass('mobile-mode');
         });
 
         watchdog.registerOverrider('login', function() {
@@ -233,8 +235,21 @@ function topmenuUI() {
         var $cm = $('.files-menu.context').removeClass('hidden');
         var top = $('.viewer-top-bl').height();
         var left = $cm.outerWidth();
-        $cm.css({'top': top, 'left': innerWidth - left - 4});
-        return false;
+        var $wrapper = $('.video-wrapper');
+        
+        if (is_mobile) {
+            $cm.addClass('mobile-mode');
+            $wrapper.addClass('main-blur-block'); 
+            
+            $('.close-overlay .close-icon').rebind('click', function() {
+                $cm.removeClass('mobile-mode').addClass('hidden');
+                $wrapper.removeClass('main-blur-block');
+            });
+
+        } else {
+            $cm.css({'top': top, 'left': innerWidth - left - 4});
+            return false
+        }
     });
 }
 

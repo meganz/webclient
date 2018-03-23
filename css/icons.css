@@ -851,6 +851,11 @@
     width: 22px;
     margin: 6px 13px 1px -1px;
 }
+.small-icon.context.syncmegasync {
+    background-position: -200px -351px;
+    width: 22px;
+    margin: 6px 13px 1px -1px;
+}
 .small-icon.context.remove-link {
     background-position: -200px -165px;
     width: 22px;

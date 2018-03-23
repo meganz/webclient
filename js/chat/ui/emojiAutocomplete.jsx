@@ -59,13 +59,15 @@ var EmojiAutocomplete = React.createClass({
                 // up/left
                 selected = selected - 1;
                 selected = selected < 0 ? self.maxFound - 1 : selected;
-                self.setState({
-                    'selected': selected,
-                    'prefilled': true
-                });
 
-                self.props.onPrefill(false, ":" + self.found[selected].n + ":");
-                handled = true;
+                if (self.found[selected] && self.state.selected !== selected) {
+                    self.setState({
+                        'selected': selected,
+                        'prefilled': true
+                    });
+                    handled = true;
+                    self.props.onPrefill(false, ":" + self.found[selected].n + ":");
+                }
             }
             else if (key === 39 || key === 40 || key === 9) {
                 // down, right, tab
@@ -77,14 +79,18 @@ var EmojiAutocomplete = React.createClass({
                     selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ?
                         0 : selected
                 );
-                self.setState({
-                    'selected': selected,
-                    'prefilled': true
-                });
 
-                self.props.onPrefill(false, ":" + self.found[selected].n + ":");
+                // is a valid item in the list, tab is pressed OR prev selected != current selected
+                if (self.found[selected] && (key === 9 || self.state.selected !== selected)) {
+                    self.setState({
+                        'selected': selected,
+                        'prefilled': true
+                    });
 
-                handled = true;
+                    self.props.onPrefill(false, ":" + self.found[selected].n + ":");
+
+                    handled = true;
+                }
             }
             else if (key === 13) {
                 // enter
@@ -109,9 +115,12 @@ var EmojiAutocomplete = React.createClass({
                     }
                     return;
                 }
-                else {
+                else if (self.found.length > 0 && self.found[selected]) {
                     self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
                     handled = true;
+                }
+                else {
+                    self.props.onCancel();
                 }
             }
             else if (key === 27) {
@@ -127,7 +136,9 @@ var EmojiAutocomplete = React.createClass({
                 return false;
             }
             else {
-                self.setState({'prefilled': false});
+                if (self.isMounted()) {
+                    self.setState({'prefilled': false});
+                }
             }
         });
     },

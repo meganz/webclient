@@ -49,6 +49,7 @@ var dlmanager = {
     // How many queue IO we want before pausing the XHR fetching,
     // useful when we have internet faster than our IO
     ioThrottleLimit: 6,
+    isOverQuota : false,
     ioThrottlePaused: false,
     fetchingFile: false,
     dlLastQuotaWarning: 0,
@@ -1775,7 +1776,7 @@ var dlmanager = {
      * @return {MegaPromise}
      */
     isMEGAsyncRunning: function(minVersion, getVersionInfo) {
-        var timeout = 200;
+        var timeout = 400;
         var logger = this.logger;
         var promise = new MegaPromise();
 
@@ -1951,7 +1952,7 @@ var dlmanager = {
     showMEGASyncOverlay: function(onSizeExceed, dlStateError) {
         'use strict';
 
-        M.require('megasync_js').dump();
+        //M.require('megasync_js').dump();
 
         var $overlay = $('.megasync-overlay');
         var $body = $('body');

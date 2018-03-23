@@ -100,6 +100,9 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         state = 'transfer-paused';
         pauseTxt = l[1651];
     }
+    if (dlmanager.isOverQuota) {
+        pauseTxt = '';
+    }
 
     var flashhtml = '';
     if (dlMethod === FlashIO) {
@@ -138,14 +141,14 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
     }
 };
 
-MegaData.prototype.addDownload = function(n, z, preview) {
+MegaData.prototype.addDownload = function (n, z, preview) {
     var args = toArray.apply(null, arguments);
-
     // fetch all nodes needed by M.getNodesSync
     dbfetch.coll(n)
-        .always(function() {
+        .always(function () {
             M.addDownloadSync.apply(M, args);
         });
+
 };
 
 MegaData.prototype.addDownloadSync = function(n, z, preview) {
@@ -202,8 +205,13 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             var foreach = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
                     var node = M.d[nodes[i]];
-
-                    if (node) {
+                    if (!node) {
+                        if (nodes[i].h && nodes[i].name) {
+                            node = nodes[i];
+                            addNode(node);
+                        }
+                    }
+                    else {
                         addNode(node);
                     }
                 }
@@ -227,9 +235,15 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
 
             sync.megaSyncRequest(cmd)
                 .done(function() {
-                    showToast('megasync', l[8635], 'Open');
+                    //showToast('megasync', l[8635], 'Open');
+                    showToast('megasync-transfer', l[8635]); // Download added to MEGAsync
                 })
-                .fail(webdl);
+                .fail(
+                function () {
+                    sync.megaSyncIsNotResponding(webdl);
+                    
+                }
+                );
         })
         .fail(webdl);
 };
@@ -442,8 +456,11 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
             if (typeof fdl_queue_var !== 'undefined' && Object(fdl_queue_var).ph) {
                 var gid = dlmanager.getGID(fdl_queue_var);
 
-                if (dlQueue.isPaused(gid)) {
+                if (dlQueue.isPaused(gid) && !dlmanager.isOverQuota) {
                     mega.ui.tpp.pause(gid, 'dl');
+                }
+                else if (dlmanager.isOverQuota) {
+                    mega.ui.tpp.hide();
                 }
             }
         });
@@ -1339,6 +1356,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 };
 
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
+
+    'use strict';
+
     var id = ul.id;
     var $tr = $('#ul_' + id);
     if (!$tr.hasClass('transfer-started')) {

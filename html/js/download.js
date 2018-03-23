@@ -365,6 +365,7 @@ function dl_g(res) {
                             if (res.msd !== 0 && (!err || is)) {
                                 $('.megasync-overlay').removeClass('downloading');
                                 megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
+                                browserDownload(true);
                             }
                             else {
                                 dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
@@ -573,7 +574,7 @@ function dl_g(res) {
     }
 }
 
-function browserDownload() {
+function browserDownload(isDlWithMegaSync) {
     // If regular download using Firefox and the total download is over 1GB then show the dialog
     // to use the extension, but not if they've seen the dialog before and ticked the checkbox
     /*if (dlMethod === MemoryIO && !localStorage.firefoxDialog
@@ -597,26 +598,37 @@ function browserDownload() {
         $('.download.warning-block').removeClass('visible');
         $('.progress-resume').addClass('hidden');
         $('.download-state-text').addClass('hidden');
-
-        if (is_mobile) {
-            if (!Object(fdl_queue_var).lastProgress) {
-                $('body').addClass('downloading').find('.bar').width('1%');
+        if (!isDlWithMegaSync) {
+            $('.download.transfer-buttons', $downloadPage).removeClass('hidden');
+            if ($('.download .pause-transfer').hasClass('hidden')) {
+                $('.download .pause-transfer').removeClass('hidden');
+                $('.download .pause-transfer').css('display', '');
             }
-        }
-        else if (mediaCollectFn) {
-            onIdle(mediaCollectFn);
-            mediaCollectFn = null;
-        }
-
-        if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
-            dlmanager.isDownloading = true;
-
-            if (dlResumeInfo) {
-                fdl_queue_var.byteOffset = dlResumeInfo.byteLength;
+            if (is_mobile) {
+                if (!Object(fdl_queue_var).lastProgress) {
+                    $('body').addClass('downloading').find('.bar').width('1%');
+                }
             }
-            dl_queue.push(fdl_queue_var);
+            else if (mediaCollectFn) {
+                onIdle(mediaCollectFn);
+                mediaCollectFn = null;
+            }
+
+            if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
+                dlmanager.isDownloading = true;
+
+                if (dlResumeInfo) {
+                    fdl_queue_var.byteOffset = dlResumeInfo.byteLength;
+                }
+                dl_queue.push(fdl_queue_var);
+            }
+            $.dlhash = getSitePath();
         }
-        $.dlhash = getSitePath();
+        else {
+            $('.download.transfer-buttons', $downloadPage).addClass('hidden');
+            $('.download .pause-transfer').addClass('hidden');
+            $('.download .pause-transfer').hide();
+        }
     }
 }
 

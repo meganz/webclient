@@ -567,6 +567,7 @@ mBroadcaster.once('startMega', function populate_l() {
 	l[16315] = l[16315].replace('4096','8192').replace('4','8');
 	l[16304] = l[16304].replace('8','16').replace('4096','8192').replace('4','8');
 	l[1367] = l[1367].replace('4','8');
+
     l[17083] = l[17083]
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
@@ -580,6 +581,8 @@ mBroadcaster.once('startMega', function populate_l() {
     if (l[17742]) {
         l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     }
+    l[17805] = l[17805].replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.nz">')
+                       .replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

@@ -379,6 +379,8 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
         var lang = localStorage.lang;
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
+        var cdlogger = debug && localStorage.chatdLogger;
+
 
         localStorage.clear();
         sessionStorage.clear();
@@ -403,6 +405,10 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
             if (apipath) {
                 // restore api path across reloads, only for debugging purposes...
                 localStorage.apipath = apipath;
+            }
+
+            if (cdlogger) {
+                localStorage.chatdLogger = 1;
             }
         }
 
@@ -445,6 +451,17 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                     ) {
                         waitingPromises.push(
                             megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
+                        );
+                    }
+                    else if (
+                        typeof(megaChat) !== 'undefined' &&
+                        megaChat.plugins.chatdIntegration &&
+                        !megaChat.plugins.chatdIntegration.chatd.chatdPersist &&
+                        typeof(ChatdPersist) !== 'undefined'
+                    ) {
+                        // chatdPersist was disabled, potential crash, try to delete the db manually
+                        waitingPromises.push(
+                            ChatdPersist.forceDrop()
                         );
                     }
 

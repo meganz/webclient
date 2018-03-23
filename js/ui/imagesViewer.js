@@ -7,9 +7,18 @@ var slideshowid;
     "use strict";
 
     var fullScreenTimer = null;
+    var _hideCounter = false;
 
     function slideshowsteps() {
         var $stepsBlock = $('.viewer-overlay .viewer-images-num');
+
+        if (_hideCounter === true) {
+            $stepsBlock.addClass('hidden');
+        }
+        else {
+            $stepsBlock.removeClass('hidden');
+        }
+
         var forward = [];
         var backward = [];
         var ii = [];
@@ -30,7 +39,9 @@ var slideshowid;
         // If there is at least 2 images
         if (len > 1) {
             var n = ii.indexOf(ci);
-            $stepsBlock.removeClass('hidden');
+            if (!_hideCounter) {
+                $stepsBlock.removeClass('hidden');
+            }
             switch (n) {
                 // last
                 case len - 1:
@@ -72,7 +83,7 @@ var slideshowid;
         var steps = slideshowsteps();
         if (steps.forward.length > 0) {
             mBroadcaster.sendMessage('slideshow:next', steps);
-            slideshow(steps.forward[0]);
+            slideshow(steps.forward[0], undefined, _hideCounter);
         }
     }
 
@@ -91,7 +102,7 @@ var slideshowid;
         var steps = slideshowsteps();
         if (steps.backward.length > 0) {
             mBroadcaster.sendMessage('slideshow:prev', steps);
-            slideshow(steps.backward[steps.backward.length - 1]);
+            slideshow(steps.backward[steps.backward.length - 1], undefined, _hideCounter);
         }
     }
 
@@ -207,9 +218,16 @@ var slideshowid;
         return n || false;
     }
 
-    function slideshow(id, close) {
+    function slideshow(id, close, hideCounter) {
         var $overlay = $('.viewer-overlay');
         var $document = $(document);
+
+        if (hideCounter) {
+            _hideCounter = true;
+        }
+        else {
+            _hideCounter = false;
+        }
 
         $overlay.removeClass('fullscreen mouse-idle');
 
@@ -264,14 +282,14 @@ var slideshowid;
                     closeDialog($.dialog);
                 }
                 else {
-                    slideshow(slideshowid, true);
+                    slideshow(slideshowid, true, _hideCounter);
                 }
             }
             else if (e.keyCode === 8 || e.key === 'Backspace') {
                 // since Backspace event is processed with keydown at document level for cloudBrowser.
                 // i prefered that to process it here, instead of unbind the previous handler.
                 if (hashLogic || location.hash) {
-                    slideshow(slideshowid, 1);
+                    slideshow(slideshowid, 1, _hideCounter);
                 }
                 else {
                     history.back();
@@ -284,7 +302,7 @@ var slideshowid;
         $overlay.find('.viewer-button.close,.viewer-error-close')
             .rebind('click', function () {
                 if (hashLogic || location.hash) {
-                    slideshow(0, 1);
+                    slideshow(0, 1, _hideCounter);
                 }
                 else {
                     history.back();

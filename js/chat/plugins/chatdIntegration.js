@@ -997,6 +997,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     chatRoom.rebind('typing.chatdInt', function() {
         self.broadcast(chatRoom, String.fromCharCode(1));
     });
+    chatRoom.rebind('stoppedTyping.chatdInt', function() {
+        self.broadcast(chatRoom, String.fromCharCode(2));
+    });
 
     self.chatd.rebind('onBroadcast.chatdInt' + chatRoomId, function(e, eventData) {
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
@@ -1811,7 +1814,6 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
 ChatdIntegration.prototype.broadcast = function(chatRoom, broadCastCode) {
     var self = this;
     var rawChatId = base64urldecode(chatRoom.chatId);
-    var chatMessages = self.chatd.chatIdMessages[rawChatId];
     return self.chatd.broadcast(rawChatId, broadCastCode);
 };
 

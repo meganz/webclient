@@ -2173,7 +2173,7 @@ var ConversationPanels = React.createClass({
                     messagesBuff={chatRoom.messagesBuff}
                     contacts={M.u}
                     contact={contact}
-                    key={chatRoom.roomId}
+                    key={chatRoom.roomId + "_" + chatRoom.instanceIndex}
                     />
             );
         });

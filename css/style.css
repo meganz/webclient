@@ -6822,7 +6822,7 @@ table {
 .dragger-icon.folder-shared, .share-folder-icon div.folder-shared {
     background-position: center -4615px;
 }
-.export-icon.folder-shared, .export-icon.folder {
+.export-icon.folder-shared, .export-icon.folder, .export-icon.puf-folder {
     background-image: url(../images/mega/dialogs-sprite_v14.svg);
     background-position: -7px -2680px;
     background-size: auto;
@@ -11650,10 +11650,10 @@ table {
 }
 .dropdown.body.popup.contacts-search  .contacts-search-scroll {
     border:1px solid rgba(0,0,0,0.2);
-    border-radius: 3px; 
+    border-radius: 3px;
 }
 .dropdown.body.popup.contacts-search .fm-dialog-footer {
-    border-top: none; 
+    border-top: none;
     padding: 12px 0 16px 0;
 }
 .dropdown.body.popup.bandwidth-info {
@@ -23045,7 +23045,7 @@ opacity: 1;
 }
 .investors-pdf-block:last-of-type {
     margin-bottom: 0;
-}  
+}
 .investors-pdf-block a {
     float: right;
     color: #eb4444;

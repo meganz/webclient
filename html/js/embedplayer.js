@@ -84,14 +84,13 @@ function init_embed(ph, key, time, g) {
             var timeoffset = 0;
             var $block = $('.sharefile-block');
             var $wrapper = $('.video-wrapper');
-            var $cntmnu = $('.files-menu.context');
             var url = getBaseUrl() + '/embed' + link;
             var embed = '<iframe src="%" width="640" height="360" frameborder="0" allowfullscreen></iframe>';
 
             $('.close-overlay, .sharefile-buttons .cancel', $block).rebind('click', function() {
                 playing = false;
                 $block.addClass('hidden');
-                $wrapper.removeClass('main-blur-block');
+                $wrapper.removeClass('share-option');
             });
 
             $('.sharefile-buttons .copy', $block).rebind('click', function() {
@@ -126,8 +125,7 @@ function init_embed(ph, key, time, g) {
             }
 
             $block.removeClass('hidden');
-            $wrapper.addClass('main-blur-block');
-            $cntmnu.addClass('hidden').removeClass('mobile-mode');
+            $wrapper.addClass('main-blur-block share-option');
         });
 
         watchdog.registerOverrider('login', function() {
@@ -227,29 +225,28 @@ function topmenuUI() {
         $('.dropdown-item.login-item').find('i').removeClass('hidden').end().find('.login-text').text(l[16345]);
     }
 
+    var $wrapper = $('.video-wrapper');
     $('body').rebind('click.bodyw', function() {
-        $('.files-menu.context').addClass('hidden');
+        if (!$wrapper.hasClass('share-option')) {
+            $wrapper.removeClass('main-blur-block');
+        }
+        $('.files-menu.context').addClass('hidden').removeClass('mobile-mode');
     });
 
     $('.moreoptions').rebind('click', function() {
         var $cm = $('.files-menu.context').removeClass('hidden');
-        var top = $('.viewer-top-bl').height();
-        var left = $cm.outerWidth();
-        var $wrapper = $('.video-wrapper');
-        
+
         if (is_mobile) {
             $cm.addClass('mobile-mode');
-            $wrapper.addClass('main-blur-block'); 
-            
-            $('.close-overlay .close-icon').rebind('click', function() {
-                $cm.removeClass('mobile-mode').addClass('hidden');
-                $wrapper.removeClass('main-blur-block');
-            });
-
-        } else {
-            $cm.css({'top': top, 'left': innerWidth - left - 4});
-            return false
+            $wrapper.addClass('main-blur-block');
         }
+        else {
+            var top = $('.viewer-top-bl').height();
+            var left = $cm.outerWidth();
+
+            $cm.css({'top': top, 'left': innerWidth - left - 4});
+        }
+        return false;
     });
 }
 

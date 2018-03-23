@@ -156,8 +156,10 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
                         if (backgroundNacl.workers._taggedTasks[tagName]) {
                             var tasks = backgroundNacl.workers._taggedTasks[tagName];
                             for (var i = tasks.length - 1; i >= 0; i--) {
-                                tasks[i].reject(0xDEAD);
-                                backgroundNacl.workers.filter(tasks[i].taskId);
+                                if (tasks[i]) {
+                                    backgroundNacl.workers.filter(tasks[i].taskId);
+                                    tasks[i].reject(0xDEAD);
+                                }
                             }
 
                             backgroundNacl.workers._taggedTasks[tagName] = [];

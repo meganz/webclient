@@ -3665,8 +3665,8 @@
         </div>
 
         <div class="viewer-image-bl" data-fullscreen="false" id="videoContainer">
-            <div class="img-wrap" data-count="" id="container">
-                <img alt="" class="img1" id="drag-img" />
+            <div class="img-wrap" data-count="">
+                <img alt="" class="img1" />
                 <img alt="" class="img2" />
             </div>
             <embed type="application/pdf" class="hidden">
@@ -3726,13 +3726,13 @@
 
         <div class="viewer-bottom-bl">
             <div class="viewer-short-controls img-controls">
-                <div class="viewer-button inline def-pad minus">
+                <div class="viewer-button inline def-pad minus" id="zoomout">
                     <i class="medium-icon icons-img minus"></i>
                 </div>
-                <div class="viewer-button-label zoom">
+                <div class="viewer-button-label zoom" data-perc="100">
                     100%
                 </div>
-                <div class="viewer-button inline def-pad plus">
+                <div class="viewer-button inline def-pad plus" id="zoomin">
                     <i class="medium-icon icons-img plus"></i>
                 </div>
                 <div class="viewer-button inline slideshow">

@@ -3,6 +3,7 @@ var preqs = Object.create(null);
 var pfails = Object.create(null);
 var slideshowid;
 var slideshowplay;
+var zoom_mode;
 
 (function _imageViewerSlideShow(global) {
     "use strict";
@@ -10,6 +11,8 @@ var slideshowplay;
     var fullScreenTimer = null;
     var mouseIdleTimer;
     var slideshowTimer;
+    var origImgWidth;
+    var origImgHeight;
 
     function slideshowsteps() {
         var $stepsBlock = $('.viewer-overlay .viewer-images-num');
@@ -261,14 +264,17 @@ var slideshowplay;
         }, 4000);
     }
 
-    // Init Slideshow viewer mode
-    function slideshowMode(close) {
+    // Inits Image viewer bottom control bar
+    function slideshow_imgControls(close) {
         var $overlay = $('.viewer-overlay');
         var $controls = $overlay.find('.viewer-slideshow-controls');
         var $startButton = $overlay.find('.viewer-button.slideshow');
         var $pauseButton = $overlay.find('.viewer-big-button.pause');
         var $prevButton = $overlay.find('.viewer-big-button.prev');
         var $nextButton = $overlay.find('.viewer-big-button.next');
+        var $zoomInButton = $overlay.find('.viewer-button.plus');
+        var $zoomOutButton = $overlay.find('.viewer-button.minus');
+        var $percLabel = $overlay.find('.viewer-button-label.zoom');
 
         if (close) {
             $overlay.removeClass('slideshow');
@@ -277,7 +283,7 @@ var slideshowplay;
             $pauseButton.find('i').removeClass('play').addClass('pause');
             clearInterval(slideshowTimer);
         }
-        
+
         var resetTimer = function() {
             clearInterval(slideshowTimer);
             slideshowTimer = setInterval(function() {
@@ -323,10 +329,160 @@ var slideshowplay;
             resetTimer();
         });
 
+        // Bind ZoomIn button
+        $zoomInButton.rebind('click', function() {
+            slideshow_zoom($overlay);
+        });
+
+        // Bind ZoomOut button
+        $zoomOutButton.rebind('click', function() {
+            slideshow_zoom($overlay, 1);
+        });
+
         // Bind Slideshow Close button
         $controls.find('.viewer-big-button.close').rebind('click', function() {
-            slideshowMode(1);
-        });  
+            slideshow_imgControls(1);
+        });
+    }
+
+    // Inits Pick and pan mode if image doesn't fit into the container
+    function slideshow_pickpan($overlay, close) {
+        var $imgWrap = $overlay.find('.img-wrap');
+        var $img = $imgWrap.find('img.active');
+        var wrapWidth = $imgWrap.outerWidth();
+        var wrapHeight = $imgWrap.outerHeight();
+        var imgWidth = $img.width();
+        var imgHeight = $img.height();
+        var dragStart = 0;
+        var lastPos = {x: null, y: null};
+
+        if (close) {
+            $imgWrap.unbind('mousedown.pickpan');
+            $imgWrap.unbind('mouseup.pickpan, mouseout.pickpan');
+            $imgWrap.unbind('mousemove.pickpan');
+            return false;
+        }
+
+        // Get cursor last position before dragging
+        $imgWrap.rebind('mousedown.pickpan', function(event) {
+            dragStart = 1;
+            lastPos = {x: event.pageX, y: event.pageY};
+            $(this).addClass('picked');
+        });
+
+        // Stop dragging
+        $imgWrap.rebind('mouseup.pickpan, mouseout.pickpan', function() {
+            dragStart = 0;
+            $(this).removeClass('picked');
+        });
+
+        // Drag image if it doesn't fit into the container
+        $imgWrap.rebind('mousemove.pickpan', function(event) {
+            if (dragStart == 1) {
+                var currentPos = {x: event.pageX, y: event.pageY};
+                var changeX = currentPos.x - lastPos.x;
+                var changeY = currentPos.y - lastPos.y;
+
+                /* Save mouse position */
+                lastPos = currentPos;
+
+                var imgTop = $img.position().top;
+                var imgLeft = $img.position().left;
+                var imgTopNew = imgTop + changeY;
+                var imgLeftNew = imgLeft + changeX;
+
+                // Check if top and left do not fall outside the image
+                if (wrapHeight >= imgHeight) {
+                    imgTopNew = (wrapHeight - imgHeight) / 2;
+                }
+                else if (imgTopNew > 0) {
+                    imgTopNew = 0;
+                }
+                else if (imgTopNew < (wrapHeight - imgHeight)) {
+                    imgTopNew = wrapHeight - imgHeight;
+                }
+                if (wrapWidth >= imgWidth) {
+                    imgLeftNew = (wrapWidth - imgWidth) / 2;
+                }
+                else if (imgLeftNew > 0) {
+                    imgLeftNew = 0;
+                }
+                else if (imgLeftNew < (wrapWidth - imgWidth)) {
+                    imgLeftNew = wrapWidth - imgWidth;
+                }
+
+                $img.css({
+                    'left': imgLeftNew + 'px',
+                    'top': imgTopNew + 'px'
+                });
+            }
+        });
+    }
+
+    // Zoom In/Out function
+    function slideshow_zoom($overlay, zoomout) {
+        var $img = $overlay.find('img.active');
+        var $percLabel = $overlay.find('.viewer-button-label.zoom');
+        var perc = Math.round(parseInt($percLabel.attr('data-perc')) / 10) * 10;
+        var newPerc = (perc + 10) / 100;
+        var newImgWidth;
+        var newImgHeight;
+
+        if (zoomout) {
+            newPerc = (perc - 10 > 0) ?  (perc - 10) / 100 : 0;
+        }
+
+        newImgWidth = origImgWidth * newPerc;
+        newImgHeight = origImgHeight * newPerc;
+
+        $img.css({
+            'width': newImgWidth,
+            'height': newImgHeight
+        });
+
+        zoom_mode = true;
+        $overlay.addClass('zoomed');
+
+        // Set zoom, position values and init pick and pan
+        slideshow_imgPosition($overlay);
+    }
+
+    // Sets zoom percents and image position
+    function slideshow_imgPosition($overlay) {
+        var $img = $overlay.find('img.active');
+        var $percLabel = $overlay.find('.viewer-button-label.zoom');
+        var viewerWidth = $overlay.width();
+        var viewerHeight = $overlay.height();
+        var imgWidth= $img.width();
+        var imgHeight = $img.height();
+        var perc = 0;
+        var leftPos = 0;
+        var topPos = 0;
+
+        // Set current img size percents
+        if (origImgWidth) {
+            perc = Math.round(imgWidth / origImgWidth * 100);
+            $percLabel.attr('data-perc' , perc).text(perc + '%');
+        }
+
+        // Quit if zoom mode is off
+        if (!zoom_mode) {
+            return false;
+        }
+
+        // Init pick and pan mode if Image larger its wrapper
+        if (imgWidth > viewerWidth || imgHeight > viewerHeight) {
+            slideshow_pickpan($overlay);
+        }
+        else {
+            slideshow_pickpan($overlay, 1);
+        }
+
+        // Set zoomed image position
+        $img.css({
+            'left': (viewerWidth - imgWidth) / 2,
+            'top': (viewerHeight - imgHeight) / 2
+        });
     }
 
     // Viewer Init
@@ -342,11 +498,14 @@ var slideshowplay;
         if (close) {
             slideshowid = false;
             slideshowplay = false;
-            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow')
+            zoom_mode = false;
+            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow zoomed')
                 .addClass('hidden');
+            $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
+            $(window).unbind('resize.imgResize');
             $document.unbind('keydown.slideshow mousemove.idle');
             $overlay.find('.viewer-image-bl .img-wrap').attr('data-count', '');
-            $overlay.find('.viewer-image-bl img').attr('src', '');
+            $overlay.find('.viewer-image-bl img').attr('src', '').removeAttr('style');
             if ($document.fullScreen()) {
                 document.exitFullscreen();
             }
@@ -379,10 +538,14 @@ var slideshowplay;
         if (!n) {
             return;
         }
+        
         slideshowid = n.h;
         $.selected = [n.h];
 
-       // Bind static events is viewer is not in slideshow mode
+        //Turn off pick and pan mode
+        slideshow_pickpan($overlay, 1);
+
+       // Bind static events is viewer is not in slideshow mode to avoid unnecessary rebinds
         if (!slideshowplay) {
             $overlay.removeClass('fullscreen mouse-idle slideshow');
 
@@ -399,7 +562,7 @@ var slideshowplay;
                         closeDialog($.dialog);
                     }
                     else if (slideshowplay) {
-                        slideshowMode(1);
+                        slideshow_imgControls(1);
                     }
                     else {
                         slideshow(slideshowid, true);
@@ -439,7 +602,9 @@ var slideshowplay;
             slideshow_fullscreen($overlay);
 
             // Slideshow Mode Init
-            slideshowMode();
+            if (!is_video(n)) {
+                slideshow_imgControls(); 
+            }
 
             // Autohide controls
             viewer_hidecontrols($overlay)
@@ -452,10 +617,12 @@ var slideshowplay;
                 });
             });
         }
-        
+
         // Favourite Icon
         slideshow_favourite(n, $overlay);
 
+        // Set file data
+        zoom_mode = false;
         $overlay.find('.viewer-filename').text(n.name);
         $overlay.find('.viewer-pending').removeClass('hidden');
         $overlay.find('.viewer-progress').addClass('hidden');
@@ -697,7 +864,7 @@ var slideshowplay;
             });
         });
 
-        $overlay.addClass('video');
+        $overlay.removeClass('zoomed').addClass('video');
         $overlay.find('video').removeClass('hidden');
         $overlay.find('.viewer-pending').addClass('hidden');
         // $overlay.find('.viewer-progress').addClass('hidden');
@@ -838,9 +1005,23 @@ var slideshowplay;
 
         var img = new Image();
         img.onload = function() {
-            $imgCount.find('img').removeClass('active');
+            origImgWidth = img.width;
+            origImgHeight = img.height;
+
+            // Apply img data to necessary image
+            $imgCount.find('img').removeClass('active').removeAttr('style');
             $imgCount.find('.' + imgClass).attr('src', this.src).addClass('active');
             $imgCount.attr('data-count', imgClass);
+
+            // Set position, zoom values
+            zoom_mode = false;
+            $overlay.removeClass('zoomed');
+            $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
+            slideshow_imgPosition($overlay);
+            $(window).rebind('resize.imgResize', function() {
+                slideshow_imgPosition($overlay);
+            });
+
             $overlay.find('.viewer-image-bl').removeClass('default-state');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');

@@ -269,7 +269,7 @@ var GenericConversationMessage = React.createClass({
 
         M.v = imagesList;
 
-        slideshow(v.h);
+        slideshow(v.h, undefined, true);
         if (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -472,12 +472,14 @@ var GenericConversationMessage = React.createClass({
                                     v.messageId = message.messageId;
                                     chatRoom.images.push(v);
                                 }
-                                var previewLabel = is_video(v) ? l[17732] : l[1899];
-                                previewButton = <span key="previewButton">
-                                    <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
-                                                              onClick={self._startPreview.bind(self, v)}/>
-                                    <hr/>
-                                </span>;
+                                if (is_image(v) || is_video(v)) {
+                                    var previewLabel = is_video(v) ? l[17732] : l[1899];
+                                    previewButton = <span key="previewButton">
+                                        <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
+                                                                  onClick={self._startPreview.bind(self, v)}/>
+                                        <hr/>
+                                    </span>;
+                                }
                             }
                             if (contact.u === u_handle) {
                                 dropdown = <ButtonsUI.Button
@@ -619,21 +621,24 @@ var GenericConversationMessage = React.createClass({
 
                                     v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
                                 }
+                                var previewable = is_image(v) || is_video(v);
+                                if (previewable) {
+                                    preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
+                                        <div className="img-overlay" onClick={self._startPreview.bind(self, v)}></div>
+                                        <div className="button overlay-button"
+                                                onClick={self._startPreview.bind(self, v)}>
+                                            <i className="huge-white-icon loupe"></i>
+                                        </div>
 
-                                preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
-                                    <div className="img-overlay" onClick={self._startPreview.bind(self, v)}></div>
-                                    <div className="button overlay-button" onClick={self._startPreview.bind(self, v)}>
-                                        <i className="huge-white-icon loupe"></i>
-                                    </div>
+                                        {dropdown}
 
-                                    {dropdown}
-
-                                    <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                         width="156"
-                                         height="156"
-                                         onClick={self._startPreview.bind(self, v)}
-                                    />
-                                </div>) :  preview);
+                                        <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
+                                             width="156"
+                                             height="156"
+                                             onClick={self._startPreview.bind(self, v)}
+                                        />
+                                    </div>) :  preview);
+                                }
                             }
                         }
 

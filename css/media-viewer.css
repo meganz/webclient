@@ -74,6 +74,9 @@
     vertical-align: top;
     display: inline-block;
 }
+.viewer-button.inline.hidden {
+    display: none;
+}
 .viewer-button span, .viewer-button-label {
     color: white;
     font-size: 16px;

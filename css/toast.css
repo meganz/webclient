@@ -50,14 +50,14 @@
     -webkit-border-radius: inherit;
     border-radius: inherit;
 }
-    .toast-notification.visible {
-        margin-bottom: 0;
-        filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-        -moz-opacity: 1;
-        -khtml-toast-notification: 1;
-        opacity: 1;
-        visibility: visible;
-    }
+.toast-notification.visible {
+    margin-bottom: 0;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-toast-notification: 1;
+    opacity: 1;
+    visibility: visible;
+}
 .toast-notification.second {
     margin-bottom: 64px;
     bottom: 16px;
@@ -209,6 +209,11 @@
 }
 .megasync-transfer.upload .toast-col:nth-child(1) span::before {
     background-position: -228px -1240px;
+}
+.megasync-transfer.sync .toast-col:nth-child(1) span::before {
+    background-position: -200px -351px;
+    width: 20px;
+    height: 20px;
 }
 .megasync-transfer .toast-col:nth-child(1) span {
     padding-right: 20px;

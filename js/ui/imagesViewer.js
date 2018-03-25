@@ -13,9 +13,18 @@ var zoom_mode;
     var slideshowTimer;
     var origImgWidth;
     var origImgHeight;
+    var _hideCounter = false;
 
     function slideshowsteps() {
-        var $stepsBlock = $('.viewer-overlay .viewer-images-num');
+        var $stepsBlock = $('.viewer-overlay').find('.viewer-images-num, .viewer-button.slideshow');
+
+        if (_hideCounter === true) {
+            $stepsBlock.addClass('hidden');
+        }
+        else {
+            $stepsBlock.removeClass('hidden');
+        }
+
         var forward = [];
         var backward = [];
         var ii = [];
@@ -36,7 +45,9 @@ var zoom_mode;
         // If there is at least 2 images
         if (len > 1) {
             var n = ii.indexOf(ci);
-            $stepsBlock.removeClass('hidden');
+            if (!_hideCounter) {
+                $stepsBlock.removeClass('hidden');
+            }
             switch (n) {
                 // last
                 case len - 1:
@@ -78,7 +89,7 @@ var zoom_mode;
         var steps = slideshowsteps();
         if (steps.forward.length > 0) {
             mBroadcaster.sendMessage('slideshow:next', steps);
-            slideshow(steps.forward[0]);
+            slideshow(steps.forward[0], undefined, _hideCounter);
         }
     }
 
@@ -97,7 +108,7 @@ var zoom_mode;
         var steps = slideshowsteps();
         if (steps.backward.length > 0) {
             mBroadcaster.sendMessage('slideshow:prev', steps);
-            slideshow(steps.backward[steps.backward.length - 1]);
+            slideshow(steps.backward[steps.backward.length - 1], undefined, _hideCounter);
         }
     }
 
@@ -265,7 +276,7 @@ var zoom_mode;
     }
 
     // Inits Image viewer bottom control bar
-    function slideshow_imgControls(close) {
+    function slideshow_imgControls(slideshow_stop) {
         var $overlay = $('.viewer-overlay');
         var $controls = $overlay.find('.viewer-slideshow-controls');
         var $startButton = $overlay.find('.viewer-button.slideshow');
@@ -276,7 +287,7 @@ var zoom_mode;
         var $zoomOutButton = $overlay.find('.viewer-button.minus');
         var $percLabel = $overlay.find('.viewer-button-label.zoom');
 
-        if (close) {
+        if (slideshow_stop) {
             $overlay.removeClass('slideshow');
             slideshowplay = false;
             $pauseButton.attr('data-state', 'pause');
@@ -486,10 +497,19 @@ var zoom_mode;
     }
 
     // Viewer Init
-    function slideshow(id, close) {
+    function slideshow(id, close, hideCounter) {
         var $overlay = $('.viewer-overlay');
         var $controls = $overlay.find('.viewer-top-bl, .viewer-bottom-bl, .viewer-slideshow-controls');
         var $document = $(document);
+
+        if (hideCounter) {
+            _hideCounter = true;
+        }
+        else {
+            _hideCounter = false;
+        }
+
+        $overlay.removeClass('fullscreen mouse-idle');
 
         if (d) {
             console.log('slideshow', id, close, slideshowid);
@@ -565,14 +585,14 @@ var zoom_mode;
                         slideshow_imgControls(1);
                     }
                     else {
-                        slideshow(slideshowid, true);
+                        slideshow(slideshowid, true, _hideCounter);
                     }
                 }
                 else if (e.keyCode === 8 || e.key === 'Backspace') {
                     // since Backspace event is processed with keydown at document level for cloudBrowser.
                     // i prefered that to process it here, instead of unbind the previous handler.
                     if (hashLogic || location.hash) {
-                        slideshow(slideshowid, 1);
+                        slideshow(slideshowid, 1, _hideCounter);
                     }
                     else {
                         history.back();
@@ -585,7 +605,7 @@ var zoom_mode;
             $overlay.find('.viewer-button.close,.viewer-error-close')
                 .rebind('click', function () {
                     if (hashLogic || location.hash) {
-                        slideshow(0, 1);
+                        slideshow(0, 1, _hideCounter);
                     }
                     else {
                         history.back();

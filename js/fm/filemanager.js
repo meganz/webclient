@@ -575,9 +575,12 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     var fmTabState;
+    var isMegaSyncTransfer = true;
     $('.nw-fm-left-icon').rebind('click', function() {
         treesearch = false;
-        var clickedClass = $(this).attr('class');
+        var mySelf = $(this);
+        var clickedClass = mySelf.attr('class');
+        
         if (!clickedClass) {
             return;
         }
@@ -594,6 +597,37 @@ FileManager.prototype.initFileManagerUI = function() {
                 'inbox':           {root: M.InboxID,   prev: null},
                 'rubbish-bin':     {root: M.RubbishID, prev: null}
             };
+        }
+
+        if ((ul_queue && ul_queue.length) || (dl_queue && dl_queue.length)) {
+            isMegaSyncTransfer = false;
+        }
+        if (clickedClass.indexOf('transfers') > -1) {
+            if (isMegaSyncTransfer) {
+                // if we need to check megaSync - true defualt
+                megasync.isInstalled(function (err, is) {
+                    if (!err || is) {
+                        if (megasync.currUser === u_handle) {
+                            megasync.transferManager();
+                            return;
+                        }
+                        else {
+                            isMegaSyncTransfer = false;
+                        }
+                    }
+                    else {
+                        isMegaSyncTransfer = false;
+                    }
+                    mySelf.click();
+                    
+                });
+                return false;
+            }
+            else {
+                // reset - to ckeck again next time
+                isMegaSyncTransfer = true;
+            }
+            
         }
 
         var activeClass = ('' + $('.nw-fm-left-icon.active:visible')
@@ -948,7 +982,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.download-item').rebind('click', function(event) {
         var c = $(event.target).attr('class');
-        if (c && c.indexOf('contains-submenu') > -1) {
+        if (c && (c.indexOf('contains-submenu') > -1 || c.indexOf('msync-found') > -1)) {
             M.addDownload($.selected);
         }
     });
@@ -961,6 +995,22 @@ FileManager.prototype.initContextUI = function() {
         M.addDownload($.selected, true);
     });
 
+
+    $(c + '.syncmegasync-item').rebind('click', function () {
+        //M.addDownload($.selected, true);
+        megasync.isInstalled(function (err, is) {
+            if (!err || is) {
+                if (megasync.currUser === u_handle) {
+                    // i know the selection is 1 item [otherwise option in menu wont be visible]
+                    megasync.syncFolder($.selected[0]);
+                }
+            }
+                // no need to do anything, something wierd happened, next time
+                // the option wont be visible.
+        });
+        $.hideContextMenu();
+    });
+
     $(c + '.getlink-item').rebind('click', function() {
         // ToDo: Selected can be more than one folder $.selected
         // Avoid multiple referencing $.selected instead use event
@@ -970,19 +1020,20 @@ FileManager.prototype.initContextUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var count = mega.megadrop.isDropExist($.selected[0], true);
-            if (count) {
-                var fldName = count > 1
-                    ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
-                    : l[17403].replace('%1', escapeHTML(M.d[$.selected[0]].name));
+            var mdList = mega.megadrop.isDropExist($.selected);
+            if (mdList.length) {
+                var fldName = mdList.length > 1
+                    ? l[17626]
+                    : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
                 msgDialog(
                     'confirmation',
                     l[1003],
                     fldName,
                     false, function(e) {
                     if (e) {
-                        var list = mega.megadrop.getDropList();
-                        mega.megadrop.pufRemove(list, $.selected, mega.Share.initCopyrightsDialog);
+                        mega.megadrop.pufRemove(mdList).always(function() {
+                            mega.Share.initCopyrightsDialog($.selected);
+                        });
                     }
                 });
             }
@@ -1046,19 +1097,20 @@ FileManager.prototype.initContextUI = function() {
             return $dialog;
         };
 
-        var count = mega.megadrop.isDropExist($.selected[0], true);
-        if (count) {
-            var fldName = count > 1
-                ? 'Multiple MEGAdrop will be cancelled...'// l[17626]
-                : l[17403].replace('%1', escapeHTML(M.d[$.selected[0]].name));
+        var mdList = mega.megadrop.isDropExist($.selected);
+        if (mdList.length) {
+            var fldName = mdList.length > 1
+                ? l[17626]
+                : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
             msgDialog(
                 'confirmation',
                 l[1003],
                 fldName,
                 false, function(e) {
                 if (e) {
-                    var list = mega.megadrop.getDropList();
-                    mega.megadrop.pufRemove(list, $.selected, M.safeShowDialog, 'share', showShareDlg);
+                    mega.megadrop.pufRemove(mdList).always(function() {
+                        M.safeShowDialog('share', showShareDlg);
+                    });
                 }
             });
         }

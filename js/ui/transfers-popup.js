@@ -582,10 +582,6 @@ mega.ui.tpp = function () {
         // Cached
         opts.dlg.cached = true;
 
-        // Close button, Ongoing Transfers Popup Dialog
-        $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
-            opts.dlg.$.hide(opts.duration);
-        });
         // add event listener for click on tpp
         opts.dlg.$.rebind('click.tppOn', function () {
             M.openFolder('transfers', true);

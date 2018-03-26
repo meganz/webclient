@@ -619,6 +619,17 @@
         <div class="clear"></div>
     </div>
 
+    <!-- Share link & Embed Tab link -->
+    <div class="fm-dialog-tab">
+        <div class="fm-tab-wrapper">
+            <div class="fm-tab tab-url-link active">
+                <span>[$5622]</span>
+            </div>
+            <div class="fm-tab tab-embed-link">
+                <span>[$17407]</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Please add "expiry-date" class to show new features. Please add "pro-only" class for free accounts !-->
     <div class="export-content-block">
@@ -687,11 +698,82 @@
         </div>
         <div id="export-link-body" class="export-link-body"></div>
     </div>
+
+    <!-- Embed code block - Hidden unless it is selected from the context menu via Embed video or when the tab is selected -->
+    <div class="embed-content-block hidden">
+        <div class="wrapper embed-video hidden">
+            <div class="video-thumbnail-container">
+                <!-- Render video thumnail here. Display using 16:9 ratio, if you can't display normally and the video should centre itself -->
+                <div class="video-thumbnail">
+                    <div class="">
+                    </div>
+                </div>
+                <div class="file-information-container">
+                    <div class="video-filename">
+                        <span>This is the file name of the file</span>
+                    </div>
+                    <div class="video-attributes">
+                        <span class="">236 MB</span><span class="bullet-point"></span><span class="">04:30</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Insert iframe here. If the user enables any of the features hide the container `video-thumbnail-container and remove hidden from video-player-container -->
+            <div class="video-player-container hidden">
+                <iframe width="640" height="360" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="wrapper embed-code-container">
+            <div class="code-field">
+                <div class="tab-icon embed"></div><span class=""></span>
+            </div>
+            <div class="fm-subheading">
+                <span>Embed Settings</span>
+            </div>
+            <div class="settings-container">
+                <div class="settings-row">
+                    <div class="start-video-at">
+                        <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" name="" id="" class="checkboxOff" checked="">
+                        </div>
+                        <label for="" class="radio-txt">Start video at</label>
+                        <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                         <div class="embed-setting disabled">
+                        <div class="start-at-time"><input type="text" value="00:00" id=""></div>
+                         </div>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div class="change-video-resolution">
+                        <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" name="" id="" class="checkboxOff" checked="">
+                        </div>
+                        <label for="" class="radio-txt">Change video resolution</label>
+                        <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                        <div class="embed-setting disabled">
+                            <div class="video-resolution width-video">
+                                <input type="text" value="640px" id="">
+                            </div>
+                            <span class="video-resolution-by">by</span> 
+                            <div class="video-resolution height-video">
+                                <input type="text" value="360px" id=""> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="fm-notifications-bottom">
         <div class="export-description hidden">
             [$7682]
         </div>
-        <div class="default-white-button right links-button copy-to-clipboard" id="clipboardbtn1">
+        <!-- Preview video should only be visible when the embed video tab is selected -->
+        <div class="default-white-button left preview-embed">
+            <span>Preview video</span>
+        </div>
+        <div class="default-grey-button right links-button copy-to-clipboard" id="clipboardbtn1">
             <span></span>
         </div>
         <div class="clear"></div>
@@ -4405,125 +4487,6 @@
         <hr>
         <div class="drag-n-drop info-block">
             <i></i><span>[$16560]</span>
-        </div>
-    </div>
-</div>
-
-<!-- Export Embed players in Cloud drive -->
-<!-- Add preview-embed-player class to the fm-dialog to show the iframe of the video within the dialog-->
-<div class="fm-dialog export-embed-player">
-   <div class="fm-dialog-header">
-        <div class="fm-dialog-title">Export embed player</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-    <div class="fm-dialog-body">
-        <div class="wrapper embed-video">
-            <div class="video-thumbnail-container">
-                <!-- Render video thumbnail here. Display using 16:9 ratio, if you can't display normally and the video should centre itself-->
-                <div class="video-thumbnail">
-                    <div class="play-icon">
-                    </div>
-                </div>
-            </div>
-            <div class="file-information-container">
-                <div class="video-filename">
-                    <span>This is the file name of the file</span>
-                </div>
-                <div class="video-attributes">
-                    <span class="">236 MB</span><span class="bullet-point"></span><span class="">04:30</span>
-                </div>
-            </div>
-            <!-- Hide and show hidden class when user switches between preview and non preview-->
-            <div class="video-player-container">
-                <iframe width="640" height="360" frameborder="0" allowfullscreen></iframe>
-            </div>
-        </div>
-        <div class="wrapper link-code-container">
-            <div class="link-code-field">
-                <span class=""></span>
-            </div>
-            <div class="embed-information-container">
-                <div class="">This video will be embedded at 640px wide
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="fm-notifications-bottom">
-            <div class="default-widget-buttons">
-                <div class="fm-dialog-new-folder-button default-grey-button right"><span>Copy</span></div>
-                <div class="fm-dialog-new-folder-button default-white-button left"><span>Preview</span></div>
-                <div class="fm-dialog-new-folder-button default-white-button left"><span>Get link</span></div>
-            </div>
-        </div>
-</div>
-
-<!-- Share file via downloadpage -->
-<!-- Add preview-embed-player class to the fm-dialog to show the iframe of the video within the dialog-->
-<div class="fm-dialog share-dialog-dl-page">
-   <div class="fm-dialog-header">
-        <div class="fm-dialog-title">Share file</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-     <!-- URL & Embed Tab link -->
-    <div class="fm-dialog-tab">
-        <div class="fm-tab-wrapper">
-            <div class="fm-tab tab-url-link active">
-                <span>[$5622]</span>
-            </div>
-            <div class="fm-tab tab-embed-link">
-                <span>[$17407]</span>
-            </div>
-        </div>
-    </div>
-    <div class="fm-dialog-body">
-        <div class="wrapper embed-video">
-            <div class="video-thumbnail-container">
-                <!-- Render video thumnail here. Display using 16:9 ratio, if you can't display normally and the video should centre itself-->
-                <div class="video-thumbnail">
-                    <div class="play-icon">
-                    </div>
-                </div>
-            </div>
-            <div class="file-information-container">
-                <div class="video-filename">
-                    <span>This is the file name of the file</span>
-                </div>
-                <div class="video-attributes">
-                    <span class="">236 MB</span><span class="bullet-point"></span><span class="">04:30</span>
-                </div>
-            </div>
-            <!-- Hide and show hidden class when user switches between preview and non preview-->
-            <div class="video-player-container">
-                <iframe width="640" height="360" frameborder="0" allowfullscreen></iframe>
-            </div>
-        </div>
-        <div class="wrapper link-code-container">
-            <div class="link-code-field">
-                <!-- Toggle between the URL and Embed icon by toggling the classes url & embed in tab-icon -->
-                <div class="tab-icon url"></div><span class=""></span>
-            </div>
-            <div class="settings-container">
-                <div class="settings-row">
-                    <div class="checkbox-item">
-                        <div class="checkdiv checkboxOff">
-                            <input type="checkbox" name="" id="" class="checkboxOff" checked="">
-                        </div>
-                        <label for="transfers-tooltip" class="radio-txt">Start video at</label><div class="start-at-time"><input type="text" value="time" id=""></div>
-                    </div>
-                </div>
-            </div>
-            <div class="information-container hidden">
-                <div class="">This video will be embedded at 640px wide
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="default-widget-buttons">
-            <div class="fm-dialog-new-folder-button default-grey-button right"><span>Copy</span></div>
-            <div class="fm-dialog-new-folder-button default-white-button left"><span>Preview</span></div>
         </div>
     </div>
 </div>

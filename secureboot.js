@@ -51,7 +51,7 @@ var is_embed = location.pathname === '/embed' || getCleanSitePath().substr(0, 2)
  * @returns {Boolean}
  */
 function isMobile() {
-   
+
     // If extension, not applicable
     if (is_extension) {
         return false;
@@ -446,7 +446,7 @@ var mega = {
     flags: 0,
     utils: {},
     updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt',
-    chrome: typeof window.chrome === 'object' && window.chrome.webstore !== undefined,
+    chrome: typeof window.chrome === 'object' && String(window.webkitRTCPeerConnection).indexOf('native') > 0,
     browserBrand: [
         0, 'Torch', 'Epic'
     ],

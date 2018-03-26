@@ -9043,16 +9043,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .read .notification-status-icon:hover .notification-status {
     background-color: rgba(0,0,0,0.4);
 }
-.fm-dialog-chrome-clipboard {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-}
-.fm-dialog-chrome-clipboard div {
-    height: 20px;
-    opacity: 0.01;
-    width: 10px;
-}
 .fm-dialog-close, .btn-close-dialog, .export-links-warning-close {
     cursor: pointer;
     height: 30px;

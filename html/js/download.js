@@ -420,6 +420,11 @@ function dl_g(res) {
 
             $('.mid-button.to-clouddrive, .big-button.to-clouddrive').rebind('click', start_import);
 
+            $('.share-content-button').rebind('click', function() {
+                copyToClipboard(getBaseUrl() + '#!' + dlpage_ph + '!' + dlpage_key, l[1642]);
+                return false;
+            });
+
             var $fileinfoBlock = $('.download.file-info');
 
             $fileinfoBlock.find('.big-txt').attr('title', filename);

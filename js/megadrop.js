@@ -55,30 +55,6 @@ mega.megadrop = (function() {
     };
 
     /**
-     * Copy to clipboard
-     * Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
-     * @param {String} value Value to copy, URL or HTML embeddable code
-     * @param {Integer} index Index of DOM element
-     * @return {Boolean} true/false Returns false if the command is not supported or enabled
-     */
-    var _clipboardCopy = function clipboardCopy(value, index) {
-        var id = 'chromeclipboard' + index;
-        var success = false;
-
-        $('#' + id).text(value);
-        selectText(id);
-
-        try {
-            success = document.execCommand('copy');
-        }
-        catch (e) {
-            console.error(e);
-        }
-
-        return success;
-    };
-
-    /**
      * Search for MEGAdrop's in folder tree starting from selected node
      * @param {String} selected Selected folder/s node handle
      * @returns {Array} List of items
@@ -1134,7 +1110,6 @@ mega.megadrop = (function() {
 
             $domElem.attr('id', 'ew_' + handle);
             $domElem.removeClass('hidden');
-            $domElem.find('.fm-dialog-chrome-clipboard div').attr('id', 'chromeclipboard3');
             $domElem.find('.widget-location-url').attr('data-node', nodeHandle);
             $domElem.find('.widget-card-left span').text(name);
             $domElem.find('.widget-location-url span').text(path);
@@ -1234,39 +1209,13 @@ mega.megadrop = (function() {
             });
 
             // Widget expanded copy link
-            $('.widget-container').on('click.WS_copyUrl', '.url-link .copy-widget-dialog.button', function () {
-                var toastText = l[17619];
-                var success = false;
-
-                // If extension, use the native extension method
-                if (is_chrome_firefox) {
-                    mozSetClipboard(settingsOpts.card.url);
-                }
-                else {
-                    success = _clipboardCopy(settingsOpts.card.url, 3);
-                }
-
-                if (success) {
-                    showToast('clipboard', toastText);
-                }
+            $('.widget-container').on('click.WS_copyUrl', '.url-link .copy-widget-dialog.button', function() {
+                copyToClipboard(settingsOpts.card.url, l[17619]);
             });
 
             // Widget expanded copy source code
-            $('.widget-container').on('click.WS_copyCode', '.embed-link .copy-widget-dialog.button', function () {
-                var toastText = l[17620];
-                var success = false;
-
-                // If extension, use the native extension method
-                if (is_chrome_firefox) {
-                    mozSetClipboard(settingsOpts.card.code);
-                }
-                else {
-                    success = _clipboardCopy(settingsOpts.card.code, 3);
-                }
-
-                if (success) {
-                    showToast('clipboard', toastText);
-                }
+            $('.widget-container').on('click.WS_copyCode', '.embed-link .copy-widget-dialog.button', function() {
+                copyToClipboard(settingsOpts.card.code, l[17620]);
             });
 
             // Widget expanded  Preview upload page
@@ -1492,7 +1441,6 @@ mega.megadrop = (function() {
                 uiOpts.dlg.widget.class + ' .fm-dialog-close',
                 uiOpts.dlg.widget.class + ' .close-button'
             ]).rebind('click.WD_close', function () {
-                uiOpts.dlg.widget.$.clipboard.addClass('hidden');
                 closeDialog();
             });
 
@@ -1515,40 +1463,14 @@ mega.megadrop = (function() {
 
             // Widget dialog copy url
             // NOTE: document.execCommand('copy') calls must take place as a direct result of a user action
-            $(uiOpts.dlg.widget.class + ' .copy-widget-code').rebind('click.WD_copy_code', function () {
-                var toastText = l[17620];
-                var success = false;
-
-                // If extension, use the native extension method
-                if (is_chrome_firefox) {
-                    mozSetClipboard(uiOpts.dlg.widget.code);
-                }
-                else {
-                    success = _clipboardCopy(uiOpts.dlg.widget.code, 2);
-                }
-
-                if (success) {
-                    showToast('clipboard', toastText);
-                }
+            $(uiOpts.dlg.widget.class + ' .copy-widget-code').rebind('click.WD_copy_code', function() {
+                copyToClipboard(uiOpts.dlg.widget.code, l[17620]);
             });
 
             // Widget dialog copy source code
             // NOTE: document.execCommand('copy') calls must take place as a direct result of a user action
-            $(uiOpts.dlg.widget.class + ' .copy-widget-url').rebind('click.WD_copy_url', function () {
-                var toastText = l[17619];
-                var success = false;
-
-                // If extension, use the native extension method
-                if (is_chrome_firefox) {
-                    mozSetClipboard(uiOpts.dlg.widget.url);
-                }
-                else {
-                    success = _clipboardCopy(uiOpts.dlg.widget.url, 2);
-                }
-
-                if (success) {
-                    showToast('clipboard', toastText);
-                }
+            $(uiOpts.dlg.widget.class + ' .copy-widget-url').rebind('click.WD_copy_url', function() {
+                copyToClipboard(uiOpts.dlg.widget.url, l[17619]);
             });
 
             // Dialog Preview upload page
@@ -1573,7 +1495,6 @@ mega.megadrop = (function() {
             // Widget Dialog
             uiOpts.dlg.widget.$ = $(uiOpts.dlg.widget.class);
             uiOpts.dlg.widget.$.title = uiOpts.dlg.widget.$.find('.fm-dialog-title');
-            uiOpts.dlg.widget.$.clipboard = uiOpts.dlg.widget.$.find('.fm-dialog-chrome-clipboard');
             uiOpts.dlg.widget.$.closeButton = uiOpts.dlg.widget.$.find('.close-button');
             uiOpts.dlg.widget.$.url = uiOpts.dlg.widget.$.find('.widget-url');
             uiOpts.dlg.widget.$.code = uiOpts.dlg.widget.$.find('.embed-link .widget-code');
@@ -1664,7 +1585,6 @@ mega.megadrop = (function() {
             if (puf.items[handle] && puf.items[handle].p) {
                 _widgetDlgContent(handle);
                 M.safeShowDialog('megadrop-dialog', uiOpts.dlg.widget.$[0]);
-                uiOpts.dlg.widget.$.clipboard.removeClass('hidden');
             }
             loadingDialog.hide();
         };

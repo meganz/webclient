@@ -95,7 +95,7 @@ var SharedLocalKVStorage = function(name, manualFlush, broadcaster) {
  * when running in realworld cases to a bit higher value.
  */
 SharedLocalKVStorage.DEFAULT_QUERY_TIMEOUT = (
-    window.chrome ? 10000 : 1000
+    mega.chrome ? 10000 : 1000
 );
 
 SharedLocalKVStorage._replyToQuery = function(watchdog, token, query, value) {

@@ -235,7 +235,7 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
         + encodeURIComponent(ab_to_str(ab).replace(/foreignObject|script/g, 'desc'));
 });
 
-if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
+if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
     delete mThumbHandler.sup.SVG;
 }
 
@@ -700,7 +700,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 var hint = error.message || error;
                 info.push(String(hint || 'na'));
 
-                if (!hint && !window.chrome) {
+                if (!hint && !mega.chrome) {
                     // Suggest Chrome...
                     hint = l[16151] + ' ' + l[242];
                 }
@@ -1795,7 +1795,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                         audiocodec = swap[audiocodec] || audiocodec;
                     }
                     var amime = 'audio/mp4; codecs="' + audiocodec + '"';
-                    if (window.chrome && audiocodec === 'mp3') {
+                    if (mega.chrome && audiocodec === 'mp3') {
                         amime = 'audio/mpeg';
                     }
                     return MediaSource.isTypeSupported(amime) ? 2 : 0;
@@ -1803,7 +1803,7 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                 break;
 
             case 'WebM':
-                switch (window.chrome && videocodec) {
+                switch (mega.chrome && videocodec) {
                     case 'V_VP8':
                     case 'V_VP9':
                         var codec = videocodec.substr(2).toLowerCase();

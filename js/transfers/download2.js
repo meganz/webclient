@@ -50,6 +50,7 @@ var dlmanager = {
     // How many queue IO we want before pausing the XHR fetching,
     // useful when we have internet faster than our IO
     ioThrottleLimit: 6,
+    isOverQuota : false,
     ioThrottlePaused: false,
     fetchingFile: false,
     dlLastQuotaWarning: 0,
@@ -1770,7 +1771,7 @@ var dlmanager = {
      * @return {MegaPromise}
      */
     isMEGAsyncRunning: function(minVersion, getVersionInfo) {
-        var timeout = 200;
+        var timeout = 400;
         var logger = this.logger;
         var promise = new MegaPromise();
 
@@ -1858,7 +1859,7 @@ var dlmanager = {
         else if (window.safari) {
             $elm.addClass('safari');
         }
-        else if (window.chrome) {
+        else if (mega.chrome) {
             $elm.addClass('chrome');
         }
         else if (window.opr) {
@@ -1881,7 +1882,7 @@ var dlmanager = {
                 text = l[1676] + ': ' + message + '<br/>' + l[16870] + ' %2';
             }
 
-            if (window.chrome) {
+            if (mega.chrome) {
                 if (window.Incognito) {
                     text = text.replace('%2', '(' + l[16869] + ')');
                 }
@@ -1946,7 +1947,7 @@ var dlmanager = {
     showMEGASyncOverlay: function(onSizeExceed, dlStateError) {
         'use strict';
 
-        M.require('megasync_js').dump();
+        //M.require('megasync_js').dump();
 
         var $overlay = $('.megasync-overlay');
         var $body = $('body');
@@ -2081,6 +2082,9 @@ function fm_tfspause(gid, overquota) {
         }
         else {
             dlQueue.pause(gid);
+        }
+        if (typeof overquota === 'undefined') {
+            overquota = dlmanager.isOverQuota;
         }
 
         if (page === 'download') {

@@ -878,6 +878,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
             };
 
             if (t !== M.RubbishID) {
+                mega.megadrop.preMoveCheck(n, t).done(function(n, t) {
                 fileconflict.check(n, t, 'move')
                     .always(function (files) {
                         if (!quiet) { // closing conflict dialogs is hiding the loading
@@ -925,6 +926,9 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                             promise.resolve();
                         }
                     });
+                }).fail(function() {
+                    loadingDialog.hide();
+                });
             }
             else {
                 foreach(n);

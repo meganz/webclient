@@ -202,6 +202,9 @@ MegaUtils.prototype.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
     method = options.method || (aData && 'POST') || 'GET';
 
     xhr = getxhr();
+    if (options.timeout) {
+        xhr.timeout = options.timeout;
+    }
 
     if (typeof options.prepare === 'function') {
         options.prepare(xhr);
@@ -461,6 +464,8 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
         var lang = localStorage.lang;
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
+        var cdlogger = debug && localStorage.chatdLogger;
+
 
         localStorage.clear();
         sessionStorage.clear();
@@ -485,6 +490,10 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
             if (apipath) {
                 // restore api path across reloads, only for debugging purposes...
                 localStorage.apipath = apipath;
+            }
+
+            if (cdlogger) {
+                localStorage.chatdLogger = 1;
             }
         }
 
@@ -527,6 +536,17 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                     ) {
                         waitingPromises.push(
                             megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
+                        );
+                    }
+                    else if (
+                        typeof(megaChat) !== 'undefined' &&
+                        megaChat.plugins.chatdIntegration &&
+                        !megaChat.plugins.chatdIntegration.chatd.chatdPersist &&
+                        typeof(ChatdPersist) !== 'undefined'
+                    ) {
+                        // chatdPersist was disabled, potential crash, try to delete the db manually
+                        waitingPromises.push(
+                            ChatdPersist.forceDrop()
                         );
                     }
 
@@ -1068,7 +1088,7 @@ MegaUtils.prototype.getSiteVersion = function() {
 
         // If an extension use the version of that (because sometimes there are independent deployments of extensions)
         if (is_extension) {
-            version = (window.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
+            version = (mega.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
         }
     }
 
@@ -1120,7 +1140,7 @@ MegaUtils.prototype.zoomLevelNotification = function() {
     }
 
     // Chrome specific broken layout tested on versions <= 62
-    if (window.chrome && dpr === 2.200000047683716 || dpr === 1.100000023841858
+    if (mega.chrome && dpr === 2.200000047683716 || dpr === 1.100000023841858
         || dpr === 1.3320000171661377 || dpr === 0.6660000085830688 || dpr === 0.3330000042915344) {
 
         $('.nw-dark-overlay').removeClass('mac');

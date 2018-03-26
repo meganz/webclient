@@ -313,7 +313,7 @@ function init_page() {
 
     // If on the plugin page, show the page with the relevant extension for their current browser
     if (page == 'plugin') {
-        page = (window.chrome) ? 'chrome' : 'firefox';
+        page = (mega.chrome) ? 'chrome' : 'firefox';
     }
 
     if (localStorage.signupcode && u_type !== false) {
@@ -974,14 +974,60 @@ function init_page() {
                 });
         }
     }
+
+    // Initial recovery process page to choose whether to recover with Master/Recovery Key or park the account
     else if (page === 'recovery') {
-        parsepage(pages['recovery']);
-        var accountRecovery = new mega.AccountRecovery();
-        accountRecovery.initRecovery();
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.recovery.init();
+        }
+        else {
+            parsepage(pages['recovery']);
+            var accountRecovery = new mega.AccountRecovery();
+            accountRecovery.initRecovery();
+        }
     }
-    else if (page.substr(0, 7) == 'recover' && page.length > 25) {
-        parsepage(pages['reset']);
-        init_reset();
+
+    // Page for mobile to let them recover by Master/Recovery Key
+    else if (is_mobile && page === 'recoverybykey') {
+        parsepage(pages['mobile']);
+        mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_KEY);
+    }
+
+    // Page for mobile to let them park their account (start a new account with the same email)
+    else if (is_mobile && page === 'recoverybypark') {
+        parsepage(pages['mobile']);
+        mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_PARK);
+    }
+
+    // Code for handling the return from a #recover email link
+    else if (page.substr(0, 7) === 'recover' && page.length > 25) {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.recovery.fromEmailLink.init();
+        }
+        else {
+            parsepage(pages['reset']);
+            init_reset();
+        }
+    }
+
+    // Page for mobile to enter (or upload) their Master/Recovery Key
+    else if (is_mobile && page === 'recoveryenterkey') {
+        parsepage(pages['mobile']);
+        mobile.recovery.enterKey.init();
+    }
+
+    // Page for mobile to let them change their password after they have entered their Master/Recovery key
+    else if (is_mobile && page === 'recoverykeychangepass') {
+        parsepage(pages['mobile']);
+        mobile.recovery.changePassword.init('key');
+    }
+
+    // Page for mobile to let the user change their password and finish parking their account
+    else if (is_mobile && page === 'recoveryparkchangepass') {
+        parsepage(pages['mobile']);
+        mobile.recovery.changePassword.init('park');
     }
     else if (page == 'sdkterms') {
         parsepage(pages['sdkterms']);

@@ -586,6 +586,10 @@ mega.ui.tpp = function () {
         $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
             opts.dlg.$.hide(opts.duration);
         });
+        // add event listener for click on tpp
+        opts.dlg.$.rebind('click.tppOn', function () {
+            M.openFolder('transfers', true);
+        });
     });
 
     mBroadcaster.addListener('fmconfig:tpp', function(value) {

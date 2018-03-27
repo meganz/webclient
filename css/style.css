@@ -1080,6 +1080,9 @@ a.account-manage-button:hover {
     text-overflow: ellipsis;
     overflow: hidden;
 }
+body.kr .chart.data .of-txt, .chart.data .pecents-txt, .chart.data .gb-txt {
+    font-size: 13px;
+}
 .chart.data .perc-txt {
     font-size: 34px;
     line-height: 40px;
@@ -1118,6 +1121,9 @@ a.account-manage-button:hover {
     font-size: 18px;
     line-height: 26px;
     color: #333333;
+}
+body.kr .chart.data .size-txt {
+    font-size: 17px;
 }
 .chart.icon {
     position: absolute;

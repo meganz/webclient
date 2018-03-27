@@ -1813,6 +1813,9 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
 
 ChatdIntegration.prototype.broadcast = function(chatRoom, broadCastCode) {
     var self = this;
+    if (!chatRoom.chatId) {
+        return;
+    }
     var rawChatId = base64urldecode(chatRoom.chatId);
     return self.chatd.broadcast(rawChatId, broadCastCode);
 };

@@ -7,12 +7,12 @@
 mobile.recovery.sendEmail = {
 
     /**
-     * @type Number RECOVERY_TYPE_KEY Recovering with the Master/Recovery Key
+     * @property {Number} RECOVERY_TYPE_KEY Recovering with the Master/Recovery Key
      */
     RECOVERY_TYPE_KEY: 9,
 
     /**
-     * @type Number RECOVERY_TYPE_PARK Recovering by parking the user's account and reclaiming the email
+     * @property {Number} RECOVERY_TYPE_PARK Recovering by parking the user's account and reclaiming the email
      */
     RECOVERY_TYPE_PARK: 10,
 

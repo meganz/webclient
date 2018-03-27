@@ -6,7 +6,7 @@
 mobile.recovery.enterKey = {
 
     /**
-     * @type {Array} recoveryKeyArray The recovery key converted from Base64 to 32 Byte signed array
+     * @property {Array} recoveryKeyArray The recovery key converted from Base64 to 32 Byte signed array
      */
     recoveryKeyArray: null,
 

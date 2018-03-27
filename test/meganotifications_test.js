@@ -56,8 +56,10 @@ describe("MegaNotifications Unit Test", function() {
                     'icon': 'type1 icon',
                     'body': 'type1 body'
                 }
-            }
+            },
+            showFaviconCounter: true
         });
+
         megaNotifications.bind("onNotificationCreated", function(e, n) {
             sinon.spy(n, '_showDesktopNotification', n._showDesktopNotification);
         });

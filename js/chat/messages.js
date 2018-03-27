@@ -1161,7 +1161,13 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.addChangeListener(function() {
         var newCounter = 0;
         self.messages.forEach(function(v, k) {
-            if (v.getState && v.getState() === Message.STATE.NOT_SEEN && !v.deleted && v.textContents !== "") {
+            if (
+                v.getState &&
+                v.getState() === Message.STATE.NOT_SEEN &&
+                !v.deleted &&
+                v.textContents !== "" &&
+                v.textContents /* not false-based value */
+            ) {
                 var shouldRender = true;
                 if (
                     (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) ||

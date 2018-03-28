@@ -402,7 +402,7 @@ function init_page() {
                 return;
             }
 
-            if (fminitialized && !folderlink) {
+            if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
                 // Clean up internal state in case we're navigating back to a folderlink
                 M.currentdirid = M.RootID = undefined;
                 delete $.onImportCopyNodes;

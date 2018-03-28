@@ -1366,6 +1366,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     if (msgObject.pendingMessageId) {
                                         mb.messages.remove(msgObject.pendingMessageId);
                                     }
+                                    msg.source = Message.SOURCE.CHATD;
                                     mb.messages.push(msg);
                                     self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                                 }

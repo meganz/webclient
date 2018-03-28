@@ -505,7 +505,9 @@ function contactAddDialog() {
 
         // Show
         else {
-            $('.add-user-popup .add-user-textarea textarea').val('');
+            var $textarea = $('.add-user-popup .add-user-textarea textarea');
+
+            $textarea.val('');
             $('.add-user-popup .import-contacts-dialog').fadeOut(0);
             $('.import-contacts-link').removeClass('active');
             clearScrollPanel('.add-user-popup');
@@ -518,7 +520,7 @@ function contactAddDialog() {
 
             topPopupAlign(this, '.add-user-popup');
 
-            initTextareaScrolling($('.add-user-textarea textarea'), 39);
+            initTextareaScrolling($textarea, 39);
             $('.add-user-popup .token-input-input-token-mega input').focus();
             focusOnInput();
         }
@@ -998,15 +1000,28 @@ function fm_showoverlay() {
  * Looking for a already existing name of URL (M.v)
  * @param {Integer} nodeType file:0 folder:1
  * @param {String} value New file/folder name
+ * @param {String} target {optional}Target handle to check the duplication inside. if not provided M.v will be used
  */
-function duplicated(nodeType, value) {
+function duplicated(nodeType, value, target) {
     "use strict";
+    if (!target) {
+        var items = M.v.filter(function (item) {
+            return item.name === value && item.t === nodeType;
+        });
 
-    var items = M.v.filter(function(item) {
-        return item.name === value && item.t === nodeType;
-    });
-
-    return items.length !== 0;
+        return items.length !== 0;
+    }
+    else {
+        if (M.c[target]) {
+            // Check if a folder/file with the same name already exists.
+            for (var handle in M.c[target]) {
+                if (M.d[handle] && M.d[handle].t === nodeType && M.d[handle].name === value) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
 
 function renameDialog() {
@@ -2222,6 +2237,12 @@ function closeDialog(ev) {
         $('.fm-dialog').addClass('arrange-to-back');
         $('.fm-dialog.' + $.dialog + '-dialog').removeClass('arrange-to-back');
     }
+    if ($.copyDialogContactsChangeToken) {
+        // a listner for contacts changes is added at copy dialog
+        // we need to remove it on dialog close
+        M.u.removeChangeListener($.copyDialogContactsChangeToken);
+        $.copyDialogContactsChangeToken = 0;
+    }
 
     mBroadcaster.sendMessage('closedialog');
 }
@@ -2250,7 +2271,11 @@ function createFolderDialog(close) {
             return;
         }
         else {
-            if (duplicated(1, v)) {
+            var specifyTarget = null;
+            if ($.cftarget) {
+                specifyTarget = $.cftarget;
+            }
+            if (duplicated(1, v, specifyTarget)) {
                 $dialog.addClass('duplicate');
                 $input.addClass('error');
 
@@ -2621,10 +2646,7 @@ function fm_resize_handler(force) {
         console.time('fm_resize_handler');
     }
 
-    if (window.chrome) {
-        // XXX: Seems this 110% zoom bug got fixed as of Chrome 54?
-        M.chrome110ZoomLevelNotification();
-    }
+    M.zoomLevelNotification();
 
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         var tfse = M.getTransferElements();

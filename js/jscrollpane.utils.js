@@ -208,13 +208,15 @@ function clearScrollPanel(from) {
 function reselect(n) {
     'use strict';
 
+    // ToDo: does the reselect() function work on mobile? i.e. does it highlights nodes in the $.selected array?
+    // Perhaps we need a mobile version of it anyway... the exception only happens with debugging turned on
     if (d) {
-        console.debug('reselect(%s)', n, [selectionManager]);
+        console.debug('reselect(%s)', n, [window.selectionManager]);
     }
     $('.ui-selected').removeClass('ui-selected');
 
     if (!Array.isArray($.selected)) {
-        if (selectionManager) {
+        if (window.selectionManager) {
             selectionManager.clear_selection();
         }
         $.selected = [];
@@ -227,7 +229,7 @@ function reselect(n) {
     });
 
     for (var i = ids.length; i--;) {
-        if (selectionManager) {
+        if (window.selectionManager) {
             selectionManager.add_to_selection(ids[i], n, i);
         }
         $('#' + ids[i]).addClass('ui-selected');

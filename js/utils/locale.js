@@ -490,6 +490,11 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
     l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
     l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
+    l[17793] = escapeHTML(l[17793])
+        .replace('[A1]', '<a href="/sync" class="clickurl">').replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
+        .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
+
     // l[] = escapeHTML(l[]).replace('', '');
 
     // carefully replace various strings to adhere to the new pro quotas:
@@ -502,6 +507,7 @@ mBroadcaster.once('startMega', function populate_l() {
 	l[16315] = l[16315].replace('4096','8192').replace('4','8');
 	l[16304] = l[16304].replace('8','16').replace('4096','8192').replace('4','8');
 	l[1367] = l[1367].replace('4','8');
+
     l[17083] = l[17083]
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
@@ -511,6 +517,11 @@ mBroadcaster.once('startMega', function populate_l() {
                 .replace('[A]', '<a id="versionhelp" href="' + linktohelp + '" target="_blank" class="red">')
                 .replace('[/A]', '</a>');
     l[17690] = l[17690].replace('[A]', '<a href="https://mega.nz/recovery" target="_blank" class="red">')
+                       .replace('[/A]', '</a>');
+    if (l[17742]) {
+        l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
+    }
+    l[17805] = l[17805].replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.nz">')
                        .replace('[/A]', '</a>');
 
     var common = [

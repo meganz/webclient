@@ -236,6 +236,13 @@ Message.STATE = {
     'SEEN': 40,
     'DELETED': 8,
 };
+
+Message.SOURCE = {
+    'IDB': 0,
+    'CHATD': 1,
+    'SENT': 2,
+};
+
 Message.MANAGEMENT_MESSAGE_TYPES = {
     "MANAGEMENT": "\0",
     "ATTACHMENT": "\x10",
@@ -389,6 +396,27 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     // because on connect, chatd.js would request hist retrieval automatically, lets simply set a "lock"
     self.isDecrypting = new MegaPromise();
 
+
+    var origPush = self.messages.push;
+    self.messages.push = function(msg) {
+        var res = origPush.apply(this, arguments);
+        if (
+            !(
+                msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false
+            )
+        ) {
+            chatRoom.trigger('onMessagesBuffAppend', msg);
+        }
+
+        if (self.chatRoom.scrolledToBottom === true) {
+            if (self.messages.length > Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2) {
+                self.detachMessages();
+            }
+        }
+
+        return res;
+    };
+
     if (self.chatd.chatdPersist) {
         [
             'push',
@@ -421,25 +449,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         });
     }
 
-    var origPush = self.messages.push;
-    self.messages.push = function(msg) {
-        var res = origPush.apply(this, arguments);
-        if (
-            !(
-                msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false
-            )
-        ) {
-            chatRoom.trigger('onMessagesBuffAppend', msg);
-        }
-
-        if (self.chatRoom.scrolledToBottom === true) {
-            if (self.messages.length > Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2) {
-                self.detachMessages();
-            }
-        }
-
-        return res;
-    };
 
     self.lastSeen = null;
     self.lastSent = null;
@@ -820,6 +829,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         if (eventData.ts) {
                             editedMessage.delay = eventData.ts;
                         }
+                        chatRoom.protocolHandler.clearKeyId();
                     }
 
                     chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
@@ -1261,7 +1271,13 @@ MessagesBuff.prototype.setLastSeen = function(msgId) {
         self.lastSeen = msgId;
 
         if (!self.isRetrievingHistory && !self.chatRoom.stateIsLeftOrLeaving()) {
-            self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
+            if (self._lastSeenThrottling) {
+                clearTimeout(self._lastSeenThrottling);
+            }
+            self._lastSeenThrottling = setTimeout(function() {
+                delete self._lastSeenThrottling;
+                self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
+            }, 160);
         }
         if (ChatdPersist.isMasterTab() && self.chatdInt.chatd.chatdPersist) {
             var chatdPersist = self.chatdInt.chatd.chatdPersist;
@@ -1624,4 +1640,41 @@ MessagesBuff.prototype._removeMessagesBefore = function(messageId) {
             self.messages.removeByKey(currentMessage.messageId);
         }
     }
+};
+
+
+/**
+ * Calculate low and high message ids from the decrypted UI buffer.
+ * @param [returnNumsInsteadOfIds] {boolean} if true, would return orderValues instead of ids
+ */
+MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
+    var self = this;
+    var msg;
+    if (self.messages.length === 0) {
+        return false;
+    }
+
+    var foundFirst = false;
+    var foundLast = false;
+    var i = 0;
+    do {
+        msg = self.messages.getItem(i++);
+    }
+    while (!(msg instanceof Message) || msg.messageId.length !== 11);
+
+    foundFirst = msg ? msg : foundFirst;
+    msg = false;
+
+    var last = self.messages.length - 1;
+    do {
+        msg = self.messages.getItem(last--);
+    }
+    while (!(msg instanceof Message) || msg.messageId.length !== 11);
+
+    foundLast = msg ? msg : foundLast;
+
+    return foundFirst && foundLast ? [
+        (returnNumsInsteadOfIds ? foundFirst.orderValue : foundFirst.messageId),
+        (returnNumsInsteadOfIds ? foundLast.orderValue : foundLast.messageId)
+    ] : false;
 };

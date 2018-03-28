@@ -365,6 +365,7 @@ function dl_g(res) {
                             if (res.msd !== 0 && (!err || is)) {
                                 $('.megasync-overlay').removeClass('downloading');
                                 megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
+                                browserDownload(true);
                             }
                             else {
                                 dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
@@ -531,9 +532,6 @@ function dl_g(res) {
                             return dlmanager.showOverQuotaDialog();
                         }
 
-                        if (!d) {
-                            api_req({a: 'log', e: 99668, m: 'video watch'});
-                        }
                         if (mediaCollectFn) {
                             onIdle(mediaCollectFn);
                             mediaCollectFn = null;
@@ -543,6 +541,13 @@ function dl_g(res) {
                         $pageScrollBlock.find('.viewer-pending').removeClass('hidden');
 
                         vsp.then(function(stream) {
+                            if (stream.error) {
+                                onIdle(function() {
+                                    $pageScrollBlock.removeClass('video-theatre-mode video');
+                                });
+                                return msgDialog('warninga', l[135], l[47], stream.error);
+                            }
+
                             if (String(res.fa).indexOf(':0*') < 0 || String(res.fa).indexOf(':1*') < 0) {
                                 // TODO: refactor this with similar code at imagesViewer.js
                                 var storeImage = function(ab) {
@@ -657,7 +662,7 @@ function dl_g(res) {
     }
 }
 
-function browserDownload() {
+function browserDownload(isDlWithMegaSync) {
     // If regular download using Firefox and the total download is over 1GB then show the dialog
     // to use the extension, but not if they've seen the dialog before and ticked the checkbox
     /*if (dlMethod === MemoryIO && !localStorage.firefoxDialog
@@ -681,26 +686,37 @@ function browserDownload() {
         $('.download.warning-block').removeClass('visible');
         $('.progress-resume').addClass('hidden');
         $('.download-state-text').addClass('hidden');
-
-        if (is_mobile) {
-            if (!Object(fdl_queue_var).lastProgress) {
-                $('body').addClass('downloading').find('.bar').width('1%');
+        if (!isDlWithMegaSync) {
+            $('.download.transfer-buttons', $downloadPage).removeClass('hidden');
+            if ($('.download .pause-transfer').hasClass('hidden')) {
+                $('.download .pause-transfer').removeClass('hidden');
+                $('.download .pause-transfer').css('display', '');
             }
-        }
-        else if (mediaCollectFn) {
-            onIdle(mediaCollectFn);
-            mediaCollectFn = null;
-        }
-
-        if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
-            dlmanager.isDownloading = true;
-
-            if (dlResumeInfo) {
-                fdl_queue_var.byteOffset = dlResumeInfo.byteLength;
+            if (is_mobile) {
+                if (!Object(fdl_queue_var).lastProgress) {
+                    $('body').addClass('downloading').find('.bar').width('1%');
+                }
             }
-            dl_queue.push(fdl_queue_var);
+            else if (mediaCollectFn) {
+                onIdle(mediaCollectFn);
+                mediaCollectFn = null;
+            }
+
+            if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
+                dlmanager.isDownloading = true;
+
+                if (dlResumeInfo) {
+                    fdl_queue_var.byteOffset = dlResumeInfo.byteLength;
+                }
+                dl_queue.push(fdl_queue_var);
+            }
+            $.dlhash = getSitePath();
         }
-        $.dlhash = getSitePath();
+        else {
+            $('.download.transfer-buttons', $downloadPage).addClass('hidden');
+            $('.download .pause-transfer').addClass('hidden');
+            $('.download .pause-transfer').hide();
+        }
     }
 }
 
@@ -745,67 +761,7 @@ function closedlpopup()
 
 function importFile() {
     'use strict';
-    var file = null;
-
-    if (dl_import) {
-        var base64key = String(dl_import[1]).trim();
-        var dkey = base64_to_a32(base64key).slice(0, 8);
-        if (dkey.length === 8) {
-            var dl_a = base64_to_ab(dl_attr);
-            file = dec_attr(dl_a, dkey);
-            file.a = dl_attr;
-            file.size = fdl_filesize;
-            file.h = dl_import[0];
-            crypto_procattr(file, dkey);
-        }
-    }
-
-    if (file) {
-        var f = {
-            target:M.RootID,
-            t:0,
-            name:file.name,
-            size:file.size,
-            lastModified: file.mtime * 1000
-        };
-        fileconflict.check([f], M.RootID, 'import').
-        done(function (files) {
-            for (var i = 0; i < files.length; i++) {
-                var n = {
-                    name: files[i].name,
-                    hash: file.c,
-                    k: file.k
-                };
-                var ea = ab_to_base64(crypto_makeattr(n));
-                var req = {
-                    a: 'p',
-                    t: M.RootID,
-                    n: [{
-                        ph: file.h,
-                        t: 0,
-                        a: ea,
-                        k: a32_to_base64(encrypt_key(u_k_aes, file.k)),
-                    }]
-                };
-
-                if (files[i]._replaces) {
-                    req.n[0].ov = files[i]._replaces;
-                }
-
-                api_req(req, {
-                    callback: function (r) {
-                        if (typeof r === 'object') {
-                            $.onRenderNewSelectNode = r.f[0].h;
-                        }
-                        else {
-                            M.ulerror(null, r);
-                        }
-                    }
-                });
-            }
-        });
-    }
-    dl_import = false;
+    M.importFileLink(dl_import[0], dl_import[1], dl_attr);
 }
 
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
@@ -899,6 +855,10 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 function dlstart(id,name,filesize)
 {
     dlmanager.isDownloading = true;
+
+    if (window.slideshowid) {
+        M.showTransferToast();
+    }
 }
 
 function start_import()

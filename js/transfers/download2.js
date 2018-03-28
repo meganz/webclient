@@ -50,6 +50,7 @@ var dlmanager = {
     // How many queue IO we want before pausing the XHR fetching,
     // useful when we have internet faster than our IO
     ioThrottleLimit: 6,
+    isOverQuota : false,
     ioThrottlePaused: false,
     fetchingFile: false,
     dlLastQuotaWarning: 0,
@@ -347,7 +348,7 @@ var dlmanager = {
         var promise = new MegaPromise();
 
         var max = function() {
-            promise.resolve(Math.pow(2, 53));
+            promise.resolve(Math.pow(2, is_mobile ? 32 : 53));
         };
 
         if (dlMethod === FileSystemAPI) {
@@ -714,11 +715,17 @@ var dlmanager = {
             dl.onDownloadError(dl, code);
         }
 
-        if (code === EKEY) {
+        var eekey = code === EKEY;
+        if (eekey || code === EACCESS) {
             // TODO: Check if other codes should raise abort()
             later(function() {
-                dlmanager.abort(dl, true);
+                dlmanager.abort(dl, eekey);
             });
+
+            if (M.chat) {
+                $('.toast-notification').removeClass('visible');
+                showToast('download', eekey ? l[24] : l[23]);
+            }
         }
     },
 
@@ -1770,7 +1777,7 @@ var dlmanager = {
      * @return {MegaPromise}
      */
     isMEGAsyncRunning: function(minVersion, getVersionInfo) {
-        var timeout = 200;
+        var timeout = 400;
         var logger = this.logger;
         var promise = new MegaPromise();
 
@@ -1858,7 +1865,7 @@ var dlmanager = {
         else if (window.safari) {
             $elm.addClass('safari');
         }
-        else if (window.chrome) {
+        else if (mega.chrome) {
             $elm.addClass('chrome');
         }
         else if (window.opr) {
@@ -1881,12 +1888,49 @@ var dlmanager = {
                 text = l[1676] + ': ' + message + '<br/>' + l[16870] + ' %2';
             }
 
-            if (window.chrome) {
+            if (mega.chrome) {
                 if (window.Incognito) {
                     text = text.replace('%2', '(' + l[16869] + ')');
                 }
-                else {
+                else if (message) {
                     text = text.replace('%2', '');
+                }
+                else if (is_extension) {
+                    text = l[17792];
+                }
+                else {
+                    text = l[17793];
+
+                    onIdle(function() {
+                        $('.freeupdiskspace').rebind('click', function() {
+                            var $dialog = $('.megasync-overlay');
+                            $('.megasync-close, .fm-dialog-close', $dialog).click();
+
+                            msgDialog('warningb', l[882], l[7157], 0, function(yes) {
+                                if (yes) {
+                                    var logged = false;
+
+                                    loadingDialog.show();
+                                    M.req({a: 'log', e: 99682}).always(function() { logged = true; });
+
+                                    M.clearFileSystemStorage()
+                                        .always(function() {
+                                            var reload = function() {
+                                                location.reload(true);
+                                            };
+
+                                            if (logged) {
+                                                reload();
+                                            }
+                                            else {
+                                                setTimeout(reload, 3000);
+                                            }
+                                        });
+                                }
+                            });
+                            return false;
+                        });
+                    });
                 }
             }
             else {
@@ -1909,7 +1953,7 @@ var dlmanager = {
     showMEGASyncOverlay: function(onSizeExceed, dlStateError) {
         'use strict';
 
-        M.require('megasync_js').dump();
+        //M.require('megasync_js').dump();
 
         var $overlay = $('.megasync-overlay');
         var $body = $('body');
@@ -2044,6 +2088,9 @@ function fm_tfspause(gid, overquota) {
         }
         else {
             dlQueue.pause(gid);
+        }
+        if (typeof overquota === 'undefined') {
+            overquota = dlmanager.isOverQuota;
         }
 
         if (page === 'download') {

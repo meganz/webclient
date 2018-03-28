@@ -16,7 +16,7 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
+var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
     var self = this;
 
     this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -50,6 +50,7 @@ var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chat
     );
 
     this.roomId = roomId;
+    this.instanceIndex = ChatRoom.INSTANCE_INDEX++;
     this.type = type;
     this.ctime = ctime;
     this.lastActivity = lastActivity ? lastActivity : 0;
@@ -63,7 +64,7 @@ var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chat
     this.callIsActive = false;
     this.shownMessages = {};
     this.attachments = new MegaDataMap(this);
-    this.images = new MegaDataSortedMap("id", "delay", this);
+    this.images = new MegaDataSortedMap("id", "orderValue", this);
 
     self.members = {};
 
@@ -126,6 +127,7 @@ var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chat
         }
 
         self.lastActivity = ts;
+
         if (msg.userId === u_handle) {
             self.didInteraction(u_handle, ts);
             return;
@@ -214,7 +216,9 @@ var ChatRoom = function(megaChat, roomId, type, users, ctime, lastActivity, chat
             getLastInteractionWith(contact.u);
         }
     });
-    self.megaChat.trigger('onRoomCreated', [self]);
+    if (!noUI) {
+        self.megaChat.trigger('onRoomCreated', [self]);
+    }
 
     $(window).rebind("focus." + self.roomId, function() {
         if (self.isCurrentlyActive) {
@@ -261,6 +265,8 @@ ChatRoom.STATE = {
 
     'LEFT': 250
 };
+
+ChatRoom.INSTANCE_INDEX = 0;
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
     var self = this;
@@ -694,6 +700,8 @@ ChatRoom.prototype.appendMessage = function(message) {
         }
     }
 
+    message.source = Message.SOURCE.SENT;
+
     self.trigger('onMessageAppended', message);
     self.messagesBuff.messages.push(message);
 
@@ -763,6 +771,8 @@ ChatRoom.prototype.sendMessage = function(message) {
         }
     );
 
+
+    self.trigger('onSendMessage');
 
     self.appendMessage(msgObject);
 
@@ -1260,7 +1270,6 @@ ChatRoom.prototype.truncate = function() {
         }
     }
 };
-
 
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

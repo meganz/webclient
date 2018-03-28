@@ -1076,11 +1076,11 @@
         "context": ""
     },
     "694": {
-        "text": "1. Disable one link (\"URL\") per file - the file(s) will remain the user's\n account",
+        "text": "1. Disable one link (\"URL\") per file - the file(s) will remain in the user's account",
         "context": ""
     },
     "695": {
-        "text": "2. Disable multiple URL's per file - the file(s) will remain the user's account",
+        "text": "2. Disable multiple URL's per file - the file(s) will remain in the user's account",
         "context": ""
     },
     "696": {
@@ -8360,7 +8360,7 @@
         "context": "Title of the dialog displayed in cases that the user types some data with a wrong format - (String as short as possible)."
     },
     "7274": {
-        "text": "The subscription has not been canceled correctly. Please contact support@mega.nz to cancel your subscription.",
+        "text": "The subscription has not been canceled successfully. Please contact support@mega.nz to cancel your subscription.",
         "context": "Message of the dialog displayed when the process\/request to cancel a subscription failed."
     },
     "7275": {
@@ -10984,7 +10984,7 @@
         "context": "Open the whole blog post"
     },
     "8514": {
-        "text": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
+        "text": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your mobile device, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
         "context": "Specific paragraph shown only on the App Store in iOS"
     },
     "8515": {
@@ -12544,12 +12544,12 @@
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhile downloading through the mobile browser, this message is shown to users to encourage installing our app.\r\n\r\n[S] is replaced with <span> and the text within turns red."
     },
     "8951": {
-        "text": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50 GB cloud storage![\/S]",
-        "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the filesize exceeds an stated limit. \r\n\r\n[S] is replaced with <span> and the text within turns red."
+        "text": "This file is too large to open in your mobile browser. Please use our mobile app for [S]unlimited file size support and free 50 GB cloud storage![\/S]",
+        "context": "This is used on the downloads page on the mobile webclient when viewing a download link through the mobile browser and the filesize exceeds an stated limit. Leave the [S] and [\/S] tags which will be used to turn the text red."
     },
     "8952": {
-        "text": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50 GB cloud storage![\/S]",
-        "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the file-type cannot be handled through the mobile browser itself. (The message is shown BEFORE trying to download the file)\r\n\r\n[S] is replaced with <span> and the text within turns red."
+        "text": "This file could not be opened in your mobile browser. Please use our mobile app for [S]unlimited file size, unlimited file types and free 50 GB cloud storage![\/S]",
+        "context": "This is used on the downloads page in the mobile webclient when viewing a download link through the mobile browser and the file-type cannot be handled through the mobile browser itself. The message is shown BEFORE trying to download the file. Leave the [S] and [\/S] tags which will turn the text red."
     },
     "8953": {
         "text": "Set an expiry date",
@@ -12728,7 +12728,7 @@
         "context": "Message when an error ocurred when changing an user attribute"
     },
     "8999": {
-        "text": "Your account data has been correctly updated.",
+        "text": "Your account data has been successfully updated.",
         "context": "Message when an user attribute has been changed successfully"
     },
     "9000": {
@@ -12744,7 +12744,7 @@
         "context": "The title of the alert dialog to change the email associated to an account."
     },
     "9003": {
-        "text": "Your email has been correctly updated.",
+        "text": "Your email has been successfully updated.",
         "context": "Message when the user email has been changed successfully"
     },
     "9004": {
@@ -15720,7 +15720,7 @@
         "context": "Message to confirm if the user wants to delete a multiple contacts from a shared folder. The %d variable will be replaced by the number of contacts to be removed."
     },
     "16700": {
-        "text": "%d contacts removed correctly from the shared folder",
+        "text": "%d contacts removed successfully from the shared folder",
         "context": "success message when removing a contact from a shared folder. %d will be replaced with the number of contacts removed."
     },
     "16701": {
@@ -15784,7 +15784,7 @@
         "context": "Message show when the history of a chat has been successfully deleted"
     },
     "16717": {
-        "text": "Error. The history of the chat has not been cleared correctly",
+        "text": "Error. The history of the chat has not been cleared successfully",
         "context": "Message show when the history of a chat hasn't been successfully deleted"
     },
     "16718": {
@@ -15884,7 +15884,7 @@
         "context": "Message show when a participant hasn't been successfully invited to a group chat"
     },
     "16744": {
-        "text": "%d participants were correctly invited",
+        "text": "%d participants were successfully invited",
         "context": "success message when inviting multiple contacts to a group chat. Please do not change or translate the %d placeholder as it will be replaced by the number of participants invited."
     },
     "16745": {
@@ -15948,7 +15948,7 @@
         "context": "Title of the error dialog when opening a chat"
     },
     "16765": {
-        "text": "The chat could not be opened correctly",
+        "text": "The chat could not be opened successfully",
         "context": "Message of the error dialog when opening a chat"
     },
     "16766": {
@@ -16660,7 +16660,7 @@
         "context": "Ask for confirmation before removing all the elements of the rubbish bin"
     },
     "16966": {
-        "text": "Request correctly sent to %s. The status can be consulted in the Sent Requests tab.",
+        "text": "Request successfully sent to %s. The status can be consulted in the Sent Requests tab.",
         "context": "success message when sending a contact request. Please do not modify the %s placeholder."
     },
     "16967": {
@@ -17072,7 +17072,7 @@
         "context": "Message when an error ocurred when changing an user attribute"
     },
     "17069": {
-        "text": "Your name has been correctly updated",
+        "text": "Your name has been successfully updated",
         "context": "Message when an user attribute has been changed successfully"
     },
     "17070": {
@@ -17416,7 +17416,7 @@
         "context": "Step two of how to share with others on iOS or Android"
     },
     "17244": {
-        "text": "Using your desktop browser, you can have a secure voice or video call with a single contact or have a group text chat with several contacts participating. You can also send files from your MEGA Cloud Drive to other members of the group chat while messages are flowing. [Br]Secure text chat is also available on Android and iOS applications (encrypted voice and video calls are coming to mobile soon).",
+        "text": "Using your desktop browser, Android or iOS device, you can have a secure voice or video call with a single contact or have a group text chat with several contacts participating. You can also send files from your MEGA Cloud Drive to other members of the group chat while messages are flowing.",
         "context": "MEGAchat introduction and description for new users"
     },
     "17245": {
@@ -18139,6 +18139,10 @@
         "text": "You already have a PRO account. You will be buying a new subscription to MEGA. In case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
         "context": "An alert message shown in case the user has an active subscription and is in the process of buying a higher plan (i.e. a higher level PRO account)."
     },
+    "17586": {
+        "text": "Downloading canceled in MEGAsync",
+        "context": "Downloading status text which appears when a download gets canceled in MEGAsync."
+    },
     "17587": {
         "text": "Invite Contact",
         "context": "Text shown when the user tries to make a call and the receiver is not a contact"
@@ -18154,6 +18158,22 @@
     "17590": {
         "text": "by %1",
         "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
+    },
+    "17591": {
+        "text": "Cannot get downloading status from MEGAsync",
+        "context": "Download status text which appears when MEGAsync stops sending status updates. This is possibly due to a crash in MEGAsync. We don't have a screenshot for this case (it's a rare one). However the attached screenshot will show the location of this text."
+    },
+    "17592": {
+        "text": "Downloading with MEGAsync ...",
+        "context": "Download status description of a file download."
+    },
+    "17593": {
+        "text": "Download is queued in MEGAsync ...",
+        "context": "Download status description for while downloading a file with MEGASync (from a file link)\r\nScreenshot contains the place of this status."
+    },
+    "17594": {
+        "text": "Download is paused in MEGAsync",
+        "context": "Download status text which appears when a download is paused from MEGAsync."
     },
     "17595": {
         "text": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
@@ -18186,6 +18206,22 @@
     "17602": {
         "text": "The current version of the file will be replaced with the file you are uploading.",
         "context": "A description in the duplicate items dialog below the Upload and replace title. This option allows the user to update an existing file in the folder by replacing the current version of the file with the file they are uploading."
+    },
+    "17603": {
+        "text": "Download retrying in MEGAsync",
+        "context": "Download status text which appears when MEGAsync for some reason is forced to retry downloading (rare case). The attached screenshot shows the location of this text."
+    },
+    "17604": {
+        "text": "Download completing in MEGAsync",
+        "context": "Download status text which appears when the download is in its final stage at MEGAsync. Usually this is a very quick stage and wont be noticed unless the user was on a very slow PC. The screenshot shows the text location."
+    },
+    "17605": {
+        "text": "Downloading failed in MEGAsync",
+        "context": "Downloading status text which appears if the download failed somehow on the MEGAsync side. The screenshot shows the text location."
+    },
+    "17606": {
+        "text": "No response from MEGAsync",
+        "context": "Downloading status text which appears when MEGAsync stops responding. "
     },
     "17607": {
         "text": "%1 cleaning scheduler",
@@ -18472,7 +18508,7 @@
         "context": "An instruction on the mobile webclient Backup Recovery Key screen which tells the user to tap and hold on the Recovery Key to copy it to the clipboard."
     },
     "17690": {
-        "text": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
+        "text": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] and follow the instructions.",
         "context": "An instruction for the user on how they can recover their account using the Recovery Key."
     },
     "17691": {
@@ -18535,6 +18571,102 @@
         "text": "Your login is taking longer than expected. Do you want to wait or force a reload?",
         "context": "dialog message to be shown for the user if their cloud is taking too long to load."
     },
+    "17707": {
+        "text": "Get Bonus",
+        "context": "Button title to go to the achievements view. Short as possible."
+    },
+    "17708": {
+        "text": "Please give MEGA app permission to access your Microphone in your Settings",
+        "context": "Alert message to remember that MEGA app needs permission to use the Microphone to make calls and record videos and it doesn't have it"
+    },
+    "17709": {
+        "text": "You already have a PRO account. You will be buying a new subscription to MEGA and in case you have an auto-renewable subscription you must cancel it or you will be charged for two plans.",
+        "context": "Alert text shown in case the user has an active subscription and is in the process to buy a higher plan (An upper level of a PRO account)"
+    },
+    "17710": {
+        "text": "Please give MEGA app permission to access your Camera in your Settings. In case you proceed the call will end because the app will be restarted.",
+        "context": "Alert message to notify that MEGA video calls needs the Camera permission and the call will end"
+    },
+    "17711": {
+        "text": "MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 \u20ac per month or 49.99 \u20ac per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 \u20ac per month or 99.99 \u20ac per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 \u20ac per month or 199.99 \u20ac per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 \u20ac per month or 299.99 \u20ac per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven't already done so) and then click on the MEGA app. You'll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO & CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio\/video calls\n\n\nTo enhance users' confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https:\/\/github.com\/meganz\/android\n\nFor more info, please check our website:\nSee https:\/\/mega.nz\/terms\n\n\nDesktop - https:\/\/mega.nz\/",
+        "context": "Full description text of the app in the Google Play page of the app"
+    },
+    "17712": {
+        "text": "Error. The pdf file is corrupted or does not exist.",
+        "context": "when open PDF Viewer, the pdf that it try to open is damaged or does not exist"
+    },
+    "17713": {
+        "text": "Save to my[Br]Cloud Drive",
+        "context": "Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage"
+    },
+    "17714": {
+        "text": "Advanced options",
+        "context": "title of the section advanced options on the get link screen"
+    },
+    "17715": {
+        "text": "No contact permissions granted",
+        "context": "Title of the section to invite contacts if the user has denied the contacts permissions"
+    },
+    "17716": {
+        "text": "* Subject to your participation in our achievement program",
+        "context": "Footnote to clarify the storage space is subject to the achievement program"
+    },
+    "17717": {
+        "text": "Open with",
+        "context": "Item menu option to reproduce audio or video in external reproductors"
+    },
+    "17718": {
+        "text": "Share using",
+        "context": "to share a file using Facebook, Whatsapp, etc"
+    },
+    "17719": {
+        "text": "Please, log in before enabling the chat",
+        "context": "Message shown if the user choose enable button and he is not logged in"
+    },
+    "17720": {
+        "text": "[C]Enable [\/C][B]Chat[\/B][A][C] and enjoy our encrypted platform with privacy and security.[\/C]",
+        "context": "Message shown when the user has no recent chats"
+    },
+    "17721": {
+        "text": "[B]No media on [\/B][A]Camera Uploads[\/A][B].[\/B]",
+        "context": "Text of the empty screen when there are not elements in Camera Uploads"
+    },
+    "17722": {
+        "text": "[B]Empty [\/B][A]Rubbish Bin[\/A][B].[\/B]",
+        "context": "Text of the empty screen when there are not elements in the Rubbish Bin"
+    },
+    "17723": {
+        "text": "[B]No files on your [\/B][A]%1$s[\/A][B].[\/B]",
+        "context": "Text of the empty screen when there are not elements in Cloud Drive or Inbox"
+    },
+    "17724": {
+        "text": "[B]No files [\/B][A]%1$s[\/A][B].[\/B]",
+        "context": "Text of the empty screen when there are not elements in Saved for Offline"
+    },
+    "17725": {
+        "text": "[B]No [\/B][A]%1$s[\/A][B].[\/B]",
+        "context": "Text of the empty screen when there are not contacts"
+    },
+    "17726": {
+        "text": "Incoming Shared folders",
+        "context": "Text of the empty screen when there are not elements in Incoming"
+    },
+    "17727": {
+        "text": "Outgoing Shared folders",
+        "context": "Text of the empty screen when there are not elements in Outgoing"
+    },
+    "17728": {
+        "text": "Invalid link, please ask for a new valid link",
+        "context": "error message shown when an account confirmation link or reset password link is invalid for unknown reasons"
+    },
+    "17729": {
+        "text": "Processing link...",
+        "context": "Message shown when a link is being processing"
+    },
+    "17731": {
+        "text": "An annual subscription is 17% cheaper than 12 monthly payments",
+        "context": "Text shown in the purchase plan view to explain that annual subscription is 17% cheaper than 12 monthly payments"
+    },
     "17732": {
         "text": "View video",
         "context": "A button that users can click to start streaming a video."
@@ -18563,6 +18695,14 @@
         "text": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
         "context": "Warning dialog appears to uses trying to merge folders with sharing (or link) is activated on one of the merged folders."
     },
+    "17740": {
+        "text": "Your account was terminated due to a breach of MEGA's Terms of Service, such as abuse of rights of others; sharing and\/or importing illegal data; or system abuse.",
+        "context": "Message of the dialog shown when the user is trying to login and the account has been blocked."
+    },
+    "17741": {
+        "text": "Your account has been suspended due to multiple breaches of MEGA's Terms of Service. Please check your email inbox.",
+        "context": "Message of the dialog shown when the user is trying to login and the account has been blocked for multiple copyright violation."
+    },
     "17742": {
         "text": "Drop to [S]upload[\/S]",
         "context": "A header of a dialog which allows dragging external files into the MEGA browser. Please leave the placeholders [S] and [\/S] which will be used to bolden the text."
@@ -18570,5 +18710,273 @@
     "17743": {
         "text": "This file uses a video codec that is not supported by your browser.",
         "context": "An error message which is shown to the user when there is a problem streaming a video file as a result of an unsupported codec. https:\/\/en.wikipedia.org\/wiki\/Codec"
+    },
+    "17744": {
+        "text": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels.",
+        "context": "An overlay message when the main menu is displaced outside of the window"
+    },
+    "17745": {
+        "text": "Request correctly sent to %s. The status can be consulted in the Sent Requests tab.",
+        "context": "success message when sending a contact request"
+    },
+    "17746": {
+        "text": "%d contacts removed correctly from the shared folder",
+        "context": "success message when removing a contact from a shared folder"
+    },
+    "17747": {
+        "text": "Error. The history of the chat has not been cleared correctly",
+        "context": "Message show when the history of a chat hasn't been successfully deleted"
+    },
+    "17748": {
+        "text": "%d participants were correctly invited",
+        "context": "success message when inviting multiple contacts to a group chat"
+    },
+    "17749": {
+        "text": "The chat could not be opened correctly",
+        "context": "Message of the error dialog when opening a chat"
+    },
+    "17750": {
+        "text": "Your name has been correctly updated",
+        "context": "Message when an user attribute has been changed successfully"
+    },
+    "17751": {
+        "text": "If you cancel your account you will not be able to access your account data, your MEGA contacts or conversations.[Br]You will not be able to undo this action.",
+        "context": "Text shown in the alert dialog to confirm the cancellation of an account"
+    },
+    "17752": {
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.[Br]PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.[Br]PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.[Br]PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
+        "context": "Paragraph 5 of the general description of MEGA shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "17753": {
+        "text": "For more info, please check our website:[Br]Mobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html[Br]Desktop - https:\/\/mega.nz\/",
+        "context": "Paragraph 6 of the general description of MEGA shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "17754": {
+        "text": "QR Code",
+        "context": "QR Code label, used in Settings as title. String as short as possible"
+    },
+    "17755": {
+        "text": "Auto-Accept",
+        "context": "Label for the setting that allow users to automatically add contacts when they scan his\/her QR code. String as short as possible."
+    },
+    "17756": {
+        "text": "Contacts that scan your QR Code will be automatically added to your contact list.",
+        "context": "Footer that explains the way Auto-Accept works for QR codes"
+    },
+    "17757": {
+        "text": "Reset QR Code",
+        "context": "Action to reset the current valid QR code of the user"
+    },
+    "17758": {
+        "text": "Your current QR Code will no longer be valid.",
+        "context": "Footer that explains what would happen if the user resets his\/her QR code"
+    },
+    "17759": {
+        "text": "My Code",
+        "context": "Title for view that displays the QR code of the user. String as short as possible."
+    },
+    "17760": {
+        "text": "Scan Code",
+        "context": "Segmented control title for view that allows the user to scan QR codes. String as short as possible."
+    },
+    "17761": {
+        "text": "Line up the QR code to scan it with your device\u2019s camera",
+        "context": "Label that encourage the user to line the QR to scan with the camera"
+    },
+    "17762": {
+        "text": "Invalid code",
+        "context": "Error text shown when the user scans a QR that is not valid. String as short as possible."
+    },
+    "17763": {
+        "text": "Code scanned",
+        "context": "Success text shown in a label when the user scans a valid QR. String as short as possible."
+    },
+    "17764": {
+        "text": "Send to chat",
+        "context": "Send to chat [copy dialog] Tab header"
+    },
+    "17765": {
+        "text": "My chats",
+        "context": "Column header of my contacts\/chats at copy dialog"
+    },
+    "17766": {
+        "text": "File sent to chat",
+        "context": "Toast text upon sending a single file to chat"
+    },
+    "17767": {
+        "text": "Files sent to chat",
+        "context": "Toast text upon sending multiple files to chat"
+    },
+    "17768": {
+        "text": "Terminated account",
+        "context": "Dialog title message when user account is terminated due to breach of Mega's Terms of Service"
+    },
+    "17769": {
+        "text": "MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.[Br][Br]Upload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.[Br][Br]End-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.[Br][Br]MEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:[Br][Br][Br]PRO LITE subscription: 4.99 \u20ac per month or 49.99 \u20ac per year gives you 200 GB of storage space and 1 TB of transfer quota per month.[Br]PRO I subscription: 9.99 \u20ac per month or 99.99 \u20ac per year gives you 1 TB of storage space and 2 TB of transfer quota per month.[Br]PRO II subscription: 19.99 \u20ac per month or 199.99 \u20ac per year gives you 4 TB of storage space and 8 TB of transfer quota per month.[Br]PRO III subscription: 29.99 \u20ac per month or 299.99 \u20ac per year gives you 8 TB of storage space and 16 TB of transfer quota per month.[Br][Br]Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven't already done so) and then click on the MEGA app. You'll be able to manage your subscription there.[Br][Br]App Permissions:[Br]WRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA[Br]CAMERA -> Take a picture and upload your photos to MEGA[Br]READ_CONTACTS -> Easily add contacts from your device as MEGA contacts[Br]RECORD_AUDIO & CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio\/video calls[Br][Br][Br]To enhance users' confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https:\/\/github.com\/meganz\/android[Br][Br]For more info, please check our website:[Br]See https:\/\/mega.nz\/terms[Br][Br][Br]Desktop - https:\/\/mega.nz\/",
+        "context": "Full description text of the app in the Google Play page of the app"
+    },
+    "17770": {
+        "text": "You have exceeded your storage limit. Would you like to upgrade your account?",
+        "context": "Dialog text overquota error"
+    },
+    "17771": {
+        "text": "[A]No[\/A] [B]Conversations[\/B]",
+        "context": "Message shown when the user has no archived chats"
+    },
+    "17772": {
+        "text": "[A]Loading[\/A] [B]Conversations...[\/B]",
+        "context": "Message shown when the chat is section is loading the conversations"
+    },
+    "17773": {
+        "text": "Call in progress",
+        "context": "Title of the notification shown on the action bar when there is a call in progress"
+    },
+    "17774": {
+        "text": "Click to go back to the call",
+        "context": "Subtitle of the notification shown on the action bar when there is a call in progress"
+    },
+    "17775": {
+        "text": "Return to the call",
+        "context": "Button in the notification shown on the action bar when there is a call in progress"
+    },
+    "17776": {
+        "text": "%1$d versions",
+        "context": "Number of versions of a file shown on the screen info of the file"
+    },
+    "17777": {
+        "text": "Current version",
+        "context": "Header of the item to show the current version of a file in a list"
+    },
+    "17778": {
+        "text": "Previous version",
+        "context": "file item"
+    },
+    "17779": {
+        "text": "Delete version?",
+        "context": "version item"
+    },
+    "17780": {
+        "text": "Delete versions?",
+        "context": "version items"
+    },
+    "17781": {
+        "text": "This version will be permanently removed.",
+        "context": "Content of the dialog to confirm that a version is going to be deleted"
+    },
+    "17782": {
+        "text": "These %d versions will be permanently removed.",
+        "context": "Content of the dialog to confirm that several versions are going to be deleted"
+    },
+    "17783": {
+        "text": "Chat uploading",
+        "context": "Title of the notification shown when a file is uploading to a chat"
+    },
+    "17784": {
+        "text": "Chat media quality",
+        "context": "Label for the option on setting to set up the quality of multimedia files uploaded to the chat"
+    },
+    "17785": {
+        "text": "Original",
+        "context": "the options of what to upload."
+    },
+    "17786": {
+        "text": "An annual subscription is 17% cheaper than 12 monthly payments",
+        "context": "This text is shown in the purchase plan view to explain that an annual subscription is 17% cheaper than 12 individual monthly payments."
+    },
+    "17788": {
+        "text": "%1$s has accepted your contact request.",
+        "context": "Message that will be received as a push notification to the user's phone, to inform them that one of their contact invites that they have sent out has been accepted. The %1$s is a placeholder for the accepting user's name."
+    },
+    "17789": {
+        "text": "The entered tax number is invalid.",
+        "context": "An error dialog message explaining that the tax number (CPF, RUT, DNI, etc) the user entered is invalid for that country."
+    },
+    "17791": {
+        "text": "Filter",
+        "context": "Label of block with filter parameters. User is able filter folders by color label."
+    },
+    "17792": {
+        "text": "Your primary disk volume is full. Please free up some space and try again.",
+        "context": "Message shown to Chrome Extension users when running out of disk space when attempting to download something."
+    },
+    "17793": {
+        "text": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3].",
+        "context": "Message shown to Chrome users when running out of disk space when attempting to download something."
+    },
+    "17794": {
+        "text": "Initialising...",
+        "context": "Initialising status which appears at the beginning of downloading a file through MEGAsync via a public file link."
+    },
+    "17795": {
+        "text": "MEGAsync stopped responding, it could be closed or too busy.",
+        "context": "A dialog box message warning which appears when MEGAsync stops responding."
+    },
+    "17796": {
+        "text": "Do you want to re-initialise the connection with MEGAsync and turn it off if MEGAsync does not respond?",
+        "context": "A dialog warning box sub-message which appears if MEGAsync stopped responding.\r\n"
+    },
+    "17797": {
+        "text": "Download sent to MEGASync",
+        "context": "A toast appears when the user download something while integrating with MEGASync"
+    },
+    "17799": {
+        "text": "folders containing a total of",
+        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync.\r\n[PLURAL] "
+    },
+    "17800": {
+        "text": "file was added to the transfer manager",
+        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync.\r\n[SINGULAR] \r\n"
+    },
+    "17801": {
+        "text": "files were added to the transfer manager",
+        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync. \r\n[PLURAL] "
+    },
+    "17802": {
+        "text": "Slideshow",
+        "context": "A button label. This shows images with a time interval."
+    },
+    "17803": {
+        "text": "Fullscreen",
+        "context": "A button label. This opens the media viewer in full screen mode."
+    },
+    "17804": {
+        "text": "Check your email",
+        "context": "The title of a dialog in the mobile webclient to tell the user to check their email."
+    },
+    "17805": {
+        "text": "We have sent you an email. If you cannot access your email account, you will need to contact [A]support@mega.nz[\/A].",
+        "context": "A dialog message in the mobile webclient. Please keep the [A] and [\/A] tags and do not alter the email address."
+    },
+    "17806": {
+        "text": "Forgot Password",
+        "context": "A title of the Forgot Password page on mobile webclient which asks the user if they have a copy of their Recovery Key."
+    },
+    "17807": {
+        "text": "Recover Account",
+        "context": "The title of the Recover Account page for mobile webclient. This page lets the user start the recovery process."
+    },
+    "17808": {
+        "text": "I have my Recovery Key",
+        "context": "A heading on the Recover Account page. This key is needed to retrieve their encrypted data and re-enter their account if they forgot their password."
+    },
+    "17809": {
+        "text": "Enter your Recovery Key to restore your account",
+        "context": "A heading on a page in the mobile webclient. This page lets the user type or paste in their Recovery Key to recover their account."
+    },
+    "17810": {
+        "text": "Alternatively, you can upload your exported Recovery Key text file.",
+        "context": "A message on the Recover Account page in mobile webclient. This means they can select the .txt file on their computer and the program will retrieve the key from it."
+    },
+    "17811": {
+        "text": "Upload Recovery Key",
+        "context": "A button on the mobile webclient to let the user select the Recovery Key .txt file so the account recovery process can continue."
+    },
+    "17812": {
+        "text": "Transfer with MEGAsync if it is running",
+        "context": "A setting option in Settings -> Advanced -> Transfers.\r\n"
+    },
+    "17813": {
+        "text": "I do not have my Recovery Key",
+        "context": "The heading of the page where the user can request to park their account because they do not have their Recovery Key."
     }
 }

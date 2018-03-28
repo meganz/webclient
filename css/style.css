@@ -56,11 +56,12 @@
 }
 @font-face {
     font-family: 'Open Sans Italic';
-    src: url('../fonts/opensansitalic.eot');
-    src: url('../fonts/opensansitalic.eot?#iefix') format('embedded-opentype'), url('../fonts/opensansitalic.woff2') format('woff2'), url('../fonts/opensansitalic.woff') format('woff'), url('../fonts/opensansitalic.ttf') format('truetype'), url('../fonts/opensansitalic.svg#open_sansitalic') format('svg');
+    src: url('../fonts/opensans-italic-webfont.eot');
+    src: url('../fonts/opensans-italic-webfont.eot?#iefix') format('embedded-opentype'),  url('../fonts/opensans-italic-webfont.woff2') format('woff2'),  url('../fonts/opensans-italic-webfont.woff') format('woff'),  url('../fonts/opensans-italic-webfont.ttf') format('truetype'),  url('../fonts/opensans-italic-webfont.svg#open_sansitalic') format('svg');
     font-weight: normal;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'source_code_proregular';
     src: url('../fonts/sourcecodepro-regular-webfont.eot');
@@ -475,6 +476,11 @@ input[type="checkbox"] {
     position: relative;
     z-index: 1;
 }
+.checkboxOn.small, .checkboxOff.small {
+    width: 14px;
+    height: 14px;
+    margin: 9px 11px 0 0;
+}
 .checkdiv.right {
     float: right;
 }
@@ -483,8 +489,8 @@ input[type="checkbox"] {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    width: 16px;
-    height: 16px;
+    width: 100%;
+    height: 100%;
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
@@ -496,17 +502,21 @@ input[type="checkbox"] {
     -moz-box-shadow: none;
     box-shadow: none;
     background-position: -34px -395px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
-    width: 16px;
-    height: 16px;
+    width: 100%;
+    height: 100%;
     position: absolute;
     top: 0;
 }
 .checkboxOn::after {
     background-position: -34px -445px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
-    background-repeat: no-repeat;
+}
+.checkboxOff::after {
+    display: none;
+}
+.small.checkboxOn::after {
+    background-position: -35px -446px;
 }
 .fm-dialog .checkboxOff, .fm-dialog .checkboxOn {
     margin: 20px 12px 0 7px;
@@ -4276,7 +4286,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -khtml-opacity: 0.7;
     opacity: 0.7;
 }
-.nw-conversations-item, .fm-tree-panel .nw-contact-item {
+.nw-conversations-item, .fm-tree-panel .nw-contact-item, .fm-dialog-body .nw-contact-item {
     height: 24px;
     padding-right: 12px;
     overflow: hidden;
@@ -4344,18 +4354,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(43,166,222,0.5);
     color: white;
 }
-.nw-conversations-name, .fm-tree-panel .nw-contact-name {
+.nw-conversations-name, .fm-tree-panel .nw-contact-name, .fm-dialog-body .nw-contact-item {
     margin: 0 25px 0 32px;
     font-size: 13px;
     line-height: 23px;
-    color: #666666;
+    color: #444;
     padding: 0;
     overflow: hidden;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
-.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name {
+.fm-dialog-body .nw-contact-item.selected {
+    background-color: rgba(43,166,222,0.5);
+    color: white;
+}
+.fm-dialog-body .nw-contact-item.selected .nw-contact-email, .fm-dialog-body .nw-contact-item.selected .nw-contact-group {
+    color: #fff;
+}
+.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name  {
     color: white;
 }
 .tree-item {
@@ -4611,7 +4628,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 37px;
     height: 56px;
     background-position: -5px -1974px;
-    background-image: url(../images/mega/top-login-sprite_v7@2x.png);
+    background-image: url(../images/mega/top-login-sprite_v9@2x.png);
     background-repeat: no-repeat;
     margin: 0 auto;
 }
@@ -4762,7 +4779,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: right -1769px;
     background-repeat: no-repeat;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -5337,7 +5354,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -5462,7 +5479,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .versioning-block .fm-account-header {
     margin-bottom: 16px;
 }
-.tab-content .versioning-switch {    
+.tab-content .versioning-switch {
   position: relative;
   display: inline-block;
   width: 40px;
@@ -5873,6 +5890,84 @@ th.grid-first-th {
 .fm-blocks-view.shared-view .block-view-file-type.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder, .block-view-file-type.folder.inbound-share, .contact-details-view .block-view-file-type.folder-shared {
     background-position: center -9747px;
 }
+/* Ct changes for copy to conversations */
+.fm-dialog-body .nw-contact-name {
+    line-height: 24px;
+    margin: 0 20px 0 14px;
+    overflow: hidden;
+    display: inline-block;
+    padding: 0 0 0 0;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    width: calc(50% - 56px);
+    color: inherit;
+}
+.fm-dialog-body .online .nw-contact-status, .fm-dialog-body .away .nw-contact-status, .fm-dialog-body .offline .nw-contact-status, .fm-dialog-body .busy .nw-contact-status {
+    border: 1px solid #fff;
+    margin: 9px 0 0 14px;
+}
+.fm-dialog-body .nw-contact-status {
+    width: 8px;
+    height: 8px;
+}
+.fm-dialog-body .nw-contact-item {
+    padding: 0 14px 0 14px;
+    margin: 0 0;
+    height: 26px;
+    background-color:rgba(0,0,0,0);
+    color: #444;
+}
+.fm-dialog-body .nw-contact-item:hover {
+    background-color: rgba(43, 166, 222, 0.4);
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-item.selected:hover {
+    background-color: rgba(43, 166, 222, 0.5);
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-email, .fm-dialog-body .nw-contact-group {
+    line-height: 24px;
+    margin: 0 0;
+    overflow: hidden;
+    display: inline-block;
+    padding: 0 0;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    width: calc(50% - 2px);
+    color: #888;
+}
+.fm-dialog-body .nw-contact-item:hover .nw-contact-email {
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-item:hover .nw-contact-group {
+    color: #fff;
+}
+.fm-dialog-body .nw-contact-group-icon {
+    width: 12px;
+    height: 10px;
+    float: left;
+    margin-left: 13px;
+    margin-top: 8px;
+    background-image: url(../images/mega/group_copy@2x.png);
+    background-repeat: no-repeat;
+    background-size: 12px 10px;
+    opacity: 0.8;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.fm-dialog-body .nw-contact-item:hover > .nw-contact-group-icon, .fm-dialog-body .nw-contact-item.selected > .nw-contact-group-icon {
+    background-image: url(../images/mega/group_copy_white@2x.png);
+    opacity: 1;
+}
+
+.fm-dialog-body .nw-contact-name.group {
+    margin-left: 11px;
+}
 .file-icon-area {
     width: 120px;
     height: 120px;
@@ -6080,7 +6175,7 @@ th.grid-first-th {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -6721,13 +6816,13 @@ table {
 .dragger-icon.font, .export-icon.font, .share-folder-icon div.font {
     background-position: center -4455px;
 }
-.dragger-icon.folder, .share-folder-icon div.folder {
+.dragger-icon.folder, .share-folder-icon div.folder, .export-icon.folderConflict {
     background-position: center -4535px;
 }
 .dragger-icon.folder-shared, .share-folder-icon div.folder-shared {
     background-position: center -4615px;
 }
-.export-icon.folder-shared, .export-icon.folder {
+.export-icon.folder-shared, .export-icon.folder, .export-icon.puf-folder {
     background-image: url(../images/mega/dialogs-sprite_v14.svg);
     background-position: -7px -2680px;
     background-size: auto;
@@ -7109,11 +7204,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -7644,7 +7739,7 @@ table {
     margin-top: -171px;
 }
 .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg {
-    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-image: url(../images/mega/empty-sprite_v4.png);
     background-repeat: no-repeat;
 }
 .fm-empty-cloud-bg {
@@ -7777,7 +7872,7 @@ table {
     top: 34px;
 }
 .dialog-sorting-menu {
-    left: 466px;
+    left: 590px;
     top: 103px;
 }
 .context-menu-divider, .pause-item-divider, .sorting-item-divider {
@@ -7795,13 +7890,13 @@ table {
 .dropdown.body.add-user-popup {
     max-width: 90%;
     z-index: 100;
-    width: 400px !important;
+    width: 416px !important;
 }
 .dropdown.body.add-user-popup.dialog {
     z-index: 1200;
     left: 50% !important;
     top: 50% !important;
-    margin: -108px 0 0 -200px;
+    margin: -108px 0 0 -208px;
 }
 .dialog .add-user-size-icon.short-size {
     display: none;
@@ -8371,7 +8466,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-dialog.dlkey-dialog {
     min-width: 440px;
-    margin: -77px 0 0 -300px;
+    max-width: 440px;
+    margin: -120px 0 0 -220px;
+}
+
+.fm-dialog.dlkey-dialog .fm-dialog-new-folder-pad {
+        margin: 0 36px 0 0;
 }
 /* Decryption key dialog */
 .dlkey-dialog .wrapper, .fm-dialog.network-testing .wrapper {
@@ -8400,7 +8500,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 24px;
 }
 .dlkey-dialog .decryption-key input {
-    text-indent: 36px;
+    text-indent: 0px;
+    margin-left: 36px;
+    margin-right: 36px;
 }
 /* Password decryption dialog */
 .password-dialog .wrapper {
@@ -8444,8 +8546,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     margin: 0;
 }
 .fm-dialog.copy-dialog, .fm-dialog.move-dialog {
-    width: 480px;
-    margin: -200px 0 0 -240px;
+    width: 604px;
+    margin: -220px 0 0 -302px;
 }
 .fm-dialog.arrange-to-back, div.overlay.arrange-to-back {
     z-index: 900;
@@ -9333,7 +9435,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     min-width: 168px;
 }
 .fm-share-permissions.active, .account-history-drop-items.active {
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
 }
 .fm-notification-body {
     padding: 7px 20px 20px 20px;
@@ -10289,7 +10391,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-arrow {
     height: 6px;
     background-position: center -2060px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
     height: 5px;
     width: 10px;
@@ -10394,7 +10496,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     background-image: none;
 }
 .dropdown-item.do-sort.selected i {
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -30px -1810px;
     background-repeat: no-repeat;
 }
@@ -10687,6 +10789,7 @@ table {
     overflow: hidden;
     top: 0;
     left: 0;
+    -webkit-transform: translate3d(0, 0, 0);
 }
 .avatar-bg span {
     background-size: cover;
@@ -11423,7 +11526,7 @@ table {
 }
 .account.data-item  .tiny-icon.cog:hover {
     opacity: 1;
-} 
+}
 .account.bonuses-block {
     float: left;
     width: 50%;
@@ -11540,6 +11643,18 @@ table {
     width: 68px;
     height: 68px;
     margin: 23px auto 0 auto;
+}
+.dropdown.body.popup.contacts-search {
+    width: 464px;
+    padding: 0 12px;
+}
+.dropdown.body.popup.contacts-search  .contacts-search-scroll {
+    border:1px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+.dropdown.body.popup.contacts-search .fm-dialog-footer {
+    border-top: none;
+    padding: 12px 0 16px 0;
 }
 .dropdown.body.popup.bandwidth-info {
     bottom: 34px;
@@ -11710,7 +11825,7 @@ table {
     width: 20px;
     height: 20px;
     float: right;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 1px 4px;
     background-repeat: no-repeat;
     margin: 8px 12px 5px 0;
@@ -11735,7 +11850,7 @@ table {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     margin-bottom: 10px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 6px -73px;
     background-repeat: no-repeat;
     padding: 1px 11px 1px 31px;
@@ -11813,7 +11928,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 13px;
     height: 14px;
     cursor: pointer;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -3px -237px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -11832,7 +11947,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     float: left;
     width: 55px;
     height: 57px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -2px -289px;
     background-repeat: no-repeat;
 }
@@ -11847,7 +11962,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     padding-top: 5px;
 }
 .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff {
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -2px -392px;
     background-repeat: no-repeat;
     background-size: auto;
@@ -11883,7 +11998,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 5px;
     height: 26px;
     position: relative;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: -3px -554px;
     background-repeat: no-repeat;
     margin-left: -13px;
@@ -11891,7 +12006,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .login-notification-icon {
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 0 -1497px;
     background-repeat: no-repeat;
     position: absolute;
@@ -11916,7 +12031,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     font-size: 13px;
     color: rgb(153,153,153);
     line-height: 21px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 0 -1582px;
     background-repeat: no-repeat;
     float: right;
@@ -11937,7 +12052,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 13px;
     height: 5px;
     position: absolute;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 0 -912px;
     background-repeat: no-repeat;
     margin: 0 0 -10px -6px;
@@ -12082,7 +12197,7 @@ h5.main-italic-header {
     -webkit-border-radius: 5px;
     border-radius: 5px;
     margin-bottom: 20px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 9px -69px;
     background-repeat: no-repeat;
     padding: 0 10px 0 35px;
@@ -12177,7 +12292,7 @@ h5.main-italic-header {
     float: left;
     padding-right: 20px;
     cursor: pointer;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: right -772px;
     background-repeat: no-repeat;
     margin-bottom: 20px;
@@ -12195,7 +12310,7 @@ h5.main-italic-header {
     -webkit-border-top-left-radius: 5px;
     -moz-border-radius-topleft: 5px;
     border-top-left-radius: 5px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: right -662px;
     background-repeat: no-repeat;
 }
@@ -12271,7 +12386,7 @@ h5.main-italic-header {
 .password-status-icon {
     height: 36px;
     width: 30px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 2px -1000px;
     background-repeat: no-repeat;
     position: absolute;
@@ -13220,7 +13335,7 @@ span.browsers-update {
 .account-warning-icon {
     width: 19px;
     margin-left: 3px;
-    background-image: url(../images/mega/top-login-sprite_v7@2x.png);
+    background-image: url(../images/mega/top-login-sprite_v9@2x.png);
     background-position: 3px -1888px;
     position: relative;
     display: none;
@@ -16422,7 +16537,7 @@ color: #D90007 !important;
 }
 div.token-input-dropdown-mega {
     position: absolute;
-    /*width: 456px !important;*/
+    width: 342px !important;
     background-color: #fff;
     overflow: hidden;
     border: 2px solid rgba(0,0,0,0.1);
@@ -17442,21 +17557,30 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .copy-dialog .fm-dialog-body, .move-dialog .fm-dialog-body {
     padding: 14px 0 0 0;
 }
-.copy-dialog-button, .move-dialog-button {
+.copy-dialog-button-block.hidden {
+    display: none;
+}
+.copy-dialog-button, .move-dialog-button  {
     height: 48px;
-    width: 244px;
+    width: 200px;
     float: left;
     background-color: rgba(0,0,0,0.15);
     background-image: url(../images/mega/nw-fm-sprite_v26.svg);
     background-repeat: no-repeat;
     cursor: pointer;
 }
+.copy-dialog .fm-dialog-body.two-tabs .copy-dialog-button.conversations {
+    display: none;
+}
+.copy-dialog .fm-dialog-body.two-tabs .copy-dialog-button {
+    width: 300px;
+}
 .copy-dialog-button.cloud-drive, .move-dialog-button.cloud-drive {
     background-position: center 8px;
 }
 .copy-dialog-button.shared-with-me, .move-dialog-button.shared-with-me {
     background-position: center -87px;
-    width: 232px;
+    width: 200px;
 }
 .copy-dialog-button.conversations, .move-dialog-button.conversations {
     background-position: center -184px;
@@ -17477,7 +17601,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-color: rgba(49,181,0,1);
 }
 .dialog-empty-block {
-    height: 240px;
+    height: 280px;
     position: relative;
     display: none;
     background-color: #FAFAFA;
@@ -17487,14 +17611,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     display: block;
 }
 .move-dialog-button {
-    width: 158px;
+    width: 200px;
 }
 .move-dialog-button.shared-with-me {
-    width: 160px;
+    width: 200px;
 }
 .dialog-empty-icon {
     height: 128px;
-    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-image: url(../images/mega/empty-sprite_v4.png);
     background-position: center -2677px;
     background-repeat: no-repeat;
 }
@@ -17506,6 +17630,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .rubbish-bin .dialog-empty-icon {
     background-position: center -3118px;
+}
+.conversations .dialog-empty-icon {
+    background-position: center -3282px;
 }
 .dialog-empty-header {
     font-size: 18px;
@@ -17532,8 +17659,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     border: 0;
 }
 .copy-dialog-tree-panel, .move-dialog-tree-panel {
-    height: 240px;
-    overflow: hidden;
+    height: 280px;
     display: none;
 }
 .share-dialog-tree-panel {
@@ -17559,7 +17685,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     top: 11px;
 }
 .dialog-tree-panel-scroll {
-    height: 168px;
+    height: 232px;
     min-width: 100%;
 }
 .fm-dialog-body .nw-conversations-item {
@@ -17596,6 +17722,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .main-blur-block {
     height: 100%;
+}
+.overlayed .tooltip-blur {
+    filter: blur(0.25em);
+    -webkit-filter: blur(0.25em);
 }
 /**
  * MegaDialog.js
@@ -17704,7 +17834,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     font-size: 13px;
     color: #999999;
     line-height: 21px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-position: 0 -1582px;
     background-repeat: no-repeat;
     float: right;
@@ -19729,11 +19859,12 @@ body.pro:after {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
+    cursor: pointer;
 }
 .dropdown.body.popup.transfer-widget .fm-dialog-close {
     top: -1px;
     right: -1px;
-    display: block;
+    display: none;
 }
 .fm-dialog-close.small {
     background-image: url(../images/mega/register-big-sprite-v15.png);
@@ -20158,7 +20289,7 @@ div.camera-bottom-txt {
     background-position: -11px -10569px;
 }
 .fm-account-button.megadrop::before {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-position: -78px -1109px;
 }
 .fm-account-button.megadrop.active::before {
@@ -21009,7 +21140,7 @@ div.camera-bottom-txt {
     top: 50%;
 }
 .empty-icon {
-    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-image: url(../images/mega/empty-sprite_v4.png);
     background-repeat: no-repeat;
     height: 185px;
 }
@@ -21220,7 +21351,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     width: 160px;
     height: 160px;
     margin: 0 auto;
-    background: url(../images/mega/zoom-sprite.png) 0px 0px no-repeat;
+    background: url(../images/mega/zoom-sprite_v1.png) 0px 0px no-repeat;
 }
 .zoom-overlay-txt {
     padding: 58px 0 38px 0;
@@ -21273,7 +21404,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     border: 1px solid rgba(255,255,255,0.1);
-    background: url(../images/mega/zoom-sprite.png) center -363px no-repeat;
+    background: url(../images/mega/zoom-sprite_v1.png) center -363px no-repeat;
+}
+.zoom-overlay-key.minus::after {
+    background-position: -111px -364px;
 }
 .zoom-overlay-key.ctrl::after {
     background-position: -25px -171px;
@@ -21525,8 +21659,8 @@ body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
     background-image: url(../images/mega/new-chat-sprite-v7.svg);
     background-repeat: no-repeat;
     background-position: -7px -1353px;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    -webkit-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
+    -moz-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
     box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
     position: absolute;
     right: -3px;
@@ -22522,7 +22656,6 @@ opacity: 1;
 }
 .wu-main .wu-items {
 	height: 350px;
-    cursor: pointer;
 	width: inherit;
     background-color: #FFFFFF;
     border-bottom: 1px solid #eee;
@@ -22865,6 +22998,7 @@ opacity: 1;
 }
 .wu-main .wu-items:hover {
     /* background-color: #f5f7f9; */
+    cursor: pointer;
     background-color: #FFFFFF;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -22902,4 +23036,29 @@ opacity: 1;
 }
 .widget-card .footer-button.widget-dialog-buttons {
     padding-top: 16px;
+}
+.investors-pdf-block {
+    margin-bottom: 12px
+}
+.investors-pdf-block:first-of-type {
+    margin-top: 12px;
+}
+.investors-pdf-block:last-of-type {
+    margin-bottom: 0;
+}
+.investors-pdf-block a {
+    float: right;
+    color: #eb4444;
+    font-size: 14px;
+    line-height: 44px;
+}
+.investors-pdf-title {
+    font-size: 16px;
+    line-height: 24px;
+    color: #333;
+}
+.investors-pdf-date {
+    font-size: 13px;
+    line-height: 20px;
+    color: #999;
 }

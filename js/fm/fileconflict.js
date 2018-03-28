@@ -8,6 +8,7 @@
         }
         keepBothState[target][name] = node;
     };
+    var usedNames = Object.create(null);
 
     var ns = {
         /**
@@ -19,11 +20,16 @@
          * @returns {MegaPromise} Resolves with a non-conflicting array
          * @memberof fileconflict
          */
-        check: function(files, target, op, defaultAction) {
+        check: function (files, target, op, defaultAction, defaultActionFolders) {
             var noFileConflicts = !!localStorage.noFileConflicts;
             var promise = new MegaPromise();
             var conflicts = [];
             var result = [];
+            var merges = [];
+            usedNames = Object.create(null);
+            var foldersRepeatAction = null;
+            var mySelf = this;
+            var breakOP = false;
 
             var setName = function(file, name) {
                 try {
@@ -62,13 +68,15 @@
                 var nodeName = M.getSafeName(file.name);
 
                 if (M.c[nodeTarget] && !file.t) {
-                    found = this.getNodeByName(nodeTarget, nodeName, true);
+                    found = this.getNodeByName(nodeTarget, nodeName, false);
+                }
+                else if (M.c[nodeTarget] && file.t && file.t === 1) {
+                    found = this.getNodeByName(nodeTarget, nodeName, false);
                 }
 
                 if (!found) {
                     found = this.locateFileInUploadQueue(nodeTarget, nodeName);
                 }
-
                 if (found && !noFileConflicts) {
                     conflicts.push([file, found]);
                 }
@@ -88,16 +96,40 @@
                 var repeat;
                 var self = this;
                 var save = function(file, name, action, node) {
+                    var stop = false;
                     if (file) {
                         setName(file, name);
-
-                        result.push(file);
-
+                        var isAddNode = true;
+                        
                         if (action === ns.REPLACE) {
-                            file._replaces = node.h;
+                            if (!file.t) {
+                                file._replaces = node.h;
+                            }
+                            else if (file.t && file.t === 1) {
+                                merges.push([file, node]);
+                                isAddNode = false;
+                                if (op === 'move') {
+                                    // in move i need to propograte mergered folders
+                                    // in order to remove.
+                                    isAddNode = true;
+                                    file._mergedFolderWith = node.h;
+                                    if (M.getShareNodesSync(file.h).length || M.getShareNodesSync(node.h).length) {
+                                        stop = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (isAddNode) {
+                            result.push(file);
                         }
                     }
                     saveKeepBothState(target, node, name);
+                    if (stop) {
+                        resolve();
+                        breakOP = true;
+                        return false;
+                    }
+                    return true;
                 };
 
                 switch (defaultAction) {
@@ -106,58 +138,202 @@
                     case ns.KEEPBOTH:
                         repeat = defaultAction;
                 }
+                switch (defaultActionFolders) {
+                    case ns.REPLACE:
+                    case ns.DONTCOPY:
+                    case ns.KEEPBOTH:
+                        foldersRepeatAction = defaultActionFolders;
+                }
 
-                (function _prompt(a) {
-                    var file = a.pop();
+                var applyCheck = function _prompt(a) {
+                    var promptPromise = new MegaPromise();
 
-                    if (file) {
-                        var node = file[1];
-                        file = file[0];
+                    var promptRecursion = function (a) {
+                        var file = a.pop();
 
-                        if (repeat) {
-                            var name = file.name;
+                        if (file) {
+                            var node = file[1];
+                            file = file[0];
 
-                            switch (repeat) {
-                                case ns.DONTCOPY:
-                                    break;
-                                case ns.KEEPBOTH:
-                                    name = self.findNewName(name, target);
-                                /* fallthrough */
-                                case ns.REPLACE:
-                                    save(file, name, repeat, node);
-                                    break;
+                            var currRepeat = (file.t && file.t === 1) ? foldersRepeatAction : repeat;
+
+                            if (currRepeat && currRepeat !== null) {
+                                var name = file.name;
+
+                                switch (currRepeat) {
+                                    case ns.DONTCOPY:
+                                        break;
+                                    case ns.KEEPBOTH:
+                                        name = self.findNewName(name, (node.p) ? node.p : target);
+                                    /* fallthrough */
+                                    case ns.REPLACE:
+                                        save(file, name, currRepeat, node);
+                                        break;
+                                }
+                                promptRecursion(a);
                             }
-                            _prompt(a);
+                            else {
+                                self.prompt(op, file, node, a.length, (node.p) ? node.p : target)
+                                    .always(function (file, name, action, checked) {
+                                        if (file === -0xBADF) {
+                                            result = [];
+                                            resolve();
+                                        }
+                                        else {
+                                            if (checked) {
+                                                if (file.t && file.t === 1) {
+                                                    foldersRepeatAction = action;
+                                                }
+                                                else {
+                                                    repeat = action;
+                                                }
+                                            }
+                                            if (action !== ns.DONTCOPY) {
+                                                if (!save(file, name, action, node)) {
+                                                    promptPromise.resolve();
+                                                    return;
+                                                }
+                                            }
+
+                                            promptRecursion(a);
+                                        }
+                                    });
+                            }
                         }
                         else {
-                            self.prompt(op, file, node, a.length, target)
-                                .always(function(file, name, action, checked) {
-                                    if (file === -0xBADF) {
-                                        result = [];
-                                        resolve();
-                                    }
-                                    else {
-                                        if (checked) {
-                                            repeat = action;
-                                        }
-                                        save(file, name, action, node);
-
-                                        _prompt(a);
-                                    }
-                                });
+                            promptPromise.resolve();
                         }
+                    };
+                    promptRecursion(a);
+                    return promptPromise;
+
+                };
+                applyCheck(conflicts).always(function _traversTree() {
+                    if (merges && merges.length && !breakOP) { // merge mode ! --> checking everything
+                        var conflictedNodes = [];
+                        var okNodes = [];
+                        for (var k = 0; k < merges.length; k++) {
+                            var res = mySelf.filesFolderConfilicts(M.c[merges[k][0].h], merges[k][1].h);
+                            conflictedNodes = conflictedNodes.concat(res.confilicts);
+                            okNodes = okNodes.concat(res.okNodes);
+                        }
+                        result = result.concat(okNodes);
+                        foldersRepeatAction = ns.REPLACE; // per specifications, merge all internal folders
+                        applyCheck(conflictedNodes).always(function _endingRecursion() {
+                            resolve();
+                        });
+
                     }
                     else {
                         resolve();
                     }
-
-                })(conflicts);
+                });
             }
             else {
                 resolve();
             }
 
             return promise;
+        },
+
+        filesFolderConfilicts: function _filesFolderConfilicts(nodesToCopy, target) {
+            var noConflicts = localStorage.noFileConflicts ? localStorage.noFileConflicts : false;
+            var setName = function (node, name) {
+                try {
+                    Object.defineProperty(node, 'name', {
+                        writable: true,
+                        configurable: true,
+                        value: name
+                    });
+                }
+                catch (e) { }
+            };
+            if (!nodesToCopy || nodesToCopy.length === 0) {
+                return [];
+            }
+            if (!target || target === null) {
+                return [];
+            }
+            if (!Array.isArray(nodesToCopy)) {
+                nodesToCopy = Object.keys(nodesToCopy);
+            }
+            var conflictedNodes = [];
+            var okNodes = [];
+            var folderFound = false;
+            for (var k = 0; k < nodesToCopy.length; k++) {
+                var currNode = nodesToCopy[k];
+
+                if (typeof currNode === 'string') {
+                    currNode = clone(M.d[currNode] || false);
+                }
+                if (!currNode) {
+                    console.warn('Got invalid node (file|folder)...');
+                    continue;
+                }
+                var isFile = !currNode.t;
+                var isFolder = (!isFile && currNode.t === 1);
+                if (isFile) {
+                    try {
+                        // this could throw NS_ERROR_FILE_NOT_FOUND
+                        var test = currNode.size;
+                    }
+                    catch (ex) {
+                        ulmanager.logger.warn(currNode.name, ex);
+                        continue;
+                    }
+                }
+                var found = null;
+
+                var nodeTarget = currNode.target || target;
+                var nodeName = M.getSafeName(currNode.name);
+                if (M.c[nodeTarget]) {
+                    if (isFile) {
+                        found = this.getNodeByName(nodeTarget, nodeName, false);
+                    }
+                    else if (isFolder) {
+                        found = this.getNodeByName(nodeTarget, nodeName, false);
+                    }
+                    else {
+                        console.warn('Got not (file|folder) node, type=' + currNode.t);
+                        continue;
+                    }
+                }
+                currNode.keepParent = nodeTarget;
+                if (!found || found === null) {
+                    found = this.locateFileInUploadQueue(nodeTarget, nodeName);
+                }
+                if (found && !noConflicts) {
+                    if (!folderFound && isFolder) {
+                        folderFound = true;
+                    }
+                    conflictedNodes.push([currNode, found]);
+                }
+                else {
+                    setName(currNode, nodeName);
+                    okNodes.push(currNode);
+                }
+            }
+            if (!folderFound) {
+                return {
+                    confilicts: conflictedNodes,
+                    okNodes: okNodes
+                };
+            }
+            else {
+                var newConflictedNodes = [];
+                var newOkNodes = [];
+                for (var k2 = 0; k2 < conflictedNodes.length; k2++) {
+                    if (conflictedNodes[k2][0].t) { // array contains either files or folders only
+                        var res = this.filesFolderConfilicts(M.c[conflictedNodes[k2][0].h], conflictedNodes[k2][1].h);
+                        newConflictedNodes = newConflictedNodes.concat(res.confilicts);
+                        newOkNodes = newOkNodes.concat(res.okNodes);
+                    }
+                }
+                return {
+                    confilicts: conflictedNodes.concat(newConflictedNodes),
+                    okNodes: okNodes.concat(newOkNodes)
+                };
+            }
         },
 
         /**
@@ -172,40 +348,81 @@
             var promise = new MegaPromise();
             var $dialog = $('.fm-dialog.duplicate-conflict');
             var name = M.getSafeName(file.name);
-
-            $('.info-txt-fn', $dialog).safeHTML(escapeHTML(l[16486]).replace('%1', '<strong>' + name + '</strong>'));
-
             var $a1 = $('.action-block.a1', $dialog);
             var $a2 = $('.action-block.a2', $dialog);
             var $a3 = $('.action-block.a3', $dialog);
+            var icons = $('.export-icon', $dialog);
+            var classes = icons.attr('class').split(' ');
+            icons.removeClass(classes[classes.length - 1]); // remove last class
+            var fIcon;
+            if (!file.t) {
+                $a3.removeClass('hidden');
+                $('.info-txt-fn', $dialog).safeHTML(escapeHTML(l[16486]).replace('%1', '<strong>' + name
+                    + '</strong>'));
+                $('.info-txt.light-grey', $dialog).text(l[16487]);
+                fIcon = fileIcon(node);
+            }
+            else if (file.t && file.t === 1) {
+                $a3.addClass('hidden');
+                $('.info-txt-fn', $dialog).safeHTML(escapeHTML(l[17550]).replace('%1', '<strong>' + name
+                    + '</strong>'));
+                $('.info-txt.light-grey', $dialog).text(l[17556]);
+                fIcon = 'folderConflict';
+            }
+            icons.addClass(fIcon);
+
             switch (op) {
                 case 'copy':
-                    $('.red-header', $a1).text(l[16496]);
-                    $('.red-header', $a2).text(l[16500]);
-                    $('.red-header', $a3).text(l[17095]);
-                    $('.light-grey', $a1).text(l[16498]);
-                    $('.light-grey', $a3).text(l[16515]);
+                    if (!file.t) {
+                        $('.red-header', $a1).text(l[16496]);
+                        $('.red-header', $a2).text(l[16500]);
+                        $('.red-header', $a3).text(l[17095]);
+                        $('.light-grey', $a1).text(l[16498]);
+                        $('.light-grey', $a3).text(l[16515]);
+                    }
+                    else if (file.t && file.t === 1) {
+                        $('.red-header', $a1).text(l[17551]);
+                        $('.red-header', $a2).text(l[16500]);
+                        $('.light-grey', $a1).text(l[17552]);
+                    }
                     break;
                 case 'move':
-                    $('.red-header', $a1).text(l[16495]);
-                    $('.red-header', $a2).text(l[16499]);
-                    $('.red-header', $a3).text(l[17096]);
-                    $('.light-grey', $a1).text(l[16497]);
-                    $('.light-grey', $a3).text(l[16514]);
+                    if (!file.t) {
+                        $('.red-header', $a1).text(l[16495]);
+                        $('.red-header', $a2).text(l[16499]);
+                        $('.red-header', $a3).text(l[17096]);
+                        $('.light-grey', $a1).text(l[16497]);
+                        $('.light-grey', $a3).text(l[16514]);
+                    }
+                    else {
+                        $('.red-header', $a1).text(l[17553]);
+                        $('.red-header', $a2).text(l[16499]);
+                        $('.light-grey', $a1).text(l[17554]);
+                    }
                     break;
                 case 'upload':
-                    $('.red-header', $a1).text(l[17093]);
-                    $('.red-header', $a2).text(l[16490]);
-                    $('.red-header', $a3).text(l[17094]);
-                    $('.light-grey', $a1).html(l[17097]);
-                    $('.light-grey', $a3).text(l[16493]);
-                    break;
-                case 'import':
-                    $('.red-header', $a1).text(l[17558]);
-                    $('.red-header', $a2).text(l[17559]);
-                    $('.red-header', $a3).text(l[17560]);
-                    $('.light-grey', $a1).html(l[17097]);
-                    $('.light-grey', $a3).text(l[17561]);
+                    if (!file.t) {
+                        $('.red-header', $a1).text(l[17093]);
+                        $('.red-header', $a2).text(l[16490]);
+                        $('.red-header', $a3).text(l[17094]);
+
+                        var link = 'https://mega.nz/help/client/webclient/cloud-drive/59f13b42f1b7093a7f8b4589';
+                        var linkHtml = l[17097];
+                        if (linkHtml.indexOf('<') < 0 || linkHtml.indexOf('>') < 0) { // html embed
+                            linkHtml = escapeHTML(l[17097])
+                                .replace(
+                                '[A]', '<a id = "versionhelp"\n' +
+                                'href="' + link + '" target="_blank" class="red">')
+                                .replace('[/A]', '</a>');
+                        }
+                        $('.light-grey', $a1).html(linkHtml);
+                        $('.light-grey', $a3).text(l[16493]);
+                    }
+                    else {
+                        $('.red-header', $a1).text(l[17555]);
+                        $('.red-header', $a2).text(l[16490]);
+                        $('.light-grey', $a2).text('Skip this folder:');
+                    }
                     break;
                 case 'replace':
                     $('.red-header', $a1).text(l[16488]);
@@ -217,14 +434,20 @@
             }
 
             $('.file-name', $a1).text(name);
-            $('.file-size', $a1).text(bytesToSize(file.size || file.s));
-            $('.file-date', $a1).text(time2date(file.mtime || file.ts || (file.lastModified / 1000), 2));
-
+            if (!file.t) {
+                $('.file-size', $a1).text(bytesToSize(file.size || file.s || ''));
+                $('.file-name', $a3).text(this.findNewName(file.name, target));
+                $('.file-size', $a2).text(bytesToSize(node.size || node.s));
+            }
+            else {
+                $('.file-size', $a1).text('');
+                $('.file-size', $a2).text('');
+            }
+            var myTime = file.mtime || file.ts || (file.lastModified / 1000);
+            $('.file-date', $a1).text(myTime ? time2date(myTime, 2) : '');
             $('.file-name', $a2).text(node.name);
-            $('.file-size', $a2).text(bytesToSize(node.size || node.s));
-            $('.file-date', $a2).text(time2date(node.mtime || node.ts, 2));
-
-            $('.file-name', $a3).text(this.findNewName(file.name, target));
+            myTime = node.mtime || node.ts;
+            $('.file-date', $a2).text(myTime ? time2date(myTime, 2) : '');
 
             var done = function(file, name, action) {
                 closeDialog();
@@ -235,7 +458,7 @@
                 done(file, $('.file-name', this).text(), ns.REPLACE);
             });
             $a2.rebind('click', function() {
-                done(null, 0, ns.DONTCOPY);
+                done(file, 0, ns.DONTCOPY);
             });
             $a3.rebind('click', function() {
                 done(file, $('.file-name', this).text(), ns.KEEPBOTH);
@@ -312,8 +535,14 @@
 
             do {
                 newName = this.getNewName(newName);
-            } while (this.getNodeByName(target, newName));
-
+            } while (this.getNodeByName(target, newName) || this.locateFileInUploadQueue(target, newName)
+                || (usedNames[target] && usedNames[target].indexOf(newName) > -1));
+            if (usedNames[target]) {
+                usedNames[target].push(newName);
+            }
+            else {
+                usedNames[target] = [newName];
+            }
             return newName;
         },
 
@@ -357,7 +586,7 @@
          * @returns {Object} The queue entry found
          */
         locateFileInUploadQueue: function(target, name) {
-            for (var i = ul_queue.length; i--;) {
+            for (var i = 0; i < ul_queue.length; i++) {
                 var q = ul_queue[i] || false;
 
                 if (q.target === target && q.name === name) {

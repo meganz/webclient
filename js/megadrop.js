@@ -79,36 +79,94 @@ mega.megadrop = (function() {
     };
 
     /**
-     * Search for MEGAdrop's in folder tree starting from rootNode
-     * @param {String} rootNodeId Folder node handle
-     * @param {Boolean} reset Perform new search
-     * @returns {String} True if MEGAdrop exists
+     * Search for MEGAdrop's in folder tree starting from selected node
+     * @param {String} selected Selected folder/s node handle
+     * @returns {Array} List of items
      */
-    var isDropExist = function isDropExist(rootNodeId, reset) {
-        var list = widgetOpts.fldrList;// MEGAdrop folders id list
-        var currNodeId = rootNodeId;
+    var isDropExist = function isDropExist(selected) {
+        var sel = Array.isArray(selected) ? selected.slice(0) : [selected];
+        var result = [];
 
-        if (reset) {
-            widgetOpts.dropList = [];
-            widgetOpts.fldrList = [];
+        while (sel.length) {
+            var id = sel.shift();
+            if (puf.items[id]) {
+                result.push(id);
+            }
+            if (M.tree[id]) {
+                sel = sel.concat(Object.keys(M.tree[id]));
+            }
         }
 
-        $.each(M.tree[currNodeId], function(nodeId) {
-                list.push(nodeId);
-        });
-
-        if (mega.megadrop.pufs[currNodeId]) {
-            widgetOpts.dropList.push(currNodeId);
-        }
-
-        currNodeId = list.shift();
-        if (currNodeId) {
-            isDropExist(currNodeId);
-        }
-
-        return widgetOpts.dropList.length;
+        return result;
     };
 
+    /**
+     * Make sure that user knows that MEGAdrops wiil be cancelled if any
+     * full shares or public links are available for target
+     * @param {Array} handles Array of nodes id which will be moved
+     * @param {Boolean} target Target node
+     */
+    var preMoveCheck = function preMoveCheck(handles, target) {
+        var sel = Array.isArray(handles) ? handles : [handles];
+        var count = 0;
+        var fldName = '';
+        var list = [];
+        var promise = new MegaPromise();
+
+        var tmpFn = function(fldName, list) {
+            var promise = new MegaPromise();
+
+            msgDialog(
+                'confirmation',
+                l[1003],
+                fldName,
+                false, function(e) {
+                if (e) {
+                    mega.megadrop.pufRemove(list).done(function() {
+                        promise.resolve(sel, target);
+                    });
+                }
+                else {
+                    promise.reject();
+                }
+            });
+
+            return promise;
+        };
+
+        // Is there any MEGAdrop active for given handles?
+        // Count for precise dlg message, will loop to the
+        // end in case there is not MEGAdrops or if only 1 found
+        for (var i = sel.length; i--;) {
+            list = list.concat(isDropExist(sel[i]));
+        }
+        count = list.length;
+        if (count) {// MEGAdrop detected in source tree
+            fldName = count > 1
+                ? l[17626]
+                : l[17403].replace('%1', escapeHTML(M.d[list[0]].name));
+
+            shared(target).done(function(res) {
+                if (res) {// Full share or pub link found
+                    promise = tmpFn(fldName, list);
+                }
+                else {
+                    var share = new mega.Share({});
+                    if (share.isShareExist([target], false, true)) {// Search pending shares .ps
+                        promise = tmpFn(fldName, list);
+                    }
+                    else {
+                        promise.resolve(sel, target);
+                    }
+                }
+            });
+        }
+        else {// Free to move no MEGAdrop's
+            promise.resolve(sel, target);
+        }
+
+        return promise;
+    };
     /**
      * Public upload folder's (PUF) related methods and properties
      */
@@ -147,9 +205,15 @@ mega.megadrop = (function() {
             }
         };
 
-        var onPupAdd = function pufOnPupAdd(pufHandle, pupHandle, state, ignoreDb)  {
+        /**
+         *
+         * @param {String} pufId
+         * @param {String} pupId
+         * @param {Integer} state
+         */
+        var onPupAdd = function pufOnPupAdd(pufId, pupId, state)  {
             var obj = pufOpts.items;
-            var nodeHandle = '';
+            var nodeId = '';
             var folderName = '';
 
             // Update puf.items with related PUP handle
@@ -157,74 +221,75 @@ mega.megadrop = (function() {
                 if (obj.hasOwnProperty(key)) {
                     var elem = obj[key];
 
-                    if (elem.ph === pufHandle) {
-                        nodeHandle = key;
-                        puf.items[key].p = pupHandle;
+                    if (elem.ph === pufId) {
+                        nodeId = key;
+                        pufOpts.items[key].p = pupId;
+                        pufOpts.items[key].s = state;
                         folderName = puf.items[key].fn;
-                        if (fmdb && !ignoreDb && !pfkey) {
-                            if (!pupHandle) {
-                                pupHandle = '';
-                            }
-                            fmdb.add('puf', { ph: pufHandle,
-                                d: { p: pupHandle,
-                                    h: nodeHandle,
+                        if (fmdb && !pfkey) {
+                            fmdb.add('puf', { ph: pufId,
+                                d: { p: pupId,
+                                    h: key,
                                     fn: folderName,
-                                    ph: pufHandle,
+                                    ph: pufId,
                                     s: state
                                 }
                             });
-                            pufOpts.items[nodeHandle].s = state;
                         }
                         break;
                     }
                 }
             }
 
-            return nodeHandle;
+            return nodeId;
         };
         /**
          * Updates variables and indexedDb for PUF
-         * @param {Object} puf Action packet
-         * @param {Boolean} ignoreDb Do/Not write to indexedDb i.e. [true, false]
+         * @param {Object} puh 'puh' AP
          */
-        var _add = function _pufAdd(puf, ignoreDb) {
+        var add = function pufAdd(puh) {
             if (d) {
-                console.log('puf._add');
+                console.log('puf.add');
             }
-            var pufHandle = puf.ph;
-            var nodeHandle = puf.h;
-            var pupHandle = puf.p;
+            var pufId = puh.ph;
+            var nodeId = puh.h;
             var folderName = '';
             var state = 2;
 
-            if (nodeHandle) {
-                if (!pufOpts.items[nodeHandle]) {
-                    pufOpts.items[nodeHandle] = {};
+            if (nodeId) {
+                if (!pufOpts.items[nodeId]) {
+                    pufOpts.items[nodeId] = Object.create(null);
                 }
 
-                pufOpts.items[nodeHandle].h = nodeHandle;
-                pufOpts.items[nodeHandle].ph = pufHandle;
-                pufOpts.items[nodeHandle].p = pupHandle;
+                pufOpts.items[nodeId].h = nodeId;
+                pufOpts.items[nodeId].ph = pufId;
 
-                if (M.d[nodeHandle] && M.d[nodeHandle].name) {
-                    folderName = M.d[nodeHandle].name;
-                }
-                pufOpts.items[nodeHandle].fn = folderName;
-
-                if (pufHandle && fmdb && !ignoreDb && !pfkey) {
-                    fmdb.add('puf', { ph: pufHandle,
-                        d: { p : pupHandle,
-                            h: nodeHandle,
-                            fn: folderName,
-                            ph: pufHandle,
-                            s: state
+                dbfetch.get(nodeId).always(function() {
+                    if (M.d[nodeId] && M.d[nodeId].name) {
+                        folderName = M.d[nodeId].name;
+                    }
+                    else {
+                        if (d) {
+                            console.error('Missing node info M.d ', nodeId);
                         }
-                    });
-                }
+                    }
+                    pufOpts.items[nodeId].fn = folderName;
+
+                    if (pufId && fmdb && !pfkey) {
+                        fmdb.add('puf', { ph: pufId,
+                            d: { p : '',
+                                h: nodeId,
+                                fn: folderName,
+                                ph: pufId,
+                                s: state
+                            }
+                        });
+                    }
+                });
             }
             else {
                 if (d) {
-                    console.error('puf._add nodeHandle is not provided.');
+                    console.error('puf.add nodeHandle is not provided.');
                 }
             }
         };
@@ -232,16 +297,15 @@ mega.megadrop = (function() {
         /**
          * Remove variables and related indexedDb
          * @param {Object} puf Action packet
-         * @param {Boolean} ignoreDb Do/Not remove to indexedDb i.e. [true, false]
          */
-        var _del = function _pufDel(puf, ignoreDb) {
+        var _del = function _pufDel(puf) {
             if (d) {
                 console.log('puf._del');
             }
             var nodeHandle = puf.h;
             var pufHandle = puf.ph;
 
-            if (fmdb && !ignoreDb && !pfkey) {
+            if (fmdb && !pfkey) {
                 fmdb.del('puf', pufHandle);
             }
 
@@ -251,38 +315,30 @@ mega.megadrop = (function() {
         };
 
         /**
-         * Handle API action packets PUH
-         * @param {Array} publicUploadFolders Array of nodes, array of JSON objects
-         * @param {Boolean} ignoreDb i.e [true, false]
-         * @param {Boolean} isPuh Is this 'puh' action packet or not i.e [true, false]
+         * Handle API action packet PUH
+         * @param {Object} ap API AP 'puh'
          */
-        // ToDo: remove isPuh parameter now when uphProcess function is used
-        var processPUH = function pufProcessPUH(publicUploadFolders, ignoreDb, isPuh) {
-            var puf;
-            var pupHandle = '';
+        var processPUH = function pufProcessPUH(ap) {
             if (d) {
                 console.log('puf.processPUH');
             }
 
-            for (var i in publicUploadFolders) {
-                if (publicUploadFolders.hasOwnProperty(i)) {
-                    puf = publicUploadFolders[i];
-
-                    if (puf.d) {// PUF AP delete
-                        pupHandle = pufOpts.items[puf.h].p;
-                        _del(puf, ignoreDb);
-                        if (requesti === puf.i) {
-                            mBroadcaster.sendMessage('MEGAdrop:puf:deleted', pupHandle, ignoreDb, puf.i);
+            for (var i = ap.length; i--;) {
+                var puh = Object.assign({}, ap[i]);
+                if (puh.d) {// 'puh' AP delete
+                    if (requesti === puh.i) {
+                        if (puh.p) {
+                            pup.remove(puh.p);
                         }
-                        else {
-                            pup.remove(pupHandle, false, puf.i);
+                        else {// Make sure that PUF is synced
+                            _del(puh);
                         }
                     }
-                    else {
-                        _add(puf, ignoreDb);
-                        if (requesti === puf.i) {
-                            mBroadcaster.sendMessage('MEGAdrop:puf:created', isPuh, puf.ph, puf.h, ignoreDb, puf.i);
-                        }
+                }
+                else {
+                    add(puh);
+                    if (requesti === puh.i) {
+                        pup.create(puh.h);
                     }
                 }
             }
@@ -315,18 +371,13 @@ mega.megadrop = (function() {
 
         /**
          * Create public upload folder (PUF)
-         * @param {String} handle Node handle
+         * @param {String} handle Folder handle
          */
         var create = function pufCreate(handle) {
             if (d) {
                 console.log('puf.create');
             }
-            var req = {// Create PUF
-                    a: 'ul',
-                    n: '',// Folder handle
-                    d: 0,// Create public upload folder
-                    i: requesti
-                };
+            var req = pufOpts.req.create;
 
             if (handle) {
 
@@ -338,9 +389,9 @@ mega.megadrop = (function() {
                     loadingDialog.show();// .hide() is called in ui.widgetDialog() or on res != 0
                     req.n = handle;
                     api_req(req, {
-                        handle: handle,
                         callback: function (res) {
                             if (res < 0) {
+                                loadingDialog.hide();
                                 msgDialog('warninga', l[135], l[47], api_strerror(res));
                                 if (d) {
                                     console.error('pufCreate failed ', res);
@@ -367,56 +418,59 @@ mega.megadrop = (function() {
          * @param {Object} list MEGAdrop folders id list
          * @param {String} selection Selected folders id
          * @param {String} cb Callback function
+         * @returns {Promise}
          */
-        var remove = function pufRemove(list, selection, cb, cbParam1, cbParam2) {
+        var remove = function pufRemove(list) {
             if (d) {
                 console.log('puf.remove');
             }
 
             var len = list.length;
-            var end = 0;
-            if (len) {
+            var masterPromise = new MegaPromise();
+            var requestPromises = [];
+            var collectedData = [];
+            var failedRequests = [];
 
+            var tmpDone = function (response) {
+                collectedData.push(response);
+            };
+
+            var tmpFail = function (failReason) {
+                if (d) {
+                    console.warn('puf.remove fail ', api_strerror(failReason));
+                }
+                failedRequests.push(failReason);
+            };
+
+            if (len) {
                 loadingDialog.show();
                 for (var k = len; k--;) {
+                    if (!pufOpts.items[list[k]]) {
+                        continue;
+                    }
+                    var req = Object.assign({}, pufOpts.req.remove);
+                    req.n = list[k];
 
-                    var req = {// Remove PUF
-                        a: 'ul',
-                        n: list[k],// Folder handle
-                        d: 1,// Delete public upload folder
-                        i: requesti
-                    };
-
-                    api_req(req, {
-                        callback: function (res) {
-                            if (res < 0) {
-                                 msgDialog('warninga', l[135], l[47], api_strerror(res));
-                            if (d) {
-                                console.error('pufRemove failed ', res);
-                            }
-                        }
-                        else {
-                            end++;
-                            if (cb && len === end) {
-                                if (cbParam1 && cbParam2) {
-                                    cb(cbParam1, cbParam2);
-                                }
-                                else {
-                                    cb(selection);
-                                }
-                            }
-                            if (d) {
-                                console.log('Removal of public upload folder: ', res);
-                            }
-                        }
-                    }});
+                    requestPromises.push(
+                        asyncApiReq(req)
+                            .done(tmpDone)
+                            .fail(tmpFail)
+                    );
                 }
             }
             else {
-                if (d) {
-                    console.warn('Removal of public upload folder: Folder handle is not provided.');
-                }
+                failedRequests.push('puf.remove handle not provided');
             }
+
+            MegaPromise.allDone(requestPromises)
+            .always(function () {
+                masterPromise.resolve([collectedData, failedRequests]);
+                if (failedRequests.length) {
+                    loadingDialog.hide();
+                }
+            });
+
+            return masterPromise;
         };
 
         /**
@@ -447,15 +501,8 @@ mega.megadrop = (function() {
                 console.log('puf.updateFolderName');
             }
 
-            var req = {// Update pup data
-                a: 'ps',
-                p: '',// pup handle
-                d: {},// Data
-                i: requesti
-            };
             var param = 'fn';
             var item = pufOpts.items[handle];
-            var pupHandle = puf.items[handle].p;
 
             item[param] = value;
             if (fmdb && !pfkey) {
@@ -467,34 +514,6 @@ mega.megadrop = (function() {
                     }
                 });
             }
-
-            if (handle && value) {
-                req.d.msg = value;
-                req.d.email = u_attr.email;
-                req.d.name = u_attr.name;
-                req.p = pupHandle;
-                api_req(req, {
-                    callback: function (res) {
-                        if (res < 0) {
-                            msgDialog('warninga', l[135], l[47], api_strerror(res));
-                            if (d) {
-                                console.error('pufUpdateFolderName failed ', res);
-                            }
-                        }
-                        else {
-                            if (d) {
-                                console.log('Public upload page %s update result: ', res);
-                            }
-                        }
-                    }
-                });
-            }
-            else {
-                if (d) {
-                    console.error('Public upload page update: Handle is not provided.');
-                }
-                return EARGS;
-            }
         };
 
         // PUF exports
@@ -503,6 +522,7 @@ mega.megadrop = (function() {
             items: pufOpts.items,
 
             // Functions
+            add: add,
             pufDel: _del,
             getHandle: getHandle,
             create: create,
@@ -530,178 +550,155 @@ mega.megadrop = (function() {
                     name: '',
                     email: '',
                     msg: ''
+                },
+                update: {// Update PUP data
+                    a: 'ps',
+                    p: '',// PUP id
+                    d: {},// data
+                    i: requesti
+                },
+                set: {// Create PUP
+                    a: 'ps',
+                    s: 2,// State i.e. ['remove', 'disable', 'enable']
+                    ph: '',// puf handle
+                    d: {},// Data
+                    i: requesti
+                },
+                get: {// Get PUP data
+                    a: 'pg',
+                    p: '',// pup handle
+                    // i: requesti
+                },
+                remove: {// PUP remove
+                    a: 'ps',
+                    s: 0,
+                    p: '',
+                    i: requesti
+                },
+                list: {// List non-deleted PUP
+                    a: 'pl',
+                    i: requesti
                 }
             }
         };
 
         /**
          * Update indexedDb and pup.opts.items
-         * @param {Object} pup
-         * @param {String} pupHandle PUP handle
-         * @param {Boolean} ignoreDb
-         * @param {Boolean} isPuh Is 'puh' action packet or not
-         * @param {Object} cb callback
+         * @param {Object} pg PUP AP
          */
-        var _add = function _pupAdd(pup, pupHandle, ignoreDb, isPuh, cb) {
+        var add = function pupAdd(pg) {
             if (d) {
-                console.log('pup._add');
+                console.log('pup.add');
             }
-            var msg = '';
-            var name = u_attr.name;
-            var email = u_attr.email;
-            var state = pup.s;// state i.e. ['remove', 'disable', 'enable']
-            var folderName = '';
-            var pufHandle = pup.ph;
-            var nodeHandle = '';
+
+            var state = pg.s;
+            var pufId = pg.ph;
+            var pupId = pg.p;
 
             // Update puf.items with related PUP handle
-            nodeHandle = puf.onPupAdd(pufHandle, pupHandle, state, ignoreDb);
-            folderName = puf.items[nodeHandle].fn;
+            var nodeId = puf.onPupAdd(pufId, pupId, state);
+            if (!nodeId) {
+                return;
+            }
+            var folderName = puf.items[nodeId].fn;
 
-            if (pupHandle) {
-
-                if (fmdb && !ignoreDb && !pfkey) {
-                    fmdb.add('pup', { p: pupHandle,
-                        d: { p: pupHandle,
-                            ph: pufHandle,
-                            name: name,
-                            email: email,
+            if (pupId) {
+                if (fmdb && !pfkey) {
+                    fmdb.add('pup', { p: pupId,
+                        d: { p: pupId,
+                            ph: pufId,
+                            name: u_attr.name,
+                            email: u_attr.email,
                             s: state,
-                            msg: msg,
+                            msg: '',
                             fn: folderName,
-                            h: nodeHandle
+                            h: nodeId
                         }
                     });
                 }
 
-                if (!pupOpts.items[pupHandle]) {
-                    pupOpts.items[pupHandle] = {};
+                if (!pupOpts.items[pupId]) {
+                    pupOpts.items[pupId] = {};
                 }
 
-                pupOpts.items[pupHandle] = {};
-                folderName = puf.items[nodeHandle].fn;
-                pupOpts.items[pupHandle].fn = folderName;
-                pupOpts.items[pupHandle].h = nodeHandle;
-                pupOpts.items[pupHandle].msg = msg;
-                pupOpts.items[pupHandle].s = state;
+                pupOpts.items[pupId] = {};
+                folderName = puf.items[nodeId].fn;
+                pupOpts.items[pupId].fn = folderName;
+                pupOpts.items[pupId].h = nodeId;
+                pupOpts.items[pupId].msg = '';
+                pupOpts.items[pupId].s = state;
 
-                pupOpts.items[pupHandle].p = pupHandle;
-                pupOpts.items[pupHandle].ph = pufHandle;
-
-                // Add new widget card to settings
-                settings.add(pupHandle);
-            }
-
-            // Add widget->settings DOM
-            if (cb) {
-                cb(pupHandle, isPuh);
+                pupOpts.items[pupId].p = pupId;
+                pupOpts.items[pupId].ph = pufId;
             }
         };
 
         /**
          * Get public upload page data
-         * @param {String} handle Public upload page handle
-         * @param {Boolean} ignoreDb To ignore indexedDb or not
+         * @param {Array} pupList PUP id list
          * @param {Boolean} isPuh Is 'puh' action packet or not
          * @param {Object} cb Callback
          */
-        var get = function pupGet(handle, ignoreDb, isPuh, cb) {
+        var get = function pupGet(pupList) {
             if (d) {
                 console.log('pup.get');
             }
-            var req = {// Get pup data
-                a: 'pg',
-                p: '',// pup handle
-                i: requesti
+            var cb = function(res) {
+                if (res < 0) {
+                    if (d) {
+                        console.warn('pup.get failed');
+                    }
+                }
+                else {
+                    add(res);
+                    if (d) {
+                        console.log('pup.get success ', JSON.stringify(res));
+                    }
+                }
             };
 
-            if (handle) {
-                req.p = handle;// pup handle
+            for (var i = pupList.length; i--;) {
+                var req = Object.assign({}, pupOpts.req.get);
+                req.p = pupList[i].p;
 
                 // Get pup data
                 api_req(req, {
-                    handle: handle,
-                    isPuh: isPuh,
-                    cb: cb,
-                    callback: function (res) {
-                        if (res < 0) {
-                            if (d) {
-                                console.warn('pupGet, no associated data to ', handle);
-                            }
-                        }
-                        else {
-                            if (d) {
-                                console.log('pup.get: Pup %s get result: %s', handle, JSON.stringify(res));
-                            }
-                            _add(res, handle, ignoreDb, isPuh, cb);
-                        }
-                    }
+                    callback: cb
                 });
-            }
-            else {
-                if (d) {
-                    console.error('pup Get: Page handle is not provided.');
-                }
             }
         };
 
         /**
-         * Set public upload page data, link PUP with PUF
-         * it's executed only on puf:created, for PUP page date
-         * update update function is used
-         * @param {String} pufHandle Public upload folder handle
-         * @param {Number} state State i.e. [delete, disable, enable]
-         * @param {Boolean} ignoreDb i.e [true, false]
-         * @param {Boolean} isPuh Is this 'puh' AP or not i.e [true, false]
-         * @param {String} nodeHandle PUF related node handle
+         * Set public upload page data
+         * @param {String} nodeId Folder id
          */
-        var set = function pupSet(pufHandle, state, ignoreDb, isPuh, nodeHandle) {
+        var create = function pupCreate(nodeId) {
             if (d) {
-                console.log('pup.set');
+                console.log('pup.create');
             }
-            var req = {// Create pup
-                a: 'ps',
-                s: 2,// State i.e. ['remove', 'disable', 'enable']
-                ph: '',// puf handle
-                d: {},// Data
-                i: requesti
-            };
-            var data = {// pup data
-                name: '',
-                email: '',
-                msg: ''
-            };
+            var req = Object.assign({}, pupOpts.req.set);
+            var data = Object.assign({}, pupOpts.req.data);
 
-            if (pufHandle) {
+            if (nodeId) {
                 data.name = u_attr.name;
                 data.email = u_attr.email;
-                data.msg = puf.items[nodeHandle].fn;// Folder name instead of custom msg
+                data.msg = puf.items[nodeId].fn;// Folder name instead of custom msg
 
-                req.ph = pufHandle;
-                req.d = data;
+                req.ph = puf.items[nodeId].ph;
+                req.d = Object.assign({}, data);
 
                 api_req(req, {
-                    handle: pufHandle,
-                    nodeHandle: nodeHandle,
                     callback: function (res) {
-
                         if (res.length === 11) {// Length of PUP handle
-                            get(res, ignoreDb, isPuh, function(pupHandle, isPuh) {
-                                if (isPuh) {
-                                    ui.widgetDialog(pupHandle);
-                                }
-                            });
-
                             if (d) {
-                                console.log('pup.set: Public upload page %s set result: ', res);
+                                console.log('pup created ', res);
                             }
                         }
                         else {
-                            loadingDialog.hide();
                             closeDialog();
                             msgDialog('warninga', l[135], l[47], api_strerror(res));
                             if (d) {
-                                console.error('pupSet failed ', res);
+                                console.error('pupSet failed ', api_strerror(res));
                             }
                         }
                     }
@@ -709,7 +706,7 @@ mega.megadrop = (function() {
             }
             else {
                 if (d) {
-                    console.error('pup.set: Public upload page: pufHandle is not provided.');
+                    console.error('pup.create: Public upload page: pufHandle is not provided.');
                 }
             }
         };
@@ -717,15 +714,14 @@ mega.megadrop = (function() {
         /**
          * Remove from indexedDb and pup.opts.items
          * @param {String} handle PUP handle
-         * @param {Boolean} ignoreDb
          */
-        var _del = function _pupDel(handle, ignoreDb) {
+        var _del = function _pupDel(handle) {
             if (d) {
                 console.log('pup._del');
             }
             var obj = puf.items;
 
-            if (fmdb && !ignoreDb && !pfkey) {
+            if (fmdb && !pfkey) {
                 fmdb.del('pup', handle);
             }
 
@@ -739,7 +735,7 @@ mega.megadrop = (function() {
                     var elem = obj[key];
 
                     if (elem.p === handle) {
-                        if (fmdb && !ignoreDb && !pfkey) {
+                        if (fmdb && !pfkey) {
                             if (puf.items[key]) {
                                 delete puf.items[key];
                             }
@@ -755,49 +751,30 @@ mega.megadrop = (function() {
         /**
          * Remove public upload page PUP
          * @param {String} handle Public upload page handle
-         * @param {Boolean} ignoreDb
          */
-        var remove = function pupRemove(handle, ignoreDb, sourceId) {
+        var remove = function pupRemove(handle) {
             if (d) {
                 console.log('pup.remove');
             }
-            var req = {
-                a: 'ps',
-                s: 0,
-                p: '',
-                i: requesti
-            };
 
             if (handle) {
-                if (requesti === sourceId) {
-                    req.p = handle;// pup handle
-                    api_req(req, {
-                        callback: function (res) {
-                            if (res < 0) {
-                                msgDialog('warninga', l[135], l[47], api_strerror(res));
-                                if (d) {
-                                    console.error('pupRemove failed ', res);
-                                }
+                var req = Object.assign({}, pupOpts.req.remove);
+                req.p = handle;// pup handle
+                api_req(req, {
+                    callback: function (res) {
+                        if (res < 0) {
+                            msgDialog('warninga', l[135], l[47], api_strerror(res));
+                            if (d) {
+                                console.error('pupRemove failed ', res);
                             }
-                            else {
-                                if (d) {
-                                    console.log('pup.remove: Public upload page state change result: ', res);
-                                }
-                                settings.remove(handle);
-                                _del(res, ignoreDb);
-                            }
-                            loadingDialog.hide();
                         }
-                    });
-                }
-                else {
-                    if (d) {
-                        console.log('pup.remove: PUP local vars and idxDb items remove, handle: ', handle);
+                        else {
+                            if (d) {
+                                console.log('pup.remove: Public upload page state change result: ', res);
+                            }
+                        }
                     }
-                    settings.remove(handle);
-                    _del(handle, ignoreDb);
-                    loadingDialog.hide();
-                }
+                });
             }
             else {
                 if (d) {
@@ -818,38 +795,32 @@ mega.megadrop = (function() {
                 console.log('pup.list');
             }
 
-            var req = {// List non-deleted user's pups
-                a: 'pl',
-                i: requesti
-            };
+            var promise = new MegaPromise();
+            var req = pupOpts.req.list;
 
             api_req(req, {
                 callback: function (res) {
                     if (res.length) {
+                        promise.resolve(res);
+                        if (toRemove) {
+                            for (var i = res.length; i--;) {
+                                var tmp = Object.assign({}, res[i]);
+                                pup.remove(tmp.p);
+                            }
+                        }
                         if (d) {
                             console.table(res);
                         }
-                        for (var i in res) {
-                            if (res.hasOwnProperty(i)) {
-                                var item = res[i];
-                                var pupHandle = item.p;
-
-                                if (toRemove) {
-                                    pup.remove(pupHandle, true, requesti);
-                                }
-                                else {
-                                    pup.get(pupHandle, false, false);
-                                }
-                            }
-                        }
                     }
                     else {
+                        promise.reject();
                         if (d) {
                             console.log('pup.list: There is no PUPs available');
                         }
                     }
                 }
             });
+            return promise;
         };
 
         /**
@@ -862,11 +833,7 @@ mega.megadrop = (function() {
             if (d) {
                 console.log('pup.check');
             }
-            var req = {// Get pup data
-                a: 'pg',
-                p: '',// pup handle
-                i: requesti
-            };
+            var req = pupOpts.req.get;
 
             loadingDialog.show();
             req.p = handle;
@@ -923,22 +890,6 @@ mega.megadrop = (function() {
         };
 
         /**
-         * Create PUP and link it with PUF
-         * @param {String} handle PUF handle
-         * @param {Boolean} ignoreDb i.e [true, false]
-         * @param {Boolean} isPuh Is this 'puh' action packet or not i.e [true, false]
-         * @param {String} folderHandle PUF related node handle
-         */
-        var create = function pupCreate(handle, ignoreDb, isPuh, folderHandle, sourceId) {
-            if (d) {
-                console.log('pup.create');
-            }
-            var state = 'enable';
-
-            set(handle, state, ignoreDb, isPuh, folderHandle, sourceId);
-        };
-
-        /**
          * @param {Array} data Read from indexedDb PUP
          */
         var processDb = function pupProcessDb(data) {
@@ -960,23 +911,6 @@ mega.megadrop = (function() {
                     pupOpts.items[pupHandle] = pup;
                 }
             }
-        };
-
-        var adjustReq = function pupAdjustReq(args) {
-            var req = {
-                a: 'ps',
-                s: 0,
-                p: '',
-                i: requesti
-            };
-
-            for (var key in args) {
-                if (args.hasOwnProperty(key)) {
-                    req[key] = args[key];
-                }
-            }
-
-            return req;
         };
 
         /**
@@ -1009,48 +943,109 @@ mega.megadrop = (function() {
 
         /**
          * Handle API action packet 'pup'
+         * @param {Object} ap 'pup' API AP
          */
-        var processPUP = function pupProcessPUP(ap, ignoreDb) {
+        var processPUP = function pupProcessPUP(ap) {
             if (d) {
                 console.log('pup.processPUP');
             }
             var item = {};
             var state = 0;
+            var folderId = '';
+            var pupId = '';
 
-            for (var i in ap) {
-                if (ap.hasOwnProperty(i)) {
-                    item = ap[i];
-                    pupHandle = item.p;
-                    pufHandle = item.ph;
-                    state = item.s ? item.s : 0;
-                    if (state) {
-                        _add(item, pupHandle, ignoreDb, true, settings.drawPupCard);
-                        $('.fm-account-button.megadrop').removeClass('hidden');
+            for (var i = ap.length; i--;) {
+                item = Object.assign({}, ap[i]);
+                pupId = item.p;
+                pufHandle = item.ph;
+                state = item.s ? item.s : 0;
+                if (state === 2) {// Active PUP
+                    add(item);
+                    folderId = pupOpts.items[pupId].h;
+                    if (item.u) {// In case that pup data is updated
+                        onRename(folderId, M.d[folderId].name);
                     }
-                    else {
-                        _del(pupHandle, ignoreDb);
-                    }
+                    settings.add(pupId, folderId);
+                    settings.drawPupCard(pupId);// Add to DOM widget->settings
+                    $('.fm-account-button.megadrop').removeClass('hidden');
 
+                    // Don't show dialog if PUP data is updated
+                    if (requesti === item.i && !item.u) {
+                        ui.widgetDialog(pupId);
+                    }
                 }
                 else {
-                    if (d) {
-                        console.warn('Public upload page disabled: Handle or state are not provided.', i);
+                    if (pupOpts.items[pupId]) {
+                        folderId = pupOpts.items[pupId].h;
+                        settings.remove(pupId, folderId);
+                        _del(pupId);
                     }
+                }
+            }
+
+            loadingDialog.hide();
+        };
+
+        /**
+         * Update PUP data
+         * @param {String} id Node id
+         * @param {String} type 'msg' folder name, 'name' full name, 'email' email
+         * @param {String} value
+         */
+        var update = function pupUpdate(id, type, value) {
+
+            if (d) {
+                console.log('pup.update');
+            }
+
+            // Same folder name, exit
+            if (!fminitialized || type === 'msg' && value === puf.items[id].fn) {
+                return false;
+            }
+            var req = pupOpts.req.update;
+            var pupId = puf.items[id].p;
+
+            req.d.msg = puf.items[id].fn;
+            req.d.email = u_attr.email;
+            req.d.name = u_attr.name;
+            req.d[type] = value;// Update param with new value
+
+            if (value) {
+                req.p = pupId;
+                api_req(req, {
+                    callback: function (res) {
+                        if (res < 0) {
+                            msgDialog('warninga', l[135], l[47], api_strerror(res));
+                            if (d) {
+                                console.error('pup.update failed ', res, type, value);
+                            }
+                        }
+                        else {
+                            if (d) {
+                                console.log('pup.update ', res);
+                            }
+                        }
+                    }
+                });
+            }
+            else {
+                if (d) {
+                    console.error('pup.update missing value', type, value);
                 }
             }
         };
 
         return {
+            add: add,
             get: get,
-            set: set,
             list: list,
             pubk: pubk,
             check: check,
             create: create,
+            update: update,
             remove: remove,
             processPUP: processPUP,
             items: pupOpts.items,
-            adjustReq: adjustReq,
             processDb: processDb,
             updateFolderName: updateFolderName
         };
@@ -1107,7 +1102,7 @@ mega.megadrop = (function() {
             var pupPath = l[1687];
             var $domElem = $('#stngs_pup_tmpl').clone();
 
-            if (!$('#pup_' + pupHandle).length) {
+            if (pupHandle && !$('#pup_' + pupHandle).length) {
                 item = pup.items[pupHandle];
                 name = item.fn;
                 nodeHandle = item.h;
@@ -1298,12 +1293,12 @@ mega.megadrop = (function() {
                 for (var key in list) {
                     if (list.hasOwnProperty(key)) {
                         item = list[key];
-                        if (item.p) {
+                        if (item.p && item.s === 2) {
                             cb(item.p);
                         }
                         else {
                             if (d) {
-                                console.error('settings.drawPups: Missing pupHandle for folder: ', item.fn);
+                                console.warn('settings.drawPups: non-active PUP: ', item.fn);
                             }
                         }
                     }
@@ -1331,40 +1326,34 @@ mega.megadrop = (function() {
         /**
          * Remove upload page card and expanded card on PUF/PUP removal
          * @param {String} pupHandle Public upload page handle
-         */
-        var remove = function settingsRemove(pupHandle) {
-            var nodeHandle = '';
+         * @param {String} nodeHandle Folder id
+         *          */
+        var remove = function settingsRemove(pupHandle, nodeHandle) {
 
-            if (pup.items[pupHandle]) {
+            // un-bind all events related to .expanded-widget
+            $('.widget-container .expanded-widget').off();
 
-                nodeHandle = pup.items[pupHandle].h;
+            $('#ew_' + pupHandle).remove();// Remove expanded-card
+            $('#pup_' + pupHandle).remove();// Remove widget-card
+            delExpanded(pupHandle);
+            ui.nodeIcon(nodeHandle);
 
-                // un-bind all events related to .expanded-widget
-                $('.widget-container .expanded-widget').off();
-
-                $('#ew_' + pupHandle).remove();// Remove expanded-card
-                $('#pup_' + pupHandle).remove();// Remove widget-card
-                delExpanded(pupHandle);
-                ui.nodeIcon(nodeHandle);
-
-                if (!Object.keys(puf.items).length && M.currentdirid === 'account/megadrop') {
-                    M.openFolder(M.RootID);
-                }
+            if (Object.keys(puf.items).length === 1 && M.currentdirid === 'account/megadrop') {
+                M.openFolder(M.RootID);
             }
         };
 
         /**
          * Add newly created widget to settings tab
-         * @param {Object} pupHandle Cacheck PUP
+         * @param {String} pupHandle PUP id
+         * @param {String} nodeHandle Folder id
          */
-        var add = function settingsAdd(pupHandle) {
-            var nodeHandle = '';
+        var add = function settingsAdd(pupHandle, nodeHandle) {
 
             // Draw only enabled PUP, disregard disabled
-            if (!$('#pup_' + pupHandle).length) {
+            if (pupHandle && !$('#pup_' + pupHandle).length) {
                 drawPupCard(pupHandle);
-                nodeHandle = pup.items[pupHandle].h;
-                ui.nodeIcon(nodeHandle);
+                ui.nodeIcon(nodeHandle, true);
             }
         };
 
@@ -1675,22 +1664,23 @@ mega.megadrop = (function() {
             var handle = pup.items[pupHandle].h;
 
             // Is there a related public upload page handle
-            loadingDialog.hide();
             if (puf.items[handle] && puf.items[handle].p) {
                 _widgetDlgContent(handle);
                 M.safeShowDialog('megadrop-dialog', uiOpts.dlg.widget.$[0]);
                 uiOpts.dlg.widget.$.clipboard.removeClass('hidden');
             }
+            loadingDialog.hide();
         };
 
         /**
          * Check is widget exists for folder and render or remove appropriate icon
          * @param {String} nodeHandle Folder handle
+         * @param {Boolean} render To draw or to delete
          */
-        var nodeIcon = function uiNodeIcon(nodeHandle) {
+        var nodeIcon = function uiNodeIcon(nodeHandle, render) {
             var icon = 'puf-folder';
 
-            if (puf.items[nodeHandle] && puf.items[nodeHandle].s !== 1) {
+            if (render) {
 
                 // Update right panel selected node with appropriate icon for list view
                 $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').addClass(icon);
@@ -1824,7 +1814,7 @@ mega.megadrop = (function() {
 
         // Widget upload window event listeners
         var _winEventListeners = function _uiWinEventListeners() {
-            $('.widget-upload .wu-empty-upload,.widget-upload .wu-btn').rebind('click.widget_upload', function() {
+            $('.widget-upload .wu-items,.widget-upload .wu-btn').rebind('click.widget_upload', function() {
                 $('#fileselect5').click();
             });
 
@@ -1933,7 +1923,7 @@ mega.megadrop = (function() {
         }
 
         // Context menu create widget
-        $('.dropdown.body.context .dropdown-item.createwidget-item').rebind('click.create_widget', function (event) {
+        $('.dropdown.body.context .dropdown-item.createwidget-item').rebind('click.create_widget', function () {
 
             // Go to widget creation directly don't display PUF info dialog
             if (ui.skipInfoDlg()) {
@@ -1945,7 +1935,7 @@ mega.megadrop = (function() {
         });
 
         // Context menu manage widget
-        $('.dropdown.body.context .dropdown-item.managewidget-item').rebind('click.manage_widget', function (event) {
+        $('.dropdown.body.context .dropdown-item.managewidget-item').rebind('click.manage_widget', function () {
 
             // Go to widget creation directly don't display PUF info dialog
             if (ui.skipInfoDlg()) {
@@ -1957,7 +1947,7 @@ mega.megadrop = (function() {
         });
 
         // Context menu Remove upload page
-        $('.dropdown.body.context .dropdown-item.removewidget-item').rebind('click.remove_widget', function (event) {
+        $('.dropdown.body.context .dropdown-item.removewidget-item').rebind('click.remove_widget', function () {
             puf.remove($.selected);
         });
     });
@@ -2013,28 +2003,6 @@ mega.megadrop = (function() {
         widgetOpts.ownerKey = crypto_decodepubkey(base64urldecode(widgetOpts.pubk));
         widgetOpts.initialized = true;
         init();
-    });
-
-    /**
-     * @param {Boolean} isPuh 'puh' AP or not
-     */
-    mBroadcaster.addListener('MEGAdrop:puf:created', function(isPuh, pufHandle, nodeHandle, ignoreDb, sourceId) {
-        if (d) {
-            console.log('MEGAdrop:puf:created');
-        }
-
-        if (nodeHandle && puf.items[nodeHandle]) {
-            pup.create(pufHandle, ignoreDb, isPuh, nodeHandle, sourceId);
-        }
-        else {
-            if (d) {
-                console.error('MEGAdrop:puf:created nodeHandle is not provided.');
-            }
-        }
-    });
-
-    mBroadcaster.addListener('MEGAdrop:puf:deleted', function(handle, ignoreDb, sourceId) {
-        pup.remove(handle, ignoreDb, sourceId);
     });
 
     /**
@@ -2102,7 +2070,10 @@ mega.megadrop = (function() {
             }
         }
         ulmanager.isUploading = Boolean(ul_queue.length);
-        InitFileDrag();
+
+        // Hide Drop to Upload dialog, no need to call InitFileDrag on every upload
+        $('.drag-n-drop.overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
     };/* jshint +W074 */
 
     var isInit = function widgetIsInit() {
@@ -2121,45 +2092,60 @@ mega.megadrop = (function() {
      * From this AP, db and cached data structures will be recreated
      * and updated with active PUP informations. We are taking
      * enabled and disabled PUPs into account
-     * @param {Object} ap 'uph' action packet
+     * @param {Object} ap 'uph' action packet {ph: puhId, h : nodeId}
      */
-    var processUPH = function widgetProcessUPH(ap, ignoreDb) {
+    var processUPH = function widgetProcessUPH(ap) {
+        if (d) {
+            console.log('processUPH');
+        }
+        var promise = new MegaPromise();
 
         // Use data from AP
         // Get folder name from 'h' attribute
         for (var i in ap) {
             if (ap.hasOwnProperty(i)) {
                 var item = ap[i];
-                var pufHandle = item.ph;
-                var nodeHandle = item.h;
+                var pufId = item.ph;
+                var nodeId = item.h;
                 var nodeName = '';
 
-                if (M.d[nodeHandle]) {
-                    nodeName = M.d[nodeHandle].name;
+                dbfetch.get(nodeId)
+                    .done(function() {
+                        nodeName = M.d[nodeId].name;
+                        if (pufId && fmdb && !pfkey) {
+                            fmdb.add('puf', { ph: pufId,
+                                d: { h: nodeId,
+                                    p: '',
+                                    fn: nodeName,
+                                    ph: pufId
+                                }
+                            });
+                        }
 
-                    if (pufHandle && fmdb && !ignoreDb && !pfkey) {
-                        fmdb.add('puf', { ph: pufHandle,
-                            d: { h: nodeHandle,
-                                fn: nodeName,
-                                ph: pufHandle,
-                            }
-                        });
-                    }
-
-                    puf.items[nodeHandle] = {};
-                    puf.items[nodeHandle].h = nodeHandle;
-                    puf.items[nodeHandle].ph = pufHandle;
-                    puf.items[nodeHandle].fn = nodeName;
-                }
-                else {
-                    if (d) {
-                        console.warn('widget.processUph Missing M.d for handle: ', nodeHandle);
-                    }
-                }
+                        puf.items[nodeId] = {};
+                        puf.items[nodeId].h = nodeId;
+                        puf.items[nodeId].ph = pufId;
+                        puf.items[nodeId].fn = nodeName;
+                        promise.resolve();
+                    })
+                    .fail(function() {
+                        if (d) {
+                            console.warn('widget.processUph Missing M.d for handle: ', nodeId);
+                        }
+                        promise.reject();
+                    });
             }
         }
 
-        pup.list();
+        return promise;
+    };
+
+    var processUPHAP = function processUPHAP(ap) {
+        processUPH(ap).done(function() {
+            pup.list().done(function(pupList) {
+                pup.get(pupList);
+            });
+        });
     };
 
     /**
@@ -2253,26 +2239,28 @@ mega.megadrop = (function() {
         upload: put,
         isInit: isInit,
         onRename: onRename,
-        processUPH: processUPH,
-        getPufHandle: pufHandle,
         getDropList: dropList,
+        getPufHandle: pufHandle,
         isDropExist: isDropExist,
+        preMoveCheck: preMoveCheck,
+        processUPHAP: processUPHAP,
         getOwnersHandle: ownersHandle,
         disableDragDrop: disableDragDrop,
         overQuota: showMEGAdropOverQuota,
 
         // PUF
         pufs: puf.items,
-        pufProcessPUH: puf.processPUH,
+        pufRemove: puf.remove,
         pufHandle: puf.getHandle,
         pufProcessDb: puf.processDb,
-        pufRemove: puf.remove,
+        pufProcessPUH: puf.processPUH,
 
         // PUP
+        pupGet: pup.get,
         pups: pup.items,
-        pupInfo: pup.get,
         pupList: pup.list,
         pupCheck: pup.check,
+        pupUpdate: pup.update,
         pupProcessPUP: pup.processPUP,
         pupProcessDb: pup.processDb,
 

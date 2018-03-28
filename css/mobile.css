@@ -297,7 +297,6 @@ ul, li {
     color: #444;
     word-break: break-all;
     white-space: normal;
-    letter-spacing: 0.2px;
     padding: 0 0 0 0;
     margin: -32px 15px 0 15px;
     font-family: 'source_sans_prosemibold';
@@ -317,7 +316,6 @@ ul, li {
 .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
     font-size: 19px;
     line-height: 24px;
-    letter-spacing: 1.9px;
     color: #AAAAAA;
     padding: 0 23px;
     margin: 8px 0 18px 0;
@@ -753,7 +751,10 @@ ul, li {
 .mobile.fm-item.undecrypted .fm-item-details {
     color: #ffa500;
 }
-.mobile.fm-item:nth-child(even) {
+.mobile.fm-item.folder:nth-child(odd) {
+    background-color: #fff;
+}
+.mobile.fm-item.file:nth-child(even) {
     background-color: #fff;
 }
 .mobile.fm-icon {
@@ -800,6 +801,12 @@ ul, li {
 }
 .mobile.fm-header .fm-icon.menu {
     margin: 12px 6px 0 7px;
+}
+.mobile.fm-header .fm-icon.view-options.grid-icon {
+    margin: 11px 6px 0 6px;
+}
+.mobile.fm-header .fm-icon.view-options.list-icon {
+    margin: 11px 6px 0 6px;
 }
 .mobile.fm-icon.plus {
     background-position: -126px -1239px;
@@ -877,6 +884,12 @@ ul, li {
 .mobile.fm-icon.broken-heart {
     background-position: -50px -1667px
 }
+.mobile.fm-icon.grid-icon {
+    background-position: -150px -1787px
+}
+.mobile.fm-icon.list-icon {
+    background-position: -100px -1787px;
+}
 .mobile.content-cell .mobile.menu.dl-page {
     position: absolute;
     top: 20px;
@@ -931,6 +944,7 @@ ul, li {
 }
 .folder-link .mobile.fm-header-txt {
     padding: 14px 20px 0 20px;
+    overflow: initial;
 }
 .folder-link .mobile.fm-header-txt span {
     font-size: 18px;
@@ -938,11 +952,11 @@ ul, li {
     text-align: center;
 }
 .mobile.fm-item-img {
-    float: left;
     margin: 0 0 0 12px;
-    text-align: center;
+    text-align: left;
     position: relative;
     height: 56px;
+    float: left;
 }
 .mobile.fm-item-img.folder {
     margin: 7px 0 0 10px;
@@ -1134,7 +1148,7 @@ ul, li {
 }
 .mobile.empty-icon {
     width: 145px;
-    height: 108px;
+    height: 109px;
     margin: 0 auto 20px auto;
     background-image: url(../images/mobile/mobile-sprite_v10.png);
     background-repeat: no-repeat;
@@ -1143,7 +1157,7 @@ ul, li {
     background-position: -3px -1442px;
 }
 .mobile.empty-folder .empty-icon {
-    background-position: -3px -1299px;
+    background-position: -3px -1300px;
 }
 .mobile.empty-txt span {
     color: #777777;
@@ -1271,7 +1285,7 @@ ul, li {
 .signin-register-block .tab-block.register .signin-input.password {
     position: relative;
 }
-.signin-register-block .estimator-loading-icon {
+.signin-register-block .estimator-loading-icon, .recover-account-page .estimator-loading-icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader-gray.gif") no-repeat scroll 0 0 / 16px 16px;
     display: none;
     height: 16px;
@@ -1281,7 +1295,7 @@ ul, li {
     width: 16px;
     z-index: 1;
 }
-.signin-register-block .estimator-loading-icon.loading {
+.signin-register-block .estimator-loading-icon.loading, .recover-account-page .estimator-loading-icon.loading {
     display: block;
 }
 /* Prevent Chrome displaying the default checkbox */
@@ -1358,6 +1372,17 @@ input[type='checkbox'] {
 }
 .mobile.sign-in .download-app, .mobile.register .download-app {
     margin: 15px auto 0 auto;
+}
+.mobile.sign-in .forgot-password-button {
+    color: #888;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 15px;
+    letter-spacing: 0.2px;
+    margin-top: 16px;
+    text-decoration: underline;
+    text-align: center;
+    width: 100%;
 }
 .mobile.confirm-terms {
     background-color: #fff;
@@ -2713,6 +2738,10 @@ div.checkboxOn, div.checkboxOff {
     margin: 0;
     padding: 0;
 }
+.mobile.generic-dialog-overlay .initial-message a {
+    font-family: 'source_sans_prosemibold';
+    color: #eb4444;
+}
 .mobile.check-email-dialog,
 .mobile.cancel-account-dialog {
     position: relative;
@@ -3895,6 +3924,7 @@ div.checkboxOn, div.checkboxOff {
 }
 .mobile.context-menu-container .context-menu-item.delete-button {
     color: #ff0000;
+    margin-bottom: 10px;
 }
 .mobile.context-menu-container .fm-icon {
     display: inline-block;
@@ -4370,7 +4400,136 @@ textarea.mobile.support-text-field {
 } 
 
 
+/* Grid view */
 
+.mobile.fm-block.file-manager-block.grid-view {
+    background-color: #f5f6f7;
+}
+
+.mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+    border: 1px solid #eee;
+    box-sizing: border-box;
+    height: 48px;
+    cursor: pointer;
+    overflow: hidden;
+    background-color: #fff;
+    float: left;
+    margin-left: 12px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.mobile.grid-view .mobile.fm-item.file {
+    height: auto;
+}
+.mobile.grid-view .mobile.fm-item-details {
+    display: none;
+}
+
+.mobile.grid-view .mobile.fm-item.file:nth-child(even) {
+    background-color: white;
+}
+
+.mobile.grid-view .mobile.fm-item.file:nth-child(odd) {
+    background-color: white;
+}
+.mobile.grid-view .mobile.fm-item-info {
+    padding: 0 0;
+}
+.mobile.grid-view .folder .mobile.fm-item-info {
+    padding: 0 0;
+}
+.mobile.grid-view .mobile.folder .mobile.fm-item-img {
+    height: 48px;
+    width: 36px;
+    text-align: left;
+    margin: 0 4px  0 12px;
+    float: left;
+}
+.mobile.grid-view .file.thumb .fm-item-img {
+    margin: 4px 11px 0 4px;
+    overflow: hidden;
+    width: calc(100% - 10px);
+    border-radius: 2px;
+    border:1px solid #eee;
+    background-color: #fafafa;
+}
+.mobile.grid-view .file .fm-item-img {
+    height: 177px;
+    margin: 4px 11px 0 4px;
+    overflow: hidden;
+    width: calc(100% - 10px);
+    border-radius: 2px;
+    border: 1px solid #eee;
+    background-color: #fafafa;
+    position: relative;
+}
+.mobile.grid-view .file .fm-item-img img {
+    width: 82px;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.mobile.fm-item-links {
+    display: none;
+}
+.mobile.grid-view .mobile.fm-item.file .fm-icon.link {
+    margin-top: -1px;
+    width: 27px;
+    height: 36px;
+}
+.mobile.grid-view .file.thumb .fm-item-img img {
+    position: relative;
+    margin: 0 0;
+    width: 100%;
+    height: 100%;
+}
+.mobile.grid-view .mobile.fm-icon.open-context-menu {
+    background-position: -196px -1664px;
+    height: 100%;
+    margin: 0;
+    width: 37px;
+}
+.mobile.grid-view .mobile.file .mobile.fm-item-info {
+    padding: 0 0;
+}
+.mobile.grid-view .mobile.file .mobile.fm-icon.open-context-menu {
+    background-position: -197px -1669px;
+    height: 100%;
+    margin: 0;
+    width: 36px;
+    height: 36px;
+}
+.mobile.grid-view .mobile.fm-item.file:last-of-type {
+    margin-bottom: 32px;
+}
+.mobile.grid-view .mobile.fm-item .fm-icon.link {
+    margin-top: 5px;
+    width: 27px;
+}
+.mobile.grid-view .mobile.fm-item.line-break {
+    height: 48px;
+    cursor: pointer;
+    overflow: hidden;
+    width: calc((100% - 24px) / 2);
+    background-color: inherit;
+    float: left;
+    margin-left: 8px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+}
+.mobile.grid-view .mobile.fm-item-name {
+    font-size: 14px;
+    line-height: 36px;
+    padding-left: 10px;
+    padding-right: 5px;
+}
+.mobile.grid-view .folder .mobile.fm-item-name {
+    line-height: 48px;
+    padding-left: 6px;
+}
 /* Get support page */
 .support-form {
     position:relative;
@@ -4398,7 +4557,6 @@ textarea.mobile.support-text-field {
     border-image: initial;
     border-radius: 100%;
 }
-
 .mobile.main-block form.inline-labels div.radioOn {
     border-width: 1px;
     border-style: solid;
@@ -4479,6 +4637,9 @@ textarea.mobile.support-text-field {
     line-height: 24px;
     margin: 20px 24px;
 }
+.mobile.recover-account-body-text a {
+    color: #eb4444;
+}
 .mobile.recovery-key-page .mobile.recovery-key-string-block{
     margin: 16px 24px 4px;
 }
@@ -4522,7 +4683,7 @@ textarea.mobile.support-text-field {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(http://localhost/images/mobile/mobile-sprite_v10.png);
+    background-image: url(../images/mobile/mobile-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: -164px -1149px;
     position: absolute;
@@ -4531,8 +4692,8 @@ textarea.mobile.support-text-field {
 }
 .mobile.recovery-key-page .mobile.recovery-key-copy-btn, 
 .mobile.recovery-key-page .mobile.recovery-key-download-btn,
-.mobile.recover-account-page .mobile.r-a-email-send-btn,
-.mobile.send-recovery-key,
+.mobile.recover-account-page .mobile.recover-account-email-send-btn,
+.mobile.verify-recovery-key-btn,
 .mobile.upload-recovery-key {
     background-color: #f44;
     padding: 0;
@@ -4552,30 +4713,34 @@ textarea.mobile.support-text-field {
     opacity: 0.3;
     border-radius: 2px;
 }
+.mobile.upload-recovery-key {
+	display: block;
+}
 .mobile.recovery-key-page .mobile.recovery-key-download-btn {
     margin-top: 8px;
 }
-.mobile.recovery-key-page .mobile.recovery-key-copy-btn.active,
-.mobile.recovery-key-page .mobile.recovery-key-download-btn.active,
-.mobile.recover-account-page .mobile.r-a-email-send-btn.active,
-.mobile.send-recovery-key.active ,
+.mobile.recovery-key-page .recovery-key-copy-btn.active,
+.mobile.recovery-key-page .recovery-key-download-btn.active,
+.mobile.recover-account-page .recover-account-email-send-btn.active,
+.mobile.verify-recovery-key-btn.active ,
 .mobile.upload-recovery-key.active {
     opacity: 1;
 }
 .mobile.buttons {
     text-align: center;
 }
-.mobile.send-recovery-key ,
+.mobile.verify-recovery-key-btn ,
 .mobile.upload-recovery-key{
     opacity: 1;
 }
 .mobile.recover-account-btn-block {
-    display: block;
-    margin:8px 0;
+	display: block;
+	margin: 8px 0 25px 0;
 }
 .mobile.forgot-password-btn-block {
     display: block;
     margin: 24px 24px;
+    overflow: auto;
 }
 .mobile.forgot-password-btn {
     background-color: #f44;
@@ -4612,7 +4777,6 @@ textarea.mobile.support-text-field {
 }
 .mobile.update-password .mobile.register-button.account-recovery, .mobile.park-account-block .park-account {
     margin: 8px 24px;
-
 }
 
 /* Achievements page */
@@ -5124,6 +5288,11 @@ textarea.mobile.support-text-field {
     margin-left: 2px;
 }
 
+/* Make sure Free plan is shown after registration */
+body.key .reg-st3-membership-bl.free.hidden {
+    display: inline-block !important;
+}
+
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {
@@ -5158,7 +5327,7 @@ textarea.mobile.support-text-field {
         padding: 10px;
         margin: 0 0 14px 0;
     }
-    .mobile.file-download-info, mobile.file-upload-info {
+    .mobile.file-download-info, .mobile.file-upload-info {
         margin: 0 auto;
     }
     .mobile.filename {
@@ -5170,11 +5339,10 @@ textarea.mobile.support-text-field {
         line-height: 20px;
     }
     .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
-        font-size: 15px;
+        font-size: 14px;
         line-height: 19px;
         margin: 6px 0 15px 0;
         padding: 0 18px;
-        letter-spacing: 1px;
     }
     .mobile.inline-buttons .mobile.red-button {
         line-height: 40px;
@@ -5250,9 +5418,14 @@ textarea.mobile.support-text-field {
         line-height: 28px;
         padding: 0 20px 20px 20px;
     }
+    /* Grid view */
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 60px) / 4);
+    }
 }
 
 @media only screen and (orientation:portrait) and (max-height: 1280px) {
+
     .wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block {
         bottom: -62px;
         margin: 0;
@@ -5331,10 +5504,10 @@ textarea.mobile.support-text-field {
     }
     .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
         margin: 3px 0 13px 0;
-        font-size: 16px;
+        font-size: 14px;
     }
     .mobile.filename {
-        font-size: 17px;
+        font-size: 15px;
         line-height: 20px;
         white-space: nowrap;
         overflow: hidden;
@@ -5411,6 +5584,10 @@ textarea.mobile.support-text-field {
         line-height: 28px;
         padding: 0 18px 18px 18px;
         margin: -32px 0 0 0;
+    }
+    /* Grid view */
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 36px) / 2);
     }
 }
 
@@ -5572,6 +5749,10 @@ textarea.mobile.support-text-field {
         padding: 0 18px 14px 18px;
         margin: -28px 0 0 0;
     }
+    /* Grid view */
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 36px) / 2);
+    }
 }
 
 @media only screen and (orientation:landscape) and (max-width: 670px) {
@@ -5724,7 +5905,6 @@ textarea.mobile.support-text-field {
         min-height: 0;
     }
 }
-
 @media only screen and (max-width: 400px) {
     .mobile.my-account-page .pro-plan-name {
         display: block;
@@ -5805,14 +5985,62 @@ textarea.mobile.support-text-field {
     }
 }
 
+/* Specific styles for showing grid view on devices in landscape and portrait*/
+@media only screen and (orientation:landscape) and (min-width: 813px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 740px) and (max-height: 800px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 60px) / 5);
+    }
+    .mobile.grid-view .mobile.file .mobile.fm-item-info {
+        padding: 0 0;
+    }
+}
+
+@media only screen and (orientation:landscape) and (max-width: 800px), only screen and (orientation:portrait) and (max-height: 420px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 60px) / 4);
+    }
+}
+/* iPhone X Portrait styles go here */
+@media only screen and (orientation:landscape) and (max-width: 376px), only screen and (orientation:portrait) and (min-height: 801px) and (max-height: 813px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 36px) / 2);
+    }
+}
+/*iphone se portrait styles */
+@media only screen and (orientation:landscape) and (max-width: 321px), only screen and (orientation:portrait) and (max-height: 569px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 36px) / 2);
+    }
+}
+/*iphone se landscape styles */
+@media only screen and (orientation:portrait) and (max-height: 321px), only screen and (orientation:landscape) and (max-width: 569px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 60px) / 3);
+    }
+}
+
+/* Large tablets Landscape styles go here */
+@media only screen and (orientation:landscape) and (min-width: 1280px) and (max-width: 1440px), only screen and (orientation:portrait) and (min-height: 1025px) and (max-height: 1025px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 96px) / 7)
+    }
+}
+
+/* Large tablets Portrait styles go here */
+@media only screen and (orientation:landscape) and (min-width:900px) and (max-width: 1025px), only screen and (orientation:portrait) and (min-height: 1281px) and (max-height: 1366px) {
+    .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
+        width: calc((100% - 72px) / 5);
+    }
+}
+
 /* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */
 @media only screen and (min-width: 400px) {
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-options-list .payment-method {
         float: left;
-        width: 154px;
+        width: 153px;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .provider-details .provider-name {
-        width: 97px;
+        width: 96px;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration {
         display: inline-block;
@@ -5820,22 +6048,25 @@ textarea.mobile.support-text-field {
         margin-top: 0;
         height: 80px;
         vertical-align: middle;
+        width: 153px
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-duration.template {
         display: none;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .duration-options-list .payment-duration:last-child {
-        margin-left: 39px;
+        margin-left: 0;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option {
         display: inline-block;
+        width: 153px
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .renewal-options-list .renewal-option:last-child {
-        margin-left: 110px;
+        margin-left: 0;
     }
     body:not(.fr):not(.ru) .mobile.membership-step2 .option-question.renewal {
         margin-top: 30px;
     }
+
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {

@@ -120,7 +120,7 @@
     width: 24px;
     height: 11px;
     z-index: 123;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: 0 -2249px;
 }
@@ -148,6 +148,26 @@
     right: -11px;
     margin: -12px 0 0 0;
     background-position: -29px -2284px;
+}
+.left-pos-arrow .dropdown-white-arrow {
+    left: 8px;
+    right: auto;
+    margin: 0;
+}
+.right-pos-arrow .dropdown-white-arrow {
+    left: auto;
+    right: 8px;
+    margin: 0;
+}
+.top-pos-arrow .dropdown-white-arrow {
+    top: 8px;
+    bottom: auto;
+    margin: 0;
+}
+.bottom-pos-arrow .dropdown-white-arrow {
+    top: auto;
+    bottom: 8px;
+    margin: 0;
 }
 .dropdown-item {
     height: 32px;
@@ -190,7 +210,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
@@ -219,7 +239,7 @@
     right: 8px;
     top: 50%;
     margin: -4px 0 0 0;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -30px -1816px;
 }
@@ -359,8 +379,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .img-preview .dropdown.img-wrapper {
     width: 176px;
 }
-.dropdown.body.download.context, .dropdown.body.submenu.download {
+.dropdown.body.download.context {
     width: 188px;
+}
+.dropdown.body.submenu.download {
+    width: 214px;
 }
 .dropdown.body.dropdown-arrow.wide-dropdown {
     margin-bottom: 16px;
@@ -370,7 +393,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     content: '';
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-image: url(../images/mega/top-login-sprite_v9.png);
 }
 .dropdown.text-block {
     font-size: 14px;
@@ -462,7 +485,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-position: 2px -532px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
@@ -578,3 +601,161 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-box-shadow: 0px 0px 0px 4px rgba(164,164,167,1);
     box-shadow: 0px 0px 0px 4px rgba(164,164,167,1);
 }
+/* Tips and Hints */
+.dropdown.body.hint {
+    padding: 0;
+    width: 542px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.1);
+}
+.dropdown.body.hint:not(.white-context-menu):not(.fm-dialog)::before {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+}
+.hint .dropdown-white-arrow {
+    background-position: 0 -2314px;
+}
+.hint.down-arrow .dropdown-white-arrow {
+    background-position: -24px -2321px;
+}
+.hint.left-arrow .dropdown-white-arrow {
+    background-position: -8px -2349px;
+}
+.hint.right-arrow .dropdown-white-arrow {
+    background-position: -29px -2349px;
+}
+.hint .dropdown.content-block {
+    padding: 24px;
+}
+.dropdown.hint-thumb {
+    width: 180px;
+    height: 180px;
+    float: left;
+    background-image: url(../images/mega/hints-sprite.png);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+}
+.es .dropdown.hint-thumb {
+    background-image: url(../images/mega/hints-sprite-es.png);
+}
+.br .dropdown.hint-thumb {
+    background-image: url(../images/mega/hints-sprite-pt.png);
+}
+.cn .dropdown.hint-thumb {
+    background-image: url(../images/mega/hints-sprite-cn.png);
+}
+.dropdown.hint-thumb.upload {
+    height: 198px;
+    margin-bottom: -18px;
+    background-position: -420px -210px;
+}
+.dropdown.hint-thumb.add-contacts {
+    background-position: 0 -420px;
+}
+.dropdown.hint-thumb.chat {
+    background-position: -210px -210px;
+}
+.dropdown.hint-thumb.manage-transfers {
+    background-position: 0 -210px;
+}
+.dropdown.hint-thumb.share-content {
+    background-position: 0 0;
+}
+.dropdown.hint-thumb.share-folders {
+    background-position: -210px 0;
+}
+.dropdown.hint-thumb.rubbish-bin {
+    background-position: -420px 0;
+}
+.dropdown.hint-thumb.have-notifications {
+    background-position: -195px -420px;
+    width: 210px;
+    margin-left: -15px;
+}
+.dropdown.hint-info-block {
+    margin: 0 0 0 204px;
+    min-height: 180px;
+    position: relative;
+}
+.dropdown.close-button {
+    height:24px;
+    width: 24px;
+    position: absolute;
+    right:10px;
+    top: 10px;
+    z-index: 10;
+    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-position: 6px -1157px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    -webkit-transition: opacity 100ms ease-in-out;
+    -moz-transition: opacity 100ms ease-in-out;
+    -o-transition: opacity 100ms ease-in-out;
+    -ms-transition: opacity 100ms ease-in-out;
+    transition: opacity 100ms ease-in-out;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=53);
+    -moz-opacity: 0.53;
+    -khtml-opacity: 0.53;
+    opacity: 0.53;
+}
+.dropdown.close-button:hover {
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=65);
+    -moz-opacity: 0.65;
+    -khtml-opacity: 0.65;
+    opacity: 0.65;
+}
+.dropdown.hint-header {
+    font-size: 18px;
+    line-height: 24px;
+    color: #FF333A;
+}
+.dropdown.hint-info {
+    font-size: 14px;
+    line-height: 24px;
+    color: #333333;
+    padding: 8px 0 40px 0;
+}
+.dropdown.hint-info .bold {
+    font-family: 'source_sans_prosemibold';
+}
+.dropdown.hint-info .red {
+    color: #FF333A;
+}
+.dropdown.hint-info a {
+    color: #FF333A;
+    font-family: 'source_sans_prosemibold';
+}
+.dropdown.hint-bottom {
+    position: absolute;
+    display: table;
+    width: 100%;
+    bottom: 0;
+    padding: 0 24px 24px 228px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.hint-bottom .checkbox-block {
+    display: table-cell;
+    vertical-align: middle;
+}
+.hint-bottom .checkdiv.small {
+    margin-top: 1px;
+}
+.hint-bottom .button {
+    min-width: auto;
+    margin-top: 1px;
+    display: table-cell;
+}
+.hint-bottom .radio-txt {
+    padding-right: 6px;
+    padding-top: 0;
+    line-height: 16px;
+    vertical-align: top;
+}
+/* end of Tips and Hints */

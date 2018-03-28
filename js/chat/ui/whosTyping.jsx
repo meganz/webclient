@@ -14,14 +14,13 @@ var WhosTyping = React.createClass({
         var chatRoom = self.props.chatRoom;
         var megaChat = self.props.chatRoom.megaChat;
 
-        chatRoom.bind("onParticipantTyping.whosTyping", function(e, user_handle) {
+        chatRoom.bind("onParticipantTyping.whosTyping", function(e, user_handle, bCastCode) {
             if (!self.isMounted()) {
                 return;
             }
             if (user_handle === u_handle) {
                 return;
             }
-
 
             var currentlyTyping = clone(self.state.currentlyTyping);
             var u_h = user_handle;
@@ -38,19 +37,20 @@ var WhosTyping = React.createClass({
                 clearTimeout(currentlyTyping[u_h][1]);
             }
 
-            var timer = setTimeout(function() {
-                if (self.state.currentlyTyping[u_h]) {
-                    var newState = clone(self.state.currentlyTyping);
-                    delete newState[u_h];
-                    self.setState({currentlyTyping: newState});
-                }
-            }, 5000);
+            if (bCastCode === 1) {
+                var timer = setTimeout(function (u_h) {
+                    self.stoppedTyping(u_h);
+                }, 5000, u_h);
 
-            currentlyTyping[u_h] = [unixtime(), timer];
+                currentlyTyping[u_h] = [unixtime(), timer];
 
-            self.setState({
-                currentlyTyping: currentlyTyping
-            });
+                self.setState({
+                    currentlyTyping: currentlyTyping
+                });
+            }
+            else {
+                self.stoppedTyping(u_h);
+            }
 
             self.forceUpdate();
         });
@@ -61,6 +61,17 @@ var WhosTyping = React.createClass({
         var megaChat = chatRoom.megaChat;
 
         chatRoom.unbind("onParticipantTyping.whosTyping");
+    },
+    stoppedTyping: function(u_h) {
+        var self = this;
+        if (self.state.currentlyTyping[u_h]) {
+            var newState = clone(self.state.currentlyTyping);
+            if (newState[u_h]) {
+                clearTimeout(newState[u_h][1]);
+            }
+            delete newState[u_h];
+            self.setState({currentlyTyping: newState});
+        }
     },
     render: function() {
         var self = this;

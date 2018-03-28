@@ -468,6 +468,19 @@ React.makeElement = React['createElement'];
 	Chat.prototype.updateSectionUnreadCount = function () {
 	    var self = this;
 
+	    if (!self.favico) {
+	        assert(Favico, 'Favico.js is missing.');
+
+	        $('link[rel="icon"]').attr('href', (location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath) + 'favicon.ico');
+
+	        self.favico = new Favico({
+	            type: 'rectangle',
+	            animation: 'popFade',
+	            bgColor: '#fff',
+	            textColor: '#d00'
+	        });
+	    }
+
 	    var unreadCount = 0;
 
 	    self.chats.forEach(function (megaRoom, k) {
@@ -475,13 +488,20 @@ React.makeElement = React['createElement'];
 	        unreadCount += c;
 	    });
 
+	    unreadCount = unreadCount > 9 ? "9+" : unreadCount;
+
 	    if (self._lastUnreadCount != unreadCount) {
-	        if (unreadCount > 0) {
-	            $('.new-messages-indicator').text(unreadCount > 9 ? "9+" : unreadCount).removeClass('hidden');
+	        if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
+	            $('.new-messages-indicator').text(unreadCount).removeClass('hidden');
 	        } else {
 	            $('.new-messages-indicator').addClass('hidden');
 	        }
 	        self._lastUnreadCount = unreadCount;
+
+	        delay('notifFavicoUpd', function () {
+	            self.favico.reset();
+	            self.favico.badge(unreadCount);
+	        });
 
 	        self.updateDashboard();
 	    }
@@ -2607,6 +2627,20 @@ React.makeElement = React['createElement'];
 	        this._lastKnownScrollHeight = res;
 	        return res;
 	    },
+	    getScrollWidth: function getScrollWidth() {
+	        var $elem = $(this.findDOMNode());
+	        var outerWidthContainer = $elem.children(":first").outerWidth();
+	        var outerWidthScrollable = $elem.outerWidth();
+
+	        var res = outerWidthContainer - outerWidthScrollable;
+
+	        if (res <= 0) {
+
+	            return this._lastKnownScrollWidth ? this._lastKnownScrollWidth : 0;
+	        }
+	        this._lastKnownScrollWidth = res;
+	        return res;
+	    },
 	    getContentHeight: function getContentHeight() {
 	        var $elem = $(this.findDOMNode());
 	        return $elem.children(":first").outerHeight();
@@ -2628,9 +2662,22 @@ React.makeElement = React['createElement'];
 	    },
 	    scrollToPercentY: function scrollToPercentY(posPerc, skipReinitialised) {
 	        var $elem = $(this.findDOMNode());
-	        var targetPx = 100 / this.getScrollHeight() * posPerc;
+	        var targetPx = this.getScrollHeight() / 100 * posPerc;
 	        if ($elem[0].scrollTop !== targetPx) {
 	            $elem[0].scrollTop = targetPx;
+	            this.isUserScroll = false;
+	            Ps.update($elem[0]);
+	            this.isUserScroll = true;
+	            if (!skipReinitialised) {
+	                this.reinitialised(true);
+	            }
+	        }
+	    },
+	    scrollToPercentX: function scrollToPercentX(posPerc, skipReinitialised) {
+	        var $elem = $(this.findDOMNode());
+	        var targetPx = this.getScrollWidth() / 100 * posPerc;
+	        if ($elem[0].scrollLeft !== targetPx) {
+	            $elem[0].scrollLeft = targetPx;
 	            this.isUserScroll = false;
 	            Ps.update($elem[0]);
 	            this.isUserScroll = true;
@@ -2947,7 +2994,7 @@ React.makeElement = React['createElement'];
 	                var $element = $(this.popupElement);
 	                var positionToElement = $('.button.active:visible');
 	                var offsetLeft = 0;
-	                var $container = $element.closest('.jspPane:first');
+	                var $container = positionToElement.closest('.messages.scroll-area');
 
 	                if ($container.size() == 0) {
 	                    $container = $(document.body);
@@ -2959,7 +3006,7 @@ React.makeElement = React['createElement'];
 	                    of: positionToElement,
 	                    my: self.props.positionMy ? self.props.positionMy : "center top",
 	                    at: self.props.positionAt ? self.props.positionAt : "center bottom",
-	                    collision: "flip flip",
+	                    collision: "flipfit",
 	                    within: $container,
 	                    using: function using(obj, info) {
 	                        var vertOffset = 0;
@@ -3108,7 +3155,7 @@ React.makeElement = React['createElement'];
 
 	        return React.makeElement(
 	            Dropdown,
-	            { className: "popup contacts-search " + this.props.className,
+	            { className: "popup contacts-search " + this.props.className + " tooltip-blur",
 	                active: this.props.active,
 	                closeDropdown: this.props.closeDropdown,
 	                ref: "dropdown",
@@ -3117,7 +3164,7 @@ React.makeElement = React['createElement'];
 	            },
 	            React.makeElement(ContactsUI.ContactPickerWidget, {
 	                active: this.props.active,
-	                className: "popup contacts-search",
+	                className: "popup contacts-search tooltip-blur",
 	                contacts: this.props.contacts,
 	                megaChat: this.props.megaChat,
 	                exclude: this.props.exclude,
@@ -3216,6 +3263,7 @@ React.makeElement = React['createElement'];
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var utils = __webpack_require__(5);
+	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
 
 	var ContactsListItem = React.createClass({
 	    displayName: "ContactsListItem",
@@ -3537,6 +3585,46 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
+	var ContactItem = React.createClass({
+	    displayName: "ContactItem",
+
+	    mixins: [MegaRenderMixin, RenderDebugger],
+	    render: function render() {
+	        var classString = "nw-conversations-item";
+	        var self = this;
+	        var contact = this.props.contact;
+
+	        if (!contact) {
+	            return null;
+	        }
+
+	        return React.makeElement(
+	            "div",
+	            { className: "selected-contact-card" },
+	            React.makeElement(
+	                "div",
+	                { className: "remove-contact-bttn", onClick: function onClick(e) {
+	                        if (self.props.onClick) {
+	                            self.props.onClick(contact, e);
+	                        }
+	                    } },
+	                React.makeElement("div", { className: "remove-contact-icon" })
+	            ),
+	            React.makeElement(Avatar, { contact: contact, className: "small-rounded-avatar" }),
+	            React.makeElement(
+	                "div",
+	                { className: "user-card-data" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "user-card-name light" },
+	                    this.props.namePrefix ? this.props.namePrefix : null,
+	                    M.getNameByHandle(contact.u)
+	                )
+	            )
+	        );
+	    }
+	});
+
 	var ContactPickerWidget = React.createClass({
 	    displayName: "ContactPickerWidget",
 
@@ -3558,15 +3646,30 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        self.setState({ searchValue: e.target.value });
 	    },
+	    componentDidUpdate: function componentDidUpdate() {
+
+	        var self = this;
+	        if (self.scrollToLastSelected && self.jspSelected) {
+
+	            self.scrollToLastSelected = false;
+	            var $jsp = $(self.jspSelected.findDOMNode()).data('jsp');
+	            if ($jsp) {
+	                $jsp.scrollToPercentX(1, false);
+	            }
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 
 	        var contacts = [];
 
+	        var contactsSelected = [];
+
 	        var footer = null;
 
 	        if (self.props.multiple) {
 	            var onSelectDoneCb = function onSelectDoneCb(e) {
+
 	                e.preventDefault();
 	                e.stopPropagation();
 
@@ -3576,41 +3679,144 @@ React.makeElement = React['createElement'];
 	                    self.props.onSelectDone(self.state.selected);
 	                }
 	            };
+	            var clearSearch = function clearSearch(e) {
+	                self.setState({ searchValue: '' });
+	                self.refs.contactSearchField.focus();
+	            };
+	            var onAddContact = function onAddContact(e) {
 
+	                e.preventDefault();
+	                e.stopPropagation();
+
+	                $('.add-user-popup .import-contacts-dialog').fadeOut(0);
+	                $('.import-contacts-link').removeClass('active');
+
+	                $('.add-user-popup').addClass('dialog').removeClass('hidden');
+	                fm_showoverlay();
+	                $('.add-user-size-icon').removeClass('full-size').addClass('short-size');
+	                $('.fm-add-user').removeClass('active');
+	                $('.add-user-popup-button.add').addClass('disabled');
+	                var $tokenInput = $('#token-input-');
+	                $tokenInput.focus();
+	            };
+	            var onContactSelectDoneCb = function onContactSelectDoneCb(contact, e) {
+
+	                var contactHash = contact.u;
+
+	                if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
+
+	                    if (self.props.onSelected) {
+	                        self.props.onSelected([contactHash]);
+	                    }
+	                    self.props.onSelectDone([contactHash]);
+	                    return;
+	                } else {
+	                    var selected = clone(self.state.selected || []);
+
+	                    if (selected.indexOf(contactHash) === -1) {
+	                        selected.push(contactHash);
+
+	                        self.scrollToLastSelected = true;
+
+	                        if (self.props.onSelected) {
+	                            self.props.onSelected(selected);
+	                        }
+	                    } else {
+	                        array.remove(selected, contactHash);
+	                        if (self.props.onSelected) {
+	                            self.props.onSelected(selected);
+	                        }
+	                    }
+	                    self.setState({ 'selected': selected });
+	                }
+	                self.clickTime = new Date();
+	                self.lastClicked = contactHash;
+	            };
+	            var selectedWidth = self.state.selected.length * 60;
 	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "fm-dialog-footer" },
 	                    React.makeElement(
+	                        "a",
+	                        { href: "javascript:;", className: "default-white-button left", onClick: onAddContact },
+	                        l[71]
+	                    ),
+	                    React.makeElement(
 	                        "div",
-	                        { className: "fm-dialog-footer-txt" },
+	                        { className: "fm-dialog-footer-txt right" },
 	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __(l[8889])
 	                    )
 	                );
 	            } else if (self.state.selected.length === 1) {
+	                self.state.selected.forEach(function (v, k) {
+	                    contactsSelected.push(React.makeElement(ContactItem, { contact: self.props.contacts[v], onClick: onContactSelectDoneCb,
+	                        key: v
+	                    }));
+	                });
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
 	                    React.makeElement(
+	                        PerfectScrollbar,
+	                        { className: "selected-contact-block", selected: this.state.selected },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "select-contact-centre", style: { width: selectedWidth } },
+	                            contactsSelected
+	                        )
+	                    ),
+	                    React.makeElement(
 	                        "div",
 	                        { className: "fm-dialog-footer" },
 	                        React.makeElement(
+	                            "span",
+	                            { className: "selected-contact-amount" },
+	                            self.state.selected.length,
+	                            " contacts selected"
+	                        ),
+	                        React.makeElement(
 	                            "a",
-	                            { href: "javascript:;", className: "default-white-button right", onClick: onSelectDoneCb },
+	                            { href: "javascript:;", className: "default-grey-button right", onClick: onSelectDoneCb },
 	                            self.props.singleSelectedButtonLabel ? self.props.singleSelectedButtonLabel : l[5885]
 	                        )
 	                    )
 	                );
 	            } else if (self.state.selected.length > 1) {
+	                self.state.selected.forEach(function (v, k) {
+	                    contactsSelected.push(React.makeElement(ContactItem, { contact: self.props.contacts[v], onClick: onContactSelectDoneCb,
+	                        key: v
+	                    }));
+	                });
+
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
 	                    React.makeElement(
+	                        utils.JScrollPane,
+	                        { className: "selected-contact-block horizontal-only",
+	                            selected: this.state.selected,
+	                            ref: function ref(jspSelected) {
+	                                self.jspSelected = jspSelected;
+	                            } },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "select-contact-centre", style: { width: selectedWidth } },
+	                            contactsSelected
+	                        )
+	                    ),
+	                    React.makeElement(
 	                        "div",
 	                        { className: "fm-dialog-footer" },
 	                        React.makeElement(
+	                            "span",
+	                            { className: "selected-contact-amount" },
+	                            self.state.selected.length,
+	                            " contacts selected"
+	                        ),
+	                        React.makeElement(
 	                            "a",
-	                            { href: "javascript:;", className: "default-white-button right", onClick: onSelectDoneCb },
+	                            { href: "javascript:;", className: "default-grey-button right", onClick: onSelectDoneCb },
 	                            self.props.multipleSelectedButtonLabel ? self.props.multipleSelectedButtonLabel : __(l[8890])
 	                        )
 	                    )
@@ -3650,7 +3856,6 @@ React.makeElement = React['createElement'];
 	            contacts.push(React.makeElement(ContactCard, {
 	                contact: v,
 	                className: "contacts-search " + selectedClass,
-
 	                onClick: function onClick(contact, e) {
 	                    var contactHash = contact.u;
 
@@ -3666,6 +3871,8 @@ React.makeElement = React['createElement'];
 
 	                        if (selected.indexOf(contactHash) === -1) {
 	                            selected.push(contactHash);
+
+	                            self.scrollToLastSelected = true;
 	                            if (self.props.onSelected) {
 	                                self.props.onSelected(selected);
 	                            }
@@ -3706,10 +3913,10 @@ React.makeElement = React['createElement'];
 	                noContactsMsg
 	            );
 	        }
-
+	        var displayStyle = self.state.searchValue && self.state.searchValue.length > 0 ? "" : "none";
 	        return React.makeElement(
 	            "div",
-	            { className: this.props.className },
+	            { className: this.props.className + " " },
 	            React.makeElement(
 	                "div",
 	                { className: "contacts-search-header " + this.props.headerClasses },
@@ -3720,7 +3927,8 @@ React.makeElement = React['createElement'];
 	                    ref: "contactSearchField",
 	                    onChange: this.onSearchChange,
 	                    value: this.state.searchValue
-	                })
+	                }),
+	                React.makeElement("div", { className: "search-result-clear", style: { display: displayStyle }, onClick: clearSearch })
 	            ),
 	            React.makeElement(
 	                utils.JScrollPane,
@@ -4498,6 +4706,8 @@ React.makeElement = React['createElement'];
 	    },
 
 	    uploadFromComputer: function uploadFromComputer() {
+	        this.scrolledToBottom = true;
+
 	        this.props.chatRoom.uploadFromComputer();
 	    },
 	    refreshUI: function refreshUI() {
@@ -4537,6 +4747,13 @@ React.makeElement = React['createElement'];
 
 	        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
 	            self.callJustEnded = true;
+	        });
+
+	        self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
+	            self.scrolledToBottom = true;
+	            if (self.messagesListScrollable) {
+	                self.messagesListScrollable.scrollToBottom();
+	            }
 	        });
 
 	        self.eventuallyInit();
@@ -5078,6 +5295,8 @@ React.makeElement = React['createElement'];
 	                onAttachClicked: function onAttachClicked() {
 	                    self.setState({ 'attachCloudDialog': false });
 
+	                    self.scrolledToBottom = true;
+
 	                    room.attachNodes(selected);
 	                }
 	            });
@@ -5195,6 +5414,8 @@ React.makeElement = React['createElement'];
 	                            });
 	                        } catch (e) {}
 
+	                        self.scrolledToBottom = true;
+
 	                        M.addUpload([meta[0]]);
 
 	                        self.setState({
@@ -5246,6 +5467,8 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'truncateDialog': false });
 	                    },
 	                    onConfirmClicked: function onConfirmClicked() {
+	                        self.scrolledToBottom = true;
+
 	                        room.truncate();
 
 	                        self.setState({
@@ -5267,6 +5490,8 @@ React.makeElement = React['createElement'];
 	        if (self.state.renameDialog === true) {
 	            var onEditSubmit = function onEditSubmit(e) {
 	                if ($.trim(self.state.renameDialogValue).length > 0 && self.state.renameDialogValue !== self.props.chatRoom.getRoomTitle()) {
+	                    self.scrolledToBottom = true;
+
 	                    var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
 	                    var promises = [];
 	                    promises.push(ChatdIntegration._ensureKeysAreLoaded(undefined, participants));
@@ -5387,6 +5612,8 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'attachCloudDialog': true });
 	                    },
 	                    onAddParticipantSelected: function onAddParticipantSelected(contactHashes) {
+	                        self.scrolledToBottom = true;
+
 	                        if (self.props.chatRoom.type == "private") {
 	                            var megaChat = self.props.chatRoom.megaChat;
 
@@ -5553,7 +5780,23 @@ React.makeElement = React['createElement'];
 	                                },
 	                                onConfirm: function onConfirm(messageContents) {
 	                                    if (messageContents && messageContents.length > 0) {
-	                                        self.props.chatRoom.sendMessage(messageContents);
+	                                        if (!self.scrolledToBottom) {
+	                                            self.scrolledToBottom = true;
+	                                            self.lastScrollPosition = 0;
+
+	                                            $(self.props.chatRoom).bind('onMessagesBuffAppend.pull', function () {
+	                                                self.messagesListScrollable.scrollToBottom(false);
+	                                                setTimeout(function () {
+	                                                    self.messagesListScrollable.enable();
+	                                                }, 1500);
+	                                            });
+
+	                                            self.props.chatRoom.sendMessage(messageContents);
+	                                            self.messagesListScrollable.disable();
+	                                            self.messagesListScrollable.scrollToBottom(true);
+	                                        } else {
+	                                            self.props.chatRoom.sendMessage(messageContents);
+	                                        }
 	                                    }
 	                                }
 	                            },
@@ -5636,7 +5879,7 @@ React.makeElement = React['createElement'];
 	                messagesBuff: chatRoom.messagesBuff,
 	                contacts: M.u,
 	                contact: contact,
-	                key: chatRoom.roomId
+	                key: chatRoom.roomId + "_" + chatRoom.instanceIndex
 	            }));
 	        });
 
@@ -7277,6 +7520,19 @@ React.makeElement = React['createElement'];
 	        }, 100);
 	    },
 
+	    stoppedTyping: function stoppedTyping() {
+	        if (this.props.disabled) {
+	            return;
+	        }
+	        var self = this;
+	        var room = this.props.chatRoom;
+
+	        self.iAmTyping = false;
+
+	        delete self.lastTypingStamp;
+
+	        room.trigger('stoppedTyping');
+	    },
 	    typing: function typing() {
 	        if (this.props.disabled) {
 	            return;
@@ -7291,8 +7547,7 @@ React.makeElement = React['createElement'];
 
 	        self.stoppedTypingTimeout = setTimeout(function () {
 	            if (room && self.iAmTyping) {
-	                self.iAmTyping = false;
-	                delete self.lastTypingStamp;
+	                self.stoppedTyping();
 	            }
 	        }, 4000);
 
@@ -7340,6 +7595,9 @@ React.makeElement = React['createElement'];
 	    onCancelClicked: function onCancelClicked(e) {
 	        var self = this;
 	        self.setState({ typedMessage: "" });
+	        if (self.props.chatRoom && self.iAmTyping) {
+	            self.stoppedTyping();
+	        }
 	        self.onConfirmTrigger(false);
 	        self.triggerOnUpdate();
 	    },
@@ -7355,6 +7613,9 @@ React.makeElement = React['createElement'];
 
 	        if (self.onConfirmTrigger(val) !== true) {
 	            self.setState({ typedMessage: "" });
+	        }
+	        if (self.props.chatRoom && self.iAmTyping) {
+	            self.stoppedTyping();
 	        }
 	        self.triggerOnUpdate();
 	    },
@@ -7404,6 +7665,9 @@ React.makeElement = React['createElement'];
 	            }
 	            e.preventDefault();
 	            e.stopPropagation();
+	            if (self.props.chatRoom && self.iAmTyping) {
+	                self.stoppedTyping();
+	            }
 	            return;
 	        }
 	    },
@@ -7492,21 +7756,28 @@ React.makeElement = React['createElement'];
 	                    }
 	                }
 
-	                if (matchedWord && matchedWord.length > 2 && matchedWord.substr(0, 1) === ":" && matchedWord.substr(-1) !== ":") {
+	                if (matchedWord && matchedWord.length > 2 && matchedWord.substr(0, 1) === ":") {
+	                    endPos = endPos ? endPos : startPos + matchedWord.length;
+
+	                    if (matchedWord.substr(-1) === ":") {
+	                        matchedWord = matchedWord.substr(0, matchedWord.length - 1);
+	                    }
+
 	                    self.setState({
 	                        'emojiSearchQuery': matchedWord,
 	                        'emojiStartPos': startPos ? startPos : 0,
-	                        'emojiEndPos': endPos ? endPos : startPos + matchedWord.length
+	                        'emojiEndPos': endPos
 	                    });
 	                    return;
 	                } else {
-	                    if (self.state.emojiSearchQuery) {
+	                    if (!element.value || element.value.length <= 2) {
 	                        self.setState({
 	                            'emojiSearchQuery': false,
 	                            'emojiStartPos': false,
 	                            'emojiEndPos': false
 	                        });
 	                    }
+	                    return;
 	                }
 	            }
 	            if (self.state.emojiSearchQuery) {
@@ -7551,6 +7822,8 @@ React.makeElement = React['createElement'];
 
 	        if ($.trim(e.target.value).length > 0) {
 	            self.typing();
+	        } else {
+	            self.stoppedTyping();
 	        }
 
 	        if (this.props.persist) {
@@ -7861,17 +8134,34 @@ React.makeElement = React['createElement'];
 	        if (self.state.emojiSearchQuery) {
 	            emojiAutocomplete = React.makeElement(EmojiAutocomplete, {
 	                emojiSearchQuery: self.state.emojiSearchQuery,
-	                onSelect: function onSelect(e, emojiAlias) {
+	                onPrefill: function onPrefill(e, emojiAlias) {
 	                    if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
 	                        var msg = self.state.typedMessage;
 	                        var pre = msg.substr(0, self.state.emojiStartPos);
 	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
 	                        self.setState({
 	                            'typedMessage': pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " "),
+	                            'emojiEndPos': self.state.emojiStartPos + emojiAlias.length + (post ? post.substr(0, 1) !== " " ? 1 : 0 : 1)
+	                        });
+	                    }
+	                },
+	                onSelect: function onSelect(e, emojiAlias, forceSend) {
+	                    if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
+	                        var msg = self.state.typedMessage;
+	                        var pre = msg.substr(0, self.state.emojiStartPos);
+	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+	                        var val = pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " ");
+	                        self.setState({
+	                            'typedMessage': val,
 	                            'emojiSearchQuery': false,
 	                            'emojiStartPos': false,
 	                            'emojiEndPos': false
 	                        });
+	                        if (forceSend) {
+	                            if (self.onConfirmTrigger($.trim(val)) !== true) {
+	                                self.setState({ typedMessage: "" });
+	                            }
+	                        }
 	                    }
 	                },
 	                onCancel: function onCancel() {
@@ -8505,24 +8795,63 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
+
 	            var handled = false;
 	            if (key === 37 || key === 38) {
 
 	                selected = selected - 1;
 	                selected = selected < 0 ? self.maxFound - 1 : selected;
-	                self.setState({ 'selected': selected });
-	                handled = true;
+
+	                if (self.found[selected] && self.state.selected !== selected) {
+	                    self.setState({
+	                        'selected': selected,
+	                        'prefilled': true
+	                    });
+	                    handled = true;
+	                    self.props.onPrefill(false, ":" + self.found[selected].n + ":");
+	                }
 	            } else if (key === 39 || key === 40 || key === 9) {
 
-	                selected = selected + 1;
+	                selected = selected + (key === 9 ? e.shiftKey ? -1 : 1 : 1);
+
+	                selected = selected < 0 ? Object.keys(self.found).length - 1 : selected;
+
 	                selected = selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ? 0 : selected;
-	                self.setState({ 'selected': selected });
-	                handled = true;
+
+	                if (self.found[selected] && (key === 9 || self.state.selected !== selected)) {
+	                    self.setState({
+	                        'selected': selected,
+	                        'prefilled': true
+	                    });
+
+	                    self.props.onPrefill(false, ":" + self.found[selected].n + ":");
+
+	                    handled = true;
+	                }
 	            } else if (key === 13) {
 
 	                self.unbindKeyEvents();
-	                self.props.onSelect(false, ":" + self.found[selected].n + ":");
-	                handled = true;
+	                if (selected === -1) {
+	                    if (self.found.length > 0) {
+	                        for (var i = 0; i < self.found.length; i++) {
+	                            if (":" + self.found[i].n + ":" === self.props.emojiSearchQuery + ":") {
+
+	                                self.props.onSelect(false, ":" + self.found[0].n + ":", self.state.prefilled);
+	                                handled = true;
+	                            }
+	                        }
+	                    }
+
+	                    if (!handled && key === 13) {
+	                        self.props.onCancel();
+	                    }
+	                    return;
+	                } else if (self.found.length > 0 && self.found[selected]) {
+	                    self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
+	                    handled = true;
+	                } else {
+	                    self.props.onCancel();
+	                }
 	            } else if (key === 27) {
 
 	                self.unbindKeyEvents();
@@ -8534,6 +8863,10 @@ React.makeElement = React['createElement'];
 	                e.preventDefault();
 	                e.stopPropagation();
 	                return false;
+	            } else {
+	                if (self.isMounted()) {
+	                    self.setState({ 'prefilled': false });
+	                }
 	            }
 	        });
 	    },
@@ -8696,7 +9029,7 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.chatRoom;
 	        var megaChat = self.props.chatRoom.megaChat;
 
-	        chatRoom.bind("onParticipantTyping.whosTyping", function (e, user_handle) {
+	        chatRoom.bind("onParticipantTyping.whosTyping", function (e, user_handle, bCastCode) {
 	            if (!self.isMounted()) {
 	                return;
 	            }
@@ -8718,19 +9051,19 @@ React.makeElement = React['createElement'];
 	                clearTimeout(currentlyTyping[u_h][1]);
 	            }
 
-	            var timer = setTimeout(function () {
-	                if (self.state.currentlyTyping[u_h]) {
-	                    var newState = clone(self.state.currentlyTyping);
-	                    delete newState[u_h];
-	                    self.setState({ currentlyTyping: newState });
-	                }
-	            }, 5000);
+	            if (bCastCode === 1) {
+	                var timer = setTimeout(function (u_h) {
+	                    self.stoppedTyping(u_h);
+	                }, 5000, u_h);
 
-	            currentlyTyping[u_h] = [unixtime(), timer];
+	                currentlyTyping[u_h] = [unixtime(), timer];
 
-	            self.setState({
-	                currentlyTyping: currentlyTyping
-	            });
+	                self.setState({
+	                    currentlyTyping: currentlyTyping
+	                });
+	            } else {
+	                self.stoppedTyping(u_h);
+	            }
 
 	            self.forceUpdate();
 	        });
@@ -8741,6 +9074,17 @@ React.makeElement = React['createElement'];
 	        var megaChat = chatRoom.megaChat;
 
 	        chatRoom.unbind("onParticipantTyping.whosTyping");
+	    },
+	    stoppedTyping: function stoppedTyping(u_h) {
+	        var self = this;
+	        if (self.state.currentlyTyping[u_h]) {
+	            var newState = clone(self.state.currentlyTyping);
+	            if (newState[u_h]) {
+	                clearTimeout(newState[u_h][1]);
+	            }
+	            delete newState[u_h];
+	            self.setState({ currentlyTyping: newState });
+	        }
 	    },
 	    render: function render() {
 	        var self = this;
@@ -9328,7 +9672,7 @@ React.makeElement = React['createElement'];
 	        }
 	    },
 	    _startDownload: function _startDownload(v) {
-	        M.addDownload([v.h || v]);
+	        M.addDownload([v]);
 	    },
 	    _addToCloudDrive: function _addToCloudDrive(v) {
 	        M.injectNodes(v, M.RootID, function (res) {
@@ -9366,8 +9710,19 @@ React.makeElement = React['createElement'];
 	    _startPreview: function _startPreview(v, e) {
 	        var chatRoom = this.props.message.chatRoom;
 	        assert(M.chat, 'Not in chat.');
-	        M.v = chatRoom.images.values();
-	        slideshow(v.h);
+	        var imagesList = [];
+	        chatRoom.images.values().forEach(function (v) {
+	            var msg = chatRoom.messagesBuff.getMessageById(v.messageId);
+	            if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
+	                chatRoom.images.removeByKey(v.id);
+	                return;
+	            }
+	            imagesList.push(v);
+	        });
+
+	        M.v = imagesList;
+
+	        slideshow(v.h, undefined, true);
 	        if (e) {
 	            e.preventDefault();
 	            e.stopPropagation();
@@ -9523,16 +9878,20 @@ React.makeElement = React['createElement'];
 	                                var imagesListKey = message.messageId + "_" + v.h;
 	                                if (!chatRoom.images.exists(imagesListKey)) {
 	                                    v.id = imagesListKey;
-	                                    v.delay = message.delay;
+	                                    v.orderValue = message.orderValue;
+	                                    v.messageId = message.messageId;
 	                                    chatRoom.images.push(v);
 	                                }
-	                                previewButton = React.makeElement(
-	                                    'span',
-	                                    { key: 'previewButton' },
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: __(l[1899]),
-	                                        onClick: self._startPreview.bind(self, v) }),
-	                                    React.makeElement('hr', null)
-	                                );
+	                                if (is_image(v) || is_video(v)) {
+	                                    var previewLabel = is_video(v) ? l[17732] : l[1899];
+	                                    previewButton = React.makeElement(
+	                                        'span',
+	                                        { key: 'previewButton' },
+	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
+	                                            onClick: self._startPreview.bind(self, v) }),
+	                                        React.makeElement('hr', null)
+	                                    );
+	                                }
 	                            }
 	                            if (contact.u === u_handle) {
 	                                dropdown = React.makeElement(
@@ -9671,23 +10030,26 @@ React.makeElement = React['createElement'];
 
 	                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
 	                                }
-
-	                                preview = src ? React.makeElement(
-	                                    'div',
-	                                    { id: v.imgId, className: 'shared-link img-block' },
-	                                    React.makeElement('div', { className: 'img-overlay', onClick: self._startPreview.bind(self, v) }),
-	                                    React.makeElement(
+	                                var previewable = is_image(v) || is_video(v);
+	                                if (previewable) {
+	                                    preview = src ? React.makeElement(
 	                                        'div',
-	                                        { className: 'button overlay-button', onClick: self._startPreview.bind(self, v) },
-	                                        React.makeElement('i', { className: 'huge-white-icon loupe' })
-	                                    ),
-	                                    dropdown,
-	                                    React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
-	                                        width: '156',
-	                                        height: '156',
-	                                        onClick: self._startPreview.bind(self, v)
-	                                    })
-	                                ) : preview;
+	                                        { id: v.imgId, className: 'shared-link img-block' },
+	                                        React.makeElement('div', { className: 'img-overlay', onClick: self._startPreview.bind(self, v) }),
+	                                        React.makeElement(
+	                                            'div',
+	                                            { className: 'button overlay-button',
+	                                                onClick: self._startPreview.bind(self, v) },
+	                                            React.makeElement('i', { className: 'huge-white-icon loupe' })
+	                                        ),
+	                                        dropdown,
+	                                        React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
+	                                            width: '156',
+	                                            height: '156',
+	                                            onClick: self._startPreview.bind(self, v)
+	                                        })
+	                                    ) : preview;
+	                                }
 	                            }
 	                        }
 
@@ -10760,7 +11122,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(11);
 
-	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
+	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
 	    var self = this;
 
 	    this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -10790,6 +11152,7 @@ React.makeElement = React['createElement'];
 	    }, true);
 
 	    this.roomId = roomId;
+	    this.instanceIndex = ChatRoom.INSTANCE_INDEX++;
 	    this.type = type;
 	    this.ctime = ctime;
 	    this.lastActivity = lastActivity ? lastActivity : 0;
@@ -10803,7 +11166,7 @@ React.makeElement = React['createElement'];
 	    this.callIsActive = false;
 	    this.shownMessages = {};
 	    this.attachments = new MegaDataMap(this);
-	    this.images = new MegaDataSortedMap("id", "delay", this);
+	    this.images = new MegaDataSortedMap("id", "orderValue", this);
 
 	    self.members = {};
 
@@ -10851,6 +11214,7 @@ React.makeElement = React['createElement'];
 	        }
 
 	        self.lastActivity = ts;
+
 	        if (msg.userId === u_handle) {
 	            self.didInteraction(u_handle, ts);
 	            return;
@@ -10929,7 +11293,9 @@ React.makeElement = React['createElement'];
 	            getLastInteractionWith(contact.u);
 	        }
 	    });
-	    self.megaChat.trigger('onRoomCreated', [self]);
+	    if (!noUI) {
+	        self.megaChat.trigger('onRoomCreated', [self]);
+	    }
 
 	    $(window).rebind("focus." + self.roomId, function () {
 	        if (self.isCurrentlyActive) {
@@ -10961,6 +11327,8 @@ React.makeElement = React['createElement'];
 
 	    'LEFT': 250
 	};
+
+	ChatRoom.INSTANCE_INDEX = 0;
 
 	ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
 	    var self = this;
@@ -11269,6 +11637,8 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 
+	    message.source = Message.SOURCE.SENT;
+
 	    self.trigger('onMessageAppended', message);
 	    self.messagesBuff.messages.push(message);
 
@@ -11313,6 +11683,8 @@ React.makeElement = React['createElement'];
 	        'delay': unixtime(),
 	        'sent': Message.STATE.NOT_SENT
 	    });
+
+	    self.trigger('onSendMessage');
 
 	    self.appendMessage(msgObject);
 

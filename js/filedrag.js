@@ -1,150 +1,36 @@
 (function(scope) {
 
-    function getDDhelper() {
-        var id = '#fmholder';
-        if (page == 'start') {
-            id = '#startholder';
-        }
-        $('.udragger-block').remove();
-        $(id).append('<div class="udragger-block drag" id="draghelper"><div class="dragger-status"></div><div class="dragger-files-number u-dfn">1</div></div>');
-        $('.udragger-block').removeClass('multiple');
-        $('.udragger-block').show();
-        $('.dragger-files-number.u-dfn').hide();
-        return $('.udragger-block')[0];
-    }
-
-    function FileDragHover(e) {
-        if (d) {
-            console.log('hover', $.dragging);
-        }
-        // if (folderlink) return false;
-        $.dragging = Date.now();
-        e.stopPropagation();
-        e.preventDefault();
-        if (document.getElementById('start_uploadbutton')) {
-            document.getElementById('start_uploadbutton').style.display = 'none';
-        }
-        if (!$.ddhelper) {
-            var filecnt = 0;
-            if (e && e.target && e.target.files) {
-                var files = e.target.files || e.dataTransfer.files;
-                for (var i in files) {
-                    filecnt++;
-                }
-            }
-            else if (e
-                    && e.dataTransfer
-                    && e.dataTransfer.items
-                    && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry) {
-                var items = e.dataTransfer.items;
-                for (var i in items) {
-                    if (items[i].kind) {
-                        filecnt++;
-                    }
-                }
-            }
-            else if (e && e.dataTransfer && e.dataTransfer.files) {
-                var files = e.dataTransfer.files;
-                for (var i in files) {
-                    filecnt++;
-                }
-            }
-            else if (e && e.dataTransfer && e.dataTransfer.mozItemCount) {
-                filecnt = e.dataTransfer.mozItemCount;
-            }
-            else {
-                filecnt = 1;
-            }
-            if (filecnt > 0) {
-                $.ddhelper = getDDhelper();
-            }
-            if (filecnt > 1) {
-                $('.dragger-files-number.u-dfn').text(filecnt);
-                $('.dragger-files-number.u-dfn').show();
-            }
-        }
-        if ($.ddhelper) {
-            $('#draghelper .dragger-icon').remove();
-            $('<div class="dragger-icon ' + fileIcon({
-                name: ''
-            }) + '"></div>').insertAfter('#draghelper .dragger-status');
-            $('.dragger-icon.fade').fadeTo(500, 0.1);
-            $($.ddhelper).css({
-                left: (e.pageX + 35 + "px"),
-                top: (e.pageY - 5 + "px")
-            });
-            $('.udragger-block').removeClass('drag warning copy download move to-shared to-contacts to-conversations to-rubbish');
-            $('.udragger-block').addClass('copy');
-        }
-        if (e) {
-            var t = $(e.target);
-            $('.nw-fm-tree-item, .nw-contact-item').css('background-color', '');
-            $('.ui-selected').removeClass('ui-selected');
-
-            if (t.hasClass('nw-fm-tree-folder') || t.hasClass("nw-contact-name")) {
-                t = t.parent();
-            }
-            if (t.hasClass('nw-fm-tree-item') || t.hasClass("nw-contact-item")) {
-                t.css('background-color', 'rgba(222,222,10,0.3)');
-            }
-            else if (M.viewmode) {
-                if (t.hasClass('data-block-view folder')) {
-                    t.addClass('ui-selected');
-                }
-            }
-            else {
-                if (t.hasClass('tranfer-filetype-txt')
-                    || t.hasClass('shared-folder-info-block')
-                    || t.parent().hasClass('shared-folder-info-block')) {
-
-                    t = t.closest('tr');
-
-                    if (t.hasClass('folder')) {
-                        t.addClass('ui-selected');
-                    }
-                }
-            }
-        }
-    }
-
-    function FileDragLeave(e) {
-        if (d) {
-            console.log(e);
-        }
-        // if (folderlink || M.getNodeRights(M.currentdirid) < 1) return false;
-        e.stopPropagation();
-        e.preventDefault();
-        setTimeout(function() {
-            if (e && (e.pageX < 6 || e.pageY < 6) && $.dragging && $.dragging + 50 < Date.now()) {
-                $($.ddhelper).remove();
-                $.ddhelper = undefined;
-            }
-        }, 100);
-        setTimeout(function() {
-            if (page == 'start'
-                    && e && (e.pageX < 6 || e.pageY < 6) && $.dragging && $.dragging + 500 < Date.now()) {
-                $.dragging = false;
-            }
-        }, 500);
-    }
-
     var dir_inflight = 0;
     var filedrag_u = [];
     var filedrag_paths = Object.create(null);
+    var touchedElement = 0;
+    var startUploading = false;
+    var tempFileDrag = [];
 
     function pushUpload() {
-        if (!--dir_inflight && $.dostart) {
+        if (!--dir_inflight && startUploading) {
             var emptyFolders = Object.keys(filedrag_paths)
                 .filter(function(p) {
                     return filedrag_paths[p] < 1;
                 });
-
+            filedrag_u = filedrag_u.concat(tempFileDrag);
             M.addUpload(filedrag_u, false, emptyFolders);
             filedrag_u = [];
+            tempFileDrag = [];
+            startUploading = false;
             filedrag_paths = Object.create(null);
 
             if (page === 'start') {
                 start_upload();
+            }
+        }
+        else {
+            if (!dir_inflight && !startUploading) {
+                // This means that the controle flow arrived to FileSystemFileEntry.file()
+                //  success handler before finishing iterating on items at FileSelectHandler(e).
+                // The above behavior found on Edge, discovered on March 2018.
+                // Probably all other browers may chage this at some point, since this API is still experimental.
+                tempFileDrag = tempFileDrag.concat(filedrag_u);
             }
         }
     }
@@ -252,8 +138,140 @@
         }, true);
     }
 
-    // file selection
+    function FileDragEnter(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (localStorage.d > 1) {
+            console.info('----- ENTER event :' + e.target.className);
+        }
+        touchedElement++;
+        if (touchedElement === 1) {
+            $('.drag-n-drop.overlay').removeClass('hidden');
+            $('body').addClass('overlayed');
+        }
+
+    }
+
+    function FileDragHover(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+    var useMegaSync = -1;
+    var usageMegaSync = 0;
+
+
+    function FileSelectHandlerMegaSyncClick(e) {
+        if (useMegaSync === -1) {
+            e.preventDefault();
+            e.stopPropagation();
+            megasync.isInstalled(function (err, is) {
+                if (!err || is) {
+                    if (megasync.currUser === u_handle) {
+                        useMegaSync = 2;
+                    }
+                    else {
+                        useMegaSync = 3;
+                    }
+                }
+                else {
+                    useMegaSync = 3;
+                }
+            });
+            return false;
+        }
+        else if (useMegaSync === 3) {
+            useMegaSync = -1
+            return true;
+        }
+        else if (useMegaSync === 2) {
+            e.preventDefault();
+            e.stopPropagation();
+            var target;
+            if ($.onDroppedTreeFolder) {
+                target = $.onDroppedTreeFolder;
+                delete $.onDroppedTreeFolder;
+            }
+            else if (String(M.currentdirid).length !== 8) {
+                target = M.lastSeenCloudFolder || M.RootID;
+            }
+            else {
+                target = M.currentdirid;
+            }
+            if ((onChat = (String(M.currentdirid).substr(0, 4) === 'chat'))) {
+                target = M.currentdirid;
+            }
+
+            var uploadCmdIsFine = function _uploadCmdIsFine(error, response) {
+                if (error) {
+                    useMegaSync = 3;
+                }
+            };
+
+            //var elem = $('#' + e.toElement.id)[0];
+            var elem = e.target;
+            if (elem.hasAttribute('webkitdirectory') || elem.hasAttribute('mozdirectory')
+                || elem.hasAttribute('msdirectory') || elem.hasAttribute('odirectory')
+                || elem.hasAttribute('directory')) {
+                megasync.uploadFolder(target, uploadCmdIsFine);
+            }
+            else {
+                megasync.uploadFile(target, uploadCmdIsFine);
+            }
+            return false;
+        }
+        else {
+            if (localStorage.dd && localStorage.jj && localStorage.d) {
+                console.warn('Strange value of UseMegaSync found = ' + useMegaSync);
+            }
+            return true;
+        }
+    }
+    function FileSelectHandlerMegaSyncMouse(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (useMegaSync === -1) {
+            megasync.isInstalled(function (err, is) {
+                if (!err || is) {
+                    if (megasync.currUser === u_handle) {
+                        useMegaSync = 2;
+                    }
+                    else {
+                        useMegaSync = 3;
+                    }
+                }
+                else {
+                    useMegaSync = 3;
+                }
+            });
+            return false;
+        }
+        else if (useMegaSync === 2 && ++usageMegaSync > 3) {
+            useMegaSync = -1;
+            usageMegaSync = 0;
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+    function FileDragLeave(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (localStorage.d > 1) {
+            console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
+        }
+        touchedElement--;
+        // below condition is due to firefox bug. https://developer.mozilla.org/en-US/docs/Web/Events/dragenter
+        if ((touchedElement <= 0) || (touchedElement === 1 && ua.details.browser === 'Firefox')) {
+            $('.drag-n-drop.overlay').addClass('hidden');
+            $('body').removeClass('overlayed');
+            touchedElement = 0;
+        }
+    }
+
+    // on Drop event
     function FileSelectHandler(e) {
+        useMegaSync = -1;
         if (e.stopPropagation) {
             e.stopPropagation();
         }
@@ -261,46 +279,27 @@
             e.preventDefault();
         }
 
-        $($.ddhelper).remove();
-        $.ddhelper = undefined;
+        var currentDir = M.currentdirid;
+        startUploading = false;
+        tempFileDrag = [];
 
-        var target   = $(e.target);
-        var targetid = M.currentdirid;
+        // Clear drag element
+        touchedElement = 0;
 
-        if (target.hasClass("nw-fm-tree-folder") || target.hasClass("nw-contact-name")) {
-            target = target.parent();
-        }
-        if (target.hasClass("nw-fm-tree-item") || target.hasClass("nw-contact-item")) {
-            targetid = target.attr('id').split('_').pop();
-        }
-        else if (M.viewmode) {
-            if (target.hasClass('data-block-view folder')) {
-                targetid = target.attr('id');
-            }
-        }
-        else {
-            if (target.hasClass('tranfer-filetype-txt')
-                || target.hasClass('shared-folder-info-block')
-                || target.parent().hasClass('shared-folder-info-block')) {
-
-                target = target.closest('tr');
-
-                if (target.hasClass('folder')) {
-                    targetid = target.attr('id');
-                }
-            }
-        }
+        $('.drag-n-drop.overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
 
         if (
             (
                 folderlink ||
+                currentDir === 'contacts' ||
                 (
-                    M.currentdirid !== 'dashboard' &&
-                    M.currentdirid !== 'transfers' &&
-                    (M.getNodeRights(targetid) | 0) < 1
+                    currentDir !== 'dashboard' &&
+                    currentDir !== 'transfers' &&
+                    (M.getNodeRights(currentDir) | 0) < 1
                 )
             ) &&
-            String(M.currentdirid).indexOf("chat/") === -1
+            String(currentDir).indexOf("chat/") === -1
         ) {
             msgDialog('warningb', l[1676], l[1023]);
             return true;
@@ -309,40 +308,6 @@
         if (page == 'start') {
             if ($('#fmholder').html() == '') {
                 $('#fmholder').html(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
-            }
-        }
-        else {
-            $('.nw-fm-tree-item, .nw-contact-item').css('background-color', '');
-
-            if (targetid !== M.currentdirid) {
-                $.onDroppedTreeFolder = targetid;
-            }
-            else if (M.currentdirid === 'contacts') {
-                targetid = null;
-
-                if (M.viewmode) {
-                    if (target.parent().hasClass('data-block-view ustatus')) {
-                        target = target.parent();
-                    }
-
-                    if (target.hasClass('data-block-view ustatus')) {
-                        targetid = target.attr('id');
-                    }
-                }
-                else {
-                    if (target.parent().hasClass('fm-chat-user-info')) {
-                        target = target.parent();
-                    }
-
-                    if (target.hasClass('fm-chat-user-info')) {
-                        targetid = target.closest('tr').attr('id');
-                    }
-                }
-
-                if (String(targetid).length !== 11) {
-                    return false;
-                }
-                $.onDroppedTreeFolder = targetid;
             }
         }
 
@@ -377,7 +342,7 @@
                     if (item) {
                         filedrag_u = [];
                         if (i == items.length - 1) {
-                            $.dostart = true;
+                            startUploading = true;
                         }
                         traverseFileTree(item, '', item.isFile && items[i].getAsFile());
                     }
@@ -391,7 +356,7 @@
                     if (file instanceof Ci.nsIFile) {
                         filedrag_u = [];
                         if (i == m - 1) {
-                            $.dostart = true;
+                            startUploading = true;
                         }
                         traverseFileTree(new mozDirtyGetAsEntry(file /*,e.dataTransfer*/ ));
                     }
@@ -449,6 +414,15 @@
         return true;
     }
 
+    function onDragStartHandler(e) {
+        if ((e.target && e.target.toString && e.target.toString() === '[object Text]')
+            || page.indexOf('/fm/') === -1) {
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+        }
+    }
+
     // initialize
     scope.InitFileDrag = function() {
         var i = 5;
@@ -456,27 +430,33 @@
             var o = document.getElementById(i ? 'fileselect' + i : 'start-upload');
             if (o) {
                 o.addEventListener("change", FileSelectHandler, false);
+                if (!is_mobile) {
+                    o.addEventListener("click", FileSelectHandlerMegaSyncClick, true);
+                    o.addEventListener("mouseover", FileSelectHandlerMegaSyncMouse, true);
+                }
             }
         }
 
         var fnHandler = FileSelectHandler;
+        var fnEnter = FileDragEnter;
         var fnHover = FileDragHover;
         var fnLeave = FileDragLeave;
+
+        touchedElement = 0;
 
         // MEGAdrop upload
         var elem = document.getElementById("wu_items");
         if (elem) {
             fnHandler = mega.megadrop.upload;
-            // fnHover= mega.megadrop.uiDragHover;
-            // fnLeave = mega.megadrop.uiDragLeave;
-            document.getElementById('fileselect5').addEventListener("change", fnHandler, false);
+            document.getElementById("fileselect5").addEventListener("change", fnHandler, false);
         }
-        document.getElementById("fmholder").addEventListener("dragover", fnHover, false);
-        document.getElementById("fmholder").addEventListener("dragleave", fnLeave, false);
-        document.getElementById("fmholder").addEventListener("drop", fnHandler, false);
-        document.getElementById("startholder").addEventListener("dragover", fnHover, false);
-        document.getElementById("startholder").addEventListener("dragleave", fnLeave, false);
-        document.getElementById("startholder").addEventListener("drop", fnHandler, false);
+
+        document.getElementsByTagName("body")[0].addEventListener("dragenter", fnEnter, false);
+        document.getElementsByTagName("body")[0].addEventListener("dragover", fnHover, false);
+        document.getElementsByTagName("body")[0].addEventListener("dragleave", fnLeave, false);
+        document.getElementsByTagName("body")[0].addEventListener("drop", fnHandler, false);
+        document.getElementsByTagName("body")[0].addEventListener("dragstart", onDragStartHandler, false);
+
 
         if (is_chrome_firefox) {
             $('input[webkitdirectory], .fm-folder-upload input').click(function(e) {

@@ -451,14 +451,26 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
                 }
-                loadSubPage(chatRoom.getRoomUrl());
+                if (!chatRoom.inCpyDialog) {
+                    loadSubPage(chatRoom.getRoomUrl());
+                }
+                else {
+                    chatRoom.inCpyDialog();
+                    delete chatRoom.inCpyDialog;
+                }
             }
             if (!chatRoom.lastActivity && actionPacket.ts) {
                 chatRoom.lastActivity = actionPacket.ts;
             }
 
             if (wasActive) {
-                loadSubPage(chatRoom.getRoomUrl());
+                if (!chatRoom.inCpyDialog) {
+                    loadSubPage(chatRoom.getRoomUrl());
+                }
+                else {
+                    chatRoom.inCpyDialog();
+                    delete chatRoom.inCpyDialog;
+                }
             }
         }
         else {
@@ -893,7 +905,8 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
                             v.id = imagesListKey;
-                            v.delay = message.delay;
+                            v.orderValue = message.orderValue;
+                            v.messageId = message.messageId;
                             chatRoom.images.push(v);
                         }
                     }
@@ -983,6 +996,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
     chatRoom.rebind('typing.chatdInt', function() {
         self.broadcast(chatRoom, String.fromCharCode(1));
+    });
+    chatRoom.rebind('stoppedTyping.chatdInt', function() {
+        self.broadcast(chatRoom, String.fromCharCode(2));
     });
 
     self.chatd.rebind('onBroadcast.chatdInt' + chatRoomId, function(e, eventData) {
@@ -1350,6 +1366,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     if (msgObject.pendingMessageId) {
                                         mb.messages.remove(msgObject.pendingMessageId);
                                     }
+                                    msg.source = Message.SOURCE.CHATD;
                                     mb.messages.push(msg);
                                     self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                                 }
@@ -1432,6 +1449,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
 ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInstance, decryptedResult) {
     var self = this;
+
     if (decryptedResult && msgInstance) {
         if (decryptedResult.type === strongvelope.MESSAGE_TYPES.GROUP_FOLLOWUP) {
             if (typeof decryptedResult.payload === 'undefined' || decryptedResult.payload === null) {
@@ -1442,6 +1460,7 @@ ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInst
                 var mb = chatRoom.messagesBuff;
                 msgInstance.references = decryptedResult.references;
                 msgInstance.msgIdentity = decryptedResult.identity;
+
                 mb.messageOrders[decryptedResult.identity] = msgInstance.orderValue;
                 if (mb.verifyMessageOrder(decryptedResult.identity, decryptedResult.references) === false) {
                     // potential message order tampering detected.
@@ -1797,7 +1816,6 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
 ChatdIntegration.prototype.broadcast = function(chatRoom, broadCastCode) {
     var self = this;
     var rawChatId = base64urldecode(chatRoom.chatId);
-    var chatMessages = self.chatd.chatIdMessages[rawChatId];
     return self.chatd.broadcast(rawChatId, broadCastCode);
 };
 

@@ -7,9 +7,18 @@ var slideshowid;
     "use strict";
 
     var fullScreenTimer = null;
+    var _hideCounter = false;
 
     function slideshowsteps() {
         var $stepsBlock = $('.viewer-overlay .viewer-images-num');
+
+        if (_hideCounter === true) {
+            $stepsBlock.addClass('hidden');
+        }
+        else {
+            $stepsBlock.removeClass('hidden');
+        }
+
         var forward = [];
         var backward = [];
         var ii = [];
@@ -30,7 +39,9 @@ var slideshowid;
         // If there is at least 2 images
         if (len > 1) {
             var n = ii.indexOf(ci);
-            $stepsBlock.removeClass('hidden');
+            if (!_hideCounter) {
+                $stepsBlock.removeClass('hidden');
+            }
             switch (n) {
                 // last
                 case len - 1:
@@ -60,7 +71,7 @@ var slideshowid;
     function slideshow_next() {
         var valid = true;
         $.each(dl_queue || [], function(id, file) {
-            if (file.id === slideshowid) {
+            if (file.id === slideshowid && file.preview) {
                 valid = false;
                 return false;
                 /* break loop */
@@ -72,14 +83,14 @@ var slideshowid;
         var steps = slideshowsteps();
         if (steps.forward.length > 0) {
             mBroadcaster.sendMessage('slideshow:next', steps);
-            slideshow(steps.forward[0]);
+            slideshow(steps.forward[0], undefined, _hideCounter);
         }
     }
 
     function slideshow_prev() {
         var valid = true;
         $.each(dl_queue || [], function(id, file) {
-            if (file.id === slideshowid) {
+            if (file.id === slideshowid && file.preview) {
                 valid = false;
                 return false;
                 /* break loop */
@@ -91,7 +102,7 @@ var slideshowid;
         var steps = slideshowsteps();
         if (steps.backward.length > 0) {
             mBroadcaster.sendMessage('slideshow:prev', steps);
-            slideshow(steps.backward[steps.backward.length - 1]);
+            slideshow(steps.backward[steps.backward.length - 1], undefined, _hideCounter);
         }
     }
 
@@ -207,9 +218,16 @@ var slideshowid;
         return n || false;
     }
 
-    function slideshow(id, close) {
+    function slideshow(id, close, hideCounter) {
         var $overlay = $('.viewer-overlay');
         var $document = $(document);
+
+        if (hideCounter) {
+            _hideCounter = true;
+        }
+        else {
+            _hideCounter = false;
+        }
 
         $overlay.removeClass('fullscreen mouse-idle');
 
@@ -241,7 +259,15 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         // then pushing fake states of history/hash
         if (!slideshowid && !hashLogic && !location.hash) {
-            history.pushState({subpage: page}, '', '/' + page);
+            var isSearch = page.indexOf('fm/search/');
+            if (isSearch >= 0) {
+                var searchString = page.substring(isSearch + 10);
+                var tempPage = page.substring(0, isSearch + 10);
+                history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
+            }
+            else {
+                history.pushState({ subpage: page }, '', '/' + page);
+            }
         }
         // Bind keydown events
         $document.rebind('keydown.slideshow', function(e) {
@@ -252,13 +278,18 @@ var slideshowid;
                 slideshow_next();
             }
             else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
-                slideshow(slideshowid, true);
+                if ($.dialog) {
+                    closeDialog($.dialog);
+                }
+                else {
+                    slideshow(slideshowid, true, _hideCounter);
+                }
             }
             else if (e.keyCode === 8 || e.key === 'Backspace') {
                 // since Backspace event is processed with keydown at document level for cloudBrowser.
                 // i prefered that to process it here, instead of unbind the previous handler.
                 if (hashLogic || location.hash) {
-                    slideshow(slideshowid, 1);
+                    slideshow(slideshowid, 1, _hideCounter);
                 }
                 else {
                     history.back();
@@ -271,7 +302,7 @@ var slideshowid;
         $overlay.find('.viewer-button.close,.viewer-error-close')
             .rebind('click', function () {
                 if (hashLogic || location.hash) {
-                    slideshow(0, 1);
+                    slideshow(0, 1, _hideCounter);
                 }
                 else {
                     history.back();
@@ -332,6 +363,7 @@ var slideshowid;
                 }
             }
 
+
             // TODO: adapt the above code to work on the downloads page if we need to download the original
             if (page === 'download') {
                 $('.big-button.download-file').click();
@@ -351,7 +383,7 @@ var slideshowid;
             $dlBut.addClass('hidden');
         }
 
-        if (previews[n.h]) {
+        if (previews[n.h] && preqs[n.h]) {
             previewsrc(n.h);
             fetchnext();
         }
@@ -416,6 +448,15 @@ var slideshowid;
                     }
                     previewimg(n.h, u8, 'image/svg+xml');
                     delete previews[n.h].buffer;
+                    preqs[n.h] = 0; // to retry again
+                    if (ev && ev.target && ev.target.status === 509) {
+                        dlmanager.setUserFlags();
+                        dlmanager.showOverQuotaDialog();
+                    }
+                    else if (ev === EOVERQUOTA) {
+                        dlmanager.setUserFlags();
+                        dlmanager.showOverQuotaDialog();
+                    }
                 });
             }
             return false;
@@ -474,10 +515,6 @@ var slideshowid;
                     preqs[n.h] = false;
                 }
             };
-
-            if (!d) {
-                api_req({a: 'log', e: 99668, m: 'video watch'});
-            }
 
             // Show loading spinner until video is playing
             $overlay.find('.viewer-pending').removeClass('hidden');
@@ -551,7 +588,7 @@ var slideshowid;
             }
         }
         else if (String(n.fa).indexOf(':1*') > 0) {
-            api_getfileattr([{fa: M.d[id].fa, k: M.d[id].k}], 1, function(a, b, data) {
+            api_getfileattr([{fa: n.fa, k: n.k}], 1, function(a, b, data) {
                 if (data !== 0xDEAD) {
                     data = mObjectURL([data.buffer || data], 'image/jpeg');
 
@@ -655,7 +692,7 @@ var slideshowid;
         }
 
         var img = new Image();
-        img.onload = function() {
+        img.onload = img.onerror = function(ev) {
             var w = this.width;
             var h = this.height;
             if (w < 960 && w < $(window).width() - 382 && h < 522 && h < $(window).height() - 222) {
@@ -664,13 +701,14 @@ var slideshowid;
             else {
                 $overlay.find('.viewer-image-bl').removeClass('default-state');
             }
-            $overlay.find('.viewer-image-bl img').attr('src', this.src);
+            $overlay.find('.viewer-image-bl img').attr('src', ev.type === 'error' ? noThumbURI : this.src);
             $overlay.find('.viewer-image-bl').removeClass('hidden');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
-        };
-        img.onerror = function(ev) {
-            console.error('Preview image error', ev);
+
+            if (d && ev.type === 'error') {
+                console.debug('Failed to preview image...', src, ev);
+            }
         };
         img.src = src;
     }

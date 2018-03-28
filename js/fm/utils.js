@@ -202,6 +202,9 @@ MegaUtils.prototype.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
     method = options.method || (aData && 'POST') || 'GET';
 
     xhr = getxhr();
+    if (options.timeout) {
+        xhr.timeout = options.timeout;
+    }
 
     if (typeof options.prepare === 'function') {
         options.prepare(xhr);
@@ -461,6 +464,8 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
         var lang = localStorage.lang;
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
+        var cdlogger = debug && localStorage.chatdLogger;
+
 
         localStorage.clear();
         sessionStorage.clear();
@@ -485,6 +490,10 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
             if (apipath) {
                 // restore api path across reloads, only for debugging purposes...
                 localStorage.apipath = apipath;
+            }
+
+            if (cdlogger) {
+                localStorage.chatdLogger = 1;
             }
         }
 
@@ -527,6 +536,17 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                     ) {
                         waitingPromises.push(
                             megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
+                        );
+                    }
+                    else if (
+                        typeof(megaChat) !== 'undefined' &&
+                        megaChat.plugins.chatdIntegration &&
+                        !megaChat.plugins.chatdIntegration.chatd.chatdPersist &&
+                        typeof(ChatdPersist) !== 'undefined'
+                    ) {
+                        // chatdPersist was disabled, potential crash, try to delete the db manually
+                        waitingPromises.push(
+                            ChatdPersist.forceDrop()
                         );
                     }
 
@@ -807,8 +827,13 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                     location.reload();
                 }
                 else {
+                    var myHost;
                     if (location.href.indexOf('search') > -1) {
-                        var myHost = location.href.substr(0, location.href.lastIndexOf('search') - 1);
+                        myHost = location.href.substr(0, location.href.lastIndexOf('search') - 1);
+                        location.replace(myHost);
+                    }
+                    else if (location.href.indexOf('/fm/chat/') > -1){
+                        myHost = location.href.substr(0, location.href.lastIndexOf('/fm/chat/'));
                         location.replace(myHost);
                     }
                     else {
@@ -1063,7 +1088,7 @@ MegaUtils.prototype.getSiteVersion = function() {
 
         // If an extension use the version of that (because sometimes there are independent deployments of extensions)
         if (is_extension) {
-            version = (window.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
+            version = (mega.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
         }
     }
 
@@ -1071,9 +1096,11 @@ MegaUtils.prototype.getSiteVersion = function() {
 };
 
 /*
- * Alert about 110% zoom level in Chrome/Chromium
+ * Alert about broken layout caused by zoom level
  */
-MegaUtils.prototype.chrome110ZoomLevelNotification = function() {
+/* jshint -W074 */
+MegaUtils.prototype.zoomLevelNotification = function() {
+    "use strict";
 
     var dpr = window.devicePixelRatio;
     var pf = navigator.platform.toUpperCase();
@@ -1084,42 +1111,74 @@ MegaUtils.prototype.chrome110ZoomLevelNotification = function() {
         0.6660000085830688,// 67% non-retian, 33% retina
         0.3330000042915344// 33% non-retina
     ];
+    var $menu = $('.top-icon.menu');
+    var WIDTH = 24;// .top-icon.menu width in px
+    var pos = $menu.length ? $menu.position().left + WIDTH : 0 ;
+    var $exc = {};
+    var $over = {};
 
-    if (window.chrome) {
+    $exc = $('.nw-dark-overlay.zoom-exceeded-overlay');
+    $over = $('.nw-dark-overlay.zoom-overlay');
+
+    // Alert about broken layout, main (hamburger) menu is displaced and exceeding window width
+    if (window.innerWidth < pos) {
+        $('.nw-dark-overlay').removeClass('mac');
+        $exc.removeClass('zoom-67 zoom-33');
+
+        if (pf.indexOf('MAC') >= 0) {
+            $('.nw-dark-overlay').addClass('mac');
+        }
+
+        if ($exc.not(':visible')) {
+            $exc.fadeIn(400);
+        }
+
+        return;
+    }
+    else if ($exc.is(':visible')) {
+        $exc.fadeOut(200);
+    }
+
+    // Chrome specific broken layout tested on versions <= 62
+    if (mega.chrome && dpr === 2.200000047683716 || dpr === 1.100000023841858
+        || dpr === 1.3320000171661377 || dpr === 0.6660000085830688 || dpr === 0.3330000042915344) {
 
         $('.nw-dark-overlay').removeClass('mac');
-        $('.nw-dark-overlay.zoom-overlay').removeClass('zoom-67 zoom-33');
+        $over.removeClass('zoom-67 zoom-33');
 
         if (pf.indexOf('MAC') >= 0) {
             $('.nw-dark-overlay').addClass('mac');
         }
 
         // zoom level110%
-        if ((dpr === 2.200000047683716) || (dpr === 1.100000023841858)) {
-            $('.nw-dark-overlay.zoom-overlay').fadeIn(400);
+        if (dpr === 2.200000047683716 || dpr === 1.100000023841858) {
+            $over.fadeIn(400);
         }
 
         // 67% both or 33% retina
-        if ((dpr === 1.3320000171661377) || (dpr === 0.6660000085830688)) {
-            $('.nw-dark-overlay.zoom-overlay')
+        if (dpr === 1.3320000171661377 || dpr === 0.6660000085830688) {
+            $over
                 .addClass('zoom-67')
                 .fadeIn(400);
         }
 
         // 33% non-retina
         if (dpr === 0.3330000042915344) {
-            $('.nw-dark-overlay.zoom-overlay')
+            $over
                 .addClass('zoom-33')
                 .fadeIn(400);
         }
 
-        if (brokenRatios.indexOf(dpr) === -1) {
-            $('.nw-dark-overlay.zoom-overlay').fadeOut(200);
-        }
+    }
+    else if (brokenRatios.indexOf(dpr) === -1 && $over.is(':visible')) {
+        $over.fadeOut(200);
     }
 };
+/* jshint +W074 */
+
 mBroadcaster.once('startMega', function() {
-    onIdle(M.chrome110ZoomLevelNotification);
+    "use strict";
+    onIdle(M.zoomLevelNotification);
 });
 
 /**

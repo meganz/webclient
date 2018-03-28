@@ -235,7 +235,7 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
         + encodeURIComponent(ab_to_str(ab).replace(/foreignObject|script/g, 'desc'));
 });
 
-if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
+if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
     delete mThumbHandler.sup.SVG;
 }
 
@@ -302,10 +302,12 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
         var hideControls = function() {
             $wrapper.removeClass('mouse-idle');
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                $wrapper.addClass('mouse-idle');
-            }, 2600);
+            if (dlmanager.isStreaming) {
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    $wrapper.addClass('mouse-idle');
+                }, 2600);
+            }
         };
 
         var getTimeOffset = function(x) {
@@ -463,9 +465,11 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
 
         // Bind Mute button
         $mute.rebind('click', function() {
-            videoElement.muted = !videoElement.muted;
-            changeButtonState('mute');
-            updateVolumeBar();
+            if (!$(this).parent('.volume-control').hasClass('no-audio')) {
+                videoElement.muted = !videoElement.muted;
+                changeButtonState('mute');
+                updateVolumeBar();
+            }
         });
 
         var progressBarElementStyle = $progressBar.get(0).style;
@@ -635,6 +639,10 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
             options = destroy;
             destroy = null;
         }
+        var c = MediaAttribute.getCodecStrings(node);
+        if (c) {
+            options = Object.assign(Object.create(null), {type: c && c[0]}, options);
+        }
         var s = Streamer(node.link || node.h, $wrapper.find('video').get(0), options);
 
         _initVideoControls($wrapper, s);
@@ -687,32 +695,41 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
         s.on('error', function(ev, error) {
             // <video>'s element `error` handler
 
+            var emsg;
             var info = [2].concat(MediaAttribute.getCodecStrings(node)).concat(s.hasVideo, s.hasAudio);
 
             if (!$.dialog) {
                 var hint = error.message || error;
                 info.push(String(hint || 'na'));
 
-                if (!hint && !window.chrome) {
+                if (!hint && !mega.chrome) {
                     // Suggest Chrome...
                     hint = l[16151] + ' ' + l[242];
                 }
 
-                if (String(hint) === 'The provided type is not supported') {
-                    msgDialog('warninga', l[135], l[17743]);
+                emsg = String(hint) === 'The provided type is not supported' ? l[17743]
+                     : String(hint) === 'Access denied' ? l[23] : hint;
+
+                if (s.options.autoplay) {
+                    msgDialog('warninga', l[135], l[47], emsg);
                 }
                 else {
-                    msgDialog('warninga', l[135], l[47], hint);
+                    // $wrapper.removeClass('video-theatre-mode video');
                 }
             }
             if (d) {
                 console.debug('ct=%s, buf=%s', this.video.currentTime, this.stream.bufTime, error, info);
             }
             destroy();
+            s.error = emsg;
 
-            if (!d) {
-                api_req({a: 'log', e: 99669, m: JSON.stringify(info)});
+            if (!d && String(Object.entries).indexOf('native') > 0) {
+                eventlog(99669, JSON.stringify(info));
             }
+        });
+
+        s.on('playing', function() {
+            eventlog(s.options.type === 'WebM' ? 99681 : 99668);
         });
 
         return s;
@@ -1781,11 +1798,21 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
                         audiocodec = swap[audiocodec] || audiocodec;
                     }
                     var amime = 'audio/mp4; codecs="' + audiocodec + '"';
-                    if (window.chrome && audiocodec === 'mp3') {
+                    if (mega.chrome && audiocodec === 'mp3') {
                         amime = 'audio/mpeg';
                     }
                     return MediaSource.isTypeSupported(amime) ? 2 : 0;
                 }
+                break;
+
+            case 'WebM':
+                switch (mega.chrome && videocodec) {
+                    case 'V_VP8':
+                    case 'V_VP9':
+                        var codec = videocodec.substr(2).toLowerCase();
+                        return MediaSource.isTypeSupported('video/webm; codecs="' + codec + '"') ? 1 : 0;
+                }
+                break;
         }
 
         return 0;

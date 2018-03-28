@@ -771,6 +771,10 @@
         "text": "I agree with the MEGA [A]Reseller Terms of Service[\/A]",
         "context": ""
     },
+    "556": {
+        "text": "Next",
+        "context": ""
+    },
     "561": {
         "text": "Address",
         "context": ""
@@ -1004,11 +1008,11 @@
         "context": ""
     },
     "694": {
-        "text": "1. Disable one link (\"URL\") per file - the file(s) will remain the user's\n account",
+        "text": "1. Disable one link (\"URL\") per file - the file(s) will remain in the user's account",
         "context": ""
     },
     "695": {
-        "text": "2. Disable multiple URL's per file - the file(s) will remain the user's account",
+        "text": "2. Disable multiple URL's per file - the file(s) will remain in the user's account",
         "context": ""
     },
     "696": {
@@ -2839,6 +2843,14 @@
         "text": "Folder created",
         "context": "success message when creating a folder"
     },
+    "5687": {
+        "text": "How to upload",
+        "context": "settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan"
+    },
+    "5700": {
+        "text": "Got it",
+        "context": "Answer meaning 'I understand'"
+    },
     "5710": {
         "text": "Are you sure you want to abort the registration?",
         "context": "Asking whether the user really wants to abort\/stop the registration process or continue on."
@@ -3306,10 +3318,6 @@
     "6771": {
         "text": "Deleted folders",
         "context": "FM description of rubbish bin"
-    },
-    "6772": {
-        "text": "No Conversations",
-        "context": "Empty Conversations section"
     },
     "6773": {
         "text": "Ascending",
@@ -4123,14 +4131,6 @@
         "text": "Hide languages",
         "context": "Button text to hide the less popular languages that are available in the language selection dialog."
     },
-    "7659": {
-        "text": "You have been suspended due to excess data usage. \r\nPlease contact support@mega.nz to get your account reinstated.",
-        "context": "Error message when a given user with a suspended account tries to login. The user is suspended due excess of data usage. "
-    },
-    "7660": {
-        "text": "You have been suspended due to repeated copyright infringement.",
-        "context": "Error message when a given user with a suspended account tries to login. "
-    },
     "7663": {
         "text": "Press",
         "context": "Button label e.g. 'Press CTRL+C' to copy a link to the clipboard."
@@ -4703,17 +4703,9 @@
         "text": "PRO membership plan expiring soon",
         "context": "A title for a notification saying the user's pricing plan will expire soon."
     },
-    "8601": {
-        "text": "Download with MEGAsync if it is running",
-        "context": "This option in the account settings allows users to download files with the external MEGAsync program if it is running in the background. Otherwise they will normally download through the browser.\r\n"
-    },
     "8602": {
         "text": "This file will be decrypted as soon as the cryptographic key becomes available (when the share creator logs in again).",
         "context": "A tooltip message for undecryptable file."
-    },
-    "8603": {
-        "text": "You have been suspended due to Terms of Service violations.",
-        "context": "A warning for serious infringers who have had their accounts suspended. This is shown to them during login in a dialog."
     },
     "8623": {
         "text": "popular!",
@@ -5448,20 +5440,40 @@
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhile downloading through the mobile browser, this message is shown to users to encourage installing our app.\r\n\r\n[S] is replaced with <span> and the text within turns red."
     },
     "8951": {
-        "text": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50 GB cloud storage![\/S]",
-        "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the filesize exceeds an stated limit. \r\n\r\n[S] is replaced with <span> and the text within turns red."
+        "text": "This file is too large to open in your mobile browser. Please use our mobile app for [S]unlimited file size support and free 50 GB cloud storage![\/S]",
+        "context": "This is used on the downloads page on the mobile webclient when viewing a download link through the mobile browser and the filesize exceeds an stated limit. Leave the [S] and [\/S] tags which will be used to turn the text red."
     },
     "8952": {
-        "text": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50 GB cloud storage![\/S]",
-        "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the file-type cannot be handled through the mobile browser itself. (The message is shown BEFORE trying to download the file)\r\n\r\n[S] is replaced with <span> and the text within turns red."
+        "text": "This file could not be opened in your mobile browser. Please use our mobile app for [S]unlimited file size, unlimited file types and free 50 GB cloud storage![\/S]",
+        "context": "This is used on the downloads page in the mobile webclient when viewing a download link through the mobile browser and the file-type cannot be handled through the mobile browser itself. The message is shown BEFORE trying to download the file. Leave the [S] and [\/S] tags which will turn the text red."
     },
     "8953": {
         "text": "Set an expiry date",
         "context": "A label for the Get Link dialog when there is no expiry time currently set for the link. This lets them set an expiry date for the link so it will no longer be available after this date."
     },
+    "8969": {
+        "text": "Forgot password?",
+        "context": "An option to reset the password."
+    },
+    "8970": {
+        "text": "If you have a backup of your Recovery Key, you can reset your password by selecting YES. No data will be lost.",
+        "context": "First paragraph of the screen when the password has been forgotten"
+    },
+    "8971": {
+        "text": "You can still export your Recovery Key now if you have an active MEGA session in any other browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
+        "context": "Second paragraph of the screen when the password has been forgotten"
+    },
+    "8973": {
+        "text": "Do you have a backup of your Recovery Key?",
+        "context": "Sentence to ask to the user if he has the master key in the screen when the password has been forgotten"
+    },
     "8982": {
         "text": "An error occurred, please try again.",
         "context": "Text of the alert dialog to inform the user when an error occurs when cancelling the account"
+    },
+    "8993": {
+        "text": "This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. If you do recall your parked account's password, please contact support@mega.nz",
+        "context": "Text shown in the last alert dialog to park an account"
     },
     "9000": {
         "text": "Error. This email address is already in use.",
@@ -5774,14 +5786,6 @@
     "10660": {
         "text": "Disable future hints",
         "context": "When the onboarding tooltip is shown, the user can click\/toggle this checkbox to hide all current\/future onboarding hints\/tooltips."
-    },
-    "10661": {
-        "text": "You can [B]add and manage contacts[\/B] in the Contacts tab, then securely chat and share files using MEGAchat.",
-        "context": "Onboarding hint\/tooltip that would be shown to new users\/users with no contacts or only one contact."
-    },
-    "10662": {
-        "text": "Communicate securely with your family, friends and colleagues using our audio\/video and text chat with user-controlled end-to-end encryption.",
-        "context": "Onboarding hint\/tooltip that would be shown to new users\/users."
     },
     "10663": {
         "text": "... and [X] more",
@@ -7583,25 +7587,37 @@
         "text": "We have recently made some improvements to our Firefox Legacy extension. You can download and install the update using the button below.",
         "context": "A message in a popup dialog explaining that there is an update available for the Firefox Legacy extension which works on browsers such as Pale Moon."
     },
+    "17550": {
+        "text": "A folder named %1 already exists in this location.",
+        "context": "Dialog description. Informs user during copy,move or upload that a folder with the same name already exists. Please leave %1 as it is, it'll be replaced by folder name.\r\n\r\nthis is similar to files dialog [attached]"
+    },
+    "17551": {
+        "text": "Copy and merge",
+        "context": "Header of clickable block in duplicate items dialog. Allows user to merge the folder in the destination with the folder he is copying.\r\nthis is similar to 'upload and update' in files conflict dialog [attached]"
+    },
+    "17552": {
+        "text": "Merge the folder at the destination with the folder you are copying:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to merge the folder in destination with the folder he is copying.\r\nSimilar to \"The file will be updated with version history\" in attached screenshot"
+    },
+    "17553": {
+        "text": "Move and merge",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to merge the folder in destination with the folder he is moving.\r\nsimilar to \"upload and update\" in the attached screenshot."
+    },
+    "17554": {
+        "text": "Merge the folder at the destination with the folder you are moving:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to merge the folder in destination with the folder he is moving.\r\nSimilar to \"The file will be updated with version history\" in attached screenshot"
+    },
+    "17555": {
+        "text": "Upload and merge",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to merge the folder in destination with the folder he is uploading.\r\nsimilar to \"upload and update\" in the attached screenshot."
+    },
+    "17556": {
+        "text": "Select whether you want to merge the folders:",
+        "context": "Dialog sub description. Informs user during copy,move or upload that a folder with the same name already exists.\r\nhighlighted in attached example screenshot\r\n"
+    },
     "17557": {
         "text": "The link you are trying to access is not valid.",
         "context": "attached, this will be the dialog content"
-    },
-    "17558": {
-        "text": "Import and update",
-        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to import the file in the destination folder by generating a new version with the file he is importing."
-    },
-    "17559": {
-        "text": "Don't import",
-        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and not replace it with the file they are importing."
-    },
-    "17560": {
-        "text": "Import and rename",
-        "context": "The header of a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and rename the file he is importing to avoid a filename conflict."
-    },
-    "17561": {
-        "text": "The file you are importing will be renamed as:",
-        "context": "A description for a clickable block in the Duplicate items dialog. This option allows the user to keep the existing file in the destination folder and also the file they are importing by renaming it automatically."
     },
     "17564": {
         "text": "Link error",
@@ -7610,6 +7626,54 @@
     "17565": {
         "text": "The link cannot be managed, due to an unknown error received from server.",
         "context": "An error message originating from the Manage Link dialog.\r\n"
+    },
+    "17566": {
+        "text": "Visit the Contacts tab to add or manage your contacts. [B]Invite your friends to MEGA[\/B] to allow you to [B]share[\/B] with them privately or [B]chat securely[\/B] using MEGAchat.",
+        "context": "This text is shown to users who have two or more contacts."
+    },
+    "17567": {
+        "text": "Communicate securely with your family, friends and colleagues using MEGAchat. Chats and calls are end-to-end encrypted, [B]not even MEGA can read or listen to your communication[\/B].",
+        "context": "This message is shown to users who have two or more contacts and less than two chats."
+    },
+    "17568": {
+        "text": "Start uploading files to your account by using the [B]file or folder upload button[\/B], or simply [B]drag and drop[\/B] from your local computer to MEGA in the browser.",
+        "context": "Onboarding tip on how to upload new files, only shown to users with less than two files in their cloud drive (typically, they would have the welcome pdf, so that may mean that they had never uploaded files in their current folder that they are viewing)."
+    },
+    "17569": {
+        "text": "Start uploading files to your account by using the [B]file upload button[\/B], or simply [B]drag and drop[\/B] from your local computer to MEGA in the browser.",
+        "context": "Same as string 17568, but shown to browsers which only support file uploads (and no folder uploads)."
+    },
+    "17570": {
+        "text": "Items moved to the Rubbish Bin will remain there temporarily. The Rubbish Bin is periodically [B]cleaned for you automatically[\/B], and you can control its setup in your Settings.",
+        "context": "Once the user has moved an item to the Rubbish bin, we would remind him (if we never did before) that there are items that can be cleared automatically by going into their Settings."
+    },
+    "17571": {
+        "text": "Manage your transfers",
+        "context": "Title for the \"Manage your transfers\" onboarding hint."
+    },
+    "17572": {
+        "text": "You can see the progress of your transfers by placing the mouse over the Transfers tab. If you want to have more control over your transfers, just click the icon to move to the Transfer Manager.",
+        "context": "An onboarding tip which is shown once the user starts a new download. Typically this is only shown once."
+    },
+    "17573": {
+        "text": "Notifications will keep you posted regarding everything going on with your account. You can manage your notifications in your Settings.",
+        "context": "An onboarding tip shown once when the user gets a new notification."
+    },
+    "17574": {
+        "text": "Share your content",
+        "context": "The title of the \"Share your content\" onboarding tooltip. This is typically only shown once when the user doesn't have any files shared."
+    },
+    "17575": {
+        "text": "You can create a link to share your content by right clicking on the file or folder you want to share and selecting Get Link from the context menu.",
+        "context": "An onboarding tooltip message. This is typically shown only once when the user doesn't have any files shared."
+    },
+    "17576": {
+        "text": "Sharing folders",
+        "context": "The title of the \"Sharing folders\" onboarding tip. This is shown only once with all other onboarding tips and only when the user doesn't have any shared folders."
+    },
+    "17577": {
+        "text": "To start sharing folders with your contacts, right click on the folder you want to share and choose [B]Share[\/B] from the context menu.",
+        "context": "An onboarding tooltip message which is shown only once along with all other onboarding tips and only when the user doesn't have any shared folders."
     },
     "17578": {
         "text": "There is already a file with the same name",
@@ -7631,9 +7695,29 @@
         "text": "You have [X1] file versions, taking up a total of [X2].\r\n",
         "context": "A message to summarise the total number of file versions (X1) and total storage usage (X2) of the versioned files. Please keep the placeholders [X1] and [X2] as they will be replaced at runtime."
     },
+    "17586": {
+        "text": "Downloading canceled in MEGAsync",
+        "context": "Downloading status text which appears when a download gets canceled in MEGAsync."
+    },
     "17590": {
         "text": "by %1",
         "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
+    },
+    "17591": {
+        "text": "Cannot get downloading status from MEGAsync",
+        "context": "Download status text which appears when MEGAsync stops sending status updates. This is possibly due to a crash in MEGAsync. We don't have a screenshot for this case (it's a rare one). However the attached screenshot will show the location of this text."
+    },
+    "17592": {
+        "text": "Downloading with MEGAsync ...",
+        "context": "Download status description of a file download."
+    },
+    "17593": {
+        "text": "Download is queued in MEGAsync ...",
+        "context": "Download status description for while downloading a file with MEGASync (from a file link)\r\nScreenshot contains the place of this status."
+    },
+    "17594": {
+        "text": "Download is paused in MEGAsync",
+        "context": "Download status text which appears when a download is paused from MEGAsync."
     },
     "17595": {
         "text": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
@@ -7667,6 +7751,22 @@
         "text": "The current version of the file will be replaced with the file you are uploading.",
         "context": "A description in the duplicate items dialog below the Upload and replace title. This option allows the user to update an existing file in the folder by replacing the current version of the file with the file they are uploading."
     },
+    "17603": {
+        "text": "Download retrying in MEGAsync",
+        "context": "Download status text which appears when MEGAsync for some reason is forced to retry downloading (rare case). The attached screenshot shows the location of this text."
+    },
+    "17604": {
+        "text": "Download completing in MEGAsync",
+        "context": "Download status text which appears when the download is in its final stage at MEGAsync. Usually this is a very quick stage and wont be noticed unless the user was on a very slow PC. The screenshot shows the text location."
+    },
+    "17605": {
+        "text": "Downloading failed in MEGAsync",
+        "context": "Downloading status text which appears if the download failed somehow on the MEGAsync side. The screenshot shows the text location."
+    },
+    "17606": {
+        "text": "No response from MEGAsync",
+        "context": "Downloading status text which appears when MEGAsync stops responding. "
+    },
     "17617": {
         "text": "Create Folder",
         "context": "The title of a dialog in the mobile webclient which lets the user create a new folder (directory) to be added to their Cloud Drive"
@@ -7682,6 +7782,10 @@
     "17620": {
         "text": "MEGAdrop source code was successfully copied to clipboard.",
         "context": "A toast notification message when the MEGAdrop source code was copied to the clipboard."
+    },
+    "17621": {
+        "text": "Sync",
+        "context": "This is a new option in the right click context menu of a folder. The button will allow synchronisation of the folder with MEGAsync."
     },
     "17626": {
         "text": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
@@ -7704,7 +7808,7 @@
         "context": "An instruction on the mobile webclient Backup Recovery Key screen which tells the user to tap and hold on the Recovery Key to copy it to the clipboard."
     },
     "17690": {
-        "text": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] on your desktop device and follow the instructions.",
+        "text": "To restore your account with your Recovery Key, visit [A]https:\/\/mega.nz\/recovery[\/A] and follow the instructions.",
         "context": "An instruction for the user on how they can recover their account using the Recovery Key."
     },
     "17694": {
@@ -7731,8 +7835,132 @@
         "text": "Open this file in the mobile app",
         "context": "A button on the downloads page for the user to open the file-link in the mobile app."
     },
+    "17738": {
+        "text": "Hello, join me on MEGA and get access to encrypted storage and communication.",
+        "context": "This string is shown inside the Add Contact dialog and is sent to a user in an email."
+    },
+    "17739": {
+        "text": "Folders cannot be merged due to the presence of a share or a link. If you wish to merge these folders you will need to remove the share or link and retry.",
+        "context": "Warning dialog appears to uses trying to merge folders with sharing (or link) is activated on one of the merged folders."
+    },
+    "17740": {
+        "text": "Your account was terminated due to a breach of MEGA's Terms of Service, such as abuse of rights of others; sharing and\/or importing illegal data; or system abuse.",
+        "context": "Message of the dialog shown when the user is trying to login and the account has been blocked."
+    },
+    "17741": {
+        "text": "Your account has been suspended due to multiple breaches of MEGA's Terms of Service. Please check your email inbox.",
+        "context": "Message of the dialog shown when the user is trying to login and the account has been blocked for multiple copyright violation."
+    },
+    "17742": {
+        "text": "Drop to [S]upload[\/S]",
+        "context": "A header of a dialog which allows dragging external files into the MEGA browser. Please leave the placeholders [S] and [\/S] which will be used to bolden the text."
+    },
     "17743": {
-        "text": "This file has a video codec that is unsupported by your browser.",
+        "text": "This file uses a video codec that is not supported by your browser.",
         "context": "An error message which is shown to the user when there is a problem streaming a video file as a result of an unsupported codec. https:\/\/en.wikipedia.org\/wiki\/Codec"
+    },
+    "17744": {
+        "text": "MEGA cannot be used at this zoom level. Please maximize the browser window or zoom out by pressing Ctrl \/ \u2318 then - at the same time to restore zoom to acceptable levels.",
+        "context": "An overlay message when the main menu is displaced outside of the window"
+    },
+    "17764": {
+        "text": "Send to chat",
+        "context": "Send to chat [copy dialog] Tab header"
+    },
+    "17765": {
+        "text": "My chats",
+        "context": "Column header of my contacts\/chats at copy dialog"
+    },
+    "17766": {
+        "text": "File sent to chat",
+        "context": "Toast text upon sending a single file to chat"
+    },
+    "17767": {
+        "text": "Files sent to chat",
+        "context": "Toast text upon sending multiple files to chat"
+    },
+    "17768": {
+        "text": "Terminated account",
+        "context": "Dialog title message when user account is terminated due to breach of Mega's Terms of Service"
+    },
+    "17789": {
+        "text": "The entered tax number is invalid.",
+        "context": "An error dialog message explaining that the tax number (CPF, RUT, DNI, etc) the user entered is invalid for that country."
+    },
+    "17792": {
+        "text": "Your primary disk volume is full. Please free up some space and try again.",
+        "context": "Message shown to Chrome Extension users when running out of disk space when attempting to download something."
+    },
+    "17793": {
+        "text": "Unfortunately, Chrome only allows MEGA to use a part of your available disk space which is currently insufficient. Please install the [A1]MEGA desktop app[\/A1] or our [A2]Chrome Extension[\/A2], or try to [A3]free up some space[\/A3].",
+        "context": "Message shown to Chrome users when running out of disk space when attempting to download something."
+    },
+    "17794": {
+        "text": "Initialising...",
+        "context": "Initialising status which appears at the beginning of downloading a file through MEGAsync via a public file link."
+    },
+    "17795": {
+        "text": "MEGAsync stopped responding, it could be closed or too busy.",
+        "context": "A dialog box message warning which appears when MEGAsync stops responding."
+    },
+    "17796": {
+        "text": "Do you want to re-initialise the connection with MEGAsync and turn it off if MEGAsync does not respond?",
+        "context": "A dialog warning box sub-message which appears if MEGAsync stopped responding.\r\n"
+    },
+    "17797": {
+        "text": "Download sent to MEGASync",
+        "context": "A toast appears when the user download something while integrating with MEGASync"
+    },
+    "17799": {
+        "text": "folders containing a total of",
+        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync.\r\n[PLURAL] "
+    },
+    "17800": {
+        "text": "file was added to the transfer manager",
+        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync.\r\n[SINGULAR] \r\n"
+    },
+    "17801": {
+        "text": "files were added to the transfer manager",
+        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync. \r\n[PLURAL] "
+    },
+    "17804": {
+        "text": "Check your email",
+        "context": "The title of a dialog in the mobile webclient to tell the user to check their email."
+    },
+    "17805": {
+        "text": "We have sent you an email. If you cannot access your email account, you will need to contact [A]support@mega.nz[\/A].",
+        "context": "A dialog message in the mobile webclient. Please keep the [A] and [\/A] tags and do not alter the email address."
+    },
+    "17806": {
+        "text": "Forgot Password",
+        "context": "A title of the Forgot Password page on mobile webclient which asks the user if they have a copy of their Recovery Key."
+    },
+    "17807": {
+        "text": "Recover Account",
+        "context": "The title of the Recover Account page for mobile webclient. This page lets the user start the recovery process."
+    },
+    "17808": {
+        "text": "I have my Recovery Key",
+        "context": "A heading on the Recover Account page. This key is needed to retrieve their encrypted data and re-enter their account if they forgot their password."
+    },
+    "17809": {
+        "text": "Enter your Recovery Key to restore your account",
+        "context": "A heading on a page in the mobile webclient. This page lets the user type or paste in their Recovery Key to recover their account."
+    },
+    "17810": {
+        "text": "Alternatively, you can upload your exported Recovery Key text file.",
+        "context": "A message on the Recover Account page in mobile webclient. This means they can select the .txt file on their computer and the program will retrieve the key from it."
+    },
+    "17811": {
+        "text": "Upload Recovery Key",
+        "context": "A button on the mobile webclient to let the user select the Recovery Key .txt file so the account recovery process can continue."
+    },
+    "17812": {
+        "text": "Transfer with MEGAsync if it is running",
+        "context": "A setting option in Settings -> Advanced -> Transfers.\r\n"
+    },
+    "17813": {
+        "text": "I do not have my Recovery Key",
+        "context": "The heading of the page where the user can request to park their account because they do not have their Recovery Key."
     }
 }

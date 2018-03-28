@@ -1686,9 +1686,9 @@ function api_reqfailed(c, e) {
     else if (e == EBLOCKED) {
         var queue = apixs[c];
         queue.rawreq = false;
-        cmdsQueue.clear();
-        cmdsBuffer = [];
-        ctxsBuffer = [];
+        queue.cmdsQueue.clear();
+        queue.cmdsBuffer = [];
+        queue.ctxsBuffer = [];
         queue.setimmediate = false;
 
         api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reasonCode) {
@@ -1697,16 +1697,21 @@ function api_reqfailed(c, e) {
             // On clicking OK, log the user out and redirect to contact page
             loadingDialog.hide();
 
-            var reasonText = l[7660];   // You have been suspended due to repeated copyright infringement.
+            var reasonText = '';
+            var dialogTitle = l[17768];// Terminated account
 
-            if (reasonCode === 100) {
-                reasonText = l[7659];   // You have been suspended due to excess data usage.
+            if (reasonCode === 200) {
+                dialogTitle = l[6789];// Suspended account
+                reasonText = l[17741];// Your account has been suspended due to multiple breaches of Mega's Terms...
             }
             else if (reasonCode === 300) {
-                reasonText = l[8603];   // You have been suspended due to Terms of Service violations.
+                reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
+            }
+            else {// Unknown reasonCode
+                reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
             }
 
-            msgDialog('warninga', l[6789],
+            msgDialog('warninga', dialogTitle,
                 reasonText,
                 false,
                 function() {

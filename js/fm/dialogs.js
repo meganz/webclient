@@ -47,6 +47,7 @@
      * @private
      */
     var disableFolders = function(dialogPrefix) {
+        var promiseToSyncCalls = new MegaPromise();
         $('*[id^="mctreea_"]').removeClass('disabled');
 
         if (dialogPrefix === 'move') {
@@ -62,7 +63,9 @@
         dbfetch.geta(Object.keys(M.c.shares || {}))
             .always(function () {
                 disableReadOnlySharedFolders(dialogPrefix);
+                promiseToSyncCalls.resolve();
             });
+        return promiseToSyncCalls;
     };
 
     /**
@@ -108,6 +111,161 @@
         }
     };
 
+
+
+    /**
+     * Getting contacts and view them in copy dialog
+     * @param {Boolean} allowConversationTab if true then it means show Conversation Tab
+     */
+    var handleConversationTabContent = function _handleConversationTabContent() {
+        var myChats = megaChat.chats;
+        var myContacts = M.getContactsEMails();
+        var conversationTab = $('.copy-dialog-tree-panel.conversations');
+        var conversationNoConvTab = $('.dialog-empty-block.copy.conversations');
+        var conversationTabHeader = $('.copy-dialog-panel-header', conversationTab);
+        var contactsContentBlock = $('.dialog-content-block', conversationTab);
+        if (myContacts && myContacts.length) {
+            var contactGeneratedList = "";
+            var ulListId = 'cpy-dlg-chat-' + u_handle;
+
+            var createContactEntry = function _createContactEntry(name, email, handle) {
+                if (name && handle && email) {
+                    var contactElem = '<span id="cpy-dlg-chat-itm-spn-' + handle
+                        + '" class="nw-contact-item single-contact ';
+                    var contactStatus = 'offline';
+                    if (M.d[handle] && M.d[handle].presence) {
+                        contactStatus = M.onlineStatusClass(M.d[handle].presence)[1];
+                    }
+                    contactElem += contactStatus + '">';
+                    contactElem += '<span class="nw-contact-status"></span>';
+                    contactElem += '<span class="nw-contact-name">' + escapeHTML(name) + '</span>';
+                    contactElem += '<span class="nw-contact-email">' + escapeHTML(email) + '</span> </span>';
+                    contactElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + contactElem + '</li>';
+                    return contactElem;
+                }
+                else {
+                    return '';
+                }
+            };
+            var createGroupEntry = function _createGroupEntry(names, nb, handle) {
+                if (names && names.length && nb && handle) {
+                    var groupElem = '<span id="cpy-dlg-chat-itm-spn-' + handle
+                        + '" class="nw-contact-item multi-contact">';
+                    groupElem += '<span class="nw-contact-group-icon"></span>';
+                    var namesCombine = names[0];
+                    var k = 1;
+                    while (namesCombine.length <= 40 && k < names.length) {
+                        namesCombine += ', ' + names[k];
+                        k++;
+                    }
+                    if (k !== names.length) {
+                        namesCombine = namesCombine.substr(0, 37);
+                        namesCombine += '...';
+                    }
+                    groupElem += '<span class="nw-contact-name group">' + escapeHTML(namesCombine) + '</span>';
+                    groupElem += '<span class="nw-contact-group">' + nb + ' chat members</span> </span>';
+                    groupElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + groupElem + '</li>';
+                    return groupElem;
+                }
+                else {
+                    return '';
+                }
+
+            };
+            var addedContactsByRecent = [];
+            var top5 = 5; // defined in specs, top 5 contacts
+            var nbOfRecent = 0;
+            if (myChats && myChats.length) {
+                var sortedChats = obj_values(myChats.toJS());
+                sortedChats.sort(M.sortObjFn("lastActivity", -1));
+                for (var chati = 0; chati < sortedChats.length; chati++) {
+                    if (sortedChats[chati].type === 'group') {
+                        var gNames = [];
+                        if (!sortedChats[chati].topic) {
+                            ChatdIntegration._ensureNamesAreLoaded(sortedChats[chati].members);
+                            for (var grHandle in sortedChats[chati].members) {
+                                if (grHandle !== u_handle) {
+                                    gNames.push(M.getNameByHandle(grHandle));
+                                }
+                            }
+                        }
+                        else {
+                            gNames.push(sortedChats[chati].topic);
+                        }
+                        if (gNames.length) {
+                            if (nbOfRecent < top5) {
+                                var gElem = createGroupEntry(gNames,
+                                    Object.keys(sortedChats[chati].members).length, sortedChats[chati].roomId);
+                                contactGeneratedList = contactGeneratedList + gElem;
+                            }
+                            else {
+                                myContacts.push({
+                                    id: Object.keys(sortedChats[chati].members).length,
+                                    name: gNames, handle: sortedChats[chati].roomId, isG: true
+                                });
+                            }
+                            nbOfRecent++;
+                            
+                        }
+                    }
+                    else {
+                        if (nbOfRecent < top5) {
+                            var contactHandle;
+                            for (var ctHandle in sortedChats[chati].members) {
+                                if (ctHandle !== u_handle) {
+                                    contactHandle = ctHandle;
+                                    break;
+                                }
+                            }
+                            if (contactHandle) {
+                                if (M.u[contactHandle] && M.u[contactHandle].c === 1 && M.u[contactHandle].m) {
+                                    addedContactsByRecent.push(contactHandle);
+                                    var ctElemC = createContactEntry(M.getNameByHandle(contactHandle),
+                                        M.u[contactHandle].m, contactHandle);
+                                    contactGeneratedList = contactGeneratedList + ctElemC;
+                                    nbOfRecent++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            myContacts.sort(M.sortObjFn("name", 1));
+            
+            for (var a = 0; a < myContacts.length; a++) {
+                if (addedContactsByRecent.includes(myContacts[a].handle)) {
+                    continue;
+                }
+                var ctElem;
+                if (!myContacts[a].isG) {
+                    ctElem = createContactEntry(myContacts[a].name, myContacts[a].id, myContacts[a].handle);
+                }
+                else {
+                    ctElem = createGroupEntry(myContacts[a].name, myContacts[a].id, myContacts[a].handle);
+                }
+                contactGeneratedList = contactGeneratedList + ctElem;
+            }
+            contactGeneratedList = '<ul id="' + ulListId + '">' + contactGeneratedList + '</ul>';
+            contactsContentBlock.html(contactGeneratedList);
+            conversationTab.addClass('active');
+            conversationNoConvTab.removeClass('active');
+            conversationTabHeader.removeClass('hidden');
+        }
+        else {
+            conversationTab.removeClass('active');
+            conversationNoConvTab.addClass('active');
+            conversationTabHeader.addClass('hidden');
+        }
+    };
+
+    var checkContactHandler = function _checkContactHandler() {
+        var conversationTab = $('.copy-dialog-tree-panel.conversations');
+        var conversationTabHeader = $('.copy-dialog-panel-header', conversationTab);
+        if (!conversationTabHeader.hasClass('hidden') && conversationTab.hasClass('active')) {
+            handleConversationTabContent();
+        }
+    };
+
     /**
      * Handle DOM directly, no return value.
      * @param {String} dialogTabClass dialog tab class name.
@@ -145,7 +303,8 @@
      * @param {String} dialogTabClass Dialog tab class name.
      * @private
      */
-    var buildDialogTree = function(dialogPrefix, dialogTabClass) {
+    var buildDialogTree = function (dialogPrefix, dialogTabClass) {
+        $('.' + dialogPrefix + '-dialog-panel-arrows').removeClass('hidden');
         if (dialogTabClass === 'cloud-drive' || dialogTabClass === 'folder-link') {
             M.buildtree(M.d[M.RootID], dialogPrefix + '-dialog');
         }
@@ -156,7 +315,12 @@
             M.buildtree({h: M.RubbishID}, dialogPrefix + '-dialog');
         }
         else if (dialogTabClass === 'conversations') {
-            // ToDo: make this working when chat start functioning
+            // prepare Conversation Tab if needed
+            $('.' + dialogPrefix + '-dialog-panel-arrows').addClass('hidden');
+            if (!$.copyDialogContactsChangeToken) {//= M.u.removeChangeListener(checkContactHandler);
+                $.copyDialogContactsChangeToken = M.u.addChangeListener(checkContactHandler);
+            }
+            handleConversationTabContent();
         }
 
         disableFolders(dialogPrefix);
@@ -206,6 +370,28 @@
         }
         else {
             html = $('.content-panel' + '.' + dialogTabClass).html();
+        }
+
+        // check if we will enable conversation tab
+        var allowConversationTab = false;
+        if (dialogPrefix.toLowerCase() === 'copy') {
+            if ($.selected.length) {
+                allowConversationTab = true;
+                for (var e = 0; e < $.selected.length; e++) {
+                    if (!M.d[$.selected[e]] || M.d[$.selected[e]].t !== 0) {
+                        allowConversationTab = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!allowConversationTab) {
+            $('.copy-dialog-button.conversations').addClass('hidden');
+            $('.fm-dialog-body').addClass('two-tabs');
+        }
+        else {
+            $('.copy-dialog-button.conversations').removeClass('hidden');
+            $('.fm-dialog-body').removeClass('two-tabs');
         }
 
         handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, html);
@@ -317,7 +503,7 @@
      * Generic function to open the Copy dialog.
      * @global
      */
-    global.openCopyDialog = function openCopyDialog() {
+    global.openCopyDialog = function openCopyDialog(activeTab) {
         M.safeShowDialog('copy', function() {
             var $dialog = $('.fm-dialog.copy-dialog');
 
@@ -326,7 +512,12 @@
 
             $dialog.removeClass('hidden');
             $('.dialog-copy-button', $dialog).addClass('active');
-            handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : l[16176]);
+            var aTab = 'cloud-drive';
+            if (activeTab && typeof activeTab === 'string') {
+                aTab = activeTab;
+            }
+            handleDialogContent(aTab, 'ul', (aTab === 'conversations') ? false : true,
+                'copy', $.mcImport ? l[236] : (aTab === 'conversations' ? l[1940] : l[16176]));
 
             $.hideContextMenu();
             return $dialog;
@@ -398,7 +589,7 @@
                 selectDialogTabRoot(section);
 
                 if (section === 'cloud-drive' || section === 'folder-link') {
-                    handleDialogContent(section, 'ul', true, type, move ? l[62] : $.mcImport ? l[236] : l[63]);
+                    handleDialogContent(section, 'ul', true, type, move ? l[62] : $.mcImport ? l[236] : l[16176]);
                 }
                 else if (section === 'shared-with-me') {
                     handleDialogContent(section, 'ul', false, type, $.mcImport ? l[236] :l[1344]); // Share
@@ -519,10 +710,21 @@
             $('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
         });
 
+        $dialog.off('click', '.nw-contact-item');
+        $dialog.on('click', '.nw-contact-item', function () {
+            $.mcselected = $(this).attr('id').replace('cpy-dlg-chat-itm-spn-', '');
+
+            $('.nw-contact-item', $dialog).removeClass('selected');
+            $(this).addClass('selected');
+            dialogScroll('.dialog-tree-panel-scroll');
+            setDialogButtonState($btn);
+        });
+
         $dialog.off('click', '.nw-fm-tree-item');
         $dialog.on('click', '.nw-fm-tree-item', function(e) {
 
             var old = $.mcselected;
+            var mySelf = this;
 
             $.mcselected = $(this).attr('id').replace('mctreea_', '');
             M.buildtree({h: $.mcselected});
@@ -536,60 +738,61 @@
                 $('#mctreesub_' + $.mcselected).html(markup);
             }
 
-            disableFolders(type);
+            disableFolders(type).always(function () {
+                var c = $(e.target).attr('class');
 
-            var c = $(e.target).attr('class');
+                // Sub-folder exist?
+                if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
 
-            // Sub-folder exist?
-            if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
+                    c = $(mySelf).attr('class');
 
-                c = $(this).attr('class');
-
-                // Sub-folder expanded
-                if (c && c.indexOf('expanded') > -1) {
-                    $(this).removeClass('expanded');
-                    $('#mctreesub_' + $.mcselected).removeClass('opened');
-                }
-                else {
-                    $(this).addClass('expanded');
-                    $('#mctreesub_' + $.mcselected).addClass('opened');
-                }
-            }
-            else {
-
-                c = $(this).attr('class');
-
-                if (c && c.indexOf('selected') > -1) {
+                    // Sub-folder expanded
                     if (c && c.indexOf('expanded') > -1) {
-                        $(this).removeClass('expanded');
+                        $(mySelf).removeClass('expanded');
                         $('#mctreesub_' + $.mcselected).removeClass('opened');
                     }
                     else {
-                        $(this).addClass('expanded');
+                        $(mySelf).addClass('expanded');
                         $('#mctreesub_' + $.mcselected).addClass('opened');
                     }
                 }
-            }
+                else {
 
-            if (!$(this).is('.disabled')) {
-                // unselect previously selected item
-                $('.nw-fm-tree-item', $dialog).removeClass('selected');
-                $(this).addClass('selected');
-                $btn.removeClass('disabled');
-            }
-            else if ($('#mctreea_' + old + ':visible').length) {
-                $.mcselected = old;
-                $('#mctreea_' + old).addClass('selected');
-            }
-            else {
-                $.mcselected = undefined;
-            }
+                    c = $(mySelf).attr('class');
 
-            // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
-            dialogScroll('.dialog-tree-panel-scroll');
+                    if (c && c.indexOf('selected') > -1) {
+                        if (c && c.indexOf('expanded') > -1) {
+                            $(mySelf).removeClass('expanded');
+                            $('#mctreesub_' + $.mcselected).removeClass('opened');
+                        }
+                        else {
+                            $(mySelf).addClass('expanded');
+                            $('#mctreesub_' + $.mcselected).addClass('opened');
+                        }
+                    }
+                }
 
-            // Disable action button if there is no selected items
-            setDialogButtonState($btn);
+                if (!$(mySelf).is('.disabled')) {
+                    // unselect previously selected item
+                    $('.nw-fm-tree-item', $dialog).removeClass('selected');
+                    $(mySelf).addClass('selected');
+                    $btn.removeClass('disabled');
+                }
+                else if ($('#mctreea_' + old + ':visible').length) {
+                    $.mcselected = old;
+                    $('#mctreea_' + old).addClass('selected');
+                }
+                else {
+                    $.mcselected = undefined;
+                }
+
+                // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
+                dialogScroll('.dialog-tree-panel-scroll');
+
+                // Disable action button if there is no selected items
+                setDialogButtonState($btn);
+            });
+
         });
 
         $swm.off('mouseenter', '.nw-fm-tree-item');
@@ -706,9 +909,25 @@
                 M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
             }
             else if (section === 'conversations') {
-                var $selectedConv = $('.nw-conversations-item.selected', $dialog);
-                var id = $selectedConv.attr('data-room-id') + "@conference." + megaChat.options.xmppDomain;
-                megaChat.chats[id].attachNodes($.selected);
+                if (megaChat.chats[$.mcselected]) {
+                    megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
+                    showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
+                }
+                else {
+                    var userHandles = [u_handle, $.mcselected];
+                    var room = new ChatRoom(megaChat, $.mcselected, 'private', userHandles,
+                        unixtime(), undefined, undefined, undefined, undefined, true);
+                    // the final parameter at ChatRoom constructor is to prevent 'onRoomCreated' event from triggering
+                    // as i need to add temporary members to ChatRoom object to distinguish copy dialog case.
+                    // [the only stopped behavior is: openning the chat room page]
+                    var sendAttachments = function _sendAttachments() {
+                        megaChat.chats[room.roomId].attachNodes($.selected);
+                        showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
+                    };
+                    room.inCpyDialog = sendAttachments;
+                    megaChat.plugins.chatdIntegration._attachToChatRoom(room);
+                    megaChat.chats.set(room.roomId, room);
+                }
             }
 
             delete $.onImportCopyNodes;

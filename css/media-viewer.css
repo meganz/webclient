@@ -41,7 +41,7 @@
     top: auto;
     bottom: 0;
     padding: 8px 11px;
-    height: 64px;
+    height: 54px;
 }
 .viewer-filename {
     position: absolute;
@@ -190,7 +190,7 @@
     left: 48px;
     top: 50%;
     margin: -33px 0 0 0;
-    background-image: url(../images/mega/icons-sprite_v14.png);
+    background-image: url(../images/mega/icons-sprite_v16.png);
     background-position: -188px -670px;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;

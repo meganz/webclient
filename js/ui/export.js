@@ -72,7 +72,7 @@ var exportPassword = {
     ],
 
     // The current algorithm in use for production
-    currentAlgorithm: 1,    // 1 byte (0x01) ToDo: Update to 2 when the apps have decryption support for algorithm 2
+    currentAlgorithm: 2,    // 1 byte (0x02)
 
     /**
      * Constants for folder or file type

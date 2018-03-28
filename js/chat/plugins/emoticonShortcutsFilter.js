@@ -24,7 +24,8 @@ var EmoticonShortcutsFilter = function(megaChat) {
         ':\\': ':confused:',
         ':/': ':confused:',
         ':|': ':neutral_face:',
-        'd:': ':anguished:'
+        'd:': ':anguished:',
+        ':o': ':open_mouth:'
     };
 
 

@@ -82,7 +82,11 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     var n;
 
                     // halt if already seen.
-                    if (!message.getState || message.getState() === Message.STATE.SEEN || message.revoked === true) {
+                    if (
+                        !message.getState ||
+                        message.getState() === Message.STATE.SEEN ||
+                        message.revoked === true
+                    ) {
                         return;
                     }
 
@@ -91,33 +95,38 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                             // skip non renderable management messages, as "Attachment Revoked" and others...
                             return;
                         }
+
                         var unreadFlag = message.getState() === Message.STATE.NOT_SEEN && !document.hasFocus();
-                        n = self.notifications.notify(
-                            'incoming-chat-message',
-                            {
-                                'sound': 'incoming_chat_message',
-                                'group': megaRoom.chatId,
-                                'incrementCounter': unreadFlag,
-                                'icon': icon,
-                                'anfFlag': 'chat_enabled',
-                                'params': {
-                                    'from': avatarMeta.fullName
-                                }
-                            },
-                            unreadFlag
-                        );
+                        if (message.source === Message.SOURCE.CHATD) {
+                            n = self.notifications.notify(
+                                'incoming-chat-message',
+                                {
+                                    'sound': 'incoming_chat_message',
+                                    'group': megaRoom.chatId,
+                                    'incrementCounter': unreadFlag,
+                                    'icon': icon,
+                                    'anfFlag': 'chat_enabled',
+                                    'params': {
+                                        'from': avatarMeta.fullName
+                                    }
+                                },
+                                unreadFlag
+                            );
+                        }
 
                         if (unreadFlag === false) {
                             resetChatNotificationCounters();
                         }
 
-                        var changeListenerId = megaRoom.messagesBuff.addChangeListener(function() {
-                            if (message.getState() === Message.STATE.SEEN) {
-                                n.setUnread(false);
+                        if (n) {
+                            var changeListenerId = megaRoom.messagesBuff.addChangeListener(function () {
+                                if (message.getState() === Message.STATE.SEEN) {
+                                    n.setUnread(false);
 
-                                megaRoom.messagesBuff.removeChangeListener(changeListenerId);
-                            }
-                        });
+                                    megaRoom.messagesBuff.removeChangeListener(changeListenerId);
+                                }
+                            });
+                        }
                     } else if (message.type && message.textContents && !message.seen) {
                         if (message.type === "incoming-call") {
                             return; // already caught by the onIncomingCall...

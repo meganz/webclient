@@ -56,6 +56,19 @@ var TypingArea = React.createClass({
         }, 100);
     },
 
+    stoppedTyping: function () {
+        if (this.props.disabled) {
+            return;
+        }
+        var self = this;
+        var room = this.props.chatRoom;
+
+        self.iAmTyping = false;
+
+        delete self.lastTypingStamp;
+
+        room.trigger('stoppedTyping');
+    },
     typing: function () {
         if (this.props.disabled) {
             return;
@@ -70,8 +83,7 @@ var TypingArea = React.createClass({
 
         self.stoppedTypingTimeout = setTimeout(function() {
             if (room && self.iAmTyping) {
-                self.iAmTyping = false;
-                delete self.lastTypingStamp;
+                self.stoppedTyping();
             }
         }, 4000);
 
@@ -124,6 +136,9 @@ var TypingArea = React.createClass({
     onCancelClicked: function(e) {
         var self = this;
         self.setState({typedMessage: ""});
+        if (self.props.chatRoom && self.iAmTyping) {
+            self.stoppedTyping();
+        }
         self.onConfirmTrigger(false);
         self.triggerOnUpdate();
     },
@@ -139,6 +154,9 @@ var TypingArea = React.createClass({
 
         if (self.onConfirmTrigger(val) !== true) {
             self.setState({typedMessage: ""});
+        }
+        if (self.props.chatRoom && self.iAmTyping) {
+            self.stoppedTyping();
         }
         self.triggerOnUpdate();
     },
@@ -190,6 +208,9 @@ var TypingArea = React.createClass({
             }
             e.preventDefault();
             e.stopPropagation();
+            if (self.props.chatRoom && self.iAmTyping) {
+                self.stoppedTyping();
+            }
             return;
         }
     },
@@ -305,27 +326,29 @@ var TypingArea = React.createClass({
                     }
                 }
 
-                if (
-                    matchedWord &&
-                    matchedWord.length > 2 &&
-                    matchedWord.substr(0, 1) === ":" &&
-                    matchedWord.substr(-1) !== ":"
-                ) {
+                if (matchedWord && matchedWord.length > 2 && matchedWord.substr(0, 1) === ":") {
+                    endPos = endPos ? endPos : startPos + matchedWord.length;
+
+                    if (matchedWord.substr(-1) === ":") {
+                        matchedWord = matchedWord.substr(0, matchedWord.length - 1);
+                    }
+
                     self.setState({
                         'emojiSearchQuery': matchedWord,
                         'emojiStartPos': startPos ? startPos : 0,
-                        'emojiEndPos': endPos ? endPos : startPos + matchedWord.length,
+                        'emojiEndPos': endPos
                     });
                     return;
                 }
                 else {
-                    if (self.state.emojiSearchQuery) {
+                    if (!element.value || element.value.length <= 2) {
                         self.setState({
                             'emojiSearchQuery': false,
                             'emojiStartPos': false,
                             'emojiEndPos': false
                         });
                     }
+                    return;
                 }
             }
             if (self.state.emojiSearchQuery) {
@@ -371,6 +394,9 @@ var TypingArea = React.createClass({
 
         if ($.trim(e.target.value).length > 0) {
             self.typing();
+        }
+        else {
+            self.stoppedTyping();
         }
 
         // persist typed values
@@ -749,7 +775,7 @@ var TypingArea = React.createClass({
         if (self.state.emojiSearchQuery) {
             emojiAutocomplete = <EmojiAutocomplete
                 emojiSearchQuery={self.state.emojiSearchQuery}
-                onSelect={function (e, emojiAlias) {
+                onPrefill={function(e, emojiAlias) {
                     if (
                         $.isNumeric(self.state.emojiStartPos) &&
                         $.isNumeric(self.state.emojiEndPos)
@@ -761,10 +787,34 @@ var TypingArea = React.createClass({
                             'typedMessage': pre + emojiAlias + (
                                 post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
                             ),
+                            'emojiEndPos': self.state.emojiStartPos + emojiAlias.length + (
+                                post ? (post.substr(0, 1) !== " " ? 1 : 0) : 1
+                            )
+                        });
+                    }
+                }}
+                onSelect={function (e, emojiAlias, forceSend) {
+                    if (
+                        $.isNumeric(self.state.emojiStartPos) &&
+                        $.isNumeric(self.state.emojiEndPos)
+                    ) {
+                        var msg = self.state.typedMessage;
+                        var pre = msg.substr(0, self.state.emojiStartPos);
+                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+                        var val = pre + emojiAlias + (
+                            post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
+                        );
+                        self.setState({
+                            'typedMessage': val,
                             'emojiSearchQuery': false,
                             'emojiStartPos': false,
                             'emojiEndPos': false
                         });
+                        if (forceSend) {
+                            if (self.onConfirmTrigger($.trim(val)) !== true) {
+                                self.setState({typedMessage: ""});
+                            }
+                        }
                     }
                 }}
                 onCancel={function () {

@@ -6,6 +6,9 @@ mobile.signin = {
     /** jQuery selector for the login/register screen */
     $screen: null,
 
+    /** The previous email used, if set will be pre-populated in the login form */
+    previousEmailUsed: null,
+
     /**
      * Render the signin screen
      */
@@ -23,15 +26,31 @@ mobile.signin = {
         this.$screen.find('.tab-block.sign-in').removeClass('hidden');
         this.$screen.find('.tab-block.register').addClass('hidden');
 
-        // Init events
+        // Init functionality
+        this.prefillEmailField();
         this.initLoginButton();
+        this.initForgotPasswordButton();
         this.initEmailPasswordKeyupEvents();
 
         // Initialise the Remember Me checkbox, top button tabs
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');
         mobile.initHeaderMegaIcon();
-        mobile.initMobileAppButton();
+    },
+
+    /**
+     * Pre-fills the email text input if recently completed the recovery process
+     */
+    prefillEmailField: function() {
+
+        'use strict';
+
+        var $emailField = this.$screen.find('.signin-input.login input');
+
+        // If the email has been set (e.g. from recovery process), pre-fill the email field
+        if (this.previousEmailUsed !== null) {
+            $emailField.val(this.previousEmailUsed);
+        }
     },
 
     /**
@@ -186,5 +205,21 @@ mobile.signin = {
                 }
             });
         }
+    },
+
+    /**
+     * Initialise the Forgot Password button
+     */
+    initForgotPasswordButton: function() {
+
+        'use strict';
+
+        // Add click/tap handler to Forgot Password button
+        this.$screen.find('.forgot-password-button').off('tap').on('tap', function() {
+
+            // Load the Recovery page
+            loadSubPage('recovery');
+            return false;
+        });
     }
 };

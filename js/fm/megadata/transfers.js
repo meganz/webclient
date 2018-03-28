@@ -100,6 +100,9 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         state = 'transfer-paused';
         pauseTxt = l[1651];
     }
+    if (dlmanager.isOverQuota) {
+        pauseTxt = '';
+    }
 
     var flashhtml = '';
     if (dlMethod === FlashIO) {
@@ -138,14 +141,14 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
     }
 };
 
-MegaData.prototype.addDownload = function(n, z, preview) {
+MegaData.prototype.addDownload = function (n, z, preview) {
     var args = toArray.apply(null, arguments);
-
     // fetch all nodes needed by M.getNodesSync
     dbfetch.coll(n)
-        .always(function() {
+        .always(function () {
             M.addDownloadSync.apply(M, args);
         });
+
 };
 
 MegaData.prototype.addDownloadSync = function(n, z, preview) {
@@ -202,14 +205,26 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             var foreach = function(nodes) {
                 for (var i = 0; i < nodes.length; i++) {
                     var node = M.d[nodes[i]];
-
-                    if (node) {
+                    if (!node) {
+                        if (nodes[i].h && nodes[i].name) {
+                            node = nodes[i];
+                            addNode(node);
+                        }
+                    }
+                    else {
                         addNode(node);
                     }
                 }
             };
-
-            foreach(n);
+            try {
+                foreach(n);
+            }
+            catch (exx) {
+                if (d) {
+                    dlmanager.logger.error('Failed to load all nodes to pass to megaSync', exx);
+                }
+                return webdl();
+            }
 
             if (!files.length) {
                 console.error('No files');
@@ -220,9 +235,15 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
 
             sync.megaSyncRequest(cmd)
                 .done(function() {
-                    showToast('megasync', l[8635], 'Open');
+                    //showToast('megasync', l[8635], 'Open');
+                    showToast('megasync-transfer', l[8635]); // Download added to MEGAsync
                 })
-                .fail(webdl);
+                .fail(
+                function () {
+                    sync.megaSyncIsNotResponding(webdl);
+                    
+                }
+                );
         })
         .fail(webdl);
 };
@@ -435,8 +456,11 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
             if (typeof fdl_queue_var !== 'undefined' && Object(fdl_queue_var).ph) {
                 var gid = dlmanager.getGID(fdl_queue_var);
 
-                if (dlQueue.isPaused(gid)) {
+                if (dlQueue.isPaused(gid) && !dlmanager.isOverQuota) {
                     mega.ui.tpp.pause(gid, 'dl');
+                }
+                else if (dlmanager.isOverQuota) {
+                    mega.ui.tpp.hide();
                 }
             }
         });
@@ -1165,10 +1189,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 
     var makeDirPromise = new MegaPromise();
 
-    var makeDirProc = function() {
-        loadingDialog.show();
-
-        (function _md(paths) {
+    var makeDirProc = function () {
+        var dirMaker = function _md(paths) {
             var path = paths.pop();
 
             if (path) {
@@ -1177,7 +1199,115 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
             else {
                 makeDirPromise.resolve();
             }
-        })(Object.keys(paths));
+        };
+        // loadingDialog.show();
+        if (!onChat) {
+            var looped_checked = false;
+            var conflictedFolders = [];
+            var checkedF = [];
+            for (var folderO in paths) {
+                var foldersList = M.getSafePath(folderO);
+                if (foldersList && foldersList.length >= 1) {
+                    var folderName = foldersList[0];
+                    if (checkedF.indexOf(folderName) > -1) {
+                        continue;
+                    }
+                    checkedF.push(folderName);
+                    var matchNode = fileconflict.getNodeByName(target, folderName, false);
+                    if (matchNode && matchNode !== null) {
+                        looped_checked = true;
+                        var fl = {
+                            name: folderName,
+                            t: 1,
+                        };
+                        conflictedFolders.push([fl, matchNode]);
+                    }
+                }
+            }
+            if (!looped_checked) {
+                dirMaker(Object.keys(paths));
+            }
+            else {
+                var gettingUserResponse = function _gettingUserResponse() {
+                    var waitUser = new MegaPromise();
+                    var excludedFolders = [];
+                    var askUserForConflicts = function _askUserForConflicts(confs) {
+                        var pair = confs.pop();
+                        if (pair) {
+                            fileconflict.prompt('upload', pair[0], pair[1], confs.length, target)
+                                .always(function _userChoice(file, name, action, checked) {
+                                    if (file === -0xBADF || !action) {
+                                        waitUser.reject();
+                                    }
+                                    else if (action !== fileconflict.REPLACE) { // not merging
+                                        excludedFolders.push(pair[0].name);
+                                        if (checked) {
+                                            var itm = confs.pop();
+                                            while (itm) {
+                                                excludedFolders.push(itm[0].name);
+                                                itm = confs.pop();
+                                            }
+                                            waitUser.resolve(excludedFolders);
+                                        }
+                                        else {
+                                            askUserForConflicts(confs);
+                                        }
+                                    }
+                                    else {
+                                        if (checked) {
+                                            waitUser.resolve(excludedFolders);
+                                        }
+                                        else {
+                                            askUserForConflicts(confs);
+                                        }
+                                    }
+                                });
+                        }
+                        else {
+                            waitUser.resolve(excludedFolders);
+                        }
+                    };
+                    askUserForConflicts(conflictedFolders);
+                    return waitUser;
+                };
+                gettingUserResponse().done(function (noMerge) {
+                    if (noMerge && noMerge.length) {
+                        var acceptedPathes = [];
+                        for (var currPath in paths) {
+                            var currFolders = M.getSafePath(currPath);
+                            if (noMerge.indexOf(currFolders[0]) === -1) {
+                                acceptedPathes.push(currPath);
+                            }
+                        }
+                        var fileToUpload = [];
+                        for (var kh = 0; kh < u.length; kh++) { // N^2  :(
+                            if (!u[kh].path) { // a file to target location
+                                fileToUpload.push(u[kh]);
+                                continue;
+                            }
+                            for (var al = 0; al < acceptedPathes.length; al++) {
+                                if (u[kh].path.startsWith(acceptedPathes[al])) {
+                                    fileToUpload.push(u[kh]);
+                                    break;
+                                }
+                            }
+                        }
+                        u = fileToUpload;
+                        dirMaker(acceptedPathes);
+                    }
+                    else {
+                        dirMaker(Object.keys(paths));
+                    }
+                })
+                    .fail(function () {
+                        return false;
+                    });
+                    
+            }
+        }
+        else {
+            dirMaker(Object.keys(paths));
+        }
     };
 
     var ulOpSize = 0; // how much bytes we're going to upload
@@ -1209,7 +1339,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 
             dbfetch.geta(Object.keys(targets))
                 .always(function(r) {
-                    loadingDialog.hide();
+                    // loadingDialog.hide();
 
                     if (!M.c[target] && String(target).length !== 11 && !onChat) {
                         if (d) {
@@ -1226,6 +1356,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
 };
 
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
+
+    'use strict';
+
     var id = ul.id;
     var $tr = $('#ul_' + id);
     if (!$tr.hasClass('transfer-started')) {
@@ -1613,7 +1746,7 @@ MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
 MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_length, isPaused) {
     'use strict';
 
-    if (M.currentdirid !== 'transfers' && fmconfig.tpp === false) {
+    if ((M.currentdirid !== 'transfers' && fmconfig.tpp === false) || slideshowid) {
         var $toast;
         var $second_toast;
         var timer = 0;
@@ -1653,7 +1786,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
         $toast.removeClass('second hidden').addClass('visible');
         timer = setTimeout(function() {
             M.hideTransferToast($toast);
-        }, 5000);
+        }, 4000);
 
         $('.transfer .toast-button').rebind('click', function() {
             $('.toast-notification').removeClass('visible second');
@@ -1675,7 +1808,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
         $toast.rebind('mouseout', function() {
             timer = setTimeout(function() {
                 M.hideTransferToast($toast);
-            }, 5000);
+            }, 4000);
         });
     }
 };

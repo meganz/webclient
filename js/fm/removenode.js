@@ -176,6 +176,8 @@ function fmremovesync(selectedNodes) {
     var contactcnt = 0;
     var removesharecnt = 0;
     var widgets = [];
+    var title = '';
+    var message = '';
 
     // If on mobile we will bypass the warning dialog prompts
     if (is_mobile) {
@@ -193,9 +195,7 @@ function fmremovesync(selectedNodes) {
         }
         else if (n && n.t) {
             foldercnt++;
-            if (mega.megadrop.pufs[selectedNodes[i]]) {
-                widgets.push(selectedNodes[i]);
-            }
+            widgets.push(selectedNodes[i]);
         }
         else {
             filecnt++;
@@ -329,8 +329,8 @@ function fmremovesync(selectedNodes) {
             M.copyNodes(selectedNodes, M.RubbishID, true);
         }
         else {
-            var title = l[1003];
-            var message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt));
+            title = l[1003];
+            message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt));
 
             msgDialog('confirmation', title, message, false, function(e) {
                     if (e) {
@@ -348,10 +348,7 @@ function fmremovesync(selectedNodes) {
                 M.moveNodes(selectedNodes, M.RubbishID);
             }
 
-            // Remove PUF/PUP if any
-            for (var w = widgets.length - 1; w >= 0; w--) {
-                mega.megadrop.pufRemove(widgets[w]);
-            }
+            mega.megadrop.pufRemove(mega.megadrop.isDropExist(widgets));// Remove PUF/PUP
         }
         else {
             // Contains complete directory structure of selected nodes, their ids
@@ -366,8 +363,8 @@ function fmremovesync(selectedNodes) {
             // Additional message in case that there's a shared node
             var share = new mega.Share({});
             var delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
-            var title = l[1003];
-            var message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo;
+            title = l[1003];
+            message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo;
 
             msgDialog('remove', title, message, false, function(e) {
                 if (e) {
@@ -377,10 +374,7 @@ function fmremovesync(selectedNodes) {
                     else {
                         var delctx = {pending: 1, selected: selected};
 
-                        // Remove PUF/PUP if any
-                        for (var w = widgets.length - 1; w >= 0; w--) {
-                            mega.megadrop.pufRemove(widgets[w]);
-                        }
+                        mega.megadrop.pufRemove(mega.megadrop.isDropExist(widgets));// Remove PUF/PUP
 
                         // Remove all shares related to selected nodes
                         for (var i = dirTree.length; i--;) {

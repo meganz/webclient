@@ -465,7 +465,7 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	Chat.prototype.updateSectionUnreadCount = function () {
+	Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
 	    var self = this;
 
 	    if (!self.favico) {
@@ -505,7 +505,7 @@ React.makeElement = React['createElement'];
 
 	        self.updateDashboard();
 	    }
-	};
+	}, 100);
 
 	Chat.prototype.destroy = function (isLogout) {
 	    var self = this;

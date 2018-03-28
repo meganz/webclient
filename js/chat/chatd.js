@@ -2082,6 +2082,10 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
     var chatRoom = self.megaChat.getChatById(base64urlencode(chatIdBin));
     var cdr = self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, chatIdBin);
     chatRoom.messagesBuff.messageOrders = {};
+    chatRoom.notDecryptedBuffer = {};
+    if (chatRoom.messagesBuff.messagesBatchFromHistory && chatRoom.messagesBuff.messagesBatchFromHistory.length > 0) {
+        chatRoom.messagesBuff.messagesBatchFromHistory.clear();
+    }
 
     if (oldChatIdMessages) {
         [
@@ -2109,17 +2113,21 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
 Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
     var self = this;
 
-    console.error("TO BE IMPLEMENTED, onJoinRangeHistReject", base64urlencode(chatIdBin), shardId);
+    var chatIdEnc = base64urlencode(chatIdBin);
+
     var promises = [];
+
+    backgroundNacl.workers.removeTasksByTagName("svlp:" + chatIdEnc);
+
     if (self.chatdPersist && ChatdPersist.isMasterTab()) {
-        promises.push(self.chatdPersist.clearChatHistoryForChat(base64urlencode(chatIdBin)));
+        promises.push(self.chatdPersist.clearChatHistoryForChat(chatIdEnc));
     }
 
     MegaPromise.allDone(promises)
         .always(function() {
             // clear any old messages
 
-            self._reinitChatIdHistory(base64urlencode(chatIdBin), true);
+            self._reinitChatIdHistory(chatIdEnc, true);
 
             var shard = self.shards[shardId];
             shard._sendHist(chatIdBin, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);

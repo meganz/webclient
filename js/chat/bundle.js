@@ -7706,7 +7706,15 @@ React.makeElement = React['createElement'];
 	                return;
 	            }
 	        } else {
+	            if (self.prefillMode && (key === 8 || key === 32 || key === 13)) {
+
+	                self.prefillMode = false;
+	            }
 	            var char = String.fromCharCode(key);
+	            if (self.prefillMode) {
+	                return;
+	            }
+
 	            if (key === 16 || key === 17 || key === 18 || key === 91 || key === 8 || key === 37 || key === 39 || key === 40 || key === 38 || key === 9 || char.match(self.validEmojiCharacters)) {
 	                var currentContent = element.value;
 	                var currentCursorPos = self.getCursorPosition(element) - 1;
@@ -7750,7 +7758,11 @@ React.makeElement = React['createElement'];
 	                    });
 	                    return;
 	                } else {
-	                    if (!element.value || element.value.length <= 2) {
+	                    if (!matchedWord && self.state.emojiStartPos !== false && self.state.emojiEndPos !== false) {
+	                        matchedWord = element.value.substr(self.state.emojiStartPos, self.state.emojiEndPos);
+	                    }
+
+	                    if (!element.value || element.value.length <= 2 || matchedWord.length === 1) {
 	                        self.setState({
 	                            'emojiSearchQuery': false,
 	                            'emojiStartPos': false,
@@ -8079,6 +8091,18 @@ React.makeElement = React['createElement'];
 	    isActive: function isActive() {
 	        return document.hasFocus() && this.$messages && this.$messages.is(":visible");
 	    },
+	    resetPrefillMode: function resetPrefillMode() {
+	        this.prefillMode = false;
+	    },
+	    onCopyCapture: function onCopyCapture(e) {
+	        this.resetPrefillMode();
+	    },
+	    onCutCapture: function onCutCapture(e) {
+	        this.resetPrefillMode();
+	    },
+	    onPasteCapture: function onPasteCapture(e) {
+	        this.resetPrefillMode();
+	    },
 	    render: function render() {
 	        var self = this;
 
@@ -8119,6 +8143,10 @@ React.makeElement = React['createElement'];
 	                        var msg = self.state.typedMessage;
 	                        var pre = msg.substr(0, self.state.emojiStartPos);
 	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+
+	                        self.onUpdateCursorPosition = self.state.emojiStartPos + emojiAlias.length;
+
+	                        self.prefillMode = true;
 	                        self.setState({
 	                            'typedMessage': pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " "),
 	                            'emojiEndPos': self.state.emojiStartPos + emojiAlias.length + (post ? post.substr(0, 1) !== " " ? 1 : 0 : 1)
@@ -8131,6 +8159,7 @@ React.makeElement = React['createElement'];
 	                        var pre = msg.substr(0, self.state.emojiStartPos);
 	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
 	                        var val = pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " ");
+	                        self.prefillMode = false;
 	                        self.setState({
 	                            'typedMessage': val,
 	                            'emojiSearchQuery': false,
@@ -8145,6 +8174,7 @@ React.makeElement = React['createElement'];
 	                    }
 	                },
 	                onCancel: function onCancel() {
+	                    self.prefillMode = false;
 	                    self.setState({
 	                        'emojiSearchQuery': false,
 	                        'emojiStartPos': false,
@@ -8196,7 +8226,10 @@ React.makeElement = React['createElement'];
 	                        ref: "typearea",
 	                        style: textareaStyles,
 	                        disabled: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false,
-	                        readOnly: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false
+	                        readOnly: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false,
+	                        onCopyCapture: self.onCopyCapture,
+	                        onPasteCapture: self.onPasteCapture,
+	                        onCutCapture: self.onCutCapture
 	                    }),
 	                    React.makeElement("div", { className: "message-preview" })
 	                )
@@ -8771,10 +8804,15 @@ React.makeElement = React['createElement'];
 	                return;
 	            }
 
+	            if (e.altKey || e.metaKey) {
+
+	                return;
+	            }
+
 	            var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
 
 	            var handled = false;
-	            if (key === 37 || key === 38) {
+	            if (!e.shiftKey && (key === 37 || key === 38)) {
 
 	                selected = selected - 1;
 	                selected = selected < 0 ? self.maxFound - 1 : selected;
@@ -8787,7 +8825,7 @@ React.makeElement = React['createElement'];
 	                    handled = true;
 	                    self.props.onPrefill(false, ":" + self.found[selected].n + ":");
 	                }
-	            } else if (key === 39 || key === 40 || key === 9) {
+	            } else if (!e.shiftKey && (key === 39 || key === 40 || key === 9)) {
 
 	                selected = selected + (key === 9 ? e.shiftKey ? -1 : 1 : 1);
 

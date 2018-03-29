@@ -303,7 +303,10 @@ function dl_g(res) {
                                 if (is_mobile) {
                                     var $progress = $('.mobile .download-progress span');
                                     $progress.text(l[1649]).addClass('resume-bttn');
+<<<<<<< HEAD
                                     $('.mobile .dl-app-link').removeClass('hidden');
+=======
+>>>>>>> parent of 318d84761... Add link button to the page below the dialog
 
                                     $('.download-progress').rebind('click', function() {
                                         $('.download-progress').unbind('click');

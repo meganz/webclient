@@ -54,6 +54,13 @@ mobile.uploadOverlay = {
 
             // Get file information
             var fileInfo = this.files[0];
+
+            // If they clicked the Cancel button in the dialog, prevent Chrome exception by returning early
+            if (typeof fileInfo === 'undefined') {
+                return false;
+            }
+
+            // Format the file size and get the file name
             var fileSize = numOfBytes(fileInfo.size);
             var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
             var fileName = fileInfo.name;

@@ -465,8 +465,21 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	Chat.prototype.updateSectionUnreadCount = function () {
+	Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
 	    var self = this;
+
+	    if (!self.favico) {
+	        assert(Favico, 'Favico.js is missing.');
+
+	        $('link[rel="icon"]').attr('href', (location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath) + 'favicon.ico');
+
+	        self.favico = new Favico({
+	            type: 'rectangle',
+	            animation: 'popFade',
+	            bgColor: '#fff',
+	            textColor: '#d00'
+	        });
+	    }
 
 	    var unreadCount = 0;
 
@@ -475,17 +488,24 @@ React.makeElement = React['createElement'];
 	        unreadCount += c;
 	    });
 
+	    unreadCount = unreadCount > 9 ? "9+" : unreadCount;
+
 	    if (self._lastUnreadCount != unreadCount) {
-	        if (unreadCount > 0) {
-	            $('.new-messages-indicator').text(unreadCount > 9 ? "9+" : unreadCount).removeClass('hidden');
+	        if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
+	            $('.new-messages-indicator').text(unreadCount).removeClass('hidden');
 	        } else {
 	            $('.new-messages-indicator').addClass('hidden');
 	        }
 	        self._lastUnreadCount = unreadCount;
 
+	        delay('notifFavicoUpd', function () {
+	            self.favico.reset();
+	            self.favico.badge(unreadCount);
+	        });
+
 	        self.updateDashboard();
 	    }
-	};
+	}, 100);
 
 	Chat.prototype.destroy = function (isLogout) {
 	    var self = this;
@@ -11613,6 +11633,8 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 	    }
+
+	    message.source = Message.SOURCE.SENT;
 
 	    self.trigger('onMessageAppended', message);
 	    self.messagesBuff.messages.push(message);

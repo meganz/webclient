@@ -7696,7 +7696,7 @@
         "context": "A message to summarise the total number of file versions (X1) and total storage usage (X2) of the versioned files. Please keep the placeholders [X1] and [X2] as they will be replaced at runtime."
     },
     "17586": {
-        "text": "Downloading canceled in MEGAsync",
+        "text": "Download canceled in MEGAsync",
         "context": "Downloading status text which appears when a download gets canceled in MEGAsync."
     },
     "17590": {
@@ -7704,7 +7704,7 @@
         "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
     },
     "17591": {
-        "text": "Cannot get downloading status from MEGAsync",
+        "text": "Cannot get download status from MEGAsync",
         "context": "Download status text which appears when MEGAsync stops sending status updates. This is possibly due to a crash in MEGAsync. We don't have a screenshot for this case (it's a rare one). However the attached screenshot will show the location of this text."
     },
     "17592": {
@@ -7760,7 +7760,7 @@
         "context": "Download status text which appears when the download is in its final stage at MEGAsync. Usually this is a very quick stage and wont be noticed unless the user was on a very slow PC. The screenshot shows the text location."
     },
     "17605": {
-        "text": "Downloading failed in MEGAsync",
+        "text": "Download failed in MEGAsync",
         "context": "Downloading status text which appears if the download failed somehow on the MEGAsync side. The screenshot shows the text location."
     },
     "17606": {
@@ -7908,8 +7908,8 @@
         "context": "A dialog warning box sub-message which appears if MEGAsync stopped responding.\r\n"
     },
     "17797": {
-        "text": "Download sent to MEGASync",
-        "context": "A toast appears when the user download something while integrating with MEGASync"
+        "text": "Download sent to MEGAsync",
+        "context": "A toast appears when the user download something while integrating with MEGAsync"
     },
     "17799": {
         "text": "folders containing a total of",

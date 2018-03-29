@@ -19850,11 +19850,12 @@ body.pro:after {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
+    cursor: pointer;
 }
 .dropdown.body.popup.transfer-widget .fm-dialog-close {
     top: -1px;
     right: -1px;
-    display: block;
+    display: none;
 }
 .fm-dialog-close.small {
     background-image: url(../images/mega/register-big-sprite-v15.png);

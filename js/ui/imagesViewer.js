@@ -355,14 +355,13 @@ var slideshowid;
 
         var $dlBut = $overlay.find('.viewer-button.download');
         $dlBut.rebind('click', function() {
-            for (var i in dl_queue) {
-                if (dl_queue[i] && dl_queue[i].id === slideshowid) {
+            for (var i = dl_queue.length; i--;) {
+                if (dl_queue[i] && dl_queue[i].id === slideshowid && dl_queue[i].preview) {
                     dl_queue[i].preview = false;
                     M.openTransfersPanel();
                     return;
                 }
             }
-
 
             // TODO: adapt the above code to work on the downloads page if we need to download the original
             if (page === 'download') {
@@ -584,7 +583,7 @@ var slideshowid;
             }
         }
         else if (String(n.fa).indexOf(':1*') > 0) {
-            api_getfileattr([{fa: M.d[id].fa, k: M.d[id].k}], 1, function(a, b, data) {
+            api_getfileattr([{fa: n.fa, k: n.k}], 1, function(a, b, data) {
                 if (data !== 0xDEAD) {
                     data = mObjectURL([data.buffer || data], 'image/jpeg');
 
@@ -688,7 +687,7 @@ var slideshowid;
         }
 
         var img = new Image();
-        img.onload = function() {
+        img.onload = img.onerror = function(ev) {
             var w = this.width;
             var h = this.height;
             if (w < 960 && w < $(window).width() - 382 && h < 522 && h < $(window).height() - 222) {
@@ -697,13 +696,14 @@ var slideshowid;
             else {
                 $overlay.find('.viewer-image-bl').removeClass('default-state');
             }
-            $overlay.find('.viewer-image-bl img').attr('src', this.src);
+            $overlay.find('.viewer-image-bl img').attr('src', ev.type === 'error' ? noThumbURI : this.src);
             $overlay.find('.viewer-image-bl').removeClass('hidden');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
-        };
-        img.onerror = function(ev) {
-            console.error('Preview image error', ev);
+
+            if (d && ev.type === 'error') {
+                console.debug('Failed to preview image...', src, ev);
+            }
         };
         img.src = src;
     }

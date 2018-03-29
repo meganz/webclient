@@ -700,6 +700,8 @@ ChatRoom.prototype.appendMessage = function(message) {
         }
     }
 
+    message.source = Message.SOURCE.SENT;
+
     self.trigger('onMessageAppended', message);
     self.messagesBuff.messages.push(message);
 

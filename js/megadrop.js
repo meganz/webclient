@@ -573,6 +573,9 @@ mega.megadrop = (function() {
 
             // Update puf.items with related PUP handle
             var nodeId = puf.onPupAdd(pufId, pupId, state);
+            if (!nodeId) {
+                return;
+            }
             var folderName = puf.items[nodeId].fn;
 
             if (pupId) {

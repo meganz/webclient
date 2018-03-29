@@ -161,6 +161,9 @@
 
 
     function FileSelectHandlerMegaSyncClick(e) {
+        if (page.indexOf('/chat/') > -1) {
+            return true;
+        }
         if (useMegaSync === -1) {
             e.preventDefault();
             e.stopPropagation();

@@ -1976,7 +1976,7 @@
     "17794": "Iniciando...",
     "17795": "MEGAsync no responde, podr\u00eda estar cerrado o ocupado.",
     "17796": "\u00bfQuieres reiniciar la conexi\u00f3n con MEGAsync y desactivarla si MEGAsync no responde?",
-    "17797": "Descarga enviada a MEGASync",
+    "17797": "Descarga enviada a MEGAsync",
     "17799": "carpetas que contienen un total de",
     "17800": "archivo ha sido a\u00f1adido al gestor de transferencia",
     "17801": "archivos han sido a\u00f1adidos al gestor de transferencia",
@@ -1988,6 +1988,6 @@
     "17809": "Introduce la Clave de recuperaci\u00f3n para restaurar tu cuenta",
     "17810": "Tambi\u00e9n puedes subir el archivo de texto previamente exportado que contiene la Clave de recuperaci\u00f3n.",
     "17811": "Subir Clave de recuperaci\u00f3n",
-    "17812": "Transfer with MEGAsync if it is running",
-    "17813": "I do not have my Recovery Key"
+    "17812": "Transferir con MEGAsync si est\u00e1 en funcionamiento",
+    "17813": "No tengo la Clave de recuperaci\u00f3n"
 }

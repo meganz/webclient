@@ -261,8 +261,8 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
             // If our user handle is greater than the calldata sender's, our outgoing call
             // survives, and their call request is declined. Otherwise, our existing outgoing
             // call is hung up, and theirs is answered
-            if (base64urldecode(self.chatd.userId) < ci.fromUser) {
-                self.logger.warn("Another call: we don't have priority - hangup our outgoing call and answer the incoming");
+            if (self.chatd.userId < self.handler.get1on1RoomPeer(chatid)) {
+                self.logger.warn("We have an outgoing call, and there is an incoming call - we don't have priority, hangup our outgoing call and answer the incoming");
                 var av = existingOutCall._callInitiateAvFlags;
                 existingOutCall.hangup()
                 .then(function() {
@@ -278,7 +278,8 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
                     }, 0);
                 });
             }  else {
-                self.logger.warn("Another call: we have a priority - decline the incoming call", base64urlencode(packet.callid));
+                self.logger.warn("We have an outgoing call, and there is an incoming call - we have a priority, decline the incoming call");
+                //sendBusy();
             }
             return;
         }
@@ -448,6 +449,7 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin) {
         self.logger.warn("There is already a call in this chatroom, not starting a new one");
         return null;
     }
+
     var call = new Call(
         this, {
             chatid: chatid,

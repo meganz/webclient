@@ -80,9 +80,8 @@
 .dropdown.body.fm-dialog .fm-dialog-close {
     display: block;
 }
-.dropdown.body:not(.fm-dialog) .nw-fm-dialog-title {
+.dropdown.body:not(.fm-dialog):not(.add-user-popup) .nw-fm-dialog-title {
     padding-top: 34px;
-
 }
 .dropdown.body:not(.white-context-menu):not(.fm-dialog)::before {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);

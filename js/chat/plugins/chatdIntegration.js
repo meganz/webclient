@@ -1366,6 +1366,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     if (msgObject.pendingMessageId) {
                                         mb.messages.remove(msgObject.pendingMessageId);
                                     }
+                                    msg.source = Message.SOURCE.CHATD;
                                     mb.messages.push(msg);
                                     self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                                 }
@@ -1459,6 +1460,7 @@ ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInst
                 var mb = chatRoom.messagesBuff;
                 msgInstance.references = decryptedResult.references;
                 msgInstance.msgIdentity = decryptedResult.identity;
+
                 mb.messageOrders[decryptedResult.identity] = msgInstance.orderValue;
                 if (mb.verifyMessageOrder(decryptedResult.identity, decryptedResult.references) === false) {
                     // potential message order tampering detected.
@@ -1813,6 +1815,9 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
 
 ChatdIntegration.prototype.broadcast = function(chatRoom, broadCastCode) {
     var self = this;
+    if (!chatRoom.chatId) {
+        return;
+    }
     var rawChatId = base64urldecode(chatRoom.chatId);
     return self.chatd.broadcast(rawChatId, broadCastCode);
 };

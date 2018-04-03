@@ -241,7 +241,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                 .fail(
                 function () {
                     sync.megaSyncIsNotResponding(webdl);
-                    
+
                 }
                 );
         })
@@ -369,6 +369,9 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     if (!entries.length) {
         if (d) {
             dlmanager.logger.warn('Nothing to download.');
+        }
+        if (dlmanager.isOverQuota) {
+            dlmanager.showOverQuotaDialog();
         }
         return;
     }
@@ -1302,7 +1305,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
                     .fail(function () {
                         return false;
                     });
-                    
+
             }
         }
         else {

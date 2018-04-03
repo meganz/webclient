@@ -305,7 +305,7 @@ mobile.downloadOverlay = {
         this.startTime = new Date().getTime();
 
         // Start download and show progress
-        M.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
+        M.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).done(function(data) {
 
             // Show the download completed so they can open the file
             mobile.downloadOverlay.showDownloadComplete(data, nodeHandle);
@@ -364,8 +364,9 @@ mobile.downloadOverlay = {
      * @param {String} nodeHandle The node handle for this file
      */
     showDownloadComplete: function(data, nodeHandle) {
-
         'use strict';
+        var node = M.d[nodeHandle];
+        var isVideo = ua.details.engine !== 'Gecko' && filemime(node).startsWith('video/');
 
         var $downloadButton = this.$overlay.find('.download-progress');
         var $downloadButtonText = this.$overlay.find('.download-progress span');
@@ -376,13 +377,12 @@ mobile.downloadOverlay = {
         $downloadButton.addClass('complete');
         $downloadPercent.text('');
         $downloadSpeed.text('');
-        $downloadButtonText.text(l[8949]);  // Open File
+        $downloadButtonText.text(isVideo ? String(l[1988]).toUpperCase() : l[8949]);  // Save/Open File
 
         // Make download button clickable
         $downloadButton.off('tap').on('tap', function() {
 
             // Get the file's mime type
-            var node = M.d[nodeHandle];
             var fileName = node.name;
             var mimeType = filemime(fileName);
 
@@ -390,7 +390,17 @@ mobile.downloadOverlay = {
             api_req({ a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient' });
 
             // Create object URL to download the file to the client
-            location.href = mObjectURL([data.buffer], mimeType);
+            if (isVideo) {
+                M.saveAs(data.buffer, fileName).fail(function(ex) {
+                    if (d) {
+                        console.warn(ex);
+                    }
+                    location.href = mObjectURL([data.buffer], mimeType);
+                });
+            }
+            else {
+                location.href = mObjectURL([data.buffer], mimeType);
+            }
 
             return false;
         });

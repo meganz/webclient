@@ -1405,7 +1405,9 @@ FileUpload.prototype.run = function(done) {
         if (file.hash && file.ts) {
             throw "The fingerprint exists already.";
         }
-        if (!is_extension && file.gecko && !file.size && -1 === ua.indexOf('windows')) {
+        if (!is_extension && file.gecko && !file.size
+                && ua.indexOf('windows') < 0 && parseInt(ua.details.version) < 55) {
+
             throw new Error('!ZeroByte');
         }
 

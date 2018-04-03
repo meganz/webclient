@@ -302,10 +302,12 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
         var hideControls = function() {
             $wrapper.removeClass('mouse-idle');
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                $wrapper.addClass('mouse-idle');
-            }, 2600);
+            if (dlmanager.isStreaming) {
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    $wrapper.addClass('mouse-idle');
+                }, 2600);
+            }
         };
 
         var getTimeOffset = function(x) {
@@ -705,7 +707,8 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                     hint = l[16151] + ' ' + l[242];
                 }
 
-                emsg = String(hint) === 'The provided type is not supported' ? l[17743] : hint;
+                emsg = String(hint) === 'The provided type is not supported' ? l[17743]
+                     : String(hint) === 'Access denied' ? l[23] : hint;
 
                 if (s.options.autoplay) {
                     msgDialog('warninga', l[135], l[47], emsg);

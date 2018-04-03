@@ -5,7 +5,8 @@
  */
 function selectText(elementId) {
     'use strict';
-    var range, selection;
+    var range;
+    var selection;
     var text = document.getElementById(elementId);
 
     if (document.body.createTextRange) {
@@ -29,6 +30,7 @@ function selectText(elementId) {
  * @returns {Boolean} Whether the operation was successful
  */
 function copyToClipboard(content, toastText) {
+    'use strict';
     var success = true;
 
     if (is_chrome_firefox) {

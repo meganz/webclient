@@ -204,6 +204,10 @@ function megaUtilsXHR(aURLOrOptions, aData) {
         options.prepare(xhr);
     }
 
+    if (options.timeout) {
+        xhr.timeout = options.timeout;
+    }
+
     xhr.onloadend = function(ev) {
         var error = false;
 

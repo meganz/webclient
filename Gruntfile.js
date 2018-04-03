@@ -1,6 +1,6 @@
 var fs = require('fs');
 var RJSON = require('relaxed-json');
-var fileLimit = 555*1024;
+var fileLimit = 512*1024;
 var useHtmlMin = false;
 
 var Secureboot = function() {

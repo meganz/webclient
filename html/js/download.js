@@ -68,6 +68,12 @@ function dlinfo(ph,key,next)
             $('.top-head div').children().not('.logo').hide();
         });
     }
+
+    $(window).rebind('keydown.uikeyevents', function(ev) {
+        if (ev.keyCode === 27) {
+            closeDialog();
+        }
+    });
 }
 
 function dl_g(res) {
@@ -154,6 +160,10 @@ function dl_g(res) {
                 s: fdl_filesize,
                 link: dlpage_ph + '!' + dlpage_key
             });
+
+            M.v = [dl_node];
+            M.d[dlpage_ph] = dl_node;
+            dl_node.shares = {EXP: Object.assign({u: "EXP", r: 0}, dl_node)};
 
             mediaCollectFn = function() {
                 MediaAttribute.setAttribute(dl_node)
@@ -354,6 +364,17 @@ function dl_g(res) {
                 }
             });
 
+            $('.big-button.share, .viewer-button.right.share').rebind('click', function() {
+                document.exitFullscreen();
+                $.itemExport = [dlpage_ph];
+                var exportLink = new mega.Share.ExportLink({
+                    'showExportLinkDialog': true,
+                    'nodesToProcess': $.itemExport
+                });
+                exportLink.getExportLink();
+                return false;
+            });
+
             $('.mid-button.download-file, .big-button.download-file, .mobile.dl-browser')
                 .rebind('click', function() {
                     if ($('.checkdiv.megaapp-download input').prop('checked')) {
@@ -479,18 +500,10 @@ function dl_g(res) {
                 }
                 else {
                     // load thumbnail
-                    api_getfileattr([{fa: res.fa, k: key}], 0, function(a, b, data) {
-                        if (data !== 0xDEAD) {
-                            data = mObjectURL([data.buffer || data], 'image/jpeg');
-
-                            if (data) {
-                                var $infoBlock = $('.download.info-block');
-                                $infoBlock.addClass('thumb');
-                                $infoBlock.find('img').attr('src', data);
-
-                                showPreviewButton($infoBlock);
-                            }
-                        }
+                    getImage(dl_node).then(function(uri) {
+                        var $infoBlock = $('.download.info-block');
+                        $infoBlock.addClass('thumb').find('img').attr('src', uri);
+                        showPreviewButton($infoBlock);
                     });
                 }
 

@@ -2444,11 +2444,11 @@ li.token-input-token-invite .input-close {
     background: #FFF;
     border: 1px solid rgba(0,0,0,0.15);
     border-radius: 3px;
-    padding: 12px 12px;
+    padding: 10px 12px 8px 12px;
     min-height: 20px;
 }
 .fm-dialog .embed-content-block .code-field span {
-    line-height: 26px;
+    line-height: 21px;
     color: #333;
     font-size: 14px;
     -webkit-touch-callout: text;
@@ -2583,10 +2583,9 @@ li.token-input-token-invite .input-close {
 .embed-content-block .tab-icon{
     width: 20px;
     height: 16px;
-    margin: 0 12px 0 2px;
+    margin: -1px 12px 0 2px;
     float: left;
     display: inline-block;
-    margin-top: 2px;
     opacity: 0.8;
 }
 ..embed-content-block .tab-icon.url {
@@ -2613,7 +2612,7 @@ li.token-input-token-invite .input-close {
 .export-links-dialog .settings-container {
     overflow: auto;
 }
-.export-links-dialog .video-thumbnail {
+.export-links-dialog .video-thumbnail * {
     height: 72px;
     width: 128px;
     background-color: #222;
@@ -2632,11 +2631,11 @@ li.token-input-token-invite .input-close {
     padding-left: 16px;
 }
 .export-links-dialog .video-thumbnail-container {
-    padding: 24px 24px 0 24px; 
+    padding: 24px 24px 0 24px;
 }
 .export-links-dialog .video-thumbnail {
     display: table-cell;
-    vertical-align: middle; 
+    vertical-align: middle;
 }
 .fm-dialog .embed-content-block .video-filename {
     font-size: 15px;
@@ -2651,12 +2650,12 @@ li.token-input-token-invite .input-close {
     display: table-cell;
     vertical-align: middle;
     font-size: 14px;
-    color: #999;
+    color: #777;
 }
 .export-links-dialog .video-attributes .bullet-point {
     width: 4px;
     height: 4px;
-    background-color: #666;
+    background-color: #999;
     border-radius: 6px;
     display: inline-block;
     padding: 0;

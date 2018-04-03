@@ -251,6 +251,7 @@ function init_page() {
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
+        $.playbackTimeOffset = parseInt(ar[2]) | 0;
 
         if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
@@ -1660,20 +1661,8 @@ function topmenuUI() {
         $menuItem = undefined;
     }
 
-    if (u_type === 3) {
-        var name = '';
-
-        if (u_attr.firstname) {
-            name = u_attr.firstname;
-        }
-        if (u_attr.lastname) {
-            name += (name.length ? ' ' : '') + u_attr.lastname;
-        }
-        name = name || u_attr.name;
-
-        if (name) {
-            $topHeader.find('.user-name').text(name).removeClass('hidden');
-        }
+    if (u_type === 3 && u_attr.fullname) {
+        $topHeader.find('.user-name').text(u_attr.fullname).removeClass('hidden');
     }
 
     // Show language in top menu

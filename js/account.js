@@ -187,6 +187,12 @@ function u_checklogin3a(res, ctx) {
         }
         u_attr.flags = Object(u_attr.flags);
 
+        var name = u_attr.firstname || '';
+        if (u_attr.lastname) {
+            name += (name.length ? ' ' : '') + u_attr.lastname;
+        }
+        u_attr.fullname = String(name || u_attr.name || '').trim();
+
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
         if ((typeof u_attr.lup !== 'undefined') && !is_mobile) {
             alarm.planExpired.lastPayment = u_attr.lup;

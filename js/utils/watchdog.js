@@ -120,6 +120,8 @@ var watchdog = Object.freeze({
      * @param {Function|*} callback
      */
     registerOverrider: function(event, callback) {
+        'use strict';
+
         this.overrides[event] = callback;
     },
 
@@ -128,6 +130,8 @@ var watchdog = Object.freeze({
      * @param {String} event The event name
      */
     unregisterOverrider: function(event) {
+        'use strict';
+
         delete this.overrides[event];
     },
 

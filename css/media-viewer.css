@@ -37,10 +37,6 @@
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
-.viewer-top-bl {
-    padding: 0 8px;
-    display: none; 
-}
 .video-theatre-mode .viewer-top-bl {
     display: block;
 }

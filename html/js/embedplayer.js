@@ -13,10 +13,12 @@ var folderlink;
 var fminitialized;
 var loadingDialog;
 var dlmanager;
+var thumbnails = {};
 
 function startMega() {
     'use strict';
     mBroadcaster.sendMessage('startMega');
+    eventlog(99686, true);
     init_page();
 }
 
@@ -32,10 +34,10 @@ function init_page() {
 
     var ph = tmp[1];
     var key = tmp[2];
-    var time = tmp[3];
+    $.playbackTimeOffset = parseInt(tmp[3]) | 0;
 
     var init = function(res) {
-        init_embed(ph, key, time, res);
+        init_embed(ph, key, res);
     };
 
     if (dl_res || !key) {
@@ -46,7 +48,7 @@ function init_page() {
     }
 }
 
-function init_embed(ph, key, time, g) {
+function init_embed(ph, key, g) {
     'use strict';
     var node;
 
@@ -101,16 +103,23 @@ function init_embed(ph, key, time, g) {
                 copyToClipboard(content, 1);
             });
 
+            $('.tab-content', $block).rebind('click', function() {
+                selectText('embed-code-field');
+                return false;
+            });
+
             (function _() {
                 $('.tab-link', $block).removeClass('active').rebind('click', _);
 
                 if ($(this).is('.getlink-item, .share-link')) {
                     $('.tab-link.share-link', $block).addClass('active');
-                    $('.tab-content', $block).text(url);
+                    $('.tab-content', $block).text(url.replace('/embed', '/'));
+                    $('.sharefile-settings', $block).addClass('hidden');
                 }
                 else {
                     $('.tab-link.share-embed-code', $block).addClass('active');
                     $('.tab-content', $block).text(embed.replace('%', url));
+                    $('.sharefile-settings', $block).removeClass('hidden');
                 }
             }).call(this);
 
@@ -118,7 +127,7 @@ function init_embed(ph, key, time, g) {
                 playing = true;
                 var elm = document.getElementById('timeoffset');
                 node.stream.on('timeupdate', function() {
-                    timeoffset = this.video.currentTime | 0;
+                    timeoffset = this.currentTime | 0;
                     elm.value = secondsToTimeShort(timeoffset);
                     return playing;
                 });
@@ -140,6 +149,10 @@ function init_embed(ph, key, time, g) {
                     checkloginresult: function(ctx, r) {
                         u_type = r;
                         topmenuUI();
+
+                        delay('q:retry', function() {
+                            dlmanager._onQuotaRetry();
+                        });
                     }
                 });
                 watchdog.unregisterOverrider('setsid');
@@ -149,8 +162,9 @@ function init_embed(ph, key, time, g) {
             u_logout(-0xDEADF);
             topmenuUI();
         });
+        watchdog.registerOverrider('loadfm_done', function() {});
 
-        iniVideoStreamLayout(node, $('body'))
+        iniVideoStreamLayout(node, $('body'), {preBuffer: false})
             .then(function(stream) {
                 if (stream instanceof Streamer) {
                     stream.on('activity', function() {
@@ -158,7 +172,6 @@ function init_embed(ph, key, time, g) {
                             dlmanager.isOverQuota = false;
                             dlmanager.isOverFreeQuota = false;
                             $('.transfer-limitation-block .close-overlay').trigger('click');
-                            clearInterval($.quotaTimer);
                         }
                         return true;
                     });
@@ -200,7 +213,7 @@ function topmenuUI() {
     ];
 
     if (u_type === 3) {
-        var name = $.trim(u_attr.name || (u_attr.firstname + ' ' + u_attr.lastname));
+        var name = u_attr.fullname;
         var fl = String(name && name[0] || '').toUpperCase();
         var color = UH64(u_handle).mod(_colors.length);
 
@@ -316,9 +329,6 @@ mBroadcaster.once('startMega', function() {
         $('.button.login', $block).rebind('click', toPage.bind(this, 'login'));
         $('.button.signup', $block).rebind('click', toPage.bind(this, 'register'));
         $('.upgrade-option .button', $block).rebind('click', toPage.bind(this, 'pro'));
-
-        // FIXME: ...
-        $.quotaTimer = setInterval(this._onQuotaRetry.bind(this), 4e4);
     };
     dlmanager._onQuotaRetry = function() {
         for (var i = 0; i < this._quotaTasks.length; i++) {
@@ -328,12 +338,8 @@ mBroadcaster.once('startMega', function() {
     };
 });
 
-(function(global) {
+mBroadcaster.once('startMega', function() {
     'use strict';
-
-    function MegaLogger(n, o) {
-        this.options = Object(o);
-    }
 
     function expand(p, m) {
         return function(a, b) {
@@ -376,22 +382,28 @@ mBroadcaster.once('startMega', function() {
         return extend(promise);
     }
 
-    inherits(MegaLogger, console);
     inherits(MegaPromise, window.Promise || {});
 
-    MegaLogger.getLogger = function(n, o) {
-        return new MegaLogger(n, o);
-    };
+    window.MegaPromise = MegaPromise;
+});
 
-    global.MegaLogger = MegaLogger;
-    global.MegaPromise = MegaPromise;
+function MegaLogger(n, o) {
+    this.options = Object(o);
+}
 
-})(self);
+inherits(MegaLogger, console);
+MegaLogger.getLogger = function(n, o) {
+    return ("ActiveXObject" in window) ? console : new MegaLogger(n, o);
+};
 
 function getBaseUrl() {
+    'use strict';
+
     return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.nz');
 }
 function getAppBaseUrl() {
+    'use strict';
+
     var l = location;
     var base = (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname));
     if (is_extension) {
@@ -401,9 +413,18 @@ function getAppBaseUrl() {
 }
 
 function showToast() {
+    'use strict';
+
     var $toast = $('.toast-notification');
     $toast.addClass('visible second');
     setTimeout(function() {
         $toast.removeClass('visible second');
     }, 2000);
+}
+
+function msgDialog(type, title, msg, submsg, callback, checkbox) {
+    if (d) {
+        console.debug('msgDialog', arguments)
+    }
+    alert(String(msg) + (submsg ? '\n\n' + submsg : ''));
 }

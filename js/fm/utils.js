@@ -216,7 +216,10 @@ MegaUtils.prototype.getStack = function megaUtilsGetStack() {
 MegaUtils.prototype.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
     'use strict';
 
-    return ((fminitialized && ulmanager.isUploading) || dlmanager.isDownloading || dlmanager.isStreaming);
+    return (
+        (fminitialized && ulmanager.isUploading) || dlmanager.isDownloading
+            || typeof dlmanager.isStreaming === 'object'
+    );
 };
 
 /**

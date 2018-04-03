@@ -8,7 +8,7 @@ function is_video(n) {
 
     if (String(n && n.fa).indexOf(':8*') > 0) {
         // check whether it's an *streamable* video
-        return MediaAttribute.getMediaType(n) > 0;
+        return MediaAttribute.getMediaType(n);
     }
 
     var ext = String(n && n.name || n).split('.').pop().toUpperCase();
@@ -20,10 +20,6 @@ is_video.ext = {
     'MP4': -1,
     'M4V': -1
 };
-
-if (d) {
-    is_video.ext.MOV = 1;
-}
 
 if (!isMediaSourceSupported()) {
     window.is_video = function() {
@@ -242,6 +238,136 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
 // ---------------------------------------------------------------------------------------------------------------
 
+var _getImageCache = Object.create(null);
+
+/**
+ * Retrieve file attribute image
+ * @param {MegaNode} node The node to get associated image with
+ * @param {Number} [type] Image type, 0: thumbnail, 1: preview
+ * @param {Boolean} [raw] get back raw buffer, otherwise a blob: URI
+ * @returns {Promise}
+ */
+function getImage(node, type, raw) {
+    'use strict';
+    var entry = Object(node).h + '!' + (type |= 0) + '.' + (raw |= 0);
+
+    if (!(node instanceof MegaNode)) {
+        return Promise.reject(EARGS);
+    }
+
+    if (!type && thumbnails[node.h] && !raw) {
+        return Promise.resolve(thumbnails[node.h]);
+    }
+
+    if (_getImageCache[entry]) {
+        if (_getImageCache[entry] instanceof Promise) {
+            return _getImageCache[entry];
+        }
+        return Promise.resolve(_getImageCache[entry]);
+    }
+
+    _getImageCache[entry] = new Promise(function(resolve, reject) {
+        var done = function(a, b, data) {
+            if (data !== 0xDEAD) {
+                _getImageCache[entry] = raw ? data : mObjectURL([data.buffer || data], 'image/jpeg');
+                resolve(_getImageCache[entry]);
+            }
+            else {
+                _getImageCache[entry] = null;
+                reject();
+            }
+        };
+        api_getfileattr([node], type, done, function(ex) {
+            onIdle(function() {
+                reject(ex);
+            });
+        });
+    });
+
+    return _getImageCache[entry];
+}
+
+/**
+ * Store file attribute image
+ * @param {MegaNode} n The node to set associated image
+ * @param {ArrayBuffer} ab The binary data holding the image
+ */
+function setImage(n, ab) {
+    'use strict';
+    var aes = new sjcl.cipher.aes([
+        n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
+    ]);
+    var ph = !n.u || n.u !== u_handle ? n.ph : null;
+    createnodethumbnail(n.h, aes, n.h, ab, false, ph);
+}
+
+/**
+ * Just a quick&dirty function to retrieve an image embed through ID3v2.3 tags
+ * @details Based on https://github.com/tmont/audio-metadata
+ * @param {File|ArrayBuffer} entry
+ */
+function getID3CoverArt(entry) {
+    'use strict';
+    return new Promise(function(resolve, reject) {
+        var parse = tryCatch(function(ab) {
+            var u8 = new Uint8Array(ab);
+            var getLong = function(offset) {
+                return (((((u8[offset] << 8) + u8[offset + 1]) << 8) + u8[offset + 2]) << 8) + u8[offset + 3];
+            };
+            var readFrame = function(offset) {
+                var id = String.fromCharCode.apply(String, [
+                    u8[offset], u8[offset + 1], u8[offset + 2], u8[offset + 3]
+                ]);
+                return {id: id, size: getLong(offset + 4) + 10};
+            };
+            if (u8[0] === 0x49 && u8[1] === 0x44 && u8[2] === 0x33 && u8[3] === 3) {
+                var result;
+                var offset = 10 + (u8[5] & 128 ? getLong(10) : 0);
+                var size = offset + getLong(6);
+
+                while (offset < size) {
+                    var frame = readFrame(offset);
+                    if (frame.id === 'APIC') {
+                        offset += 11;
+                        for (var x = 2; x--; offset++) {
+                            while (u8[offset++]) ;
+                        }
+                        result = u8.slice(--offset, frame.size);
+                        break;
+                    }
+                    offset += frame.size;
+                }
+                if (d) {
+                    console.debug('getID3CoverArt', [result]);
+                }
+                if (result) {
+                    return resolve(result);
+                }
+            }
+            reject(Error('Not found.'));
+        }, reject);
+
+        if (entry instanceof Blob) {
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                if (ev.target.error) {
+                    return reject(ev.target.error);
+                }
+                parse(ev.target.result);
+            };
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(entry);
+        }
+        else {
+            onIdle(function() {
+                parse(entry);
+            });
+        }
+    });
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+
 
 (function _initVideoStream(global) {
     'use strict';
@@ -249,13 +375,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
     // @private Make thumb/preview images if missing
     var _makethumb = function(n, stream) {
         if (String(n.fa).indexOf(':0*') < 0 || String(n.fa).indexOf(':1*') < 0) {
-            var storeImage = function(ab) {
-                var aes = new sjcl.cipher.aes([
-                    n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
-                ]);
-                createnodethumbnail(n.h, aes, n.h, ab, {isVideo: true}, n.ph);
-            };
-            stream.on('playing', function() {
+            var onVideoPlaying = function() {
                 var video = this.video;
 
                 if (video && video.duration) {
@@ -270,19 +390,28 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                             return true;
                         }
 
-                        this.getImage().then(storeImage).catch(console.warn.bind(console));
+                        this.getImage().then(setImage.bind(null, n)).catch(console.warn.bind(console));
                     });
 
                     return false;
                 }
 
                 return true;
-            });
+            };
+
+            if (is_video(n) !== 2) {
+                stream.on('playing', onVideoPlaying);
+            }
+            else {
+                stream.on('audio-buffer', function(ev, buffer) {
+                    getID3CoverArt(buffer).then(setImage.bind(null, n)).catch(console.debug.bind(console));
+                });
+            }
         }
     };
 
     // @private Init custom video controls
-    var _initVideoControls = function(wrapper, streamer) {
+    var _initVideoControls = function(wrapper, streamer, node, options) {
         var $wrapper = $(wrapper);
         var $video = $wrapper.find('video');
         var videoElement = $video.get(0);
@@ -304,13 +433,6 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         var $progressBar = $videoControls.find('.video-time-bar');
         var $fullscreen = $videoControls.find('.fs');
         var $volumeBar = $videoControls.find('.volume-bar');
-
-        // Wait for the video's meta data to be loaded, then set
-        // the progress bar's max value to the duration of the video
-        $video.rebind('loadedmetadata', function() {
-            $wrapper.find('.video-timing.duration')
-                .text(secondsToTimeShort(videoElement.duration, 1));
-        });
 
         // Changes the button state of certain button's so the correct visuals can be displayed with CSS
         var changeButtonState = function(type) {
@@ -354,6 +476,10 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
             return {time: selectedTime | 0, percent: percentage};
         };
 
+        var setDuration = function(value) {
+            $wrapper.find('.video-timing.duration').text(secondsToTimeShort(value, 1));
+        };
+
         // Set Init Values
         changeButtonState('playpause');
         changeButtonState('mute');
@@ -373,6 +499,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
                 if (!playevent) {
                     playevent = true;
+                    setDuration(videoElement.duration);
 
                     // play/pause on click
                     $video.rebind('click', function() {
@@ -512,13 +639,24 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         var videoTimingElement = $wrapper.find('.video-timing.current').get(0);
 
         // As the video is playing, update the progress bar
-        $video.rebind('timeupdate', function() {
-            var currentPos = videoElement.currentTime;
-            var maxduration = videoElement.duration;
-            var percentage = 100 * currentPos / maxduration;
+        var onTimeUpdate = function(offset, length) {
+            if (offset > length) {
+                offset = length;
+            }
 
-            progressBarElementStyle.setProperty('width', percentage + '%');
-            videoTimingElement.textContent = secondsToTimeShort(videoElement.currentTime, 1);
+            videoTimingElement.textContent = secondsToTimeShort(offset, 1);
+            progressBarElementStyle.setProperty('width', Math.round(100 * offset / length) + '%');
+        };
+
+        if (options.startTime) {
+            var playtime = MediaAttribute(node).data.playtime;
+            if (playtime) {
+                setDuration(playtime);
+                onTimeUpdate(options.startTime, playtime);
+            }
+        }
+        $video.rebind('timeupdate', function() {
+            onTimeUpdate(streamer.currentTime, videoElement.duration);
         });
 
         /* Drag status */
@@ -526,7 +664,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         $progress.rebind('mousedown.videoprogress', function(e) {
             timeDrag = true;
 
-            if (videoElement.currentTime) {
+            if (streamer.currentTime) {
                 videoElement.pause();
                 onIdle(updatebar.bind(0, e.pageX));
             }
@@ -536,7 +674,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
             if (timeDrag) {
                 timeDrag = false;
 
-                if (videoElement.currentTime) {
+                if (streamer.currentTime) {
                     updatebar(e.pageX);
 
                     if (!streamer.WILL_AUTOPLAY_ONSEEK) {
@@ -547,7 +685,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         });
 
         $document.rebind('mousemove.videoprogress', function(e) {
-            if (timeDrag && videoElement.currentTime) {
+            if (timeDrag && streamer.currentTime) {
                 updatebar(e.pageX);
             }
         });
@@ -565,7 +703,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
             $wrapper.find('.video-timing.current').text(secondsToTimeShort(o.time, 1));
 
             if (!timeDrag) {
-                videoElement.currentTime = o.time;
+                streamer.currentTime = o.time;
             }
         };
 
@@ -676,13 +814,22 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
             options = destroy;
             destroy = null;
         }
-        var c = MediaAttribute.getCodecStrings(node);
-        if (c) {
-            options = Object.assign(Object.create(null), {type: c && c[0]}, options);
+        options = Object.assign(Object.create(null), options);
+
+        if ($.playbackTimeOffset) {
+            options.startTime = $.playbackTimeOffset | 0;
+            $.playbackTimeOffset = null;
+        }
+
+        if (!options.type) {
+            var c = MediaAttribute.getCodecStrings(node);
+            if (c) {
+                options.type = c && c[0];
+            }
         }
         var s = Streamer(node.link || node.h, $wrapper.find('video').get(0), options);
 
-        _initVideoControls($wrapper, s);
+        _initVideoControls($wrapper, s, node, options);
 
         destroy = destroy || function() {
             s.destroy();
@@ -766,8 +913,18 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         });
 
         s.on('playing', function() {
-            eventlog(s.options.type === 'WebM' ? 99681 : 99668);
+            var events = {'WebM': 99681, 'MPEG Audio': 99684};
+            var eid = events[s.options.type] || 99668;
+
+            if (eid === 99684 && node.s > 41943040) {
+                eid = 99685;
+            }
+
+            console.assert(eid !== 99668 || is_video(node) !== 2, 'This is not a video...');
+            eventlog(eid);
         });
+
+        _makethumb(node, s);
 
         return s;
     };
@@ -803,10 +960,11 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
      * Initialize common video player layout for the downloads and embed pages
      * @param {MegaNode} node An ufs node
      * @param {Object} $wrapper Video element wrapper
+     * @param {Object} [options] Streamer options
      * @returns {MegaPromise}
      * @global
      */
-    global.iniVideoStreamLayout = function(node, $wrapper) {
+    global.iniVideoStreamLayout = function(node, $wrapper, options) {
         var $fileinfoBlock = $('.download.file-info', $wrapper);
         var $fn = $('.big-txt', $fileinfoBlock);
 
@@ -832,17 +990,13 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                 // Disable default video controls
                 $video.get(0).controls = false;
 
-                api_getfileattr([{fa: node.fa, k: node.k}], 1, function(a, b, data) {
-                    if (data !== 0xDEAD) {
-                        data = mObjectURL([data.buffer || data], 'image/jpeg');
+                getImage(node, 1).then(function(uri) {
+                    $video.attr('poster', uri);
+                }).catch(console.debug.bind(console));
 
-                        if (data) {
-                            $video.attr('poster', data);
-                        }
-                    }
-                });
+                options = Object.assign({autoplay: false, preBuffer: true}, options);
 
-                var vsp = initVideoStream(node, $wrapper, {autoplay: false});
+                var vsp = options.preBuffer && initVideoStream(node, $wrapper, options);
 
                 $('.play-video-button', $wrapper).rebind('click', function() {
                     if (dlmanager.isOverQuota) {
@@ -857,6 +1011,11 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                     // Show Loader until video is playing
                     $wrapper.find('.viewer-pending').removeClass('hidden');
 
+                    if (!vsp) {
+                        vsp = initVideoStream(node, $wrapper, options);
+                        resolve(vsp);
+                    }
+
                     vsp.done(function(stream) {
                         if (stream.error) {
                             onIdle(function() {
@@ -865,14 +1024,17 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                             return msgDialog('warninga', l[135], l[47], stream.error);
                         }
 
-                        _makethumb(node, stream);
+                        // _makethumb(node, stream);
                         node.stream = stream;
                         stream.play();
                     }).fail(console.warn.bind(console));
 
                     $wrapper.addClass('video-theatre-mode');
                 });
-                resolve(vsp);
+
+                if (vsp) {
+                    resolve(vsp);
+                }
             }).catch(reject);
         });
     };
@@ -1945,6 +2107,11 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                         return MediaSource.isTypeSupported('video/webm; codecs="' + codec + '"') ? 1 : 0;
                 }
                 break;
+
+            case 'MPEG Audio':
+                if (!videocodec && audiocodec === container) {
+                    return mega.fullAudioContextSupport ? 2 : 0;
+                }
         }
 
         return 0;
@@ -2248,18 +2415,17 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
             M.req(req).tryCatch(success, reject);
 
-            if (Object(res.General).Cover_Data && !res.vcodec && req.n) {
-                var aes = new sjcl.cipher.aes([
-                    self.k[0] ^ self.k[4],
-                    self.k[1] ^ self.k[5],
-                    self.k[2] ^ self.k[6],
-                    self.k[3] ^ self.k[7]
-                ]);
-                try {
-                    createnodethumbnail(req.n, aes, req.n, str_to_ab(atob(res.General.Cover_Data)));
+            if (!res.vcodec && req.n) {
+                if (Object(res.General).Cover_Data) {
+                    try {
+                        setImage(self, str_to_ab(atob(res.General.Cover_Data)));
+                    }
+                    catch (ex) {
+                        console.warn(ex);
+                    }
                 }
-                catch (ex) {
-                    console.warn(ex);
+                else if (res.container === 'MPEG Audio') {
+                    getID3CoverArt(res.entry).then(setImage.bind(null, self)).catch(console.debug.bind(console));
                 }
             }
         });
@@ -2328,3 +2494,26 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
     Object.defineProperty(global, 'MediaAttribute', {value: Object.freeze(MediaAttribute)});
 
 })(self);
+
+mBroadcaster.once('startMega', function isAudioContextSupported() {
+    'use strict';
+
+    if ('AudioContext' in window) {
+        var ctx;
+        var stream;
+
+        try {
+            ctx = new AudioContext();
+            stream = ctx.createMediaStreamDestination();
+            stream.connect(ctx.destination);
+        }
+        catch (ex) {
+            console.debug(ex);
+        }
+        finally {
+            ctx.close().then(function() {
+                mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
+            });
+        }
+    }
+});

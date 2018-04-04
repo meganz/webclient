@@ -32,6 +32,16 @@ var EmoticonsFilter = function(megaChat) {
     return this;
 };
 
+EmoticonsFilter.prototype.replaceTag = function(content, source, targetStart, targetEnd) {
+    var div = $('<div>').append(content);
+    var lis = div.find(source);
+    lis.each(function() {
+        var elem = $(this);
+        elem.replaceWith(targetStart + elem.text() + targetEnd);
+    });
+    return div.html();
+};
+
 EmoticonsFilter.prototype.processMessage = function(e, eventData) {
     var self = this;
 
@@ -140,10 +150,8 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
         );
     }
     // convert ` and ``` back for next step of filter.
-    messageContents = messageContents.replace(
-            new RegExp('(^|\\s)<pre class="rtf-single">(.*)<\/pre>{1}', 'gi'), '$1`$2`');
-    messageContents = messageContents.replace(
-            new RegExp('(^|\\s)<pre class="rtf-multi">(.*)<\/pre>{1}', 'gi'), '$1```$2```');
+    messageContents = self.replaceTag(messageContents, '.rtf-single', '`', '`');
+    messageContents = self.replaceTag(messageContents, '.rtf-multi', '```', '```');
     return messageContents;
 };
 
@@ -184,9 +192,10 @@ EmoticonsFilter.prototype.processOutgoingMessage = function(e, messageObject) {
             return match;
         }
     });
+
     // convert ` and ``` back for next step of filter.
-    contents = contents.replace(new RegExp('(^|\\s)<pre class="rtf-single">(.*)<\/pre>{1}', 'gi'), '$1`$2`');
-    contents = contents.replace(new RegExp('(^|\\s)<pre class="rtf-multi">(.*)<\/pre>{1}', 'gi'), '$1```$2```');
+    contents = self.replaceTag(contents, '.rtf-single', '`', '`');
+    contents = self.replaceTag(contents, '.rtf-multi', '```', '```');
     messageObject.textContents = contents;
 };
 

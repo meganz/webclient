@@ -310,7 +310,7 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
  * and creates a list of contacts email addresses.
  * @returns {Array} contacts, array of contacts email.
  */
-MegaData.prototype.getContactsEMails = function() {
+MegaData.prototype.getContactsEMails = function(excludeRequests) {
     var contact;
     var contacts = [];
     var contactName;
@@ -323,25 +323,27 @@ MegaData.prototype.getContactsEMails = function() {
         }
     });
 
-    // Loop through outgoing pending contacts
-    for (var k in M.opc) {
-        contact = M.opc[k];
-        contactName = M.getNameByHandle(M.opc[k].p);
+    if (!excludeRequests) {
+        // Loop through outgoing pending contacts
+        for (var k in M.opc) {
+            contact = M.opc[k];
+            contactName = M.getNameByHandle(M.opc[k].p);
 
-        // Is contact deleted
-        if (!contact.dts) {
-            contacts.push({ id: contact.m, name: contactName, handle: M.opc[k].p });
+            // Is contact deleted
+            if (!contact.dts) {
+                contacts.push({ id: contact.m, name: contactName, handle: M.opc[k].p });
+            }
         }
-    }
 
-    // Loop through incomming pending contacts
-    for (var m in M.ipc) {
-        contact = M.ipc[m];
-        contactName = M.getNameByHandle(M.ipc[m].p);
+        // Loop through incomming pending contacts
+        for (var m in M.ipc) {
+            contact = M.ipc[m];
+            contactName = M.getNameByHandle(M.ipc[m].p);
 
-        // Is there a email available
-        if (contact.m) {
-            contacts.push({ id: contact.m, name: contactName, handle: M.ipc[m].p });
+            // Is there a email available
+            if (contact.m) {
+                contacts.push({ id: contact.m, name: contactName, handle: M.ipc[m].p });
+            }
         }
     }
 

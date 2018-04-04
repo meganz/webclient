@@ -2078,6 +2078,18 @@ else if (!b_u) {
         jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
     }
 
+    if (lang === 'ar') {
+        jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+    }
+
+    if (lang === 'fa') {
+        jsl.push({f:'css/lang_ar.css', n: 'lang_farsi_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+    }
+
+    if (lang === 'th') {
+        jsl.push({f:'css/lang_th.css', n: 'lang_thai_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+    }
+
     // Load files common to all mobile pages
     if (is_mobile) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});

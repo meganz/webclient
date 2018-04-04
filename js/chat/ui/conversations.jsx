@@ -93,8 +93,33 @@ var ConversationsListItem = React.createClass({
             }
 
             renderableSummary = htmlentities(renderableSummary);
+            var escapeUnescapeArgs = [
+                {'type': 'onPreBeforeRenderMessage'},
+                {'message': {'textContents': renderableSummary}},
+                ['textContents', 'messageHtml'],
+                'textContents'
+            ];
+
+            megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
+                escapeUnescapeArgs[0],
+                escapeUnescapeArgs[1],
+                escapeUnescapeArgs[2],
+                escapeUnescapeArgs[3]
+            );
+            renderableSummary = escapeUnescapeArgs[1].message.textContents;
+
             renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
             renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+
+            escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+
+            megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(
+                escapeUnescapeArgs[0],
+                escapeUnescapeArgs[1],
+                escapeUnescapeArgs[2],
+                escapeUnescapeArgs[3]
+            );
+            renderableSummary = escapeUnescapeArgs[1].message.textContents;
 
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
                     </div>;

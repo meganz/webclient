@@ -10,12 +10,66 @@ describe("chat.rtf_filter unit test", function() {
 
     var sandbox;
     var rtf;
+    var megaChat;
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
-        rtf = new RtfFilter({
-            'bind': function() {}
+        var EMOJI_DATASET_VERSION = 2;
+        megaChat = {
+            'getEmojiDataSet': function(name) {
+                var self = this;
+                assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
+
+                if (!self._emojiDataLoading) {
+                    self._emojiDataLoading = {};
+                }
+                if (!self._emojiData) {
+                    self._emojiData = {};
+                }
+
+                if (self._emojiData[name]) {
+                    return MegaPromise.resolve(
+                        self._emojiData[name]
+                    );
+                }
+                else if (self._emojiDataLoading[name]) {
+                    return self._emojiDataLoading[name];
+                }
+                else {
+                    self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy(
+                        $.getJSON(staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json")
+                    );
+                    self._emojiDataLoading[name].done(function(data) {
+                        self._emojiData[name] = data;
+                        delete self._emojiDataLoading[name];
+                    }).fail(function() {
+                        delete self._emojiDataLoading[name];
+                    });
+
+                    return self._emojiDataLoading[name];
+                }
+            }
+        };
+        makeObservable(megaChat);
+        megaChat.plugins = {
+            // 'chatStats': ChatStats,
+            // 'chatdIntegration': ChatdIntegration,
+            // 'callManager': CallManager,
+            'urlFilter': UrlFilter,
+            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
+            'emoticonsFilter': EmoticonsFilter,
+            // 'callFeedback': CallFeedback,
+            // 'presencedIntegration': PresencedIntegration,
+            // 'persistedTypeArea': PersistedTypeArea,
+            'btRtfFilter': BacktickRtfFilter,
+            'rtfFilter': RtfFilter
+        };
+        // init
+        Object.keys(megaChat.plugins).forEach(function(plName) {
+            megaChat.plugins[plName] = new megaChat.plugins[plName](megaChat);
         });
+
+        rtf = new RtfFilter({'bind': function(){}});
     });
 
     afterEach(function() {
@@ -25,11 +79,59 @@ describe("chat.rtf_filter unit test", function() {
 
     var expected = function(expected, got, msg) {
         if (expected !== got) {
-            var errorMsg = "Expected: \n" + expected + "\nGot: \n" + got + "\nError message: " + msg;
+            var errorMsg = "Expected: " + expected + "\nGot: \n" + got + "\nError message: " + msg;
             assert.fail(expected, got, errorMsg);
         }
     };
 
+
+    it("test escaping", function() {
+        [
+            ['a', 'a', 'a'],
+            [
+                '`:spoon:`\n' +
+                '`:apple: `\n' +
+                '`:dolphin: `',
+
+                '`:spoon:`\n' +
+                '`:apple: `\n' +
+                '`:dolphin: `',
+
+                '<pre class="rtf-single">:spoon:</pre><br/>' +
+                '<pre class="rtf-single">:apple: </pre><br/><pre class="rtf-single">:dolphin: </pre>'
+            ],
+            [
+                '<img src="#" width=300 height=300 />',
+                '<img src="#" width=300 height=300 />',
+                '&lt;img src="#" width=300 height=300 /&gt;',
+            ]
+        ].forEach(function(rule) {
+            var evtObj = {
+                message: {
+                    'textContents': rule[0],
+                    'message': rule[0],
+                },
+                room: {}
+            };
+
+            megaChat.trigger('onPreBeforeRenderMessage', evtObj);
+            var event = new $.Event("onBeforeRenderMessage");
+            megaChat.trigger(event, evtObj);
+            megaChat.trigger('onPostBeforeRenderMessage', evtObj);
+
+            expected(
+                rule[1],
+                evtObj.message.textContents,
+                'RTF formatting failed (textContents)'
+            );
+
+            expected(
+                rule[2],
+                evtObj.message.messageHtml,
+                'RTF formatting failed (messageHtml)'
+            );
+        });
+    });
 
     it("testing util funcs of rtf to html", function() {
         var fixture = [
@@ -44,6 +146,7 @@ describe("chat.rtf_filter unit test", function() {
                 "b*\n" +
                 "dontmatchme ***\n" +
                 "testtt***",
+
 
                 "<strong>singleline</strong>\n" +
                 "a*test*b\n" +
@@ -81,7 +184,7 @@ describe("chat.rtf_filter unit test", function() {
                 "testtt_"
             ],
             [
-                "`singleline`\n" +
+                "2 `singleline`\n" +
                 "a`test`b\n" +
                 "a `test` b\n" +
                 "a `test` b `test2` `test 3 space`\n" +
@@ -92,20 +195,16 @@ describe("chat.rtf_filter unit test", function() {
                 "dontmatchme `\n" +
                 "testtt`",
 
-                "<pre class=\"rtf-single\">singleline</pre>\n" +
-                "a`test`b\n" +
-                "a <pre class=\"rtf-single\">test</pre> b\n" +
-                "a <pre class=\"rtf-single\">test</pre> b <pre class=\"rtf-single\">test2</pre> " +
-                "<pre class=\"rtf-single\">test 3 space</pre>\n" +
-                "a <pre class=\"rtf-multi\">test</pre>\n" +
-                "a `\n" +
-                "test\n" +
-                "b`\n" +
-                "dontmatchme `\n" +
+                "2 <pre class=\"rtf-single\">singleline</pre><br/>" +
+                "a`test`b<br/>" +
+                "a <pre class=\"rtf-single\">test</pre> b<br/>" +
+                "a <pre class=\"rtf-single\">test</pre> b <pre class=\"rtf-single\">test2</pre> <pre class=\"rtf-single\">test 3 space</pre><br/>" +
+                "a<pre class=\"rtf-multi\">test</pre><br/>" +
+                "a `<br/>test<br/>b`<br/>dontmatchme `<br/>" +
                 "testtt`"
             ],
             [
-                "```singleline```\n" +
+                "1 ```singleline```\n" +
                 "a```test```b\n" +
                 "a ```test``` b\n" +
                 "a ```test``` b ```test2``` ```test 3 space```\n" +
@@ -116,35 +215,38 @@ describe("chat.rtf_filter unit test", function() {
                 "domatchme ```\n" +
                 "testtt```",
 
-                "<pre class=\"rtf-multi\">singleline</pre>\n" +
-                "a```test```b\n" +
-                "a <pre class=\"rtf-multi\">test</pre> b\n" +
-                "a <pre class=\"rtf-multi\">test</pre> b <pre class=\"rtf-multi\">test2</pre> " +
-                "<pre class=\"rtf-multi\">test 3 space</pre>\n" +
-                "a ````test````\n" +
-                "a <pre class=\"rtf-multi\">" +
-                "test\n" +
-                "b</pre>\n" +
-                "domatchme <pre class=\"rtf-multi\">" +
-                "testtt</pre>"
+                "1<pre class=\"rtf-multi\">singleline</pre><br/>" +
+                "a<pre class=\"rtf-multi\">test</pre>b<br/>" +
+                "a<pre class=\"rtf-multi\">test</pre> b<br/>" +
+                "a<pre class=\"rtf-multi\">test</pre> b<pre class=\"rtf-multi\">test2</pre><pre class=\"rtf-multi\">test 3 space</pre><br/>" +
+                "a <pre class=\"rtf-single\"><pre class=\"rtf-multi\">test</pre></pre><br/>" +
+                "a<pre class=\"rtf-multi\">test<br/>" +
+                "b</pre><br/>" +
+                "domatchme<pre class=\"rtf-multi\">testtt</pre>"
             ]
         ];
 
         fixture.forEach(function(entry) {
-            var msg = {
-                'message': {
-                    'messageHtml': entry[0],
-                    'textContents': entry[0],
-                    'decrypted': true
-                }
-            };
             entry[1] = entry[1].replace(/\n/gi, "<br/>");
 
-            rtf.processMessage(false, msg);
+
+            var evtObj = {
+                message: {
+                    'messageHtml': htmlentities(entry[0]),
+                    'textContents': entry[0],
+                    'decrypted': true
+                },
+                room: {}
+            };
+
+            megaChat.trigger('onPreBeforeRenderMessage', evtObj);
+            var event = new $.Event("onBeforeRenderMessage");
+            megaChat.trigger(event, evtObj);
+            megaChat.trigger('onPostBeforeRenderMessage', evtObj);
 
             expected(
                 entry[1],
-                msg.message.messageHtml,
+                evtObj.message.messageHtml,
                 'RTF formatting failed'
             );
         });

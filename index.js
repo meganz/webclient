@@ -500,10 +500,15 @@ function init_page() {
         }
     }
 
+    // If the account has just finished being cancelled
     if (localStorage.beingAccountCancellation) {
         if (is_mobile) {
             parsepage(pages['mobile']);
-            // todo
+
+            // Show message that the account has been cancelled successfully
+            mobile.messageOverlay.show(l[6188], l[6189], function() {
+                loadSubPage('start');
+            });
         }
         else {
             // Insert placeholder page while waiting for user input
@@ -931,24 +936,36 @@ function init_page() {
         }
     }
     else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
-
-        if (u_type) {
-            var ac = new mega.AccountClosure();
-            ac.handleFeedback();
+        if (is_mobile) {
+            if (u_type) {
+                parsepage(pages['mobile']);
+                mobile.account.cancel.init();
+            }
+            else {
+                login_next = page;
+                loadSubPage('login');
+            }
         }
         else {
-            // Unable to cancel, not logged in
-            mega.ui.showLoginRequiredDialog({
-                title: l[6186],
-                textContent: l[5841]
-            })
-            .done(init_page)
-            .fail(function(aError) {
-                if (aError) {
-                    alert(aError);
-                }
-                loadSubPage('start');
-            });
+            // If desktop and logged in
+            if (u_type) {
+                var ac = new mega.AccountClosure();
+                ac.handleFeedback();
+            }
+            else {
+                // Unable to cancel, not logged in
+                mega.ui.showLoginRequiredDialog({
+                    title: l[6186],
+                    textContent: l[5841]
+                })
+                .done(init_page)
+                .fail(function(aError) {
+                    if (aError) {
+                        alert(aError);
+                    }
+                    loadSubPage('start');
+                });
+            }
         }
     }
     else if (page === 'wiretransfer') {

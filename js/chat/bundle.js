@@ -8272,14 +8272,15 @@ React.makeElement = React['createElement'];
 	        'numberOfEmojisPerRow': 9
 	    },
 	    categoryLabels: {
+	        'frequently_used': l[17737],
 	        'people': l[8016],
-	        'objects': __('Objects'),
+	        'objects': l[17735],
 	        'activity': l[8020],
 	        'nature': l[8017],
 	        'travel': l[8021],
-	        'symbols': __('Symbols'),
+	        'symbols': l[17736],
 	        'food': l[8018],
-	        'flags': __('Flags')
+	        'flags': l[17703]
 	    },
 	    getDefaultProps: function getDefaultProps() {
 	        return {

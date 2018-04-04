@@ -180,6 +180,7 @@ React.makeElement = React['createElement'];
 	            'callFeedback': CallFeedback,
 	            'presencedIntegration': PresencedIntegration,
 	            'persistedTypeArea': PersistedTypeArea,
+	            'btRtfFilter': BacktickRtfFilter,
 	            'rtfFilter': RtfFilter
 	        },
 	        'chatNotificationOptions': {
@@ -1217,8 +1218,18 @@ React.makeElement = React['createElement'];
 	            }
 
 	            renderableSummary = htmlentities(renderableSummary);
+	            var escapeUnescapeArgs = [{ 'type': 'onPreBeforeRenderMessage' }, { 'message': { 'textContents': renderableSummary } }, ['textContents', 'messageHtml'], 'textContents'];
+
+	            megaChat.plugins.btRtfFilter.escapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+	            renderableSummary = escapeUnescapeArgs[1].message.textContents;
+
 	            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
 	            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+
+	            escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+
+	            megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+	            renderableSummary = escapeUnescapeArgs[1].message.textContents;
 
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
 
@@ -9754,21 +9765,29 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (message instanceof Message) {
+	            if (!message.wasRendered) {
 
-	            if (!message.messageHtml) {
 	                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
+
+	                message.processedBy = {};
+
+	                var evtObj = {
+	                    message: message,
+	                    room: chatRoom
+	                };
+
+	                megaChat.trigger('onPreBeforeRenderMessage', evtObj);
+	                var event = new $.Event("onBeforeRenderMessage");
+	                megaChat.trigger(event, evtObj);
+	                megaChat.trigger('onPostBeforeRenderMessage', evtObj);
+
+	                if (event.isPropagationStopped()) {
+	                    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
+	                    return false;
+	                }
+	                message.wasRendered = 1;
 	            }
 
-	            var event = new $.Event("onBeforeRenderMessage");
-	            megaChat.trigger(event, {
-	                message: message,
-	                room: chatRoom
-	            });
-
-	            if (event.isPropagationStopped()) {
-	                self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
-	                return false;
-	            }
 	            textMessage = message.messageHtml;
 
 	            if (message instanceof Message || typeof message.userId !== 'undefined' && message.userId === u_handle) {
@@ -11695,7 +11714,9 @@ React.makeElement = React['createElement'];
 	    var self = this;
 	    var megaChat = this.megaChat;
 
+	    megaChat.trigger('onPreBeforeSendMessage', messageObject);
 	    megaChat.trigger('onBeforeSendMessage', messageObject);
+	    megaChat.trigger('onPostBeforeSendMessage', messageObject);
 
 	    return megaChat.plugins.chatdIntegration.sendMessage(self, messageObject);
 	};

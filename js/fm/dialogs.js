@@ -119,7 +119,7 @@
      */
     var handleConversationTabContent = function _handleConversationTabContent() {
         var myChats = megaChat.chats;
-        var myContacts = M.getContactsEMails();
+        var myContacts = M.getContactsEMails(true); // true to exclude requests (incoming and outgoing)
         var conversationTab = $('.copy-dialog-tree-panel.conversations');
         var conversationNoConvTab = $('.dialog-empty-block.copy.conversations');
         var conversationTabHeader = $('.copy-dialog-panel-header', conversationTab);

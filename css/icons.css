@@ -689,6 +689,12 @@
 .huge-icon.achievement {
     background-image: url(../images/mega/big-achievements.png);
 }
+.small-icon.fm-s {
+    background-image: url(../images/mega/fm-main-sprite.png);
+}
+.small-icon.verify.fm-s {
+    background-position: -14px -4586px;
+}
 .ach-create-account .huge-icon.achievement {
     background-position: -2px 6px;
 }

@@ -1769,8 +1769,8 @@ a.blog-button:hover {
     line-height: 18px;
     padding: 2px 0 2px 28px;
     margin: 0 14px 0 0;
-    background-image: url(../images/mega/notifications-sprite-v3.svg);
-    background-position: -10px -350px;
+    background-image: url(../images/mega/fm-main-sprite.png);
+    background-position: -14px -7100px;
     background-repeat: no-repeat;
 }
 .notification-avatar-icon {
@@ -1779,37 +1779,35 @@ a.blog-button:hover {
     height: 20px;
     right: -4px;
     top: -4px;
-    background-image: url(../images/mega/notifications-sprite-v3.svg);
+    background-image: url(../images/mega/fm-main-sprite.png);
     background-position: -10px -27px;
+    background-position: -14px -6776px;
     background-repeat: no-repeat;
 }
 .black {
     color: black;
 }
 /* Small notification icons on top of the notification avatar */
-.nt-revocation-of-incoming .notification-avatar-icon {
-    background-position: -10px -153px;
-}
 .nt-new-files .notification-avatar-icon {
-    background-position: -10px -217px;
+    background-position: -14px -6966px;
 }
 .nt-deleted-files .notification-avatar-icon {
     background-position: -10px -89px;
 }
 .nt-contact-request .notification-avatar-icon {
-    background-position: -10px -287px;
+    background-position: -14px -7036px;
 }
 .nt-contact-deleted .notification-avatar-icon {
-    background-position: -10px -89px;
+    background-position: -14px -6838px;
 }
 .nt-contact-accepted .notification-avatar-icon {
-    background-position: -10px -351px;
+    background-position: -14px -6776px;
 }
-.nt-contact-request-denied .notification-avatar-icon, .nt-contact-request-blocked .notification-avatar-icon, .nt-contact-request-ignored .notification-avatar-icon {
-    background-position: -10px -153px;
+.nt-revocation-of-incoming .notification-avatar-icon, .nt-contact-request-denied .notification-avatar-icon, .nt-contact-request-blocked .notification-avatar-icon, .nt-contact-request-ignored .notification-avatar-icon {
+    background-position: -14px -6902px;
 }
 .nt-payment-reminder-notification .notification-avatar-icon {
-    background-position: -10px -415px;
+    background-position: -14px -7164px;
 }
 /* Custom icon instead of avatar for MEGA notifications */
 .notification-item .notification-icon {
@@ -5373,9 +5371,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .transfer-table, .transfer-table tbody {
     height: auto;
+    white-space: nowrap;
 }
 .transfer-table tr td {
     position: relative;
+    display: inline-block;
 }
 .transfer-table td object {
     position: absolute;
@@ -15026,16 +15026,16 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-image: url(../images/mega/files-icons_v2.png);
 }
 .search-path-icon.shared-folder {
-    background-position: -8px -502px;
-    background-image: url(../images/mega/shared-sprite_v7.svg);
+    background-position: -12px -4369px;
+    background-image: url(../images/mega/fm-main-sprite.png);
 }
 .search-path-icon.recycle-item {
     background-position: -1px -8035px;
     background-image: url(../images/mega/fm-main-sprite.png);
 }
 .search-path-icon.contacts-item {
-    background-position: -6px -935px;
-    background-image: url(../images/mega/shared-sprite_v7.svg);
+    background-position: -12px -4410px;
+    background-image: url(../images/mega/fm-main-sprite.png);
 }
 .search-path-icon.inbox-item {
     background-position: -3px -6717px;
@@ -15700,30 +15700,30 @@ span.incoming-call-name {
     padding-left: 31px;
     color: #999999;
     display: block;
-    background-image: url(../images/mega/shared-sprite_v7.svg);
-    background-position: -37px -244px;
+    background-image: url(../images/mega/fm-main-sprite.png);
+    background-position: -13px -4292px;
     background-repeat: no-repeat;
 }
 .contacts-interation {
     text-transform: lowercase;
 }
 .shared-folder-access.read-and-write {
-    background-position: -36px -292px;
+    background-position: -11px -4330px;
 }
 .shared-folder-access.full-access {
-    background-position: -37px -196px;
+    background-position: -13px -4254px;
 }
 .contacts-interation.never {
-    background-position: -7px -1179px;
+    background-position: -12px -4550px;
 }
 .contacts-interation.cloud-drive {
-    background-position: -6px -1095px;
+    background-position: -13px -4491px;
 }
 .contacts-interation.conversations {
-    background-position: -7px -1152px;
+    background-position: -12px -4520px;
 }
 .contacts-interation.unread-conversations {
-    background-position: -6px -1067px
+    background-position: -12px -4460px;
 }
 .shared-top-details {
     height: 123px;
@@ -18164,13 +18164,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog .verifyCredentials .verify-contact-button {
     display: inline-block;
     float: none;
-    margin-left: -3px;
-}
-.credentials-warning-dialog .verifyCredentials .verify-contact-button span {
-    background-image: url(../images/mega/shared-sprite_v7.svg);
-    background-position: -9px -739px;
-    display: block;
-    text-indent: 19px;
+    margin: 10px 0 0 0;
 }
 .credentials-warning-dialog .verifyCredentials .verify-contact-button.hidden {
     display: none;

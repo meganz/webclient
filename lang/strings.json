@@ -19026,5 +19026,9 @@
     "17825": {
         "text": "My QR Code:",
         "context": "A section title for the My Account page where the user can see their current Quick Response Code (QR code). This QR code can be shared with other users to let them add the user as a contact quickly."
+    },
+    "17828": {
+        "text": "Play Audio",
+        "context": "a context-menu button to let user start streaming audio files."
     }
 }

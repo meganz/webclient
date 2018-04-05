@@ -10,13 +10,17 @@ var BacktickRtfFilter = function(megaChat) {
     var self = this;
 
     self.regexps = {};
-    self.regexps['(^|\\\\s)?\\s?`{3}(\\n?)([^(?!```).]{1,})`{3}'] = [
-        'gim',
-        '$1<pre class="rtf-multi">$3</pre>',
-        '$1 $3'
+    self.regexps['(^|\\s)`{3}(\\n?)(\\n|.*)`{3}'] = [
+        'gis',
+        '$1<pre class="rtf-multi">$2$3</pre>',
+        '$1 $2$3'
     ];
 
-    self.regexps['(^|\\s)`{1}([^`\\n]{1,})`{1}'] = ['gi', '$1<pre class="rtf-single">$2</pre>', '$1 $2'];
+    self.regexps['(^|\\s)`{1}([^\\n|^`]{1,})`{1}'] = [
+        'gim',
+        '$1<pre class="rtf-single">$2</pre>',
+        '$1 $2'
+    ];
     self.escaped = {};
     self.index = 0;
 
@@ -80,6 +84,7 @@ BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, pro
     props.forEach(function(prop) {
         var messageContents = eventData.message[prop] ? eventData.message[prop] : textContents;
 
+
         if (prop === "messageHtml" && !eventData.message[prop]) {
             messageContents = htmlentities(messageContents);
         }
@@ -95,14 +100,15 @@ BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, pro
             messageContents = messageContents.replace(/\<br\/\>/gi, '\n');
         }
         /*jshint +W049 */
-        Object.keys(self.regexps).forEach(function(regexp, type) {
-            var replacement = self.regexps[regexp];
-            messageContents = messageContents.replace(new RegExp(regexp, replacement[0]), function(match) {
+
+        // performance cheat/trick
+        if (messageContents.indexOf("`") !== -1) {
+            messageContents = self.processBackticks(messageContents, function (match, replacementHtml, replTxt) {
                 var id = self.index++;
-                self.escaped[id] = [type, match.replace(new RegExp(regexp, replacement[0]), replacement[1]), match];
+                self.escaped[id] = [replacementHtml, e.textOnly ? replTxt : match];
                 return BacktickRtfFilter.ESCAPE_TEMPLATE.replace("$NUM", id);
             });
-        });
+        }
 
         if (prop === "messageHtml") {
             messageContents = messageContents.replace(/\n/gi, "<br/>");
@@ -112,6 +118,121 @@ BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, pro
 
 
     return eventData.message[mainProp];
+};
+
+BacktickRtfFilter.PARSER_STATE = {
+    REGULAR: 0,
+    IN_PLACEHOLDER_SINGLE: 1,
+    IN_PLACEHOLDER_MULTI: 2,
+};
+
+BacktickRtfFilter.PARSER_VALID_PREV_CHAR_MATCH = new RegExp(/\n|\s|\r/);
+
+BacktickRtfFilter.prototype.processBackticks = function(msgString, replaceGenCb) {
+    var self = this;
+    msgString = String(msgString);
+    var newString = "";
+    var placeholderString = "";
+
+    var state = BacktickRtfFilter.PARSER_STATE.REGULAR;
+    var len = msgString.length;
+
+    for (var i = 0; i < len; i++) {
+        if (msgString.substr(i, 3) === "```" && (
+                state === BacktickRtfFilter.PARSER_STATE.REGULAR ||
+                state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_MULTI
+            ) &&
+            (
+                state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_MULTI ||
+                i === 0 ||
+                msgString[i - 1].match(BacktickRtfFilter.PARSER_VALID_PREV_CHAR_MATCH))
+        ) {
+            if (state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_MULTI) {
+                state = BacktickRtfFilter.PARSER_STATE.REGULAR;
+                newString += replaceGenCb(
+                    "```" + placeholderString + "```",
+                    '<pre class="rtf-multi">' + placeholderString + '</pre>',
+                    placeholderString
+                );
+                placeholderString = "";
+            }
+            else {
+                state = BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_MULTI;
+            }
+            i += 2;
+        }
+        else if (msgString[i] === "`" && (
+                state === BacktickRtfFilter.PARSER_STATE.REGULAR ||
+                state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_SINGLE
+            ) && (
+                state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_SINGLE ||
+                i === 0 ||
+                msgString[i - 1].match(BacktickRtfFilter.PARSER_VALID_PREV_CHAR_MATCH)
+            )
+        ) {
+            if (state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_SINGLE) {
+
+                // ensure the placeholder is not just empty thing.
+                if ($.trim(placeholderString) === "") {
+                    // current char is `, try to start a new placeholder state
+                    newString += "`" + placeholderString;
+                    placeholderString = "";
+                    if (i === len - 1 || msgString[i + 1] === "\n"  || msgString[i + 1] === "\r") {
+                        // end of string.
+                        newString += msgString[i];
+                        if (msgString[i + 1] === "\n" || msgString[i + 1] === "\r") {
+                            newString += msgString[i + 1];
+                        }
+                        state = BacktickRtfFilter.PARSER_STATE.REGULAR;
+                    }
+                }
+                else if (msgString[i + 1] === "`" || msgString[i - 1] === "`") {
+                    // fast forward. e.g. skip ``(`)? in SINGLE placeholders.
+                    placeholderString += msgString[i];
+                }
+                else {
+                    state = BacktickRtfFilter.PARSER_STATE.REGULAR;
+                    newString += replaceGenCb(
+                        "`" + placeholderString + "`",
+                        '<pre class="rtf-single">' + placeholderString + '</pre>',
+                        placeholderString
+                    );
+                    placeholderString = "";
+                }
+            }
+            else {
+                state = BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_SINGLE;
+            }
+        }
+        else if (state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_SINGLE && (
+                msgString[i] === "\n" ||
+                msgString[i] === "\r"
+            )
+        ) {
+            newString += "`" + placeholderString + msgString[i];
+            placeholderString = "";
+            state = BacktickRtfFilter.PARSER_STATE.REGULAR;
+        }
+        else if (state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_SINGLE) {
+            placeholderString += msgString[i];
+        }
+        else if (state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_MULTI) {
+            placeholderString += msgString[i];
+        }
+        else if (state === BacktickRtfFilter.PARSER_STATE.REGULAR) {
+            newString += msgString[i];
+        }
+    }
+    // console.error("finished:", [msgString, newString, state, placeholderString]);
+
+    if (state !== BacktickRtfFilter.PARSER_STATE.REGULAR) {
+        // have started parsing something, but string ended unexpectedly.
+        newString += state === BacktickRtfFilter.PARSER_STATE.IN_PLACEHOLDER_SINGLE ? "`" : "```";
+        newString += placeholderString;
+
+    }
+
+    return newString;
 };
 
 BacktickRtfFilter.prototype.unescapeAndProcessMessage = function(e, eventData, props, mainProp) {
@@ -140,6 +261,8 @@ BacktickRtfFilter.prototype.unescapeAndProcessMessage = function(e, eventData, p
 
 
 
+    var notFound = false;
+
     props.forEach(function(prop) {
         var messageContents = eventData.message[prop] ? eventData.message[prop] : textContents;
 
@@ -157,21 +280,32 @@ BacktickRtfFilter.prototype.unescapeAndProcessMessage = function(e, eventData, p
 
         messageContents = messageContents.replace(
             new RegExp(BacktickRtfFilter.UNESCAPE_REGEXP, "gi"),
-            function(match, id) {
+            function (match, id) {
                 var escaped = self.escaped[id];
                 var result = match;
                 if (escaped) {
-                    if (prop === "messageHtml") {
-                        result = escaped[1];
+                    if (prop === "messageHtml" && !e.textOnly) {
+                        result = escaped[0];
                     }
                     else {
-                        result = escaped[2];
+                        result = escaped[1];
                     }
-                    delete self.escaped[id];
+
+                    // because of plugins shuffling message, messageHtml and textContents, we need to delete the
+                    // cache a bit later
+                    setTimeout(function(idx) {
+                        delete self.escaped[idx];
+                    }, 100, id);
+                }
+                else {
+                    notFound = true;
+                    result = "";
+                    console.error("replacement not found:", id);
                 }
 
                 return result;
             });
+
 
         if (prop === "messageHtml") {
             messageContents = messageContents.replace(/\n/gi, "<br/>");
@@ -181,7 +315,7 @@ BacktickRtfFilter.prototype.unescapeAndProcessMessage = function(e, eventData, p
     });
 
 
-    if (eventData.message[mainProp].indexOf(BacktickRtfFilter.ESCAPE_SEARCH) > -1) {
+    if (!notFound && eventData.message[mainProp].indexOf(BacktickRtfFilter.ESCAPE_SEARCH) > -1) {
         // recurse to ensure ALL escaped stuff are unescaped (specially if nested with some super tricky strings)
         return self.unescapeAndProcessMessage(e, eventData, props, mainProp);
     }

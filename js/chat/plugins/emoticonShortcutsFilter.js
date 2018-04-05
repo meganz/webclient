@@ -46,9 +46,15 @@ var EmoticonShortcutsFilter = function(megaChat) {
     });
 
     megaChat.bind("onBeforeSendMessage", function(e, messageObject) {
-        self.processMessage(e, {
-            'message': messageObject
+        var formatted = self.processMessage(e, {
+            'message': {
+                'textContents': messageObject.textContents
+            }
         });
+
+        if (formatted) {
+            messageObject.textContents = formatted;
+        }
     });
 
     return this;

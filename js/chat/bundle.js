@@ -1209,27 +1209,37 @@ React.makeElement = React['createElement'];
 	        if (lastMessage) {
 	            var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
 
-	            var renderableSummary = lastMessage.textContents;
+	            var renderableSummary;
+	            if (lastMessage.renderableSummary) {
+	                renderableSummary = lastMessage.renderableSummary;
+	            } else {
+	                renderableSummary = htmlentities(lastMessage.textContents);
 
-	            if (lastMessage.isManagement && lastMessage.isManagement()) {
-	                renderableSummary = lastMessage.getManagementMessageSummaryText();
-	            } else if (!lastMessage.textContents && lastMessage.dialogType) {
-	                renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+	                if (lastMessage.isManagement && lastMessage.isManagement()) {
+	                    renderableSummary = lastMessage.getManagementMessageSummaryText();
+	                } else if (!lastMessage.textContents && lastMessage.dialogType) {
+	                    renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+	                }
+
+	                var escapeUnescapeArgs = [{ 'type': 'onPreBeforeRenderMessage', 'textOnly': true }, { 'message': { 'textContents': renderableSummary } }, ['textContents', 'messageHtml'], 'messageHtml'];
+
+	                megaChat.plugins.btRtfFilter.escapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+	                renderableSummary = escapeUnescapeArgs[1].message.textContents;
+
+	                renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+	                renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+
+	                escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
+
+	                escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+
+	                renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+
+	                renderableSummary = renderableSummary || "";
+	                renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
+	                renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+	                lastMessage.renderableSummary = renderableSummary;
 	            }
-
-	            renderableSummary = htmlentities(renderableSummary);
-	            var escapeUnescapeArgs = [{ 'type': 'onPreBeforeRenderMessage' }, { 'message': { 'textContents': renderableSummary } }, ['textContents', 'messageHtml'], 'textContents'];
-
-	            megaChat.plugins.btRtfFilter.escapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
-	            renderableSummary = escapeUnescapeArgs[1].message.textContents;
-
-	            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
-	            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
-
-	            escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
-
-	            megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
-	            renderableSummary = escapeUnescapeArgs[1].message.textContents;
 
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
 

@@ -2787,7 +2787,7 @@
     "8561": "If you have an active subscription on the v1 app, please cancel it on Google Play and subscribe again on the v3 app when the current subscription expires. Don't worry, you will keep your PRO status on the new app until it expires.",
     "8562": "[Pricing may vary slightly depending on your country of residence and payment method.]",
     "8563": "You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help change your mind.",
-    "8564": "You don't have access to the path '{0}'. Please select another one and try again.",
+    "8564": "You don't have access to the folder '{0}'. Please select another one and try again.",
     "8565": "The name of the file '{0}' is not valid or has illegal characters. Please change it and try again.",
     "8566": "Invalid file name",
     "8567": "The path of the file\/folder '{0}' is too long. Please change it and try again.",
@@ -4740,8 +4740,8 @@
     "17807": "Recover Account",
     "17808": "I have my Recovery Key",
     "17809": "Enter your Recovery Key to restore your account",
-    "17810": "Alternatively, you can upload your exported Recovery Key text file.",
-    "17811": "Upload Recovery Key",
+    "17810": "Alternatively, you can read your Recovery Key from the previously exported text file.",
+    "17811": "Read Recovery Key From File",
     "17812": "Transfer with MEGAsync if it is running",
     "17813": "I do not have my Recovery Key",
     "17814": "%@ per month",
@@ -4751,5 +4751,9 @@
     "17818": "Location",
     "17819": "Do you want to delete this version?",
     "17820": "It will be permanently removed",
-    "17821": "Previous Versions"
+    "17821": "Previous Versions",
+    "17822": "Start video at",
+    "17823": "Change video resolution",
+    "17824": "When you remove the link of a file, the embedded player also gets disabled. Would you like to continue?",
+    "17825": "My QR Code:"
 }

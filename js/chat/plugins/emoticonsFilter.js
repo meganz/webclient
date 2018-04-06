@@ -7,9 +7,8 @@
  */
 var EmoticonsFilter = function(megaChat) {
     var self = this;
-    // only match emojis when they are not in between of rtf tags.
-    self.emoticonsRegExp =
-            /((^|\W?)(:[a-zA-Z0-9\-_]+:)(?!(.(?!<pre))*?<\/pre>)(\s|$))/gi;
+
+    self.emoticonsRegExp = /((^|\W?)(:[a-zA-Z0-9\-_]+:)(?=(\s|$)))/gi;
     self.map = {};
 
     self.emoticonsLoading = megaChat.getEmojiDataSet('emojis')
@@ -30,16 +29,6 @@ var EmoticonsFilter = function(megaChat) {
     });
 
     return this;
-};
-
-EmoticonsFilter.prototype.replaceTag = function(content, source, targetStart, targetEnd) {
-    var div = $('<div>').append(content);
-    var lis = div.find(source);
-    lis.each(function() {
-        var elem = $(this);
-        elem.replaceWith(targetStart + elem.text() + targetEnd);
-    });
-    return div.html();
 };
 
 EmoticonsFilter.prototype.processMessage = function(e, eventData) {
@@ -100,11 +89,7 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
     if (!messageContents) {
         return; // ignore, maybe its a system message (or composing/paused composing notification)
     }
-    // the rtf convertion of ` and ``` so anything in between will not be interpreted by emoji filter.
-    messageContents = messageContents.replace(
-            new RegExp('(^|\\s)`{1}([^`\\n]{1,})`{1}', 'gi'), '$1<pre class="rtf-single">$2</pre>');
-    messageContents = messageContents.replace(
-            new RegExp('(^|\\s)`{3}(\n?)([^`]{1,})`{3}', 'gi'), '$1<pre class="rtf-multi">$3</pre>');
+
     // convert legacy :smile: emojis to utf
     messageContents = messageContents.replace(self.emoticonsRegExp, function(match, p1, p2, p3, p4) {
         var foundSlug = $.trim(p3.toLowerCase());
@@ -149,9 +134,7 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
             'class="emoji big"'
         );
     }
-    // convert ` and ``` back for next step of filter.
-    messageContents = self.replaceTag(messageContents, '.rtf-single', '`', '`');
-    messageContents = self.replaceTag(messageContents, '.rtf-multi', '```', '```');
+
     return messageContents;
 };
 
@@ -169,11 +152,6 @@ EmoticonsFilter.prototype.processOutgoingMessage = function(e, messageObject) {
     if (!contents) {
         return; // ignore, maybe its a system message (or composing/paused composing notification)
     }
-    // the rtf convertion of ` and ``` so anything in between will not be interpreted by emoji filter.
-    contents = contents.replace(
-            new RegExp('(^|\\s)`{1}([^`\\n]{1,})`{1}', 'gi'), '$1<pre class="rtf-single">$2</pre>');
-    contents = contents.replace(
-            new RegExp('(^|\\s)`{3}(\n?)([^`]{1,})`{3}', 'gi'), '$1<pre class="rtf-multi">$3</pre>');
 
     contents = contents.replace(self.emoticonsRegExp, function(match) {
         var origSlug = $.trim(match.toLowerCase());
@@ -193,9 +171,6 @@ EmoticonsFilter.prototype.processOutgoingMessage = function(e, messageObject) {
         }
     });
 
-    // convert ` and ``` back for next step of filter.
-    contents = self.replaceTag(contents, '.rtf-single', '`', '`');
-    contents = self.replaceTag(contents, '.rtf-multi', '```', '```');
     messageObject.textContents = contents;
 };
 

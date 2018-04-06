@@ -2262,6 +2262,7 @@ else if (!b_u) {
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
             'emoticonsFilter_js': {f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1},
             'rtfFilter_js': {f:'js/chat/plugins/rtfFilter.js', n: 'rtfFilter_js', j:1},
+            'btRtfFilter_js': {f:'js/chat/plugins/backtickRtfFilter.js', n: 'btRtfFilter_js', j:1},
             'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},

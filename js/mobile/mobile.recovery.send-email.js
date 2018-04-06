@@ -106,7 +106,7 @@ mobile.recovery.sendEmail = {
                     else if (result === 0) {
 
                         // If the email exists, show a dialog saying they need to check their email
-                        mobile.recovery.sendEmail.showEmailConfirmOverlay();
+                        mobile.showEmailConfirmOverlay();
                     }
                     else {
                         // Otherwise show a generic "Oops, something went wrong" error
@@ -118,17 +118,5 @@ mobile.recovery.sendEmail = {
             // Prevent double taps
             return false;
         });
-    },
-
-    /**
-     * Show a dialog asking the user to check their email
-     */
-    showEmailConfirmOverlay: function() {
-
-        'use strict';
-
-        // Show white background overlay behind the dialog
-        $('.light-overlay').removeClass('hidden');
-        $('.mobile.recovery-check-email-dialog').removeClass('hidden');
     }
 };

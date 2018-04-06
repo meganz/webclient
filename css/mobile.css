@@ -2783,6 +2783,9 @@ div.checkboxOn, div.checkboxOff {
     border-radius: 2px;
     padding: 16px;
 }
+.mobile.cancel-account .confirm-close-account-button {
+    margin: 0 20px 20px 20px;
+}
 .mobile.header-icon {
     width: 36px;
     height: 36px;
@@ -4268,42 +4271,33 @@ div.checkboxOn, div.checkboxOff {
 }
 
 /* Generic page styling */
-
 .mobile.main-block {
     background-color: #fff;
 }
-
 .mobile.main-block .normal-body-text {
     color: #777E82;
     font-size: 15px;
     line-height: 24px;
     margin: 20px 24px;
 }
-
 .mobile .pad-sm {
     padding: 0 12px;
 }
-
 .mobile .mrgn-sm {
     margin: 0 12px;
 }
-
 .mobile .mrgn-md {
     margin: 0 24px;
 }
-
 .mobile .mrgn-b-sm {
     margin: 0 0 12px 0;
 }
-
 .mobile .mrgn-b-md {
     margin: 0 0 24px 0;
 }
-
 .mobile .pad-md {
     padding: 0 24px;
 }
-
 .mobile.main-block .red-heading{
     color: #eb4444;
     font-family: 'source_sans_prosemibold';
@@ -4311,7 +4305,6 @@ div.checkboxOn, div.checkboxOff {
     line-height: 22px;
     margin: 0 24px 0 24px;
 }
-
 .mobile.main-block .sub-heading.gray{
     color: #666;
     font-family: 'source_sans_prosemibold';
@@ -4334,7 +4327,6 @@ select.mobile.dropdown-style {
     -moz-appearance: none;
     appearance: none;
 }
-
 .mobile.select-wrapper::after {
     content: '';
     height: 16px;
@@ -4354,8 +4346,7 @@ select.mobile.dropdown-style {
 }
 .mobile.cta-button.secondary {
     background-color: #fff;
-    border:1px solid #f44;
-    border-box:box-sizing;
+    border: 1px solid #f44;
     color: #f44;
 }
 .mobile.cta-button.active {
@@ -4377,7 +4368,6 @@ select.mobile.dropdown-style {
     opacity: 0.3;
     border-radius: 2px;
 }
-
 .mobile.support-text-field {
     height: 200px;
     padding: 12px 16px;
@@ -4391,27 +4381,22 @@ select.mobile.dropdown-style {
     line-height: 18px;
     font-family: 'source_sans_proregular';
 }
-
 textarea.mobile.support-text-field {
     font-family: 'source_sans_proregular';
 }
-
 .mobile.main-block .radio-button-form {
     display: block;
     position: relative;
     margin: 16px 24px;
 }
-
 .mobile.main-block .mobile.generic-content-block {
     background-color: #fff;
     position: relative;
 }
-
 .mobile.main-block form.inline-labels div {
-    display: inline-block;
+    display: block;
     position: relative;
 }
-
 .mobile.main-block form.inline-labels label {
     font-size: 15px;
     float: none;
@@ -4421,14 +4406,11 @@ textarea.mobile.support-text-field {
     color: #3F3F3F;
     margin-bottom: 17px;
 }
-
 .mobile.main-block form.inline-labels label.active {
     font-family: 'source_sans_prosemibold';
-} 
-
+}
 
 /* Grid view */
-
 .mobile.fm-block.file-manager-block.grid-view {
     background-color: #f5f6f7;
 }

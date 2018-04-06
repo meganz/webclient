@@ -53,7 +53,7 @@ var EmoticonShortcutsFilter = function(megaChat) {
         });
 
         if (formatted) {
-            messageObject.textContents = messageObject.textContents = formatted;
+            messageObject.textContents = formatted;
         }
     });
 

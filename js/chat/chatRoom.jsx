@@ -794,7 +794,9 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
     var megaChat = this.megaChat;
 
+    megaChat.trigger('onPreBeforeSendMessage', messageObject);
     megaChat.trigger('onBeforeSendMessage', messageObject);
+    megaChat.trigger('onPostBeforeSendMessage', messageObject);
 
     return megaChat.plugins.chatdIntegration.sendMessage(
         self,

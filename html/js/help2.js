@@ -104,12 +104,12 @@ var Help = (function() {
             if (newpage !== page && page.substr(0, 4) === 'help') {
                 page = newpage;
 
-                try {
-                    history.pushState({subpage: newpage}, '', '/' + newpage);
-                }
-                catch (ex) {
+                if (hashLogic) {
                     skipHashChange = true;
                     location.hash = '#' + newpage;
+                }
+                else {
+                    history.pushState({subpage: newpage}, '', '/' + newpage);
                 }
             }
         }, 100);
@@ -179,7 +179,8 @@ var Help = (function() {
         $('.d-section-items a, .popular-question-items a, .related-articles-list a').each(function(i,el) {
             var url = $(el).attr('href') || $(el).data('fxhref');
 
-            if (url) {
+            // If not using hash routing (e.g. not an extension), change the link to use / at the start rather than #
+            if (url && !hashLogic) {
                 $(el).attr('href', String(url).replace('#', '/'));
             }
         });

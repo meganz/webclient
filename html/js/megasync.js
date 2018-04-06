@@ -589,7 +589,7 @@ var megasync = (function() {
     };
 
     ns.isInstalled = function (next) {
-        if (!fmconfig.dlThroughMEGAsync) {
+        if (!fmconfig.dlThroughMEGAsync && page !== "download") {
             next(true, false); // next with error=true and isworking=false
         }
         else if (!lastCheckStatus || !lastCheckTime) {

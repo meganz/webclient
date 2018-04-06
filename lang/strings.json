@@ -19016,7 +19016,7 @@
         "context": "Text for an option which will allow users to specify a time offset that the embedded player will start playback."
     },
     "17823": {
-        "text": "Change video resolution",
+        "text": "Player dimensions",
         "context": "Text for an option which will allow users to specify which video resolution the embedded player will use to show videos."
     },
     "17824": {

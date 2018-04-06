@@ -33,7 +33,8 @@ if (typeof process !== 'undefined') {
     }
 }
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
+var is_embed = location.pathname === '/embed' || getCleanSitePath().substr(0, 2) === 'E!';
+var is_karma = !is_embed && /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&
     document.location.host === 'mega' || document.location.protocol === 'mega:';
 var location_sub = document.location.href.substr(0, 16);
@@ -44,7 +45,6 @@ var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
-var is_embed = location.pathname === '/embed' || getCleanSitePath().substr(0, 2) === 'E!';
 
 /**
  * Check if the user is coming from a mobile device

@@ -180,6 +180,7 @@ React.makeElement = React['createElement'];
 	            'callFeedback': CallFeedback,
 	            'presencedIntegration': PresencedIntegration,
 	            'persistedTypeArea': PersistedTypeArea,
+	            'btRtfFilter': BacktickRtfFilter,
 	            'rtfFilter': RtfFilter
 	        },
 	        'chatNotificationOptions': {
@@ -465,8 +466,21 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	Chat.prototype.updateSectionUnreadCount = function () {
+	Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
 	    var self = this;
+
+	    if (!self.favico) {
+	        assert(Favico, 'Favico.js is missing.');
+
+	        $('link[rel="icon"]').attr('href', (location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath) + 'favicon.ico');
+
+	        self.favico = new Favico({
+	            type: 'rectangle',
+	            animation: 'popFade',
+	            bgColor: '#fff',
+	            textColor: '#d00'
+	        });
+	    }
 
 	    var unreadCount = 0;
 
@@ -475,17 +489,24 @@ React.makeElement = React['createElement'];
 	        unreadCount += c;
 	    });
 
+	    unreadCount = unreadCount > 9 ? "9+" : unreadCount;
+
 	    if (self._lastUnreadCount != unreadCount) {
-	        if (unreadCount > 0) {
-	            $('.new-messages-indicator').text(unreadCount > 9 ? "9+" : unreadCount).removeClass('hidden');
+	        if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
+	            $('.new-messages-indicator').text(unreadCount).removeClass('hidden');
 	        } else {
 	            $('.new-messages-indicator').addClass('hidden');
 	        }
 	        self._lastUnreadCount = unreadCount;
 
+	        delay('notifFavicoUpd', function () {
+	            self.favico.reset();
+	            self.favico.badge(unreadCount);
+	        });
+
 	        self.updateDashboard();
 	    }
-	};
+	}, 100);
 
 	Chat.prototype.destroy = function (isLogout) {
 	    var self = this;
@@ -1188,17 +1209,37 @@ React.makeElement = React['createElement'];
 	        if (lastMessage) {
 	            var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
 
-	            var renderableSummary = lastMessage.textContents;
+	            var renderableSummary;
+	            if (lastMessage.renderableSummary) {
+	                renderableSummary = lastMessage.renderableSummary;
+	            } else {
+	                renderableSummary = htmlentities(lastMessage.textContents);
 
-	            if (lastMessage.isManagement && lastMessage.isManagement()) {
-	                renderableSummary = lastMessage.getManagementMessageSummaryText();
-	            } else if (!lastMessage.textContents && lastMessage.dialogType) {
-	                renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+	                if (lastMessage.isManagement && lastMessage.isManagement()) {
+	                    renderableSummary = lastMessage.getManagementMessageSummaryText();
+	                } else if (!lastMessage.textContents && lastMessage.dialogType) {
+	                    renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+	                }
+
+	                var escapeUnescapeArgs = [{ 'type': 'onPreBeforeRenderMessage', 'textOnly': true }, { 'message': { 'textContents': renderableSummary } }, ['textContents', 'messageHtml'], 'messageHtml'];
+
+	                megaChat.plugins.btRtfFilter.escapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+	                renderableSummary = escapeUnescapeArgs[1].message.textContents;
+
+	                renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+	                renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+
+	                escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
+
+	                escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+
+	                renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+
+	                renderableSummary = renderableSummary || "";
+	                renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
+	                renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+	                lastMessage.renderableSummary = renderableSummary;
 	            }
-
-	            renderableSummary = htmlentities(renderableSummary);
-	            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
-	            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
 
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
 
@@ -8241,14 +8282,15 @@ React.makeElement = React['createElement'];
 	        'numberOfEmojisPerRow': 9
 	    },
 	    categoryLabels: {
+	        'frequently_used': l[17737],
 	        'people': l[8016],
-	        'objects': __('Objects'),
+	        'objects': l[17735],
 	        'activity': l[8020],
 	        'nature': l[8017],
 	        'travel': l[8021],
-	        'symbols': __('Symbols'),
+	        'symbols': l[17736],
 	        'food': l[8018],
-	        'flags': __('Flags')
+	        'flags': l[17703]
 	    },
 	    getDefaultProps: function getDefaultProps() {
 	        return {
@@ -9734,21 +9776,29 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (message instanceof Message) {
+	            if (!message.wasRendered) {
 
-	            if (!message.messageHtml) {
 	                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
+
+	                message.processedBy = {};
+
+	                var evtObj = {
+	                    message: message,
+	                    room: chatRoom
+	                };
+
+	                megaChat.trigger('onPreBeforeRenderMessage', evtObj);
+	                var event = new $.Event("onBeforeRenderMessage");
+	                megaChat.trigger(event, evtObj);
+	                megaChat.trigger('onPostBeforeRenderMessage', evtObj);
+
+	                if (event.isPropagationStopped()) {
+	                    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
+	                    return false;
+	                }
+	                message.wasRendered = 1;
 	            }
 
-	            var event = new $.Event("onBeforeRenderMessage");
-	            megaChat.trigger(event, {
-	                message: message,
-	                room: chatRoom
-	            });
-
-	            if (event.isPropagationStopped()) {
-	                self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
-	                return false;
-	            }
 	            textMessage = message.messageHtml;
 
 	            if (message instanceof Message || typeof message.userId !== 'undefined' && message.userId === u_handle) {
@@ -11614,6 +11664,8 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 
+	    message.source = Message.SOURCE.SENT;
+
 	    self.trigger('onMessageAppended', message);
 	    self.messagesBuff.messages.push(message);
 
@@ -11673,7 +11725,9 @@ React.makeElement = React['createElement'];
 	    var self = this;
 	    var megaChat = this.megaChat;
 
+	    megaChat.trigger('onPreBeforeSendMessage', messageObject);
 	    megaChat.trigger('onBeforeSendMessage', messageObject);
+	    megaChat.trigger('onPostBeforeSendMessage', messageObject);
 
 	    return megaChat.plugins.chatdIntegration.sendMessage(self, messageObject);
 	};

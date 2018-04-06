@@ -187,6 +187,12 @@ function u_checklogin3a(res, ctx) {
         }
         u_attr.flags = Object(u_attr.flags);
 
+        var name = u_attr.firstname || '';
+        if (u_attr.lastname) {
+            name += (name.length ? ' ' : '') + u_attr.lastname;
+        }
+        u_attr.fullname = String(name || u_attr.name || '').trim();
+
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
         if ((typeof u_attr.lup !== 'undefined') && !is_mobile) {
             alarm.planExpired.lastPayment = u_attr.lup;
@@ -205,7 +211,7 @@ function u_checklogin3a(res, ctx) {
             r = 3;      // Fully registered
         }
 
-        if (r == 3) {
+        if (r > 2 && !is_embed) {
             return mBroadcaster.crossTab.initialize(function() {
                 ctx.checkloginresult(ctx, r);
             });
@@ -261,9 +267,11 @@ function u_logout(logout) {
             watchdog.notify('logout');
         }
 
-        // The slideshow and notifications are not applicable for the mobile website
-        if (!is_mobile) {
+        if (typeof slideshow === 'function') {
             slideshow(0, 1);
+        }
+
+        if (typeof notify === 'object') {
             notify.notifications = [];
         }
 
@@ -273,9 +281,10 @@ function u_logout(logout) {
         u_sharekeys = {};
         u_type = false;
         loggedout = true;
-        $('#fmholder').html('');
-        $('#fmholder').attr('class', 'fmholder');
-        M = new MegaData();
+        $('#fmholder').text('').attr('class', 'fmholder');
+        if (window.MegaData) {
+            M = new MegaData();
+        }
         $.hideContextMenu = function () {};
         api_reset();
         if (waitxhr) {

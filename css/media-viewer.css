@@ -37,11 +37,14 @@
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
+.video-theatre-mode .viewer-top-bl {
+    display: block;
+}
 .viewer-bottom-bl {
     top: auto;
     bottom: 0;
-    padding: 8px 11px;
-    height: 64px;
+    padding: 5px 11px;
+    height: 54px;
 }
 .viewer-filename {
     position: absolute;
@@ -190,7 +193,7 @@
     left: 48px;
     top: 50%;
     margin: -33px 0 0 0;
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
     background-position: -188px -670px;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -377,6 +380,7 @@
     background-color: #F52929;
     background-image: url(../images/mega/download-sprite-v8.png);
     background-position: -64px -2285px;
+    background-size: 257px auto; 
 }
 .video-theatre-mode .viewer-image-bl {
     width: 100%;

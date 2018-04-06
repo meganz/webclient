@@ -36,7 +36,6 @@
  *    https://github.com/meganz/webclient/blob/master/LICENCE.md
  *
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
-var dlMethod;
 
 /* jshint -W003 */
 var dlmanager = {
@@ -79,10 +78,12 @@ var dlmanager = {
             }
         }
 
-        mega.achievem.enabled()
-            .done(function() {
-                dlmanager.lmtUserFlags |= dlmanager.LMT_HASACHIEVEMENTS;
-            });
+        if (mega.achievem) {
+            mega.achievem.enabled()
+                .done(function() {
+                    dlmanager.lmtUserFlags |= dlmanager.LMT_HASACHIEVEMENTS;
+                });
+        }
 
         // dlmanager.lmtUserFlags |= dlmanager.LMT_HASACHIEVEMENTS;
     },
@@ -715,11 +716,17 @@ var dlmanager = {
             dl.onDownloadError(dl, code);
         }
 
-        if (code === EKEY) {
+        var eekey = code === EKEY;
+        if (eekey || code === EACCESS) {
             // TODO: Check if other codes should raise abort()
             later(function() {
-                dlmanager.abort(dl, true);
+                dlmanager.abort(dl, eekey);
             });
+
+            if (M.chat) {
+                $('.toast-notification').removeClass('visible');
+                showToast('download', eekey ? l[24] : l[23]);
+            }
         }
     },
 
@@ -1720,6 +1727,10 @@ var dlmanager = {
     getCurrentDownloadsSize: function(sri) {
         var size = 0;
 
+        if (typeof dl_queue === 'undefined') {
+            return size;
+        }
+
         dl_queue
             .filter(isQueueActive)
             .map(function(dl) {
@@ -2055,327 +2066,6 @@ var dlmanager = {
 /** @name dlmanager.LMT_HASACHIEVEMENTS */
 makeEnum(['ISREGISTERED', 'ISPRO', 'HASACHIEVEMENTS'], 'LMT_', dlmanager);
 
-// TODO: move the next functions to fm.js when no possible conflicts
-function fm_tfsorderupd() {
-    M.t = {};
-    $('.transfer-table tr[id]:visible').each(function(pos, node) {
-        var t = String(node.id).split('_').shift();
-        if (['ul', 'dl', 'zip', 'LOCKed'].indexOf(t) === -1) {
-            dlmanager.logger.error('fm_tfsorderupd', 'Unexpected node id: ' + node.id);
-        }
-
-        // if (t !== 'LOCKed') {
-            M.t[pos] = node.id;
-            M.t[node.id] = pos;
-        // }
-    });
-    if (d) {
-        dlmanager.logger.info('M.t', M.t);
-    }
-    return M.t;
-}
-
-function fm_tfspause(gid, overquota) {
-    if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Ivalid GID to pause')) {
-        if (gid[0] === 'u') {
-            ulQueue.pause(gid);
-        }
-        else {
-            dlQueue.pause(gid);
-        }
-        if (typeof overquota === 'undefined') {
-            overquota = dlmanager.isOverQuota;
-        }
-
-        if (page === 'download') {
-            if (overquota === true) {
-                setTransferStatus(gid, l[1673]);
-                $('.download.file-info').addClass('overquota');
-            }
-            $('.download .pause-transfer span').text(l[9118]);
-            $('.download.scroll-block').addClass('paused-transfer');
-            $('.download.eta-block span').text('');
-            $('.download.speed-block .dark-numbers').text('');
-            $('.download.speed-block .light-txt').text(l[1651]).addClass('small');
-        }
-        else {
-            var $tr = $('.transfer-table tr#' + gid);
-
-            if ($tr.hasClass('transfer-started')) {
-                $tr.find('.eta').text('').addClass('unknown');
-                $tr.find('.speed').text(l[1651]).addClass('unknown');
-            }
-            $tr.addClass('transfer-paused');
-            $tr.removeClass('transfer-started');
-
-            if (overquota === true) {
-                $tr.addClass('transfer-error');
-                $tr.find('.transfer-status').addClass('overquota').text(l[1673]);
-            }
-            else {
-                $tr.addClass('transfer-queued');
-                $tr.removeClass('transfer-error');
-                $tr.find('.transfer-status').text(l[7227]);
-            }
-
-            if (fminitialized) {
-                // FIXME: do not rely on cached DOM nodes and just queue the paused state for transfers
-                mega.ui.tpp.pause(gid, gid[0] === 'u' ? 'ul' : 'dl');
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
-function fm_tfsresume(gid) {
-    if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
-        if (gid[0] === 'u') {
-            ulQueue.resume(gid);
-
-            if (page !== 'download') {
-                mega.ui.tpp.resume(gid, 'ul');
-            }
-        }
-        else {
-            var $tr = $('.transfer-table tr#' + gid);
-
-            if (page === 'download'
-                    && $('.download.file-info').hasClass('overquota')
-                    || $tr.find('.transfer-status').hasClass('overquota')) {
-
-                if (page === 'download') {
-                    $('.download .pause-transfer').addClass('active');
-                    $('.download.scroll-block').addClass('paused-transfer');
-                }
-
-                if (dlmanager.isOverFreeQuota) {
-                    return dlmanager.showOverQuotaRegisterDialog();
-                }
-
-                return dlmanager.showOverQuotaDialog();
-            }
-            dlQueue.resume(gid);
-
-            if (page !== 'download') {
-                mega.ui.tpp.resume(gid, 'dl');
-            }
-
-            if (page === 'download') {
-                $('.download .pause-transfer span').text(l[9112]);
-                $('.download.scroll-block').removeClass('paused-transfer');
-                $('.download.speed-block .light-txt').text('').removeClass('small');
-            }
-            else {
-                $tr.removeClass('transfer-paused');
-
-                if (!$('.transfer-table tr.transfer-started, .transfer-table tr.transfer-initiliazing').length) {
-
-                    $tr.addClass('transfer-initiliazing')
-                        .find('.transfer-status').text(l[1042]);
-                }
-                else {
-                    $tr.find('.speed, .eta').removeClass('unknown').text('');
-                }
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
-function fm_tfsmove(gid, dir) { // -1:up, 1:down
-    /* jshint -W074 */
-    var tfs = $('#' + gid);
-    var to;
-    var act;
-    var p1;
-    var p2;
-    var i;
-    var x;
-    var mng;
-    gid = String(gid);
-    mng = gid[0] === 'u' ? ulmanager : dlmanager;
-    if (tfs.length !== 1) {
-        mng.logger.warn('Invalid transfer node', gid, tfs);
-        return;
-    }
-
-    if (!GlobalProgress[gid] || GlobalProgress[gid].working.length) {
-        mng.logger.warn('Invalid transfer state', gid);
-        return;
-    }
-
-    if (dir !== -1) {
-        to = tfs.next();
-        act = 'after';
-    }
-    else {
-        to = tfs.prev();
-        act = 'before';
-    }
-
-    var id = to && to.attr('id') || 'x';
-
-    if (!GlobalProgress[id] || GlobalProgress[id].working.length) {
-        if (id !== 'x') {
-            mng.logger.warn('Invalid [to] transfer state', gid, id, to);
-        }
-        return;
-    }
-
-    if (id[0] === gid[0] || "zdz".indexOf(id[0] + gid[0]) !== -1) {
-        to[act](tfs);
-    }
-    else {
-        if (d) {
-            dlmanager.logger.error('Unable to move ' + gid);
-        }
-        return;
-    }
-
-    fm_tfsorderupd();
-
-    var m_prop;
-    var m_queue;
-    var mQueue = [];
-    if (gid[0] === 'z' || id[0] === 'z') {
-        var p = 0;
-        var trick = Object.keys(M.t).map(Number).filter(function(n) {
-                        return !isNaN(n) && M.t[n][0] !== 'u';
-                    });
-        for (i in trick) {
-            if (trick.hasOwnProperty(i)) {
-                ASSERT(i === trick[i] && M.t[i], 'Oops..');
-                var mQ = dlQueue.slurp(M.t[i]);
-                for (x in mQ) {
-                    if (mQ.hasOwnProperty(x)) {
-                        (dl_queue[p] = mQ[x][0].dl).pos = p;
-                        ++p;
-                    }
-                }
-                mQueue = mQueue.concat(mQ);
-            }
-        }
-        // we should probably fix our Array inheritance
-        for (var j = p, len = dl_queue.length; j < len; ++j) {
-            delete dl_queue[j];
-        }
-        dl_queue.length = p;
-        dlQueue._queue = mQueue;
-        return;
-    }
-
-    if (gid[0] === 'u') {
-        m_prop = 'ul';
-        mQueue = ulQueue._queue;
-        m_queue = ul_queue;
-    }
-    else {
-        m_prop = 'dl';
-        mQueue = dlQueue._queue;
-        m_queue = dl_queue;
-    }
-    var t_queue = m_queue.filter(isQueueActive);
-    if (t_queue.length !== m_queue.length) {
-        var m = t_queue.length;
-        i = 0;
-        while (i < m) {
-            (m_queue[i] = t_queue[i]).pos = i;
-            ++i;
-        }
-        m_queue.length = i;
-        while (m_queue[i]) {
-            delete m_queue[i++];
-        }
-    }
-    for (i in mQueue) {
-        if (mQueue[i][0][gid]) {
-            var tmp = mQueue[i];
-            var m_q = tmp[0][m_prop];
-            p1 = Number(i) + dir;
-            p2 = m_q.pos;
-            tmp[0][m_prop].pos = mQueue[p1][0][m_prop].pos;
-            mQueue[p1][0][m_prop].pos = p2;
-            mQueue[i] = mQueue[p1];
-            mQueue[p1] = tmp;
-            p1 = m_queue.indexOf(m_q);
-            tmp = m_queue[p1];
-            m_queue[p1] = m_queue[p1 + dir];
-            m_queue[p1 + dir] = tmp;
-            ASSERT(m_queue[p1].pos === mQueue[i][0][m_prop].pos, 'Huh, move sync error..');
-            break;
-        }
-    }
-}
-
-function fm_tfsupdate() {
-    var i = 0;
-    var u = 0;
-
-    var tfse = M.getTransferElements();
-    if (!tfse) {
-        return false;
-    }
-    var domTable = tfse.domTable;
-
-    var domCompleted = domTable.querySelectorAll('tr.transfer-completed');
-    var completedLen = domCompleted.length;
-    if (completedLen) {
-        var ttl    = M.getTransferTableLengths();
-        var parent = domCompleted[0].parentNode;
-
-        if (completedLen + 4 > ttl.size || M.pendingTransfers > 50 + ttl.used * 4) {
-            // Remove completed transfers filling the whole table
-            while (completedLen--) {
-                parent.removeChild(domCompleted[completedLen]);
-            }
-            mBroadcaster.sendMessage('tfs-dynlist-flush');
-        }
-        else {
-            // Move completed transfers to the bottom
-            while (completedLen--) {
-                parent.appendChild(domCompleted[completedLen]);
-            }
-        }
-    }
-    if ($.transferHeader) {
-        $.transferHeader(tfse);
-    }
-
-    /*$('.transfer-table span.row-number').each(function() {
-        var $this = $(this);
-        $this.text(++i);
-        if ($this.closest('tr').find('.transfer-type.upload').length) {
-            ++u;
-        }
-    });*/
-    var $trs = domTable.querySelectorAll('tr:not(.transfer-completed)');
-    i = $trs.length;
-    while (i--) {
-        if ($trs[i].classList.contains('transfer-upload')) {
-            ++u;
-        }
-    }
-    i = $trs.length - u;
-    for (var k in M.tfsdomqueue) {
-        if (k[0] === 'u') {
-            ++u;
-        }
-        else {
-            ++i;
-        }
-    }
-
-    M.pendingTransfers = i + u;
-    tfse.domUploadBlock.textContent = u || '';
-    tfse.domDownloadBlock.textContent = i || '';
-
-    if (!i && !u) {
-        mega.ui.tpp.hide();
-    }
-}
-
 var dlQueue = new TransferQueue(function _downloader(task, done) {
     if (!task.dl) {
         dlQueue.logger.info('Skipping frozen task ' + task);
@@ -2482,81 +2172,3 @@ DownloadQueue.prototype.push = function() {
 
     return pos;
 };
-
-window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-
-if (localStorage.dlMethod) {
-    dlMethod = window[localStorage.dlMethod];
-}
-else if (is_chrome_firefox & 4) {
-    dlMethod = FirefoxIO;
-}
-else if (window.requestFileSystem) {
-    dlMethod = FileSystemAPI;
-}
-else if (MemoryIO.usable()) {
-    dlMethod = MemoryIO;
-}
-else {
-    dlMethod = FlashIO;
-}
-
-if (typeof dlMethod.init === 'function') {
-    dlMethod.init();
-}
-
-var dl_queue = new DownloadQueue();
-
-if (is_mobile) {
-    dlmanager.ioThrottleLimit = 2;
-    dlmanager.fsExpiryThreshold = 10800;
-    dlmanager.dlMaxChunkSize = 4 * 1048576;
-}
-
-mBroadcaster.once('startMega', function() {
-    'use strict';
-
-    M.onFileManagerReady(true, function() {
-        var prefix = dlmanager.resumeInfoTag + u_handle;
-
-        // automatically resume transfers on fm initialization
-        M.getPersistentDataEntries(prefix)
-            .done(function(entries) {
-                entries = entries.map(function(entry) {
-                    return entry.substr(prefix.length);
-                });
-
-                dbfetch.geta(entries)
-                    .always(function() {
-                        for (var i = entries.length; i--;) {
-                            if (!M.d[entries[i]]) {
-                                entries.splice(i, 1);
-                            }
-                        }
-
-                        if (entries.length) {
-                            var $dialog = $('.fm-dialog.resume-transfer');
-
-                            $('.fm-dialog-close, .cancel', $dialog).rebind('click', function() {
-                                closeDialog();
-
-                                for (var i = entries.length; i--;) {
-                                    M.delPersistentData(prefix + entries[i]);
-                                }
-                            });
-
-                            $('.big-button.red', $dialog).rebind('click', function() {
-                                if (d) {
-                                    dlmanager.logger.info('Resuming transfers...', entries);
-                                }
-
-                                closeDialog();
-                                M.addDownload(entries);
-                            });
-
-                            M.safeShowDialog('resume-transfer', $dialog);
-                        }
-                    });
-            });
-    });
-});

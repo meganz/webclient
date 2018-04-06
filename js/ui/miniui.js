@@ -49,6 +49,11 @@ var uiPlaceholders = function($scope) {
  * @returns {jQuery}
  */
 var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
+    if (typeof saveState === 'function') {
+        initialState = stateChangeCb;
+        stateChangeCb = saveState;
+        saveState = false;
+    }
     $('.radio-txt', $scope).each(function() {
         var $label = $(this);
         var $cbxElement = $label.prev('.checkboxOn, .checkboxOff');
@@ -77,7 +82,7 @@ var uiCheckboxes = function($scope, saveState, stateChangeCb, initialState) {
                 }
             }
             if (stateChangeCb) {
-                stateChangeCb(state);
+                stateChangeCb.call($input.get(0), state);
             }
         };
 

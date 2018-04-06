@@ -3234,30 +3234,6 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
 }
 
 /**
- * Highlights some text inside an element as if you had selected it with the mouse
- * From http://stackoverflow.com/a/987376
- * @param {String} elementId The name of the id
- */
-function selectText(elementId) {
-
-    var range, selection;
-    var text = document.getElementById(elementId);
-
-    if (document.body.createTextRange) {
-        range = document.body.createTextRange();
-        range.moveToElementText(text);
-        range.select();
-    }
-    else if (window.getSelection) {
-        selection = window.getSelection();
-        range = document.createRange();
-        range.selectNodeContents(text);
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
-}
-
-/**
  * addToMultiInputDropDownList
  *
  * Add item from token.input plugin drop down list.

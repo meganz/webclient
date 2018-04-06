@@ -772,6 +772,9 @@
                 node.download = name;
                 node.href = link || zfileEntry.toURL();
 
+                // prevent the beforeunload dispatcher from showing a dialog
+                $.memIOSaveAttempt = dl_id;
+
                 if (!is_chrome_firefox) {
                     node.click();
                 }
@@ -781,6 +784,13 @@
                         myURL.revokeObjectURL(link);
                     });
                 }
+
+                // restore beforeunload behavior...
+                onIdle(function() {
+                    if ($.memIOSaveAttempt === dl_id) {
+                        delete $.memIOSaveAttempt;
+                    }
+                });
             };
 
             var saveFile = function(file) {

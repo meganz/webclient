@@ -63,7 +63,7 @@
 
                 if (folders[i].t & M.IS_SHARED) {
                     sharedFolder += ' shared-folder-item';
-                }  
+                }
                 else if (mega.megadrop.pufs[fid] && mega.megadrop.pufs[fid].s !== 1) {
                     sharedFolder += ' puf-folder';
                 }
@@ -194,8 +194,16 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             if (is_image(selNode)) {
                 items['.preview-item'] = 1;
             }
-            else if (is_video(selNode)) {
-                items['.play-item'] = 1;
+            else {
+                var mediaType = is_video(selNode);
+
+                if (mediaType) {
+                    items['.play-item'] = 1;
+
+                    if (mediaType === 1) {
+                        items['.embedcode-item'] = 1;
+                    }
+                }
             }
         }
 
@@ -246,6 +254,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         // If any of selected items is taken down remove actions from context menu
         if (isTakenDown) {
             delete items['.getlink-item'];
+            delete items['.embedcode-item'];
             delete items['.removelink-item'];
             delete items['.sh4r1ng-item'];
             delete items['.add-star-item'];
@@ -267,6 +276,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     if (folderlink) {
         delete items['.copy-item'];
         delete items['.add-star-item'];
+        delete items['.embedcode-item'];
         delete items['.colour-label-items'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
@@ -467,24 +477,40 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             asyncShow = true;
             M.menuItems()
                 .done(function(items) {
+                    var $menuCMI = $(menuCMI);
+
                     for (var item in items) {
-                        $(menuCMI).filter(item).show();
+                        $menuCMI.filter(item).show();
                     }
 
                     // Hide context menu items not needed for undecrypted nodes
                     if (missingkeys[id]) {
-                        $(menuCMI).filter('.add-star-item').hide();
-                        $(menuCMI).filter('.download-item').hide();
-                        $(menuCMI).filter('.rename-item').hide();
-                        $(menuCMI).filter('.copy-item').hide();
-                        $(menuCMI).filter('.getlink-item').hide();
-                        $(menuCMI).filter('.colour-label-items').hide();
+                        $menuCMI.filter('.add-star-item').hide();
+                        $menuCMI.filter('.download-item').hide();
+                        $menuCMI.filter('.rename-item').hide();
+                        $menuCMI.filter('.copy-item').hide();
+                        $menuCMI.filter('.getlink-item').hide();
+                        $menuCMI.filter('.embedcode-item').hide();
+                        $menuCMI.filter('.colour-label-items').hide();
                     }
                     else if (M.getNodeShare(id).down === 1) {
-                        $(menuCMI).filter('.copy-item').hide();
+                        $menuCMI.filter('.copy-item').hide();
                     }
                     else if (items['.getlink-item']) {
                         onIdle(M.setContextMenuGetLinkText.bind(M));
+
+                        if (items['.play-item']) {
+                            var $playItem = $menuCMI.filter('.play-item');
+
+                            if (is_video(M.d[id]) === 2) {
+                                $playItem.find('i').removeClass('videocam').addClass('play')
+                                    .end().find('span').text(l[17828]);
+                            }
+                            else {
+                                $playItem.find('i').removeClass('play').addClass('videocam')
+                                    .end().find('span').text(l[16275]);
+                            }
+                        }
                     }
 
                     onIdle(showContextMenu);

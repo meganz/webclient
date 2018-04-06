@@ -251,6 +251,7 @@ function init_page() {
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
+        $.playbackTimeOffset = parseInt(ar[2]) | 0;
 
         if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
@@ -1677,20 +1678,8 @@ function topmenuUI() {
         $menuItem = undefined;
     }
 
-    if (u_type === 3) {
-        var name = '';
-
-        if (u_attr.firstname) {
-            name = u_attr.firstname;
-        }
-        if (u_attr.lastname) {
-            name += (name.length ? ' ' : '') + u_attr.lastname;
-        }
-        name = name || u_attr.name;
-
-        if (name) {
-            $topHeader.find('.user-name').text(name).removeClass('hidden');
-        }
+    if (u_type === 3 && u_attr.fullname) {
+        $topHeader.find('.user-name').text(u_attr.fullname).removeClass('hidden');
     }
 
     // Show language in top menu
@@ -2386,10 +2375,6 @@ function parsepage(pagehtml, pp) {
             translate(pages['transferwidget']) + pagehtml)
         .show();
 
-    $(window).rebind('resize.subpage', function () {
-        M.zoomLevelNotification();
-    });
-
     $('body').addClass('bottom-pages');
     $('body, html, .bottom-pages .fmholder').stop().animate({
         scrollTop: 0
@@ -2533,4 +2518,8 @@ mBroadcaster.once('boot_done', function() {
     M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', {murSeed: 0x800F0002});
     attribCache.bitMapsManager = new MegaDataBitMapManager();
+
+    $(window).rebind('resize.subpage', function() {
+        M.zoomLevelNotification();
+    });
 });

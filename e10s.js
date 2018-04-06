@@ -15,8 +15,11 @@
 		var path = String(l.hash || l.pathname).substr(1);
 
 		if (!path || (!~path.indexOf('.') && path.substr(0,5) !== 'linux')) {
-			
-			return '#' + path + l.search;
+			var embed = '';
+			if (String(l.pathname).indexOf('/embed') != -1) {
+				embed = 'E';
+			}
+			return '#' + embed + path + l.search;
 		}
 
 		return l.hash + l.search;

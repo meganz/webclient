@@ -786,11 +786,11 @@
                 }
 
                 // restore beforeunload behavior...
-                onIdle(function() {
+                setTimeout(function() {
                     if ($.memIOSaveAttempt === dl_id) {
                         delete $.memIOSaveAttempt;
                     }
-                });
+                }, 4e3);
             };
 
             var saveFile = function(file) {

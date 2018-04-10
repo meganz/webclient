@@ -1080,8 +1080,15 @@ a.account-manage-button:hover {
     text-overflow: ellipsis;
     overflow: hidden;
 }
-body.kr .chart.data .of-txt, .chart.data .pecents-txt, .chart.data .gb-txt {
-    font-size: 13px;
+body.kr .chart.data .of-txt, body.kr .chart.data .pecents-txt, body.kr .chart.data .gb-txt {
+    font-size: 14px;
+    display: inline-block;
+    line-height: 20px;
+    float: left;
+}
+body.kr .chart.data .pecents-txt, body.kr .chart.data .gb-txt {
+    display: block;
+    margin-right: 4px;
 }
 .chart.data .perc-txt {
     font-size: 34px;

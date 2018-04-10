@@ -2331,10 +2331,12 @@ function pagemetadata()
 	{
 		mega_title = 'Takedown Guidance - MEGA';
 	}
-	else
-	{
-		mega_title = 'MEGA';
-	}
+    else if (typeof Object(window.dlmanager).isStreaming === 'object') {
+        mega_title = 'MEGA - ' + dlmanager.isStreaming._megaNode.name;
+    }
+    else {
+        mega_title = 'MEGA';
+    }
 	if (!mega_desc) mega_desc = 'We make secure cloud storage simple. Create an account and get 50 GB free on MEGA\'s end-to-end encrypted cloud collaboration platform today!';
 	$('meta[name=description]').remove();
     $('head').append( '<meta name="description" content="' + mega_desc + '">');

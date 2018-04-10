@@ -1010,12 +1010,12 @@ Call.prototype._fire = function(evName) {
 Call.prototype._startOrJoin = function(av) {
     var self = this;
     self._callInitiateAvFlags = av;
-    self._getLocalStream(av)
-    .catch(function(err) {
+    var pms = self._getLocalStream(av);
+    pms.catch(function(err) {
+        self.logger.log("Call.getLocalStream returned error:", err);
         self._destroy(Term.kErrLocalMedia, true, err);
-        return Promise.reject(err);
-    })
-    .then(function() {
+    });
+    pms.then(function() {
         if (self.isJoiner) {
             self._join();
         } else {

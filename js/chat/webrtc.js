@@ -380,8 +380,7 @@ RtcModule.prototype._getLocalStream = function(av) {
         }
     }, 1000);
 
-    var pms = MegaPromise.asMegaPromiseProxy(
-        RTC.getUserMedia({audio: true, video: true})
+    var pms = RTC.getUserMedia({audio: true, video: true})
         .catch(function(error) {
             self.logger.warn("getUserMedia: Failed to get audio+video, trying audio-only...");
             return RTC.getUserMedia({audio: true, video: false});
@@ -400,9 +399,9 @@ RtcModule.prototype._getLocalStream = function(av) {
                 msg = "Exception in final catch handler of getUserMedia: "+err;
             }
             return Promise.resolve(msg);
-        }));
+        });
     assert(self.localMediaPromise, "getUserMedia executed synchronously");
-    self.localMediaPromise = MegaPromise.asMegaPromiseProxy(pms
+    self.localMediaPromise = pms
         .then(function(stream) {
             resolved = true;
             if (typeof stream === 'string') {
@@ -419,13 +418,12 @@ RtcModule.prototype._getLocalStream = function(av) {
                 }
             }
             delete self.localMediaPromise;
-            resolved = true;
             if (Object.keys(self.calls).length !== 0) {// all calls were destroyed meanwhile
                 return Promise.resolve(stream);
             }
-        }));
+        });
     setTimeout(function() {
-        if (pms.state() === 'pending') {
+        if (!resolved) {
             pms.resolve("timeout");
         }
     }, RtcModule.kMediaGetTimeout);

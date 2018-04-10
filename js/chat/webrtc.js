@@ -616,7 +616,7 @@ Call.prototype._getLocalStream = function(av) {
         })
         .then(function(stream) {
             if (self.state > CallState.kInProgress) {
-                return Promise.reject("getLocalStream: Call killed (or went into state "+constStateToText(CallState, this.state)+") while obtaining local stream");
+                return Promise.reject("getLocalStream: Call killed (or went into state "+constStateToText(CallState, self.state)+") while obtaining local stream");
             }
             self._setState(CallState.kHasLocalStream);
         });
@@ -1148,7 +1148,6 @@ Call.prototype.hangup = function(reason) {
         this.logger.warn("Don't know what term code to send in state", constStateToText(Term, this.state));
         break;
     }
-    this.logger.warn("Sending CALL_TERMINATE on call in state", this.state);
     // in any state, we just have to send CALL_TERMINATE and that's all
     return this._destroy(term, true);
 };
@@ -1382,12 +1381,8 @@ Session.prototype._createRtcConn = function() {
     };
     conn.onaddstream = function(event) {
         self.remoteStream = event.stream;
-        self._setState(SessState.kInProgress);
         self._remoteStream = self.remoteStream;
         self._fire("onRemoteStreamAdded", self.remoteStream);
-        var player = self.mediaWaitPlayer = document.createElement('video');
-        RTC.attachMediaStream(player, self.remoteStream);
-        // self.waitForRemoteMedia();
     };
     conn.onremovestream = function(event) {
         self.self.remoteStream = null;
@@ -1408,6 +1403,7 @@ Session.prototype._createRtcConn = function() {
         } else if (state === 'failed') {
             self.terminateAndDestroy(Term.kErrIceFail);
         } else if (state === 'connected') {
+            self._setState(SessState.kInProgress);
             self._tsIceConn = Date.now();
             self.call._notifySessionConnected(self);
         }
@@ -1670,10 +1666,16 @@ Session.prototype.msgSessTerminate = function(packet) {
     var self = this;
     assert(packet.data.length >= 1);
     self.cmd(RTCMD.SESS_TERMINATE_ACK);
-
+    if (self.state === SessState.kDestroyed) {
+        this.logger.warn("msgSessTerminate executed for a session that is in kDestroyed state - it should have been removed from the sessions map of the call");
+        return;
+    }
     if (self.state === SessState.kTerminating && this.terminateAckCallback) {
         // handle terminate as if it were an ack - in both cases the peer is terminating
         self.msgSessTerminateAck(packet);
+    }
+    if (self.state === SessState.kDestroyed) {
+        return;
     }
     self._setState(SessState.kTerminating);
     self._destroy(packet.data.charCodeAt(8) | Term.kPeer);

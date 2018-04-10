@@ -161,6 +161,9 @@
 
 
     function FileSelectHandlerMegaSyncClick(e) {
+        if (page.indexOf('/chat/') > -1) {
+            return true;
+        }
         if (useMegaSync === -1) {
             e.preventDefault();
             e.stopPropagation();
@@ -322,6 +325,11 @@
         if (localStorage.testMediaInfo) {
             return MediaInfoLib.test(files);
         }
+        if (localStorage.testGetID3CoverArt) {
+            return getID3CoverArt(files[0]).then(function(ab) {
+                console.info('getID3CovertArt result', mObjectURL([ab], 'image/jpeg'));
+            }).catch(console.debug.bind(console));
+        }
         if (localStorage.testStreamerThumbnail) {
             return M.require('videostream').tryCatch(function() {
                 Streamer.getThumbnail(files[0])
@@ -414,6 +422,15 @@
         return true;
     }
 
+    function onDragStartHandler(e) {
+        if ((e.target && e.target.toString && e.target.toString() === '[object Text]')
+            || page.indexOf('/fm/') === -1) {
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+        }
+    }
+
     // initialize
     scope.InitFileDrag = function() {
         var i = 5;
@@ -446,6 +463,7 @@
         document.getElementsByTagName("body")[0].addEventListener("dragover", fnHover, false);
         document.getElementsByTagName("body")[0].addEventListener("dragleave", fnLeave, false);
         document.getElementsByTagName("body")[0].addEventListener("drop", fnHandler, false);
+        document.getElementsByTagName("body")[0].addEventListener("dragstart", onDragStartHandler, false);
 
 
         if (is_chrome_firefox) {

@@ -1,0 +1,23 @@
+/* Unique language styling 
+   Update the standard font family from Source Sans Pro to Noto Naskh non latin/cyrillic text
+   */
+
+/* Thai .th */
+@font-face {
+    font-family: 'noto_sans_thai';
+    src: url('../fonts/international-text/NotoSansThaiUI-Regular.ttf') format('truetype');
+    font-style: normal;
+}
+@font-face {
+    font-family: 'noto_sans_thai_semibold';
+    src: url('../fonts/international-text/NotoSansThaiUI-SemiBold.ttf') format('truetype');
+    font-style: normal;
+}
+
+body.th, body.th div, body.th span, body.th input, body.th form, body.th label, body.th textarea, body.th option, body.th select  {
+    font-family: 'noto_sans_thai', 'source_sans_proregular';
+}
+
+body.th .message.user-card-name {
+    font-family: 'noto_sans_thai_semibold', 'source_sans_prosemibold';
+}

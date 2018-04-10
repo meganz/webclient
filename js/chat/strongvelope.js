@@ -330,13 +330,13 @@ var strongvelope = {};
      *     Verification result.
      * @private
      */
-    strongvelope._verifyMessage = function(message, signature, pubKey) {
+    strongvelope._verifyMessage = function(message, signature, pubKey, chatId) {
 
         var messageBytes = asmCrypto.string_to_bytes('strongvelopesig' + message);
         var signatureBytes = asmCrypto.string_to_bytes(signature);
         var keyBytes = asmCrypto.string_to_bytes(pubKey);
 
-        return backgroundNacl.sign.detached.verify(messageBytes, signatureBytes, keyBytes);
+        return backgroundNacl.sign.detached.verify(messageBytes, signatureBytes, keyBytes, 'svlp:' + chatId);
     };
 
 
@@ -750,8 +750,10 @@ var strongvelope = {};
                 var verifyPromise = ns._verifyMessage(
                     parsedMessage.signedContent,
                     parsedMessage.signature,
-                    pubEd25519[message.userId]
+                    pubEd25519[message.userId],
+                    self.chatRoom.chatId
                 );
+
                 var proxyPromise = new MegaPromise();
 
                 verifyPromise.done(function() {
@@ -790,9 +792,11 @@ var strongvelope = {};
                     proxyPromise.resolve(result);
                 })
                 .fail(function(arg) {
-                    logger.critical('Signature invalid for message from *** on ***');
-                    logger.error('Signature invalid for message from '
-                                 + message.userId + ' on ' + message.ts);
+                    if (arg !== 0xDEAD) {
+                        logger.critical('Signature invalid for message from *** on ***');
+                        logger.error('Signature invalid for message from '
+                            + message.userId + ' on ' + message.ts);
+                    }
 
                     proxyPromise.reject(arg);
                 });
@@ -1640,14 +1644,19 @@ var strongvelope = {};
         if (parsedMessage) {
             var proxyPromise = new MegaPromise();
 
-            var verifyPromise = ns._verifyMessage(String.fromCharCode(parsedMessage.protocolVersion) +
-                                  String.fromCharCode(parsedMessage.type) + senderKey + parsedMessage.signedContent,
-                                  parsedMessage.signature,
-                                  pubEd25519[sender]);
+            var verifyPromise = ns._verifyMessage(
+                String.fromCharCode(parsedMessage.protocolVersion) +
+                    String.fromCharCode(parsedMessage.type) + senderKey + parsedMessage.signedContent,
+                parsedMessage.signature,
+                pubEd25519[sender],
+                this.chatRoom.chatId
+            );
 
-            verifyPromise.fail(function() {
-                logger.critical('Signature invalid for message from *** on ***');
-                logger.error('Signature invalid for message from ' + sender);
+            verifyPromise.fail(function(arg) {
+                if (arg !== 0xDEAD) {
+                    logger.critical('Signature invalid for message from *** on ***');
+                    logger.error('Signature invalid for message from ' + sender);
+                }
                 proxyPromise.reject(false);
             });
 

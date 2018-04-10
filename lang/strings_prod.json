@@ -199,6 +199,10 @@
         "text": "If you do not wish to wait, you may wish to consider signing up for a bandwidth package that also gives you ample extra storage.",
         "context": ""
     },
+    "129": {
+        "text": "Upgrade to PRO",
+        "context": "Pro refers to the name of the storage & bandwidth packeges we sell to our users. This can be translated to something localized, however it should always be the same throughout all other texts"
+    },
     "135": {
         "text": "Error",
         "context": ""
@@ -410,6 +414,10 @@
     "368": {
         "text": "Caution:",
         "context": ""
+    },
+    "371": {
+        "text": "Copied to clipboard",
+        "context": "Text of the button after the links were copied to the clipboard"
     },
     "372": {
         "text": "Upload",
@@ -2323,6 +2331,10 @@
         "text": "MEGAsync",
         "context": "Name of the application, should be exactly the same in most languages (except probably languages like Chinese and perhaps some others)"
     },
+    "1642": {
+        "text": "The link has been copied to the clipboard",
+        "context": "Notification message launched when a link to a file has been copied succesfully to the clipboard."
+    },
     "1647": {
         "text": "Pause",
         "context": ""
@@ -3767,6 +3779,10 @@
         "text": "UNLIMITED",
         "context": "File Size: UNLIMITED"
     },
+    "7098": {
+        "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
+        "context": "Information on the over bandwidth quota dialog."
+    },
     "7100": {
         "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the number of minutes they need to wait."
@@ -3789,6 +3805,10 @@
     },
     "7111": {
         "text": "Credit Card",
+        "context": ""
+    },
+    "7136": {
+        "text": "seconds",
         "context": ""
     },
     "7138": {
@@ -6759,6 +6779,10 @@
         "text": "You have successfully logged into the account %1, we will now proceed to migrate your ephemeral account contents to your Cloud Drive's Inbox.",
         "context": "A message which is shown when an ephemeral account user tries to register an account and instead they are logged in because they used a valid existing account. What happens then is that the ephemeral account's files and folders are migrated to the logged in user's Inbox. Please leave the %1 placeholder which is replaced with an email address."
     },
+    "16518": {
+        "text": "View on MEGA",
+        "context": "Finder context menu option to view a synced file through the web browser within your MEGA account."
+    },
     "16528": {
         "text": "Enter an email or MEGA contact name",
         "context": "This is used as placeholder text for the input field on the sharing and add contact dialogs."
@@ -7210,6 +7234,10 @@
     "16671": {
         "text": "Download using the MEGA desktop app for faster downloads.",
         "context": "A message about the MEGAsync application which allows the user to download files faster and more reliably."
+    },
+    "16763": {
+        "text": "Copied to the clipboard",
+        "context": "success alert when the user copy some messages to the clipboard"
     },
     "16861": {
         "text": "Install the MEGA desktop client",
@@ -7696,7 +7724,7 @@
         "context": "A message to summarise the total number of file versions (X1) and total storage usage (X2) of the versioned files. Please keep the placeholders [X1] and [X2] as they will be replaced at runtime."
     },
     "17586": {
-        "text": "Downloading canceled in MEGAsync",
+        "text": "Download canceled in MEGAsync",
         "context": "Downloading status text which appears when a download gets canceled in MEGAsync."
     },
     "17590": {
@@ -7704,7 +7732,7 @@
         "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
     },
     "17591": {
-        "text": "Cannot get downloading status from MEGAsync",
+        "text": "Cannot get download status from MEGAsync",
         "context": "Download status text which appears when MEGAsync stops sending status updates. This is possibly due to a crash in MEGAsync. We don't have a screenshot for this case (it's a rare one). However the attached screenshot will show the location of this text."
     },
     "17592": {
@@ -7760,7 +7788,7 @@
         "context": "Download status text which appears when the download is in its final stage at MEGAsync. Usually this is a very quick stage and wont be noticed unless the user was on a very slow PC. The screenshot shows the text location."
     },
     "17605": {
-        "text": "Downloading failed in MEGAsync",
+        "text": "Download failed in MEGAsync",
         "context": "Downloading status text which appears if the download failed somehow on the MEGAsync side. The screenshot shows the text location."
     },
     "17606": {
@@ -7815,6 +7843,10 @@
         "text": "Download key",
         "context": "A button label on the mobile webclient which allows the user to download the Recovery Key to a text file."
     },
+    "17703": {
+        "text": "Flags",
+        "context": "The title of the category in the emoji picker dialog which allows picking a flag emoji to be added to the message."
+    },
     "17704": {
         "text": "Wait",
         "context": "text button to be shown in a dialog for the user to choose some operation to wait. (E.g. if an operation such as decryption takes usually less then one minute, and we detect it does exceed that time, we give the user the chance to abort it or to continue waiting)"
@@ -7834,6 +7866,18 @@
     "17733": {
         "text": "Open this file in the mobile app",
         "context": "A button on the downloads page for the user to open the file-link in the mobile app."
+    },
+    "17735": {
+        "text": "Objects",
+        "context": "This is used in the emoji picker dialog as a title for a category of physical object related emojis e.g. phones, computers, TV etc)."
+    },
+    "17736": {
+        "text": "Symbols",
+        "context": "This is used in the emoji picker dialog as a title of a category of symbol related emojis e.g. the heart emoji."
+    },
+    "17737": {
+        "text": "Frequently Used",
+        "context": "This is used in the emoji picker dialog as the title for the category of frequently used emojis. Please translate the text in the case as seen here, not the screenshot where the website automatically uppercases it."
     },
     "17738": {
         "text": "Hello, join me on MEGA and get access to encrypted storage and communication.",
@@ -7908,8 +7952,8 @@
         "context": "A dialog warning box sub-message which appears if MEGAsync stopped responding.\r\n"
     },
     "17797": {
-        "text": "Download sent to MEGASync",
-        "context": "A toast appears when the user download something while integrating with MEGASync"
+        "text": "Download sent to MEGAsync",
+        "context": "A toast appears when the user download something while integrating with MEGAsync"
     },
     "17799": {
         "text": "folders containing a total of",
@@ -7948,11 +7992,11 @@
         "context": "A heading on a page in the mobile webclient. This page lets the user type or paste in their Recovery Key to recover their account."
     },
     "17810": {
-        "text": "Alternatively, you can upload your exported Recovery Key text file.",
+        "text": "Alternatively, you can read your Recovery Key from the previously exported text file.",
         "context": "A message on the Recover Account page in mobile webclient. This means they can select the .txt file on their computer and the program will retrieve the key from it."
     },
     "17811": {
-        "text": "Upload Recovery Key",
+        "text": "Read Recovery Key From File",
         "context": "A button on the mobile webclient to let the user select the Recovery Key .txt file so the account recovery process can continue."
     },
     "17812": {
@@ -7962,5 +8006,21 @@
     "17813": {
         "text": "I do not have my Recovery Key",
         "context": "The heading of the page where the user can request to park their account because they do not have their Recovery Key."
+    },
+    "17822": {
+        "text": "Start video at",
+        "context": "Text for an option which will allow users to specify a time offset that the embedded player will start playback."
+    },
+    "17823": {
+        "text": "Player dimensions",
+        "context": "Text for an option which will allow users to specify which video resolution the embedded player will use to show videos."
+    },
+    "17824": {
+        "text": "When you remove the link of a file, the embedded player also gets disabled. Would you like to continue?",
+        "context": "A warning dialog message to let the user know that removing a public link will also disable the embedded player."
+    },
+    "17828": {
+        "text": "Play Audio",
+        "context": "a context-menu button to let user start streaming audio files."
     }
 }

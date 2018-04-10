@@ -354,8 +354,8 @@
                             '<i class="small-icon icons-sprite revert-small-arrow"></i>' +
                             '</div>';
                     // if the user does not have full access of the shared folder.
-                    if ((nodeData && (nodeData.r < 2)) || ((i === 0)
-                            && (fileversioning.getTopNodeSync(current_sel_version) === v.h))) {
+                    if ((nodeData && (nodeData.r < 2)) || (fileversioning.dvState === 1) ||
+                    ((i === 0) && (fileversioning.getTopNodeSync(current_sel_version) === v.h))) {
                         revertBtnHtml = '<div class="button revert-file disabled nonclickable" title="' +
                             l[16475] + '" id=' + 'vrv_' + v.h + '>' +
                             '<i class="small-icon icons-sprite revert-small-arrow disabled nonclickable"></i>' +
@@ -453,7 +453,7 @@
             var refreshHeader = function(fileHandle) {
                 if (((fileHandle === fh)
                         && (fileversioning.getTopNodeSync(fileHandle) === current_sel_version))
-                        || (nodeData && (nodeData.r < 2))) {
+                        || (nodeData && (nodeData.r < 2)) || (fileversioning.dvState === 1)) {
                     $('.fm-versioning .pad .top-column .default-white-button .reverted-clock')
                         .parent()
                         .addClass("disabled nonclickable");

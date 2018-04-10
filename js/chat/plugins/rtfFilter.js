@@ -12,8 +12,6 @@ var RtfFilter = function(megaChat) {
     self.regexps = {};
     self.regexps['(^|\\s)\\*{1,2}([^\\*\\n]{1,})\\*{1,2}'] = ['gi', '$1<strong>$2</strong>', '$1 $2'];
     self.regexps['(^|\\s)_{1,2}([^_\\n]{1,})_{1,2}'] = ['gi', '$1<em class="rtf-italic">$2</em>', '$1 $2'];
-    self.regexps['(^|\\s)`{1}([^`\\n]{1,})`{1}'] = ['gi', '$1<pre class="rtf-single">$2</pre>', '$1 $2'];
-    self.regexps['(^|\\s)`{3}(\n?)([^`]{1,})`{3}'] = ['gi', '$1<pre class="rtf-multi">$3</pre>', '$1 $3'];
     self.regexps['^&gt;(.*)'] = ['gm', '<pre class="rtf-quote">$1</pre>', '$1']; // support > style.
 
     megaChat.bind("onBeforeRenderMessage", function(e, eventData) {

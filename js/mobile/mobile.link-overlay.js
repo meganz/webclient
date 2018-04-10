@@ -254,9 +254,21 @@ mobile.linkOverlay = {
         'use strict';
 
         var $closeButton = this.$overlay.find('.fm-dialog-close');
+        var $closeTextButton =this.$overlay.find('.text-button');
 
         // Add tap handler
         $closeButton.off('tap').on('tap', function() {
+
+            // Hide overlay
+            mobile.linkOverlay.$overlay.addClass('hidden');
+
+            // Re-show the file manager and re-enable scrolling
+            $('.mobile.file-manager-block').removeClass('hidden disable-scroll');
+
+            // Prevent clicking the menu button behind
+            return false;
+        });
+        $closeTextButton.off('tap').on('tap', function() {
 
             // Hide overlay
             mobile.linkOverlay.$overlay.addClass('hidden');

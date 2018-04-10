@@ -14,7 +14,7 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
 
     var worker = [];
     var instances = [];
-    var wid = mRandomToken(url);
+    var wid = url + '!' + rand(1e11);
 
     var terminator = function() {
         delay('createworkers:terminator:' + wid,
@@ -138,7 +138,7 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
              * @param publicKey
              * @returns {MegaPromise}
              */
-            'verify': function(msg, sig, publicKey) {
+            'verify': function(msg, sig, publicKey, tagName) {
                 var masterPromise = new MegaPromise();
 
                 if (!backgroundNacl.workers) {
@@ -149,11 +149,28 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
                         mega.maxWorkers,
                         0
                     );
+
+                    backgroundNacl.workers._taggedTasks = {};
+
+                    backgroundNacl.workers.removeTasksByTagName = function(tagName) {
+                        if (backgroundNacl.workers._taggedTasks[tagName]) {
+                            var tasks = backgroundNacl.workers._taggedTasks[tagName];
+                            for (var i = tasks.length - 1; i >= 0; i--) {
+                                if (tasks[i]) {
+                                    backgroundNacl.workers.filter(tasks[i].taskId);
+                                    tasks[i].reject(0xDEAD);
+                                }
+                            }
+
+                            backgroundNacl.workers._taggedTasks[tagName] = [];
+                        }
+                    };
                 }
 
+                var taskId = (tagName ? tagName + "_" : "") + "req" + (x++);
                 backgroundNacl.workers.push(
                     [
-                        "req" + (x++),
+                        taskId,
                         [
                             "verify", msg, sig, publicKey
                         ]
@@ -164,6 +181,20 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
                         );
                     }
                 );
+                masterPromise.taskId = taskId;
+
+                if (tagName) {
+                    if (!backgroundNacl.workers._taggedTasks[tagName]) {
+                        backgroundNacl.workers._taggedTasks[tagName] = [];
+                    }
+                    backgroundNacl.workers._taggedTasks[tagName].push(masterPromise);
+
+                    masterPromise.always(function() {
+                        if (backgroundNacl.workers._taggedTasks[tagName]) {
+                            array.remove(backgroundNacl.workers._taggedTasks[tagName], masterPromise);
+                        }
+                    });
+                }
 
                 return masterPromise;
             }

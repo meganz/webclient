@@ -201,7 +201,8 @@
                             else {
                                 myContacts.push({
                                     id: Object.keys(sortedChats[chati].members).length,
-                                    name: gNames, handle: sortedChats[chati].roomId, isG: true
+                                    name: gNames[0], handle: sortedChats[chati].roomId, isG: true,
+                                    gMembers: gNames
                                 });
                             }
                             nbOfRecent++;
@@ -241,7 +242,7 @@
                     ctElem = createContactEntry(myContacts[a].name, myContacts[a].id, myContacts[a].handle);
                 }
                 else {
-                    ctElem = createGroupEntry(myContacts[a].name, myContacts[a].id, myContacts[a].handle);
+                    ctElem = createGroupEntry(myContacts[a].gMembers, myContacts[a].id, myContacts[a].handle);
                 }
                 contactGeneratedList = contactGeneratedList + ctElem;
             }

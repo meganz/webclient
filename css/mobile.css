@@ -5772,6 +5772,7 @@ textarea.mobile.support-text-field {
     margin: 0 0;
     text-align: left;
     color: white;
+    font-family: 'source_sans_proregular';
 } 
 /* Make sure Free plan is shown after registration */
 body.key .reg-st3-membership-bl.free.hidden {

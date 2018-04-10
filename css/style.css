@@ -21027,6 +21027,9 @@ div.camera-bottom-txt {
     white-space: nowrap;
     left: -3px;
 }
+body.kr .account.chart.data {
+    margin: 9px 0 0 74px;
+} 
 .account.upgrade-account {
     padding: 21px 0 0 0;
     text-align: right;

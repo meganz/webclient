@@ -238,6 +238,14 @@ function topmenuUI() {
         $('.dropdown-item.login-item').find('i').removeClass('hidden').end().find('.login-text').text(l[16345]);
     }
 
+    if (is_mobile) {
+        var $wrapper = $('.video-wrapper');
+        $wrapper.addClass('mobile-mode');
+    }
+    else {
+        return false;
+    }
+
     var $wrapper = $('.video-wrapper');
     $('body').rebind('click.bodyw', function() {
         if (!$wrapper.hasClass('share-option')) {

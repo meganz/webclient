@@ -269,16 +269,18 @@ ul, li {
 }
 .mobile.white-block {
     width: calc(100% - 40px);
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
+    max-width: 420px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
     background-color: white;
-    -webkit-box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.06);
-    -moz-box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.06);
-    box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.06);
+    border: 1px solid #eee;
+    -webkit-box-shadow: 0px 1px 20px 10px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 20px 10px rgba(0,0,0,0.05);
+    box-shadow: 0px 1px 20px 10px rgba(0,0,0,0.05);
     display: inline-block;
-    margin: -30px 0 0 0;
-    padding: 13px;
+    margin: 0 0 0 0;
+    padding: 8px;
     font-size: 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -286,24 +288,26 @@ ul, li {
     white-space: nowrap;
 }
 .mobile.filetype-img {
-    width: 72px;
+    width: 60px;
     margin: 0 auto;
     position: relative;
     top: -48px;
 }
 .mobile.filename {
-    font-size: 20px;
+    font-size: 15px;
     line-height: 20px;
     color: #444;
     word-break: break-all;
-    white-space: normal;
-    padding: 0 0 0 0;
+    padding: 0 0;
     margin: -32px 15px 0 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
     font-family: 'source_sans_prosemibold';
 }
 .mobile.public-link {
-    font-size: 20px;
-    line-height: 20px;
+    font-size: 15px;
+    line-height: 22px;
 }
 .mobile.na-file-txt {
     font-size: 20px;
@@ -315,11 +319,11 @@ ul, li {
 }
 .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
     font-size: 14px;
-    line-height: 24px;
+    line-height: 21px;
     letter-spacing: 0px;
     color: #AAAAAA;
     padding: 0 23px;
-    margin: 8px 0 0 0;
+    margin: 4px 0;
     display: inline-block;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -408,15 +412,15 @@ ul, li {
 }
 .mobile.red-button, .mobile.download-progress .bar, .mobile.upload-progress .bar {
     color: white;
-    font-size: 20px;
+    font-size: 14px;
     display: block;
-    height: 64px;
-    line-height: 60px;
+    height: 48px;
+    line-height: 47px;
     /* Rectangle 7: */
     background: #F0373A;
     border: 1px solid #D82928;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 1px 1px 0 rgba(255,255,255,0.20);
-    margin-top: 2px;
+    margin-top: 8px;
     position: relative;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -5570,7 +5574,7 @@ textarea.mobile.support-text-field {
     display: block;
 }
 .mobile.video .video-progress-block {
-    padding: 11px 84px 20px 82px;
+    padding: 11px 98px 20px 94px;
 }
 .mobile.video .video-progress-bar {
     display: block;
@@ -5732,15 +5736,11 @@ textarea.mobile.support-text-field {
 .mobile.video.video-theatre-mode .video-timing {
     height: 28px;
     line-height: 27px;
-    width: 40px;
+    width: 52px;
 }
 .mobile.video.video-theatre-mode .viewer-button.fs {
     margin: 0;
 } 
-.mobile.download:not(.video-theatre-mode) video {
-    display: none;
-}
-
 .mobile.video .download.video-block[data-fullscreen="true"] {
     height: 100%;
 }
@@ -5752,7 +5752,7 @@ textarea.mobile.support-text-field {
     height: 48px;
 }
 .video-theatre-mode .video-block[data-fullscreen="true"] .video-progress-block {
-    padding: 16px 84px 20px 82px;
+    padding: 15px 98px 20px 94px;
 }
 .video-theatre-mode .video-block[data-fullscreen="true"] .viewer-button.playpause {
     margin: 5px 0 0 0;
@@ -5785,17 +5785,8 @@ body.key .reg-st3-membership-bl.free.hidden {
         height: 420px;
         background-image: url(../images/mobile/ipad-mid@2x.png);
     }
-    .mobile.white-block {
-        width: 360px;
-        padding: 8px;
-        margin: 0 0 14px 0;
-    }
     .mobile.file-download-info, .mobile.file-upload-info {
         margin: 0 auto;
-    }
-    .mobile.filename {
-        font-size: 15px;
-        line-height: 20px;
     }
     .mobile.public-link {
         font-size: 15px;
@@ -5879,6 +5870,9 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 60px) / 4);
     }
+    .mobile.white-block {
+        width: 360px;
+    }
 }
 
 @media only screen and (orientation:portrait) and (max-height: 1280px) {
@@ -5935,11 +5929,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile.app-info.bottom {
         display: none;
     }
-    .mobile.white-block {
-        width: 360px;
-        padding: 8px;
-        margin: 0 0;
-    }
     .mobile.filetype-img {
         width: 56px;
         top: -38px;
@@ -5954,13 +5943,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile.filesize, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.upload-percents {
         margin: 3px 0 0 0;
         font-size: 14px;
-    }
-    .mobile.filename {
-        font-size: 15px;
-        line-height: 20px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow:ellipsis;
     }
     .mobile.inline-buttons .mobile.red-button {
         line-height: 40px;
@@ -6016,7 +5998,6 @@ body.key .reg-st3-membership-bl.free.hidden {
         padding: 0 18px 18px 18px;
         margin: -32px 0 0 0;
     }
-    /* Grid view */
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 36px) / 2);
     }
@@ -6056,11 +6037,6 @@ body.key .reg-st3-membership-bl.free.hidden {
 @media only screen and (orientation:landscape) and (max-width: 670px), only screen and (orientation:portrait) and (max-height: 670px) {
     .mobile.white-block {
         width: calc(100% - 32px);
-        padding: 8px;
-        margin: 0 0;
-        -moz-border-radius: 2px;
-        -webkit-border-radius: 2px;
-        border-radius: 2px;
     }
     .mobile.grey-textarea {
         margin: 0 0 9px 0;
@@ -6075,13 +6051,7 @@ body.key .reg-st3-membership-bl.free.hidden {
         height: 176px;
     }
     .mobile.filename {
-        font-size: 15px;
-        line-height: 20px;
         margin: -32px 15px -1px 15px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow:ellipsis;
-        letter-spacing: 0px;
     }
     .mobile.public-link {
         font-size: 15px;

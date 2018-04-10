@@ -1308,11 +1308,21 @@ var exportExpiry = {
         var $linkContent = $linksDialog.find('.export-content-block');
         var html = '';
         var scroll = '.export-link-body';
-        var links = $.trim(getClipboardLinks());
+        var links;
         var $span = $('.copy-to-clipboard span');
         var toastTxt;
         var linksNum;
-        var success;
+        var centerDialog = function() {
+            $linksDialog.css('margin-top',
+                $linksDialog.outerHeight() / 2 * -1 - $('.export-links-warning:visible').outerHeight() / 2);
+        };
+        var getContentsToClip = function() {
+            if ($('.fm-tab.tab-embed-link', $linksDialog).hasClass('active')) {
+                toastTxt = l[371];
+                return $('.code-field .code', $linksDialog).text();
+            }
+            return $.trim(getClipboardLinks());
+        };
 
         deleteScrollPanel(scroll, 'jsp');
 
@@ -1328,6 +1338,14 @@ var exportExpiry = {
 
         $linksDialog.addClass('file-keys-view');
 
+        $('.fm-tab', $linksDialog).removeClass('active');
+        $('.fm-dialog-title', $linksDialog).text(l[1031]);
+        $('.preview-embed', $linksDialog).addClass('hidden');
+        $('.fm-dialog-tab', $linksDialog).addClass('hidden');
+        $('.embed-content-block', $linksDialog).addClass('hidden');
+        $('.export-content-block', $linksDialog).removeClass('hidden');
+        $('.export-link-body', $linksDialog).siblings().removeClass('hidden');
+
         // Generate content
         html = itemExportLink();
 
@@ -1337,6 +1355,110 @@ var exportExpiry = {
             return true;
         }
         $linksDialog.find('.export-link-body').safeHTML(html);
+
+        // Embed code handling
+        var n = Object($.itemExport).length === 1 && M.d[$.itemExport[0]];
+        if ($.itemExportEmbed || is_video(n) === 1) {
+            var link = getBaseUrl() + '/embed#!' + n.ph + '!' + a32_to_base64(n.k);
+            var iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen></iframe>\n';
+            var setCode = function() {
+                var time = 0;
+                var width = 0;
+                var height = 0;
+                var $time = $('.start-video-at .embed-setting', $linksDialog);
+                var $vres = $('.change-video-resolution .embed-setting', $linksDialog);
+                var getValue = function(s, c) {
+                    var $input = $(s, c);
+                    var value = String($input.val() || '').replace(/\.\d*$/g, '').replace(/\D/g, '');
+                    value = parseInt(value || $input.attr('min') || '0') | 0;
+                    $input.val(value);
+                    return value;
+                };
+                if (!$time.hasClass('disabled')) {
+                    time = getValue('input', $time);
+                }
+                if (!$vres.hasClass('disabled')) {
+                    width = getValue('.width-video input', $vres);
+                    height = getValue('.height-video input', $vres);
+                }
+                var code = iframe
+                    .replace('%w', width > 0 && height > 0 ? width : 640)
+                    .replace('%h', width > 0 && height > 0 ? height : 360)
+                    .replace('%s', link + (time > 0 ? '!' + time + 's' : ''));
+                $('.code-field .code', $linksDialog).text(code);
+            };
+
+            uiCheckboxes($('.settings-container', $linksDialog), function(enabled) {
+                var $row = $(this).closest('.settings-row');
+                var $setting = $('.embed-setting', $row);
+
+                if (enabled) {
+                    $setting.removeClass('disabled').find('input').prop('readonly', false).rebind('input', setCode);
+                }
+                else {
+                    $setting.addClass('disabled').find('input').prop('readonly', true).unbind('input');
+                }
+                setCode();
+            });
+            $('.fm-dialog-tab', $linksDialog).removeClass('hidden');
+
+            (function _() {
+                var $block = $('.fm-tab-wrapper', $linksDialog);
+                $('.fm-tab', $block).removeClass('active').rebind('click', _);
+
+                if (this === window || $(this).is('.tab-embed-link')) {
+                    $('.fm-tab.tab-embed-link', $block).addClass('active');
+                    // $('.preview-embed', $linksDialog).removeClass('hidden');
+                    $('.embed-content-block', $linksDialog).removeClass('hidden');
+                    $('.export-content-block', $linksDialog).addClass('hidden');
+                    $('.fm-dialog-title', $linksDialog).text(l[1344] + ' (' + l[17407] + ')');
+                }
+                else {
+                    $('.fm-tab.tab-url-link', $block).addClass('active');
+                    $('.preview-embed', $linksDialog).addClass('hidden');
+                    $('.embed-content-block', $linksDialog).addClass('hidden');
+                    $('.export-content-block', $linksDialog).removeClass('hidden');
+                    $('.fm-dialog-title', $linksDialog).text(l[1031]);
+                    deleteScrollPanel(scroll, 'jsp');
+                }
+                centerDialog();
+            }).call($.itemExportEmbed ? window : {});
+            $.itemExportEmbed = null;
+
+            $('.video-filename span', $linksDialog).text(n.name);
+            $('.video-attributes .size', $linksDialog).text(bytesToSize(n.s));
+            $('.video-attributes .duration', $linksDialog).text(secondsToTimeShort(MediaAttribute(n).data.playtime));
+
+            var $thumb = $('.video-thumbnail img', $linksDialog).attr('src', noThumbURI);
+            getImage(n, 1).then(function(uri) {
+                $thumb.attr('src', uri);
+            }).catch(console.debug.bind(console));
+
+            $('.code-field .code', $linksDialog).rebind('click', function() {
+                selectText('embed-code-field');
+                return false;
+            });
+
+            $('.preview-embed', $linksDialog).rebind('click', function() {
+                if ($(this).text() !== l[1899]) {
+                    $(this).text(l[148]);
+                    $('.video-thumbnail-container', $linksDialog).addClass('hidden');
+                    $('.video-player-container', $linksDialog).removeClass('hidden')
+                        .safeHTML(iframe.replace('%s', link));
+                }
+                else {
+                    $(this).text(l[1899]);
+                    $('.video-thumbnail-container', $linksDialog).removeClass('hidden');
+                    $('.video-player-container', $linksDialog).addClass('hidden').text('');
+                }
+                $linksDialog.css('margin-top', $linksDialog.outerHeight() / 2 * -1);
+            });
+
+            // Let's hide it for now...
+            $('.preview-embed', $linksDialog).addClass('hidden');
+
+            setCode();
+        }
 
         // Reset state from previous dialog opens and pre-select the 'Link with key' option by default
         $linkContent.removeClass('public-handle decryption-key full-link').addClass('full-link');
@@ -1348,10 +1470,12 @@ var exportExpiry = {
             $linksDialog.removeClass('hidden');
             $('.export-links-warning').removeClass('hidden');
 
+            if (page === 'download') {
+                $('.export-link-body', $linksDialog).siblings().addClass('hidden');
+            }
+
             $(scroll).jScrollPane({showArrows: true, arrowSize: 5});
             jScrollFade(scroll);
-
-            $linksDialog.css('margin-top', $linksDialog.outerHeight() / 2 * -1);
 
             setTimeout(function() {
                 $('.file-link-info').rebind('click', function() {
@@ -1359,6 +1483,7 @@ var exportExpiry = {
                 });
             }, 300);
 
+            centerDialog();
             return $linksDialog;
         });
 
@@ -1375,34 +1500,9 @@ var exportExpiry = {
 
         // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
         if (is_extension || M.execCommandUsable()) {
-            if (!is_chrome_firefox) {
-                $('.fm-dialog-chrome-clipboard').removeClass('hidden');
-            }
-
             $('.copy-to-clipboard').rebind('click', function() {
-                success = true;
-                links = $.trim(getClipboardLinks());
-
-                // If extension, use the native extension method
-                if (is_chrome_firefox) {
-                    mozSetClipboard(links);
-                }
-                else {
-                    // Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
-                    $('#chromeclipboard').html(links);
-                    selectText('chromeclipboard');
-                    try {
-                        success = document.execCommand('copy');
-                    }
-                    catch (e) {
-                        console.error(e);
-                        success = false;
-                    }
-                }
-
-                if (success) {
-                    showToast('clipboard', toastTxt);
-                }
+                copyToClipboard(getContentsToClip(), toastTxt);
+                return false;
             });
         }
         else if (flashIsEnabled()) {
@@ -1419,7 +1519,7 @@ var exportExpiry = {
             $('.copy-to-clipboard').rebind('mouseover.copyToClipboard', function() {
                 var e = $('#clipboardswf1')[0];
                 if (e && e.setclipboardtext) {
-                    e.setclipboardtext(getClipboardLinks());
+                    e.setclipboardtext(getContentsToClip());
                 }
             });
             $('.copy-to-clipboard').rebind('mousedown.copyToClipboard', function() {
@@ -1431,7 +1531,7 @@ var exportExpiry = {
 
             if (uad.icon === 'ie.png' && window.clipboardData) {
                 $('.copy-to-clipboard').rebind('click', function() {
-                    links = $.trim(getClipboardLinks());
+                    links = getContentsToClip();
                     var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
                     window.clipboardData.setData(mode, links);
                     showToast('clipboard', toastTxt);
@@ -1445,9 +1545,9 @@ var exportExpiry = {
                             if (d) {
                                 console.log('onCopyEvent', arguments);
                             }
-                            links = $.trim(getClipboardLinks());
+                            links = getContentsToClip();
                             ev.clipboardData.setData('text/plain', links);
-                            if (1) {
+                            if (links[0] !== '<') {
                                 ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
                                     return '<a href="' + link + '"></a>';
                                 }).join("<br/>\n"));
@@ -1508,9 +1608,11 @@ var exportExpiry = {
             return false;
         });
 
-        // Initialise the Export Link expiry and password protect features
-        exportExpiry.init();
-        exportPassword.encrypt.init();
+        if (page !== 'download') {
+            // Initialise the Export Link expiry and password protect features
+            exportExpiry.init();
+            exportPassword.encrypt.init();
+        }
     };
 
 
@@ -1737,31 +1839,42 @@ var exportExpiry = {
      * Get public link for file or folder.
      */
     ExportLink.prototype.getExportLink = function() {
+        var nodes = this.options.nodesToProcess || false;
 
-        var self = this;
+        if (!nodes.length) {
+            return this.logger.warn('No nodes provided to export...', this);
+        }
 
         // Add some logging for usage comparisons
-        if (is_mobile) {
-            api_req({ a: 'log', e: 99634, m: 'Created public link on mobile webclient' });
+        if (page === 'download') {
+            eventlog(99683); // Share public link on downloads page.
+        }
+        else if (is_mobile) {
+            eventlog(99634); // Created public link on mobile webclient
         }
         else {
-            api_req({ a: 'log', e: 99635, m: 'Created public link on regular webclient' });
+            eventlog(99635); // Created public link on regular webclient
         }
 
-        // Prompt copyright dialog and if accepted get link, otherwise stall
-        if (self.options.nodesToProcess.length) {
-            loadingDialog.show();
-            self.logger.debug('getExportLink');
+        loadingDialog.show();
+        this.logger.debug('getExportLink');
 
-            $.each(self.options.nodesToProcess, function(index, nodeId) {
-                // ToDo: Improve conditions use .getNodeByHandle()
-                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
-                    self._getFolderExportLinkRequest(nodeId);
+        for (var i = 0; i < nodes.length; i++) {
+            var h = nodes[i];
+            var n = M.d[h];
+
+            if (n) {
+                if (n.t) {
+                    this._getFolderExportLinkRequest(h);
                 }
-                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
-                    self._getExportLinkRequest(nodeId);
+                else {
+                    this._getExportLinkRequest(h);
                 }
-            });
+            }
+            else {
+                loadingDialog.hide();
+                this.logger.warn('Invalid node to export...', h);
+            }
         }
     };
 
@@ -2004,10 +2117,12 @@ var exportExpiry = {
      * Shows the copyright warning dialog.
      *
      * @param {Array} nodesToProcess Array of strings, node ids
+     * @param {*} [isEmbed] Whether we're opening the dialog with the embed-code tab focused.
      */
-    var initCopyrightsDialog = function(nodesToProcess) {
+    var initCopyrightsDialog = function(nodesToProcess, isEmbed) {
         'use strict';
 
+        $.itemExportEmbed = isEmbed;
         $.itemExport = nodesToProcess;
 
         var openGetLinkDialog = function() {

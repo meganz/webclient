@@ -4751,5 +4751,10 @@
     "17818": "Location",
     "17819": "Do you want to delete this version?",
     "17820": "It will be permanently removed",
-    "17821": "Previous Versions"
+    "17821": "Previous Versions",
+    "17822": "Start video at",
+    "17823": "Player dimensions",
+    "17824": "When you remove the link of a file, the embedded player also gets disabled. Would you like to continue?",
+    "17825": "My QR Code:",
+    "17828": "Play Audio"
 }

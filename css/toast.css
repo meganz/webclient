@@ -1,7 +1,7 @@
 /**
  * CSS for the desktop and mobile toast notifications
  */
-.toast-notification {
+ .toast-notification {
     width: 100%;
     max-width: 507px;
     position: fixed;
@@ -26,7 +26,7 @@
     -ms-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
     transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
     cursor: default;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
@@ -182,6 +182,16 @@
     -moz-box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.1);
     box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.1);
 }
+.second-line-message {
+    color: #939DA3;
+    font-size: 13px;
+    z-index: 9;
+    margin-top: 4px;
+    line-height: 16px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
 /* Megasync transfer */
 .toast-notification.megasync-transfer {
     width: 720px;
@@ -202,7 +212,7 @@
     display: inline-block;
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
     vertical-align: top;
     margin: 2px 9px 0 1px;
     background-position: -198px -1240px;

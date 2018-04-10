@@ -46,14 +46,15 @@ var DropdownEmojiSelector = React.createClass({
      "OBJECTS & SYMBOLS": l[8022]
      */
     categoryLabels: {
+        'frequently_used': l[17737],
         'people': l[8016],
-        'objects': __('Objects'),
+        'objects': l[17735],
         'activity': l[8020],
         'nature': l[8017],
         'travel': l[8021],
-        'symbols': __('Symbols'),
+        'symbols': l[17736],
         'food': l[8018],
-        'flags': __('Flags'),
+        'flags': l[17703]
     },
     getDefaultProps: function() {
         return {
@@ -179,7 +180,7 @@ var DropdownEmojiSelector = React.createClass({
 
                         // custom categories order
                         self.data_categories.push('frequently_used');
-                        self.data_categoriesWithCustomOrder = []
+                        self.data_categoriesWithCustomOrder = [];
                         self.customCategoriesOrder.forEach(function(catName) {
                             self.data_categoriesWithCustomOrder.push(
                                 self.data_categories.indexOf(catName)

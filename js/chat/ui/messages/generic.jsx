@@ -306,23 +306,31 @@ var GenericConversationMessage = React.createClass({
 
         // if this is a text msg.
         if (message instanceof Message) {
-            // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
-            if (!message.messageHtml) {
+            if (!message.wasRendered) {
+                // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
                 message.messageHtml = htmlentities(
                     message.textContents
                 ).replace(/\n/gi, "<br/>");
+
+                message.processedBy = {};
+
+                var evtObj = {
+                    message: message,
+                    room: chatRoom
+                };
+
+                megaChat.trigger('onPreBeforeRenderMessage', evtObj);
+                var event = new $.Event("onBeforeRenderMessage");
+                megaChat.trigger(event, evtObj);
+                megaChat.trigger('onPostBeforeRenderMessage', evtObj);
+
+                if (event.isPropagationStopped()) {
+                    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
+                    return false;
+                }
+                message.wasRendered = 1;
             }
 
-            var event = new $.Event("onBeforeRenderMessage");
-            megaChat.trigger(event, {
-                message: message,
-                room: chatRoom
-            });
-
-            if (event.isPropagationStopped()) {
-                self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
-                return false;
-            }
             textMessage = message.messageHtml;
 
 

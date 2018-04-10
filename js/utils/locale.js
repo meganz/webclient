@@ -201,6 +201,66 @@ function time2lastSeparator(dateString, refDate) {
 }
 
 /**
+ * Gets the current UNIX timestamp
+ * @returns {Number} Returns an integer with the current UNIX timestamp (in seconds)
+ */
+function unixtime() {
+    'use strict';
+    return Math.round(Date.now() / 1000);
+}
+
+function uplpad(number, length) {
+    'use strict';
+    var str = String(number);
+    while (str.length < length) {
+        str = '0' + str;
+    }
+    return str;
+}
+
+function secondsToTime(secs, html_format) {
+    'use strict';
+
+    if (isNaN(secs) || secs === Infinity) {
+        return '--:--:--';
+    }
+    if (secs < 0) {
+        return '';
+    }
+
+    var hours = uplpad(Math.floor(secs / (60 * 60)), 2);
+    var divisor_for_minutes = secs % (60 * 60);
+    var minutes = uplpad(Math.floor(divisor_for_minutes / 60), 2);
+    var divisor_for_seconds = divisor_for_minutes % 60;
+    var seconds = uplpad(Math.floor(divisor_for_seconds), 2);
+    var returnvar = hours + ':' + minutes + ':' + seconds;
+
+    if (html_format) {
+        hours = (hours !== '00') ? (hours + '<span>h</span> ') : '';
+        returnvar = hours + minutes + '<span>m</span> ' + seconds + '<span>s</span>';
+    }
+    return returnvar;
+}
+
+function secondsToTimeShort(secs) {
+    'use strict';
+    var val = secondsToTime(secs);
+
+    if (!val) {
+        return val;
+    }
+
+    if (val.substr(0, 1) === "0") {
+        val = val.substr(1, val.length);
+    }
+    if (val.substr(0, 2) === "0:") {
+        val = val.substr(2, val.length);
+    }
+
+    return val;
+}
+
+/**
  * Calculate the number of days since the given date
  * @param {String} dateStr The date string, in YYYY-MM-DD format
  * @returns {Number} the number of days

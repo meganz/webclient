@@ -530,13 +530,16 @@
     width: 18px;
 }
 .medium-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
 }
 .medium-icon.icons-img.chain {
         background-position: -237px -129px;
+}
+.medium-icon.icons-img.share {
+        background-position: -230px -1005px;
 }
 .medium-icon.icons-img.arrow-in-circle {
         background-position: -47px -631px;
@@ -816,15 +819,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -832,7 +835,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -858,6 +861,11 @@
 }
 .small-icon.context.remove-link {
     background-position: -200px -165px;
+    width: 22px;
+    margin: 6px 13px 1px -1px;
+}
+.small-icon.context.embed {
+    background-position: -233px -873px;
     width: 22px;
     margin: 6px 13px 1px -1px;
 }
@@ -1005,6 +1013,9 @@
 }
 .dropdown-item:hover .small-icon.context.remove-link {
     background-position: -240px -165px;
+}
+.dropdown-item:hover .small-icon.context.embed {
+    background-position: -233px -909px;
 }
 .dropdown-item:hover .small-icon.context.share {
     background-position: -139px -172px;
@@ -1215,7 +1226,7 @@
     background-position: -192px -781px;
 }
 i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
@@ -1231,6 +1242,11 @@ i.icons-sprite {
 }
 .medium-icon.icons-sprite.download.save {
     background-position: -106px -953px;
+}
+.medium-icon.icons-sprite.share {
+    background-position: -194px -1006px;
+    opacity: 0.6;
+    margin-right: 0px;
 }
 .small-icon.icons-sprite.dark-down-arrow {
     background-position: 5px -870px;

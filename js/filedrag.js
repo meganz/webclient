@@ -161,6 +161,9 @@
 
 
     function FileSelectHandlerMegaSyncClick(e) {
+        if (page.indexOf('/chat/') > -1) {
+            return true;
+        }
         if (useMegaSync === -1) {
             e.preventDefault();
             e.stopPropagation();
@@ -321,6 +324,11 @@
 
         if (localStorage.testMediaInfo) {
             return MediaInfoLib.test(files);
+        }
+        if (localStorage.testGetID3CoverArt) {
+            return getID3CoverArt(files[0]).then(function(ab) {
+                console.info('getID3CovertArt result', mObjectURL([ab], 'image/jpeg'));
+            }).catch(console.debug.bind(console));
         }
         if (localStorage.testStreamerThumbnail) {
             return M.require('videostream').tryCatch(function() {

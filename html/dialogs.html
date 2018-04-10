@@ -120,9 +120,6 @@
             </div>
         </div>
         <div class="default-dialog-bottom">
-            <div class="fm-dialog-chrome-clipboard">
-                <div id="chromeclipboard1" class="selectable"></div>
-            </div>
             <div class="default-white-button right copy-to-clipboard"><span>[$63]</span></div>
             <div class="clear"></div>
         </div>
@@ -612,13 +609,21 @@
 <div class="fm-dialog export-links-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$1031]</div>
-        <div class="fm-dialog-chrome-clipboard hidden">
-            <div id="chromeclipboard" class="selectable"></div>
-        </div>
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
     </div>
 
+    <!-- Share link & Embed Tab link -->
+    <div class="fm-dialog-tab hidden">
+        <div class="fm-tab-wrapper">
+            <div class="fm-tab tab-url-link active">
+                <span>[$5622]</span>
+            </div>
+            <div class="fm-tab tab-embed-link">
+                <span>[$17407]</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Please add "expiry-date" class to show new features. Please add "pro-only" class for free accounts !-->
     <div class="export-content-block">
@@ -687,11 +692,82 @@
         </div>
         <div id="export-link-body" class="export-link-body"></div>
     </div>
+
+    <!-- Embed code block - Hidden unless it is selected from the context menu via Embed video or when the tab is selected -->
+    <div class="embed-content-block hidden">
+        <div class="wrapper embed-video">
+            <div class="video-thumbnail-container">
+                <!-- Render video thumnail here. Display using 16:9 ratio, if you can't display normally and the video should centre itself -->
+                <div class="video-thumbnail"><img/></div>
+                <div class="file-information-container">
+                    <div class="video-filename">
+                        <span>bunny.mp4</span>
+                    </div>
+                    <div class="video-attributes">
+                        <span class="size">26 MB</span>
+                        <span class="bullet-point"></span>
+                        <span class="duration">04:30</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Insert iframe here. If the user enables any of the features hide the container `video-thumbnail-container and remove hidden from video-player-container -->
+            <div class="video-player-container hidden"></div>
+        </div>
+        <div class="wrapper embed-code-container">
+            <div class="code-field">
+                <div class="tab-icon embed"></div><span class="code" id="embed-code-field"></span>
+            </div>
+            <div class="fm-subheading">
+                <span>[$6849]</span>
+            </div>
+            <div class="settings-container">
+                <div class="settings-row">
+                    <div class="start-video-at">
+                        <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" id="embed-start-at" class="checkboxOff"/>
+                        </div>
+                        <label for="embed-start-at" class="radio-txt">[$17822]</label>
+                        <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                        <div class="embed-setting disabled">
+                            <div class="start-at-time">
+                                <input type="number" value="0" min="0" readonly/>
+                            </div>
+                            <span class="video-resolution-by">[$7136]</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div class="change-video-resolution">
+                        <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" id="embed-video-res" class="checkboxOff"/>
+                        </div>
+                        <label for="embed-video-res" class="radio-txt">[$17823]</label>
+                        <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                        <div class="embed-setting disabled">
+                            <div class="video-resolution width-video">
+                                <input type="number" value="640" min="128" readonly/>
+                            </div>
+                            <span class="video-resolution-by">x</span>
+                            <div class="video-resolution height-video">
+                                <input type="number" value="360" min="72" readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="fm-notifications-bottom">
         <div class="export-description hidden">
             [$7682]
         </div>
-        <div class="default-white-button right links-button copy-to-clipboard" id="clipboardbtn1">
+        <!-- Preview video should only be visible when the embed video tab is selected -->
+        <div class="default-white-button left preview-embed hidden">
+            <span>[$1899]</span>
+        </div>
+        <div class="default-grey-button right links-button copy-to-clipboard" id="clipboardbtn1">
             <span></span>
         </div>
         <div class="clear"></div>
@@ -2276,6 +2352,8 @@
     <div class="toast-body">
         <div class="toast-col">
             <span></span>
+            <!-- Insert the share link here -->
+            <div class="second-line-message hidden"></div>
         </div>
         <div class="toast-col">
             <div class="toast-button first">
@@ -2291,6 +2369,8 @@
         </div>
     </div>
 </div>
+
+
 
 <div class="toast-notification transfer download">
     <div class="toast-icon"></div>
@@ -3655,8 +3735,7 @@
         <div class="viewer-image-bl hidden" data-fullscreen="false" id="videoContainer">
             <img alt="" />
             <embed type="application/pdf" class="hidden">
-            <video id="video" controls preload="metadata" poster="" data-autoplayvideo="false"  data-playvideoonclick="false"></video>
-
+            <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
             <iframe id="pdfpreviewdiv1" src="about:blank" class="hidden"></iframe>
         </div>
 
@@ -4267,9 +4346,6 @@
 <div class="fm-dialog widget-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$17401]</div>
-        <div class="fm-dialog-chrome-clipboard hidden">
-            <div id="chromeclipboard2" class="selectable"></div>
-        </div>
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
     </div>

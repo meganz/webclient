@@ -1,16 +1,3 @@
-var inherits = (function() {
-    var createObject = Object.create || function createObject(source) {
-        var Host = function() {};
-        Host.prototype = source;
-        return new Host();
-    };
-
-    return function(destination, source) {
-        var proto = destination.prototype = createObject(source.prototype);
-        proto.constructor = destination;
-        proto._super = source.prototype;
-    };
-})();
 
 makeEnum(['MDBOPEN', 'EXECSC', 'LOADINGCLOUD'], 'MEGAFLAG_', window);
 
@@ -195,63 +182,6 @@ function countrydetails(isocode) {
 }
 
 /**
- * Gets the current UNIX timestamp
- * @returns {Number} Returns an integer with the current UNIX timestamp (in seconds)
- */
-function unixtime() {
-    return Math.round(Date.now() / 1000);
-}
-
-function uplpad(number, length) {
-    var str = '' + number;
-    while (str.length < length) {
-        str = '0' + str;
-    }
-    return str;
-}
-
-function secondsToTime(secs, html_format) {
-    'use strict';
-
-    if (isNaN(secs) || secs === Infinity) {
-        return '--:--:--';
-    }
-    if (secs < 0) {
-        return '';
-    }
-
-    var hours = uplpad(Math.floor(secs / (60 * 60)), 2);
-    var divisor_for_minutes = secs % (60 * 60);
-    var minutes = uplpad(Math.floor(divisor_for_minutes / 60), 2);
-    var divisor_for_seconds = divisor_for_minutes % 60;
-    var seconds = uplpad(Math.floor(divisor_for_seconds), 2);
-    var returnvar = hours + ':' + minutes + ':' + seconds;
-
-    if (html_format) {
-        hours = (hours !== '00') ? (hours + '<span>h</span> ') : '';
-        returnvar = hours + minutes + '<span>m</span> ' + seconds + '<span>s</span>';
-    }
-    return returnvar;
-}
-
-function secondsToTimeShort(secs) {
-    var val = secondsToTime(secs);
-
-    if (!val) {
-        return val;
-    }
-
-    if (val.substr(0, 1) === "0") {
-        val = val.substr(1, val.length);
-    }
-    if (val.substr(0, 2) === "0:") {
-        val = val.substr(2, val.length);
-    }
-
-    return val;
-}
-
-/**
  * Convert bytes sizes into a human-friendly format (KB, MB, GB), pretty
  * similar to `bytesToSize` but this function returns an object
  * (`{ size: "23,33", unit: 'KB' }`) which is easier to consume
@@ -399,23 +329,6 @@ function makeObservable(kls) {
     });
 
     target = aliases = kls = undefined;
-}
-
-/**
- * Instantiates an enum-like list on the provided target object
- */
-function makeEnum(aEnum, aPrefix, aTarget, aNorm) {
-    aTarget = aTarget || {};
-
-    var len = aEnum.length;
-    while (len--) {
-        Object.defineProperty(aTarget,
-            (aPrefix || '') + String(aEnum[len]).toUpperCase(), {
-                value: aNorm ? len : (1 << len),
-                enumerable: true
-            });
-    }
-    return aTarget;
 }
 
 /**
@@ -785,57 +698,6 @@ function srvlog2(type /*, ...*/) {
     }
 }
 
-// fire an event log
-function eventlog(id, msg, once) {
-    if ((id = parseInt(id)) >= 99600) {
-        var req = {a: 'log', e: id};
-
-        if (msg === true) {
-            once = true;
-            msg = 0;
-        }
-
-        if (msg) {
-            req.m = String(msg);
-        }
-
-        if (!once || !eventlog.sent[id]) {
-            eventlog.sent[id] = [Date.now(), M.getStack()];
-            api_req(req);
-        }
-    }
-    else {
-        console.error('Invalid event log.', arguments);
-    }
-}
-eventlog.sent = Object.create(null);
-
-function oDestroy(obj) {
-    if (window.d) {
-        ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
-    }
-
-    Object.keys(obj).forEach(function(memb) {
-        if (obj.hasOwnProperty(memb)) {
-            delete obj[memb];
-        }
-    });
-    if (!oIsFrozen(obj)) {
-        Object.defineProperty(obj, ":$:frozen:", {
-            value: String(new Date()),
-            writable: false
-        });
-    }
-
-    if (window.d) {
-        Object.freeze(obj);
-    }
-}
-
-function oIsFrozen(obj) {
-    return obj && typeof obj === 'object' && obj.hasOwnProperty(":$:frozen:");
-}
-
 /**
  * Original: http://stackoverflow.com/questions/7317299/regex-matching-list-of-emoticons-of-various-type
  *
@@ -1121,14 +983,6 @@ function percent_megatitle() {
         $ul_rchart.css('transform', 'rotate(180deg)');
         $ul_lchart.css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
     }
-}
-
-function hostname(url) {
-    if (d) {
-        ASSERT(url && /^http/.test(url), 'Invalid URL passed to hostname() -> ' + url);
-    }
-    url = ('' + url).match(/https?:\/\/([^.]+)/);
-    return url && url[1];
 }
 
 function moveCursortoToEnd(el) {
@@ -1480,41 +1334,6 @@ function generateAnonymousReport() {
 function __(s) { // TODO: waiting for @crodas to commit the real __ code.
     return s;
 }
-
-function MegaEvents() {}
-MegaEvents.prototype.trigger = function(name, args) {
-    if (!(this._events && this._events.hasOwnProperty(name))) {
-        return false;
-    }
-
-    if (d > 1) {
-        console.log(' >>> Triggering ' + name, this._events[name].length, args);
-    }
-
-    args = args || []
-    var done = 0,
-        evs = this._events[name];
-    for (var i in evs) {
-        try {
-            evs[i].apply(null, args);
-        }
-        catch (ex) {
-            console.error(ex);
-        }
-        ++done;
-    }
-    return done;
-};
-MegaEvents.prototype.on = function(name, callback) {
-    if (!this._events) {
-        this._events = {};
-    }
-    if (!this._events.hasOwnProperty(name)) {
-        this._events[name] = [];
-    }
-    this._events[name].push(callback);
-    return this;
-};
 
 (function(scope) {
     var MegaAnalytics = function(id) {

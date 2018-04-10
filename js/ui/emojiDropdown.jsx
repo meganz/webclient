@@ -46,6 +46,7 @@ var DropdownEmojiSelector = React.createClass({
      "OBJECTS & SYMBOLS": l[8022]
      */
     categoryLabels: {
+        'frequently_used': l[17737],
         'people': l[8016],
         'objects': l[17735],
         'activity': l[8020],
@@ -53,8 +54,7 @@ var DropdownEmojiSelector = React.createClass({
         'travel': l[8021],
         'symbols': l[17736],
         'food': l[8018],
-        'flags': l[17703],
-        'frequently_used': l[17737]
+        'flags': l[17703]
     },
     getDefaultProps: function() {
         return {
@@ -180,7 +180,7 @@ var DropdownEmojiSelector = React.createClass({
 
                         // custom categories order
                         self.data_categories.push('frequently_used');
-                        self.data_categoriesWithCustomOrder = []
+                        self.data_categoriesWithCustomOrder = [];
                         self.customCategoriesOrder.forEach(function(catName) {
                             self.data_categoriesWithCustomOrder.push(
                                 self.data_categories.indexOf(catName)
@@ -303,10 +303,6 @@ var DropdownEmojiSelector = React.createClass({
                     (totalEmojis / self.heightDefs.numberOfEmojisPerRow)
                 ) * self.heightDefs.emojiRowHeight;
 
-            var categoryLabel = self.categoryLabels[categoryName] ?
-                self.categoryLabels[categoryName] :
-                categoryName;
-
             return self._cachedNodes[categoryId] = [
                 totalHeight,
                 <div
@@ -320,7 +316,9 @@ var DropdownEmojiSelector = React.createClass({
                     {emojis.length > 0 ? <div className="clear"></div> : null}
                     <div className="emoji-type-txt">
                         {
-                            categoryLabel
+                            self.categoryLabels[categoryName] ?
+                                self.categoryLabels[categoryName] :
+                                categoryName
                         }
                     </div>
 
@@ -478,7 +476,7 @@ var DropdownEmojiSelector = React.createClass({
                 { preview ? preview : <div className="search-block emoji">
                         <i className="small-icon search-icon"></i>
                         <input type="search"
-                               placeholder={l[102]}
+                               placeholder={__(l[102])}
                                ref="emojiSearchField"
                                onChange={this.onSearchChange}
                                value={this.state.searchValue}/>

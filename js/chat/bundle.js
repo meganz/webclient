@@ -180,6 +180,7 @@ React.makeElement = React['createElement'];
 	            'callFeedback': CallFeedback,
 	            'presencedIntegration': PresencedIntegration,
 	            'persistedTypeArea': PersistedTypeArea,
+	            'btRtfFilter': BacktickRtfFilter,
 	            'rtfFilter': RtfFilter
 	        },
 	        'chatNotificationOptions': {
@@ -465,7 +466,7 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	Chat.prototype.updateSectionUnreadCount = function () {
+	Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
 	    var self = this;
 
 	    if (!self.favico) {
@@ -505,7 +506,7 @@ React.makeElement = React['createElement'];
 
 	        self.updateDashboard();
 	    }
-	};
+	}, 100);
 
 	Chat.prototype.destroy = function (isLogout) {
 	    var self = this;
@@ -1208,17 +1209,37 @@ React.makeElement = React['createElement'];
 	        if (lastMessage) {
 	            var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
 
-	            var renderableSummary = lastMessage.textContents;
+	            var renderableSummary;
+	            if (lastMessage.renderableSummary) {
+	                renderableSummary = lastMessage.renderableSummary;
+	            } else {
+	                renderableSummary = htmlentities(lastMessage.textContents);
 
-	            if (lastMessage.isManagement && lastMessage.isManagement()) {
-	                renderableSummary = lastMessage.getManagementMessageSummaryText();
-	            } else if (!lastMessage.textContents && lastMessage.dialogType) {
-	                renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+	                if (lastMessage.isManagement && lastMessage.isManagement()) {
+	                    renderableSummary = lastMessage.getManagementMessageSummaryText();
+	                } else if (!lastMessage.textContents && lastMessage.dialogType) {
+	                    renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+	                }
+
+	                var escapeUnescapeArgs = [{ 'type': 'onPreBeforeRenderMessage', 'textOnly': true }, { 'message': { 'textContents': renderableSummary } }, ['textContents', 'messageHtml'], 'messageHtml'];
+
+	                megaChat.plugins.btRtfFilter.escapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+	                renderableSummary = escapeUnescapeArgs[1].message.textContents;
+
+	                renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+	                renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+
+	                escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
+
+	                escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+
+	                renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+
+	                renderableSummary = renderableSummary || "";
+	                renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
+	                renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+	                lastMessage.renderableSummary = renderableSummary;
 	            }
-
-	            renderableSummary = htmlentities(renderableSummary);
-	            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
-	            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
 
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
 
@@ -6139,7 +6160,7 @@ React.makeElement = React['createElement'];
 	        return React.makeElement(
 	            ModalDialog,
 	            {
-	                title: l[8628],
+	                title: __(l[8628]),
 	                className: classes,
 	                selected: self.state.selected,
 	                onClose: function onClose() {
@@ -8261,6 +8282,7 @@ React.makeElement = React['createElement'];
 	        'numberOfEmojisPerRow': 9
 	    },
 	    categoryLabels: {
+	        'frequently_used': l[17737],
 	        'people': l[8016],
 	        'objects': l[17735],
 	        'activity': l[8020],
@@ -8268,8 +8290,7 @@ React.makeElement = React['createElement'];
 	        'travel': l[8021],
 	        'symbols': l[17736],
 	        'food': l[8018],
-	        'flags': l[17703],
-	        'frequently_used': l[17737]
+	        'flags': l[17703]
 	    },
 	    getDefaultProps: function getDefaultProps() {
 	        return {
@@ -8481,8 +8502,6 @@ React.makeElement = React['createElement'];
 	        if (emojis.length > 0) {
 	            var totalHeight = self.heightDefs.categoryTitleHeight + Math.ceil(totalEmojis / self.heightDefs.numberOfEmojisPerRow) * self.heightDefs.emojiRowHeight;
 
-	            var categoryLabel = self.categoryLabels[categoryName] ? self.categoryLabels[categoryName] : categoryName;
-
 	            return self._cachedNodes[categoryId] = [totalHeight, React.makeElement(
 	                "div",
 	                {
@@ -8497,7 +8516,7 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "div",
 	                    { className: "emoji-type-txt" },
-	                    categoryLabel
+	                    self.categoryLabels[categoryName] ? self.categoryLabels[categoryName] : categoryName
 	                ),
 	                React.makeElement("div", { className: "clear" }),
 	                emojis,
@@ -8646,7 +8665,7 @@ React.makeElement = React['createElement'];
 	                    { className: "search-block emoji" },
 	                    React.makeElement("i", { className: "small-icon search-icon" }),
 	                    React.makeElement("input", { type: "search",
-	                        placeholder: l[102],
+	                        placeholder: __(l[102]),
 	                        ref: "emojiSearchField",
 	                        onChange: this.onSearchChange,
 	                        value: this.state.searchValue })
@@ -9757,21 +9776,29 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (message instanceof Message) {
+	            if (!message.wasRendered) {
 
-	            if (!message.messageHtml) {
 	                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
+
+	                message.processedBy = {};
+
+	                var evtObj = {
+	                    message: message,
+	                    room: chatRoom
+	                };
+
+	                megaChat.trigger('onPreBeforeRenderMessage', evtObj);
+	                var event = new $.Event("onBeforeRenderMessage");
+	                megaChat.trigger(event, evtObj);
+	                megaChat.trigger('onPostBeforeRenderMessage', evtObj);
+
+	                if (event.isPropagationStopped()) {
+	                    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
+	                    return false;
+	                }
+	                message.wasRendered = 1;
 	            }
 
-	            var event = new $.Event("onBeforeRenderMessage");
-	            megaChat.trigger(event, {
-	                message: message,
-	                room: chatRoom
-	            });
-
-	            if (event.isPropagationStopped()) {
-	                self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
-	                return false;
-	            }
 	            textMessage = message.messageHtml;
 
 	            if (message instanceof Message || typeof message.userId !== 'undefined' && message.userId === u_handle) {
@@ -11698,7 +11725,9 @@ React.makeElement = React['createElement'];
 	    var self = this;
 	    var megaChat = this.megaChat;
 
+	    megaChat.trigger('onPreBeforeSendMessage', messageObject);
 	    megaChat.trigger('onBeforeSendMessage', messageObject);
+	    megaChat.trigger('onPostBeforeSendMessage', messageObject);
 
 	    return megaChat.plugins.chatdIntegration.sendMessage(self, messageObject);
 	};

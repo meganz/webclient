@@ -11,7 +11,8 @@ var megasync = (function() {
     var currStatus = l[17794]; // 'Initializing'; // download status from MEGAsync
     var lastCheckTime;
     var lastCheckStatus;
-    var defaultStatusThreshold = 15; // minutes
+    var defaultStatusThreshold = 15 * 60000; // 15 minutes
+    var statusThresholdWhenDifferentUsr = 30000; // 0.5 minutes
     var currBid = -1;
     function getNewBid() {
         currBid = Math.random().toString().substr(2);
@@ -588,17 +589,26 @@ var megasync = (function() {
     };
 
     ns.isInstalled = function (next) {
-        if (!lastCheckStatus || !lastCheckTime) {
+        if (!fmconfig.dlThroughMEGAsync && page !== "download") {
+            next(true, false); // next with error=true and isworking=false
+        }
+        else if (!lastCheckStatus || !lastCheckTime) {
             SyncAPI({ a: "v" }, next);
         }
         else {
             var myNow = Date.now();
             var diff = myNow - lastCheckTime;
-            if (diff >= (defaultStatusThreshold * 60000)) {
+            if (diff >= defaultStatusThreshold) {
                 SyncAPI({ a: "v" }, next);
             }
             else {
-                if (typeof next === "function") {
+                // we found before that MEGAsync is working but with a different logged-in users.
+
+                if (lastCheckStatus && (!ns.currUser || ns.currUser !== u_handle)
+                    && diff >= statusThresholdWhenDifferentUsr) {
+                    SyncAPI({ a: "v" }, next);
+                }
+                else if (typeof next === "function") {
                     next(null, lastCheckStatus);
                 }
             }

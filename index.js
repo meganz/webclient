@@ -251,6 +251,7 @@ function init_page() {
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
+        $.playbackTimeOffset = parseInt(ar[2]) | 0;
 
         if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
@@ -402,7 +403,7 @@ function init_page() {
                 return;
             }
 
-            if (fminitialized && !folderlink) {
+            if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
                 // Clean up internal state in case we're navigating back to a folderlink
                 M.currentdirid = M.RootID = undefined;
                 delete $.onImportCopyNodes;
@@ -500,10 +501,15 @@ function init_page() {
         }
     }
 
+    // If the account has just finished being cancelled
     if (localStorage.beingAccountCancellation) {
         if (is_mobile) {
             parsepage(pages['mobile']);
-            // todo
+
+            // Show message that the account has been cancelled successfully
+            mobile.messageOverlay.show(l[6188], l[6189], function() {
+                loadSubPage('start');
+            });
         }
         else {
             // Insert placeholder page while waiting for user input
@@ -931,24 +937,36 @@ function init_page() {
         }
     }
     else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
-
-        if (u_type) {
-            var ac = new mega.AccountClosure();
-            ac.handleFeedback();
+        if (is_mobile) {
+            if (u_type) {
+                parsepage(pages['mobile']);
+                mobile.account.cancel.init();
+            }
+            else {
+                login_next = page;
+                loadSubPage('login');
+            }
         }
         else {
-            // Unable to cancel, not logged in
-            mega.ui.showLoginRequiredDialog({
-                title: l[6186],
-                textContent: l[5841]
-            })
-            .done(init_page)
-            .fail(function(aError) {
-                if (aError) {
-                    alert(aError);
-                }
-                loadSubPage('start');
-            });
+            // If desktop and logged in
+            if (u_type) {
+                var ac = new mega.AccountClosure();
+                ac.handleFeedback();
+            }
+            else {
+                // Unable to cancel, not logged in
+                mega.ui.showLoginRequiredDialog({
+                    title: l[6186],
+                    textContent: l[5841]
+                })
+                .done(init_page)
+                .fail(function(aError) {
+                    if (aError) {
+                        alert(aError);
+                    }
+                    loadSubPage('start');
+                });
+            }
         }
     }
     else if (page === 'wiretransfer') {
@@ -1660,20 +1678,8 @@ function topmenuUI() {
         $menuItem = undefined;
     }
 
-    if (u_type === 3) {
-        var name = '';
-
-        if (u_attr.firstname) {
-            name = u_attr.firstname;
-        }
-        if (u_attr.lastname) {
-            name += (name.length ? ' ' : '') + u_attr.lastname;
-        }
-        name = name || u_attr.name;
-
-        if (name) {
-            $topHeader.find('.user-name').text(name).removeClass('hidden');
-        }
+    if (u_type === 3 && u_attr.fullname) {
+        $topHeader.find('.user-name').text(u_attr.fullname).removeClass('hidden');
     }
 
     // Show language in top menu
@@ -2369,10 +2375,6 @@ function parsepage(pagehtml, pp) {
             translate(pages['transferwidget']) + pagehtml)
         .show();
 
-    $(window).rebind('resize.subpage', function () {
-        M.zoomLevelNotification();
-    });
-
     $('body').addClass('bottom-pages');
     $('body, html, .bottom-pages .fmholder').stop().animate({
         scrollTop: 0
@@ -2516,4 +2518,8 @@ mBroadcaster.once('boot_done', function() {
     M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', {murSeed: 0x800F0002});
     attribCache.bitMapsManager = new MegaDataBitMapManager();
+
+    $(window).rebind('resize.subpage', function() {
+        M.zoomLevelNotification();
+    });
 });

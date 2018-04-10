@@ -257,17 +257,7 @@ var GenericConversationMessage = React.createClass({
     _startPreview: function(v, e) {
         var chatRoom = this.props.message.chatRoom;
         assert(M.chat, 'Not in chat.');
-        var imagesList = [];
-        chatRoom.images.values().forEach(function(v) {
-            var msg = chatRoom.messagesBuff.getMessageById(v.messageId);
-            if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
-                chatRoom.images.removeByKey(v.id);
-                return;
-            }
-            imagesList.push(v);
-        });
-
-        M.v = imagesList;
+        chatRoom._rebuildAttachments();
 
         slideshow(v.h, undefined, true);
         if (e) {

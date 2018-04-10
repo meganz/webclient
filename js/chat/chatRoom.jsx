@@ -65,6 +65,11 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.shownMessages = {};
     this.attachments = new MegaDataMap(this);
     this.images = new MegaDataSortedMap("id", "orderValue", this);
+    this.images.addChangeListener(function() {
+        if (slideshowid) {
+            self._rebuildAttachments();
+        }
+    });
 
     self.members = {};
 
@@ -1272,6 +1277,50 @@ ChatRoom.prototype.truncate = function() {
         }
     }
 };
+
+ChatRoom.prototype._rebuildAttachments = SoonFc(function() {
+    var self = this;
+
+    var imagesList = [];
+    self.images.values().forEach(function(v) {
+        var msg = self.messagesBuff.getMessageById(v.messageId);
+        if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
+            if (v.id.substr(-8) === slideshowid) {
+
+                var lastNode;
+                var found = false;
+                M.v.forEach(function(node) {
+                    if (!found && node.h !== v.id.substr(-8)) {
+                        lastNode = node.h;
+                    }
+                    if (node.h === v.id.substr(-8)) {
+                        found = true;
+                    }
+
+                });
+
+                if (!lastNode) {
+                    // first item
+                    lastNode = M.v[0];
+                }
+
+                if (!lastNode) {
+                    // no nodes? close
+                    slideshow(undefined, true);
+                }
+                else {
+                    // go back 1 node, since slideshow_steps crashes.
+                    slideshow(lastNode, undefined, true);
+                }
+            }
+            self.images.removeByKey(v.id);
+            return;
+        }
+        imagesList.push(v);
+    });
+
+    M.v = imagesList;
+}, 500);
 
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

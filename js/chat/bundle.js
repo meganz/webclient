@@ -9729,17 +9729,7 @@ React.makeElement = React['createElement'];
 	    _startPreview: function _startPreview(v, e) {
 	        var chatRoom = this.props.message.chatRoom;
 	        assert(M.chat, 'Not in chat.');
-	        var imagesList = [];
-	        chatRoom.images.values().forEach(function (v) {
-	            var msg = chatRoom.messagesBuff.getMessageById(v.messageId);
-	            if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
-	                chatRoom.images.removeByKey(v.id);
-	                return;
-	            }
-	            imagesList.push(v);
-	        });
-
-	        M.v = imagesList;
+	        chatRoom._rebuildAttachments();
 
 	        slideshow(v.h, undefined, true);
 	        if (e) {
@@ -11198,6 +11188,11 @@ React.makeElement = React['createElement'];
 	    this.shownMessages = {};
 	    this.attachments = new MegaDataMap(this);
 	    this.images = new MegaDataSortedMap("id", "orderValue", this);
+	    this.images.addChangeListener(function () {
+	        if (slideshowid) {
+	            self._rebuildAttachments();
+	        }
+	    });
 
 	    self.members = {};
 
@@ -12101,6 +12096,48 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 	};
+
+	ChatRoom.prototype._rebuildAttachments = SoonFc(function () {
+	    var self = this;
+
+	    var imagesList = [];
+	    self.images.values().forEach(function (v) {
+	        var msg = self.messagesBuff.getMessageById(v.messageId);
+	        if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
+	            if (v.id.substr(-8) === slideshowid) {
+
+	                var lastNode;
+	                var found = false;
+	                M.v.forEach(function (node) {
+	                    if (!found && node.h !== v.id.substr(-8)) {
+	                        lastNode = node.h;
+	                    }
+	                    if (node.h === v.id.substr(-8)) {
+	                        found = true;
+	                    }
+	                });
+
+	                if (!lastNode) {
+
+	                    lastNode = M.v[0];
+	                }
+
+	                if (!lastNode) {
+
+	                    slideshow(undefined, true);
+	                } else {
+
+	                    slideshow(lastNode, undefined, true);
+	                }
+	            }
+	            self.images.removeByKey(v.id);
+	            return;
+	        }
+	        imagesList.push(v);
+	    });
+
+	    M.v = imagesList;
+	}, 500);
 
 	window.ChatRoom = ChatRoom;
 	module.exports = ChatRoom;

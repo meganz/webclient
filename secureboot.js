@@ -446,7 +446,11 @@ var mega = {
     flags: 0,
     utils: {},
     updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt',
-    chrome: typeof window.chrome === 'object' && String(window.webkitRTCPeerConnection).indexOf('native') > 0,
+    chrome: (
+        typeof window.chrome === 'object'
+        && window.chrome.runtime !== undefined
+        && String(window.webkitRTCPeerConnection).indexOf('native') > 0
+    ),
     browserBrand: [
         0, 'Torch', 'Epic'
     ],
@@ -2361,7 +2365,7 @@ else if (!b_u) {
     }
 	if (page == 'megacmd') page = 'cmd';
 
-    if (page)
+    if (page && !is_embed)
     {
         for (var p in subpages)
         {

@@ -794,7 +794,7 @@ function getID3CoverArt(entry) {
 
         $wrapper.rebind('video-destroy', function() {
             clearTimeout(timer);
-            $wrapper.removeClass('mouse-idle');
+            $wrapper.removeClass('mouse-idle video-theatre-mode video');
             $video.unbind('mousemove.idle');
             $wrapper.unbind('is-over-quota');
             $document.unbind('mousemove.videoprogress');
@@ -913,7 +913,7 @@ function getID3CoverArt(entry) {
         });
 
         s.on('playing', function() {
-            var events = {'WebM': 99681, 'MPEG Audio': 99684};
+            var events = {'WebM': 99681, 'MPEG Audio': 99684, 'M4A ': 99687, 'Wave': 99688, 'Ogg': 99689};
             var eid = events[s.options.type] || 99668;
 
             if (eid === 99684 && node.s > 41943040) {
@@ -2053,6 +2053,8 @@ function getID3CoverArt(entry) {
         });
     };
 
+    var audioElement = document.createElement('audio');
+
     /**
      * Test a media attribute's decoded properties against MediaSource.isTypeSupported()
      * @param {String} container
@@ -2061,6 +2063,8 @@ function getID3CoverArt(entry) {
      * @returns {Number} 1: is video, 2: is audio, 0: not supported
      */
     MediaAttribute.isTypeSupported = function(container, videocodec, audiocodec) {
+        var mime;
+
         switch ('MediaSource' in window && container) {
             case 'mp41':
             case 'mp42':
@@ -2072,7 +2076,7 @@ function getID3CoverArt(entry) {
             // case 'dash':
             case 'avc1': // JVT
                 if (videocodec === 'avc1') {
-                    var mime = 'video/mp4; codecs="avc1.640029';
+                    mime = 'video/mp4; codecs="avc1.640029';
 
                     if (0 && String(audiocodec).startsWith('mp4a')) {
                         if (audiocodec === 'mp4a') {
@@ -2108,9 +2112,19 @@ function getID3CoverArt(entry) {
                 }
                 break;
 
+            case 'M4A ':
+                mime = 'audio/aac';
+            /* fallthrough */
+            case 'Ogg':
+                mime = mime || 'audio/ogg';
+            /* fallthrough */
+            case 'Wave':
+                mime = mime || 'audio/wav';
+            /* fallthrough */
             case 'MPEG Audio':
-                if (!videocodec && audiocodec === container) {
-                    return mega.fullAudioContextSupport ? 2 : 0;
+                if (!videocodec) {
+                    mime = mime || (audiocodec === container ? 'audio/mpeg' : 'doh');
+                    return mega.fullAudioContextSupport && audioElement.canPlayType(mime) ? 2 : 0;
                 }
         }
 
@@ -2504,6 +2518,7 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
 
         try {
             ctx = new AudioContext();
+            stream = new MediaStream();
             stream = ctx.createMediaStreamDestination();
             stream.connect(ctx.destination);
         }
@@ -2511,9 +2526,11 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
             console.debug(ex);
         }
         finally {
-            ctx.close().then(function() {
-                mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
-            });
+            if (typeof ctx.close === 'function') {
+                ctx.close().then(function() {
+                    mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
+                });
+            }
         }
     }
 });

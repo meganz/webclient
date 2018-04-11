@@ -266,6 +266,11 @@ mobile.downloadOverlay = {
         // Add tap handler
         $closeButton.off('tap').on('tap', function() {
 
+            // Destroy any streaming instance if running
+            if (typeof dlmanager.isStreaming === 'object') {
+                dlmanager.isStreaming.abort();
+            }
+
             // Hide overlay with download button options
             mobile.downloadOverlay.$overlay.addClass('hidden');
             $body.removeClass('wrong-file');

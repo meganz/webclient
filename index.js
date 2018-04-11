@@ -1738,7 +1738,7 @@ function topmenuUI() {
         }
         else {
             // Show the free badge
-            $topMenu.find('.top-menu-item.account .right-el').text('FREE');
+            $topMenu.find('.top-menu-item.account .right-el').text(l[435]);
             $topHeader.find('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('body').removeClass('lite').addClass('free');
         }

@@ -6160,7 +6160,7 @@ React.makeElement = React['createElement'];
 	        return React.makeElement(
 	            ModalDialog,
 	            {
-	                title: __("Send Contact"),
+	                title: __(l[8628]),
 	                className: classes,
 	                selected: self.state.selected,
 	                onClose: function onClose() {

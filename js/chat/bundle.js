@@ -12101,35 +12101,11 @@ React.makeElement = React['createElement'];
 	    var self = this;
 
 	    var imagesList = [];
+	    var deleted = [];
 	    self.images.values().forEach(function (v) {
 	        var msg = self.messagesBuff.getMessageById(v.messageId);
 	        if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
-	            if (v.id.substr(-8) === slideshowid) {
-
-	                var lastNode;
-	                var found = false;
-	                M.v.forEach(function (node) {
-	                    if (!found && node.h !== v.id.substr(-8)) {
-	                        lastNode = node.h;
-	                    }
-	                    if (node.h === v.id.substr(-8)) {
-	                        found = true;
-	                    }
-	                });
-
-	                if (!lastNode) {
-
-	                    lastNode = M.v[0];
-	                }
-
-	                if (!lastNode) {
-
-	                    slideshow(undefined, true);
-	                } else {
-
-	                    slideshow(lastNode, undefined, true);
-	                }
-	            }
+	            slideshowid && deleted.push(v.id.substr(-8));
 	            self.images.removeByKey(v.id);
 	            return;
 	        }
@@ -12137,6 +12113,43 @@ React.makeElement = React['createElement'];
 	    });
 
 	    M.v = imagesList;
+
+	    var slideshowCalled = false;
+	    slideshowid && deleted.forEach(function (currentNodeId) {
+	        if (currentNodeId === slideshowid) {
+	            var lastNode;
+	            var found = false;
+	            M.v.forEach(function (node) {
+	                if (!found && node.h !== currentNodeId) {
+	                    lastNode = node.h;
+	                }
+	                if (node.h === currentNodeId) {
+	                    found = true;
+	                }
+	            });
+
+	            if (!lastNode) {
+	                for (var i = 0; i < M.v.length; i++) {
+	                    if (M.v[i].h !== currentNodeId) {
+	                        lastNode = M.v[i].h;
+	                        break;
+	                    }
+	                }
+	            }
+
+	            if (!lastNode) {
+
+	                slideshow(undefined, true);
+	                slideshowCalled = true;
+	            } else {
+
+	                slideshow(lastNode, undefined, true);
+	                slideshowCalled = true;
+	            }
+	        }
+	    });
+
+	    slideshowid && !slideshowCalled && slideshow(slideshowid, undefined, true);
 	}, 500);
 
 	window.ChatRoom = ChatRoom;

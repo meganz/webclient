@@ -69,12 +69,12 @@ function init_embed(ph, key, g) {
         var link = '#!' + ph + '!' + key;
 
         $('.play-video-button, .viewonmega-item, .filename').rebind('click', function() {
-            open(getAppBaseUrl() + '/' + link);
+            open(getAppBaseUrl() + link);
             return false;
         });
 
         $('.login-item').rebind('click', function() {
-            open(getBaseUrl() + '/login');
+            open(getAppBaseUrl() + '#login');
         });
 
         $('.logo-container, .login-item.with-avatar, .useravatar').rebind('click', function() {
@@ -238,14 +238,6 @@ function topmenuUI() {
         $('.dropdown-item.login-item').find('i').removeClass('hidden').end().find('.login-text').text(l[16345]);
     }
 
-    if (is_mobile) {
-        var $wrapper = $('.video-wrapper');
-        $wrapper.addClass('mobile-mode');
-    }
-    else {
-        return false;
-    }
-
     var $wrapper = $('.video-wrapper');
     $('body').rebind('click.bodyw', function() {
         if (!$wrapper.hasClass('share-option')) {
@@ -254,16 +246,23 @@ function topmenuUI() {
         $('.files-menu.context').addClass('hidden').removeClass('mobile-mode');
     });
 
-    $('.moreoptions').rebind('click', function() {
-        var $cm = $('.files-menu.context').removeClass('hidden');
+    $('video', $wrapper).rebind('click', function() {
+        $('.play-video-button').trigger('click');
+    });
 
-        if (is_mobile) {
-            $cm.addClass('mobile-mode');
+    $('.moreoptions').rebind('click', function() {
+        var $cm = $('.files-menu.context');
+
+        if (!$cm.hasClass('hidden')) {
+            $cm.addClass('hidden');
+        }
+        else if (is_mobile) {
+            $cm.removeClass('hidden').addClass('mobile-mode');
             $wrapper.addClass('main-blur-block');
         }
         else {
             var top = $('.viewer-top-bl').height();
-            var left = $cm.outerWidth();
+            var left = $cm.removeClass('hidden').outerWidth();
 
             $cm.css({'top': top, 'left': innerWidth - left - 4});
         }

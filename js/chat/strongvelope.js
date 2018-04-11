@@ -332,6 +332,14 @@ var strongvelope = {};
      */
     strongvelope._verifyMessage = function(message, signature, pubKey, chatId) {
 
+        if ((signature === null) || (typeof signature === 'undefined')) {
+            logger.critical('No signature.');
+            return MegaPromise.resolve(false);
+        }
+        if ((pubKey === null) || (typeof pubKey === 'undefined')) {
+            logger.critical('No pubKey.');
+            return MegaPromise.resolve(false);
+        }
         var messageBytes = asmCrypto.string_to_bytes('strongvelopesig' + message);
         var signatureBytes = asmCrypto.string_to_bytes(signature);
         var keyBytes = asmCrypto.string_to_bytes(pubKey);
@@ -1660,17 +1668,24 @@ var strongvelope = {};
                 proxyPromise.reject(false);
             });
 
-            verifyPromise.done(function() {
-                // Decrypt message payload.
-                var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
-                    senderKey,
-                    parsedMessage.nonce);
-                // Bail out if decryption failed.
-                if (cleartext === false) {
-                    logger.warn("Decryption failed [1]: ", sender, keyId);
+            verifyPromise.done(function(arg) {
+                if (!arg) {
+                    // signature verification failed.
+                    logger.error('Signature invalid for message from ' + sender);
                     proxyPromise.reject(false);
+                } else {
+
+                    // Decrypt message payload.
+                    var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
+                        senderKey,
+                        parsedMessage.nonce);
+                    // Bail out if decryption failed.
+                    if (cleartext === false) {
+                        logger.warn("Decryption failed [1]: ", sender, keyId);
+                        proxyPromise.reject(false);
+                    }
+                    proxyPromise.resolve(cleartext);
                 }
-                proxyPromise.resolve(cleartext);
             });
             return proxyPromise;
         }

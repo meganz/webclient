@@ -19017,7 +19017,7 @@
     },
     "17823": {
         "text": "Player dimensions",
-        "context": "Text for an option which will allow users to specify which video resolution the embedded player will use to show videos."
+        "context": "Text for an option which will allow users to specify the dimensions for the embedded player that will be used to show videos."
     },
     "17824": {
         "text": "When you remove the link of a file, the embedded player also gets disabled. Would you like to continue?",
@@ -19027,8 +19027,72 @@
         "text": "My QR Code:",
         "context": "A section title for the My Account page where the user can see their current Quick Response Code (QR code). This QR code can be shared with other users to let them add the user as a contact quickly."
     },
+    "17826": {
+        "text": "You can use a QR code to share your contact link. You can customise and regenerate your link at any time.",
+        "context": "The QR code widget description text found on the My Account page."
+    },
+    "17827": {
+        "text": "Access QR Code",
+        "context": "A button on the My Account page to access the QR code widget."
+    },
     "17828": {
         "text": "Play Audio",
         "context": "a context-menu button to let user start streaming audio files."
+    },
+    "17829": {
+        "text": "My QR code",
+        "context": "QR Dialog header"
+    },
+    "17830": {
+        "text": "Automatically Accept",
+        "context": "Automatically Accept switch title in QR dialog"
+    },
+    "17831": {
+        "text": "Users that scan your QR code will be automatically added to your contact list",
+        "context": "QR auto accept switch description"
+    },
+    "17832": {
+        "text": "Reset QR Code",
+        "context": "Reset QR code option in QR Dialog"
+    },
+    "17833": {
+        "text": "Previous QR codes will no longer be valid",
+        "context": "QR Rest option description in QR dialog"
+    },
+    "17834": {
+        "text": "Save as Image",
+        "context": "save as image button in QR dialog"
+    },
+    "17835": {
+        "text": "Copy Link",
+        "context": "Copy Link button text on QR dialog"
+    },
+    "17836": {
+        "text": "With your QR Code enabled you can share your unique code with other users so they can add you as a contact, or you can add other users by scanning their code.",
+        "context": "QR Code Setting description,\r\nfound in settings page."
+    },
+    "17879": {
+        "text": "%nbFo folders containing a total of %nbFi files were added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync intrgration mode.\r\n** plural folders, plural files **"
+    },
+    "17880": {
+        "text": "%nbFo folder containing a total of %nbFi files was added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync intrgration mode.\r\n** singular folder, plural files **"
+    },
+    "17881": {
+        "text": "%nbFo folders containing a total of %nbFi file were added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n** plural folders, singular file **\r\n"
+    },
+    "17882": {
+        "text": "%nbFo folder containing a total of %nbFi file was added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n** singular folder, singular file **"
+    },
+    "17883": {
+        "text": "%nbFi files were added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n\r\n** plural files **"
+    },
+    "17884": {
+        "text": "%nbFi file was added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n\r\n** singular file ** "
     }
 }

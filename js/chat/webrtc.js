@@ -262,7 +262,8 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
             // survives, and their call request is declined. Otherwise, our existing outgoing
             // call is hung up, and theirs is answered
             if (self.chatd.userId < self.handler.get1on1RoomPeer(chatid)) {
-                self.logger.warn("We have an outgoing call, and there is an incoming call - we don't have priority, hangup our outgoing call and answer the incoming");
+                self.logger.warn("We have an outgoing call, and there is an incoming call - we don't have priority.",
+                    "Hanging up our outgoing call and answering the incoming");
                 var av = existingOutCall._callInitiateAvFlags;
                 existingOutCall.hangup()
                 .then(function() {
@@ -278,7 +279,8 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
                     }, 0);
                 });
             }  else {
-                self.logger.warn("We have an outgoing call, and there is an incoming call - we have a priority, decline the incoming call");
+                self.logger.warn("We have an outgoing call, and there is an incoming call - we have a priority.",
+                    "Declining the incoming call");
                 //sendBusy();
             }
             return;
@@ -1352,9 +1354,9 @@ Session.prototype.handleMsg = function(packet) {
 
 Session.prototype._createRtcConn = function() {
     var self = this;
-    var conn = self.rtcConn = new RTCPeerConnection({
-        iceServers: RTC.fixupIceServers(self.call.manager.iceServers)
-    });
+    var iceServers = RTC.fixupIceServers(self.call.manager.iceServers);
+    this.logger.log("Using ICE servers:", JSON.stringify(iceServers[0].urls));
+    var conn = self.rtcConn = new RTCPeerConnection({ iceServers: iceServers });
     if (self.call.manager.gLocalStream) {
         conn.addStream(self.call.manager.gLocalStream);
     }

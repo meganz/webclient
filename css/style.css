@@ -1080,6 +1080,16 @@ a.account-manage-button:hover {
     text-overflow: ellipsis;
     overflow: hidden;
 }
+body.kr .chart.data .of-txt, body.kr .chart.data .pecents-txt, body.kr .chart.data .gb-txt {
+    font-size: 14px;
+    display: inline-block;
+    line-height: 20px;
+    float: left;
+}
+body.kr .chart.data .pecents-txt, body.kr .chart.data .gb-txt {
+    display: block;
+    margin-right: 4px;
+}
 .chart.data .perc-txt {
     font-size: 34px;
     line-height: 40px;
@@ -1118,6 +1128,9 @@ a.account-manage-button:hover {
     font-size: 18px;
     line-height: 26px;
     color: #333333;
+}
+body.kr .chart.data .size-txt {
+    font-size: 17px;
 }
 .chart.icon {
     position: absolute;
@@ -21014,6 +21027,9 @@ div.camera-bottom-txt {
     white-space: nowrap;
     left: -3px;
 }
+body.kr .account.chart.data {
+    margin: 9px 0 0 74px;
+} 
 .account.upgrade-account {
     padding: 21px 0 0 0;
     text-align: right;

@@ -494,12 +494,12 @@ function getID3CoverArt(entry) {
 
         var playevent;
         $video.rebind('playing', function() {
-            if (videoElement && videoElement.duration) {
+            if (streamer.duration) {
                 $wrapper.removeClass('paused').find('.viewer-pending').addClass('hidden');
 
                 if (!playevent) {
                     playevent = true;
-                    setDuration(videoElement.duration);
+                    setDuration(streamer.duration);
 
                     // play/pause on click
                     $video.rebind('click', function() {
@@ -548,7 +548,12 @@ function getID3CoverArt(entry) {
                 }
                 else {
                     later(hideControls);
-                    streamer.play();
+                    if (streamer.currentTime >= streamer.duration) {
+                        streamer.currentTime = 0;
+                    }
+                    else {
+                        streamer.play();
+                    }
                 }
             }
             else {
@@ -656,7 +661,7 @@ function getID3CoverArt(entry) {
             }
         }
         $video.rebind('timeupdate', function() {
-            onTimeUpdate(streamer.currentTime, videoElement.duration);
+            onTimeUpdate(streamer.currentTime, streamer.duration);
         });
 
         /* Drag status */
@@ -794,13 +799,15 @@ function getID3CoverArt(entry) {
 
         $wrapper.rebind('video-destroy', function() {
             clearTimeout(timer);
-            $wrapper.removeClass('mouse-idle video-theatre-mode video');
+            $wrapper.removeClass('mouse-idle video-theatre-mode video')
+                .unbind('is-over-quota')
+                .find('.viewer-pending').addClass('hidden');
             $video.unbind('mousemove.idle');
-            $wrapper.unbind('is-over-quota');
             $document.unbind('mousemove.videoprogress');
             $document.unbind('mouseup.videoprogress');
             $document.unbind('mousemove.volumecontrol');
             $document.unbind('mouseup.volumecontrol');
+            $(window).unbind('video-destroy.main');
             dlmanager.isStreaming = false;
             return false;
         });
@@ -925,6 +932,11 @@ function getID3CoverArt(entry) {
         });
 
         _makethumb(node, s);
+
+        $(window).rebind('video-destroy.main', function() {
+            $('.mobile.filetype-img').removeClass('hidden');
+            s.abort();
+        });
 
         return s;
     };
@@ -2064,6 +2076,22 @@ function getID3CoverArt(entry) {
      */
     MediaAttribute.isTypeSupported = function(container, videocodec, audiocodec) {
         var mime;
+        var canPlayMSEAudio = function() {
+            if (!videocodec && audiocodec) {
+                audiocodec = String(audiocodec).replace(/-/g, '.').toLowerCase(); // fLaC
+
+                if (String(audiocodec).startsWith('mp4a')) {
+                    var swap = {'mp4a': 'mp4a.40.2', 'mp4a.69': 'mp3', 'mp4a.6b': 'mp3'};
+                    audiocodec = swap[audiocodec] || audiocodec;
+                }
+                var amime = 'audio/mp4; codecs="' + audiocodec + '"';
+                if (mega.chrome && audiocodec === 'mp3') {
+                    amime = 'audio/mpeg';
+                }
+                return MediaSource.isTypeSupported(amime) ? 2 : 0;
+            }
+            return 0;
+        };
 
         switch ('MediaSource' in window && container) {
             case 'mp41':
@@ -2087,21 +2115,7 @@ function getID3CoverArt(entry) {
 
                     return MediaSource.isTypeSupported(mime + '"') ? 1 : 0;
                 }
-
-                if (d && videocodec === undefined && audiocodec) {
-                    audiocodec = String(audiocodec).replace(/-/g, '.').toLowerCase(); // fLaC
-
-                    if (String(audiocodec).startsWith('mp4a')) {
-                        var swap = {'mp4a': 'mp4a.40.2', 'mp4a.69': 'mp3', 'mp4a.6b': 'mp3'};
-                        audiocodec = swap[audiocodec] || audiocodec;
-                    }
-                    var amime = 'audio/mp4; codecs="' + audiocodec + '"';
-                    if (mega.chrome && audiocodec === 'mp3') {
-                        amime = 'audio/mpeg';
-                    }
-                    return MediaSource.isTypeSupported(amime) ? 2 : 0;
-                }
-                break;
+                return canPlayMSEAudio();
 
             case 'WebM':
                 switch (mega.chrome && videocodec) {
@@ -2113,6 +2127,9 @@ function getID3CoverArt(entry) {
                 break;
 
             case 'M4A ':
+                if (!mega.fullAudioContextSupport) {
+                    return canPlayMSEAudio();
+                }
                 mime = 'audio/aac';
             /* fallthrough */
             case 'Ogg':
@@ -2126,6 +2143,7 @@ function getID3CoverArt(entry) {
                     mime = mime || (audiocodec === container ? 'audio/mpeg' : 'doh');
                     return mega.fullAudioContextSupport && audioElement.canPlayType(mime) ? 2 : 0;
                 }
+                break;
         }
 
         return 0;

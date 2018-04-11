@@ -8,6 +8,11 @@ MegaEvents.prototype.trigger = function(name, args) {
 
     var count = false;
 
+    if (!this._events) {
+        console.error('MegaEvents: This instance is destroyed and cannot dispatch any more events.', name, args);
+        return false;
+    }
+
     if (this._events[name]) {
 
         if (d > 1) {
@@ -22,6 +27,11 @@ MegaEvents.prototype.trigger = function(name, args) {
             }
             catch (ex) {
                 console.error(ex);
+
+                onIdle(function() {
+                    // Let window.onerror catch it
+                    throw ex;
+                });
             }
             ++count;
         }

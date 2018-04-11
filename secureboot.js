@@ -2891,6 +2891,15 @@ else if (!b_u) {
             '    </div>'+
             '</div>';
 
+    if (is_embed) {
+        try {
+            document.body.textContent = '';
+            document.body.style.background = '#000';
+            jsl_progress = function() {};
+        }
+        catch (ex) {}
+    }
+
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 

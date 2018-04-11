@@ -1421,9 +1421,6 @@ var exportExpiry = {
                     // $('.fm-dialog-title', $linksDialog).text(page === 'download' ? l[5622] : l[1031]);
                     deleteScrollPanel(scroll, 'jsp');
                 }
-                if (page === 'download') {
-                    $('.fm-dialog-title', $linksDialog).text('');
-                }
                 centerDialog();
             }).call($.itemExportEmbed ? window : {});
             $.itemExportEmbed = null;
@@ -1474,6 +1471,7 @@ var exportExpiry = {
 
             if (page === 'download') {
                 $('.export-link-body', $linksDialog).siblings().addClass('hidden');
+                $('.fm-dialog-title', $linksDialog).text('');
             }
             else {
                 $('.export-links-warning').removeClass('hidden');

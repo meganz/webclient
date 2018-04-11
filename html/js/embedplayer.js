@@ -78,7 +78,7 @@ function init_embed(ph, key, g) {
         });
 
         $('.logo-container, .login-item.with-avatar, .useravatar').rebind('click', function() {
-            open(getBaseUrl());
+            open(getAppBaseUrl());
         });
 
         $('.embedcode-item, .getlink-item, .share-generic').rebind('click', function() {

@@ -1070,96 +1070,81 @@
             <div class="mobile fm-dialog-close hidden"></div>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
-                <!-- Video player Elements-->
                 <div class="mobile bottom-page scroll-block download">
-                    <div class="download video-block hidden">
+                    <!-- Video player Elements-->
+                    <div class="download video-block">
                         <div class="viewer-top-bl">
                             <div class="viewer-filename">
                                 <div class="mobile filename">[$5533]</div>
                             </div>
                         </div>
-                      <video id="video" data-autoplayvideo="false"  data-playvideoonclick="false"></video>
-                      <div class="download play-video-button"></div>
-                      <div class="viewer-pending hidden">
-                        <div class="bounce1"></div>
-                        <div class="bounce2"></div>
-                        <div class="bounce3"></div>
-                    </div>
-                    <div class="viewer-bottom-bl">
-                        <div id="video-controls" class="video-controls hidden" data-state="hidden">
-                            <div data-state="play" class="viewer-button left playpause">
-                                <i class="medium-icon icons-img play"></i>
-                            </div>
-                            <div class="volume-control left hidden" style="">
-                                <div data-state="mute" class="viewer-button mute">
-                                    <i class="medium-icon icons-img volume"></i>
+                        <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
+                        <div class="download play-video-button"></div>
+                        <div class="viewer-pending hidden">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
+                        </div>
+                        <div class="viewer-bottom-bl">
+                            <div id="video-controls" class="video-controls" data-state="hidden">
+                                <div data-state="play" class="viewer-button left playpause">
+                                    <i class="medium-icon icons-img play"></i>
                                 </div>
-                                <div class="video-vol-range">
-                                    <div class="volume-bar"><span style="height: 100%;"></span></div>
+                                <div class="volume-control left hidden" style="">
+                                    <div data-state="mute" class="viewer-button mute">
+                                        <i class="medium-icon icons-img volume"></i>
+                                    </div>
+                                    <div class="video-vol-range">
+                                        <div class="volume-bar"><span style="height: 100%;"></span></div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="video-timing current left">00:00</div>
-                            <div data-state="go-fullscreen" class="viewer-button right fs">
-                                <i class="medium-icon icons-img fullscreen"></i>
-                            </div>
-                            <div class="video-timing duration right">03:09</div>
-                            <div class="video-progress-block">
-                                <div class="video-progress-bar">
-                                    <div class="video-time-bar"></div>
+                                <div class="video-timing current left">00:00</div>
+                                <div data-state="go-fullscreen" class="viewer-button right fs">
+                                    <i class="medium-icon icons-img fullscreen"></i>
+                                </div>
+                                <div class="video-timing duration right">03:09</div>
+                                <div class="video-progress-block">
+                                    <div class="video-progress-bar">
+                                        <div class="video-time-bar"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- End of Video player Elements-->
-                <div class="mobile filename"><em>[$5533]</em></div>
-                <div class="mobile file-download-info">
-                    <div class="mobile download-speed"></div>
-                    <div class="mobile filesize"></div>
-                    <div class="mobile download-percents"></div>
-                </div>
-                <a class="mobile red-button first dl-browser"> <i></i> <span>[$8947]</span> </a>
-                <a class="mobile red-button second dl-megaapp"> <i></i> <span>[$8948]</span> </a>
-                <!-- Progressbar is hidden. "downloading" body class will show it !-->
-                <!-- Set width to ".bar" block !-->
-                <a class="mobile download-progress">
-                    <div class="bar"></div>
-                    <span class="mobile">[$8949]</span>
-                </a>
-            </div>
-        </div>
-        <div class="mobile app-info-cell">
-            <div class="mobile app-info-block">
-                <div class="mobile wrong-file-block">
-                    <div class="mobile error-txt file-too-large hidden">[$8951]</div>
-                    <div class="mobile error-txt file-unsupported hidden">[$8952]</div>
-                </div>
-                <div class="mobile application-txt standalone-download-message hidden">
-                    [$8950]
-                </div>
-                <div class="mobile application-txt file-manager-download-message hidden">
-                    [$16107]
-                </div>
-                <a class="mobile download-app"></a>
-            </div>
-        </div>
-    </div>
-</div>
-<!--
-<div class="mobile content-row second">
-    <div class="mobile content-cell">
-        <div class="mobile app-info-block">
-            <div class="mobile fm-dialog-close hidden"></div>
-            <div class="mobile app-info top">
-                <div class="mobile app-info-cell">
-                    <div class="mobile dl-app-link hidden">
-                        <a class="mobile dl-megaapp"> <i></i> <span>[$17733]</span> </a>
+                    <!-- End of Video player Elements-->
+                    <div class="mobile filename"><em>[$5533]</em></div>
+                    <div class="mobile file-download-info">
+                        <div class="mobile download-speed"></div>
+                        <div class="mobile filesize"></div>
+                        <div class="mobile download-percents"></div>
                     </div>
+                    <a class="mobile red-button first dl-browser"> <i></i> <span>[$8947]</span> </a>
+                    <a class="mobile red-button second dl-megaapp"> <i></i> <span>[$8948]</span> </a>
+                    <!-- Progressbar is hidden. "downloading" body class will show it !-->
+                    <!-- Set width to ".bar" block !-->
+                    <a class="mobile download-progress">
+                        <div class="bar"></div>
+                        <span class="mobile">[$8949]</span>
+                    </a>
+                </div>
+            </div>
+            <div class="mobile app-info-cell">
+                <div class="mobile app-info-block">
+                    <div class="mobile wrong-file-block">
+                        <div class="mobile error-txt file-too-large hidden">[$8951]</div>
+                        <div class="mobile error-txt file-unsupported hidden">[$8952]</div>
+                    </div>
+                    <div class="mobile application-txt standalone-download-message hidden">
+                        [$8950]
+                    </div>
+                    <div class="mobile application-txt file-manager-download-message hidden">
+                        [$16107]
+                    </div>
+                    <a class="mobile download-app"></a>
                 </div>
             </div>
         </div>
     </div>
-</div>-->
 </div>
 
 

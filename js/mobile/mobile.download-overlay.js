@@ -267,9 +267,7 @@ mobile.downloadOverlay = {
         $closeButton.off('tap').on('tap', function() {
 
             // Destroy any streaming instance if running
-            if (typeof dlmanager.isStreaming === 'object') {
-                dlmanager.isStreaming.abort();
-            }
+            $(window).trigger('video-destroy');
 
             // Hide overlay with download button options
             mobile.downloadOverlay.$overlay.addClass('hidden');

@@ -6164,8 +6164,8 @@
         "context": ""
     },
     "6051": {
-        "text": "Failed to select folder. Please, try again or select another folder: [{0}]",
-        "context": "Message of the dialog displayed when the process to select a folder failed.\nPreserve the [{0}] code because is for include the error code or the error message in runtime."
+        "text": "Failed to select the folder. Please try again or select another one.",
+        "context": "A dialog message which is displayed when the process to select a folder failed."
     },
     "6052": {
         "text": "Select folder failed",
@@ -11152,8 +11152,8 @@
         "context": "A dialog message displayed when a user is trying to cancel a subscription and it asks them to send a feedback message."
     },
     "8564": {
-        "text": "You don't have access to the path '{0}'. Please select another one and try again.",
-        "context": "A dialog message which is displayed in cases that the app or the user doesn't have access to a folder path in the device memory. For example to download a file\/folder, create a new folder, etc.\r\nPlease preserve the '{0}' code because is for including the file\/folder path at runtime."
+        "text": "You don't have access to the folder '{0}'. Please select another one and try again.",
+        "context": "A dialog message which is displayed in cases that the app or the user doesn't have access to a folder in the device's memory. For example to download a file\/folder, create a new folder, etc.\r\nPlease keep the '{0}' placeholder because is for including the folder name at runtime."
     },
     "8565": {
         "text": "The name of the file '{0}' is not valid or has illegal characters. Please change it and try again.",
@@ -18964,11 +18964,11 @@
         "context": "A heading on a page in the mobile webclient. This page lets the user type or paste in their Recovery Key to recover their account."
     },
     "17810": {
-        "text": "Alternatively, you can upload your exported Recovery Key text file.",
+        "text": "Alternatively, you can read your Recovery Key from the previously exported text file.",
         "context": "A message on the Recover Account page in mobile webclient. This means they can select the .txt file on their computer and the program will retrieve the key from it."
     },
     "17811": {
-        "text": "Upload Recovery Key",
+        "text": "Read Recovery Key From File",
         "context": "A button on the mobile webclient to let the user select the Recovery Key .txt file so the account recovery process can continue."
     },
     "17812": {
@@ -19010,5 +19010,25 @@
     "17821": {
         "text": "Previous Versions",
         "context": "A button label which opens a dialog to display the full version history of the selected file."
+    },
+    "17822": {
+        "text": "Start video at",
+        "context": "Text for an option which will allow users to specify a time offset that the embedded player will start playback."
+    },
+    "17823": {
+        "text": "Player dimensions",
+        "context": "Text for an option which will allow users to specify which video resolution the embedded player will use to show videos."
+    },
+    "17824": {
+        "text": "When you remove the link of a file, the embedded player also gets disabled. Would you like to continue?",
+        "context": "A warning dialog message to let the user know that removing a public link will also disable the embedded player."
+    },
+    "17825": {
+        "text": "My QR Code:",
+        "context": "A section title for the My Account page where the user can see their current Quick Response Code (QR code). This QR code can be shared with other users to let them add the user as a contact quickly."
+    },
+    "17828": {
+        "text": "Play Audio",
+        "context": "a context-menu button to let user start streaming audio files."
     }
 }

@@ -228,6 +228,36 @@ else {
     Object.values = obj_values;
 }
 
+function oDestroy(obj) {
+    'use strict';
+
+    if (d && Object.isFrozen(obj)) {
+        console.warn('Object already frozen...', obj);
+    }
+
+    Object.keys(obj).forEach(function(memb) {
+        if (obj.hasOwnProperty(memb)) {
+            delete obj[memb];
+        }
+    });
+
+    if (!oIsFrozen(obj)) {
+        Object.defineProperty(obj, ":$:frozen:", {
+            value: String(new Date()),
+            writable: false
+        });
+    }
+
+    if (d) {
+        Object.freeze(obj);
+    }
+}
+
+function oIsFrozen(obj) {
+    'use strict';
+    return obj && typeof obj === 'object' && obj.hasOwnProperty(":$:frozen:");
+}
+
 /**
  * Convert hexadecimal string to binary
  * @param {String} hex The input string
@@ -300,3 +330,23 @@ function hex2bin(hex) {
     global.UH64 = UH64;
 
 })(self);
+
+
+/**
+ * Instantiates an enum-like list on the provided target object
+ */
+function makeEnum(aEnum, aPrefix, aTarget, aNorm) {
+    'use strict';
+
+    aTarget = aTarget || {};
+
+    var len = aEnum.length;
+    while (len--) {
+        Object.defineProperty(aTarget,
+            (aPrefix || '') + String(aEnum[len]).toUpperCase(), {
+                value: aNorm ? len : (1 << len),
+                enumerable: true
+            });
+    }
+    return aTarget;
+}

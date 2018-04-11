@@ -19,6 +19,9 @@ var u_pubCu25519;
 /** Cache for contacts' public Curve25519 keys. */
 var pubCu25519 = {};
 
+/** Cache for fingerprint mismatch warns of user/keyType. */
+var warnedFingerprint = {};
+
 var crypt = (function() {
     "use strict";
 
@@ -719,7 +722,13 @@ var crypt = (function() {
         // contacts during the 3 week broken period and none of them are signing back in to heal their stuff).
         if (localStorage.hideCryptoWarningDialogs !== '1') {
             M.onFileManagerReady(function() {
-                mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+                if (!warnedFingerprint[userHandle]) {
+                    warnedFingerprint[userHandle] = {};
+                }
+                if (!warnedFingerprint[userHandle][keyType]) {
+                    mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+                    warnedFingerprint[userHandle][keyType] = 1;
+                }
             });
         }
 

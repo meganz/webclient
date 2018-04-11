@@ -6442,6 +6442,12 @@ body.key .reg-st3-membership-bl.free.hidden {
     }
 }
 
+ @media screen and (orientation:landscape) { 
+    .app-info-block .mobile.download-app {
+        display: none;
+    }
+
+
 @keyframes rotate-loading {
     0% {
         transform: rotate(0deg);

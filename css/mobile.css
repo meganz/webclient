@@ -548,7 +548,7 @@ ul, li {
     background: url(../images/mobile/mobile-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: 0 -345px;
-    margin-top: 8px;
+    margin-top: 16px;
 }
 .android.app-info-block .mobile.download-app {
     background-position: 0 -275px;
@@ -5819,8 +5819,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile.red-button, .mobile.download-progress, .mobile.upload-progress {
         height: 48px;
         line-height: 48px;
-        font-size: 13px;
-        margin-top: 4px;
     }
     .mobile.download-progress .bar, .mobile.upload-progress .bar {
         height: 48px;
@@ -5964,8 +5962,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile.red-button, .mobile.download-progress, .mobile.upload-progress {
         height: 44px;
         line-height: 43px;
-        font-size: 13px;
-        margin-top: 4px;
     }
     .mobile.download-progress .bar, .mobile.upload-progress .bar {
         height: 48px;
@@ -5991,14 +5987,16 @@ body.key .reg-st3-membership-bl.free.hidden {
         height: 60%;
     }
     .app-info-block .mobile.download-app {
-        width: 152px;
+        width: 136px;
         height: 47px;
         background-position: 0 -564px;
+    }
+    .ios.app-info-block .mobile.download-app {
+        width: 152px;
     }
     .app-info-block .mobile.application-txt.hidden .mobile.download-app {
         margin-top:8px;
     }
-    .app-info-block .mobile.download-app
     .android.app-info-block .mobile.download-app {
         background-position: 0 -496px;
     }
@@ -6158,13 +6156,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     }
 }
 @media only screen and (orientation:landscape) and (max-width: 570px), only screen and (orientation:portrait) and (max-height: 570px) {
-    .mobile.white-block {
-        padding: 8px;
-        margin: 20px 0 22px 0;
-        -moz-border-radius: 2px;
-        -webkit-border-radius: 2px;
-        border-radius: 2px;
-    }
     .mobile.filetype-img, .downloaidng .mobile.filetype-img, .wrong-file .mobile.filetype-img {
         width: 40px;
         top: -28px;

@@ -257,17 +257,7 @@ var GenericConversationMessage = React.createClass({
     _startPreview: function(v, e) {
         var chatRoom = this.props.message.chatRoom;
         assert(M.chat, 'Not in chat.');
-        var imagesList = [];
-        chatRoom.images.values().forEach(function(v) {
-            var msg = chatRoom.messagesBuff.getMessageById(v.messageId);
-            if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
-                chatRoom.images.removeByKey(v.id);
-                return;
-            }
-            imagesList.push(v);
-        });
-
-        M.v = imagesList;
+        chatRoom._rebuildAttachments();
 
         slideshow(v.h, undefined, true);
         if (e) {
@@ -599,7 +589,6 @@ var GenericConversationMessage = React.createClass({
                         }
                         else {
                             // else if (attachmentMetaInfo.revoked) { ... don't show revoked files
-                            debugger;
                             return;
                         }
 
@@ -615,20 +604,25 @@ var GenericConversationMessage = React.createClass({
                         if (M.chat && !message.revoked) {
                             if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
                                 var src = thumbnails[v.h];
+                                message.imagesAreLoading = message.imagesAreLoading || {};
+
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);
 
                                     if (!src || src !== v) {
-                                        M.v.push(v);
-                                        if (!v.seen) {
-                                            v.seen = 1; // HACK
+                                        if (!v.seen && !message.imagesAreLoading[v.h]) {
+                                            message.imagesAreLoading[v.h] = 1;
+                                            v.seen = 1;
+                                            M.v.push(v);
+                                            delay('thumbnails', fm_thumbnails, 90);
                                         }
-                                        delay('thumbnails', fm_thumbnails, 90);
                                     }
                                     src = window.noThumbURI || '';
-
+                                }
+                                if (!v.imgId) {
                                     v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
                                 }
+
                                 var previewable = is_image(v) || is_video(v);
                                 if (previewable) {
                                     preview =  (src ? (<div id={v.imgId} className="shared-link img-block">

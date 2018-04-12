@@ -1192,6 +1192,11 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self._unreadCountCache = newCounter;
             self.chatRoom.megaChat.updateSectionUnreadCount();
         }
+
+        if (slideshowid) {
+            chatRoom._rebuildAttachments();
+        }
+
     });
 };
 

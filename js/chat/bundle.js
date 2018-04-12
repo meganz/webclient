@@ -9729,17 +9729,7 @@ React.makeElement = React['createElement'];
 	    _startPreview: function _startPreview(v, e) {
 	        var chatRoom = this.props.message.chatRoom;
 	        assert(M.chat, 'Not in chat.');
-	        var imagesList = [];
-	        chatRoom.images.values().forEach(function (v) {
-	            var msg = chatRoom.messagesBuff.getMessageById(v.messageId);
-	            if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
-	                chatRoom.images.removeByKey(v.id);
-	                return;
-	            }
-	            imagesList.push(v);
-	        });
-
-	        M.v = imagesList;
+	        chatRoom._rebuildAttachments();
 
 	        slideshow(v.h, undefined, true);
 	        if (e) {
@@ -10024,7 +10014,6 @@ React.makeElement = React['createElement'];
 	                            }
 	                        } else {
 
-	                            debugger;
 	                            return;
 	                        }
 
@@ -10043,20 +10032,25 @@ React.makeElement = React['createElement'];
 	                        if (M.chat && !message.revoked) {
 	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
 	                                var src = thumbnails[v.h];
+	                                message.imagesAreLoading = message.imagesAreLoading || {};
+
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);
 
 	                                    if (!src || src !== v) {
-	                                        M.v.push(v);
-	                                        if (!v.seen) {
+	                                        if (!v.seen && !message.imagesAreLoading[v.h]) {
+	                                            message.imagesAreLoading[v.h] = 1;
 	                                            v.seen = 1;
+	                                            M.v.push(v);
+	                                            delay('thumbnails', fm_thumbnails, 90);
 	                                        }
-	                                        delay('thumbnails', fm_thumbnails, 90);
 	                                    }
 	                                    src = window.noThumbURI || '';
-
+	                                }
+	                                if (!v.imgId) {
 	                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
 	                                }
+
 	                                var previewable = is_image(v) || is_video(v);
 	                                if (previewable) {
 	                                    preview = src ? React.makeElement(
@@ -11194,6 +11188,11 @@ React.makeElement = React['createElement'];
 	    this.shownMessages = {};
 	    this.attachments = new MegaDataMap(this);
 	    this.images = new MegaDataSortedMap("id", "orderValue", this);
+	    this.images.addChangeListener(function () {
+	        if (slideshowid) {
+	            self._rebuildAttachments();
+	        }
+	    });
 
 	    self.members = {};
 
@@ -12097,6 +12096,61 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 	};
+
+	ChatRoom.prototype._rebuildAttachments = SoonFc(function () {
+	    var self = this;
+
+	    var imagesList = [];
+	    var deleted = [];
+	    self.images.values().forEach(function (v) {
+	        var msg = self.messagesBuff.getMessageById(v.messageId);
+	        if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
+	            slideshowid && deleted.push(v.id.substr(-8));
+	            self.images.removeByKey(v.id);
+	            return;
+	        }
+	        imagesList.push(v);
+	    });
+
+	    M.v = imagesList;
+
+	    var slideshowCalled = false;
+	    slideshowid && deleted.forEach(function (currentNodeId) {
+	        if (currentNodeId === slideshowid) {
+	            var lastNode;
+	            var found = false;
+	            M.v.forEach(function (node) {
+	                if (!found && node.h !== currentNodeId) {
+	                    lastNode = node.h;
+	                }
+	                if (node.h === currentNodeId) {
+	                    found = true;
+	                }
+	            });
+
+	            if (!lastNode) {
+	                for (var i = 0; i < M.v.length; i++) {
+	                    if (M.v[i].h !== currentNodeId) {
+	                        lastNode = M.v[i].h;
+	                        break;
+	                    }
+	                }
+	            }
+
+	            if (!lastNode) {
+
+	                slideshow(undefined, true);
+	                slideshowCalled = true;
+	            } else {
+
+	                slideshow(lastNode, undefined, true);
+	                slideshowCalled = true;
+	            }
+	        }
+	    });
+
+	    slideshowid && !slideshowCalled && slideshow(slideshowid, undefined, true);
+	}, 500);
 
 	window.ChatRoom = ChatRoom;
 	module.exports = ChatRoom;

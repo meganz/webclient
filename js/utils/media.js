@@ -522,7 +522,9 @@ function getID3CoverArt(entry) {
                     hideControls();
                     $document.rebind('mousemove.idle', hideControls);
 
+                    streamer._megaNode = node;
                     dlmanager.isStreaming = streamer;
+                    pagemetadata();
                 }
             }
         });
@@ -809,6 +811,7 @@ function getID3CoverArt(entry) {
             $document.unbind('mouseup.volumecontrol');
             $(window).unbind('video-destroy.main');
             dlmanager.isStreaming = false;
+            pagemetadata();
             return false;
         });
 

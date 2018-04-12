@@ -32,7 +32,11 @@ var megasync = (function() {
 
         linuxDropdown(selected);
     };
-
+    mBroadcaster.once('fm:initialized', function () {
+        if (typeof fmconfig.dlThroughMEGAsync === 'undefined') {
+            mega.config.set('dlThroughMEGAsync', 1);
+        }
+    });
     // Linux stuff {{{
     /**
      * Prepare Linux Dropdown with the list of distro.

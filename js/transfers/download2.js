@@ -2034,7 +2034,7 @@ var dlmanager = {
                     megasync.download(dlpage_ph, dlpage_key);
                 }
                 else {
-                    open(megasync.getMegaSyncUrl() || '/sync');
+                    open(megasync.getMegaSyncUrl() || (getAppBaseUrl() + '#sync'));
                 }
             }
 

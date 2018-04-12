@@ -2887,7 +2887,7 @@ div.checkboxOn, div.checkboxOff {
     border: 1px solid #eee;
     border-radius: 3px;
     box-sizing: border-box;
-    color: #rgba(0, 0, 0, 0.3);
+    color: rgba(0, 0, 0, 0.3);
     font-size: 14px;
     line-height: 48px;
     padding: 0px 12px 0px;
@@ -6452,7 +6452,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     .app-info-block .mobile.download-app {
         display: none;
     }
-
+}
 
 @keyframes rotate-loading {
     0% {

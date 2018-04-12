@@ -5773,6 +5773,12 @@ textarea.mobile.support-text-field {
     text-align: left;
     color: white;
     font-family: 'source_sans_proregular';
+}
+.mobile.download .video-block {
+    display: none;
+} 
+.mobile.download.video .video-block {
+    display: block;
 } 
 /* Make sure Free plan is shown after registration */
 body.key .reg-st3-membership-bl.free.hidden {

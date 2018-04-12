@@ -3487,6 +3487,10 @@
         "text": "Select folder to share",
         "context": ""
     },
+    "6856": {
+        "text": "I'm happy to share my email for future communication related to my feedback",
+        "context": "Feedback dialog first checkbox label."
+    },
     "6858": {
         "text": "New unverified credentials",
         "context": ""
@@ -4006,6 +4010,14 @@
     "7235": {
         "text": "Payment Failed",
         "context": "A dialog box heading, when the user has tried to pay, but something has gone wrong."
+    },
+    "7237": {
+        "text": "SUBMIT YOUR FEEDBACK",
+        "context": "Feedback dialog submit button label, all capital letters (upper case)"
+    },
+    "7238": {
+        "text": "How do you rate your experience with MEGA?",
+        "context": "Feedback dialog header"
     },
     "7241": {
         "text": "You must agree with our Terms of Service",
@@ -7843,6 +7855,34 @@
         "text": "Download key",
         "context": "A button label on the mobile webclient which allows the user to download the Recovery Key to a text file."
     },
+    "17695": {
+        "text": "days",
+        "context": "This is a setting to configure the Rubbish-Bin Cleaning Scheduler to run after a certain number of days.\r\n\r\n"
+    },
+    "17696": {
+        "text": "GB",
+        "context": "This is a setting to configure the Rubbish-Bin Cleaning Scheduler to keep the rubbish bin under a certain number of gigabytes."
+    },
+    "17697": {
+        "text": "YYYY",
+        "context": "Expected year in 4-digit format to be picked from drop down menu for the user's year of birth."
+    },
+    "17698": {
+        "text": "MM",
+        "context": "Pick 2-digit month from drop down list for the user's month of birth."
+    },
+    "17699": {
+        "text": "DD",
+        "context": "Pick 2-digit day from drop down list for the user's date of birth."
+    },
+    "17700": {
+        "text": "Your message here... (optional)",
+        "context": "Some placeholder text on a text input field on the Feedback dialog to let the user know they can type a message there."
+    },
+    "17701": {
+        "text": "Click here to see [B]the exact information[\/B] that will be sent to our servers.",
+        "context": "A hover tooltip message on the Feedback dialog's Question icon\/button. This explains to the user that the information they will send to the server is exactly what is seen in the dialog (if they click the button to see the information), no more, no less."
+    },
     "17703": {
         "text": "Flags",
         "context": "The title of the category in the emoji picker dialog which allows picking a flag emoji to be added to the message."
@@ -7862,10 +7902,6 @@
     "17732": {
         "text": "View video",
         "context": "A button that users can click to start streaming a video."
-    },
-    "17733": {
-        "text": "Open this file in the mobile app",
-        "context": "A button on the downloads page for the user to open the file-link in the mobile app."
     },
     "17735": {
         "text": "Objects",
@@ -7955,18 +7991,6 @@
         "text": "Download sent to MEGAsync",
         "context": "A toast appears when the user download something while integrating with MEGAsync"
     },
-    "17799": {
-        "text": "folders containing a total of",
-        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync.\r\n[PLURAL] "
-    },
-    "17800": {
-        "text": "file was added to the transfer manager",
-        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync.\r\n[SINGULAR] \r\n"
-    },
-    "17801": {
-        "text": "files were added to the transfer manager",
-        "context": "a part of toast text appears when a user upload to his cloud drive - while integrating with megaSync. \r\n[PLURAL] "
-    },
     "17804": {
         "text": "Check your email",
         "context": "The title of a dialog in the mobile webclient to tell the user to check their email."
@@ -8013,7 +8037,7 @@
     },
     "17823": {
         "text": "Player dimensions",
-        "context": "Text for an option which will allow users to specify which video resolution the embedded player will use to show videos."
+        "context": "Text for an option which will allow users to specify the dimensions for the embedded player that will be used to show videos."
     },
     "17824": {
         "text": "When you remove the link of a file, the embedded player also gets disabled. Would you like to continue?",
@@ -8022,5 +8046,29 @@
     "17828": {
         "text": "Play Audio",
         "context": "a context-menu button to let user start streaming audio files."
+    },
+    "17879": {
+        "text": "%nbFo folders containing a total of %nbFi files were added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync intrgration mode.\r\n** plural folders, plural files **"
+    },
+    "17880": {
+        "text": "%nbFo folder containing a total of %nbFi files was added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync intrgration mode.\r\n** singular folder, plural files **"
+    },
+    "17881": {
+        "text": "%nbFo folders containing a total of %nbFi file were added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n** plural folders, singular file **\r\n"
+    },
+    "17882": {
+        "text": "%nbFo folder containing a total of %nbFi file was added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n** singular folder, singular file **"
+    },
+    "17883": {
+        "text": "%nbFi files were added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n\r\n** plural files **"
+    },
+    "17884": {
+        "text": "%nbFi file was added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n\r\n** singular file ** "
     }
 }

@@ -591,7 +591,9 @@ Chatd.rtcmdToString = function(cmd, tx) {
     if (dataLen > 0) {
         assert(dataLen <= cmd.length-24);
         if (opCode === RTCMD.ICE_CANDIDATE) {
-            result += '\n'+cmd.substr(25, dataLen); //FIXME: there is binary data before the candidate text, but it's variable length, so more complex parsing is required.
+            // FIXME: there is binary data before the candidate text, but it's variable length,
+            // so more complex parsing is required.
+            result += '\n'+cmd.substr(25, dataLen);
         } else {
             result += ' data(' + (Chatd.unpack16le(cmd.substr(21, 2)) - 1) + '): ';
             if (dataLen > 64) {

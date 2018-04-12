@@ -616,8 +616,8 @@ Call.prototype._getLocalStream = function(av) {
         })
         .then(function(stream) {
             if (self.state > CallState.kInProgress) {
-                return Promise.reject("getLocalStream: Call killed (or went into state "+constStateToText(CallState, self.state)+
-                       ") while obtaining local stream");
+                return Promise.reject("getLocalStream: Call killed (or went into state "+
+                    constStateToText(CallState, self.state) + ") while obtaining local stream");
             }
             self._setState(CallState.kHasLocalStream);
         });

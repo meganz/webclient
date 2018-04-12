@@ -446,7 +446,11 @@ var mega = {
     flags: 0,
     utils: {},
     updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt',
-    chrome: typeof window.chrome === 'object' && String(window.webkitRTCPeerConnection).indexOf('native') > 0,
+    chrome: (
+        typeof window.chrome === 'object'
+        && window.chrome.runtime !== undefined
+        && String(window.webkitRTCPeerConnection).indexOf('native') > 0
+    ),
     browserBrand: [
         0, 'Torch', 'Epic'
     ],
@@ -2361,7 +2365,7 @@ else if (!b_u) {
     }
 	if (page == 'megacmd') page = 'cmd';
 
-    if (page)
+    if (page && !is_embed)
     {
         for (var p in subpages)
         {
@@ -2886,6 +2890,15 @@ else if (!b_u) {
             '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>'+
             '    </div>'+
             '</div>';
+
+    if (is_embed) {
+        try {
+            document.body.textContent = '';
+            document.body.style.background = '#000';
+            jsl_progress = function() {};
+        }
+        catch (ex) {}
+    }
 
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);

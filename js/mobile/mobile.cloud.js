@@ -597,6 +597,22 @@ mobile.cloud = {
             else {
                 // Otherwise show the download overlay immediately
                 mobile.downloadOverlay.showOverlay(nodeHandle);
+
+                var $overlay = $('.mobile.bottom-page.scroll-block.download');
+                $('.mobile.filetype-img').removeClass('hidden');
+                $('.video-block, .video-controls', $overlay).addClass('hidden');
+
+                if (is_video(node)) {
+                    M.require('videostream').tryCatch(function() {
+                        iniVideoStreamLayout(node, $overlay).then(function(ok) {
+                            if (ok) {
+                                $overlay.addClass('video');
+                                $('.mobile.filetype-img').addClass('hidden');
+                                $('.video-block, .video-controls', $overlay).removeClass('hidden');
+                            }
+                        });
+                    });
+                }
             }
 
             // Prevent pre clicking one of the Open in Browser/App buttons

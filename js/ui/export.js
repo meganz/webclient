@@ -1411,14 +1411,14 @@ var exportExpiry = {
                     // $('.preview-embed', $linksDialog).removeClass('hidden');
                     $('.embed-content-block', $linksDialog).removeClass('hidden');
                     $('.export-content-block', $linksDialog).addClass('hidden');
-                    $('.fm-dialog-title', $linksDialog).text(l[1344] + ' (' + l[17407] + ')');
+                    // $('.fm-dialog-title', $linksDialog).text(l[1344] + ' (' + l[17407] + ')');
                 }
                 else {
                     $('.fm-tab.tab-url-link', $block).addClass('active');
                     $('.preview-embed', $linksDialog).addClass('hidden');
                     $('.embed-content-block', $linksDialog).addClass('hidden');
                     $('.export-content-block', $linksDialog).removeClass('hidden');
-                    $('.fm-dialog-title', $linksDialog).text(l[1031]);
+                    // $('.fm-dialog-title', $linksDialog).text(page === 'download' ? l[5622] : l[1031]);
                     deleteScrollPanel(scroll, 'jsp');
                 }
                 centerDialog();
@@ -1468,10 +1468,13 @@ var exportExpiry = {
         M.safeShowDialog('links', function() {
             fm_showoverlay();
             $linksDialog.removeClass('hidden');
-            $('.export-links-warning').removeClass('hidden');
 
             if (page === 'download') {
                 $('.export-link-body', $linksDialog).siblings().addClass('hidden');
+                $('.fm-dialog-title', $linksDialog).text('');
+            }
+            else {
+                $('.export-links-warning').removeClass('hidden');
             }
 
             $(scroll).jScrollPane({showArrows: true, arrowSize: 5});

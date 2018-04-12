@@ -7007,6 +7007,10 @@
         "text": "Select folder to share",
         "context": ""
     },
+    "6856": {
+        "text": "I'm happy to share my email for future communication related to my feedback",
+        "context": "Feedback dialog first checkbox label."
+    },
     "6858": {
         "text": "New unverified credentials",
         "context": ""
@@ -8230,6 +8234,14 @@
     "7236": {
         "text": "To download files larger than 1 GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
         "context": "Description in a popup dialog when they are trying to download a file larger than 1GB using the browser."
+    },
+    "7237": {
+        "text": "SUBMIT YOUR FEEDBACK",
+        "context": "Feedback dialog submit button label, all capital letters (upper case)"
+    },
+    "7238": {
+        "text": "How do you rate your experience with MEGA?",
+        "context": "Feedback dialog header"
     },
     "7241": {
         "text": "You must agree with our Terms of Service",

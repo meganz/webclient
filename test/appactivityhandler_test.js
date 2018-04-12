@@ -3,14 +3,18 @@ describe("AppActivityHandler test", function() {
 
     var clock;
     var appActivityHandler;
+    var origHasFocus;
     beforeEach(function () {
         clock = sinon.useFakeTimers("Date", "setTimeout", "clearTimeout");
+        origHasFocus = document.hasFocus;
+        document.hasFocus = function() { return true; };
         appActivityHandler = new AppActivityHandler();
     });
 
     afterEach(function () {
         clock.restore();
         appActivityHandler.destroy();
+        document.hasFocus = origHasFocus;
     });
 
     it("Initial setup", function() {
@@ -154,5 +158,54 @@ describe("AppActivityHandler test", function() {
         expect(appActivityHandler.isActive).to.eql(true);
         expect(JSON.stringify(events1)).to.eql("[false,true]");
         expect(JSON.stringify(events2)).to.eql("[]");
+    });
+
+    it("add => remove subscribers - Initial no focus => Focus => Blur", function(done) {
+        document.hasFocus = function() { return false; };
+
+        appActivityHandler = new AppActivityHandler();
+
+        expect(appActivityHandler.isActive).to.eql(false);
+
+        var events1 = [];
+        appActivityHandler.addSubscriber("test1", function(isActive) {
+            events1.push(isActive);
+        });
+        var events2 = [];
+        appActivityHandler.addSubscriber("test2", function(isActive) {
+            events2.push(isActive);
+        });
+        // remove after adding, so that we can later assert on events2 if this subscriber was actually called or not
+        appActivityHandler.removeSubscriber("test2");
+
+        expect(appActivityHandler.isActive).to.eql(false);
+        expect(JSON.stringify(events1)).to.eql("[]");
+        expect(JSON.stringify(events2)).to.eql("[]");
+
+        $(window).triggerHandler('focus');
+
+        setTimeout(function() {
+            expect(appActivityHandler.isActive).to.eql(true);
+            expect(JSON.stringify(events1)).to.eql("[true]");
+            expect(JSON.stringify(events2)).to.eql("[]");
+
+            $(window).triggerHandler('blur');
+
+            clock.tick(AppActivityHandler.APPACTIVITYHANDLER_BLUR_FOCUS_THROTTLING + 5);
+            expect(appActivityHandler.isActive).to.eql(false);
+            expect(JSON.stringify(events1)).to.eql("[true,false]");
+            expect(JSON.stringify(events2)).to.eql("[]");
+
+            $(window).triggerHandler('focus');
+
+            clock.tick(AppActivityHandler.APPACTIVITYHANDLER_BLUR_FOCUS_THROTTLING + 5);
+
+            expect(appActivityHandler.isActive).to.eql(true);
+            expect(JSON.stringify(events1)).to.eql("[true,false,true]");
+            expect(JSON.stringify(events2)).to.eql("[]");
+            done();
+        }, AppActivityHandler.APPACTIVITYHANDLER_BLUR_FOCUS_THROTTLING + 5);
+        clock.tick(AppActivityHandler.APPACTIVITYHANDLER_BLUR_FOCUS_THROTTLING + 5);
+
     });
 });

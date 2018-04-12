@@ -4766,11 +4766,11 @@
     "17833": "\u00c4ltere QR-Codes verlieren ihre G\u00fcltigkeit",
     "17834": "Als Bilddatei speichern",
     "17835": "Link kopieren",
-    "17836": "With your QR Code enabled you can share your unique code with other users so they can add you as a contact, or you can add other users by scanning their code.",
-    "17879": "%nbFo folders containing a total of %nbFi files were added to the transfer manager",
-    "17880": "%nbFo folder containing a total of %nbFi files was added to the transfer manager",
-    "17881": "%nbFo folders containing a total of %nbFi file were added to the transfer manager",
-    "17882": "%nbFo folder containing a total of %nbFi file was added to the transfer manager",
-    "17883": "%nbFi files were added to the transfer manager",
-    "17884": "%nbFi file was added to the transfer manager"
+    "17836": "Ihr QR-Code l\u00e4sst andere Benutzer Sie direkt zu Ihren Kontakten hinzuf\u00fcgen. Sie k\u00f6nnen andere Benutzer durch Scannen ihrer QR-Codes zu Ihren Kontakten hinzuf\u00fcgen.",
+    "17879": "%nbFo Ordner mit insgesamt %nbFi Dateien neu im Transfer Manager",
+    "17880": "%nbFo Ordner mit insgesamt %nbFi Dateien neu im Transfer Manager",
+    "17881": "%nbFo Ordner mit insgesamt %nbFi Dateien neu im Transfer Manager",
+    "17882": "%nbFo Ordner mit insgesamt %nbFi Datei neu im Transfer Manager",
+    "17883": "%nbFi Dateien neu im Transfer Manager",
+    "17884": "%nbFi Datei neu im Transfer Manager"
 }

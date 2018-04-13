@@ -1668,7 +1668,8 @@ Session.prototype.msgSessTerminate = function(packet) {
     assert(packet.data.length >= 1);
     self.cmd(RTCMD.SESS_TERMINATE_ACK);
     if (self.state === SessState.kDestroyed) {
-        this.logger.warn("msgSessTerminate executed for a session that is in kDestroyed state - it should have been removed from the sessions map of the call");
+        this.logger.warn("msgSessTerminate executed for a session that is in kDestroyed state -",
+            "it should have been removed from the sessions map of the call");
         return;
     }
     if (self.state === SessState.kTerminating && this.terminateAckCallback) {

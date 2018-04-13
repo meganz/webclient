@@ -587,13 +587,13 @@ Chatd.rtcmdToString = function(cmd, tx) {
     result += (tx ? ' to:' : ' from:') + base64urlencode(cmd.substr(9, 8));
     result += ' clientid: 0x' + Chatd.dumpToHex(cmd, 17, 4, true);
 
-    var dataLen = Chatd.unpack16le(cmd.substr(21, 2)) - 1; //first data byte is the RTCMD opcode
+    var dataLen = Chatd.unpack16le(cmd.substr(21, 2)) - 1; // first data byte is the RTCMD opcode
     if (dataLen > 0) {
-        assert(dataLen <= cmd.length-24);
+        assert(dataLen <= cmd.length - 24);
         if (opCode === RTCMD.ICE_CANDIDATE) {
             // FIXME: there is binary data before the candidate text, but it's variable length,
             // so more complex parsing is required.
-            result += '\n'+cmd.substr(25, dataLen);
+            result += '\n' + cmd.substr(25, dataLen);
         } else {
             result += ' data(' + (Chatd.unpack16le(cmd.substr(21, 2)) - 1) + '): ';
             if (dataLen > 64) {

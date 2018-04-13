@@ -280,8 +280,7 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
                 });
             }  else {
                 self.logger.warn("We have an outgoing call, and there is an incoming call - we have a priority.",
-                    "Declining the incoming call");
-                //sendBusy();
+                    "The caller of the incoming call should abort the call");
             }
             return;
         }
@@ -616,7 +615,7 @@ Call.prototype._getLocalStream = function(av) {
         })
         .then(function(stream) {
             if (self.state > CallState.kInProgress) {
-                return Promise.reject("getLocalStream: Call killed (or went into state "+
+                return Promise.reject("getLocalStream: Call killed (or went into state " +
                     constStateToText(CallState, self.state) + ") while obtaining local stream");
             }
             self._setState(CallState.kHasLocalStream);

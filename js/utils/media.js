@@ -2547,7 +2547,7 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
             console.debug(ex);
         }
         finally {
-            if (typeof ctx.close === 'function') {
+            if (ctx && typeof ctx.close === 'function') {
                 ctx.close().then(function() {
                     mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
                 });

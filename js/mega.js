@@ -2946,7 +2946,7 @@ function init_chat() {
 function loadfm_callback(res) {
     'use strict';
 
-    if ((parseInt(res) | 0) < 0) {
+    if ((parseInt(res) | 0) < 0 || res === undefined) {
         loadingDialog.hide();
         loadingInitDialog.hide();
 

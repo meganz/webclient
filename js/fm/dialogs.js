@@ -206,7 +206,7 @@
                                 });
                             }
                             nbOfRecent++;
-                            
+
                         }
                     }
                     else {
@@ -232,7 +232,7 @@
                 }
             }
             myContacts.sort(M.sortObjFn("name", 1));
-            
+
             for (var a = 0; a < myContacts.length; a++) {
                 if (addedContactsByRecent.includes(myContacts[a].handle)) {
                     continue;
@@ -316,12 +316,17 @@
             M.buildtree({h: M.RubbishID}, dialogPrefix + '-dialog');
         }
         else if (dialogTabClass === 'conversations') {
-            // prepare Conversation Tab if needed
-            $('.' + dialogPrefix + '-dialog-panel-arrows').addClass('hidden');
-            if (!$.copyDialogContactsChangeToken) {//= M.u.removeChangeListener(checkContactHandler);
-                $.copyDialogContactsChangeToken = M.u.addChangeListener(checkContactHandler);
+            if (window.megaChatIsReady) {
+                // prepare Conversation Tab if needed
+                $('.' + dialogPrefix + '-dialog-panel-arrows').addClass('hidden');
+                if (!$.copyDialogContactsChangeToken) {
+                    $.copyDialogContactsChangeToken = M.u.addChangeListener(checkContactHandler);
+                }
+                handleConversationTabContent();
             }
-            handleConversationTabContent();
+            else {
+                console.error('MEGAchat is not ready');
+            }
         }
 
         disableFolders(dialogPrefix);
@@ -595,7 +600,7 @@
                 else if (section === 'shared-with-me') {
                     handleDialogContent(section, 'ul', false, type, $.mcImport ? l[236] :l[1344]); // Share
                 }
-                else if (section === 'conversations') {
+                else if (section === 'conversations' && window.megaChatIsReady) {
                     handleDialogContent(section, 'div', false, type, l[1940], '.conversations-container'); // Send
                 }
                 else if (section === 'rubbish-bin') {
@@ -910,7 +915,10 @@
                 M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
             }
             else if (section === 'conversations') {
-                if (megaChat.chats[$.mcselected]) {
+                if (!window.megaChatIsReady) {
+                    console.error('MEGAchat is not ready');
+                }
+                else if (megaChat.chats[$.mcselected]) {
                     megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
                     showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
                 }

@@ -119,7 +119,7 @@
      */
     var handleConversationTabContent = function _handleConversationTabContent() {
         var myChats = megaChat.chats;
-        var myContacts = M.getContactsEMails();
+        var myContacts = M.getContactsEMails(true); // true to exclude requests (incoming and outgoing)
         var conversationTab = $('.copy-dialog-tree-panel.conversations');
         var conversationNoConvTab = $('.dialog-empty-block.copy.conversations');
         var conversationTabHeader = $('.copy-dialog-panel-header', conversationTab);
@@ -201,7 +201,8 @@
                             else {
                                 myContacts.push({
                                     id: Object.keys(sortedChats[chati].members).length,
-                                    name: gNames, handle: sortedChats[chati].roomId, isG: true
+                                    name: gNames[0], handle: sortedChats[chati].roomId, isG: true,
+                                    gMembers: gNames
                                 });
                             }
                             nbOfRecent++;
@@ -241,7 +242,7 @@
                     ctElem = createContactEntry(myContacts[a].name, myContacts[a].id, myContacts[a].handle);
                 }
                 else {
-                    ctElem = createGroupEntry(myContacts[a].name, myContacts[a].id, myContacts[a].handle);
+                    ctElem = createGroupEntry(myContacts[a].gMembers, myContacts[a].id, myContacts[a].handle);
                 }
                 contactGeneratedList = contactGeneratedList + ctElem;
             }

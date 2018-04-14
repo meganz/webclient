@@ -60,7 +60,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var ctx;
         var ab;
         var imageType = 'image/jpeg';
-        var canStoreAttr = !n || (n.u === u_handle && n.f !== u_handle);
+        var canStoreAttr = !n || !n.u || (n.u === u_handle && n.f !== u_handle);
 
         if (img.isPNG) {
             var transparent;

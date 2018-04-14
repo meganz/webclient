@@ -6164,8 +6164,8 @@
         "context": ""
     },
     "6051": {
-        "text": "Failed to select folder. Please, try again or select another folder: [{0}]",
-        "context": "Message of the dialog displayed when the process to select a folder failed.\nPreserve the [{0}] code because is for include the error code or the error message in runtime."
+        "text": "Failed to select the folder. Please try again or select another one.",
+        "context": "A dialog message which is displayed when the process to select a folder failed."
     },
     "6052": {
         "text": "Select folder failed",
@@ -7006,6 +7006,10 @@
     "6855": {
         "text": "Select folder to share",
         "context": ""
+    },
+    "6856": {
+        "text": "I'm happy to share my email for future communication related to my feedback",
+        "context": "Feedback dialog first checkbox label."
     },
     "6858": {
         "text": "New unverified credentials",
@@ -8230,6 +8234,14 @@
     "7236": {
         "text": "To download files larger than 1 GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
         "context": "Description in a popup dialog when they are trying to download a file larger than 1GB using the browser."
+    },
+    "7237": {
+        "text": "SUBMIT YOUR FEEDBACK",
+        "context": "Feedback dialog submit button label, all capital letters (upper case)"
+    },
+    "7238": {
+        "text": "How do you rate your experience with MEGA?",
+        "context": "Feedback dialog header"
     },
     "7241": {
         "text": "You must agree with our Terms of Service",
@@ -11152,8 +11164,8 @@
         "context": "A dialog message displayed when a user is trying to cancel a subscription and it asks them to send a feedback message."
     },
     "8564": {
-        "text": "You don't have access to the path '{0}'. Please select another one and try again.",
-        "context": "A dialog message which is displayed in cases that the app or the user doesn't have access to a folder path in the device memory. For example to download a file\/folder, create a new folder, etc.\r\nPlease preserve the '{0}' code because is for including the file\/folder path at runtime."
+        "text": "You don't have access to the folder '{0}'. Please select another one and try again.",
+        "context": "A dialog message which is displayed in cases that the app or the user doesn't have access to a folder in the device's memory. For example to download a file\/folder, create a new folder, etc.\r\nPlease keep the '{0}' placeholder because is for including the folder name at runtime."
     },
     "8565": {
         "text": "The name of the file '{0}' is not valid or has illegal characters. Please change it and try again.",
@@ -18140,7 +18152,7 @@
         "context": "An alert message shown in case the user has an active subscription and is in the process of buying a higher plan (i.e. a higher level PRO account)."
     },
     "17586": {
-        "text": "Downloading canceled in MEGAsync",
+        "text": "Download canceled in MEGAsync",
         "context": "Downloading status text which appears when a download gets canceled in MEGAsync."
     },
     "17587": {
@@ -18160,7 +18172,7 @@
         "context": "The owner of the shared folder, for example: by Nicolas Cage. The %1 placeholder will be dynamically replaced with the name"
     },
     "17591": {
-        "text": "Cannot get downloading status from MEGAsync",
+        "text": "Cannot get download status from MEGAsync",
         "context": "Download status text which appears when MEGAsync stops sending status updates. This is possibly due to a crash in MEGAsync. We don't have a screenshot for this case (it's a rare one). However the attached screenshot will show the location of this text."
     },
     "17592": {
@@ -18216,7 +18228,7 @@
         "context": "Download status text which appears when the download is in its final stage at MEGAsync. Usually this is a very quick stage and wont be noticed unless the user was on a very slow PC. The screenshot shows the text location."
     },
     "17605": {
-        "text": "Downloading failed in MEGAsync",
+        "text": "Download failed in MEGAsync",
         "context": "Downloading status text which appears if the download failed somehow on the MEGAsync side. The screenshot shows the text location."
     },
     "17606": {
@@ -18916,8 +18928,8 @@
         "context": "A dialog warning box sub-message which appears if MEGAsync stopped responding.\r\n"
     },
     "17797": {
-        "text": "Download sent to MEGASync",
-        "context": "A toast appears when the user download something while integrating with MEGASync"
+        "text": "Download sent to MEGAsync",
+        "context": "A toast appears when the user download something while integrating with MEGAsync"
     },
     "17799": {
         "text": "folders containing a total of",
@@ -18964,11 +18976,11 @@
         "context": "A heading on a page in the mobile webclient. This page lets the user type or paste in their Recovery Key to recover their account."
     },
     "17810": {
-        "text": "Alternatively, you can upload your exported Recovery Key text file.",
+        "text": "Alternatively, you can read your Recovery Key from the previously exported text file.",
         "context": "A message on the Recover Account page in mobile webclient. This means they can select the .txt file on their computer and the program will retrieve the key from it."
     },
     "17811": {
-        "text": "Upload Recovery Key",
+        "text": "Read Recovery Key From File",
         "context": "A button on the mobile webclient to let the user select the Recovery Key .txt file so the account recovery process can continue."
     },
     "17812": {
@@ -18978,5 +18990,121 @@
     "17813": {
         "text": "I do not have my Recovery Key",
         "context": "The heading of the page where the user can request to park their account because they do not have their Recovery Key."
+    },
+    "17814": {
+        "text": "%@ per month",
+        "context": "The price associated with the MEGA PRO account level you can subscribe to."
+    },
+    "17815": {
+        "text": "Jump to latest",
+        "context": "A button label that allows for jumping to the latest item."
+    },
+    "17816": {
+        "text": "New messages",
+        "context": "A button label that allows for jumping to the latest message."
+    },
+    "17817": {
+        "text": "Previous QR codes will no longer be valid.",
+        "context": "A footer message that explains what would happen if the user resets their QR code."
+    },
+    "17818": {
+        "text": "Location",
+        "context": "The title label of a folder\/file node property."
+    },
+    "17819": {
+        "text": "Do you want to delete this version?",
+        "context": "A question to ensure that the user wants to delete this file version."
+    },
+    "17820": {
+        "text": "It will be permanently removed",
+        "context": "A message to notify the user that the file version will be permanently removed."
+    },
+    "17821": {
+        "text": "Previous Versions",
+        "context": "A button label which opens a dialog to display the full version history of the selected file."
+    },
+    "17822": {
+        "text": "Start video at",
+        "context": "Text for an option which will allow users to specify a time offset that the embedded player will start playback."
+    },
+    "17823": {
+        "text": "Player dimensions",
+        "context": "Text for an option which will allow users to specify the dimensions for the embedded player that will be used to show videos."
+    },
+    "17824": {
+        "text": "When you remove the link of a file, the embedded player also gets disabled. Would you like to continue?",
+        "context": "A warning dialog message to let the user know that removing a public link will also disable the embedded player."
+    },
+    "17825": {
+        "text": "My QR Code:",
+        "context": "A section title for the My Account page where the user can see their current Quick Response Code (QR code). This QR code can be shared with other users to let them add the user as a contact quickly."
+    },
+    "17826": {
+        "text": "You can use a QR code to share your contact link. You can customise and regenerate your link at any time.",
+        "context": "The QR code widget description text found on the My Account page."
+    },
+    "17827": {
+        "text": "Access QR Code",
+        "context": "A button on the My Account page to access the QR code widget."
+    },
+    "17828": {
+        "text": "Play Audio",
+        "context": "a context-menu button to let user start streaming audio files."
+    },
+    "17829": {
+        "text": "My QR code",
+        "context": "QR Dialog header"
+    },
+    "17830": {
+        "text": "Automatically Accept",
+        "context": "Automatically Accept switch title in QR dialog"
+    },
+    "17831": {
+        "text": "Users that scan your QR code will be automatically added to your contact list",
+        "context": "QR auto accept switch description"
+    },
+    "17832": {
+        "text": "Reset QR Code",
+        "context": "Reset QR code option in QR Dialog"
+    },
+    "17833": {
+        "text": "Previous QR codes will no longer be valid",
+        "context": "QR Rest option description in QR dialog"
+    },
+    "17834": {
+        "text": "Save as Image",
+        "context": "save as image button in QR dialog"
+    },
+    "17835": {
+        "text": "Copy Link",
+        "context": "Copy Link button text on QR dialog"
+    },
+    "17836": {
+        "text": "With your QR Code enabled you can share your unique code with other users so they can add you as a contact, or you can add other users by scanning their code.",
+        "context": "QR Code Setting description,\r\nfound in settings page."
+    },
+    "17879": {
+        "text": "%nbFo folders containing a total of %nbFi files were added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync intrgration mode.\r\n** plural folders, plural files **"
+    },
+    "17880": {
+        "text": "%nbFo folder containing a total of %nbFi files was added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync intrgration mode.\r\n** singular folder, plural files **"
+    },
+    "17881": {
+        "text": "%nbFo folders containing a total of %nbFi file were added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n** plural folders, singular file **\r\n"
+    },
+    "17882": {
+        "text": "%nbFo folder containing a total of %nbFi file was added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n** singular folder, singular file **"
+    },
+    "17883": {
+        "text": "%nbFi files were added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n\r\n** plural files **"
+    },
+    "17884": {
+        "text": "%nbFi file was added to the transfer manager",
+        "context": "The text of a toast appears when the user uploads to cloud drive while in MEGASync integration mode.\r\n\r\n** singular file ** "
     }
 }

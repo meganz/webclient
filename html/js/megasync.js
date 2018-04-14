@@ -11,7 +11,8 @@ var megasync = (function() {
     var currStatus = l[17794]; // 'Initializing'; // download status from MEGAsync
     var lastCheckTime;
     var lastCheckStatus;
-    var defaultStatusThreshold = 15; // minutes
+    var defaultStatusThreshold = 15 * 60000; // 15 minutes
+    var statusThresholdWhenDifferentUsr = 30000; // 0.5 minutes
     var currBid = -1;
     function getNewBid() {
         currBid = Math.random().toString().substr(2);
@@ -501,19 +502,46 @@ var megasync = (function() {
                 var response = (response.length) ? response[0] : response;
                 if (response.s && response.s == 1) { // selection done
                     var toastTxt = '';
+                    var folderP = 0;
                     if (response.fo) {
                         if (response.fo > 1) {
-                            toastTxt += '' + response.fo + ' ' + l[17799] + ' ';
+                            folderP = 2;
                         }
                         else {
-                            toastTxt += '' + response.fo + ' ' + l[17798] + ' ';
+                            folderP = 1;
                         }
                     }
                     if (response.fi > 1) {
-                        toastTxt += '' + response.fi + ' ' + l[17801];
+                        if (folderP === 2) {
+                            toastTxt = l[17879];
+                            toastTxt = toastTxt.replace('%nbFo', response.fo);
+                            toastTxt = toastTxt.replace('%nbFi', response.fi);
+                        }
+                        else if (folderP === 1) {
+                            toastTxt = l[17880];
+                            toastTxt = toastTxt.replace('%nbFo', 1);
+                            toastTxt = toastTxt.replace('%nbFi', response.fi);
+                        }
+                        else {
+                            toastTxt = l[17883];
+                            toastTxt = toastTxt.replace('%nbFi', response.fi);
+                        }
                     }
                     else {
-                        toastTxt += '' + response.fi + ' ' + l[17800];
+                        if (folderP === 2) {
+                            toastTxt = l[17881];
+                            toastTxt = toastTxt.replace('%nbFo', response.fo);
+                            toastTxt = toastTxt.replace('%nbFi', response.fi);
+                        }
+                        else if (folderP === 1) {
+                            toastTxt = l[17882];
+                            toastTxt = toastTxt.replace('%nbFo', 1);
+                            toastTxt = toastTxt.replace('%nbFi', response.fi);
+                        }
+                        else {
+                            toastTxt = l[17884];
+                            toastTxt = toastTxt.replace('%nbFi', response.fi);
+                        }
                     }
 
                     showToast('megasync-transfer upload', toastTxt, l[865], l[823],
@@ -588,17 +616,26 @@ var megasync = (function() {
     };
 
     ns.isInstalled = function (next) {
-        if (!lastCheckStatus || !lastCheckTime) {
+        if (!fmconfig.dlThroughMEGAsync && page !== "download") {
+            next(true, false); // next with error=true and isworking=false
+        }
+        else if (!lastCheckStatus || !lastCheckTime) {
             SyncAPI({ a: "v" }, next);
         }
         else {
             var myNow = Date.now();
             var diff = myNow - lastCheckTime;
-            if (diff >= (defaultStatusThreshold * 60000)) {
+            if (diff >= defaultStatusThreshold) {
                 SyncAPI({ a: "v" }, next);
             }
             else {
-                if (typeof next === "function") {
+                // we found before that MEGAsync is working but with a different logged-in users.
+
+                if (lastCheckStatus && (!ns.currUser || ns.currUser !== u_handle)
+                    && diff >= statusThresholdWhenDifferentUsr) {
+                    SyncAPI({ a: "v" }, next);
+                }
+                else if (typeof next === "function") {
                     next(null, lastCheckStatus);
                 }
             }

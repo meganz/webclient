@@ -209,6 +209,18 @@ var mobile = {
                 $appStoreButton.removeClass('hidden').addClass('android');
                 break;
         }
+    },
+
+    /**
+     * Show a dialog asking the user to check their email
+     */
+    showEmailConfirmOverlay: function() {
+
+        'use strict';
+
+        // Show white background overlay behind the dialog
+        $('.light-overlay').removeClass('hidden');
+        $('.mobile.common-check-email-dialog').removeClass('hidden');
     }
 };
 

@@ -134,6 +134,7 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
             'class="emoji big"'
         );
     }
+
     return messageContents;
 };
 

@@ -179,9 +179,6 @@
     -moz-box-shadow: 0 0 0 1px #CCCCCC;
     box-shadow: 0 0 0 1px #CCCCCC;
 }
-.edit-typing-area .textarea-autofill-bl {
-    bottom: 34px;
-}
 .textarea-autofill-info {
     text-align: center;
     padding: 10px 0 0 0;

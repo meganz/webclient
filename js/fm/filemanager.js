@@ -580,7 +580,7 @@ FileManager.prototype.initFileManagerUI = function() {
         treesearch = false;
         var mySelf = $(this);
         var clickedClass = mySelf.attr('class');
-        
+
         if (!clickedClass) {
             return;
         }
@@ -619,7 +619,7 @@ FileManager.prototype.initFileManagerUI = function() {
                         isMegaSyncTransfer = false;
                     }
                     mySelf.click();
-                    
+
                 });
                 return false;
             }
@@ -627,7 +627,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 // reset - to ckeck again next time
                 isMegaSyncTransfer = true;
             }
-            
+
         }
 
         var activeClass = ('' + $('.nw-fm-left-icon.active:visible')
@@ -1011,7 +1011,7 @@ FileManager.prototype.initContextUI = function() {
         $.hideContextMenu();
     });
 
-    $(c + '.getlink-item').rebind('click', function() {
+    $(c + '.getlink-item, ' + c + '.embedcode-item').rebind('click', function() {
         // ToDo: Selected can be more than one folder $.selected
         // Avoid multiple referencing $.selected instead use event
         // add new translation message '... for multiple folders.'
@@ -1020,25 +1020,24 @@ FileManager.prototype.initContextUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var mdList = mega.megadrop.isDropExist($.selected);
+            var isEmbed = $(this).hasClass('embedcode-item');
+            var selNodes = Array.isArray($.selected) ? $.selected.concat() : [];
+            var showDialog = function() {
+                mega.Share.initCopyrightsDialog(selNodes, isEmbed);
+            };
+
+            var mdList = mega.megadrop.isDropExist(selNodes);
             if (mdList.length) {
-                var fldName = mdList.length > 1
-                    ? l[17626]
-                    : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
-                msgDialog(
-                    'confirmation',
-                    l[1003],
-                    fldName,
-                    false, function(e) {
+                var fldName = mdList.length > 1 ? l[17626] : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
+
+                msgDialog('confirmation', l[1003], fldName, false, function(e) {
                     if (e) {
-                        mega.megadrop.pufRemove(mdList).always(function() {
-                            mega.Share.initCopyrightsDialog($.selected);
-                        });
+                        mega.megadrop.pufRemove(mdList).always(showDialog);
                     }
                 });
             }
             else {
-                mega.Share.initCopyrightsDialog($.selected);
+                showDialog();
             }
         }
     });
@@ -1049,8 +1048,30 @@ FileManager.prototype.initContextUI = function() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': $.selected});
-            exportLink.removeExportLink();
+            var media = false;
+            var handles = Array.isArray($.selected) && $.selected.concat();
+            var removeLink = function() {
+                var exportLink = new mega.Share.ExportLink({'updateUI': true, 'nodesToProcess': handles});
+                exportLink.removeExportLink();
+            };
+
+            for (var i = handles.length; i--;) {
+                if (is_video(M.d[handles[i]])) {
+                    media = true;
+                    break;
+                }
+            }
+
+            if (media) {
+                msgDialog('confirmation', l[882], l[17824], 0, function(e) {
+                    if (e) {
+                        removeLink();
+                    }
+                });
+            }
+            else {
+                removeLink();
+            }
         }
     });
 
@@ -2875,6 +2896,7 @@ FileManager.prototype.addTreeUI = function() {
             $target.parents('#startholder').length ||
             $target.is('input') ||
             $target.is('textarea') ||
+            $target.is('#embed-code-field') ||
             $target.is('.download.info-txt') ||
             $target.closest('.multiple-input').length ||
             $target.closest('.create-folder-input-bl').length ||

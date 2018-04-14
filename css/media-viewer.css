@@ -39,6 +39,9 @@
     -khtml-opacity: 1;
     opacity: 1;
 }
+.video-theatre-mode .viewer-top-bl {
+    display: block;
+}
 .viewer-bottom-bl {
     top: auto;
     bottom: 0;
@@ -254,7 +257,7 @@
     height: 28px;
     display: inline-block;
     vertical-align: top;
-    background-image: url(../images/mega/icons-sprite_v18.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
     background-position: 2px -1393px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
@@ -475,6 +478,8 @@
 /* Video player */
 .video .viewer-bottom-bl {
     background-color: rgba(34,34,34,0.8);
+    height: 54px;
+    padding: 5px 11px;
 }
 .viewer-overlay.video-theatre-mode, .video-theatre-mode .viewer-body {
     display: block;
@@ -505,6 +510,7 @@
     background-color: #F52929;
     background-image: url(../images/mega/download-sprite-v8.png);
     background-position: -64px -2285px;
+    background-size: 257px auto; 
 }
 .video-theatre-mode .viewer-image-bl {
     width: 100%;

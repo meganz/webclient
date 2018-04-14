@@ -8,7 +8,7 @@ function is_video(n) {
 
     if (String(n && n.fa).indexOf(':8*') > 0) {
         // check whether it's an *streamable* video
-        return MediaAttribute.getMediaType(n) > 0;
+        return MediaAttribute.getMediaType(n);
     }
 
     var ext = String(n && n.name || n).split('.').pop().toUpperCase();
@@ -20,10 +20,6 @@ is_video.ext = {
     'MP4': -1,
     'M4V': -1
 };
-
-if (d) {
-    is_video.ext.MOV = 1;
-}
 
 if (!isMediaSourceSupported()) {
     window.is_video = function() {
@@ -242,11 +238,180 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
 // ---------------------------------------------------------------------------------------------------------------
 
+var _getImageCache = Object.create(null);
+
+/**
+ * Retrieve file attribute image
+ * @param {MegaNode} node The node to get associated image with
+ * @param {Number} [type] Image type, 0: thumbnail, 1: preview
+ * @param {Boolean} [raw] get back raw buffer, otherwise a blob: URI
+ * @returns {Promise}
+ */
+function getImage(node, type, raw) {
+    'use strict';
+    var entry = Object(node).h + '!' + (type |= 0) + '.' + (raw |= 0);
+
+    if (!(node instanceof MegaNode)) {
+        return Promise.reject(EARGS);
+    }
+
+    if (!type && thumbnails[node.h] && !raw) {
+        return Promise.resolve(thumbnails[node.h]);
+    }
+
+    if (_getImageCache[entry]) {
+        if (_getImageCache[entry] instanceof Promise) {
+            return _getImageCache[entry];
+        }
+        return Promise.resolve(_getImageCache[entry]);
+    }
+
+    _getImageCache[entry] = new Promise(function(resolve, reject) {
+        var done = function(a, b, data) {
+            if (data !== 0xDEAD) {
+                _getImageCache[entry] = raw ? data : mObjectURL([data.buffer || data], 'image/jpeg');
+                resolve(_getImageCache[entry]);
+            }
+            else {
+                _getImageCache[entry] = null;
+                reject();
+            }
+        };
+        api_getfileattr([node], type, done, function(ex) {
+            onIdle(function() {
+                reject(ex);
+            });
+        });
+    });
+
+    return _getImageCache[entry];
+}
+
+/**
+ * Store file attribute image
+ * @param {MegaNode} n The node to set associated image
+ * @param {ArrayBuffer} ab The binary data holding the image
+ */
+function setImage(n, ab) {
+    'use strict';
+    var aes = new sjcl.cipher.aes([
+        n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
+    ]);
+    var ph = !n.u || n.u !== u_handle ? n.ph : null;
+    createnodethumbnail(n.h, aes, n.h, ab, false, ph);
+}
+
+/**
+ * Just a quick&dirty function to retrieve an image embed through ID3v2.3 tags
+ * @details Based on https://github.com/tmont/audio-metadata
+ * @param {File|ArrayBuffer} entry
+ */
+function getID3CoverArt(entry) {
+    'use strict';
+    return new Promise(function(resolve, reject) {
+        var parse = tryCatch(function(ab) {
+            var u8 = new Uint8Array(ab);
+            var getLong = function(offset) {
+                return (((((u8[offset] << 8) + u8[offset + 1]) << 8) + u8[offset + 2]) << 8) + u8[offset + 3];
+            };
+            var readFrame = function(offset) {
+                var id = String.fromCharCode.apply(String, [
+                    u8[offset], u8[offset + 1], u8[offset + 2], u8[offset + 3]
+                ]);
+                return {id: id, size: getLong(offset + 4) + 10};
+            };
+            if (u8[0] === 0x49 && u8[1] === 0x44 && u8[2] === 0x33 && u8[3] === 3) {
+                var result;
+                var offset = 10 + (u8[5] & 128 ? getLong(10) : 0);
+                var size = offset + getLong(6);
+
+                while (offset < size) {
+                    var frame = readFrame(offset);
+                    if (frame.id === 'APIC') {
+                        offset += 11;
+                        for (var x = 2; x--; offset++) {
+                            while (u8[offset++]) ;
+                        }
+                        result = u8.slice(--offset, frame.size);
+                        break;
+                    }
+                    offset += frame.size;
+                }
+                if (d) {
+                    console.debug('getID3CoverArt', [result]);
+                }
+                if (result) {
+                    return resolve(result);
+                }
+            }
+            reject(Error('Not found.'));
+        }, reject);
+
+        if (entry instanceof Blob) {
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                if (ev.target.error) {
+                    return reject(ev.target.error);
+                }
+                parse(ev.target.result);
+            };
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(entry);
+        }
+        else {
+            onIdle(function() {
+                parse(entry);
+            });
+        }
+    });
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+
+
 (function _initVideoStream(global) {
     'use strict';
 
-    // Init custom video controls
-    var _initVideoControls = function(wrapper, streamer) {
+    // @private Make thumb/preview images if missing
+    var _makethumb = function(n, stream) {
+        if (String(n.fa).indexOf(':0*') < 0 || String(n.fa).indexOf(':1*') < 0) {
+            var onVideoPlaying = function() {
+                var video = this.video;
+
+                if (video && video.duration) {
+                    var took = Math.round(2 * video.duration / 100);
+
+                    if (d) {
+                        console.debug('Video thumbnail missing, will take image at %s...', secondsToTime(took));
+                    }
+
+                    this.on('timeupdate', function() {
+                        if (video.currentTime < took) {
+                            return true;
+                        }
+
+                        this.getImage().then(setImage.bind(null, n)).catch(console.warn.bind(console));
+                    });
+
+                    return false;
+                }
+
+                return true;
+            };
+
+            if (is_video(n) !== 2) {
+                stream.on('playing', onVideoPlaying);
+            }
+            else {
+                stream.on('audio-buffer', function(ev, buffer) {
+                    getID3CoverArt(buffer).then(setImage.bind(null, n)).catch(console.debug.bind(console));
+                });
+            }
+        }
+    };
+
+    // @private Init custom video controls
+    var _initVideoControls = function(wrapper, streamer, node, options) {
         var $wrapper = $(wrapper);
         var $video = $wrapper.find('video');
         var videoElement = $video.get(0);
@@ -268,13 +433,6 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         var $progressBar = $videoControls.find('.video-time-bar');
         var $fullscreen = $videoControls.find('.fs');
         var $volumeBar = $videoControls.find('.volume-bar');
-
-        // Wait for the video's meta data to be loaded, then set
-        // the progress bar's max value to the duration of the video
-        $video.rebind('loadedmetadata', function() {
-            $wrapper.find('.video-timing.duration')
-                .text(secondsToTimeShort(videoElement.duration, 1));
-        });
 
         // Changes the button state of certain button's so the correct visuals can be displayed with CSS
         var changeButtonState = function(type) {
@@ -302,10 +460,12 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
         var hideControls = function() {
             $wrapper.removeClass('mouse-idle');
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                $wrapper.addClass('mouse-idle');
-            }, 2600);
+            if (dlmanager.isStreaming) {
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    $wrapper.addClass('mouse-idle');
+                }, 2600);
+            }
         };
 
         var getTimeOffset = function(x) {
@@ -314,6 +474,10 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
             var percentage = Math.max(0, Math.min(100, 100 * position / $progress.width()));
             var selectedTime = Math.round(maxduration * percentage / 100);
             return {time: selectedTime | 0, percent: percentage};
+        };
+
+        var setDuration = function(value) {
+            $wrapper.find('.video-timing.duration').text(secondsToTimeShort(value, 1));
         };
 
         // Set Init Values
@@ -330,11 +494,12 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
         var playevent;
         $video.rebind('playing', function() {
-            if (videoElement && videoElement.duration) {
+            if (streamer.duration) {
                 $wrapper.removeClass('paused').find('.viewer-pending').addClass('hidden');
 
                 if (!playevent) {
                     playevent = true;
+                    setDuration(streamer.duration);
 
                     // play/pause on click
                     $video.rebind('click', function() {
@@ -357,7 +522,9 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                     hideControls();
                     $document.rebind('mousemove.idle', hideControls);
 
+                    streamer._megaNode = node;
                     dlmanager.isStreaming = streamer;
+                    pagemetadata();
                 }
             }
         });
@@ -383,7 +550,12 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                 }
                 else {
                     later(hideControls);
-                    streamer.play();
+                    if (streamer.currentTime >= streamer.duration) {
+                        streamer.currentTime = 0;
+                    }
+                    else {
+                        streamer.play();
+                    }
                 }
             }
             else {
@@ -474,13 +646,24 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         var videoTimingElement = $wrapper.find('.video-timing.current').get(0);
 
         // As the video is playing, update the progress bar
-        $video.rebind('timeupdate', function() {
-            var currentPos = videoElement.currentTime;
-            var maxduration = videoElement.duration;
-            var percentage = 100 * currentPos / maxduration;
+        var onTimeUpdate = function(offset, length) {
+            if (offset > length) {
+                offset = length;
+            }
 
-            progressBarElementStyle.setProperty('width', percentage + '%');
-            videoTimingElement.textContent = secondsToTimeShort(videoElement.currentTime, 1);
+            videoTimingElement.textContent = secondsToTimeShort(offset, 1);
+            progressBarElementStyle.setProperty('width', Math.round(100 * offset / length) + '%');
+        };
+
+        if (options.startTime) {
+            var playtime = MediaAttribute(node).data.playtime;
+            if (playtime) {
+                setDuration(playtime);
+                onTimeUpdate(options.startTime, playtime);
+            }
+        }
+        $video.rebind('timeupdate', function() {
+            onTimeUpdate(streamer.currentTime, streamer.duration);
         });
 
         /* Drag status */
@@ -488,7 +671,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         $progress.rebind('mousedown.videoprogress', function(e) {
             timeDrag = true;
 
-            if (videoElement.currentTime) {
+            if (streamer.currentTime) {
                 videoElement.pause();
                 onIdle(updatebar.bind(0, e.pageX));
             }
@@ -498,7 +681,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
             if (timeDrag) {
                 timeDrag = false;
 
-                if (videoElement.currentTime) {
+                if (streamer.currentTime) {
                     updatebar(e.pageX);
 
                     if (!streamer.WILL_AUTOPLAY_ONSEEK) {
@@ -509,7 +692,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         });
 
         $document.rebind('mousemove.videoprogress', function(e) {
-            if (timeDrag && videoElement.currentTime) {
+            if (timeDrag && streamer.currentTime) {
                 updatebar(e.pageX);
             }
         });
@@ -527,7 +710,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
             $wrapper.find('.video-timing.current').text(secondsToTimeShort(o.time, 1));
 
             if (!timeDrag) {
-                videoElement.currentTime = o.time;
+                streamer.currentTime = o.time;
             }
         };
 
@@ -541,32 +724,45 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
         $wrapper.rebind('video-destroy', function() {
             clearTimeout(timer);
-            $wrapper.removeClass('mouse-idle');
+            $wrapper.removeClass('mouse-idle video-theatre-mode video')
+                .unbind('is-over-quota')
+                .find('.viewer-pending').addClass('hidden');
             $video.unbind('mousemove.idle');
-            $wrapper.unbind('is-over-quota');
             $document.unbind('mousemove.videoprogress');
             $document.unbind('mouseup.videoprogress');
             $document.unbind('mousemove.volumecontrol');
             $document.unbind('mouseup.volumecontrol');
+            $(window).unbind('video-destroy.main');
             dlmanager.isStreaming = false;
+            pagemetadata();
             return false;
         });
 
         dlmanager.isStreaming = true;
     };
 
+    // @private Launch video streaming
     var _initVideoStream = function(node, $wrapper, destroy, options) {
         if (typeof destroy === 'object') {
             options = destroy;
             destroy = null;
         }
-        var c = MediaAttribute.getCodecStrings(node);
-        if (c) {
-            options = Object.assign(Object.create(null), {type: c && c[0]}, options);
+        options = Object.assign(Object.create(null), options);
+
+        if ($.playbackTimeOffset) {
+            options.startTime = $.playbackTimeOffset | 0;
+            $.playbackTimeOffset = null;
+        }
+
+        if (!options.type) {
+            var c = MediaAttribute.getCodecStrings(node);
+            if (c) {
+                options.type = c && c[0];
+            }
         }
         var s = Streamer(node.link || node.h, $wrapper.find('video').get(0), options);
 
-        _initVideoControls($wrapper, s);
+        _initVideoControls($wrapper, s, node, options);
 
         destroy = destroy || function() {
             s.destroy();
@@ -628,7 +824,8 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                     hint = l[16151] + ' ' + l[242];
                 }
 
-                emsg = String(hint) === 'The provided type is not supported' ? l[17743] : hint;
+                emsg = String(hint) === 'The provided type is not supported' ? l[17743]
+                     : String(hint) === 'Access denied' ? l[23] : hint;
 
                 if (s.options.autoplay) {
                     msgDialog('warninga', l[135], l[47], emsg);
@@ -649,7 +846,22 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         });
 
         s.on('playing', function() {
-            eventlog(s.options.type === 'WebM' ? 99681 : 99668);
+            var events = {'WebM': 99681, 'MPEG Audio': 99684, 'M4A ': 99687, 'Wave': 99688, 'Ogg': 99689};
+            var eid = events[s.options.type] || 99668;
+
+            if (eid === 99684 && node.s > 41943040) {
+                eid = 99685;
+            }
+
+            console.assert(eid !== 99668 || is_video(node) !== 2, 'This is not a video...');
+            eventlog(eid);
+        });
+
+        _makethumb(node, s);
+
+        $(window).rebind('video-destroy.main', function() {
+            $('.mobile.filetype-img').removeClass('hidden');
+            s.abort();
         });
 
         return s;
@@ -661,19 +873,110 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
      * @param {Object} wrapper Video element wrapper
      * @param {Function} [destroy] Function to invoke when the video is destroyed
      * @param {Object} [options] Streamer options
+     * @returns {MegaPromise}
      * @global
      */
     global.initVideoStream = function(node, wrapper, destroy, options) {
+        var _init = function() {
+            dlmanager.setUserFlags();
+            return _initVideoStream(node, wrapper, destroy, options);
+        };
         return new MegaPromise(function(resolve, reject) {
+            if (typeof Streamer !== 'undefined') {
+                return resolve(_init());
+            }
             M.require('videostream').tryCatch(function() {
-                dlmanager.setUserFlags();
-                resolve(_initVideoStream(node, wrapper, destroy, options));
+                resolve(_init());
             }, function(ex) {
                 msgDialog('warninga', l[135], l[47], ex);
                 reject(ex);
             });
         });
     };
+
+    /**
+     * Initialize common video player layout for the downloads and embed pages
+     * @param {MegaNode} node An ufs node
+     * @param {Object} $wrapper Video element wrapper
+     * @param {Object} [options] Streamer options
+     * @returns {MegaPromise}
+     * @global
+     */
+    global.iniVideoStreamLayout = function(node, $wrapper, options) {
+        var $fileinfoBlock = $('.download.file-info', $wrapper);
+        var $fn = $('.big-txt', $fileinfoBlock);
+
+        if (!$.trim($fn.text())) {
+            $fn.text(node.name);
+        }
+
+        return new MegaPromise(function(resolve, reject) {
+            MediaAttribute.canPlayMedia(node).then(function(yup) {
+                var c = MediaAttribute.getCodecStrings(node);
+                if (c) {
+                    $fn.attr('title', node.name + ' (' + c.join("/") + ')');
+                }
+
+                if (!yup) {
+                    return resolve(false);
+                }
+                var $video = $wrapper.find('video');
+                if (!$video.length) {
+                    return reject(new Error('No video element found...'));
+                }
+
+                // Disable default video controls
+                $video.get(0).controls = false;
+
+                getImage(node, 1).then(function(uri) {
+                    $video.attr('poster', uri);
+                }).catch(console.debug.bind(console));
+
+                options = Object.assign({autoplay: false, preBuffer: true}, options);
+
+                var vsp = options.preBuffer && initVideoStream(node, $wrapper, options);
+
+                $('.play-video-button', $wrapper).rebind('click', function() {
+                    if (dlmanager.isOverQuota) {
+                        return dlmanager.showOverQuotaDialog();
+                    }
+
+                    if (typeof mediaCollectFn === 'function') {
+                        onIdle(mediaCollectFn);
+                        mediaCollectFn = null;
+                    }
+
+                    // Show Loader until video is playing
+                    $wrapper.find('.viewer-pending').removeClass('hidden');
+
+                    if (!vsp) {
+                        vsp = initVideoStream(node, $wrapper, options);
+                        resolve(vsp);
+                    }
+
+                    vsp.done(function(stream) {
+                        if (stream.error) {
+                            onIdle(function() {
+                                $wrapper.removeClass('video-theatre-mode video');
+                            });
+                            return msgDialog('warninga', l[135], l[47], stream.error);
+                        }
+
+                        // _makethumb(node, stream);
+                        node.stream = stream;
+                        stream.play();
+                    }).fail(console.warn.bind(console));
+
+                    $wrapper.addClass('video-theatre-mode');
+                });
+
+                if (vsp) {
+                    resolve(vsp);
+                }
+            }).catch(reject);
+        });
+    };
+
 })(self);
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -893,11 +1196,10 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         }
 
         mediaCodecs = new Promise(function(resolve, reject) {
+            var db;
             var timer;
-            var dbname = '$mcv1';
-            var db = new Dexie(dbname);
             var apiReq = function() {
-                M.req('mc').fail(reject).done(function(res) {
+                var prc = function(res) {
                     if (!Array.isArray(res) || res.length !== 2) {
                         if (d) {
                             console.warn('Unexpected response, will keep using cached codecs..if any', res);
@@ -948,9 +1250,12 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
                     mediaCodecs = data;
                     data.version = res[0] | 0;
-                    db.kv.put({k: 'l', t: Date.now(), v: data});
+                    if (db) {
+                        db.kv.put({k: 'l', t: Date.now(), v: data});
+                    }
                     resolve(mediaCodecs);
-                });
+                };
+                api_req({a: 'mc'}, {callback: tryCatch(prc, reject)});
             };
             var read = function() {
                 db.kv.get('l').then(function(r) {
@@ -980,12 +1285,19 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                 };
             })(reject);
 
-            db.version(1).stores({kv: '&k'});
-            db.open().then(read).catch(console.warn.bind(console, dbname));
-            timer = setTimeout(apiReq, 800);
+            if (typeof Dexie !== 'undefined') {
+                var dbname = '$mcv1';
+                db = new Dexie(dbname);
+                db.version(1).stores({kv: '&k'});
+                db.open().then(read).catch(console.warn.bind(console, dbname));
+                timer = setTimeout(apiReq, 800);
 
-            // save the db name for our getDatabaseNames polyfill
-            localStorage['_$mdb$' + dbname] = 1;
+                // save the db name for our getDatabaseNames polyfill
+                localStorage['_$mdb$' + dbname] = 1;
+            }
+            else {
+                apiReq();
+            }
         });
 
         return mediaCodecs;
@@ -1679,6 +1991,8 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
         });
     };
 
+    var audioElement = document.createElement('audio');
+
     /**
      * Test a media attribute's decoded properties against MediaSource.isTypeSupported()
      * @param {String} container
@@ -1687,6 +2001,24 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
      * @returns {Number} 1: is video, 2: is audio, 0: not supported
      */
     MediaAttribute.isTypeSupported = function(container, videocodec, audiocodec) {
+        var mime;
+        var canPlayMSEAudio = function() {
+            if (!videocodec && audiocodec) {
+                audiocodec = String(audiocodec).replace(/-/g, '.').toLowerCase(); // fLaC
+
+                if (String(audiocodec).startsWith('mp4a')) {
+                    var swap = {'mp4a': 'mp4a.40.2', 'mp4a.69': 'mp3', 'mp4a.6b': 'mp3'};
+                    audiocodec = swap[audiocodec] || audiocodec;
+                }
+                var amime = 'audio/mp4; codecs="' + audiocodec + '"';
+                if (mega.chrome && audiocodec === 'mp3') {
+                    amime = 'audio/mpeg';
+                }
+                return MediaSource.isTypeSupported(amime) ? 2 : 0;
+            }
+            return 0;
+        };
+
         switch ('MediaSource' in window && container) {
             case 'mp41':
             case 'mp42':
@@ -1698,7 +2030,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
             // case 'dash':
             case 'avc1': // JVT
                 if (videocodec === 'avc1') {
-                    var mime = 'video/mp4; codecs="avc1.640029';
+                    mime = 'video/mp4; codecs="avc1.640029';
 
                     if (0 && String(audiocodec).startsWith('mp4a')) {
                         if (audiocodec === 'mp4a') {
@@ -1709,21 +2041,7 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
                     return MediaSource.isTypeSupported(mime + '"') ? 1 : 0;
                 }
-
-                if (d && videocodec === undefined && audiocodec) {
-                    audiocodec = String(audiocodec).replace(/-/g, '.').toLowerCase(); // fLaC
-
-                    if (String(audiocodec).startsWith('mp4a')) {
-                        var swap = {'mp4a': 'mp4a.40.2', 'mp4a.69': 'mp3', 'mp4a.6b': 'mp3'};
-                        audiocodec = swap[audiocodec] || audiocodec;
-                    }
-                    var amime = 'audio/mp4; codecs="' + audiocodec + '"';
-                    if (mega.chrome && audiocodec === 'mp3') {
-                        amime = 'audio/mpeg';
-                    }
-                    return MediaSource.isTypeSupported(amime) ? 2 : 0;
-                }
-                break;
+                return canPlayMSEAudio();
 
             case 'WebM':
                 switch (mega.chrome && videocodec) {
@@ -1731,6 +2049,25 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
                     case 'V_VP9':
                         var codec = videocodec.substr(2).toLowerCase();
                         return MediaSource.isTypeSupported('video/webm; codecs="' + codec + '"') ? 1 : 0;
+                }
+                break;
+
+            case 'M4A ':
+                if (!mega.fullAudioContextSupport) {
+                    return canPlayMSEAudio();
+                }
+                mime = 'audio/aac';
+            /* fallthrough */
+            case 'Ogg':
+                mime = mime || 'audio/ogg';
+            /* fallthrough */
+            case 'Wave':
+                mime = mime || 'audio/wav';
+            /* fallthrough */
+            case 'MPEG Audio':
+                if (!videocodec) {
+                    mime = mime || (audiocodec === container ? 'audio/mpeg' : 'doh');
+                    return mega.fullAudioContextSupport && audioElement.canPlayType(mime) ? 2 : 0;
                 }
                 break;
         }
@@ -2036,18 +2373,17 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 
             M.req(req).tryCatch(success, reject);
 
-            if (Object(res.General).Cover_Data && !res.vcodec && req.n) {
-                var aes = new sjcl.cipher.aes([
-                    self.k[0] ^ self.k[4],
-                    self.k[1] ^ self.k[5],
-                    self.k[2] ^ self.k[6],
-                    self.k[3] ^ self.k[7]
-                ]);
-                try {
-                    createnodethumbnail(req.n, aes, req.n, str_to_ab(atob(res.General.Cover_Data)));
+            if (!res.vcodec && req.n) {
+                if (Object(res.General).Cover_Data) {
+                    try {
+                        setImage(self, str_to_ab(atob(res.General.Cover_Data)));
+                    }
+                    catch (ex) {
+                        console.warn(ex);
+                    }
                 }
-                catch (ex) {
-                    console.warn(ex);
+                else if (res.container === 'MPEG Audio') {
+                    getID3CoverArt(res.entry).then(setImage.bind(null, self)).catch(console.debug.bind(console));
                 }
             }
         });
@@ -2116,3 +2452,29 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
     Object.defineProperty(global, 'MediaAttribute', {value: Object.freeze(MediaAttribute)});
 
 })(self);
+
+mBroadcaster.once('startMega', function isAudioContextSupported() {
+    'use strict';
+
+    if ('AudioContext' in window) {
+        var ctx;
+        var stream;
+
+        try {
+            ctx = new AudioContext();
+            stream = new MediaStream();
+            stream = ctx.createMediaStreamDestination();
+            stream.connect(ctx.destination);
+        }
+        catch (ex) {
+            console.debug(ex);
+        }
+        finally {
+            if (typeof ctx.close === 'function') {
+                ctx.close().then(function() {
+                    mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
+                });
+            }
+        }
+    }
+});

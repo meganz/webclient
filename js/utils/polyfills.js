@@ -65,3 +65,17 @@ if (!String.prototype.endsWith) {
         return this.substr((pos | 0) - searchStr.length, searchStr.length) === searchStr;
     };
 }
+
+
+mBroadcaster.once('boot_done', function() {
+    'use strict';
+    var mg;
+
+    // Check whether the running browser is ES2019 compliant by testing RegExp's Look-behind Assertions.
+    try {
+        mg = '<foo one>m1</foo><foo doh>:</foo><foo two>m2</foo>'.match(RegExp('(?<=foo (?:one|two)>)([^<]+)', 'g'));
+    }
+    catch (ex) {}
+
+    Object.defineProperty(mega, 'es2019', {value: mg && mg.length === 2 && mg[0] === 'm1' && mg[1] === 'm2'});
+});

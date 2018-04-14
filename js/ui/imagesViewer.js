@@ -235,7 +235,7 @@ var zoom_mode;
 
         if (!n) {
             if (typeof id === 'object') {
-                n = id;
+                n = new MegaNode(id);
             }
             else if (typeof dl_node !== 'undefined' && dl_node.h === id) {
                 n = dl_node;
@@ -675,14 +675,13 @@ var zoom_mode;
 
         var $dlBut = $overlay.find('.viewer-button.download');
         $dlBut.rebind('click', function() {
-            for (var i in dl_queue) {
-                if (dl_queue[i] && dl_queue[i].id === slideshowid) {
+            for (var i = dl_queue.length; i--;) {
+                if (dl_queue[i] && dl_queue[i].id === slideshowid && dl_queue[i].preview) {
                     dl_queue[i].preview = false;
                     M.openTransfersPanel();
                     return;
                 }
             }
-
 
             // TODO: adapt the above code to work on the downloads page if we need to download the original
             if (page === 'download') {
@@ -854,7 +853,7 @@ var zoom_mode;
 
                     if (video && video.duration) {
 
-                        if (isThumbnailMissing(n) && n.u === u_handle && n.f !== u_handle) {
+                        if (isThumbnailMissing(n) && is_video(n) === 1 && n.u === u_handle && n.f !== u_handle) {
                             var took = Math.round(2 * video.duration / 100);
 
                             if (d) {
@@ -877,11 +876,7 @@ var zoom_mode;
 
                     return true;
                 });
-
-                if (d) {
-                    window.strm = preqs[n.h];
-                }
-            });
+            }).catch(console.warn.bind(console));
         });
 
         $overlay.removeClass('zoomed').addClass('video');
@@ -909,20 +904,14 @@ var zoom_mode;
             }
         }
         else if (String(n.fa).indexOf(':1*') > 0) {
-            api_getfileattr([{fa: M.d[id].fa, k: M.d[id].k}], 1, function(a, b, data) {
-                if (data !== 0xDEAD) {
-                    data = mObjectURL([data.buffer || data], 'image/jpeg');
+            getImage(n, 1).then(function(uri) {
+                previews[id].poster = uri;
 
-                    if (data) {
-                        previews[id].poster = data;
-
-                        if (id === slideshowid) {
-                            $video.attr('poster', data);
-                            $overlay.find('.viewer-image-bl').removeClass('default-state');
-                        }
-                    }
+                if (id === slideshowid) {
+                    $video.attr('poster', uri);
+                    $overlay.find('.viewer-image-bl').removeClass('default-state');
                 }
-            });
+            }).catch(console.debug.bind(console));
         }
         else {
             $overlay.find('.viewer-image-bl').addClass('default-state');
@@ -1011,7 +1000,7 @@ var zoom_mode;
             return;
         }
 
-        if (String(previews[id].type).startsWith('video')) {
+        if (/^(?:audio|video)\//i.test(previews[id].type)) {
             return slideshow_videostream(id, $overlay);
         }
 
@@ -1030,7 +1019,8 @@ var zoom_mode;
 
             // Apply img data to necessary image
             $imgCount.find('img').removeClass('active').removeAttr('style');
-            $imgCount.find('.' + imgClass).attr('src', this.src).addClass('active');
+            $imgCount.find('.' + imgClass).attr('src', ev.type === 'error' ? noThumbURI : this.src)
+                .addClass('active');
             $imgCount.attr('data-count', imgClass);
 
             // Set position, zoom values
@@ -1045,9 +1035,10 @@ var zoom_mode;
             $overlay.find('.viewer-image-bl').removeClass('default-state');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
-        };
-        img.onerror = function(ev) {
-            console.error('Preview image error', ev);
+
+            if (d && ev.type === 'error') {
+                console.debug('Failed to preview image...', src, ev);
+            }
         };
         img.src = src;
     }

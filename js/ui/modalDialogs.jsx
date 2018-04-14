@@ -189,7 +189,7 @@ var SelectContactDialog = React.createClass({
 
         return (
             <ModalDialog
-                title={__("Send Contact")}
+                title={__(l[8628])}
                 className={classes}
                 selected={self.state.selected}
                 onClose={() => {

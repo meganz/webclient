@@ -930,6 +930,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                             }
                         });
 
+                        msg.source = Message.SOURCE.IDB;
                         chatRoom.messagesBuff.restoreMessage(msg);
                     });
 
@@ -1501,7 +1502,8 @@ Chatd.prototype.leave = function(chatId) {
             });
             shard = null;
         }
-
+        // clear up pending list.
+        this.chatIdMessages[chatId].clearpending();
         delete this.chatIdMessages[chatId];
         delete this.chatIdShard[chatId];
     }
@@ -1732,6 +1734,19 @@ Chatd.Messages.prototype.clearpending = function() {
     // mapping of transactionids of messages being sent to the numeric index of this.buf
     var self = this;
     this.sendingList.forEach(function(msgxid) {
+        var num = self.sending[msgxid];
+        if (!num) {
+            return ;
+        }
+        self.chatd.trigger('onMessageUpdated', {
+            chatId: base64urlencode(self.chatId),
+            userId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.USERID]),
+            messageId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.MSGID]),
+            id: num >>> 0,
+            state: 'DISCARDED',
+            keyid: self.sendingbuf[num][Chatd.MsgField.KEYID],
+            message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
+        });
         self.removefrompersist(msgxid);
     });
     this.sending = {};
@@ -2081,6 +2096,10 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
     var chatRoom = self.megaChat.getChatById(base64urlencode(chatIdBin));
     var cdr = self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, chatIdBin);
     chatRoom.messagesBuff.messageOrders = {};
+    chatRoom.notDecryptedBuffer = {};
+    if (chatRoom.messagesBuff.messagesBatchFromHistory && chatRoom.messagesBuff.messagesBatchFromHistory.length > 0) {
+        chatRoom.messagesBuff.messagesBatchFromHistory.clear();
+    }
 
     if (oldChatIdMessages) {
         [
@@ -2108,17 +2127,21 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
 Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
     var self = this;
 
-    console.error("TO BE IMPLEMENTED, onJoinRangeHistReject", base64urlencode(chatIdBin), shardId);
+    var chatIdEnc = base64urlencode(chatIdBin);
+
     var promises = [];
+
+    backgroundNacl.workers.removeTasksByTagName("svlp:" + chatIdEnc);
+
     if (self.chatdPersist && ChatdPersist.isMasterTab()) {
-        promises.push(self.chatdPersist.clearChatHistoryForChat(base64urlencode(chatIdBin)));
+        promises.push(self.chatdPersist.clearChatHistoryForChat(chatIdEnc));
     }
 
     MegaPromise.allDone(promises)
         .always(function() {
             // clear any old messages
 
-            self._reinitChatIdHistory(base64urlencode(chatIdBin), true);
+            self._reinitChatIdHistory(chatIdEnc, true);
 
             var shard = self.shards[shardId];
             shard._sendHist(chatIdBin, Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1);

@@ -161,6 +161,7 @@ var Chat = function() {
             'callFeedback': CallFeedback,
             'presencedIntegration': PresencedIntegration,
             'persistedTypeArea': PersistedTypeArea,
+            'btRtfFilter': BacktickRtfFilter,
             'rtfFilter': RtfFilter
         },
         'chatNotificationOptions': {
@@ -493,9 +494,24 @@ Chat.prototype.getRoomFromUrlHash = function(urlHash) {
 };
 
 
-Chat.prototype.updateSectionUnreadCount = function() {
+Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
     var self = this;
 
+    if (!self.favico) {
+        assert(Favico, 'Favico.js is missing.');
+
+
+        $('link[rel="icon"]').attr('href',
+            (location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath) + 'favicon.ico'
+        );
+
+        self.favico = new Favico({
+            type : 'rectangle',
+            animation: 'popFade',
+            bgColor : '#fff',
+            textColor : '#d00'
+        });
+    }
     // update the "global" conversation tab unread counter
     var unreadCount = 0;
 
@@ -505,13 +521,13 @@ Chat.prototype.updateSectionUnreadCount = function() {
         unreadCount += c;
     });
 
+    unreadCount = unreadCount > 9 ? "9+" : unreadCount;
+
     // try NOT to touch the DOM if not needed...
     if (self._lastUnreadCount != unreadCount) {
-        if (unreadCount > 0) {
+        if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
             $('.new-messages-indicator')
-                .text(
-                unreadCount > 9 ? "9+" : unreadCount
-            )
+                .text(unreadCount)
                 .removeClass('hidden');
         }
         else {
@@ -520,9 +536,14 @@ Chat.prototype.updateSectionUnreadCount = function() {
         }
         self._lastUnreadCount = unreadCount;
 
+        delay('notifFavicoUpd', function () {
+            self.favico.reset();
+            self.favico.badge(unreadCount);
+        });
+
         self.updateDashboard();
     }
-};
+}, 100);
 
 /**
  * Destroy this MegaChat instance (leave all rooms then disconnect)

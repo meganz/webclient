@@ -111,9 +111,11 @@
                 dlLinkNode.click();
 
                 // restore beforeunload behavior...
-                if ($.memIOSaveAttempt === dl_id) {
-                    delete $.memIOSaveAttempt;
-                }
+                setTimeout(function() {
+                    if ($.memIOSaveAttempt === dl_id) {
+                        delete $.memIOSaveAttempt;
+                    }
+                }, 4e3);
             }
             else {
                 location.href = myURL.createObjectURL(blob);

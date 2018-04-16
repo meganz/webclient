@@ -1013,7 +1013,7 @@ var zoom_mode;
         }
 
         var img = new Image();
-        img.onload = function() {
+        img.onload = function(ev) {
             origImgWidth = img.width;
             origImgHeight = img.height;
 

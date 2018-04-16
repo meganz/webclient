@@ -1279,6 +1279,10 @@ ChatRoom.prototype.truncate = function() {
 };
 
 ChatRoom.prototype._rebuildAttachments = SoonFc(function() {
+    if (!M.chat) {
+        return;
+    }
+
     var self = this;
 
     var imagesList = [];

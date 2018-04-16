@@ -12136,6 +12136,10 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype._rebuildAttachments = SoonFc(function () {
+	    if (!M.chat) {
+	        return;
+	    }
+
 	    var self = this;
 
 	    var imagesList = [];

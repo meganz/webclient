@@ -132,25 +132,19 @@
     font-size: 0;
     line-height: 0;
 }
-.viewer-image-bl video {
-    max-width: 100%;
-    max-height: 100%;
-    width: 100%;
-    height: 100%;
-    background-color: black;
-}
-.viewer-image-bl:not(.default-state) video {
+.viewer-image-bl video, .viewer-image-bl embed, .viewer-image-bl iframe {
     max-width: -webkit-calc(100% - 342px);
     max-width: -moz-calc(100% - 342px);
     max-width: calc(100% - 342px);
     max-height: -webkit-calc(100% - 182px);
     max-height: -moz-calc(100% - 182px);
     max-height: calc(100% - 182px);
+    width: auto;
+    height: auto;
+    background-color: black;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    width: auto;
-    height: auto;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -163,36 +157,8 @@
     border-radius: 4px;
 }
 .viewer-image-bl embed, .viewer-image-bl iframe {
-    min-width: 64%;
-    min-height: 86%;
-    margin-bottom: 34px;
-}
-.viewer-overlay:not(.video-theatre-mode) .viewer-image-bl.default-state {
-    border: 12px solid #111111;
-    background-color: #111111;
-    background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
-    background-image: none;
-    background-size: 24px 24px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    max-width: -webkit-calc(100% - 342px);
-    max-width: -moz-calc(100% - 342px);
-    max-width: calc(100% - 342px);
-    max-height: -webkit-calc(100% - 182px);
-    max-height: -moz-calc(100% - 182px);
-    max-height: calc(100% - 182px);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.video .viewer-image-bl {
-    width: -webkit-calc(100% - 342px);
-    width: -moz-calc(100% - 342px);
-    width: calc(100% - 342px);
-    height: -webkit-calc(100% - 182px);
-    height: -moz-calc(100% - 182px);
-    height: calc(100% - 182px);
+    width: 100%;
+    height: 100%;
 }
 .viewer-image-bl .img-wrap {
     width: 100%;
@@ -488,7 +454,7 @@
 .video-theatre-mode .viewer-bottom-bl, .video-theatre-mode .viewer-top-bl {
     background-color: rgba(0,0,0,0.5);
 }
-.video .viewer-image-bl.default-state {
+.video-theatre-mode .viewer-image-bl.default-state {
     /* height: auto; */
     background-color: black;
 }

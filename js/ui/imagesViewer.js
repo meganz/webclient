@@ -646,7 +646,7 @@ var zoom_mode;
         $overlay.find('.viewer-filename').text(n.name);
         $overlay.find('.viewer-pending').removeClass('hidden');
         $overlay.find('.viewer-progress').addClass('hidden');
-        $overlay.find('.viewer-error').addClass('hidden');
+        $overlay.find('.viewer-progress, .viewer-error, video').addClass('hidden');
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
         $overlay.find('.viewer-progress p').removeAttr('style');
 
@@ -884,7 +884,7 @@ var zoom_mode;
         $overlay.find('.viewer-pending').addClass('hidden');
         // $overlay.find('.viewer-progress').addClass('hidden');
         $overlay.find('.viewer-image-bl .img-wrap').addClass('hidden');
-        $overlay.find('.viewer-image-bl').addClass('default-state').removeClass('hidden');
+        $overlay.find('.viewer-image-bl').removeClass('hidden');
 
         if (n.name) {
             var c = MediaAttribute.getCodecStrings(n);
@@ -898,10 +898,6 @@ var zoom_mode;
 
         if (previews[id].poster !== undefined) {
             $video.attr('poster', previews[id].poster);
-
-            if (previews[id].poster) {
-                $overlay.find('.viewer-image-bl').removeClass('default-state');
-            }
         }
         else if (String(n.fa).indexOf(':1*') > 0) {
             getImage(n, 1).then(function(uri) {
@@ -909,7 +905,6 @@ var zoom_mode;
 
                 if (id === slideshowid) {
                     $video.attr('poster', uri);
-                    $overlay.find('.viewer-image-bl').removeClass('default-state');
                 }
             }).catch(console.debug.bind(console));
         }
@@ -971,7 +966,8 @@ var zoom_mode;
 
     function previewsrc(id) {
         var $overlay = $('.viewer-overlay');
-        var $imgCount = $overlay.find('.viewer-image-bl .img-wrap');
+        var $imgBlock = $overlay.find('.viewer-image-bl');
+        var $imgCount = $imgBlock.find('.img-wrap');
         var imgCountVal = $imgCount.attr('data-count');
         var imgClass = '';
 
@@ -982,16 +978,15 @@ var zoom_mode;
         }
 
         $overlay.removeClass('video video-theatre-mode');
-        $overlay.find('.viewer-image-bl embed').addClass('hidden');
-        $overlay.find('.viewer-image-bl video').addClass('hidden');
-        $overlay.find('.viewer-image-bl .img-wrap').removeClass('hidden');
-        $('#pdfpreviewdiv1').addClass('hidden');
+        $imgBlock.find('embed').addClass('hidden');
+        $imgBlock.find('video').addClass('hidden');
+        $imgBlock.find('.img-wrap').removeClass('hidden');
+        $imgBlock.find('#pdfpreviewdiv1').addClass('hidden');
 
         if (previews[id].type === 'application/pdf') {
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
-            $overlay.find('.viewer-image-bl .img-wrap').addClass('hidden');
-            $overlay.find('.viewer-image-bl').removeClass('default-state');
+            $imgBlock.find('.img-wrap').addClass('hidden');
             // preview pdfs using pdfjs for all browsers #8036
             // to fix pdf compatibility - Bug #7796
             localStorage.setItem('currPdfPrev2', JSON.stringify(src));
@@ -1032,7 +1027,6 @@ var zoom_mode;
                 slideshow_imgPosition($overlay);
             });
 
-            $overlay.find('.viewer-image-bl').removeClass('default-state');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
 

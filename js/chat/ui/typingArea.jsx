@@ -396,11 +396,13 @@ var TypingArea = React.createClass({
             // delay is required, otherwise the onBlur -> setState may cause halt of child onclick handlers, in case
             // of a onClick in the emoji autocomplete.
             setTimeout(function() {
-                self.setState({
-                    'emojiSearchQuery': false,
-                    'emojiStartPos': false,
-                    'emojiEndPos': false
-                });
+                if (self.isMounted()) {
+                    self.setState({
+                        'emojiSearchQuery': false,
+                        'emojiStartPos': false,
+                        'emojiEndPos': false
+                    });
+                }
             }, 300);
         }
     },
@@ -810,8 +812,12 @@ var TypingArea = React.createClass({
 
         var emojiAutocomplete = null;
         if (self.state.emojiSearchQuery) {
+
             emojiAutocomplete = <EmojiAutocomplete
                 emojiSearchQuery={self.state.emojiSearchQuery}
+                emojiStartPos={self.state.emojiStartPos}
+                emojiEndPos={self.state.emojiEndPos}
+                typedMessage={self.state.typedMessage}
                 onPrefill={function(e, emojiAlias) {
                     if (
                         $.isNumeric(self.state.emojiStartPos) &&

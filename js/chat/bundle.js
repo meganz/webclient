@@ -7832,11 +7832,13 @@ React.makeElement = React['createElement'];
 	        if (self.state.emojiSearchQuery) {
 
 	            setTimeout(function () {
-	                self.setState({
-	                    'emojiSearchQuery': false,
-	                    'emojiStartPos': false,
-	                    'emojiEndPos': false
-	                });
+	                if (self.isMounted()) {
+	                    self.setState({
+	                        'emojiSearchQuery': false,
+	                        'emojiStartPos': false,
+	                        'emojiEndPos': false
+	                    });
+	                }
 	            }, 300);
 	        }
 	    },
@@ -8177,8 +8179,12 @@ React.makeElement = React['createElement'];
 
 	        var emojiAutocomplete = null;
 	        if (self.state.emojiSearchQuery) {
+
 	            emojiAutocomplete = React.makeElement(EmojiAutocomplete, {
 	                emojiSearchQuery: self.state.emojiSearchQuery,
+	                emojiStartPos: self.state.emojiStartPos,
+	                emojiEndPos: self.state.emojiEndPos,
+	                typedMessage: self.state.typedMessage,
 	                onPrefill: function onPrefill(e, emojiAlias) {
 	                    if ($.isNumeric(self.state.emojiStartPos) && $.isNumeric(self.state.emojiEndPos)) {
 	                        var msg = self.state.typedMessage;
@@ -8834,7 +8840,7 @@ React.makeElement = React['createElement'];
 	    bindKeyEvents: function bindKeyEvents() {
 	        var self = this;
 	        $(document).rebind('keydown.emojiAutocomplete' + self.getUniqueId(), function (e) {
-	            if (!self.props.emojiSearchQuery) {
+	            if (!self._wasRendered || !self.props.emojiSearchQuery) {
 	                self.unbindKeyEvents();
 	                return;
 	            }
@@ -8943,6 +8949,16 @@ React.makeElement = React['createElement'];
 	            return null;
 	        }
 
+	        var startPos = self.props.emojiStartPos;
+	        var endPos = self.props.emojiEndPos;
+	        var typedMessage = self.props.typedMessage;
+	        var strictMatch = typedMessage.substr(startPos, endPos - startPos);
+	        if (strictMatch.substr(0, 1) === ":" && strictMatch.substr(-1) === ":") {
+	            strictMatch = strictMatch.substr(1, strictMatch.length - 2);
+	        } else {
+	            strictMatch = false;
+	        }
+
 	        self.preload_emojis();
 
 	        if (self.loadingPromise && self.loadingPromise.state() === 'pending') {
@@ -8962,6 +8978,8 @@ React.makeElement = React['createElement'];
 	        var exactMatch = [];
 	        var partialMatch = [];
 	        var emojis = self.data_emojis || [];
+	        var foundIndexHash = {};
+
 	        for (var i = 0; i < emojis.length; i++) {
 	            var emoji = emojis[i];
 	            var match = emoji.n.indexOf(q);
@@ -8975,9 +8993,33 @@ React.makeElement = React['createElement'];
 	            if (exactMatch.length >= self.props.maxEmojis) {
 	                break;
 	            }
-	        };
+	        }
+
+	        exactMatch.sort(function (a, b) {
+	            if (a.n === q) {
+	                return -1;
+	            } else if (b.n === q) {
+	                return 1;
+	            } else {
+	                return 0;
+	            }
+	        });
 
 	        var found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
+
+	        if (strictMatch) {
+	            for (var i = 0; i < found.length; i++) {
+	                foundIndexHash[found[i].n] = 1;
+	            }
+
+	            if (foundIndexHash[strictMatch]) {
+
+	                this._wasRendered = false;
+	                this.unbindKeyEvents();
+	                return null;
+	            }
+	        }
+	        this._wasRendered = true;
 
 	        exactMatch = partialMatch = null;
 

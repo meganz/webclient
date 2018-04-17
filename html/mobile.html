@@ -471,7 +471,7 @@
                 <div class="mobile recovery-key-text">[$17688]</div>
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
-            <div class="mobile acount-cancellation-block hidden">
+            <div class="mobile acount-cancellation-block">
                 <div class="mobile fm-icon broken-heart"></div>
                 <div class="mobile account-upgrade-text">[$16115]</div>
                 <div class="mobile fm-icon right-arrow"></div>
@@ -538,7 +538,7 @@
 </div>
 
 
-<!-- Cancel account page (ToDo: this is not actually implemented yet) -->
+<!-- Cancel account page -->
 <div class="mobile main-block cancel-account hidden">
     <div class="mobile fm-header fm-hr">
         <div class="mobile fm-icon top-icon menu right"></div>
@@ -554,24 +554,38 @@
                     </div>
                     <div class="mobile red-heading">[$6844]</div>
                     <form class="mobile inline-labels radio-button-form">
-                        <div class="radioOff" id="res2_div"><input type="radio" name="feedback-radio" id="res2" value="2"></div>
-                        <label for="res2" class="radio-txt">[$6226]</label>
-
-                        <div class="radioOff" id="res3_div"><input type="radio" name="feedback-radio" id="res3" value="3"></div>
-                        <label for="res3" class="radio-txt">[$6227]</label>
-
-                        <div class="radioOff" id="res4_div"><input type="radio" name="feedback-radio" id="res4" value="4"></div>
-                        <label for="res4" class="radio-txt">[$6846]</label>
-
-                        <div class="radioOff" id="res5_div"><input type="radio" name="feedback-radio" id="res5" value="5"></div>
-                        <label for="res5" class="radio-txt">[$6229]</label>
-
-                        <div class="radioOff" id="res6_div"><input type="radio" name="feedback-radio" id="res6" value="6"></div>
-                        <label for="res6" class="radio-txt">[$6847]</label>
-
-                        <div class="radioOff" id="res7_div"><input type="radio" name="feedback-radio" id="res7" value="7"></div>
-                        <label for="res7" class="radio-txt">[$2007]</label>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input type="radio" name="feedback-radio" value="1" data-english-log-text="I don't use my account anymore"></div>
+                            <label class="radio-txt">[$6845]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input type="radio" name="feedback-radio" value="2" data-english-log-text="I have another MEGA account"></div>
+                            <label class="radio-txt">[$6226]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input type="radio" name="feedback-radio" value="3" data-english-log-text="I have experienced too many problems"></div>
+                            <label class="radio-txt">[$6227]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input type="radio" name="feedback-radio" value="4" data-english-log-text="My favourite browser is not technologically compatible and I don't want to change"></div>
+                            <label class="radio-txt">[$6846]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input type="radio" name="feedback-radio" value="5" data-english-log-text="I find the interface too confusing to use"></div>
+                            <label class="radio-txt">[$6229]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input type="radio" name="feedback-radio" value="6" data-english-log-text="MEGA has under delivered on its promise"></div>
+                            <label class="radio-txt">[$6847]</label>
+                        </div>
+                        <div class="mobile radio-option">
+                            <div class="radioOff"><input type="radio" name="feedback-radio" value="7" data-english-log-text="Other"></div>
+                            <label class="radio-txt">[$2007]</label>
+                        </div>
                     </form>
+                    <div class="mobile buttons">
+                        <a class="mobile red-button first confirm-close-account-button"><i></i> <span>[$16115]</span></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -680,7 +694,7 @@
 
 
 <!-- Check email dialog if they have a recovery key - Method A-3 & Method B-3 of recovery process -->
-<div class="mobile fm-block generic-dialog-overlay recovery-check-email-dialog hidden">
+<div class="mobile fm-block generic-dialog-overlay common-check-email-dialog hidden">
     <div class= "mobile center-block">
         <div class="mobile fm-block check-email-dialog">
             <div class="mobile fm-row">
@@ -1056,56 +1070,81 @@
             <div class="mobile fm-dialog-close hidden"></div>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
-                <div class="mobile filename"><em>[$5533]</em></div>
-                <div class="mobile file-download-info">
-                    <div class="mobile download-speed"></div>
-                    <div class="mobile filesize"></div>
-                    <div class="mobile download-percents"></div>
-                </div>
-                <a class="mobile red-button first dl-browser"> <i></i> <span>[$8947]</span> </a>
-                <a class="mobile red-button second dl-megaapp"> <i></i> <span>[$8948]</span> </a>
-                <!-- Progressbar is hidden. "downloading" body class will show it !-->
-                <!-- Set width to ".bar" block !-->
-                <a class="mobile download-progress">
-                    <div class="bar"></div>
-                    <span class="mobile">[$8949]</span>
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="mobile content-row second">
-        <div class="mobile content-cell">
-            <div class="mobile app-info-block">
-                <div class="mobile fm-dialog-close hidden"></div>
-                <div class="mobile app-info top">
-                    <div class="mobile app-info-cell">
-                        <div class="mobile wrong-file-block">
-                            <i class="mobile warning-icon"></i>
-                            <div class="mobile error-txt file-too-large hidden">[$8951]</div>
-                            <div class="mobile error-txt file-unsupported hidden">[$8952]</div>
+                <div class="mobile bottom-page scroll-block download">
+                    <!-- Video player Elements-->
+                    <div class="download video-block">
+                        <div class="viewer-top-bl">
+                            <div class="viewer-filename">
+                                <div class="mobile filename">[$5533]</div>
+                            </div>
                         </div>
-                        <div class="mobile application-txt standalone-download-message hidden">
-                            [$8950]
+                        <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
+                        <div class="download play-video-button"></div>
+                        <div class="viewer-pending hidden">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
                         </div>
-                        <div class="mobile application-txt file-manager-download-message hidden">
-                            [$16107]
+                        <div class="viewer-bottom-bl">
+                            <div id="video-controls" class="video-controls" data-state="hidden">
+                                <div data-state="play" class="viewer-button left playpause">
+                                    <i class="medium-icon icons-img play"></i>
+                                </div>
+                                <div class="volume-control left hidden" style="">
+                                    <div data-state="mute" class="viewer-button mute">
+                                        <i class="medium-icon icons-img volume"></i>
+                                    </div>
+                                    <div class="video-vol-range">
+                                        <div class="volume-bar"><span style="height: 100%;"></span></div>
+                                    </div>
+                                </div>
+                                <div class="video-timing current left">00:00</div>
+                                <div data-state="go-fullscreen" class="viewer-button right fs">
+                                    <i class="medium-icon icons-img fullscreen"></i>
+                                </div>
+                                <div class="video-timing duration right">03:09</div>
+                                <div class="video-progress-block">
+                                    <div class="video-progress-bar">
+                                        <div class="video-time-bar"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mobile dl-app-link hidden">
-                            <a class="mobile dl-megaapp"> <i></i> <span>[$17733]</span> </a>
-                       </div>
-                       <a class="mobile download-app"></a>
-                   </div>
-               </div>
-               <div class="mobile app-info bottom">
-                <div class="mobile app-info-cell bottom-align">
-                    <div class="mobile tablet-img-wrapper">
-                        <div class="mobile tablet-img"></div>
                     </div>
+                    <!-- End of Video player Elements-->
+                    <div class="mobile filename"><em>[$5533]</em></div>
+                    <div class="mobile file-download-info">
+                        <div class="mobile download-speed"></div>
+                        <div class="mobile filesize"></div>
+                        <div class="mobile download-percents"></div>
+                    </div>
+                    <a class="mobile red-button first dl-browser"> <i></i> <span>[$8947]</span> </a>
+                    <a class="mobile red-button second dl-megaapp"> <i></i> <span>[$8948]</span> </a>
+                    <!-- Progressbar is hidden. "downloading" body class will show it !-->
+                    <!-- Set width to ".bar" block !-->
+                    <a class="mobile download-progress">
+                        <div class="bar"></div>
+                        <span class="mobile">[$8949]</span>
+                    </a>
+                </div>
+            </div>
+            <div class="mobile app-info-cell">
+                <div class="mobile app-info-block">
+                    <div class="mobile wrong-file-block">
+                        <div class="mobile error-txt file-too-large hidden">[$8951]</div>
+                        <div class="mobile error-txt file-unsupported hidden">[$8952]</div>
+                    </div>
+                    <div class="mobile application-txt standalone-download-message hidden">
+                        [$8950]
+                    </div>
+                    <div class="mobile application-txt file-manager-download-message hidden">
+                        [$16107]
+                    </div>
+                    <a class="mobile download-app"></a>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 
@@ -1148,6 +1187,7 @@
                     <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
                     <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
                 </div>
+                 <a class="mobile text-button third cancel"><span>Close</span> </a>
             </div>
         </div>
     </div>

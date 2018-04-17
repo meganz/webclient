@@ -20,6 +20,13 @@
     var APPACTIVITYHANDLER_MOUSEMOVE_THROTTLING = APPACTIVITYHANDLER_ACTIVITY_TIMEOUT / 3;
 
     /**
+     * Blur and focus throttling
+     *
+     * @type {Number}
+     */
+    var APPACTIVITYHANDLER_BLUR_FOCUS_THROTTLING = 300;
+
+    /**
      * AppActivityHandler's main goal is to provide a single, reusable and performance optimised handler for notifying
      * our internal implementation stuff when the user is active and when not.
      *
@@ -78,6 +85,8 @@
         var self = this;
 
         var _isActive = true;
+
+        self._windowIsActive = _isActive = document.hasFocus && document.hasFocus() ? true : false;
 
         Object.defineProperty(this, "isActive", {
             get: function() { return _isActive; },
@@ -185,7 +194,7 @@
     };
 
     /**
-     * Enable activity handlin
+     * Enable activity handling
      * g and the required events/timers
      * @private
      */
@@ -216,6 +225,14 @@
                 }, APPACTIVITYHANDLER_ACTIVITY_TIMEOUT);
             }
         });
+        $(window).rebind('focus.appActivityHandler', function() {
+            self._windowIsActive = true;
+            self._throttledWindowIsActiveChanged();
+        });
+        $(window).rebind('blur.appActivityHandler', function() {
+            self._windowIsActive = false;
+            self._throttledWindowIsActiveChanged();
+        });
 
         self._timer = setTimeout(function() {
             if (self.debugMode) {
@@ -231,6 +248,8 @@
      * @private
      */
     AppActivityHandler.prototype._activityHandlingDisable = function() {
+        var self = this;
+
         if (self._timer) {
             clearTimeout(self._timer);
             self._timer = false;
@@ -240,6 +259,16 @@
         $(window).unbind('keypress.appActivityHandler');
     };
 
+    /**
+     * Throttled function (by SoonFc) that should notify subscribers on active change.
+     * @private
+     */
+    AppActivityHandler.prototype._throttledWindowIsActiveChanged = SoonFc(function() {
+        var self = this;
+        if (self._windowIsActive !== self.isActive) {
+            self.isActive = self._windowIsActive;
+        }
+    }, 300);
 
     /**
      * Method that would cleanup any internal data and started timers.
@@ -279,5 +308,6 @@
 
     AppActivityHandler.APPACTIVITYHANDLER_ACTIVITY_TIMEOUT = APPACTIVITYHANDLER_ACTIVITY_TIMEOUT;
     AppActivityHandler.APPACTIVITYHANDLER_MOUSEMOVE_THROTTLING = APPACTIVITYHANDLER_MOUSEMOVE_THROTTLING;
+    AppActivityHandler.APPACTIVITYHANDLER_BLUR_FOCUS_THROTTLING = APPACTIVITYHANDLER_BLUR_FOCUS_THROTTLING;
     scope.AppActivityHandler = AppActivityHandler;
 })(window);

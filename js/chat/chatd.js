@@ -1507,7 +1507,8 @@ Chatd.prototype.leave = function(chatId) {
             });
             shard = null;
         }
-
+        // clear up pending list.
+        this.chatIdMessages[chatId].clearpending();
         delete this.chatIdMessages[chatId];
         delete this.chatIdShard[chatId];
     }
@@ -1738,6 +1739,19 @@ Chatd.Messages.prototype.clearpending = function() {
     // mapping of transactionids of messages being sent to the numeric index of this.buf
     var self = this;
     this.sendingList.forEach(function(msgxid) {
+        var num = self.sending[msgxid];
+        if (!num) {
+            return ;
+        }
+        self.chatd.trigger('onMessageUpdated', {
+            chatId: base64urlencode(self.chatId),
+            userId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.USERID]),
+            messageId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.MSGID]),
+            id: num >>> 0,
+            state: 'DISCARDED',
+            keyid: self.sendingbuf[num][Chatd.MsgField.KEYID],
+            message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
+        });
         self.removefrompersist(msgxid);
     });
     this.sending = {};

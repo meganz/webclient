@@ -65,6 +65,11 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.shownMessages = {};
     this.attachments = new MegaDataMap(this);
     this.images = new MegaDataSortedMap("id", "orderValue", this);
+    this.images.addChangeListener(function() {
+        if (slideshowid) {
+            self._rebuildAttachments();
+        }
+    });
 
     self.members = {};
 
@@ -794,7 +799,9 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
     var megaChat = this.megaChat;
 
+    megaChat.trigger('onPreBeforeSendMessage', messageObject);
     megaChat.trigger('onBeforeSendMessage', messageObject);
+    megaChat.trigger('onPostBeforeSendMessage', messageObject);
 
     return megaChat.plugins.chatdIntegration.sendMessage(
         self,
@@ -1270,6 +1277,69 @@ ChatRoom.prototype.truncate = function() {
         }
     }
 };
+
+ChatRoom.prototype._rebuildAttachments = SoonFc(function() {
+    if (!M.chat) {
+        return;
+    }
+
+    var self = this;
+
+    var imagesList = [];
+    var deleted = [];
+    self.images.values().forEach(function(v) {
+        var msg = self.messagesBuff.getMessageById(v.messageId);
+        if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
+            slideshowid && deleted.push(v.id.substr(-8));
+            self.images.removeByKey(v.id);
+            return;
+        }
+        imagesList.push(v);
+    });
+
+    M.v = imagesList;
+
+
+    var slideshowCalled = false;
+    slideshowid && deleted.forEach(function(currentNodeId) {
+        if (currentNodeId === slideshowid) {
+            var lastNode;
+            var found = false;
+            M.v.forEach(function(node) {
+                if (!found && node.h !== currentNodeId) {
+                    lastNode = node.h;
+                }
+                if (node.h === currentNodeId) {
+                    found = true;
+                }
+
+            });
+
+            if (!lastNode) {
+                for (var i = 0; i < M.v.length; i++) {
+                    if (M.v[i].h !== currentNodeId) {
+                        lastNode = M.v[i].h;
+                        break;
+                    }
+                }
+            }
+
+            if (!lastNode) {
+                // no nodes? close
+                slideshow(undefined, true);
+                slideshowCalled = true;
+            }
+            else {
+                // go back 1 node, since slideshow_steps crashes.
+                slideshow(lastNode, undefined, true);
+                slideshowCalled = true;
+            }
+        }
+    });
+
+    slideshowid && !slideshowCalled && slideshow(slideshowid, undefined, true);
+
+}, 500);
 
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

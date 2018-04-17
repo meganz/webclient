@@ -280,7 +280,20 @@ var TypingArea = React.createClass({
             }
         }
         else {
+            if (self.prefillMode && (
+                    key === 8 /* backspace */ ||
+                    key === 32 /* space */ ||
+                    key === 13 /* backspace */
+                )
+            ) {
+                // cancel prefill mode.
+                self.prefillMode = false;
+            }
             var char = String.fromCharCode(key);
+            if (self.prefillMode) {
+                return; // halt next checks if its in prefill mode.
+            }
+
             if (
                 key === 16 /* shift */ ||
                 key === 17 /* ctrl */ ||
@@ -341,7 +354,19 @@ var TypingArea = React.createClass({
                     return;
                 }
                 else {
-                    if (!element.value || element.value.length <= 2) {
+                    if (
+                        !matchedWord &&
+                        self.state.emojiStartPos !== false &&
+                        self.state.emojiEndPos !== false
+                    ) {
+                        matchedWord = element.value.substr(self.state.emojiStartPos, self.state.emojiEndPos);
+                    }
+
+                    if (
+                        !element.value ||
+                        element.value.length <= 2 ||
+                        matchedWord.length === 1 /* used backspace to delete the emoji search query?*/
+                    ) {
                         self.setState({
                             'emojiSearchQuery': false,
                             'emojiStartPos': false,
@@ -732,6 +757,18 @@ var TypingArea = React.createClass({
     isActive: function () {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
     },
+    resetPrefillMode: function() {
+        this.prefillMode = false;
+    },
+    onCopyCapture: function(e) {
+        this.resetPrefillMode();
+    },
+    onCutCapture: function(e) {
+        this.resetPrefillMode();
+    },
+    onPasteCapture: function(e) {
+        this.resetPrefillMode();
+    },
     render: function () {
         var self = this;
 
@@ -783,6 +820,10 @@ var TypingArea = React.createClass({
                         var msg = self.state.typedMessage;
                         var pre = msg.substr(0, self.state.emojiStartPos);
                         var post = msg.substr(self.state.emojiEndPos, msg.length);
+
+                        self.onUpdateCursorPosition = self.state.emojiStartPos + emojiAlias.length;
+
+                        self.prefillMode = true;
                         self.setState({
                             'typedMessage': pre + emojiAlias + (
                                 post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
@@ -804,6 +845,7 @@ var TypingArea = React.createClass({
                         var val = pre + emojiAlias + (
                             post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
                         );
+                        self.prefillMode = false;
                         self.setState({
                             'typedMessage': val,
                             'emojiSearchQuery': false,
@@ -818,6 +860,7 @@ var TypingArea = React.createClass({
                     }
                 }}
                 onCancel={function () {
+                    self.prefillMode = false;
                     self.setState({
                         'emojiSearchQuery': false,
                         'emojiStartPos': false,
@@ -861,6 +904,9 @@ var TypingArea = React.createClass({
                         style={textareaStyles}
                         disabled={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
                         readOnly={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
+                        onCopyCapture={self.onCopyCapture}
+                        onPasteCapture={self.onPasteCapture}
+                        onCutCapture={self.onCutCapture}
                     ></textarea>
                     <div className="message-preview"></div>
                 </div>

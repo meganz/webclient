@@ -1,0 +1,25 @@
+/* Unique language styling 
+   Update the standard font family from Source Sans Pro to Noto Naskh non latin/cyrillic text
+   */
+
+/* Arabic/Farsi .ar .fa */ 
+@font-face {
+    font-family: 'noto_nashk_regular';
+    src: url('../fonts/international-text/NotoNaskhArabicUI-Regular.ttf') format('truetype');
+    font-style: normal;
+}
+@font-face {
+    font-family: 'noto_nashk_bold';
+    src: url('../fonts/international-text/NotoNaskhArabicUI-Bold.ttf') format('truetype');
+    font-style: normal;
+}
+
+body.ar, body.ar div, body.ar span, body.ar input, body.ar form, body.ar label, body.ar textarea, body.ar option, body.ar select,
+body.fa, body.ar div, body.ar span, body.fa input, body.fa form, body.fa label, body.fa textarea, body.fa option, body.fa select {
+    font-family: 'noto_nashk_regular', 'source_sans_proregular';
+}
+
+body.ar .message.user-card-name,
+body.fa .message.user-card-name {
+    font-family: 'noto_nashk_bold', 'source_sans_prosemibold';
+}

@@ -52,10 +52,15 @@ var EmojiAutocomplete = React.createClass({
                 return;
             }
 
+            if (e.altKey || e.metaKey) {
+                // don't process this event if alt is pressed. e.g. alt + left should allow selection
+                return;
+            }
+
             var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
 
             var handled = false;
-            if (key === 37 || key === 38) {
+            if (!e.shiftKey && (key === 37 || key === 38)) {
                 // up/left
                 selected = selected - 1;
                 selected = selected < 0 ? self.maxFound - 1 : selected;
@@ -69,7 +74,7 @@ var EmojiAutocomplete = React.createClass({
                     self.props.onPrefill(false, ":" + self.found[selected].n + ":");
                 }
             }
-            else if (key === 39 || key === 40 || key === 9) {
+            else if (!e.shiftKey && (key === 39 || key === 40 || key === 9)) {
                 // down, right, tab
                 selected = selected + (key === 9 ? (e.shiftKey ? -1 : 1): 1);
                 // support for shift+tab (left/back)

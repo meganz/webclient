@@ -180,6 +180,7 @@ React.makeElement = React['createElement'];
 	            'callFeedback': CallFeedback,
 	            'presencedIntegration': PresencedIntegration,
 	            'persistedTypeArea': PersistedTypeArea,
+	            'btRtfFilter': BacktickRtfFilter,
 	            'rtfFilter': RtfFilter
 	        },
 	        'chatNotificationOptions': {
@@ -1208,17 +1209,37 @@ React.makeElement = React['createElement'];
 	        if (lastMessage) {
 	            var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
 
-	            var renderableSummary = lastMessage.textContents;
+	            var renderableSummary;
+	            if (lastMessage.renderableSummary) {
+	                renderableSummary = lastMessage.renderableSummary;
+	            } else {
+	                renderableSummary = htmlentities(lastMessage.textContents);
 
-	            if (lastMessage.isManagement && lastMessage.isManagement()) {
-	                renderableSummary = lastMessage.getManagementMessageSummaryText();
-	            } else if (!lastMessage.textContents && lastMessage.dialogType) {
-	                renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+	                if (lastMessage.isManagement && lastMessage.isManagement()) {
+	                    renderableSummary = lastMessage.getManagementMessageSummaryText();
+	                } else if (!lastMessage.textContents && lastMessage.dialogType) {
+	                    renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+	                }
+
+	                var escapeUnescapeArgs = [{ 'type': 'onPreBeforeRenderMessage', 'textOnly': true }, { 'message': { 'textContents': renderableSummary } }, ['textContents', 'messageHtml'], 'messageHtml'];
+
+	                megaChat.plugins.btRtfFilter.escapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+	                renderableSummary = escapeUnescapeArgs[1].message.textContents;
+
+	                renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+	                renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+
+	                escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
+
+	                escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+
+	                renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
+
+	                renderableSummary = renderableSummary || "";
+	                renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
+	                renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+	                lastMessage.renderableSummary = renderableSummary;
 	            }
-
-	            renderableSummary = htmlentities(renderableSummary);
-	            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
-	            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
 
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
 
@@ -6141,7 +6162,7 @@ React.makeElement = React['createElement'];
 	        return React.makeElement(
 	            ModalDialog,
 	            {
-	                title: __("Send Contact"),
+	                title: __(l[8628]),
 	                className: classes,
 	                selected: self.state.selected,
 	                onClose: function onClose() {
@@ -7728,7 +7749,15 @@ React.makeElement = React['createElement'];
 	                return;
 	            }
 	        } else {
+	            if (self.prefillMode && (key === 8 || key === 32 || key === 13)) {
+
+	                self.prefillMode = false;
+	            }
 	            var char = String.fromCharCode(key);
+	            if (self.prefillMode) {
+	                return;
+	            }
+
 	            if (key === 16 || key === 17 || key === 18 || key === 91 || key === 8 || key === 37 || key === 39 || key === 40 || key === 38 || key === 9 || char.match(self.validEmojiCharacters)) {
 	                var currentContent = element.value;
 	                var currentCursorPos = self.getCursorPosition(element) - 1;
@@ -7772,7 +7801,11 @@ React.makeElement = React['createElement'];
 	                    });
 	                    return;
 	                } else {
-	                    if (!element.value || element.value.length <= 2) {
+	                    if (!matchedWord && self.state.emojiStartPos !== false && self.state.emojiEndPos !== false) {
+	                        matchedWord = element.value.substr(self.state.emojiStartPos, self.state.emojiEndPos);
+	                    }
+
+	                    if (!element.value || element.value.length <= 2 || matchedWord.length === 1) {
 	                        self.setState({
 	                            'emojiSearchQuery': false,
 	                            'emojiStartPos': false,
@@ -8101,6 +8134,18 @@ React.makeElement = React['createElement'];
 	    isActive: function isActive() {
 	        return document.hasFocus() && this.$messages && this.$messages.is(":visible");
 	    },
+	    resetPrefillMode: function resetPrefillMode() {
+	        this.prefillMode = false;
+	    },
+	    onCopyCapture: function onCopyCapture(e) {
+	        this.resetPrefillMode();
+	    },
+	    onCutCapture: function onCutCapture(e) {
+	        this.resetPrefillMode();
+	    },
+	    onPasteCapture: function onPasteCapture(e) {
+	        this.resetPrefillMode();
+	    },
 	    render: function render() {
 	        var self = this;
 
@@ -8141,6 +8186,10 @@ React.makeElement = React['createElement'];
 	                        var msg = self.state.typedMessage;
 	                        var pre = msg.substr(0, self.state.emojiStartPos);
 	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+
+	                        self.onUpdateCursorPosition = self.state.emojiStartPos + emojiAlias.length;
+
+	                        self.prefillMode = true;
 	                        self.setState({
 	                            'typedMessage': pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " "),
 	                            'emojiEndPos': self.state.emojiStartPos + emojiAlias.length + (post ? post.substr(0, 1) !== " " ? 1 : 0 : 1)
@@ -8153,6 +8202,7 @@ React.makeElement = React['createElement'];
 	                        var pre = msg.substr(0, self.state.emojiStartPos);
 	                        var post = msg.substr(self.state.emojiEndPos, msg.length);
 	                        var val = pre + emojiAlias + (post ? post.substr(0, 1) !== " " ? " " + post : post : " ");
+	                        self.prefillMode = false;
 	                        self.setState({
 	                            'typedMessage': val,
 	                            'emojiSearchQuery': false,
@@ -8167,6 +8217,7 @@ React.makeElement = React['createElement'];
 	                    }
 	                },
 	                onCancel: function onCancel() {
+	                    self.prefillMode = false;
 	                    self.setState({
 	                        'emojiSearchQuery': false,
 	                        'emojiStartPos': false,
@@ -8218,7 +8269,10 @@ React.makeElement = React['createElement'];
 	                        ref: "typearea",
 	                        style: textareaStyles,
 	                        disabled: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false,
-	                        readOnly: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false
+	                        readOnly: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false,
+	                        onCopyCapture: self.onCopyCapture,
+	                        onPasteCapture: self.onPasteCapture,
+	                        onCutCapture: self.onCutCapture
 	                    }),
 	                    React.makeElement("div", { className: "message-preview" })
 	                )
@@ -8263,14 +8317,15 @@ React.makeElement = React['createElement'];
 	        'numberOfEmojisPerRow': 9
 	    },
 	    categoryLabels: {
+	        'frequently_used': l[17737],
 	        'people': l[8016],
-	        'objects': __('Objects'),
+	        'objects': l[17735],
 	        'activity': l[8020],
 	        'nature': l[8017],
 	        'travel': l[8021],
-	        'symbols': __('Symbols'),
+	        'symbols': l[17736],
 	        'food': l[8018],
-	        'flags': __('Flags')
+	        'flags': l[17703]
 	    },
 	    getDefaultProps: function getDefaultProps() {
 	        return {
@@ -8793,10 +8848,15 @@ React.makeElement = React['createElement'];
 	                return;
 	            }
 
+	            if (e.altKey || e.metaKey) {
+
+	                return;
+	            }
+
 	            var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
 
 	            var handled = false;
-	            if (key === 37 || key === 38) {
+	            if (!e.shiftKey && (key === 37 || key === 38)) {
 
 	                selected = selected - 1;
 	                selected = selected < 0 ? self.maxFound - 1 : selected;
@@ -8809,7 +8869,7 @@ React.makeElement = React['createElement'];
 	                    handled = true;
 	                    self.props.onPrefill(false, ":" + self.found[selected].n + ":");
 	                }
-	            } else if (key === 39 || key === 40 || key === 9) {
+	            } else if (!e.shiftKey && (key === 39 || key === 40 || key === 9)) {
 
 	                selected = selected + (key === 9 ? e.shiftKey ? -1 : 1 : 1);
 
@@ -9709,17 +9769,7 @@ React.makeElement = React['createElement'];
 	    _startPreview: function _startPreview(v, e) {
 	        var chatRoom = this.props.message.chatRoom;
 	        assert(M.chat, 'Not in chat.');
-	        var imagesList = [];
-	        chatRoom.images.values().forEach(function (v) {
-	            var msg = chatRoom.messagesBuff.getMessageById(v.messageId);
-	            if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
-	                chatRoom.images.removeByKey(v.id);
-	                return;
-	            }
-	            imagesList.push(v);
-	        });
-
-	        M.v = imagesList;
+	        chatRoom._rebuildAttachments();
 
 	        slideshow(v.h, undefined, true);
 	        if (e) {
@@ -9756,21 +9806,29 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (message instanceof Message) {
+	            if (!message.wasRendered) {
 
-	            if (!message.messageHtml) {
 	                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
+
+	                message.processedBy = {};
+
+	                var evtObj = {
+	                    message: message,
+	                    room: chatRoom
+	                };
+
+	                megaChat.trigger('onPreBeforeRenderMessage', evtObj);
+	                var event = new $.Event("onBeforeRenderMessage");
+	                megaChat.trigger(event, evtObj);
+	                megaChat.trigger('onPostBeforeRenderMessage', evtObj);
+
+	                if (event.isPropagationStopped()) {
+	                    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
+	                    return false;
+	                }
+	                message.wasRendered = 1;
 	            }
 
-	            var event = new $.Event("onBeforeRenderMessage");
-	            megaChat.trigger(event, {
-	                message: message,
-	                room: chatRoom
-	            });
-
-	            if (event.isPropagationStopped()) {
-	                self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
-	                return false;
-	            }
 	            textMessage = message.messageHtml;
 
 	            if (message instanceof Message || typeof message.userId !== 'undefined' && message.userId === u_handle) {
@@ -9996,7 +10054,6 @@ React.makeElement = React['createElement'];
 	                            }
 	                        } else {
 
-	                            debugger;
 	                            return;
 	                        }
 
@@ -10015,20 +10072,25 @@ React.makeElement = React['createElement'];
 	                        if (M.chat && !message.revoked) {
 	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
 	                                var src = thumbnails[v.h];
+	                                message.imagesAreLoading = message.imagesAreLoading || {};
+
 	                                if (!src) {
 	                                    src = M.getNodeByHandle(v.h);
 
 	                                    if (!src || src !== v) {
-	                                        M.v.push(v);
-	                                        if (!v.seen) {
+	                                        if (!v.seen && !message.imagesAreLoading[v.h]) {
+	                                            message.imagesAreLoading[v.h] = 1;
 	                                            v.seen = 1;
+	                                            M.v.push(v);
+	                                            delay('thumbnails', fm_thumbnails, 90);
 	                                        }
-	                                        delay('thumbnails', fm_thumbnails, 90);
 	                                    }
 	                                    src = window.noThumbURI || '';
-
+	                                }
+	                                if (!v.imgId) {
 	                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
 	                                }
+
 	                                var previewable = is_image(v) || is_video(v);
 	                                if (previewable) {
 	                                    preview = src ? React.makeElement(
@@ -11166,6 +11228,11 @@ React.makeElement = React['createElement'];
 	    this.shownMessages = {};
 	    this.attachments = new MegaDataMap(this);
 	    this.images = new MegaDataSortedMap("id", "orderValue", this);
+	    this.images.addChangeListener(function () {
+	        if (slideshowid) {
+	            self._rebuildAttachments();
+	        }
+	    });
 
 	    self.members = {};
 
@@ -11697,7 +11764,9 @@ React.makeElement = React['createElement'];
 	    var self = this;
 	    var megaChat = this.megaChat;
 
+	    megaChat.trigger('onPreBeforeSendMessage', messageObject);
 	    megaChat.trigger('onBeforeSendMessage', messageObject);
+	    megaChat.trigger('onPostBeforeSendMessage', messageObject);
 
 	    return megaChat.plugins.chatdIntegration.sendMessage(self, messageObject);
 	};
@@ -12067,6 +12136,65 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 	};
+
+	ChatRoom.prototype._rebuildAttachments = SoonFc(function () {
+	    if (!M.chat) {
+	        return;
+	    }
+
+	    var self = this;
+
+	    var imagesList = [];
+	    var deleted = [];
+	    self.images.values().forEach(function (v) {
+	        var msg = self.messagesBuff.getMessageById(v.messageId);
+	        if (!msg || msg.revoked || msg.deleted || msg.keyid === 0) {
+	            slideshowid && deleted.push(v.id.substr(-8));
+	            self.images.removeByKey(v.id);
+	            return;
+	        }
+	        imagesList.push(v);
+	    });
+
+	    M.v = imagesList;
+
+	    var slideshowCalled = false;
+	    slideshowid && deleted.forEach(function (currentNodeId) {
+	        if (currentNodeId === slideshowid) {
+	            var lastNode;
+	            var found = false;
+	            M.v.forEach(function (node) {
+	                if (!found && node.h !== currentNodeId) {
+	                    lastNode = node.h;
+	                }
+	                if (node.h === currentNodeId) {
+	                    found = true;
+	                }
+	            });
+
+	            if (!lastNode) {
+	                for (var i = 0; i < M.v.length; i++) {
+	                    if (M.v[i].h !== currentNodeId) {
+	                        lastNode = M.v[i].h;
+	                        break;
+	                    }
+	                }
+	            }
+
+	            if (!lastNode) {
+
+	                slideshow(undefined, true);
+	                slideshowCalled = true;
+	            } else {
+
+	                slideshow(lastNode, undefined, true);
+	                slideshowCalled = true;
+	            }
+	        }
+	    });
+
+	    slideshowid && !slideshowCalled && slideshow(slideshowid, undefined, true);
+	}, 500);
 
 	window.ChatRoom = ChatRoom;
 	module.exports = ChatRoom;

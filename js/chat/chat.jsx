@@ -161,6 +161,7 @@ var Chat = function() {
             'callFeedback': CallFeedback,
             'presencedIntegration': PresencedIntegration,
             'persistedTypeArea': PersistedTypeArea,
+            'btRtfFilter': BacktickRtfFilter,
             'rtfFilter': RtfFilter
         },
         'chatNotificationOptions': {

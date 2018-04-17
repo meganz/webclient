@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # This script fetches the latest translation strings from Babel for the live site. This means it only fetches language
 # strings that are currently in use in the develop branch. It updates all the xx_prod.json files in the /lang
@@ -22,21 +22,46 @@ wget --post-data='u=Jq1EXnelOeQpj7UCaBa1&id=fetch&s=6&ids='$data https://babel.m
 # Check if the fetch failed
 if [ $? -ne 0 ]; then
 
-    echo "WARNING: There was a problem fetching production language strings from Babel. The update was aborted."
+    echo "ERROR: There was a problem fetching production language strings from Babel. The update was aborted."
     exit 1
 fi
 
 # Extract the tar.gz file
 tar xfvz lang.tar.gz
 
-# Delete it
-rm lang.tar.gz
+# Display any errors from Babel e.g. missing strings to the console
+cat error.json
 
-# Add the .json files
-git add *.json
+# If the error.json file does not exist, then this command will fail which is fine, so continue as normal
+if [ $? -ne 0 ]; then
 
-# Commit it
-git commit -m 'Updated production language strings from Babel'
+    echo "No errors from Babel, continuing as normal..."
 
-# Push to develop branch
-git push
+    # Delete the tar.gz file and other non-needed files
+    rm lang.tar.gz
+    rm strings.json
+    rm strings_prod.json
+    rm error.json
+
+    # Add the .json files
+    git add *.json
+
+    # Commit it
+    git commit -m 'Updated production language strings from Babel'
+
+    # Push to develop branch
+    git push
+else
+    # Otherwise show an error and make sure they fix the issues before continuing with the release
+    echo
+    echo "ERROR: There are errors above with the production language strings from Babel."
+    echo "The issues must be resolved before proceeding with the release."
+
+    # Delete the tar.gz file and other non-needed files
+    rm lang.tar.gz
+    rm strings.json
+    rm strings_prod.json
+    rm error.json
+
+    exit 1
+fi

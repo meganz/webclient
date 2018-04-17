@@ -266,6 +266,9 @@ mobile.downloadOverlay = {
         // Add tap handler
         $closeButton.off('tap').on('tap', function() {
 
+            // Destroy any streaming instance if running
+            $(window).trigger('video-destroy');
+
             // Hide overlay with download button options
             mobile.downloadOverlay.$overlay.addClass('hidden');
             $body.removeClass('wrong-file');

@@ -14,7 +14,7 @@ var EmojiAutocomplete = require('./emojiAutocomplete.jsx').EmojiAutocomplete;
 
 var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
-    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gi"),
+    validEmojiCharacters: new RegExp("[\w\:\-\_0-9]", "gi"),
     getDefaultProps: function() {
         return {
             'textareaMaxHeight': "40%"
@@ -345,6 +345,20 @@ var TypingArea = React.createClass({
                     if (matchedWord.substr(-1) === ":") {
                         matchedWord = matchedWord.substr(0, matchedWord.length - 1);
                     }
+
+                    var strictMatch = currentContent.substr(startPos, endPos - startPos);
+                    if (strictMatch.substr(0, 1) === ":" && strictMatch.substr(-1) === ":") {
+                        strictMatch = strictMatch.substr(1, strictMatch.length - 2);
+                    }
+                    else {
+                        strictMatch = false;
+                    }
+
+                    if (strictMatch && megaChat.isValidEmojiSlug(strictMatch)) {
+                        // emoji already filled in, dot set emojiSearchQuery/trigger emoji auto complete
+                        return;
+                    }
+
 
                     self.setState({
                         'emojiSearchQuery': matchedWord,

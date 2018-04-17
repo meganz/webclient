@@ -39,7 +39,7 @@ var EmojiAutocomplete = React.createClass({
     bindKeyEvents: function() {
         var self = this;
         $(document).rebind('keydown.emojiAutocomplete' + self.getUniqueId(), function(e) {
-            if (!self._wasRendered || !self.props.emojiSearchQuery) {
+            if (!self.props.emojiSearchQuery) {
                 self.unbindKeyEvents();
                 return;
             }
@@ -164,18 +164,6 @@ var EmojiAutocomplete = React.createClass({
             return null;
         }
 
-        var startPos = self.props.emojiStartPos;
-        var endPos = self.props.emojiEndPos;
-        var typedMessage = self.props.typedMessage;
-        var strictMatch = typedMessage.substr(startPos, endPos-startPos);
-        if (strictMatch.substr(0, 1) === ":" && strictMatch.substr(-1) === ":") {
-            strictMatch = strictMatch.substr(1, strictMatch.length - 2);
-        }
-        else {
-            strictMatch = false;
-        }
-
-
         self.preload_emojis();
 
         if (self.loadingPromise && self.loadingPromise.state() === 'pending') {
@@ -192,7 +180,6 @@ var EmojiAutocomplete = React.createClass({
         var exactMatch = [];
         var partialMatch = [];
         var emojis = (self.data_emojis || []);
-        var foundIndexHash = {};
 
         for (var i = 0; i < emojis.length; i++) {
             var emoji = emojis[i];
@@ -224,22 +211,6 @@ var EmojiAutocomplete = React.createClass({
         });
 
         var found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
-
-        if (strictMatch) {
-            for (var i = 0; i < found.length; i++) {
-                foundIndexHash[found[i].n] = 1;
-            }
-
-            if (
-                foundIndexHash[strictMatch]
-            ) {
-                // found :validEmoji:, don't show autocomplete!
-                this._wasRendered = false;
-                this.unbindKeyEvents();
-                return null;
-            }
-        }
-        this._wasRendered = true;
 
         // explicit mem cleanup
         exactMatch = partialMatch = null;

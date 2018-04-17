@@ -35,6 +35,12 @@
         pushUpload();
     }
 
+    function getFile(entry) {
+        return new Promise(function(resolve, reject) {
+            entry.file(resolve, reject);
+        });
+    }
+
     function traverseFileTree(item, path, symlink) {
         'use strict';
 
@@ -42,9 +48,9 @@
 
         if (item.isFile) {
             dir_inflight++;
-            item.file(function(file) {
+            getFile(item).then(function(file) {
                 pushFile(file, path);
-            }, function(error) {
+            }).catch(function(error) {
                 if (d) {
                     var fn = symlink ? 'debug' : 'warn';
 

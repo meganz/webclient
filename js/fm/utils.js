@@ -602,7 +602,11 @@ MegaUtils.prototype.neuterArrayBuffer = function neuter(ab) {
         }
         else {
             if (!neuter.dataWorker) {
-                neuter.dataWorker = new Worker("data:application/javascript,var%20d%3B");
+                var blobURI = mObjectURL(['var d'], 'text/javascript');
+                setTimeout(function() {
+                    URL.revokeObjectURL(blobURI);
+                }, 2e3);
+                neuter.dataWorker = new Worker(blobURI);
             }
             neuter.dataWorker.postMessage(ab, [ab]);
         }

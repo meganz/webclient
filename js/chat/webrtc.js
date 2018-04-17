@@ -1383,6 +1383,10 @@ Session.prototype._createRtcConn = function() {
         self.remoteStream = event.stream;
         self._remoteStream = self.remoteStream;
         self._fire("onRemoteStreamAdded", self.remoteStream);
+        // FIXME: We never had audio work from the GUI player if video is disabled,
+        // and the audio was coming from this 'internal' player. We need to fix that ASAP
+        var player = self.mediaWaitPlayer = document.createElement('video');
+        RTC.attachMediaStream(player, self.remoteStream);
     };
     conn.onremovestream = function(event) {
         self.self.remoteStream = null;

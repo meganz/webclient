@@ -7808,6 +7808,7 @@ React.makeElement = React['createElement'];
 	                    }
 
 	                    var strictMatch = currentContent.substr(startPos, endPos - startPos);
+
 	                    if (strictMatch.substr(0, 1) === ":" && strictMatch.substr(-1) === ":") {
 	                        strictMatch = strictMatch.substr(1, strictMatch.length - 2);
 	                    } else {
@@ -7816,6 +7817,13 @@ React.makeElement = React['createElement'];
 
 	                    if (strictMatch && megaChat.isValidEmojiSlug(strictMatch)) {
 
+	                        if (self.state.emojiSearchQuery) {
+	                            self.setState({
+	                                'emojiSearchQuery': false,
+	                                'emojiStartPos': false,
+	                                'emojiEndPos': false
+	                            });
+	                        }
 	                        return;
 	                    }
 

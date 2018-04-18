@@ -346,7 +346,10 @@ var TypingArea = React.createClass({
                         matchedWord = matchedWord.substr(0, matchedWord.length - 1);
                     }
 
+
                     var strictMatch = currentContent.substr(startPos, endPos - startPos);
+
+
                     if (strictMatch.substr(0, 1) === ":" && strictMatch.substr(-1) === ":") {
                         strictMatch = strictMatch.substr(1, strictMatch.length - 2);
                     }
@@ -356,6 +359,13 @@ var TypingArea = React.createClass({
 
                     if (strictMatch && megaChat.isValidEmojiSlug(strictMatch)) {
                         // emoji already filled in, dot set emojiSearchQuery/trigger emoji auto complete
+                        if (self.state.emojiSearchQuery) {
+                            self.setState({
+                                'emojiSearchQuery': false,
+                                'emojiStartPos': false,
+                                'emojiEndPos': false
+                            });
+                        }
                         return;
                     }
 

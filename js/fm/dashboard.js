@@ -55,23 +55,21 @@ function dashboardUI() {
     // Space-widget clickable sections
     $('.account.widget.storage .pr-item')
         .rebind('click', function() {
-            var section = String($(this).attr('class')).replace(/account|pr-item|empty/g, '').trim();
-            switch (section) {
-                case 'cloud-drive':
-                    section = M.RootID;
-                    break;
-                case 'rubbish-bin':
-                    section = M.RubbishID;
-                    break;
-                case 'inbox':
-                    section = M.InboxID;
-                    break;
-                case 'incoming-shares':
-                    section = 'shares';
-                    break;
-                default:
-                    section = null;
-                    break;
+            var section = String($(this).attr('class')).replace(/account|pr-item|empty|ui-droppable/g, '').trim();
+            if (section.indexOf('cloud-drive') !== -1) {
+                section = M.RootID;
+            }
+            else if (section.indexOf('rubbish-bin') !== -1) {
+                section = M.RubbishID;
+            }
+            else if (section.indexOf('incoming-shares') !== -1) {
+                section = 'shares';
+            }
+            else if (section.indexOf('inbox') !== -1) {
+                section = M.InboxID;
+            }
+            else {
+                section = null;
             }
 
             if (section) {

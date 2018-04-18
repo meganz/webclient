@@ -577,9 +577,9 @@ Chatd.Shard.prototype.sendIdentity = function() {
 
 Chatd.rtcmdToString = function(cmd, tx) {
     // (opcode.1 chatid.8 userid.8 clientid.4 len.2) (type.1 data.(len-1))
-    if (cmd.length < 23) {
+    if (cmd.length < 24) {
         assert(false, "rtcmdToString: Command buffer length (" +
-            cmd.length + ") is less than 23 bytes. Data:\n" + Chatd.dumpToHex(cmd));
+            cmd.length + ") is less than 24 bytes. Data:\n" + Chatd.dumpToHex(cmd));
     }
     var opCode = cmd.charCodeAt(23);
     var result = constStateToText(RTCMD, opCode);
@@ -587,13 +587,20 @@ Chatd.rtcmdToString = function(cmd, tx) {
     result += (tx ? ' to:' : ' from:') + base64urlencode(cmd.substr(9, 8));
     result += ' clientid: 0x' + Chatd.dumpToHex(cmd, 17, 4, true);
 
-    var dataLen = cmd.length - 24;
+    var dataLen = Chatd.unpack16le(cmd.substr(21, 2)) - 1; // first data byte is the RTCMD opcode
     if (dataLen > 0) {
-        result += ' data(' + (Chatd.unpack16le(cmd.substr(21, 2)) - 1) + '): ';
-        if (dataLen > 64) {
-            result += Chatd.dumpToHex(cmd, 24, 64) + '...';
+        assert(dataLen <= cmd.length - 24);
+        if (opCode === RTCMD.ICE_CANDIDATE) {
+            // FIXME: there is binary data before the candidate text, but it's variable length,
+            // so more complex parsing is required.
+            result += '\n' + cmd.substr(25, dataLen);
         } else {
-            result += Chatd.dumpToHex(cmd, 24);
+            result += ' data(' + (Chatd.unpack16le(cmd.substr(21, 2)) - 1) + '): ';
+            if (dataLen > 64) {
+                result += Chatd.dumpToHex(cmd, 24, 64) + '...';
+            } else {
+                result += Chatd.dumpToHex(cmd, 24);
+            }
         }
     }
     return result;
@@ -1019,14 +1026,12 @@ Chatd.Shard.prototype.exec = function(a) {
 
     // TODO: find more optimised way of doing this...fromCharCode may also cause exceptions if too big array is passed
     var cmd = ab_to_str(a);
-
-    if (self.loggerIsEnabled) {
-        self.logger.log("recv:", Chatd.cmdToString(cmd, false));
-    }
-
     var len;
 
     while (cmd.length) {
+        if (self.loggerIsEnabled) {
+            self.logger.log("recv:", Chatd.cmdToString(cmd, false));
+        }
         var opcode = cmd.charCodeAt(0);
         switch (opcode) {
             case Chatd.Opcode.KEEPALIVE:

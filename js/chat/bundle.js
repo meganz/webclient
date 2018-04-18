@@ -4692,7 +4692,9 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "div",
 	                    { className: "button call", onClick: function onClick(e) {
-	                            chatRoom.callManagerCall.endCall();
+	                            if (chatRoom.callManagerCall) {
+	                                chatRoom.callManagerCall.endCall();
+	                            }
 	                        } },
 	                    React.makeElement("i", { className: "big-icon horizontal-red-handset" })
 	                ),

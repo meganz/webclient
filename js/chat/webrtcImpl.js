@@ -172,6 +172,14 @@
         // TO BE IMPLEMENTED
         return false;
     };
+    RtcGlobalEventHandler.prototype.get1on1RoomPeer = function(chatid) {
+        chatid = base64urlencode(chatid);
+        var room = megaChat.getChatById(chatid);
+        if (!room) {
+            throw new Exception('Chatroom with id', chatid, 'not found');
+        }
+        return base64urldecode(room.getParticipantsExceptMe()[0]);
+    };
 
     RtcGlobalEventHandler.prototype.onLocalMediaRequest = function () {
         $('.camera-access').removeClass('hidden');

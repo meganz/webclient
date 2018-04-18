@@ -779,7 +779,9 @@ var ConversationAudioVideoPanel = React.createClass({
                     }></i>
                 </div>
                 <div className="button call" onClick={function(e) {
-                        chatRoom.callManagerCall.endCall();
+                        if (chatRoom.callManagerCall) {
+                            chatRoom.callManagerCall.endCall();
+                        }
                     }}>
                     <i className="big-icon horizontal-red-handset"></i>
                 </div>

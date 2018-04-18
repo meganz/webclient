@@ -305,6 +305,7 @@ mega.ui.showRegisterDialog = function() {};
 
 mega.loadReport = {};
 var previews = {};
+var preqs = Object.create(null); // FIXME: mobile needs to use preqs[] to prevent dupe requests sent to API!
 
 function removeUInode(nodeHandle, parentHandle) {
 

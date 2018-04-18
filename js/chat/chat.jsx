@@ -1343,6 +1343,25 @@ Chat.prototype.getEmojiDataSet = function(name) {
 };
 
 /**
+ * Method for checking if an emoji by that slug exists
+ * @param slug
+ */
+Chat.prototype.isValidEmojiSlug = function(slug) {
+    var self = this;
+    var emojiData = self._emojiData['emojis'];
+    if (!emojiData) {
+        self.getEmojiDataSet('emojis');
+        return false;
+    }
+
+    for (var i = 0; i < emojiData.length; i++) {
+        if (emojiData[i]['n'] === slug) {
+            return true;
+        }
+    }
+};
+
+/**
  * A simple alias that returns PresencedIntegration's presence for the current user
  *
  * @returns {Number|undefined} UserPresence.PRESENCE.* or undefined for offline/unknown presence

@@ -5421,19 +5421,22 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 96px;
 }
 .transfer-table td:nth-child(5), .transfer-table-header th:nth-child(5) {
-    width: 192px;
+    width: 96px;
 }
 .transfer-table td:nth-child(6), .transfer-table-header th:nth-child(6) {
     width: 192px;
-    background-image: none;
 }
 .transfer-table td:nth-child(7), .transfer-table-header th:nth-child(7) {
-    width: 69px;
+    width: 192px;
+    background-image: none;
 }
 .transfer-table td:nth-child(8), .transfer-table-header th:nth-child(8) {
+    width: 69px;
+}
+.transfer-table td:nth-child(9), .transfer-table-header th:nth-child(9) {
     width: 0px;
 }
-.transfer-table-header th:nth-child(8), .transfer-table td:nth-child(8), .dndc-sort .transfer-table td:nth-child(8) {
+.transfer-table-header th:nth-child(9), .transfer-table td:nth-child(9), .dndc-sort .transfer-table td:nth-child(9) {
     display: none;
 }
 .fm-right-files-block td, .fm-right-files-block th, .fm-transfers-block td, .fm-transfers-block th, .account.tab-content td, .account.tab-content th, .grid-table-header th {

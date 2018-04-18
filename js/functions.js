@@ -2423,7 +2423,11 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('var filename = getPDFFileNameFromURL(this.url);',
-        'var filename = this.documentInfo.Title + \'.pdf\';');
+        'var filename = PDFViewerApplication.appConfig.pdfDocTitile;');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('var filename = pdfjsLib.getFilenameFromUrl(item.filename);',
+        'var filename = PDFViewerApplication.appConfig.pdfDocTitile;');
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('validateFileURL(file);',
@@ -2532,6 +2536,8 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
         + 'var config = getViewerConfiguration(); '
         + 'var pdfRef = JSON.parse(localStorage.getItem(\'currPdfPrev2\')); '
         + 'localStorage.removeItem(\'currPdfPrev2\'); '
+        + 'config.pdfDocTitile = localStorage.getItem(\'pdfPrevTitle\'); '
+        + 'localStorage.removeItem(\'pdfPrevTitle\'); '
         + 'config.defaultUrl = pdfRef; '
         + 'config.toolbar.openFile.setAttribute(\'hidden\', \'true\'); '
         + 'config.secondaryToolbar.openFileButton.setAttribute(\'hidden\', \'true\'); '

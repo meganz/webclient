@@ -1646,7 +1646,7 @@
                         downloadManager.downloadUrl(url, filename);
                     }
                     var url = this.baseUrl;
-                    var filename = this.documentInfo.Title + '.pdf';
+                    var filename = PDFViewerApplication.appConfig.pdfDocTitile;
                     var downloadManager = this.downloadManager;
                     downloadManager.onerror = function (err) {
                         PDFViewerApplication.error('PDF failed to download.');
@@ -3945,7 +3945,7 @@
                         attachmentsCount = names.length;
                         for (var i = 0; i < attachmentsCount; i++) {
                             var item = attachments[names[i]];
-                            var filename = pdfjsLib.getFilenameFromUrl(item.filename);
+                            var filename = PDFViewerApplication.appConfig.pdfDocTitile;
                             filename = pdfjsLib.removeNullCharacters(filename);
                             var div = document.createElement('div');
                             div.className = 'attachmentsItem';
@@ -7842,6 +7842,8 @@
                 var config = getViewerConfiguration();
                 var pdfRef = JSON.parse(localStorage.getItem('currPdfPrev2'));
                 localStorage.removeItem('currPdfPrev2');
+                config.pdfDocTitile = localStorage.getItem('pdfPrevTitle');
+                localStorage.removeItem('pdfPrevTitle');
                 config.defaultUrl = pdfRef;
                 config.toolbar.openFile.setAttribute('hidden', 'true');
                 config.secondaryToolbar.openFileButton.setAttribute('hidden', 'true');

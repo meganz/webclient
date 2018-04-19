@@ -342,6 +342,10 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         var $tr = $('.transfer-table #dl_' + htmlentities(n.h));
         if ($tr.length) {
             if (!$tr.hasClass('transfer-completed')) {
+                if ($tr.hasClass('transfer-error') && !entries.length) {
+                    var errorStatus = $('.transfer-status', $tr).text();
+                    showToast('download', errorStatus);
+                }
                 continue;
             }
             $tr.remove();

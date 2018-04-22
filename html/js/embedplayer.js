@@ -14,6 +14,7 @@ var fminitialized;
 var loadingDialog;
 var dlmanager;
 var thumbnails = {};
+var ep_node = false;
 
 function startMega() {
     'use strict';
@@ -177,6 +178,9 @@ function init_embed(ph, key, g) {
                     });
                 }
             });
+
+        ep_node = node;
+        pagemetadata();
     }
     else {
         console.info(404, arguments);
@@ -434,4 +438,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         console.debug('msgDialog', arguments)
     }
     alert(String(msg) + (submsg ? '\n\n' + submsg : ''));
+}
+
+function pagemetadata() {
+    'use strict';
+    $('meta[name=description]').remove();
+    $('head').append('<meta name="description" content="' + String(mega.whoami).replace(/[<">]/g, '') + '">');
+    document.title = 'MEGA' + (ep_node ? ' - ' + ep_node.name : '');
 }

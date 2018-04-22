@@ -990,6 +990,7 @@ var zoom_mode;
             // preview pdfs using pdfjs for all browsers #8036
             // to fix pdf compatibility - Bug #7796
             localStorage.setItem('currPdfPrev2', JSON.stringify(src));
+            localStorage.setItem('pdfPrevTitle', $overlay.find('.viewer-filename').text());
             prepareAndViewPdfViewer();
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;

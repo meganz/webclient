@@ -1773,7 +1773,9 @@ function topmenuUI() {
 
             // Otherwise show the ephemeral session warning
             else if (($.len(M.c[M.RootID] || {})) && (page !== 'register')) {
-                alarm.ephemeralSession.render();
+                if (alarm.ephemeralSession) {
+                    alarm.ephemeralSession.render();
+                }
             }
         }
 
@@ -2337,9 +2339,11 @@ function pagemetadata()
     else {
         mega_title = 'MEGA';
     }
-	if (!mega_desc) mega_desc = 'We make secure cloud storage simple. Create an account and get 50 GB free on MEGA\'s end-to-end encrypted cloud collaboration platform today!';
-	$('meta[name=description]').remove();
-    $('head').append( '<meta name="description" content="' + mega_desc + '">');
+    if (!mega_desc) {
+        mega_desc = mega.whoami;
+    }
+    $('meta[name=description]').remove();
+    $('head').append('<meta name="description" content="' + String(mega_desc).replace(/[<">]/g, '') + '">');
 	document.title = mega_title;
 	megatitle();
 }

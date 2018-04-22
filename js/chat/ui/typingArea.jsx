@@ -14,7 +14,7 @@ var EmojiAutocomplete = require('./emojiAutocomplete.jsx').EmojiAutocomplete;
 
 var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
-    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gi"),
+    validEmojiCharacters: new RegExp("[\w\:\-\_0-9]", "gi"),
     getDefaultProps: function() {
         return {
             'textareaMaxHeight': "40%"
@@ -346,6 +346,30 @@ var TypingArea = React.createClass({
                         matchedWord = matchedWord.substr(0, matchedWord.length - 1);
                     }
 
+
+                    var strictMatch = currentContent.substr(startPos, endPos - startPos);
+
+
+                    if (strictMatch.substr(0, 1) === ":" && strictMatch.substr(-1) === ":") {
+                        strictMatch = strictMatch.substr(1, strictMatch.length - 2);
+                    }
+                    else {
+                        strictMatch = false;
+                    }
+
+                    if (strictMatch && megaChat.isValidEmojiSlug(strictMatch)) {
+                        // emoji already filled in, dot set emojiSearchQuery/trigger emoji auto complete
+                        if (self.state.emojiSearchQuery) {
+                            self.setState({
+                                'emojiSearchQuery': false,
+                                'emojiStartPos': false,
+                                'emojiEndPos': false
+                            });
+                        }
+                        return;
+                    }
+
+
                     self.setState({
                         'emojiSearchQuery': matchedWord,
                         'emojiStartPos': startPos ? startPos : 0,
@@ -396,11 +420,13 @@ var TypingArea = React.createClass({
             // delay is required, otherwise the onBlur -> setState may cause halt of child onclick handlers, in case
             // of a onClick in the emoji autocomplete.
             setTimeout(function() {
-                self.setState({
-                    'emojiSearchQuery': false,
-                    'emojiStartPos': false,
-                    'emojiEndPos': false
-                });
+                if (self.isMounted()) {
+                    self.setState({
+                        'emojiSearchQuery': false,
+                        'emojiStartPos': false,
+                        'emojiEndPos': false
+                    });
+                }
             }, 300);
         }
     },
@@ -810,8 +836,12 @@ var TypingArea = React.createClass({
 
         var emojiAutocomplete = null;
         if (self.state.emojiSearchQuery) {
+
             emojiAutocomplete = <EmojiAutocomplete
                 emojiSearchQuery={self.state.emojiSearchQuery}
+                emojiStartPos={self.state.emojiStartPos}
+                emojiEndPos={self.state.emojiEndPos}
+                typedMessage={self.state.typedMessage}
                 onPrefill={function(e, emojiAlias) {
                     if (
                         $.isNumeric(self.state.emojiStartPos) &&

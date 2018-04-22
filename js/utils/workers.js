@@ -14,18 +14,26 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
 
     var worker = [];
     var instances = [];
-    var wid = url + '!' + rand(1e11);
+    var wid = url + '!' + makeUUID();
 
     var terminator = function() {
         delay('createworkers:terminator:' + wid,
             function cwt() {
+                var kills = 0;
                 var now = Date.now();
 
                 for (var i = worker.length; i--;) {
                     if (worker[i] && !worker[i].busy && (now - worker[i].tts) > 12e4) {
                         worker[i].terminate();
                         worker[i] = null;
+                        kills++;
                     }
+                }
+
+                if (kills) {
+                    onIdle(function() {
+                        mBroadcaster.sendMessage('createworkers:terminated', kills);
+                    });
                 }
             },
             13e4);
@@ -52,6 +60,10 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
             w = new Worker(url);
         }
         catch (e) {
+            // deal with QuotaExceededError: Failed to construct 'Worker': Maximum worker number has been reached.
+            if (e.name === 'QuotaExceededError') {
+                return false;
+            }
             msgDialog('warninga', '' + url, '' + e, location.hostname);
             throw e;
         }
@@ -83,20 +95,22 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
         window._cwInstances[wid] = instances;
     }
 
-    return new MegaQueue(function(task, done) {
+    return new MegaQueue(function _(task, done) {
         var i = size;
 
         while (i--) {
-            if (worker[i] === null) {
-                worker[i] = create(i);
+            if (!worker[i] && !(worker[i] = create(i))) {
+                continue;
             }
             if (!worker[i].busy) {
                 break;
             }
         }
 
-        if (i < 0 || worker[i].busy) {
-            console.error('Huh?.... worker inconsistency...');
+        if (i < 0) {
+            console.error('Workers subsystem exhausted... holding.', mega.maxWorkers, size);
+            mBroadcaster.once('createworkers:terminated', _.bind(this, task, done));
+            return;
         }
 
         instances[i] = done;
@@ -146,7 +160,7 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
                         function(ctx, e, release) {
                             release(e.data);
                         },
-                        mega.maxWorkers,
+                        0,
                         0
                     );
 

@@ -224,10 +224,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     }
 
     // view send to chat if all selected items are files
-    if (!folderlink && $.selected.length) {
+    if (!folderlink && window.megaChatIsReady && $.selected.length) {
         var viewChat = true;
-        for (var e = 0; e < $.selected.length; e++) {
-            if (M.d[$.selected[e]].t !== 0) {
+        for (var i = $.selected.length; i--;) {
+            var n = M.d[$.selected[i]];
+            if (!n || n.t) {
                 viewChat = false;
                 break;
             }

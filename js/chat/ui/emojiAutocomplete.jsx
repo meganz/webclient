@@ -180,6 +180,7 @@ var EmojiAutocomplete = React.createClass({
         var exactMatch = [];
         var partialMatch = [];
         var emojis = (self.data_emojis || []);
+
         for (var i = 0; i < emojis.length; i++) {
             var emoji = emojis[i];
             var match = emoji.n.indexOf(q);
@@ -194,7 +195,20 @@ var EmojiAutocomplete = React.createClass({
             if (exactMatch.length >= self.props.maxEmojis) {
                 break;
             }
-        };
+        }
+
+        exactMatch.sort(function(a, b) {
+            if (a.n === q) {
+                return -1;
+            }
+            else if (b.n === q) {
+                return 1;
+            }
+
+            else {
+                return 0;
+            }
+        });
 
         var found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
 

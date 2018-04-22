@@ -593,9 +593,12 @@ MegaUtils.prototype.clearFileSystemStorage = function megaUtilsClearFileSystemSt
  * @param {Mixed} ab ArrayBuffer/TypedArray
  */
 MegaUtils.prototype.neuterArrayBuffer = function neuter(ab) {
+    'use strict';
+
     if (!(ab instanceof ArrayBuffer)) {
         ab = ab && ab.buffer;
     }
+
     try {
         if (typeof ArrayBuffer.transfer === 'function') {
             ArrayBuffer.transfer(ab, 0); // ES7

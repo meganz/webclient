@@ -56,7 +56,9 @@
             }
             $('.contact-list-icon').removeClass('active');
             $('.properties-context-menu').fadeOut(200);
-            $.hideContextMenu();
+            if ($.hideContextMenu) {
+                $.hideContextMenu();
+            }
 
             return true;
         }

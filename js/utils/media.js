@@ -56,8 +56,7 @@ is_image.def = {
     'JPEG': 1,
     'GIF': 1,
     'BMP': 1,
-    'PNG': 1,
-    'HEIC': 1
+    'PNG': 1
 };
 
 is_image.raw = {
@@ -365,6 +364,95 @@ function getID3CoverArt(entry) {
         }
     });
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+
+/**
+ * Fullscreen handling helper
+ * @param {Object} $button The button to jump into fullscreen
+ * @param {Object} $element The element that must go into fullscreen
+ * @returns {FullScreenManager}
+ * @requires jquery.fullscreen.js
+ * @constructor
+ */
+function FullScreenManager($button, $element) {
+    'use strict';
+
+    if (!(this instanceof FullScreenManager)) {
+        return new FullScreenManager($button, $element);
+    }
+
+    var listeners = [];
+    var iid = makeUUID();
+    var $document = $(document);
+    var state = $document.fullScreen();
+
+    if (state === null) {
+        // FullScreen is not supported
+        $button.addClass('hidden');
+    }
+    else {
+        $button.removeClass('hidden')
+            .rebind('click.' + iid, function() {
+                state = $document.fullScreen();
+
+                if (state) {
+                    $document.fullScreen(false);
+                }
+                else {
+                    $element.fullScreen(true);
+                }
+            });
+        $document.rebind('fullscreenchange.' + iid, function() {
+            state = $document.fullScreen();
+            for (var i = listeners.length; i--;) {
+                listeners[i](state);
+            }
+        });
+    }
+
+    Object.defineProperty(this, 'state', {
+        get: function() {
+            return state;
+        }
+    });
+
+    this.iid = iid;
+    this.$button = $button;
+    this.$document = $document;
+    this.listeners = listeners;
+    this.destroyed = false;
+}
+
+FullScreenManager.prototype = Object.create(null);
+
+// destroy full screen manager instance
+FullScreenManager.prototype.destroy = function() {
+    'use strict';
+
+    if (!this.destroyed) {
+        this.destroyed = true;
+        this.$button.unbind('click.' + this.iid);
+        this.$document.unbind('fullscreenchange.' + this.iid);
+        this.exitFullscreen();
+    }
+};
+
+// list for full screen changes
+FullScreenManager.prototype.change = function(cb) {
+    'use strict';
+    this.listeners.push(tryCatch(cb.bind(this)));
+    return this;
+};
+
+// exit full screen
+FullScreenManager.prototype.exitFullscreen = function() {
+    'use strict';
+    this.$document.fullScreen(false);
+};
+
+Object.freeze(FullScreenManager.prototype);
+Object.freeze(FullScreenManager);
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -714,10 +802,26 @@ function getID3CoverArt(entry) {
             }
         };
 
-        $wrapper.rebind('is-over-quota', function() {
-            if (isFullScreen()) {
-                $fullscreen.trigger('click');
+        // Set the video container's fullscreen state
+        var setFullscreenData = function(state) {
+            $videoContainer.attr('data-fullscreen', !!state);
+
+            // Set the fullscreen button's 'data-state' which allows the correct button image to be set via CSS
+            $fullscreen.attr('data-state', state ? 'cancel-fullscreen' : 'go-fullscreen');
+
+            if (state) {
+                $fullscreen.find('i').removeClass('fullscreen').addClass('lowscreen');
             }
+            else {
+                $fullscreen.find('i').removeClass('lowscreen').addClass('fullscreen');
+            }
+        };
+
+        var $element = page === 'download' ? $wrapper.find('.video-block') : $wrapper;
+        var fullScreenManager = FullScreenManager($fullscreen, $element).change(setFullscreenData);
+
+        $wrapper.rebind('is-over-quota', function() {
+            fullScreenManager.exitFullscreen();
             videoElement.pause();
             return false;
         });
@@ -734,6 +838,7 @@ function getID3CoverArt(entry) {
             $document.unbind('mouseup.volumecontrol');
             $(window).unbind('video-destroy.main');
             dlmanager.isStreaming = false;
+            fullScreenManager.destroy();
             pagemetadata();
             return false;
         });

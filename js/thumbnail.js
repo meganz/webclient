@@ -160,7 +160,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             canvas.height = preview_y;
             ctx.drawImage(this, 0, 0, preview_x, preview_y);
 
-            dataURI = canvas.toDataURL('image/jpeg', 0.75);
+            dataURI = canvas.toDataURL('image/jpeg', 0.85);
             // if (d) console.log('PREVIEW', dataURI);
 
             ab = dataURLToAB(dataURI);
@@ -194,7 +194,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     }, img.onerror = function(e) {
         if (d) {
             console.timeEnd('createthumbnail' + id);
-            console.error('Failed to create thumbnail', e);
+            console.warn('Failed to create thumbnail', e);
         }
 
         api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});

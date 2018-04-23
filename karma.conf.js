@@ -154,6 +154,7 @@ module.exports = function(config) {
         'js/chat/plugins/rtfFilter.js',
         'js/chat/plugins/chatNotifications.js',
         'js/chat/plugins/callFeedback.js',
+        'js/chat/webrtc.js',
         'js/chat/plugins/callManager.js',
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',

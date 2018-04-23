@@ -1045,7 +1045,7 @@ Call.prototype._removeSession = function(sess, reason) {
             // There are no sessions currently
             // TODO: For group calls we would need to revise this
             self.logger.warn("Timed out waiting for peer to rejoin, terminating call");
-            self.hangup(Term.kErrSessRetryTimeout); //kErrSessSetupTimeout is about existing session not reaching kInProgress
+            self.hangup(Term.kErrSessRetryTimeout); // not to be confused with kErrSessSetupTimeout
         }
     }, RtcModule.kSessSetupTimeout);
 };

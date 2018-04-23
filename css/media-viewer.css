@@ -39,6 +39,9 @@
     -khtml-opacity: 1;
     opacity: 1;
 }
+.download.video:not(.video-theatre-mode) .viewer-top-bl, .download.video:not(.video-theatre-mode) .viewer-bottom-bl {
+    background-color: transparent;
+}
 .video-theatre-mode .viewer-top-bl {
     display: block;
 }

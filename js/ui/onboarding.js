@@ -2,8 +2,8 @@
     /**
      * Onboarding related stuff
      *
-     * This file contains a generic logic for attaching "click handlers" (the onboarding circles) and non-generic
-     * (specific, to each onboarding screen) logic to determinate when should a click handler (and its screen) needs
+     * This file contains a generic logic for attaching "dropdowns" and non-generic
+     * (specific, to each onboarding screen) logic to determinate when should a dropdown (and its screen) needs
      * to be shown.
      *
      * @constructor
@@ -21,12 +21,6 @@
             'screensContainerId': 'onboarding-screens',
 
             /**
-             * The ID of the element defined in onboarding.html as a click handler.
-             */
-            'clickHandlerTemplateId': 'onboarding-click-handler-template',
-
-
-            /**
              * The ID of the element that contains the actual dialog HTML code
              */
             'onboardingDialogTemplateId': 'onboarding-dialog-template'
@@ -37,10 +31,7 @@
 
         self.screens = [];
         self._lastShown = {};
-
-        self.$clickHandlerTemplate = $("#" + self.options.clickHandlerTemplateId);
-        self.$clickHandlerTemplate.detach();
-        self.$clickHandlerTemplate.removeClass('hidden');
+        self._queuedForShowing = [];
 
         self.$screensContainer = $("#" + self.options.screensContainerId);
         self.$screensContainer.detach();
@@ -73,57 +64,56 @@
             mBroadcaster.removeListener(self._pageChangeListener);
         }
         self._pageChangeListener = mBroadcaster.addListener('pagechange', function() {
-            self.eventuallyRenderClickHandlers();
-        });
-        $(window).rebind('resize.onboarding', function() {
-            self.eventuallyRenderClickHandlers();
+            self.eventuallyRenderDialogs();
         });
 
-        self.eventuallyRenderClickHandlers();
+        self._closeDialogListener = mBroadcaster.addListener('closedialog', function() {
+            self.eventuallyRenderDialogs();
+        });
+
+        $(document.body).rebind('onMegaNotification.onboarding', function() {
+            self.eventuallyRenderDialogs();
+        });
+
+        $(window).rebind('resize.onboarding', function() {
+            self.eventuallyRenderDialogs();
+        });
+
+        self.eventuallyRenderDialogs();
     };
 
-    Onboarding.prototype.hideClickHandler = function(screenId, screenInfo, dontRemove) {
+    Onboarding.prototype.hideDialog = function(screenId) {
 
         var self = this;
 
         if (self._lastShown[screenId]) {
+            var screenInfo = self.getScreenMeta(screenId);
+
             // mark as seen
             self._persisted.set(screenId, 1);
-            if (screenInfo.dontShow === true) {
+            if (screenInfo && screenInfo.dontShow === true) {
                 self._persisted.set("onboarding", 1);
             }
 
             self._persisted.commit();
 
-            var $dialog = screenInfo.$dialog;
-            var $clickHandler = screenInfo.$clickHandler;
+            var $dialog = $('#onboarding-dialog-' + screenId);
 
             var wasScreenVisible = $dialog.is(":visible");
             $dialog.removeClass('active');
-            $dialog.removeClass('animate-in');
-            $dialog.addClass('animate-out');
-            $dialog.one('animationend', function () {
-                $dialog.removeClass('animate-out');
-                $dialog.addClass('hidden');
-            });
+            $dialog.addClass('hidden');
+            $dialog.fadeOut();
+            if ($.dialog === "onboarding-" + screenId) {
+                delete $.dialog;
+            }
 
-            $clickHandler
-                .removeClass('active')
-                .addClass('animate-hide')
-                .one('animationend', function () {
-                    if (!dontRemove) {
-                        $clickHandler.remove();
-                        $dialog.remove();
-                    }
-                    else {
-                        $clickHandler.removeClass('animate-hide');
-                    }
-                });
 
             $(document.body).unbind('mousedown.onboarding' + screenId);
             $(document.body).unbind('keyup.onboarding' + screenId);
 
-            if (wasScreenVisible && screenInfo.onHideFn) {
+            $(window).unbind('resize.onboardingRepos');
+
+            if (screenInfo && wasScreenVisible && screenInfo.onHideFn) {
                 screenInfo.onHideFn(screenId, screenInfo);
             }
             else {
@@ -138,113 +128,138 @@
         else {
             console.error("Not visible: ", screenId);
         }
+
+        setTimeout(function() {
+            // give some time for animations and stuff to finish.
+            if ($('.onboarding-dialog:visible').size() === 0 && !$.dialog) {
+                // all onboarding dialogs had been closed, lets trigger a 'closedialog' in case a dialog is queued to
+                // be 'safe'-shown (@see M.safeShowDialog)
+                mBroadcaster.sendMessage('closedialog');
+            }
+        }, 1000);
     };
 
-    Onboarding.prototype._initGenericEvents = function(screenId, $clickHandler, $screen, $dialog, screenInfo) {
+    Onboarding.prototype._initGenericEvents = function(screenId, $screen, $dialog, screenInfo) {
         var self = this;
 
+        $('.default-grey-button', $dialog).text(
+            !screenInfo.dontShow && self._queuedForShowing.length > 1 ? l[556] /* next */ : l[5700] /* Got it */
+        );
 
-        $clickHandler.on('click', function() {
-
-            $('.fm-dialog-close', $dialog).rebind('click.onboarding', function() {
-                self.hideClickHandler(screenId, screenInfo);
+        $('.dropdown.close-button, .default-grey-button', $dialog)
+            .rebind('click.onboarding', function() {
+                self.hideDialog(screenId);
             });
 
 
-            if (!$clickHandler.is(".active")) {
-                // show
+        if (!$dialog.is(".active")) {
+            // show
 
-                screenInfo.dontShow = false;
-                uiCheckboxes($('.checkbox-block', $dialog), undefined, function(state) {
-                    if (state) {
-                        screenInfo.dontShow = true;
-                    }
-                    else {
-                        screenInfo.dontShow = false;
-                    }
-                });
-
-                $dialog.css({
-                    'top': 'auto',
-                    'left': 'auto',
-                });
-
-                $dialog.position({
-                    of: $clickHandler,
-                    my: "left-2 top-2",
-                    at: "right-55% center-2px",
-                    using: function (obj, info) {
-                        if (info.horizontal === "right") {
-                            $dialog.addClass('flipped-animation');
-                        }
-
-
-                        $dialog.css({
-                            left: obj.left + 'px',
-                            top: obj.top + 'px'
-                        });
-
-                    }
-                });
-
-                $dialog.removeClass('hidden');
-                $dialog.removeClass('fadeout');
-                $dialog.addClass('active');
-
-                if ($screen.height() > 300) {
-                    $dialog.addClass('long-content');
+            screenInfo.dontShow = false;
+            uiCheckboxes($('.checkbox-block', $dialog), undefined, function(state) {
+                if (state) {
+                    screenInfo.dontShow = true;
                 }
+                else {
+                    screenInfo.dontShow = false;
+                }
+                self._initGenericEvents(screenId, $screen, $dialog, screenInfo);
+            });
 
-                $dialog.addClass('animate-in');
+            $dialog.css({
+                'top': 'auto',
+                'left': 'auto',
+            });
 
-                $dialog.one('animationend', function() {
-                    $dialog.removeClass('animate-in');
-                });
+            self._positionDialog(screenId);
 
+            $dialog.removeClass('hidden');
+            $dialog.removeClass('fadeout');
+            $dialog.addClass('active');
 
-                $clickHandler.addClass("active");
+            if ($screen.height() > 300) {
+                $dialog.addClass('long-content');
+            }
 
-                $(document.body).rebind('mousedown.onboarding' + screenId, function(e) {
-                    if (
-                        $(e.target).closest($clickHandler).size() === 0 &&
+            $screen.addClass("active");
+
+            $(document.body).rebind('mousedown.onboarding' + screenId, function(e) {
+                /**
+                 *  Close the onboarding dialog IF:
+                 *  1) the user clicks OUTSIDE the dialog
+                 *  2) in a link in the dialog (a link in the dialog, would typically navigate the user to a
+                 *  different page, so it makes sense to hide the dialog, at least for the current use cases)
+                 */
+                if (
+                    (
+                        $(e.target).closest($screen).size() === 0 &&
                         $(e.target).closest($dialog).size() === 0
-                    ) {
-                        if (!self._lastShown) {
-                            // was destroyed.
-                            $(document.body).unbind('mousedown.onboarding' + screenId);
-                            return;
-                        }
-                        self.hideClickHandler(screenId, screenInfo);
-                    }
-                });
-                $(document.body).rebind('keyup.onboarding' + screenId, function(e) {
+                    ) ||
+                    (
+                        $(e.target).is(".onboarding-dialog p a")
+                    )
+                ) {
                     if (!self._lastShown) {
                         // was destroyed.
-                        $(document.body).unbind('keyup.onboarding' + screenId);
+                        $(document.body).unbind('mousedown.onboarding' + screenId);
                         return;
                     }
+                    self.hideDialog(screenId);
+                }
+            });
+            $(document.body).rebind('keyup.onboarding' + screenId, function(e) {
+                if (!self._lastShown) {
+                    // was destroyed.
+                    $(document.body).unbind('keyup.onboarding' + screenId);
+                    return;
+                }
 
-                    if (e.keyCode === 27) { // escape key maps to keycode `27`
-                        self.hideClickHandler(screenId, screenInfo);
-                    }
-                });
-            }
-            else {
-                self.hideClickHandler(screenId, screenInfo);
-            }
-        });
+                if (e.keyCode === 27) { // escape key maps to keycode `27`
+                    self.hideDialog(screenId);
+                }
+            });
+
+            $(window).rebind('resize.onboardingRepos', function() {
+                self._positionDialog(screenId);
+            });
+        }
+        else {
+            self._positionDialog(screenId);
+        }
     };
 
 
-    Onboarding.prototype.registerScreen = function(screenId, shouldShowFn, onHideFn) {
+    Onboarding.prototype.getScreenMeta = function(screenId) {
+        var self = this;
+        for (var i = 0; i < self.screens.length; i++) {
+            if (self.screens[i].screenId === screenId) {
+                return self.screens[i];
+            }
+        }
+        return false;
+    };
+
+    Onboarding.prototype.registerScreen = function(
+        screenId,
+        shouldShowFn,
+        onHideFn,
+        onBeforeShow,
+        learnMoreUrl,
+        customLinkUrl
+    ) {
         var self = this;
 
+        var meta = {
+            screenId: screenId,
+            shouldShowFn: shouldShowFn,
+            onHideFn: onHideFn,
+            onBeforeShow: onBeforeShow,
+            learnMoreUrl: learnMoreUrl,
+            customLinkUrl: customLinkUrl,
+        };
+
         self.screens.push(
-            {
-                screenId: screenId,
-                shouldShowFn: shouldShowFn,
-                onHideFn: onHideFn
-            }
+            meta
         );
     };
 
@@ -261,61 +276,75 @@
 
 
     /**
-     * This function would/should be called often, so that it would determinate which click handlers would need to be
+     * This function would/should be called often, so that it would determinate which dropdowns would need to be
      * added/removed to the DOM, depending on the current state of the app.
      * For now, we would be doing that on:
      *  - hash change
      *  - onboarding screen closing/hiding
      */
-    Onboarding.prototype.eventuallyRenderClickHandlers = SoonFc(function() {
+    Onboarding.prototype.eventuallyRenderDialogs = SoonFc(function() {
         var self = this;
         if (!self.screens) {
             // not initialised/destroyed
             return;
         }
+        if ($.dialog || $.msgDialog) {
+            return;
+        }
+
+        if (
+            $('.notification-popup:visible').size() > 0 ||
+            $('.dropdown:visible:not(.transfer-widget)').size() > 0
+        ) {
+            return;
+        }
+
+
+        self._queuedForShowing = [];
+        var promises = [];
         self.screens.forEach(function(v, k) {
-            self._persisted.get(v.screenId).done(function(r) {
-                if (r === 0) {
-                    var res = v.shouldShowFn(self);
-                    if (res) {
-                        if (!self._lastShown[v.screenId]) {
-                            var res2 = self._renderClickHandler(v.screenId, v, self._lastShown);
-                            v['$clickHandler'] = res2[0];
-                            v['$screen'] = res2[1];
-                            v['$dialog'] = res2[2];
-                            if (!self._lastShown[v.screenId]) {
-                                self._lastShown[v.screenId] = v;
-                            }
+            // if ($('#onboarding-dialog-' + v.screenId).is(":visible")) {
+            //     return;
+            // }
+
+            promises.push(
+                self._persisted.get(v.screenId).done(function(r) {
+                    if (r === 0) {
+                        var res = v.shouldShowFn(self);
+                        if (res) {
+                            self._queuedForShowing.push([v.screenId, v]);
                         }
-                        self._positionClickHandler(v.screenId, v);
                     }
-                    else if (self._lastShown[v.screenId]) {
-                        // was shown... and now we should hide it.
-                        self._removeClickHandler(v.screenId, self._lastShown[v.screenId]);
-                        delete self._lastShown[v.screenId];
-                    }
-                }
-                else {
-                    // was shown... and now we should hide it.
-                    if (self._lastShown[v.screenId]) {
-                        self._removeClickHandler(v.screenId, self._lastShown[v.screenId]);
-                        delete self._lastShown[v.screenId];
-                    }
-                }
-            });
+                })
+            );
         });
 
-        Object.keys(self._lastShown).forEach(function (k) {
-            var v = self._lastShown[k];
-            self._positionClickHandler(k, v);
+        MegaPromise.allDone(promises).always(function() {
+            var $currentlyOpened = $('.onboarding-dialog.active');
+            if ($currentlyOpened.size() > 0) {
+                var screenId = $currentlyOpened.attr('id').replace("onboarding-dialog-", "");
+                self._initGenericEvents(
+                    screenId,
+                    $('.content-block', $currentlyOpened),
+                    $currentlyOpened,
+                    false
+                );
+            }
+            else {
+                if (self._queuedForShowing.length > 0) {
+                    self.renderDialog(self._queuedForShowing[0][0], self._queuedForShowing[0][1]);
+                }
+            }
         });
     }, 150);
 
 
-    Onboarding.prototype._renderClickHandler = function(screenId, screenInfo) {
+    Onboarding.prototype.renderDialog = function(screenId, screenInfo) {
         var self = this;
-        var $clickHandler = self.$clickHandlerTemplate.clone();
-        $clickHandler.attr('id', 'onboarding-' + screenId);
+        if ($.dialog) {
+            return;
+        }
+        $.dialog = "onboarding-" + screenId;
 
         var $onboardingDialogTemplate = self.$onboardingDialogTemplate.clone();
         $onboardingDialogTemplate.attr('id', 'onboarding-dialog-' + screenId);
@@ -323,61 +352,98 @@
         var $screen = $('#' + screenId, self.$screensContainer).clone();
         $('.onboarding-dialog-contents', $onboardingDialogTemplate).replaceWith($screen);
 
+        var extraClasses = $screen.data('classes');
+        if (extraClasses) {
+            extraClasses.split(" ").forEach(function(kls) {
+                $onboardingDialogTemplate.addClass(kls);
+            });
+        }
+
+        if (screenInfo.onBeforeShow) {
+            screenInfo.onBeforeShow(self, $onboardingDialogTemplate);
+        }
+
         // add some formatting ([B]...[/B])
-        $('p', $screen).each(function() {
+        $('.hint-info', $screen).each(function() {
             var txt = $(this).text();
             txt = htmlentities(txt);
             txt = txt
-                .replace("[B]", "<strong>")
-                .replace("[/B]", "</strong>");
+                .replace(/\[B\]/gi, '<span class="bold">')
+                .replace(/\[\/B\]/gi, '</span>')
+                .replace("[A1]", '<a href="/fm/account">')
+                .replace("[/A1]", '</a>')
+                .replace("[A2]", '<a href="/fm/account/notifications">')
+                .replace("[/A2]", '</a>');
 
+            if (screenInfo.customLinkUrl) {
+                txt = txt
+                    .replace("[CL]", '<a href="' + screenInfo.customLinkUrl + '">')
+                    .replace("[/CL]", "</a>");
+            }
             $(this).html(txt);
         });
 
+        if (screenInfo.learnMoreUrl) {
+            $('.hint-info', $screen).append(
+                $('<div><a href="' + screenInfo.learnMoreUrl + '" target="_blank">' + l[8742] + '</a></div>')
+            );
+        }
+
+        $onboardingDialogTemplate.hide();
+
         $(document.body).append($onboardingDialogTemplate);
+        self._lastShown[screenId] = $onboardingDialogTemplate;
 
-        $clickHandler.hide();
-        $(document.body).append($clickHandler);
-        $clickHandler.fadeIn();
 
-        self._initGenericEvents(screenId, $clickHandler, $screen, $onboardingDialogTemplate, screenInfo);
+        $onboardingDialogTemplate.fadeIn();
 
-        return [$clickHandler, $screen, $onboardingDialogTemplate];
+        screenInfo.$dialog = $onboardingDialogTemplate;
+
+        self._initGenericEvents(screenId, $screen, $onboardingDialogTemplate, screenInfo);
     };
 
-    Onboarding.prototype._removeClickHandler = function(screenId, screenInfo) {
-        var self = this;
-        screenInfo.$clickHandler.fadeOut(200, "easeInCubic", function() {
-            screenInfo.$clickHandler.show();
-            screenInfo.$clickHandler.remove();
-            delete screenInfo.$clickHandler;
-        });
-        screenInfo.$dialog.fadeOut(200, "easeInCubic", function() {
-            screenInfo.$dialog.remove();
-            delete screenInfo.$dialog;
-            delete screenInfo.$screen;
-        });
-    };
 
-    Onboarding.prototype._positionClickHandler = function(screenId, screenInfo) {
+    Onboarding.prototype._positionDialog = function(screenId) {
         var self = this;
 
-        var $screen = screenInfo.$screen;
-        var $clickHandler = screenInfo.$clickHandler;
+        // var $screen = screenInfo.$screen;
+        // var $dropdown = screenInfo.$dropdown;
 
-        if ($screen.data('clickHandlerPosition')) {
-            var $targetElement = $($screen.data('clickHandlerPosition'));
-            if (!$targetElement.is(":visible")) {
-                if ($clickHandler && $clickHandler.is(":visible")) {
-                    self.hideClickHandler(screenId, screenInfo);
-                }
-                return;
-            }
-            $clickHandler.position({
-                of: $targetElement,
-                my: $screen.data('clickHandlerPositionMy') ? $screen.data('clickHandlerPositionMy') : "left bottom",
-                at: $screen.data('clickHandlerPositionAt') ? $screen.data('clickHandlerPositionAt') : "right center"
+        // if ($screen.data('dropdownPosition')) {
+        //     var $targetElement = $($screen.data('dropdownPosition'));
+        //     if (!$targetElement.is(":visible")) {
+        //         if ($dropdown && $dropdown.is(":visible")) {
+        //             self.hideDialog(screenId, screenInfo);
+        //         }
+        //         return;
+        //     }
+        //     $dropdown.position({
+        //         of: $targetElement,
+        //         my: $screen.data('dropdownPositionMy') ? $screen.data('dropdownPositionMy') : "left bottom",
+        //         at: $screen.data('dropdownPositionAt') ? $screen.data('dropdownPositionAt') : "right center"
+        //     });
+        // }
+        var $elem = $('#onboarding-dialog-' + screenId);
+        var $screen = $('.content-block', $elem);
+        var pos = $screen.data('position');
+
+        if (pos === 'center') {
+            $elem.position({
+                of: $(window)
             });
+        }
+        else if (String(pos).substr(0, 1) === '$') {
+            var query = pos.substr(1, pos.length);
+            var posAt = ($screen.data('positionAt') || "left top");
+            var posMy = ($screen.data('positionMy') || "left top");
+            $elem.position({
+                of: query,
+                at: posAt,
+                my: posMy
+            });
+        }
+        else {
+            console.error("invalid pos data attr:" + $screen.data('position'));
         }
     };
 
@@ -389,7 +455,11 @@
         if (self._pageChangeListener) {
             mBroadcaster.removeListener(self._pageChangeListener);
         }
+        if (self._closeDialogListener) {
+            mBroadcaster.removeListener(self._closeDialogListener);
+        }
 
+        $(document.body).unbind('onMegaNotification.onboarding');
         $(window).unbind('resize.onboarding');
 
         if (!self.screens) {
@@ -397,12 +467,8 @@
             return;
         }
 
-        $("#" + self.options.clickHandlerTemplateId).remove();
         $("#" + self.options.screensContainerId).remove();
         $("#" + self.options.onboardingDialogTemplateId).remove();
-        if (self.$clickHandlerTemplate) {
-            delete self.$clickHandlerTemplate;
-        }
 
         if (self.$screensContainer) {
             delete self.$screensContainer;
@@ -416,13 +482,12 @@
 
         Object.keys(self._lastShown).forEach(function(k) {
             var v = self._lastShown[k];
-            v.$screen.remove();
-            v.$clickHandler.remove();
-            v.$dialog.remove();
+            $('#onboarding-dialog-' + k).remove();
         });
 
         delete self._lastShown;
         delete self.options;
+        delete self._queuedForShowing;
     };
 
 
@@ -445,26 +510,186 @@
                 self._persisted.get(k).done(function(r) {
                     if (r === 0) {
                         // reset, if already shown, but then unhidden (because of ._persisted.reset())
-                        if (self._lastShown[k]) {
+                        if (self._lastShown && self._lastShown[k]) {
                             delete self._lastShown[k];
                         }
-                        self.eventuallyRenderClickHandlers();
+                        self.eventuallyRenderDialogs();
                     }
                     else {
-                        self.eventuallyRenderClickHandlers();
+                        self.eventuallyRenderDialogs();
                     }
                 });
             }
-
         });
+    };
+
+    Onboarding.prototype._calculateNodesCount = function() {
+        var self = this;
+        if (typeof(self._calculatedNodesCount) === 'undefined' && M && M.tree && M.tree[M.RootID]) {
+            self._calculatedNodesCount = Object.keys(M.tree[M.RootID]).length;
+        }
+        return self._calculatedNodesCount || 0;
     };
 
     // Define the screens and logic here...
     Onboarding.prototype._initScreens = function() {
         var self = this;
 
+        var rootNodesCount = self._calculateNodesCount();
+
+        // notifications should be first, from UX point of view.
         self.registerScreen(
-            'contacts-section',
+            'have-notifications',
+            function shouldShowNotificationsTip() {
+                if (
+                    u_type !== 0 &&
+                    is_fm() &&
+                    !folderlink &&
+                    rootNodesCount < 3 &&
+                    $('.top-icon.notification .notification-num:visible').size() > 0 &&
+                    parseInt($('.top-icon.notification .notification-num:visible').text(), 10) > 0
+                ) {
+                    return true;
+                }
+            },
+            function _onHideOnboardingNotificationsTip(screenId) {
+                self.unregisterScreen(screenId);
+            }
+        );
+
+        self.registerScreen(
+            'how-to-upload',
+            function _shouldShowOnboardingUpload() {
+                if (
+                    u_type !== 0 &&
+                    is_fm() &&
+                    !folderlink &&
+                    M.currentdirid === M.RootID &&
+                    M.v.length <= 1 /* 1st item is the welcome pdf */
+                ) {
+                    return true;
+                }
+            },
+            function _onHideOnboardingUpload(screenId) {
+                self.unregisterScreen(screenId);
+            },
+            function _onBeforeShowUpload(onboarding, $elem) {
+                $('.is-chrome, .is-ff', $elem).addClass('hidden');
+
+                if (ua.details.browser === "Chrome") {
+                    $('.is-chrome', $elem).removeClass('hidden');
+                    $('.is-ff', $elem).remove();
+                }
+                else {
+                    // FF, IE, Safari, Etc
+                    $('.is-ff', $elem).removeClass('hidden');
+                    $('.is-chrome', $elem).remove();
+                }
+            }
+        );
+
+        self.registerScreen(
+            'manage-transfers',
+            function _shouldShowOnboardingTransfers() {
+                if (
+                    u_type !== 0 &&
+                    is_fm() &&
+                    !folderlink &&
+                    rootNodesCount < 3 &&
+                    $('.nw-fm-left-icon.transfers').is(":visible") &&
+                    M.hasPendingTransfers()
+                ) {
+                    return true;
+                }
+            },
+            function _onHideOnboardingTransfer(screenId) {
+                self.unregisterScreen(screenId);
+            },
+            undefined
+        );
+
+
+
+        // Have outgoing shares
+        // Object.keys(M.su).filter(n => n !== 'EXP').length > 0
+
+        // Have pub links
+        // Object.keys(Object(M.su.EXP)).length > 0
+
+
+
+        self.registerScreen(
+            'share-content',
+            function _shouldShowOnboardingShareContent() {
+                var fileNodeInUi = $('tr.file.megaListItem:visible:first, .data-block-view.file:visible:first');
+
+                if (
+                    u_type !== 0 &&
+                    is_fm() &&
+                    !folderlink &&
+                    Object.keys(Object(M.su.EXP)).length === 0 &&
+                    $('.fm-blocks-view.fm:visible,.files-grid-view.fm:visible').size() > 0 &&
+                    fileNodeInUi.size() > 0
+                ) {
+                    return true;
+                }
+            },
+            function _onHideOnboardingShareContent(screenId) {
+                self.unregisterScreen(screenId);
+            },
+            undefined,
+            "https://mega.nz/help/client/webclient/getting-started/how-can-i-share-data-without-requirin" +
+            "g-the-recipient-to-register-with-mega-first-57885f6f886688d0168b45b6"
+        );
+
+
+        self.registerScreen(
+            'share-folders',
+            function _shouldShowOnboardingShareFolders() {
+                var folderInUI = $('tr.folder.megaListItem:visible:first, .data-block-view.folder:visible:first');
+
+                if (
+                    u_type !== 0 &&
+                    is_fm() &&
+                    !folderlink &&
+                    Object.keys(M.su).filter(function(n) { return n !== 'EXP'; }).length === 0 &&
+                    $('.fm-blocks-view.fm:visible,.files-grid-view.fm:visible').size() > 0 &&
+                    folderInUI.size() > 0
+                ) {
+                    return true;
+                }
+            },
+            function _onHideOnboardingShareFolders(screenId) {
+                self.unregisterScreen(screenId);
+            }
+        );
+
+
+        self.registerScreen(
+            'rubbish-bin',
+            function shouldShowRubbishBinTip() {
+                if (
+                    u_type !== 0 &&
+                    is_fm() &&
+                    !folderlink &&
+                    (
+                        typeof u_attr.flags.ssrs !== 'undefined' &&
+                        parseInt(u_attr.flags.ssrs, 10) === 1 &&
+                        !u_attr['^!rubbishtime']
+                    ) &&
+                    $('.nw-fm-left-icon.rubbish-bin.active').size() === 0 &&
+                    $('.nw-fm-left-icon.rubbish-bin.filled:visible').size() > 0
+                ) {
+                    return true;
+                }
+            },
+            function _onHideOnboardingRubbishBinTip(screenId) {
+                self.unregisterScreen(screenId);
+            }
+        );
+
+        self.registerScreen(
+            'add-contacts',
             function _shouldShowOnboardingContacts() {
                 if (
                     u_type !== 0 &&
@@ -482,9 +707,8 @@
             }
         );
 
-
         self.registerScreen(
-            'chats-section',
+            'megachat',
             function shouldShowOnboardingChats() {
                 if (
                     u_type !== 0 &&
@@ -492,6 +716,7 @@
                     !folderlink &&
                     megaChatIsReady &&
                     !megaChatIsDisabled &&
+                    M.u.keys().length >= 2 /* 1st of them == u_handle */ &&
                     megaChat.chats.length <= 1 &&
                     ChatdIntegration.mcfHasFinishedPromise &&
                     ChatdIntegration.mcfHasFinishedPromise.state() === "resolved" &&
@@ -502,11 +727,9 @@
                 ) {
                     return true;
                 }
-                else if (typeof megaChat !== 'undefined') {
-                    if (megaChat.plugins.chatdIntegration.isLoading() === false) {
-                        $(megaChat.plugins.chatdIntegration).rebind('onMcfLoadingDone.onboardingChat', function() {
-                            self.eventuallyRenderClickHandlers();
-                        });
+                else {
+                    if (megaChatIsDisabled) {
+                        return;
                     }
                     if (
                         ChatdIntegration.mcfHasFinishedPromise &&
@@ -515,11 +738,18 @@
                         // schedule an update in case the MCF is still loading
                         ChatdIntegration.mcfHasFinishedPromise.always(function() {
                             Soon(function() {
-                                self.eventuallyRenderClickHandlers();
+                                self.eventuallyRenderDialogs();
                             });
                         });
                     }
 
+                    if (typeof megaChat !== 'undefined') {
+                        if (megaChat.plugins.chatdIntegration.isLoading() === false) {
+                            $(megaChat.plugins.chatdIntegration).rebind('onMcfLoadingDone.onboardingChat', function() {
+                                self.eventuallyRenderDialogs();
+                            });
+                        }
+                    }
                 }
             },
             function _onHideOnboardingChats(screenId) {
@@ -527,15 +757,34 @@
             }
         );
 
+
+
         self._initPersistence([
             'onboarding',
-            'contacts-section',
-            'chats-section'
+            'how-to-upload',
+            'manage-transfers',
+            'add-contacts',
+            'have-notifications',
+            'megachat',
+            'share-folders',
+            'share-content',
+            'rubbish-bin'
         ]);
     };
+    Onboarding.prototype.dumpState = function() {
+        var self = this;
+        self._persisted._keys.forEach(function(k) {
+            self._persisted.get(k)
+                .done(function(r) {
+                    console.error(k, "=", r);
+                })
+                .fail(function(e) {
+                    console.error("failed: ", k, e);
+                });
+        });
+    };
 
-    if(0) // disabled for now
-    mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
+    var initOnboarding = function() {
         if (!folderlink) {
             assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
             assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
@@ -545,7 +794,18 @@
             // we reached our goal, stop listening for fminitialized
             return 0xDEAD;
         }
-    });
+    };
+
+    if (megaChatIsDisabled) {
+        mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
+            return initOnboarding();
+        });
+    }
+    else {
+        ChatdIntegration.mcfHasFinishedPromise.always(function() {
+            initOnboarding();
+        });
+    }
 
     // export
     scope.mega.ui.Onboarding = Onboarding;

@@ -213,7 +213,7 @@ var GenericConversationMessage = React.createClass({
         }
     },
     _startDownload: function(v) {
-        M.addDownload([v.h || v]);
+        M.addDownload([v]);
     },
     _addToCloudDrive: function(v) {
         M.injectNodes(v, M.RootID, function(res) {
@@ -257,8 +257,9 @@ var GenericConversationMessage = React.createClass({
     _startPreview: function(v, e) {
         var chatRoom = this.props.message.chatRoom;
         assert(M.chat, 'Not in chat.');
-        M.v = chatRoom.images.values();
-        slideshow(v.h);
+        chatRoom._rebuildAttachments();
+
+        slideshow(v.h, undefined, true);
         if (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -295,23 +296,31 @@ var GenericConversationMessage = React.createClass({
 
         // if this is a text msg.
         if (message instanceof Message) {
-            // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
-            if (!message.messageHtml) {
+            if (!message.wasRendered) {
+                // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
                 message.messageHtml = htmlentities(
                     message.textContents
                 ).replace(/\n/gi, "<br/>");
+
+                message.processedBy = {};
+
+                var evtObj = {
+                    message: message,
+                    room: chatRoom
+                };
+
+                megaChat.trigger('onPreBeforeRenderMessage', evtObj);
+                var event = new $.Event("onBeforeRenderMessage");
+                megaChat.trigger(event, evtObj);
+                megaChat.trigger('onPostBeforeRenderMessage', evtObj);
+
+                if (event.isPropagationStopped()) {
+                    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
+                    return false;
+                }
+                message.wasRendered = 1;
             }
 
-            var event = new $.Event("onBeforeRenderMessage");
-            megaChat.trigger(event, {
-                message: message,
-                room: chatRoom
-            });
-
-            if (event.isPropagationStopped()) {
-                self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
-                return false;
-            }
             textMessage = message.messageHtml;
 
 
@@ -457,15 +466,18 @@ var GenericConversationMessage = React.createClass({
                                 var imagesListKey = message.messageId + "_" + v.h;
                                 if (!chatRoom.images.exists(imagesListKey)) {
                                     v.id = imagesListKey;
-                                    v.delay = message.delay;
+                                    v.orderValue = message.orderValue;
+                                    v.messageId = message.messageId;
                                     chatRoom.images.push(v);
                                 }
-                                var previewLabel = is_video(v) ? l[17732] : l[1899];
-                                previewButton = <span key="previewButton">
-                                    <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
-                                                              onClick={self._startPreview.bind(self, v)}/>
-                                    <hr/>
-                                </span>;
+                                if (is_image(v) || is_video(v)) {
+                                    var previewLabel = is_video(v) ? l[17732] : l[1899];
+                                    previewButton = <span key="previewButton">
+                                        <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
+                                                                  onClick={self._startPreview.bind(self, v)}/>
+                                        <hr/>
+                                    </span>;
+                                }
                             }
                             if (contact.u === u_handle) {
                                 dropdown = <ButtonsUI.Button
@@ -577,7 +589,6 @@ var GenericConversationMessage = React.createClass({
                         }
                         else {
                             // else if (attachmentMetaInfo.revoked) { ... don't show revoked files
-                            debugger;
                             return;
                         }
 
@@ -593,35 +604,43 @@ var GenericConversationMessage = React.createClass({
                         if (M.chat && !message.revoked) {
                             if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
                                 var src = thumbnails[v.h];
+                                message.imagesAreLoading = message.imagesAreLoading || {};
+
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);
 
                                     if (!src || src !== v) {
-                                        M.v.push(v);
-                                        if (!v.seen) {
-                                            v.seen = 1; // HACK
+                                        if (!v.seen && !message.imagesAreLoading[v.h]) {
+                                            message.imagesAreLoading[v.h] = 1;
+                                            v.seen = 1;
+                                            M.v.push(v);
+                                            delay('thumbnails', fm_thumbnails, 90);
                                         }
-                                        delay('thumbnails', fm_thumbnails, 90);
                                     }
                                     src = window.noThumbURI || '';
-
+                                }
+                                if (!v.imgId) {
                                     v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
                                 }
 
-                                preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
-                                    <div className="img-overlay" onClick={self._startPreview.bind(self, v)}></div>
-                                    <div className="button overlay-button" onClick={self._startPreview.bind(self, v)}>
-                                        <i className="huge-white-icon loupe"></i>
-                                    </div>
+                                var previewable = is_image(v) || is_video(v);
+                                if (previewable) {
+                                    preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
+                                        <div className="img-overlay" onClick={self._startPreview.bind(self, v)}></div>
+                                        <div className="button overlay-button"
+                                                onClick={self._startPreview.bind(self, v)}>
+                                            <i className="huge-white-icon loupe"></i>
+                                        </div>
 
-                                    {dropdown}
+                                        {dropdown}
 
-                                    <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                         width="156"
-                                         height="156"
-                                         onClick={self._startPreview.bind(self, v)}
-                                    />
-                                </div>) :  preview);
+                                        <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
+                                             width="156"
+                                             height="156"
+                                             onClick={self._startPreview.bind(self, v)}
+                                        />
+                                    </div>) :  preview);
+                                }
                             }
                         }
 

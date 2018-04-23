@@ -35,30 +35,42 @@ mobile.linkOverlay = {
         this.$overlay.find('.copy').addClass('disabled');
         this.$overlay.find('.remove').addClass('disabled');
 
-        // If a link already exists for this, show the link and copy/remove buttons
-        if (node.ph) {
-            this.showPublicLinkAndEnableButtons(nodeHandle);
+        var tmpFn = function() {
+
+            // If a link already exists for this, show the link and copy/remove buttons
+            if (node.ph) {
+                this.showPublicLinkAndEnableButtons(nodeHandle);
+            }
+            else {
+
+                // Otherwise create the link first then show the link and copy/remove buttons
+                var exportLink = new mega.Share.ExportLink({
+                    'showExportLinkDialog': false,
+                    'updateUI': false,
+                    'nodesToProcess': [nodeHandle]
+                });
+                exportLink.getExportLink();
+            }
+
+            // Initialise the buttons
+            this.initCopyButton(nodeHandle);
+            this.initRemoveButton(nodeHandle);
+            this.initCloseButton();
+
+            // Disable scrolling of the file manager in the background to fix a bug on iOS Safari
+            $('.mobile.file-manager-block').addClass('disable-scroll');
+
+            // Show the overlay
+            this.$overlay.removeClass('hidden').addClass('overlay');
+        };
+
+        var mdList = mega.megadrop.isDropExist(nodeHandle);
+        if (mdList.length) {
+            mega.megadrop.pufRemove(mdList).done(tmpFn.bind(this));
         }
         else {
-            // Otherwise create the link first then show the link and copy/remove buttons
-            var exportLink = new mega.Share.ExportLink({
-                'showExportLinkDialog': false,
-                'updateUI': false,
-                'nodesToProcess': [nodeHandle]
-            });
-            exportLink.getExportLink();
+            tmpFn.call(this);
         }
-
-        // Initialise the buttons
-        this.initCopyButton(nodeHandle);
-        this.initRemoveButton(nodeHandle);
-        this.initCloseButton();
-
-        // Disable scrolling of the file manager in the background to fix a bug on iOS Safari
-        $('.mobile.file-manager-block').addClass('disable-scroll');
-
-        // Show the overlay
-        this.$overlay.removeClass('hidden').addClass('overlay');
     },
 
     /**
@@ -242,9 +254,21 @@ mobile.linkOverlay = {
         'use strict';
 
         var $closeButton = this.$overlay.find('.fm-dialog-close');
+        var $closeTextButton =this.$overlay.find('.text-button');
 
         // Add tap handler
         $closeButton.off('tap').on('tap', function() {
+
+            // Hide overlay
+            mobile.linkOverlay.$overlay.addClass('hidden');
+
+            // Re-show the file manager and re-enable scrolling
+            $('.mobile.file-manager-block').removeClass('hidden disable-scroll');
+
+            // Prevent clicking the menu button behind
+            return false;
+        });
+        $closeTextButton.off('tap').on('tap', function() {
 
             // Hide overlay
             mobile.linkOverlay.$overlay.addClass('hidden');

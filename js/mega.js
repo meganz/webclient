@@ -929,14 +929,14 @@ scparser.$add('upco', {
 scparser.$add('puh', {
     b: function(a) {
         "use strict";
-        mega.megadrop.pufProcessPUH([a], false, true);
+        mega.megadrop.pufProcessPUH([a]);
     }
 });
 
 scparser.$add('pup', {
     b: function(a) {
         "use strict";
-        mega.megadrop.pupProcessPUP([a], false);
+        mega.megadrop.pupProcessPUP([a]);
     }
 });
 
@@ -1075,6 +1075,10 @@ scparser.$add('u', function(a) {
         else {
             // success - check what changed and redraw
             if (M.scAckQueue[a.i]) {
+                if (fminitialized && mega.megadrop.pufs[n.h] && n.name !== mega.megadrop.pufs[n.h].fn) {
+                    mega.megadrop.pupUpdate(n.h, 'msg', n.name);
+                }
+
                 // Triggered locally, being DOM already updated.
                 if (d) {
                     console.log('scAckQueue - triggered locally.', a.i);
@@ -2038,7 +2042,6 @@ function dbfetchfm() {
 
                         // Prevent MEGAdrop tables being created for mobile
                         if (is_mobile) {
-                            delete tables.puf;
                             delete tables.pup;
                         }
 
@@ -2113,6 +2116,29 @@ function treetype(h) {
 
         h = M.d[h].p;
     }
+}
+
+// determine whether a node is shared
+function shared(h) {
+    "use strict";
+    var promise = new MegaPromise();
+
+    dbfetch.get(h).always(function() {
+        var rc = false;
+
+        while (h && M.d[h]) {
+            if (M.d[h].shares) {
+                rc = h;
+                break;
+            }
+
+            h = M.d[h].p;
+        }
+
+        promise.resolve(rc);
+    });
+
+    return promise;
 }
 
 // returns sharing user (or false if not in an inshare)
@@ -2920,7 +2946,7 @@ function init_chat() {
 function loadfm_callback(res) {
     'use strict';
 
-    if ((parseInt(res) | 0) < 0) {
+    if ((parseInt(res) | 0) < 0 || res === undefined) {
         loadingDialog.hide();
         loadingInitDialog.hide();
 
@@ -3017,8 +3043,8 @@ function loadfm_callback(res) {
         }
 
         // This package is sent on hard refresh if owner have enabled or disabled PUF
-        if (!is_mobile && res.uph) {
-            mega.megadrop.processUPH(res.uph, false);
+        if (res.uph) {
+            mega.megadrop.processUPHAP(res.uph);
         }
 
         // decrypt hitherto undecrypted nodes

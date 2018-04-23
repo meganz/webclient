@@ -134,9 +134,10 @@ MegaPromise.busy = function() {
  * @private
  */
 MegaPromise.getTraceableReject = function($promise, origPromise) {
+    'use strict';
     // Save the current stack pointer in case of an async call behind
     // the promise.reject (Ie, onAPIProcXHRLoad shown as initial call)
-    var preStack = d && M.getStack();
+    var preStack = d > 1 && M.getStack();
 
     return function __mpTraceableReject(aResult) {
         if (window.d > 1) {

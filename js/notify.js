@@ -349,10 +349,12 @@ var notify = {
         // If there is a new notification, show the red circle with the number of notifications in it
         if (newNotifications >= 1) {
             $popup.removeClass('hidden').text(newNotifications);
+            $(document.body).trigger('onMegaNotification', newNotifications);
         }
         else {
             // Otherwise hide it
             $popup.addClass('hidden').text(newNotifications);
+            $(document.body).trigger('onMegaNotification', false);
         }
 
         // Update page title

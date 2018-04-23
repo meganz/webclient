@@ -24,7 +24,8 @@ var EmoticonShortcutsFilter = function(megaChat) {
         ':\\': ':confused:',
         ':/': ':confused:',
         ':|': ':neutral_face:',
-        'd:': ':anguished:'
+        'd:': ':anguished:',
+        ':o': ':open_mouth:'
     };
 
 
@@ -52,7 +53,7 @@ var EmoticonShortcutsFilter = function(megaChat) {
         });
 
         if (formatted) {
-            messageObject.textContents = messageObject.textContents = formatted;
+            messageObject.textContents = formatted;
         }
     });
 

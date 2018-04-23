@@ -201,6 +201,66 @@ function time2lastSeparator(dateString, refDate) {
 }
 
 /**
+ * Gets the current UNIX timestamp
+ * @returns {Number} Returns an integer with the current UNIX timestamp (in seconds)
+ */
+function unixtime() {
+    'use strict';
+    return Math.round(Date.now() / 1000);
+}
+
+function uplpad(number, length) {
+    'use strict';
+    var str = String(number);
+    while (str.length < length) {
+        str = '0' + str;
+    }
+    return str;
+}
+
+function secondsToTime(secs, html_format) {
+    'use strict';
+
+    if (isNaN(secs) || secs === Infinity) {
+        return '--:--:--';
+    }
+    if (secs < 0) {
+        return '';
+    }
+
+    var hours = uplpad(Math.floor(secs / (60 * 60)), 2);
+    var divisor_for_minutes = secs % (60 * 60);
+    var minutes = uplpad(Math.floor(divisor_for_minutes / 60), 2);
+    var divisor_for_seconds = divisor_for_minutes % 60;
+    var seconds = uplpad(Math.floor(divisor_for_seconds), 2);
+    var returnvar = hours + ':' + minutes + ':' + seconds;
+
+    if (html_format) {
+        hours = (hours !== '00') ? (hours + '<span>h</span> ') : '';
+        returnvar = hours + minutes + '<span>m</span> ' + seconds + '<span>s</span>';
+    }
+    return returnvar;
+}
+
+function secondsToTimeShort(secs) {
+    'use strict';
+    var val = secondsToTime(secs);
+
+    if (!val) {
+        return val;
+    }
+
+    if (val.substr(0, 1) === "0") {
+        val = val.substr(1, val.length);
+    }
+    if (val.substr(0, 2) === "0:") {
+        val = val.substr(2, val.length);
+    }
+
+    return val;
+}
+
+/**
  * Calculate the number of days since the given date
  * @param {String} dateStr The date string, in YYYY-MM-DD format
  * @returns {Number} the number of days
@@ -490,6 +550,11 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
     l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
     l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/sync" class="clickurl">').replace('[/A]', '</a>');
+    l[17793] = escapeHTML(l[17793])
+        .replace('[A1]', '<a href="/sync" class="clickurl">').replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
+        .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
+
     // l[] = escapeHTML(l[]).replace('', '');
 
     // carefully replace various strings to adhere to the new pro quotas:
@@ -502,6 +567,7 @@ mBroadcaster.once('startMega', function populate_l() {
 	l[16315] = l[16315].replace('4096','8192').replace('4','8');
 	l[16304] = l[16304].replace('8','16').replace('4096','8192').replace('4','8');
 	l[1367] = l[1367].replace('4','8');
+
     l[17083] = l[17083]
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
@@ -515,6 +581,8 @@ mBroadcaster.once('startMega', function populate_l() {
     if (l[17742]) {
         l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     }
+    l[17805] = l[17805].replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.nz">')
+                       .replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

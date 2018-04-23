@@ -714,7 +714,7 @@ var ulmanager = {
                 var file = ctx.file;
                 var done = function() {
                     // get thumb/prev created if it wasn't already, eg. an mp4 renamed as avi/mov/etc
-                    if (is_video(n) && String(n.fa).indexOf(':0*') < 0) {
+                    if (is_video(n) === 1 && String(n.fa).indexOf(':0*') < 0) {
                         var aes = new sjcl.cipher.aes([
                             n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
                         ]);
@@ -1405,7 +1405,9 @@ FileUpload.prototype.run = function(done) {
         if (file.hash && file.ts) {
             throw "The fingerprint exists already.";
         }
-        if (!is_extension && file.gecko && !file.size && -1 === ua.indexOf('windows')) {
+        if (!is_extension && file.gecko && !file.size
+                && ua.indexOf('windows') < 0 && parseInt(ua.details.version) < 55) {
+
             throw new Error('!ZeroByte');
         }
 

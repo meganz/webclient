@@ -251,6 +251,7 @@ function init_page() {
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
+        $.playbackTimeOffset = parseInt(ar[2]) | 0;
 
         if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
@@ -313,7 +314,7 @@ function init_page() {
 
     // If on the plugin page, show the page with the relevant extension for their current browser
     if (page == 'plugin') {
-        page = (window.chrome) ? 'chrome' : 'firefox';
+        page = (mega.chrome) ? 'chrome' : 'firefox';
     }
 
     if (localStorage.signupcode && u_type !== false) {
@@ -402,7 +403,7 @@ function init_page() {
                 return;
             }
 
-            if (fminitialized && !folderlink) {
+            if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
                 // Clean up internal state in case we're navigating back to a folderlink
                 M.currentdirid = M.RootID = undefined;
                 delete $.onImportCopyNodes;
@@ -500,10 +501,15 @@ function init_page() {
         }
     }
 
+    // If the account has just finished being cancelled
     if (localStorage.beingAccountCancellation) {
         if (is_mobile) {
             parsepage(pages['mobile']);
-            // todo
+
+            // Show message that the account has been cancelled successfully
+            mobile.messageOverlay.show(l[6188], l[6189], function() {
+                loadSubPage('start');
+            });
         }
         else {
             // Insert placeholder page while waiting for user input
@@ -931,24 +937,36 @@ function init_page() {
         }
     }
     else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
-
-        if (u_type) {
-            var ac = new mega.AccountClosure();
-            ac.handleFeedback();
+        if (is_mobile) {
+            if (u_type) {
+                parsepage(pages['mobile']);
+                mobile.account.cancel.init();
+            }
+            else {
+                login_next = page;
+                loadSubPage('login');
+            }
         }
         else {
-            // Unable to cancel, not logged in
-            mega.ui.showLoginRequiredDialog({
-                title: l[6186],
-                textContent: l[5841]
-            })
-            .done(init_page)
-            .fail(function(aError) {
-                if (aError) {
-                    alert(aError);
-                }
-                loadSubPage('start');
-            });
+            // If desktop and logged in
+            if (u_type) {
+                var ac = new mega.AccountClosure();
+                ac.handleFeedback();
+            }
+            else {
+                // Unable to cancel, not logged in
+                mega.ui.showLoginRequiredDialog({
+                    title: l[6186],
+                    textContent: l[5841]
+                })
+                .done(init_page)
+                .fail(function(aError) {
+                    if (aError) {
+                        alert(aError);
+                    }
+                    loadSubPage('start');
+                });
+            }
         }
     }
     else if (page === 'wiretransfer') {
@@ -974,14 +992,60 @@ function init_page() {
                 });
         }
     }
+
+    // Initial recovery process page to choose whether to recover with Master/Recovery Key or park the account
     else if (page === 'recovery') {
-        parsepage(pages['recovery']);
-        var accountRecovery = new mega.AccountRecovery();
-        accountRecovery.initRecovery();
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.recovery.init();
+        }
+        else {
+            parsepage(pages['recovery']);
+            var accountRecovery = new mega.AccountRecovery();
+            accountRecovery.initRecovery();
+        }
     }
-    else if (page.substr(0, 7) == 'recover' && page.length > 25) {
-        parsepage(pages['reset']);
-        init_reset();
+
+    // Page for mobile to let them recover by Master/Recovery Key
+    else if (is_mobile && page === 'recoverybykey') {
+        parsepage(pages['mobile']);
+        mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_KEY);
+    }
+
+    // Page for mobile to let them park their account (start a new account with the same email)
+    else if (is_mobile && page === 'recoverybypark') {
+        parsepage(pages['mobile']);
+        mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_PARK);
+    }
+
+    // Code for handling the return from a #recover email link
+    else if (page.substr(0, 7) === 'recover' && page.length > 25) {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.recovery.fromEmailLink.init();
+        }
+        else {
+            parsepage(pages['reset']);
+            init_reset();
+        }
+    }
+
+    // Page for mobile to enter (or upload) their Master/Recovery Key
+    else if (is_mobile && page === 'recoveryenterkey') {
+        parsepage(pages['mobile']);
+        mobile.recovery.enterKey.init();
+    }
+
+    // Page for mobile to let them change their password after they have entered their Master/Recovery key
+    else if (is_mobile && page === 'recoverykeychangepass') {
+        parsepage(pages['mobile']);
+        mobile.recovery.changePassword.init('key');
+    }
+
+    // Page for mobile to let the user change their password and finish parking their account
+    else if (is_mobile && page === 'recoveryparkchangepass') {
+        parsepage(pages['mobile']);
+        mobile.recovery.changePassword.init('park');
     }
     else if (page == 'sdkterms') {
         parsepage(pages['sdkterms']);
@@ -1614,20 +1678,8 @@ function topmenuUI() {
         $menuItem = undefined;
     }
 
-    if (u_type === 3) {
-        var name = '';
-
-        if (u_attr.firstname) {
-            name = u_attr.firstname;
-        }
-        if (u_attr.lastname) {
-            name += (name.length ? ' ' : '') + u_attr.lastname;
-        }
-        name = name || u_attr.name;
-
-        if (name) {
-            $topHeader.find('.user-name').text(name).removeClass('hidden');
-        }
+    if (u_type === 3 && u_attr.fullname) {
+        $topHeader.find('.user-name').text(u_attr.fullname).removeClass('hidden');
     }
 
     // Show language in top menu
@@ -1686,7 +1738,7 @@ function topmenuUI() {
         }
         else {
             // Show the free badge
-            $topMenu.find('.top-menu-item.account .right-el').text('FREE');
+            $topMenu.find('.top-menu-item.account .right-el').text(l[435]);
             $topHeader.find('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('body').removeClass('lite').addClass('free');
         }
@@ -1721,7 +1773,9 @@ function topmenuUI() {
 
             // Otherwise show the ephemeral session warning
             else if (($.len(M.c[M.RootID] || {})) && (page !== 'register')) {
-                alarm.ephemeralSession.render();
+                if (alarm.ephemeralSession) {
+                    alarm.ephemeralSession.render();
+                }
             }
         }
 
@@ -2279,13 +2333,17 @@ function pagemetadata()
 	{
 		mega_title = 'Takedown Guidance - MEGA';
 	}
-	else
-	{
-		mega_title = 'MEGA';
-	}
-	if (!mega_desc) mega_desc = 'We make secure cloud storage simple. Create an account and get 50 GB free on MEGA\'s end-to-end encrypted cloud collaboration platform today!';
-	$('meta[name=description]').remove();
-    $('head').append( '<meta name="description" content="' + mega_desc + '">');
+    else if (typeof Object(window.dlmanager).isStreaming === 'object') {
+        mega_title = 'MEGA - ' + dlmanager.isStreaming._megaNode.name;
+    }
+    else {
+        mega_title = 'MEGA';
+    }
+    if (!mega_desc) {
+        mega_desc = mega.whoami;
+    }
+    $('meta[name=description]').remove();
+    $('head').append('<meta name="description" content="' + String(mega_desc).replace(/[<">]/g, '') + '">');
 	document.title = mega_title;
 	megatitle();
 }
@@ -2322,10 +2380,6 @@ function parsepage(pagehtml, pp) {
         .safeHTML('<div class="nav-overlay"></div>' +
             translate(pages['transferwidget']) + pagehtml)
         .show();
-
-    $(window).rebind('resize.subpage', function () {
-        M.zoomLevelNotification();
-    });
 
     $('body').addClass('bottom-pages');
     $('body, html, .bottom-pages .fmholder').stop().animate({
@@ -2470,4 +2524,8 @@ mBroadcaster.once('boot_done', function() {
     M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', {murSeed: 0x800F0002});
     attribCache.bitMapsManager = new MegaDataBitMapManager();
+
+    $(window).rebind('resize.subpage', function() {
+        M.zoomLevelNotification();
+    });
 });

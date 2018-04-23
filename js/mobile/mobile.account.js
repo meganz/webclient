@@ -27,6 +27,7 @@ mobile.account = {
         mobile.account.initAchievementsButton($page);
         mobile.account.fetchSubscriptionInformation($page);
         mobile.account.initRecoveryKeyButton($page);
+        mobile.account.initCancelAccountButton($page);
 
         // Initialise the top menu
         topmenuUI();
@@ -373,6 +374,81 @@ mobile.account = {
             // Load the Backup page
             loadSubPage('backup');
             return false;
+        });
+    },
+
+    /**
+     * Initialise the Cancel Account button to send the user an account cancellation confirmation email
+     * @param {String} $page The jQuery selector for the current page
+     */
+    initCancelAccountButton: function($page) {
+
+        'use strict';
+
+        // On clicking/tapping the Upgrade Account button
+        $page.find('.acount-cancellation-block').off('tap').on('tap', function() {
+
+            // Please confirm that all your data will be deleted
+            var confirmMessage = l[1974];
+
+            // Search through their Pro plan purchase history
+            $(account.purchases).each(function(index, purchaseTransaction) {
+
+                // Get payment method name
+                var paymentMethodId = purchaseTransaction[4];
+                var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).name;
+
+                // If they have paid with iTunes or Google Play in the past
+                if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
+
+                    // Update confirmation message to remind them to cancel iTunes or Google Play
+                    confirmMessage += ' ' + l[8854];
+                    return false;
+                }
+            });
+
+            // Show a confirm dialog
+            mobile.account.showAccountCancelConfirmDialog(confirmMessage);
+
+            // Prevent double tap
+            return false;
+        });
+    },
+
+    /**
+     * Show dialog asking for confirmation and send an email to the user to finish the process if they agree
+     * @param {String} confirmMessage
+     */
+    showAccountCancelConfirmDialog: function(confirmMessage) {
+
+        'use strict';
+
+        // Show dialog asking for confirmation and continue if they agree
+        mobile.messageOverlay.show(l[6181], confirmMessage, function() {
+
+            loadingDialog.show();
+
+            // Make account cancellation request
+            api_req({a: 'erm', m: u_attr.email, t: 21}, {
+                callback: function(result) {
+
+                    loadingDialog.hide();
+
+                    // Please check the e-mail address and try again
+                    if (result === ENOENT) {
+                        mobile.messageOverlay.show(l[1513], l[1946]);
+                    }
+
+                    // If successful, show a dialog saying they need to check their email
+                    else if (result === 0) {
+                        mobile.showEmailConfirmOverlay();
+                    }
+                    else {
+                        // Oops, something went wrong
+                        mobile.messageOverlay.show(l[135], l[200]);
+                    }
+                }
+            });
         });
     }
 };

@@ -758,3 +758,32 @@ var from8 = firefox_boost ? mozFrom8 : function (utf8) {
     }
 
 })(self);
+
+function MegaNode(node) {
+    'use strict';
+
+    if (!node || !node.h || node.h.length !== 8) {
+        return Object(node || null);
+    }
+    Object.assign(this, node);
+}
+
+MegaNode.prototype = Object.create(null, {
+    constructor: {
+        value: MegaNode
+    },
+    toString: {
+        value: function toString() {
+            'use strict';
+
+            return this.h || '';
+        }
+    },
+    valueOf: {
+        value: function valueOf() {
+            'use strict';
+
+            return this.s || 0;
+        }
+    }
+});

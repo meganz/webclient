@@ -14,7 +14,7 @@ var EmojiAutocomplete = require('./emojiAutocomplete.jsx').EmojiAutocomplete;
 
 var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
-    validEmojiCharacters: new RegExp("[\w\:\-\_]", "gi"),
+    validEmojiCharacters: new RegExp("[\w\:\-\_0-9]", "gi"),
     getDefaultProps: function() {
         return {
             'textareaMaxHeight': "40%"
@@ -56,6 +56,19 @@ var TypingArea = React.createClass({
         }, 100);
     },
 
+    stoppedTyping: function () {
+        if (this.props.disabled) {
+            return;
+        }
+        var self = this;
+        var room = this.props.chatRoom;
+
+        self.iAmTyping = false;
+
+        delete self.lastTypingStamp;
+
+        room.trigger('stoppedTyping');
+    },
     typing: function () {
         if (this.props.disabled) {
             return;
@@ -70,8 +83,7 @@ var TypingArea = React.createClass({
 
         self.stoppedTypingTimeout = setTimeout(function() {
             if (room && self.iAmTyping) {
-                self.iAmTyping = false;
-                delete self.lastTypingStamp;
+                self.stoppedTyping();
             }
         }, 4000);
 
@@ -124,6 +136,9 @@ var TypingArea = React.createClass({
     onCancelClicked: function(e) {
         var self = this;
         self.setState({typedMessage: ""});
+        if (self.props.chatRoom && self.iAmTyping) {
+            self.stoppedTyping();
+        }
         self.onConfirmTrigger(false);
         self.triggerOnUpdate();
     },
@@ -139,6 +154,9 @@ var TypingArea = React.createClass({
 
         if (self.onConfirmTrigger(val) !== true) {
             self.setState({typedMessage: ""});
+        }
+        if (self.props.chatRoom && self.iAmTyping) {
+            self.stoppedTyping();
         }
         self.triggerOnUpdate();
     },
@@ -190,6 +208,9 @@ var TypingArea = React.createClass({
             }
             e.preventDefault();
             e.stopPropagation();
+            if (self.props.chatRoom && self.iAmTyping) {
+                self.stoppedTyping();
+            }
             return;
         }
     },
@@ -259,7 +280,20 @@ var TypingArea = React.createClass({
             }
         }
         else {
+            if (self.prefillMode && (
+                    key === 8 /* backspace */ ||
+                    key === 32 /* space */ ||
+                    key === 13 /* backspace */
+                )
+            ) {
+                // cancel prefill mode.
+                self.prefillMode = false;
+            }
             var char = String.fromCharCode(key);
+            if (self.prefillMode) {
+                return; // halt next checks if its in prefill mode.
+            }
+
             if (
                 key === 16 /* shift */ ||
                 key === 17 /* ctrl */ ||
@@ -305,27 +339,65 @@ var TypingArea = React.createClass({
                     }
                 }
 
-                if (
-                    matchedWord &&
-                    matchedWord.length > 2 &&
-                    matchedWord.substr(0, 1) === ":" &&
-                    matchedWord.substr(-1) !== ":"
-                ) {
+                if (matchedWord && matchedWord.length > 2 && matchedWord.substr(0, 1) === ":") {
+                    endPos = endPos ? endPos : startPos + matchedWord.length;
+
+                    if (matchedWord.substr(-1) === ":") {
+                        matchedWord = matchedWord.substr(0, matchedWord.length - 1);
+                    }
+
+
+                    var strictMatch = currentContent.substr(startPos, endPos - startPos);
+
+
+                    if (strictMatch.substr(0, 1) === ":" && strictMatch.substr(-1) === ":") {
+                        strictMatch = strictMatch.substr(1, strictMatch.length - 2);
+                    }
+                    else {
+                        strictMatch = false;
+                    }
+
+                    if (strictMatch && megaChat.isValidEmojiSlug(strictMatch)) {
+                        // emoji already filled in, dot set emojiSearchQuery/trigger emoji auto complete
+                        if (self.state.emojiSearchQuery) {
+                            self.setState({
+                                'emojiSearchQuery': false,
+                                'emojiStartPos': false,
+                                'emojiEndPos': false
+                            });
+                        }
+                        return;
+                    }
+
+
                     self.setState({
                         'emojiSearchQuery': matchedWord,
                         'emojiStartPos': startPos ? startPos : 0,
-                        'emojiEndPos': endPos ? endPos : startPos + matchedWord.length,
+                        'emojiEndPos': endPos
                     });
                     return;
                 }
                 else {
-                    if (self.state.emojiSearchQuery) {
+                    if (
+                        !matchedWord &&
+                        self.state.emojiStartPos !== false &&
+                        self.state.emojiEndPos !== false
+                    ) {
+                        matchedWord = element.value.substr(self.state.emojiStartPos, self.state.emojiEndPos);
+                    }
+
+                    if (
+                        !element.value ||
+                        element.value.length <= 2 ||
+                        matchedWord.length === 1 /* used backspace to delete the emoji search query?*/
+                    ) {
                         self.setState({
                             'emojiSearchQuery': false,
                             'emojiStartPos': false,
                             'emojiEndPos': false
                         });
                     }
+                    return;
                 }
             }
             if (self.state.emojiSearchQuery) {
@@ -348,11 +420,13 @@ var TypingArea = React.createClass({
             // delay is required, otherwise the onBlur -> setState may cause halt of child onclick handlers, in case
             // of a onClick in the emoji autocomplete.
             setTimeout(function() {
-                self.setState({
-                    'emojiSearchQuery': false,
-                    'emojiStartPos': false,
-                    'emojiEndPos': false
-                });
+                if (self.isMounted()) {
+                    self.setState({
+                        'emojiSearchQuery': false,
+                        'emojiStartPos': false,
+                        'emojiEndPos': false
+                    });
+                }
             }, 300);
         }
     },
@@ -371,6 +445,9 @@ var TypingArea = React.createClass({
 
         if ($.trim(e.target.value).length > 0) {
             self.typing();
+        }
+        else {
+            self.stoppedTyping();
         }
 
         // persist typed values
@@ -706,6 +783,18 @@ var TypingArea = React.createClass({
     isActive: function () {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
     },
+    resetPrefillMode: function() {
+        this.prefillMode = false;
+    },
+    onCopyCapture: function(e) {
+        this.resetPrefillMode();
+    },
+    onCutCapture: function(e) {
+        this.resetPrefillMode();
+    },
+    onPasteCapture: function(e) {
+        this.resetPrefillMode();
+    },
     render: function () {
         var self = this;
 
@@ -747,9 +836,13 @@ var TypingArea = React.createClass({
 
         var emojiAutocomplete = null;
         if (self.state.emojiSearchQuery) {
+
             emojiAutocomplete = <EmojiAutocomplete
                 emojiSearchQuery={self.state.emojiSearchQuery}
-                onSelect={function (e, emojiAlias) {
+                emojiStartPos={self.state.emojiStartPos}
+                emojiEndPos={self.state.emojiEndPos}
+                typedMessage={self.state.typedMessage}
+                onPrefill={function(e, emojiAlias) {
                     if (
                         $.isNumeric(self.state.emojiStartPos) &&
                         $.isNumeric(self.state.emojiEndPos)
@@ -757,17 +850,47 @@ var TypingArea = React.createClass({
                         var msg = self.state.typedMessage;
                         var pre = msg.substr(0, self.state.emojiStartPos);
                         var post = msg.substr(self.state.emojiEndPos, msg.length);
+
+                        self.onUpdateCursorPosition = self.state.emojiStartPos + emojiAlias.length;
+
+                        self.prefillMode = true;
                         self.setState({
                             'typedMessage': pre + emojiAlias + (
                                 post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
                             ),
+                            'emojiEndPos': self.state.emojiStartPos + emojiAlias.length + (
+                                post ? (post.substr(0, 1) !== " " ? 1 : 0) : 1
+                            )
+                        });
+                    }
+                }}
+                onSelect={function (e, emojiAlias, forceSend) {
+                    if (
+                        $.isNumeric(self.state.emojiStartPos) &&
+                        $.isNumeric(self.state.emojiEndPos)
+                    ) {
+                        var msg = self.state.typedMessage;
+                        var pre = msg.substr(0, self.state.emojiStartPos);
+                        var post = msg.substr(self.state.emojiEndPos, msg.length);
+                        var val = pre + emojiAlias + (
+                            post ? (post.substr(0, 1) !== " " ? " " + post : post) : " "
+                        );
+                        self.prefillMode = false;
+                        self.setState({
+                            'typedMessage': val,
                             'emojiSearchQuery': false,
                             'emojiStartPos': false,
                             'emojiEndPos': false
                         });
+                        if (forceSend) {
+                            if (self.onConfirmTrigger($.trim(val)) !== true) {
+                                self.setState({typedMessage: ""});
+                            }
+                        }
                     }
                 }}
                 onCancel={function () {
+                    self.prefillMode = false;
                     self.setState({
                         'emojiSearchQuery': false,
                         'emojiStartPos': false,
@@ -811,6 +934,9 @@ var TypingArea = React.createClass({
                         style={textareaStyles}
                         disabled={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
                         readOnly={room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false}
+                        onCopyCapture={self.onCopyCapture}
+                        onPasteCapture={self.onPasteCapture}
+                        onCutCapture={self.onCutCapture}
                     ></textarea>
                     <div className="message-preview"></div>
                 </div>

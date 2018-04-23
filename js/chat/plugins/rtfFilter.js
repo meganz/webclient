@@ -10,11 +10,9 @@ var RtfFilter = function(megaChat) {
     var self = this;
 
     self.regexps = {};
-    self.regexps['(^|\\s)\\*{1,2}([^\\*\\n]{1,})\\*{1,2}'] = ['$1<strong>$2</strong>', '$1 $2'];
-    self.regexps['(^|\\s)_{1,2}([^_\\n]{1,})_{1,2}'] = ['$1<em class="rtf-italic">$2</em>', '$1 $2'];
-    self.regexps['(^|\\s)`{1}([^`\\n]{1,})`{1}'] = ['$1<pre class="rtf-single">$2</pre>', '$1 $2'];
-    self.regexps['(^|\\s)`{3}(\n?)([^`]{1,})`{3}'] = ['$1<pre class="rtf-multi">$3</pre>', '$1 $3'];
-
+    self.regexps['(^|\\s)\\*{1,2}([^\\*\\n]{1,})\\*{1,2}'] = ['gi', '$1<strong>$2</strong>', '$1 $2'];
+    self.regexps['(^|\\s)_{1,2}([^_\\n]{1,})_{1,2}'] = ['gi', '$1<em class="rtf-italic">$2</em>', '$1 $2'];
+    self.regexps['^&gt;(.*)'] = ['gm', '<pre class="rtf-quote">$1</pre>', '$1']; // support > style.
 
     megaChat.bind("onBeforeRenderMessage", function(e, eventData) {
         self.processMessage(e, eventData);
@@ -29,7 +27,7 @@ RtfFilter.prototype.processStripRtfFromMessage = function(msg) {
     var self = this;
     Object.keys(self.regexps).forEach(function(regexp) {
         var replacement = self.regexps[regexp];
-        msg = msg.replace(new RegExp(regexp, "gi"), replacement[1]);
+        msg = msg.replace(new RegExp(regexp, replacement[0]), replacement[2]);
     });
     return msg;
 };
@@ -67,7 +65,6 @@ RtfFilter.prototype.processMessage = function(e, eventData) {
         return; // ignore, maybe its a system message (or composing/paused composing notification)
     }
 
-
     messageContents = messageContents ? $.trim(messageContents) : "";
 
     /*jshint -W049 */
@@ -75,9 +72,11 @@ RtfFilter.prototype.processMessage = function(e, eventData) {
     /*jshint +W049 */
     Object.keys(self.regexps).forEach(function(regexp) {
         var replacement = self.regexps[regexp];
-        messageContents = messageContents.replace(new RegExp(regexp, "gi"), replacement[0]);
+        messageContents = messageContents.replace(new RegExp(regexp, replacement[0]), replacement[1]);
     });
+
     messageContents = messageContents.replace(/\n/gi, "<br/>");
+
     eventData.message.messageHtml = messageContents;
     eventData.message.processedBy['rtfFltr'] = true;
 

@@ -262,8 +262,9 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
             // If our user handle is greater than the calldata sender's, our outgoing call
             // survives, and their call request is declined. Otherwise, our existing outgoing
             // call is hung up, and theirs is answered
-            if (base64urldecode(self.chatd.userId) < ci.fromUser) {
-                self.logger.warn("Call received while sending outgoing call req: we don't have priority - hangup our outgoing call and answer the incoming");
+            if (self.chatd.userId < self.handler.get1on1RoomPeer(chatid)) {
+                self.logger.warn("We have an outgoing call, and there is an incoming call - we don't have priority.",
+                    "Hanging up our outgoing call and answering the incoming");
                 var av = existingOutCall._callInitiateAvFlags;
                 existingOutCall.hangup()
                 .then(function() {
@@ -279,7 +280,8 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
                     }, 0);
                 });
             }  else {
-                self.logger.warn("Received call request during outgoing call request: outgoing has priority - ignoring the incoming call", base64urlencode(packet.callid));
+                self.logger.warn("We have an outgoing call, and there is an incoming call - we have a priority.",
+                    "The caller of the incoming call should abort the call");
             }
             return;
         } else {
@@ -393,8 +395,7 @@ RtcModule.prototype._getLocalStream = function(av) {
         }
     }, 1000);
 
-    var pms = MegaPromise.asMegaPromiseProxy(
-        RTC.getUserMedia({audio: true, video: true})
+    var pms = RTC.getUserMedia({audio: true, video: true})
         .catch(function(error) {
             self.logger.warn("getUserMedia: Failed to get audio+video, trying audio-only...");
             return RTC.getUserMedia({audio: true, video: false});
@@ -413,9 +414,9 @@ RtcModule.prototype._getLocalStream = function(av) {
                 msg = "Exception in final catch handler of getUserMedia: "+err;
             }
             return Promise.resolve(msg);
-        }));
+        });
     assert(self.localMediaPromise, "getUserMedia executed synchronously");
-    self.localMediaPromise = MegaPromise.asMegaPromiseProxy(pms
+    self.localMediaPromise = pms
         .then(function(stream) {
             resolved = true;
             if (typeof stream === 'string') {
@@ -432,13 +433,12 @@ RtcModule.prototype._getLocalStream = function(av) {
                 }
             }
             delete self.localMediaPromise;
-            resolved = true;
             if (Object.keys(self.calls).length !== 0) {// all calls were destroyed meanwhile
                 return Promise.resolve(stream);
             }
-        }));
+        });
     setTimeout(function() {
-        if (pms.state() === 'pending') {
+        if (!resolved) {
             pms.resolve("timeout");
         }
     }, RtcModule.kMediaGetTimeout);
@@ -462,6 +462,7 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin) {
         self.logger.warn("There is already a call in this chatroom, not starting a new one");
         return null;
     }
+
     var call = new Call(
         this, {
             chatid: chatid,
@@ -628,7 +629,8 @@ Call.prototype._getLocalStream = function(av) {
         })
         .then(function(stream) {
             if (self.state > CallState.kInProgress) {
-                return Promise.reject("getLocalStream: Call killed (or went into state "+constStateToText(CallState, this.state)+") while obtaining local stream");
+                return Promise.reject("getLocalStream: Call killed (or went into state " +
+                    constStateToText(CallState, self.state) + ") while obtaining local stream");
             }
             self._setState(CallState.kHasLocalStream);
         });
@@ -1071,12 +1073,12 @@ Call.prototype._fire = function(evName) {
 Call.prototype._startOrJoin = function(av) {
     var self = this;
     self._callInitiateAvFlags = av;
-    self._getLocalStream(av)
-    .catch(function(err) {
+    var pms = self._getLocalStream(av);
+    pms.catch(function(err) {
+        self.logger.log("Call.getLocalStream returned error:", err);
         self._destroy(Term.kErrLocalMedia, true, err);
-        return Promise.reject(err);
-    })
-    .then(function() {
+    });
+    pms.then(function() {
         if (self.isJoiner) {
             self._join();
         } else {
@@ -1436,9 +1438,9 @@ Session.prototype.handleMsg = function(packet) {
 
 Session.prototype._createRtcConn = function() {
     var self = this;
-    var conn = self.rtcConn = new RTCPeerConnection({
-        iceServers: RTC.fixupIceServers(self.call.manager.iceServers)
-    });
+    var iceServers = RTC.fixupIceServers(self.call.manager.iceServers);
+    this.logger.log("Using ICE servers:", JSON.stringify(iceServers[0].urls));
+    var conn = self.rtcConn = new RTCPeerConnection({ iceServers: iceServers });
     if (self.call.manager.gLocalStream) {
         conn.addStream(self.call.manager.gLocalStream);
     }
@@ -1463,12 +1465,12 @@ Session.prototype._createRtcConn = function() {
     };
     conn.onaddstream = function(event) {
         self.remoteStream = event.stream;
-        self._setState(SessState.kInProgress);
         self._remoteStream = self.remoteStream;
         self._fire("onRemoteStreamAdded", self.remoteStream);
+        // FIXME: We never had audio work from the GUI player if video is disabled,
+        // and the audio was coming from this 'internal' player. We need to fix that ASAP
         var player = self.mediaWaitPlayer = document.createElement('video');
         RTC.attachMediaStream(player, self.remoteStream);
-        // self.waitForRemoteMedia();
     };
     conn.onremovestream = function(event) {
         self._fire("onRemoteStreamRemoved");
@@ -1489,6 +1491,7 @@ Session.prototype._createRtcConn = function() {
         } else if (state === 'failed') {
             self.terminateAndDestroy(Term.kErrIceFail);
         } else if (state === 'connected') {
+            self._setState(SessState.kInProgress);
             self._tsIceConn = Date.now();
             self.call._notifySessionConnected(self);
 /*
@@ -1766,13 +1769,20 @@ Session.prototype.msgSessTerminate = function(packet) {
     }
     assert(packet.data.length >= 1);
     self.cmd(RTCMD.SESS_TERMINATE_ACK);
-
+    if (self.state === SessState.kDestroyed) {
+        this.logger.warn("msgSessTerminate executed for a session that is in kDestroyed state -",
+            "it should have been removed from the sessions map of the call");
+        return;
+    }
     if (self.state === SessState.kTerminating && this.terminateAckCallback) {
         // handle terminate as if it were an ack - in both cases the peer is terminating
         self.msgSessTerminateAck(packet);
         if (self.state === SessState.kDestroyed) { // the ack handler destroyed it
             return;
         }
+    }
+    if (self.state === SessState.kDestroyed) {
+        return;
     }
     self._setState(SessState.kTerminating);
     self._destroy(packet.data.charCodeAt(8) | Term.kPeer);

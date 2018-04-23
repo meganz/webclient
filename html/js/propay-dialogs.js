@@ -27,6 +27,22 @@ var astroPayDialog = {
      */
     init: function(selectedProvider) {
 
+        /* Testing stub for different AstroPay tax validation
+        selectedProvider = {
+            displayName: 'AstroPay Visa',
+            gatewayId: 11,
+            gatewayName: 'astropayVI',
+            supportsAnnualPayment: 1,
+            supportsExpensivePlans: 1,
+            supportsMonthlyPayment: 1,
+            supportsRecurring: 1,
+            type: "subgateway",
+            extra: {
+                taxIdLabel: 'CPF'
+            }
+        };
+        //*/
+
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.astropay-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
@@ -160,10 +176,222 @@ var astroPayDialog = {
                 return false;
             }
 
+            // If the tax number is invalid, show an error dialog
+            if (!astroPayDialog.taxNumberIsValid()) {
+
+                msgDialog('warninga', l[6958], l[17789], '', function() {
+                    astroPayDialog.showBackgroundOverlay();
+                });
+
+                return false;
+            }
+
             // Try redirecting to payment provider
             astroPayDialog.hideDialog();
             pro.propay.sendPurchaseToApi();
         });
+    },
+
+    /**
+     * Checks if the tax number provided is valid for that tax label
+     * @returns {Boolean} Returns true if valid, false if not
+     */
+    taxNumberIsValid: function() {
+
+        'use strict';
+
+        // Use the tax label from the API and the tax number entered by the user
+        var taxLabel = astroPayDialog.selectedProvider.extra.taxIdLabel;
+        var taxNum = astroPayDialog.taxNumber;
+
+        // Remove special characters and check the length
+        var taxNumCleaned = taxNum.replace(/([~!@#$%^&*()_+=`{}\[\]\-|\\:;'<>,.\/? ])+/g, '');
+        var taxNumLength = taxNumCleaned.length;
+
+        // Check for Peru (between 8 and 9) and Argentina (between 7 and 9 or 11)
+        if (taxLabel === 'DNI' && taxNumLength >= 7 && taxNumLength <= 11) {
+            return true;
+        }
+
+        // Check for Mexico (between 10 and 18)
+        else if (taxLabel === 'CURP / RFC / IFE' && taxNumLength >= 10 && taxNumLength <= 18) {
+            return true;
+        }
+
+        // Check for Colombia (between 6 and 10)
+        else if (taxLabel === 'NUIP / CC / RUT' && taxNumLength >= 6 && taxNumLength <= 10) {
+            return true;
+        }
+
+        // Check for Uruguay (between 6 and 8)
+        else if (taxLabel === 'CI' && taxNumLength >= 6 && taxNumLength <= 8) {
+            return true;
+        }
+
+        // Check for Chile (between 8 and 9)
+        else if (taxLabel === 'RUT' && taxNumLength >= 8 && taxNumLength <= 9) {
+            return true;
+        }
+
+        // Check for Brazil (CPF and CPNJ)
+        else if (taxLabel === 'CPF' &&
+                (astroPayDialog.cpfIsValid(taxNumCleaned) || astroPayDialog.cpnjIsValid(taxNumCleaned))) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+
+    /**
+     * Validate the Brazillian CPF number (Cadastrado de Pessoas Fisicas) is the equivalent of a personal Brazilian tax
+     * registration number. CPF numbers have 11 digits in total: 9 numbers followed by 2 check numbers that are being
+     * used for validation. Validation code from:
+     * http://nadikun.com/how-to-validate-cpf-number-using-custom-method-in-jquery-validate-plugin/
+     *
+     * @param {String} taxNum The tax number entered by the user (which contains only numbers, no hyphens etc)
+     * @returns {Boolean} Returns true if the CPF is valid
+     */
+    cpfIsValid: function(taxNum) {
+
+        'use strict';
+
+        // Checking value to have 11 digits only
+        if (taxNum.length !== 11) {
+            return false;
+        }
+
+        var firstCheckNum = parseInt(taxNum.substring(9, 10), 10);
+        var secondCheckNum = parseInt(taxNum.substring(10, 11), 10);
+
+        var checkResult = function(sum, checkNum) {
+            var result = (sum * 10) % 11;
+            if ((result === 10) || (result === 11)) {
+                result = 0;
+            }
+            return (result === checkNum);
+        };
+
+        // Checking for dump data
+        if (taxNum === '' ||
+                taxNum === '00000000000' ||
+                taxNum === '11111111111' ||
+                taxNum === '22222222222' ||
+                taxNum === '33333333333' ||
+                taxNum === '44444444444' ||
+                taxNum === '55555555555' ||
+                taxNum === '66666666666' ||
+                taxNum === '77777777777' ||
+                taxNum === '88888888888' ||
+                taxNum === '99999999999'
+                ) {
+
+            return false;
+        }
+
+        var sum = 0;
+
+        // Step 1 - using first Check Number:
+        for (var i = 1; i <= 9; i++) {
+            sum = sum + parseInt(taxNum.substring(i - 1, i), 10) * (11 - i);
+        }
+
+        // If first Check Number is valid, move to Step 2 - using second Check Number:
+        if (checkResult(sum, firstCheckNum)) {
+            sum = 0;
+            for (var j = 1; j <= 10; j++) {
+                sum = sum + parseInt(taxNum.substring(j - 1, j), 10) * (12 - j);
+            }
+            return checkResult(sum, secondCheckNum);
+        }
+
+        return false;
+    },
+
+    /**
+     * Validate the Brazillian CPNJ number (Cadastro Nacional da Pessoa Juridica) is the equivalent of a
+     * company/organisation/non-personal Brazilian tax registration number. The CNPJ consists of a 14-digit number
+     * formatted as 00.000.000/0001-00 - The first eight digits identify the company, the four digits after the slash
+     * identify the branch or subsidiary ("0001" defaults to the headquarters), and the last two are check digits.
+     * Validation code from:
+     * https://github.com/fnando/cpf_cnpj.js/blob/master/lib/cnpj.js
+     *
+     * @param {String} taxNum The tax number entered by the user (which contains only numbers, no hyphens etc)
+     * @returns {Boolean} Returns true if the CPNJ is valid
+     */
+    cpnjIsValid: function(taxNum) {
+
+        'use strict';
+
+        // Blacklist common values
+        var BLACKLIST = [
+            '00000000000000',
+            '11111111111111',
+            '22222222222222',
+            '33333333333333',
+            '44444444444444',
+            '55555555555555',
+            '66666666666666',
+            '77777777777777',
+            '88888888888888',
+            '99999999999999'
+        ];
+
+        var STRICT_STRIP_REGEX = /[-\/.]/g;
+        var LOOSE_STRIP_REGEX = /[^\d]/g;
+
+        var verifierDigit = function (numbers) {
+
+            var index = 2;
+            var reverse = numbers.split("").reduce(function(buffer, number) {
+                return [parseInt(number, 10)].concat(buffer);
+            }, []);
+
+            var sum = reverse.reduce(function(buffer, number) {
+                buffer += number * index;
+                index = (index === 9 ? 2 : index + 1);
+                return buffer;
+            }, 0);
+
+            var mod = sum % 11;
+
+            return (mod < 2 ? 0 : 11 - mod);
+        };
+
+        var strip = function(number, strict) {
+
+            var regex = strict ? STRICT_STRIP_REGEX : LOOSE_STRIP_REGEX;
+
+            return (number || "").toString().replace(regex, "");
+        };
+
+        var isValid = function(number, strict) {
+
+            var stripped = strip(number, strict);
+
+            // CNPJ must be defined
+            if (!stripped) {
+                return false;
+            }
+
+            // CNPJ must have 14 chars
+            if (stripped.length !== 14) {
+                return false;
+            }
+
+            // CNPJ can't be blacklisted
+            if (BLACKLIST.indexOf(stripped) >= 0) {
+                return false;
+            }
+
+            var numbers = stripped.substr(0, 12);
+            numbers += verifierDigit(numbers);
+            numbers += verifierDigit(numbers);
+
+            return numbers.substr(-2) === stripped.substr(-2);
+        };
+
+        return isValid(taxNum);
     },
 
     /**

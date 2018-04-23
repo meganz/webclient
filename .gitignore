@@ -243,6 +243,12 @@ dont-deploy/ui/out/
 # Local diffcheck.py configuration.
 contrib/local_config.py
 
+# Temp language files from Babel
+lang/error.json
+lang/lang.tar.gz
+lang/strings.json
+lang/strings_prod.json
+
 #############
 ## Netbeans project metadata
 #############

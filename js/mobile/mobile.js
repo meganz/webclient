@@ -209,6 +209,18 @@ var mobile = {
                 $appStoreButton.removeClass('hidden').addClass('android');
                 break;
         }
+    },
+
+    /**
+     * Show a dialog asking the user to check their email
+     */
+    showEmailConfirmOverlay: function() {
+
+        'use strict';
+
+        // Show white background overlay behind the dialog
+        $('.light-overlay').removeClass('hidden');
+        $('.mobile.common-check-email-dialog').removeClass('hidden');
     }
 };
 
@@ -218,6 +230,7 @@ var mobile = {
  */
 /* jshint -W098 */
 /* jshint -W007 */
+/* jshint strict: false */
 
 mega.ui.tpp = {
     reset: function() {},
@@ -235,12 +248,15 @@ mega.ui.tpp = {
 };
 
 mega.megadrop = {
-    pufs: false,
+    pufs: function() { return mobile.megadrop.pufs; },
     isInit: function() { return false; },
-    pufProcessDb: function() { return false; },
+    pufProcessDb: function(data) { mobile.megadrop.pufProcessDb(data); },
     onRename: function() { return false; },
-    pupProcessPUP: function() { return false; },
-    pufProcessPUH:  function() { return false; }
+    pupProcessPUP: function(ap) {  mobile.megadrop.processPUP(ap); },
+    pufProcessPUH:  function(ap) { mobile.megadrop.processPUH(ap); },
+    pufRemove: function(ids) { return mobile.megadrop.pufRemove(ids); },
+    processUPHAP: function (ap) { mobile.megadrop.processUPH(ap); },
+    isDropExist: function (sel) { return mobile.megadrop.isDropExist(sel); }
 };
 
 var notify = {
@@ -259,6 +275,7 @@ var alarm = {
         render: function() {}
     }
 };
+/* jshint strict: true */
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
@@ -288,6 +305,7 @@ mega.ui.showRegisterDialog = function() {};
 
 mega.loadReport = {};
 var previews = {};
+var preqs = Object.create(null); // FIXME: mobile needs to use preqs[] to prevent dupe requests sent to API!
 
 function removeUInode(nodeHandle, parentHandle) {
 
@@ -303,3 +321,5 @@ function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
 function closeDialog() {}
+/* jshint +W098 */
+/* jshint +W007 */

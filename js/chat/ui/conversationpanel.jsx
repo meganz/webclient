@@ -779,7 +779,9 @@ var ConversationAudioVideoPanel = React.createClass({
                     }></i>
                 </div>
                 <div className="button call" onClick={function(e) {
-                        chatRoom.callManagerCall.endCall();
+                        if (chatRoom.callManagerCall) {
+                            chatRoom.callManagerCall.endCall();
+                        }
                     }}>
                     <i className="big-icon horizontal-red-handset"></i>
                 </div>
@@ -810,6 +812,8 @@ var ConversationPanel = React.createClass({
     },
 
     uploadFromComputer: function() {
+        this.scrolledToBottom = true;
+
         this.props.chatRoom.uploadFromComputer();
     },
     refreshUI: function() {
@@ -849,6 +853,13 @@ var ConversationPanel = React.createClass({
 
         self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
             self.callJustEnded = true;
+        });
+
+        self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
+            self.scrolledToBottom = true;
+            if (self.messagesListScrollable) {
+                self.messagesListScrollable.scrollToBottom();
+            }
         });
 
         self.eventuallyInit();
@@ -1550,6 +1561,8 @@ var ConversationPanel = React.createClass({
                 onAttachClicked={() => {
                     self.setState({'attachCloudDialog': false});
 
+                    self.scrolledToBottom = true;
+
                     room.attachNodes(
                         selected
                     );
@@ -1685,6 +1698,8 @@ var ConversationPanel = React.createClass({
                     }
                     catch (e) {}
 
+                    self.scrolledToBottom = true;
+
                     M.addUpload([meta[0]]);
 
                     self.setState({
@@ -1733,6 +1748,8 @@ var ConversationPanel = React.createClass({
                     self.setState({'truncateDialog': false});
                 }}
                 onConfirmClicked={() => {
+                    self.scrolledToBottom = true;
+
                     room.truncate();
 
                     self.setState({
@@ -1753,6 +1770,8 @@ var ConversationPanel = React.createClass({
                 if ($.trim(self.state.renameDialogValue).length > 0 &&
                     self.state.renameDialogValue !== self.props.chatRoom.getRoomTitle()
                 ) {
+                    self.scrolledToBottom = true;
+
                     var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
                     var promises = [];
                     promises.push(
@@ -1882,6 +1901,8 @@ var ConversationPanel = React.createClass({
                             self.setState({'attachCloudDialog': true});
                         }}
                         onAddParticipantSelected={function(contactHashes) {
+                            self.scrolledToBottom = true;
+
                             if (self.props.chatRoom.type == "private") {
                                 var megaChat = self.props.chatRoom.megaChat;
 
@@ -2049,7 +2070,28 @@ var ConversationPanel = React.createClass({
                                 }}
                                 onConfirm={(messageContents) => {
                                     if (messageContents && messageContents.length > 0) {
-                                        self.props.chatRoom.sendMessage(messageContents);
+                                        if (!self.scrolledToBottom) {
+                                            self.scrolledToBottom = true;
+                                            self.lastScrollPosition = 0;
+                                            // tons of hacks required because of the super weird continuous native
+                                            // scroll event under Chrome + OSX, e.g. when the user scrolls up to the
+                                            // start of the chat, the event continues to be received event that the
+                                            // scrollTop is now 0..and if in that time the user sends a message
+                                            // the event triggers a weird "scroll up" animation out of nowhere...
+                                            $(self.props.chatRoom).bind('onMessagesBuffAppend.pull', function() {
+                                                self.messagesListScrollable.scrollToBottom(false);
+                                                setTimeout(function() {
+                                                    self.messagesListScrollable.enable();
+                                                }, 1500);
+                                            });
+
+                                            self.props.chatRoom.sendMessage(messageContents);
+                                            self.messagesListScrollable.disable();
+                                            self.messagesListScrollable.scrollToBottom(true);
+                                        }
+                                        else {
+                                            self.props.chatRoom.sendMessage(messageContents);
+                                        }
                                     }
                                 }}
                             >
@@ -2133,7 +2175,7 @@ var ConversationPanels = React.createClass({
                     messagesBuff={chatRoom.messagesBuff}
                     contacts={M.u}
                     contact={contact}
-                    key={chatRoom.roomId}
+                    key={chatRoom.roomId + "_" + chatRoom.instanceIndex}
                     />
             );
         });

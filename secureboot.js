@@ -33,7 +33,8 @@ if (typeof process !== 'undefined') {
     }
 }
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
+var is_embed = location.pathname === '/embed' || getCleanSitePath().substr(0, 2) === 'E!';
+var is_karma = !is_embed && /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&
     document.location.host === 'mega' || document.location.protocol === 'mega:';
 var location_sub = document.location.href.substr(0, 16);
@@ -44,7 +45,6 @@ var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
-var isWebkit = /webkit/.test(ua);
 
 /**
  * Check if the user is coming from a mobile device
@@ -103,7 +103,8 @@ function getCleanSitePath(path) {
 function isPublicLink(page) {
     page = mURIDecode(page).replace(/^[/#]+/, '');
 
-    return (page[0] === '!' || page.substr(0, 2) === 'F!' || page.substr(0, 2) === 'P!') ? page : false;
+    var types = {'F!': 1, 'P!': 1, 'E!': 1};
+    return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
 }
 
 // Safer wrapper around decodeURIComponent
@@ -445,9 +446,16 @@ var mega = {
     flags: 0,
     utils: {},
     updateURL: 'https://eu.static.mega.co.nz/3/current_ver.txt',
+    chrome: (
+        typeof window.chrome === 'object'
+        && window.chrome.runtime !== undefined
+        && String(window.webkitRTCPeerConnection).indexOf('native') > 0
+    ),
     browserBrand: [
         0, 'Torch', 'Epic'
     ],
+    whoami: 'We make secure cloud storage simple. Create an account and get 50 GB ' +
+            'free on MEGA\'s end-to-end encrypted cloud collaboration platform today!',
 
     maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
 
@@ -638,7 +646,7 @@ var ln2 = {};
 // Native language names
 ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español';
 ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português'; ln.vi = 'Tiếng Việt';
-ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.he = 'עברית';
+ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語';
 ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi';
 ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';
 ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски';
@@ -647,7 +655,7 @@ ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارس
 // Language names in English
 ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish';
 ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Portuguese'; ln2.vi = 'Vietnamese';
-ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.he = 'Hebrew';
+ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese';
 ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish';
 ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish';
 ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian';
@@ -896,6 +904,10 @@ function mObjectURL(data, type)
                     rc = ev.callback.apply(ev.scope, args);
                 } catch (ex) {
                     if (d) console.error(ex);
+
+                    onIdle(function() {
+                        throw ex;
+                    });
                 }
                 if (ev.once || rc === 0xDEAD)
                     idr.push(id);
@@ -1331,9 +1343,8 @@ if (is_ios) {
  * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
  * because the new mobile site is not designed for those yet.
  */
-if (m && (page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
-    page.substr(0, 4) === 'blog')) {
+if (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
+    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog')) {
 
     var app;
     var mobileblog;
@@ -1461,7 +1472,7 @@ else if (!b_u) {
         'en':['en','en-'], 'es':['es','es-'], 'fr':['fr','fr-'], 'de':['de','de-'], 'it':['it','it-'],
         'nl':['nl','nl-'], 'br':['pt-br','pt'], 'se':['sv'], 'fi':['fi'], 'pl':['pl'], 'cz':['cz','cs','cz-'],
         'sk':['sk','sk-'], 'sl':['sl','sl-'], 'hu':['hu','hu-'], 'jp':['ja'], 'cn':['zh','zh-cn'],
-        'ct':['zh-hk','zh-sg','zh-tw'], 'kr':['ko'], 'ru':['ru','ru-mo'], 'ar':['ar','ar-'], 'he':['he'],
+        'ct':['zh-hk','zh-sg','zh-tw'], 'kr':['ko'], 'ru':['ru','ru-mo'], 'ar':['ar','ar-'],
         'id':['id'], 'sg':[], 'tr':['tr','tr-'], 'ro':['ro','ro-'], 'uk':['||'], 'sr':['||'], 'th':['||'],
         'fa':['||'], 'bg':['bg'], 'tl':['en-ph'], 'vi':['vn', 'vi']
     };
@@ -1549,7 +1560,7 @@ else if (!b_u) {
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
-            dump.m = (is_mobile ? '[mobile] ' : '') + dump.m.replace(/\s+/g, ' ');
+            dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : '') + dump.m.replace(/\s+/g, ' ');
 
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
@@ -1850,11 +1861,15 @@ else if (!b_u) {
 
     jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+    jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
     jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
+    jsl.push({f:'js/utils/crypt.js', n: 'js_utils_crypt_js', j: 1});
     jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
+    jsl.push({f:'js/utils/events.js', n: 'js_utils_events_js', j: 1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
+    jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
     jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
     jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
@@ -1894,6 +1909,10 @@ else if (!b_u) {
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -1954,16 +1973,13 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
     jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
-    jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
-
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
-        is_chrome_firefox |= 4;
-        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j:1,w:3});
-    }
-
+    // jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
     jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j:1,w:3});
+    jsl.push({f:'js/transfers/decrypter.js', n: 'dl_decrypter', j: 1, w: 3});
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
+    jsl.push({f:'js/transfers/meths.js', n: 'dl_meths', j: 1, w: 3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
+    jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
@@ -2015,13 +2031,8 @@ else if (!b_u) {
         jsl.push({f:'css/download.css', n: 'download_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
-    }
+        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
 
-    jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
-
-    if (!is_mobile) {
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2030,23 +2041,16 @@ else if (!b_u) {
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
-    }
 
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
-
-    if (!is_mobile) {
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
-        jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
-
-        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
-        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
     } // !is_mobile
 
     // do not change the order...
@@ -2066,6 +2070,7 @@ else if (!b_u) {
     jsl.push({f:'js/fm/megadata/sort.js', n: 'fm_megadata_sort_js', j: 1});
     jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
     jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
+    jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2073,6 +2078,18 @@ else if (!b_u) {
 
     if (localStorage.enableDevtools) {
         jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
+    }
+
+    if (lang === 'ar') {
+        jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+    }
+
+    if (lang === 'fa') {
+        jsl.push({f:'css/lang_ar.css', n: 'lang_farsi_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+    }
+
+    if (lang === 'th') {
+        jsl.push({f:'css/lang_th.css', n: 'lang_thai_css', j: 2, w: 30, c: 1, d: 1, m: 1});
     }
 
     // Load files common to all mobile pages
@@ -2084,6 +2101,7 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account__cancel_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
@@ -2103,6 +2121,11 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.not-found-overlay.js', n: 'mobile_not_found_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.pro-signup-prompt.js', n: 'mobile_pro_signup_prompt_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.propay.js', n: 'mobile_propay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.recovery.js', n: 'mobile_rec_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.recovery.send-email.js', n: 'mobile_rec_send_email_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.recovery.from-email-link.js', n: 'mobile_rec_from_email_link_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.recovery.enter-key.js', n: 'mobile_rec_enter_key_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.recovery.change-password.js', n: 'mobile_rec_change_password_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.register.js', n: 'mobile_register_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.slideshow.js', n: 'mobile_slideshow_js', j: 1, w: 1});
@@ -2117,6 +2140,38 @@ else if (!b_u) {
     // different browsers. Hence, do NOT add more jsl entries after this block,
     // unless they're optional (such as polyfills) or third-party resources.
 
+    if (is_embed) {
+        jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
+        jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
+        jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
+        jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});
+
+        jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+        jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+        jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
+        jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
+        jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
+        jsl.push({f:'js/utils/events.js', n: 'js_utils_events_js', j: 1});
+        jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
+        jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
+        jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
+        jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
+        jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
+        jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
+
+        jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
+        jsl.push({f:'js/account.js', n: 'user_js', j: 1});
+
+        jsl.push({f:'js/transfers/queue.js', n: 'queue', j: 1, w: 4});
+        jsl.push({f:'js/transfers/decrypter.js', n: 'dl_downloader', j: 1, w: 3});
+        jsl.push({f:'js/vendor/videostream.js', n: 'videostream', j: 1, w: 3});
+
+        jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
+        jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
+    }
+
     jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
     jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
 
@@ -2129,12 +2184,16 @@ else if (!b_u) {
         jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
     }
 
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
+        is_chrome_firefox |= 4;
+        jsl.push({f: 'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
+    }
+
     var jsl2 =
     {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
-        'megasync_js': {f:'html/js/megasync.js', n: 'megasync_js', j:1},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
         'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
@@ -2198,9 +2257,9 @@ else if (!b_u) {
         'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
         'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
-        'megadrop': { f: 'html/megadrop.html', n: 'megadrop', j: 0 },
-        'nomegadrop': { f: 'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
-        'megadrop_js': { f: 'js/megadrop.js', n: 'megadrop_js', j: 1 }
+        'megadrop': {f:'html/megadrop.html', n: 'megadrop', j: 0 },
+        'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
+        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 }
     };
 
     var jsl3 = {
@@ -2242,6 +2301,7 @@ else if (!b_u) {
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
             'emoticonsFilter_js': {f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1},
             'rtfFilter_js': {f:'js/chat/plugins/rtfFilter.js', n: 'rtfFilter_js', j:1},
+            'btRtfFilter_js': {f:'js/chat/plugins/backtickRtfFilter.js', n: 'btRtfFilter_js', j:1},
             'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
@@ -2250,7 +2310,10 @@ else if (!b_u) {
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
-            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
+            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1},
+
+            /* misc */
+            'onboarding_js': {f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1}
         }
     };
 
@@ -2270,7 +2333,7 @@ else if (!b_u) {
         'register': ['register','register_js', 'zxcvbn_js'],
         'newsignup': ['register','register_js', 'zxcvbn_js'],
         'resellers': ['resellers'],
-        '!': ['download','download_js', 'megasync_js'],
+        '!': ['download','download_js'],
         'dispute': ['dispute'],
         'disputenotice': ['disputenotice', 'disputenotice_js'],
         'copyright': ['copyright'],
@@ -2278,7 +2341,7 @@ else if (!b_u) {
         'privacy': ['privacy','privacycompany'],
         'mega': ['mega'],
         'takedown': ['takedown'],
-        'sync': ['sync', 'sync_js', 'megasync_js'],
+        'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
@@ -2295,8 +2358,7 @@ else if (!b_u) {
         'bird': ['megabird'],
         'ios': ['ios'],
         'android': ['android'],
-        'wp': ['wp'],
-        'android': ['android']
+        'wp': ['wp']
     };
 
     if (is_mobile) {
@@ -2305,7 +2367,7 @@ else if (!b_u) {
     }
 	if (page == 'megacmd') page = 'cmd';
 
-    if (page)
+    if (page && !is_embed)
     {
         for (var p in subpages)
         {
@@ -2831,6 +2893,15 @@ else if (!b_u) {
             '    </div>'+
             '</div>';
 
+    if (is_embed) {
+        try {
+            document.body.textContent = '';
+            document.body.style.background = '#000';
+            jsl_progress = function() {};
+        }
+        catch (ex) {}
+    }
+
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
@@ -2914,17 +2985,13 @@ else if (!b_u) {
         else u_checklogin({checkloginresult:boot_auth},false);
     }
 
-    if (page.substr(0,1) == '!' && page.length > 1)
-    {
+    if ((page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2) {
         dl_res = true;
         var dlxhr = getxhr();
-        dlxhr.onload = function()
-        {
+        dlxhr.onload = function() {
             dl_res = false;
-            if (this.status == 200)
-            {
-                try
-                {
+            if (this.status === 200) {
+                try {
                     dl_res = this.response || this.responseText;
                     if (dl_res[0] == '[') dl_res = JSON.parse(dl_res);
                     if (dl_res[0]) dl_res = dl_res[0];
@@ -2933,15 +3000,14 @@ else if (!b_u) {
             }
             boot_done();
         };
-        dlxhr.onerror = function()
-        {
+        dlxhr.onerror = function() {
             dl_res= false;
             boot_done();
         };
         var esid='';
         if (u_storage.sid) esid = u_storage.sid;
         dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-        dlxhr.send(JSON.stringify([{a: 'g', p: page.substr(1, 8), 'ad': showAd(), 'esid': esid}]));
+        dlxhr.send(JSON.stringify([{a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': esid}]));
     }
 }
 
@@ -3044,4 +3110,14 @@ function makeUUID(a) {
     return a
         ? (a ^ Math.random() * 16 >> a / 4).toString(16)
         : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, makeUUID);
+}
+
+function inherits(target, source) {
+    'use strict';
+
+    target.prototype = Object.create(source.prototype || source);
+    Object.defineProperty(target.prototype, 'constructor', {
+        value: target,
+        enumerable: false
+    });
 }

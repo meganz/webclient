@@ -534,9 +534,6 @@
         if (this.correctLabel) {
             this.correctLabel.classList.add('hidden');
         }
-        if (this.passwordField && isWebkit) {
-            this.passwordField.type = 'text';
-        }
     };
 
 

@@ -478,10 +478,9 @@ mobile.register = {
         // Show the general login screen
         mobile.signin.show();
 
-        // Change the header text, hide the registration and preinput the email
+        // Change the header text and preinput the email
         var $loginScreen = $('.signin-register-block');
-        $loginScreen.find('.top-link.sign-in').text(l[812]);            // Confirm Account
-        $loginScreen.find('.top-link.register').addClass('hidden');
+        $loginScreen.find('.fm-header-txt.sign-in').text(l[812]);   // Confirm Account
         $loginScreen.find('.signin-input.login input').val(email);
     },
 

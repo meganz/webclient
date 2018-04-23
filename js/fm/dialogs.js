@@ -47,6 +47,7 @@
      * @private
      */
     var disableFolders = function(dialogPrefix) {
+        var promiseToSyncCalls = new MegaPromise();
         $('*[id^="mctreea_"]').removeClass('disabled');
 
         if (dialogPrefix === 'move') {
@@ -62,7 +63,9 @@
         dbfetch.geta(Object.keys(M.c.shares || {}))
             .always(function () {
                 disableReadOnlySharedFolders(dialogPrefix);
+                promiseToSyncCalls.resolve();
             });
+        return promiseToSyncCalls;
     };
 
     /**
@@ -116,7 +119,7 @@
      */
     var handleConversationTabContent = function _handleConversationTabContent() {
         var myChats = megaChat.chats;
-        var myContacts = M.getContactsEMails();
+        var myContacts = M.getContactsEMails(true); // true to exclude requests (incoming and outgoing)
         var conversationTab = $('.copy-dialog-tree-panel.conversations');
         var conversationNoConvTab = $('.dialog-empty-block.copy.conversations');
         var conversationTabHeader = $('.copy-dialog-panel-header', conversationTab);
@@ -198,11 +201,12 @@
                             else {
                                 myContacts.push({
                                     id: Object.keys(sortedChats[chati].members).length,
-                                    name: gNames, handle: sortedChats[chati].roomId, isG: true
+                                    name: gNames[0], handle: sortedChats[chati].roomId, isG: true,
+                                    gMembers: gNames
                                 });
                             }
                             nbOfRecent++;
-                            
+
                         }
                     }
                     else {
@@ -228,7 +232,7 @@
                 }
             }
             myContacts.sort(M.sortObjFn("name", 1));
-            
+
             for (var a = 0; a < myContacts.length; a++) {
                 if (addedContactsByRecent.includes(myContacts[a].handle)) {
                     continue;
@@ -238,7 +242,7 @@
                     ctElem = createContactEntry(myContacts[a].name, myContacts[a].id, myContacts[a].handle);
                 }
                 else {
-                    ctElem = createGroupEntry(myContacts[a].name, myContacts[a].id, myContacts[a].handle);
+                    ctElem = createGroupEntry(myContacts[a].gMembers, myContacts[a].id, myContacts[a].handle);
                 }
                 contactGeneratedList = contactGeneratedList + ctElem;
             }
@@ -312,12 +316,17 @@
             M.buildtree({h: M.RubbishID}, dialogPrefix + '-dialog');
         }
         else if (dialogTabClass === 'conversations') {
-            // prepare Conversation Tab if needed
-            $('.' + dialogPrefix + '-dialog-panel-arrows').addClass('hidden');
-            if (!$.copyDialogContactsChangeToken) {//= M.u.removeChangeListener(checkContactHandler);
-                $.copyDialogContactsChangeToken = M.u.addChangeListener(checkContactHandler);
+            if (window.megaChatIsReady) {
+                // prepare Conversation Tab if needed
+                $('.' + dialogPrefix + '-dialog-panel-arrows').addClass('hidden');
+                if (!$.copyDialogContactsChangeToken) {
+                    $.copyDialogContactsChangeToken = M.u.addChangeListener(checkContactHandler);
+                }
+                handleConversationTabContent();
             }
-            handleConversationTabContent();
+            else {
+                console.error('MEGAchat is not ready');
+            }
         }
 
         disableFolders(dialogPrefix);
@@ -375,7 +384,7 @@
             if ($.selected.length) {
                 allowConversationTab = true;
                 for (var e = 0; e < $.selected.length; e++) {
-                    if (M.d[$.selected[e]].t !== 0) {
+                    if (!M.d[$.selected[e]] || M.d[$.selected[e]].t !== 0) {
                         allowConversationTab = false;
                         break;
                     }
@@ -586,12 +595,12 @@
                 selectDialogTabRoot(section);
 
                 if (section === 'cloud-drive' || section === 'folder-link') {
-                    handleDialogContent(section, 'ul', true, type, move ? l[62] : $.mcImport ? l[236] : l[63]);
+                    handleDialogContent(section, 'ul', true, type, move ? l[62] : $.mcImport ? l[236] : l[16176]);
                 }
                 else if (section === 'shared-with-me') {
                     handleDialogContent(section, 'ul', false, type, $.mcImport ? l[236] :l[1344]); // Share
                 }
-                else if (section === 'conversations') {
+                else if (section === 'conversations' && window.megaChatIsReady) {
                     handleDialogContent(section, 'div', false, type, l[1940], '.conversations-container'); // Send
                 }
                 else if (section === 'rubbish-bin') {
@@ -721,6 +730,7 @@
         $dialog.on('click', '.nw-fm-tree-item', function(e) {
 
             var old = $.mcselected;
+            var mySelf = this;
 
             $.mcselected = $(this).attr('id').replace('mctreea_', '');
             M.buildtree({h: $.mcselected});
@@ -734,60 +744,61 @@
                 $('#mctreesub_' + $.mcselected).html(markup);
             }
 
-            disableFolders(type);
+            disableFolders(type).always(function () {
+                var c = $(e.target).attr('class');
 
-            var c = $(e.target).attr('class');
+                // Sub-folder exist?
+                if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
 
-            // Sub-folder exist?
-            if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
+                    c = $(mySelf).attr('class');
 
-                c = $(this).attr('class');
-
-                // Sub-folder expanded
-                if (c && c.indexOf('expanded') > -1) {
-                    $(this).removeClass('expanded');
-                    $('#mctreesub_' + $.mcselected).removeClass('opened');
-                }
-                else {
-                    $(this).addClass('expanded');
-                    $('#mctreesub_' + $.mcselected).addClass('opened');
-                }
-            }
-            else {
-
-                c = $(this).attr('class');
-
-                if (c && c.indexOf('selected') > -1) {
+                    // Sub-folder expanded
                     if (c && c.indexOf('expanded') > -1) {
-                        $(this).removeClass('expanded');
+                        $(mySelf).removeClass('expanded');
                         $('#mctreesub_' + $.mcselected).removeClass('opened');
                     }
                     else {
-                        $(this).addClass('expanded');
+                        $(mySelf).addClass('expanded');
                         $('#mctreesub_' + $.mcselected).addClass('opened');
                     }
                 }
-            }
+                else {
 
-            if (!$(this).is('.disabled')) {
-                // unselect previously selected item
-                $('.nw-fm-tree-item', $dialog).removeClass('selected');
-                $(this).addClass('selected');
-                $btn.removeClass('disabled');
-            }
-            else if ($('#mctreea_' + old + ':visible').length) {
-                $.mcselected = old;
-                $('#mctreea_' + old).addClass('selected');
-            }
-            else {
-                $.mcselected = undefined;
-            }
+                    c = $(mySelf).attr('class');
 
-            // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
-            dialogScroll('.dialog-tree-panel-scroll');
+                    if (c && c.indexOf('selected') > -1) {
+                        if (c && c.indexOf('expanded') > -1) {
+                            $(mySelf).removeClass('expanded');
+                            $('#mctreesub_' + $.mcselected).removeClass('opened');
+                        }
+                        else {
+                            $(mySelf).addClass('expanded');
+                            $('#mctreesub_' + $.mcselected).addClass('opened');
+                        }
+                    }
+                }
 
-            // Disable action button if there is no selected items
-            setDialogButtonState($btn);
+                if (!$(mySelf).is('.disabled')) {
+                    // unselect previously selected item
+                    $('.nw-fm-tree-item', $dialog).removeClass('selected');
+                    $(mySelf).addClass('selected');
+                    $btn.removeClass('disabled');
+                }
+                else if ($('#mctreea_' + old + ':visible').length) {
+                    $.mcselected = old;
+                    $('#mctreea_' + old).addClass('selected');
+                }
+                else {
+                    $.mcselected = undefined;
+                }
+
+                // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
+                dialogScroll('.dialog-tree-panel-scroll');
+
+                // Disable action button if there is no selected items
+                setDialogButtonState($btn);
+            });
+
         });
 
         $swm.off('mouseenter', '.nw-fm-tree-item');
@@ -904,10 +915,12 @@
                 M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
             }
             else if (section === 'conversations') {
-                if (megaChat.chats[$.mcselected]) {
-                    megaChat.chats[$.mcselected].attachNodes($.selected);
-                    showToast('send-chat', 'File' + (($.selected.length > 1) ?
-                        's ' : ' ') + 'sent to chat.');
+                if (!window.megaChatIsReady) {
+                    console.error('MEGAchat is not ready');
+                }
+                else if (megaChat.chats[$.mcselected]) {
+                    megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
+                    showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
                 }
                 else {
                     var userHandles = [u_handle, $.mcselected];
@@ -918,8 +931,7 @@
                     // [the only stopped behavior is: openning the chat room page]
                     var sendAttachments = function _sendAttachments() {
                         megaChat.chats[room.roomId].attachNodes($.selected);
-                        showToast('send-chat', 'File' + (($.selected.length > 1) ?
-                            's ' : ' ') + 'sent to chat.');
+                        showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
                     };
                     room.inCpyDialog = sendAttachments;
                     megaChat.plugins.chatdIntegration._attachToChatRoom(room);

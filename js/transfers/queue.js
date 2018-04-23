@@ -69,6 +69,8 @@ function MegaQueue(worker, limit, name, setTimeoutValue) {
     if (d) {
         MegaQueue.weakRef.push(this);
     }
+
+    MegaEvents.call(this);
 }
 inherits(MegaQueue, MegaEvents);
 
@@ -97,7 +99,7 @@ MegaQueue.prototype.pushFirst = function(arg, next, self) {
                 break;
             }
         }
-        ASSERT(!found, 'Huh, that task already exists');
+        console.assert(!found, 'Huh, that task already exists');
     }
     this._queue.unshift([arg, next, self]);
     this._process();
@@ -228,7 +230,7 @@ MegaQueue.prototype.run_in_context = function(task) {
     this._running++;
     this._pending.push(task[0]);
     this._worker(task[0], function MQRicStub() {
-        ASSERT(task[0], 'This should not be reached twice.');
+        console.assert(task[0], 'This should not be reached twice.');
         if (!task[0]) {
             return;
         } /* already called */
@@ -239,7 +241,7 @@ MegaQueue.prototype.run_in_context = function(task) {
             else {
                 this._running--;
                 array.remove(this._pending, task[0]);
-                ASSERT(this._running > -1, 'Queue inconsistency (RIC)');
+                console.assert(this._running > -1, 'Queue inconsistency (RIC)');
 
                 var done = task[1] || task[0].onQueueDone;
                 if (done) {
@@ -477,7 +479,7 @@ TransferQueue.prototype.pause = function(gid) {
             this.pushFirst(chunk);
             if (array.remove(this._pending, chunk, 1)) {
                 this._running--;
-                ASSERT(this._running > -1, 'Queue inconsistency on pause');
+                console.assert(this._running > -1, 'Queue inconsistency on pause');
             }
             else {
                 this.logger.warn("Paused chunk was NOT in pending state: " + chunk, chunk, this);
@@ -548,7 +550,7 @@ TransferQueue.prototype.push = function(cl) {
     };
 
     if (localStorage.ignoreLimitedBandwidth || Object(u_attr).p || cl.dl.byteOffset === cl.dl.size) {
-        showToast();
+        delay('show_toast', showToast);
         dlmanager.setUserFlags();
         return MegaQueue.prototype.push.apply(this, arguments);
     }

@@ -139,8 +139,10 @@ mega.ui.tpp = function () {
         var enabled = isEnabled();
 
         if (isCached() && enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
-            opts.dlg.$.show(opts.duration);
-            setStatus(true);
+            if (getTotal('ul') > 0 || getTotal('dl') > 0) {
+                opts.dlg.$.show(opts.duration);
+                setStatus(true);
+            }
         }
     };
 
@@ -580,9 +582,9 @@ mega.ui.tpp = function () {
         // Cached
         opts.dlg.cached = true;
 
-        // Close button, Ongoing Transfers Popup Dialog
-        $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
-            opts.dlg.$.hide(opts.duration);
+        // add event listener for click on tpp
+        opts.dlg.$.rebind('click.tppOn', function () {
+            M.openFolder('transfers', true);
         });
     });
 

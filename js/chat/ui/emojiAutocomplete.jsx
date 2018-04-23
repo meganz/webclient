@@ -52,30 +52,81 @@ var EmojiAutocomplete = React.createClass({
                 return;
             }
 
+            if (e.altKey || e.metaKey) {
+                // don't process this event if alt is pressed. e.g. alt + left should allow selection
+                return;
+            }
+
             var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
+
             var handled = false;
-            if (key === 37 || key === 38) {
+            if (!e.shiftKey && (key === 37 || key === 38)) {
                 // up/left
                 selected = selected - 1;
                 selected = selected < 0 ? self.maxFound - 1 : selected;
-                self.setState({'selected': selected});
-                handled = true;
+
+                if (self.found[selected] && self.state.selected !== selected) {
+                    self.setState({
+                        'selected': selected,
+                        'prefilled': true
+                    });
+                    handled = true;
+                    self.props.onPrefill(false, ":" + self.found[selected].n + ":");
+                }
             }
-            else if (key === 39 || key === 40 || key === 9) {
+            else if (!e.shiftKey && (key === 39 || key === 40 || key === 9)) {
                 // down, right, tab
-                selected = selected + 1;
+                selected = selected + (key === 9 ? (e.shiftKey ? -1 : 1): 1);
+                // support for shift+tab (left/back)
+                selected = selected < 0 ? Object.keys(self.found).length - 1 : selected;
+
                 selected = (
                     selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ?
                         0 : selected
                 );
-                self.setState({'selected': selected});
-                handled = true;
+
+                // is a valid item in the list, tab is pressed OR prev selected != current selected
+                if (self.found[selected] && (key === 9 || self.state.selected !== selected)) {
+                    self.setState({
+                        'selected': selected,
+                        'prefilled': true
+                    });
+
+                    self.props.onPrefill(false, ":" + self.found[selected].n + ":");
+
+                    handled = true;
+                }
             }
             else if (key === 13) {
                 // enter
                 self.unbindKeyEvents();
-                self.props.onSelect(false, ":" + self.found[selected].n + ":");
-                handled = true;
+                if (selected === -1) {
+                    if (
+                        self.found.length > 0
+                    ) {
+                        for (var i = 0; i < self.found.length; i++) {
+                            if (":" + self.found[i].n + ":" === self.props.emojiSearchQuery + ":") {
+                                // if only 1 found and it matches almost the search query
+                                // e.g. support for :smiley$ENTER$
+                                self.props.onSelect(false, ":" + self.found[0].n + ":", self.state.prefilled);
+                                handled = true;
+                            }
+                        }
+
+                    }
+
+                    if (!handled && key === 13) {
+                        self.props.onCancel();
+                    }
+                    return;
+                }
+                else if (self.found.length > 0 && self.found[selected]) {
+                    self.props.onSelect(false, ":" + self.found[selected].n + ":", self.state.prefilled);
+                    handled = true;
+                }
+                else {
+                    self.props.onCancel();
+                }
             }
             else if (key === 27) {
                 // esc
@@ -88,6 +139,11 @@ var EmojiAutocomplete = React.createClass({
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
+            }
+            else {
+                if (self.isMounted()) {
+                    self.setState({'prefilled': false});
+                }
             }
         });
     },
@@ -124,6 +180,7 @@ var EmojiAutocomplete = React.createClass({
         var exactMatch = [];
         var partialMatch = [];
         var emojis = (self.data_emojis || []);
+
         for (var i = 0; i < emojis.length; i++) {
             var emoji = emojis[i];
             var match = emoji.n.indexOf(q);
@@ -138,7 +195,20 @@ var EmojiAutocomplete = React.createClass({
             if (exactMatch.length >= self.props.maxEmojis) {
                 break;
             }
-        };
+        }
+
+        exactMatch.sort(function(a, b) {
+            if (a.n === q) {
+                return -1;
+            }
+            else if (b.n === q) {
+                return 1;
+            }
+
+            else {
+                return 0;
+            }
+        });
 
         var found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
 

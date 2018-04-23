@@ -67,8 +67,6 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
         fIcon = '',
         prefix;
 
-    var share = new mega.Share({});
-
     var inshares = n.h === 'shares';
 
     /*
@@ -150,7 +148,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
         if (inshares) {
             folders = folders
                 .filter(function(n) {
-                    return !M.tree.shares[n.p];
+                    return !M.d[n.p];
                 });
         }
 

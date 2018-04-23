@@ -377,6 +377,10 @@
         else if (fetchshares || id === 'shares') {
             dbfetch.geta(Object.keys(M.c.shares || {}))
                 .always(function() {
+                    if (!$.inSharesRebuild) {
+                        $.inSharesRebuild = Date.now();
+                        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+                    }
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
                 });
         }

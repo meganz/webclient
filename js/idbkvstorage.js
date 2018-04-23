@@ -119,7 +119,7 @@ IndexedDBKVStorage.prototype.saveState = function() {
             self.logger.debug('saveState(%s)...', currsn, fminitialized);
         }
 
-        if (currsn) {
+        if (window.fmdb && fmdb.db && currsn) {
             setsn(currsn);
         }
     }, 2600);

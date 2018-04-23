@@ -19,7 +19,7 @@
         <a class="dropdown-item do-sort" data-by="mtime"><i class="small-icon"></i>[$17446]</a>
     </div>
     <div class="dropdown-section">
-        <a class="dropdown-item play-item"><i class="small-icon context videocam"></i>[$16275]</a>
+        <a class="dropdown-item play-item"><i class="small-icon context videocam"></i><span>[$16275]</span></a>
         <a class="dropdown-item preview-item"><i class="small-icon context loupe"></i>[$1899]</a>
         <a class="dropdown-item open-item"><i class="small-icon context open-folder"></i>[$865]</a>
         <a class="dropdown-item createwidget-item">
@@ -76,12 +76,16 @@
         <a class="dropdown-item getlink-item">
             <i class="small-icon context get-link"></i><span>[$59]</span>
         </a>
+        <a class="dropdown-item embedcode-item">
+            <i class="small-icon context embed"></i><span>[$17407]</span>
+        </a>
         <a class="dropdown-item removelink-item">
             <i class="small-icon context remove-link"></i><span>[$6821]</span>
         </a>
         <a class="dropdown-item sh4r1ng-item"><i class="small-icon context share"></i>[$60]</a>
         <a class="dropdown-item shared-folder-item"><i class="small-icon context share"></i>[$6775]</a>
         <a class="dropdown-item permissions-item"><i class="small-icon"></i>[$64]</a>
+        <a class="dropdown-item syncmegasync-item"><i class="small-icon context syncmegasync"></i>[$17621]</a> <!-- Sync-->
         <hr />
     </div>
     <div class="dropdown-section">
@@ -959,15 +963,15 @@
 
                                             <div class="fm-account-select-block">
                                                 <div class="default-select year" id="account-year">
-                                                    <span>YYYY</span>
+                                                    <span>[$17697]</span>
                                                     <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                                                 </div>
                                                 <div class="default-select month" id="account-month">
-                                                    <span>MM</span>
+                                                    <span>[$17698]</span>
                                                     <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                                                 </div>
                                                 <div class="default-select day" id="account-day">
-                                                    <span>DD</span>
+                                                    <span>[$17699]</span>
                                                     <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                                                 </div>
                                                 <div class="clear"></div>
@@ -1594,7 +1598,7 @@
                                       <div class="account plan-info-block">
                                           <div class="account plan-info-row">
                                               <div class="account plan-info grey small">
-                                                  Plan
+                                                  [$16166]
                                               </div>
                                               <div class="account plan-info right-textalign accounttype bold">
                                                   <span></span>
@@ -1837,7 +1841,7 @@
                                     </div>
 
 
-                                    <div class="fm-account-header">[$8601]:</div>
+                                    <div class="fm-account-header">[$17812]:</div>
                                     <div class="account radio-buttons bottom-pad">
                                         <div class="dlThroughMEGAsync radioOn" id="rad18_div">
                                             <input type="radio" id="rad18" class="ulskip radioOn" value="1">
@@ -1979,7 +1983,7 @@
                                                   <div class="account-counter-number">
                                                       <input type="text" value="15" id="rad14_opt" class="rubsched_textopt" />
                                                   </div>
-                                                  <div class="radio-txt">days.</div>
+                                                  <div class="radio-txt">[$17695]</div>
                                                   <div class="clear"></div>
                                                </div>
                                                <div class="clear"></div>
@@ -1996,7 +2000,7 @@
                                                   <div class="account-counter-number">
                                                       <input type="text" value="2" id="rad15_opt" class="rubsched_textopt" />
                                                   </div>
-                                                  <div class="radio-txt">GB</div>
+                                                  <div class="radio-txt">[$17696]</div>
                                                   <div class="clear"></div>
                                               </div>
                                               <div class="clear"></div>
@@ -2011,7 +2015,7 @@
                                     <div class="fm-account-header">[$17596]
                                     </div>
                                     <div class="enable-version">
-                                        <label class="versioning-switch"> 
+                                        <label class="versioning-switch">
                                           <input type="checkbox" id="versioning-status" checked="">
                                           <span class="versioning-slider"></span>
                                           <label class="label-heading">[$17601]</label>
@@ -2170,7 +2174,7 @@
                 <!-- start fm-account-widget UI for account settings | widget -->
                 <div class="fm-account-widget hidden fm-account-sections">
                     <div class="account tabs-bl">
-                        <div class="account tab-lnk active" data-tab="widget">[$17402]</div>
+                        <div class="account tab-lnk active" data-tab="megadrop">[$17402]</div>
                         <div class="clear"></div>
                     </div>
 
@@ -2196,9 +2200,6 @@
                                 <!-- Template Account Settings MEGAdrop expanded PUP card -->
                                 <div id="stngs_pupexp_tmpl" class="widget-card expanded-widget hidden">
                                     <div class="widget-header">
-                                        <div class="fm-dialog-chrome-clipboard">
-                                            <div class="selectable"></div>
-                                        </div>
                                         <div class="widget-card-left">
                                             <div class="widget-name"><span>%name</span>
                                                 <div class="widget-minimise"></div>
@@ -2713,35 +2714,6 @@
         </div>
     </div>
     <div class="fm-account-overlay hidden"></div>
-    <div class="toast-notification transfer download">
-        <div class="toast-icon"></div>
-        <div class="toast-body">
-            <div class="toast-col">
-                <span></span>
-                <div class="toast-button">
-                    <span>[$7224]</span>
-                </div>
-            </div>
-            <div class="toast-col">
-                <div class="toast-close-button"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="toast-notification transfer upload">
-        <div class="toast-icon"></div>
-        <div class="toast-body">
-            <div class="toast-col">
-                <span></span>
-                <div class="toast-button">
-                    [$7224]
-                </div>
-            </div>
-            <div class="toast-col">
-                <div class="toast-close-button"></div>
-            </div>
-        </div>
-    </div>
 
     <div class="dropdown body popup dropdown-arrow transfer-widget left-arrow hidden">
         <i class="dropdown-white-arrow"></i>

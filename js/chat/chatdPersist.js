@@ -476,14 +476,13 @@
             var shard = shards[shardId];
             var chatIds = shard.chatIds;
             Object.keys(chatIds).forEach(function(chatIdBin) {
-                self.chatd.chatIdMessages[chatIdBin] = new Chatd.Messages(self.chatd, chatIdBin);
-                var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(chatIdBin));
-                chatRoom.messagesBuff.messageOrders = {};
+                self.chatd._reinitChatIdHistory(base64urlencode(chatIdBin));
             });
             shard.s.close();
         });
 
     };
+
 
     ChatdPersist.prototype.onDbCrashOnOpen = function() {
         var self = this;
@@ -491,8 +490,9 @@
         self.logger.warn('DB crashed, disabling chatdPersist (is this an FF incognito?)');
     };
 
-    ChatdPersist.prototype.onDbCrashCritical = SoonFc(function() {
+    ChatdPersist.prototype._stopChatdPersist = function() {
         var self = this;
+
         // already destroying/destroyed?
         if (!self.chatd.chatdPersist) {
             return;
@@ -501,13 +501,29 @@
         self._destroy();
         self._reinitWithoutChardPersist();
 
-        self.db.close();
-        // using Soon, since db.close's promise is not reliable.
-        Soon(function() {
-            Dexie.delete("ctdb_" + u_handle + "_chatd_" + VERSION);
-        });
+        if (ChatdPersist.isMasterTab()) {
+            self.db.close();
+        }
+    };
 
-        self.logger.error('DB crashed, disabling chatdPersist (out of IDB space? broken indexedDB data?');
+    ChatdPersist.prototype.onDbCrashCritical = SoonFc(function() {
+        var self = this;
+
+        // already destroying/destroyed?
+        if (!self.chatd.chatdPersist) {
+            return;
+        }
+
+        self._stopChatdPersist();
+
+        if (ChatdPersist.isMasterTab()) {
+            // using Soon, since db.close's promise is not reliable.
+            Soon(function () {
+                ChatdPersist.forceDrop();
+            });
+        }
+
+        self.logger.error('DB crashed, disabling chatdPersist (out of IDB space? broken indexedDB data?)');
     }, 500);
 
 
@@ -1311,11 +1327,12 @@
         var lownum = 0;
         var highnum = self.chatd.chatIdMessages[base64urldecode(chatId)].highnum;
 
+
         var chatRoom = self.chatd.megaChat.getChatById(chatId);
         if (chatRoom && chatRoom.messagesBuff.messages.length > 0) {
-            var msgs = chatRoom.messagesBuff.messages;
-            lownum = msgs.getItem(0).orderValue;
-            highnum = msgs.getItem(msgs.length - 1).orderValue;
+            var lowHigh = chatRoom.messagesBuff.getLowHighIds(true);
+            lownum = lowHigh ? lowHigh[0] : false;
+            highnum = lowHigh ? lowHigh[1] : false;
         }
 
         var lastRetrOrdValue = len === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL ? 0 : lownum;
@@ -1396,9 +1413,11 @@
         var lowNum;
         var highNum;
 
-        var p1 = self.db.msgs
-            .where('[chatId+orderValue]')
-            .between([encChatId, -Infinity], [encChatId, Infinity]).last().then(
+        var p1 = MegaPromise.asMegaPromiseProxy(
+            self.db.msgs
+                .where('[chatId+orderValue]')
+                .between([encChatId, -Infinity], [encChatId, Infinity]).last()
+        ).then(
                 function(r) {
                     if (r) {
                         high = r.msgId;
@@ -1412,9 +1431,11 @@
                     promise.reject();
                 });
 
-        var p2 = self.db.msgs
-            .where('[chatId+orderValue]')
-            .between([encChatId, -Infinity], [encChatId, Infinity]).first().then(
+        var p2 = MegaPromise.asMegaPromiseProxy(
+            self.db.msgs
+                .where('[chatId+orderValue]')
+                .between([encChatId, -Infinity], [encChatId, Infinity]).first()
+        ).then(
                 function(r) {
                     if (r) {
                         low = r.msgId;
@@ -1429,8 +1450,8 @@
                 });
 
         MegaPromise.allDone([
-            MegaPromise.asMegaPromiseProxy(p1),
-            MegaPromise.asMegaPromiseProxy(p2),
+            p1,
+            p2,
         ])
             .done(function() {
                 promise.resolve([low, high, lowNum, highNum]);
@@ -1868,6 +1889,16 @@
     ChatdPersist.prototype.drop = function() {
         var self = this;
         return MegaPromise.asMegaPromiseProxy(self.db.delete());
+    };
+
+    /**
+     * Basically same as .drop, but can be called without ChatdPersist to be initialized (e.g. if its
+     * disabled, because of IDB crash).
+     *
+     * @returns {MegaPromise}
+     */
+    ChatdPersist.forceDrop = function() {
+        return MegaPromise.asMegaPromiseProxy(Dexie.delete("$ctdb_" + u_handle + "_" + "chatd_" + VERSION));
     };
 
     [

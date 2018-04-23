@@ -43,15 +43,15 @@ React.makeElement = React['createElement'];
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
 	module.exports = __webpack_require__(4);
 
 
-/***/ }),
+/***/ },
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -1121,21 +1121,21 @@ React.makeElement = React['createElement'];
 	    chatui: _chatui
 	};
 
-/***/ }),
+/***/ },
 /* 2 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = React;
 
-/***/ }),
+/***/ },
 /* 3 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	module.exports = ReactDOM;
 
-/***/ }),
+/***/ },
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -1728,9 +1728,9 @@ React.makeElement = React['createElement'];
 	    ConversationsApp: ConversationsApp
 	};
 
-/***/ }),
+/***/ },
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -1971,9 +1971,9 @@ React.makeElement = React['createElement'];
 	    EmojiFormattedContent: EmojiFormattedContent
 	};
 
-/***/ }),
+/***/ },
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	var ReactDOM = __webpack_require__(3);
 
@@ -2512,9 +2512,9 @@ React.makeElement = React['createElement'];
 	};
 
 
-/***/ }),
+/***/ },
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -2792,9 +2792,9 @@ React.makeElement = React['createElement'];
 	    PerfectScrollbar: PerfectScrollbar
 	};
 
-/***/ }),
+/***/ },
 /* 8 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -2972,9 +2972,9 @@ React.makeElement = React['createElement'];
 	    Button: Button
 	};
 
-/***/ }),
+/***/ },
 /* 9 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3289,9 +3289,9 @@ React.makeElement = React['createElement'];
 	    DropdownContactsSelector: DropdownContactsSelector
 	};
 
-/***/ }),
+/***/ },
 /* 10 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3989,9 +3989,9 @@ React.makeElement = React['createElement'];
 	    ContactPresence: ContactPresence
 	};
 
-/***/ }),
+/***/ },
 /* 11 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -5986,9 +5986,9 @@ React.makeElement = React['createElement'];
 	    ConversationPanels: ConversationPanels
 	};
 
-/***/ }),
+/***/ },
 /* 12 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -6348,9 +6348,9 @@ React.makeElement = React['createElement'];
 	    ExtraFooterElement: ExtraFooterElement
 	};
 
-/***/ }),
+/***/ },
 /* 13 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -6545,9 +6545,9 @@ React.makeElement = React['createElement'];
 	    Contents: Contents
 	};
 
-/***/ }),
+/***/ },
 /* 14 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -6614,9 +6614,9 @@ React.makeElement = React['createElement'];
 	    Checkbox: Checkbox
 	};
 
-/***/ }),
+/***/ },
 /* 15 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -7493,9 +7493,9 @@ React.makeElement = React['createElement'];
 	    CloudBrowserDialog: CloudBrowserDialog
 	};
 
-/***/ }),
+/***/ },
 /* 16 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -8327,9 +8327,9 @@ React.makeElement = React['createElement'];
 	    TypingArea: TypingArea
 	};
 
-/***/ }),
+/***/ },
 /* 17 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -8830,9 +8830,9 @@ React.makeElement = React['createElement'];
 	    DropdownEmojiSelector: DropdownEmojiSelector
 	};
 
-/***/ }),
+/***/ },
 /* 18 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -9116,9 +9116,9 @@ React.makeElement = React['createElement'];
 	    EmojiAutocomplete: EmojiAutocomplete
 	};
 
-/***/ }),
+/***/ },
 /* 19 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -9258,9 +9258,9 @@ React.makeElement = React['createElement'];
 	    WhosTyping: WhosTyping
 	};
 
-/***/ }),
+/***/ },
 /* 20 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -9300,9 +9300,9 @@ React.makeElement = React['createElement'];
 	    getMessageString: getMessageString
 	};
 
-/***/ }),
+/***/ },
 /* 21 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -9588,9 +9588,9 @@ React.makeElement = React['createElement'];
 	    ParticipantsList: ParticipantsList
 	};
 
-/***/ }),
+/***/ },
 /* 22 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -10724,9 +10724,9 @@ React.makeElement = React['createElement'];
 	    GenericConversationMessage: GenericConversationMessage
 	};
 
-/***/ }),
+/***/ },
 /* 23 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -10814,9 +10814,9 @@ React.makeElement = React['createElement'];
 	    ConversationMessageMixin: ConversationMessageMixin
 	};
 
-/***/ }),
+/***/ },
 /* 24 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -10960,9 +10960,9 @@ React.makeElement = React['createElement'];
 	    AlterParticipantsConversationMessage: AlterParticipantsConversationMessage
 	};
 
-/***/ }),
+/***/ },
 /* 25 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -11049,9 +11049,9 @@ React.makeElement = React['createElement'];
 	    TruncatedMessage: TruncatedMessage
 	};
 
-/***/ }),
+/***/ },
 /* 26 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -11144,9 +11144,9 @@ React.makeElement = React['createElement'];
 	    PrivilegeChange: PrivilegeChange
 	};
 
-/***/ }),
+/***/ },
 /* 27 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -11225,9 +11225,9 @@ React.makeElement = React['createElement'];
 	    TopicChange: TopicChange
 	};
 
-/***/ }),
+/***/ },
 /* 28 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -12251,9 +12251,9 @@ React.makeElement = React['createElement'];
 	window.ChatRoom = ChatRoom;
 	module.exports = ChatRoom;
 
-/***/ }),
+/***/ },
 /* 29 */
-/***/ (function(module, exports) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -12281,5 +12281,5 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-/***/ })
+/***/ }
 /******/ ]);

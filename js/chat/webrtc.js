@@ -1020,7 +1020,7 @@ Call.prototype._removeSession = function(sess, reason) {
     if (sess.isJoiner) {
         self.logger.log("Session to", base64urlencode(sess.peer), "failed, re-establishing it...");
         setTimeout(function() { //execute it async, to avoid re-entrancy
-            self.rejoinUser(sess.peer);
+            self.rejoinPeer(sess.peer, sess.peerClient);
         }, 0);
     } else {
         // Else wait for peer to re-join...
@@ -1139,17 +1139,17 @@ Call.prototype._join = function(userid) {
     }, RtcModule.kSessSetupTimeout);
     return true;
 };
-Call.prototype.rejoinUser = function(userid) {
+Call.prototype.rejoinPeer = function(userid, clientid) {
     var self = this;
     assert(self.state === CallState.kInProgress);
     // JOIN:
     // chatid.8 userid.8 clientid.4 dataLen.2 type.1 callid.8 anonId.8
     // if userid is not specified, join all clients in the chat, otherwise
     // join a specific user (used when a session gets broken)
-    var data = self.chatid + userid + "\0\0\0\0" +
+    var data = self.chatid + userid + clientid +
         Chatd.pack16le(17) + String.fromCharCode(RTCMD.JOIN) +
         self.id + self.manager.ownAnonId;
-    if (!self.shard.cmd(Chatd.Opcode.RTMSG_USER, data)) {
+    if (!self.shard.cmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
         setTimeout(function() {
              self._destroy(Term.kErrNetSignalling, true);
         }, 0);

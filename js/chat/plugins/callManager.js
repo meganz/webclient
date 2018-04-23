@@ -847,12 +847,12 @@ CallManagerCall.prototype.onCallTerminated = function () {
 
 CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates) {
     var self = this;
-    //TODO: @lp: Execute onRemoteStreamRemoved() just in case it wasn't called by the rtcModule before session destroy
+    // TODO: @lp: Execute onRemoteStreamRemoved() just in case it wasn't called by the rtcModule before session destroy
     var isIncoming = self.rtcCall.isJoiner;
     var state = self.rtcCall.termCodeToUIState(terminationCode);
     self.setState(state);
     var callMgr = self.getCallManager();
-    switch(state) {
+    switch (state) {
         case CallManagerCall.STATE.REJECTED:
             callMgr.trigger('CallRejected', [self, terminationCode]);
             break;
@@ -863,7 +863,7 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
             callMgr.trigger('CallMissed', [self, terminationCode]);
             break;
         case CallManagerCall.STATE.STARTED:
-        callMgr.trigger('CallStarted', [self, terminationCode]);
+            callMgr.trigger('CallStarted', [self, terminationCode]);
             break;
         case CallManagerCall.STATE.ENDED:
             callMgr.trigger('CallEnded', [self, terminationCode]);

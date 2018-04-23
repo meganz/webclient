@@ -286,7 +286,7 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
             }
             return;
         } else {
-// Call state is either kInProgress or kTerminating
+            // Call state is either kInProgress or kTerminating
             self.logger.log("Received call request while another call is in progress or terminating, sending busy");
             sendBusy();
             return;
@@ -332,7 +332,6 @@ RtcModule.prototype.cmdBroadcast = function(op, chatid, payload) {
     }
     if (!shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
         throw new Error("cmdEndpoint: Send error trying to send command " + constStateToText(RTCMD, op));
-        return false;
     } else {
         return true;
     }
@@ -553,7 +552,7 @@ function Call(rtcModule, info, isGroup, isJoiner, handler) {
     if (isJoiner) {
         this._callerInfo = info; // callerInfo is actually CALLDATA, needed for answering
     }
-};
+}
 
 Call.prototype.handleMsg = function(packet) {
     var type = packet.type;
@@ -661,7 +660,7 @@ Call.prototype.msgCallTerminate = function(packet) {
         && ci.fromClient === packet.fromClient) { // call is in setup phase, only call initiator can abort it
             isCallParticipant = true;
     } else {
-        var retry = self.sessRetries[ci.fromUser+ci.fromClient];
+        var retry = self.sessRetries[ci.fromUser + ci.fromClient];
         if (retry && (Date.now() - retry.active <= RtcModule.kSessSetupTimeout)) {
             // no session to this peer at the moment, but we are in the process of reconnecting to them
             isCallParticipant = true;
@@ -992,10 +991,10 @@ Call.prototype._removeSession = function(sess, reason) {
     var self = this;
     delete self.sessions[sess.sid];
 
-// If we want to terminate the call (no matter if initiated by us or peer), we first
-// set the call's state to kTerminating. If that is not set, then it's only the session
-// that terminates for a reason that is not fatal to the call,
-// and can try re-establishing the session
+    // If we want to terminate the call (no matter if initiated by us or peer), we first
+    // set the call's state to kTerminating. If that is not set, then it's only the session
+    // that terminates for a reason that is not fatal to the call,
+    // and can try re-establishing the session
     if (self.state === CallState.kTerminating) {
         return;
     }
@@ -1021,7 +1020,7 @@ Call.prototype._removeSession = function(sess, reason) {
     // ongoing and accepts the JOIN
     if (sess.isJoiner) {
         self.logger.log("Session to", base64urlencode(sess.peer), "failed, re-establishing it...");
-        setTimeout(function() { //execute it async, to avoid re-entrancy
+        setTimeout(function() { // Execute it async, to avoid re-entrancy
             self.rejoinPeer(sess.peer, sess.peerClient);
         }, 0);
     } else {
@@ -1038,7 +1037,7 @@ Call.prototype._removeSession = function(sess, reason) {
         delete retry.active;
         if ((sessRetries.all > totalRetries) // there was a newer retry on another session
          || (self.state >= CallState.kTerminating)) { // call already terminating
-            return; //timer is not relevant anymore
+            return; // timer is not relevant anymore
         }
 
         if (!self.isGroup && !Object.keys(self.sessions).length) {
@@ -1153,12 +1152,12 @@ Call.prototype.rejoinPeer = function(userid, clientid) {
         self.id + self.manager.ownAnonId;
     if (!self.shard.cmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
         setTimeout(function() {
-             self._destroy(Term.kErrNetSignalling, true);
+            self._destroy(Term.kErrNetSignalling, true);
         }, 0);
         return false;
     }
     return true;
-}
+};
 
 Call.prototype.answer = function(av) {
     var self = this;
@@ -1496,8 +1495,7 @@ Session.prototype._createRtcConn = function() {
             self._setState(SessState.kInProgress);
             self._tsIceConn = Date.now();
             self.call._notifySessionConnected(self);
-/*
-// DEBUG: Enable this to simulate session ICE disconnect
+            /* DEBUG: Enable this to simulate session ICE disconnect
             if (self.isJoiner)
             {
                 setTimeout(() => {
@@ -1506,7 +1504,7 @@ Session.prototype._createRtcConn = function() {
                     }
                 }, 4000);
             }
-*/
+           */
         }
     };
     // RTC.Stats will be set to 'false' if stats are not available for this browser
@@ -2155,33 +2153,32 @@ var UICallTerm = Object.freeze({
     'TIMEOUT': 80
 });
 RtcModule.UICallTerm = UICallTerm;
-RtcModule.termCodeIsError = function(termCode, name) {
-    if (!name) {
-        name = constStateToText(Term, termCode);
-    }
-    return !!name.match(/kErr+/i);
-}
+RtcModule.termCodeIsError = function(termCode) {
+    return (termCode >= Term.kErrorFirst) && (termCode <= Term.kErrorLast);
+};
 
 // Not all timeouts are errors, i.e. kAnswerTimeout
 RtcModule.termCodeIsTimeout = function(termCode, name) {
     if (!name) {
         name = constStateToText(Term, termCode);
     }
-    return !!name.match(/k[^\s]+Timeout/i);
-}
+    return name.match(/k[^\s]+Timeout/i) != null; // covers both null and undefined
+};
 
 Call.prototype.termCodeToUIState = function(terminationCode) {
     var self = this;
     var isIncoming = self.isJoiner;
-    switch(terminationCode) {
+    switch (terminationCode) {
         case Term.kUserHangup:
-            if (self.predestroyState === CallState.kRingIn) {
-                return UICallTerm.MISSED;
-            } else if (self.predestroyState === CallState.kReqSent) {
-                return UICallTerm.ABORTED;
-            } else {
-                return UICallTerm.ENDED;
+            switch (self.predestroyState) {
+                case CallState.kRingIn:
+                    return UICallTerm.MISSED;
+                case CallState.kReqSent:
+                    return UICallTerm.ABORTED;
+                default:
+                    return UICallTerm.ENDED;
             }
+            break; // just in case
         case Term.kCallRejected:
             return UICallTerm.REJECTED;
         case Term.kAnsElsewhere:
@@ -2199,17 +2196,17 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             return UICallTerm.ENDED;
         default:
             var name = constStateToText(Term, terminationCode);
-            if (RtcModule.termCodeIsError(terminationCode, name)) {
+            if (RtcModule.termCodeIsError(terminationCode)) {
                 return UICallTerm.FAILED;
             } else if (RtcModule.termCodeIsTimeout(terminationCode, name)) {
                 return UICallTerm.TIMEOUT;
             } else {
-                self.logger.warn("termCodeToUIState: Don't know how to translate term code "+
-                    name+ ", returning FAIL");
+                self.logger.warn("termCodeToUIState: Don't know how to translate term code " +
+                    name + ", returning FAIL");
                 return UICallTerm.FAILED;
             }
     }
-}
+};
 
 
 scope.RtcModule = RtcModule;

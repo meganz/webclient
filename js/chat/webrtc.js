@@ -2183,6 +2183,8 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
         case Term.kBusy:
             assert(!isIncoming);
             return UICallTerm.REJECTED;
+        case Term.kAppTerminating:
+            return UICallTerm.ENDED;
         default:
             var name = constStateToText(Term, terminationCode);
             if (RtcModule.termCodeIsError(terminationCode, name)) {
@@ -2190,7 +2192,7 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             } else if (RtcModule.termCodeIsTimeout(terminationCode, name)) {
                 return UICallTerm.TIMEOUT;
             } else {
-                self.logger.warn("termCodeToUIState: Don't know how to translate term code", name, "returning FAIL");
+                self.logger.warn("termCodeToUIState: Don't know how to translate term code "+ name+ ", returning FAIL");
                 return UICallTerm.FAILED;
             }
     }

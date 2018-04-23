@@ -623,7 +623,9 @@ CallManagerCall.prototype.onCallAnswered = function () {
 CallManagerCall.prototype._renderInCallUI = function () {
     var self = this;
 
-    self.room._currentCallCounter = 0;
+    self.room._currentCallCounter = self.room._currentCallCounter || 0;
+
+
     if (self.room._currentCallTimer) {
         clearInterval(self.room._currentCallTimer);
     }
@@ -658,6 +660,8 @@ CallManagerCall.prototype.onCallStarted = function () {
     }
 
     self.setState(CallManagerCall.STATE.STARTED);
+
+    self.room._currentCallCounter = 0;
 
     self._renderInCallUI();
 

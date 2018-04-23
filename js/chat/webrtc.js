@@ -239,7 +239,8 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
     }
     function sendBusy() {
         // Broadcast instead of send only to requestor, so that all other our clients know we rejected the call
-        self.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, parsedCallData.chatid, parsedCallData.callid + String.fromCharCode(Term.kBusy));
+        self.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, parsedCallData.chatid,
+            parsedCallData.callid + String.fromCharCode(Term.kBusy));
     }
     var keys = Object.keys(self.calls);
     if (keys.length) {

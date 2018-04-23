@@ -881,7 +881,8 @@ CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates)
             callMgr.trigger('CallTimeout', [self, terminationCode]);
             break;
         default:
-            self.logger.warn("onDestroy: Unknown UI call termination state", constStateToText(CallManagerCall.STATE, state),
+            self.logger.warn("onDestroy: Unknown UI call termination state",
+                constStateToText(CallManagerCall.STATE, state),
                 " for termcode ", RtcModule.getTermCodeName(terminationCode));
             break;
     }

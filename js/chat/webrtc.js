@@ -692,7 +692,8 @@ Call.prototype.msgCallReqDecline = function(packet) {
     if (packet.fromUser === self.manager.chatd.userId) {
         // Some other client of our user declined the call
         if (self.state !== CallState.kRingIn) {
-            self.logger.warn("Ignoring CALL_REQ_DECLINE from another client of our user - the call is not in kRingIn state, but in ", constStateToText(CallState, self.state));
+            self.logger.warn("Ignoring CALL_REQ_DECLINE from another client of our user -",
+                "the call is not in kRingIn state, but in ", constStateToText(CallState, self.state));
             return;
         }
         // TODO: Maybe verify the reason is not other than kCallRejected or kBusy

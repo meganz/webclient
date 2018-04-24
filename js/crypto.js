@@ -738,7 +738,7 @@ function api_send(q) {
     }
 
     if (logger) {
-        logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
+        logger.debug("Sending API request: " + q.rawreq + " to " + String(q.url).replace(/sid=[\w-]+/, 'sid=\u2026'));
     }
 
     // reset number of bytes received and response size

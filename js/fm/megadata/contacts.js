@@ -319,7 +319,10 @@ MegaData.prototype.getContactsEMails = function(excludeRequests) {
     M.u.forEach(function(contact) {
         // Active contacts with email set
         if (contact.c === 1 && contact.m) {
-            contacts.push({ id: contact.m, name: M.getNameByHandle(contact.u), handle: contact.u });
+            contacts.push({
+                id: contact.m, name: M.getNameByHandle(contact.u), handle: contact.u,
+                contactType: 'active'
+            });
         }
     });
 
@@ -331,7 +334,7 @@ MegaData.prototype.getContactsEMails = function(excludeRequests) {
 
             // Is contact deleted
             if (!contact.dts) {
-                contacts.push({ id: contact.m, name: contactName, handle: M.opc[k].p });
+                contacts.push({ id: contact.m, name: contactName, handle: M.opc[k].p, contactType: 'opc' });
             }
         }
 
@@ -342,7 +345,7 @@ MegaData.prototype.getContactsEMails = function(excludeRequests) {
 
             // Is there a email available
             if (contact.m) {
-                contacts.push({ id: contact.m, name: contactName, handle: M.ipc[m].p });
+                contacts.push({ id: contact.m, name: contactName, handle: M.ipc[m].p, contactType: 'ipc' });
             }
         }
     }

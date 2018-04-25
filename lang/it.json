@@ -2090,5 +2090,9 @@
     "17882": "%nbFo cartella contenente un numero totale di %nbFi file \u00e8 stata aggiunta al gestore dei trasferimenti",
     "17883": "%nbFi file sono stati aggiunti al gestore dei trasferimenti",
     "17884": "%nbFi file \u00e8 stato aggiunto al gestore dei trasferimenti",
-    "17886": "Questo utente \u00e8 gi\u00e0 presente nella tua lista dei contatti"
+    "17886": "Questo utente \u00e8 gi\u00e0 presente nella tua lista dei contatti",
+    "18215": "Upload securely",
+    "18216": "Dark theme",
+    "18217": "Light theme",
+    "18218": "Choose a button below and copy and paste the code into your website to generate the button that users can click to open your personal MEGAdrop folder."
 }

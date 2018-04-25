@@ -2090,5 +2090,9 @@
     "17882": "%nbFo dossier contenant un total de %nbFi fichier a \u00e9t\u00e9 ajout\u00e9 au gestionnaire de transferts",
     "17883": "%nbFi fichiers ont \u00e9t\u00e9 ajout\u00e9s au gestionnaire de transferts",
     "17884": "%nbFi fichier a \u00e9t\u00e9 ajout\u00e9 au gestionnaire de transferts",
-    "17886": "Cet utilisateur existe d\u00e9j\u00e0 dans votre liste de contacts"
+    "17886": "Cet utilisateur existe d\u00e9j\u00e0 dans votre liste de contacts",
+    "18215": "Upload securely",
+    "18216": "Dark theme",
+    "18217": "Light theme",
+    "18218": "Choose a button below and copy and paste the code into your website to generate the button that users can click to open your personal MEGAdrop folder."
 }

@@ -2090,5 +2090,9 @@
     "17882": "%nbFo Ordner mit insgesamt %nbFi Datei neu im Transfer Manager",
     "17883": "%nbFi Dateien neu im Transfer Manager",
     "17884": "%nbFi Datei neu im Transfer Manager",
-    "17886": "Dieser Benutzer ist bereits Ihr Kontakt"
+    "17886": "Dieser Benutzer ist bereits Ihr Kontakt",
+    "18215": "Upload securely",
+    "18216": "Dark theme",
+    "18217": "Light theme",
+    "18218": "Choose a button below and copy and paste the code into your website to generate the button that users can click to open your personal MEGAdrop folder."
 }

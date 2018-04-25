@@ -2690,3 +2690,6 @@ li.token-input-token-invite .input-close {
     display: block;
     position: relative;
 }
+.widget-dialog .copy-widget-code {
+    text-transform: capitalize;
+}

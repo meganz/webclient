@@ -35,7 +35,7 @@ var watchdog = Object.freeze({
         data = {origin: this.wdID, data: data, sid: Math.random()};
         localStorage.setItem(this.eTag + msg, JSON.stringify(data));
         if (d) {
-            console.log('mWatchDog Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
+            console.log('mWatchDog Notifying', this.eTag + msg, msg === 'setsid' ? '' : localStorage[this.eTag + msg]);
         }
     },
 

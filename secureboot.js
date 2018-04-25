@@ -2211,7 +2211,6 @@ else if (!b_u) {
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'network_js': {f:'js/network-testing.js', n: 'network_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
         'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},

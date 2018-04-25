@@ -2090,5 +2090,9 @@
     "17882": "%nbFo katalog zawieraj\u0105cy liczb\u0119 %nbFi pliku zosta\u0142 dodany to transferu",
     "17883": "%nbFi plik\u00f3w zosta\u0142o dodanych do tranferu",
     "17884": "%nbFi plik zosta\u0142 dodany do tranferu",
-    "17886": "This user already exists in your contact list"
+    "17886": "This user already exists in your contact list",
+    "18215": "Upload securely",
+    "18216": "Dark theme",
+    "18217": "Light theme",
+    "18218": "Choose a button below and copy and paste the code into your website to generate the button that users can click to open your personal MEGAdrop folder."
 }

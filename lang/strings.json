@@ -8366,5 +8366,21 @@
     "17886": {
         "text": "This user already exists in your contact list",
         "context": "descriptive text appears when a user tries to add an already existed contact."
+    },
+    "18215": {
+        "text": "Upload securely",
+        "context": "MEGAdrop embeddable buttons label"
+    },
+    "18216": {
+        "text": "Dark theme",
+        "context": "MEGAdrop embeddable button theme"
+    },
+    "18217": {
+        "text": "Light theme",
+        "context": "MEGAdrop embeddable button theme"
+    },
+    "18218": {
+        "text": "Choose a button below and copy and paste the code into your website to generate the button that users can click to open your personal MEGAdrop folder.",
+        "context": "Description in 'Embed code' tab for MEGAdrop embeddable button"
     }
 }

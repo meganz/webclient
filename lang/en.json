@@ -2090,5 +2090,9 @@
     "17882": "%nbFo folder containing a total of %nbFi file was added to the transfer manager",
     "17883": "%nbFi files were added to the transfer manager",
     "17884": "%nbFi file was added to the transfer manager",
-    "17886": "This user already exists in your contact list"
+    "17886": "This user already exists in your contact list",
+    "18215": "Upload securely",
+    "18216": "Dark theme",
+    "18217": "Light theme",
+    "18218": "Choose a button below and copy and paste the code into your website to generate the button that users can click to open your personal MEGAdrop folder."
 }

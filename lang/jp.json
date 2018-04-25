@@ -2090,5 +2090,9 @@
     "17882": "\u5408\u8a08%nbFi\u30d5\u30a1\u30a4\u30eb\u3092\u542b\u3080%nbFo\u30d5\u30a9\u30eb\u30c0\u304c\u8ee2\u9001\u30de\u30cd\u30fc\u30b8\u30e3\u306b\u8ffd\u52a0\u3055\u308c\u307e\u3057\u305f",
     "17883": "%nbFi\u30d5\u30a1\u30a4\u30eb\u304c\u8ee2\u9001\u30de\u30cd\u30fc\u30b8\u30e3\u306b\u8ffd\u52a0\u3055\u308c\u307e\u3057\u305f",
     "17884": "%nbFi\u30d5\u30a1\u30a4\u30eb\u304c\u8ee2\u9001\u30de\u30cd\u30fc\u30b8\u30e3\u306b\u8ffd\u52a0\u3055\u308c\u307e\u3057\u305f",
-    "17886": "This user already exists in your contact list"
+    "17886": "This user already exists in your contact list",
+    "18215": "Upload securely",
+    "18216": "Dark theme",
+    "18217": "Light theme",
+    "18218": "Choose a button below and copy and paste the code into your website to generate the button that users can click to open your personal MEGAdrop folder."
 }

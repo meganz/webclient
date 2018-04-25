@@ -786,7 +786,7 @@ var slideshowid;
         treq[n.h] = {fa: n.fa, k: n.k};
         var getPreview = api_getfileattr.bind(window, treq, 1, preview, eot);
 
-        if (n.s > 0x1000000 || is_image(n) !== 1) {
+        if (n.s > 0x3000000 || is_image(n) !== 1) {
             getPreview();
         }
         else {

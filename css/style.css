@@ -21897,8 +21897,8 @@ opacity: 1;
     margin: 4px 0 0 8px;
 }
 .fm-dialog.create-widget-info-dialog {
-    width: 620px;
-    margin: -275px 0 0 -310px;
+    width: 640px;
+    margin: -275px 0 0 -320px;
 }
 
 .fm-widget-illustration {
@@ -21922,8 +21922,8 @@ opacity: 1;
     margin: 20px auto 12px;
 }
 .fm-dialog.widget-dialog {
-    width: 620px;
-    margin: -305px 0 0 -310px;
+    width: 640px;
+    margin: -305px 0 0 -320px;
 }
 .fm-dialog.manage-widget {
     width: 600px;
@@ -22942,11 +22942,8 @@ opacity: 1;
     line-height: 19px;
 }
 .widget-dialog .embed-block.active .embed-button-subheading{
-    font-family: 'source_sans_prosemibold';
-    color: #333;
-}
-.widget-dialog .embed-block.active .embed-button-centre {
-    background-color: #fafafa;
+    font-family: 'source_sans_probold';
+    color: #222;
 }
 .widget-dialog .embed-button-centre {
     margin: 7px 0 0 8px;

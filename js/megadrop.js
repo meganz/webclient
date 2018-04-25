@@ -1473,16 +1473,20 @@ mega.megadrop = (function() {
             });
 
             // Widget dialog light theme
-            $('#rad22_div').rebind('click', function () {
+            $('.left-button').rebind('click', function () {
                 $('#rad23_div').removeClass('radioOn').addClass('radioOff');
-                $(this).addClass('radioOn');
+                $('#rad22_div').addClass('radioOn');
+                $('.right-button').removeClass('active');
+                $(this).addClass('active');
                 _widgetDlgContent(pup.items[uiOpts.dlg.widget.url.substr(-11)].h);
             });
 
             // Widget dialog dark theme
-            $('#rad23_div').rebind('click', function () {
+            $('.right-button').rebind('click', function () {
                 $('#rad22_div').removeClass('radioOn').addClass('radioOff');
-                $(this).addClass('radioOn');
+                $('#rad23_div').addClass('radioOn');
+                $('.left-button').removeClass('active');
+                $(this).addClass('active');
                 _widgetDlgContent(pup.items[uiOpts.dlg.widget.url.substr(-11)].h);
             });
 

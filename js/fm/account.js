@@ -26,6 +26,7 @@ function accountUI() {
     $('.fm-account-save-block').addClass('hidden');
     $('.fm-account-save').removeClass('disabled');
 
+
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
@@ -374,9 +375,59 @@ function accountUI() {
 
             mega.achievem.parseAccountAchievements();
         }
-        /* End of No achievements */
-
-        /* End of New Used space */
+        /* QR stuff */
+        if (account.contactLink && account.contactLink.length) {
+            $('.qr-settings .qr-settings-acc').removeClass('hidden');
+            $('.qr-settings .dialog-feature-toggle').addClass('toggle-on')
+                .find('.dialog-feature-switch').css('marginLeft', '22px');
+        }
+        else {
+            $('.qr-settings .qr-settings-acc').addClass('hidden');
+            $('.qr-settings .dialog-feature-toggle').removeClass('toggle-on')
+                .find('.dialog-feature-switch').css('marginLeft', '2px');
+        }
+        $('.qr-settings .button.access-qr').rebind('click', function () {
+            openAccessQRDialog();
+        });
+        $('.qr-settings .dialog-feature-toggle').rebind('click', function () {
+            var me = $(this);
+            if (me.hasClass('toggle-on')) {
+                me.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function () {
+                    me.removeClass('toggle-on');
+                    $('.qr-settings .qr-settings-acc').addClass('hidden');
+                    api_req({
+                        a: 'cld',
+                        cl: account.contactLink.substring(2, account.contactLink.length)
+                    }, {
+                        myAccount: account,
+                        callback: function (res, ctx) {
+                            if (res === 0) { // success
+                                ctx.myAccount.contactLink = '';
+                            }
+                        }
+                    });
+                });
+            }
+            else {
+                me.find('.dialog-feature-switch').animate({ marginLeft: '22px' }, 150, 'swing', function () {
+                    me.addClass('toggle-on');
+                    $('.qr-settings .qr-settings-acc').removeClass('hidden');
+                    api_req({ a: 'clc' }, {
+                        myAccount: account,
+                        callback: function (res, ctx) {
+                            if (typeof res !== 'string') {
+                                res = '';
+                            }
+                            else {
+                                res = 'C!' + res;
+                            }
+                            ctx.myAccount.contactLink = res;
+                        }
+                    });
+                });
+            }
+        });
+        /* End QR stuff */
 
 
         $('.fm-account-main .pro-upgrade').rebind('click', function(e) {

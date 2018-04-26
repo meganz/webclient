@@ -553,7 +553,6 @@
         return false;
     };
 
-
     mBroadcaster.addListener('fm:initialized', function copyMoveDialogs(mode) {
         if (folderlink) {
             return false;

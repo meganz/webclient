@@ -340,6 +340,16 @@ function init_page() {
 
     var oldPFKey = pfkey;
     var pageBeginLetters = page.substr(0, 2);
+    // contact link handling...
+    if (pageBeginLetters === 'C!' && page.length > 2) {
+        var ctLink = page.substring(2, page.length);
+        mBroadcaster.once('boot_done', function () {            
+            openContactInfoLink(ctLink);
+        });
+        
+        page = 'fm/contacts';
+    }
+
     if (pageBeginLetters === 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
 

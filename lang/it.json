@@ -2098,7 +2098,7 @@
     "18217": "Tema chiaro",
     "18218": "Scegli un pulsante qui sotto e copia e incolla il codice all'interno del tuo sito web per generare il pulsante, per far s\u00ec che i tuoi utenti lo possano cliccare per aprire la tua cartella personale MEGAdrop.",
     "18227": "Regenerate QR Code",
-    "18228": "You are about to generate a new QR code. Your [B]existing[B] QR code and invitation link will no longer work.",
+    "18228": "You are about to generate a new QR code. Your [B]existing[\/B] QR code and invitation link will no longer work.",
     "18229": "Do you want to proceed?",
     "18230": "Reactivate QR Code",
     "18231": "Your QR code is deactivated.",

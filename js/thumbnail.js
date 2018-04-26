@@ -124,7 +124,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             while (len-- && !ab[len]) {}
             if (len < 0) {
                 console.warn('All pixels are black, aborting thumbnail creation...', ab.byteLength);
-                throw new Error('Unsupported image type/format.');
+                return img.onerror('Unsupported image type/format.');
             }
 
             dataURI = canvas.toDataURL(imageType, 0.80);

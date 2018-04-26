@@ -201,6 +201,13 @@ var slideshowid;
         return n || false;
     }
 
+    function slideshow_timereset() {
+        if (slideshowplay) {
+            clearTimeout(slideshowTimer);
+            slideshowTimer = setTimeout(slideshow_next, 4000);
+        }
+    }
+
     // Inits Image viewer bottom control bar
     function slideshow_imgControls(slideshow_stop) {
         var $overlay = $('.viewer-overlay');
@@ -218,19 +225,14 @@ var slideshowid;
             slideshowplay = false;
             $pauseButton.attr('data-state', 'pause');
             $pauseButton.find('i').removeClass('play').addClass('pause');
-            clearInterval(slideshowTimer);
+            clearTimeout(slideshowTimer);
         }
-
-        var resetTimer = function() {
-            clearInterval(slideshowTimer);
-            slideshowTimer = setInterval(slideshow_next, 4000);
-        };
 
         // Bind Slideshow Mode button
         $startButton.rebind('click', function() {
             $overlay.addClass('slideshow');
             slideshowplay = true;
-            resetTimer();
+            slideshow_timereset();
             return false;
         });
 
@@ -238,7 +240,7 @@ var slideshowid;
         $pauseButton.rebind('click', function() {
             var $this = $(this);
 
-            clearInterval(slideshowTimer);
+            clearTimeout(slideshowTimer);
             if ($(this).attr('data-state') === 'pause') {
                 $this.attr('data-state', 'play');
                 $this.find('i').removeClass('pause').addClass('play');
@@ -246,7 +248,7 @@ var slideshowid;
             else {
                 $this.attr('data-state', 'pause');
                 $this.find('i').removeClass('play').addClass('pause');
-                slideshowTimer = setInterval(slideshow_next, 4000);
+                slideshowTimer = setTimeout(slideshow_next, 4000);
             }
             return false;
         });
@@ -254,14 +256,14 @@ var slideshowid;
         // Bind Slideshow Prev button
         $prevButton.rebind('click', function() {
             slideshow_prev();
-            resetTimer();
+            slideshow_timereset();
             return false;
         });
 
         // Bind Slideshow Next button
         $nextButton.rebind('click', function() {
             slideshow_next();
-            resetTimer();
+            slideshow_timereset();
             return false;
         });
 
@@ -481,6 +483,7 @@ var slideshowid;
                     break;
                 }
             }
+            slideshow_imgControls(1);
             mBroadcaster.sendMessage('slideshow:close');
             slideshow_freemem();
             return false;
@@ -603,6 +606,10 @@ var slideshowid;
                     slideshow_fullscreen($overlay);
                 }
             }
+
+            if (!previews[n.h]) {
+                $overlay.find('.viewer-pending').removeClass('hidden');
+            }
         }
 
         // Favourite Icon
@@ -611,7 +618,6 @@ var slideshowid;
         // Set file data
         zoom_mode = false;
         $overlay.find('.viewer-filename').text(n.name);
-        $overlay.find('.viewer-pending').removeClass('hidden');
         $overlay.find('.viewer-progress').addClass('hidden');
         $overlay.find('.viewer-progress, .viewer-error, video, #pdfpreviewdiv1').addClass('hidden');
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
@@ -718,6 +724,7 @@ var slideshowid;
             if (h === slideshowid) {
                 fetchnext();
             }
+            delete pfails[h];
         };
 
         var n = slideshow_node(id);
@@ -786,14 +793,12 @@ var slideshowid;
         treq[n.h] = {fa: n.fa, k: n.k};
         var getPreview = api_getfileattr.bind(window, treq, 1, preview, eot);
 
-        if (n.s > 0x3000000 || is_image(n) !== 1) {
-            getPreview();
-        }
-        else {
+        if (n.s < 0x3000000 && is_image(n) === 1) {
             M.gfsfetch(n.link || n.h, 0, -1).tryCatch(function(data) {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
-            }, getPreview);
+            }, slideshow_timereset);
         }
+        getPreview();
     }
 
     // start streaming a video file
@@ -954,8 +959,10 @@ var slideshowid;
         var $overlay = $('.viewer-overlay');
         var $imgBlock = $overlay.find('.viewer-image-bl');
         var $imgCount = $imgBlock.find('.img-wrap');
-        // Choose img to set src for Slideshow transition effect
-        var imgClass = $imgCount.attr('data-count') !== 'img1' ? 'img1' : 'img2';
+
+        if (slideshowplay && Object(previews[id]).full) {
+            slideshow_timereset();
+        }
 
         var src = Object(previews[id]).src;
         if (!src) {
@@ -987,8 +994,21 @@ var slideshowid;
             return slideshow_videostream(id, $overlay);
         }
 
+        // Choose img to set src for Slideshow transition effect
+        var imgClass = $imgCount.attr('data-count') !== 'img1' ? 'img1' : 'img2';
+
+        if ($imgCount.attr('data-image') === id) {
+            imgClass = $imgCount.attr('data-count');
+        }
+
         var img = new Image();
         img.onload = img.onerror = function(ev) {
+            if (id !== slideshowid) {
+                if (d) {
+                    console.debug('Moved to another image, not displaying %s...', id);
+                }
+                return;
+            }
             origImgWidth = img.width;
             origImgHeight = img.height;
 
@@ -997,6 +1017,7 @@ var slideshowid;
             $imgCount.find('.' + imgClass).attr('src', ev.type === 'error' ? noThumbURI : this.src)
                 .addClass('active');
             $imgCount.attr('data-count', imgClass);
+            $imgCount.attr('data-image', id);
 
             // Set position, zoom values
             zoom_mode = false;
@@ -1029,6 +1050,16 @@ var slideshowid;
         }
         if (!blob || blob.size < 25) {
             blob = new Blob([uint8arr.buffer], {type: type});
+        }
+
+        if (previews[id]) {
+            if (previews[id].full) {
+                if (d) {
+                    console.warn('Not overwriting a full preview...', id);
+                }
+                return;
+            }
+            myURL.revokeObjectURL(previews[id].src);
         }
 
         previews[id] = {
@@ -1074,7 +1105,7 @@ var slideshowid;
             console.debug('Previews cache is using %s of memory...', bytesToSize(size));
         }
 
-        if (size > 0x10000000) {
+        if (size > 450 * 1048576) {
             size = 0;
             for (k in previews) {
                 if (k !== slideshowid) {
@@ -1082,7 +1113,7 @@ var slideshowid;
                     if (p.buffer && (now - p.time) > 2e4) {
                         size += p.buffer.byteLength;
                         M.neuterArrayBuffer(p.buffer);
-                        p.buffer = p.full = false;
+                        p.buffer = p.full = preqs[k] = false;
                         if (p.type.startsWith('image')) {
                             URL.revokeObjectURL(p.src);
                             previews[k] = false;

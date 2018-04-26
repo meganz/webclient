@@ -414,7 +414,7 @@ function changepw(currentpw, newpw, ctx) {
 
     api_req({
         a: 'up',
-        currk: a32_to_base64(encrypt_key(new sjcl.cipher.aes(prepare_key_pw(currentpw)), u_k)),
+        // currk: a32_to_base64(encrypt_key(new sjcl.cipher.aes(prepare_key_pw(currentpw)), u_k)),
         k: a32_to_base64(encrypt_key(pw_aes, u_k)),
         uh: stringhash(u_attr['email'].toLowerCase(), pw_aes)
     }, ctx);

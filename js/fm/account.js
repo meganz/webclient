@@ -834,7 +834,7 @@ function accountUI() {
 
             var pws = zxcvbn($('#account-new-password').val());
 
-            if ($('#account-password').val() == ''
+            /*if ($('#account-password').val() == ''
                 && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== '')) {
 
                 msgDialog('warninga', l[135], l[719], false, function() {
@@ -863,7 +863,7 @@ function accountUI() {
                     });
                 });
             }
-            else if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
+            else*/ if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
                 msgDialog('warninga', l[135], l[715], false, function() {
                     $('#account-new-password').val('');
                     $('#account-confirm-password').val('');
@@ -872,8 +872,8 @@ function accountUI() {
                     $('.fm-account-save').addClass('disabled');
                 });
             }
-            else if ($('#account-password').val() !== ''
-                && $('#account-confirm-password').val() !== ''
+            else if (/*$('#account-password').val() !== ''
+                &&*/ $('#account-confirm-password').val() !== ''
                 && $('#account-new-password').val() !== ''
                 && (pws.score === 0 || pws.entropy < 16)) {
 
@@ -885,8 +885,8 @@ function accountUI() {
                     $('.fm-account-save').addClass('disabled');
                 });
             }
-            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
-                && $('#account-confirm-password').val() !== $('#account-password').val()) {
+            else if ($('#account-confirm-password').val() !== '' /*&& $('#account-password').val() !== ''
+                && $('#account-confirm-password').val() !== $('#account-password').val()*/) {
                 loadingDialog.show();
                 changepw($('#account-password').val(), $('#account-confirm-password').val(), {
                     callback: function(res) {
@@ -916,14 +916,14 @@ function accountUI() {
                     }
                 });
             }
-            else if ($('#account-password').val() !== ''
+            /*else if ($('#account-password').val() !== ''
                     && $('#account-confirm-password').val() === $('#account-password').val()) {
                 msgDialog('warninga', l[135], l[16664]);
                 $('#account-confirm-password').val('');
                 $('#account-new-password').val('');
                 $('.fm-account-save-block').removeClass('hidden');
                 $('.fm-account-save').addClass('disabled');
-            }
+            }*/
             else {
                 $passwords.val('');
             }

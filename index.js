@@ -996,13 +996,25 @@ function init_page() {
     // Initial recovery process page to choose whether to recover with Master/Recovery Key or park the account
     else if (page === 'recovery') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
-            mobile.recovery.init();
+            if (u_type) {
+                loadSubPage('fm/account');
+                return false;
+            }
+            else {
+                parsepage(pages['mobile']);
+                mobile.recovery.init();
+            }
         }
         else {
-            parsepage(pages['recovery']);
-            var accountRecovery = new mega.AccountRecovery();
-            accountRecovery.initRecovery();
+            if (u_type) {
+                loadSubPage('fm/account/email-and-pass');
+                return false;
+            }
+            else {
+                parsepage(pages['recovery']);
+                var accountRecovery = new mega.AccountRecovery();
+                accountRecovery.initRecovery();
+            }
         }
     }
 

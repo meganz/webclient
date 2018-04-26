@@ -282,8 +282,16 @@ function initAddDialogMultiInputPlugin() {
         onEmailCheck: function() {
             errorMsg(l[7415]);
         },
-        onDoublet: function(u) {
-            errorMsg(l[7413]);
+        onDoublet: function (u, iType) {
+            if (iType === 'opc') {
+                errorMsg(l[17545]);
+            }
+            else if (iType === 'ipc') {
+                errorMsg(l[17546]);
+            }
+            else {
+                errorMsg(l[7413]);
+            }
         },
         onHolder: function() {
             errorMsg(l[7414]);

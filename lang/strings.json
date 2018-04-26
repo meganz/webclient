@@ -380,7 +380,7 @@
         "context": ""
     },
     "240": {
-        "text": "In order to complete the file transfer process, you need to manually save your file. ",
+        "text": "In order to complete the file transfer process, you need to manually save your file.",
         "context": "After the download has completed in other browser the user still has to make an additional click on a button to choose where he wants to save the file on his computer."
     },
     "241": {
@@ -892,7 +892,7 @@
         "context": ""
     },
     "637": {
-        "text": "The information in this notification is accurate, and I state under penalty of perjury that I am authorized to act on behalf of the copyright owner. ",
+        "text": "The information in this notification is accurate, and I state under penalty of perjury that I am authorized to act on behalf of the copyright owner.",
         "context": ""
     },
     "638": {
@@ -2796,7 +2796,7 @@
         "context": "Message of the dialog displayed when fails the process\/request to import an image."
     },
     "5528": {
-        "text": " of ",
+        "text": "of",
         "context": "Showing progress of elements. Example: 2 of 10."
     },
     "5533": {
@@ -3167,6 +3167,10 @@
         "text": "Wrong password",
         "context": "Error text shown when you introduce a wrong password on the confirmation proccess"
     },
+    "6039": {
+        "text": "Recovery Key copied to clipboard",
+        "context": ""
+    },
     "6078": {
         "text": "MEGA",
         "context": ""
@@ -3194,6 +3198,10 @@
     "6126": {
         "text": "PRO III",
         "context": "Label to indicate that the current user has a PRO III account."
+    },
+    "6158": {
+        "text": "Recovery Key",
+        "context": "Title for the MEGA Master Key"
     },
     "6159": {
         "text": "MEGA SDK",
@@ -3288,7 +3296,7 @@
         "context": "Account closure, warning dialog after user confirm that he want to cancel account."
     },
     "6216": {
-        "text": "If you can't access your email account, you will need to contact ",
+        "text": "If you can't access your email account, you will need to contact",
         "context": "Account closure, warning dialog to remind user to contact mega support after he confirms that he wants to cancel account. \r\n\r\n"
     },
     "6217": {
@@ -3684,7 +3692,7 @@
         "context": "An user attempts to change its password but something went wrong"
     },
     "6973": {
-        "text": " Are you sure you want to remove your avatar?",
+        "text": "Are you sure you want to remove your avatar?",
         "context": "Confirmation message to remove the user's avatar image."
     },
     "6975": {
@@ -3796,7 +3804,7 @@
         "context": "Information on the over bandwidth quota dialog."
     },
     "7100": {
-        "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free. ",
+        "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free.",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the number of minutes they need to wait."
     },
     "7101": {
@@ -4144,7 +4152,7 @@
         "context": "Button label for \"I disagree to the terms and conditions\"."
     },
     "7647": {
-        "text": "MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. ",
+        "text": "MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright.",
         "context": "String already exists: 367, but we need to split paragraphs."
     },
     "7648": {
@@ -4704,7 +4712,7 @@
         "context": "Chat advantages information.\r\n\r\nFull text: Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances: \r\n[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. \r\n\r\n[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit."
     },
     "8540": {
-        "text": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. ",
+        "text": "[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content.",
         "context": "Chat advantages information.\r\n\r\nFull text: Mega protects your chat with end-to-end (user controlled) encryption providing essential safety assurances: \r\n[S]Confidentiality.[\/S] Only the author and intended recipients are able to decipher and read the content. \r\n\r\n[S]Authenticity.[\/S] The system ensures that the data received is from the sender displayed, and its content has not been manipulated during transit."
     },
     "8577": {
@@ -4812,7 +4820,7 @@
         "context": "Message subject in our help system"
     },
     "8641": {
-        "text": " MEGAsync Issue",
+        "text": "MEGAsync Issue",
         "context": "Message subject in our help system"
     },
     "8642": {
@@ -5100,7 +5108,7 @@
         "context": "Information regarding the copyright takedown dispute process. The user should not fill out the form if they did not agree with the things they just read about"
     },
     "8786": {
-        "text": "If there is any inconsistency or ambiguity between the English and other language versions of the above terms, the English version shall prevail. ",
+        "text": "If there is any inconsistency or ambiguity between the English and other language versions of the above terms, the English version shall prevail.",
         "context": "Information regarding the copyright takedown dispute process. This states that the english version of this legal wording is the one that counts, if there is any disagreement between language versions"
     },
     "8787": {
@@ -5246,14 +5254,6 @@
     "8834": {
         "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
         "context": "A warning message which is displayed to warn the user about the reason why their download can not proceed because they would be over the bandwidth quota."
-    },
-    "8836": {
-        "text": "Recovery Key copied to clipboard",
-        "context": "Message of the dialog displayed when copy the user's Recovery Key to the clipboard to be saved or exported."
-    },
-    "8839": {
-        "text": "Recovery Key",
-        "context": "Label for any 'Recovery Key' button, link, text, title, etc. Preserve uppercase - (String as short as possible).\r\nThe Recovery Key is the new name for the account \"Master Key\", and can unlock (recover) the account if the user forgets their password."
     },
     "8840": {
         "text": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",
@@ -5420,7 +5420,7 @@
         "context": "A summary message when a user has attached many files at once into the chat. Please keep %s as it will be replaced at runtime with the number of files."
     },
     "8896": {
-        "text": "Sent Contact: %s ",
+        "text": "Sent Contact: %s",
         "context": "A summary message when a user sent a contact's details through the chat. Please keep %s as it will be replaced at runtime with the name of the contact that was sent."
     },
     "8897": {
@@ -5564,7 +5564,7 @@
         "context": "Help text in our Network Diagnostics tool"
     },
     "9036": {
-        "text": " Please paste a file link below and click on [S]Test[\/S].",
+        "text": "Please paste a file link below and click on [S]Test[\/S].",
         "context": "Help text in our Network Diagnostics tool. Please leave the [S] and [\/S] around the translation for Test (which is the name of the button they need to click)"
     },
     "9037": {
@@ -6520,7 +6520,7 @@
         "context": "The header of a block which contains information about the storage quota bonus the user has already received for completed achievements."
     },
     "16338": {
-        "text": "Summary of the achievements completed and the storage quota bonus already received ",
+        "text": "Summary of the achievements completed and the storage quota bonus already received",
         "context": "Information about completed achievements and earned bonuses."
     },
     "16339": {
@@ -6528,7 +6528,7 @@
         "context": "The header of a block which contains information about the transfer quota bonus the user has already received for completed achievements."
     },
     "16340": {
-        "text": "Summary of the achievements completed and the transfer quota bonus already received ",
+        "text": "Summary of the achievements completed and the transfer quota bonus already received",
         "context": "Information about completed achievements and earned bonuses."
     },
     "16342": {
@@ -6732,7 +6732,7 @@
         "context": "A button label which reverts a certain version of a file to be the current version of the selected file."
     },
     "16476": {
-        "text": "Edited by %1 ",
+        "text": "Edited by %1",
         "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
     },
     "16480": {
@@ -8367,6 +8367,14 @@
         "text": "This user already exists in your contact list",
         "context": "descriptive text appears when a user tries to add an already existed contact."
     },
+    "18213": {
+        "text": "The download size exceeds the maximum size supported by the browser. You can use MEGAsync to proceed with the download.",
+        "context": "The text of a message box which appears to users trying to download large files\/folders."
+    },
+    "18214": {
+        "text": "Do you want to turn ON downloading with MEGAsync?",
+        "context": "A question contained in a message box which appears to users trying to perform big download."
+    },
     "18215": {
         "text": "Upload securely",
         "context": "MEGAdrop embeddable buttons label"
@@ -8382,5 +8390,29 @@
     "18218": {
         "text": "Choose a button below and copy and paste the code into your website to generate the button that users can click to open your personal MEGAdrop folder.",
         "context": "Description in 'Embed code' tab for MEGAdrop embeddable button"
+    },
+    "18227": {
+        "text": "Regenerate QR Code",
+        "context": "A heading for a dialog which is shown when the user presses on the button to regenerate their QR code."
+    },
+    "18228": {
+        "text": "You are about to generate a new QR code. Your [B]existing[B] QR code and invitation link will no longer work.",
+        "context": "A dialog message shown to the user to describe the QR code regenerating action."
+    },
+    "18229": {
+        "text": "Do you want to proceed?",
+        "context": "a question showed to user to ask if he wants to proceed in QR re-generating."
+    },
+    "18230": {
+        "text": "Reactivate QR Code",
+        "context": "A header of a dialog which is shown to the user when they try to reactivate their QR code."
+    },
+    "18231": {
+        "text": "Your QR code is deactivated.",
+        "context": "A dialog message telling the user that their QR code is now deactivated."
+    },
+    "18232": {
+        "text": "Do you want to reactivate your QR Code?",
+        "context": "the question to get user confirmation to reactivate his QR code."
     }
 }

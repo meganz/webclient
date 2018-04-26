@@ -34,7 +34,8 @@ mega.ui.tpp = function () {
                 bps: 0,
                 time: 0,// Start time in ms
                 curr: {},
-                fileName: ''
+                fileName: '',
+                currSpeed: -1
             },
             dl: {
                 index: 0,
@@ -43,7 +44,8 @@ mega.ui.tpp = function () {
                 bps: 0,
                 time: 0,// Start time in ms
                 curr: {},
-                fileName: ''
+                fileName: '',
+                currSpeed: -1
             }
         }
     };
@@ -244,7 +246,7 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e ['dl', 'ul'] download or upload
      * @param {Object} qe Queue Entry, either dl_queue or ul_queue instance for id
      */
-    var setTransfered = function setTransfered(id, value, blk, qe) {
+    var setTransfered = function setTransfered(id, value, blk, qe, actualSpeed) {
 
         if (id === -1) {
             opts.queue[blk].curr = {};
@@ -252,7 +254,9 @@ mega.ui.tpp = function () {
         else {
             opts.queue[blk].curr[id] = value;
         }
-
+        if (actualSpeed) {
+            opts.queue[blk].currSpeed = actualSpeed;
+        }
         if (qe) {
             var name = qe.zipname || qe.n || qe.name;
 
@@ -403,6 +407,9 @@ mega.ui.tpp = function () {
      * @returns {Number} dl/ul average speed in bytes per second
      */
     var getAvgSpeed = function getAvgSpeed(blk) {
+        if (opts.queue[blk].currSpeed !== -1) {
+            return opts.queue[blk].currSpeed;
+        }
         var result = 0;
         var speed = getTransfered(blk);
         // var time = Math.ceil((Date.now() - getTime(blk)) / 1000);// Seconds

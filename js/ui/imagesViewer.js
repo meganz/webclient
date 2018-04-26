@@ -523,7 +523,7 @@ var slideshowid;
 
         // Bind static events is viewer is not in slideshow mode to avoid unnecessary rebinds
         if (!slideshowplay) {
-            $overlay.removeClass('fullscreen mouse-idle slideshow');
+            $overlay.removeClass('fullscreen mouse-idle slideshow video pdf');
 
             // Bind keydown events
             $document.rebind('keydown.slideshow', function(e) {
@@ -613,7 +613,7 @@ var slideshowid;
         $overlay.find('.viewer-filename').text(n.name);
         $overlay.find('.viewer-pending').removeClass('hidden');
         $overlay.find('.viewer-progress').addClass('hidden');
-        $overlay.find('.viewer-progress, .viewer-error, video').addClass('hidden');
+        $overlay.find('.viewer-progress, .viewer-error, video, #pdfpreviewdiv1').addClass('hidden');
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
         $overlay.find('.viewer-progress p').removeAttr('style');
 
@@ -963,13 +963,14 @@ var slideshowid;
             return;
         }
 
-        $overlay.removeClass('video video-theatre-mode');
+        $overlay.removeClass('pdf video video-theatre-mode');
         $imgBlock.find('embed').addClass('hidden');
         $imgBlock.find('video').addClass('hidden');
         $imgBlock.find('.img-wrap').removeClass('hidden');
         $imgBlock.find('#pdfpreviewdiv1').addClass('hidden');
 
         if (previews[id].type === 'application/pdf') {
+            $overlay.addClass('pdf');
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
             $imgBlock.find('.img-wrap').addClass('hidden');

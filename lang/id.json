@@ -2098,7 +2098,7 @@
     "18217": "Light theme",
     "18218": "Choose a button below and copy and paste the code into your website to generate the button that users can click to open your personal MEGAdrop folder.",
     "18227": "Regenerate QR Code",
-    "18228": "You are about to generate a new QR code. Your [B]existing[B] QR code and invitation link will no longer work.",
+    "18228": "You are about to generate a new QR code. Your [B]existing[\/B] QR code and invitation link will no longer work.",
     "18229": "Do you want to proceed?",
     "18230": "Reactivate QR Code",
     "18231": "Your QR code is deactivated.",

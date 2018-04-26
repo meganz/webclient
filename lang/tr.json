@@ -2098,7 +2098,7 @@
     "18217": "A\u00e7\u0131k tema",
     "18218": "A\u015fa\u011f\u0131daki d\u00fc\u011fmelerden birini se\u00e7ip \u00e7\u0131kan kodu sitenize ekleyerek ziyaret\u00e7ilerinizin ki\u015fisel MEGAdrop klas\u00f6r\u00fcn\u00fcze tek t\u0131k ile eri\u015fmesini sa\u011flayabilirsiniz.",
     "18227": "Regenerate QR Code",
-    "18228": "You are about to generate a new QR code. Your [B]existing[B] QR code and invitation link will no longer work.",
+    "18228": "You are about to generate a new QR code. Your [B]existing[\/B] QR code and invitation link will no longer work.",
     "18229": "Do you want to proceed?",
     "18230": "Reactivate QR Code",
     "18231": "Your QR code is deactivated.",

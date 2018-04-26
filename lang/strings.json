@@ -8396,7 +8396,7 @@
         "context": "A heading for a dialog which is shown when the user presses on the button to regenerate their QR code."
     },
     "18228": {
-        "text": "You are about to generate a new QR code. Your [B]existing[B] QR code and invitation link will no longer work.",
+        "text": "You are about to generate a new QR code. Your [B]existing[\/B] QR code and invitation link will no longer work.",
         "context": "A dialog message shown to the user to describe the QR code regenerating action."
     },
     "18229": {

@@ -2137,12 +2137,6 @@ function fm_tfsupdate() {
             }
             mBroadcaster.sendMessage('tfs-dynlist-flush');
         }
-        else {
-            // Move completed transfers to the bottom
-            while (completedLen--) {
-                parent.appendChild(domCompleted[completedLen]);
-            }
-        }
     }
     if ($.transferHeader) {
         $.transferHeader(tfse);

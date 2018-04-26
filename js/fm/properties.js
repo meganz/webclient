@@ -79,52 +79,43 @@
         var hasValid = false;
         var icons = [];
 
-        var nodeInfoCalculator = function _nodeInfoCalculator(handle) {
-            n = M.d[handle];
+        for (var i = $.selected.length; i--;) {
+            n = M.d[$.selected[i]];
             if (!n) {
-                console.error('propertiesDialog: invalid node', handle);
-                return;
+                console.error('propertiesDialog: invalid node', $.selected[i]);
+                continue;
             }
             hasValid = true;
             icons.push(fileIcon(n));
 
             if (n.t) {
-                size += n.tb;
-                sfilecnt += n.tf;
+                size += n.tb;// - (n.tvb || 0);
+                sfilecnt += n.tf;// - (n.tvf || 0);
                 sfoldercnt += n.td;
                 foldercnt++;
-                vsize += n.tvb;
-                svfilecnt += n.tvf;
+                vsize += n.tvb || 0;
+                svfilecnt += n.tvf || 0;
             }
             else {
                 filecnt++;
                 size += n.s;
-                vsize += (n.tvb) ? n.tvb : 0;
-                svfilecnt += (n.tvf) ? n.tvf : 0;
-            }
-        };
-        // stupid code, but with optimized performance.
-        if ($.selected.length && $.selected.length > 1) {
-            for (var i = $.selected.length; i--;) {
-                nodeInfoCalculator($.selected[i]);
-            }
-            n = Object.create(null); // empty n [multiple selection]
-        }
-        else {
-            if ($.selected.length) { // > 0
-                nodeInfoCalculator($.selected[0]);
-                if (n.tvf) {
-                    $dialog.addClass('versioning');
-                    versioningFlag = true;
-                }
-            }
-            else {
-                return propertiesDialog(1); // no selection!
+                vsize += n.tvb || 0;
+                svfilecnt += n.tvf || 0;
             }
         }
+
         if (!hasValid) {
             // $.selected had no valid nodes!
             return propertiesDialog(1);
+        }
+
+        if ($.selected.length > 1) {
+            n = Object.create(null); // empty n [multiple selection]
+        }
+
+        if (n.tvf) {
+            $dialog.addClass('versioning');
+            versioningFlag = true;
         }
 
         M.safeShowDialog('properties', function() {

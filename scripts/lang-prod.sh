@@ -26,6 +26,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Remove any old errors
+rm error.json
+
 # Extract the tar.gz file
 tar xfvz lang.tar.gz
 

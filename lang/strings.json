@@ -3167,10 +3167,6 @@
         "text": "Wrong password",
         "context": "Error text shown when you introduce a wrong password on the confirmation proccess"
     },
-    "6039": {
-        "text": "Recovery Key copied to clipboard",
-        "context": ""
-    },
     "6078": {
         "text": "MEGA",
         "context": ""
@@ -3198,10 +3194,6 @@
     "6126": {
         "text": "PRO III",
         "context": "Label to indicate that the current user has a PRO III account."
-    },
-    "6158": {
-        "text": "Recovery Key",
-        "context": "Title for the MEGA Master Key"
     },
     "6159": {
         "text": "MEGA SDK",
@@ -4043,6 +4035,10 @@
         "text": "Wrong data format",
         "context": "Title of the dialog displayed in cases that the user types some data with a wrong format - (String as short as possible)."
     },
+    "7337": {
+        "text": "Security",
+        "context": "Label for any 'Security' button, link, text, title, etc. - (String as short as possible)."
+    },
     "7352": {
         "text": "State",
         "context": "Label for any 'State' button, link, text, title, etc. - (String as short as possible).\r\nThis is referred to a State of a Country, to include it in the billing details in a credit card payment case."
@@ -4054,6 +4050,10 @@
     "7368": {
         "text": "Message",
         "context": "Label for any 'Message' button, link, text, title, etc. - (String as short as possible)."
+    },
+    "7371": {
+        "text": "MEGA contacts",
+        "context": "Label for any 'Yes' button, link, text, title, etc. Try to preserve the MEGA uppercase word. - (String as short as possible)."
     },
     "7375": {
         "text": "Accepted",
@@ -5254,6 +5254,14 @@
     "8834": {
         "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address.",
         "context": "A warning message which is displayed to warn the user about the reason why their download can not proceed because they would be over the bandwidth quota."
+    },
+    "8836": {
+        "text": "Recovery Key copied to clipboard",
+        "context": ""
+    },
+    "8839": {
+        "text": "Recovery Key",
+        "context": "Title for the MEGA Master Key"
     },
     "8840": {
         "text": "MEGAchat has been upgraded and requires a reload. Do you want reload the page now to update to the latest version?",

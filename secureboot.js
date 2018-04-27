@@ -2179,22 +2179,22 @@ else if (!b_u) {
         jsl.push({f:'css/embeddrop.css', n: 'embeddrop_css', j: 2, w: 5});
     }
     else {
-        jsl.push({f: 'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
-        jsl.push({f: 'js/vendor/asmcrypto.js', n: 'asmcrypto_js', j: 1, w: 5});
+        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
+        jsl.push({f:'js/vendor/asmcrypto.js', n: 'asmcrypto_js', j: 1, w: 5});
 
         if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
-            jsl.push({f: 'js/vendor/es6-shim.js', n: 'es6shim_js', j: 1});
+            jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j: 1});
         }
     }
 
     // only used on beta
     if (onBetaW) {
-        jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+        jsl.push({f:'js/betacrashes.js', n: 'betacrashes_js', j: 1});
     }
 
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
         is_chrome_firefox |= 4;
-        jsl.push({f: 'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
+        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
     }
 
     var jsl2 =

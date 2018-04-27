@@ -111,13 +111,6 @@ function accountUI() {
 
             accountUI.advancedSection();
 
-            $('#network-testing-button').rebind('click', function() {
-                M.require('network_js')
-                    .then(function() {
-                        NetworkTesting.dialog();
-                    });
-            });
-
             if (is_chrome_firefox) {
                 if (!$('#acc_dls_folder').length) {
                     $('.transfer-settings').safeAppend(

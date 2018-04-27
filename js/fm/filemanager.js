@@ -1359,14 +1359,6 @@ FileManager.prototype.initContextUI = function() {
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
-    $(c + '.network-diagnostic').rebind('click', function() {
-        var $trs = $('.transfer-table tr.ui-selected');
-        M.require('network_js')
-            .then(function() {
-                NetworkTesting.dialog($trs.attrs('id')[0].replace(/^dl_/, '#!'));
-            });
-    });
-
     $(c + '.canceltransfer-item,' + c + '.transfer-clear').rebind('click', function() {
         var $trs = $('.transfer-table tr.ui-selected');
         var toabort = $trs.attrs('id');
@@ -1860,11 +1852,6 @@ FileManager.prototype.addTransferPanelUI = function() {
         // XXX: Hide context-menu's menu-up/down items for now to check if that's the
         // origin of some problems, users can still use the new d&d logic to move transfers
         menuitems.filter('.move-up,.move-down').hide();
-
-        if (d && target.length === 1 && target.eq(0).attr('id').match(/^dl_/)) {
-            menuitems.filter('.network-diagnostic').show();
-        }
-
 
         var parent = menuitems.parent();
         parent

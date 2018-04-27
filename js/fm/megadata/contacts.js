@@ -855,17 +855,24 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
  * @param {String} owner, account owner email address.
  * @param {String} target, target email address.
  * @param {String} msg, optional custom text message.
+ * @param {String} contactLink, optional contact link.
  * @returns {Integer} proceed, API response code, if negative something is wrong
  * look at API response code table.
  */
-MegaData.prototype.inviteContact = function(owner, target, msg) {
+MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
     "use strict";
 
     if (d) {
         console.debug('inviteContact');
     }
-
-    api_req({ 'a': 'upc', 'e': owner, 'u': target, 'msg': msg, 'aa': 'a', i: requesti }, {
+    var request = { 'a': 'upc', 'u': target, 'e': owner, 'aa': 'a', i: requesti };
+    if (contactLink && contactLink.length) {
+        request.cl = contactLink;
+    }
+    if (msg && msg.length) {
+        request.msg = msg;
+    }
+    api_req(request, {
         callback: function(resp) {
             if (typeof resp === 'object' && resp.p) {
 
@@ -873,6 +880,9 @@ MegaData.prototype.inviteContact = function(owner, target, msg) {
                 if ($.dialog !== 'invite-friend') {
                     M.inviteContactMessageHandler(resp.p);
                 }
+            }
+            if (typeof resp !== 'object' && contactLink) {
+                M.inviteContactMessageHandler(resp);
             }
         }
     });

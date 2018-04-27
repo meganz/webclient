@@ -176,7 +176,7 @@ var dlmanager = {
         }
 
         if (is_ios) {
-            exts.push("doc", "docx", "ods", "odt", "rtf", "xls", "xlsx");
+            exts.push("doc", "docx", "ods", "odt", "ppt", "pptx", "rtf", "xls", "xlsx");
         }
 
         return localStorage.openAllInBrowser || exts.indexOf(fileext(n.n || n.name || n)) !== -1;

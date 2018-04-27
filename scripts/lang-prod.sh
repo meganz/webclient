@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 #
 # This script fetches the latest translation strings from Babel for the live site. This means it only fetches language
 # strings that are currently in use in the develop branch. It updates all the xx_prod.json files in the /lang

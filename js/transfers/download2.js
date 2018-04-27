@@ -163,6 +163,42 @@ var dlmanager = {
     },
 
     /**
+     * Check whether a downloaded file can be viewed within the browser through a blob/data URI in mobile.
+     * @param {Object|String} n An ufs-node or filename
+     * @returns {Boolean}
+     */
+    openInBrowser: function(n) {
+        'use strict';
+        var exts = ["pdf", "txt", "png", "gif", "jpg", "jpeg"];
+
+        if (ua.details.engine === 'Gecko') {
+            exts.push('mp4', 'm4a', 'mp3', 'webm', 'ogg');
+        }
+
+        if (is_ios) {
+            exts.push("doc", "docx", "ods", "odt", "rtf", "xls", "xlsx");
+        }
+
+        return localStorage.openAllInBrowser || exts.indexOf(fileext(n.n || n.name || n)) !== -1;
+    },
+
+    /**
+     * Check whether the browser does support saving downloaded data to disk
+     * @param {Object|String} n An ufs-node or filename
+     * @returns {Number} 1: yes, 0: no, -1: can be viewed in a blob:
+     */
+    canSaveToDisk: function(n) {
+        'use strict';
+
+        if (dlMethod === MemoryIO && !MemoryIO.canSaveToDisk) {
+            // if cannot be saved to disk, check whether at least we can open it within the browser.
+            return this.openInBrowser(n) ? -1 : 0;
+        }
+
+        return 1;
+    },
+
+    /**
      * For a resumable download, check the filesize on disk
      * @param {String} handle Node handle
      * @param {String} filename The filename..

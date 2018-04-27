@@ -3,28 +3,6 @@
  */
 mobile.downloadOverlay = {
 
-    /** Supported max file size of 100 MB */
-    maxFileSize: 100 * (1024 * 1024),
-
-    /** Supported file types for download on mobile */
-    supportedFileTypes: {
-        doc: 'word',
-        docx: 'word',
-        odt: 'word',
-        txt: 'word',
-        rtf: 'word',
-        xls: 'excel',
-        xlsx: 'excel',
-        ods: 'excel',
-        jpeg: 'image',
-        jpg: 'image',
-        png: 'image',
-        gif: 'image',
-        mp3: 'audio',
-        mp4: 'video',
-        pdf: 'pdf'
-    },
-
     /** Download start time in milliseconds */
     startTime: null,
 
@@ -63,7 +41,6 @@ mobile.downloadOverlay = {
 
         // Change depending on platform and file size/type
         this.setMobileAppInfo();
-        this.adjustMaxFileSize();
         this.checkSupportedFile(node);
 
         // Disable scrolling of the file manager in the background to fix a bug on iOS Safari
@@ -81,8 +58,19 @@ mobile.downloadOverlay = {
 
         'use strict';
 
+        var n = M.d[nodeHandle];
+        var $button = this.$overlay.find('.first.dl-browser');
+        var $label = $button.find('span');
+
+        if (dlMethod !== MemoryIO || !dlmanager.openInBrowser(n)) {
+            $label.text(String(l[58]).toUpperCase()); // DOWNLOAD
+        }
+        else {
+            $label.text(String(l[8947]).toUpperCase()); // OPEN IN BROWSER
+        }
+
         // On Open in Browser button click/tap
-        this.$overlay.find('.first.dl-browser').off('tap').on('tap', function() {
+        $button.off('tap').on('tap', function() {
 
             // Start the download
             mobile.downloadOverlay.startFileDownload(nodeHandle);
@@ -304,24 +292,52 @@ mobile.downloadOverlay = {
         // Change message to 'Did you know that you can download the entire folder at once...'
         this.$overlay.find('.file-manager-download-message').removeClass('hidden');
 
-        // Set the start time
-        this.startTime = new Date().getTime();
+        var self = this;
+        var n = M.d[nodeHandle] || false;
 
         // Start download and show progress
-        M.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).done(function(data) {
+        dl_queue.push({
+            id: n.h,
+            key: n.k,
+            size: n.s,
+            n: n.name,
+            nauth: n_h,
+            t: n.mtime || n.ts,
+            onDownloadProgress: function(h, p, b) {
+                self.showDownloadProgress(p, b);
+            },
+            onDownloadComplete: function(dl) {
+                // Show the download completed so they can open the file
+                self.showDownloadComplete(dl);
 
-            // Show the download completed so they can open the file
-            mobile.downloadOverlay.showDownloadComplete(data, nodeHandle);
-        })
-        .fail(function(data) {
+                if (dl.hasResumeSupport) {
+                    dlmanager.remResumeInfo(dl).dump();
+                }
+                Soon(M.resetUploadDownload);
+                $.tresizer();
+            },
+            onBeforeDownloadComplete: function(dl) {
+                if (dl.io instanceof MemoryIO) {
+                    // pretend to be a preview to omit the download attempt
+                    dl.preview = true;
+                }
+            },
+            onDownloadError: function(dl, error) {
+                if (d) {
+                    dlmanager.logger.error(error, dl);
+                }
 
-            // If over bandwidth quota
-            if (data.target.status === 509) {
-                dlmanager.showOverQuotaDialog();
-            }
-            else {
-                // Show message 'An error occurred, please try again.'
-                mobile.messageOverlay.show(l[8982]);
+                // If over bandwidth quota
+                if (error === EOVERQUOTA) {
+                    dlmanager.showOverQuotaDialog();
+                }
+                else {
+                    // Show message 'An error occurred, please try again.'
+                    mobile.messageOverlay.show(l[8982]);
+                }
+            },
+            onDownloadStart: function() {
+                self.startTime = Date.now();
             }
         });
     },
@@ -335,7 +351,7 @@ mobile.downloadOverlay = {
 
         'use strict';
 
-        var $overlay = mobile.downloadOverlay.$overlay;
+        var $overlay = this.$overlay;
         var $downloadButtonText = $overlay.find('.download-progress span');
         var $downloadProgressBar = $overlay.find('.download-progress .bar');
         var $downloadPercent = $overlay.find('.download-percents');
@@ -344,7 +360,7 @@ mobile.downloadOverlay = {
         // Calculate the download speed
         var percentCompleteRounded = Math.round(percentComplete);
         var currentTime = new Date().getTime();
-        var secondsElapsed = (currentTime - mobile.downloadOverlay.startTime) / 1000;
+        var secondsElapsed = (currentTime - this.startTime) / 1000;
         var bytesPerSecond = secondsElapsed ? bytesLoaded / secondsElapsed : 0;
         var speed = numOfBytes(bytesPerSecond);
         var speedSizeRounded = Math.round(speed.size);
@@ -363,13 +379,10 @@ mobile.downloadOverlay = {
 
     /**
      * Download complete handler, activate the Open File button and let the user download the file
-     * @param {Object} data The download data
-     * @param {String} nodeHandle The node handle for this file
+     * @param {Object} dl The download instance
      */
-    showDownloadComplete: function(data, nodeHandle) {
+    showDownloadComplete: function(dl) {
         'use strict';
-        var node = M.d[nodeHandle];
-        var isVideo = ua.details.engine !== 'Gecko' && filemime(node).startsWith('video/');
 
         var $downloadButton = this.$overlay.find('.download-progress');
         var $downloadButtonText = this.$overlay.find('.download-progress span');
@@ -377,49 +390,40 @@ mobile.downloadOverlay = {
         var $downloadSpeed = this.$overlay.find('.download-speed');
 
         // Change button text to full white and hide the download percentage and speed
-        $downloadButton.addClass('complete');
+        $downloadButton.addClass('complete').off('tap');
         $downloadPercent.text('');
         $downloadSpeed.text('');
-        $downloadButtonText.text(isVideo ? String(l[1988]).toUpperCase() : l[8949]);  // Save/Open File
 
-        // Make download button clickable
-        $downloadButton.off('tap').on('tap', function() {
+        // Store a log for statistics
+        eventlog(99637);// Downloaded file on mobile webclient
 
-            // Get the file's mime type
-            var fileName = node.name;
-            var mimeType = filemime(fileName);
+        // There are three (download-button) states for completed downloads in mobile:
+        // 1. Download completed - the download is automatically saved to disk since it was handled by the FileSystem
+        // 2. Open File - The download was handled by the MemoryIO, and it can be viewed within the browser
+        // 3. Save File - The download was handled by the MemoryIO, but due its file type it must be saved to disk.
+        var doneText = String(l[239]).toUpperCase(); // Download completed
 
-            // Store a log for statistics
-            api_req({ a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient' });
+        if (dl.io instanceof MemoryIO) {
+            var openInBrowser = dlmanager.openInBrowser(dl);
 
-            // Create object URL to download the file to the client
-            if (isVideo) {
-                M.saveAs(data.buffer, fileName).fail(function(ex) {
-                    if (d) {
-                        console.warn(ex);
-                    }
-                    location.href = mObjectURL([data.buffer], mimeType);
-                });
-            }
-            else {
-                location.href = mObjectURL([data.buffer], mimeType);
-            }
+            doneText = openInBrowser ? l[8949] : String(l[1988]).toUpperCase();  // Save/Open File
 
-            return false;
-        });
-    },
+            // Make download button clickable
+            $downloadButton.on('tap', function() {
 
-    /**
-     * Change the max file size supported for various platforms based on device testing
-     */
-    adjustMaxFileSize: function() {
+                if (openInBrowser) {
+                    dl.io.openInBrowser(dl.n);
+                }
+                else {
+                    dl.io.completed = false;
+                    dl.io.download(dl.n);
+                }
 
-        'use strict';
-
-        // If Chrome or Firefox on iOS, reduce the size to 1.3 MB
-        if (navigator.userAgent.match(/CriOS/i) || navigator.userAgent.match(/FxiOS/i)) {
-            this.maxFileSize = 1.3 * (1024 * 1024);
+                return false;
+            });
         }
+
+        $downloadButtonText.text(doneText);
     },
 
     /**
@@ -441,27 +445,30 @@ mobile.downloadOverlay = {
         $fileSizeUnsupportedMessage.addClass('hidden');
         $body.removeClass('wrong-file');
 
-        // Get the name, size, extension and whether supported
-        var fileName = node.name;
-        var fileSize = node.s;
-        var fileExtension = fileext(fileName);
-        var fileExtensionIsSupported = this.supportedFileTypes[fileExtension];
-
         // Check if the download is supported
-        if (fileSize > this.maxFileSize || !fileExtensionIsSupported) {
+        dlmanager.getMaximumDownloadSize().done(function(maxFileSize) {
+            dlmanager.getResumeInfo({id: node.h}, function(aResumeInfo) {
+                var supported = dlmanager.canSaveToDisk(node);
 
-            // Show an error overlay, remove the tap/click handler and show as greyed out
-            $body.addClass('wrong-file');
-            $openInBrowserButton.off('tap').addClass('disabled');
+                if (aResumeInfo) {
+                    maxFileSize += aResumeInfo.byteOffset;
+                    $openInBrowserButton.find('span').text(String(l[9118]).toUpperCase());
+                }
 
-            // Change error message
-            if (!fileExtensionIsSupported) {
-                $fileTypeUnsupportedMessage.removeClass('hidden');
-            }
-            else {
-                $fileSizeUnsupportedMessage.removeClass('hidden');
-            }
-        }
+                if (node.s > maxFileSize || !supported) {
+                    // Show an error overlay, remove the tap/click handler and show as greyed out
+                    $body.addClass('wrong-file');
+                    $openInBrowserButton.off('tap').addClass('disabled');
+
+                    if (!supported) {
+                        $fileTypeUnsupportedMessage.removeClass('hidden');
+                    }
+                    else {
+                        $fileSizeUnsupportedMessage.removeClass('hidden');
+                    }
+                }
+            });
+        });
     },
 
     /**

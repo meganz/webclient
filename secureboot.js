@@ -644,31 +644,29 @@ if (b_u && !is_mobile) {
     document.location = 'update.html';
 }
 
-// NB: When adding/removing languages, be sure to update all 3 objects (ln, ln2 and languages)!
-var ln = {};
-var ln2 = {};
-
-// Native language names
-ln.ar = 'العربية'; ln.br = 'Português'; ln.cn = '简体中文'; ln.ct = '中文繁體';
-ln.de = 'Deutsch'; ln.en = 'English'; ln.es = 'Español'; ln.fr = 'Français'; ln.id = 'Bahasa Indonesia';
-ln.it = 'Italiano'; ln.jp = '日本語'; ln.kr = '한국어'; ln.nl = 'Nederlands'; ln.pl = 'Polski';
-ln.ro = 'Română'; ln.ru = 'Pусский'; ln.th = 'ภาษาไทย'; ln.tl = 'Tagalog'; ln.tr = 'Türkçe';
-ln.uk = 'Українська'; ln.vi = 'Tiếng Việt';
-
-// Language names in English
-ln2.ar = 'Arabic'; ln2.br = 'Portuguese'; ln2.cn = 'Chinese'; ln2.ct = 'Traditional Chinese';
-ln2.de = 'German'; ln2.en = 'English'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.id = 'Indonesian';
-ln2.it = 'Italian'; ln2.jp = 'Japanese'; ln2.kr = 'Korean'; ln2.nl = 'Dutch'; ln2.pl = 'Polish';
-ln2.ro = 'Romanian'; ln2.ru = 'Russian'; ln2.th = 'Thai'; ln2.tl = 'Tagalog'; ln2.tr = 'Turkish';
-ln2.uk = 'Ukrainian'; ln2.vi = 'Vietnamese';
-
-// Mapping of user's browser language preference to language codes
+// Mapping of user's browser language preference to language codes and native/english names
 var languages = {
-    'ar':['ar','ar-'], 'br':['pt-br','pt'], 'cn':['zh','zh-cn'], 'ct':['zh-hk','zh-sg','zh-tw'],
-    'de':['de','de-'], 'en':['en','en-'], 'es':['es','es-'], 'fr':['fr','fr-'], 'id':['id'],
-    'it':['it','it-'], 'jp':['ja'], 'kr':['ko'], 'nl':['nl','nl-'], 'pl':['pl'],
-    'ro':['ro','ro-'], 'ru':['ru','ru-mo'], 'th':['||'], 'tl':['en-ph'], 'tr':['tr','tr-'],
-    'uk':['||'], 'vi':['vn', 'vi']
+    'ar': [['ar', 'ar-'], 'Arabic', 'العربية'],
+    'br': [['pt-br', 'pt'], 'Portuguese', 'Português'],
+    'cn': [['zh', 'zh-cn'], 'Chinese', '简体中文'],
+    'ct': [['zh-hk', 'zh-sg', 'zh-tw'], 'Traditional Chinese', '中文繁體'],
+    'de': [['de', 'de-'], 'German', 'Deutsch'],
+    'en': [['en', 'en-'], 'English', 'English'],
+    'es': [['es', 'es-'], 'Spanish', 'Español'],
+    'fr': [['fr', 'fr-'], 'French', 'Français'],
+    'id': [['id'], 'Indonesian', 'Bahasa Indonesia'],
+    'it': [['it', 'it-'], 'Italian', 'Italiano'],
+    'jp': [['ja'], 'Japanese', '日本語'],
+    'kr': [['ko'], 'Korean', '한국어'],
+    'nl': [['nl', 'nl-'], 'Dutch', 'Nederlands'],
+    'pl': [['pl'], 'Polish', 'Polski'],
+    'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
+    'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
+    'th': [['||'], 'Thai', 'ภาษาไทย'],
+    'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
+    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
+    'uk': [['||'], 'Ukrainian', 'Українська'],
+    'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
 };
 
 /**
@@ -1761,46 +1759,58 @@ else if (!b_u) {
      * @returns {String} Returns the two letter language code e.g. 'en', 'es' etc
      */
     var detectLang = function() {
+        'use strict';
 
         // Get the preferred language in their browser
-        var userLang = null;
-        var langCode = null;
-        var langCodeVariant = null;
+        var userLangs, userLang, ourLangs, k, v, j, i, u;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
         if (is_bot && locationSearchParams !== '') {
-            userLang = locationSearchParams.replace('?', '');
-			console.log('userlang',userLang);
+            userLangs = locationSearchParams.replace('?', '');
         }
         else {
             // Otherwise get the user's preferred language in their browser settings
-            userLang = (navigator.languages) ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+            userLangs = navigator.languages || navigator.language || navigator.userLanguage;
         }
 
         // If a language can't be detected, default to English
-        if (!userLang) {
+        if (!userLangs) {
             return 'en';
         }
 
-        // Lowercase it
-        userLang = userLang.toLowerCase();
-
-        // Match on language code variants e.g. 'pt-br' returns 'br'
-        /* jshint -W089 */
-        for (langCode in languages) {
-            for (langCodeVariant in languages[langCode]) {
-                if (languages[langCode][langCodeVariant] === userLang) {
-                    return langCode;
-                }
-            }
+        if (!Array.isArray(userLangs)) {
+            userLangs = [userLangs];
         }
 
-        // If no exact match supported, normalise to base language code e.g. en-gb, en-us, en-ca returns 'en'
-        /* jshint -W089 */
-        for (langCode in languages) {
-            for (langCodeVariant in languages[langCode]) {
-                if (languages[langCode][langCodeVariant].substring(0, 3) === userLang.substring(0, 3)) {
-                    return langCode;
+        for (u = 0; u < userLangs.length; u++) {
+
+            // Lowercase it
+            userLang = String(userLangs[u]).toLowerCase();
+
+            // Language mapping handling.
+            ourLangs = Object.keys(languages);
+
+            // Match on language code variants e.g. 'pt-br' returns 'br'
+            for (i = ourLangs.length; i--;) {
+                k = ourLangs[i];
+                v = languages[k][0];
+
+                for (j = v.length; j--;) {
+                    if (v[j] === userLang || v[j] === userLang.substr(0, 3)) {
+                        return k;
+                    }
+                }
+            }
+
+            // If no exact match supported, normalise to base language code e.g. en-gb, en-us, en-ca returns 'en'
+            for (i = ourLangs.length; i--;) {
+                k = ourLangs[i];
+                v = languages[k][0];
+
+                for (j = v.length; j--;) {
+                    if (v[j].substr(0, 3) === userLang.substr(0, 3)) {
+                        return k;
+                    }
                 }
             }
         }
@@ -1815,35 +1825,45 @@ else if (!b_u) {
      * @returns {String}
      */
     var getLanguageFilePath = function(language) {
+        'use strict';
 
         // If the sh1 (filename with hashes) array has been created from deploy script
-        if (typeof sh1 !== 'undefined') {
-
-            // Search the array
-            for (var i = 0, length = sh1.length; i < length; i++) {
-
-                var filePath = sh1[i];
-
-                // If the language e.g. 'en' matches part of the filename from the deploy script e.g.
-                // 'lang/en_0a8e1591149050ef1884b0c4abfbbeb759bbe9eaf062fa54e5b856fdb78e1eb3.json'
-                if (filePath.indexOf('lang/' + language) > -1) {
-                    return filePath;
-                }
-            }
-        }
-        else {
+        if (typeof sh1 === 'undefined') {
             // Otherwise return the filename.json when in Development
             return 'lang/' + language + '.json';
         }
+
+        var enLang;
+        for (var i = 0, length = sh1.length; i < length; i++) {
+            var filePath = sh1[i];
+
+            // If the language e.g. 'en' matches part of the filename from the deploy script e.g.
+            // 'lang/en_0a8e1591149050ef1884b0c4abfbbeb759bbe9eaf062fa54e5b856fdb78e1eb3.json'
+            if (filePath.indexOf('lang/' + language) > -1) {
+                return filePath;
+            }
+
+            // Catch the English language file.
+            if (filePath.indexOf('lang/en_') > -1) {
+                enLang = filePath;
+            }
+        }
+
+        console.warn('Failed to find language file for %s...', language);
+        return enLang;
     };
 
     var lang = detectLang();
     var jsl = [];
 
     // If they've already selected a language, use that
-    if ((typeof localStorage != 'undefined') && (localStorage.lang)) {
+    if (localStorage.lang) {
         if (languages[localStorage.lang]) {
             lang = localStorage.lang;
+        }
+        else {
+            console.warn('Language "%s" is no longer available...', localStorage.lang);
+            delete localStorage.lang;
         }
     }
 

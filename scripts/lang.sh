@@ -57,6 +57,10 @@ find . -type f -not -name '*_prod.json' -not -name 'lang.tar.gz' -delete
 # Extract the tar.gz file
 tar xfvz lang.tar.gz
 
+# Remove unnecessary files
+rm strings.json
+rm error.json
+
 # Add the .json files
 git add *.json
 
@@ -82,6 +86,10 @@ if [ -n "$mergeResult" ]; then
 
     # Extract the tar.gz file again
     tar xfvz lang.tar.gz
+
+    # Remove unnecessary files
+    rm strings.json
+    rm error.json
 
     # Mark conflict resolved and commit changes
     git add *.json

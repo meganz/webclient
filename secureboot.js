@@ -644,22 +644,32 @@ if (b_u && !is_mobile) {
     document.location = 'update.html';
 }
 
+// NB: When adding/removing languages, be sure to update all 3 objects (ln, ln2 and languages)!
 var ln = {};
 var ln2 = {};
 
 // Native language names
-ln.en = 'English'; ln.cn = '简体中文'; ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español';
-ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português'; ln.vi = 'Tiếng Việt';
-ln.nl = 'Nederlands'; ln.kr = '한국어'; ln.ar = 'العربية'; ln.jp = '日本語'; ln.pl = 'Polski';
-ln.ro = 'Română'; ln.tr = 'Türkçe'; ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська';
-ln.th = 'ภาษาไทย'; ln.tl = 'Tagalog';
+ln.ar = 'العربية'; ln.br = 'Português'; ln.cn = '简体中文'; ln.ct = '中文繁體';
+ln.de = 'Deutsch'; ln.en = 'English'; ln.es = 'Español'; ln.fr = 'Français'; ln.id = 'Bahasa Indonesia';
+ln.it = 'Italiano'; ln.jp = '日本語'; ln.kr = '한국어'; ln.nl = 'Nederlands'; ln.pl = 'Polski';
+ln.ro = 'Română'; ln.ru = 'Pусский'; ln.th = 'ภาษาไทย'; ln.tl = 'Tagalog'; ln.tr = 'Türkçe';
+ln.uk = 'Українська'; ln.vi = 'Tiếng Việt';
 
 // Language names in English
-ln2.en = 'English'; ln2.cn = 'Chinese'; ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish';
-ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Portuguese'; ln2.vi = 'Vietnamese';
-ln2.nl = 'Dutch'; ln2.kr = 'Korean'; ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pl = 'Polish';
-ln2.ro = 'Romanian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian';
-ln2.th = 'Thai'; ln2.tl = 'Tagalog';
+ln2.ar = 'Arabic'; ln2.br = 'Portuguese'; ln2.cn = 'Chinese'; ln2.ct = 'Traditional Chinese';
+ln2.de = 'German'; ln2.en = 'English'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.id = 'Indonesian';
+ln2.it = 'Italian'; ln2.jp = 'Japanese'; ln2.kr = 'Korean'; ln2.nl = 'Dutch'; ln2.pl = 'Polish';
+ln2.ro = 'Romanian'; ln2.ru = 'Russian'; ln2.th = 'Thai'; ln2.tl = 'Tagalog'; ln2.tr = 'Turkish';
+ln2.uk = 'Ukrainian'; ln2.vi = 'Vietnamese';
+
+// Mapping of user's browser language preference to language codes
+var languages = {
+    'ar':['ar','ar-'], 'br':['pt-br','pt'], 'cn':['zh','zh-cn'], 'ct':['zh-hk','zh-sg','zh-tw'],
+    'de':['de','de-'], 'en':['en','en-'], 'es':['es','es-'], 'fr':['fr','fr-'], 'id':['id'],
+    'it':['it','it-'], 'jp':['ja'], 'kr':['ko'], 'nl':['nl','nl-'], 'pl':['pl'],
+    'ro':['ro','ro-'], 'ru':['ru','ru-mo'], 'th':['||'], 'tl':['en-ph'], 'tr':['tr','tr-'],
+    'uk':['||'], 'vi':['vn', 'vi']
+};
 
 /**
  * Below is the asmCrypto SHA-256 library which was converted to a string so it can be run by the web worker which
@@ -1468,14 +1478,6 @@ else if (!b_u) {
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
-    var languages = {
-        'en':['en','en-'], 'es':['es','es-'], 'fr':['fr','fr-'], 'de':['de','de-'], 'it':['it','it-'],
-        'nl':['nl','nl-'], 'br':['pt-br','pt'], 'se':['sv'], 'fi':['fi'], 'pl':['pl'], 'cz':['cz','cs','cz-'],
-        'sk':['sk','sk-'], 'sl':['sl','sl-'], 'hu':['hu','hu-'], 'jp':['ja'], 'cn':['zh','zh-cn'],
-        'ct':['zh-hk','zh-sg','zh-tw'], 'kr':['ko'], 'ru':['ru','ru-mo'], 'ar':['ar','ar-'],
-        'id':['id'], 'sg':[], 'tr':['tr','tr-'], 'ro':['ro','ro-'], 'uk':['||'], 'sr':['||'], 'th':['||'],
-        'fa':['||'], 'bg':['bg'], 'tl':['en-ph'], 'vi':['vn', 'vi']
-    };
 
     if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
     if (d && !console.time) (function(c)

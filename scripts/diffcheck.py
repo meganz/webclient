@@ -334,9 +334,11 @@ def analyse_secureboot(filename, result):
     with open(filename, 'r') as f:
         contents = f.read()
 
-    match = re.search(r'(\{\sf:|\{f:\s|\{f\s:|\{\sf\s:)', contents)
+    match = re.search(r'(?:\{\sf:|\{f:\s|\{f\s:|\{\sf\s:)(?!lang)', contents)
     if match:
-        result.append('Found invalid jsl.push-like reference in secureboot...')
+        start = max(match.start() - 12, 0)
+        end = min(len(contents), match.end() + 24)
+        result.append('Found invalid jsl.push-like reference in secureboot.js -> {}...'.format(contents[start:end].strip()))
         test_fail = True
 
     return test_fail

@@ -209,7 +209,7 @@
     float: left;
 }
 .toast-close-button.qr-toast-close {
-    background-image: url(../images/mega/icons-sprite_v16.png);
+    background-image: url(../images/mega/icons-sprite_v19.png);
     background-position: -136px -206px;
     margin-top: -4px;
     margin-left: 226px;
@@ -222,9 +222,9 @@
     z-index: 9;
     margin-top: 4px;
     line-height: 16px;
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; 
+    text-overflow: ellipsis;
 }
 /* Megasync transfer */
 .toast-notification.megasync-transfer {

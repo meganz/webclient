@@ -42,6 +42,7 @@ var GenericConversationMessage = React.createClass({
                 self.props.onUpdate();
             }
         }
+
         $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
             Soon(function() {
                 if (self.isMounted()) {
@@ -49,6 +50,8 @@ var GenericConversationMessage = React.createClass({
                 }
             });
         });
+
+
     },
     componentDidMount: function() {
         var self = this;
@@ -257,7 +260,7 @@ var GenericConversationMessage = React.createClass({
     _startPreview: function(v, e) {
         var chatRoom = this.props.message.chatRoom;
         assert(M.chat, 'Not in chat.');
-        chatRoom._rebuildAttachments();
+        chatRoom._rebuildAttachmentsImmediate();
 
         slideshow(v.h, undefined, true);
         if (e) {
@@ -420,12 +423,7 @@ var GenericConversationMessage = React.createClass({
                 if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
                     textContents = textContents.substr(2, textContents.length);
 
-                    try {
-                        var attachmentMeta = JSON.parse(textContents);
-                    } catch(e) {
-                        debugger;
-                        return null;
-                    }
+                    attachmentMeta = message.getAttachmentMeta() || {};
 
                     var files = [];
 
@@ -603,18 +601,16 @@ var GenericConversationMessage = React.createClass({
 
                         if (M.chat && !message.revoked) {
                             if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-                                var src = thumbnails[v.h];
-                                message.imagesAreLoading = message.imagesAreLoading || {};
+                                var src = (previews[v.h] && (previews[v.h].poster || previews[v.h].src)) ||
+                                    chatRoom._mediaAttachmentsCache[v.h];
 
                                 if (!src) {
                                     src = M.getNodeByHandle(v.h);
 
                                     if (!src || src !== v) {
-                                        if (!v.seen && !message.imagesAreLoading[v.h]) {
-                                            message.imagesAreLoading[v.h] = 1;
+                                        if (!v.seen) {
                                             v.seen = 1;
-                                            M.v.push(v);
-                                            delay('thumbnails', fm_thumbnails, 90);
+                                            chatRoom.loadImage(v);
                                         }
                                     }
                                     src = window.noThumbURI || '';
@@ -625,18 +621,40 @@ var GenericConversationMessage = React.createClass({
 
                                 var previewable = is_image(v) || is_video(v);
                                 if (previewable) {
-                                    preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
-                                        <div className="img-overlay" onClick={self._startPreview.bind(self, v)}></div>
-                                        <div className="button overlay-button"
-                                                onClick={self._startPreview.bind(self, v)}>
-                                            <i className="huge-white-icon loupe"></i>
-                                        </div>
+                                    var thumbClass = "";
+                                    var thumbOverlay = null;
 
+                                    if (is_image(v)) {
+                                        thumbClass = thumbClass + " image";
+                                        thumbOverlay = <div className="thumb-overlay"
+                                                            onClick={self._startPreview.bind(self, v)}></div>;
+                                    }
+                                    else {
+                                        var duration = v.duration;
+                                        if (!duration) {
+                                            var mediaAttrData = MediaAttribute(v).data;
+                                            duration = mediaAttrData && mediaAttrData.playtime;
+                                            duration = duration || 0;
+                                            v.duration = duration;
+                                        }
+
+                                        thumbClass = thumbClass + " video";
+                                        thumbOverlay = <div className="thumb-overlay"
+                                                            onClick={self._startPreview.bind(self, v)}>
+                                            <div className="play-video-button"></div>
+                                            <div className="video-thumb-details">
+                                                <i className="small-icon small-play-icon"></i>
+                                                <span>{secondsToTimeShort(duration)}</span>
+                                            </div>
+                                        </div>;
+                                    }
+
+                                    preview = (src ? (<div id={v.imgId} className={"shared-link thumb " + thumbClass}>
+                                        {thumbOverlay}
                                         {dropdown}
 
                                         <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                             width="156"
-                                             height="156"
+                                             key={src === window.noThumbURI ? v.imgId : src}
                                              onClick={self._startPreview.bind(self, v)}
                                         />
                                     </div>) :  preview);

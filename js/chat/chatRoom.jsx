@@ -71,6 +71,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }
     });
 
+    this._mediaAttachmentsCache = {};
+
     self.members = {};
 
     if (type === "private") {
@@ -1278,7 +1280,7 @@ ChatRoom.prototype.truncate = function() {
     }
 };
 
-ChatRoom.prototype._rebuildAttachments = SoonFc(function() {
+ChatRoom.prototype._rebuildAttachmentsImmediate = function() {
     if (!M.chat) {
         return;
     }
@@ -1339,7 +1341,196 @@ ChatRoom.prototype._rebuildAttachments = SoonFc(function() {
 
     slideshowid && !slideshowCalled && slideshow(slideshowid, undefined, true);
 
-}, 500);
+};
+
+ChatRoom.prototype._rebuildAttachments = SoonFc(ChatRoom.prototype._rebuildAttachmentsImmediate, 300);
+
+/**
+ * Queue up a load of an image/preview (type 1) for a node.
+ *
+ * @param node {Object} MegaNode-like (.h) object
+ */
+ChatRoom.prototype.loadImage = function(node) {
+    "use strict";
+
+    var self = this;
+    self._imagesToBeLoaded = self._imagesToBeLoaded || {};
+
+    if (self._imagesToBeLoaded[node.h] || typeof self._mediaAttachmentsCache[node.h] !== 'undefined') {
+        setTimeout(function() {
+            // wait for the rendering to finish.
+            self._doneLoadingImage(node);
+        }, 350);
+        return;
+    }
+    if (preqs[node.h] || pfails[node.h] || previews[node.h]) {
+        setTimeout(function() {
+            // wait for the rendering to finish.
+            self._doneLoadingImage(node);
+        }, 350);
+        return;
+    }
+
+    self._imagesToBeLoaded[node.h] = node;
+    if (self._imagesToBeLoadedTimer) {
+        clearTimeout(self._imagesToBeLoadedTimer);
+    }
+    self._imagesToBeLoadedTimer = setTimeout(self._doLoadImages.bind(self), 300);
+};
+
+/**
+ * Internal - called when an image is loaded in previews
+ *
+ * @param node {Object} MegaNode-like object
+ * @private
+ */
+ChatRoom.prototype._doneLoadingImage = function(node) {
+    "use strict";
+
+    var self = this;
+    var imgNode = document.getElementById(node.imgId || node.h);
+
+    if (imgNode && (imgNode = imgNode.querySelector('img'))) {
+        node.seen = 2;
+        var src = (previews[node.h] && (previews[node.h].poster || previews[node.h].src)) ||
+            self._mediaAttachmentsCache[node.h];
+        if (src) {
+            imgNode.setAttribute('src', src);
+            imgNode.parentNode.parentNode.classList.add('thumb');
+            imgNode.parentNode.parentNode.classList.remove('thumb-loading');
+        }
+        else {
+            imgNode.setAttribute('src', window.noThumbURI || '');
+            imgNode.parentNode.parentNode.classList.add('thumb-failed');
+            imgNode.parentNode.parentNode.classList.remove('thumb-loading');
+        }
+    }
+};
+
+/**
+ * Called when an image starts loading from the preview servers
+ *
+ * @param node {Object} MegaNode-like object
+ * @private
+ */
+ChatRoom.prototype._startedLoadingImage = function(node) {
+    "use strict";
+
+    // to be used in the UI with the next design changes.
+    var imgNode = document.getElementById(node.imgId || node.h);
+
+    if (imgNode && (imgNode = imgNode.querySelector('img'))) {
+        imgNode.parentNode.parentNode.classList.add('thumb-loading');
+    }
+};
+
+
+/**
+ * Internal method for `_doLoadImages` that dereferences .fa_dups and returns a deduped list of nodes as an array
+ *
+ * @param imagesToBeLoaded {Object}
+ * @param origNodeHandle
+ * @returns {*[]}
+ * @private
+ */
+ChatRoom.prototype._getDedupedNodesForThumbanils = function(imagesToBeLoaded, origNodeHandle) {
+    "use strict";
+
+    var origNode = imagesToBeLoaded[origNodeHandle];
+    var nodes = [origNode];
+    if (origNode.fa_dups) {
+        nodes = nodes.concat(origNode.fa_dups);
+    }
+
+    return nodes;
+};
+
+/**
+ * Actual code that is throttled and does load a bunch of queued images
+ *
+ * @private
+ */
+ChatRoom.prototype._doLoadImages = function() {
+    "use strict";
+
+    var self = this;
+    var imagesToBeLoaded = clone(self._imagesToBeLoaded);
+    self._imagesToBeLoaded = {};
+    self._imagesLoading = self._imagesLoading || {};
+
+    var dups = {};
+    // dedup the same .fa's as in fm_thumbnails
+    for (var k in imagesToBeLoaded) {
+        var node = imagesToBeLoaded[k];
+        if (dups[node.fa]) {
+            dups[node.fa].fa_dups = dups[node.fa].fa_dups || [];
+            dups[node.fa].fa_dups.push(node);
+
+            delete imagesToBeLoaded[k];
+        }
+        else {
+            dups[node.fa] = node;
+        }
+    }
+
+    api_getfileattr(
+        imagesToBeLoaded,
+        1,
+        function(ctx, origNodeHandle, uint8arr) {
+
+            var nodes = self._getDedupedNodesForThumbanils(imagesToBeLoaded, origNodeHandle);
+
+            nodes.forEach(function(node) {
+                var nodeHandle = node.h;
+                if (uint8arr !== 0xDEAD) {
+                    if (is_image(node) && fileext(node.name) !== 'pdf' && !previews[node.h]) {
+                        previewimg(node.h, uint8arr, 'image/jpeg');
+                        preqs[node.h] = 1;
+                    }
+                    else {
+                        var blob;
+                        try {
+                            blob = new Blob([uint8arr], {type: "image/jpeg"});
+                        }
+                        catch (ex) {
+                        }
+                        if (!blob || blob.size < 25) {
+                            blob = new Blob([uint8arr.buffer], {type: "image/jpeg"});
+                        }
+
+                        self._mediaAttachmentsCache[node.h] = myURL.createObjectURL(blob);
+                    }
+                }
+                else {
+                    // not-retrievable.
+                    if (d) {
+                        console.error('Failed to load 1 thumbnail for:', nodeHandle);
+                    }
+                    self._mediaAttachmentsCache[nodeHandle] = false;
+                }
+                delete self._imagesLoading[nodeHandle];
+                self._doneLoadingImage(node);
+            });
+        },
+        function(origNodeHandle) {
+            var nodes = self._getDedupedNodesForThumbanils(imagesToBeLoaded, origNodeHandle);
+
+            nodes.forEach(function(node) {
+                var nodeHandle = node.h;
+                // not-retrievable.
+                if (d) {
+                    console.error('Failed to load 1 thumbnail for:', nodeHandle, '(errfa)');
+                }
+                self._mediaAttachmentsCache[nodeHandle] = false;
+                delete self._imagesLoading[nodeHandle];
+                self._doneLoadingImage(node);
+            });
+        }
+    );
+    Object.keys(imagesToBeLoaded).forEach(function(nodeHandle) {
+        self._startedLoadingImage(imagesToBeLoaded[nodeHandle]);
+    });
+};
 
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

@@ -23,6 +23,7 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'sent': Message.STATE.NOT_SENT,
             'deleted': false,
             'revoked': false,
+            'attachmentMeta': false,
         },
         true,
         vals
@@ -172,6 +173,46 @@ Message.getContactForMessage = function(message) {
     }
 
     return contact;
+};
+
+/**
+ * Cached attachment's extracted from the message (if such data is available)
+ *
+ * @returns {*}
+ */
+Message.prototype.getAttachmentMeta = function() {
+    "use strict";
+    var self = this;
+    if (self.attachmentMeta) {
+        return self.attachmentMeta;
+    }
+
+    var textContents = self.textContents;
+
+    if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+        if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+            textContents = textContents.substr(2, textContents.length);
+
+            try {
+                var attachmentMeta = JSON.parse(textContents);
+                self.attachmentMeta = attachmentMeta;
+                if (self.attachmentMeta.forEach) {
+                    self.attachmentMeta.forEach(function(v, k) {
+                        self.attachmentMeta[k] = new MegaNode(v);
+                    });
+                }
+                return self.attachmentMeta;
+            } catch (e) {
+                return null;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
 };
 
 Message.prototype.getState = function() {

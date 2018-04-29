@@ -2104,8 +2104,8 @@ function getID3CoverArt(entry) {
             case 'iso4':
             case 'iso5':
             case 'M4V ':
-            // case 'dash':
             case 'avc1': // JVT
+            case 'f4v ': // Adobe Flash (MPEG-4 Part 12)
                 if (videocodec === 'avc1') {
                     mime = 'video/mp4; codecs="avc1.640029';
 

@@ -792,13 +792,25 @@ var slideshowid;
         preqs[n.h] = 1;
         treq[n.h] = {fa: n.fa, k: n.k};
         var getPreview = api_getfileattr.bind(window, treq, 1, preview, eot);
+        var loadOriginal = n.s < 50 * 1048576 && is_image(n) === 1;
+        var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
 
-        if (n.s < 0x3000000 && is_image(n) === 1) {
+        if (loadOriginal) {
             M.gfsfetch(n.link || n.h, 0, -1).tryCatch(function(data) {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
-            }, slideshow_timereset);
+                previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
+            }, function() {
+                if (loadPreview) {
+                    slideshow_timereset();
+                }
+                else {
+                    getPreview();
+                }
+            });
         }
-        getPreview();
+        if (loadPreview) {
+            getPreview();
+        }
     }
 
     // start streaming a video file
@@ -996,9 +1008,17 @@ var slideshowid;
 
         // Choose img to set src for Slideshow transition effect
         var imgClass = $imgCount.attr('data-count') !== 'img1' ? 'img1' : 'img2';
+        var replacement = false;
 
         if ($imgCount.attr('data-image') === id) {
-            imgClass = $imgCount.attr('data-count');
+            replacement = $imgCount.attr('data-count');
+            if (replacement) {
+                imgClass = replacement;
+
+                if (d) {
+                    console.debug('Replacing preview image with original', id, imgClass);
+                }
+            }
         }
 
         var img = new Image();
@@ -1009,24 +1029,35 @@ var slideshowid;
                 }
                 return;
             }
-            origImgWidth = img.width;
-            origImgHeight = img.height;
+            var src = ev.type === 'error' ? noThumbURI : this.src;
+            var $img = $imgCount.find('.' + imgClass);
+
+            origImgWidth = this.naturalWidth;
+            origImgHeight = this.naturalHeight;
 
             // Apply img data to necessary image
-            $imgCount.find('img').removeClass('active').removeAttr('style');
-            $imgCount.find('.' + imgClass).attr('src', ev.type === 'error' ? noThumbURI : this.src)
-                .addClass('active');
-            $imgCount.attr('data-count', imgClass);
-            $imgCount.attr('data-image', id);
+            if (!replacement) {
+                $imgCount.find('img').removeClass('active').removeAttr('style');
+                $imgCount.attr('data-count', imgClass);
+                $imgCount.attr('data-image', id);
+                $img.attr('src', src).addClass('active');
 
-            // Set position, zoom values
-            zoom_mode = false;
-            $overlay.removeClass('zoomed');
-            $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
-            slideshow_imgPosition($overlay);
-            $(window).rebind('resize.imgResize', function() {
+                // Set position, zoom values
+                zoom_mode = false;
+                $overlay.removeClass('zoomed');
+                $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
                 slideshow_imgPosition($overlay);
-            });
+                $(window).rebind('resize.imgResize', function() {
+                    slideshow_imgPosition($overlay);
+                });
+            }
+            else if (src !== noThumbURI) {
+                $img.attr('src', src).addClass('active');
+
+                // adjust zoom percent label
+                var perc = Math.round($img.width() / origImgWidth * 100);
+                $overlay.find('.viewer-button-label.zoom').attr('data-perc', perc).text(perc + '%');
+            }
 
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');

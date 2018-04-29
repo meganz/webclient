@@ -792,13 +792,24 @@ var slideshowid;
         preqs[n.h] = 1;
         treq[n.h] = {fa: n.fa, k: n.k};
         var getPreview = api_getfileattr.bind(window, treq, 1, preview, eot);
+        var loadOriginal = n.s < 50 * 1048576 && is_image(n) === 1;
+        var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
 
-        if (n.s < 0x3000000 && is_image(n) === 1) {
+        if (loadOriginal) {
             M.gfsfetch(n.link || n.h, 0, -1).tryCatch(function(data) {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
-            }, slideshow_timereset);
+            }, function() {
+                if (loadPreview) {
+                    slideshow_timereset();
+                }
+                else {
+                    getPreview();
+                }
+            });
         }
-        getPreview();
+        if (loadPreview) {
+            getPreview();
+        }
     }
 
     // start streaming a video file
@@ -996,8 +1007,10 @@ var slideshowid;
 
         // Choose img to set src for Slideshow transition effect
         var imgClass = $imgCount.attr('data-count') !== 'img1' ? 'img1' : 'img2';
+        var original = false;
 
         if ($imgCount.attr('data-image') === id) {
+            original = true;
             imgClass = $imgCount.attr('data-count');
         }
 
@@ -1013,20 +1026,25 @@ var slideshowid;
             origImgHeight = img.height;
 
             // Apply img data to necessary image
-            $imgCount.find('img').removeClass('active').removeAttr('style');
-            $imgCount.find('.' + imgClass).attr('src', ev.type === 'error' ? noThumbURI : this.src)
-                .addClass('active');
-            $imgCount.attr('data-count', imgClass);
-            $imgCount.attr('data-image', id);
+            if (!original) {
+                $imgCount.find('img').removeClass('active').removeAttr('style');
+                $imgCount.attr('data-count', imgClass);
+                $imgCount.attr('data-image', id);
 
-            // Set position, zoom values
-            zoom_mode = false;
-            $overlay.removeClass('zoomed');
-            $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
-            slideshow_imgPosition($overlay);
-            $(window).rebind('resize.imgResize', function() {
+                // Set position, zoom values
+                zoom_mode = false;
+                $overlay.removeClass('zoomed');
+                $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
                 slideshow_imgPosition($overlay);
-            });
+                $(window).rebind('resize.imgResize', function() {
+                    slideshow_imgPosition($overlay);
+                });
+            }
+
+            var src = ev.type === 'error' ? noThumbURI : this.src;
+            if (!original || src !== noThumbURI) {
+                $imgCount.find('.' + imgClass).attr('src', src).addClass('active');
+            }
 
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');

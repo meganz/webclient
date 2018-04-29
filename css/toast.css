@@ -182,15 +182,49 @@
     -moz-box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.1);
     box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.1);
 }
+/* QR Toast */
+.toast-notification.toast-qr-code {
+    width: 480px;
+    height: 48px;
+    border-radius: 8px;
+    background-color: #777777;
+    margin-left: -240px;
+    margin-bottom: 0px;
+    padding-left: 12px;
+}
+.qr-toast-icon {
+    height: 24px;
+    width: 24px;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    border-radius: 15px;
+    float: left;
+}
+.qr-toast-text {
+    color: #FFFFFF;
+    font-size: 14px;
+    line-height: 18px;
+    margin-left: 16px;
+    margin-top: 3px;
+    float: left;
+}
+.toast-close-button.qr-toast-close {
+    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-position: -136px -206px;
+    margin-top: -4px;
+    margin-left: 226px;
+    margin-right: 0px;
+}
+/* */
 .second-line-message {
     color: #939DA3;
     font-size: 13px;
     z-index: 9;
     margin-top: 4px;
     line-height: 16px;
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; 
+    text-overflow: ellipsis;
 }
 /* Megasync transfer */
 .toast-notification.megasync-transfer {

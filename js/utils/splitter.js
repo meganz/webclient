@@ -197,6 +197,8 @@
     // jshint -W074
     // returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
     JSONSplitter.prototype.proc = function json_proc(json, inputcomplete) {
+        var node;
+        var filter;
         var callback;
 
         while (this.p < json.length) {
@@ -235,18 +237,21 @@
                 this.lastname = '';
 
                 // check if this concludes an exfiltrated object and return it if so
-                callback = this.filters[this.stack.join('')];
+                filter = this.stack.join('');
+                callback = this.filters[filter];
                 this.p++;
 
                 if (callback) {
                     // we have a filter configured for this object
                     try {
                         // pass filtrate to application and empty bucket
-                        callback.call(this.ctx,
-                            JSON.parse(
-                                this.buckets[0] + this.tostring(this.sub(json, this.lastpos, this.p - this.lastpos))
-                            )
+                        node = JSON.parse(
+                            this.buckets[0] + this.tostring(this.sub(json, this.lastpos, this.p - this.lastpos))
                         );
+                        if (filter === '[{[f2{' || filter === '{[a{{t[f2{') {
+                            node.fv = 1; // file version
+                        }
+                        callback.call(this.ctx, node);
                     }
                     catch (e) {
                         this.logger.error("Malformed JSON - parse error in filter element " + callback.name, e);

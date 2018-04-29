@@ -322,6 +322,28 @@ def reduce_htmlhint(file_line_mapping, **extra):
     return re.sub('\n+', '\n', '\n\n'.join(result).rstrip()), 1
 
 
+def analyse_secureboot(filename, result):
+    """
+    Analyses secureboot.js
+
+    :param filename: Name/path of file to analyse.
+    :return: True, if errors are found. False otherwise.
+    """
+    test_fail = False
+
+    with open(filename, 'r') as f:
+        contents = f.read()
+
+    match = re.search(r'(?:\{\sf:|\{f:\s|\{f\s:|\{\sf\s:)(?!lang)', contents)
+    if match:
+        start = max(match.start() - 12, 0)
+        end = min(len(contents), match.end() + 24)
+        result.append('Found invalid jsl.push-like reference in secureboot.js -> {}...'.format(contents[start:end].strip()))
+        test_fail = True
+
+    return test_fail
+
+
 def analyse_files_for_special_chars(filename, result):
     """
     Analyses a file for characters with unicode code >= 128.
@@ -401,7 +423,7 @@ def reduce_validator(file_line_mapping, **extra):
     """
 
     exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy', 'secureboot', 'test']
-    special_chars_exclude = ['secureboot', 'test', 'emoji']
+    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy']
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
@@ -420,6 +442,8 @@ def reduce_validator(file_line_mapping, **extra):
         if file_path in config.VALIDATOR_IGNORE_FILES:
             continue
         if any([n in file_path for n in exclude]):
+            if 'secureboot' in file_path and analyse_secureboot(file_path, result):
+                fatal += 1
             continue
 
         # Ignore this specific file types

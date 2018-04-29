@@ -140,7 +140,9 @@
                 this.doSort('status', 1);
             }
             else {
-                this.doSort('name', 1);
+                if (this.currentdirid !== 'transfers') { // IN TRANSFERS we dont want to re-order
+                    this.doSort('name', 1);
+                }
             }
 
             if (this.currentdirid === 'opc') {

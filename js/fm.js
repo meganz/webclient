@@ -282,8 +282,16 @@ function initAddDialogMultiInputPlugin() {
         onEmailCheck: function() {
             errorMsg(l[7415]);
         },
-        onDoublet: function(u) {
-            errorMsg(l[7413]);
+        onDoublet: function (u, iType) {
+            if (iType === 'opc') {
+                errorMsg(l[17545]);
+            }
+            else if (iType === 'ipc') {
+                errorMsg(l[17546]);
+            }
+            else {
+                errorMsg(l[7413]);
+            }
         },
         onHolder: function() {
             errorMsg(l[7414]);
@@ -1375,6 +1383,221 @@ function closeMsg() {
 function dialogPositioning(s) {
     $(s).css('margin-top', '-' + $(s).height() / 2 + 'px');
 }
+
+/**
+ * opens a contact link dialog, after getting all needed info from API
+ *
+ * @param {String} contactLink, user contact link, the link we want to get.
+ * @returns {null} no return value
+ */
+function openContactInfoLink(contactLink) {
+    var $dialog = $('.fm-dialog.qr-contact');
+    var QRContactDialogPrepare = function QRContactDialogPrepare(avatar, em, fullname, ctHandle) {
+        $('.qr-contact-name', $dialog).text(fullname);
+        $('.qr-contact-email', $dialog).text(em);
+        if (avatar) {
+
+            var ab = base64_to_ab(avatar);
+            var blob = new Blob([ab], { type: 'image/jpeg' });
+            $('.avatar-wrapper.avatar img', $dialog).attr('src', myURL.createObjectURL(blob))
+                .removeClass('hidden');
+        }
+        else {
+            var curAvatar = useravatar.contact(em);
+            $('.avatar-container-qr-contact', $dialog).html(curAvatar);
+        }
+        var contactStatus = 1;
+        if (ctHandle === u_handle) {
+            $('#qr-ctn-add', $dialog).addClass('disabled');
+            $('#qr-ctn-add', $dialog).off('click');
+        }
+        else if (M.u[ctHandle] && M.u[ctHandle]._data.c) {
+            contactStatus = 2;
+            $('#qr-ctn-add', $dialog).addClass('disabled');
+            $('.qr-ct-exist', $dialog).removeClass('hidden');
+            $('#qr-ctn-add', $dialog).off('click');
+        }
+        else {
+            $('.big-btn-txt', $dialog).text(l[101]);
+            $('#qr-ctn-add', $dialog).removeClass('disabled');
+            $('.qr-ct-exist', $dialog).addClass('hidden');
+            $('#qr-ctn-add', $dialog).rebind('click', function () {
+                if (contactStatus === 1) {
+                    M.inviteContact(u_attr.email, em, null, contactLink)
+                }
+                $('#qr-ctn-add', $dialog).off('click');
+                closeDialog();
+
+                return false;
+            });
+        }
+        $dialog.removeClass('hidden');
+    };
+    $dialog.find('.fm-dialog-close')
+        .rebind('click', function () {
+            closeDialog();
+            return false;
+        });
+    var req = { a: 'clg', cl: contactLink };
+    api_req(req, {
+        callback: function (res, ctx) {
+            if (typeof res === 'object') {
+                M.safeShowDialog('qr-contact', function () {
+                    QRContactDialogPrepare(res['+a'], res.e, res.fn + ' ' + res.ln, res.h);
+                    return $dialog;
+                });
+                
+            }
+        }
+    });
+}
+
+/**
+ * IFunction to open QR customization dialog.
+ * Access QR Code Dialog, can be accessed from dashboard -> QR widget, and from settings -> security
+ *
+ * @returns {null} no returned value
+ */
+function openAccessQRDialog() {
+    var $dialog = $('.fm-dialog.qr-dialog');
+
+    var QRdialogPrepare = function _QRdialogPrepare() {
+        $dialog.removeClass('hidden');
+        $dialog.removeClass('disabled');
+        if (M.account.contactLink && M.account.contactLink.length) {
+            var cutPlace = location.href.indexOf('/fm/');
+            var myHost = location.href.substr(0, cutPlace);
+            myHost += '/' + M.account.contactLink;
+            var QRoptions = {
+                width: 222,
+                height: 222,
+                correctLevel: QRErrorCorrectLevel.H,    // high
+                foreground: '#D90007',
+                text: myHost
+            };
+            $('.qr-icon-big', $dialog).text('').qrcode(QRoptions);
+            
+            
+            $('.qr-http-link', $dialog).text(myHost);
+            var curAvatar = useravatar.contact(u_handle);
+            $('.avatar-container-qr', $dialog).html(curAvatar);
+            var handleAutoAccept = function _handleAutoAccept(autoAcc) {
+                if (autoAcc === '1') {
+                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').addClass('toggle-on')
+                        .find('.dialog-feature-switch').css('marginLeft', '22px');
+                }
+                else {
+                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').removeClass('toggle-on')
+                        .find('.dialog-feature-switch').css('marginLeft', '2px');
+                }
+            };
+            mega.attr.get(u_handle, 'clv', -2, 0).done(handleAutoAccept);
+            
+        }
+    };
+
+    $dialog.find('.fm-dialog-close')
+        .rebind('click', function () {
+            closeDialog();
+            return false;
+        });
+    $dialog.find('#qr-dlg-close')
+        .rebind('click', function () {
+            closeDialog();
+            return false;
+        });
+    $dialog.find('.qr-dialog-label .dialog-feature-toggle').rebind('click', function () {
+        var me = $(this);
+        if (me.hasClass('toggle-on')) {
+            me.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function () {
+                me.removeClass('toggle-on');
+                mega.attr.set('clv', 0, -2, 0);
+            });
+        }
+        else {
+            me.find('.dialog-feature-switch').animate({ marginLeft: '22px' }, 150, 'swing', function () {
+                me.addClass('toggle-on');
+                mega.attr.set('clv', 1, -2, 0);
+            });
+        }
+    });
+    $dialog.find('.reset-qr-label')
+        .rebind('click', function () {
+            var msgTitle = l[18227]; // 'QR Code Regenerate';
+            var msgMsg = l[18228] + ' '; // 'You are about to generate a new QR code. ' +
+                // 'Your <b>existing</b> QR code and invitation link will no longer work. ';
+            var msgQuestion = l[18229]; // 'Do you want to proceed?';
+            msgDialog('confirmation', msgTitle, msgMsg,
+                msgQuestion,
+                function (regenQR) {
+                    if (regenQR) {
+                        $dialog.addClass('disabled');
+                        var delQR = {
+                            a: 'cld',
+                            cl: M.account.contactLink.substring(2, M.account.contactLink.length)
+                        };
+                        var reGenQR = { a: 'clc' };
+
+                        api_req(delQR, {
+                            callback: function (res, ctx) {
+                                if (res === 0) { // success
+                                    api_req(reGenQR, {
+                                        callback: function (res2, ctx2) {
+                                            if (typeof res2 !== 'string') {
+                                                res2 = '';
+                                            }
+                                            else {
+                                                res2 = 'C!' + res2;
+                                            }
+                                            M.account.contactLink = res2;
+                                            QRdialogPrepare();
+                                        }
+                                    });
+                                }
+                                else {
+                                    $dialog.removeClass('disabled');
+                                }
+                            }
+                        });
+                    }
+                });
+
+        });
+    if (is_extension || M.execCommandUsable()) {
+        $('#qr-dlg-cpy-lnk').removeClass('hidden');
+        $('#qr-dlg-cpy-lnk').rebind('click', function () {
+            var links = $.trim($('.qr-http-link', $dialog).text());
+            var toastTxt = l[7654];
+            copyToClipboard(links, toastTxt);
+        });
+    }
+    else {
+        $('#qr-dlg-cpy-lnk').addClass('hidden');
+    }
+    if (ua.details.browser === "Chrome") {
+        $dialog.find('#qr-dlg-sv-img').removeClass('hidden');
+        $dialog.find('#qr-dlg-sv-img').rebind('click', function () {
+            var canvasQR = $('.qr-icon-big canvas', $dialog)[0];
+            var genImageURL = canvasQR.toDataURL();
+            var link = document.createElement("a");
+
+            link.setAttribute("href", genImageURL);
+            link.setAttribute("download", M.account.contactLink);
+            //link.addClass('hidden');
+            link.click();
+        });
+    }
+    else {
+        $dialog.find('#qr-dlg-sv-img').addClass('hidden');
+    }
+
+    M.safeShowDialog('qr-dialog', function () {
+        QRdialogPrepare();
+        return $dialog;
+    });
+
+}
+
 
 
 

@@ -83,6 +83,57 @@ function dashboardUI() {
     M.accountData(function(account) {
         var perc;
 
+        // QR Code
+        var drawQRCanvas = function _drawQRCanvas() {
+            var cutPlace = location.href.indexOf('/fm/');
+            var myHost = location.href.substr(0, cutPlace);
+            myHost += '/' + M.account.contactLink;
+            if (account.contactLink && account.contactLink.length) {
+                var QRoptions = {
+                    width: 106,
+                    height: 106,
+                    correctLevel: QRErrorCorrectLevel.H,    // high
+                    foreground: '#D90007',
+                    text: myHost
+                };
+                // Render the QR code
+                $('.account.qr-icon').text('').qrcode(QRoptions);
+            }
+            else {
+                $('.account.qr-icon').text('');
+
+            }
+        };
+        drawQRCanvas();
+        
+        $('.qr-widget-w .button.access-qr').rebind('click', function () {
+            if (account.contactLink && account.contactLink.length) {
+                openAccessQRDialog();
+            }
+            else {
+                var msgTitle = l[18230]; // 'QR Code Reactivate';
+                var msgMsg = l[18231]; // 'Your QR Code is deactivated.';
+                var msgQuestion = l[18232]; // 'Do you want to reactivate your QR Code?';
+                msgDialog('confirmation', msgTitle, msgMsg,
+                    msgQuestion,
+                    function (reActivate) {
+                        if (reActivate) {
+                            var reGenQR = { a: 'clc' };
+                            api_req(reGenQR, {
+                                callback: function (res2, ctx2) {
+                                    if (typeof res2 !== 'string') {
+                                        return;
+                                    }
+                                    M.account.contactLink = 'C!' + res2;
+                                    drawQRCanvas();
+                                    openAccessQRDialog();
+                                }
+                            });
+                        }
+                    });
+            }
+        });
+
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
         $('.account.left-pane.balance-txt').safeHTML('@@ &euro; ', account.balance[0][0]);

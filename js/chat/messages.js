@@ -187,32 +187,27 @@ Message.prototype.getAttachmentMeta = function() {
         return self.attachmentMeta;
     }
 
-    var textContents = self.textContents;
+    var textContents = self.textContents || false;
 
-    if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
-        if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
-            textContents = textContents.substr(2, textContents.length);
+    if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT
+        && textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
 
-            try {
-                var attachmentMeta = JSON.parse(textContents);
-                self.attachmentMeta = attachmentMeta;
-                if (self.attachmentMeta.forEach) {
-                    self.attachmentMeta.forEach(function(v, k) {
-                        self.attachmentMeta[k] = new MegaNode(v);
-                    });
+        try {
+            self.attachmentMeta = JSON.parse(textContents.substr(2, textContents.length));
+
+            for (var i = self.attachmentMeta.length; i--;) {
+                var n = new MegaNode(self.attachmentMeta[i]);
+                if (n.fa && String(n.fa).indexOf(':8*') > 0) {
+                    Object.assign(n, MediaAttribute(n).data);
                 }
-                return self.attachmentMeta;
-            } catch (e) {
-                return null;
+                self.attachmentMeta[i] = n;
             }
         }
-        else {
-            return false;
+        catch (e) {
         }
     }
-    else {
-        return false;
-    }
+
+    return self.attachmentMeta || false;
 };
 
 Message.prototype.getState = function() {

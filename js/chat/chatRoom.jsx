@@ -71,7 +71,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }
     });
 
-    this._mediaAttachmentsCache = {};
+    this._imagesLoading = Object.create(null);
+    this._imagesToBeLoaded = Object.create(null);
+    this._mediaAttachmentsCache = Object.create(null);
 
     self.members = {};
 
@@ -1354,28 +1356,15 @@ ChatRoom.prototype.loadImage = function(node) {
     "use strict";
 
     var self = this;
-    self._imagesToBeLoaded = self._imagesToBeLoaded || {};
 
-    if (self._imagesToBeLoaded[node.h] || typeof self._mediaAttachmentsCache[node.h] !== 'undefined') {
-        setTimeout(function() {
-            // wait for the rendering to finish.
-            self._doneLoadingImage(node);
-        }, 350);
-        return;
+    if (preqs[node.h] || pfails[node.h] || self.getCachedImageURI(node)) {
+        onIdle(self._doneLoadingImage.bind(self, node));
     }
-    if (preqs[node.h] || pfails[node.h] || previews[node.h]) {
-        setTimeout(function() {
-            // wait for the rendering to finish.
-            self._doneLoadingImage(node);
-        }, 350);
-        return;
+    else if (!self._imagesLoading[node.h]) {
+        self._imagesLoading[node.h] = true;
+        self._imagesToBeLoaded[node.h] = node;
+        delay('ChatRoom:doLoadImages', self._doLoadImages.bind(self));
     }
-
-    self._imagesToBeLoaded[node.h] = node;
-    if (self._imagesToBeLoadedTimer) {
-        clearTimeout(self._imagesToBeLoadedTimer);
-    }
-    self._imagesToBeLoadedTimer = setTimeout(self._doLoadImages.bind(self), 300);
 };
 
 /**
@@ -1387,24 +1376,35 @@ ChatRoom.prototype.loadImage = function(node) {
 ChatRoom.prototype._doneLoadingImage = function(node) {
     "use strict";
 
-    var self = this;
     var imgNode = document.getElementById(node.imgId || node.h);
 
     if (imgNode && (imgNode = imgNode.querySelector('img'))) {
-        node.seen = 2;
-        var src = (previews[node.h] && (previews[node.h].poster || previews[node.h].src)) ||
-            self._mediaAttachmentsCache[node.h];
+        var src = this.getCachedImageURI(node);
+        var container = imgNode.parentNode.parentNode;
+
         if (src) {
             imgNode.setAttribute('src', src);
-            imgNode.parentNode.parentNode.classList.add('thumb');
-            imgNode.parentNode.parentNode.classList.remove('thumb-loading');
+            container.classList.add('thumb');
+            container.classList.remove('thumb-loading');
         }
         else {
-            imgNode.setAttribute('src', window.noThumbURI || '');
-            imgNode.parentNode.parentNode.classList.add('thumb-failed');
-            imgNode.parentNode.parentNode.classList.remove('thumb-loading');
+            imgNode.setAttribute('src', window.noThumbURIs || '');
+            container.classList.add('thumb-failed');
+            container.classList.remove('thumb-loading');
         }
+
+        node.seen = 2;
     }
+};
+
+/**
+ * Returns the cached Blob URI for a media resource, if any
+ * @param {Object|String} n An ufs-node or handle
+ */
+ChatRoom.prototype.getCachedImageURI = function(n) {
+    var h = n && typeof n === 'object' && n.h || n;
+
+    return this._mediaAttachmentsCache[h] || (previews[h] && (previews[h].poster || previews[h].src));
 };
 
 /**
@@ -1454,9 +1454,9 @@ ChatRoom.prototype._doLoadImages = function() {
     "use strict";
 
     var self = this;
-    var imagesToBeLoaded = clone(self._imagesToBeLoaded);
-    self._imagesToBeLoaded = {};
-    self._imagesLoading = self._imagesLoading || {};
+    var thumbToLoad = Object.create(null);
+    var imagesToBeLoaded = self._imagesToBeLoaded;
+    self._imagesToBeLoaded = Object.create(null);
 
     var dups = {};
     // dedup the same .fa's as in fm_thumbnails
@@ -1471,64 +1471,67 @@ ChatRoom.prototype._doLoadImages = function() {
         else {
             dups[node.fa] = node;
         }
+
+        if (String(node.fa).indexOf(':1*') < 0) {
+            if (String(node.fa).indexOf(':0*') > 0) {
+                if (d) {
+                    console.debug('Chat loading thumbnail for %s since it has no preview fa', node.h, node);
+                }
+                thumbToLoad[node.h] = node;
+            }
+            else if (d) {
+                console.warn('Chat cannot load image for %s since it has no suitable file attribute.', node.h, node);
+            }
+            delete imagesToBeLoaded[k];
+        }
     }
 
-    api_getfileattr(
-        imagesToBeLoaded,
-        1,
-        function(ctx, origNodeHandle, uint8arr) {
+    var chatImageParser = function(h, data) {
+        var isThumbnail = thumbToLoad[h];
+        var nodes = self._getDedupedNodesForThumbanils(isThumbnail ? thumbToLoad : imagesToBeLoaded, h);
 
-            var nodes = self._getDedupedNodesForThumbanils(imagesToBeLoaded, origNodeHandle);
+        for (var i = nodes.length; i--;) {
+            var n = nodes[i];
+            h = n.h;
 
-            nodes.forEach(function(node) {
-                var nodeHandle = node.h;
-                if (uint8arr !== 0xDEAD) {
-                    if (is_image(node) && fileext(node.name) !== 'pdf' && !previews[node.h]) {
-                        previewimg(node.h, uint8arr, 'image/jpeg');
-                        preqs[node.h] = 1;
-                    }
-                    else {
-                        var blob;
-                        try {
-                            blob = new Blob([uint8arr], {type: "image/jpeg"});
-                        }
-                        catch (ex) {
-                        }
-                        if (!blob || blob.size < 25) {
-                            blob = new Blob([uint8arr.buffer], {type: "image/jpeg"});
-                        }
-
-                        self._mediaAttachmentsCache[node.h] = myURL.createObjectURL(blob);
-                    }
+            if (data !== 0xDEAD) {
+                if (!isThumbnail && !previews[h] && is_image(n) && fileext(n.name) !== 'pdf') {
+                    preqs[h] = 1;
+                    previewimg(h, data, 'image/jpeg');
                 }
                 else {
-                    // not-retrievable.
-                    if (d) {
-                        console.error('Failed to load 1 thumbnail for:', nodeHandle);
-                    }
-                    self._mediaAttachmentsCache[nodeHandle] = false;
+                    self._mediaAttachmentsCache[h] = mObjectURL([data.buffer || data], 'image/jpeg');
                 }
-                delete self._imagesLoading[nodeHandle];
-                self._doneLoadingImage(node);
-            });
-        },
-        function(origNodeHandle) {
-            var nodes = self._getDedupedNodesForThumbanils(imagesToBeLoaded, origNodeHandle);
-
-            nodes.forEach(function(node) {
-                var nodeHandle = node.h;
-                // not-retrievable.
+            }
+            else {
                 if (d) {
-                    console.error('Failed to load 1 thumbnail for:', nodeHandle, '(errfa)');
+                    console.error('Failed to load image for %s', h);
                 }
-                self._mediaAttachmentsCache[nodeHandle] = false;
-                delete self._imagesLoading[nodeHandle];
-                self._doneLoadingImage(node);
-            });
+                self._mediaAttachmentsCache[h] = false;
+            }
+            delete self._imagesLoading[h];
+            self._doneLoadingImage(n);
         }
-    );
-    Object.keys(imagesToBeLoaded).forEach(function(nodeHandle) {
-        self._startedLoadingImage(imagesToBeLoaded[nodeHandle]);
+    };
+
+    var onSuccess = function(ctx, origNodeHandle, data) {
+        chatImageParser(origNodeHandle, data);
+    };
+
+    var onError = function(origNodeHandle) {
+        chatImageParser(origNodeHandle, 0xDEAD);
+    };
+
+    api_getfileattr(imagesToBeLoaded, 1, onSuccess, onError);
+
+    if ($.len(thumbToLoad)) {
+        api_getfileattr(thumbToLoad, 0, onSuccess, onError);
+    }
+
+    [imagesToBeLoaded, thumbToLoad].forEach(function(obj) {
+        Object.keys(obj).forEach(function(handle) {
+            self._startedLoadingImage(obj[handle]);
+        });
     });
 };
 

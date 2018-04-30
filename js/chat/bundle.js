@@ -9824,6 +9824,9 @@ React.makeElement = React['createElement'];
 	        assert(M.chat, 'Not in chat.');
 	        chatRoom._rebuildAttachmentsImmediate();
 
+	        if (is_video(v)) {
+	            $.autoplay = v.h;
+	        }
 	        slideshow(v.h, undefined, true);
 	        if (e) {
 	            e.preventDefault();
@@ -9947,13 +9950,11 @@ React.makeElement = React['createElement'];
 	                displayName = contact;
 	            }
 
-	            var textContents = message.textContents;
+	            var textContents = message.textContents || false;
 
-	            if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
-	                if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
-	                    textContents = textContents.substr(2, textContents.length);
-
-	                    attachmentMeta = message.getAttachmentMeta() || {};
+	            if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+	                if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+	                    attachmentMeta = message.getAttachmentMeta() || [];
 
 	                    var files = [];
 
@@ -10119,17 +10120,11 @@ React.makeElement = React['createElement'];
 
 	                        if (M.chat && !message.revoked) {
 	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-	                                var src = previews[v.h] && (previews[v.h].poster || previews[v.h].src) || chatRoom._mediaAttachmentsCache[v.h];
+	                                var src = chatRoom.getCachedImageURI(v);
 
 	                                if (!src) {
-	                                    src = M.getNodeByHandle(v.h);
-
-	                                    if (!src || src !== v) {
-	                                        if (!v.seen) {
-	                                            v.seen = 1;
-	                                            chatRoom.loadImage(v);
-	                                        }
-	                                    }
+	                                    v.seen = 1;
+	                                    chatRoom.loadImage(v);
 	                                    src = window.noThumbURI || '';
 	                                }
 	                                if (!v.imgId) {
@@ -10146,14 +10141,6 @@ React.makeElement = React['createElement'];
 	                                        thumbOverlay = React.makeElement('div', { className: 'thumb-overlay',
 	                                            onClick: self._startPreview.bind(self, v) });
 	                                    } else {
-	                                        var duration = v.duration;
-	                                        if (!duration) {
-	                                            var mediaAttrData = MediaAttribute(v).data;
-	                                            duration = mediaAttrData && mediaAttrData.playtime;
-	                                            duration = duration || 0;
-	                                            v.duration = duration;
-	                                        }
-
 	                                        thumbClass = thumbClass + " video";
 	                                        thumbOverlay = React.makeElement(
 	                                            'div',
@@ -10167,7 +10154,7 @@ React.makeElement = React['createElement'];
 	                                                React.makeElement(
 	                                                    'span',
 	                                                    null,
-	                                                    secondsToTimeShort(duration)
+	                                                    secondsToTimeShort(v.playtime || -1)
 	                                                )
 	                                            )
 	                                        );
@@ -10247,7 +10234,7 @@ React.makeElement = React['createElement'];
 	                            spinnerElement
 	                        )
 	                    );
-	                } else if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
+	                } else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
 	                    textContents = textContents.substr(2, textContents.length);
 
 	                    try {
@@ -10449,7 +10436,7 @@ React.makeElement = React['createElement'];
 	                            spinnerElement
 	                        )
 	                    );
-	                } else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+	                } else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
 
 	                    return null;
 	                } else {
@@ -11252,6 +11239,8 @@ React.makeElement = React['createElement'];
 
 	"use strict";
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 	var utils = __webpack_require__(29);
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(11);
@@ -11307,7 +11296,9 @@ React.makeElement = React['createElement'];
 	        }
 	    });
 
-	    this._mediaAttachmentsCache = {};
+	    this._imagesLoading = Object.create(null);
+	    this._imagesToBeLoaded = Object.create(null);
+	    this._mediaAttachmentsCache = Object.create(null);
 
 	    self.members = {};
 
@@ -12277,49 +12268,43 @@ React.makeElement = React['createElement'];
 	    "use strict";
 
 	    var self = this;
-	    self._imagesToBeLoaded = self._imagesToBeLoaded || {};
 
-	    if (self._imagesToBeLoaded[node.h] || typeof self._mediaAttachmentsCache[node.h] !== 'undefined') {
-	        setTimeout(function () {
-
-	            self._doneLoadingImage(node);
-	        }, 350);
-	        return;
+	    if (preqs[node.h] || pfails[node.h] || self.getCachedImageURI(node)) {
+	        onIdle(self._doneLoadingImage.bind(self, node));
+	    } else if (!self._imagesLoading[node.h]) {
+	        self._imagesLoading[node.h] = true;
+	        self._imagesToBeLoaded[node.h] = node;
+	        delay('ChatRoom:doLoadImages', self._doLoadImages.bind(self));
 	    }
-	    if (preqs[node.h] || pfails[node.h] || previews[node.h]) {
-	        setTimeout(function () {
-
-	            self._doneLoadingImage(node);
-	        }, 350);
-	        return;
-	    }
-
-	    self._imagesToBeLoaded[node.h] = node;
-	    if (self._imagesToBeLoadedTimer) {
-	        clearTimeout(self._imagesToBeLoadedTimer);
-	    }
-	    self._imagesToBeLoadedTimer = setTimeout(self._doLoadImages.bind(self), 300);
 	};
 
 	ChatRoom.prototype._doneLoadingImage = function (node) {
 	    "use strict";
 
-	    var self = this;
 	    var imgNode = document.getElementById(node.imgId || node.h);
 
 	    if (imgNode && (imgNode = imgNode.querySelector('img'))) {
-	        node.seen = 2;
-	        var src = previews[node.h] && (previews[node.h].poster || previews[node.h].src) || self._mediaAttachmentsCache[node.h];
+	        var src = this.getCachedImageURI(node);
+	        var container = imgNode.parentNode.parentNode;
+
 	        if (src) {
 	            imgNode.setAttribute('src', src);
-	            imgNode.parentNode.parentNode.classList.add('thumb');
-	            imgNode.parentNode.parentNode.classList.remove('thumb-loading');
+	            container.classList.add('thumb');
+	            container.classList.remove('thumb-loading');
 	        } else {
-	            imgNode.setAttribute('src', window.noThumbURI || '');
-	            imgNode.parentNode.parentNode.classList.add('thumb-failed');
-	            imgNode.parentNode.parentNode.classList.remove('thumb-loading');
+	            imgNode.setAttribute('src', window.noThumbURIs || '');
+	            container.classList.add('thumb-failed');
+	            container.classList.remove('thumb-loading');
 	        }
+
+	        node.seen = 2;
 	    }
+	};
+
+	ChatRoom.prototype.getCachedImageURI = function (n) {
+	    var h = n && (typeof n === "undefined" ? "undefined" : _typeof(n)) === 'object' && n.h || n;
+
+	    return this._mediaAttachmentsCache[h] || previews[h] && (previews[h].poster || previews[h].src);
 	};
 
 	ChatRoom.prototype._startedLoadingImage = function (node) {
@@ -12348,9 +12333,9 @@ React.makeElement = React['createElement'];
 	    "use strict";
 
 	    var self = this;
-	    var imagesToBeLoaded = clone(self._imagesToBeLoaded);
-	    self._imagesToBeLoaded = {};
-	    self._imagesLoading = self._imagesLoading || {};
+	    var thumbToLoad = Object.create(null);
+	    var imagesToBeLoaded = self._imagesToBeLoaded;
+	    self._imagesToBeLoaded = Object.create(null);
 
 	    var dups = {};
 
@@ -12364,55 +12349,64 @@ React.makeElement = React['createElement'];
 	        } else {
 	            dups[node.fa] = node;
 	        }
+
+	        if (String(node.fa).indexOf(':1*') < 0) {
+	            if (String(node.fa).indexOf(':0*') > 0) {
+	                if (d) {
+	                    console.debug('Chat loading thumbnail for %s since it has no preview fa', node.h, node);
+	                }
+	                thumbToLoad[node.h] = node;
+	            } else if (d) {
+	                console.warn('Chat cannot load image for %s since it has no suitable file attribute.', node.h, node);
+	            }
+	            delete imagesToBeLoaded[k];
+	        }
 	    }
 
-	    api_getfileattr(imagesToBeLoaded, 1, function (ctx, origNodeHandle, uint8arr) {
+	    var chatImageParser = function chatImageParser(h, data) {
+	        var isThumbnail = thumbToLoad[h];
+	        var nodes = self._getDedupedNodesForThumbanils(isThumbnail ? thumbToLoad : imagesToBeLoaded, h);
 
-	        var nodes = self._getDedupedNodesForThumbanils(imagesToBeLoaded, origNodeHandle);
+	        for (var i = nodes.length; i--;) {
+	            var n = nodes[i];
+	            h = n.h;
 
-	        nodes.forEach(function (node) {
-	            var nodeHandle = node.h;
-	            if (uint8arr !== 0xDEAD) {
-	                if (is_image(node) && fileext(node.name) !== 'pdf' && !previews[node.h]) {
-	                    previewimg(node.h, uint8arr, 'image/jpeg');
-	                    preqs[node.h] = 1;
+	            if (data !== 0xDEAD) {
+	                if (!isThumbnail && !previews[h] && is_image(n) && fileext(n.name) !== 'pdf') {
+	                    preqs[h] = 1;
+	                    previewimg(h, data, 'image/jpeg');
 	                } else {
-	                    var blob;
-	                    try {
-	                        blob = new Blob([uint8arr], { type: "image/jpeg" });
-	                    } catch (ex) {}
-	                    if (!blob || blob.size < 25) {
-	                        blob = new Blob([uint8arr.buffer], { type: "image/jpeg" });
-	                    }
-
-	                    self._mediaAttachmentsCache[node.h] = myURL.createObjectURL(blob);
+	                    self._mediaAttachmentsCache[h] = mObjectURL([data.buffer || data], 'image/jpeg');
 	                }
 	            } else {
-
 	                if (d) {
-	                    console.error('Failed to load 1 thumbnail for:', nodeHandle);
+	                    console.error('Failed to load image for %s', h);
 	                }
-	                self._mediaAttachmentsCache[nodeHandle] = false;
+	                self._mediaAttachmentsCache[h] = false;
 	            }
-	            delete self._imagesLoading[nodeHandle];
-	            self._doneLoadingImage(node);
-	        });
-	    }, function (origNodeHandle) {
-	        var nodes = self._getDedupedNodesForThumbanils(imagesToBeLoaded, origNodeHandle);
+	            delete self._imagesLoading[h];
+	            self._doneLoadingImage(n);
+	        }
+	    };
 
-	        nodes.forEach(function (node) {
-	            var nodeHandle = node.h;
+	    var onSuccess = function onSuccess(ctx, origNodeHandle, data) {
+	        chatImageParser(origNodeHandle, data);
+	    };
 
-	            if (d) {
-	                console.error('Failed to load 1 thumbnail for:', nodeHandle, '(errfa)');
-	            }
-	            self._mediaAttachmentsCache[nodeHandle] = false;
-	            delete self._imagesLoading[nodeHandle];
-	            self._doneLoadingImage(node);
+	    var onError = function onError(origNodeHandle) {
+	        chatImageParser(origNodeHandle, 0xDEAD);
+	    };
+
+	    api_getfileattr(imagesToBeLoaded, 1, onSuccess, onError);
+
+	    if ($.len(thumbToLoad)) {
+	        api_getfileattr(thumbToLoad, 0, onSuccess, onError);
+	    }
+
+	    [imagesToBeLoaded, thumbToLoad].forEach(function (obj) {
+	        Object.keys(obj).forEach(function (handle) {
+	            self._startedLoadingImage(obj[handle]);
 	        });
-	    });
-	    Object.keys(imagesToBeLoaded).forEach(function (nodeHandle) {
-	        self._startedLoadingImage(imagesToBeLoaded[nodeHandle]);
 	    });
 	};
 

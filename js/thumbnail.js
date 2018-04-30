@@ -52,7 +52,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     img.aes = aes;
     img.onload = tryCatch(function() {
         var t = new Date().getTime();
-        var n = M.d[node];
+        var n = M.getNodeByHandle(node);
         var fa = '' + (n && n.fa);
         var ph = Object(storedattr[id]).$ph;
         var dataURI;

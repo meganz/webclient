@@ -251,10 +251,6 @@ function getImage(node, type, raw) {
     'use strict';
     var entry = Object(node).h + '!' + (type |= 0) + '.' + (raw |= 0);
 
-    if (!(node instanceof MegaNode)) {
-        return Promise.reject(EARGS);
-    }
-
     if (!type && thumbnails[node.h] && !raw) {
         return Promise.resolve(thumbnails[node.h]);
     }
@@ -291,14 +287,15 @@ function getImage(node, type, raw) {
  * Store file attribute image
  * @param {MegaNode} n The node to set associated image
  * @param {ArrayBuffer} ab The binary data holding the image
+ * @param {*} [options]
  */
-function setImage(n, ab) {
+function setImage(n, ab, options) {
     'use strict';
     var aes = new sjcl.cipher.aes([
         n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]
     ]);
     var ph = !n.u || n.u !== u_handle ? n.ph : null;
-    createnodethumbnail(n.h, aes, n.h, ab, false, ph);
+    createnodethumbnail(n.h, aes, n.h, ab, options || false, ph);
 }
 
 /**

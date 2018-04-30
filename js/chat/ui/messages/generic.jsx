@@ -262,6 +262,9 @@ var GenericConversationMessage = React.createClass({
         assert(M.chat, 'Not in chat.');
         chatRoom._rebuildAttachmentsImmediate();
 
+        if (is_video(v)) {
+            $.autoplay = v.h;
+        }
         slideshow(v.h, undefined, true);
         if (e) {
             e.preventDefault();
@@ -417,13 +420,11 @@ var GenericConversationMessage = React.createClass({
                 displayName = contact;
             }
 
-            var textContents = message.textContents;
+            var textContents = message.textContents || false;
 
-            if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
-                if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
-                    textContents = textContents.substr(2, textContents.length);
-
-                    attachmentMeta = message.getAttachmentMeta() || {};
+            if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+                if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+                    attachmentMeta = message.getAttachmentMeta() || [];
 
                     var files = [];
 
@@ -601,18 +602,11 @@ var GenericConversationMessage = React.createClass({
 
                         if (M.chat && !message.revoked) {
                             if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-                                var src = (previews[v.h] && (previews[v.h].poster || previews[v.h].src)) ||
-                                    chatRoom._mediaAttachmentsCache[v.h];
+                                var src = chatRoom.getCachedImageURI(v);
 
                                 if (!src) {
-                                    src = M.getNodeByHandle(v.h);
-
-                                    if (!src || src !== v) {
-                                        if (!v.seen) {
-                                            v.seen = 1;
-                                            chatRoom.loadImage(v);
-                                        }
-                                    }
+                                    v.seen = 1;
+                                    chatRoom.loadImage(v);
                                     src = window.noThumbURI || '';
                                 }
                                 if (!v.imgId) {
@@ -630,21 +624,13 @@ var GenericConversationMessage = React.createClass({
                                                             onClick={self._startPreview.bind(self, v)}></div>;
                                     }
                                     else {
-                                        var duration = v.duration;
-                                        if (!duration) {
-                                            var mediaAttrData = MediaAttribute(v).data;
-                                            duration = mediaAttrData && mediaAttrData.playtime;
-                                            duration = duration || 0;
-                                            v.duration = duration;
-                                        }
-
                                         thumbClass = thumbClass + " video";
                                         thumbOverlay = <div className="thumb-overlay"
                                                             onClick={self._startPreview.bind(self, v)}>
                                             <div className="play-video-button"></div>
                                             <div className="video-thumb-details">
                                                 <i className="small-icon small-play-icon"></i>
-                                                <span>{secondsToTimeShort(duration)}</span>
+                                                <span>{secondsToTimeShort(v.playtime || -1)}</span>
                                             </div>
                                         </div>;
                                     }
@@ -708,7 +694,7 @@ var GenericConversationMessage = React.createClass({
                         </div>
                     </div>;
                 }
-                else if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
+                else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
                     textContents = textContents.substr(2, textContents.length);
 
                     try {
@@ -904,8 +890,7 @@ var GenericConversationMessage = React.createClass({
                         </div>
                     </div>;
                 }
-                else if (textContents.substr &&
-                 textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+                else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
                     // don't show anything if this is a 'revoke' message
                     return null;
                 }

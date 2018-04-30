@@ -343,7 +343,7 @@ function init_page() {
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
         var ctLink = page.substring(2, page.length);
-        mBroadcaster.once('boot_done', function () {            
+        mBroadcaster.once('fm:initialized', function () {
             openContactInfoLink(ctLink);
         });
         

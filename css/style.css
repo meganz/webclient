@@ -22101,7 +22101,6 @@ opacity: 1;
     width: 640px;
     margin: -275px 0 0 -320px;
 }
-
 .fm-widget-illustration {
     width: 560px;
     height: 300px;
@@ -22112,10 +22111,10 @@ opacity: 1;
 }
 .fm-dialog .fm-widget-introduction, .fm-dialog .fm-widget-manage {
     /* The public upload wi: */
-    font-family: "source_sans_prolight", sans-serif;
+    font-family: "source_sans_prosemibold", sans-serif;
     font-weight: lighter;
     font-size: 21px;
-    color: #333;
+    color: #777;
     letter-spacing: 0;
     line-height: 28px;
     width: 556px;
@@ -22123,8 +22122,15 @@ opacity: 1;
     margin: 20px auto 12px;
 }
 .fm-dialog.widget-dialog {
-    width: 640px;
-    margin: -305px 0 0 -320px;
+    width: 690px;
+    margin: -185px 0 0 -345px;
+}
+.fm-dialog.widget-dialog.centre {
+    margin: -280px 0 0 -345px;
+}
+.fm-dialog.widget-dialog .fm-notifications-bottom {
+    border-top: none;
+    background-color: #fafafa;
 }
 .fm-dialog.manage-widget {
     width: 600px;
@@ -22507,9 +22513,6 @@ opacity: 1;
 }
 .widget-dialog .close-button{
     min-width: 100px;
-}
-.widget-dialog .wrapper {
-    min-height: 120px;
 }
 .widget-card .fm-dialog-tab {
     height: 36px;
@@ -23088,7 +23091,7 @@ opacity: 1;
     padding-top: 16px;
 }
 .widget-dialog .fm-dialog-block {
-    margin: 24px 0 12px 0;
+    margin: 24px 0 0 0;
 }
 
 .widget-dialog .fm-block-subheading {
@@ -23102,6 +23105,7 @@ opacity: 1;
     background-color: #fff;
     border: 1px solid #ddd;
     box-sizing:border-box;
+    border-radius: 2px; 
 }
 
 .widget-dialog .embed-block {

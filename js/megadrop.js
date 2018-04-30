@@ -1398,8 +1398,8 @@ mega.megadrop = (function() {
             var link = getBaseUrl() + '/drop#!' + pupHandle + '!' + theme + '!' + lang;
 
             var source = code
-                .replace('%w', width > 0 ? width : 300)
-                .replace('%h', height > 0 ? height : 100)
+                .replace('%w', width > 0 ? width : 180)
+                .replace('%h', height > 0 ? height : 44)
                 .replace('%s', link);
             source = source.replace('/[\t\n\s]+/g', '');// Minimize
 
@@ -1458,6 +1458,7 @@ mega.megadrop = (function() {
                     .find('span').safeHTML(l[17408]);
                 uiOpts.dlg.widget.$.embedForm.removeClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.addClass('hidden');
+               $('.widget-dialog').addClass('centre');
             });
 
             // Widget dialog url tab
@@ -1470,6 +1471,7 @@ mega.megadrop = (function() {
                     .find('span').safeHTML(l[17835]);
                 uiOpts.dlg.widget.$.embedForm.addClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.removeClass('hidden');
+                $('.widget-dialog').removeClass('centre');
             });
 
             // Widget dialog light theme

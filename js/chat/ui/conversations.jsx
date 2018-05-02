@@ -88,7 +88,7 @@ var ConversationsListItem = React.createClass({
                 renderableSummary = lastMessage.renderableSummary;
             }
             else {
-                renderableSummary = htmlentities(lastMessage.textContents);
+                renderableSummary = lastMessage.textContents ? removeHTML(lastMessage.textContents, true) : "";
 
                 if (lastMessage.isManagement && lastMessage.isManagement()) {
                     renderableSummary = lastMessage.getManagementMessageSummaryText();

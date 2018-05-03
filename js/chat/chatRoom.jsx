@@ -1363,7 +1363,7 @@ ChatRoom.prototype.loadImage = function(node) {
     else if (!self._imagesLoading[node.h]) {
         self._imagesLoading[node.h] = true;
         self._imagesToBeLoaded[node.h] = node;
-        delay('ChatRoom:doLoadImages', self._doLoadImages.bind(self));
+        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self));
     }
 };
 
@@ -1394,6 +1394,17 @@ ChatRoom.prototype._doneLoadingImage = function(node) {
         }
 
         node.seen = 2;
+    }
+
+    // trigger React DOM update if needed, by notifying the message there is data that changed.
+    var self = this;
+    if (self.attachments[node.h]) {
+        self.attachments[node.h].keys().forEach(function(foundInMessageId) {
+            var msg = self.messagesBuff.messages[foundInMessageId];
+            if (msg) {
+                msg.trackDataChange();
+            }
+        });
     }
 };
 

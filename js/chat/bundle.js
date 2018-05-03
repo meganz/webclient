@@ -12273,7 +12273,7 @@ React.makeElement = React['createElement'];
 	    } else if (!self._imagesLoading[node.h]) {
 	        self._imagesLoading[node.h] = true;
 	        self._imagesToBeLoaded[node.h] = node;
-	        delay('ChatRoom:doLoadImages', self._doLoadImages.bind(self));
+	        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self));
 	    }
 	};
 
@@ -12297,6 +12297,16 @@ React.makeElement = React['createElement'];
 	        }
 
 	        node.seen = 2;
+	    }
+
+	    var self = this;
+	    if (self.attachments[node.h]) {
+	        self.attachments[node.h].keys().forEach(function (foundInMessageId) {
+	            var msg = self.messagesBuff.messages[foundInMessageId];
+	            if (msg) {
+	                msg.trackDataChange();
+	            }
+	        });
 	    }
 	};
 

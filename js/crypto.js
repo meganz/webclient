@@ -338,6 +338,7 @@ function api_reset() {
     // active view's SC interface (chunked mode)
     api_init(2, 'sc', { '{[a{'      : sc_packet,     // SC command
                         '{[a{{t[f{' : sc_node,       // SC node
+                        '{[a{{t[f2{': sc_node,       // SC node (versioned)
                         '{'         : sc_residue,    // SC residue
                         '#'         : api_esplit }); // numeric error code
 
@@ -348,6 +349,7 @@ function api_reset() {
     // active view's initial tree fetch (chunked mode)
     api_init(4, 'cs', { '[{[ok0{' : tree_ok0,        // tree shareownerkey
                         '[{[f{'   : tree_node,       // tree node
+                        '[{[f2{'  : tree_node,       // tree node (versioned)
                         '['       : tree_residue,    // tree residue
                         '#'       : api_esplit });   // numeric error code
 }
@@ -738,7 +740,7 @@ function api_send(q) {
     }
 
     if (logger) {
-        logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
+        logger.debug("Sending API request: " + q.rawreq + " to " + String(q.url).replace(/sid=[\w-]+/, 'sid=\u2026'));
     }
 
     // reset number of bytes received and response size

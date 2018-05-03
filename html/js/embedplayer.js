@@ -56,8 +56,9 @@ function init_embed(ph, key, g) {
     if (typeof g === 'object' && typeof g.at === 'string') {
         var akey = base64_to_a32(String(key).trim()).slice(0, 8);
         if (akey.length === 8) {
-            var a = dec_attr(base64_to_ab(g.at), akey);
-            node = a && new MegaNode({h: ph, ph: ph, s: g.s, k: akey, fa: g.fa, name: a.n, link: ph + '!' + key});
+            var n = {h: ph, ph: ph, s: g.s, a: g.at, fa: g.fa, link: ph + '!' + key};
+            crypto_procattr(n, akey);
+            node = n.name && new MegaNode(n);
         }
     }
 
@@ -442,7 +443,49 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
 function pagemetadata() {
     'use strict';
-    $('meta[name=description]').remove();
-    $('head').append('<meta name="description" content="' + String(mega.whoami).replace(/[<">]/g, '') + '">');
-    document.title = 'MEGA' + (ep_node ? ' - ' + ep_node.name : '');
+
+    var filter = function(s) {
+        return String(s).replace(/[<">]/g, '');
+    };
+
+    var append = function(p, c, k) {
+        p = filter(p);
+        k = k || 'property';
+        $('meta[' + k + '="' + p + '"]').remove();
+        $('head').append('<meta ' + k + '="' + p + '" content="' + filter(c) + '">');
+    };
+
+    append('description', mega.whoami, 'name');
+
+    if (ep_node) {
+        var url = getBaseUrl() + '/embed#!' + ep_node.link;
+        var data = MediaAttribute(ep_node).data;
+
+        if (data) {
+            append('og:duration', data.playtime);
+
+            if (data.width) {
+                append('og:type', 'video.other');
+                append('og:video', url);
+                append('og:video:secure_url', url);
+                append('og:video:type', 'video/mp4');
+                append('og:video:width', data.width);
+                append('og:video:height', data.height);
+                append('video:duration', data.playtime);
+            }
+        }
+
+        if (ep_node.mtime) {
+            append('date', (new Date(ep_node.mtime * 1000)).toISOString(), 'name');
+        }
+
+        var title = 'MEGA - ' + ep_node.name;
+        document.title = title;
+        append('og:url', url);
+        append('og:title', title);
+        append('keywords', title.split(/\W+/).filter(String).sort().join(',').toLowerCase(), 'name');
+    }
+    else {
+        document.title = 'MEGA';
+    }
 }

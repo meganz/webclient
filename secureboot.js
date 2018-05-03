@@ -32,9 +32,13 @@ if (typeof process !== 'undefined') {
         // localStorage.jj = 1;
     }
 }
+
+var tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_embed = location.pathname === '/embed' || getCleanSitePath().substr(0, 2) === 'E!';
-var is_karma = !is_embed && /^localhost:987[6-9]/.test(window.top.location.host);
+var is_embed = location.pathname === '/embed' || tmp.substr(0, 2) === 'E!';
+var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
+var is_iframed = is_embed || is_drop;
+var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&
     document.location.host === 'mega' || document.location.protocol === 'mega:';
 var location_sub = document.location.href.substr(0, 16);
@@ -103,7 +107,7 @@ function getCleanSitePath(path) {
 function isPublicLink(page) {
     page = mURIDecode(page).replace(/^[/#]+/, '');
 
-    var types = {'F!': 1, 'P!': 1, 'E!': 1};
+    var types = {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1};
     return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
 }
 
@@ -644,22 +648,18 @@ var ln = {};
 var ln2 = {};
 
 // Native language names
-ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español';
+ln.en = 'English'; ln.cn = '简体中文'; ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español';
 ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português'; ln.vi = 'Tiếng Việt';
-ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語';
-ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi';
-ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';
-ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски';
-ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارسی '; ln.tl = 'Tagalog';
+ln.nl = 'Nederlands'; ln.kr = '한국어'; ln.ar = 'العربية'; ln.jp = '日本語'; ln.pl = 'Polski';
+ln.ro = 'Română'; ln.tr = 'Türkçe'; ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська';
+ln.th = 'ภาษาไทย'; ln.tl = 'Tagalog';
 
 // Language names in English
-ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish';
+ln2.en = 'English'; ln2.cn = 'Chinese'; ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish';
 ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Portuguese'; ln2.vi = 'Vietnamese';
-ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese';
-ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish';
-ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish';
-ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian';
-ln2.fa = 'Farsi'; ln2.tl = 'Tagalog';
+ln2.nl = 'Dutch'; ln2.kr = 'Korean'; ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pl = 'Polish';
+ln2.ro = 'Romanian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian';
+ln2.th = 'Thai'; ln2.tl = 'Tagalog';
 
 /**
  * Below is the asmCrypto SHA-256 library which was converted to a string so it can be run by the web worker which
@@ -1560,7 +1560,7 @@ else if (!b_u) {
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
-            dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : '') + dump.m.replace(/\s+/g, ' ');
+            dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : is_drop ? '[drop] ' : '') + dump.m.replace(/\s+/g, ' ');
 
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
@@ -2172,21 +2172,29 @@ else if (!b_u) {
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
     }
 
-    jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
-    jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
+    if (is_drop) {
+        u_checked = true;
+        jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        jsl.push({f:'html/js/embeddrop.js', n: 'embeddrop_js', j: 1, w: 4});
+        jsl.push({f:'css/embeddrop.css', n: 'embeddrop_css', j: 2, w: 5});
+    }
+    else {
+        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
+        jsl.push({f:'js/vendor/asmcrypto.js', n: 'asmcrypto_js', j: 1, w: 5});
 
-    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
-        jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
+        if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
+            jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j: 1});
+        }
     }
 
     // only used on beta
     if (onBetaW) {
-        jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+        jsl.push({f:'js/betacrashes.js', n: 'betacrashes_js', j: 1});
     }
 
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
         is_chrome_firefox |= 4;
-        jsl.push({f: 'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
+        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
     }
 
     var jsl2 =
@@ -2203,7 +2211,6 @@ else if (!b_u) {
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'network_js': {f:'js/network-testing.js', n: 'network_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
         'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
@@ -2367,7 +2374,7 @@ else if (!b_u) {
     }
 	if (page == 'megacmd') page = 'cmd';
 
-    if (page && !is_embed)
+    if (page && !is_iframed)
     {
         for (var p in subpages)
         {
@@ -2893,10 +2900,10 @@ else if (!b_u) {
             '    </div>'+
             '</div>';
 
-    if (is_embed) {
+    if (is_iframed) {
         try {
             document.body.textContent = '';
-            document.body.style.background = '#000';
+            document.body.style.background = is_drop ? '#fff' : '#000';
             jsl_progress = function() {};
         }
         catch (ex) {}
@@ -2905,7 +2912,7 @@ else if (!b_u) {
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
-    if ((u_sid = u_storage.sid))
+    if (!is_drop && (u_sid = u_storage.sid))
     {
         loginresponse = true;
         var lxhr = getxhr();
@@ -2985,7 +2992,7 @@ else if (!b_u) {
         else u_checklogin({checkloginresult:boot_auth},false);
     }
 
-    if ((page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2) {
+    if ((page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2 && !is_drop) {
         dl_res = true;
         var dlxhr = getxhr();
         dlxhr.onload = function() {

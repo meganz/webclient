@@ -340,6 +340,16 @@ function init_page() {
 
     var oldPFKey = pfkey;
     var pageBeginLetters = page.substr(0, 2);
+    // contact link handling...
+    if (pageBeginLetters === 'C!' && page.length > 2) {
+        var ctLink = page.substring(2, page.length);
+        mBroadcaster.once('boot_done', function () {            
+            openContactInfoLink(ctLink);
+        });
+        
+        page = 'fm/contacts';
+    }
+
     if (pageBeginLetters === 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
 
@@ -996,13 +1006,25 @@ function init_page() {
     // Initial recovery process page to choose whether to recover with Master/Recovery Key or park the account
     else if (page === 'recovery') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
-            mobile.recovery.init();
+            if (u_type) {
+                loadSubPage('fm/account');
+                return false;
+            }
+            else {
+                parsepage(pages['mobile']);
+                mobile.recovery.init();
+            }
         }
         else {
-            parsepage(pages['recovery']);
-            var accountRecovery = new mega.AccountRecovery();
-            accountRecovery.initRecovery();
+            if (u_type) {
+                loadSubPage('fm/account/email-and-pass');
+                return false;
+            }
+            else {
+                parsepage(pages['recovery']);
+                var accountRecovery = new mega.AccountRecovery();
+                accountRecovery.initRecovery();
+            }
         }
     }
 

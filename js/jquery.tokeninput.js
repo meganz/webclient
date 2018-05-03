@@ -899,18 +899,22 @@
 
             if ($(input).data("settings").preventDoublet) {
 
-                var doubleEmail = $.grep($(input).data("settings").local_data, function(row) {
-                    var property = $(input).data("settings").propertyToSearch,
-                        tokenValue = $(input).data("settings").tokenValue;
-                    return coerceToString(row[property]).toLowerCase().indexOf(item[tokenValue].toLowerCase()) > -1;
-                });
-
+                var property = $(input).data("settings").propertyToSearch;
+                var tokenValue = $(input).data("settings").tokenValue;
+                var itemFoundType;
+                var currData = $(input).data("settings").local_data;
+                for (var k = 0; k < currData.length; k++) {
+                    if (currData[k][property].toLowerCase() === item[tokenValue].toLowerCase()) {
+                        itemFoundType = currData[k].contactType;
+                        break;
+                    }
+                }
                 // Prevent further execution if email is duplicated
-                if (doubleEmail.length) {
+                if (itemFoundType) {
                     select_token(item);
                     var cb = $(input).data("settings").onDoublet;
                     if ($.isFunction(cb)) {
-                        cb.call(hidden_input, item);
+                        cb.call(hidden_input, item, itemFoundType);
                     }
 
                     return false;

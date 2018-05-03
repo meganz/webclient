@@ -22739,10 +22739,10 @@ opacity: 1;
 	width: 400px;
     height: 250px;
     margin:20px 0 0 0;
-    background-image: url(../images/mega/wu_empty_upload@2x.png);
+    background-image: url(../images/mega/wu_empty_upload_v2@2x.png);
     background-position: 0 0;
     background-repeat: no-repeat;
-    background-size: 400px 250px;
+    background-size: 400px auto;
 }
 .wu-empty-upload .wu-large-logo.grey {
     -webkit-filter: grayscale(100%);
@@ -23229,8 +23229,8 @@ opacity: 1;
     display: inline-block;
     vertical-align: middle;
     margin-right: 12px;
-    background-image: url(../images/mega/megadrop-embed-icons-sprite@2x.png);
-    background-size: 262px 1258px;
+    background-image: url(../images/mega/wu_empty_upload_v2.png);
+    background-size: 400px auto;
     background-repeat: no-repeat;
 }
 .widget-dialog .embed-button.dark-theme .embed-mega-icon {

@@ -282,78 +282,96 @@
     color: white;
 }
 .viewer-progress {
-    background-color: rgba(255,255,255,0.15);
-    width: 80px;
-    height: 80px;
+    width: 36px;
+    height: 36px;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
     overflow: hidden;
     margin: 0 auto;
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    z-index: 10;
+    background-color: rgba(34,34,34,1);
+    -webkit-transition: opacity 100ms ease-in-out, visibility 100ms ease-in-out;
+    -moz-transition: opacity 100ms ease-in-out, visibility 100ms ease-in-out;
+    -o-transition: opacity 100ms ease-in-out, visibility 100ms ease-in-out;
+    -ms-transition: opacity 100ms ease-in-out, visibility 100ms ease-in-out;
+    transition: opacity 100ms ease-in-out, visibility 100ms ease-in-out;
 }
 .viewer-progress ul {
-    width: 80px;
-    height: 80px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     margin: 0;
     list-style-type: none;
     position: relative;
+    background-color: rgba(255,255,255,0.2);
 }
 .viewer-progress ul::after {
-    top: 50%;
-    margin: -35px 0 0 -35px;
-    background-color: #3f3f3f;
-    z-index: 1;
+    content: '';
+    display: block;
+    width: 28px;
+    height: 28px;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
+    overflow: hidden;
+    position: absolute;
+    background-color: #222222;
+    left: 4px;
+    top: 4px;
 }
 .viewer-progress ul li {
     content: '';
     position: absolute;
-    width: 70px;
-    height: 70px;
-    left: 50%;
-    width: 80px;
-    height: 80px;
+    left: 0;
+    width: 36px;
+    height: 36px;
     padding: 0;
     margin: 0;
     position: absolute;
     top: 0px;
 }
 .viewer-progress ul :nth-child(odd) {
-    clip: rect(0px, 80px, 80px, 40px);
+    clip: rect(0px, 36px, 36px, 18px);
 }
 .viewer-progress ul :nth-child(even) {
-    clip: rect(0px, 40px, 80px, 0px);
+    clip: rect(0px, 18px, 36px, 0px);
 }
 .viewer-progress p {
-    width: 80px;
-    height: 80px;
+    width: 36px;
+    height: 36px;
     margin: 0;
+    -webkit-transition: transform 100ms ease-in-out;
+    -moz-transition: transform 100ms ease-in-out;
+    -o-transition: transform 100ms ease-in-out;
+    -ms-transition: transform 100ms ease-in-out;
+    transition: transform 100ms ease-in-out;
 }
 .viewer-progress span {
     display: block;
-    width: 40px;
-    height: 80px;
-    background-color: #FF333A
+    width: 18px;
+    height: 36px;
+    background-color: rgba(255,255,255,0.8);
 }
 .viewer-progress .right-c span {
-    -moz-border-radius-topleft: 40px;
-    -moz-border-radius-bottomleft: 40px;
-    -webkit-border-bottom-left-radius: 40px;
-    -webkit-border-top-left-radius: 40px;
-    border-top-left-radius: 40px;
-    border-bottom-left-radius: 40px;
+    -moz-border-radius-topleft: 18px;
+    -moz-border-radius-bottomleft: 18px;
+    -webkit-border-bottom-left-radius: 18px;
+    -webkit-border-top-left-radius: 18px;
+    border-top-left-radius: 18px;
+    border-bottom-left-radius: 18px;
 }
 .viewer-progress .left-c span {
-    margin-left: 40px;
-    -moz-border-radius-topright: 40px;
-    -moz-border-radius-bottomright: 40px;
-    -webkit-border-top-right-radius: 40px;
-    -webkit-border-bottom-right-radius: 40px;
-    border-top-right-radius: 40px;
-    border-bottom-right-radius: 40px;
+    margin-left: 18px;
+    -moz-border-radius-topright: 18px;
+    -moz-border-radius-bottomright: 18px;
+    -webkit-border-top-right-radius: 18px;
+    -webkit-border-bottom-right-radius: 18px;
+    border-top-right-radius: 18px;
+    border-bottom-right-radius: 18px;
 }
 .viewer-images-num {
     position: absolute;

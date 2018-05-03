@@ -115,6 +115,7 @@ CallManager._proxyCallTo = function (prototype, listName, fnName, subpropName) {
 
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onDestroy', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteStreamAdded', 'rtcCall');
+CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteStreamRemoved', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onRemoteMute', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onLocalMute', 'rtcCall');
 CallManager._proxyCallTo(CallManager.prototype, '_calls', 'onCallStarted', 'rtcCall');
@@ -376,19 +377,7 @@ var CallManagerCall = function (chatRoom, rtcCall) {
 makeObservable(CallManagerCall);
 
 
-CallManagerCall.STATE = {
-    'INITIALISED': 0,
-    'WAITING_RESPONSE_OUTGOING': 10,
-    'WAITING_RESPONSE_INCOMING': 20,
-    'STARTING': 25,
-    'STARTED': 30,
-    'ENDED': 40,
-    'HANDLED_ELSEWHERE': 45,
-    'REJECTED': 50,
-    'FAILED': 60,
-    'MISSED': 70,
-    'TIMEOUT': 80
-};
+CallManagerCall.STATE = RtcModule.UICallTerm;
 
 // ES5's ugly syntax...in the future we can use ES6 to properly format this code
 CallManagerCall.ALLOWED_STATE_TRANSITIONS = {};
@@ -404,7 +393,8 @@ CallManagerCall.ALLOWED_STATE_TRANSITIONS[CallManagerCall.STATE.WAITING_RESPONSE
         CallManagerCall.STATE.STARTING,
         CallManagerCall.STATE.REJECTED,
         CallManagerCall.STATE.FAILED,
-        CallManagerCall.STATE.TIMEOUT
+        CallManagerCall.STATE.TIMEOUT,
+        CallManagerCall.STATE.ABORTED
     ];
 
 CallManagerCall.ALLOWED_STATE_TRANSITIONS[CallManagerCall.STATE.WAITING_RESPONSE_INCOMING] = // ->
@@ -434,6 +424,11 @@ CallManagerCall.ALLOWED_STATE_TRANSITIONS[CallManagerCall.STATE.REJECTED] = // -
         CallManagerCall.STATE.ENDED
     ];
 
+CallManagerCall.ALLOWED_STATE_TRANSITIONS[CallManagerCall.STATE.ABORTED] = // ->
+    [
+        CallManagerCall.STATE.ENDED
+    ];
+
 
 CallManagerCall.prototype.isActive = function () {
     return this.state === CallManagerCall.STATE.STARTED || this.state === CallManagerCall.STATE.STARTING;
@@ -442,15 +437,6 @@ CallManagerCall.prototype.isActive = function () {
 /**
  * UI -> event mapping stuff
  */
-
-
-CallManagerCall._extractMediaOptionsFromEventData = function (eventData) {
-    var opts = eventData.peerMedia;
-    if (!opts) {
-        opts = eventData.callOptions;
-    }
-    return opts;
-};
 
 CallManagerCall.prototype.onWaitingResponseOutgoing = function () {
     // Unused
@@ -637,7 +623,9 @@ CallManagerCall.prototype.onCallAnswered = function () {
 CallManagerCall.prototype._renderInCallUI = function () {
     var self = this;
 
-    self.room._currentCallCounter = 0;
+    self.room._currentCallCounter = self.room._currentCallCounter || 0;
+
+
     if (self.room._currentCallTimer) {
         clearInterval(self.room._currentCallTimer);
     }
@@ -672,6 +660,8 @@ CallManagerCall.prototype.onCallStarted = function () {
     }
 
     self.setState(CallManagerCall.STATE.STARTED);
+
+    self.room._currentCallCounter = 0;
 
     self._renderInCallUI();
 
@@ -734,29 +724,29 @@ CallManagerCall.prototype.onCallEnded = function (e, reason) {
 
 CallManagerCall.prototype.onCallRejected = function (e, reason) {
     var self = this;
-
-    if (reason === "caller") {
-        self.room.appendMessage(
-            new ChatDialogMessage({
-                messageId: 'call-ended-' + self.id,
-                type: 'call-canceled',
-                authorContact: self.getPeer(),
-                delay: unixtime(),
-            })
-        );
-    } else {
-        self.room.appendMessage(
-            new ChatDialogMessage({
-                messageId: 'call-rejected-' + self.id,
-                type: 'call-rejected',
-                authorContact: self.getPeer(),
-                delay: unixtime()
-            })
-        );
-    }
-
+    self.room.appendMessage(
+        new ChatDialogMessage({
+            messageId: 'call-rejected-' + self.id,
+            type: 'call-rejected',
+            authorContact: self.getPeer(),
+            delay: unixtime()
+        })
+    );
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
+CallManagerCall.prototype.onCallAborted = function (e, reason) {
+    var self = this;
+    self.room.appendMessage(
+        new ChatDialogMessage({
+            messageId: 'call-ended-' + self.id,
+            type: 'call-canceled',
+            authorContact: self.getPeer(),
+            delay: unixtime(),
+        })
+    );
+    self.getCallManager().trigger('CallTerminated', [self, e]);
+};
+
 CallManagerCall.prototype.onCallHandledElsewhere = function (e) {
     var self = this;
 
@@ -857,86 +847,59 @@ CallManagerCall.prototype.onCallTerminated = function () {
 
 CallManagerCall.prototype.onDestroy = function (terminationCode, peerTerminates) {
     var self = this;
+    // TODO: @lp: Execute onRemoteStreamRemoved() just in case it wasn't called by the rtcModule before session destroy
     var isIncoming = self.rtcCall.isJoiner;
-    if (terminationCode === Term.kCallReqCancel) {
-        if (!isIncoming) {
-            self.setState(CallManagerCall.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self, "caller"]);
-        }
-        else {
-            self.setState(CallManagerCall.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self, terminationCode]);
-        }
+    var state = self.rtcCall.termCodeToUIState(terminationCode);
+    self.setState(state);
+    var callMgr = self.getCallManager();
+    switch (state) {
+        case CallManagerCall.STATE.REJECTED:
+            callMgr.trigger('CallRejected', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.ABORTED:
+            callMgr.trigger('CallAborted', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.MISSED:
+            callMgr.trigger('CallMissed', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.STARTED:
+            callMgr.trigger('CallStarted', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.ENDED:
+            callMgr.trigger('CallEnded', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.FAILED:
+            callMgr.trigger('CallFailed', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.HANDLED_ELSEWHERE:
+            callMgr.trigger('CallHandledElsewhere', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.MISSED:
+            callMgr.trigger('CallMissed', [self, terminationCode]);
+            break;
+        case CallManagerCall.STATE.TIMEOUT:
+            callMgr.trigger('CallTimeout', [self, terminationCode]);
+            break;
+        default:
+            self.logger.warn("onDestroy: Unknown UI call termination state",
+                constStateToText(CallManagerCall.STATE, state),
+                " for termcode ", RtcModule.getTermCodeName(terminationCode));
+            break;
     }
-    else if (terminationCode === Term.kUserHangup) {
-        if (self.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING) {
-            self.setState(CallManagerCall.STATE.MISSED);
-            self.getCallManager().trigger('CallMissed', [self, terminationCode]);
-        }
-        else if (self.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) {
-            self.setState(CallManagerCall.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self, "caller"]);
-        }
-        else if (self.state === CallManagerCall.STATE.STARTED) {
-            self.setState(CallManagerCall.STATE.ENDED);
-            self.getCallManager().trigger('CallEnded', [self, terminationCode]);
-        }
-        else {
-            self.logger.warn('call failed?: ', terminationCode, "state:", self.getStateAsText());
-            self.setState(CallManagerCall.STATE.FAILED);
-            self.getCallManager().trigger('CallFailed', [self, terminationCode]);
-        }
-    }
-    else if (terminationCode === Term.kCallRejected) {
-        self.setState(CallManagerCall.STATE.REJECTED);
-        self.getCallManager().trigger('CallRejected', [self, terminationCode]);
-    }
-    else if (terminationCode === Term.kAnsElsewhere) {
-        self.setState(CallManagerCall.STATE.HANDLED_ELSEWHERE);
-        self.getCallManager().trigger('CallHandledElsewhere', [self, terminationCode]);
-    }
-    else if (terminationCode === Term.kCallReqCancel) {
-        if (self.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) {
-            self.setState(CallManagerCall.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self, 'caller']);
-        }
-        else {
-            self.setState(CallManagerCall.STATE.MISSED);
-            self.getCallManager().trigger('CallMissed', [self, terminationCode]);
-        }
-    }
-    else if (
-        terminationCode === Term.kRingOutTimeout ||
-        terminationCode === Term.kAnswerTimeout
-    ) {
-        if (isIncoming) {
-            self.setState(CallManagerCall.STATE.MISSED);
-            self.getCallManager().trigger('CallMissed', [self, terminationCode]);
-        }
-        else {
-            self.setState(CallManagerCall.STATE.TIMEOUT);
-            self.getCallManager().trigger('CallTimeout', [self, terminationCode]);
-        }
-    }
-    else {
-        self.logger.debug("onDestroy, todo: parse", terminationCode, " and add UI for the state.");
-        self.setState(CallManagerCall.STATE.FAILED);
-        self.getCallManager().trigger('CallFailed', [self, terminationCode]);
-    }
-
     this.onCallTerminated();
 };
 
 CallManagerCall.prototype.onRemoteStreamAdded = function (rtcSessionEventHandler, stream) {
     var peerId = base64urlencode(rtcSessionEventHandler.rtcCallSession.peer);
     this._streams[peerId] = stream;
+    this._renderInCallUI();
 };
 CallManagerCall.prototype.onRemoteStreamRemoved = function (rtcSessionEventHandler) {
     var peerId = base64urlencode(rtcSessionEventHandler.rtcCallSession.peer);
     if (this._streams[peerId]) {
         delete this._streams[peerId];
     }
-    this._renderInCallUI();
+    this.room.trackDataChange();
 };
 
 /**

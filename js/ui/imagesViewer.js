@@ -407,7 +407,6 @@ var slideshowid;
         });
 
         zoom_mode = true;
-        $overlay.addClass('zoomed');
 
         // Set zoom, position values and init pick and pan
         slideshow_imgPosition($overlay);
@@ -478,7 +477,7 @@ var slideshowid;
             slideshowid = false;
             _hideCounter = false;
             slideshowplay = false;
-            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow zoomed').addClass('hidden');
+            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow').addClass('hidden');
             $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
             $(window).unbind('resize.imgResize');
             $document.unbind('keydown.slideshow mousemove.idle');
@@ -896,7 +895,7 @@ var slideshowid;
             }).catch(console.warn.bind(console));
         });
 
-        $overlay.removeClass('zoomed').addClass('video');
+        $overlay.addClass('video');
         $overlay.find('video').removeClass('hidden');
         $overlay.find('.viewer-pending').addClass('hidden');
         // $overlay.find('.viewer-progress').addClass('hidden');
@@ -1071,7 +1070,6 @@ var slideshowid;
 
                 // Set position, zoom values
                 zoom_mode = false;
-                $overlay.removeClass('zoomed');
                 $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
                 slideshow_imgPosition($overlay);
                 $(window).rebind('resize.imgResize', function() {

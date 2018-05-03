@@ -616,12 +616,14 @@ var GenericConversationMessage = React.createClass({
                                                     onClick={self._startPreview.bind(self, v)}></div>;
                             }
                             else {
-                                thumbClass = thumbClass + " video";
+                                thumbClass = thumbClass + " video " + (
+                                    isPreviewable ? " previewable" : "non-previewable"
+                                );
                                 thumbOverlay = <div className="thumb-overlay"
                                                     onClick={isPreviewable && self._startPreview.bind(self, v)}>
                                     {isPreviewable && <div className="play-video-button"></div>}
                                     <div className="video-thumb-details">
-                                        <i className="small-icon small-play-icon"></i>
+                                        {isPreviewable && <i className="small-icon small-play-icon"></i>}
                                         <span>{secondsToTimeShort(v.playtime || -1)}</span>
                                     </div>
                                 </div>;

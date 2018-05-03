@@ -10142,7 +10142,7 @@ React.makeElement = React['createElement'];
 	                                thumbOverlay = React.makeElement('div', { className: 'thumb-overlay',
 	                                    onClick: self._startPreview.bind(self, v) });
 	                            } else {
-	                                thumbClass = thumbClass + " video";
+	                                thumbClass = thumbClass + " video " + (isPreviewable ? " previewable" : "non-previewable");
 	                                thumbOverlay = React.makeElement(
 	                                    'div',
 	                                    { className: 'thumb-overlay',
@@ -10151,7 +10151,7 @@ React.makeElement = React['createElement'];
 	                                    React.makeElement(
 	                                        'div',
 	                                        { className: 'video-thumb-details' },
-	                                        React.makeElement('i', { className: 'small-icon small-play-icon' }),
+	                                        isPreviewable && React.makeElement('i', { className: 'small-icon small-play-icon' }),
 	                                        React.makeElement(
 	                                            'span',
 	                                            null,

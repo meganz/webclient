@@ -75,6 +75,9 @@ a.shared-link.show-more {
 .video.thumb .thumb-overlay {
     cursor: pointer;
 }
+.video.thumb.non-previewable .thumb-overlay {
+	cursor: default;
+}
 .thumb-overlay .video-thumb-details {
     display: block;
 }

@@ -433,6 +433,7 @@ var slideshowid;
         }
         else {
             perc = viewerWidth / origImgWidth;
+            $img.removeAttr('style');
 
             // Set minHeight, minWidth if image is bigger then browser window
             if (origImgWidth > viewerWidth && origImgHeight * perc < viewerHeight) {
@@ -1063,7 +1064,7 @@ var slideshowid;
 
             // Apply img data to necessary image
             if (!replacement || src !== noThumbURI) {
-                $imgCount.find('img').removeClass('active').removeAttr('style');
+                $imgCount.find('img').removeClass('active');
                 $imgCount.attr('data-count', imgClass);
                 $imgCount.attr('data-image', id);
                 $img.attr('src', src).addClass('active');

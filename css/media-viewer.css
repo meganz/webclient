@@ -647,49 +647,27 @@
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
 }
 .exif-rotation-2 {
-    -webkit-transform: rotateY(180deg);
-    -ms-transform: rotateY(180deg);
     transform: rotateY(180deg);
 }
 .exif-rotation-3 {
-    -webkit-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
     transform: rotate(180deg);
 }
 .exif-rotation-4 {
-    -webkit-transform: rotate(180deg) rotateY(180deg);
-    -ms-transform: rotate(180deg) rotateY(180deg);
     transform: rotate(180deg) rotateY(180deg);
 }
 .exif-rotation-5 {
-    -webkit-transform-origin: top left;
-    -ms-transform-origin: top left;
     transform-origin: top left;
-    -webkit-transform: rotate(270deg) rotateY(180deg);
-    -ms-transform: rotate(270deg) rotateY(180deg);
     transform: rotate(270deg) rotateY(180deg);
 }
 .exif-rotation-6 {
-    -webkit-transform-origin: bottom left;
-    -ms-transform-origin: bottom left;
     transform-origin: bottom left;
-    -webkit-transform: translateY(-100%) rotate(90deg);
-    -ms-transform: translateY(-100%) rotate(90deg);
     transform: translateY(-100%) rotate(90deg);
 }
 .exif-rotation-7 {
-    -webkit-transform-origin: bottom right;
-    -ms-transform-origin: bottom right;
     transform-origin: bottom right;
-    -webkit-transform: translateY(-100%) translateX(-100%) rotate(90deg) rotateY(180deg);
-    -ms-transform: translateY(-100%) translateX(-100%) rotate(90deg) rotateY(180deg);
     transform: translateY(-100%) translateX(-100%) rotate(90deg) rotateY(180deg);
 }
 .exif-rotation-8 {
-    -webkit-transform-origin: top right;
-    -ms-transform-origin: top right;
     transform-origin: top right;
-    -webkit-transform: translateX(-100%) rotate(270deg);
-    -ms-transform: translateX(-100%) rotate(270deg);
     transform: translateX(-100%) rotate(270deg);
 }

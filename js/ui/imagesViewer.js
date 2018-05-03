@@ -420,6 +420,7 @@ var slideshowid;
         var viewerHeight = $overlay.height();
         var imgWidth = $img.width();
         var imgHeight = $img.height();
+        var rot = $img.attr('data-exit') | 0;
         var perc = 0;
 
         // Set current img size percents
@@ -430,7 +431,7 @@ var slideshowid;
 
         // Quit if zoom mode is off
         if (!zoom_mode) {
-            return false;
+            // return false;
         }
 
         // Init pick and pan mode if Image larger its wrapper
@@ -1031,9 +1032,14 @@ var slideshowid;
             }
             var src = ev.type === 'error' ? noThumbURI : this.src;
             var $img = $imgCount.find('.' + imgClass);
+            var rot = previews[id].orientation | 0;
 
             origImgWidth = this.naturalWidth;
             origImgHeight = this.naturalHeight;
+
+            if (d) {
+                console.debug('Loading image %s:%sx%s, orientation=%s', id, origImgWidth, origImgHeight, rot);
+            }
 
             // Apply img data to necessary image
             if (!replacement) {
@@ -1058,6 +1064,9 @@ var slideshowid;
                 var perc = Math.round($img.width() / origImgWidth * 100);
                 $overlay.find('.viewer-button-label.zoom').attr('data-perc', perc).text(perc + '%');
             }
+
+            // Apply exit orientation
+            $img.removeClassWith('exif-rotation-').addClass('exif-rotation-' + rot).attr('data-exif', rot);
 
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');

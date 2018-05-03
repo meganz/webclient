@@ -450,145 +450,140 @@ var GenericConversationMessage = React.createClass({
                             }
                         }
 
-
-
+                        if (attachmentMetaInfo.revoked) {
+                            // don't show revoked files
+                            return;
+                        }
 
 
                         // generate preview/icon
                         var icon = fileIcon(v);
+                        var isImage = is_image(v);
+                        var isVideo = is_video(v) > 0;
+                        var showThumbnail = v.fa && isImage || String(v.fa).indexOf(':0*') > 0;
+                        var isPreviewable = isImage || isVideo;
 
                         var dropdown = null;
                         var previewButton = null;
 
-                        if (!attachmentMetaInfo.revoked) {
-                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-                                var imagesListKey = message.messageId + "_" + v.h;
-                                if (!chatRoom.images.exists(imagesListKey)) {
-                                    v.id = imagesListKey;
-                                    v.orderValue = message.orderValue;
-                                    v.messageId = message.messageId;
-                                    chatRoom.images.push(v);
-                                }
-                                if (is_image(v) || is_video(v)) {
-                                    var previewLabel = is_video(v) ? l[17732] : l[1899];
-                                    previewButton = <span key="previewButton">
-                                        <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
-                                                                  onClick={self._startPreview.bind(self, v)}/>
-                                        <hr/>
-                                    </span>;
-                                }
+                        if (showThumbnail) {
+                            var imagesListKey = message.messageId + "_" + v.h;
+                            if (!chatRoom.images.exists(imagesListKey)) {
+                                v.id = imagesListKey;
+                                v.orderValue = message.orderValue;
+                                v.messageId = message.messageId;
+                                chatRoom.images.push(v);
                             }
-                            if (contact.u === u_handle) {
-                                dropdown = <ButtonsUI.Button
-                                    className="default-white-button tiny-button"
-                                    icon="tiny-icon icons-sprite grey-dots">
-                                    <DropdownsUI.Dropdown
-                                        ref={(refObj) => {
-                                            self.dropdown = refObj;
-                                        }}
-                                        className="white-context-menu attachments-dropdown"
-                                        noArrow={true}
-                                        positionMy="left top"
-                                        positionAt="left bottom"
-                                        horizOffset={-4}
-                                        vertOffset={3}
-                                        onBeforeActiveChange={(newState) => {
-                                            if (newState === true) {
-                                                self.forceUpdate();
-                                            }
-                                        }}
-                                        dropdownItemGenerator={function(dd) {
-                                            var linkButtons = [];
-                                            var firstGroupOfButtons = [];
-                                            var revokeButton = null;
-                                            var downloadButton = null;
-
-                                            if (message.isEditable && message.isEditable()) {
-                                                revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
-                                                                                         label={__(l[83])}
-                                                                                         className="red"
-                                                                                         onClick={() => {
-                                                    chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
-                                                        chatRoom,
-                                                        (
-                                                            message.internalId ?
-                                                                message.internalId : message.orderValue
-                                                        ),
-                                                        ""
-                                                    );
-                                                }} />
-                                            }
-
-                                            if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-                                                dropdown = "<span>" + l[5533] + "</span>";
-                                                dbfetch.get(v.h)
-                                                    .always(function() {
-                                                        if (!M.d[v.h]) {
-                                                            NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
-                                                            Soon(function() {
-                                                                self.safeForceUpdate();
-                                                            });
-                                                        }
-                                                    });
-                                            }
-                                            else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-                                                downloadButton = <DropdownsUI.DropdownItem
-                                                    icon="rounded-grey-down-arrow"
-                                                    label={__(l[1187])}
-                                                    onClick={self._startDownload.bind(self, v)}/>;
-
-                                                self._addLinkButtons(v.h, linkButtons);
-
-                                                firstGroupOfButtons.push(
-                                                    <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
-                                                                              key="infoDialog"
-                                                                              onClick={() => {
-                                                                                  $.selected = [v.h];
-                                                                                  propertiesDialog();
-                                                                              }} />
-                                                );
-
-
-                                                self._addFavouriteButtons(v.h, firstGroupOfButtons);
-                                            }
-
-                                            return <div>
-                                                {previewButton}
-                                                {firstGroupOfButtons}
-                                                {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
-                                                {downloadButton}
-                                                {linkButtons}
-                                                {revokeButton && downloadButton ? <hr /> : ""}
-                                                {revokeButton}
-                                            </div>;
-                                        }}
-                                    />
-                                </ButtonsUI.Button>;
-                            }
-                            else {
-                                dropdown = <ButtonsUI.Button
-                                    className="default-white-button tiny-button"
-                                    icon="tiny-icon icons-sprite grey-dots">
-                                    <DropdownsUI.Dropdown
-                                        className="white-context-menu attachments-dropdown"
-                                        noArrow={true}
-                                        positionMy="left top"
-                                        positionAt="left bottom"
-                                        horizOffset={-4}
-                                        vertOffset={3}
-                                    >
-                                        {previewButton}
-                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
-                                                                  onClick={self._startDownload.bind(self, v)}/>
-                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
-                                                                  onClick={self._addToCloudDrive.bind(self, v)}/>
-                                    </DropdownsUI.Dropdown>
-                                </ButtonsUI.Button>;
+                            if (isPreviewable) {
+                                var previewLabel = isVideo ? l[17732] : l[1899];
+                                previewButton = <span key="previewButton">
+                                    <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
+                                                              onClick={self._startPreview.bind(self, v)}/>
+                                    <hr/>
+                                </span>;
                             }
                         }
+                        if (contact.u === u_handle) {
+                            dropdown = <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon icons-sprite grey-dots">
+                                <DropdownsUI.Dropdown
+                                    ref={(refObj) => {
+                                        self.dropdown = refObj;
+                                    }}
+                                    className="white-context-menu attachments-dropdown"
+                                    noArrow={true}
+                                    positionMy="left top"
+                                    positionAt="left bottom"
+                                    horizOffset={-4}
+                                    vertOffset={3}
+                                    onBeforeActiveChange={(newState) => {
+                                        if (newState === true) {
+                                            self.forceUpdate();
+                                        }
+                                    }}
+                                    dropdownItemGenerator={function(dd) {
+                                        var linkButtons = [];
+                                        var firstGroupOfButtons = [];
+                                        var revokeButton = null;
+                                        var downloadButton = null;
+
+                                        if (message.isEditable && message.isEditable()) {
+                                            revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
+                                                                                     label={__(l[83])}
+                                                                                     className="red"
+                                                                                     onClick={() => {
+                                                 chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
+                                                     chatRoom, message.internalId || message.orderValue, ""
+                                                 );
+                                            }}/>
+                                        }
+
+                                        if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                            dropdown = "<span>" + l[5533] + "</span>";
+                                            dbfetch.get(v.h)
+                                                .always(function() {
+                                                    if (!M.d[v.h]) {
+                                                        NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
+                                                        Soon(function() {
+                                                            self.safeForceUpdate();
+                                                        });
+                                                    }
+                                                });
+                                        }
+                                        else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                            downloadButton = <DropdownsUI.DropdownItem
+                                                icon="rounded-grey-down-arrow"
+                                                label={__(l[1187])}
+                                                onClick={self._startDownload.bind(self, v)}/>;
+
+                                            self._addLinkButtons(v.h, linkButtons);
+
+                                            firstGroupOfButtons.push(
+                                                <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
+                                                                          key="infoDialog"
+                                                                          onClick={() => {
+                                                                              $.selected = [v.h];
+                                                                              propertiesDialog();
+                                                                          }}/>
+                                            );
+
+
+                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+                                        }
+
+                                        return <div>
+                                            {previewButton}
+                                            {firstGroupOfButtons}
+                                            {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr/> : ""}
+                                            {downloadButton}
+                                            {linkButtons}
+                                            {revokeButton && downloadButton ? <hr/> : ""}
+                                            {revokeButton}
+                                        </div>;
+                                    }}
+                                />
+                            </ButtonsUI.Button>;
+                        }
                         else {
-                            // else if (attachmentMetaInfo.revoked) { ... don't show revoked files
-                            return;
+                            dropdown = <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon icons-sprite grey-dots">
+                                <DropdownsUI.Dropdown
+                                    className="white-context-menu attachments-dropdown"
+                                    noArrow={true}
+                                    positionMy="left top"
+                                    positionAt="left bottom"
+                                    horizOffset={-4}
+                                    vertOffset={3}
+                                >
+                                    {previewButton}
+                                    <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
+                                                              onClick={self._startDownload.bind(self, v)}/>
+                                    <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
+                                                              onClick={self._addToCloudDrive.bind(self, v)}/>
+                                </DropdownsUI.Dropdown>
+                            </ButtonsUI.Button>;
                         }
 
                         var attachmentClasses = "message shared-data";
@@ -600,52 +595,47 @@ var GenericConversationMessage = React.createClass({
                             </div>
                         </div>;
 
-                        if (M.chat && !message.revoked) {
-                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-                                var src = chatRoom.getCachedImageURI(v);
+                        if (M.chat && showThumbnail && !message.revoked) {
+                            var src = chatRoom.getCachedImageURI(v);
 
-                                if (!src) {
-                                    v.seen = 1;
-                                    chatRoom.loadImage(v);
-                                    src = window.noThumbURI || '';
-                                }
-                                if (!v.imgId) {
-                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
-                                }
-
-                                var previewable = is_image(v) || is_video(v);
-                                if (previewable) {
-                                    var thumbClass = "";
-                                    var thumbOverlay = null;
-
-                                    if (is_image(v)) {
-                                        thumbClass = thumbClass + " image";
-                                        thumbOverlay = <div className="thumb-overlay"
-                                                            onClick={self._startPreview.bind(self, v)}></div>;
-                                    }
-                                    else {
-                                        thumbClass = thumbClass + " video";
-                                        thumbOverlay = <div className="thumb-overlay"
-                                                            onClick={self._startPreview.bind(self, v)}>
-                                            <div className="play-video-button"></div>
-                                            <div className="video-thumb-details">
-                                                <i className="small-icon small-play-icon"></i>
-                                                <span>{secondsToTimeShort(v.playtime || -1)}</span>
-                                            </div>
-                                        </div>;
-                                    }
-
-                                    preview = (src ? (<div id={v.imgId} className={"shared-link thumb " + thumbClass}>
-                                        {thumbOverlay}
-                                        {dropdown}
-
-                                        <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                             key={src === window.noThumbURI ? v.imgId : src}
-                                             onClick={self._startPreview.bind(self, v)}
-                                        />
-                                    </div>) :  preview);
-                                }
+                            if (!src) {
+                                v.seen = 1;
+                                chatRoom.loadImage(v);
+                                src = window.noThumbURI || '';
                             }
+                            if (!v.imgId) {
+                                v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
+                            }
+
+                            var thumbClass = "";
+                            var thumbOverlay = null;
+
+                            if (isImage) {
+                                thumbClass = thumbClass + " image";
+                                thumbOverlay = <div className="thumb-overlay"
+                                                    onClick={self._startPreview.bind(self, v)}></div>;
+                            }
+                            else {
+                                thumbClass = thumbClass + " video";
+                                thumbOverlay = <div className="thumb-overlay"
+                                                    onClick={isPreviewable && self._startPreview.bind(self, v)}>
+                                    {isPreviewable && <div className="play-video-button"></div>}
+                                    <div className="video-thumb-details">
+                                        <i className="small-icon small-play-icon"></i>
+                                        <span>{secondsToTimeShort(v.playtime || -1)}</span>
+                                    </div>
+                                </div>;
+                            }
+
+                            preview = (src ? (<div id={v.imgId} className={"shared-link thumb " + thumbClass}>
+                                {thumbOverlay}
+                                {dropdown}
+
+                                <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
+                                     key={src === window.noThumbURI ? v.imgId : src}
+                                     onClick={isPreviewable && self._startPreview.bind(self, v)}
+                                />
+                            </div>) : preview);
                         }
 
                         files.push(

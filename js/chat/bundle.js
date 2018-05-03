@@ -9974,136 +9974,140 @@ React.makeElement = React['createElement'];
 	                            }
 	                        }
 
+	                        if (attachmentMetaInfo.revoked) {
+
+	                            return;
+	                        }
+
 	                        var icon = fileIcon(v);
+	                        var isImage = is_image(v);
+	                        var isVideo = is_video(v) > 0;
+	                        var showThumbnail = v.fa && isImage || String(v.fa).indexOf(':0*') > 0;
+	                        var isPreviewable = isImage || isVideo;
 
 	                        var dropdown = null;
 	                        var previewButton = null;
 
-	                        if (!attachmentMetaInfo.revoked) {
-	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-	                                var imagesListKey = message.messageId + "_" + v.h;
-	                                if (!chatRoom.images.exists(imagesListKey)) {
-	                                    v.id = imagesListKey;
-	                                    v.orderValue = message.orderValue;
-	                                    v.messageId = message.messageId;
-	                                    chatRoom.images.push(v);
-	                                }
-	                                if (is_image(v) || is_video(v)) {
-	                                    var previewLabel = is_video(v) ? l[17732] : l[1899];
-	                                    previewButton = React.makeElement(
-	                                        'span',
-	                                        { key: 'previewButton' },
-	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
-	                                            onClick: self._startPreview.bind(self, v) }),
-	                                        React.makeElement('hr', null)
-	                                    );
-	                                }
+	                        if (showThumbnail) {
+	                            var imagesListKey = message.messageId + "_" + v.h;
+	                            if (!chatRoom.images.exists(imagesListKey)) {
+	                                v.id = imagesListKey;
+	                                v.orderValue = message.orderValue;
+	                                v.messageId = message.messageId;
+	                                chatRoom.images.push(v);
 	                            }
-	                            if (contact.u === u_handle) {
-	                                dropdown = React.makeElement(
-	                                    ButtonsUI.Button,
+	                            if (isPreviewable) {
+	                                var previewLabel = isVideo ? l[17732] : l[1899];
+	                                previewButton = React.makeElement(
+	                                    'span',
+	                                    { key: 'previewButton' },
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
+	                                        onClick: self._startPreview.bind(self, v) }),
+	                                    React.makeElement('hr', null)
+	                                );
+	                            }
+	                        }
+	                        if (contact.u === u_handle) {
+	                            dropdown = React.makeElement(
+	                                ButtonsUI.Button,
+	                                {
+	                                    className: 'default-white-button tiny-button',
+	                                    icon: 'tiny-icon icons-sprite grey-dots' },
+	                                React.makeElement(DropdownsUI.Dropdown, {
+	                                    ref: function ref(refObj) {
+	                                        self.dropdown = refObj;
+	                                    },
+	                                    className: 'white-context-menu attachments-dropdown',
+	                                    noArrow: true,
+	                                    positionMy: 'left top',
+	                                    positionAt: 'left bottom',
+	                                    horizOffset: -4,
+	                                    vertOffset: 3,
+	                                    onBeforeActiveChange: function onBeforeActiveChange(newState) {
+	                                        if (newState === true) {
+	                                            self.forceUpdate();
+	                                        }
+	                                    },
+	                                    dropdownItemGenerator: function dropdownItemGenerator(dd) {
+	                                        var linkButtons = [];
+	                                        var firstGroupOfButtons = [];
+	                                        var revokeButton = null;
+	                                        var downloadButton = null;
+
+	                                        if (message.isEditable && message.isEditable()) {
+	                                            revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross',
+	                                                label: __(l[83]),
+	                                                className: 'red',
+	                                                onClick: function onClick() {
+	                                                    chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId || message.orderValue, "");
+	                                                } });
+	                                        }
+
+	                                        if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                            dropdown = "<span>" + l[5533] + "</span>";
+	                                            dbfetch.get(v.h).always(function () {
+	                                                if (!M.d[v.h]) {
+	                                                    NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
+	                                                    Soon(function () {
+	                                                        self.safeForceUpdate();
+	                                                    });
+	                                                }
+	                                            });
+	                                        } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                            downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                                                icon: 'rounded-grey-down-arrow',
+	                                                label: __(l[1187]),
+	                                                onClick: self._startDownload.bind(self, v) });
+
+	                                            self._addLinkButtons(v.h, linkButtons);
+
+	                                            firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
+	                                                key: 'infoDialog',
+	                                                onClick: function onClick() {
+	                                                    $.selected = [v.h];
+	                                                    propertiesDialog();
+	                                                } }));
+
+	                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+	                                        }
+
+	                                        return React.makeElement(
+	                                            'div',
+	                                            null,
+	                                            previewButton,
+	                                            firstGroupOfButtons,
+	                                            firstGroupOfButtons && firstGroupOfButtons.length > 0 ? React.makeElement('hr', null) : "",
+	                                            downloadButton,
+	                                            linkButtons,
+	                                            revokeButton && downloadButton ? React.makeElement('hr', null) : "",
+	                                            revokeButton
+	                                        );
+	                                    }
+	                                })
+	                            );
+	                        } else {
+	                            dropdown = React.makeElement(
+	                                ButtonsUI.Button,
+	                                {
+	                                    className: 'default-white-button tiny-button',
+	                                    icon: 'tiny-icon icons-sprite grey-dots' },
+	                                React.makeElement(
+	                                    DropdownsUI.Dropdown,
 	                                    {
-	                                        className: 'default-white-button tiny-button',
-	                                        icon: 'tiny-icon icons-sprite grey-dots' },
-	                                    React.makeElement(DropdownsUI.Dropdown, {
-	                                        ref: function ref(refObj) {
-	                                            self.dropdown = refObj;
-	                                        },
 	                                        className: 'white-context-menu attachments-dropdown',
 	                                        noArrow: true,
 	                                        positionMy: 'left top',
 	                                        positionAt: 'left bottom',
 	                                        horizOffset: -4,
-	                                        vertOffset: 3,
-	                                        onBeforeActiveChange: function onBeforeActiveChange(newState) {
-	                                            if (newState === true) {
-	                                                self.forceUpdate();
-	                                            }
-	                                        },
-	                                        dropdownItemGenerator: function dropdownItemGenerator(dd) {
-	                                            var linkButtons = [];
-	                                            var firstGroupOfButtons = [];
-	                                            var revokeButton = null;
-	                                            var downloadButton = null;
-
-	                                            if (message.isEditable && message.isEditable()) {
-	                                                revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross',
-	                                                    label: __(l[83]),
-	                                                    className: 'red',
-	                                                    onClick: function onClick() {
-	                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId ? message.internalId : message.orderValue, "");
-	                                                    } });
-	                                            }
-
-	                                            if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-	                                                dropdown = "<span>" + l[5533] + "</span>";
-	                                                dbfetch.get(v.h).always(function () {
-	                                                    if (!M.d[v.h]) {
-	                                                        NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
-	                                                        Soon(function () {
-	                                                            self.safeForceUpdate();
-	                                                        });
-	                                                    }
-	                                                });
-	                                            } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-	                                                downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
-	                                                    icon: 'rounded-grey-down-arrow',
-	                                                    label: __(l[1187]),
-	                                                    onClick: self._startDownload.bind(self, v) });
-
-	                                                self._addLinkButtons(v.h, linkButtons);
-
-	                                                firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
-	                                                    key: 'infoDialog',
-	                                                    onClick: function onClick() {
-	                                                        $.selected = [v.h];
-	                                                        propertiesDialog();
-	                                                    } }));
-
-	                                                self._addFavouriteButtons(v.h, firstGroupOfButtons);
-	                                            }
-
-	                                            return React.makeElement(
-	                                                'div',
-	                                                null,
-	                                                previewButton,
-	                                                firstGroupOfButtons,
-	                                                firstGroupOfButtons && firstGroupOfButtons.length > 0 ? React.makeElement('hr', null) : "",
-	                                                downloadButton,
-	                                                linkButtons,
-	                                                revokeButton && downloadButton ? React.makeElement('hr', null) : "",
-	                                                revokeButton
-	                                            );
-	                                        }
-	                                    })
-	                                );
-	                            } else {
-	                                dropdown = React.makeElement(
-	                                    ButtonsUI.Button,
-	                                    {
-	                                        className: 'default-white-button tiny-button',
-	                                        icon: 'tiny-icon icons-sprite grey-dots' },
-	                                    React.makeElement(
-	                                        DropdownsUI.Dropdown,
-	                                        {
-	                                            className: 'white-context-menu attachments-dropdown',
-	                                            noArrow: true,
-	                                            positionMy: 'left top',
-	                                            positionAt: 'left bottom',
-	                                            horizOffset: -4,
-	                                            vertOffset: 3
-	                                        },
-	                                        previewButton,
-	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
-	                                            onClick: self._startDownload.bind(self, v) }),
-	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[8005]),
-	                                            onClick: self._addToCloudDrive.bind(self, v) })
-	                                    )
-	                                );
-	                            }
-	                        } else {
-
-	                            return;
+	                                        vertOffset: 3
+	                                    },
+	                                    previewButton,
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
+	                                        onClick: self._startDownload.bind(self, v) }),
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[8005]),
+	                                        onClick: self._addToCloudDrive.bind(self, v) })
+	                                )
+	                            );
 	                        }
 
 	                        var attachmentClasses = "message shared-data";
@@ -10118,60 +10122,55 @@ React.makeElement = React['createElement'];
 	                            )
 	                        );
 
-	                        if (M.chat && !message.revoked) {
-	                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-	                                var src = chatRoom.getCachedImageURI(v);
+	                        if (M.chat && showThumbnail && !message.revoked) {
+	                            var src = chatRoom.getCachedImageURI(v);
 
-	                                if (!src) {
-	                                    v.seen = 1;
-	                                    chatRoom.loadImage(v);
-	                                    src = window.noThumbURI || '';
-	                                }
-	                                if (!v.imgId) {
-	                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
-	                                }
-
-	                                var previewable = is_image(v) || is_video(v);
-	                                if (previewable) {
-	                                    var thumbClass = "";
-	                                    var thumbOverlay = null;
-
-	                                    if (is_image(v)) {
-	                                        thumbClass = thumbClass + " image";
-	                                        thumbOverlay = React.makeElement('div', { className: 'thumb-overlay',
-	                                            onClick: self._startPreview.bind(self, v) });
-	                                    } else {
-	                                        thumbClass = thumbClass + " video";
-	                                        thumbOverlay = React.makeElement(
-	                                            'div',
-	                                            { className: 'thumb-overlay',
-	                                                onClick: self._startPreview.bind(self, v) },
-	                                            React.makeElement('div', { className: 'play-video-button' }),
-	                                            React.makeElement(
-	                                                'div',
-	                                                { className: 'video-thumb-details' },
-	                                                React.makeElement('i', { className: 'small-icon small-play-icon' }),
-	                                                React.makeElement(
-	                                                    'span',
-	                                                    null,
-	                                                    secondsToTimeShort(v.playtime || -1)
-	                                                )
-	                                            )
-	                                        );
-	                                    }
-
-	                                    preview = src ? React.makeElement(
-	                                        'div',
-	                                        { id: v.imgId, className: "shared-link thumb " + thumbClass },
-	                                        thumbOverlay,
-	                                        dropdown,
-	                                        React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
-	                                            key: src === window.noThumbURI ? v.imgId : src,
-	                                            onClick: self._startPreview.bind(self, v)
-	                                        })
-	                                    ) : preview;
-	                                }
+	                            if (!src) {
+	                                v.seen = 1;
+	                                chatRoom.loadImage(v);
+	                                src = window.noThumbURI || '';
 	                            }
+	                            if (!v.imgId) {
+	                                v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
+	                            }
+
+	                            var thumbClass = "";
+	                            var thumbOverlay = null;
+
+	                            if (isImage) {
+	                                thumbClass = thumbClass + " image";
+	                                thumbOverlay = React.makeElement('div', { className: 'thumb-overlay',
+	                                    onClick: self._startPreview.bind(self, v) });
+	                            } else {
+	                                thumbClass = thumbClass + " video";
+	                                thumbOverlay = React.makeElement(
+	                                    'div',
+	                                    { className: 'thumb-overlay',
+	                                        onClick: isPreviewable && self._startPreview.bind(self, v) },
+	                                    isPreviewable && React.makeElement('div', { className: 'play-video-button' }),
+	                                    React.makeElement(
+	                                        'div',
+	                                        { className: 'video-thumb-details' },
+	                                        React.makeElement('i', { className: 'small-icon small-play-icon' }),
+	                                        React.makeElement(
+	                                            'span',
+	                                            null,
+	                                            secondsToTimeShort(v.playtime || -1)
+	                                        )
+	                                    )
+	                                );
+	                            }
+
+	                            preview = src ? React.makeElement(
+	                                'div',
+	                                { id: v.imgId, className: "shared-link thumb " + thumbClass },
+	                                thumbOverlay,
+	                                dropdown,
+	                                React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
+	                                    key: src === window.noThumbURI ? v.imgId : src,
+	                                    onClick: isPreviewable && self._startPreview.bind(self, v)
+	                                })
+	                            ) : preview;
 	                        }
 
 	                        files.push(React.makeElement(

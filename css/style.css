@@ -23232,15 +23232,15 @@ opacity: 1;
     display: inline-block;
     vertical-align: middle;
     margin-right: 12px;
-    background-image: url(../images/mega/wu_empty_upload_v2@2x.png);
-    background-size: 400px auto;
+    background-image: url(../images/mega/puf-embed-icons@2x.png);
+    background-size: 56px auto;
     background-repeat: no-repeat;
 }
 .widget-dialog .embed-button.dark-theme .embed-mega-icon {
-    background-position: -2px -252px;
+    background-position:-2px -2px;
 }
 .widget-dialog .embed-button.light-theme .embed-mega-icon {
-    background-position: -30px -252px;
+    background-position: -29px -2px;
 }
 .widget-dialog .embed-button .embed-action-text {
     font-family: 'source_sans_prosemibold';

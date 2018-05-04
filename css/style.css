@@ -8795,7 +8795,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-dialog.qr-contact {
     width: 482px;
-    margin: -300px 0 0 -280px;
+    margin: -300px 0 0 -240px;
     overflow: visible;
 }
 .fm-dialog.qr-contact .fm-dialog-title{

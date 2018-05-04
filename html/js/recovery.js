@@ -1,4 +1,4 @@
-﻿/**
+/**
  * a class to view and control account recovery (password forgetting) prcess
  * 
  */

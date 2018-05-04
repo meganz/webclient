@@ -1161,7 +1161,7 @@ html.gbot {
     padding: 0 0 88px 0;
 }
 .bottom-page.top-links {
-    padding: 36px 0 9px 0;
+    padding: 20px 0 9px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -1170,11 +1170,17 @@ html.gbot {
 .browsers.icon {
     width: 16px;
     height: 14px;
-    background-image: url(../images/mega/extensions-sprite.png);
+    background-image: url(../images/mega/extensions-sprite-v2.png);
     background-position: 0 0;
 }
 .browsers.icon.ff {
-    background-position: 0 -86px;
+    background-position: -68px -86px;
+}
+.browsers.icon.palemoon {
+    background-position: -216px -87px;
+}
+.browsers.icon.chrome {
+    background-position: -141px -87px;
 }
 .browsers.icon.megabird {
     background-position: -70px 0px;
@@ -1557,7 +1563,7 @@ html.gbot {
     background-size: 300px auto;
 }
 .browsers.icon {
-    background-image: url(../images/mega/extensions-sprite@2x.png) !important;
+    background-image: url(../images/mega/extensions-sprite-v2@2x.png) !important;
     background-size: 308px auto;
 }
 }
@@ -2013,7 +2019,7 @@ html.gbot {
     padding-left: 0;
     display: inline-block;
 }
-.bottom-page.top-links:first-child {
+.bottom-page.top-links:nth-child(0) {
     padding-left: 0;
 }
 }
@@ -2048,7 +2054,7 @@ html.gbot {
 .medium-txt.small-lineheight.info {
     display: none;
 }
-.browsers.download-info.chrome {
+.browsers.download-info.palemoon {
     margin-bottom: 50px;
 }
 }

@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 @font-face {
     font-family: 'source_sans_prolight';
     src: url('../fonts/SourceSansPro-Light.eot');
@@ -17,6 +17,13 @@
     font-family: 'source_sans_prosemibold';
     src: url('../fonts/SourceSansPro-Semibold.eot');
     src: url('../fonts/SourceSansPro-Semibold.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Semibold.woff2') format('woff2'), url('../fonts/SourceSansPro-Semibold.woff') format('woff'), url('../fonts/SourceSansPro-Semibold.ttf') format('truetype'), url('../fonts/SourceSansPro-Semibold.svg#source_sans_prosemibold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'source_sans_probold';
+    src: url('../fonts/SourceSansPro-Bold.eot');
+    src: url('../fonts/SourceSansPro-Bold.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Bold.woff2') format('woff2'), url('../fonts/SourceSansPro-Bold.woff') format('woff'), url('../fonts/SourceSansPro-Bold.ttf') format('truetype'), url('../fonts/SourceSansPro-Bold.svg#source_sans_probold') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -968,7 +975,7 @@ ul, li {
     line-height: 19px;
     color: #999999;
 }
-.mobile.fm-header-txt span {
+.mobile.fm-header-txt span, .mobile.fm-subheader-txt span {
     display: block;
     overflow: hidden;
     -o-text-overflow: ellipsis;
@@ -5784,6 +5791,663 @@ textarea.mobile.support-text-field {
 body.key .reg-st3-membership-bl.free.hidden {
     display: inline-block !important;
 }
+
+/* Recover account styles */ 
+.mobile .improved-recovery-steps {
+    padding-top: 60px;
+}
+.mobile .improved-recovery-steps .block-wrapper {
+    width: 100%;
+}
+.mobile .improved-recovery-steps .main-left-block {
+    width: 100%;
+    padding: 0 0;
+    height: 100%;
+    display: block;
+    float: left;
+}
+.mobile .improved-recovery-steps .main-right-block {
+    display: none;
+}
+.mobile .improved-recovery-steps h3.main-italic-header, .mobile .improved-recovery-steps h2 {
+    font-family: 'source_sans_probold';
+    font-size: 14px;
+    color: #999;
+    letter-spacing: 0;
+    padding: 0 0; 
+    -webkit-margin-before: 1.6em;
+    -webkit-margin-after: .6em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+.mobile .improved-recovery-steps .checkbox-block h3.main-italic-header, .mobile .improved-recovery-steps .app-instruction-block h3.main-italic-header {
+    padding: 0 0;
+}
+.mobile .improved-recovery-steps h2 {
+    position: absolute;
+    top: 40px;
+    color: #333;
+    display: none;
+}
+.mobile .improved-recovery-steps h1, .mobile.fm-dialog.park-account-dialog .fm-dialog-title {
+    font-family: 'source_sans_probold';
+    font-size: 1.1em;
+    color: #3C4045;
+    letter-spacing: -0.2px;
+    line-height: 1.5;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+.mobile .improved-recovery-steps .register-st2-txt-block {
+    display: table;
+    min-height: 660px;
+    width: 100%;
+    margin: 0 0 24px 0;
+}
+.mobile .improved-recovery-steps .vert-container-aligner {
+    /*vertical-align: middle;
+    display: table-cell;*/
+}
+.mobile .improved-recovery-steps .content-wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 20px;
+    min-height: 560px;
+    position: relative;
+}
+.mobile .improved-recovery-steps .main-right-block .content-wrapper {
+    padding: 0 0;
+}
+.mobile .improved-recovery-steps .content-wrapper p span {
+    font-family: 'source_sans_probold';
+    color: #F57223;
+}
+.mobile .improved-recovery-steps p {
+    font-size: 14px;
+    color: #333333;
+    letter-spacing: 0;
+    line-height: 1.7;
+}
+.mobile .improve-recovery-steps .button-container {
+    width: 100%;
+    height: 100px;
+}
+.mobile .improved-recovery-steps .recover-button {
+    font-size: 14px;
+    letter-spacing: 0;
+    text-align: right;
+    line-height: 1.5;
+    text-decoration: underline;
+    width: auto;
+    height: initial;
+    background-color: initial;
+    text-align: right;
+    text-transform: none;
+    float: none;
+    margin: 0;
+    display: block;
+    border-radius: 0px;
+    padding: 10px 16px;
+    border: 0px solid rgba(0,0,0,0);
+    -webkit-box-shadow: 0 0 0 0 #6BB219;
+    -moz-box-shadow: 0 0 0 0 #6BB219;
+    box-shadow: 0 0 0 0 #6BB219;
+    border-radius: 2px;
+    font-family: 'source_sans_proregular', Arial;
+}
+.mobile .improved-recovery-steps .recover-button.yes {
+    color: #2AAF5F;
+    margin-bottom: 12px;
+}
+.mobile .improved-recovery-steps .recover-button.yes:hover,.mobile  .recover-button.yes.active {
+    background-color: rgba(42,175,95,0.0);
+    -webkit-box-shadow: 0 0 0 0 #6BB219;
+    -moz-box-shadow: 0 0 0 0 #6BB219;
+    box-shadow: 0 0 0 0 #6BB219;
+}
+.mobile .improved-recovery-steps .recover-button.no {
+    color: #eb4444;
+}
+.mobile .improved-recovery-steps .recover-button.no:hover, .mobile .improved-recovery-steps .recover-button.no.active {
+    background-color: rgba(235,68,68,0.0);
+    -webkit-box-shadow: 0 0 0 0 #6BB219;
+    -moz-box-shadow: 0 0 0 0 #6BB219;
+    box-shadow: 0 0 0 0 #6BB219;
+}
+.mobile .improved-recovery-steps .button-container {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+.mobile .improved-recovery-steps .button-aligner {
+    float: right;
+}
+.mobile .improved-recovery-steps .backup-input-button.recover-button {
+    background: #F0373A;
+    border: 1px solid #D82928;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 1px 1px 0 rgba(255,255,255,0.20);
+    text-align: center;
+    text-decoration: none;  
+    color: #fff;
+    border-radius: 3px;
+}
+.mobile .improved-recovery-steps .progress-meter {
+    margin: 20px auto 40px;
+    padding: 40px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    max-width: 400px;
+}
+.mobile .improved-recovery-steps .progress-meter .track {
+    position: relative;
+    height: 4px;
+    background: #ddd;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-points {
+    position: relative;
+    margin: -14px 0 0;
+    padding: 0;
+    list-style: none;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point {
+    -moz-transition: color 1s;
+    -o-transition: color 1s;
+    -webkit-transition: color 1s;
+    transition: color 1s;
+    position: relative;
+    text-align: left;
+    cursor: pointer;
+    color: #999;
+    margin-bottom: 72px;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.inactive {
+    cursor: default;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point:last-of-type {
+    margin-bottom: 0px;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.completed,.mobile  .improved-recovery-steps .progress-meter .progress-point.active {
+    color: #777;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-meter .progress-points .progress-point:nth-child(1) {
+    left: 0%;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point:before {
+    -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+    -moz-border-radius: 24px;
+    -webkit-border-radius: 24px;
+    border-radius: 24px;
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 0;
+    background-color: #777E82;
+    border: 1px solid  #777E82;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point:not(.inactive):hover:before {
+    border: 4px solid  #CBCFD1;
+    margin: -4px -3px;
+    -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.active:before {
+    border-color: #777;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point:hover .progress-track {
+    height: 87px;
+    bottom: 11px;
+    -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.inactive {
+    opacity: .2; 
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.inactive .progress-content {
+    display: none;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.success:before {
+    background-color: #2AAF5F;
+    border: 1px solid  #2AAF5F;
+    -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.success .progress-track {
+    background-color: #2AAF5F;
+        -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.success:hover:before {
+    border: 4px solid  #D4EFDF;
+    margin: -4px -3px;
+        -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.success .step-label {
+    color:  #2AAF5F;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.warning:before{
+    background-color: #FF6406;
+    border: 1px solid  #FF6406;
+        -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.warning:hover:before {
+    border: 4px solid  #FDE3D3;
+    margin: -4px -3px;
+        -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+
+.mobile .improved-recovery-steps .progress-meter .progress-point.warning .progress-track {
+    background-color: #FF6406;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point.warning .step-label {
+    color: #F57223;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-point:hover .step-label {
+    text-decoration: underline;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-content {
+    display: inline-block;
+    margin: -2px 0 0 16px;
+    position: absolute;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-content .step-label {
+    font-family: "source_sans_probold";
+    font-size: 13px;
+    color: #777E82;
+    letter-spacing: 0;
+     margin-bottom: 8px;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-content .step-answer {
+    font-size: 13px;
+}
+.mobile .improved-recovery-steps .progress-meter .progress-track {
+    width: 2px;
+    height: 83px;
+    display: block;
+    background: #777E82;
+    position: absolute;
+    bottom: 15px;
+    left: 5px;
+}
+.mobile .improved-recovery-steps .login-register-input  {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-position: 9px -65px;
+    background-repeat: no-repeat;
+    padding: 0 10px 0 35px;
+    position: relative;
+    background-color: rgba(250,250,250,0.50);
+    border: 1px solid #eee;
+    max-width: 420px;
+    min-height: 48px;
+}
+.mobile .improved-recovery-steps .login-register-input:hover {
+    border: 1px solid #ddd;
+} 
+.mobile .improved-recovery-steps .login-register-input input {
+    color: #444;
+    line-height: 25px;
+    width: 100%;
+    margin-top: 7px;
+    font-size: 13px;
+}
+.mobile .improved-recovery-steps .login-register-input input::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #aaa;
+    opacity: 1; /* Firefox */
+}
+.mobile .improved-recovery-steps .login-register-input input:-ms-input-placeholder {
+     /* Internet Explorer 10-11 */
+    color: #aaa;
+}
+.mobile .improved-recovery-steps .login-register-input input::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color:#aaa;
+}
+.mobile .improved-recovery-steps .app-button {
+    border-radius: 3px;
+    padding: 0 8px;
+    display: inline-block;
+    line-height: 24px;
+    margin: 4px 2px 4px 0px;
+    cursor: pointer;
+    color: #555;
+    font-size: 14px;
+}
+.mobile .improved-recovery-steps .app-button {
+    background-color: : #FFFFFF;
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(242,242,242,0.50) 100%);
+    border: 1px solid #DFDFDF;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.03);
+    border-radius: 3px;
+}
+.mobile .improved-recovery-steps .app-button:first-of-type {
+    margin-left: 0px; 
+}
+.mobile .improved-recovery-steps .app-button:last-of-type {
+    margin-right: 0px; 
+}
+.mobile .improved-recovery-steps .app-button:hover {
+    background-color: #f2f2f2;
+    color: #111;
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(242,242,242,0.80) 100%);
+}
+.mobile .improved-recovery-steps .app-button.active {
+    background-color: #eb4444;
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0) 0%, rgba(242,242,242,0) 100%);
+    border: 1px solid #d90007;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 1px 1px 0 rgba(255,255,255,0.20);
+    border-radius: 3px;
+    color: #fff;
+}
+.improved-recovery-steps .app-button.active:hover {
+    color: #fff;
+}
+.improved-recovery-steps .app-instruction-block {
+    margin: 0 0 8px 0;
+}
+
+.mobile .improved-recovery-steps .hidden {
+    display: none;
+}
+.mobile .improved-recovery-steps ol.app-instructions-list {
+    list-style-type: none;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    -webkit-padding-start: 00;
+}
+.mobile .improved-recovery-steps li.list-point:before{
+    background-color: #eee;
+    width: 23px;
+    text-indent: 8px;
+    padding-left: 0px;
+    height: 23px;
+    line-height: 22px;
+    vertical-align: top;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    color: #666;
+    font-weight: 900;
+    display: inline-block;
+    content: counter(list);
+    margin-right: 15px;
+    font-size: 14px;
+}
+.mobile .improved-recovery-steps .list-point {
+    margin-bottom: 20px;
+    line-height: 22px;
+    counter-increment: list;
+    text-indent: -40px;
+    margin-left: 40px;
+    font-size: 14px;
+}
+.mobile .improved-recovery-steps strong {
+    font-family: 'source_sans_probold';
+    color: #333;
+}
+.mobile .improved-recovery-steps  strong.warning-text {
+    color: #eb4444;
+}
+.mobile .improved-recovery-steps .instruction-block {
+    margin-top: 32px;
+    font-size: 14px;
+}
+.mobile .improved-recovery-steps .checkbox-block {
+    padding: 0 0;
+    margin-top: 40px;
+}
+.mobile .improved-recovery-steps .checkbox-container/*, .improved-recovery-steps .app-button-block  .instruction-block */{
+    background-color: rgba(250,250,250,0.5);
+    padding:12px 0;
+    margin: 0 0;
+    border: 1px solid #eee;
+}
+.mobile .improved-recovery-steps .checkbox-container .settings-row {
+    margin-bottom: 4px;
+}
+.mobile .improved-recovery-steps .checkbox-container .settings-row div.checkboxOff, .mobile .improved-recovery-steps .checkbox-container .settings-row div.checkboxOn{
+    margin:  16px 14px;
+    width: 16px;
+    height: 16px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+    float: left;
+    cursor: pointer;
+    background-color: white;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    position: relative;
+    z-index: 1;
+    border: 1px solid #ddd;
+}
+.mobile .improved-recovery-steps .checkbox-container .settings-row input.checkboxOn, .mobile .improved-recovery-steps .checkbox-container .settings-row input.checkboxOff {
+    margin: 0;
+}
+.mobile .improved-recovery-steps .checkboxOn::before, .mobile .improved-recovery-steps .checkboxOff::before, .mobile .improved-recovery-steps .checkboxOn::after, .mobile .improved-recovery-steps .checkboxOff::after {
+    position: absolute;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    width: 100%;
+    height: 100%;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    display: block;
+    content: "";
+}
+.mobile .improved-recovery-steps .checkboxOn::after, .mobile .improved-recovery-steps .checkboxOff::after  {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    background-position: -35px -396px;
+    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+}
+.mobile .improved-recovery-steps .checkboxOn::after {
+    background-position: -35px -446px;
+}
+/*.improved-recovery-steps  .instruction-block {
+    padding: 0 12px;
+}*/
+.mobile .improved-recovery-steps .app-button-block {
+    padding: 0 0;
+    min-height: initial;
+}
+.mobile .improved-recovery-steps .checkbox-container .settings-row label {
+    line-height: 1.5;
+    padding-top: 14px;
+    color: #333;
+    font-size: 13px;
+    max-width: initial;
+    padding-right: 12px;
+    margin-top:0;
+    float: inherit;
+    display: block;
+    margin-left: 44px;
+}
+.mobile .improved-recovery-steps .checkbox-container .settings-row label:last-of-type {
+    padding-bottom: 12px;
+}
+.mobile .improved-recovery-steps .checkbox-container .settings-row label strong {
+    font-family: 'source_sans_probold';
+}
+.mobile .improved-recovery-steps strong {
+    font-family: 'source_sans_probold';
+    color: #333;
+}
+.mobile .improved-recovery-steps  strong.warning-text {
+    color: #eb4444;
+}
+.mobile .improved-recovery-steps .instruction-block {
+    margin-top: 32px;
+    font-size: 14px;
+}
+.mobile .improved-recovery-steps .content-highlight {
+    background-color: rgba(42,175,95,0.03);
+    border: 1px solid rgba(42,175,95,0.20);
+    border-radius: 2px;
+    color: #62C489;
+    margin-top: 80px;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.mobile .improved-recovery-steps .highlight-wrapper {
+    display: table;
+    min-height: 40px;
+}
+.mobile .improved-recovery-steps .content-highlight:hover {
+    background-color: rgba(250,250,250,0.75);
+    border: 1px solid #ddd;
+}
+.mobile .improved-recovery-steps .content-highlight.warning {
+    background: rgba(235,68,68,0.03);
+    border: 1px solid rgba(235,68,68,0.15);
+    border-radius: 2px;
+    color: #eb4444;
+}
+.mobile .improved-recovery-steps .content-text {
+    padding: 8px 12px 8px 0;
+    display: table-cell;
+    vertical-align: middle;
+}
+.mobile .improved-recovery-steps .feedback-logo {
+    display: block;
+    float: left;
+    position: relative;
+    background-image: url(../images/mega/help2/welcome_icons_v2.png);
+    background-repeat: no-repeat;
+    height: 32px;
+    background-position: -100px -300px;
+    width: 32px;
+    background-size: 250px auto; 
+    margin: 8px 12px;
+}
+.mobile .improved-recovery-steps .warning-icon  {
+    margin-top: 6px;
+    background-image: url(../images/mega/download-dialog_v1.png);
+    background-size: 384px auto;
+    background-position: -355px -46px;
+    width: 30px;
+    height: 25px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    float: left;
+    position: relative;
+    margin: -4px 15px 0 0px;
+}
+.mobile .improved-recovery-steps .warning-icon {
+    margin: -4px 15px 0 0;
+    display: none;
+}
+.mobile .improved-recovery-steps .warning-icon.warning  {
+    display: block;
+}
+.mobile .improved-recovery-steps h3.warning {
+    color: #F57223;
+}
+.mobile .improved-recovery-steps h3.success {
+    color: #2AAF5F;
+}
+.mobile.fm-dialog.park-account-dialog {
+    width: 100%;
+    position: relative;
+    border: none;
+    left: initial;
+    top: initial;
+    border-radius: 0;
+    max-width: 460px;
+    padding: 12px 20px;
+    margin: 0 auto;
+    border: 4px;
+}
+.mobile.fm-dialog.park-account-dialog .improved-recovery-steps {
+    padding: 0;
+    margin: 24px 0;
+}
+.mobile.fm-dialog.park-account-dialog .checkbox-block {
+    margin-bottom: 12px;
+}
+.mobile.fm-dialog.park-account-dialog .content-highlight.warning {
+    margin-top: 12px;
+}
+.mobile.fm-dialog.park-account-dialog .warning-icon {
+    margin: 14px 16px 0 14px;
+    display: block;
+}
+.mobile.fm-dialog.park-account-dialog .inline-buttons {
+    overflow: auto;
+}
+.mobile.fm-dialog-container {
+    display: table;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    position: absolute;
+}
+.mobile.fm-dialog-aligner {
+    display: table-cell;
+    vertical-align: middle;
+}
+.forgot-password-page .mobile.fm-subheader-txt {
+    font-size: 13px;
+    color: #777;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: left;
+    white-space: nowrap;
+    margin: 0 60px 0;
+}
+.forgot-password-page .mobile.fm-header-txt {
+    font-size: 17px;
+    color: #111;
+    padding: 14px 00px 0 00px
+}
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {
@@ -5909,6 +6573,35 @@ body.key .reg-st3-membership-bl.free.hidden {
     }
 }
 
+@media only screen and (orientation:landscape) and (min-width: 768px) and (min-height: 768px), only screen and (orientation:portrait) and (min-height: 768px) and (min-width: 768px) {
+    .mobile .improved-recovery-steps .backup-input-button.recover-button {
+        max-width: 100px;
+    }
+    .mobile .improved-recovery-steps .vert-container-aligner {
+        vertical-align: middle;
+        display: table-cell;
+    }
+    .mobile .improved-recovery-steps .main-left-block {
+        width: 70%;
+    }
+    .mobile .improved-recovery-steps .main-right-block {
+        width: 30%;
+        display: block;
+        background-color:#F6F7F8;
+        width: 30%;
+        margin: 36px 0 0 0;
+        bottom: 0;
+        top: 0;
+        right: 0;
+        float: right;
+    }
+    .mobile .improved-recovery-steps {
+        padding-top: 26px; 
+    }
+    .mobile .improved-recovery-steps .register-st2-txt-block {
+        min-height: 100vh;
+    }
+}
 @media only screen and (orientation:landscape) and (max-width: 800px), only screen and (orientation:portrait) and (max-height: 800px) {
     .mobile.homepage .company-slogan {
         font-size: 24px;
@@ -6364,6 +7057,15 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile.grid-view .mobile.fm-item.folder, .mobile.grid-view .mobile.fm-item.file {
         width: calc((100% - 36px) / 2);
     }
+    .mobile .improved-recovery-steps .main-left-block {
+        width: 100%;
+    }
+    .mobile .improved-recovery-steps .main-right-block {
+        display: none;
+    }
+    .mobile .improved-recovery-steps {
+        padding-top: 72px;
+    }
 }
 /*iphone se portrait styles */
 @media only screen and (orientation:landscape) and (max-width: 321px), only screen and (orientation:portrait) and (max-height: 569px) {
@@ -6394,7 +7096,6 @@ body.key .reg-st3-membership-bl.free.hidden {
         width: calc((100% - 72px) / 5);
     }
 }
-
 /* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */
 @media only screen and (min-width: 400px) {
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-options-list .payment-method {
@@ -6446,13 +7147,32 @@ body.key .reg-st3-membership-bl.free.hidden {
         background-image: url(../images/mega/register-big-sprite-v15@2x.png);
         background-size: 200px auto;
     }
+    .mobile .improved-recovery-steps .login-register-input, .mobile .improved-recovery-steps .checkboxOn::after, .mobile .improved-recovery-steps .checkboxOff::after {
+        background-image: url(../images/mega/top-login-sprite_v9@2x.png);
+        background-size: 48px auto;
+    }
+    .mobile .improved-recovery-steps .feedback-logo {
+        background-image: url(../images/mega/help2/welcome_icons_v2@2x.png);
+        background-size: 250px auto;
+    }
 }
 
  @media screen and (orientation:landscape) { 
     .app-info-block .mobile.download-app {
         display: none;
     }
+    .mobile .improved-recovery-steps .backup-input-button.recover-button {
+        max-width: 100px;
+    }
 }
+ @media screen and (orientation:portrait) {
+    .mobile .improved-recovery-steps .main-right-block {
+        display: none;
+    }
+    .mobile .improved-recovery-steps .main-left-block {
+        width: 100%;
+    }
+ }
 
 @keyframes rotate-loading {
     0% {

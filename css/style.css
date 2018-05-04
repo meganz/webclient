@@ -8795,7 +8795,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-dialog.qr-contact {
     width: 482px;
-    margin: -300px 0 0 -240px;
+    margin: -170px 0 0 -240px;
     overflow: visible;
 }
 .fm-dialog.qr-contact .fm-dialog-title{
@@ -8810,23 +8810,21 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .qr-contact .default-red-button {
     width: 200px;
     height: 56px;
-    float: left;
+    float: initial;
     margin: 32px auto 33px;
     line-height: 56px;
     background-color: #F0373A;
     -webkit-box-shadow:inset 0 1px 1px 0 rgba(255,255,255,0.2), 0 1px 2px 0 rgba(217,0,7,0.3);
     -moz-box-shadow:inset 0 1px 1px 0 rgba(255,255,255,0.2), 0 1px 2px 0 rgba(217,0,7,0.3);
     box-shadow: inset 0 1px 1px 0 rgba(255,255,255,0.2), 0 1px 2px 0 rgba(217,0,7,0.3);
-
 }
 .qr-contact .default-red-button .big-btn-txt {
-    height: 22px;
-    width: 121px;
     color: #FFFFFF;
     font-family: 'montserrat, open_sans, sans-serif' ;
     font-size: 18px;
     text-align: center;
     line-height: 56px;
+    margin: auto;
 }
 .qr-contact .avatar img {
     width: 96px;
@@ -8845,7 +8843,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     font-family: source_sans_prosemibold;
     font-size: 16px;
     line-height: 24px;
-    font-weight: 600;
     text-align: center;
     margin-top: 24px;
     user-select: text;
@@ -8857,7 +8854,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     line-height: 18px;
     text-align: center;
     user-select: text;
-    font-weight: 600;
+    margin-top: 4px;
 }
 .fm-dialog.qr-dialog {
     width: 560px;

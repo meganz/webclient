@@ -10448,7 +10448,7 @@ React.makeElement = React['createElement'];
 	                    message.deleted = true;
 	                }
 	                var messageActionButtons = null;
-	                if (message.getState() === Message.STATE.NOT_SENT) {
+	                if (message.getState() === Message.STATE.NOT_SENT || message.getState() === Message.STATE.NOT_SENT_EXPIRED) {
 	                    messageActionButtons = null;
 
 	                    if (!spinnerElement) {

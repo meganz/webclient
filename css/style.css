@@ -8798,30 +8798,35 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     margin: -300px 0 0 -280px;
     overflow: visible;
 }
+.fm-dialog.qr-contact .fm-dialog-title{
+    font-size: 20px;
+}
 .qr-contact .avatar {
     width: 100px;
     height: 100px;
-    margin-left: 193px;
+    margin: 0 auto;
     float: none;
 }
 .qr-contact .default-red-button {
     width: 200px;
     height: 56px;
     float: left;
-    margin-top: 32px;
-    margin-left: 141px;
-    margin-bottom: 33px;
+    margin: 32px auto 33px;
+    line-height: 56px;
+    background-color: #F0373A;
+    -webkit-box-shadow:inset 0 1px 1px 0 rgba(255,255,255,0.2), 0 1px 2px 0 rgba(217,0,7,0.3);
+    -moz-box-shadow:inset 0 1px 1px 0 rgba(255,255,255,0.2), 0 1px 2px 0 rgba(217,0,7,0.3);
+    box-shadow: inset 0 1px 1px 0 rgba(255,255,255,0.2), 0 1px 2px 0 rgba(217,0,7,0.3);
+
 }
 .qr-contact .default-red-button .big-btn-txt {
     height: 22px;
     width: 121px;
     color: #FFFFFF;
-    font-family: VentiCF-Bold;
+    font-family: 'montserrat, open_sans, sans-serif' ;
     font-size: 18px;
-    line-height: 22px;
     text-align: center;
-    margin-top: 17px;
-    margin-left: 25px;
+    line-height: 56px;
 }
 .qr-contact .avatar img {
     width: 96px;
@@ -8966,7 +8971,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     height: 100%;
     text-align: center;
     color: white;
-    margin-top: 28px;
+    line-height: 98px;
 }
 .fm-dialog.browsers-dialog {
     width: 624px;

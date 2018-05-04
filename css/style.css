@@ -22041,6 +22041,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail {
     right: 0px !important;
     margin: 2px 0;
+    z-index: 7;
 }
 .bp-main .jspPane {
     min-width: auto;

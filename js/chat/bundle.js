@@ -1606,8 +1606,6 @@ React.makeElement = React['createElement'];
 
 	        var presence = self.props.megaChat.getMyPresence();
 
-	        var startChatIsDisabled = !presence || presence === UserPresence.PRESENCE.OFFLINE;
-
 	        var leftPanelStyles = {};
 
 	        if (self.state.leftPaneWidth) {
@@ -1684,7 +1682,6 @@ React.makeElement = React['createElement'];
 	                            {
 	                                group: "conversationsListing",
 	                                icon: "white-medium-plus",
-	                                disabled: startChatIsDisabled,
 	                                contacts: this.props.contacts
 	                            },
 	                            React.makeElement(DropdownsUI.DropdownContactsSelector, {
@@ -4132,7 +4129,7 @@ React.makeElement = React['createElement'];
 	        array.remove(excludedParticipants, u_handle, false);
 
 	        var dontShowTruncateButton = false;
-	        if (myPresence === 'offline' || !room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
+	        if (!room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
 	            dontShowTruncateButton = true;
 	        }
 
@@ -4155,7 +4152,7 @@ React.makeElement = React['createElement'];
 	            );
 	        }
 
-	        var renameButtonClass = "link-button " + (room.isReadOnly() || !room.iAmOperator() || myPresence === 'offline' ? "disabled" : "");
+	        var renameButtonClass = "link-button " + (room.isReadOnly() || !room.iAmOperator() ? "disabled" : "");
 
 	        return React.makeElement(
 	            "div",
@@ -4185,7 +4182,7 @@ React.makeElement = React['createElement'];
 	                                icon: "rounded-grey-plus",
 	                                label: __(l[8007]),
 	                                contacts: this.props.contacts,
-	                                disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator()) || myPresence === 'offline'
+	                                disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
 	                            },
 	                            React.makeElement(DropdownsUI.DropdownContactsSelector, {
 	                                contacts: this.props.contacts,
@@ -4198,7 +4195,6 @@ React.makeElement = React['createElement'];
 	                                multipleSelectedButtonLabel: __(l[8869]),
 	                                nothingSelectedButtonLabel: __(l[8870]),
 	                                onSelectDone: this.props.onAddParticipantSelected,
-	                                disabled: myPresence === 'offline',
 	                                positionMy: "center top",
 	                                positionAt: "left bottom"
 	                            })
@@ -4223,7 +4219,7 @@ React.makeElement = React['createElement'];
 	                                className: "link-button dropdown-element",
 	                                icon: "rounded-grey-up-arrow",
 	                                label: __(l[6834] + "..."),
-	                                disabled: room.isReadOnly() || myPresence === 'offline'
+	                                disabled: room.isReadOnly()
 	                            },
 	                            React.makeElement(
 	                                DropdownsUI.Dropdown,
@@ -4258,7 +4254,7 @@ React.makeElement = React['createElement'];
 	                        ),
 	                        room.type === "group" ? React.makeElement(
 	                            "div",
-	                            { className: "link-button red " + (myPresence === 'offline' || room.stateIsLeftOrLeaving() ? "disabled" : ""),
+	                            { className: "link-button red " + (room.stateIsLeftOrLeaving() ? "disabled" : ""),
 	                                onClick: function onClick(e) {
 	                                    if ($(e.target).closest('.disabled').size() > 0) {
 	                                        return false;
@@ -5843,7 +5839,7 @@ React.makeElement = React['createElement'];
 	                                {
 	                                    className: "popup-button",
 	                                    icon: "small-icon grey-medium-plus",
-	                                    disabled: room.isReadOnly() || myPresence === 'offline'
+	                                    disabled: room.isReadOnly()
 	                                },
 	                                React.makeElement(
 	                                    DropdownsUI.Dropdown,

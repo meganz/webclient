@@ -436,7 +436,7 @@ def reduce_validator(file_line_mapping, **extra):
         if not any([n in file_path for n in special_chars_exclude]):
             if analyse_files_for_special_chars(file_path, result):
                 fatal += 1
-                break
+                # break
 
         # Ignore known custom made files
         if file_path in config.VALIDATOR_IGNORE_FILES:
@@ -455,12 +455,12 @@ def reduce_validator(file_line_mapping, **extra):
             fatal += 1
             result.append('Minified/obfuscated code found in file {}. {}'
                           .format(file_path, warning))
-            continue
+            # continue
 
         if os.path.getsize(file_path) > 120000 and file_extension != '.css':
             result.append('The file "{}" has turned too big, '
                           'any new functions must be moved elsewhere.'.format(file_path))
-            continue;
+            # continue
 
         lines = []
         with open(file_path, 'r') as fd:
@@ -484,7 +484,7 @@ def reduce_validator(file_line_mapping, **extra):
                     result.append('Found line too long in file {}, line {} (length {}). '
                                   'Please keep your lines under 120 characters.'
                                   .format(file_path, line_number, line_length))
-                    break
+                    # break
 
                 lines.append(line.rstrip())
 
@@ -720,8 +720,8 @@ def main(base, target, norules, branch):
         total_errors += error_count
 
         # If a fatal issue is found, halt execution and quit
-        if fatal > 0:
-            break
+        # if fatal > 0:
+            # break
 
     if total_errors > 0:
         logging.info('Output of reduced results ...')

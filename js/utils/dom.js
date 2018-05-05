@@ -197,12 +197,24 @@ function escapeHTML(str) {
 }
 escapeHTML.replacements = {"&": "&amp;", '"': "&quot;", "'": "&#39;", "<": "&lt;", ">": "&gt;"};
 
-
+// deprecated
 function htmlentities(value) {
     if (!value) {
         return '';
     }
     return $('<div/>').text(value).html();
+}
+
+/**
+ * Purge html content from an string
+ * @param {String} str The html string
+ * @param {Boolean} escape Whether we want the result escaped,
+ *                         MUST be set if you want to insert the string back in the DOM as html
+ */
+function removeHTML(str, escape) {
+    'use strict';
+    str = $('<div/>').safeHTML(str).text();
+    return escape ? escapeHTML(str) : str;
 }
 
 /**

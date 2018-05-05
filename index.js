@@ -42,14 +42,14 @@ var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500
 pages['placeholder'] = '<div class="bottom-page scroll-block">' +
     '((TOP))' +
     '<div class="main-pad-block">' +
-        '<div class="main-mid-pad new-bottom-pages"></div>' +
+    '<div class="main-mid-pad new-bottom-pages"></div>' +
     '</div>';
 
-mBroadcaster.once('startMega', function() {
+mBroadcaster.once('startMega', function () {
     'use strict';
 
     if (!hashLogic) {
-        $(window).rebind('popstate.mega', function(event) {
+        $(window).rebind('popstate.mega', function (event) {
             var state = event.originalEvent.state || {};
             var add = '';
             if (state.searchString) {
@@ -60,7 +60,7 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
-mBroadcaster.once('startMega:desktop', function() {
+mBroadcaster.once('startMega:desktop', function () {
     'use strict';
 
     if (pages['dialogs']) {
@@ -120,7 +120,7 @@ function topMenu(close) {
 
         if (!is_mobile) {
             topMenuScroll();
-            $(window).rebind('resize.topmenu', function() {
+            $(window).rebind('resize.topmenu', function () {
                 if ($('.top-icon.menu').hasClass('active')) {
                     topMenuScroll();
                 }
@@ -129,7 +129,7 @@ function topMenu(close) {
         else {
             // If on mobile, show the dark backround overlay behind the menu and if it's clicked, close the menu
             $('html').addClass('overlayed');
-            $('.mobile.dark-overlay').removeClass('hidden').addClass('active').off('tap').on('tap', function() {
+            $('.mobile.dark-overlay').removeClass('hidden').addClass('active').off('tap').on('tap', function () {
                 topMenu(true);
                 return false;
             });
@@ -149,7 +149,7 @@ function topMenuScroll() {
 function scrollMenu() {
     "use strict";
 
-    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function() {
+    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function () {
         if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
             var $menu = $('.new-left-menu-block');
             var topPos = $(this).scrollTop();
@@ -169,8 +169,7 @@ function scrollMenu() {
 }
 
 function topPopupAlign(button, popup, topPos) {
-    $.popupAlign = function()
-    {
+    $.popupAlign = function () {
         var $button = $(button),
             $popup = $(popup),
             $popupArrow = $popup.find('.dropdown-white-arrow'),
@@ -185,8 +184,8 @@ function topPopupAlign(button, popup, topPos) {
             $popupArrow.removeAttr('style');
             popupRightPos = pageWidth
                 - $button.offset().left
-                - $button.outerWidth()/2
-                - $popup.outerWidth()/2;
+                - $button.outerWidth() / 2
+                - $popup.outerWidth() / 2;
             if (topPos) {
                 $popup.css('top', topPos + 'px');
             }
@@ -202,7 +201,7 @@ function topPopupAlign(button, popup, topPos) {
                 $popup.css('right', '10px');
                 arrowRightPos = pageWidth
                     - $button.offset().left
-                    - $button.outerWidth()/2;
+                    - $button.outerWidth() / 2;
                 $popupArrow.css({
                     left: 'auto',
                     right: arrowRightPos - 22
@@ -213,7 +212,7 @@ function topPopupAlign(button, popup, topPos) {
 
     // If top menu is opened - set timeout to count correct positions
     if (!$('.top-menu-popup').hasClass('hidden')) {
-        setTimeout(function() {
+        setTimeout(function () {
             $.popupAlign();
         }, 250);
     } else {
@@ -257,10 +256,10 @@ function init_page() {
             page = 'download';
 
             M.abortTransfers()
-                .done(function() {
+                .done(function () {
                     location.reload();
                 })
-                .fail(function() {
+                .fail(function () {
                     loadSubPage($.lastSeenFilelink);
                 });
 
@@ -307,7 +306,7 @@ function init_page() {
 
         $html.height(window.innerHeight);
 
-        $(window).rebind('resize.htmlheight', function() {
+        $(window).rebind('resize.htmlheight', function () {
             $html.height(window.innerHeight);
         });
     }
@@ -321,11 +320,11 @@ function init_page() {
         delete localStorage.signupcode;
     }
     else if (localStorage.signupcode
-            && page.substr(0, 6) !== 'signup'
-            && page !== 'register'
-            && page !== 'terms'
-            && page !== 'mega'
-            && page !== 'privacy' && page !== 'chrome' && page !== 'firefox') {
+        && page.substr(0, 6) !== 'signup'
+        && page !== 'register'
+        && page !== 'terms'
+        && page !== 'mega'
+        && page !== 'privacy' && page !== 'chrome' && page !== 'firefox') {
         register_txt = l[1291];
         loadSubPage('signup' + localStorage.signupcode);
         return false;
@@ -343,10 +342,10 @@ function init_page() {
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
         var ctLink = page.substring(2, page.length);
-        mBroadcaster.once('boot_done', function () {            
+        mBroadcaster.once('fm:initialized', function () {
             openContactInfoLink(ctLink);
         });
-        
+
         page = 'fm/contacts';
     }
 
@@ -405,7 +404,7 @@ function init_page() {
 
                     // Show the decryption key dialog on top
                     mKeyDialog(pfid, true, pfkey)
-                        .fail(function() {
+                        .fail(function () {
                             loadSubPage('start');
                         });
                     pfkey = false;
@@ -502,7 +501,7 @@ function init_page() {
                 // Insert placeholder page while waiting for user input
                 parsepage(pages['placeholder']);
 
-                return mega.ui.sendSignupLinkDialog(acc, function() {
+                return mega.ui.sendSignupLinkDialog(acc, function () {
                     // The user clicked 'close', abort and start over...
                     delete localStorage.awaitingConfirmationAccount;
                     init_page();
@@ -517,7 +516,7 @@ function init_page() {
             parsepage(pages['mobile']);
 
             // Show message that the account has been cancelled successfully
-            mobile.messageOverlay.show(l[6188], l[6189], function() {
+            mobile.messageOverlay.show(l[6188], l[6189], function () {
                 loadSubPage('start');
             });
         }
@@ -525,7 +524,7 @@ function init_page() {
             // Insert placeholder page while waiting for user input
             parsepage(pages['placeholder']);
 
-            msgDialog('warninga', l[6188], l[6189], '', function() {
+            msgDialog('warninga', l[6188], l[6189], '', function () {
                 loadSubPage('start');
             });
         }
@@ -671,42 +670,42 @@ function init_page() {
             a: 'uv',
             c: signupcode
         }, {
-            callback: function (res) {
-                loadingDialog.hide();
-                if (typeof res == 'number' && res < 0) {
-                    if (localStorage.signupcode) {
-                        delete localStorage.signupcode;
-                        delete localStorage.registeremail;
-                    }
-                    else {
-                        msgDialog('warningb', l[135], l[1290]);
-                    }
-                    loadSubPage('start');
-                }
-                else if (u_type === false) {
-                    localStorage.signupcode = signupcode;
-                    localStorage.registeremail = res;
-                    loadSubPage('register');
-                    if (!register_txt) {
-                        register_txt = l[1289];
-                    }
-                }
-                else {
-                    var confirmtxt = 'You are currently logged in. Would you like to log out and register a new account?';
-                    if (l[1824]) {
-                        confirmtxt = l[1824];
-                    }
-                    msgDialog('confirmation', l[968], confirmtxt, '', function (e) {
-                        if (e) {
-                            mLogout();
+                callback: function (res) {
+                    loadingDialog.hide();
+                    if (typeof res == 'number' && res < 0) {
+                        if (localStorage.signupcode) {
+                            delete localStorage.signupcode;
+                            delete localStorage.registeremail;
                         }
                         else {
-                            loadSubPage('');
+                            msgDialog('warningb', l[135], l[1290]);
                         }
-                    });
+                        loadSubPage('start');
+                    }
+                    else if (u_type === false) {
+                        localStorage.signupcode = signupcode;
+                        localStorage.registeremail = res;
+                        loadSubPage('register');
+                        if (!register_txt) {
+                            register_txt = l[1289];
+                        }
+                    }
+                    else {
+                        var confirmtxt = 'You are currently logged in. Would you like to log out and register a new account?';
+                        if (l[1824]) {
+                            confirmtxt = l[1824];
+                        }
+                        msgDialog('confirmation', l[968], confirmtxt, '', function (e) {
+                            if (e) {
+                                mLogout();
+                            }
+                            else {
+                                loadSubPage('');
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
     }
     else if (page == 'newpw') {
         setpwset(pwchangecode, {
@@ -742,7 +741,7 @@ function init_page() {
         loadingDialog.show();
 
         var ctx = {
-            signupcodeok: function(email) {
+            signupcodeok: function (email) {
 
                 loadingDialog.hide();
                 confirmok = true;
@@ -762,7 +761,7 @@ function init_page() {
                     topmenuUI();
                 }
             },
-            signupcodebad: function(res) {
+            signupcodebad: function (res) {
 
                 loadingDialog.hide();
                 page = 'login';
@@ -903,7 +902,7 @@ function init_page() {
             $('.account-mid-block').addClass('high');
         }
     }
-    else if (page.substr(0,4) == 'help') {
+    else if (page.substr(0, 4) == 'help') {
         return Help.render();
     }
     else if (page == 'privacy') {
@@ -969,13 +968,13 @@ function init_page() {
                     title: l[6186],
                     textContent: l[5841]
                 })
-                .done(init_page)
-                .fail(function(aError) {
-                    if (aError) {
-                        alert(aError);
-                    }
-                    loadSubPage('start');
-                });
+                    .done(init_page)
+                    .fail(function (aError) {
+                        if (aError) {
+                            alert(aError);
+                        }
+                        loadSubPage('start');
+                    });
             }
         }
     }
@@ -990,11 +989,11 @@ function init_page() {
         }
         else {
             mega.ui.showLoginRequiredDialog({
-                    minUserType: 3,
-                    skipInitialDialog: 1
-                })
+                minUserType: 3,
+                skipInitialDialog: 1
+            })
                 .done(init_page)
-                .fail(function(aError) {
+                .fail(function (aError) {
                     if (aError) {
                         alert(aError);
                     }
@@ -1011,8 +1010,11 @@ function init_page() {
                 return false;
             }
             else {
-                parsepage(pages['mobile']);
-                mobile.recovery.init();
+                parsepage(pages['recovery']);
+                //mobile.recovery.init();
+                var recov = new AccountRecoveryControl();
+                mega.accountController = recov;
+                mega.accountController.showStep();
             }
         }
         else {
@@ -1022,8 +1024,11 @@ function init_page() {
             }
             else {
                 parsepage(pages['recovery']);
-                var accountRecovery = new mega.AccountRecovery();
-                accountRecovery.initRecovery();
+                //var accountRecovery = new mega.AccountRecovery();
+                //accountRecovery.initRecovery();
+                var recov = new AccountRecoveryControl();
+                mega.accountController = recov;
+                mega.accountController.showStep();
             }
         }
     }
@@ -1083,7 +1088,7 @@ function init_page() {
     }
     else if (page == 'about') {
         loadingDialog.show();
-        CMS.get("team", function(err, content) {
+        CMS.get("team", function (err, content) {
             parsepage(pages['about']);
 
             var html = '';
@@ -1278,7 +1283,7 @@ function init_page() {
         else if (u_type < 3) {
             // If their account is ephemeral and the email is not confirmed, then show them a dialog to warn them and
             // make sure they confirm first otherwise we get lots of chargebacks from users paying in the wrong account
-            msgDialog('warningb', l[8666], l[8665], false, function() {
+            msgDialog('warningb', l[8666], l[8665], false, function () {
                 loadSubPage('fm');
             });
         }
@@ -1329,9 +1334,9 @@ function init_page() {
         if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
 
             M.reset();
-            folderlink     = 0;
-            fminitialized  = false;
-            loadfm.loaded  = false;
+            folderlink = 0;
+            fminitialized = false;
+            loadfm.loaded = false;
             loadfm.loading = false;
 
             stopapi();
@@ -1378,9 +1383,9 @@ function init_page() {
             }
 
             if (u_type === 0 && !u_attr.terms) {
-                $.termsAgree = function() {
+                $.termsAgree = function () {
                     u_attr.terms = 1;
-                    api_req({a: 'up', terms: 'Mq'});
+                    api_req({ a: 'up', terms: 'Mq' });
                     // queued work is continued when user accept terms of service
                     $('.transfer-pause-icon').removeClass('active');
                     $('.nw-fm-left-icon.transfers').removeClass('paused');
@@ -1392,7 +1397,7 @@ function init_page() {
                     }
                 };
 
-                $.termsDeny = function() {
+                $.termsDeny = function () {
                     u_logout();
                     document.location.reload();
                 };
@@ -1432,7 +1437,7 @@ function init_page() {
                 var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
                 if (fdl && fdl_queue_var.dlkey === dlpage_key) {
 
-                    Soon(function() {
+                    Soon(function () {
                         M.putToTransferTable(fdl);
                         M.onDownloadAdded(1, dlQueue.isPaused(dlmanager.getGID(fdl)));
 
@@ -1447,7 +1452,7 @@ function init_page() {
         if (megaChatIsDisabled) {
             $(document.body).addClass("megaChatDisabled");
         }
-		pagemetadata();
+        pagemetadata();
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout) {
@@ -1547,9 +1552,9 @@ function loginDialog(close) {
         $(this).find('input').focus();
     });
 
-    $('.top-login-input-block.password input,.top-login-input-block.e-mail input').rebind('blur', function() {
+    $('.top-login-input-block.password input,.top-login-input-block.e-mail input').rebind('blur', function () {
         $(this).parents('.top-login-input-block').removeClass('focused');
-    }).rebind('focus', function() {
+    }).rebind('focus', function () {
         $(this).parents('.top-login-input-block').addClass('focused');
     });
 
@@ -1729,10 +1734,10 @@ function topmenuUI() {
 
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
-            .done(function() {
+            .done(function () {
                 $topHeader.find('.top-icon.achievements').removeClass('hidden');
             })
-            .fail(function() {
+            .fail(function () {
                 $topHeader.find('.top-icon.achievements').addClass('hidden');
             });
 
@@ -1839,7 +1844,7 @@ function topmenuUI() {
             // Init the top header change language button
             $topChangeLangName.text(lang);
             $topChangeLang.removeClass('hidden');
-            $topChangeLang.rebind('click', function() {
+            $topChangeLang.rebind('click', function () {
 
                 // Add log to see how often they click to change language
                 api_req({ a: 'log', e: 99600, m: 'Language menu opened from top header' });
@@ -1866,34 +1871,34 @@ function topmenuUI() {
             c = $(e.target).attr('class');
         }
         if (!e || ($(e.target).parents('.top-menu-popup').length == 0
-                && !$(e.target).hasClass('top-menu-popup')
-                && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
+            && !$(e.target).hasClass('top-menu-popup')
+            && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
             topMenu(1);
         }
         if (!e || ($(e.target).parents('.top-warning-popup').length == 0
-                && !$(e.target).hasClass('top-menu-popup')
-                && ((c && c.indexOf('top-icon warning') == -1) || !c))) {
+            && !$(e.target).hasClass('top-menu-popup')
+            && ((c && c.indexOf('top-icon warning') == -1) || !c))) {
             $topHeader.find('.top-warning-popup').addClass('hidden');
             $topHeader.find('.top-icon.warning').removeClass('active');
         }
         if (!e || ($(e.target).parents('.top-user-status-popup').length == 0
-                && ((c && c.indexOf('activity-status') == -1 && c.indexOf('loading') == -1) || !c))) {
+            && ((c && c.indexOf('activity-status') == -1 && c.indexOf('loading') == -1) || !c))) {
             $topHeader.find('.top-user-status-popup').addClass('hidden');
             $topHeader.find('.activity-status-block').removeClass('active');
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
-                && ((c && c.indexOf('top-icon notification') == -1) || !c))) {
+            && ((c && c.indexOf('top-icon notification') == -1) || !c))) {
 
             if (typeof notify === 'object') {
                 notify.closePopup();
             }
         }
         if (!e || ($(e.target).parents('.dropdown.top-login-popup').length == 0
-                && ((c && c.indexOf('top-login-button') == -1) || !c))) {
+            && ((c && c.indexOf('top-login-button') == -1) || !c))) {
             $topHeader.find('.dropdown.top-login-popup').addClass('hidden');
         }
         if ((!e || $(e.target).parents('.create-new-folder').length == 0)
-                && (!c || c.indexOf('fm-new-folder') == -1)) {
+            && (!c || c.indexOf('fm-new-folder') == -1)) {
             var c3;
             if (e && e.target) {
                 c3 = $(e.target).parent().attr('class');
@@ -1904,20 +1909,20 @@ function topmenuUI() {
             }
         }
         if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0)
-                && (!c || c.indexOf('fm-add-user') == -1)) {
+            && (!c || c.indexOf('fm-add-user') == -1)) {
             $('.fm-add-user').removeClass('active');
             $('.add-user-popup').addClass('dialog hidden');
             $('.add-user-popup').removeAttr('style');
         }
     };
 
-    $('#pageholder, #startholder').rebind('click', function(e) {
+    $('#pageholder, #startholder').rebind('click', function (e) {
         if (typeof $.hideTopMenu === 'function') {
             $.hideTopMenu(e);
         }
     });
 
-    $topHeader.find('.top-icon.achievements').rebind('click', function() {
+    $topHeader.find('.top-icon.achievements').rebind('click', function () {
         mega.achievem.achievementsListDialog();
     });
 
@@ -2099,7 +2104,7 @@ function topmenuUI() {
                         M.nn = Object.create(null);
 
                         promise = fmdb.get('f')
-                            .always(function(r) {
+                            .always(function (r) {
                                 for (var i = r.length; i--;) {
                                     if (!r[i].fv) {
                                         M.nn[r[i].h] = r[i].name;
@@ -2111,17 +2116,17 @@ function topmenuUI() {
                         promise.resolve();
                     }
 
-                    promise.always(function() {
+                    promise.always(function () {
                         var handles = [];
                         var filter = M.getFilterBySearchFn(val);
 
                         for (var h in M.nn) {
-                            if (!M.d[h] && filter({name: M.nn[h]})) {
+                            if (!M.d[h] && filter({ name: M.nn[h] })) {
                                 handles.push(h);
                             }
                         }
 
-                        dbfetch.geta(handles).always(function() {
+                        dbfetch.geta(handles).always(function () {
                             loadingDialog.hide();
                             loadSubPage('fm/search/' + val);
                         });
@@ -2132,8 +2137,8 @@ function topmenuUI() {
     });
 
     // Hover tooltip for top-menu elements and sidebar icons
-    $('.nw-fm-left-icon, .top-icon').rebind('mouseover.nw-fm-left-icon', function() {
-        var $this    = $(this);
+    $('.nw-fm-left-icon, .top-icon').rebind('mouseover.nw-fm-left-icon', function () {
+        var $this = $(this);
         var $tooltip = $this.find('.dark-tooltip');
         var tooltipPos;
         var tooltipWidth;
@@ -2143,11 +2148,11 @@ function topmenuUI() {
             clearTimeout($.liTooltipTimer);
         }
         $.liTooltipTimer = window.setTimeout(
-            function() {
+            function () {
                 if ($tooltip.hasClass('top')) {
                     tooltipWidth = $tooltip.outerWidth();
-                    buttonPos    = $this.position().left;
-                    tooltipPos   = buttonPos + $this.outerWidth() / 2 - tooltipWidth / 2;
+                    buttonPos = $this.position().left;
+                    tooltipPos = buttonPos + $this.outerWidth() / 2 - tooltipWidth / 2;
                     if ($('body').width() - (tooltipPos + tooltipWidth) > 0) {
                         $tooltip.css({
                             'left': tooltipPos,
@@ -2164,12 +2169,12 @@ function topmenuUI() {
                 $tooltip.addClass('hovered');
             }, 1000);
     })
-    .rebind('mouseout.nw-fm-left-icon', function() {
-        $(this).find('.dark-tooltip').removeClass('hovered');
-        clearTimeout($.liTooltipTimer);
-    });
+        .rebind('mouseout.nw-fm-left-icon', function () {
+            $(this).find('.dark-tooltip').removeClass('hovered');
+            clearTimeout($.liTooltipTimer);
+        });
 
-    $topHeader.find('.fm-avatar').rebind('click', function() {
+    $topHeader.find('.fm-avatar').rebind('click', function () {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
         if ($(this).find('img').length > 0) {
@@ -2182,18 +2187,18 @@ function topmenuUI() {
     });
 
     // If the user name in the header is clicked, take them to the account overview page
-    $topHeader.find('.user-name').rebind('click', function() {
+    $topHeader.find('.user-name').rebind('click', function () {
         loadSubPage('fm/account');
     });
 
     // If the main Mega M logo in the header is clicked
-    $topHeader.find('.logo').rebind('click', function() {
+    $topHeader.find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             if (folderlink) {
                 M.openFolder(M.RootID, true);
             }
             else {
-                    loadSubPage(typeof u_type !== 'undefined' && +u_type > 2 ? 'fm/dashboard' : 'start');
+                loadSubPage(typeof u_type !== 'undefined' && +u_type > 2 ? 'fm/dashboard' : 'start');
             }
         }
     });
@@ -2221,7 +2226,7 @@ function topmenuUI() {
             loadSubPage($.dlhash);
         }
         else if (folderlink && M.lastSeenFolderLink) {
-            mBroadcaster.once('mega:openfolder', function() {
+            mBroadcaster.once('mega:openfolder', function () {
                 $('.nw-fm-left-icon.transfers').click();
             });
             loadSubPage(M.lastSeenFolderLink);
@@ -2281,80 +2286,64 @@ function is_fm() {
  */
 function getTemplate(name) {
 
-    return translate(''+pages[name]).replace(/{staticpath}/g, staticpath);
+    return translate('' + pages[name]).replace(/{staticpath}/g, staticpath);
 }
 
-function pagemetadata()
-{
-	var mega_desc = false;
+function pagemetadata() {
+    var mega_desc = false;
 
-	if (page == 'android')
-	{
-		mega_title = 'Android - MEGA';
-		mega_desc = 'The MEGA Android app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
-	}
-	else if (page == 'ios')
-	{
-		mega_title = 'iOS - MEGA';
-		mega_desc = 'The MEGA iOS app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
-	}
-	else if (page == 'wp')
-	{
-		mega_title = 'Windows Phone - MEGA';
-	}
-	else if (page == 'sync')
-	{
-		mega_title = 'MEGAsync - Download';
-		mega_desc = 'MEGAsync securely synchronizes data between your computer and your MEGA account. Available for Windows, Mac and Linux.';
-	}
-	else if (page == 'extensions')
-	{
-		mega_title = 'Browser Extensions - MEGA';
-	}
-	else if (page == 'bird')
-	{
-		mega_title = 'MEGAbird - Download';
-	}
-	else if (page == 'cmd')
-	{
-		mega_title = 'MEGAcmd - Download';
-		mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
-	}
-	else if (page == 'pro')
-	{
-		mega_title = 'Plans & pricing - MEGA';
-		mega_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. MEGA provides one the cheapest cloud storage deals on the Internet.';
-	}
-	else if (page == 'register')
-	{
-		mega_title = 'Register - MEGA';
-		mega_desc = 'Create your free MEGA account and get free 50 GB.';
-	}
-	else if (page == 'login')
-	{
-		mega_title = 'Login - MEGA';
-	}
-	else if (page == 'recovery')
-	{
-		mega_title = 'Recovery - MEGA';
-		mega_desc = 'Forgot your MEGA password? Start your recovery process here.';
-	}
-	else if (page == 'terms')
-	{
-		mega_title = 'Terms of Service - MEGA';
-	}
-	else if (page == 'privacy')
-	{
-		mega_title = 'Privacy Policy - MEGA';
-	}
-	else if (page == 'copyright')
-	{
-		mega_title = 'Copyright - MEGA';
-	}
-	else if (page == 'takedown')
-	{
-		mega_title = 'Takedown Guidance - MEGA';
-	}
+    if (page == 'android') {
+        mega_title = 'Android - MEGA';
+        mega_desc = 'The MEGA Android app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
+    }
+    else if (page == 'ios') {
+        mega_title = 'iOS - MEGA';
+        mega_desc = 'The MEGA iOS app puts the cloud in your pocket and allows you to communicate with other MEGA users while on the go.';
+    }
+    else if (page == 'wp') {
+        mega_title = 'Windows Phone - MEGA';
+    }
+    else if (page == 'sync') {
+        mega_title = 'MEGAsync - Download';
+        mega_desc = 'MEGAsync securely synchronizes data between your computer and your MEGA account. Available for Windows, Mac and Linux.';
+    }
+    else if (page == 'extensions') {
+        mega_title = 'Browser Extensions - MEGA';
+    }
+    else if (page == 'bird') {
+        mega_title = 'MEGAbird - Download';
+    }
+    else if (page == 'cmd') {
+        mega_title = 'MEGAcmd - Download';
+        mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
+    }
+    else if (page == 'pro') {
+        mega_title = 'Plans & pricing - MEGA';
+        mega_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. MEGA provides one the cheapest cloud storage deals on the Internet.';
+    }
+    else if (page == 'register') {
+        mega_title = 'Register - MEGA';
+        mega_desc = 'Create your free MEGA account and get free 50 GB.';
+    }
+    else if (page == 'login') {
+        mega_title = 'Login - MEGA';
+    }
+    else if (page == 'recovery') {
+        mega_title = 'Recovery - MEGA';
+        mega_desc = 'Forgot your MEGA password? Start your recovery process here.';
+    }
+    else if (page == 'terms') {
+        mega_title = 'Terms of Service - MEGA';
+    }
+    else if (page == 'privacy') {
+        mega_title = 'Privacy Policy - MEGA';
+    }
+    else if (page == 'copyright') {
+        mega_title = 'Copyright - MEGA';
+    }
+    else if (page == 'takedown') {
+        mega_title = 'Takedown Guidance - MEGA';
+    }
     else if (typeof Object(window.dlmanager).isStreaming === 'object') {
         mega_title = 'MEGA - ' + dlmanager.isStreaming._megaNode.name;
     }
@@ -2366,19 +2355,19 @@ function pagemetadata()
     }
     $('meta[name=description]').remove();
     $('head').append('<meta name="description" content="' + String(mega_desc).replace(/[<">]/g, '') + '">');
-	document.title = mega_title;
-	megatitle();
+    document.title = mega_title;
+    megatitle();
 }
 
 
 function parsepage(pagehtml, pp) {
-	pagemetadata();
+    pagemetadata();
     $('body').removeClass('ads');
     $('#fmholder').hide();
     $('#pageholder').hide();
     $('#startholder').hide();
 
-    pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
+    pagehtml = translate('' + pagehtml).replace(/{staticpath}/g, staticpath);
     if (is_chrome_web_ext || is_firefox_web_ext) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
@@ -2392,7 +2381,7 @@ function parsepage(pagehtml, pp) {
     }
     pagehtml = pagehtml
         .replace(/\(\(MEGAINFO\)\)/g, translate(pages['megainfo'])
-        .replace(/{staticpath}/g, staticpath));
+            .replace(/{staticpath}/g, staticpath));
     pagehtml = pagehtml.replace(/\(\(TOP\)\)/g, top);
     pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(bmenu2));
     pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pagesmenu));
@@ -2400,7 +2389,7 @@ function parsepage(pagehtml, pp) {
     var $container = $('#startholder');
     $container
         .safeHTML('<div class="nav-overlay"></div>' +
-            translate(pages['transferwidget']) + pagehtml)
+        translate(pages['transferwidget']) + pagehtml)
         .show();
 
     $('body').addClass('bottom-pages');
@@ -2433,9 +2422,8 @@ function parsetopmenu() {
 }
 
 
-function loadSubPage(tpage, event)
-{
-	pagemetadata();
+function loadSubPage(tpage, event) {
+    pagemetadata();
     tpage = getCleanSitePath(tpage);
 
     if (typeof dlPageCleanup === 'function' && tpage[0] !== '!') {
@@ -2512,7 +2500,7 @@ function loadSubPage(tpage, event)
 }
 
 
-window.onhashchange = function() {
+window.onhashchange = function () {
     if (window.skipHashChange) {
         delete window.skipHashChange;
         return false;
@@ -2533,7 +2521,7 @@ window.onbeforeunload = function () {
     mBroadcaster.crossTab.leave();
 };
 
-window.onunload = function() {
+window.onunload = function () {
     mBroadcaster.crossTab.leave();
 
     if (typeof dlpage_ph === 'string') {
@@ -2542,12 +2530,12 @@ window.onunload = function() {
     }
 };
 
-mBroadcaster.once('boot_done', function() {
+mBroadcaster.once('boot_done', function () {
     M = new MegaData();
-    attribCache = new IndexedDBKVStorage('ua', {murSeed: 0x800F0002});
+    attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
     attribCache.bitMapsManager = new MegaDataBitMapManager();
 
-    $(window).rebind('resize.subpage', function() {
+    $(window).rebind('resize.subpage', function () {
         M.zoomLevelNotification();
     });
 });

@@ -43,6 +43,29 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.path.pardir))
 PATH_SPLITTER = re.compile(r'\\|/')
 
+FILELIST = {}
+SPRITE_LIST = {}
+BASE_BRANCH = None
+CURRENT_BRANCH = None
+
+def run_git_command(command, decode=None):
+    """
+    Executes a git command and returns the output from it.
+    """
+    try:
+        output = subprocess.check_output('git {}'.format(command).split())
+    except OSError as ex:
+        if ex.errno == 2:
+            logging.error('Git not installed. Install it first.')
+        else:
+            logging.error('Error calling Git: {}'.format(ex))
+        sys.exit(1)
+
+    if decode is not None:
+        output = output.decode(decode).rstrip().split('\n')
+
+    return output
+
 def get_git_line_sets(base, target):
     """
     Obtains the Git diff between the base and target to identify the lines that
@@ -56,16 +79,7 @@ def get_git_line_sets(base, target):
     """
     # Get the Git output for the desired diff.
     logging.info('Extracting relevant lines from Git diff ...')
-    command = 'git diff -U0 {} {}'.format(base, target)
-    try:
-        output = subprocess.check_output(command.split())
-    except OSError as ex:
-        if ex.errno == 2:
-            logging.error('Git not installed. Install it first.')
-        else:
-            logging.error('Error calling Git: {}'.format(ex))
-        return {}
-    diff = output.decode('latin1').split('\n')
+    diff = run_git_command('diff -U0 {} {}'.format(base, target), 'latin1')
 
     # Hunt down lines of changes for different files.
     file_line_mapping = collections.defaultdict(set)
@@ -88,27 +102,72 @@ def get_git_line_sets(base, target):
 
     return file_line_mapping
 
+def get_git_diff_files(branch=None):
+    """
+    Obtains a list for changed files against current_branch
+
+    :param branch: The branch to compare against.
+    :return: A dictionary of changed files.
+    """
+    if branch is None:
+        branch = BASE_BRANCH
+
+    list = run_git_command('diff --name-only {}'.format(branch), 'latin1')
+
+    return [f.replace('\\', '/') for f in list]
+
+def filter_list(list, filter):
+    return [f for f in list if re.search(filter, f)]
+
+def get_branch_filelist(path=None, filter=None, branch=None):
+    """
+    Obtains file list through git to compare against branches
+
+    :param path: The directory to get a filelist from, non recursively.
+    :param filter: Regex pattern to filter filelist.
+    :param branch: The branch to get the filelist from.
+    :return: A dictionary of changed files.
+    """
+    global FILELIST
+    if branch is None:
+        branch = BASE_BRANCH
+    if branch not in FILELIST:
+        FILELIST[branch] = {}
+    if path not in FILELIST[branch]:
+        FILELIST[branch][path] = {}
+    if filter in FILELIST[branch][path]:
+        return FILELIST[branch][path][filter]
+
+    files = run_git_command('ls-tree --name-only {}:{}'.format(branch, path), 'latin1')
+
+    if filter:
+        files = filter_list(files, filter)
+
+    FILELIST[branch][path][filter] = files;
+    return files
+
+def get_current_branch():
+    global CURRENT_BRANCH
+
+    if CURRENT_BRANCH is None:
+        CURRENT_BRANCH = run_git_command('symbolic-ref --short -q HEAD').decode('utf8').rstrip()
+
+    return CURRENT_BRANCH
+
 def get_commits_in_branch(current_branch=None):
     protected_branches = ['master', 'develop', 'old-design']
 
     if current_branch is None:
-        try:
-            command = 'git symbolic-ref --short -q HEAD'
-            current_branch = subprocess.check_output(command.split()).decode('utf8').rstrip()
-        except CalledProcessError as e:
-            logging.warn('Unable to query current branch.')
-            return -1, 0
+        current_branch = get_current_branch()
 
     if current_branch in protected_branches:
         logging.warn('In protected branch ({})'.format(current_branch))
         return -1, 0
 
-    command = 'git rev-list --no-merges --count develop..{}'.format(current_branch)
-    commits = int(subprocess.check_output(command.split()).decode('utf8'))
+    commits = int(run_git_command('rev-list --no-merges --count {}..{}'.format(BASE_BRANCH, current_branch)).decode('utf8'))
     # logging.info('{} commits in branch {}'.format(commits, current_branch))
 
-    command = 'git shortlog -s --no-merges develop..{}'.format(current_branch)
-    authors = len(subprocess.check_output(command.split()).decode('utf8').rstrip().split('\n'))
+    authors = len(run_git_command('shortlog -s --no-merges {}..{}'.format(BASE_BRANCH, current_branch), 'utf8'))
     # logging.info('{} authors worked in branch {}'.format(authors, current_branch))
 
     return commits, authors
@@ -411,6 +470,34 @@ def inspectjs(file, ln, line, result):
 
     return fatal
 
+def map_list_to_dict(list):
+    return {key: value for (key, value) in list}
+
+def split_sprite_name(filename):
+    vpat = r'[_-]v(\d+)'
+    version = re.search(vpat, filename)
+    if version:
+        version = int(version.group(1))
+    name = re.sub(vpat, '', os.path.splitext(os.path.basename(filename))[0].replace('@2x', ''))
+
+    return name, version
+
+def get_sprite_images(branch=None):
+    global SPRITE_LIST
+
+    if branch is None:
+        branch = BASE_BRANCH
+
+    if branch not in SPRITE_LIST:
+        list = get_branch_filelist('./images/mega', r'@2x', branch)
+        SPRITE_LIST[branch] = map_list_to_dict([split_sprite_name(f) for f in list])
+
+    return SPRITE_LIST[branch]
+
+def test():
+    print(get_sprite_images())
+    # print(FILELIST)
+
 def reduce_validator(file_line_mapping, **extra):
     """
     Checks changed files for contents and alalyzes them.
@@ -429,6 +516,18 @@ def reduce_validator(file_line_mapping, **extra):
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
     fatal = 0
 
+    # Check for older sprite images in current branch
+    diff_files = get_git_diff_files()
+    if any(['images/mega' in f for f in diff_files]):
+        base_sprites = get_sprite_images()
+        target_sprites = map_list_to_dict([split_sprite_name(f) for f in filter_list(diff_files, r'@2x')])
+        for file, version in target_sprites.iteritems():
+            if file in base_sprites and base_sprites[file] > version:
+                fatal += 1
+                result.append('Base branch {} has a newer sprite file for ~/images/mega/{}* (v{} Vs. v{})'
+                                .format(BASE_BRANCH, file, version, base_sprites[file]))
+
+    # Analise changed lines per modified file
     for filename, line_set in file_line_mapping.items():
         file_path = os.path.join(*filename)
         file_extension = os.path.splitext(file_path)[-1]
@@ -703,6 +802,9 @@ def main(base, target, norules, branch):
                        'nsiqcppstyle': reduce_nsiqcppstyle,
                        'vera++': reduce_verapp}
 
+    global BASE_BRANCH
+    BASE_BRANCH = base
+
     file_line_mapping = get_git_line_sets(base, target)
     results = []
     total_errors = 0
@@ -734,7 +836,7 @@ def main(base, target, norules, branch):
         if authors > 1:
             print('WARNING: {} authors have contributed in this branch, '
                   'consider squashing your commits only\n         by manually running '
-                  '"git rebase -i --autosquash develop", unless they do not care.'.format(authors))
+                  '"git rebase -i --autosquash {}", unless they do not care.'.format(authors, base))
         sys.exit(1)
 
     print('\nEverything seems Ok.')

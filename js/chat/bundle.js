@@ -9788,8 +9788,12 @@ React.makeElement = React['createElement'];
 	    },
 	    _addToCloudDrive: function _addToCloudDrive(v) {
 	        M.injectNodes(v, M.RootID, function (res) {
-	            if (res === 0) {
-	                msgDialog('info', __(l[8005]), __(l[8006]));
+	            if (!Array.isArray(res)) {
+	                return msgDialog('info', __(l[8005]), __(l[8006]));
+	            }
+
+	            if (d) {
+	                console.debug('injectNodes result', res);
 	            }
 	        });
 	    },

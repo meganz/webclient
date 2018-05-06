@@ -380,6 +380,42 @@ def reduce_htmlhint(file_line_mapping, **extra):
     # Add the number of errors and return in a nicely formatted way.
     return re.sub('\n+', '\n', '\n\n'.join(result).rstrip()), 1
 
+def copypaste_detector(file_line_mapping):
+    report = []
+    output = None
+    cwd = os.getcwd()
+
+    try:
+        output = subprocess.check_output('{} {}'.format(config.JSCPD_BIN, config.JSCPD_RULES).split())
+    except OSError as ex:
+        logging.error('Error calling JSCPD: {}'.format(ex))
+        return False
+    output = strip_ansi_codes(output.decode('utf8')).rstrip().split('\n')
+    output = [re.sub(r'\t-? [\\/]', '', f.replace(cwd, '')).strip() for f in output if re.search(r'^\t', f)]
+
+    # Build a list of duplicated blocks per file
+    idx = 0
+    dupes = collections.defaultdict(set)
+    for file in output:
+        x,filename,ln1,ln2,z = re.split(r'^(.*): (\d+)-(\d+)$', file)
+        dupes[filename].update(range(int(ln1), int(ln2) + 1))
+
+    # Check whether changed lines includes copy/paste code
+    for filename, line_set in file_line_mapping.items():
+        file_path = os.path.join(*filename)
+
+        if file_path in dupes:
+            rng = dupes[file_path]
+            its = list(rng.intersection(line_set))
+            if len(its):
+                report.append('copy/paste detector found a duplicated block of code at {} around lines {}-{}'
+                                .format(file_path, its[0], its[-1]))
+
+    if len(report):
+        print('\n' + '\n'.join(report))
+        return True
+
+    return False
 
 def analyse_secureboot(filename, result):
     """
@@ -790,7 +826,7 @@ def reduce_verapp(file_line_mapping, **extra):
     return '\n'.join(result), error_count
 
 
-def main(base, target, norules, branch):
+def main(base, target, norules, branch, jscpd):
     """
     Run the JSHint and JSCS tests and present output ont eh console via print.
     """
@@ -828,6 +864,11 @@ def main(base, target, norules, branch):
     if total_errors > 0:
         logging.info('Output of reduced results ...')
         print('\n\n'.join(results).rstrip())
+
+    if jscpd and copypaste_detector(file_line_mapping):
+        total_errors += 1
+
+    if total_errors:
         sys.exit(1)
 
     branch_commits, authors = get_commits_in_branch(branch)
@@ -856,6 +897,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG)
     parser.add_argument('--norules', default=False, action='store_true',
                         help="Don't show rule names with description (default: show rules names)")
+    parser.add_argument('--jscpd', default=False, action='store_true',
+                        help="Run the nodejs package jscpd to detect copy/paste code.")
     parser.add_argument('--branch', type=str, help='Source branch name.', required=False, default=None)
     parser.add_argument('base',
                         help='base revision or name of base branch')
@@ -865,4 +908,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.base, args.target, args.norules, args.branch)
+    main(args.base, args.target, args.norules, args.branch, args.jscpd)

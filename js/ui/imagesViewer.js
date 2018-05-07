@@ -445,6 +445,7 @@ var slideshowid;
             imgHeight = switchedSides ? $img.width() : $img.height();
 
             // Set minHeight, minWidth if image is bigger then browser window
+            // Check if height fits browser window after reducing width
             if (origImgWidth > viewerWidth && origImgHeight * w_perc < viewerHeight) {
                 imgWidth = viewerWidth;
                 imgHeight = origImgHeight * w_perc;
@@ -452,29 +453,35 @@ var slideshowid;
                     'width': switchedSides ? imgHeight : imgWidth
                 });
             }
+            // Check if width fits browser window after reducing height
             else if ((origImgWidth > viewerWidth && origImgHeight * w_perc > viewerHeight)
                 || (origImgWidth < viewerWidth && origImgHeight > viewerHeight)) {
-                    imgWidth = origImgWidth * h_perc;
-                    imgHeight = viewerHeight;
-                    $img.css({
-                        'height': switchedSides ? imgWidth : imgHeight
-                    });
+
+                imgWidth = origImgWidth * h_perc;
+                imgHeight = viewerHeight;
+                $img.css({
+                    'height': switchedSides ? imgWidth : imgHeight
+                });
             }
+            // Check if preview and original imgs are loading and height fits browser window after increasing width
             else if (loadOriginal && loadPreview && origImgHeight < viewerHeight
                 && origImgWidth < viewerWidth && origImgHeight * w_perc <= viewerHeight) {
-                    imgWidth = viewerWidth;
-                    imgHeight = origImgHeight * w_perc;
-                    $img.css({
-                        'width': switchedSides ? viewerHeight : viewerWidth
-                    });
+
+                imgWidth = viewerWidth;
+                imgHeight = origImgHeight * w_perc;
+                $img.css({
+                    'width': switchedSides ? viewerHeight : viewerWidth
+                });
             }
+            // Check if preview and original imgs are loading and width fits browser window after increasing height
             else if (loadOriginal && loadPreview && imgHeight < viewerHeight
                 && origImgWidth < viewerWidth && origImgWidth * h_perc <= viewerWidth) {
-                    imgWidth = origImgWidth * h_perc;
-                    imgHeight = viewerHeight;
-                    $img.css({
-                        'height': switchedSides ? viewerWidth : viewerHeight
-                    });
+
+                imgWidth = origImgWidth * h_perc;
+                imgHeight = viewerHeight;
+                $img.css({
+                    'height': switchedSides ? viewerWidth : viewerHeight
+                });
             }
         }
 
@@ -758,7 +765,6 @@ var slideshowid;
 
         eot.timeout = 8500;
 
-        var $overlay = $('.viewer-overlay');
         var preview = function preview(ctx, h, u8) {
             previewimg(h, u8, ctx.type);
 
@@ -775,6 +781,10 @@ var slideshowid;
         if (!n) {
             console.error('Node "%s" not found...', id);
             return false;
+        }
+
+        if (d) {
+            console.debug('slideshow.fetchsrc', id, n, n.h);
         }
 
         if (filetype(n) === 'PDF Document') {
@@ -840,9 +850,18 @@ var slideshowid;
         loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
 
         if (loadOriginal) {
+            var $overlay = $('.viewer-overlay');
             var $progressBar = $overlay.find('.viewer-progress');
+
             var progress = function(perc) {
                 var loadingDeg = 360 * perc / 100;
+
+                if (slideshowid !== n.h) {
+                    if (d && ((perc | 0) % 10) < 1) {
+                        console.debug('slideshow original image loading in background progress...', n.h, perc);
+                    }
+                    return;
+                }
                 $progressBar.removeClass('hidden');
 
                 if (loadingDeg <= 180) {
@@ -853,16 +872,20 @@ var slideshowid;
                     $progressBar.find('.right-c p').css('transform', 'rotate(180deg)');
                     $progressBar.find('.left-c p').css('transform', 'rotate(' + (loadingDeg - 180) + 'deg)');
                 }
+
                 if (loadingDeg === 360) {
                     $progressBar.addClass('hidden');
                     $progressBar.find('p').removeAttr('style');
                 }
             };
-            
+
             M.gfsfetch(n.link || n.h, 0, -1, progress).tryCatch(function(data) {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
                 previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
             }, function() {
+                if (slideshowid === n.h) {
+                    $progressBar.addClass('hidden');
+                }
                 if (loadPreview) {
                     slideshow_timereset();
                 }
@@ -1096,23 +1119,23 @@ var slideshowid;
             var $img = $imgCount.find('.' + imgClass);
             var rot = previews[id].orientation | 0;
 
-            if (rot === 5 || rot === 6 || rot === 7 || rot === 8) {
+            switchedSides = rot > 4;
+            if (switchedSides) {
                 origImgWidth = this.naturalHeight;
                 origImgHeight = this.naturalWidth;
-                switchedSides = true;
             }
             else {
                 origImgWidth = this.naturalWidth;
                 origImgHeight = this.naturalHeight;
-                switchedSides = false;
             }
 
             if (d) {
-                console.debug('Loading image %s:%sx%s, orientation=%s', id, origImgWidth, origImgHeight, rot);
+                console.debug('slideshow loaded image %s:%sx%s, orientation=%s', id, origImgWidth, origImgHeight, rot);
             }
 
-            // Apply img data to necessary image
-            if (!replacement || src !== noThumbURI) {
+            // Apply img data to necessary image. If replacing preview->original,
+            // update only the img's src and percent-label, to preserve any zoomed status.
+            if (!replacement || switchedSides) {
                 $imgCount.find('img').removeClass('active');
                 $imgCount.attr('data-count', imgClass);
                 $imgCount.attr('data-image', id);
@@ -1125,6 +1148,9 @@ var slideshowid;
                 $(window).rebind('resize.imgResize', function() {
                     slideshow_imgPosition($overlay);
                 });
+            }
+            else if (src !== noThumbURI) {
+                $img.attr('src', src).addClass('active');
 
                 // adjust zoom percent label
                 var perc = Math.round($img.width() / origImgWidth * 100);

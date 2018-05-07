@@ -15,6 +15,8 @@ var slideshowid;
     var fullScreenManager;
     var _hideCounter = false;
     var switchedSides = false;
+    var loadOriginal = false;
+    var loadPreview = false;
 
     function slideshowsteps() {
         var $stepsBlock = $('.viewer-overlay').find('.viewer-images-num, .viewer-button.slideshow');
@@ -418,11 +420,15 @@ var slideshowid;
         var $percLabel = $overlay.find('.viewer-button-label.zoom');
         var viewerWidth = $overlay.width();
         var viewerHeight = $overlay.height();
-        var imgWidth = switchedSides ? $img.height() : $img.width();
-        var imgHeight = switchedSides ? $img.width() : $img.height();
-        var perc = 0;
+        var imgWidth = 0;
+        var imgHeight = 0;
+        var w_perc = 0;
+        var h_perc = 0;
 
         if (zoom_mode) {
+            imgWidth = switchedSides ? $img.height() : $img.width();
+            imgHeight = switchedSides ? $img.width() : $img.height();
+
             // Init pick and pan mode if Image larger its wrapper
             if (imgWidth > viewerWidth || imgHeight > viewerHeight) {
                 slideshow_pickpan($overlay);
@@ -432,22 +438,42 @@ var slideshowid;
             }
         }
         else {
-            perc = viewerWidth / origImgWidth;
+            w_perc = viewerWidth / origImgWidth;
+            h_perc = viewerHeight / origImgHeight;
             $img.removeAttr('style');
+            imgWidth = switchedSides ? $img.height() : $img.width();
+            imgHeight = switchedSides ? $img.width() : $img.height();
 
             // Set minHeight, minWidth if image is bigger then browser window
-            if (origImgWidth > viewerWidth && origImgHeight * perc < viewerHeight) {
+            if (origImgWidth > viewerWidth && origImgHeight * w_perc < viewerHeight) {
                 imgWidth = viewerWidth;
+                imgHeight = origImgHeight * w_perc;
                 $img.css({
                     'width': switchedSides ? imgHeight : imgWidth
                 });
             }
-            else if ((origImgWidth > viewerWidth && origImgHeight * perc > viewerHeight)
+            else if ((origImgWidth > viewerWidth && origImgHeight * w_perc > viewerHeight)
                 || (origImgWidth < viewerWidth && origImgHeight > viewerHeight)) {
-                    imgWidth = origImgWidth * viewerHeight / origImgHeight;
+                    imgWidth = origImgWidth * h_perc;
                     imgHeight = viewerHeight;
                     $img.css({
                         'height': switchedSides ? imgWidth : imgHeight
+                    });
+            }
+            else if (loadOriginal && loadPreview && origImgHeight < viewerHeight
+                && origImgWidth < viewerWidth && origImgHeight * w_perc <= viewerHeight) {
+                    imgWidth = viewerWidth;
+                    imgHeight = origImgHeight * w_perc;
+                    $img.css({
+                        'width': switchedSides ? viewerHeight : viewerWidth
+                    });
+            }
+            else if (loadOriginal && loadPreview && imgHeight < viewerHeight
+                && origImgWidth < viewerWidth && origImgWidth * h_perc <= viewerWidth) {
+                    imgWidth = origImgWidth * h_perc;
+                    imgHeight = viewerHeight;
+                    $img.css({
+                        'height': switchedSides ? viewerWidth : viewerHeight
                     });
             }
         }
@@ -456,8 +482,8 @@ var slideshowid;
             'left': (viewerWidth - imgWidth) / 2,
             'top': (viewerHeight - imgHeight) / 2,
         });
-        perc = Math.round(imgWidth / origImgWidth * 100);
-        $percLabel.attr('data-perc', perc).text(perc + '%');
+        w_perc = Math.round(imgWidth / origImgWidth * 100);
+        $percLabel.attr('data-perc', w_perc).text(w_perc + '%');
     }
 
     // Viewer Init
@@ -478,6 +504,8 @@ var slideshowid;
             slideshowid = false;
             _hideCounter = false;
             slideshowplay = false;
+            loadOriginal = false;
+            loadPreview = false;
             $overlay.removeClass('video video-theatre-mode mouse-idle slideshow').addClass('hidden');
             $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
             $(window).unbind('resize.imgResize');
@@ -631,6 +659,8 @@ var slideshowid;
         // Set file data
         zoom_mode = false;
         switchedSides = false;
+        loadOriginal = false;
+        loadPreview = false;
         $overlay.find('.viewer-filename').text(n.name);
         $overlay.find('.viewer-progress, .viewer-error, video, #pdfpreviewdiv1').addClass('hidden');
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
@@ -806,8 +836,8 @@ var slideshowid;
         preqs[n.h] = 1;
         treq[n.h] = {fa: n.fa, k: n.k};
         var getPreview = api_getfileattr.bind(window, treq, 1, preview, eot);
-        var loadOriginal = n.s < 50 * 1048576 && is_image(n) === 1;
-        var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
+        loadOriginal = n.s < 50 * 1048576 && is_image(n) === 1;
+        loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
 
         if (loadOriginal) {
             var $progressBar = $overlay.find('.viewer-progress');

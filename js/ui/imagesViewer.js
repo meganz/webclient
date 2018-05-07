@@ -483,6 +483,11 @@ var slideshowid;
                     'height': switchedSides ? viewerWidth : viewerHeight
                 });
             }
+            else {
+                $img.css({
+                    'height': switchedSides ? origImgWidth : origImgHeight
+                });
+            }
         }
 
         $img.css({

@@ -300,6 +300,11 @@
     -ms-transition: opacity 100ms ease-in-out, visibility 100ms ease-in-out;
     transition: opacity 100ms ease-in-out, visibility 100ms ease-in-out;
 }
+.viewer-progress.hidden {
+    display: block;
+    opacity: 0;
+    visibility: 0;
+}
 .viewer-progress ul {
     width: 36px;
     height: 36px;
@@ -334,21 +339,18 @@
     position: absolute;
     top: 0px;
 }
-.viewer-progress ul :nth-child(odd) {
-    clip: rect(0px, 36px, 36px, 18px);
+.viewer-progress  .right-c {
+    clip: rect(0, 36px, 36px, 18px);
 }
-.viewer-progress ul :nth-child(even) {
-    clip: rect(0px, 18px, 36px, 0px);
+.viewer-progress  .left-c {
+    clip: rect(0, 18px, 36px, 0);
 }
 .viewer-progress p {
     width: 36px;
     height: 36px;
     margin: 0;
-    -webkit-transition: transform 100ms ease-in-out;
-    -moz-transition: transform 100ms ease-in-out;
-    -o-transition: transform 100ms ease-in-out;
-    -ms-transition: transform 100ms ease-in-out;
-    transition: transform 100ms ease-in-out;
+}
+.viewer-progress .right-c p {
 }
 .viewer-progress span {
     display: block;

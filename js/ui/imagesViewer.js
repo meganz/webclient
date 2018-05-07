@@ -632,7 +632,6 @@ var slideshowid;
         zoom_mode = false;
         switchedSides = false;
         $overlay.find('.viewer-filename').text(n.name);
-        $overlay.find('.viewer-progress').addClass('hidden');
         $overlay.find('.viewer-progress, .viewer-error, video, #pdfpreviewdiv1').addClass('hidden');
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
         $overlay.find('.viewer-progress p').removeAttr('style');
@@ -729,6 +728,7 @@ var slideshowid;
 
         eot.timeout = 8500;
 
+        var $overlay = $('.viewer-overlay');
         var preview = function preview(ctx, h, u8) {
             previewimg(h, u8, ctx.type);
 
@@ -810,7 +810,26 @@ var slideshowid;
         var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
 
         if (loadOriginal) {
-            M.gfsfetch(n.link || n.h, 0, -1).tryCatch(function(data) {
+            var $progressBar = $overlay.find('.viewer-progress');
+            var progress = function(perc) {
+                var loadingDeg = 360 * perc / 100;
+                $progressBar.removeClass('hidden');
+
+                if (loadingDeg <= 180) {
+                    $progressBar.find('.right-c p').css('transform', 'rotate(' + loadingDeg + 'deg)');
+                    $progressBar.find('.left-c p').removeAttr('style');
+                }
+                else {
+                    $progressBar.find('.right-c p').css('transform', 'rotate(180deg)');
+                    $progressBar.find('.left-c p').css('transform', 'rotate(' + (loadingDeg - 180) + 'deg)');
+                }
+                if (loadingDeg === 360) {
+                    $progressBar.addClass('hidden');
+                    $progressBar.find('p').removeAttr('style');
+                }
+            };
+            
+            M.gfsfetch(n.link || n.h, 0, -1, progress).tryCatch(function(data) {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
                 previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
             }, function() {

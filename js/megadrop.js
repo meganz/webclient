@@ -1398,8 +1398,8 @@ mega.megadrop = (function() {
             var link = getBaseUrl() + '/drop#!' + pupHandle + '!' + theme + '!' + lang;
 
             var source = code
-                .replace('%w', width > 0 ? width : 180)
-                .replace('%h', height > 0 ? height : 44)
+                .replace('%w', width > 0 ? width : 250)
+                .replace('%h', height > 0 ? height : 54)
                 .replace('%s', link);
             source = source.replace('/[\t\n\s]+/g', '');// Minimize
 

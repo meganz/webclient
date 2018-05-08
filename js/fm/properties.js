@@ -196,7 +196,7 @@
             p.t1 = l[86] + ':';
 
             // Hide context menu button
-            if (n.h === M.RootID) {
+            if (n.h === M.RootID || slideshowid) {
                 $dialog.addClass('hidden-context');
             }
 

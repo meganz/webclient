@@ -8795,7 +8795,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-dialog.qr-contact {
     width: 482px;
-    margin: -170px 0 0 -240px;
+    margin: -190px 0 0 -240px;
     overflow: visible;
 }
 .fm-dialog.qr-contact .fm-dialog-title{
@@ -8818,7 +8818,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     -moz-box-shadow:inset 0 1px 1px 0 rgba(255,255,255,0.2), 0 1px 2px 0 rgba(217,0,7,0.3);
     box-shadow: inset 0 1px 1px 0 rgba(255,255,255,0.2), 0 1px 2px 0 rgba(217,0,7,0.3);
 }
-.qr-contact .default-red-button:hover {
+.qr-contact .default-red-button:hover, .qr-contact .default-red-button:not(.disabled):hover {
     background: #Ff3333;
     -webkit-box-shadow:inset 0 1px 1px 0 rgba(255,255,255,0), 0 1px 2px 0 rgba(217,0,7,0);
     -moz-box-shadow:inset 0 1px 1px 0 rgba(255,255,255,0), 0 1px 2px 0 rgba(217,0,7,0);

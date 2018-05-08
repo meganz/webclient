@@ -441,8 +441,8 @@ var slideshowid;
             w_perc = viewerWidth / origImgWidth;
             h_perc = viewerHeight / origImgHeight;
             $img.removeAttr('style');
-            imgWidth = switchedSides ? $img.height() : $img.width();
-            imgHeight = switchedSides ? $img.width() : $img.height();
+            imgWidth = (switchedSides ? $img.height() : $img.width()) || origImgWidth;
+            imgHeight = (switchedSides ? $img.width() : $img.height()) || origImgHeight;
 
             // Set minHeight, minWidth if image is bigger then browser window
             // Check if height fits browser window after reducing width
@@ -1120,22 +1120,34 @@ var slideshowid;
                 }
                 return;
             }
-            var src = ev.type === 'error' ? noThumbURI : this.src;
+            var src1 = this.src;
             var $img = $imgCount.find('.' + imgClass);
             var rot = previews[id].orientation | 0;
 
-            switchedSides = rot > 4;
-            if (switchedSides) {
-                origImgWidth = this.naturalHeight;
-                origImgHeight = this.naturalWidth;
+            if (ev.type === 'error') {
+                src1 = noThumbURI;
+                origImgWidth = origImgHeight = 240;
+
+                if (d) {
+                    console.debug('slideshow failed to preview image...', id, src, ev);
+                }
             }
             else {
-                origImgWidth = this.naturalWidth;
-                origImgHeight = this.naturalHeight;
-            }
+                switchedSides = rot > 4;
 
-            if (d) {
-                console.debug('slideshow loaded image %s:%sx%s, orientation=%s', id, origImgWidth, origImgHeight, rot);
+                if (switchedSides) {
+                    origImgWidth = this.naturalHeight;
+                    origImgHeight = this.naturalWidth;
+                }
+                else {
+                    origImgWidth = this.naturalWidth;
+                    origImgHeight = this.naturalHeight;
+                }
+
+                if (d) {
+                    console.debug('slideshow loaded image %s:%sx%s, ' +
+                        'orientation=%s', id, origImgWidth, origImgHeight, rot);
+                }
             }
 
             // Apply img data to necessary image. If replacing preview->original,
@@ -1144,7 +1156,7 @@ var slideshowid;
                 $imgCount.find('img').removeClass('active');
                 $imgCount.attr('data-count', imgClass);
                 $imgCount.attr('data-image', id);
-                $img.attr('src', src).addClass('active');
+                $img.attr('src', src1).addClass('active');
 
                 // Set position, zoom values
                 zoom_mode = false;
@@ -1154,8 +1166,8 @@ var slideshowid;
                     slideshow_imgPosition($overlay);
                 });
             }
-            else if (src !== noThumbURI) {
-                $img.attr('src', src).addClass('active');
+            else if (src1 !== noThumbURI) {
+                $img.attr('src', src1).addClass('active');
 
                 // adjust zoom percent label
                 var perc = Math.round($img.width() / origImgWidth * 100);
@@ -1167,10 +1179,6 @@ var slideshowid;
 
             $overlay.find('.viewer-pending').addClass('hidden');
             $overlay.find('.viewer-progress').addClass('hidden');
-
-            if (d && ev.type === 'error') {
-                console.debug('Failed to preview image...', src, ev);
-            }
         };
         img.src = src;
     }

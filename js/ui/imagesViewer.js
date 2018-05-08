@@ -15,8 +15,7 @@ var slideshowid;
     var fullScreenManager;
     var _hideCounter = false;
     var switchedSides = false;
-    var loadOriginal = false;
-    var loadPreview = false;
+    var fitToWindow = Object.create(null);
 
     function slideshowsteps() {
         var $stepsBlock = $('.viewer-overlay').find('.viewer-images-num, .viewer-button.slideshow');
@@ -418,6 +417,7 @@ var slideshowid;
     function slideshow_imgPosition($overlay) {
         var $img = $overlay.find('img.active');
         var $percLabel = $overlay.find('.viewer-button-label.zoom');
+        var id = $overlay.find('.img-wrap').attr('data-image');
         var viewerWidth = $overlay.width();
         var viewerHeight = $overlay.height();
         var imgWidth = 0;
@@ -464,7 +464,7 @@ var slideshowid;
                 });
             }
             // Check if preview and original imgs are loading and height fits browser window after increasing width
-            else if (loadOriginal && loadPreview && origImgHeight < viewerHeight
+            else if (fitToWindow[id] && origImgHeight < viewerHeight
                 && origImgWidth < viewerWidth && origImgHeight * w_perc <= viewerHeight) {
 
                 imgWidth = viewerWidth;
@@ -474,7 +474,7 @@ var slideshowid;
                 });
             }
             // Check if preview and original imgs are loading and width fits browser window after increasing height
-            else if (loadOriginal && loadPreview && imgHeight < viewerHeight
+            else if (fitToWindow[id] && imgHeight < viewerHeight
                 && origImgWidth < viewerWidth && origImgWidth * h_perc <= viewerWidth) {
 
                 imgWidth = origImgWidth * h_perc;
@@ -516,8 +516,6 @@ var slideshowid;
             slideshowid = false;
             _hideCounter = false;
             slideshowplay = false;
-            loadOriginal = false;
-            loadPreview = false;
             $overlay.removeClass('video video-theatre-mode mouse-idle slideshow').addClass('hidden');
             $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
             $(window).unbind('resize.imgResize');
@@ -671,8 +669,6 @@ var slideshowid;
         // Set file data
         zoom_mode = false;
         switchedSides = false;
-        loadOriginal = false;
-        loadPreview = false;
         $overlay.find('.viewer-filename').text(n.name);
         $overlay.find('.viewer-progress, .viewer-error, video, #pdfpreviewdiv1').addClass('hidden');
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
@@ -851,8 +847,8 @@ var slideshowid;
         preqs[n.h] = 1;
         treq[n.h] = {fa: n.fa, k: n.k};
         var getPreview = api_getfileattr.bind(window, treq, 1, preview, eot);
-        loadOriginal = n.s < 50 * 1048576 && is_image(n) === 1;
-        loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
+        var loadOriginal = n.s < 50 * 1048576 && is_image(n) === 1;
+        var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
 
         if (loadOriginal) {
             var $overlay = $('.viewer-overlay');
@@ -899,7 +895,11 @@ var slideshowid;
                 }
             });
         }
+
         if (loadPreview) {
+            if (loadOriginal) {
+                fitToWindow[n.h] = 1;
+            }
             getPreview();
         }
     }

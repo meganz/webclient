@@ -12189,6 +12189,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     box-sizing: border-box;
     padding: 0 15px 0 15px;
 }
+.main-mid-pad.improved-recovery-steps {
+    width: 100%;
+    padding: 0 0;
+}
 .main-mid-pad.plans {
     padding-bottom: 2px;
 }
@@ -12286,7 +12290,7 @@ h5.main-italic-header {
     font-family: 'source_sans_proregular', Arial;
 }
 .login-register-input.email {
-    background-position: 9px -69px;
+    background-position: 9px -68px;
 }
 .login-register-input.password {
     background-position: 9px -109px;
@@ -15211,7 +15215,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .search-path-icon-span {
     background-position: 0 0px;
-    background-image: url(../images/mega/files-icons.png);
+    background-image: url(../images/mega/files-icons_v2.png);
     background-repeat: no-repeat;
     width: 24px;
     height: 24px;
@@ -15393,7 +15397,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     margin-bottom: 30px;
 }
 .backup-recover .login-register-input {
-    padding-right: 70px;
+    padding-right: 12px;
     margin-top: 6px;
 }
 .backup-input-button {
@@ -23281,4 +23285,462 @@ opacity: 1;
     font-size: 13px;
     line-height: 20px;
     color: #999;
+}
+.improved-recovery-steps .block-wrapper {
+    width: 100%;
+    min-width: 1024px;
+}
+.improved-recovery-steps .main-left-block {
+    width: 70%;
+    padding: 0 0;
+    height: 100%;
+    display: block;
+    float: left;
+}
+.improved-recovery-steps .main-right-block {
+    background-color:#F6F7F8;
+    width: 30%;
+    margin: 36px 0 0 0;
+    bottom: 0;
+    top: 0;
+    right: 0;
+    float: right;
+}
+.improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2 {
+    font-family: 'source_sans_probold';
+    font-size: 14px;
+    color: #999;
+    letter-spacing: 0;
+    padding: 0 0;
+}
+.improved-recovery-steps .checkbox-block h3.main-italic-header, .improved-recovery-steps .app-instruction-block h3.main-italic-header {
+    padding: 0 0;
+}
+.improved-recovery-steps .checkbox-block h3.main-italic-header {
+    color: #333333;
+}
+.improved-recovery-steps h2 {
+    position: absolute;
+    color: #333;
+    margin-top: -54px;
+}
+.improved-recovery-steps h1 {
+    font-family: 'source_sans_probold';
+    font-size: 24px;
+    color: #3C4045;
+    letter-spacing: -0.2px;
+    line-height: 36px;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+.improved-recovery-steps .register-st2-txt-block {
+    display: table;
+    min-height: 768px;
+    width: 100%; 
+}
+.improved-recovery-steps .vert-container-aligner {
+    vertical-align: middle;
+    display: table-cell;
+}
+.improved-recovery-steps .content-wrapper {
+    max-width: 672px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+.improved-recovery-steps .main-left-block .content-wrapper {
+    min-height: 540px;
+    position: relative;
+}
+.improved-recovery-steps .main-right-block .content-wrapper {
+    padding: 0 0;
+}
+.improved-recovery-steps .content-wrapper p span {
+    font-family: 'source_sans_probold';
+    color: #F57223;
+}
+.improved-recovery-steps p {
+    font-size: 14px;
+    color: #333333;
+    letter-spacing: 0;
+    line-height: 28px;
+}
+.improve-recovery-steps .button-container {
+    width: 100%;
+    height: 100px;
+}
+.improved-recovery-steps .recover-button {
+    font-size: 15px;
+    letter-spacing: 0;
+    text-align: right;
+    line-height: 44px;
+    text-decoration: underline;
+    width: auto;
+    height: initial;
+    background-color: initial;
+    text-align: right;
+    text-transform: none;
+    float: left;
+    margin: 0;
+    display: block;
+    border-radius: 0px;
+    padding: 0px 16px;
+    border: 0px solid rgba(0,0,0,0);
+    -webkit-box-shadow: 0 0 0 0 #6BB219;
+    -moz-box-shadow: 0 0 0 0 #6BB219;
+    box-shadow: 0 0 0 0 #6BB219;
+    border-radius: 2px;
+    font-family: 'source_sans_proregular', Arial;
+}
+.improved-recovery-steps .backup-input-button.default-grey-button.left {
+    right: 0px; 
+    font-size: 14px;
+    text-decoration: none;
+    line-height: 36px;
+    text-align: center;
+}
+.improved-recovery-steps .recover-button.yes {
+    color: #2AAF5F;
+}
+.improved-recovery-steps .recover-button.yes:hover, .recover-button.yes.active {
+    background-color: rgba(42,175,95,0.1);
+    -webkit-box-shadow: 0 0 0 0 #6BB219;
+    -moz-box-shadow: 0 0 0 0 #6BB219;
+    box-shadow: 0 0 0 0 #6BB219;
+}
+.improved-recovery-steps .recover-button.no {
+    color: #eb4444;
+}
+.improved-recovery-steps .recover-button.no:hover, .recover-button.no.active {
+    background-color: rgba(235,68,68,0.1);
+    -webkit-box-shadow: 0 0 0 0 #6BB219;
+    -moz-box-shadow: 0 0 0 0 #6BB219;
+    box-shadow: 0 0 0 0 #6BB219;
+}
+.improved-recovery-steps .button-container {
+    bottom: 0;
+    position: absolute;
+    right: 0;
+}
+.improved-recovery-steps .button-aligner {
+    float: right;
+}
+.improved-recovery-steps .progress-meter {
+    margin: 20px auto 40px;
+    padding: 40px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    max-width: 400px;
+}
+.improved-recovery-steps .progress-meter .track {
+    position: relative;
+    height: 4px;
+    background: #ddd;
+}
+.improved-recovery-steps .progress-meter .progress-points {
+    position: relative;
+    margin: -14px 0 0;
+    padding: 0;
+    list-style: none;
+}
+.improved-recovery-steps .progress-meter .progress-point {
+    -moz-transition: color 1s;
+    -o-transition: color 1s;
+    -webkit-transition: color 1s;
+    transition: color 1s;
+    position: relative;
+    text-align: left;
+    cursor: pointer;
+    color: #999;
+    margin-bottom: 80px;
+}
+.improved-recovery-steps .progress-meter .progress-point.inactive {
+    cursor: default;
+}
+.improved-recovery-steps .progress-meter .progress-point:last-of-type {
+    margin-bottom: 0px;
+}
+.improved-recovery-steps .progress-meter .progress-point.completed, .improved-recovery-steps .progress-meter .progress-point.active {
+    color: #777;
+}
+.improved-recovery-steps .progress-meter .progress-meter .progress-points .progress-point:nth-child(1) {
+    left: 0%;
+}
+.improved-recovery-steps .progress-meter .progress-point:before {
+    -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+    -moz-border-radius: 24px;
+    -webkit-border-radius: 24px;
+    border-radius: 24px;
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 0;
+    background-color: #777E82;
+    border: 1px solid  #777E82;
+}
+.improved-recovery-steps .progress-meter .progress-point:not(.inactive):hover:before {
+    border: 4px solid  #CBCFD1;
+    margin: -4px -3px;
+    -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.improved-recovery-steps .progress-meter .progress-point.active:before {
+    border-color: #777;
+}
+.improved-recovery-steps .progress-meter .progress-point:hover .progress-track {
+    height: 87px;
+    bottom: 11px;
+    -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.improved-recovery-steps .progress-meter .progress-point.inactive {
+    opacity: .2; 
+}
+.improved-recovery-steps .progress-meter .progress-point.inactive .progress-content {
+    display: none;
+}
+.improved-recovery-steps .progress-meter .progress-point.success:before {
+    background-color: #2AAF5F;
+    border: 1px solid  #2AAF5F;
+    -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.improved-recovery-steps .progress-meter .progress-point.success .progress-track {
+    background-color: #2AAF5F;
+        -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.improved-recovery-steps .progress-meter .progress-point.success:hover:before {
+    border: 4px solid  #D4EFDF;
+    margin: -4px -3px;
+        -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.improved-recovery-steps .progress-meter .progress-point.success .step-label {
+    color:  #2AAF5F;
+}
+.improved-recovery-steps .progress-meter .progress-point.warning:before{
+    background-color: #FF6406;
+    border: 1px solid  #FF6406;
+        -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.improved-recovery-steps .progress-meter .progress-point.warning:hover:before {
+    border: 4px solid  #FDE3D3;
+    margin: -4px -3px;
+        -moz-transition: all .2s;
+    -o-transition: all .2s;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+
+.improved-recovery-steps .progress-meter .progress-point.warning .progress-track {
+    background-color: #FF6406;
+}
+.improved-recovery-steps .progress-meter .progress-point.warning .step-label {
+    color: #F57223;
+}
+.improved-recovery-steps .progress-meter .progress-point:hover .step-label {
+    text-decoration: underline;
+}
+.improved-recovery-steps .progress-meter .progress-content {
+    display: inline-block;
+    margin: -2px 0 0 16px;
+    position: absolute;
+}
+.improved-recovery-steps .progress-meter .progress-content .step-label {
+    font-family: "source_sans_probold";
+    font-size: 13px;
+    color: #777E82;
+    letter-spacing: 0;
+     margin-bottom: 8px;
+}
+.improved-recovery-steps .progress-meter .progress-content .step-answer {
+}
+.improved-recovery-steps .progress-meter .progress-track {
+    width: 2px;
+    height: 83px;
+    display: block;
+    background: #777E82;
+    position: absolute;
+    bottom: 15px;
+    left: 5px;
+}
+.improved-recovery-steps .login-register-input {
+    background-color: rgba(250,250,250,0.50);
+    border: 1px solid #eee;
+    border-radius: 2px;
+    max-width: 400px;
+}
+.improved-recovery-steps .login-register-input:hover {
+    border: 1px solid #ddd;
+} 
+.improved-recovery-steps .login-register-input input {
+    color: #444;
+    line-height: 25px
+}
+
+.improved-recovery-steps .login-register-input input::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #aaa;
+    opacity: 1; /* Firefox */
+}
+
+.improved-recovery-steps .login-register-input input:-ms-input-placeholder {
+     /* Internet Explorer 10-11 */
+    color: #aaa;
+}
+
+.improved-recovery-steps .login-register-input input::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color:#aaa;
+}
+.improved-recovery-steps .app-button {
+    border-radius: 3px;
+    padding: 0 8px;
+    display: inline-block;
+    line-height: 24px;
+    margin: 4px 2px;
+    cursor: pointer;
+    color: #555;
+}
+.improved-recovery-steps .app-button:first-of-type {
+    margin-left: 0px; 
+}
+.improved-recovery-steps .app-button:last-of-type {
+    margin-right: 0px; 
+}
+.improved-recovery-steps .app-button:hover {
+    background-color: #f2f2f2;
+    color: #111;
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(242,242,242,0.80) 100%);
+}
+.improved-recovery-steps .app-button.active {
+    background-color: #eb4444;
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0) 0%, rgba(242,242,242,0) 100%);
+    border: 1px solid #d90007;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 1px 1px 0 rgba(255,255,255,0.20);
+    border-radius: 3px;
+    color: #fff;
+}
+.improved-recovery-steps .app-button.active:hover {
+    color: #fff;
+}
+.improved-recovery-steps .app-instruction-block {
+    margin: 0 0 8px 0;
+}
+
+.improved-recovery-steps .hidden {
+    display: none;
+}
+.improved-recovery-steps ol.app-instructions-list {
+    list-style-type: none;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    -webkit-padding-start: 00;
+}
+.improved-recovery-steps li.list-point:before {
+    background-color: #EB4444;
+    width: 23px;
+    text-indent: 8px;
+    padding-left: 0px;
+    height: 23px;
+    line-height: 22px;
+    vertical-align: top;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 12px;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    color: #FFFFFF;
+    font-weight: 900;
+    display: inline-block;
+    content: counter(list);
+    margin-right: 15px;
+    font-size: 14px;
+}
+.improved-recovery-steps .list-point {
+    margin-bottom: 20px;
+    line-height: 23px;
+    counter-increment: list;
+    text-indent: -40px;
+    margin-left: 40px;
+}
+.improved-recovery-steps .list-point b.megasync-logo {
+    background-position: -6px -773px;
+    width: 24px;
+    height: 24px;
+    background-image: url(../images/mega/top-sprite_v4.png);
+    background-repeat: no-repeat;
+    padding-left: 66px;
+    margin: 0 -39px 0 0;
+        
+}
+.improved-recovery-steps strong {
+    font-family: 'source_sans_probold';
+    color: #333;
+}
+.improved-recovery-steps  strong.warning-text {
+    color: #eb4444;
+}
+.improved-recovery-steps .instruction-block {
+    margin-top: 32px;
+    font-size: 14px;
+}
+.improved-recovery-steps .content-highlight {
+    background-color: : rgba(42,175,95,0.03);
+    border: 1px solid rgba(42,175,95,0.20);
+    border-radius: 2px;
+    line-height: 46px;
+    color: #62C489;
+    margin-top: 80px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.improved-recovery-steps .content-highlight:hover {
+    background-color: rgba(250,250,250,0.75);
+    border: 1px solid #ddd;
+}
+.improved-recovery-steps .content-highlight.warning {
+    background: rgba(235,68,68,0.03);
+    border: 1px solid rgba(235,68,68,0.15);
+    border-radius: 2px;
+    color: #eb4444;
+}
+.improved-recovery-steps .feedback-logo {
+    margin-top: 7px;
+    margin-right: 16px;
+    margin-left: 12px;
+}
+
+.improved-recovery-steps .warning-icon.warning {
+    display: block;
+}
+.improved-recovery-steps h3.warning {
+    color: #F57223;
+}
+.improved-recovery-steps h3.success {
+    color: #2AAF5F;
 }

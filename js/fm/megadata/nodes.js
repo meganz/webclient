@@ -464,10 +464,13 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     var a = tree;
     var nodesCount;
     var importNodes = Object(a).length;
+    var result = []; // copied nodes to fulfill promise
+    var ops = []; // FIXME: deploy API-side sn check
+    var opsArr = Object.create(null);
 
-    var opsArr = [];
     for (var e = 0; e < a.length; e++) {
-        var dst = (a[e].newTarget) ? a[e].newTarget : t;
+        var dst = a[e].newTarget || t;
+
         if (opsArr[dst]) {
             opsArr[dst].push(a[e]);
         }
@@ -476,7 +479,6 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         }
         delete a[e].newTarget;
     }
-    var ops = []; // FIXME: deploy API-side sn check
 
     var reportError = function copyNodesError(ex) {
         console.error(ex);
@@ -487,7 +489,6 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             promise.reject(EINTERNAL);
         });
     };
-    var promiseResolves = -1;
 
     var onCopyNodesDone = function() {
         if (todel) {
@@ -523,8 +524,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
 
         loadingDialog.phide();
         if (promise) {
-            promiseResolves = -1;
-            promise.resolve(0);
+            promise.resolve(result);
         }
 
         if (importNodes && nodesCount < importNodes) {
@@ -535,15 +535,18 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             );
         }
     };
-    var onScRecivedOnPatchedCmds = function _onScRecivedOnPatchedCmds() {
-        if (!--promiseResolves) {
+
+    var promiseResolves;
+    var onScDone = function(packet, nodes) {
+        for (var i = nodes.length; i--;) {
+            result.push(nodes[i].h);
+        }
+
+        if (--promiseResolves < 1) {
             onCopyNodesDone();
         }
     };
-    var onScDone = onCopyNodesDone;
-    if (opsArr.length && opsArr.length > 1) {
-        onScDone = onScRecivedOnPatchedCmds;
-    }
+
     for (var d in opsArr) {
         var objj = { a: 'p', t: d, n: opsArr[d] };
         objj.v = 3;
@@ -557,6 +560,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         ops.push(objj);
     }
     promiseResolves = ops.length;
+
     // encrypt nodekeys, either by RSA or by AES, depending on whether
     // we're sending them to a contact's inbox or not
     // FIXME: do this in a worker

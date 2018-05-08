@@ -663,6 +663,14 @@ var ulmanager = {
                     null, null,
                     {raw: img !== 1 && img, isVideo: vid}
                 );
+
+                if (vid && ulmanager.ulEventData[file.id]) {
+                    if (d) {
+                        console.debug('Increasing the number of expected file attributes for the chat to be aware.');
+                        console.assert(ulmanager.ulEventData[file.id].efa === 1, 'Check this...');
+                    }
+                    ulmanager.ulEventData[file.id].efa += 2;
+                }
             }
         }
 

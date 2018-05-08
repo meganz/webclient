@@ -1,0 +1,563 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>MEGA 2.0</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../css/dialogs.css" />
+    <link rel="stylesheet" type="text/css" href="../css/buttons.css" />
+    <link rel="stylesheet" type="text/css" href="../css/toast.css" />
+    <script type="text/javascript" src="../js/vendor/jquery-2.2.1.js"></script>
+    <script type="text/javascript" src="../js/vendor/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../js/vendor/jquery.qrcode.js"></script>
+    <script type="text/javascript" src="../js/vendor/qrcode.js"></script>
+    <!--<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../js/jquery.tokeninput.js"></script>-->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function dialogPositioning() {
+                $('.fm-dialog').css('margin-top', '-' + $('.fm-dialog').outerHeight() / 2 + 'px');
+            }
+            function shareContactsScroll() {
+                $('.share-dialog-contacts').jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+            }
+            dialogPositioning();
+            shareContactsScroll();
+
+            //$('.share-multiple-input').tokenInput([
+            //    { id: 7, name: "Ruby" },
+            //    { id: 11, name: "Python" },
+            //    { id: 13, name: "JavaScript" },
+            //    { id: 17, name: "ActionScript" },
+            //    { id: 19, name: "Scheme" },
+            //    { id: 23, name: "Lisp" },
+            //    { id: 29, name: "C#" },
+            //    { id: 31, name: "Fortran" },
+            //    { id: 37, name: "Visual Basic" },
+            //    { id: 41, name: "C" },
+            //    { id: 43, name: "C++" },
+            //    { id: 47, name: "Java" }
+            //], {
+            //        theme: "mega"
+            //    });
+
+            $('.share-dialog-permissions').unbind('click');
+            $('.share-dialog-permissions').bind('click', function () {
+                var m = $('.permissions-menu'),
+                    scrollPos = 0;
+                if ($('.share-dialog-contacts .jspPane'))
+                    scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+                m.removeClass('search-permissions');
+                if ($(this).attr('class').indexOf('active') == -1) {
+                    var x = $(this).position().left + 50;
+                    var y = $(this).position().top + 14 + scrollPos;
+                    m.css({
+                        'left': x,
+                        'top': y
+                    });
+                    m.removeClass('hidden');
+                    $(this).addClass('active');
+                } else {
+                    m.addClass('hidden');
+                    $(this).removeClass('active');
+                }
+            });
+
+            $('.permissions-icon').unbind('click');
+            $('.permissions-icon').bind('click', function () {
+                var m = $('.permissions-menu');
+                if ($(this).attr('class').indexOf('active') == -1) {
+                    var x = $(this).position().left + 12;
+                    var y = $(this).position().top + 8;
+                    m.css({
+                        'left': x,
+                        'top': y
+                    });
+                    m.removeClass('hidden');
+                    $(this).addClass('active');
+                    m.addClass('search-permissions');
+                } else {
+                    m.addClass('hidden');
+                    $(this).removeClass('active');
+                    m.removeClass('search-permissions');
+                }
+            });
+
+            $('.permissions-menu-item').unbind('click');
+            $('.permissions-menu-item').bind('click', function () {
+                if ($(this).attr('class').indexOf('active') == -1) {
+                    $(this).parent().find('.permissions-menu-item.active').removeClass('active');
+                    var p = $(this).attr('class').replace('permissions-menu-item', '').split(" ").join("");
+                    if ($(this).attr('class').indexOf('search-permissions') == -1) {
+                        $('.permissions-icon').removeClass('read-only read-and-write full-access');
+                        $('.permissions-icon').addClass(p);
+                    }
+                    $(this).addClass('active');
+                } else
+                    $(this).removeClass('active');
+                $('.permissions-menu').addClass('hidden');
+                $('.permissions-icon.active').removeClass('active');
+                $('.share-dialog-permissions.active').removeClass('active');
+
+            });
+
+
+            //Pending info block
+            $('.pending-indicator').bind('mouseover', function () {
+                var x = $(this).position().left,
+                    y = $(this).position().top,
+                    infoBlock = $('.share-pending-info'),
+                    scrollPos = 0;
+                if ($('.share-dialog-contacts .jspPane'))
+                    scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+                infoHeight = infoBlock.outerHeight();
+                infoBlock.css({
+                    'left': x,
+                    'top': y - infoHeight + scrollPos
+                });
+                infoBlock.fadeIn(200);
+            });
+            $('.pending-indicator').bind('mouseout', function () {
+                $('.share-pending-info').fadeOut(200);
+            });
+
+
+            //Personal message
+            $('.share-message textarea').bind('focus', function () {
+                var $this = $(this);
+                $('.share-message').addClass('active');
+                if ($this.val() == 'Include personal message...') {
+                    $this.select();
+                    window.setTimeout(function () {
+                        $this.select();
+                    }, 1);
+                    function mouseUpHandler() {
+                        $this.off("mouseup", mouseUpHandler);
+                        return false;
+                    }
+                    $this.mouseup(mouseUpHandler);
+                }
+            });
+
+            $('.share-message textarea').bind('blur', function () {
+                var $this = $(this);
+                $('.share-message').removeClass('active');
+            });
+
+            function shareMessageResizing() {
+                var txt = $('.share-message textarea'),
+                    txtHeight = txt.outerHeight(),
+                    hiddenDiv = $('.share-message-hidden'),
+                    pane = $('.share-message-scrolling'),
+                    content = txt.val(),
+                    api;
+                content = content.replace(/\n/g, '<br />');
+                hiddenDiv.html(content + '<br/>');
+
+                if (txtHeight != hiddenDiv.outerHeight()) {
+                    txt.height(hiddenDiv.outerHeight());
+
+                    if ($('.share-message-textarea').outerHeight() >= 50) {
+                        pane.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 5 });
+                        api = pane.data('jsp');
+                        txt.blur();
+                        txt.focus();
+                        api.scrollByY(0);
+                    }
+                    else {
+                        api = pane.data('jsp');
+                        if (api) {
+                            api.destroy();
+                            txt.blur();
+                            txt.focus();
+                        }
+                    }
+                }
+            }
+
+            $('.share-message textarea').on('keyup', function () {
+                shareMessageResizing();
+            });
+
+            /*$('.qr-dialog-label .dialog-feature-toggle').on('click', function () {
+                var me = $(this);
+                if (me.hasClass('toggle-on')) {
+                    me.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function () {
+                        me.removeClass('toggle-on');
+                    });
+
+                }
+                else {
+                    me.find('.dialog-feature-switch').animate({ marginLeft: '22px' }, 150, 'swing', function () {
+                        me.addClass('toggle-on');
+                    });
+                }
+            });
+
+            var QRoptions = {
+                width: 222,
+                height: 222,
+                correctLevel: QRErrorCorrectLevel.H,    // high
+                foreground: '#D90007',
+                text: 'https://mega.nz/thecaptin121'
+            };
+
+            // Render the QR code
+            $('.qr-icon-big').text('').qrcode(QRoptions);
+
+        });*/
+        
+    </script>
+</head>
+
+<body id="bodyel" class="bottom-pages">
+
+
+    <!--<div class="fm-dialog-overlay"></div>-->
+
+    <div class="mobile fm-dialog-container hidden">
+        <div class="mobile fm-dialog-aligner">
+            <div class="mobile fm-dialog park-account-dialog">
+                <div class="fm-dialog-header">
+                    <div class="fm-dialog-title">Please confirm you want to Park your account</div>
+                    <div class="fm-dialog-close"></div>
+                    <div class="clear"></div>
+                </div>
+                <div class="fm-dialog-body improved-recovery-steps">
+                    <div class="checkbox-block park-account-checkbox">
+                        <h3 class="main-italic-header">Check the boxes below and enter your email</h3>
+                        <div class="checkbox-container">
+                            <div class="settings-row">
+                                <div class="">
+                                    <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                                    <div class="checkdiv checkboxOff">
+                                        <input type="checkbox" id="" class="checkboxOff" />
+                                    </div>
+                                    <label for="" class="radio-txt">Yes, I understand parking my account will <strong class="warning-text">remove all my files, contacts, messages from my account.</strong></label>
+                                    <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <div class="">
+                                    <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                                    <div class="checkdiv checkboxOff">
+                                        <input type="checkbox" id="" class="checkboxOff" />
+                                    </div>
+                                    <label for="" class="radio-txt">Yes, I understand there is no way to undo a parked account,<strong class="warning-text"> all my files will be gone forever.</strong></label>
+                                    <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <div class="">
+                                    <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                                    <div class="checkdiv checkboxOff">
+                                        <input type="checkbox" id="" class="checkboxOff" />
+                                    </div>
+                                    <label for="" class="radio-txt">Yes, I still want to park my account</label>
+                                    <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="login-register-input email">
+
+                        <input type="text" name="recover-input1" id="recover-input1" value="" placeholder="Your email address" />
+                    </div>
+                    <!-- Only show this div when all the checkboxes have been ticked and the email field has been filled in. -->
+                    <div class="content-highlight warning">
+                        <div class="highlight-wrapper">
+                            <div class="warning-icon"></div>
+                            <div class="content-text">
+                                If you proceed, the existing account under this address will be deactivated, and you will lose access to your data.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fm-notifications-bottom mobile buttons inline-buttons">
+                    <div class="mobile red-button second"><span>Cancel</span></div>
+                    <div class="mobile red-button first "><span>Park account</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!-- Park account warning -->
+    <div class="fm-dialog park-account-dialog ">
+        <div class="fm-dialog-header">
+            <div class="fm-dialog-title">Please confirm you want to Park your account</div>
+            <div class="fm-dialog-close"></div>
+            <div class="clear"></div>
+        </div>
+        <div class="fm-dialog-body improved-recovery-steps">
+
+            <div class="checkbox-block park-account-checkbox">
+                <h3 class="main-italic-header">Check the boxes below and enter your email</h3>
+                <div class="checkbox-container">
+                    <div class="settings-row">
+                        <div class="">
+                            <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                            <!-- Toggle between checkboxOff and checkboxOn -->
+                            <div class="checkdiv checkboxOff">
+                                <!-- Toggle between checkboxOff and checkboxOn -->
+                                <input type="checkbox" id="" class="checkboxOff" />
+                            </div>
+                            <label for="" class="radio-txt">Yes, I understand parking my account will <strong class="warning-text">remove all my files, contacts, messages from my account.</strong></label>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="">
+                            <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                            <!-- Toggle between checkboxOff and checkboxOn -->
+                            <div class="checkdiv checkboxOff">
+                                <!-- Toggle between checkboxOff and checkboxOn -->
+                                <input type="checkbox" id="" class="checkboxOff" />
+                            </div>
+                            <label for="" class="radio-txt">Yes, I understand there is no way to undo a parked account,<strong class="warning-text"> all my files will be gone forever.</strong></label>
+
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <div class="">
+                            <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                            <!-- Toggle between checkboxOff and checkboxOn -->
+                            <div class="checkdiv checkboxOff">
+                                <!-- Toggle between checkboxOff and checkboxOn -->
+                                <input type="checkbox" id="" class="checkboxOff" />
+                            </div>
+                            <label for="" class="radio-txt">Yes, I still want to park my account</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="login-register-input email">
+
+                <input type="text" name="recover-input1" id="recover-input1" value="" placeholder="Your email address" />
+            </div>
+            <!-- Only show this div when all the checkboxes have been ticked and the email field has been filled in. -->
+            <div class="content-highlight warning">
+                <div class="highlight-wrapper">
+                    <div class="warning-icon"></div>
+                    <div class="content-text">
+                        If you proceed, the existing account under this address will be deactivated, and you will lose access to your data.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fm-notifications-bottom">
+            <div class="default-white-button left"><span>Contact support</span></div>
+            <div class="default-grey-button right"><span>Park account</span></div>
+            <div class="default-white-button right"><span>Cancel</span></div>
+        </div>
+    </div>
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <div class="mobile forgot-password-page hidden">
+        <div class="mobile fm-header fm-hr">
+            <div class="mobile fm-icon top-icon menu right"></div>
+            <div class="mobile fm-icon back left"></div>
+            <div class="mobile fm-header-txt"><span>[$17806]</span></div>
+            <div class="mobile fm-subheader-txt"><span>No, I am not logged into my account on another browser</span></div>
+        </div>
+    </div>
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <!--  ------------------------------------------------------------------------------------------------------ -->
+    <div class="main-pad-block hidden">
+        <div class="main-mid-pad backup-recover improved-recovery-steps">
+            <div class="block-wrapper warning">
+                <div class="main-left-block">
+                    <div class="register-st2-txt-block">
+                        <div class="vert-container-aligner">
+                            <div class="content-wrapper">
+                                <h2 class="main-italic-header">Forgot your password?</h2>
+                                <div class="warning-icon"></div><h3 class="main-italic-header">Step 1</h3>
+                                <h1 class="step-main-question">You can easily change your password in the app. Select the device you are logged in with to see how.</h1>
+                                <!-- Each section will contain body text of some kind to indicate what the section is about
+                                     Hide/Show depending on whether there is content -->
+                                <p class="recover-account-body-text hidden">Please check your browser (Chrome, Firefox, Safari, Edge, etc etc(can’t remember them all) to see if you are still logged into your account.  You might have also logged into MEGA on someone elses computer. </p>
+                                <!-- After completing the decision tree, if a user has a logged in device, we show this section.
+                                     This section contains the instruction for each client -->
+                                <div class="app-instruction-block hidden">
+                                    <h3 class="main-italic-header">Devices</h3>
+                                    <!-- This block contains the buttons to swap between the different clients. Add/Remove the active class  show the selected client -->
+                                    <div class="app-button-block">
+                                        <div class="app-button android active">Android app</div>
+                                        <div class="app-button ios">iOS app</div>
+                                        <div class="app-button osxmegasync">Megasync (OSX)</div>
+                                        <div class="app-button windowsmegasync">Megasync (Windows)</div>
+                                        <div class="app-button windowsapp">Windowsphone app</div>
+                                        <div class="app-button uwpapp">UWP app</div>
+                                    </div>
+                                    <!-- The instructions are inserted into here into a list -->
+                                    <div class="instruction-block">
+                                        <h3 class="main-italic-header">Instructions</h3>
+                                        <ol class="app-instructions-list" data-current="">
+                                            <li class="list-point">
+                                                Check your phone and/or tablet  to see if you <strong>have our MEGA app installed</strong>.
+                                            </li>
+                                            <li class="list-point">
+                                                Tap on the Cloud Drive Context  <strong class="">menu icon (three vertical dots) in the top right corner of the screen. There you can select the action you </strong> want to perform.
+                                            </li>
+                                            <li class="list-point">
+                                                Files: You can download, <strong>send, copy, move, rename and delete them.</strong> You can also create a link.
+                                            </li>
+                                            <li class="list-point">
+                                                Select the app you want to open the picture with.
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <!-- If a user does have their Recovery key, show them this block to allow them to recover their account -->
+                                <div class="recover-account-email-block hidden">
+                                    <div class="login-register-input email ">
+                                        <input type="text" name="recover-input1" id="recover-input1" value="" placeholder="Enter your email" />
+                                    </div>
+                                    <div class="backup-input-button default-grey-button recover-button left">Send</div>
+                                </div>
+
+                                <!-- This is the section for the checkboxes. A user must check all the boxes to reveal the buttons. -->
+                                <div class="checkbox-block hidden ">
+                                    <h3 class="main-italic-header">Check the boxes that apply</h3>
+                                    <div class="checkbox-container">
+                                        <div class="settings-row">
+                                            <div class="">
+                                                <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                                                <!-- Toggle between checkboxOff and checkboxOn -->
+                                                <div class="checkdiv checkboxOff">
+                                                    <!-- Toggle between checkboxOff and checkboxOn -->
+                                                    <input type="checkbox" id="" class="checkboxOff" />
+                                                </div>
+                                                <!-- The questions for each checkbox are inserted here -->
+                                                <label for="" class="radio-txt">I have checked internet browsers on my computer for logged in accounts.</label>
+
+                                            </div>
+                                        </div>
+                                        <div class="settings-row">
+                                            <div class="">
+                                                <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                                                <!-- Toggle between checkboxOff and checkboxOn -->
+                                                <div class="checkdiv checkboxOff">
+                                                    <!-- Toggle between checkboxOff and checkboxOn -->
+                                                    <input type="checkbox" id="" class="checkboxOff" />
+                                                </div>
+                                                <!-- The questions for each checkbox are inserted here -->
+                                                <label for="" class="radio-txt">I have checked internet browsers on other computer for logged in accounts.</label>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- This block is used to add content that needs to be highlighted -->
+                                <div class="content-highlight-block hidden ">
+                                    <div class="content-highlight">
+                                        <div class="highlight-wrapper">
+                                            <div class="feedback-logo"></div>
+                                            <div class="content-text">
+                                                View our help centre to see step by step instructions with images.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- This block holds the buttons. Remember the boxes need to all be checked for the buttons to be shown
+                                     As well as that, the buttons are reused from the old recovery.html which means they are currently being used to hide/show the `recover-block` div. Please remove this logic -->
+                                <div class="button-container hidden">
+                                    <div class="button-aligner">
+                                        <!-- The text of the button should be worded like it was an answer to the question-->
+                                        <div class="recover-button yes">
+                                            Check to see if I have an active/logged-in session
+                                        </div>
+                                    </div>
+                                    <div class="clear"></div>
+                                    <div class="button-aligner">
+                                        <div class="recover-button no">
+                                            No, I want to park my account
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- This is the progress breadcrumb navigation block -->
+                <div class="main-right-block recover-block decision-breadcrumb">
+                    <div class="register-st2-txt-block">
+                        <div class="vert-container-aligner">
+                            <div class="content-wrapper">
+                                <div class="progress-meter">
+                                    <ol class="progress-points" data-current="4">
+                                        <li class="progress-point">
+                                            <div class="progress-content">
+
+                                                <div class="step-label">Step 1 </div>
+                                                <div class="step-answer">Yes, I am logged into my account on another browser</div>
+                                            </div>
+                                        </li>
+                                        <li class="progress-point">
+                                            <div class="progress-track"></div>
+                                            <div class="progress-content">
+                                                <div class="step-label">Step 2</div>
+                                                <div class="step-answer">Yes, I am logged into my account on another browser</div>
+                                            </div>
+                                        </li>
+                                        <!-- Add success class to show a green navigation bar -->
+                                        <li class="progress-point success">
+                                            <div class="progress-track"></div>
+                                            <div class="progress-content">
+                                                <div class="step-label">Success</div>
+                                                <div class="step-answer">Check to see if I have an active/logged-in session</div>
+                                            </div>
+                                        </li>
+                                        <!-- Add warning class to show a orange navigation bar -->
+                                        <li class="progress-point warning">
+                                            <div class="progress-track"></div>
+                                            <div class="progress-content">
+                                                <div class="step-label">Warning</div>
+                                                <div class="step-answer">Yes, I am logged into my account on another browser</div>
+                                            </div>
+                                        </li>
+                                        <!-- Add inactive class to show a grayed out navigation bar -->
+                                        <li class="progress-point inactive">
+                                            <div class="progress-track"></div>
+                                            <div class="progress-content">
+                                                <div class="step-label">Aliquam tincidunt</div>
+                                                <div class="step-answer">Yes, I am logged into my account on another browser</div>
+                                            </div>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+
+
+</body>
+</html>

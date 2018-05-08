@@ -238,7 +238,9 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
         return call;
     }
     function sendBusy() {
-        self.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, chatid, parsedCallData.callid + String.fromCharCode(Term.kBusy));
+        // Broadcast instead of send only to requestor, so that all other our clients know we rejected the call
+        self.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, parsedCallData.chatid,
+            parsedCallData.callid + String.fromCharCode(Term.kBusy));
     }
     var keys = Object.keys(self.calls);
     if (keys.length) {
@@ -283,6 +285,11 @@ RtcModule.prototype.msgCallData = function(parsedCallData) {
                     "The caller of the incoming call should abort the call");
             }
             return;
+        } else {
+            // Call state is either kInProgress or kTerminating
+            self.logger.log("Received call request while another call is in progress or terminating, sending busy");
+            sendBusy();
+            return;
         }
     }
     var call = createNewCall();
@@ -318,8 +325,15 @@ RtcModule.prototype.cmdBroadcast = function(op, chatid, payload) {
     if (payload) {
         data += payload;
     }
-    if (!info.shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
+    var shard = this.chatd.chatIdShard[chatid];
+    if (!shard) {
+        self.logger.error("cmdBroadcast: No shard for chatid", base64urlencode(chatid));
+        return;
+    }
+    if (!shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
         throw new Error("cmdEndpoint: Send error trying to send command " + constStateToText(RTCMD, op));
+    } else {
+        return true;
     }
 };
 
@@ -530,7 +544,7 @@ function Call(rtcModule, info, isGroup, isJoiner, handler) {
     this.isGroup = isGroup;
     this.isJoiner = isJoiner; // the joiner is actually the answerer in case of new call
     this.sessions = {};
-    this.sessRetries = {};
+    this.sessRetries = { total: 0 };
     this.state = isJoiner ? CallState.kRingIn : CallState.kInitial;
     //  var level = this.manager.logger.options.minLogLevel();
     this.logger = MegaLogger.getLogger("call[" + base64urlencode(this.id) + "]",
@@ -623,13 +637,14 @@ Call.prototype._getLocalStream = function(av) {
 };
 
 Call.prototype.msgCallTerminate = function(packet) {
+    var self = this;
     if (packet.data.length < 1) {
-        this.logger.error("Ignoring CALL_TERMINATE without reason code");
+        self.logger.error("Ignoring CALL_TERMINATE without reason code");
         return;
     }
     var code = packet.data.charCodeAt(0);
-    var sessions = this.sessions;
-    var ci = this._callerInfo;
+    var sessions = self.sessions;
+    var ci = self._callerInfo;
     var isCallParticipant = false;
     if (Object.keys(sessions).length) { // Call is in progress, look in sessions
         for (var sid in sessions) {
@@ -639,18 +654,24 @@ Call.prototype.msgCallTerminate = function(packet) {
                 break;
             }
         }
-    } else if (this.state <= CallState.kJoining
+    } else if (self.state <= CallState.kJoining
         && ci
         && ci.fromUser === packet.fromUser
         && ci.fromClient === packet.fromClient) { // call is in setup phase, only call initiator can abort it
             isCallParticipant = true;
+    } else {
+        var retry = self.sessRetries[ci.fromUser + ci.fromClient];
+        if (retry && (Date.now() - retry.active <= RtcModule.kSessSetupTimeout)) {
+            // no session to this peer at the moment, but we are in the process of reconnecting to them
+            isCallParticipant = true;
+        }
     }
 
     if (!isCallParticipant) {
-        this.logger.warn("Received CALL_TERMINATE from a client that is not in the call, ignoring");
+        self.logger.warn("Received CALL_TERMINATE from a client that is not in the call, ignoring");
         return;
     }
-    this._destroy(code | Term.kPeer, false);
+    self._destroy(code | Term.kPeer, false);
 };
 
 Call.prototype.msgCallReqDecline = function(packet) {
@@ -670,7 +691,8 @@ Call.prototype.msgCallReqDecline = function(packet) {
     if (packet.fromUser === self.manager.chatd.userId) {
         // Some other client of our user declined the call
         if (self.state !== CallState.kRingIn) {
-            self.log.warn("Ignoring CALL_REQ_DECLINE from another client of our user - the call is not in kRingIn state, but in ", constStateToText(CallState, self.state));
+            self.logger.warn("Ignoring CALL_REQ_DECLINE from another client of our user -",
+                "the call is not in kRingIn state, but in ", constStateToText(CallState, self.state));
             return;
         }
         // TODO: Maybe verify the reason is not other than kCallRejected or kBusy
@@ -682,7 +704,7 @@ Call.prototype.msgCallReqDecline = function(packet) {
     }
 
     if (self.state !== CallState.kReqSent) {
-        this.log.warn("Ignoring unexpected CALL_REQ_DECLINE while in state", constStateToText(this.state));
+        this.logger.warn("Ignoring unexpected CALL_REQ_DECLINE while in state", constStateToText(this.state));
         return;
     }
     this._destroy(code | Term.kPeer, false);
@@ -752,6 +774,7 @@ Call.prototype._clearCallOutTimer = function() {
     clearTimeout(this._callOutTimer);
     delete this._callOutTimer;
 };
+
 Call.prototype._bcastCallData = function(ringing) {
     var self = this;
     assert(self.state <= CallState.kInProgress);
@@ -765,7 +788,7 @@ Call.prototype._bcastCallData = function(ringing) {
         return false;
     }
     return true;
-}
+};
 
 Call.prototype.msgSession = function(packet) {
     var self = this;
@@ -858,7 +881,7 @@ Call.prototype._waitAllSessionsTerminated = function(code, cb) {
     })
     .fail(function() {
         if (Object.keys(sessions).length > 0) {
-            self.logger.error("Timed out waiting for all sessions to terminate, force closing them");
+            self.logger.warn("Timed out waiting for all sessions to terminate, force closing them");
             for (var sid in sessions) {
                 var sess = sessions[sid];
                 sess._destroy(code);
@@ -873,14 +896,14 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
     var self = this;
     if (self.state === CallState.kDestroyed) {
         return Promise.resolve(null);
-    } else if (self.state === CallState.Terminating) {
+    } else if (self.state === CallState.kTerminating) {
         assert(self._destroyPromise);
         return self._destroyPromise;
     }
     if (msg) {
         self.logger.log("Destroying call due to:", msg);
     }
-
+    self.predestroyState = self.state;
     self._setState(CallState.kTerminating);
     self._clearCallOutTimer();
 
@@ -918,7 +941,7 @@ Call.prototype.cmdBroadcast = function(type, payload) {
         data += payload;
     }
     if (!self.shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
-        setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
+        setTimeout(function() { self._destroy(Term.kErrNetSignalling, false); }, 0);
         return false;
     }
     return true;
@@ -967,24 +990,63 @@ Call.prototype._stopIncallPingTimer = function() {
 Call.prototype._removeSession = function(sess, reason) {
     var self = this;
     delete self.sessions[sess.sid];
+
+    // If we want to terminate the call (no matter if initiated by us or peer), we first
+    // set the call's state to kTerminating. If that is not set, then it's only the session
+    // that terminates for a reason that is not fatal to the call,
+    // and can try re-establishing the session
     if (self.state === CallState.kTerminating) {
         return;
     }
-    // if no more sessions left, destroy call even if group
-    if (Object.keys(self.sessions).length === 0) {
-        self._destroy(reason, false);
-        return;
+    var peer = sess.peer;
+    var client = sess.peerClient;
+    var endpointId = peer + client;
+    var sessRetries = self.sessRetries;
+    var totalRetries = ++sessRetries.total;
+    var retryId;
+    var retry = sessRetries[endpointId];
+    // The retry.active flag is not cleared when the session is actually restored. Only the
+    // combination of .active + no session to this peer + no newer retry means that this particular
+    // retry is in progress
+    if (retry) {
+        retry.active = Date.now();
+        retryId = ++retry.cnt;
+    } else {
+        sessRetries[endpointId] = {cnt: 1, active: Date.now() };
+        retryId = 1;
     }
-    // upon session failure, we swap the offerer and answerer and retry
-    if (self.isGroup && isTermError(reason) && !sess.isJoiner) {
-        var endpointId = sess.peer + sess.peerClient;
-        if (!self.sessRetries[endpointId]) {
-            self.sessRetries[endpointId]++;
-            setTimeout(function() {
-                self._join(sess.peer);
-            }, 500);
+
+    // The original joiner re-joins, the peer does nothing, just keeps the call
+    // ongoing and accepts the JOIN
+    if (sess.isJoiner) {
+        self.logger.log("Session to", base64urlencode(sess.peer), "failed, re-establishing it...");
+        setTimeout(function() { // Execute it async, to avoid re-entrancy
+            self.rejoinPeer(sess.peer, sess.peerClient);
+        }, 0);
+    } else {
+        // Else wait for peer to re-join...
+        self.logger.log("Session to ", base64urlencode(sess.peer), "failed, expecting peer to re-establish it...");
+    }
+    // set a timeout for the session recovery
+    setTimeout(function() {
+        var retry = sessRetries[endpointId];
+        assert(retry);
+        if (retry.cnt !== retryId) { // there was another retry on this session meanwhile
+            return;
         }
-    }
+        delete retry.active;
+        if ((sessRetries.all > totalRetries) // there was a newer retry on another session
+         || (self.state >= CallState.kTerminating)) { // call already terminating
+            return; // timer is not relevant anymore
+        }
+
+        if (!self.isGroup && !Object.keys(self.sessions).length) {
+            // There are no sessions currently
+            // TODO: For group calls we would need to revise this
+            self.logger.warn("Timed out waiting for peer to rejoin, terminating call");
+            self.hangup(Term.kErrSessRetryTimeout); // not to be confused with kErrSessSetupTimeout
+        }
+    }, RtcModule.kSessSetupTimeout);
 };
 Call.prototype._fire = function(evName) {
     var self = this;
@@ -1073,9 +1135,27 @@ Call.prototype._join = function(userid) {
     // we need another timer as well
     setTimeout(function() {
         if (self.state <= CallState.kJoining) {
-            self._destroy(Term.kErrProtoTimeout, true);
+            self._destroy(Term.kErrSessSetupTimeout, true);
         }
     }, RtcModule.kSessSetupTimeout);
+    return true;
+};
+Call.prototype.rejoinPeer = function(userid, clientid) {
+    var self = this;
+    assert(self.state === CallState.kInProgress);
+    // JOIN:
+    // chatid.8 userid.8 clientid.4 dataLen.2 type.1 callid.8 anonId.8
+    // if userid is not specified, join all clients in the chat, otherwise
+    // join a specific user (used when a session gets broken)
+    var data = self.chatid + userid + clientid +
+        Chatd.pack16le(17) + String.fromCharCode(RTCMD.JOIN) +
+        self.id + self.manager.ownAnonId;
+    if (!self.shard.cmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
+        setTimeout(function() {
+            self._destroy(Term.kErrNetSignalling, true);
+        }, 0);
+        return false;
+    }
     return true;
 };
 
@@ -1136,8 +1216,13 @@ Call.prototype.hangup = function(reason) {
     case CallState.kJoining:
     case CallState.kInProgress:
     case CallState.kWaitLocalStream:
-        // TODO: Check if the sender is the call host and only then destroy the call
-        term = Term.kUserHangup;
+        // TODO: For group calls, check if the sender is the call host and only then destroy the call
+        if (reason == null) { // covers both 'undefined' and 'null'
+            term = Term.kUserHangup;
+        } else {
+            assert(reason === Term.kUserHangup || RtcModule.termCodeIsError(reason));
+            term = reason;
+        }
         break;
     case CallState.kTerminating:
     case CallState.kDestroyed:
@@ -1279,7 +1364,7 @@ function Session(call, packet) {
         call.manager._loggerOpts, call.logger);
     self.setupTimer = setTimeout(function() {
         if (self.state < SessState.kInProgress) {
-            self.terminateAndDestroy(Term.kErrProtoTimeout);
+            self.terminateAndDestroy(Term.kErrSessSetupTimeout);
         }
     }, RtcModule.kSessSetupTimeout);
 }
@@ -1389,8 +1474,8 @@ Session.prototype._createRtcConn = function() {
         RTC.attachMediaStream(player, self.remoteStream);
     };
     conn.onremovestream = function(event) {
+        self._fire("onRemoteStreamRemoved");
         self.self.remoteStream = null;
-        // TODO: Do we need to generate event from this?
     };
     conn.onsignalingstatechange = function(event) {
         var state = conn.signalingState;
@@ -1410,6 +1495,16 @@ Session.prototype._createRtcConn = function() {
             self._setState(SessState.kInProgress);
             self._tsIceConn = Date.now();
             self.call._notifySessionConnected(self);
+            /* DEBUG: Enable this to simulate session ICE disconnect
+            if (self.isJoiner)
+            {
+                setTimeout(() => {
+                    if (self.state < SessState.kTerminating) {
+                        self.terminateAndDestroy(Term.kErrIceDisconn);
+                    }
+                }, 4000);
+            }
+           */
         }
     };
     // RTC.Stats will be set to 'false' if stats are not available for this browser
@@ -1606,7 +1701,7 @@ Session.prototype.cmd = function(op, data) {
         self.call.chatid + self.peer + self.peerClient +
         Chatd.pack16le(payload.length) + payload)) {
         if (self.state < SessState.kTerminating) {
-            this._destroy(Term.kErrNetSignalling);
+            self.call._destroy(Term.kErrNetSignalling, false);
         }
         return false;
     }
@@ -1649,7 +1744,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
                     done(null);
                 }, 1000);
             }
-        });
+        }, 0);
     }, 0);
     return self.terminatePromise;
 };
@@ -1668,6 +1763,10 @@ Session.prototype.msgSessTerminateAck = function(packet) {
 Session.prototype.msgSessTerminate = function(packet) {
     // sid.8 termcode.1
     var self = this;
+    if (self.state === SessState.kDestroyed) {
+        self.logger.warn("Ignoring SESS_TERMINATE for a dead session");
+        return;
+    }
     assert(packet.data.length >= 1);
     self.cmd(RTCMD.SESS_TERMINATE_ACK);
     if (self.state === SessState.kDestroyed) {
@@ -1678,6 +1777,9 @@ Session.prototype.msgSessTerminate = function(packet) {
     if (self.state === SessState.kTerminating && this.terminateAckCallback) {
         // handle terminate as if it were an ack - in both cases the peer is terminating
         self.msgSessTerminateAck(packet);
+        if (self.state === SessState.kDestroyed) { // the ack handler destroyed it
+            return;
+        }
     }
     if (self.state === SessState.kDestroyed) {
         return;
@@ -1709,6 +1811,7 @@ Session.prototype._destroy = function(code, msg) {
         this.rtcConn = null;
     }
     this._setState(SessState.kDestroyed);
+    this._fire("onRemoteStreamRemoved");
     this._fire("onDestroy", code & 0x7f, !!(code & 0x80), msg);// jscs:ignore disallowImplicitTypeConversion
     this.call._removeSession(this, code);
 };
@@ -1935,11 +2038,13 @@ var Term = Object.freeze({
     kErrNoMedia: 28,        // < There is no media to be exchanged - both sides don't have audio/video to send
     kErrNetSignalling: 29,  // < chatd shard was disconnected
     kErrIceDisconn: 30,     // < ice-disconnect condition on webrtc connection
-    kErrIceFail: 31,        // <ice-fail condition on webrtc connection
+    kErrIceFail: 31,        // < ice-fail condition on webrtc connection
     kErrSdp: 32,            // < error generating or setting SDP description
     kErrUserOffline: 33,    // < we received a notification that that user went offline
-    kErrorLast: 33,         // < Last enum indicating call termination due to error
-    kLast: 33,              // < Last call terminate enum value
+    kErrSessSetupTimeout: 34, // < timed out waiting for session
+    kErrSessRetryTimeout: 35, // < timed out waiting for peer to retry a failed session
+    kErrorLast: 35,         // < Last enum indicating call termination due to error
+    kLast: 35,              // < Last call terminate enum value
     kPeer: 128              // < If this flag is set, the condition specified by the code happened at the peer,
     // < not at our side
 });
@@ -2032,6 +2137,77 @@ SessStateAllowedStateTransitions[SessState.kTerminating] = [
     SessState.kDestroyed
 ];
 SessStateAllowedStateTransitions[SessState.kDestroyed] = [];
+
+var UICallTerm = Object.freeze({
+    'INITIALISED': 0,
+    'WAITING_RESPONSE_OUTGOING': 10,
+    'WAITING_RESPONSE_INCOMING': 20,
+    'STARTING': 25,
+    'STARTED': 30,
+    'ENDED': 40,
+    'HANDLED_ELSEWHERE': 45,
+    'REJECTED': 50,
+    'ABORTED': 55,
+    'FAILED': 60,
+    'MISSED': 70,
+    'TIMEOUT': 80
+});
+RtcModule.UICallTerm = UICallTerm;
+RtcModule.termCodeIsError = function(termCode) {
+    return (termCode >= Term.kErrorFirst) && (termCode <= Term.kErrorLast);
+};
+
+// Not all timeouts are errors, i.e. kAnswerTimeout
+RtcModule.termCodeIsTimeout = function(termCode, name) {
+    if (!name) {
+        name = constStateToText(Term, termCode);
+    }
+    return name.match(/k[^\s]+Timeout/i) != null; // covers both null and undefined
+};
+
+Call.prototype.termCodeToUIState = function(terminationCode) {
+    var self = this;
+    var isIncoming = self.isJoiner;
+    switch (terminationCode) {
+        case Term.kUserHangup:
+            switch (self.predestroyState) {
+                case CallState.kRingIn:
+                    return UICallTerm.MISSED;
+                case CallState.kReqSent:
+                    return UICallTerm.ABORTED;
+                default:
+                    return UICallTerm.ENDED;
+            }
+            break; // just in case
+        case Term.kCallRejected:
+            return UICallTerm.REJECTED;
+        case Term.kAnsElsewhere:
+            return UICallTerm.HANDLED_ELSEWHERE;
+        case Term.kRingOutTimeout:
+            return UICallTerm.TIMEOUT;
+        case Term.kAnswerTimeout:
+            return isIncoming
+                ? UICallTerm.MISSED
+                : UICallTerm.TIMEOUT;
+        case Term.kBusy:
+            assert(!isIncoming);
+            return UICallTerm.REJECTED;
+        case Term.kAppTerminating:
+            return UICallTerm.ENDED;
+        default:
+            var name = constStateToText(Term, terminationCode);
+            if (RtcModule.termCodeIsError(terminationCode)) {
+                return UICallTerm.FAILED;
+            } else if (RtcModule.termCodeIsTimeout(terminationCode, name)) {
+                return UICallTerm.TIMEOUT;
+            } else {
+                self.logger.warn("termCodeToUIState: Don't know how to translate term code " +
+                    name + ", returning FAIL");
+                return UICallTerm.FAILED;
+            }
+    }
+};
+
 
 scope.RtcModule = RtcModule;
 scope.Call = Call;

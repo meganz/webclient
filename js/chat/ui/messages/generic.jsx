@@ -42,6 +42,7 @@ var GenericConversationMessage = React.createClass({
                 self.props.onUpdate();
             }
         }
+
         $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
             Soon(function() {
                 if (self.isMounted()) {
@@ -49,6 +50,8 @@ var GenericConversationMessage = React.createClass({
                 }
             });
         });
+
+
     },
     componentDidMount: function() {
         var self = this;
@@ -222,12 +225,15 @@ var GenericConversationMessage = React.createClass({
                     .done(function(myChatFolderId) {
                         M.injectNodes(node, myChatFolderId, function(res) {
                             console.error(res);
-                            if (res === 0) {
+                            if (!Array.isArray(res)) {
+                                if (d) {
+                                    console.error("Failed to inject nodes.");
+                                }
+                            }
+                            else {
                                 // TODO:
                                 // megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
-                            }
-                            else if (d) {
-                                console.error("Failed to inject nodes.");
+                                console.debug('injectNodes result', res); // array of handles for the newly copied nodes
                             }
                         })
                     })
@@ -243,7 +249,12 @@ var GenericConversationMessage = React.createClass({
                 // is a save/copy to
                 target = target || M.RootID;
                 M.injectNodes(node, target, function(res) {
-                    if (res === 0) {
+                    if (!Array.isArray(res)) {
+                        if (d) {
+                            console.error("Failed to inject nodes.");
+                        }
+                    }
+                    else {
                         if (target === M.RootID) {
                             // since if the user clicks Save without picking, its a bit weird, where the file went
                             // we show a simple dialog telling him the file is in Cloud Drive.
@@ -289,8 +300,11 @@ var GenericConversationMessage = React.createClass({
     _startPreview: function(v, e) {
         var chatRoom = this.props.message.chatRoom;
         assert(M.chat, 'Not in chat.');
-        chatRoom._rebuildAttachments();
+        chatRoom._rebuildAttachmentsImmediate();
 
+        if (is_video(v)) {
+            $.autoplay = v.h;
+        }
         slideshow(v.h, undefined, true);
         if (e) {
             e.preventDefault();
@@ -446,18 +460,11 @@ var GenericConversationMessage = React.createClass({
                 displayName = contact;
             }
 
-            var textContents = message.textContents;
+            var textContents = message.textContents || false;
 
-            if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
-                if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
-                    textContents = textContents.substr(2, textContents.length);
-
-                    try {
-                        var attachmentMeta = JSON.parse(textContents);
-                    } catch(e) {
-                        debugger;
-                        return null;
-                    }
+            if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
+                if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+                    attachmentMeta = message.getAttachmentMeta() || [];
 
                     var files = [];
 
@@ -483,107 +490,107 @@ var GenericConversationMessage = React.createClass({
                             }
                         }
 
-
-
+                        if (attachmentMetaInfo.revoked) {
+                            // don't show revoked files
+                            return;
+                        }
 
 
                         // generate preview/icon
                         var icon = fileIcon(v);
+                        var isImage = is_image(v);
+                        var isVideo = is_video(v) > 0;
+                        var showThumbnail = v.fa && isImage || String(v.fa).indexOf(':0*') > 0;
+                        var isPreviewable = isImage || isVideo;
 
                         var dropdown = null;
                         var previewButton = null;
 
-                        if (!attachmentMetaInfo.revoked) {
-                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-                                var imagesListKey = message.messageId + "_" + v.h;
-                                if (!chatRoom.images.exists(imagesListKey)) {
-                                    v.id = imagesListKey;
-                                    v.orderValue = message.orderValue;
-                                    v.messageId = message.messageId;
-                                    chatRoom.images.push(v);
-                                }
-                                if (is_image(v) || is_video(v)) {
-                                    var previewLabel = is_video(v) ? l[17732] : l[1899];
-                                    previewButton = <span key="previewButton">
-                                        <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
-                                                                  onClick={self._startPreview.bind(self, v)}/>
-                                        <hr/>
-                                    </span>;
-                                }
+                        if (showThumbnail) {
+                            var imagesListKey = message.messageId + "_" + v.h;
+                            if (!chatRoom.images.exists(imagesListKey)) {
+                                v.id = imagesListKey;
+                                v.orderValue = message.orderValue;
+                                v.messageId = message.messageId;
+                                chatRoom.images.push(v);
                             }
-                            if (contact.u === u_handle) {
-                                dropdown = <ButtonsUI.Button
-                                    className="default-white-button tiny-button"
-                                    icon="tiny-icon icons-sprite grey-dots">
-                                    <DropdownsUI.Dropdown
-                                        ref={(refObj) => {
-                                            self.dropdown = refObj;
-                                        }}
-                                        className="white-context-menu attachments-dropdown"
-                                        noArrow={true}
-                                        positionMy="left top"
-                                        positionAt="left bottom"
-                                        horizOffset={-4}
-                                        vertOffset={3}
-                                        onBeforeActiveChange={(newState) => {
-                                            if (newState === true) {
-                                                self.forceUpdate();
-                                            }
-                                        }}
-                                        dropdownItemGenerator={function(dd) {
-                                            var linkButtons = [];
-                                            var firstGroupOfButtons = [];
-                                            var revokeButton = null;
-                                            var downloadButton = null;
+                            if (isPreviewable) {
+                                var previewLabel = isVideo ? l[17732] : l[1899];
+                                previewButton = <span key="previewButton">
+                                    <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
+                                                              onClick={self._startPreview.bind(self, v)}/>
+                                    <hr/>
+                                </span>;
+                            }
+                        }
+                        if (contact.u === u_handle) {
+                            dropdown = <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon icons-sprite grey-dots">
+                                <DropdownsUI.Dropdown
+                                    ref={(refObj) => {
+                                        self.dropdown = refObj;
+                                    }}
+                                    className="white-context-menu attachments-dropdown"
+                                    noArrow={true}
+                                    positionMy="left top"
+                                    positionAt="left bottom"
+                                    horizOffset={-4}
+                                    vertOffset={3}
+                                    onBeforeActiveChange={(newState) => {
+                                        if (newState === true) {
+                                            self.forceUpdate();
+                                        }
+                                    }}
+                                    dropdownItemGenerator={function(dd) {
+                                        var linkButtons = [];
+                                        var firstGroupOfButtons = [];
+                                        var revokeButton = null;
+                                        var downloadButton = null;
 
-                                            if (message.isEditable && message.isEditable()) {
-                                                revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
-                                                                                         label={__(l[83])}
-                                                                                         className="red"
-                                                                                         onClick={() => {
-                                                    chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
-                                                        chatRoom,
-                                                        (
-                                                            message.internalId ?
-                                                                message.internalId : message.orderValue
-                                                        ),
-                                                        ""
-                                                    );
-                                                }} />
-                                            }
+                                        if (message.isEditable && message.isEditable()) {
+                                            revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
+                                                                                     label={__(l[83])}
+                                                                                     className="red"
+                                                                                     onClick={() => {
+                                                 chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
+                                                     chatRoom, message.internalId || message.orderValue, ""
+                                                 );
+                                            }}/>
+                                        }
 
-                                            if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-                                                dropdown = "<span>" + l[5533] + "</span>";
-                                                dbfetch.get(v.h)
-                                                    .always(function() {
-                                                        if (!M.d[v.h]) {
-                                                            NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
-                                                            Soon(function() {
-                                                                self.safeForceUpdate();
-                                                            });
-                                                        }
-                                                    });
-                                            }
-                                            else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-                                                downloadButton = <DropdownsUI.DropdownItem
-                                                    icon="rounded-grey-down-arrow"
-                                                    label={__(l[1187])}
-                                                    onClick={self._startDownload.bind(self, v)}/>;
+                                        if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                            dropdown = "<span>" + l[5533] + "</span>";
+                                            dbfetch.get(v.h)
+                                                .always(function() {
+                                                    if (!M.d[v.h]) {
+                                                        NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
+                                                        Soon(function() {
+                                                            self.safeForceUpdate();
+                                                        });
+                                                    }
+                                                });
+                                        }
+                                        else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                            downloadButton = <DropdownsUI.DropdownItem
+                                                icon="rounded-grey-down-arrow"
+                                                label={__(l[1187])}
+                                                onClick={self._startDownload.bind(self, v)}/>;
 
-                                                self._addLinkButtons(v.h, linkButtons);
+                                            self._addLinkButtons(v.h, linkButtons);
 
-                                                firstGroupOfButtons.push(
-                                                    <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
-                                                                              key="infoDialog"
-                                                                              onClick={() => {
-                                                                                  $.selected = [v.h];
-                                                                                  propertiesDialog();
-                                                                              }} />
-                                                );
+                                            firstGroupOfButtons.push(
+                                                <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
+                                                                          key="infoDialog"
+                                                                          onClick={() => {
+                                                                              $.selected = [v.h];
+                                                                              propertiesDialog();
+                                                                          }}/>
+                                            );
 
 
-                                                self._addFavouriteButtons(v.h, firstGroupOfButtons);
-                                            }
+                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+                                        }
 
                                             return <div>
                                                 {previewButton}
@@ -619,10 +626,6 @@ var GenericConversationMessage = React.createClass({
                                 </ButtonsUI.Button>;
                             }
                         }
-                        else {
-                            // else if (attachmentMetaInfo.revoked) { ... don't show revoked files
-                            return;
-                        }
 
                         var attachmentClasses = "message shared-data";
                         var preview = <div className="data-block-view medium">
@@ -633,47 +636,49 @@ var GenericConversationMessage = React.createClass({
                             </div>
                         </div>;
 
-                        if (M.chat && !message.revoked) {
-                            if (v.fa && is_image(v) || String(v.fa).indexOf(':0*') > 0) {
-                                var src = thumbnails[v.h];
-                                message.imagesAreLoading = message.imagesAreLoading || {};
+                        if (M.chat && showThumbnail && !message.revoked) {
+                            var src = chatRoom.getCachedImageURI(v);
 
-                                if (!src) {
-                                    src = M.getNodeByHandle(v.h);
-
-                                    if (!src || src !== v) {
-                                        if (!v.seen && !message.imagesAreLoading[v.h]) {
-                                            message.imagesAreLoading[v.h] = 1;
-                                            v.seen = 1;
-                                            M.v.push(v);
-                                            delay('thumbnails', fm_thumbnails, 90);
-                                        }
-                                    }
-                                    src = window.noThumbURI || '';
-                                }
-                                if (!v.imgId) {
-                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
-                                }
-
-                                var previewable = is_image(v) || is_video(v);
-                                if (previewable) {
-                                    preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
-                                        <div className="img-overlay" onClick={self._startPreview.bind(self, v)}></div>
-                                        <div className="button overlay-button"
-                                                onClick={self._startPreview.bind(self, v)}>
-                                            <i className="huge-white-icon loupe"></i>
-                                        </div>
-
-                                        {dropdown}
-
-                                        <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                             width="156"
-                                             height="156"
-                                             onClick={self._startPreview.bind(self, v)}
-                                        />
-                                    </div>) :  preview);
-                                }
+                            if (!src) {
+                                v.seen = 1;
+                                chatRoom.loadImage(v);
+                                src = window.noThumbURI || '';
                             }
+                            if (!v.imgId) {
+                                v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
+                            }
+
+                            var thumbClass = "";
+                            var thumbOverlay = null;
+
+                            if (isImage) {
+                                thumbClass = thumbClass + " image";
+                                thumbOverlay = <div className="thumb-overlay"
+                                                    onClick={self._startPreview.bind(self, v)}></div>;
+                            }
+                            else {
+                                thumbClass = thumbClass + " video " + (
+                                    isPreviewable ? " previewable" : "non-previewable"
+                                );
+                                thumbOverlay = <div className="thumb-overlay"
+                                                    onClick={isPreviewable && self._startPreview.bind(self, v)}>
+                                    {isPreviewable && <div className="play-video-button"></div>}
+                                    <div className="video-thumb-details">
+                                        {isPreviewable && <i className="small-icon small-play-icon"></i>}
+                                        <span>{secondsToTimeShort(v.playtime || -1)}</span>
+                                    </div>
+                                </div>;
+                            }
+
+                            preview = (src ? (<div id={v.imgId} className={"shared-link thumb " + thumbClass}>
+                                {thumbOverlay}
+                                {dropdown}
+
+                                <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
+                                     key={src === window.noThumbURI ? v.imgId : src}
+                                     onClick={isPreviewable && self._startPreview.bind(self, v)}
+                                />
+                            </div>) : preview);
                         }
 
                         files.push(
@@ -722,7 +727,7 @@ var GenericConversationMessage = React.createClass({
                         </div>
                     </div>;
                 }
-                else if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
+                else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
                     textContents = textContents.substr(2, textContents.length);
 
                     try {
@@ -918,8 +923,7 @@ var GenericConversationMessage = React.createClass({
                         </div>
                     </div>;
                 }
-                else if (textContents.substr &&
-                 textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+                else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
                     // don't show anything if this is a 'revoke' message
                     return null;
                 }

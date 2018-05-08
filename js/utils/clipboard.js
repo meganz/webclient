@@ -41,9 +41,12 @@ function copyToClipboard(content, toastText) {
 
         if (elm) {
             elm.textContent = content;
-            selectText(elm.id);
+            // selectText(elm.id);
 
             try {
+                elm.focus();
+                elm.setSelectionRange(0, content.length);
+
                 success = document.execCommand('copy');
             }
             catch (ex) {

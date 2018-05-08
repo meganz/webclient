@@ -2472,10 +2472,10 @@ li.token-input-token-invite .input-close {
     letter-spacing: 0;
     margin: 12px 0 0 0;
 }
-.fm-dialog .embed-content-block .checkboxOff, .fm-dialog .embed-content-block .checkboxOn {
+.fm-dialog .embed-content-block .checkboxOff, .fm-dialog .embed-content-block .checkboxOn, .checkbox-container .settings-row .checkboxOff, .checkbox-container .settings-row .checkboxOn{
     margin:  16px 14px;
 }
-.fm-dialog .embed-content-block input.checkboxOn, .fm-dialog .embed-content-block input.checkboxOff {
+.fm-dialog .embed-content-block input.checkboxOn, .fm-dialog .embed-content-block input.checkboxOff, .checkbox-container .settings-row input.checkboxOn, .checkbox-container .settings-row input.checkboxOff {
     margin: 0;
 }
 .embed-content-block .radio-txt {
@@ -2511,13 +2511,26 @@ li.token-input-token-invite .input-close {
     box-shadow: inset 0 1px 3px 0 rgba(0,0,0,0.10);
     border-radius: 3px;
 }
-.fm-dialog .embed-content-block .settings-container {
+.fm-dialog .embed-content-block .settings-container, .improved-recovery-steps .checkbox-container/*, .instruction-block, .improved-recovery-steps .app-button-block*/ {
     overflow: auto;
     margin-top: 8px;
     background-color: #fff;
-    border: 1px solid #ddd;
+    border: 1px solid #eee;
     border-radius: 3px;
     min-height: 44px;
+}
+.improved-recovery-steps .checkbox-container/*, .improved-recovery-steps .app-button-block  .instruction-block */{
+    background-color: rgba(250,250,250,0.5);
+    padding: 6px 0;
+    margin: 0 0;
+    border: 1px solid #eee;
+}
+/*.improved-recovery-steps  .instruction-block {
+    padding: 0 12px;
+}*/
+.improved-recovery-steps .app-button-block {
+    padding: 0 0;
+    min-height: initial;
 }
 .fm-dialog.export-embed-player .bullet-point {
     height: 3px;
@@ -2588,11 +2601,11 @@ li.token-input-token-invite .input-close {
     display: inline-block;
     opacity: 0.8;
 }
-..embed-content-block .tab-icon.url {
+.embed-content-block .tab-icon.url {
     background-image: url(../images/mega/dialogs-sprite_v14.svg);
     background-position: -128px -5818px;
 }
-..embed-content-block .tab-icon.embed {
+.embed-content-block .tab-icon.embed {
     background-image: url(../images/mega/dialogs-sprite_v14.svg);
     background-position: -88px -5818px;
 }
@@ -2662,11 +2675,24 @@ li.token-input-token-invite .input-close {
     margin-right: 12px;
     margin-top: -2px;
 }
-.export-links-dialog .settings-row {
+.export-links-dialog .settings-row, .improved-recovery-steps .checkbox-container .settings-row {
     overflow: auto;
 }
-.export-links-dialog  .settings-row label {
+.export-links-dialog  .settings-row label, .improved-recovery-steps .checkbox-container .settings-row label {
     cursor: pointer;
+}
+.improved-recovery-steps .checkbox-container .settings-row label {
+    line-height: 21px;
+    padding-top: 14px;
+    color: #333;
+    max-width: initial;
+    padding-right: 12px;
+    margin-top:0;
+    float: inherit;
+    display: block;
+}
+.improved-recovery-steps .checkbox-container .settings-row label strong {
+    font-family: 'source_sans_probold';
 }
 .export-links-dialog .embed-setting.disabled {
     cursor: none !important;
@@ -2689,6 +2715,58 @@ li.token-input-token-invite .input-close {
     margin: 0 auto;
     display: block;
     position: relative;
+}
+/*  Park account warning styles */
+.park-account-dialog.fm-dialog {
+    width: 700px;
+    margin: -270px 0 0 -350px;
+}
+.park-account-dialog .fm-dialog-title {
+    font-size: 17px;
+    padding-top: 24px; 
+}
+.park-account-dialog .improved-recovery-steps .content-text {
+    margin-left: 60px;
+    line-height: 21px;
+}
+.park-account-dialog .improved-recovery-steps .content-highlight.warning {
+    padding: 12px 12px 12px 0;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    cursor: default;
+}
+.park-account-dialog  .improved-recovery-steps .warning-icon, .improved-recovery-steps .warning-icon {
+    margin-top: 6px;
+    background-image: url(../images/mega/download-dialog_v1.png);
+    background-size: 384px auto;
+    background-position: -355px -46px;
+    width: 30px;
+    height: 25px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    float: left;
+    position: relative;
+    margin: 6px 18px 0 14px;
+}
+.improved-recovery-steps .warning-icon {
+    margin: 1px 11px 0 0;
+    display: none;
+}
+.park-account-dialog .park-account-checkbox {
+    margin-top: 24px;
+}
+.park-account-dialog .improved-recovery-steps .login-register-input {
+    margin-top: 12px;
+}
+.park-account-dialog .improved-recovery-steps .login-register-input.email {
+    background-position: 12px -69px;
+    padding: 0 12px 0 46px;
+    line-height: 30px;
+    color: #333;
+    margin-bottom: 18px;
+}
+.park-account-dialog .fm-notifications-bottom {
+    border-top: 1px solid #fff;
 }
 .widget-dialog .copy-widget-code {
     text-transform: capitalize;

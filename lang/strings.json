@@ -283,6 +283,10 @@
         "text": "or",
         "context": "This text will go in between two options. Like \"Black or White\". There is only space for up to 3 characters. If your language exceeds this length please put a forward slash \/ instead."
     },
+    "186": {
+        "text": "Sign out",
+        "context": "button to log out"
+    },
     "187": {
         "text": "My Account",
         "context": "Title of My Account section. There you can see your account details"
@@ -321,6 +325,14 @@
     },
     "201": {
         "text": "Incorrect e-mail and\/or password. Please try again.",
+        "context": ""
+    },
+    "205": {
+        "text": "login",
+        "context": ""
+    },
+    "206": {
+        "text": "Your name",
         "context": ""
     },
     "208": {
@@ -418,6 +430,10 @@
     "258": {
         "text": "Downloading",
         "context": "Title header on the download page while the file is downloading."
+    },
+    "367": {
+        "text": "MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.",
+        "context": ""
     },
     "368": {
         "text": "Caution:",
@@ -618,6 +634,10 @@
     "466": {
         "text": "Last [X]",
         "context": "[X] will be replaced by a number. This string is used to populate a select box where the user can select how many entries of a data set he wants to see. For example: \"Last 10\" \/ \"Last 100\" \/ \"Last 1000\" etc."
+    },
+    "468": {
+        "text": "Purchase History",
+        "context": ""
     },
     "469": {
         "text": "Last [X] purchases",
@@ -1159,12 +1179,24 @@
         "text": "Contact",
         "context": "referring to a contact in the contact list of the user"
     },
+    "770": {
+        "text": "Choose your password",
+        "context": ""
+    },
     "776": {
         "text": "Save",
         "context": "Button title to \"Save\" the selected option"
     },
+    "778": {
+        "text": "Don't have a MEGA account?",
+        "context": ""
+    },
     "779": {
         "text": "Register now",
+        "context": ""
+    },
+    "780": {
+        "text": "Already have a MEGA account?",
         "context": ""
     },
     "782": {
@@ -1181,6 +1213,10 @@
     },
     "799": {
         "text": "Used Space",
+        "context": ""
+    },
+    "800": {
+        "text": "Free Space",
         "context": ""
     },
     "808": {
@@ -1274,6 +1310,10 @@
     "871": {
         "text": "[B]Warning:[\/B] Storage quota exceeded. Please delete files or [A]upgrade your account[\/A].",
         "context": "Please make sure you apply the correct tags [B],[\/B], [A], & [\/A] - including backslash in the closing tag (\/)."
+    },
+    "872": {
+        "text": "PRO",
+        "context": "Description of the premium service which gives you more storage space & bandwidth quota"
     },
     "873": {
         "text": "[X] seconds ago",
@@ -1491,6 +1531,10 @@
         "text": "Expires on",
         "context": "Label for the 'Expires on' text into the my account page, indicating the expiration date of a PRO account without a valid subscription - (String as short as possible)."
     },
+    "988": {
+        "text": "Connections:",
+        "context": "header for the social connections, showing the number of contacts the user has"
+    },
     "989": {
         "text": "[X] contacts",
         "context": "[X] will be replaced by a plural number, indicating the total number of contacts the user has"
@@ -1558,6 +1602,10 @@
     "1007": {
         "text": "You cannot undo this action.",
         "context": "Warning message in a dialog that asks for confirmation before deleting something."
+    },
+    "1008": {
+        "text": "PRO transfer quota exceeded.",
+        "context": "PRO refers to the paid membership, which is often \"PRO\" in the same language. "
     },
     "1010": {
         "text": "Storage quota exceeded.",
@@ -1891,6 +1939,10 @@
         "text": "Today, 4000 years later, most major cloud storage providers still have not fully adopted cryptography.",
         "context": ""
     },
+    "1146": {
+        "text": "Complete your account",
+        "context": ""
+    },
     "1147": {
         "text": "Choose your account type",
         "context": ""
@@ -2002,6 +2054,10 @@
     "1187": {
         "text": "Download",
         "context": "Button title which downloads a file\/folder to your device"
+    },
+    "1190": {
+        "text": "to your Cloud Drive",
+        "context": ""
     },
     "1191": {
         "text": "The file you are trying to download is temporary unavailable.",
@@ -2138,6 +2194,10 @@
     "1291": {
         "text": "You have previously clicked on an invitation link. Please create your account.",
         "context": ""
+    },
+    "1295": {
+        "text": "Contact Support",
+        "context": "Label for any 'Contact support' button, link, text, title, etc. - (String as short as possible)."
     },
     "1297": {
         "text": "E-mail address already in use.",
@@ -2447,6 +2507,86 @@
         "text": "You are currently logged in. Would you like to log out and register a new account?",
         "context": "Confirmation message, that we show when the user clicks an invite link to register a new account while the user is logged in."
     },
+    "1825": {
+        "text": "What is MEGAsync?",
+        "context": ""
+    },
+    "1827": {
+        "text": "How do I install MEGAsync?",
+        "context": ""
+    },
+    "1829": {
+        "text": "Can I use MEGAsync on multiple computers?",
+        "context": ""
+    },
+    "1831": {
+        "text": "How can I monitor the sync status of my local files and folders?",
+        "context": ""
+    },
+    "1833": {
+        "text": "MEGAsync stores my login credentials to perform autologin. Isn't that a security concern?",
+        "context": ""
+    },
+    "1839": {
+        "text": "Does MEGAsync perform explicit file versioning?",
+        "context": "e.g. when a user updates a file (a partial write operation), the user would have the ability to go back in time and reverse the operation, which is currently not supported by MEGA"
+    },
+    "1840": {
+        "text": "No. However, you can access overwritten files in the respective debris folders until they are purged.",
+        "context": ""
+    },
+    "1841": {
+        "text": "Does MEGAsync support modifying existing files?",
+        "context": ""
+    },
+    "1845": {
+        "text": "Are there any restrictions with regards to filenames?",
+        "context": ""
+    },
+    "1849": {
+        "text": "How can I make sure that I always have the latest version of MEGAsync?",
+        "context": ""
+    },
+    "1851": {
+        "text": "Will MEGAsync use peer-to-peer transfers to achieve faster syncing between computers in the same local area network?",
+        "context": ""
+    },
+    "1852": {
+        "text": "No. The current incarnation of MEGAsync always syncs via MEGA\u2019s cloud infrastructure.",
+        "context": ""
+    },
+    "1853": {
+        "text": "What happens if conflicting concurrent actions are performed on clients synced to the same cloud location?",
+        "context": ""
+    },
+    "1854": {
+        "text": "The current version of MEGAsync does not resolve such clashes in a deterministic manner. Avoid them if possible.",
+        "context": ""
+    },
+    "1856": {
+        "text": "No. Do not expect these to be replicated to the cloud.",
+        "context": ""
+    },
+    "1857": {
+        "text": "Does MEGAsync support syncing the same local folder to different remote locations or the same remote folder to different local locations?",
+        "context": ""
+    },
+    "1858": {
+        "text": "No, unless you want to run multiple MEGAsync processes in parallel, which is not recommended. As a general rule, each filesystem item must only be visible to MEGAsync once, so avoid syncing subfolders of synced folders or placing multiple links to the same filesystem item in a local synced folder.",
+        "context": "Whether you can sync one local folder to multiple remote folders, which is not possible. Each local folder can only be synced to one remote folder"
+    },
+    "1859": {
+        "text": "Where can I find your iOS app?",
+        "context": ""
+    },
+    "1861": {
+        "text": "Where can I find your Android app?",
+        "context": ""
+    },
+    "1886": {
+        "text": "I am trying to rename a local folder in Explorer, but the name of the corresponding folder in my cloud drive stays the same, no matter what I do.",
+        "context": ""
+    },
     "1888": {
         "text": "Home",
         "context": "Link on the help page to go back to the startpage"
@@ -2502,6 +2642,10 @@
     "1930": {
         "text": "The cloud in your pocket. Access and stream your files from your smartphone or tablet.",
         "context": "Advertising text for mobile apps"
+    },
+    "1932": {
+        "text": "To download files larger than 1 GB, please install MEGAsync or our browser extension.",
+        "context": "When a user attempt to download a file larger than 1GB using Firefox, he will be prompted with a dialog asking him to install our browser extension with this text."
     },
     "1933": {
         "text": "To download files larger than 1 GB, please install MEGAsync, Google Chrome or Opera.",
@@ -2743,6 +2887,10 @@
         "text": "or [A]create an account[\/A]",
         "context": "New link on the login page, to make it easier for users without an account to find the registration page if they ever end up on the login page."
     },
+    "1995": {
+        "text": "I just remembered the password of my old account after performing a password reset. How do I get my data back?",
+        "context": "Help section question"
+    },
     "2001": {
         "text": "Do you want to upload your files to a new session?",
         "context": "when you are not logged in but you have logged in before and start an upload the user gets a confirmation dialog and is being asked if the user wants intends to upload to a new session (or perhaps prefers to log in to his existing account first)."
@@ -2884,8 +3032,8 @@
         "context": "\"Trash\" or \"recycle bin\""
     },
     "5740": {
-        "text": "Downloading\u2026",
-        "context": "Title show when a file is being downloaded"
+        "text": "Downloading...",
+        "context": "Label for the status of a transfer when is being downloading - (String as short as possible)."
     },
     "5775": {
         "text": "Used",
@@ -3010,6 +3158,14 @@
     "5878": {
         "text": "Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!",
         "context": "This string is shown inside the Add Contact dialog and sent to a user in an email."
+    },
+    "5881": {
+        "text": "Press Releases",
+        "context": ""
+    },
+    "5882": {
+        "text": "Shareholder Reports",
+        "context": ""
     },
     "5884": {
         "text": "End call \u2026",
@@ -3180,8 +3336,8 @@
         "context": ""
     },
     "6110": {
-        "text": "Uploading\u2026",
-        "context": ""
+        "text": "Uploading...",
+        "context": "Label for the status of a transfer when is being uploading - (String as short as possible)."
     },
     "6117": {
         "text": "settings",
@@ -3331,6 +3487,18 @@
         "text": "Windows Phone App",
         "context": ""
     },
+    "6243": {
+        "text": "Where do my downloads go?",
+        "context": ""
+    },
+    "6260": {
+        "text": "Audio & Video setup",
+        "context": ""
+    },
+    "6277": {
+        "text": "How do I register for an account?",
+        "context": ""
+    },
     "6690": {
         "text": "Go to My Account",
         "context": ""
@@ -3457,6 +3625,14 @@
     },
     "6841": {
         "text": "We're sorry to see you go",
+        "context": ""
+    },
+    "6842": {
+        "text": "Your account has now been closed",
+        "context": ""
+    },
+    "6843": {
+        "text": "but before you leave we would love to know why you are leaving us",
         "context": ""
     },
     "6844": {
@@ -3763,6 +3939,10 @@
         "text": "Disabled",
         "context": "Label to indicate the user if the feature of exclusion based by size is enabled\/disabled."
     },
+    "7084": {
+        "text": "with MEGAsync",
+        "context": "\"Download\" with MEGAsync"
+    },
     "7086": {
         "text": "Please select your Linux Distro",
         "context": ""
@@ -3959,6 +4139,10 @@
         "text": "Your browser does not have the required audio\/video capabilities for making calls.",
         "context": "Shown when the user's browser does not have the capabilities for making audio\/video calls."
     },
+    "7212": {
+        "text": "Advertisement",
+        "context": "Shown on the download page to inform the user that the image below is an external ad."
+    },
     "7218": {
         "text": "Clear transfer",
         "context": "Context menu item"
@@ -4018,6 +4202,10 @@
     "7235": {
         "text": "Payment Failed",
         "context": "A dialog box heading, when the user has tried to pay, but something has gone wrong."
+    },
+    "7236": {
+        "text": "To download files larger than 1 GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
+        "context": "Description in a popup dialog when they are trying to download a file larger than 1GB using the browser."
     },
     "7237": {
         "text": "SUBMIT YOUR FEEDBACK",
@@ -4407,6 +4595,18 @@
         "text": "Access to any folders shared with you by selected [X] will be lost.",
         "context": "This is shown on a confirmation message dialog when removing one or more contacts. The placeholder [X] will be replaced with \"contact\" or \"contacts\" depending on how many contacts are being removed."
     },
+    "7873": {
+        "text": "You can download the extension (v%1) below.",
+        "context": "This text is on the Chrome or Firefox extension pages and tells the user they can download a specific version of the extension further down the page. The placeholder %1 will be replaced with the version of the extension e.g. \"3.2.8\". So the text would read \"You can download the extension (v3.2.8) below.\""
+    },
+    "7874": {
+        "text": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
+        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is not the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.7\". The placeholder %2 will be replaced with the newest version available for download e.g. \"3.2.8\". So the text would read \"It looks like your current extension (v3.2.7) is out of date. You can download the latest (v3.2.8) below.\""
+    },
+    "7875": {
+        "text": "Your extension (v%1) is up to date.",
+        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.8\". So the text would read \"Your extension (v3.2.8) is up to date.\""
+    },
     "7879": {
         "text": "Access to folders shared by [X] was removed.",
         "context": "This is shown in the Notification dialog when a user removes a contact from their contact list. The placeholder [X] will be replaced with the removed contact's email address."
@@ -4606,6 +4806,10 @@
     "8413": {
         "text": "PRO LITE",
         "context": "Label to indicate that the current user has a PRO LITE account."
+    },
+    "8425": {
+        "text": "through your browser",
+        "context": "Button label. Full text: Download through your browser. "
     },
     "8426": {
         "text": "[S]MEGAsync:[\/S] Easy automated syncing between your computers and your MEGA cloud drive",
@@ -4966,6 +5170,14 @@
     "8726": {
         "text": "Invite",
         "context": "A button on a dialog which invites a contact to join MEGA."
+    },
+    "8732": {
+        "text": "Update link",
+        "context": "A right click context menu item. This will let the user update a public link with additional information. For example the public link can now be updated with an expiry time."
+    },
+    "8733": {
+        "text": "Update links",
+        "context": "A right click context menu item. This will let the user update multiple public links with additional information. For example the public links can now be updated with an expiry time."
     },
     "8734": {
         "text": "Get links",
@@ -5399,6 +5611,10 @@
         "text": "Message not sent. Click here if you want to cancel it.",
         "context": "A hint message displayed when the message failed to send. It reminds the user to click it to cancel."
     },
+    "8886": {
+        "text": "This message has been deleted.",
+        "context": "A log message in a chat to indicate that the message has been deleted by the user."
+    },
     "8887": {
         "text": "(edited)",
         "context": "A log message in a chat to indicate that the message has been edited by the user."
@@ -5415,9 +5631,17 @@
         "text": "Start Group Conversation",
         "context": "A button title. The button starts a group chat."
     },
+    "8891": {
+        "text": "Revoke Attachment",
+        "context": "A button title to revoke an attachment in a chat by revoking the access to the attachment so other participants in the chat can not access it. (It does not delete the attachment out of your cloud drive)"
+    },
     "8892": {
         "text": "Revoked access to attachment(s).",
         "context": "A summary message displaying in the chat list when the last message of the chat is somebody revoking an attachment (i.e. removing access to the attachment, it does not delete it from the owners cloud drive)"
+    },
+    "8893": {
+        "text": "Could not revoke access to the attachment. Error code: %s.",
+        "context": "A warning message of not being able to revoke access to a shared attachment. Please keep %s as it will be replaced by the reason at runtime."
     },
     "8894": {
         "text": "Attached: %s",
@@ -5534,6 +5758,10 @@
     "8982": {
         "text": "An error occurred, please try again.",
         "context": "Text of the alert dialog to inform the user when an error occurs when cancelling the account"
+    },
+    "8990": {
+        "text": "Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a backup of your Recovery Key.",
+        "context": "First paragraph of the screen to park an account"
     },
     "8993": {
         "text": "This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. If you do recall your parked account\u2019s password, please contact support@mega.nz",
@@ -5691,6 +5919,38 @@
         "text": "You can add multiple people at once with e-mail addresses separated by commas",
         "context": "Invite dialog default info text, below input box and above Send button."
     },
+    "9094": {
+        "text": "Frequently Asked Questions",
+        "context": "A title for the commonly asked questions in the Help section of the site."
+    },
+    "9095": {
+        "text": "How can we help you today?",
+        "context": "A title for the main page of the Help section of the site. A casual question about how Mega can help the user"
+    },
+    "9096": {
+        "text": "Support Centre",
+        "context": "A button for going back to the Support Centre, the main page of the Help section of the site."
+    },
+    "9098": {
+        "text": "We can't find what you are after",
+        "context": "A message which is displayed when the search query does not return any results"
+    },
+    "9099": {
+        "text": "Please try your search again or contact our support team directly",
+        "context": "A message which is displayed when the search query does not return any results."
+    },
+    "9100": {
+        "text": "Email Support",
+        "context": "A button to contact MEGA support via email."
+    },
+    "9101": {
+        "text": "If you can't find what you are looking for, please contact our support team for direct assistance.",
+        "context": "A message for the Get Support section informing the user to contact MEGA support if they can't find the help they need."
+    },
+    "9102": {
+        "text": "Go Back",
+        "context": "A button in the Help section to take the user back to a previous screen on the website."
+    },
     "9103": {
         "text": "Copy the link below to share the article.",
         "context": "Body for dialog with a link to share an article of our help section"
@@ -5698,6 +5958,10 @@
     "9104": {
         "text": "Share the Article",
         "context": "Title for dialog"
+    },
+    "9105": {
+        "text": "Enter your search here\u2026",
+        "context": "The placeholder text in the search field of the help section."
     },
     "9106": {
         "text": "Email %1 for assistance.",
@@ -6319,6 +6583,10 @@
         "text": "Scriptable",
         "context": "A title on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
     },
+    "16268": {
+        "text": "Import contacts\u2026",
+        "context": "Button label, allows user to import contacts from other services"
+    },
     "16272": {
         "text": "Transfers tooltip:",
         "context": "A heading in the Account Settings - Transfers section. This section lets the user toggle an option to show the transfer tooltip when a transfer is active."
@@ -6334,6 +6602,10 @@
     "16275": {
         "text": "Play Video",
         "context": "The title of a button which allows the user to open the video in a media \/ video player."
+    },
+    "16276": {
+        "text": "Create your free MEGA account",
+        "context": ""
     },
     "16277": {
         "text": "Create your free account and get %1 of complimentary storage space, valid for %2 days.",
@@ -6383,6 +6655,10 @@
         "text": "[S]%1[\/S] transfer quota",
         "context": "The %1 would be replaced by the transfer quota amount, for example: [S]50 GB[\/S] transfer quota"
     },
+    "16289": {
+        "text": "(Expires in [S]%1[\/S] %2)",
+        "context": "%1 will be replaced by a numeric value and %2 will be \"days\" or \"months\", for example (Expires in [S]10[\/S] days)"
+    },
     "16290": {
         "text": "days",
         "context": ""
@@ -6407,6 +6683,10 @@
         "text": "Install",
         "context": "Text placed in some button to tell the user to install something."
     },
+    "16296": {
+        "text": "Base Quota",
+        "context": "The user's achieved base quota"
+    },
     "16297": {
         "text": "Registration Bonus",
         "context": "achievement type"
@@ -6423,6 +6703,10 @@
         "text": "%1 base quota + %2",
         "context": "Initial and achieved storage quota, being %1 and %2 replaced with the value, Eg: 50GB base quota + 90GB"
     },
+    "16301": {
+        "text": "[S]%1[\/S] of %2",
+        "context": "base quota and total, Eg: [S]50GB[\/S] of 200GB"
+    },
     "16302": {
         "text": "Storage Full",
         "context": "Dialog header. Informs user that he\u2019ve reached the full capacity of Cloud Drive for Free accounts."
@@ -6431,9 +6715,17 @@
         "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
         "context": "A dialog message indicating what you can get with a PRO plan. Please leave the placeholders [A], [\/A], [S], [\/S] as they are."
     },
+    "16305": {
+        "text": "Choose a plan",
+        "context": "Button label. Allow user to check available PRO plans."
+    },
     "16306": {
         "text": "Delete old files and [A]clear your Rubbish Bin[\/A] to free up some space.",
         "context": "A dialog message that informs the user how to free up cloud drive space."
+    },
+    "16307": {
+        "text": "Tip: Keep your Rubbish Bin empty to optimise storage usage.",
+        "context": "A dialog message to inform the user how to free up more cloud drive space."
     },
     "16308": {
         "text": "You can unlock more free storage and transfer quota by using our products. Simple. Easy.",
@@ -6487,6 +6779,10 @@
         "text": "Thanks! We have sent that user an invitation email.",
         "context": ""
     },
+    "16321": {
+        "text": "You can now:",
+        "context": "headline of various things the user can now do, such as pasting a URL to the invited user."
+    },
     "16322": {
         "text": "Direct URL to MEGAsync:",
         "context": "URL stands for Uniform Resource Locator, i.e. a web addresss"
@@ -6498,6 +6794,26 @@
     "16325": {
         "text": "Get [S]%1[\/S] free storage and [S]%2[\/S] of transfer quota for each friend who installs a MEGA app",
         "context": "%1 and %2 are replaced by some amount, eg \"50GB\""
+    },
+    "16326": {
+        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive [S]%1[\/S] of complimentary storage plus [S]%2[\/S] of transfer quota, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA (your free quota will be credited once we confirm the activity of the new account, which can take a few days).",
+        "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\"."
+    },
+    "16327": {
+        "text": "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]%1[\/S] of storage space and [S]%2[\/S] of transfer quota.",
+        "context": ""
+    },
+    "16328": {
+        "text": "Do you want to hide this dialog when transfers are ongoing?",
+        "context": "A message in a confirmation dialog which is shown when the user clicks Close on the ongoing transfers popup dialog."
+    },
+    "16329": {
+        "text": "Use Settings -> Advanced -> Transfers to enable it again.",
+        "context": "This message is shown in a confirmation dialog for ongoing transfers. It explains how to re-enable the ongoing transfers popup dialog."
+    },
+    "16330": {
+        "text": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
+        "context": "Describes chat features"
     },
     "16331": {
         "text": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection.",
@@ -6539,6 +6855,10 @@
         "text": "Summary of the achievements completed and the transfer quota bonus already received",
         "context": "Information about completed achievements and earned bonuses."
     },
+    "16341": {
+        "text": "[B]Get 50 GBs free storage[\/B] when you create an account with us. For the full featured experience, download our app or use the site on a PC.",
+        "context": "An introductory sentence on the homepage of the mobile web site. It implies that the best experience comes from using the mobile apps, or the website when viewed on a PC\/desktop rather than a phone."
+    },
     "16342": {
         "text": "Link",
         "context": "A button on the mobile web site to create a public link."
@@ -6558,6 +6878,10 @@
     "16346": {
         "text": "The folder you are trying to view is no longer available.",
         "context": "A message in an error dialog in the mobile web site. This error can occur when the folder link is removed or the link is subject to a takedown notice."
+    },
+    "16347": {
+        "text": "File deleted",
+        "context": "A toast notification which is shown on the mobile web site to say that the file has been deleted successfully."
     },
     "16348": {
         "text": "Failed to copy, try copying manually.",
@@ -6743,9 +7067,21 @@
         "text": "Edited by %1",
         "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
     },
+    "16477": {
+        "text": "Renamed from %1 by %2",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous filename by a particular user. Please keep the placeholders %1 which will be replaced by the filename and %2 which will be replaced by the email address."
+    },
+    "16478": {
+        "text": "current version",
+        "context": "A message to indicate which version is the current version."
+    },
     "16480": {
         "text": "Edited by me",
         "context": "A message which is displayed in the version history that shows that a certain file version was edited by the user themself."
+    },
+    "16481": {
+        "text": "Renamed from %1 by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name by the user itself. Please keep the placeholder %1 which will be replaced by the filename."
     },
     "16485": {
         "text": "Duplicate items",
@@ -6762,6 +7098,10 @@
     "16488": {
         "text": "Upload and replace",
         "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
+    },
+    "16489": {
+        "text": "Replace the file in the destination folder with the file you are uploading:",
+        "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
     },
     "16490": {
         "text": "Don't upload",
@@ -6812,8 +7152,8 @@
         "context": "An error dialog message when the Cancel Subscription button is pressed in the My Account section of the website. This means that cancelling the subscription is not possible from the website, they must cancel with Apple or Google. Please leave the [A1], [A2] and [A3] tags as they will be replaced with links."
     },
     "16508": {
-        "text": "Completing\u2026",
-        "context": "Label for the state of a transfer when is being completing - (String as short as possible)."
+        "text": "Completing...",
+        "context": "Label for the status of a transfer when is being completing - (String as short as possible)."
     },
     "16514": {
         "text": "The file you are moving will be renamed as:",
@@ -6962,6 +7302,10 @@
     "16567": {
         "text": "Effortlessly stay connected with our secure cross-platform audio and video calls.",
         "context": "iOS MEGAchat feature description"
+    },
+    "16568": {
+        "text": "Coming soon!",
+        "context": "Text to indicate that a feature is coming soon"
     },
     "16569": {
         "text": "Seamless File Sharing",
@@ -7139,6 +7483,10 @@
         "text": "Requires the free [A]Mozilla Thunderbird[\/A] mail client.",
         "context": "MEGAbird text with link to the \"Mozilla Thunderbird\" product."
     },
+    "16615": {
+        "text": "FILE",
+        "context": "Label for a downloadable file, to indicate it is a XX sized file. View screenshot for context."
+    },
     "16616": {
         "text": "Unlike most other cloud storage providers, only you control who has access to your data. Not even MEGA can access it!",
         "context": "Feature description on the startpage"
@@ -7283,6 +7631,14 @@
         "text": "The new password must be different from the old one.",
         "context": "A message on an error dialog which is shown when a user tries to change their account password but the new password is the same as the old one."
     },
+    "16667": {
+        "text": "Back to PRO Plans",
+        "context": "A button on the second Pro page which lets the user return to the first Pro page to change their Pro plan."
+    },
+    "16668": {
+        "text": "Dashboard",
+        "context": "Button description. Opens section with account information."
+    },
     "16671": {
         "text": "Download using the MEGA desktop app for faster downloads.",
         "context": "A message about the MEGAsync application which allows the user to download files faster and more reliably."
@@ -7315,6 +7671,10 @@
         "text": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
         "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %1 is replaced with either \"your browser\" or the actual browser's brand. %2 *may* include a hint, just as \"(or use Chrome)\""
     },
+    "16867": {
+        "text": "your browser",
+        "context": "Sentence to be used on %1 under string \"Unfortunately, %1 has a limited buffer to decrypt data....\""
+    },
     "16868": {
         "text": "or use Chrome",
         "context": "Sentence to be used on %2 under string \"Unfortunately, %1 has a limited buffer to decrypt data....%2\""
@@ -7346,6 +7706,10 @@
     "16890": {
         "text": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
         "context": "An error shown to Chrome users when their download cannot continue because they are running out of disk space."
+    },
+    "16891": {
+        "text": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
+        "context": "An error shown to Chrome users when their download cannot start because they are running out of disk space."
     },
     "16892": {
         "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
@@ -7459,6 +7823,10 @@
         "text": "The file will be updated with version history: [A]Learn more[\/A]",
         "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
     },
+    "17126": {
+        "text": "The dashboard is for registered users only.",
+        "context": "A dialog message saying it is forbidden for an ephemeral user to access the dashboard."
+    },
     "17146": {
         "text": "This page is for registered users only.",
         "context": "A dialog message when user is trying to access the page from an ephemeral session which is allowed for registered users only."
@@ -7486,6 +7854,10 @@
     "17152": {
         "text": "1 version",
         "context": "Version message when files only have 1 historical version."
+    },
+    "17153": {
+        "text": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted. Would you like to proceed?",
+        "context": "A warning message for deleting the whole version history of multiple files."
     },
     "17154": {
         "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
@@ -8375,6 +8747,10 @@
         "text": "This user already exists in your contact list",
         "context": "descriptive text appears when a user tries to add an already existed contact."
     },
+    "18148": {
+        "text": "Contact Support",
+        "context": "Label for any 'Contact support' button, link, text, title, etc. - (String as short as possible)."
+    },
     "18213": {
         "text": "The download size exceeds the maximum size supported by the browser. You can use MEGAsync to proceed with the download.",
         "context": "The text of a message box which appears to users trying to download large files\/folders."
@@ -8422,5 +8798,253 @@
     "18232": {
         "text": "Do you want to reactivate your QR Code?",
         "context": "the question to get user confirmation to reactivate his QR code."
+    },
+    "18233": {
+        "text": "Your filter did not match any documents",
+        "context": "Filter didn't match any document. Note filter element left of 'New Folder' button. The filter is currently based on colour labelling but could be any type of filtering of documents."
+    },
+    "18254": {
+        "text": "Are you logged into your account in another web browser?",
+        "context": "first question in series of question when the user forgets his password."
+    },
+    "18255": {
+        "text": "Please check all your browsers (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari etc.) to see if you are still logged into your account. You may have also logged into MEGA on someone else's computer and forgotten to log out.",
+        "context": "The description of the first question the user gets when he forgets his password."
+    },
+    "18256": {
+        "text": "Step {NB}",
+        "context": "the step number in password recovery flow,\r\n{NB} is a placeholder, it will be replace by the system by the step number (1,2,3...)"
+    },
+    "18257": {
+        "text": "I have opened mega.nz on all web browsers on [B]my computers[\/B] to check if my account is logged in there.",
+        "context": "first check box in the first question in account recovery process "
+    },
+    "18258": {
+        "text": "I have opened mega.nz on [B]other computers I use[\/B] to check if my account is logged in there.",
+        "context": "the second check box in the first question in account recovery process "
+    },
+    "18259": {
+        "text": "Yes, I am logged into my account on another browser",
+        "context": "first answer of the first question in account recovery process "
+    },
+    "18260": {
+        "text": "No, I am not logged into my account on another browser",
+        "context": "the second answer of the first question in account recovery process"
+    },
+    "18261": {
+        "text": "Do you have the MEGA app installed on your phone, tablet or computer?",
+        "context": "the second question in account recovery process."
+    },
+    "18262": {
+        "text": "Check to see if you have the MEGA app installed on your mobile device or your computer.",
+        "context": "second question description in account recovery process"
+    },
+    "18263": {
+        "text": "I have checked all my phones and\/or tablets for the MEGA app.",
+        "context": "first check box in the second question in account recovery process "
+    },
+    "18264": {
+        "text": "I have checked all my desktops and\/or laptops for MEGAsync.",
+        "context": "the second checkbox in the second question in account recovery process."
+    },
+    "18265": {
+        "text": "Yes, I have a MEGA app installed",
+        "context": "the 1st answer of 2nd question in account recovery process."
+    },
+    "18266": {
+        "text": "No, I don't have any MEGA app installed",
+        "context": "2nd answer of 2nd question in account recovery process."
+    },
+    "18268": {
+        "text": "If you have a backup of your Recovery Key you can reset your password by selecting [B]YES[\/B]",
+        "context": "description of 3rd question in account recovery process "
+    },
+    "18269": {
+        "text": "Yes, I have my Recovery Key",
+        "context": "1st answer to recovery key question in account recovery process.\r\n"
+    },
+    "18270": {
+        "text": "No, I don't have my Recovery Key",
+        "context": "2nd answer of recover key question in account recovery process."
+    },
+    "18271": {
+        "text": "Are you logged into the MEGA app installed on your phone, tablet or computer?",
+        "context": "a question in account recovery process."
+    },
+    "18272": {
+        "text": "Are you able to access your account on the MEGA app? If so, you are able to change your password without requiring you to remember your current one.",
+        "context": "description of a question in account recovery process."
+    },
+    "18273": {
+        "text": "I have checked to see if I am logged in on any of my phones and\/or tablets.",
+        "context": "First checkbox in the account recovery process checking if you already have access to MEGA via one of your phones\/tablets."
+    },
+    "18274": {
+        "text": "I have checked to see if I am logged in on any of my desktops and\/or laptops.",
+        "context": "Second checkbox in the account recovery process checking if you already have access to MEGA via one of your desktops\/laptops."
+    },
+    "18275": {
+        "text": "Yes, I am logged into a MEGA app",
+        "context": "question 1st answer in account recovery process."
+    },
+    "18276": {
+        "text": "No, I am not logged into any MEGA app",
+        "context": "2nd answer of a question in account recovery process."
+    },
+    "18277": {
+        "text": "You can park your existing account and start a new, empty account under the same email address.[br]In the event you recall your parked account\u2019s password, or locate your Recovery Key, please contact us at support@mega.nz for assistance.[br][B2]Your data will be retained for at least 60 days on our servers.[\/B2][br]We recommend you double check if you really are not logged into your MEGA account anywhere before proceeding with parking your account. [B2]Parking your account will delete all your files, contacts and messages.[\/B2]",
+        "context": "warning description for account parking"
+    },
+    "18278": {
+        "text": "Check again to see if I have an active\/logged in session",
+        "context": "warning answer in account recover process."
+    },
+    "18279": {
+        "text": "No, I want to park my account",
+        "context": "warning answer in account recovery process"
+    },
+    "18280": {
+        "text": "Success",
+        "context": "step header in account recovery process"
+    },
+    "18281": {
+        "text": "You can easily change your password. Follow the steps below to see how:",
+        "context": "success page title in account recovery process"
+    },
+    "18282": {
+        "text": "Open the [B]Menu[\/B] inside the browser where you are still logged in.",
+        "context": "Step 1 in the instructions of using a web browser to reset your password after you choose that you are logged in to MEGA in another browser."
+    },
+    "18283": {
+        "text": "Select  [B]My Account[\/B].",
+        "context": "Step 2 in the instructions of using a web browser to reset your password after you choose that you are logged in to MEGA in another browser."
+    },
+    "18284": {
+        "text": "Select the [B]Security[\/B] tab.",
+        "context": "Step 3 in the instructions of using a web browser to reset your password after you choose that you are logged in to MEGA in another browser."
+    },
+    "18285": {
+        "text": "Type your new password, confirm it and click [B]Save[\/B].",
+        "context": "Step 4 in the instructions of using a web browser to reset your password after you choose that you are logged in to MEGA in another browser."
+    },
+    "18286": {
+        "text": "Open the app and tap on the [B]Menu icon[\/B] in the top left corner.",
+        "context": "Step 1 in the instructions of using the Android or UWP app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18287": {
+        "text": "Tap on the [B]Profile avatar[\/B] on the top to access [B]My Account[\/B].",
+        "context": "Step 2 in the instructions of using the Android app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18288": {
+        "text": "Tap on the [B]context menu (three vertical dots)[\/B] on the top right of the screen.",
+        "context": "Step 3 in the instructions of using the Android app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18289": {
+        "text": "Tap on the [B]Change password[\/B] button.",
+        "context": "Step 4 in the instructions of using the Android app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18290": {
+        "text": "Type your new password, confirm it and tap [B]Change[\/B].",
+        "context": "Step 5 in the instructions of using the Android app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18291": {
+        "text": "Open the app and tap on [B]My Account[\/B] located on the tab bar.",
+        "context": "Step 1 in the instructions of using the iOS app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18292": {
+        "text": "Tap on [B]Settings[\/B].",
+        "context": "Step 2 in the instructions of using the iOS app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18293": {
+        "text": "Tap on [B]Security Options[\/B].",
+        "context": "Step 3 in the instructions of using the iOS app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18294": {
+        "text": "Tap on the [B]Change password[\/B] button.",
+        "context": "Step 4 in the instructions of using the iOS app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18295": {
+        "text": "Type your new password, confirm it and tap [B]Save[\/B].",
+        "context": "Step 5 in the instructions of using the iOS app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18296": {
+        "text": "Tap on your [B]Account name[\/B] at the bottom left of the Menu.",
+        "context": "Step 2 in the instructions of using the UWP app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18297": {
+        "text": "Tap or swipe to the [B]Profile[\/B] tab.",
+        "context": "Step 3 in the instructions of using the UWP app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18298": {
+        "text": "Tap on the [B]Change password[\/B] button.",
+        "context": "Step 4 in the instructions of using the UWP app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18301": {
+        "text": "Click on the [B][LOGO] icon[\/B] on your task bar.",
+        "context": "Step 1 in the instructions of using MEGAsync to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18302": {
+        "text": "Click on the [B]Settings icon[\/B].",
+        "context": "Step 2 in the instructions of using MEGAsync to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18303": {
+        "text": "Click [B]Settings \/ Preferences[\/B] to open the dialog.",
+        "context": "Step 3 in the instructions of using MEGAsync to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18304": {
+        "text": "Click on the [B]Account[\/B] tab.",
+        "context": "Step 4 in the instructions of using MEGAsync to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18305": {
+        "text": "Click the [B]Change password[\/B] button.",
+        "context": "Step 5 in the instructions of using MEGAsync to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18306": {
+        "text": "Please confirm you want to Park your account",
+        "context": "park account dialog header"
+    },
+    "18307": {
+        "text": "Check the boxes below, enter your email address and click Park account",
+        "context": "The header for the park account dialogue box"
+    },
+    "18308": {
+        "text": "Yes, I still want to park my account.",
+        "context": "check box 3 in account park dialog"
+    },
+    "18309": {
+        "text": "If you proceed, the existing account under this address will be deactivated, and you will lose access to your data.",
+        "context": "park account dialog warning"
+    },
+    "18310": {
+        "text": "View our help centre to see step by step instructions with images.",
+        "context": "instruction notes on recovery"
+    },
+    "18311": {
+        "text": "Yes, I understand that after 60 days from the time I parked my account,[B1] all my files will be deleted permanently.[\/B1]",
+        "context": "second check in park warning"
+    },
+    "18312": {
+        "text": "Yes, I understand that parking my account will [B1]remove all my files, contacts, and messages from my account.[\/B1]",
+        "context": "park account warning check 1"
+    },
+    "18314": {
+        "text": "Tap on your [B]Account name[\/B] at the top left of the Menu.",
+        "context": "Step 2 in the instructions of using the Windows Phone app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18315": {
+        "text": "Tap on the three horizontal dots at the bottom right.",
+        "context": "Step 4 in the instructions of using the UWP or Windows Phone app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18316": {
+        "text": "Type your new password, confirm it and tap [B]Done[\/B].",
+        "context": "Step 5 in the instructions of using the Windows Phone app to reset your password after you choose that you are logged in to MEGA in the app."
+    },
+    "18347": {
+        "text": "Check all boxes to continue",
+        "context": "a header over checkbox in every step in account recovery process."
+    },
+    "18419": {
+        "text": "Type your new password, confirm it and click [B]OK[\/B].",
+        "context": "step nb 6 in megasync instruction to change the password."
     }
 }

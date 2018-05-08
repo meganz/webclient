@@ -1018,8 +1018,8 @@
                     }
                     else {
                         megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
+                        showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
                     }
-                    showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
                 }
                 else {
                     var userHandles = [u_handle, $.mcselected];

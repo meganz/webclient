@@ -218,29 +218,28 @@ var GenericConversationMessage = React.createClass({
     _startDownload: function(v) {
         M.addDownload([v]);
     },
-    _addToCloudDrive: function(v) {
+    _addToCloudDrive: function(v, openSendToChat) {
         openSaveToDialog(v, function(node, target, isForward) {
             if (isForward) {
                 megaChat.getMyChatFilesFolder()
                     .done(function(myChatFolderId) {
                         M.injectNodes(node, myChatFolderId, function(res) {
-                            console.error(res);
                             if (!Array.isArray(res)) {
                                 if (d) {
-                                    console.error("Failed to inject nodes.");
+                                    console.error("Failed to inject nodes. Res:", res);
                                 }
                             }
                             else {
                                 // TODO:
                                 // megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
-                                console.debug('injectNodes result', res); // array of handles for the newly copied nodes
+                                megaChat.chats[$.mcselected].attachNodes(res);
+                                showToast('send-chat', (res.length > 1) ? l[17767] : l[17766]);
                             }
                         })
                     })
                     .fail(function() {
                         if (d) {
-                            debugger;
-                            console.error("Failed to allocate 'My chat files' folder.");
+                            console.error("Failed to allocate 'My chat files' folder.", arguments);
                         }
                     });
 
@@ -251,7 +250,7 @@ var GenericConversationMessage = React.createClass({
                 M.injectNodes(node, target, function(res) {
                     if (!Array.isArray(res)) {
                         if (d) {
-                            console.error("Failed to inject nodes.");
+                            console.error("Failed to inject nodes. Res:", res);
                         }
                     }
                     else {
@@ -267,7 +266,7 @@ var GenericConversationMessage = React.createClass({
                     }
                 });
             }
-        });
+        }, openSendToChat ? "conversations" : false);
     },
 
     _getLink: function(h, e) {
@@ -523,6 +522,7 @@ var GenericConversationMessage = React.createClass({
                                 </span>;
                             }
                         }
+
                         if (contact.u === u_handle) {
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
@@ -590,6 +590,17 @@ var GenericConversationMessage = React.createClass({
 
 
                                             self._addFavouriteButtons(v.h, firstGroupOfButtons);
+
+                                            linkButtons.push(
+                                                <DropdownsUI.DropdownItem icon="small-icon conversations"
+                                                                          label={__(l[17764])}
+                                                                          key="sendToChat"
+                                                                          onClick={() => {
+                                                                              $.selected = [v.h];
+                                                                              openCopyDialog('conversations');
+                                                                          }}/>
+                                            );
+
                                         }
 
                                             return <div>
@@ -604,28 +615,30 @@ var GenericConversationMessage = React.createClass({
                                         }}
                                     />
                                 </ButtonsUI.Button>;
-                            }
-                            else {
-                                dropdown = <ButtonsUI.Button
-                                    className="default-white-button tiny-button"
-                                    icon="tiny-icon icons-sprite grey-dots">
-                                    <DropdownsUI.Dropdown
-                                        className="white-context-menu attachments-dropdown"
-                                        noArrow={true}
-                                        positionMy="left top"
-                                        positionAt="left bottom"
-                                        horizOffset={-4}
-                                        vertOffset={3}
-                                    >
-                                        {previewButton}
-                                        <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
-                                                                  onClick={self._startDownload.bind(self, v)}/>
-                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}
-                                                                  onClick={self._addToCloudDrive.bind(self, v)}/>
-                                    </DropdownsUI.Dropdown>
-                                </ButtonsUI.Button>;
-                            }
                         }
+                        else {
+                            dropdown = <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon icons-sprite grey-dots">
+                                <DropdownsUI.Dropdown
+                                    className="white-context-menu attachments-dropdown"
+                                    noArrow={true}
+                                    positionMy="left top"
+                                    positionAt="left bottom"
+                                    horizOffset={-4}
+                                    vertOffset={3}
+                                >
+                                    {previewButton}
+                                    <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
+                                                              onClick={self._startDownload.bind(self, v)}/>
+                                    <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}
+                                                              onClick={self._addToCloudDrive.bind(self, v)}/>
+                                    <DropdownsUI.DropdownItem icon="conversations" label={__(l[17764])}
+                                                              onClick={self._addToCloudDrive.bind(self, v, true)}/>
+                                </DropdownsUI.Dropdown>
+                            </ButtonsUI.Button>;
+                        }
+
 
                         var attachmentClasses = "message shared-data";
                         var preview = <div className="data-block-view medium">

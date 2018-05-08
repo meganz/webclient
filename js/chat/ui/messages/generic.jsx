@@ -216,13 +216,45 @@ var GenericConversationMessage = React.createClass({
         M.addDownload([v]);
     },
     _addToCloudDrive: function(v) {
-        M.injectNodes(v, M.RootID, function(res) {
-            if (res === 0) {
-                msgDialog(
-                    'info',
-                    __(l[8005]),
-                    __(l[8006])
-                );
+        openSaveToDialog(v, function(node, target, isForward) {
+            if (isForward) {
+                megaChat.getMyChatFilesFolder()
+                    .done(function(myChatFolderId) {
+                        M.injectNodes(node, myChatFolderId, function(res) {
+                            console.error(res);
+                            if (res === 0) {
+                                // TODO:
+                                // megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
+                            }
+                            else if (d) {
+                                console.error("Failed to inject nodes.");
+                            }
+                        })
+                    })
+                    .fail(function() {
+                        if (d) {
+                            debugger;
+                            console.error("Failed to allocate 'My chat files' folder.");
+                        }
+                    });
+
+            }
+            else {
+                // is a save/copy to
+                target = target || M.RootID;
+                M.injectNodes(node, target, function(res) {
+                    if (res === 0) {
+                        if (target === M.RootID) {
+                            // since if the user clicks Save without picking, its a bit weird, where the file went
+                            // we show a simple dialog telling him the file is in Cloud Drive.
+                            msgDialog(
+                                'info',
+                                l[8005],
+                                l[8006]
+                            );
+                        }
+                    }
+                });
             }
         });
     },
@@ -581,7 +613,7 @@ var GenericConversationMessage = React.createClass({
                                         {previewButton}
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={self._startDownload.bind(self, v)}/>
-                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
+                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}
                                                                   onClick={self._addToCloudDrive.bind(self, v)}/>
                                     </DropdownsUI.Dropdown>
                                 </ButtonsUI.Button>;

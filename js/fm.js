@@ -1446,7 +1446,7 @@ function openContactInfoLink(contactLink) {
                     QRContactDialogPrepare(res['+a'], res.e, res.fn + ' ' + res.ln, res.h);
                     return $dialog;
                 });
-                
+
             }
         }
     });
@@ -1476,8 +1476,8 @@ function openAccessQRDialog() {
                 text: myHost
             };
             $('.qr-icon-big', $dialog).text('').qrcode(QRoptions);
-            
-            
+
+
             $('.qr-http-link', $dialog).text(myHost);
             var curAvatar = useravatar.contact(u_handle);
             $('.avatar-container-qr', $dialog).html(curAvatar);
@@ -1492,7 +1492,7 @@ function openAccessQRDialog() {
                 }
             };
             mega.attr.get(u_handle, 'clv', -2, 0).done(handleAutoAccept);
-            
+
         }
     };
 
@@ -2433,6 +2433,11 @@ function closeDialog(ev) {
         delete $.moveDialog;
         delete $.copyToShare;
         delete $.copyrightsDialog;
+
+        /* copy/move dialog - chat - save to */
+        delete $.saveToDialogCb;
+        delete $.saveToDialogNode;
+        delete $.dialogIsChatSave;
 
         if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
             delete $.onImportCopyNodes;

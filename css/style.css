@@ -22119,12 +22119,12 @@ opacity: 1;
     font-family: "source_sans_proregular", sans-serif;
     font-weight: lighter;
     font-size: 21px;
-    color: #444;
+    color: #555;
     letter-spacing: 0;
     line-height: 28px;
     width: 556px;
     text-align: center;
-    margin: 20px auto 12px;
+    margin: 28px auto 12px;
 }
 .fm-dialog.widget-dialog {
     width: 690px;

@@ -152,7 +152,6 @@ var ConversationRightArea = React.createClass({
 
         var dontShowTruncateButton = false;
         if (
-            myPresence === 'offline' ||
             !room.iAmOperator() ||
             room.isReadOnly() ||
             room.messagesBuff.messages.length === 0 ||
@@ -187,7 +186,7 @@ var ConversationRightArea = React.createClass({
         // );
 
         var renameButtonClass = "link-button " + (
-            room.isReadOnly() || !room.iAmOperator() || myPresence === 'offline' ?
+            room.isReadOnly() || !room.iAmOperator() ?
                 "disabled" : ""
             );
 
@@ -218,8 +217,7 @@ var ConversationRightArea = React.createClass({
                                     !self.allContactsInChat(excludedParticipants) &&
                                     !room.isReadOnly() &&
                                     room.iAmOperator()
-                                ) ||
-                                myPresence === 'offline'
+                                )
                             }
                             >
                             <DropdownsUI.DropdownContactsSelector
@@ -235,7 +233,6 @@ var ConversationRightArea = React.createClass({
                                 multipleSelectedButtonLabel={__(l[8869])}
                                 nothingSelectedButtonLabel={__(l[8870])}
                                 onSelectDone={this.props.onAddParticipantSelected}
-                                disabled={myPresence === 'offline'}
                                 positionMy="center top"
                                 positionAt="left bottom"
                                 />
@@ -263,7 +260,7 @@ var ConversationRightArea = React.createClass({
                             className="link-button dropdown-element"
                             icon="rounded-grey-up-arrow"
                             label={__(l[6834] + "...")}
-                            disabled={room.isReadOnly() || myPresence === 'offline'}
+                            disabled={room.isReadOnly()}
                             >
                             <DropdownsUI.Dropdown
                                 contacts={this.props.contacts}
@@ -298,7 +295,7 @@ var ConversationRightArea = React.createClass({
                         }
                         { room.type === "group" ? (
                             <div className={"link-button red " + (
-                                    myPresence === 'offline' || room.stateIsLeftOrLeaving() ? "disabled" : ""
+                                    room.stateIsLeftOrLeaving() ? "disabled" : ""
                                 )}
                                  onClick={(e) => {
                                      if ($(e.target).closest('.disabled').size() > 0) {
@@ -2098,7 +2095,7 @@ var ConversationPanel = React.createClass({
                                     <ButtonsUI.Button
                                         className="popup-button"
                                         icon="small-icon grey-medium-plus"
-                                        disabled={room.isReadOnly() || myPresence === 'offline'}
+                                        disabled={room.isReadOnly()}
                                         >
                                         <DropdownsUI.Dropdown
                                             className="wide-dropdown attach-to-chat-popup"

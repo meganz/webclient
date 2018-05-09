@@ -525,8 +525,6 @@ var ConversationsApp = React.createClass({
 
         var presence = self.props.megaChat.getMyPresence();
 
-        var startChatIsDisabled = !presence || presence === UserPresence.PRESENCE.OFFLINE;
-
 
         var leftPanelStyles = {};
 
@@ -584,7 +582,6 @@ var ConversationsApp = React.createClass({
                             <ButtonsUI.Button
                                 group="conversationsListing"
                                 icon="white-medium-plus"
-                                disabled={startChatIsDisabled}
                                 contacts={this.props.contacts}
                                 >
                                 <DropdownsUI.DropdownContactsSelector

@@ -18,7 +18,9 @@ var slideshowid;
     var fitToWindow = Object.create(null);
 
     function slideshowsteps() {
-        var $stepsBlock = $('.viewer-overlay').find('.viewer-images-num, .viewer-button.slideshow');
+        var $overlay = $('.viewer-overlay');
+        var $controls = $overlay.find('.viewer-button.slideshow, .viewer-mid-button.prev, .viewer-mid-button.next');
+        var $counter = $overlay.find('.viewer-counter-bl');
         var forward = [];
         var backward = [];
         var ii = [];
@@ -65,15 +67,21 @@ var slideshowid;
                     forward.push(M.v[ii[n + 1]].h);
                     backward.push(M.v[ii[n - 1]].h);
             }
-            $stepsBlock.find('.first').text(n + 1);
-            $stepsBlock.find('.last').text(len);
+            $counter.find('.first').text(n + 1);
+            $counter.find('.last').text(len);
         }
 
-        if (_hideCounter || len < 2) {
-            $stepsBlock.addClass('hidden');
+        if (_hideCounter) {
+            $counter.addClass('hidden');
         }
         else {
-            $stepsBlock.removeClass('hidden');
+            $counter.removeClass('hidden');
+        }
+        if (len < 2) {
+            $controls.addClass('hidden');
+        }
+        else {
+            $controls.removeClass('hidden');
         }
         return {backward: backward, forward: forward};
     }
@@ -520,6 +528,7 @@ var slideshowid;
             $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
             $(window).unbind('resize.imgResize');
             $document.unbind('keydown.slideshow mousemove.idle');
+            $overlay.find('.viewer-image-bl').removeClass('default-state');
             $overlay.find('.viewer-image-bl .img-wrap').attr('data-count', '');
             $overlay.find('.viewer-image-bl img').attr('src', '').removeAttr('style');
             if (fullScreenManager) {
@@ -671,6 +680,7 @@ var slideshowid;
         zoom_mode = false;
         switchedSides = false;
         $overlay.find('.viewer-filename').text(n.name);
+        $overlay.find('.viewer-image-bl').removeClass('default-state');
         $overlay.find('.viewer-progress, .viewer-error, video, #pdfpreviewdiv1').addClass('hidden');
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
         $overlay.find('.viewer-progress p').removeAttr('style');
@@ -979,7 +989,7 @@ var slideshowid;
         $overlay.find('.viewer-pending').addClass('hidden');
         // $overlay.find('.viewer-progress').addClass('hidden');
         $overlay.find('.viewer-image-bl .img-wrap').addClass('hidden');
-        $overlay.find('.viewer-image-bl').removeClass('hidden');
+        $overlay.find('.viewer-image-bl').addClass('default-state').removeClass('hidden');
 
         if (n.name) {
             var c = MediaAttribute.getCodecStrings(n);
@@ -993,6 +1003,10 @@ var slideshowid;
 
         if (previews[id].poster !== undefined) {
             $video.attr('poster', previews[id].poster);
+
+            if (previews[id].poster) {
+                $overlay.find('.viewer-image-bl').removeClass('default-state');
+            }
         }
         else if (String(n.fa).indexOf(':1*') > 0) {
             getImage(n, 1).then(function(uri) {
@@ -1000,6 +1014,7 @@ var slideshowid;
 
                 if (id === slideshowid) {
                     $video.attr('poster', uri);
+                    $overlay.find('.viewer-image-bl').removeClass('default-state');
                 }
             }).catch(console.debug.bind(console));
         }

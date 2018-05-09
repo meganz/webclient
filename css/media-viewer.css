@@ -510,6 +510,12 @@
     vertical-align: middle;
     background-color: #000;
 }
+.video .viewer-image-bl.default-state video {
+    width: 70%;
+    height: -webkit-calc(100% - 182px);
+    height: -moz-calc(100% - 182px);
+    height: calc(100% - 182px);
+}
 .video .viewer-image-bl video {
     background-color: black;
 }

@@ -31,7 +31,7 @@ var slideshowid;
 
         if (slideshowplay) {
             filter = function(n) {
-                return is_image(n) && fileext(n.name) !== 'pdf';
+                return n.s && is_image(n) && fileext(n.name) !== 'pdf';
             };
         }
 
@@ -747,7 +747,7 @@ var slideshowid;
             $dlBut.addClass('hidden');
         }
 
-        if (previews[n.h] && preqs[n.h]) {
+        if (previews[n.h]) {
             previewsrc(n.h);
             fetchnext();
         }
@@ -857,9 +857,9 @@ var slideshowid;
         var treq = Object.create(null);
         preqs[n.h] = 1;
         treq[n.h] = {fa: n.fa, k: n.k};
-        var getPreview = api_getfileattr.bind(window, treq, 1, preview, eot);
         var loadOriginal = n.s < 50 * 1048576 && is_image(n) === 1;
         var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
+        var getPreview = api_getfileattr.bind(window, treq, 1, preview, !loadOriginal && eot);
 
         if (loadOriginal) {
             var $overlay = $('.viewer-overlay');
@@ -1079,10 +1079,6 @@ var slideshowid;
         var $imgBlock = $overlay.find('.viewer-image-bl');
         var $imgCount = $imgBlock.find('.img-wrap');
 
-        if (slideshowplay && Object(previews[id]).full) {
-            slideshow_timereset();
-        }
-
         var src = Object(previews[id]).src;
         if (!src) {
             console.error('Cannot preview %s', id);
@@ -1139,6 +1135,10 @@ var slideshowid;
             var src1 = this.src;
             var $img = $imgCount.find('.' + imgClass);
             var rot = previews[id].orientation | 0;
+
+            if (slideshowplay && (previews[id].full || ev.type === 'error')) {
+                slideshow_timereset();
+            }
 
             if (ev.type === 'error') {
                 src1 = noThumbURI;

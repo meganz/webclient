@@ -659,6 +659,7 @@ var slideshowid;
             }
 
             if (!previews[n.h]) {
+                $overlay.find('.img-wrap img').attr('src', '');
                 $overlay.find('.viewer-pending').removeClass('hidden');
             }
         }

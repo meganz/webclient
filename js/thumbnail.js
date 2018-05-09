@@ -31,6 +31,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             thumbHandler = isRawImage;
             isRawImage = false;
         }
+        else if (typeof isRawImage !== 'string') {
+            if (d) {
+                console.debug('Not really a raw..', isRawImage);
+            }
+            isRawImage = false;
+        }
 
         if (d && isRawImage) {
             console.log('Processing RAW Image: ' + isRawImage);
@@ -402,6 +408,9 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
                 break;
 
             default:
+                if (dv.byteLength > 24 && dv.getUint32(20) === 0x68656963) { // HEIC
+                    break;
+                }
                 switch (dv.getUint32(0)) {
                     case 0x89504e47: // PNG
                         img.isPNG = true;

@@ -57,7 +57,7 @@ is_image.def = {
     'GIF': 1,
     'BMP': 1,
     'PNG': 1,
-    'HEIC': 1
+    'HEIC': -1
 };
 
 is_image.raw = {

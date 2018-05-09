@@ -53,6 +53,14 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         console.time('createthumbnail' + id);
     }
 
+    var sendToPreview = function(h, ab) {
+        var n = h && M.getNodeByHandle(h);
+
+        if (n && filetype(n) !== 'PDF Document' && !is_video(n)) {
+            previewimg(h, ab || dataURLToAB(noThumbURI));
+        }
+    };
+
     var img = new Image();
     img.id = id;
     img.aes = aes;
@@ -182,9 +190,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
-            if (node && filetype(n) !== 'PDF Document' && !is_video(n)) {
-                previewimg(node, ab);
-            }
+            sendToPreview(node, ab);
 
             if (d) {
                 console.log('total time:', new Date().getTime() - t);
@@ -203,6 +209,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             console.warn('Failed to create thumbnail', e);
         }
 
+        sendToPreview(node);
         api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
         mBroadcaster.sendMessage('fa:error', id, e, false, 2);
     });

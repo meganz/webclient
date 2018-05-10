@@ -243,6 +243,9 @@ var slideshowid;
             $overlay.addClass('slideshow');
             slideshowplay = true;
             slideshow_timereset();
+			
+			// hack to start the slideshow in preview mode:
+			if ($('.viewer-overlay .viewer-button.inline.fs').find('i').attr('class').indexOf('fullscreen') > -1) $('.viewer-overlay .viewer-button.fs').click();
             return false;
         });
 
@@ -312,6 +315,9 @@ var slideshowid;
         // Bind Slideshow Close button
         $controls.find('.viewer-big-button.close').rebind('click', function() {
             slideshow_imgControls(1);
+			
+			// hack to also stop fullscreen 
+			if ($('.viewer-overlay .viewer-button.inline.fs').find('i').attr('class').indexOf('lowscreen') > -1) $('.viewer-overlay .viewer-button.fs').click();
             return false;
         });
     }

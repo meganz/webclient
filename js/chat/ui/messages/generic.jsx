@@ -897,7 +897,10 @@ var GenericConversationMessage = React.createClass({
                     message.deleted = true;
                 }
                 var messageActionButtons = null;
-                if (message.getState() === Message.STATE.NOT_SENT) {
+                if (
+                    message.getState() === Message.STATE.NOT_SENT ||
+                    message.getState() === Message.STATE.NOT_SENT_EXPIRED
+                ) {
                     messageActionButtons = null;
 
                     if (!spinnerElement) {

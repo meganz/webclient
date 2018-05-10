@@ -20892,14 +20892,14 @@ div.camera-bottom-txt {
     position: relative;
     margin: 12px 0 0 12px;
 }
-.account.widget.body.masterkey {
+.account.widget.body.masterkey, .account.widget.body.reviewsessions {
     margin: 36px 20px 36px 10px;
     float: left;
     width: -webkit-calc(50% - 30px);
     width: -moz-calc(50% -30px);
     width: calc(50% - 30px);
 }
-.low-width .widget.body.masterkey {
+.low-width .widget.body.masterkey, .widget.body.reviewsessions {
     width: 448px;
     margin: 36px 0px 36px 36px;
     float: none;

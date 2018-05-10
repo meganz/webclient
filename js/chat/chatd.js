@@ -2105,6 +2105,9 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
     if (chatRoom.messagesBuff.messagesBatchFromHistory && chatRoom.messagesBuff.messagesBatchFromHistory.length > 0) {
         chatRoom.messagesBuff.messagesBatchFromHistory.clear();
     }
+    if (chatRoom.messagesBuff && chatRoom.messagesBuff.retrievedAllMessages) {
+        chatRoom.messagesBuff.retrievedAllMessages = false;
+    }
 
     if (oldChatIdMessages) {
         [

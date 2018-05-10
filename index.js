@@ -320,11 +320,11 @@ function init_page() {
         delete localStorage.signupcode;
     }
     else if (localStorage.signupcode
-        && page.substr(0, 6) !== 'signup'
-        && page !== 'register'
-        && page !== 'terms'
-        && page !== 'mega'
-        && page !== 'privacy' && page !== 'chrome' && page !== 'firefox') {
+            && page.substr(0, 6) !== 'signup'
+            && page !== 'register'
+            && page !== 'terms'
+            && page !== 'mega'
+            && page !== 'privacy' && page !== 'gdpr' && page !== 'chrome' && page !== 'firefox') {
         register_txt = l[1291];
         loadSubPage('signup' + localStorage.signupcode);
         return false;
@@ -478,6 +478,7 @@ function init_page() {
         && (page !== 'cmd')
         && (page !== 'terms')
         && (page !== 'privacy')
+        && (page !== 'gdpr')
         && (page !== 'takendown')
         && (page !== 'general')
         && (page !== 'resellers')
@@ -907,6 +908,10 @@ function init_page() {
     }
     else if (page == 'privacy') {
         parsepage(pages['privacy']);
+    }
+    else if (page === 'gdpr') {
+        parsepage(pages['gdpr']);
+        gdpr.init();
     }
     else if (page == 'mega') {
         parsepage(pages['mega']);
@@ -1995,7 +2000,7 @@ function topmenuUI() {
             var subPages = [
                 'about', 'account', 'android', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
+                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'wp', 'start'
             ];
@@ -2337,6 +2342,9 @@ function pagemetadata() {
     }
     else if (page == 'privacy') {
         mega_title = 'Privacy Policy - MEGA';
+    }
+    else if (page === 'gdpr') {
+        mega_title = l[18421] + ' - MEGA';
     }
     else if (page == 'copyright') {
         mega_title = 'Copyright - MEGA';

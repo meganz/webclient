@@ -1737,34 +1737,96 @@ div.checkboxOn, div.checkboxOff {
     padding: 20px;
 }
 /* General Terms, Privacy Policy and Takedown guidance pages */
-.terms-general, .privacy-policy, .takedown-guidance, .contact-us {
+.data-protection, .terms-general, .privacy-policy, .takedown-guidance, .contact-us {
     padding: 50px 25px 50px 25px;
 }
 .contact-us .contact-new-column {
     margin-bottom: 20px;
 }
-.terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1 {
+.data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1 {
     font-family: 'source_sans_prolight', sans-serif;
     font-size: 36px;
     font-weight: 300;
     color: #222;
 }
-.terms-of-service h2, .terms-general h2, .privacy-policy h2, .takedown-guidance h2, .contact-us .contact-new-title {
+.data-protection h2, .terms-of-service h2, .terms-general h2, .privacy-policy h2, .takedown-guidance h2, .contact-us .contact-new-title {
     font-family: 'source_sans_prolight', sans-serif;
     font-size: 24px;
     font-weight: 300;
     color: #999;
 }
-.terms-of-service .number, .terms-general .number, .privacy-policy .number, .takedown-guidance .number {
+.data-protection .number, .terms-of-service .number, .terms-general .number, .privacy-policy .number, .takedown-guidance .number {
     display: block;
     font-size: 16px;
     line-height: 1.19;
     color: #eb4444;
 }
-.terms-of-service .text, .terms-general .text, .privacy-policy .text, .takedown-guidance .text, .takedown-guidance p, .contact-us .contact-new-txt, .contact-us p {
+.data-protection .text,  .terms-of-service .text, .terms-general .text, .privacy-policy .text, .takedown-guidance .text, .takedown-guidance p, .contact-us .contact-new-txt, .contact-us p {
     font-size: 15px;
     line-height: 1.73;
     color: #667;
+}
+.data-protection .text b {
+    font-family: 'source_sans_prosemibold', sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+}
+.data-protection a {
+    color: #d22400;
+}
+.data-protection ul {
+	padding-left: 15px;
+}
+.data-protection ul li {
+    color: #667;
+    font-size: 15px;
+    line-height: 1.73;
+    list-style-type: disc;
+	padding-left: 3px;
+}
+.data-protection .download-button {
+    background: #d90007;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    height: 20px;
+    padding: 10px 40px;
+    position: relative;
+    margin-top: 10px;
+    width: 100px;
+}
+.data-protection .download-button {
+    display: block;
+    text-align: center;
+}
+.data-protection .download-button .label {
+    line-height: 20px;
+}
+.data-protection .download-button .loading-image {
+    display: none;
+}
+.data-protection .download-button.loading .label {
+    display: none;
+}
+.data-protection .download-button.loading .loading-image {
+    display: inline-block;
+    height: 28px;
+    left: 50%;
+    margin-left: -14px;
+    margin-top: -4px;
+    position: absolute;
+    width: 28px;
+    font-size: 0;
+    line-height: 0;
+}
+.data-protection .download-button .loading-image img {
+    width: 28px;
+    height: 28px;
+}
+.data-protection .error-message {
+    color: #d90007;
+    margin-top: 5px;
 }
 .terms-of-service .terms-agent-info {
     background-image: none;
@@ -5750,7 +5812,7 @@ textarea.mobile.support-text-field {
 }
 .mobile.video.video-theatre-mode .viewer-button.fs {
     margin: 0;
-} 
+}
 .mobile.video .download.video-block[data-fullscreen="true"] {
     height: 100%;
 }
@@ -5783,16 +5845,16 @@ textarea.mobile.support-text-field {
 }
 .mobile.download .video-block {
     display: none;
-} 
+}
 .mobile.download.video .video-block {
     display: block;
-} 
+}
 /* Make sure Free plan is shown after registration */
 body.key .reg-st3-membership-bl.free.hidden {
     display: inline-block !important;
 }
 
-/* Recover account styles */ 
+/* Recover account styles */
 .mobile .improved-recovery-steps {
     padding-top: 60px;
 }
@@ -5814,7 +5876,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-size: 14px;
     color: #999;
     letter-spacing: 0;
-    padding: 0 0; 
+    padding: 0 0;
     -webkit-margin-before: 1.6em;
     -webkit-margin-after: .6em;
     -webkit-margin-start: 0px;
@@ -5929,7 +5991,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     border: 1px solid #D82928;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 1px 1px 0 rgba(255,255,255,0.20);
     text-align: center;
-    text-decoration: none;  
+    text-decoration: none;
     color: #fff;
     border-radius: 3px;
 }
@@ -6011,7 +6073,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     transition: all .2s;
 }
 .mobile .improved-recovery-steps .progress-meter .progress-point.inactive {
-    opacity: .2; 
+    opacity: .2;
 }
 .mobile .improved-recovery-steps .progress-meter .progress-point.inactive .progress-content {
     display: none;
@@ -6112,7 +6174,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps .login-register-input:hover {
     border: 1px solid #ddd;
-} 
+}
 .mobile .improved-recovery-steps .login-register-input input {
     color: #444;
     line-height: 25px;
@@ -6151,10 +6213,10 @@ body.key .reg-st3-membership-bl.free.hidden {
     border-radius: 3px;
 }
 .mobile .improved-recovery-steps .app-button:first-of-type {
-    margin-left: 0px; 
+    margin-left: 0px;
 }
 .mobile .improved-recovery-steps .app-button:last-of-type {
-    margin-right: 0px; 
+    margin-right: 0px;
 }
 .mobile .improved-recovery-steps .app-button:hover {
     background-color: #f2f2f2;
@@ -6365,7 +6427,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     height: 32px;
     background-position: -100px -300px;
     width: 32px;
-    background-size: 250px auto; 
+    background-size: 250px auto;
     margin: 8px 12px;
 }
 .mobile .improved-recovery-steps .warning-icon  {
@@ -6596,7 +6658,7 @@ body.key .reg-st3-membership-bl.free.hidden {
         float: right;
     }
     .mobile .improved-recovery-steps {
-        padding-top: 26px; 
+        padding-top: 26px;
     }
     .mobile .improved-recovery-steps .register-st2-txt-block {
         min-height: 100vh;
@@ -7157,7 +7219,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     }
 }
 
- @media screen and (orientation:landscape) { 
+ @media screen and (orientation:landscape) {
     .app-info-block .mobile.download-app {
         display: none;
     }

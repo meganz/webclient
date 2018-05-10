@@ -47,6 +47,7 @@ var is_firefox_web_ext = location_sub === 'moz-extension://';
 var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
+var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 
@@ -2239,6 +2240,8 @@ else if (!b_u) {
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
+        'gdpr': {f:'html/gdpr.html', n: 'gdpr', j:0},
+        'gdpr_js': {f:'html/js/gdpr.js', n: 'gdpr_js', j:1},
         'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
         'general': {f:'html/general.html', n: 'general', j:0},
@@ -2367,6 +2370,7 @@ else if (!b_u) {
         'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice','copyright_js'],
         'privacy': ['privacy','privacycompany'],
+        'gdpr': ['gdpr', 'gdpr_js'],
         'mega': ['mega'],
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],

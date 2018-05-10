@@ -13082,12 +13082,65 @@ h5.main-italic-header {
 .new-bottom-pages {
     padding: 46px 15px 73px 15px;
 }
+.new-bottom-pages ul {
+	padding-left: 15px;
+}
+.new-bottom-pages ul li {
+    color: #333333;
+    font-size: 14px;
+    line-height: 26px;
+	padding-left: 3px;
+}
 .new-bottom-pages hr, .bottom-pages-dialog .bp-main hr {
     height: 1px;
     background-color: #e5e5e5;
     margin: 28px -20px 6px -20px;
     padding: 0;
     border: 0;
+}
+.data-protection .download-button {
+    background: #d90007;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    height: 20px;
+    padding: 10px 40px;
+    position: relative;
+    margin-top: 10px;
+    width: 100px;
+}
+.data-protection .download-button {
+    display: block;
+    text-align: center;
+}
+.data-protection .download-button .label {
+    line-height: 20px;
+}
+.data-protection .download-button .loading-image {
+    display: none;
+}
+.data-protection .download-button.loading .label {
+    display: none;
+}
+.data-protection .download-button.loading .loading-image {
+    display: inline-block;
+    height: 28px;
+    left: 50%;
+    margin-left: -14px;
+    margin-top: -4px;
+    position: absolute;
+    width: 28px;
+    font-size: 0;
+    line-height: 0;
+}
+.data-protection .download-button .loading-image img {
+    width: 28px;
+    height: 28px;
+}
+.data-protection .error-message {
+    color: #d90007;
+    margin-top: 5px;
 }
 .terms-agent-info {
     background-image: url(../images/mega/terms-icons.png);

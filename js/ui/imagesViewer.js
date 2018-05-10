@@ -18,6 +18,10 @@ var slideshowid;
     var fitToWindow = Object.create(null);
 
     function slideshowsteps() {
+		
+		if (page == 'download') _hideCounter = true;
+		else _hideCounter = false;
+		
         var $overlay = $('.viewer-overlay');
         var $controls = $overlay.find('.viewer-button.slideshow, .viewer-mid-button.prev, .viewer-mid-button.next');
         var $counter = $overlay.find('.viewer-counter-bl');

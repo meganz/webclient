@@ -22116,7 +22116,6 @@ opacity: 1;
     width: 640px;
     margin: -275px 0 0 -320px;
 }
-
 .fm-widget-illustration {
     width: 560px;
     height: 300px;
@@ -22127,19 +22126,26 @@ opacity: 1;
 }
 .fm-dialog .fm-widget-introduction, .fm-dialog .fm-widget-manage {
     /* The public upload wi: */
-    font-family: "source_sans_prolight", sans-serif;
+    font-family: "source_sans_proregular", sans-serif;
     font-weight: lighter;
     font-size: 21px;
-    color: #333;
+    color: #555;
     letter-spacing: 0;
     line-height: 28px;
     width: 556px;
     text-align: center;
-    margin: 20px auto 12px;
+    margin: 28px auto 12px;
 }
 .fm-dialog.widget-dialog {
-    width: 640px;
-    margin: -305px 0 0 -320px;
+    width: 690px;
+    margin: -185px 0 0 -345px;
+}
+.fm-dialog.widget-dialog.centre {
+    margin: -280px 0 0 -345px;
+}
+.fm-dialog.widget-dialog .fm-notifications-bottom {
+    border-top: none;
+    background-color: #fafafa;
 }
 .fm-dialog.manage-widget {
     width: 600px;
@@ -22523,9 +22529,6 @@ opacity: 1;
 .widget-dialog .close-button{
     min-width: 100px;
 }
-.widget-dialog .wrapper {
-    min-height: 120px;
-}
 .widget-card .fm-dialog-tab {
     height: 36px;
     margin-top: 20px;
@@ -22751,10 +22754,10 @@ opacity: 1;
 	width: 400px;
     height: 250px;
     margin:20px 0 0 0;
-    background-image: url(../images/mega/wu_empty_upload@2x.png);
+    background-image: url(../images/mega/wu_empty_upload_v2@2x.png);
     background-position: 0 0;
     background-repeat: no-repeat;
-    background-size: 400px 250px;
+    background-size: 400px auto;
 }
 .wu-empty-upload .wu-large-logo.grey {
     -webkit-filter: grayscale(100%);
@@ -23103,7 +23106,7 @@ opacity: 1;
     padding-top: 16px;
 }
 .widget-dialog .fm-dialog-block {
-    margin: 24px 0 12px 0;
+    margin: 24px 0 0 0;
 }
 
 .widget-dialog .fm-block-subheading {
@@ -23117,6 +23120,7 @@ opacity: 1;
     background-color: #fff;
     border: 1px solid #ddd;
     box-sizing:border-box;
+    border-radius: 2px; 
 }
 
 .widget-dialog .embed-block {
@@ -23200,7 +23204,7 @@ opacity: 1;
     transition: all .5s ease-out;
 }
 .widget-dialog .embed-button.dark-theme {
-    background: #EB4444;
+    background-color: #ff3333;
     border: 1px solid #D90007;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.25), inset 0 -2px 3px 0 rgba(159,0,0,0.12);
     -webkit-transition: all .5s ease-out;
@@ -23215,7 +23219,9 @@ opacity: 1;
     color: #70777B;
 }
 .widget-dialog .embed-button.dark-theme:hover {
-    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    background-color: #ff4444;
+    border: 1px solid #D90007;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.25), inset 0 -2px 3px 0 rgba(159,0,0,0.12);
     -webkit-transition: all .5s ease-out;
     -moz-transition: all .5s ease-out;
     -o-transition: all .5s ease-out;
@@ -23223,6 +23229,7 @@ opacity: 1;
 }
 .widget-dialog .embed-button.light-theme:hover {
     box-shadow: 0 0px 0px 0 rgba(0,0,0,0);
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0.00) 0%, rgba(246,246,246,0.25) 100%);
     border: 1px solid #eee;
     -webkit-transition: all .5s ease-out;
     -moz-transition: all .5s ease-out;
@@ -23235,21 +23242,20 @@ opacity: 1;
     padding: 0 16px;
 }
 .widget-dialog .embed-button .embed-mega-icon {
-    width: 24px;
-    height: 24px;
+    width: 25px;
+    height: 25px;
     display: inline-block;
     vertical-align: middle;
     margin-right: 12px;
-    background-image: url(../images/mega/megadrop-embed-icons-sprite@2x.png);
-    background-size: 262px 1258px;
+    background-image: url(../images/mega/puf-embed-icons@2x.png);
+    background-size: 56px auto;
     background-repeat: no-repeat;
 }
 .widget-dialog .embed-button.dark-theme .embed-mega-icon {
-    background-position: -173px -1008px;
+    background-position:-2px -2px;
 }
-
 .widget-dialog .embed-button.light-theme .embed-mega-icon {
-    background-position: 0 -1008px;
+    background-position: -29px -2px;
 }
 .widget-dialog .embed-button .embed-action-text {
     font-family: 'source_sans_prosemibold';

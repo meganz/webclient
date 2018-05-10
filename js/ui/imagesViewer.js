@@ -1135,10 +1135,10 @@ var slideshowid;
             var src1 = this.src;
             var $img = $imgCount.find('.' + imgClass);
             var rot = previews[id].orientation | 0;
-
-            if (slideshowplay && (previews[id].full || ev.type === 'error')) {
+		
+            if (slideshowplay && (previews[id].full || ev.type === 'error' || is_image(Object(M.d[id]).name) !== 1)) {
                 slideshow_timereset();
-            }
+            }			
 
             if (ev.type === 'error') {
                 src1 = noThumbURI;

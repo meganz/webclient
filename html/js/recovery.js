@@ -6,27 +6,70 @@
 function AccountRecoveryControl() {
     'use strict';
     this.$recoveryPageContainer = $('.main-mid-pad.backup-recover.improved-recovery-steps');
-    this.$leftSide = $('.main-left-block', this.$recoveryPageContainer);
+    this.$leftSide = $('.main-left-block', this.$recoveryPageContainer); // colin switched side. right means left now
     this.$leftContent = $('.content-wrapper', this.$leftSide);
     this.$rightSide = $('.main-right-block.recover-block.decision-breadcrumb', this.$recoveryPageContainer);
     this.$rightContent = $('.content-wrapper', this.$rightSide);
+    this.$navigationControl = $('.nav-header-block', this.$leftContent);
     this.currStep = 0;
+    this.lastStep = -1;
     this.currBranch = 0;
+    this.lastBranch = 0;
     this.checks = 0;
     this.checks2 = 0;
+    this.emEntered = false;
+    this.isBack = false;
     var self = this;
 
+    // if mobile we view the related header for top-mobile.html and hide navigation div of desktop
+    if (is_mobile) {
+        $('.mobile.forgot-password-page').removeClass('hidden');
+        $('.mobile.fm-header').addClass('hidden');
+        $('.mobile.fm-header.fm-hr', '.mobile.forgot-password-page').removeClass('hidden');
+        $('.nav-header-block', this.$leftContent).addClass('hidden');
+        this.$navigationControl = $('.mobile.fm-header.fm-hr', '.mobile.forgot-password-page');
+        $('.mobile.fm-header.fm-hr recover-acc-subheader.fm-subheader-txt', '.mobile.forgot-password-page').text('');
+    }
+
+    // the handler for tab clicking on instruction page
     $('.app-button-block .app-button', this.$leftContent).rebind('click', function () {
         self.prepareInstruction(this.classList[this.classList.length - 1]);
     });
     $('.content-highlight-block', this.$leftContent).rebind('click', function () {
-        //loadSubPage('help');
         window.open("https://mega.nz/help");
     });
 
+    $('.recover-account-email-block input', this.$leftContent).rebind('keydown.recoverpageemail', function (e) {
+        $('.recover-account-email-block .error-message', self.$leftContent).addClass('hidden');
+        if (e.keyCode === 13) {
+            $('.button-container .recover-button.yes', self.$leftContent).click();
+            return false;
+        }
+    });
+    this.$navigationControl.rebind('click', function () {
+        self.isBack = true;
+        if (self.lastStep === 3 && self.currStep === 4) {
+            self.showStep(self.lastStep, 1);
+        }
+        else if (self.lastStep === 3 && self.currStep !== 4) {
+            self.showStep(self.lastStep, 0);
+        }
+        else if (self.lastStep >= 0 && self.lastStep <= 4) {
+            self.showStep(self.lastStep);
+        }
+        else if (self.lastStep === -1 || self.lastStep === -2) {
+            self.showStep(self.lastStep, self.lastBranch);
+        }
+        return false;
+    });
+
     $('.progress-points .progress-point', this.$rightContent).rebind('click', function () {
+        self.isBack = true;
         if ($(this).hasClass('step1')) {
             self.showStep(1);
+        }
+        if ($(this).hasClass('step0')) {
+            self.showStep(0);
         }
         else if ($(this).hasClass('step2')) {
             self.showStep(2);
@@ -55,6 +98,65 @@ function AccountRecoveryControl() {
         $('.progress-point.step' + self.currStep + ' .step-answer', self.$rightContent)
             .text($(this).text());
         switch (self.currStep) {
+            case 0: {
+                var stepDesc = '';
+                var enteredEmail = $('.login-register-input.email input', self.$leftContent).val();
+                if (!enteredEmail) {
+                    self.emEntered = !self.emEntered;
+                    if (self.emEntered) {
+                        var emailWarn; // l[18506]
+                        emailWarn = l[18506];
+                        /* "If you are able to provide your account's email address,"
+                        + " please do so.If you cannot remember it, please click Start again to skip this step.";
+                        */
+
+                        $('.recover-account-email-block .error-message span', self.$leftContent).text(emailWarn);
+                        $('.recover-account-email-block .error-message', self.$leftContent).removeClass('hidden');
+                        return false;
+                    }
+                }
+                if (enteredEmail && checkMail(enteredEmail)) {
+                    $('.progress-point.step' + self.currStep + ' .step-answer', self.$rightContent)
+                        .text('');
+                    // msgDialog('warninga', l[1100], l[1101]);
+                    $('.recover-account-email-block .error-message span', self.$leftContent).text(l[1101]);
+                    $('.recover-account-email-block .error-message', self.$leftContent).removeClass('hidden');
+                }
+                else {
+                    $('.progress-point.step' + self.currStep + ' .step-answer', self.$rightContent)
+                        .text(enteredEmail);
+                    if (!enteredEmail) {
+                        self.showStep(1);
+                        break;
+                    }
+                    loadingDialog.pshow();
+                    var request = { "a": "ere", "m": enteredEmail };
+                    api_req(request,
+                        {
+                            callback: function (res) {
+                                loadingDialog.phide();
+                                if ($.isNumeric(res)) {
+                                    if (res === 0) {
+                                        self.showParkWarning(true);
+                                        return;
+                                    }
+                                    else if (res === 1) {
+                                        self.showStep(1);
+                                        return;
+                                    }
+                                    else {
+                                        console.error('Unexpected numeric returned value from API');
+                                    }
+                                }
+                                else {
+                                    console.error('Unexpected non-numeric returned value from API');
+                                }
+                                self.showStep(1); // in problems cases, start from 1
+                            }
+                        });
+                }
+                break;
+            }
             case 1: {
                 if ($(this).hasClass('yes')) {
                     self.showStep(-2); // success
@@ -115,6 +217,10 @@ function AccountRecoveryControl() {
                 self.startRecovery(email); // recover
                 break;
             }
+            default: {
+                console.error('Unknow vale in Current Step, so we couldnt move to next Step. !!!');
+                break;
+            }
         }
     });
 
@@ -149,8 +255,10 @@ function AccountRecoveryControl() {
 AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
     'use strict';
     if (!step) {
-        step = 1;
+        step = 0;
     }
+    var bkStep = this.currStep;
+    this.lastBranch = this.currBranch;
     this.currStep = step;
     if (!branch) {
         branch = 0;
@@ -158,16 +266,30 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
     this.currBranch = branch;
     var question1 = escapeHTML(l[18254]); // 'Are you logged into your account on another internet browser?';
     var desc1 = escapeHTML(l[18255]);
-        /* 'Please check your browser (Chrome, Firefox, Opera, Edge , IE ... etc) to see '
-        + 'if you are still logged into your account. you might have also logged into MEGA on someone else computer.';
-        */
+    /* 'Please check your browser (Chrome, Firefox, Opera, Edge , IE ... etc) to see '
+    + 'if you are still logged into your account. you might have also logged into MEGA on someone else computer.';
+    */
     var stepNb = escapeHTML(l[18256]).replace('{NB}', '1'); // 'Step 1';
     var checkBx1 = escapeHTML(l[18257]).replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>');
     // 'I have checked internet browsers on my computer for logged in accounts.';
     var checkBx2 = escapeHTML(l[18258]).replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>');
     // 'I have checked internet browsers on other computer for logged in accounts.';
-    var yesAnswer = l[18259]; //'Yes, I am logged into my account on another browser';
+    var yesAnswer = l[18259]; // 'Yes, I am logged into my account on another browser';
     var noAnswer = l[18260]; // 'No, I am not logged into my account on another browser';
+    this.lastStep = step - 1;
+    if (step === 0) {
+        question1 = escapeHTML(l[8798]); // 'Account Email Address';
+        desc1 = escapeHTML(l[18508]);
+        /* 'Please enter the email address of the account you wish to recover. If you
+         * cannot remember it, please leave the field blank.'
+         */
+        stepNb = escapeHTML(l[18507]); // 'Email Address';
+        checkBx1 = '';
+        checkBx2 = '';
+        yesAnswer = escapeHTML(l[7315]); // 'Start';
+        noAnswer = '';
+        this.lastStep = -5; // igonre
+    }
     if (step === 2) {
         question1 = escapeHTML(l[18261]); // 'Do you have the MEGA app installed on your phone, tablet or desktop?';
         desc1 = escapeHTML(l[18262]);
@@ -181,11 +303,11 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
     else if ((step === 3 || step === 4) && !branch) {
         question1 = escapeHTML(l[1937]); // 'Do you have a back up of your Recovery Key?';
         desc1 = escapeHTML(l[18268]).replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>');
-            /* 'If you have a backup of your master crypto key you can reset your password by selecting YES.'
-            + '<br/> <br/>'
-            + 'If you dont have you can no longer decrypt your existing accout, but you can start a new one'
-            + ' under the same email address by selecing NO.';
-            */
+        /* 'If you have a backup of your master crypto key you can reset your password by selecting YES.'
+        + '<br/> <br/>'
+        + 'If you dont have you can no longer decrypt your existing accout, but you can start a new one'
+        + ' under the same email address by selecing NO.';
+        */
         stepNb = escapeHTML(l[18256]).replace('{NB}', step); // 'Step 3 or 4';
         checkBx1 = '';
         checkBx2 = '';
@@ -204,6 +326,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         noAnswer = l[18276]; // 'No, I am not logged into my MEGA app';
     }
     else if (step === -1) {
+        this.lastStep = bkStep;
         question1 = escapeHTML(l[8990]);
         /* 'Due to our end-to-end encryption paradigm, you will not be able to '
             + 'access your data without either your password or a backup of your Recovery Key.';
@@ -211,13 +334,13 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         desc1 = escapeHTML(l[18277]).replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>')
             .replace(/\[br\/\]/g, '<br/>').replace(/\[br\]/g, '<br/>')
             .replace(/\[B2\]/g, '<span>').replace(/\[\/B2\]/g, '</span>');
-            /* 'You can park your exising account and start a fresh one under the same the same e-mail address.'
-            + '<br/>In the event that you recall your parked account password, please contact '
-            + 'support@mega.nz for recovery assistance.Your data will be retained for at least 60 days.<br/>'
-            + 'We recommend you check again to see if you have an active session(logged in) '
-            + 'or proceed with parking your account.'
-            + '<span>This will delete all your files, contacts and messages.</span>';
-            */
+        /* 'You can park your exising account and start a fresh one under the same the same e-mail address.'
+        + '<br/>In the event that you recall your parked account password, please contact '
+        + 'support@mega.nz for recovery assistance.Your data will be retained for at least 60 days.<br/>'
+        + 'We recommend you check again to see if you have an active session(logged in) '
+        + 'or proceed with parking your account.'
+        + '<span>This will delete all your files, contacts and messages.</span>';
+        */
         stepNb = escapeHTML(l[882]); // 'Warning';
         checkBx1 = '';
         checkBx2 = '';
@@ -225,6 +348,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         noAnswer = l[18279]; // 'No, I want to park my account';
     }
     else if (step === -2 && !branch) {
+        this.lastStep = bkStep;
         question1 = l[18281];
         desc1 = '';
         stepNb = l[18280]; // 'Success';
@@ -235,25 +359,50 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         this.prepareInstruction();
     }
     else if (step === -2 && branch === 1) {
+        this.lastStep = bkStep;
         question1 = escapeHTML(l[18281]); // 'You can easily change your password. Follow the steps below to see how';
         desc1 = escapeHTML(l[1939]);
-            /* 'Please enter your e-mail address below. You will receive a recovery link that will '
-            + 'allow you to submit your Recovery Key and reset your password.';
-            */
+        /* 'Please enter your e-mail address below. You will receive a recovery link that will '
+        + 'allow you to submit your Recovery Key and reset your password.';
+        */
         stepNb = escapeHTML(l[18280]); // 'Success';
         checkBx1 = '';
         checkBx2 = '';
         yesAnswer = l[1940]; // 'Send';
         noAnswer = '';
     }
-    //if (stepNb) {
     $('h3.main-italic-header', this.$leftContent).removeClass('hidden')
         .removeClass('warning').removeClass('success');
     $('.warning-icon + h3.main-italic-header', this.$leftContent).text(stepNb);
-    //}
-    //else {
-    //    $('h3.main-italic-header', this.$leftContent).addClass('hidden');
-    //}
+    $('.recover-account-email-block .error-message', this.$leftContent).addClass('hidden');
+    this.$navigationControl.removeClass('hidden');
+
+    window.scrollTo(0, 0);
+    if (step === 0) {
+        if (is_mobile) {
+            this.$navigationControl.find('.fm-icon.left').addClass('mega').removeClass('back')
+                .removeClass('non-responsive');
+            this.$leftSide.find('.recover-button.yes').addClass('red-button');
+        }
+        else {
+            this.$navigationControl.addClass('hidden');
+            this.$leftSide.find('.recover-button.yes').addClass('default-grey-button');
+        }
+    }
+    else {
+        if (is_mobile) {
+            this.$navigationControl.find('.fm-icon.left').addClass('back').removeClass('mega')
+                .addClass('non-responsive');
+            this.$leftSide.find('.recover-button.yes').removeClass('red-button');
+        }
+        else {
+            this.$leftSide.find('.recover-button.yes').removeClass('default-grey-button');
+        }
+    }
+
+
+    $('.nav-back-subheading', this.$leftContent).text('');
+
     if (step === -2) {
         $('h3.main-italic-header', this.$leftContent).addClass('hidden');
         $('h3.main-italic-header.main-header', this.$leftContent).removeClass('hidden');
@@ -291,6 +440,12 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         $('.checkbox-block ', this.$leftContent).removeClass('hidden');
 
         $('.button-container', this.$leftContent).addClass('hidden');
+        if (this.isBack) {
+            $('.checkdiv', this.$leftContent).removeClass('checkboxOff').addClass('checkboxOn');
+            $('.checkdiv .checkbox', this.$leftContent).removeClass('checkboxOff').addClass('checkboxOn');
+            this.checks = 2;
+            $('.button-container', self.$leftContent).removeClass('hidden');
+        }
     }
     else {
         $('.checkbox-block ', this.$leftContent).addClass('hidden');
@@ -304,24 +459,28 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
             $('.button-container', this.$leftContent).addClass('hidden');
         }
     }
+    this.isBack = false;
+    
 
     $('.content-highlight-block', this.$leftContent).addClass('hidden');
 
 
     $('.button-container .recover-button.yes', this.$leftContent).text(yesAnswer);
     $('.button-container .recover-button.no', this.$leftContent).text(noAnswer);
-    if (step >= 1) {
+    if (step >= 0) {
         $('.progress-point', this.$rightContent).addClass('hidden');
-        for (var points = 1; points <= step; points++) {
+        for (var points = 0; points <= step; points++) {
             $('.progress-point.step' + points, this.$rightContent).removeClass('hidden');
         }
-        //$('.progress-point.step1', this.$rightContent).removeClass('hidden');
         $('.progress-point.step' + step + ' .step-label', this.$rightContent).text(stepNb);
         $('.progress-point.step' + step + ' .step-answer', this.$rightContent).text('');
 
         $('.progress-point.inactive', this.$rightContent).removeClass('hidden');
         $('.progress-point.warning', this.$rightContent).addClass('hidden');
         $('.progress-point.success', this.$rightContent).addClass('hidden');
+        if (step === 0) {
+            $('.recover-account-email-block', this.$leftContent).removeClass('hidden');
+        }
     }
     else {
         $('.progress-point.inactive', this.$rightContent).addClass('hidden');
@@ -370,8 +529,8 @@ AccountRecoveryControl.prototype.prepareInstruction = function _prepareInstructi
         instructions += escapeHTML(l[18286]).replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>');
         instructions += '</li><li class="list-point" >';
         instructions += escapeHTML(l[18287]).replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>');
-        instructions += '</li><li class="list-point" >';
-        instructions += escapeHTML(l[18288]).replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>');
+        // instructions += '</li><li class="list-point" >';
+        // instructions += escapeHTML(l[18288]).replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>');
         instructions += '</li> <li class="list-point" >';
         instructions += escapeHTML(l[18289]).replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>');
         instructions += '</li><li class="list-point" >';
@@ -478,22 +637,30 @@ AccountRecoveryControl.prototype.startRecovery = function _startRecovery(email, 
     }
 };
 
-AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning() {
+AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(easyPark) {
     var $dialog = $('.fm-dialog.park-account-dialog');
     var self = this;
     self.checks2 = 0;
     $('.checkbox-block.park-account-checkbox .settings-row .checkdiv', $dialog)
-        .removeClass('checkboxOn').addClass('checkboxOff');
+        .removeClass('checkboxOn').addClass('checkboxOff').removeClass('hidden');
     $('.checkbox-block.park-account-checkbox .settings-row .checkdiv .checkbox', $dialog)
         .removeClass('checkboxOn').addClass('checkboxOff');
     $('.parkbtn', $dialog).addClass('disabled');
-    $('.login-register-input.email input', $dialog).val('');
+    $('.checkbox-block.park-account-checkbox', $dialog).removeClass('hidden');
+    var enteredEmail = $('.login-register-input.email input', self.$leftContent).val();
+    $('.login-register-input.email input', $dialog).val(enteredEmail);
     var warn2 = escapeHTML(l[18311]).replace(/\[B1\]/g, '<strong class="warning-text">')
         .replace(/\[\/B1\]/g, '</strong>');
     var warn1 = escapeHTML(l[18312]).replace(/\[B1\]/g, '<strong class="warning-text">')
         .replace(/\[\/B1\]/g, '</strong>');
     $('#warn2-check', $dialog).html(warn2);
     $('#warn1-check', $dialog).html(warn1);
+    $('.content-highlight.warning', $dialog).addClass('hidden');
+    if (easyPark) {
+        $('.checkbox-block.park-account-checkbox', $dialog).addClass('hidden');
+        $('.parkbtn', $dialog).removeClass('disabled');
+        $('.content-highlight.warning', $dialog).removeClass('hidden');
+    }
 
     var closeDialogLocal = function _closeDialog() {
         if (is_mobile) {
@@ -515,6 +682,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning() {
             $('.checkbox', checkB).addClass('checkboxOff');
             self.checks2--;
             $('.parkbtn', $dialog).addClass('disabled');
+            $('.content-highlight.warning', $dialog).addClass('hidden');
         }
         else {
             checkB.addClass('checkboxOn');
@@ -523,7 +691,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning() {
             $('.checkbox', checkB).removeClass('checkboxOff');
             if (++self.checks2 === 3) {
                 $('.parkbtn', $dialog).removeClass('disabled');
-
+                $('.content-highlight.warning', $dialog).removeClass('hidden');
             }
         }
     });
@@ -550,7 +718,6 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning() {
         });
     }
     $('.supportbtn', $dialog).rebind('click', function () {
-        //loadSubPage('contact');
         window.open("https://mega.nz/contact");
     });
 
@@ -560,7 +727,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning() {
         if (is_mobile) {
             $('.mobile.fm-dialog-container').removeClass('hidden');
         }
-        
+
         return $dialog;
     });
 };

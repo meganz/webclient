@@ -1458,7 +1458,7 @@ mega.megadrop = (function() {
                     .find('span').safeHTML(l[17408]);
                 uiOpts.dlg.widget.$.embedForm.removeClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.addClass('hidden');
-               $('.widget-dialog').addClass('centre');
+                $('.widget-dialog').addClass('centre');
             });
 
             // Widget dialog url tab

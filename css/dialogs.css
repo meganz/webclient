@@ -2602,11 +2602,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialogs-sprite_v14.svg);
+    background-image: url(../images/mega/dialog-sprite.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialogs-sprite_v14.svg);
+    background-image: url(../images/mega/dialog-sprite.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {

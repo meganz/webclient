@@ -2024,6 +2024,7 @@
     "17834": "Salvar como imagem",
     "17835": "Copiar link",
     "17836": "Ao ativar o c\u00f3digo QR, voc\u00ea pode compartilhar o seu c\u00f3digo exclusivo com outros usu\u00e1rios para que eles possam adicion\u00e1-lo como um contato, ou voc\u00ea pode adicionar outros usu\u00e1rios escaneando o c\u00f3digo deles.",
+    "17865": "O link do contato \u00e9 inv\u00e1lido. Por favor, tente novamente usando um link v\u00e1lido.",
     "17879": "%nbFo pastas com um total de %nbFi arquivos foram adicionadas ao gestor de transfer\u00eancias",
     "17880": "%nbFo pasta com um total de %nbFi arquivos foi adicionada ao gestor de transfer\u00eancias",
     "17881": "%nbFo pastas com um total de %nbFi arquivo foram adicionada ao gestor de transfer\u00eancias",
@@ -2105,6 +2106,7 @@
     "18316": "Digite a sua nova senha, confirme e toque em [B]OK[\/B].",
     "18347": "Selecione todas as op\u00e7\u00f5es para continuar",
     "18419": "Digite a sua nova senha, confirme-a e clique em [B]OK[\/B].",
+    "18420": "Infelizmente, a abertura de um link protegido por senha n\u00e3o \u00e9 suportada por este navegador. Por favor, acesse o link usando o Google Chrome ou o Mozilla Firefox.",
     "18421": "Declara\u00e7\u00e3o sobre o Regulamento Geral de Prote\u00e7\u00e3o de Dados",
     "18422": "Introdu\u00e7\u00e3o",
     "18423": "Em 2013, o MEGA foi pioneiro na criptografia de ponta a ponta controlada pelo usu\u00e1rio por meio de um navegador. Proporciona a mesma seguran\u00e7a de conhecimento zero o armazenamento em nuvem e chat, tanto usando um navegador, um aplicativo m\u00f3vel, um aplicativo de sincroniza\u00e7\u00e3o ou uma ferramenta de linha de comando. MEGA, The Privacy Company, proporciona [B]Privacidade por Design[\/B].",
@@ -2188,5 +2190,6 @@
     "18501": "Regulamento de prote\u00e7\u00e3o de dados",
     "18506": "Se for poss\u00edvel, indique o endere\u00e7o de email da sua conta. Se n\u00e3o conseguir lembrar, clique em Iniciar novamente para pular esta etapa.",
     "18507": "Endere\u00e7o de email",
-    "18508": "Por favor, digite o endere\u00e7o de email da conta que voc\u00ea quer recuperar. Se voc\u00ea n\u00e3o conseguir lembrar qual \u00e9, por favor, deixe o campo em branco."
+    "18508": "Por favor, digite o endere\u00e7o de email da conta que voc\u00ea quer recuperar. Se voc\u00ea n\u00e3o conseguir lembrar qual \u00e9, por favor, deixe o campo em branco.",
+    "18514": "This is your own contact link"
 }

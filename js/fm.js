@@ -1448,6 +1448,9 @@ function openContactInfoLink(contactLink) {
                 });
 
             }
+            else {
+                msgDialog('warningb', l[8531], l[17865]);
+            }
         }
     });
 }

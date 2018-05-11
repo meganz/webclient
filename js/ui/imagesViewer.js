@@ -728,12 +728,19 @@ var slideshowid;
         });
 
         var $dlBut = $overlay.find('.viewer-button.download');
-        $dlBut.rebind('click', function() {
+        $dlBut.rebind('click', function _dlButClick() {
             var n = M.d[slideshowid];
             var p = previews[n && n.h];
 
             if (p && p.full) {
-                M.saveAs(p.buffer, n.name);
+                M.saveAs(p.buffer, n.name)
+                    .fail(function(ex) {
+                        if (d) {
+                            console.debug(ex);
+                        }
+                        p.full = p.buffer = false;
+                        _dlButClick();
+                    });
                 return false;
             }
 

@@ -533,6 +533,39 @@ function init_page() {
         delete localStorage.beingAccountCancellation;
         return false;
     }
+    // Password protected link decryption dialog
+    if (page.substr(0, 2) === 'P!' && page.length > 2) {
+        // Check if TextEncoder function is available for the stringToByteArray function
+        if (window.TextEncoder) {
+            // Show the password overlay for mobile
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+                mobile.decryptionPasswordOverlay.show(page);
+            }
+            else {
+                // Otherwise insert background page, show the password
+                // decryption dialog and pass in the current URL hash
+                parsepage(pages['placeholder']);
+                exportPassword.decrypt.init(page);
+            }
+        }
+        else { // not supported browser, appologize from user
+            var msgToUser = l[18420];
+            if (u_type) {
+                mBroadcaster.once('boot_done', function () {
+                    setTimeout(
+                        msgDialog('info', 'Pwssword protected link not supported', // not visible
+                            msgToUser), 1000);
+                });
+                page = 'fm';
+            }
+            else {
+                msgDialog('info', 'Pwssword protected link not supported', // not visible
+                    msgToUser);
+                page = 'start';
+            }
+        }
+    }
 
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
@@ -544,20 +577,7 @@ function init_page() {
         init_blog();
     }
 
-    // Password protected link decryption dialog
-    else if (page.substr(0, 2) === 'P!' && page.length > 2) {
-
-        // Show the password overlay for mobile
-        if (is_mobile) {
-            parsepage(pages['mobile']);
-            mobile.decryptionPasswordOverlay.show(page);
-        }
-        else {
-            // Otherwise insert background page, show the password decryption dialog and pass in the current URL hash
-            parsepage(pages['placeholder']);
-            exportPassword.decrypt.init(page);
-        }
-    }
+    
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();

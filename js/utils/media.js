@@ -384,29 +384,34 @@ function FullScreenManager($button, $element) {
     var iid = makeUUID();
     var $document = $(document);
     var state = $document.fullScreen();
+    var goFullScreen = function() {
+        state = $document.fullScreen();
+
+        if (state) {
+            $document.fullScreen(false);
+        }
+        else {
+            $element.fullScreen(true);
+        }
+    };
 
     if (state === null) {
         // FullScreen is not supported
         $button.addClass('hidden');
     }
     else {
-        $button.removeClass('hidden')
-            .rebind('click.' + iid, function() {
-                state = $document.fullScreen();
-
-                if (state) {
-                    $document.fullScreen(false);
-                }
-                else {
-                    $element.fullScreen(true);
-                }
-            });
         $document.rebind('fullscreenchange.' + iid, function() {
             state = $document.fullScreen();
             for (var i = listeners.length; i--;) {
                 listeners[i](state);
             }
         });
+        this.enterFullscreen = function() {
+            if (!state) {
+                goFullScreen();
+            }
+        };
+        $button.removeClass('hidden').rebind('click.' + iid, goFullScreen);
     }
 
     Object.defineProperty(this, 'state', {
@@ -449,8 +454,11 @@ FullScreenManager.prototype.exitFullscreen = function() {
     this.$document.fullScreen(false);
 };
 
-Object.freeze(FullScreenManager.prototype);
-Object.freeze(FullScreenManager);
+// enter full screen
+FullScreenManager.prototype.enterFullscreen = function() {
+    'use strict';
+    /* noop */
+};
 
 // ---------------------------------------------------------------------------------------------------------------
 

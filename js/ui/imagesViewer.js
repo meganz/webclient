@@ -528,8 +528,6 @@ var slideshowid;
         var $controls = $overlay.find('.viewer-top-bl, .viewer-bottom-bl, .viewer-slideshow-controls');
         var $document = $(document);
 
-        $overlay.removeClass('fullscreen mouse-idle');
-
         if (d) {
             console.log('slideshow', id, close, slideshowid);
         }
@@ -540,7 +538,7 @@ var slideshowid;
             slideshowid = false;
             _hideCounter = false;
             slideshowplay = false;
-            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow').addClass('hidden');
+            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen').addClass('hidden');
             $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
             $(window).unbind('resize.imgResize');
             $document.unbind('keydown.slideshow mousemove.idle');

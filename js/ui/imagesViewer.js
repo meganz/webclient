@@ -729,7 +729,6 @@ var slideshowid;
 
         var $dlBut = $overlay.find('.viewer-button.download');
         $dlBut.rebind('click', function() {
-            var n = M.d[slideshowid];
             var p = previews[n && n.h];
 
             if (p && p.full) {

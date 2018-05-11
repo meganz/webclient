@@ -470,7 +470,7 @@ function init_page() {
 
     if ((page.substr(0, 1) !== '!')
         && (page.substr(0, 3) !== 'pro')
-        && (page.substr(0, 5) !== 'start')
+        && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
         && (page !== 'ios')
@@ -581,7 +581,7 @@ function init_page() {
         init_blog();
     }
 
-    
+
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();

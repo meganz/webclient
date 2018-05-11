@@ -2144,6 +2144,15 @@ Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
     if (self.chatdPersist && ChatdPersist.isMasterTab()) {
         promises.push(self.chatdPersist.clearChatHistoryForChat(chatIdEnc));
     }
+    else {
+        var chatRoom = self.megaChat.getChatById(chatIdEnc);
+        var messageKeys = chatRoom.messagesBuff.messages.keys();
+
+        for (var i = 0; i < messageKeys.length; i++) {
+            var v = chatRoom.messagesBuff.messages[messageKeys[i]];
+            chatRoom.messagesBuff.messages.removeByKey(v.messageId);
+        }
+    }
 
     MegaPromise.allDone(promises)
         .always(function() {

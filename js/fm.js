@@ -1410,11 +1410,12 @@ function openContactInfoLink(contactLink) {
         if (ctHandle === u_handle) {
             $('#qr-ctn-add', $dialog).addClass('disabled');
             $('#qr-ctn-add', $dialog).off('click');
+            $('.qr-ct-exist', $dialog).text(l[18514]).removeClass('hidden');
         }
         else if (M.u[ctHandle] && M.u[ctHandle]._data.c) {
             contactStatus = 2;
             $('#qr-ctn-add', $dialog).addClass('disabled');
-            $('.qr-ct-exist', $dialog).removeClass('hidden');
+            $('.qr-ct-exist', $dialog).text(l[17886]).removeClass('hidden');
             $('#qr-ctn-add', $dialog).off('click');
         }
         else {

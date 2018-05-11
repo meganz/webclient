@@ -341,12 +341,16 @@ function init_page() {
     var pageBeginLetters = page.substr(0, 2);
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
-        var ctLink = page.substring(2, page.length);
-        mBroadcaster.once('fm:initialized', function () {
-            openContactInfoLink(ctLink);
-        });
-
-        page = 'fm/contacts';
+        if (!is_mobile) {
+            var ctLink = page.substring(2, page.length);
+            mBroadcaster.once('fm:initialized', function () {
+                openContactInfoLink(ctLink);
+            });
+            page = 'fm/contacts';
+        }
+        else {
+            page = (u_type ? 'fm' : 'start');
+        }
     }
 
     if (pageBeginLetters === 'F!' && page.length > 2) {

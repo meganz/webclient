@@ -2219,10 +2219,10 @@
     "18466": "Rectification",
     "18467": "Individuals are entitled to have personal data rectified if it is inaccurate or incomplete. If MEGA has disclosed the personal data in question to any third party (such as a compliance authority), it will inform them of the rectification where possible and will also inform the individuals about the third parties to whom the data has been disclosed where appropriate. The only third parties that might have had disclosure are compliance authorities.",
     "18468": "Erasure",
-    "18469": "The right to erasure does not provide an absolute 'right to be forgotten'. Individuals have a right to havepersonal data erased and to prevent processing in specific circumstances:",
-    "18470": "Where the personal data is no longer necessary in relation to the purpose for which it was originally collected\/processed.",
-    "18471": "When the individual withdraws consent.",
-    "18472": "When the individual objects to the processing and there is no overriding legitimate interest for continuing the processing.",
+    "18469": "The right to erasure does not provide an absolute 'right to be forgotten'. Individuals have a right to have personal data erased and to prevent processing in specific circumstances:",
+    "18470": "The personal data is no longer necessary in relation to the purpose for which it was originally collected\/processed.",
+    "18471": "The individual withdraws consent.",
+    "18472": "The individual objects to the processing and there is no overriding legitimate interest for continuing the processing.",
     "18473": "The personal data was unlawfully processed (i.e. otherwise in breach of the GDPR).",
     "18474": "The personal data has to be erased in order to comply with a legal obligation.",
     "18475": "The personal data is processed in relation to the offer of information society services to a child.",
@@ -2254,5 +2254,9 @@
     "18501": "Data Protection Regulation",
     "18506": "If you are able to provide your account's email address, please do so. If you cannot remember it, please click Start again to skip this step.",
     "18507": "Email Address",
-    "18508": "Please enter the email address of the account you wish to recover. If you cannot remember it, please leave the field blank."
+    "18508": "Please enter the email address of the account you wish to recover. If you cannot remember it, please leave the field blank.",
+    "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
+    "18512": "Review Session History",
+    "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
+    "18514": "This is your own contact link"
 }

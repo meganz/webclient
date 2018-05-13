@@ -3119,7 +3119,6 @@ React.makeElement = React['createElement'];
 	    },
 	    render: function render() {
 	        if (this.props.active !== true) {
-
 	            return null;
 	        } else {
 	            var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
@@ -3146,8 +3145,12 @@ React.makeElement = React['createElement'];
 	                );
 	            } else if (this.props.dropdownItemGenerator) {
 	                child = this.props.dropdownItemGenerator(this);
-	            } else {
-	                child = null;
+	            }
+	            if (!child) {
+	                Soon(function () {
+	                    self.onActiveChange(false);
+	                });
+	                return null;
 	            }
 
 	            return React.makeElement(
@@ -10097,15 +10100,23 @@ React.makeElement = React['createElement'];
 	                                        }
 
 	                                        if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-	                                            dropdown = "<span>" + l[5533] + "</span>";
 	                                            dbfetch.get(v.h).always(function () {
 	                                                if (!M.d[v.h]) {
 	                                                    NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
 	                                                    Soon(function () {
-	                                                        self.safeForceUpdate();
+	                                                        dd.safeForceUpdate();
+	                                                    });
+	                                                } else {
+	                                                    Soon(function () {
+	                                                        dd.safeForceUpdate();
 	                                                    });
 	                                                }
 	                                            });
+	                                            return React.makeElement(
+	                                                'span',
+	                                                null,
+	                                                l[5533]
+	                                            );
 	                                        } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
 	                                            downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
 	                                                icon: 'rounded-grey-down-arrow',
@@ -10130,6 +10141,8 @@ React.makeElement = React['createElement'];
 	                                                    $.selected = [v.h];
 	                                                    openCopyDialog('conversations');
 	                                                } }));
+	                                        } else if (NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                            return null;
 	                                        }
 
 	                                        return React.makeElement(

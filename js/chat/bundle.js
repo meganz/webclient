@@ -8267,6 +8267,8 @@ React.makeElement = React['createElement'];
 	                }
 	            });
 	        }
+	        var placeholder = 'Write a message to %s...';
+	        placeholder = placeholder.replace("%s", room.getRoomTitle(false, true));
 
 	        return React.makeElement(
 	            "div",
@@ -8300,7 +8302,8 @@ React.makeElement = React['createElement'];
 	                        style: textareaScrollBlockStyles },
 	                    React.makeElement("textarea", {
 	                        className: messageTextAreaClasses,
-	                        placeholder: __(l[8009]),
+	                        placeholder: placeholder,
+	                        roomTitle: room.getRoomTitle(),
 	                        onKeyUp: self.onTypeAreaKeyUp,
 	                        onKeyDown: self.onTypeAreaKeyDown,
 	                        onBlur: self.onTypeAreaBlur,
@@ -11575,14 +11578,14 @@ React.makeElement = React['createElement'];
 	    return handlesWithoutMyself;
 	};
 
-	ChatRoom.prototype.getRoomTitle = function (ignoreTopic) {
+	ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
 	        return M.getNameByHandle(participants[0]) || "";
 	    } else {
 	        if (!ignoreTopic && self.topic && self.topic.substr) {
-	            return self.topic.substr(0, 30);
+	            return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
 	        }
 
 	        var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];

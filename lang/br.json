@@ -2254,5 +2254,9 @@
     "18501": "Regulamento de prote\u00e7\u00e3o de dados",
     "18506": "Se for poss\u00edvel, indique o endere\u00e7o de email da sua conta. Se n\u00e3o conseguir lembrar, clique em Iniciar novamente para pular esta etapa.",
     "18507": "Endere\u00e7o de email",
-    "18508": "Por favor, digite o endere\u00e7o de email da conta que voc\u00ea quer recuperar. Se voc\u00ea n\u00e3o conseguir lembrar qual \u00e9, por favor, deixe o campo em branco."
+    "18508": "Por favor, digite o endere\u00e7o de email da conta que voc\u00ea quer recuperar. Se voc\u00ea n\u00e3o conseguir lembrar qual \u00e9, por favor, deixe o campo em branco.",
+    "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
+    "18512": "Review Session History",
+    "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
+    "18514": "This is your own contact link"
 }

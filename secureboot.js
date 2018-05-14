@@ -595,8 +595,12 @@ if (!b_u && is_extension)
     }
     else /* Google Chrome */
     {
-        bootstaticpath = chrome.extension.getURL('mega/');
-        urlrootfile = 'mega/secure.html';
+        tmp = 'mega';
+        if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
+            tmp = localStorage.chromextdevpath || tmp;
+        }
+        bootstaticpath = chrome.extension.getURL(tmp + '/');
+        urlrootfile = tmp + '/secure.html';
     }
 
     Object.defineProperty(window, 'eval', {

@@ -278,17 +278,17 @@ function accountUI() {
         /* Used Storage progressbar */
         var percents = [
             100 * account.stats[M.RootID].bytes / account.space,
-            100 * account.stats[M.RubbishID].bytes / account.space,
+            100 * account.stats[M.InboxID].bytes / account.space,
             100 * account.stats.inshares.bytes / account.space,
-            100 * account.stats[M.InboxID].bytes / account.space
+            100 * account.stats[M.RubbishID].bytes / account.space
         ];
         for (var i = 0; i < 4; i++) {
             var $percBlock = $('.data-block.storage-data .account.pr-item.pr' + i);
             if (percents[i] > 0) {
-                $percBlock.removeClass('empty');
+                $percBlock.removeClass('empty hidden');
             }
             else {
-                $percBlock.addClass('empty');
+                $percBlock.addClass('empty hidden');
             }
         }
 

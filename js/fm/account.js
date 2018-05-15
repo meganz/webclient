@@ -544,7 +544,6 @@ function accountUI() {
 			msgDialog('confirmation', '', l[18513], false, function(e) {
                 if (e) {
                     loadingDialog.show();
-					var $this = $(this);
 					var $activeSessionsRows = $('.active-session-txt').parents('tr');
 					// Expire all sessions but not the current one
 					api_req({a: 'usr', ko: 1}, {
@@ -553,7 +552,7 @@ function accountUI() {
 							/* clear account cache */
 							$activeSessionsRows.find('.settings-logout').remove();
 							$activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
-							$this.hide();
+							$('.fm-close-all-sessions').hide();
 							loadingDialog.hide();
 						}
 					});

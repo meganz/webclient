@@ -698,6 +698,17 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd) {
     }
     return this.triggerSendIfAble();
 };
+/*
+ * Same as .cmd, but checks if the shard has a clientId assigned. It may be
+ * connected and fully operational for text chat, but not yet assigned a clientId,
+ * which is needed for webrtc
+ */
+Chatd.Shard.prototype.rtcmd = function(opCode, cmd) {
+    if (!this.clientId) {
+        return false;
+    }
+    return this.cmd(opCode, cmd);
+};
 
 Chatd.Shard.prototype.sendKeepAlive = function(forced) {
     var self = this;

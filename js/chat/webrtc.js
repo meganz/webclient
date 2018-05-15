@@ -312,7 +312,7 @@ RtcModule.prototype.cmdEndpoint = function(type, info, payload) {
     if (payload) {
         data += payload;
     }
-    if (!info.shard.cmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
+    if (!info.shard.rtcmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
         throw new Error("cmdEndpoint: Send error trying to send command " + constStateToText(RTCMD, type));
     }
 };
@@ -330,7 +330,7 @@ RtcModule.prototype.cmdBroadcast = function(op, chatid, payload) {
         self.logger.error("cmdBroadcast: No shard for chatid", base64urlencode(chatid));
         return;
     }
-    if (!shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
+    if (!shard.rtcmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
         throw new Error("cmdEndpoint: Send error trying to send command " + constStateToText(RTCMD, op));
     } else {
         return true;
@@ -787,7 +787,7 @@ Call.prototype._bcastCallData = function(ringing) {
     Chatd.pack16le(10) + self.id +
     String.fromCharCode(ringing?1:0) +
     String.fromCharCode(self._callInitiateAvFlags);
-    if (!self.shard.cmd(Chatd.Opcode.CALLDATA, cmd)) {
+    if (!self.shard.rtcmd(Chatd.Opcode.CALLDATA, cmd)) {
         setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
         return false;
     }
@@ -944,7 +944,7 @@ Call.prototype.cmdBroadcast = function(type, payload) {
     if (payload) {
         data += payload;
     }
-    if (!self.shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
+    if (!self.shard.rtcmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
         setTimeout(function() { self._destroy(Term.kErrNetSignalling, false); }, 0);
         return false;
     }
@@ -976,7 +976,7 @@ Call.prototype._broadcastCallReq = function() {
 Call.prototype._startIncallPingTimer = function() {
     var self = this;
     self._inCallPingTimer = setInterval(function() {
-        if (!self.shard.cmd(Chatd.Opcode.INCALL, self.chatid + self.manager.chatd.userId + self.shard.clientId)) {
+        if (!self.shard.rtcmd(Chatd.Opcode.INCALL, self.chatid + self.manager.chatd.userId + self.shard.clientId)) {
             self._destroy(Term.kErrNetSignalling, true);
         }
     }, RtcModule.kIncallPingInterval);
@@ -988,7 +988,7 @@ Call.prototype._stopIncallPingTimer = function() {
         clearInterval(self._inCallPingTimer);
         delete self._inCallPingTimer;
     }
-    self.shard.cmd(Chatd.Opcode.ENDCALL, self.chatid + self.manager.chatd.userId + self.shard.clientId);
+    self.shard.rtcmd(Chatd.Opcode.ENDCALL, self.chatid + self.manager.chatd.userId + self.shard.clientId);
 };
 
 Call.prototype._removeSession = function(sess, reason) {
@@ -1110,7 +1110,7 @@ Call.prototype._cmd = function(cmd, userid, clientid, data) {
     if (data) {
         payload += data;
     }
-    return this.shard.cmd(opcode, payload);
+    return this.shard.rtcmd(opcode, payload);
 };
 
 Call.prototype._join = function(userid) {
@@ -1130,7 +1130,7 @@ Call.prototype._join = function(userid) {
     var data = self.chatid + userid + '\0\0\0\0' + Chatd.pack16le(17) +
         String.fromCharCode(RTCMD.JOIN) + self.id + self.manager.ownAnonId;
     self._setState(CallState.kJoining);
-    if (!self.shard.cmd(opcode, data)) {
+    if (!self.shard.rtcmd(opcode, data)) {
         setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
         return false;
     }
@@ -1154,7 +1154,7 @@ Call.prototype.rejoinPeer = function(userid, clientid) {
     var data = self.chatid + userid + clientid +
         Chatd.pack16le(17) + String.fromCharCode(RTCMD.JOIN) +
         self.id + self.manager.ownAnonId;
-    if (!self.shard.cmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
+    if (!self.shard.rtcmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
         setTimeout(function() {
             self._destroy(Term.kErrNetSignalling, true);
         }, 0);
@@ -1701,7 +1701,7 @@ Session.prototype.cmd = function(op, data) {
     if (data) {
         payload += data;
     }
-    if (!self.call.shard.cmd(Chatd.Opcode.RTMSG_ENDPOINT,
+    if (!self.call.shard.rtcmd(Chatd.Opcode.RTMSG_ENDPOINT,
         self.call.chatid + self.peer + self.peerClient +
         Chatd.pack16le(payload.length) + payload)) {
         if (self.state < SessState.kTerminating) {

@@ -581,7 +581,7 @@ function init_page() {
         init_blog();
     }
 
-    
+
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();
@@ -2028,6 +2028,7 @@ function topmenuUI() {
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'wp', 'start'
             ];
+            var moveTo = {'account': 'fm/account'};
 
             for (var i = subPages.length; i--;) {
                 if (className.indexOf(subPages[i]) > -1) {
@@ -2043,7 +2044,7 @@ function topmenuUI() {
                 mobile.loadCloudDrivePage();
             }
             else if (subpage) {
-                loadSubPage(subpage);
+                loadSubPage(moveTo[subpage] || subpage);
             }
             else if (className.indexOf('feedback') > -1) {
                 // Show the Feedback dialog

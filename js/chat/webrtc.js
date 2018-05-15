@@ -976,7 +976,7 @@ Call.prototype._broadcastCallReq = function() {
 Call.prototype._startIncallPingTimer = function() {
     var self = this;
     self._inCallPingTimer = setInterval(function() {
-        if (!self.shard.rtcmd(Chatd.Opcode.INCALL, self.chatid + self.manager.chatd.userId + self.shard.clientId)) {
+        if (!self.shard.rtcmd(Chatd.Opcode.INCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0')) {
             self._destroy(Term.kErrNetSignalling, true);
         }
     }, RtcModule.kIncallPingInterval);
@@ -988,7 +988,7 @@ Call.prototype._stopIncallPingTimer = function() {
         clearInterval(self._inCallPingTimer);
         delete self._inCallPingTimer;
     }
-    self.shard.rtcmd(Chatd.Opcode.ENDCALL, self.chatid + self.manager.chatd.userId + self.shard.clientId);
+    self.shard.rtcmd(Chatd.Opcode.ENDCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0');
 };
 
 Call.prototype._removeSession = function(sess, reason) {

@@ -429,7 +429,7 @@
             var o = document.getElementById(i ? 'fileselect' + i : 'start-upload');
             if (o) {
                 o.addEventListener("change", FileSelectHandler, false);
-                if (!is_mobile) {
+                if (!is_mobile && i) {
                     o.addEventListener("click", FileSelectHandlerMegaSyncClick, true);
                     o.addEventListener("mouseover", FileSelectHandlerMegaSyncMouse, true);
                 }

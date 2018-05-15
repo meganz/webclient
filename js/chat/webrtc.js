@@ -642,32 +642,36 @@ Call.prototype.msgCallTerminate = function(packet) {
         self.logger.error("Ignoring CALL_TERMINATE without reason code");
         return;
     }
+    if (self.isGroup) {
+        self.logger.warn("Ignoring CALL_TERMINATE in a group call");
+        return;
+    }
     var code = packet.data.charCodeAt(0);
     var sessions = self.sessions;
     var ci = self._callerInfo;
-    var isCallParticipant = false;
+    var isParticipant = false;
     if (Object.keys(sessions).length) { // Call is in progress, look in sessions
         for (var sid in sessions) {
             var sess = sessions[sid];
             if (sess.peer === packet.fromUser && sess.peerClient === packet.fromClient) {
-                isCallParticipant = true;
+                isParticipant = true;
                 break;
             }
         }
     } else if (self.state <= CallState.kJoining
         && ci
         && ci.fromUser === packet.fromUser
-        && ci.fromClient === packet.fromClient) { // call is in setup phase, only call initiator can abort it
-            isCallParticipant = true;
+        && ci.fromClient === packet.fromClient) { // Caller terminates, in the call setup phase
+            isParticipant = true;
     } else {
-        var retry = self.sessRetries[ci.fromUser + ci.fromClient];
+        var retry = self.sessRetries[packet.fromUser + packet.fromClient];
         if (retry && (Date.now() - retry.active <= RtcModule.kSessSetupTimeout)) {
             // no session to this peer at the moment, but we are in the process of reconnecting to them
-            isCallParticipant = true;
+            isParticipant = true;
         }
     }
 
-    if (!isCallParticipant) {
+    if (!isParticipant) {
         self.logger.warn("Received CALL_TERMINATE from a client that is not in the call, ignoring");
         return;
     }
@@ -2175,8 +2179,10 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
                     return UICallTerm.MISSED;
                 case CallState.kReqSent:
                     return UICallTerm.ABORTED;
-                default:
+                case CallState.kInProgress:
                     return UICallTerm.ENDED;
+                default:
+                    return UICallTerm.FAILED;
             }
             break; // just in case
         case Term.kCallRejected:
@@ -2193,7 +2199,9 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             assert(!isIncoming);
             return UICallTerm.REJECTED;
         case Term.kAppTerminating:
-            return UICallTerm.ENDED;
+            return (self.predestroyState === CallState.kInProgress)
+                ? UICallTerm.ENDED
+                : UICallTerm.FAILED;
         default:
             var name = constStateToText(Term, terminationCode);
             if (RtcModule.termCodeIsError(terminationCode)) {

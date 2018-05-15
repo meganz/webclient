@@ -102,6 +102,9 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
+        if ($.dialog === 'pro-login-dialog') {
+            return false;
+        }
         closeDialog(ev);
         $.hideContextMenu();
 

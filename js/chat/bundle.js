@@ -10166,7 +10166,7 @@ React.makeElement = React['createElement'];
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                        onClick: self._startDownload.bind(self, v) }),
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[1988]),
-	                                        onClick: self._addToCloudDrive.bind(self, v) }),
+	                                        onClick: self._addToCloudDrive.bind(self, v, false) }),
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'conversations', label: __(l[17764]),
 	                                        onClick: self._addToCloudDrive.bind(self, v, true) })
 	                                )

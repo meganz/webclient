@@ -702,7 +702,8 @@
                     props.size = bytesToSize(aNode.s);
 
                     if (aNode.fa && aNode.fa.indexOf(':8*') > 0) {
-                        props.playtime = MediaAttribute(aNode).data.playtime;
+                        Object.assign(props, MediaAttribute(aNode).data);
+                        props.codecs = MediaAttribute.getCodecStrings(aNode);
                     }
                 }
                 props.name = aNode.name;
@@ -869,14 +870,28 @@
              */
             'cloud-drive': function(aNode, aProperties, aTemplate) {
                 var tmp;
+                var title = [];
 
                 if (aNode.fav && !folderlink) {
                     var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
                     aTemplate.querySelector(selector).classList.add('star');
                 }
+
                 if (!aNode.t && aNode.tvf) {
                     aTemplate.classList.add('versioning');
                 }
+
+                if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime) {
+                    if (aProperties.width) {
+                        title.push(aProperties.width + 'x' + aProperties.height + ' @' + aProperties.fps + 'fps');
+                    }
+                    if (aProperties.codecs) {
+                        title.push(aProperties.codecs.join('/'));
+                    }
+                    title.push(aProperties.name);
+                }
+                title = title.join(' ');
+
                 if (this.viewmode) {
                     tmp = aTemplate.querySelector('.block-view-file-type');
 
@@ -891,6 +906,9 @@
                     }
 
                     aTemplate.querySelector('.file-block-title').textContent = aProperties.name;
+                    if (title) {
+                        aTemplate.setAttribute('title', title);
+                    }
                 }
                 else {
                     if (aProperties.linked) {
@@ -902,7 +920,12 @@
                     }
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;
-                    aTemplate.querySelector('.tranfer-filetype-txt').textContent = aProperties.name;
+
+                    tmp = aTemplate.querySelector('.tranfer-filetype-txt');
+                    tmp.textContent = aProperties.name;
+                    if (title) {
+                        tmp.setAttribute('title', title);
+                    }
 
                     tmp = aTemplate.querySelector('.transfer-filetype-icon');
                     tmp.classList.add(aProperties.icon);

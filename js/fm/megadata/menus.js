@@ -490,12 +490,14 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                         $menuCMI.filter('.download-item').hide();
                         $menuCMI.filter('.rename-item').hide();
                         $menuCMI.filter('.copy-item').hide();
+                        $menuCMI.filter('.move-item').hide();
                         $menuCMI.filter('.getlink-item').hide();
                         $menuCMI.filter('.embedcode-item').hide();
                         $menuCMI.filter('.colour-label-items').hide();
                     }
                     else if (M.getNodeShare(id).down === 1) {
                         $menuCMI.filter('.copy-item').hide();
+                        $menuCMI.filter('.move-item').hide();
                     }
                     else if (items['.getlink-item']) {
                         onIdle(M.setContextMenuGetLinkText.bind(M));

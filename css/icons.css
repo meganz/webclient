@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v1.png);
+    background-image: url(../images/mega/new-chat-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v1.png);
+    background-image: url(../images/mega/new-chat-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -252,6 +252,30 @@
     background-position: -43px -3829px;
 }
 
+/* Icons for archived chat */
+.small-icon.archive {
+    background-position: -54px -262px;
+}
+.small-icon.archive.white {
+    background-position: -104px -262px;
+}
+.small-icon.unarchive {
+    background-position: -154px -262px;
+}
+.small-icon.person {
+    background-position: -54px -292px;
+}
+.small-icon.person.white {
+    background-position: -104px -292px;
+}
+.small-icon.tiny-down-arrow {
+    background-position: -154px -292px;
+}
+.small-icon.tiny-down-arrow.flipped {
+    background-position: -204px -292px;
+}
+/*  end of Icons for chat archived */
+
 .dropdown-item .small-icon.rounded-grey-plus {
     background-position: -3px -3131px;
 }
@@ -368,7 +392,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v1.png);
+    background-image: url(../images/mega/new-chat-sprite_v2.png);
     background-repeat: no-repeat;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;

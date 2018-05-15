@@ -1,5 +1,15 @@
 var date_months = [];
 
+var locale = "en";
+
+var remappedLangLocales = {
+    "cn": "zh-Hans",
+    "ct": "zh-Hant",
+    "kr": "ko",
+    "jp": "ja",
+    "tl": "fil"
+};
+
 if (typeof l === 'undefined') {
     l = [];
 }
@@ -617,4 +627,11 @@ mBroadcaster.once('startMega', function populate_l() {
         l[408], l[409], l[410], l[411], l[412], l[413],
         l[414], l[415], l[416], l[417], l[418], l[419]
     ].map(escapeHTML);
+
+    // Set the Locale based the language that is selected. (Required for accurate string comparisons).
+    // If the locale has been remapped, apply the remap.
+    locale = lang;
+    if (remappedLangLocales.hasOwnProperty(locale)) {
+        locale = remappedLangLocales[locale];
+    }
 });

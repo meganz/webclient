@@ -13,11 +13,15 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         var roomOrUserHash = id.replace("chat/", "");
 
         var roomType = false;
-
-        if (roomOrUserHash.substr(0, 2) === "g/") {
+        megaChat.displayArchivedChats = false;
+        if (roomOrUserHash === "archived") {
+            roomType = "archived";
+            megaChat.displayArchivedChats = true;
+        }
+        else if (roomOrUserHash.substr(0, 2) === "g/") {
             roomType = "group";
             roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
-
+            megaChat.displayArchivedChats = false;
             if (!megaChat.chats[roomOrUserHash]) {
                 // chat not found
                 // is it still loading?
@@ -39,6 +43,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
         }
         else {
+            megaChat.displayArchivedChats = false;
             if (!M.u[roomOrUserHash]) {
                 setTimeout(function () {
                     loadSubPage('fm/chat');
@@ -61,9 +66,10 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
         $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
 
-
-        $('.fm-right-files-block[data-reactid]').removeClass('hidden');
-        $('.fm-right-files-block:not([data-reactid])').addClass('hidden');
+        if (roomType !== "archived") {
+            $('.fm-right-files-block[data-reactid]').removeClass('hidden');
+            $('.fm-right-files-block:not([data-reactid])').addClass('hidden');
+        }
 
         megaChat.refreshConversations();
 
@@ -91,7 +97,18 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
         }
         else if(roomType === "group") {
+            if (megaChat.chats[roomOrUserHash].isArchived()) {
+                megaChat.chats[roomOrUserHash].showArchived = true;
+            }
             megaChat.chats[roomOrUserHash].show();
+        }
+        else if(roomType === "archived") {
+            megaChat.hideAllChats();
+            M.onSectionUIOpen('conversations');
+            $('.archived-chat-view').removeClass('hidden');
+            if (megaChat.$conversationsAppInstance) {
+                megaChat.$conversationsAppInstance.safeForceUpdate();
+            }
         }
         else {
             console.error("Unknown room type.");
@@ -131,6 +148,7 @@ var Chat = function() {
     this.chats = new MegaDataMap();
     this.currentlyOpenedChat = null;
     this.lastOpenedChat = null;
+    this.archivedChatsCount = 0;
     this._myPresence = localStorage.megaChatPresence;
 
     this.options = {
@@ -872,8 +890,13 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         // wait for it to load
         ChatdIntegration._loadingChats[roomId].loadingPromise
             .done(function() {
+
                 // already initialized ? other mcc action packet triggered init with the latest data for that chat?
                 if (self.chats[roomId]) {
+                    if ((self.chats[roomId].isArchived())
+                        && (roomId === megaChat.currentlyOpenedChat)) {
+                        self.chats[roomId].showArchived = true;
+                    }
                     return;
                 }
                 var res = self.openChat(
@@ -1132,7 +1155,6 @@ Chat.prototype.getChatNum = function(idx) {
 Chat.prototype.renderListing = function() {
     var self = this;
 
-
     self.hideAllChats();
 
     M.hideEmptyGrids();
@@ -1152,7 +1174,6 @@ Chat.prototype.renderListing = function() {
 
     M.onSectionUIOpen('conversations');
 
-
     if (Object.keys(self.chats).length === 0 || Object.keys(ChatdIntegration._loadingChats).length !== 0) {
         $('.fm-empty-conversations').removeClass('hidden');
     }
@@ -1162,7 +1183,8 @@ Chat.prototype.renderListing = function() {
         if (
             self.lastOpenedChat &&
             self.chats[self.lastOpenedChat] &&
-            self.chats[self.lastOpenedChat]._leaving !== true
+            self.chats[self.lastOpenedChat]._leaving !== true &&
+            self.chats[self.lastOpenedChat].isDisplayable()
         ) {
             // have last opened chat, which is active
             self.chats[self.lastOpenedChat].setActive();
@@ -1191,14 +1213,23 @@ Chat.prototype.showLastActive = function() {
         var sortedConversations = obj_values(self.chats.toJS());
 
         sortedConversations.sort(M.sortObjFn("lastActivity", -1));
-
-        var room = sortedConversations[0];
-        if (!room.isActive()) {
-            room.setActive();
-            room.show();
+        var index = 0;
+        // find next active chat , it means a chat which is active or archived chat opened in the active chat list.
+        while ((index < sortedConversations.length) &&
+               (!sortedConversations[index].isDisplayable())) {
+                index++;
         }
-
-        return room;
+        if (index < sortedConversations.length) {
+            var room = sortedConversations[index];
+            if (!room.isActive()) {
+                room.setActive();
+                room.show();
+            }
+            return room;
+        }
+        else {
+            return false;
+        }
     }
     else {
         return false;

@@ -2343,7 +2343,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         }
 
         $firstChildTd.each(function(i, e) {
-            headerColumn = $('.grid-table-header th').get(i);
+            headerColumn = $('.files-grid-view.fm .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
     };
@@ -3199,7 +3199,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         }
     }
 
-    if (id !== 'conversations') {
+    if (id !== 'conversations' || id !== "archivedchats") {
         $('.fm-right-header').removeClass('hidden');
         $('.fm-chat-block').addClass('hidden');
         $('.section.conversations').addClass('hidden');

@@ -149,7 +149,7 @@ var ContactCard = React.createClass({
     getDefaultProps: function() {
         return {
             'dropdownButtonClasses': "default-white-button tiny-button",
-            'dropdownIconClasses': "tiny-icon grey-down-arrow"
+            'dropdownIconClasses': "tiny-icon icons-sprite grey-dots"
         }
     },
     specificShouldComponentUpdate: function(nextProps, nextState) {
@@ -300,7 +300,6 @@ var ContactCard = React.createClass({
                     }}
                     style={self.props.style}
                     >
-                <ContactPresence contact={contact} className={this.props.presenceClassName}/>
                 <Avatar contact={contact} className="small-rounded-avatar" />
 
                 {contextMenu}
@@ -309,6 +308,7 @@ var ContactCard = React.createClass({
                     <div className="user-card-name light">
                         {this.props.namePrefix ? this.props.namePrefix : null}{M.getNameByHandle(contact.u)}
                     </div>
+                    <ContactPresence contact={contact} className={this.props.presenceClassName}/>
                     <div className="user-card-email">{contact.m}</div>
                 </div>
             </div>;

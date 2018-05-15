@@ -1168,6 +1168,69 @@ scparser.$add('mcc', function(a) {
     }
 });
 
+scparser.$add('mcfc', function(a) {
+    // MEGAchat archive/unarchive
+    var cachemcfc = function (a) {
+        if (!loadfm.chatmcfc) {
+            loadfm.chatmcfc = {};
+        }
+        loadfm.chatmcfc[a.id] = a.f;
+    };
+
+    if (typeof megaChat !== "undefined") {
+        var room = megaChat.getChatById(a.id);
+        if (room) {
+
+            room.flags = a.f;
+            room.archivedSelected = false;
+            if (room.isArchived()) {
+                megaChat.archivedChatsCount++;
+                room.showArchived = false;
+            }
+            else {
+                megaChat.archivedChatsCount--;
+            }
+            if (megaChat.currentlyOpenedChat &&
+                megaChat.chats[megaChat.currentlyOpenedChat] &&
+                megaChat.chats[megaChat.currentlyOpenedChat].chatId === room.chatId) {
+                loadSubPage('fm/chat/');
+            }
+            else {
+                megaChat.refreshConversations();
+            }
+
+            if (megaChat.$conversationsAppInstance) {
+                megaChat.$conversationsAppInstance.safeForceUpdate();
+            }
+            if (fmdb) {
+                var users = [];
+                Object.keys(room.members).forEach(function(user_handle) {
+                    users.push({
+                        u: user_handle,
+                        p: room.members[user_handle]
+                    });
+                });
+                var roomInfo = {
+                    'id': room.chatId,
+                    'cs': room.chatShard,
+                    'g': (room.type === "group") ? 1 : 0,
+                    'u': users,
+                    'ts': room.ctime,
+                    'f': room.flags
+                };
+                fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
+            }
+        }
+        else {
+            cachemcfc(a);
+        }
+    }
+    // if megaChat is not created yet.
+    else {
+        cachemcfc(a);
+    }
+});
+
 scparser.$add('_sn', function(a) {
     // sn update?
     if (d) {
@@ -2846,9 +2909,19 @@ function processMCF(mcfResponse, ignoreDB) {
     // reopen chats from the MCF response.
     if (typeof mcfResponse !== 'undefined' && typeof mcfResponse.length !== 'undefined' && mcfResponse.forEach) {
         mcfResponse.forEach(function (chatRoomInfo) {
-            if (chatRoomInfo.active === 0) {
+            if (chatRoomInfo.active && chatRoomInfo.active === 0) {
                 // skip non active chats for now...
                 return;
+            }
+
+            if (chatRoomInfo.n) {
+                for (var i=0;i < chatRoomInfo.n.length; i++) {
+                    var member = chatRoomInfo.n[i];
+                    // was removed from the chat.
+                    if (member.u === u_handle && member.p === -1) {
+                        return;
+                    }
+                }
             }
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
@@ -2982,6 +3055,15 @@ function loadfm_callback(res) {
     if (res.mcf) {
         // save the response to be processed later once chat files were loaded
         loadfm.chatmcf = res.mcf.c || res.mcf;
+        // cf will include the flags (like whether it is archived) and chatid,
+        // so it needs to combine it before processing it.
+        if (res.mcf.cf) {
+            for (var i = 0; i < res.mcf.cf.length; i++) {
+                if (res.mcf.cf[i].id === loadfm.chatmcf[i].id) {
+                    loadfm.chatmcf[i].f = res.mcf.cf[i].f;
+                }
+            }
+        }
         // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
         processMCF(loadfm.chatmcf);
     }

@@ -4128,6 +4128,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-image: url(../images/mega/grid-bg2.svg);
     background-position: left top;
 }
+.grid-scrolling-table.archive-chat-list .jspPane {
+    background-image: initial;
+}
 .files-grid-view.fm .grid-scrolling-table, .files-grid-view.fm .grid-scrolling-table .jspPane, .transfer-scrolling-table, .transfer-scrolling-table .jspPane {
     background-image: url(../images/mega/grid-bg.svg);
 }
@@ -5612,7 +5615,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -khtml-opacity: 1;
     opacity: 1;
 }
-.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper {
+.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper, .files-grid-view.archived-chat-view {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -5623,6 +5626,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     position: relative;
     top: -1px;
     overflow: hidden;
+}
+.files-grid-view.archived-chat-view {
+    height: -webkit-calc(100% );
+    height: -moz-calc(100%);
+    height: calc(100%);
 }
 .files-grid-view.contact-details-view {
     height: 100%;
@@ -6278,6 +6286,12 @@ table {
     height: -webkit-calc(100% - 23px);
     height: -moz-calc(100% - 23px);
     height: calc(100% - 23px);
+}
+.archived-chats .grid-scrolling-table {
+    height: 100%;
+    height: -webkit-calc(100% - 36px);
+    height: -moz-calc(100% - 36px);
+    height: calc(100% - 36px);
 }
 .transfer-scrolling-table {
     /* do not remove, needed for perfect-scrollbar */
@@ -10509,6 +10523,9 @@ table {
     position: relative;
     font-size: 0;
     white-space: nowrap;
+}
+.conversations .grid-table-header th {
+    margin-top: 12px;
 }
 .transfer-table-header th:first-child span {
     display: block;
@@ -18874,7 +18891,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     background-color: white;
     color: #ff4444;
     font-size: 14px;
-    line-height: 28px;
+    line-height: 31px;
     text-align: center;
     text-transform: uppercase;
     -moz-box-sizing: border-box;
@@ -18941,7 +18958,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .fm-dialog.payment-address-dialog {
     border: 0 none;
     border-radius: 6px;
-    margin: -272px 0 0 -311px;
+    margin: -325px 0px 0px -311px;
     width: 622px;
 }
 .payment-address-dialog-body {
@@ -18957,13 +18974,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     float: left;
     padding: 6px 0 0 15px;
 }
+.payment-address-dialog .payment-form-header {
+    margin-top: 20px;
+}
 .payment-address-dialog .payment-plan-title, .payment-address-dialog .payment-plan-price {
     font-size: 36px;
     line-height: 38px;
     font-family: 'source_sans_prolight', Arial;
 }
 .payment-address-dialog .payment-icons {
-    position: absolute;
+    float: right;
     right: -5px;
     top: -10px;
 }
@@ -18984,14 +19004,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     float: left;
-    margin: 26px 0 0;
     padding: 0 7px 0 0;
     width: 50%;
 }
 .payment-address-dialog .payment-half-block.second {
     border: 0 none;
-    margin: 26px -2px 0;
-    padding: 15px 0 0 7px;
+    margin: 0px -2px 0;
+    padding: 0 0 0 7px;
     position: relative;
 }
 .payment-address-dialog .payment-note-first {
@@ -19011,22 +19030,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     font-weight: normal;
 }
 .payment-address-dialog .payment-note-second {
-    bottom: -90px;
+    bottom: -64px;
     color: #fff;
     font-size: 14px;
-    left: 30px;
-    line-height: 28px;
+    line-height: 21px;
     position: absolute;
     text-align: center;
+    left: 0;
+    right: 0;
 }
 .payment-address-dialog .payment-note-second a {
     color: #fff;
     text-decoration: underline;
 }
 .payment-address-dialog .payment-form-title {
+    float: left;
     color: #3d3d3d;
     font-family: 'source_sans_prosemibold', Arial;
     font-size: 12px;
+    vert-align: middle;
+    line-height: 28px;
 }
 /* Styling for jQueryUI selectmenu in use with address dialog */
 .ui-selectmenu-button {
@@ -19037,9 +19060,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     float: none;
 }
 #address-dialog-countries-button {
-    display: inline-block;
-    float: left;
-    width: 162px;
+    display: block;
+    float: none;
+    width: 100%;
 }
 .ui-selectmenu-button.ui-selectmenu-disabled {
     cursor: initial;
@@ -19134,9 +19157,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .payment-address-dialog .fm-account-input input {
     color: #848484;
 }
-.payment-address-dialog .fm-account-input.code {
-    margin-left: 175px;
-}
 .payment-address-dialog .default-select.error {
     border: 1px solid #ff4444;
     box-shadow: none;
@@ -19222,6 +19242,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .payment-address-dialog .error-message {
     color: #ff4444;
     margin-top: 5px;
+    margin-bottom: 10px;
     text-align: center;
 }
 .payment-address-dialog .error-message.hidden {
@@ -21560,7 +21581,7 @@ body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
     cursor: ew-resize;
     position: absolute;
     width: 4px;
-    z-index: 10;
+    z-index: 999;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -21599,7 +21620,7 @@ body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/new-chat-sprite_v1.png);
+    background-image: url(../images/mega/new-chat-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -7px -1353px;
     -webkit-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);

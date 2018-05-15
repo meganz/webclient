@@ -114,7 +114,7 @@ var ConversationRightArea = React.createClass({
                 <i className="small-icon video-call"></i>
                 {__(l[5897])}
             </div>;
-
+        var AVseperator = <div className="chat-button-seperator"></div>;
         var endCallButton =
                     <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
                         if (contact.presence && contact.presence !== "offline") {
@@ -201,43 +201,43 @@ var ConversationRightArea = React.createClass({
                         members={room.members}
                         isCurrentlyActive={room.isCurrentlyActive}
                     />
-
+                    <ButtonsUI.Button
+                        className="add-chat-contact"
+                        label={__(l[19083])}
+                        contacts={this.props.contacts}
+                        disabled={
+                            /* Disable in case I don't have any more contacts to add ... */
+                            !(
+                                !self.allContactsInChat(excludedParticipants) &&
+                                !room.isReadOnly() &&
+                                room.iAmOperator()
+                            )
+                        }
+                        >
+                        <DropdownsUI.DropdownContactsSelector
+                            contacts={this.props.contacts}
+                            megaChat={this.props.megaChat}
+                            chatRoom={room}
+                            exclude={
+                                excludedParticipants
+                            }
+                            multiple={true}
+                            className="popup add-participant-selector"
+                            singleSelectedButtonLabel={__(l[8869])}
+                            multipleSelectedButtonLabel={__(l[8869])}
+                            nothingSelectedButtonLabel={__(l[8870])}
+                            onSelectDone={this.props.onAddParticipantSelected}
+                            positionMy="center top"
+                            positionAt="left bottom"
+                            />
+                    </ButtonsUI.Button>
                     <div className="buttons-block">
+                        <div className="chat-right-head-txt">
+                            Options
+                        </div>
                         {room.type !== "group" ? startAudioCallButton : null}
                         {room.type !== "group" ? startVideoCallButton : null}
-
-                        <ButtonsUI.Button
-                            className="link-button dropdown-element"
-                            icon="rounded-grey-plus"
-                            label={__(l[8007])}
-                            contacts={this.props.contacts}
-                            disabled={
-                                /* Disable in case I don't have any more contacts to add ... */
-                                !(
-                                    !self.allContactsInChat(excludedParticipants) &&
-                                    !room.isReadOnly() &&
-                                    room.iAmOperator()
-                                )
-                            }
-                            >
-                            <DropdownsUI.DropdownContactsSelector
-                                contacts={this.props.contacts}
-                                megaChat={this.props.megaChat}
-                                chatRoom={room}
-                                exclude={
-                                    excludedParticipants
-                                }
-                                multiple={true}
-                                className="popup add-participant-selector"
-                                singleSelectedButtonLabel={__(l[8869])}
-                                multipleSelectedButtonLabel={__(l[8869])}
-                                nothingSelectedButtonLabel={__(l[8870])}
-                                onSelectDone={this.props.onAddParticipantSelected}
-                                positionMy="center top"
-                                positionAt="left bottom"
-                                />
-                        </ButtonsUI.Button>
-
+                        {room.type !== "group" ? AVseperator : null}
                         {
                             room.type == "group" ?
                             (
@@ -291,6 +291,27 @@ var ConversationRightArea = React.createClass({
                             }}>
                                 <i className="small-icon clear-arrow"></i>
                                 {__(l[8871])}
+                            </div>
+                        }
+                        {<div className="chat-button-seperator"></div>}
+                        {
+                            <div className={"link-button"}
+                                 onClick={(e) => {
+                                    if ($(e.target).closest('.disabled').size() > 0) {
+                                        return false;
+                                    }
+                                    if (room.isArchived()) {
+                                        if (self.props.onUnarchiveClicked) {
+                                           self.props.onUnarchiveClicked();
+                                        }
+                                    } else {
+                                        if (self.props.onArchiveClicked) {
+                                           self.props.onArchiveClicked();
+                                        }
+                                    }
+                            }}>
+                                <i className={"small-icon " +  ((room.isArchived()) ? "unarchive" : "archive")}></i>
+                                {room.isArchived() ? __(l[19065]) : __(l[16689])}
                             </div>
                         }
                         { room.type === "group" ? (
@@ -1783,6 +1804,60 @@ var ConversationPanel = React.createClass({
                 </div>
             </ModalDialogsUI.ConfirmDialog>
         }
+        if (self.state.archiveDialog === true) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__(l[19068])}
+                name="archive-conversation"
+                onClose={() => {
+                    self.setState({'archiveDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    self.scrolledToBottom = true;
+
+                    room.archive();
+
+                    self.setState({
+                        'archiveDialog': false
+                    });
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__(l[19069])}
+                    </div>
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
+        if (self.state.unarchiveDialog === true) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__(l[19063])}
+                name="unarchive-conversation"
+                onClose={() => {
+                    self.setState({'unarchiveDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    self.scrolledToBottom = true;
+
+                    room.unarchive();
+
+                    self.setState({
+                        'unarchiveDialog': false
+                    });
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__(l[19064])}
+                    </div>
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
         if (self.state.renameDialog === true) {
             var onEditSubmit = function(e) {
                 if ($.trim(self.state.renameDialogValue).length > 0 &&
@@ -1902,6 +1977,12 @@ var ConversationPanel = React.createClass({
                         }}
                         onTruncateClicked={function() {
                             self.setState({'truncateDialog': true});
+                        }}
+                        onArchiveClicked={function() {
+                            self.setState({'archiveDialog': true});
+                        }}
+                        onUnarchiveClicked={function() {
+                            self.setState({'unarchiveDialog': true});
                         }}
                         onRenameClicked={function() {
                             self.setState({
@@ -2202,13 +2283,11 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-
             if (hadLoaded) {
                 self.props.contacts.forEach(function (contact) {
                     if (contact.u === u_handle) {
                         return;
                     }
-
                     if(contact.c === 1) {
                         var pres = self.props.megaChat.userPresenceToCssClass(contact.presence);
 
@@ -2248,7 +2327,7 @@ var ConversationPanels = React.createClass({
         }
         else {
             return (
-                <div className="conversation-panels">
+                <div className={"conversation-panels " + self.props.className}>
                     {conversations}
                 </div>
             );

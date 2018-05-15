@@ -13,14 +13,14 @@ var ParticipantsList = React.createClass({
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,
-            'contactCardHeight': 49
+            'contactCardHeight': 36
 
         }
     },
     getInitialState: function() {
         return {
             'scrollPositionY': 0,
-            'scrollHeight': 49*4
+            'scrollHeight': 36*4
         };
     },
     onUserScroll: function() {
@@ -57,10 +57,10 @@ var ParticipantsList = React.createClass({
         );
 
         if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {
-            fitHeight = Math.max(fitHeight /* margin! */, 48);
+            fitHeight = Math.max(fitHeight /* margin! */, 53);
         }
         else if (maxHeight < fitHeight) {
-            fitHeight = Math.max(maxHeight, 48);
+            fitHeight = Math.max(maxHeight, 53);
         }
 
         var $contactsList = $('.chat-contacts-list', $parentContainer);
@@ -123,9 +123,9 @@ var ParticipantsListInner = React.createClass({
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,
-            'contactCardHeight': 49,
+            'contactCardHeight': 32,
             'scrollPositionY': 0,
-            'scrollHeight': 49*4
+            'scrollHeight': 32*4
 
         }
     },
@@ -314,7 +314,7 @@ var ParticipantsListInner = React.createClass({
                         }
                         dropdownIconClasses={dropdownIconClasses}
                         style={{
-                            width: 234,
+                            width: 249,
                             position: 'absolute',
                             top: i * self.props.contactCardHeight
                         }}

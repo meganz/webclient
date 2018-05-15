@@ -179,6 +179,9 @@
                 var sortedChats = obj_values(myChats.toJS());
                 sortedChats.sort(M.sortObjFn("lastActivity", -1));
                 for (var chati = 0; chati < sortedChats.length; chati++) {
+                    if (sortedChats[chati].isArchived()) {
+                        continue;
+                    }
                     if (sortedChats[chati].type === 'group') {
                         var gNames = [];
                         if (!sortedChats[chati].topic) {

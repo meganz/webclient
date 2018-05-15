@@ -327,7 +327,6 @@ ChatdIntegration._waitForProtocolHandler = function (chatRoom, cb) {
 
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missingMcf) {
     var self = this;
-
     var masterPromise = new MegaPromise();
     if (isMcf === false && ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
         // 'mcf'/'f' is still loading..ANY incoming action packets, should be rejected (and never happen...)
@@ -340,7 +339,8 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         'cs': actionPacket.cs,
         'g': actionPacket.g,
         'u': clone(actionPacket.u),
-        'ct': actionPacket.ct ? actionPacket.ct : null
+        'ct': actionPacket.ct ? actionPacket.ct : null,
+        'f': actionPacket.f
     };
 
     // is isMcf and triggered by a missingMcf in the 'f' treecache, trigger an immediate store in the fmdb
@@ -350,7 +350,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
             id: actionPacket.id,
             p: actionPacket.p,
             ts: actionPacket.ts,
-            u: actionPacket.u
+            u: actionPacket.u,
+            f: actionPacket.f,
+            cs: actionPacket.cs
         });
     }
 
@@ -361,18 +363,19 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
         return MegaPromise.reject();
     }
     var chatParticipants = actionPacket.u;
-    if (!chatParticipants) {
-        // its ok, no participants mean inactive chat, that we woudl skip...for now...
+    if (!chatParticipants && (!actionPacket.f || !(actionPacket.f & ChatRoom.ARCHIVED))) {
+        // its ok, no participants mean inactive chat, that we woudl skip if it is not archived.
         return masterPromise.reject();
     }
     var userHandles = [];
-    Object.keys(chatParticipants).forEach(function(k) {
-        var v = chatParticipants[k];
-        if (v.u) {
-            userHandles.push(v.u);
-        }
-    });
-
+    if (chatParticipants) {
+        Object.keys(chatParticipants).forEach(function(k) {
+            var v = chatParticipants[k];
+            if (v.u) {
+                userHandles.push(v.u);
+            }
+        });
+    }
     var roomId = actionPacket.id;
 
     var chatRoom = self.megaChat.chats[roomId];
@@ -446,6 +449,17 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
             if (actionPacket.ct) {
                 chatRoom.ct = actionPacket.ct;
             }
+            if (actionPacket.f) {
+                chatRoom.flags = actionPacket.f;
+            }
+            // apply the flags if any received during loading.
+            if (loadfm.chatmcfc && typeof loadfm.chatmcfc[actionPacket.id] !== 'undefined') {
+                chatRoom.flags = loadfm.chatmcfc[actionPacket.id];
+                delete loadfm.chatmcfc[actionPacket.id];
+            }
+            if (chatRoom.isArchived()) {
+                megaChat.archivedChatsCount++;
+            }
             self.decryptTopic(chatRoom);
             // handler of the same room was cached before, then restore the keys.
             if (self._cachedHandlers[roomId] && chatRoom.protocolHandler) {
@@ -499,6 +513,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                                                 chatRoom
                                             );
                                         }
+                                        delete chatRoom.members[user_handle];
                                     });
                                 }
                                 chatRoom.leave(false);
@@ -1112,13 +1127,23 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     chatRoom.membersLoaded = true;
                 }
             }
-            else if (eventData.priv === 255) {
+            else if (eventData.priv === 255 || eventData.priv === -1) {
                 var deleteParticipant = function deleteParticipant() {
-                    // remove group participant in strongvelope
-                    chatRoom.protocolHandler.removeParticipant(eventData.userId);
-                    // also remove from our list
-                    delete chatRoom.members[eventData.userId];
-
+                    if (eventData.userId === u_handle) {
+                        // remove all participants from the room.
+                        Object.keys(chatRoom.members).forEach(function(userId) {
+                            // remove group participant in strongvelope
+                            chatRoom.protocolHandler.removeParticipant(userId);
+                            // also remove from our list
+                            delete chatRoom.members[userId];
+                        });
+                    }
+                    else {
+                        // remove group participant in strongvelope
+                        chatRoom.protocolHandler.removeParticipant(eventData.userId);
+                        // also remove from our list
+                        delete chatRoom.members[eventData.userId];
+                    }
                     if (
                         M.u[eventData.userId].c === 0 &&
                         typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
@@ -1620,7 +1645,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
 
     assert(
         chatRoom.chatId && chatRoom.chatShard !== undefined && chatRoom.chatdUrl,
-        'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.'
+        'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.' + chatRoom.chatId
     );
 
     self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomId;

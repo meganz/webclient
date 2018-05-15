@@ -44,7 +44,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             chatShard: undefined,
             members: {},
             membersLoaded: false,
-            topic: ""
+            topic: "",
+            flags: 0x00,
+            archivedSelected: false
         },
         true
     );
@@ -277,6 +279,7 @@ ChatRoom.STATE = {
 };
 
 ChatRoom.INSTANCE_INDEX = 0;
+ChatRoom.ARCHIVED = 0x01;
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
     var self = this;
@@ -330,6 +333,26 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
 
 ChatRoom.prototype._resetCallStateInCall = function() {
 
+};
+
+/**
+ * Check whether a chat is archived or not.
+ *
+ * @returns {Boolen}
+ */
+ChatRoom.prototype.isArchived = function() {
+    var self = this;
+    return (self.flags & ChatRoom.ARCHIVED);
+};
+
+/**
+ * Check whether a chat is displayable.
+ *
+ * @returns {Boolen}
+ */
+ChatRoom.prototype.isDisplayable = function() {
+    var self = this;
+    return ((self.showArchived === true) || !self.isArchived());
 };
 
 /**
@@ -471,7 +494,8 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
                 );
             }
         });
-        return names.length > 0 ? names.join(", ") : __(l[8888]);
+        return names.length > 0 ? names.join(", ")
+                                : __(l[19077]).replace('%s1', (new Date(self.ctime * 1000)).toLocaleString());
     }
 };
 
@@ -488,9 +512,6 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
     self._leaving = true;
     self._closing = triggerLeaveRequest;
-
-
-    self.members[u_handle] = 0;
 
 
     if (triggerLeaveRequest) {
@@ -516,6 +537,52 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     else {
         self.setState(ChatRoom.STATE.LEFT);
     }
+};
+
+/**
+ * Archive this chat room
+ *
+ */
+ChatRoom.prototype.archive = function() {
+    var self = this;
+    var mask = 0x01;
+    var flags = ChatRoom.ARCHIVED;
+
+    asyncApiReq({
+        'a': 'mcsf',
+        'id': self.chatId,
+        'm':mask, 'f':flags,
+        'v': Chatd.VERSION}
+        )
+        .done(function(r) {
+            if (r === 0) {
+                self.flags |= ChatRoom.ARCHIVED;
+                loadSubPage('fm/chat/');
+            }
+        });
+};
+
+/**
+ * Unarchive this chat room
+ *
+ */
+ChatRoom.prototype.unarchive = function() {
+    var self = this;
+    var mask = self.flags;
+    var flags = ChatRoom.ARCHIVED^0xFF;
+
+    asyncApiReq({
+        'a': 'mcsf',
+        'id': self.chatId,
+        'm':mask, 'f':flags,
+        'v': Chatd.VERSION}
+        )
+        .done(function(r) {
+            if (r === 0) {
+                self.flags = 0x00;
+                self.megaChat.refreshConversations();
+            }
+        });
 };
 
 /**
@@ -1204,7 +1271,7 @@ ChatRoom.prototype._clearChatMessagesFromChatd = function() {
 
 ChatRoom.prototype.isReadOnly = function() {
     return (
-        (this.members && this.members[u_handle] === 0) ||
+        (this.members && this.members[u_handle] <= 0) ||
         this.privateReadOnlyChat ||
         this.state === ChatRoom.STATE.LEAVING ||
         this.state === ChatRoom.STATE.LEFT

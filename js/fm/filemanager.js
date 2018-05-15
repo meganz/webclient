@@ -1721,7 +1721,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             !is_transfers_or_accounts &&
             (e.keyCode === 113 /* F2 */) &&
             (s.length > 0) &&
-            !$.dialog && M.getNodeRights(M.currentdirid) > 1
+            !$.dialog && M.getNodeRights(M.d[s[0]] && M.d[s[0]].h) > 1
         ) {
             renameDialog();
         }

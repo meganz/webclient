@@ -18,10 +18,6 @@ var slideshowid;
     var fitToWindow = Object.create(null);
 
     function slideshowsteps() {
-		
-		if (page == 'download') _hideCounter = true;
-		else _hideCounter = false;
-		
         var $overlay = $('.viewer-overlay');
         var $controls = $overlay.find('.viewer-button.slideshow, .viewer-mid-button.prev, .viewer-mid-button.next');
         var $counter = $overlay.find('.viewer-counter-bl');
@@ -82,6 +78,7 @@ var slideshowid;
             $counter.removeClass('hidden');
         }
         if (len < 2) {
+            $counter.addClass('hidden');
             $controls.addClass('hidden');
         }
         else {
@@ -138,6 +135,11 @@ var slideshowid;
             }
             else {
                 $button.find('i').removeClass('lowscreen').addClass('fullscreen');
+
+                // disable slideshow-mode exiting from full screen
+                if (slideshowplay) {
+                    slideshow_imgControls(1);
+                }
             }
         };
 
@@ -247,9 +249,11 @@ var slideshowid;
             $overlay.addClass('slideshow');
             slideshowplay = true;
             slideshow_timereset();
-			
-			// hack to start the slideshow in preview mode:
-			if ($('.viewer-overlay .viewer-button.inline.fs').find('i').attr('class').indexOf('fullscreen') > -1) $('.viewer-overlay .viewer-button.fs').click();
+
+            // hack to start the slideshow in full screen mode
+            if (fullScreenManager) {
+                fullScreenManager.enterFullscreen();
+            }
             return false;
         });
 
@@ -319,9 +323,11 @@ var slideshowid;
         // Bind Slideshow Close button
         $controls.find('.viewer-big-button.close').rebind('click', function() {
             slideshow_imgControls(1);
-			
-			// hack to also stop fullscreen 
-			if ($('.viewer-overlay .viewer-button.inline.fs').find('i').attr('class').indexOf('lowscreen') > -1) $('.viewer-overlay .viewer-button.fs').click();
+
+            // hack to also stop fullscreen
+            if (fullScreenManager) {
+                fullScreenManager.exitFullscreen();
+            }
             return false;
         });
     }
@@ -464,7 +470,7 @@ var slideshowid;
 
             // Set minHeight, minWidth if image is bigger then browser window
             // Check if height fits browser window after reducing width
-            if (origImgWidth > viewerWidth && origImgHeight * w_perc < viewerHeight) {
+            if (origImgWidth > viewerWidth && origImgHeight * w_perc <= viewerHeight) {
                 imgWidth = viewerWidth;
                 imgHeight = origImgHeight * w_perc;
                 $img.css({
@@ -522,8 +528,6 @@ var slideshowid;
         var $controls = $overlay.find('.viewer-top-bl, .viewer-bottom-bl, .viewer-slideshow-controls');
         var $document = $(document);
 
-        $overlay.removeClass('fullscreen mouse-idle');
-
         if (d) {
             console.log('slideshow', id, close, slideshowid);
         }
@@ -534,7 +538,7 @@ var slideshowid;
             slideshowid = false;
             _hideCounter = false;
             slideshowplay = false;
-            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow').addClass('hidden');
+            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen').addClass('hidden');
             $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
             $(window).unbind('resize.imgResize');
             $document.unbind('keydown.slideshow mousemove.idle');
@@ -681,6 +685,11 @@ var slideshowid;
                 $overlay.find('.img-wrap img').attr('src', '');
                 $overlay.find('.viewer-pending').removeClass('hidden');
             }
+        }
+
+        if (ua.details.engine === 'Gecko') {
+            // Prevent an issue where some previous images are shown moving to next
+            $overlay.find('.img-wrap img').attr('src', '');
         }
 
         // Favourite Icon
@@ -867,9 +876,14 @@ var slideshowid;
         var treq = Object.create(null);
         preqs[n.h] = 1;
         treq[n.h] = {fa: n.fa, k: n.k};
-        var loadOriginal = n.s < 50 * 1048576 && is_image(n) === 1;
+        var maxSize = ua.details.engine === 'Trident' ? 12 : 50;
+        var loadOriginal = n.s < maxSize * 1048576 && is_image(n) === 1;
         var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
         var getPreview = api_getfileattr.bind(window, treq, 1, preview, !loadOriginal && eot);
+
+        if (d) {
+            console.debug('slideshow.fetchsrc(%s), preview=%s original=%s', id, loadPreview, loadOriginal, n, n.h);
+        }
 
         if (loadOriginal) {
             var $overlay = $('.viewer-overlay');
@@ -904,7 +918,10 @@ var slideshowid;
             M.gfsfetch(n.link || n.h, 0, -1, progress).tryCatch(function(data) {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
                 previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
-            }, function() {
+            }, function(ev) {
+                if (d) {
+                    console.debug('slideshow failed to load original %s', n.h, ev.target && ev.target.status || ev);
+                }
                 if (slideshowid === n.h) {
                     $progressBar.addClass('hidden');
                 }
@@ -1145,10 +1162,10 @@ var slideshowid;
             var src1 = this.src;
             var $img = $imgCount.find('.' + imgClass);
             var rot = previews[id].orientation | 0;
-		
+
             if (slideshowplay && (previews[id].full || ev.type === 'error' || is_image(Object(M.d[id]).name) !== 1)) {
                 slideshow_timereset();
-            }			
+            }
 
             if (ev.type === 'error') {
                 src1 = noThumbURI;
@@ -1189,6 +1206,7 @@ var slideshowid;
                 $overlay.find('.viewer-button-label.zoom').attr('data-perc', 100);
                 slideshow_imgPosition($overlay);
                 $(window).rebind('resize.imgResize', function() {
+                    zoom_mode = false;
                     slideshow_imgPosition($overlay);
                 });
             }
@@ -1231,6 +1249,10 @@ var slideshowid;
                 return;
             }
             myURL.revokeObjectURL(previews[id].src);
+        }
+
+        if (d) {
+            console.debug('slideshow.previewimg', id, previews[id]);
         }
 
         previews[id] = {

@@ -86,6 +86,24 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             }
         });
 
+        // getting contact link [QR]
+        // api_req : a=clc     contact link create api method
+        //           f=1       a flag to tell the api to create a new link if it doesnt exist.
+        //                     but if a previous link was deleted, then dont return any thing (empty)
+        api_req({ a: 'clc', f: 1 }, {
+            account: account,
+            callback: function (res, ctx) {
+                if (typeof res !== 'string') {
+                    res = '';
+                }
+                else {
+                    res = 'C!' + res;
+                }
+                ctx.account.contactLink = res;
+            }
+        });
+
+
         // Get (f)ull payment history
         // [[payment id, timestamp, price paid, currency, payment gateway id, payment plan id, num of months purchased]]
         api_req({a: 'utp', f: 1}, {

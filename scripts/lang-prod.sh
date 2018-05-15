@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 #
 # This script fetches the latest translation strings from Babel for the live site. This means it only fetches language
 # strings that are currently in use in the develop branch. It updates all the xx_prod.json files in the /lang
@@ -25,6 +25,9 @@ if [ $? -ne 0 ]; then
     echo "ERROR: There was a problem fetching production language strings from Babel. The update was aborted."
     exit 1
 fi
+
+# Remove any old errors
+rm error.json
 
 # Extract the tar.gz file
 tar xfvz lang.tar.gz

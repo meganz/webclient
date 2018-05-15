@@ -13,11 +13,11 @@ mobile.languageMenu = {
         // Main tier 1 languages that we support (based on usage analysis)
         var tierOneLangCodes = [
             'es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'ar',
-            'nl', 'hu', 'cn', 'jp', 'kr', 'ro', 'id', 'th', 'vi', 'pl'
+            'nl', 'cn', 'jp', 'kr', 'ro', 'id', 'th', 'vi', 'pl'
         ];
 
         // Remove all the tier 1 languages and we have only the tier 2 languages remaining
-        var allLangCodes = Object.keys(ln);
+        var allLangCodes = Object.keys(languages);
         var tierTwoLangCodes = allLangCodes.filter(function(langCode) {
             return tierOneLangCodes.indexOf(langCode) < 0;
         });
@@ -59,9 +59,17 @@ mobile.languageMenu = {
         // Make single array with code, native lang name, and english lang name
         for (var i = 0, length = langCodes.length; i < length; i++) {
 
-            var langCode = langCodes[i];            // Two letter language code e.g. de
-            var nativeName = ln[langCode];          // Deutsch
-            var englishName = ln2[langCode];        // German
+            // FIXME: why we do have all this code duplicated? :(
+
+            var langCode = langCodes[i];                 // Two letter language code e.g. de
+            var langItem = Object(languages[langCode]);  // map to languages object
+            var nativeName = langItem[2];                // Deutsch
+            var englishName = langItem[1];               // German
+
+            if (!nativeName) {
+                console.warn('Language %s not found...', langCode);
+                continue;
+            }
 
             // Clone the template
             var $langHtml = $template.clone();

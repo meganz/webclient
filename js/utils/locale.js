@@ -584,9 +584,17 @@ mBroadcaster.once('startMega', function populate_l() {
     l[17805] = l[17805].replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.nz">')
                        .replace('[/A]', '</a>');
 
+    l[18446] = l[18446].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
+    l[18447] = l[18447].replace(/\[A\]/g, '<a href="/terms" class="clickurl">').replace(/\[\/A\]/g, '</a>');
+    l[18448] = l[18448].replace('[A1]', '<a href="/terms" class="clickurl">').replace('[/A1]', '</a>')
+                       .replace(/\[A2\]/g, '<a href="/privacy" class="clickurl">').replace(/\[\/A2\]/g, '</a>');
+    l[18465] = l[18465].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
+    l[18490] = l[18490].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
+    l[18491] = l[18491].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
+
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
-        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394
+        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444
     ];
     for (i = common.length; i--;) {
         var num = common[i];
@@ -595,6 +603,7 @@ mBroadcaster.once('startMega', function populate_l() {
             .replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
             .replace(/\[P\]/g, '<p>').replace(/\[\/P\]/g, '</p>')
             .replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>')
+            .replace(/\[I\]/g, '<i>').replace(/\[\/I\]/g, '</i>')
             .replace(/\[BR\]/g, '<br/>')
             .replace(/\[A\]/g, '<a href="/pro" class="clickurl">').replace(/\[\/A\]/g, '</a>');
     }

@@ -32,9 +32,13 @@ if (typeof process !== 'undefined') {
         // localStorage.jj = 1;
     }
 }
+
+var tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_embed = location.pathname === '/embed' || getCleanSitePath().substr(0, 2) === 'E!';
-var is_karma = !is_embed && /^localhost:987[6-9]/.test(window.top.location.host);
+var is_embed = location.pathname === '/embed' || tmp.substr(0, 2) === 'E!';
+var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
+var is_iframed = is_embed || is_drop;
+var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&
     document.location.host === 'mega' || document.location.protocol === 'mega:';
 var location_sub = document.location.href.substr(0, 16);
@@ -43,6 +47,7 @@ var is_firefox_web_ext = location_sub === 'moz-extension://';
 var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
+var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 
@@ -103,7 +108,7 @@ function getCleanSitePath(path) {
 function isPublicLink(page) {
     page = mURIDecode(page).replace(/^[/#]+/, '');
 
-    var types = {'F!': 1, 'P!': 1, 'E!': 1};
+    var types = {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1};
     return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
 }
 
@@ -640,26 +645,30 @@ if (b_u && !is_mobile) {
     document.location = 'update.html';
 }
 
-var ln = {};
-var ln2 = {};
-
-// Native language names
-ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español';
-ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português'; ln.vi = 'Tiếng Việt';
-ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語';
-ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi';
-ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';
-ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски';
-ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارسی '; ln.tl = 'Tagalog';
-
-// Language names in English
-ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish';
-ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Portuguese'; ln2.vi = 'Vietnamese';
-ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese';
-ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish';
-ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish';
-ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian';
-ln2.fa = 'Farsi'; ln2.tl = 'Tagalog';
+// Mapping of user's browser language preference to language codes and native/english names
+var languages = {
+    'ar': [['ar', 'ar-'], 'Arabic', 'العربية'],
+    'br': [['pt-br', 'pt'], 'Portuguese', 'Português'],
+    'cn': [['zh', 'zh-cn'], 'Chinese', '简体中文'],
+    'ct': [['zh-hk', 'zh-sg', 'zh-tw'], 'Traditional Chinese', '中文繁體'],
+    'de': [['de', 'de-'], 'German', 'Deutsch'],
+    'en': [['en', 'en-'], 'English', 'English'],
+    'es': [['es', 'es-'], 'Spanish', 'Español'],
+    'fr': [['fr', 'fr-'], 'French', 'Français'],
+    'id': [['id'], 'Indonesian', 'Bahasa Indonesia'],
+    'it': [['it', 'it-'], 'Italian', 'Italiano'],
+    'jp': [['ja'], 'Japanese', '日本語'],
+    'kr': [['ko'], 'Korean', '한국어'],
+    'nl': [['nl', 'nl-'], 'Dutch', 'Nederlands'],
+    'pl': [['pl'], 'Polish', 'Polski'],
+    'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
+    'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
+    'th': [['||'], 'Thai', 'ภาษาไทย'],
+    'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
+    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
+    'uk': [['||'], 'Ukrainian', 'Українська'],
+    'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
+};
 
 /**
  * Below is the asmCrypto SHA-256 library which was converted to a string so it can be run by the web worker which
@@ -1468,14 +1477,6 @@ else if (!b_u) {
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
-    var languages = {
-        'en':['en','en-'], 'es':['es','es-'], 'fr':['fr','fr-'], 'de':['de','de-'], 'it':['it','it-'],
-        'nl':['nl','nl-'], 'br':['pt-br','pt'], 'se':['sv'], 'fi':['fi'], 'pl':['pl'], 'cz':['cz','cs','cz-'],
-        'sk':['sk','sk-'], 'sl':['sl','sl-'], 'hu':['hu','hu-'], 'jp':['ja'], 'cn':['zh','zh-cn'],
-        'ct':['zh-hk','zh-sg','zh-tw'], 'kr':['ko'], 'ru':['ru','ru-mo'], 'ar':['ar','ar-'],
-        'id':['id'], 'sg':[], 'tr':['tr','tr-'], 'ro':['ro','ro-'], 'uk':['||'], 'sr':['||'], 'th':['||'],
-        'fa':['||'], 'bg':['bg'], 'tl':['en-ph'], 'vi':['vn', 'vi']
-    };
 
     if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
     if (d && !console.time) (function(c)
@@ -1560,7 +1561,7 @@ else if (!b_u) {
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
-            dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : '') + dump.m.replace(/\s+/g, ' ');
+            dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : is_drop ? '[drop] ' : '') + dump.m.replace(/\s+/g, ' ');
 
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
@@ -1759,46 +1760,58 @@ else if (!b_u) {
      * @returns {String} Returns the two letter language code e.g. 'en', 'es' etc
      */
     var detectLang = function() {
+        'use strict';
 
         // Get the preferred language in their browser
-        var userLang = null;
-        var langCode = null;
-        var langCodeVariant = null;
+        var userLangs, userLang, ourLangs, k, v, j, i, u;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
         if (is_bot && locationSearchParams !== '') {
-            userLang = locationSearchParams.replace('?', '');
-			console.log('userlang',userLang);
+            userLangs = locationSearchParams.replace('?', '');
         }
         else {
             // Otherwise get the user's preferred language in their browser settings
-            userLang = (navigator.languages) ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+            userLangs = navigator.languages || navigator.language || navigator.userLanguage;
         }
 
         // If a language can't be detected, default to English
-        if (!userLang) {
+        if (!userLangs) {
             return 'en';
         }
 
-        // Lowercase it
-        userLang = userLang.toLowerCase();
-
-        // Match on language code variants e.g. 'pt-br' returns 'br'
-        /* jshint -W089 */
-        for (langCode in languages) {
-            for (langCodeVariant in languages[langCode]) {
-                if (languages[langCode][langCodeVariant] === userLang) {
-                    return langCode;
-                }
-            }
+        if (!Array.isArray(userLangs)) {
+            userLangs = [userLangs];
         }
 
-        // If no exact match supported, normalise to base language code e.g. en-gb, en-us, en-ca returns 'en'
-        /* jshint -W089 */
-        for (langCode in languages) {
-            for (langCodeVariant in languages[langCode]) {
-                if (languages[langCode][langCodeVariant].substring(0, 3) === userLang.substring(0, 3)) {
-                    return langCode;
+        for (u = 0; u < userLangs.length; u++) {
+
+            // Lowercase it
+            userLang = String(userLangs[u]).toLowerCase();
+
+            // Language mapping handling.
+            ourLangs = Object.keys(languages);
+
+            // Match on language code variants e.g. 'pt-br' returns 'br'
+            for (i = ourLangs.length; i--;) {
+                k = ourLangs[i];
+                v = languages[k][0];
+
+                for (j = v.length; j--;) {
+                    if (v[j] === userLang || v[j] === userLang.substr(0, 3)) {
+                        return k;
+                    }
+                }
+            }
+
+            // If no exact match supported, normalise to base language code e.g. en-gb, en-us, en-ca returns 'en'
+            for (i = ourLangs.length; i--;) {
+                k = ourLangs[i];
+                v = languages[k][0];
+
+                for (j = v.length; j--;) {
+                    if (v[j].substr(0, 3) === userLang.substr(0, 3)) {
+                        return k;
+                    }
                 }
             }
         }
@@ -1813,35 +1826,45 @@ else if (!b_u) {
      * @returns {String}
      */
     var getLanguageFilePath = function(language) {
+        'use strict';
 
         // If the sh1 (filename with hashes) array has been created from deploy script
-        if (typeof sh1 !== 'undefined') {
-
-            // Search the array
-            for (var i = 0, length = sh1.length; i < length; i++) {
-
-                var filePath = sh1[i];
-
-                // If the language e.g. 'en' matches part of the filename from the deploy script e.g.
-                // 'lang/en_0a8e1591149050ef1884b0c4abfbbeb759bbe9eaf062fa54e5b856fdb78e1eb3.json'
-                if (filePath.indexOf('lang/' + language) > -1) {
-                    return filePath;
-                }
-            }
-        }
-        else {
+        if (typeof sh1 === 'undefined') {
             // Otherwise return the filename.json when in Development
             return 'lang/' + language + '.json';
         }
+
+        var enLang;
+        for (var i = 0, length = sh1.length; i < length; i++) {
+            var filePath = sh1[i];
+
+            // If the language e.g. 'en' matches part of the filename from the deploy script e.g.
+            // 'lang/en_0a8e1591149050ef1884b0c4abfbbeb759bbe9eaf062fa54e5b856fdb78e1eb3.json'
+            if (filePath.indexOf('lang/' + language) > -1) {
+                return filePath;
+            }
+
+            // Catch the English language file.
+            if (filePath.indexOf('lang/en_') > -1) {
+                enLang = filePath;
+            }
+        }
+
+        console.warn('Failed to find language file for %s...', language);
+        return enLang;
     };
 
     var lang = detectLang();
     var jsl = [];
 
     // If they've already selected a language, use that
-    if ((typeof localStorage != 'undefined') && (localStorage.lang)) {
+    if (localStorage.lang) {
         if (languages[localStorage.lang]) {
             lang = localStorage.lang;
+        }
+        else {
+            console.warn('Language "%s" is no longer available...', localStorage.lang);
+            delete localStorage.lang;
         }
     }
 
@@ -1858,6 +1881,7 @@ else if (!b_u) {
     jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
 
     jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
@@ -1926,7 +1950,6 @@ else if (!b_u) {
 
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
-        jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
@@ -2145,6 +2168,7 @@ else if (!b_u) {
         jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
         jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
         jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
         jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});
 
@@ -2172,21 +2196,29 @@ else if (!b_u) {
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
     }
 
-    jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
-    jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:5});
+    if (is_drop) {
+        u_checked = true;
+        jsl = [{f: langFilepath, n: 'lang', j: 3}];
+        jsl.push({f:'html/js/embeddrop.js', n: 'embeddrop_js', j: 1, w: 4});
+        jsl.push({f:'css/embeddrop.css', n: 'embeddrop_css', j: 2, w: 5});
+    }
+    else {
+        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
+        jsl.push({f:'js/vendor/asmcrypto.js', n: 'asmcrypto_js', j: 1, w: 5});
 
-    if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
-        jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
+        if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
+            jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j: 1});
+        }
     }
 
     // only used on beta
     if (onBetaW) {
-        jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+        jsl.push({f:'js/betacrashes.js', n: 'betacrashes_js', j: 1});
     }
 
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
         is_chrome_firefox |= 4;
-        jsl.push({f: 'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
+        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
     }
 
     var jsl2 =
@@ -2203,14 +2235,14 @@ else if (!b_u) {
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'network_js': {f:'js/network-testing.js', n: 'network_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
-        'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
         'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
-        'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
+        'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
+        'gdpr': {f:'html/gdpr.html', n: 'gdpr', j:0},
+        'gdpr_js': {f:'html/js/gdpr.js', n: 'gdpr_js', j:1},
         'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
         'general': {f:'html/general.html', n: 'general', j:0},
@@ -2335,10 +2367,11 @@ else if (!b_u) {
         'resellers': ['resellers'],
         '!': ['download','download_js'],
         'dispute': ['dispute'],
-        'disputenotice': ['disputenotice', 'disputenotice_js'],
+        'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],
-        'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
+        'copyrightnotice': ['copyrightnotice','copyright_js'],
         'privacy': ['privacy','privacycompany'],
+        'gdpr': ['gdpr', 'gdpr_js'],
         'mega': ['mega'],
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],
@@ -2367,7 +2400,7 @@ else if (!b_u) {
     }
 	if (page == 'megacmd') page = 'cmd';
 
-    if (page && !is_embed)
+    if (page && !is_iframed)
     {
         for (var p in subpages)
         {
@@ -2893,10 +2926,10 @@ else if (!b_u) {
             '    </div>'+
             '</div>';
 
-    if (is_embed) {
+    if (is_iframed) {
         try {
             document.body.textContent = '';
-            document.body.style.background = '#000';
+            document.body.style.background = is_drop ? '#fff' : '#000';
             jsl_progress = function() {};
         }
         catch (ex) {}
@@ -2905,7 +2938,7 @@ else if (!b_u) {
     var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
-    if ((u_sid = u_storage.sid))
+    if (!is_drop && (u_sid = u_storage.sid))
     {
         loginresponse = true;
         var lxhr = getxhr();
@@ -2985,7 +3018,7 @@ else if (!b_u) {
         else u_checklogin({checkloginresult:boot_auth},false);
     }
 
-    if ((page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2) {
+    if ((page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2 && !is_drop) {
         dl_res = true;
         var dlxhr = getxhr();
         dlxhr.onload = function() {

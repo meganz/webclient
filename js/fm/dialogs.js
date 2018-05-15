@@ -103,7 +103,7 @@
             return;
         }
 
-        if (!getNonCircularNodes().length && !$.onImportCopyNodes) {
+        if (!getNonCircularNodes().length && !$.onImportCopyNodes && !$.dialogIsChatSave) {
             $btn.addClass('disabled');
         }
         else {
@@ -340,10 +340,12 @@
      * @param {String} dialogPrefix i.e. [copy, move].
      * @param {String} buttonLabel Action button label.
      * @param {String} [convTab] In case of conversations tab.
+     * @param {Boolean} isChatSave pass true for triggering the "Save to" logic
      * @private
      */
     var handleDialogContent = function(dialogTabClass, parentTag, newFolderButton,
-                                       dialogPrefix, buttonLabel, convTab) {
+                                       dialogPrefix, buttonLabel, convTab,
+                                       isChatSave) {
 
         var html;
         $('.' + dialogPrefix + '-dialog-txt').removeClass('active');
@@ -352,8 +354,14 @@
         $('.' + dialogPrefix + '-dialog-panel-arrows').removeClass('active');
         $('.' + dialogPrefix + '-dialog .dialog-sorting-menu').addClass('hidden');
         $('.' + dialogPrefix + '.dialog-empty-block').removeClass('active');
+        $.dialogIsChatSave = isChatSave;
 
         $('.dialog-' + dialogPrefix + '-button span').text(buttonLabel);
+
+        // if the site is initialized on the chat, $.selected may be `undefined`,
+        // which may cause issues doing .length on it in dialogs.js, so lets define it as empty array
+        // if is not def.
+        $.selected = $.selected || [];
 
         // Action button label
         var $btn = $('.dialog-' + dialogPrefix + '-button');
@@ -379,8 +387,8 @@
         }
 
         // check if we will enable conversation tab
-        var allowConversationTab = false;
-        if (dialogPrefix.toLowerCase() === 'copy') {
+        var allowConversationTab = $.dialogIsChatSave;
+        if (!allowConversationTab && dialogPrefix.toLowerCase() === 'copy') {
             if ($.selected.length) {
                 allowConversationTab = true;
                 for (var e = 0; e < $.selected.length; e++) {
@@ -553,6 +561,44 @@
         return false;
     };
 
+    /**
+     * A version of the Copy dialog used for "Save to" in chat.
+     * @global
+     */
+    global.openSaveToDialog = function openSaveToDialog(node, cb, activeTab) {
+        M.safeShowDialog('copy', function() {
+            var $dialog = $('.fm-dialog.copy-dialog');
+
+            $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
+            $.mcselected = M.RootID;
+
+            $dialog.removeClass('hidden');
+            $('.dialog-copy-button', $dialog).addClass('active');
+
+            $.saveToDialogNode = node;
+            $.saveToDialogCb = cb;
+
+            var aTab = 'cloud-drive';
+            if (activeTab && typeof activeTab === 'string') {
+                aTab = activeTab;
+            }
+
+            handleDialogContent(
+                aTab,
+                'ul',
+                (aTab === 'conversations') ? false : true,
+                'copy',
+                (aTab === 'conversations' ? l[1940] : l[776]),
+                undefined,
+                true
+            );
+
+            $.hideContextMenu();
+            return $dialog;
+        });
+
+        return false;
+    };
 
     mBroadcaster.addListener('fm:initialized', function copyMoveDialogs(mode) {
         if (folderlink) {
@@ -595,16 +641,48 @@
                 selectDialogTabRoot(section);
 
                 if (section === 'cloud-drive' || section === 'folder-link') {
-                    handleDialogContent(section, 'ul', true, type, move ? l[62] : $.mcImport ? l[236] : l[16176]);
+                    handleDialogContent(
+                        section,
+                        'ul',
+                        true,
+                        type,
+                        move ? l[62] : $.mcImport ? l[236] : $.dialogIsChatSave ? l[776] : l[16176],
+                        undefined,
+                        $.dialogIsChatSave
+                    );
                 }
                 else if (section === 'shared-with-me') {
-                    handleDialogContent(section, 'ul', false, type, $.mcImport ? l[236] :l[1344]); // Share
+                    handleDialogContent(
+                        section,
+                        'ul',
+                        false,
+                        type,
+                        $.mcImport ? l[236] : l[1344],
+                        undefined,
+                        $.dialogIsChatSave
+                    ); // Share
                 }
                 else if (section === 'conversations' && window.megaChatIsReady) {
-                    handleDialogContent(section, 'div', false, type, l[1940], '.conversations-container'); // Send
+                    handleDialogContent(
+                        section,
+                        'div',
+                        false,
+                        type,
+                        l[1940],
+                        '.conversations-container',
+                        $.dialogIsChatSave
+                    ); // Send
                 }
                 else if (section === 'rubbish-bin') {
-                    handleDialogContent(section, 'ul', false, type, l[62]); // Move
+                    handleDialogContent(
+                        section,
+                        'ul',
+                        false,
+                        type,
+                        l[62],
+                        undefined,
+                        $.dialogIsChatSave
+                    ); // Move
                 }
             }
         });
@@ -880,6 +958,11 @@
             }
             var selectedNodes = ($.selected || []).concat();
 
+            // closeDialog would cleanup some $.* variables, so we need them cloned here
+            var saveToDialogNode = $.saveToDialogNode;
+            var saveToDialogCb = $.saveToDialogCb;
+            var dialogIsChatSave = $.dialogIsChatSave;
+
             closeDialog();
 
             if (move) {
@@ -907,20 +990,36 @@
                     }
                     doShare($.mcselected, [user], true);
                 }
+                else if (dialogIsChatSave) {
+                    saveToDialogCb(saveToDialogNode, $.mcselected);
+                    saveToDialogCb = saveToDialogNode = dialogIsChatSave = undefined;
+                }
                 else {
                     M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
                 }
             }
             else if (section === 'shared-with-me') {
-                M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
+                if (dialogIsChatSave) {
+                    saveToDialogCb(saveToDialogNode, $.mcselected);
+                    saveToDialogCb = saveToDialogNode = dialogIsChatSave = undefined;
+                }
+                else {
+                    M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
+                }
             }
             else if (section === 'conversations') {
                 if (!window.megaChatIsReady) {
                     console.error('MEGAchat is not ready');
                 }
                 else if (megaChat.chats[$.mcselected]) {
-                    megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
-                    showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
+                    if (dialogIsChatSave) {
+                        saveToDialogCb(saveToDialogNode, $.mcselected, true);
+                        saveToDialogCb = saveToDialogNode = dialogIsChatSave = undefined;
+                    }
+                    else {
+                        megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
+                        showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
+                    }
                 }
                 else {
                     var userHandles = [u_handle, $.mcselected];

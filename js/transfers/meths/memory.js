@@ -118,11 +118,29 @@
                 }, 4e3);
             }
             else {
-                location.href = myURL.createObjectURL(blob);
+                this.openInBrowser(name);
             }
 
             this.completed = true;
             this.abort();
+        };
+
+        this.openInBrowser = function(name) {
+            var blob = this.getBlob(name || dl.n);
+
+            if (/CriOS/i.test(navigator.userAgent)) {
+                var reader = new FileReader();
+                reader.onload = function() {
+                    window.open(reader.result, '_blank');
+                };
+                reader.onerror = function(ex) {
+                    alert(ex.message || ex);
+                };
+                reader.readAsDataURL(blob);
+            }
+            else {
+                location.href = myURL.createObjectURL(blob);
+            }
         };
 
         this.setCredentials = function(url, size, filename, chunks, sizes) {
@@ -172,11 +190,21 @@
             }
             return new Blob(dblob, {type: filemime(name)});
         };
+
+        if (is_mobile) {
+            this.abort = function() {};
+        }
     }
 
     MemoryIO.usable = function() {
-        return is_mobile || navigator.msSaveOrOpenBlob || hasDownloadAttr;
+        return is_mobile || this.canSaveToDisk;
     };
+
+    Object.defineProperty(MemoryIO, 'canSaveToDisk', {
+        get: function() {
+            return is_chrome_firefox || navigator.msSaveOrOpenBlob || hasDownloadAttr;
+        }
+    });
 
     mBroadcaster.once('startMega', function() {
         var uad = ua.details || false;

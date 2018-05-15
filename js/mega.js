@@ -495,16 +495,6 @@ scparser.$add = function(type, handler) {
     }
 };
 
-scparser.$helper.f2 = function(a, previousFile) {
-    process_f(a.t.f2, null, true);
-    if (fminitialized) {
-        var previousFileHandle = (previousFile)
-        ? previousFile.h
-        : ((a.t.f2.length > 0) ? a.t.f2[0].h : null);
-        fileversioning.updateFileVersioningDialog(previousFileHandle);
-    }
-};
-
 scparser.$helper.c = function(a) {
     // contact notification
     process_u(a.u);
@@ -843,7 +833,6 @@ scparser.$add('t', function(a, scnodes) {
             delete scnodes[i].i;
             delete scnodes[i].scni;
             M.addNode(scnodes[i]);
-
             ufsc.feednode(scnodes[i]);
         }
     }
@@ -852,15 +841,18 @@ scparser.$add('t', function(a, scnodes) {
     if (!pfid && u_type) {
         M.checkStorageQuota();
     }
-    if (!is_mobile) {
+
+    if (d) {
+        // f2 if set must be empty since the nodes must have been processed through workers.
+        console.assert(!a.t || !a.t.f2 || !a.t.f2.length, 'Check this...');
+    }
+
+    if (fminitialized && !is_mobile) {
         // update versioning info.
-        if (a.t && a.t.f2) {
-            scparser.$helper.f2(a);
-        }
-        else {
-            if (scnodes.length === 1) {
-                fileversioning.updateFileVersioningDialog(scnodes[0].h);
-            }
+        i = scnodes.length > 1 && scnodes[1].h || rootNode.h;
+        if (i) {
+            // TODO: ensure this is backward compatible...
+            fileversioning.updateFileVersioningDialog(i);
         }
     }
 });
@@ -2461,12 +2453,11 @@ function process_f(f, cb, updateVersioning) {
                     M.delNode(n.h);
                     ufsc.delNode(n.h);
                 }
+
+                n.fv = 1;
             }
             M.addNode(n);
-            if (updateVersioning) {
-                M.d[n.h].fv = 1;
-            }
-            ufsc.addNode(M.d[n.h]);
+            ufsc.addNode(n);
         }
 
         if (cb) {

@@ -18,26 +18,27 @@ UFSSizeCache.prototype.feednode = function(n) {
             // create previously unknown parent
             this.cache[n.p] = [n.t, 1 - n.t, n.s || 0, false, 0, 0, 0, 0, 0, 0];
         }
-        else {
+        else if (!n.fv && !this.cache[n.p][9]) {
             // update known parent
-            if (n.fv) { // this is a versioned file.
-                this.cache[n.p][7]++;
-                this.cache[n.p][8] += n.s;
-            }
-            else {
-                this.cache[n.p][1 - n.t]++;
-                if (n.s) {
-                    this.cache[n.p][2] += n.s;
-                }
+            this.cache[n.p][1 - n.t]++;
+            if (n.s) {
+                this.cache[n.p][2] += n.s;
             }
         }
 
         // record parent linkage
         if (!this.cache[n.h]) {
-            this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, n.fv ? 1 : 0];
+            this.cache[n.h] = [0, 0, 0, n.p, 0, 0, 0, 0, 0, 0];
         }
         else {
             this.cache[n.h][3] = n.p;
+        }
+
+        // record file version
+        if (n.fv) {
+            this.cache[n.h][1] = 1;
+            this.cache[n.h][2] = n.s;
+            this.cache[n.h][9] = 1;
         }
     }
 };
@@ -49,13 +50,14 @@ UFSSizeCache.prototype.sum = function() {
 
         do {
             this.cache[p][4] += this.cache[h][0];
-            if (this.cache[p][9]) {
-                this.cache[p][7] +=  this.cache[h][1];
-                this.cache[p][8] +=  this.cache[h][2];
+
+            if (this.cache[h][9]) {
+                this.cache[p][7] += this.cache[h][1];
+                this.cache[p][8] += this.cache[h][2];
             }
             else {
-                this.cache[p][5] +=  this.cache[h][1];
-                this.cache[p][6] +=  this.cache[h][2];
+                this.cache[p][5] += this.cache[h][1];
+                this.cache[p][6] += this.cache[h][2];
             }
         } while ((p = this.cache[p][3]));
     }
@@ -219,6 +221,11 @@ UFSSizeCache.prototype.addNode = function(n, ignoreDB) {
         tb = (n.tb || 0);
         tvf = (n.tvf || 0);
         tvb = (n.tvb || 0);
+
+        if (!ignoreDB) {
+            // if a new folder was created, save it to db
+            this.addToDB(n);
+        }
     }
     else {
         td = 0;
@@ -227,10 +234,7 @@ UFSSizeCache.prototype.addNode = function(n, ignoreDB) {
         tvf = (n.fv) ? 1 : 0;
         tvb = (n.fv) ? n.s : 0;
     }
-    if (!ignoreDB) {
-        // if a new folder was created, save it to db
-        this.addToDB(n);
-    }
+
     if (d) {
         console.debug('ufsc.add', n.h, td, tf, tb, tvf, tvb);
     }

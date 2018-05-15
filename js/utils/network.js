@@ -204,10 +204,6 @@ function megaUtilsXHR(aURLOrOptions, aData) {
         options.prepare(xhr);
     }
 
-    if (options.timeout) {
-        xhr.timeout = options.timeout;
-    }
-
     xhr.onloadend = function(ev) {
         var error = false;
 
@@ -228,6 +224,9 @@ function megaUtilsXHR(aURLOrOptions, aData) {
             MegaLogger.getLogger('muXHR').info(method + 'ing', url, options, aData);
         }
         xhr.open(method, url);
+        if (options.timeout) {
+            xhr.timeout = options.timeout;
+        }
 
         if (options.type) {
             xhr.responseType = options.type;

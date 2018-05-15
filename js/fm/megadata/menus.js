@@ -445,7 +445,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             else {
                 flt += ',.findupes-item';
             }
-            if (M.v.length) {
+            if (M.v.length && folderlink ) {
                 flt += ',.zipdownload-item,.download-item';
             }
             $.selected = [M.RootID];

@@ -1,0 +1,69 @@
+
+          <!-- Park account warning dialog 
+              This should be moved to 
+               Remember to remove the hidden class from 'dark-overlay' when this is visible -->
+          <div class="mobile fm-dialog-container hidden">
+          <div class="mobile fm-dialog-aligner">
+            <div class="mobile fm-dialog park-account-dialog">
+                <div class="fm-dialog-header">
+                    <div class="fm-dialog-title">Please confirm you want to Park your account</div>
+                    <div class="fm-dialog-close"></div>
+                    <div class="clear"></div>
+                </div>
+                <div class="fm-dialog-body improved-recovery-steps">
+                    <div class="checkbox-block park-account-checkbox">
+                        <h3 class="main-italic-header">Check the boxes below and enter your email</h3>
+                          <div class="checkbox-container">
+                            <div class="settings-row">
+                              <div class="">
+                                  <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                                  <div class="checkdiv checkboxOff">
+                                      <input type="checkbox" id="" class="checkboxOff"/>
+                                  </div>
+                                  <label for="" class="radio-txt">Yes, I understand parking my account will <strong class="warning-text">remove all my files, contacts, messages from my account.</strong></label>
+                                  <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                              </div>
+                            </div>
+                            <div class="settings-row">
+                                <div class="">
+                                    <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                                    <div class="checkdiv checkboxOff">
+                                        <input type="checkbox" id="" class="checkboxOff"/>
+                                    </div>
+                                    <label for="" class="radio-txt">Yes, I understand there is no way to undo a parked account,<strong class="warning-text"> all my files will be gone forever.</strong></label>
+                                    <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <div class="">
+                                    <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
+                                    <div class="checkdiv checkboxOff">
+                                        <input type="checkbox" id="" class="checkboxOff"/>
+                                    </div>
+                                    <label for="" class="radio-txt">Yes, I still want to park my account</label>
+                                    <!-- Add enabled class to embed-setting to this div to remove the disabled styling -->
+                                </div>
+                            </div>
+                      </div>
+                   </div>
+                      <div class="login-register-input email">
+                   
+                   <input type="text" name="recover-input1" id="recover-input1" value="" placeholder="Your email address">
+                </div>
+                <!-- Only show this div when all the checkboxes have been ticked and the email field has been filled in. -->
+                <div class="content-highlight warning">
+                      <div class="highlight-wrapper">
+                        <div class="warning-icon"></div>
+                        <div class="content-text">
+                         If you proceed, the existing account under this address will be deactivated, and you will lose access to your data.
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="fm-notifications-bottom mobile buttons inline-buttons">
+                    <div class="mobile red-button second"><span>Cancel</span></div>
+                    <div class="mobile red-button first "><span>Park account</span></div>
+                </div>
+            </div>
+          </div>
+</div>

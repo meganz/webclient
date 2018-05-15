@@ -1119,8 +1119,7 @@ mega.megadrop = (function() {
             $domElem.find('.widget-code-wrapper.widget-url').text(url);
 
             $(elem).after($domElem);
-
-            ui.fillForm($('#ew_' + handle), handle);
+            $('#ew_' + handle).find('.embed-link .widget-code-wrapper').text(code);
         };
 
         /**
@@ -1129,7 +1128,7 @@ mega.megadrop = (function() {
         var _eventListeners = function _settingsEventListeners() {
 
             // Click on PUP basic info, show full PUP informations .expanded-widget
-            $('.widget-container').on('click.WS_clickcard', '.widget-maximise', function() {
+            $('.widget-container').on('click.WS_clickcard', '.widget-card', function() {
                 var $this = $(this).closest('div[id^=pup_]');
                 var pupHandle = $this.attr('id').replace('pup_', '');
                 var expHandle = $('div[id^=ew_]').attr('id');
@@ -1360,16 +1359,7 @@ mega.megadrop = (function() {
                 }
             },
             widgetLink: '',
-            widgetCode: [
-                '<script type="text/javascript">',
-                'function MEGAdrop() {',
-                '   window.open("',
-                '       ","_blank",',
-                '   );',
-                '}',
-                '</script>',
-                '<a href="javascript:MEGAdrop();">MEGAdrop</a>'
-            ],
+            widgetCode: '<iframe width="%w" height="%h" frameborder="0" src="%s"></iframe>',
             window: {
                 totalStat: {
                     total: 0,
@@ -1388,11 +1378,6 @@ mega.megadrop = (function() {
             }
         };
 
-        var _widgetLink = function _uiWidgetLink() {
-            var url = is_extension ? getBaseUrl() : getAppBaseUrl();
-            return url + '/megadrop/';
-        };
-
         var _queueScroll = function _uiQueueScroll(itemsNum) {
             var SCROLL_TRIGGER = 6;
             var queueDOM = uiOpts.window.class + ' ' + uiOpts.window.queueClass;
@@ -1403,6 +1388,22 @@ mega.megadrop = (function() {
             else if (itemsNum === SCROLL_TRIGGER) {// Add scroll
                 dialogScroll(queueDOM);
             }
+        };
+
+        var generateCode = function uiGenerateCode(pupHandle) {
+            var code = uiOpts.widgetCode;
+            var width = 0;
+            var height = 0;
+            var theme = $('#rad22_div').hasClass('radioOn') ? 'l' : 'd';
+            var link = getBaseUrl() + '/drop#!' + pupHandle + '!' + theme + '!' + lang;
+
+            var source = code
+                .replace('%w', width > 0 ? width : 250)
+                .replace('%h', height > 0 ? height : 54)
+                .replace('%s', link);
+            source = source.replace('/[\t\n\s]+/g', '');// Minimize
+
+            return source;
         };
 
         var _dlgEventListeners = function _uiDlgEventListeners() {
@@ -1451,29 +1452,55 @@ mega.megadrop = (function() {
             $(uiOpts.dlg.widget.class + ' .tab-embed-link').rebind('click.WD_embed_tab', function () {
                 uiOpts.dlg.widget.$.tabEmbed.addClass('active');
                 uiOpts.dlg.widget.$.tabUrl.removeClass('active');
+                uiOpts.dlg.widget.$.cpBtn
+                    .removeClass('code url')
+                    .addClass('code')
+                    .find('span').safeHTML(l[17408]);
                 uiOpts.dlg.widget.$.embedForm.removeClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.addClass('hidden');
-
+                $('.widget-dialog').addClass('centre');
             });
 
             // Widget dialog url tab
             $(uiOpts.dlg.widget.class + ' .tab-url-link').rebind('click.WD_url_tab', function () {
                 uiOpts.dlg.widget.$.tabEmbed.removeClass('active');
                 uiOpts.dlg.widget.$.tabUrl.addClass('active');
+                uiOpts.dlg.widget.$.cpBtn
+                    .removeClass('code url')
+                    .addClass('url')
+                    .find('span').safeHTML(l[17835]);
                 uiOpts.dlg.widget.$.embedForm.addClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.removeClass('hidden');
+                $('.widget-dialog').removeClass('centre');
+            });
+
+            // Widget dialog light theme
+            $('.left-button').rebind('click', function () {
+                $('#rad23_div').removeClass('radioOn').addClass('radioOff');
+                $('#rad22_div').addClass('radioOn');
+                $('.right-button').removeClass('active');
+                $(this).addClass('active');
+                _widgetDlgContent(pup.items[uiOpts.dlg.widget.url.substr(-11)].h);
+            });
+
+            // Widget dialog dark theme
+            $('.right-button').rebind('click', function () {
+                $('#rad22_div').removeClass('radioOn').addClass('radioOff');
+                $('#rad23_div').addClass('radioOn');
+                $('.left-button').removeClass('active');
+                $(this).addClass('active');
+                _widgetDlgContent(pup.items[uiOpts.dlg.widget.url.substr(-11)].h);
             });
 
             // Widget dialog copy url
             // NOTE: document.execCommand('copy') calls must take place as a direct result of a user action
-            $(uiOpts.dlg.widget.class + ' .copy-widget-code').rebind('click.WD_copy_code', function() {
-                copyToClipboard(uiOpts.dlg.widget.code, l[17620]);
-            });
-
-            // Widget dialog copy source code
-            // NOTE: document.execCommand('copy') calls must take place as a direct result of a user action
-            $(uiOpts.dlg.widget.class + ' .copy-widget-url').rebind('click.WD_copy_url', function() {
-                copyToClipboard(uiOpts.dlg.widget.url, l[17619]);
+            $(uiOpts.dlg.widget.class + ' .copy-widget-code').rebind('click.WD_copy', function() {
+                if ($(this).hasClass('code')) {
+                    copyToClipboard(uiOpts.dlg.widget.code, l[17620]);
+                }
+                else {
+                    copyToClipboard(uiOpts.dlg.widget.url, l[17619]);
+                }
             });
 
             // Dialog Preview upload page
@@ -1500,8 +1527,9 @@ mega.megadrop = (function() {
             uiOpts.dlg.widget.$.title = uiOpts.dlg.widget.$.find('.fm-dialog-title');
             uiOpts.dlg.widget.$.closeButton = uiOpts.dlg.widget.$.find('.close-button');
             uiOpts.dlg.widget.$.url = uiOpts.dlg.widget.$.find('.widget-url');
-            uiOpts.dlg.widget.$.code = uiOpts.dlg.widget.$.find('.embed-link .widget-code');
+            uiOpts.dlg.widget.$.code = uiOpts.dlg.widget.$.find('.embed-link .widget-code-wrapper');
             uiOpts.dlg.widget.$.tabEmbed = uiOpts.dlg.widget.$.find('.tab-embed-link');
+            uiOpts.dlg.widget.$.cpBtn = uiOpts.dlg.widget.$.find('.copy-widget-code');
             uiOpts.dlg.widget.$.tabUrl = uiOpts.dlg.widget.$.find('.tab-url-link');
             uiOpts.dlg.widget.$.embedForm = uiOpts.dlg.widget.$.find('.embed-link');
             uiOpts.dlg.widget.$.urlForm = uiOpts.dlg.widget.$.find('.url-link');
@@ -1533,51 +1561,17 @@ mega.megadrop = (function() {
         };
 
         var generateUrl = function uiGenerateUrl(pupHandle) {
-            return _widgetLink() + pupHandle;
-        };
-
-        var fillForm = function uiFillForm($elem, pupHandle) {
-            var code = uiOpts.widgetCode;
-            var params = wopts.widgetParams;
-            var url = generateUrl(pupHandle);
-
-            $elem.find('.l1').text(code[0]);
-            $elem.find('.l2').text(code[1]);
-            $elem.find('.l3').text(code[2]);
-            $elem.find('.l4').text(url);
-            $elem.find('.l5').text(code[3]);
-            $elem.find('.l6').text(params[0]);
-            $elem.find('.l7').text(params[1]);
-            $elem.find('.l8').text(code[4]);
-            $elem.find('.l9').text(code[5]);
-            $elem.find('.l10').text(code[6]);
-            $elem.find('.l11').text(code[7]);
-        };
-
-        var generateCode = function uiGenerateCode(pupHandle) {
-            var code = uiOpts.widgetCode;
-            var params = wopts.widgetParams;
-            var url = generateUrl(pupHandle);
-
-            var source = code[0] + code[1] + code[2] + url + code[3] + params[0];
-            source += params[1] + code[4] + code[5] + code[6] + code[7];
-            source = source.replace('/[\t\n\s]+/g', '');// Minimize
-
-            return source;
+            return getAppBaseUrl() + (is_extension ? '' : '/') + 'megadrop/' + pupHandle;
         };
 
         var _widgetDlgContent = function _uiWidgetDlgContent(handle) {
-            var url = '';
-            var $source = uiOpts.dlg.widget.$.code;
             var pupHandle = puf.items[handle].p;
 
             if (pupHandle) {
-                url = generateUrl(pupHandle);
-                uiOpts.dlg.widget.url = url;
-                uiOpts.dlg.widget.$.url.text(url);
+                uiOpts.dlg.widget.url = generateUrl(pupHandle);
                 uiOpts.dlg.widget.code = generateCode(pupHandle);
-
-                fillForm($source, pupHandle);
+                uiOpts.dlg.widget.$.url.text(uiOpts.dlg.widget.url);
+                uiOpts.dlg.widget.$.code.text(uiOpts.dlg.widget.code);
             }
         };
 
@@ -1816,7 +1810,6 @@ mega.megadrop = (function() {
         return {
             addItem: addItem,
             skipInfoDlg: skip,
-            fillForm: fillForm,
             nodeIcon: nodeIcon,
             isDlgInit: isDlgInit,
             setDlgInit: setDlgInit,

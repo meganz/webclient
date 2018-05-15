@@ -10,24 +10,6 @@ var dlResumeInfo;
 var mediaCollectFn;
 var maxDownloadSize = Math.pow(2, 53);
 
-var MOBILE_FILETYPES = {
-    doc: 'word',
-    docx: 'word',
-    odt: 'word',
-    txt: 'word',
-    rtf: 'word',
-    xls: 'excel',
-    xlsx: 'excel',
-    ods: 'excel',
-    jpeg: 'image',
-    jpg: 'image',
-    png: 'image',
-    gif: 'image',
-    mp3: 'audio',
-    mp4: 'video',
-    pdf: 'pdf'
-};
-
 function dlinfo(ph,key,next)
 {
     $('.widget-block').addClass('hidden');
@@ -250,20 +232,16 @@ function dl_g(res) {
                     // Start the download in the app
                     mobile.downloadOverlay.redirectToApp($(this));
                 });
+                $('img.filetype-img')
+                    .attr('src', staticpath + 'images/mobile/extensions/' + fileIcon(dl_node) + '.png');
 
                 onMaxSizeKnown = function() {
-                    var type = MOBILE_FILETYPES[fileExt.substr(1)];
-                    var supported = dlMethod !== MemoryIO || type;
+                    var supported = dlmanager.canSaveToDisk(dl_node);
 
-                    $('img.filetype-img').attr({
-                        src: staticpath + 'images/mobile/extensions/' + (type || 'generic') + '.png'
-                    });
-
-                    if (res.s > maxDownloadSize || !supported) {
+                    if (dl_node.s > maxDownloadSize || !supported) {
                         $('body').addClass('wrong-file');
                         $('.mobile.dl-browser').addClass('disabled').unbind('click');
 
-                        // Change error message
                         if (!supported) {
                             $('.mobile.error-txt.file-unsupported').removeClass('hidden');
                         }
@@ -272,7 +250,6 @@ function dl_g(res) {
                         }
                     }
                 };
-
             }
 
             dlmanager.getMaximumDownloadSize().done(function(size) {
@@ -394,7 +371,7 @@ function dl_g(res) {
                             }
                         });
                     }
-                    else if (filetype(filename) === 'PDF Document' && Object(previews[dlpage_ph]).buffer) {
+                    else if (Object(previews[dlpage_ph]).full) {
                         onDownloadReady();
                         M.saveAs(previews[dlpage_ph].buffer, filename);
                     }
@@ -901,28 +878,24 @@ function dlbeforecomplete(filename) {
         $('.download-progress .bar').width('100%');
         $('.mobile.download-speed, .mobile.download-percents').text('');
 
-        if (dl.io instanceof MemoryIO && (dlMethod === MemoryIO || filemime(filename).startsWith('image/'))) {
-            var blob = dl.io.getBlob(filename);
-            dl.io.completed = true;
+        // Store a log for statistics
+        eventlog(99637);// Downloaded file on mobile webclient
 
-            // open file
-            doneText = l[8949];
+        if (dl.io instanceof MemoryIO) {
+            // pretend to be a preview to omit the download attempt
+            dl.preview = true;
+
+            var openInBrowser = dlmanager.openInBrowser(filename);
+            doneText = openInBrowser ? l[8949] : String(l[1988]).toUpperCase();  // Save/Open File
 
             $dlprogress.rebind('click', function() {
 
-                // Store a log for statistics
-                api_req({a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient'});
-
-                if (navigator.userAgent.match(/CriOS/i)) {
-                    var reader = new FileReader();
-                    reader.onload = function() {
-                        window.open(reader.result, '_blank');
-                    };
-                    reader.readAsDataURL(blob);
+                if (openInBrowser) {
+                    dl.io.openInBrowser(filename);
                 }
                 else {
-                    // Redirect to object URL to download the file to the client
-                    location.href = myURL.createObjectURL(blob);
+                    dl.io.completed = false;
+                    dl.io.download(filename);
                 }
                 return false;
             });

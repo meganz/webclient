@@ -390,7 +390,7 @@ mobile.account = {
 
             // Please confirm that all your data will be deleted
             var confirmMessage = l[1974];
-
+            var $cancelAccountOverlay = $("#mobile-ui-error");
             // Search through their Pro plan purchase history
             $(account.purchases).each(function(index, purchaseTransaction) {
 
@@ -409,6 +409,9 @@ mobile.account = {
 
             // Show a confirm dialog
             mobile.account.showAccountCancelConfirmDialog(confirmMessage);
+
+            // Show close button
+            $cancelAccountOverlay.find('.text-button').removeClass('hidden');
 
             // Prevent double tap
             return false;

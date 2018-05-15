@@ -246,9 +246,9 @@
                         </div>
                     </div>
                     <div class="mobile buttons">
-                        <a class="mobile red-button close-button"> <i></i> <span>[$148]</span> </a>
-                        <a class="mobile red-button create-folder confirm-ok-button"> <i></i> <span>[$158]</span> </a>
+                        <a class="mobile red-button first create-folder confirm-ok-button"> <i></i> <span>[$158]</span> </a>
                     </div>
+                    <a class="mobile text-button third close-button"><span>[$148]</span> </a>
                 </div>
             </div>
         </div>
@@ -369,46 +369,48 @@
 
 <!-- Photo preview overlay !-->
 <div class="mobile main-block slideshow-image-previewer hidden">
-    <div class="mobile slideshow-header">
-        <div class="mobile fm-dialog-close"></div>
-        <div class="mobile slideshow-text-right-block">
-            <div class="mobile slideshow-file-name"></div>
-            <div class="mobile slideshow-file-number-and-total"></div>
-        </div>
-    </div>
     <div class="mobile content-row">
         <div class="mobile content-cell">
-            <div class="mobile slideshow-wrapper">
-                <div class="mobile slide-show-navigation">
-                    <div class="mobile viewer-pending">
-                        <div class="bounce1"></div>
-                        <div class="bounce2"></div>
-                        <div class="bounce3"></div>
+            <div class="mobile bottom-page scroll-block download" id="mobile-gallery-video-block">
+                <div class="mobile slideshow-wrapper">
+                    <div class="mobile slide-show-navigation">
+                        <div class="mobile viewer-pending">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
+                        </div>
+                        <div class="mobile slideshow-back-arrow"></div>
+                        <div class="mobile slideshow-forward-arrow"></div>
                     </div>
-                    <div class="mobile slideshow-back-arrow"></div>
-                    <div class="mobile slideshow-forward-arrow"></div>
-                </div>
-                <div class="mobile slides-bl">
-                    <div class="mobile slides left">
-                        <img alt="" />
+                    <div class="mobile slideshow-header">
+                        <div class="mobile fm-dialog-close"></div>
+                        <div class="mobile slideshow-text-right-block">
+                            <div class="mobile slideshow-file-name"></div>
+                            <div class="mobile slideshow-file-number-and-total"></div>
+                        </div>
                     </div>
-                    <div class="mobile slides mid">
-                        <img alt="" />
+                    <div class="mobile slides-bl">
+                        <div class="mobile slides left">
+                            <img alt="" />
+                        </div>
+                        <div class="mobile slides mid">
+                            <img alt="" />
+                        </div>
+                        <div class="mobile slides right">
+                            <img alt="" />
+                        </div>
                     </div>
-                    <div class="mobile slides right">
-                        <img alt="" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="mobile slideshow-buttons">
+                        <div class="mobile slideshow-buttons">
         <div class="mobile left-buttons">
             <div class="mobile fm-icon delete delete-button"></div>
         </div>
         <div class="mobile right-buttons">
             <div class="mobile fm-icon download download-button"></div>
             <div class="mobile fm-icon manage-link manage-link-button"></div>
+        </div>
+    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1050,6 +1052,7 @@
 <div class="mobile main-block hidden" id="mobile-ui-notFound">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
+            <div class="mobile fm-icon top-icon menu right"></div>
             <a class="mobile logo"></a>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/na.png" class="mobile filetype-img" />
@@ -1071,7 +1074,7 @@
             <div class="mobile fm-dialog-close hidden"></div>
             <div class="mobile white-block">
                 <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
-                <div class="mobile bottom-page scroll-block download">
+                <div class="mobile bottom-page scroll-block download" id="video-container">
                     <!-- Video player Elements-->
                     <div class="download video-block">
                         <div class="viewer-top-bl">
@@ -1119,8 +1122,10 @@
                         <div class="mobile filesize"></div>
                         <div class="mobile download-percents"></div>
                     </div>
-                    <a class="mobile red-button first dl-browser"> <i></i> <span>[$8947]</span> </a>
-                    <a class="mobile red-button second dl-megaapp"> <i></i> <span>[$8948]</span> </a>
+                    <div class="mobile buttons inline-buttons">
+                        <a class="mobile red-button second dl-browser"> <i></i> <span>[$8947]</span> </a>
+                        <a class="mobile red-button first dl-megaapp"> <i></i> <span>[$8948]</span> </a>
+                    </div>
                     <!-- Progressbar is hidden. "downloading" body class will show it !-->
                     <!-- Set width to ".bar" block !-->
                     <a class="mobile download-progress">
@@ -1141,9 +1146,21 @@
                     <div class="mobile application-txt file-manager-download-message hidden">
                         [$16107]
                     </div>
+                    <a class="mobile text-button third cancel hidden"><span>Close</span> </a>
                     <a class="mobile download-app"></a>
                 </div>
             </div>
+            <a class="mobile app-advertisement-block download-app">
+                <div class="mobile app-advertisement-aligner">
+                    <div class="mobile mega-app-icon">
+                        <i class="mobile white-mega-logo">
+                        </i>
+                    </div>
+                    <div class="mobile app-advertisement-text">
+                        <span>For a better experience, faster downloads and features like chat and sharing, try our app!</span>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 </div>
@@ -1161,10 +1178,10 @@
                 <div class="mobile file-download-info">
                     <div class="mobile filesize"></div>
                 </div>
-                <div class="mobile buttons inline-buttons">
+                <div class="mobile buttons">
                     <a class="mobile red-button first delete"> <i></i> <span>[$1730]</span> </a>
-                    <a class="mobile red-button second cancel"> <i></i> <span>[$82]</span> </a>
                 </div>
+                 <a class="mobile text-button third cancel"><span>Close</span> </a>
             </div>
         </div>
     </div>
@@ -1202,10 +1219,11 @@
             <a class="mobile logo"></a>
             <div class="mobile white-block">
                 <div class="mobile error-messages">
-                    <div class="first-message"></div><br>
-                    <div class="optional-second-message"></div>
+                    <div class="mobile first-message"></div><br>
+                    <div class="mobile optional-second-message"></div>
                 </div>
                 <a class="mobile red-button first confirm-ok-button"> <i></i> <span>[$1596]</span> </a>
+                <a class="mobile text-button third cancel hidden"><span>Close</span> </a>
             </div>
         </div>
     </div>
@@ -1216,6 +1234,7 @@
 <div class="mobile main-block error-overlay hidden" id="mobile-decryption-key-overlay">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
+            <div class="mobile fm-icon top-icon menu right"></div>
             <a href="" class="mobile logo"></a>
             <div class="mobile white-block">
                 <div class="mobile overlay-info initial-message hidden">
@@ -1240,6 +1259,7 @@
 <div class="mobile main-block error-overlay hidden" id="mobile-password-decryption-overlay">
     <div class="mobile content-row first">
         <div class="mobile content-cell">
+            <div class="mobile fm-icon top-icon menu right"></div>
             <a href="" class="mobile logo"></a>
             <div class="mobile white-block">
                 <div class="mobile overlay-info initial-message">
@@ -2429,4 +2449,38 @@
         </div>
     </div>
 </div>
+
+<!-- Video Block template -->
+<div class="mobile-video-template">
+    <div class="download video-block hidden">
+        <div class="download play-video-button"></div>
+        <video data-autoplayvideo="false" class="mobile-gallery" data-playvideoonclick="false"></video>
+        <div class="viewer-bottom-bl">
+            <div class="video-controls" data-state="hidden">
+                <div data-state="play" class="viewer-button left playpause">
+                    <i class="medium-icon icons-img play"></i>
+                </div>
+                <div class="volume-control left hidden" style="">
+                  <div data-state="mute" class="viewer-button mute">
+                        <i class="medium-icon icons-img volume"></i>
+                    </div>
+                    <div class="video-vol-range">
+                        <div class="volume-bar"><span style="height: 100%;"></span></div>
+                    </div>
+                </div>
+                <div class="video-timing current left">00:00</div>
+                <div data-state="go-fullscreen" class="viewer-button right fs">
+                    <i class="medium-icon icons-img fullscreen"></i>
+                </div>
+                <div class="video-timing duration right">03:09</div>
+                <div class="video-progress-block">
+                   <div class="video-progress-bar">
+                       <div class="video-time-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 

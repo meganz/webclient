@@ -69,16 +69,14 @@ mobile.slideshow = {
         'use strict';
 
         // Cache selectors
-        var $slideShowBackground = mobile.slideshow.$overlay.find('.slideshow-wrapper');
+        var $slideShowBackground = mobile.slideshow.$overlay.find('.slideshow-wrapper, .fs');
         var $slideShowHeader = mobile.slideshow.$overlay.find('.slideshow-header');
         var $slideShowFooterButtons = mobile.slideshow.$overlay.find('.slideshow-buttons');
         var $slideShowNavButtons = mobile.slideshow.$overlay.find('.slideshow-back-arrow, .slideshow-forward-arrow');
 
         // On clicking the image or black background of the slideshow
         $slideShowBackground.off().on('tap', function() {
-
-            // If the header and footer buttons are hidden already, show them
-            if ($slideShowHeader.hasClass('hidden') && $slideShowFooterButtons.hasClass('hidden')) {
+            if ($slideShowHeader.hasClass('hidden')) {
                 $slideShowHeader.removeClass('hidden');
                 $slideShowFooterButtons.removeClass('hidden');
                 $slideShowNavButtons.removeClass('hidden');
@@ -89,11 +87,9 @@ mobile.slideshow = {
                 $slideShowFooterButtons.addClass('hidden');
                 $slideShowNavButtons.addClass('hidden');
             }
-
-            // Prevent double taps
-            return false;
         });
     },
+
 
     /**
      * Fetch the image data from the API, populate the 'previews' object, then run the callback provided
@@ -178,6 +174,7 @@ mobile.slideshow = {
         var $fileName = mobile.slideshow.$overlay.find('.slideshow-file-name');
         var $currentFileNumAndTotal = mobile.slideshow.$overlay.find('.slideshow-file-number-and-total');
         var $image = mobile.slideshow.$overlay.find('.mobile.slides.' + slideClass + ' img');
+        var $videoDiv = mobile.slideshow.$overlay.find('.mobile.slides.' + slideClass + ' .download.video-block');
 
         // Get the node and image data
         var node = M.getNodeByHandle(nodeHandle);
@@ -206,6 +203,32 @@ mobile.slideshow = {
 
         // Show the dialog
         mobile.slideshow.$overlay.removeClass('hidden');
+
+        // Store video html block
+        var videoHtmlTemplate = $('.mobile-video-template');
+        var videoHtmlDiv = videoHtmlTemplate.html();
+
+        if (is_video(node)) {
+
+            $image.addClass('hidden');
+            mobile.slideshow.$overlay.find('.slides.mid').html(videoHtmlDiv);
+            $videoDiv.removeClass('hidden');
+            mobile.slideshow.$overlay.addClass('video');
+
+            M.require('videostream').tryCatch(function() {
+                iniVideoStreamLayout(node, mobile.slideshow.$overlay).then(function(ok) {
+                    if (ok) {
+                        mobile.slideshow.$overlay.find('.scroll-block').addClass('video');
+                        $('.video-block, .video-controls', mobile.slideshow.$overlay).removeClass('hidden');
+                    }
+                });
+            });
+        }
+        else {
+            $image.removeClass('hidden');
+            $videoDiv.addClass('hidden');
+            return false;
+        }
     },
 
     /**
@@ -225,8 +248,9 @@ mobile.slideshow = {
             var node = M.v[i];
             var nodeHandle = node.h;
 
-            // If the node is an image, add it to the array and map
-            if (is_image(node) && fileext(node.name) !== 'pdf') {
+            // If the node is an image or a video, add it to the array and map
+            if (((is_image(node) && fileext(node.name) !== 'pdf')) || (is_video(node))) {
+
                 mobile.slideshow.imagesInCurrentViewArray.push(nodeHandle);
                 mobile.slideshow.imagesInCurrentViewMap[nodeHandle] = imageNumber;
 
@@ -288,6 +312,7 @@ mobile.slideshow = {
             return false;
         });
     },
+
 
     /**
      * Find the next image handle to be displayed
@@ -401,7 +426,10 @@ mobile.slideshow = {
 
         'use strict';
 
+        mobile.slideshow.$overlay.removeClass('video-theatre-mode');
+
         if (slideClass === 'right') {
+            mobile.slideshow.$overlay.find('.slides.mid .download.video-block').remove();
             mobile.slideshow.$overlay.find('.slides.left').remove();
             mobile.slideshow.$overlay.find('.slides.mid')
                 .removeClass('mid').addClass('left');
@@ -411,6 +439,7 @@ mobile.slideshow = {
                 .append('<div class="mobile slides right"><img alt="" /></div>');
         }
         else if (slideClass === 'left') {
+            mobile.slideshow.$overlay.find('.slides.mid .download.video-block').remove();
             mobile.slideshow.$overlay.find('.slides.right').remove();
             mobile.slideshow.$overlay.find('.slides.mid')
                 .removeClass('mid').addClass('right');
@@ -450,10 +479,10 @@ mobile.slideshow = {
 
         // If the Preview button is tapped
         $contextMenu.find('.preview-file-button').off('tap').on('tap', function() {
-
             // Show the file preview overlay
             mobile.slideshow.init(nodeHandle);
             return false;
+
         });
     },
 

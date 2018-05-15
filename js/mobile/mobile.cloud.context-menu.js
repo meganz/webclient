@@ -73,8 +73,8 @@ mobile.cloud.contextMenu = {
             $folderContextMenu.removeClass('hidden');
         }
         else {
-            // If the file is an image, show the image preview button
-            if (is_image(node)) {
+            // If the file is previewable, show the preview button
+            if (is_image(node) || is_video(node)) {
                 $previewButton.removeClass('hidden');
             }
             else {

@@ -266,18 +266,21 @@
 
 /* Mobile*/
 .mobile.toast-notification {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 40px;
     margin-left: -37%;
-    margin-bottom: 0;
+    margin-bottom: 48px;
     padding: 0;
     text-align: center;
     width: 75%;
-    background-color: #565656;
-    color: white;
+    background-color: rgba(222, 222, 222, 0.9);
+    border: 1px solid #ccc;
+    color: #444;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
+    border-radius: 4px; 
+    max-width: 420px;
 }
 .mobile.toast-notification::before {
     display: none;

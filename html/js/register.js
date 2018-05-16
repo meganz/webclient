@@ -150,7 +150,7 @@ function registeraccount() {
                                 msgDialog('info', l[761], msg, null, function() {
                                     $.onImportCopyNodes = $.ephNodes;
                                     M.copyNodes(['meh'], u_handle, false, function(e) {
-                                        if (e) {
+                                        if (!Array.isArray(e)) {
                                             console.error(e);
                                             debugger
                                         }

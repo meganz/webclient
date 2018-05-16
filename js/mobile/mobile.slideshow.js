@@ -226,7 +226,7 @@ mobile.slideshow = {
             var nodeHandle = node.h;
 
             // If the node is an image, add it to the array and map
-            if (is_image(node)) {
+            if (is_image(node) && fileext(node.name) !== 'pdf') {
                 mobile.slideshow.imagesInCurrentViewArray.push(nodeHandle);
                 mobile.slideshow.imagesInCurrentViewMap[nodeHandle] = imageNumber;
 

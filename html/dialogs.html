@@ -3738,6 +3738,15 @@
     <div class="viewer-body">
         <div class="viewer-top-bl">
             <div class="viewer-filename"></div>
+            <div class="viewer-images-num">
+                <div class="viewer-mid-button prev"></div>
+                <div class="viewer-counter-bl">
+                    <span class="first">0</span>
+                    [$5528]
+                    <span class="last">0</span>
+                </div>
+                <div class="viewer-mid-button next"></div>
+            </div>
             <div class="viewer-button right close">
                 <i class="medium-icon icons-img close"></i>
             </div>
@@ -3747,14 +3756,20 @@
             <div class="viewer-button right download">
                 <i class="medium-icon icons-img arrow-in-circle"></i>
             </div>
+            <div class="viewer-button right info">
+                <i class="medium-icon icons-img i-in-circle"></i>
+            </div>
             <div class="viewer-button right favourite">
                 <i class="medium-icon icons-img heart"></i>
             </div>
             <div class="clear"></div>
         </div>
 
-        <div class="viewer-image-bl hidden" data-fullscreen="false" id="videoContainer">
-            <img alt="" />
+        <div class="viewer-image-bl" data-fullscreen="false" id="videoContainer">
+            <div class="img-wrap" data-count="">
+                <img alt="" class="img1" />
+                <img alt="" class="img2" />
+            </div>
             <embed type="application/pdf" class="hidden">
             <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
             <iframe id="pdfpreviewdiv1" src="about:blank" class="hidden"></iframe>
@@ -3788,23 +3803,45 @@
 
         <div class="viewer-progress hidden">
             <ul>
-                <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
-                <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+                <li class="right-c"><p><span></span></p></li>
+                <li class="left-c"><p><span></span></p></li>
             </ul>
         </div>
 
-        <div class="viewer-mid-button prev"></div>
-        <div class="viewer-mid-button next"></div>
+        <div class="viewer-slideshow-controls">
+            <div class="viewer-big-button prev">
+                <i class="semi-big-icon icons-img prev"></i>
+            </div>
+            <div class="viewer-big-button pause" data-state="pause">
+                <i class="semi-big-icon icons-img pause"></i>
+            </div>
+            <div class="viewer-big-button next">
+                <i class="semi-big-icon icons-img next"></i>
+            </div>
+            <div class="viewer-big-button left-pad close">
+                <i class="semi-big-icon icons-img cross"></i>
+            </div>
+            <div class="clear"></div>
+        </div>
 
         <div class="viewer-bottom-bl">
-            <div class="img-controls">
-                <div class="viewer-images-num hidden">
-                    <span class="first">0</span>
-                    [$5528]
-                    <span class="last">0</span>
+            <div class="viewer-short-controls img-controls">
+                <div class="viewer-button inline def-pad minus" id="zoomout">
+                    <i class="medium-icon icons-img minus"></i>
                 </div>
-                <div class="viewer-button right fullscreen">
+                <div class="viewer-button-label zoom" data-perc="100">
+                    100%
+                </div>
+                <div class="viewer-button inline def-pad plus" id="zoomin">
+                    <i class="medium-icon icons-img plus"></i>
+                </div>
+                <div class="viewer-button inline slideshow">
+                    <i class="medium-icon icons-img play"></i>
+                    <span>[$17802]</span>
+                </div>
+                <div class="viewer-button inline fs">
                     <i class="medium-icon icons-img fullscreen"></i>
+                    <span>[$17803]</span>
                 </div>
                 <div class="clear"></div>
             </div>
@@ -4541,7 +4578,6 @@
         <div class="clear"></div>
     </div>
     <div class="fm-dialog-body improved-recovery-steps">
-        
         <div class="checkbox-block park-account-checkbox">
             <h3 class="main-italic-header">[$18307]</h3>
               <div class="checkbox-container">
@@ -4583,17 +4619,17 @@
           </div>
        </div>
           <div class="login-register-input email">
-       
+
                 <input type="text" name="recover-input1-di" id="recover-input1-di" value="" placeholder="Your email address">
             </div>
     <!-- Only show this div when all the checkboxes have been ticked and the email field has been filled in. -->
-    <div class="content-highlight warning">
-          <div class="highlight-wrapper">
+    <div class="content-highlight warning hidden">
+        <div class="highlight-wrapper">
             <div class="warning-icon"></div>
             <div class="content-text">
                 [$18309]
             </div>
-          </div>
+        </div>
         </div>
     </div>
     <div class="fm-notifications-bottom">
@@ -4649,7 +4685,7 @@
             <span>[$17835]</span>
         </div>
         <div class="default-grey-button right links-button " id="qr-dlg-close">
-            <span>[$82]</span>
+            <span>[$148]</span>
         </div>
         <div class="clear"></div>
     </div>
@@ -4665,7 +4701,7 @@
     <div class="qr-dialog-content-block">
         <div class="avatar-container-qr-contact">
             <div class="avatar-wrapper avatar">
-                <img src="" />
+                <img />
             </div>
         </div>
         <div class="qr-contact-name">Khaled Daifallah</div>

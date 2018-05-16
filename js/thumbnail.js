@@ -31,6 +31,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             thumbHandler = isRawImage;
             isRawImage = false;
         }
+        else if (typeof isRawImage !== 'string') {
+            if (d) {
+                console.debug('Not really a raw..', isRawImage);
+            }
+            isRawImage = false;
+        }
 
         if (d && isRawImage) {
             console.log('Processing RAW Image: ' + isRawImage);
@@ -46,6 +52,14 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     if (d) {
         console.time('createthumbnail' + id);
     }
+
+    var sendToPreview = function(h, ab) {
+        var n = h && M.getNodeByHandle(h);
+
+        if (n && filetype(n) !== 'PDF Document' && !is_video(n)) {
+            previewimg(h, ab || dataURLToAB(noThumbURI));
+        }
+    };
 
     var img = new Image();
     img.id = id;
@@ -124,7 +138,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             while (len-- && !ab[len]) {}
             if (len < 0) {
                 console.warn('All pixels are black, aborting thumbnail creation...', ab.byteLength);
-                throw new Error('Unsupported image type/format.');
+                return img.onerror('Unsupported image type/format.');
             }
 
             dataURI = canvas.toDataURL(imageType, 0.80);
@@ -160,7 +174,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             canvas.height = preview_y;
             ctx.drawImage(this, 0, 0, preview_x, preview_y);
 
-            dataURI = canvas.toDataURL('image/jpeg', 0.75);
+            dataURI = canvas.toDataURL('image/jpeg', 0.85);
             // if (d) console.log('PREVIEW', dataURI);
 
             ab = dataURLToAB(dataURI);
@@ -176,9 +190,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer, n && n.h, ph);
             }
 
-            if (node && filetype(n) !== 'PDF Document' && !is_video(n)) {
-                previewimg(node, ab);
-            }
+            sendToPreview(node, ab);
 
             if (d) {
                 console.log('total time:', new Date().getTime() - t);
@@ -194,9 +206,10 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     }, img.onerror = function(e) {
         if (d) {
             console.timeEnd('createthumbnail' + id);
-            console.error('Failed to create thumbnail', e);
+            console.warn('Failed to create thumbnail', e);
         }
 
+        sendToPreview(node);
         api_req({a: 'log', e: 99665, m: 'Thumbnail creation failed.'});
         mBroadcaster.sendMessage('fa:error', id, e, false, 2);
     });
@@ -356,6 +369,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 var defMime = 'image/jpeg';
                 var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
+                M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
         };
@@ -401,6 +415,9 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
                 break;
 
             default:
+                if (dv.byteLength > 24 && dv.getUint32(20) === 0x68656963) { // HEIC
+                    break;
+                }
                 switch (dv.getUint32(0)) {
                     case 0x89504e47: // PNG
                         img.isPNG = true;
@@ -437,6 +454,7 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
                 type: 'image/jpg'
             });
         }
+        M.neuterArrayBuffer(u8);
     }
 
     if (!u8 || (img.huge && img.dataSize === blob.size)) {

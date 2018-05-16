@@ -385,8 +385,25 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         if (d) {
             console.log('Downloads exceed max size', entries.length, entries);
         }
-        mega.config.set('dlThroughMEGAsync', 1);
-        return dlmanager.showMEGASyncOverlay(true);
+        if (!fmconfig.dlThroughMEGAsync) {
+            var msgMsg = l[18213]; // 'Download size exceeds the maximum size supported by the browser. '
+            //    + 'You can use MEGASync to proceed with the download.'; // 18213
+            var msgSubMsg = l[18214]; // 'Do you want to turn ON downloading with MEGASync?'; // 18214
+            msgDialog('confirmation', 'File Size is too big',
+                msgMsg,
+                msgSubMsg,
+                function (activateMsync) {
+                    if (activateMsync) {
+                        mega.config.setn('dlThroughMEGAsync', 1);
+                    }
+                });
+            return;
+        }
+        else {
+            // this means the setting is ON to user MEGASync. but we got here because either
+            // MEGASync is not installed (or working), or there were an error when we tried to use MEGASync.
+            return dlmanager.showMEGASyncOverlay(true);
+        }
     }
 
     for (var e = 0; e < entries.length; e++) {

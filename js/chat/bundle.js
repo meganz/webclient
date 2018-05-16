@@ -1113,6 +1113,31 @@ React.makeElement = React['createElement'];
 	    return found ? found : false;
 	};
 
+	Chat.prototype.getMyChatFilesFolder = function () {
+	    var promise = new MegaPromise();
+
+	    var folderName = "My chat files";
+	    var paths = [folderName];
+	    var safePath = M.getSafePath(paths);
+
+	    if (safePath.length === 1) {
+	        safePath = safePath[0];
+	    }
+
+	    var target = M.RootID;
+
+	    M.createFolder(target, safePath, new MegaPromise()).always(function (_target) {
+	        if (typeof _target === 'number') {
+	            ulmanager.logger.warn('Unable to create folder "%s" on target "%s"', path, target, api_strerror(_target));
+	            promise.reject();
+	        } else {
+	            promise.resolve(_target);
+	        }
+	    });
+
+	    return promise;
+	};
+
 	window.Chat = Chat;
 	window.chatui = _chatui;
 
@@ -1606,8 +1631,6 @@ React.makeElement = React['createElement'];
 
 	        var presence = self.props.megaChat.getMyPresence();
 
-	        var startChatIsDisabled = !presence || presence === UserPresence.PRESENCE.OFFLINE;
-
 	        var leftPanelStyles = {};
 
 	        if (self.state.leftPaneWidth) {
@@ -1684,7 +1707,6 @@ React.makeElement = React['createElement'];
 	                            {
 	                                group: "conversationsListing",
 	                                icon: "white-medium-plus",
-	                                disabled: startChatIsDisabled,
 	                                contacts: this.props.contacts
 	                            },
 	                            React.makeElement(DropdownsUI.DropdownContactsSelector, {
@@ -4132,7 +4154,7 @@ React.makeElement = React['createElement'];
 	        array.remove(excludedParticipants, u_handle, false);
 
 	        var dontShowTruncateButton = false;
-	        if (myPresence === 'offline' || !room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
+	        if (!room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
 	            dontShowTruncateButton = true;
 	        }
 
@@ -4155,7 +4177,7 @@ React.makeElement = React['createElement'];
 	            );
 	        }
 
-	        var renameButtonClass = "link-button " + (room.isReadOnly() || !room.iAmOperator() || myPresence === 'offline' ? "disabled" : "");
+	        var renameButtonClass = "link-button " + (room.isReadOnly() || !room.iAmOperator() ? "disabled" : "");
 
 	        return React.makeElement(
 	            "div",
@@ -4185,7 +4207,7 @@ React.makeElement = React['createElement'];
 	                                icon: "rounded-grey-plus",
 	                                label: __(l[8007]),
 	                                contacts: this.props.contacts,
-	                                disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator()) || myPresence === 'offline'
+	                                disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
 	                            },
 	                            React.makeElement(DropdownsUI.DropdownContactsSelector, {
 	                                contacts: this.props.contacts,
@@ -4198,7 +4220,6 @@ React.makeElement = React['createElement'];
 	                                multipleSelectedButtonLabel: __(l[8869]),
 	                                nothingSelectedButtonLabel: __(l[8870]),
 	                                onSelectDone: this.props.onAddParticipantSelected,
-	                                disabled: myPresence === 'offline',
 	                                positionMy: "center top",
 	                                positionAt: "left bottom"
 	                            })
@@ -4223,7 +4244,7 @@ React.makeElement = React['createElement'];
 	                                className: "link-button dropdown-element",
 	                                icon: "rounded-grey-up-arrow",
 	                                label: __(l[6834] + "..."),
-	                                disabled: room.isReadOnly() || myPresence === 'offline'
+	                                disabled: room.isReadOnly()
 	                            },
 	                            React.makeElement(
 	                                DropdownsUI.Dropdown,
@@ -4258,7 +4279,7 @@ React.makeElement = React['createElement'];
 	                        ),
 	                        room.type === "group" ? React.makeElement(
 	                            "div",
-	                            { className: "link-button red " + (myPresence === 'offline' || room.stateIsLeftOrLeaving() ? "disabled" : ""),
+	                            { className: "link-button red " + (room.stateIsLeftOrLeaving() ? "disabled" : ""),
 	                                onClick: function onClick(e) {
 	                                    if ($(e.target).closest('.disabled').size() > 0) {
 	                                        return false;
@@ -5843,7 +5864,7 @@ React.makeElement = React['createElement'];
 	                                {
 	                                    className: "popup-button",
 	                                    icon: "small-icon grey-medium-plus",
-	                                    disabled: room.isReadOnly() || myPresence === 'offline'
+	                                    disabled: room.isReadOnly()
 	                                },
 	                                React.makeElement(
 	                                    DropdownsUI.Dropdown,
@@ -9789,12 +9810,43 @@ React.makeElement = React['createElement'];
 	    _startDownload: function _startDownload(v) {
 	        M.addDownload([v]);
 	    },
-	    _addToCloudDrive: function _addToCloudDrive(v) {
-	        M.injectNodes(v, M.RootID, function (res) {
-	            if (res === 0) {
-	                msgDialog('info', __(l[8005]), __(l[8006]));
+	    _addToCloudDrive: function _addToCloudDrive(v, openSendToChat) {
+	        openSaveToDialog(v, function (node, target, isForward) {
+	            if (isForward) {
+	                megaChat.getMyChatFilesFolder().done(function (myChatFolderId) {
+	                    M.injectNodes(node, myChatFolderId, function (res) {
+	                        if (!Array.isArray(res)) {
+	                            if (d) {
+	                                console.error("Failed to inject nodes. Res:", res);
+	                            }
+	                        } else {
+
+	                            megaChat.chats[$.mcselected].attachNodes(res);
+	                            showToast('send-chat', res.length > 1 ? l[17767] : l[17766]);
+	                        }
+	                    });
+	                }).fail(function () {
+	                    if (d) {
+	                        console.error("Failed to allocate 'My chat files' folder.", arguments);
+	                    }
+	                });
+	            } else {
+
+	                target = target || M.RootID;
+	                M.injectNodes(node, target, function (res) {
+	                    if (!Array.isArray(res)) {
+	                        if (d) {
+	                            console.error("Failed to inject nodes. Res:", res);
+	                        }
+	                    } else {
+	                        if (target === M.RootID) {
+
+	                            msgDialog('info', l[8005], l[8006]);
+	                        }
+	                    }
+	                });
 	            }
-	        });
+	        }, openSendToChat ? "conversations" : false);
 	    },
 
 	    _getLink: function _getLink(h, e) {
@@ -10010,6 +10062,7 @@ React.makeElement = React['createElement'];
 	                                );
 	                            }
 	                        }
+
 	                        if (contact.u === u_handle) {
 	                            dropdown = React.makeElement(
 	                                ButtonsUI.Button,
@@ -10072,6 +10125,14 @@ React.makeElement = React['createElement'];
 	                                                } }));
 
 	                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
+
+	                                            linkButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'small-icon conversations',
+	                                                label: __(l[17764]),
+	                                                key: 'sendToChat',
+	                                                onClick: function onClick() {
+	                                                    $.selected = [v.h];
+	                                                    openCopyDialog('conversations');
+	                                                } }));
 	                                        }
 
 	                                        return React.makeElement(
@@ -10107,8 +10168,10 @@ React.makeElement = React['createElement'];
 	                                    previewButton,
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                        onClick: self._startDownload.bind(self, v) }),
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[8005]),
-	                                        onClick: self._addToCloudDrive.bind(self, v) })
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[1988]),
+	                                        onClick: self._addToCloudDrive.bind(self, v) }),
+	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'conversations', label: __(l[17764]),
+	                                        onClick: self._addToCloudDrive.bind(self, v, true) })
 	                                )
 	                            );
 	                        }
@@ -10451,7 +10514,7 @@ React.makeElement = React['createElement'];
 	                    message.deleted = true;
 	                }
 	                var messageActionButtons = null;
-	                if (message.getState() === Message.STATE.NOT_SENT) {
+	                if (message.getState() === Message.STATE.NOT_SENT || message.getState() === Message.STATE.NOT_SENT_EXPIRED) {
 	                    messageActionButtons = null;
 
 	                    if (!spinnerElement) {

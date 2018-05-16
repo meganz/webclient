@@ -57,7 +57,7 @@ is_image.def = {
     'GIF': 1,
     'BMP': 1,
     'PNG': 1,
-    'HEIC': 1
+    'HEIC': -1
 };
 
 is_image.raw = {
@@ -362,6 +362,103 @@ function getID3CoverArt(entry) {
         }
     });
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+
+/**
+ * Fullscreen handling helper
+ * @param {Object} $button The button to jump into fullscreen
+ * @param {Object} $element The element that must go into fullscreen
+ * @returns {FullScreenManager}
+ * @requires jquery.fullscreen.js
+ * @constructor
+ */
+function FullScreenManager($button, $element) {
+    'use strict';
+
+    if (!(this instanceof FullScreenManager)) {
+        return new FullScreenManager($button, $element);
+    }
+
+    var listeners = [];
+    var iid = makeUUID();
+    var $document = $(document);
+    var state = $document.fullScreen();
+    var goFullScreen = function() {
+        state = $document.fullScreen();
+
+        if (state) {
+            $document.fullScreen(false);
+        }
+        else {
+            $element.fullScreen(true);
+        }
+    };
+
+    if (state === null) {
+        // FullScreen is not supported
+        $button.addClass('hidden');
+    }
+    else {
+        $document.rebind('fullscreenchange.' + iid, function() {
+            state = $document.fullScreen();
+            for (var i = listeners.length; i--;) {
+                listeners[i](state);
+            }
+        });
+        this.enterFullscreen = function() {
+            if (!state) {
+                goFullScreen();
+            }
+        };
+        $button.removeClass('hidden').rebind('click.' + iid, goFullScreen);
+    }
+
+    Object.defineProperty(this, 'state', {
+        get: function() {
+            return state;
+        }
+    });
+
+    this.iid = iid;
+    this.$button = $button;
+    this.$document = $document;
+    this.listeners = listeners;
+    this.destroyed = false;
+}
+
+FullScreenManager.prototype = Object.create(null);
+
+// destroy full screen manager instance
+FullScreenManager.prototype.destroy = function() {
+    'use strict';
+
+    if (!this.destroyed) {
+        this.destroyed = true;
+        this.$button.unbind('click.' + this.iid);
+        this.$document.unbind('fullscreenchange.' + this.iid);
+        this.exitFullscreen();
+    }
+};
+
+// list for full screen changes
+FullScreenManager.prototype.change = function(cb) {
+    'use strict';
+    this.listeners.push(tryCatch(cb.bind(this)));
+    return this;
+};
+
+// exit full screen
+FullScreenManager.prototype.exitFullscreen = function() {
+    'use strict';
+    this.$document.fullScreen(false);
+};
+
+// enter full screen
+FullScreenManager.prototype.enterFullscreen = function() {
+    'use strict';
+    /* noop */
+};
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -711,87 +808,26 @@ function getID3CoverArt(entry) {
             }
         };
 
-
-        // Check if the browser supports the Fullscreen mode
-        var fullScreenEnabled = !!(document.fullscreenEnabled
-            || document.mozFullScreenEnabled
-            || document.msFullscreenEnabled
-            || document.webkitSupportsFullscreen
-            || document.webkitFullscreenEnabled
-            || document.createElement('video').webkitRequestFullScreen);
-
-        // If the browser doesn't support the Fulscreen then hide the fullscreen button
-        if (!fullScreenEnabled) {
-            $fullscreen.addClas('hidden');
-        }
-
         // Set the video container's fullscreen state
         var setFullscreenData = function(state) {
             $videoContainer.attr('data-fullscreen', !!state);
 
             // Set the fullscreen button's 'data-state' which allows the correct button image to be set via CSS
             $fullscreen.attr('data-state', state ? 'cancel-fullscreen' : 'go-fullscreen');
-        };
 
-        // Checks if the document is currently in fullscreen mode
-        var isFullScreen = function() {
-            return !!(document.fullScreen
-                || document.webkitIsFullScreen
-                || document.mozFullScreen
-                || document.msFullscreenElement
-                || document.fullscreenElement);
-        };
-
-        // Bind Fullscreen button
-        $fullscreen.rebind('click', function() {
-            // If fullscreen mode is active...
-            if (isFullScreen()) {
-                // ...exit fullscreen mode
-                document.exitFullscreen();
-
-                $fullscreen.find('i').removeClass('lowscreen').addClass('fullscreen');
-                setFullscreenData(false);
+            if (state) {
+                $fullscreen.find('i').removeClass('fullscreen').addClass('lowscreen');
             }
             else {
-                // ...otherwise enter fullscreen mode
-                var containerEl = page === 'download' ? $wrapper.find('.video-block').get(0) : $wrapper.get(0);
-
-                if (containerEl.requestFullscreen) {
-                    containerEl.requestFullscreen();
-                }
-                else if (containerEl.mozRequestFullScreen) {
-                    containerEl.mozRequestFullScreen();
-                }
-                else if (containerEl.webkitRequestFullScreen) {
-                    containerEl.webkitRequestFullScreen();
-                }
-                else if (containerEl.msRequestFullscreen) {
-                    containerEl.msRequestFullscreen();
-                }
-
-                $fullscreen.find('i').removeClass('fullscreen').addClass('lowscreen');
-                setFullscreenData(true);
+                $fullscreen.find('i').removeClass('lowscreen').addClass('fullscreen');
             }
-        });
+        };
 
-        // Listen for fullscreen change events (from other controls, e.g. right clicking on the video itself)
-        document.addEventListener('fullscreenchange', function() {
-            setFullscreenData(!!(document.fullScreen || document.fullscreenElement));
-        });
-        document.addEventListener('webkitfullscreenchange', function() {
-            setFullscreenData(document.webkitIsFullScreen);
-        });
-        document.addEventListener('mozfullscreenchange', function() {
-            setFullscreenData(!!document.mozFullScreen);
-        });
-        document.addEventListener('msfullscreenchange', function() {
-            setFullscreenData(!!document.msFullscreenElement);
-        });
+        var $element = page === 'download' ? $wrapper.find('.video-block') : $wrapper;
+        var fullScreenManager = FullScreenManager($fullscreen, $element).change(setFullscreenData);
 
         $wrapper.rebind('is-over-quota', function() {
-            if (isFullScreen()) {
-                $fullscreen.trigger('click');
-            }
+            fullScreenManager.exitFullscreen();
             videoElement.pause();
             return false;
         });
@@ -808,6 +844,7 @@ function getID3CoverArt(entry) {
             $document.unbind('mouseup.volumecontrol');
             $(window).unbind('video-destroy.main');
             dlmanager.isStreaming = false;
+            fullScreenManager.destroy();
             pagemetadata();
             return false;
         });

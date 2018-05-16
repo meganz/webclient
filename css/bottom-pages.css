@@ -51,7 +51,7 @@ html.gbot {
     bottom: 0;
 }
 .bottom-page .top-head {
-    background-color: transparent;
+    background-color: #fff;
     position: absolute;
     width: 100%;
     z-index: 200;

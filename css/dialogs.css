@@ -2602,11 +2602,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialogs-sprite_v14.svg);
+    background-image: url(../images/mega/dialog-sprite.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialogs-sprite_v14.svg);
+    background-image: url(../images/mega/dialog-sprite.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -2735,7 +2735,7 @@ li.token-input-token-invite .input-close {
     margin-bottom: 4px;
     cursor: default;
 }
-.park-account-dialog  .improved-recovery-steps .warning-icon, .improved-recovery-steps .warning-icon {
+.park-account-dialog .improved-recovery-steps .warning-icon, .improved-recovery-steps .warning-icon {
     margin-top: 6px;
     background-image: url(../images/mega/download-dialog_v1.png);
     background-size: 384px auto;
@@ -2748,6 +2748,13 @@ li.token-input-token-invite .input-close {
     position: relative;
     margin: 6px 18px 0 14px;
 }
+/* .park-account-dialog .improved-recovery-steps .warning-icon {
+    background-size: 768px auto;
+    width: 60px;
+    height: 50px;
+    background-position: -709px -88px;
+    display: none;
+}*/
 .improved-recovery-steps .warning-icon {
     margin: 1px 11px 0 0;
     display: none;

@@ -320,11 +320,11 @@ function init_page() {
         delete localStorage.signupcode;
     }
     else if (localStorage.signupcode
-        && page.substr(0, 6) !== 'signup'
-        && page !== 'register'
-        && page !== 'terms'
-        && page !== 'mega'
-        && page !== 'privacy' && page !== 'chrome' && page !== 'firefox') {
+            && page.substr(0, 6) !== 'signup'
+            && page !== 'register'
+            && page !== 'terms'
+            && page !== 'mega'
+            && page !== 'privacy' && page !== 'gdpr' && page !== 'chrome' && page !== 'firefox') {
         register_txt = l[1291];
         loadSubPage('signup' + localStorage.signupcode);
         return false;
@@ -341,12 +341,16 @@ function init_page() {
     var pageBeginLetters = page.substr(0, 2);
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
-        var ctLink = page.substring(2, page.length);
-        mBroadcaster.once('fm:initialized', function () {
-            openContactInfoLink(ctLink);
-        });
-
-        page = 'fm/contacts';
+        if (!is_mobile) {
+            var ctLink = page.substring(2, page.length);
+            mBroadcaster.once('fm:initialized', function () {
+                openContactInfoLink(ctLink);
+            });
+            page = 'fm/contacts';
+        }
+        else {
+            page = (u_type ? 'fm' : 'start');
+        }
     }
 
     if (pageBeginLetters === 'F!' && page.length > 2) {
@@ -478,6 +482,7 @@ function init_page() {
         && (page !== 'cmd')
         && (page !== 'terms')
         && (page !== 'privacy')
+        && (page !== 'gdpr')
         && (page !== 'takendown')
         && (page !== 'general')
         && (page !== 'resellers')
@@ -532,6 +537,39 @@ function init_page() {
         delete localStorage.beingAccountCancellation;
         return false;
     }
+    // Password protected link decryption dialog
+    if (page.substr(0, 2) === 'P!' && page.length > 2) {
+        // Check if TextEncoder function is available for the stringToByteArray function
+        if (window.TextEncoder) {
+            // Show the password overlay for mobile
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+                mobile.decryptionPasswordOverlay.show(page);
+            }
+            else {
+                // Otherwise insert background page, show the password
+                // decryption dialog and pass in the current URL hash
+                parsepage(pages['placeholder']);
+                exportPassword.decrypt.init(page);
+            }
+        }
+        else { // not supported browser, appologize from user
+            var msgToUser = l[18420];
+            if (u_type) {
+                mBroadcaster.once('boot_done', function () {
+                    setTimeout(
+                        msgDialog('info', 'Pwssword protected link not supported', // not visible
+                            msgToUser), 1000);
+                });
+                page = 'fm';
+            }
+            else {
+                msgDialog('info', 'Pwssword protected link not supported', // not visible
+                    msgToUser);
+                page = 'start';
+            }
+        }
+    }
 
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
@@ -543,20 +581,7 @@ function init_page() {
         init_blog();
     }
 
-    // Password protected link decryption dialog
-    else if (page.substr(0, 2) === 'P!' && page.length > 2) {
-
-        // Show the password overlay for mobile
-        if (is_mobile) {
-            parsepage(pages['mobile']);
-            mobile.decryptionPasswordOverlay.show(page);
-        }
-        else {
-            // Otherwise insert background page, show the password decryption dialog and pass in the current URL hash
-            parsepage(pages['placeholder']);
-            exportPassword.decrypt.init(page);
-        }
-    }
+    
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();
@@ -907,6 +932,10 @@ function init_page() {
     }
     else if (page == 'privacy') {
         parsepage(pages['privacy']);
+    }
+    else if (page === 'gdpr') {
+        parsepage(pages['gdpr']);
+        gdpr.init();
     }
     else if (page == 'mega') {
         parsepage(pages['mega']);
@@ -1995,7 +2024,7 @@ function topmenuUI() {
             var subPages = [
                 'about', 'account', 'android', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
+                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'wp', 'start'
             ];
@@ -2337,6 +2366,9 @@ function pagemetadata() {
     }
     else if (page == 'privacy') {
         mega_title = 'Privacy Policy - MEGA';
+    }
+    else if (page === 'gdpr') {
+        mega_title = l[18421] + ' - MEGA';
     }
     else if (page == 'copyright') {
         mega_title = 'Copyright - MEGA';

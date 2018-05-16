@@ -66,8 +66,7 @@ var Chatd = function(userId, megaChat, options) {
 
     localStorage.setItem('chatdIdentity', base64urlencode(self.identity));
 
-    self.logger.debug("Generated new client identity: 0x"+
-                    Chatd.dumpToHex(self.identity, 0, 0, true));
+    self.logger.debug("Generated new client identity: 0x" + Chatd.dumpToHex(self.identity, 0, 0, true));
     //    } else {
     //        self.identity = base64urldecode(self.identity);
     //        assert(self.identity.length === 8);

@@ -123,34 +123,10 @@ mobile.slideshow = {
             return;
         }
 
-        var request = {};
         var node = M.getNodeByHandle(nodeHandle);
-
-        // Setup request parameters
-        request[nodeHandle] = { fa: node.fa, k: node.k };
-
-        // Get the image data which is stored as a file attribute
-        api_getfileattr(request, 1, function(ctx, nodeId, byteArray) {
-
-            var blob = null;
-
-            try {
-                // Create a new Blob
-                blob = new Blob([byteArray], { type: 'image/jpeg' });
-            }
-            catch (error) {}
-
-            // If that failed, try using the buffer
-            if (!blob || blob.size < 25) {
-                blob = new Blob([byteArray.buffer]);
-            }
-
+        var done = function(uri) {
             // Update global object with the image so it's ready for display
-            mobile.slideshow.previews[nodeId] = {
-                blob: blob,
-                src: myURL.createObjectURL(blob),
-                time: new Date().getTime()
-            };
+            mobile.slideshow.previews[nodeHandle] = {src: uri};
 
             // Hide any loading dialogs/animations if visible
             mobile.slideshow.hideLoadingAnimation();
@@ -158,6 +134,13 @@ mobile.slideshow = {
 
             // Call the callback function e.g. to display the image
             callbackFunction(nodeHandle, slideClass);
+        };
+
+        getImage(node, 1).then(done).catch(function(ex) {
+            if (d) {
+                console.warn('Preview image retrieval failed.', nodeHandle, ex);
+            }
+            done(window.noThumbURI);
         });
     },
 

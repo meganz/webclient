@@ -1074,7 +1074,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         }
 
                         // _makethumb(node, stream);
-                        node.stream = stream;
+                        if (is_embed) {
+                            node.stream = stream;
+                        }
                         stream.play();
                     }).fail(console.warn.bind(console));
 

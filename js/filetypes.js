@@ -30,7 +30,6 @@ var extensions = {
         'accdb','db','dbf','mdb','pdb'], 'Web Server Code'],
     'word': [['doc', 'docx', 'dotx', 'wps'], 'MS Word']
 };
-};
 
 var extdesc = {
     '3ds': '3D Scene',

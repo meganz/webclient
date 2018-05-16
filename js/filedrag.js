@@ -132,6 +132,9 @@
     }
 
     function FileDragEnter(e) {
+        if ($.dialog === 'avatar') {
+            return;
+        }
         e.stopPropagation();
         e.preventDefault();
         if (localStorage.d > 1) {
@@ -251,6 +254,9 @@
         }
     }
     function FileDragLeave(e) {
+        if ($.dialog === 'avatar') {
+            return;
+        }
         e.stopPropagation();
         e.preventDefault();
         if (localStorage.d > 1) {
@@ -267,6 +273,9 @@
 
     // on Drop event
     function FileSelectHandler(e) {
+        if ($.dialog === 'avatar') {
+            return;
+        }
         useMegaSync = -1;
         if (e.stopPropagation) {
             e.stopPropagation();

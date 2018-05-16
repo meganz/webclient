@@ -1256,7 +1256,8 @@ var ConversationPanel = React.createClass({
         if (
             (
                 ChatdIntegration._loadingChats[room.roomId] &&
-                ChatdIntegration._loadingChats[room.roomId].state() === 'pending'
+                ChatdIntegration._loadingChats[room.roomId].loadingPromise &&
+                ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending'
             ) ||
             (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
             room.messagesBuff.messagesHistoryIsLoading() === true ||

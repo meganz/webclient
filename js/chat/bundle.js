@@ -8267,7 +8267,7 @@ React.makeElement = React['createElement'];
 	                }
 	            });
 	        }
-	        var placeholder = 'Write a message to %s...';
+	        var placeholder = l[18669];
 	        placeholder = placeholder.replace("%s", room.getRoomTitle(false, true));
 
 	        return React.makeElement(

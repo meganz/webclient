@@ -296,7 +296,7 @@ function fmremovesync(selectedNodes) {
             toastMessage = l[13764].replace('%1', filecnt).replace('%2', foldercnt);
         }
 
-        msgDialog('clear-bin', l[1003], dlgMessage, l[1007], function(e) {
+        msgDialog('clear-bin:' + l[83], l[1003], dlgMessage, l[1007], function(e) {
             if (e) {
                 var tmp = null;
                 if (String(M.currentdirid).substr(0, 7) === 'search/') {

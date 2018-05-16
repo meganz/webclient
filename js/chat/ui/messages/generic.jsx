@@ -677,7 +677,7 @@ var GenericConversationMessage = React.createClass({
                                                     onClick={isPreviewable && self._startPreview.bind(self, v)}>
                                     {isPreviewable && <div className="play-video-button"></div>}
                                     <div className="video-thumb-details">
-                                        {isPreviewable && <i className="small-icon small-play-icon"></i>}
+                                        {v.playtime && <i className="small-icon small-play-icon"></i>}
                                         <span>{secondsToTimeShort(v.playtime || -1)}</span>
                                     </div>
                                 </div>;

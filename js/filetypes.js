@@ -544,19 +544,19 @@ function fileIcon(node) {
     return icon;
 }
 
-function fileext(name) {
+function fileext(name, upper, iknowwhatimdoing) {
+    'use strict';
 
-    var ext;
-
+    name = String(name || '');
     if (!name) {
         name = 'unknown';
     }
 
-    ext = name.substr(name.lastIndexOf('.') + 1);
+    var ext = name.substr(name.lastIndexOf('.') + 1);
     if (ext === name) {
         ext = '';
     }
-    else {
+    else if (!iknowwhatimdoing) {
         ext = ext
             .replace(/<[^>]*>/g, '')
             .replace(/[^\w+]/g, '');
@@ -566,5 +566,5 @@ function fileext(name) {
         }
     }
 
-    return ext.toLowerCase();
+    return upper ? ext.toUpperCase() : ext.toLowerCase();
 }

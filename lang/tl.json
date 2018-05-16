@@ -2169,6 +2169,7 @@
     "18314": "Tap on your [B]Account name[\/B] at the top left of the Menu.",
     "18315": "Tap on the three horizontal dots at the bottom right.",
     "18316": "Type your new password, confirm it and tap [B]Done[\/B].",
+    "18340": "Backup na Recovery Key",
     "18347": "Check all boxes to continue",
     "18419": "Type your new password, confirm it and click [B]OK[\/B].",
     "18420": "Unfortunately opening a password protected link is not supported in your current browser. Please open the link using Google Chrome or Mozilla Firefox to access it.",
@@ -2260,5 +2261,6 @@
     "18512": "Review Session History",
     "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
     "18514": "This is your own contact link",
-    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step."
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

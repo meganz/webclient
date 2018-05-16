@@ -157,7 +157,7 @@ function AccountRecoveryControl() {
                                         $('.progress-point.step' + self.currStep + ' .step-answer',
                                             self.$rightContent).text('');
                                         $('.recover-account-email-block .error-message span',
-                                            self.$leftContent).text(l[1101]);
+                                            self.$leftContent).text(l[18668]);
                                         $('.recover-account-email-block .error-message',
                                             self.$leftContent).removeClass('hidden');
                                         return;

@@ -2096,6 +2096,7 @@
     "17884": "%nbFi file \u00e8 stato aggiunto al gestore dei trasferimenti",
     "17886": "Questo utente \u00e8 gi\u00e0 presente nella tua lista dei contatti",
     "18148": "Contatta il Supporto",
+    "18192": "Inserisci un nome, un percorso assoluto ( i simboli * e ? sono concessi) o scegli quale file o cartella vuoi escludere dalla sincronizzazione",
     "18213": "La grandezza di download supera il limite massimo supporto dal tuo browser. Puoi utilizzare MEGAsync per procedere con il download.",
     "18214": "Vuoi attivare il download tramite MEGAsync?",
     "18215": "Carica in sicurezza",
@@ -2147,7 +2148,7 @@
     "18290": "Inserisci la tua nuova password, confermala e clicca [B]Cambia password[\/B].",
     "18291": "Apri l'app e clicca su [B]Mio Account[\/B] posizionato sulla barra di navigazione.",
     "18292": "Clicca su [B]Impostazioni[\/B].",
-    "18293": "Clicca su [B]Opzioni di sicurezza[\/B].",
+    "18293": "Tap on [B]Security Options[\/B].",
     "18294": "Clicca sul pulsante [B]Cambia password[\/B].",
     "18295": "Inserisci la tua nuova password, confermala e clicca [B]Salva[\/B].",
     "18296": "Clicca sul [B]Nome del tuo account[\/B] in basso a sinistra del Menu.",
@@ -2255,8 +2256,9 @@
     "18506": "Se riesci a fornire l'indirizzo email dell'account che vuoi recuperare, per favore fallo. Se non riesci a ricordarlo, per favore clicca su \"Inizia nuovo\" per saltare questo step.",
     "18507": "Indirizzo email",
     "18508": "Per favore, inserisci l'indirizzo email dell'account che desideri recuperare. Se non riesci a ricordarla, per favore lascia vuoto il campo.",
-    "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
-    "18512": "Review Session History",
-    "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
-    "18514": "This is your own contact link"
+    "18511": "Rivedi tutte le sessioni e i dispositivi da cui hai effettuato l'accesso al tuo account MEGA. Puoi chiudere da remoto ogni sessione attiva.",
+    "18512": "Rivedi la Storia delle Sessioni",
+    "18513": "Vuoi chiudere tutte le altre sessioni? Questo ti far\u00e0 uscire da tutte le altre sessioni attive, fatta eccezione per quella corrente.",
+    "18514": "Questo \u00e8 il tuo link di contatto personale",
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step."
 }

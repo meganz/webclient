@@ -2096,6 +2096,7 @@
     "17884": "%nbFi\u30d5\u30a1\u30a4\u30eb\u304c\u8ee2\u9001\u30de\u30cd\u30fc\u30b8\u30e3\u306b\u8ffd\u52a0\u3055\u308c\u307e\u3057\u305f",
     "17886": "This user already exists in your contact list",
     "18148": "\u30b5\u30dd\u30fc\u30c8\u3078\u9023\u7d61\u3059\u308b",
+    "18192": "\u540d\u524d\u3001\u7d76\u5bfe\u30d1\u30b9\uff08\u30ef\u30a4\u30eb\u30c9\u30ab\u30fc\u30c9*\u3068\uff1f\u306f\u8a31\u53ef\uff09\u3092\u5165\u529b\u3059\u308b\u304b\u3001\u540c\u671f\u304b\u3089\u9664\u5916\u3057\u305f\u3044\u30d5\u30a1\u30a4\u30eb\u307e\u305f\u306f\u30d5\u30a9\u30eb\u30c0\u3092\u9078\u629e\u3057\u307e\u3059",
     "18213": "The download size exceeds the maximum size supported by the browser. You can use MEGAsync to proceed with the download.",
     "18214": "Do you want to turn ON downloading with MEGAsync?",
     "18215": "Upload securely",
@@ -2147,7 +2148,7 @@
     "18290": "Type your new password, confirm it and tap [B]Change password[\/B].",
     "18291": "Open the app and tap on [B]My Account[\/B] located on the tab bar.",
     "18292": "Tap on [B]Settings[\/B].",
-    "18293": "Tap on [B]Security Options[\/B].",
+    "18293": "[B]\u30bb\u30ad\u30e5\u30ea\u30c6\u30a3\u30aa\u30d7\u30b7\u30e7\u30f3[\/B]\u3092\u30bf\u30c3\u30d7\u3057\u3066\u304f\u3060\u3055\u3044",
     "18294": "Tap on the [B]Change password[\/B] button.",
     "18295": "Type your new password, confirm it and tap [B]Save[\/B].",
     "18296": "Tap on your [B]Account name[\/B] at the bottom left of the Menu.",
@@ -2258,5 +2259,6 @@
     "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
     "18512": "Review Session History",
     "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
-    "18514": "This is your own contact link"
+    "18514": "This is your own contact link",
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step."
 }

@@ -2169,6 +2169,7 @@
     "18314": "Toquez sur le [B]nom de votre compte[\/B] en haut \u00e0 gauche du menu.",
     "18315": "Toquez sur les trois points horizontaux en bas \u00e0 droite.",
     "18316": "Saisissez votre nouveau mot de passe, confirmez-le et toquez sur [B]Termin\u00e9[\/B].",
+    "18340": "Sauvegarder la cl\u00e9 de r\u00e9cup\u00e9ration",
     "18347": "Cochez toutes les cases pour continuer",
     "18419": "Saisissez votre nouveau mot de passe, confirmez-le et cliquez sur [B]OK[\/B].",
     "18420": "Malheureusement, l\u2019ouverture d\u2019un lien prot\u00e9g\u00e9 par mot de passe n\u2019est pas prise en charge dans votre navigateur actuel. Veuillez ouvrir le lien en utilisant Chrome de Google ou Firefox de Mozilla pour y acc\u00e9der.",
@@ -2260,5 +2261,6 @@
     "18512": "Examiner l\u2019historique des sessions",
     "18513": "Souhaitez-vous fermer toutes les autres sessions\u2009? Cela vous d\u00e9connectera de toutes les autres sessions, sauf la session actuelle.",
     "18514": "Ce lien de contact est le v\u00f4tre",
-    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step."
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

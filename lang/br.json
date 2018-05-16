@@ -2169,6 +2169,7 @@
     "18314": "Toque no seu [B]Nome[\/B] no canto superior esquerdo do Menu.",
     "18315": "Toque nos tr\u00eas pontos horizontais no canto inferior direito.",
     "18316": "Digite a sua nova senha, confirme e toque em [B]OK[\/B].",
+    "18340": "Salvar chave de recupera\u00e7\u00e3o",
     "18347": "Selecione todas as op\u00e7\u00f5es para continuar",
     "18419": "Digite a sua nova senha, confirme-a e clique em [B]OK[\/B].",
     "18420": "Infelizmente, a abertura de um link protegido por senha n\u00e3o \u00e9 suportada por este navegador. Por favor, acesse o link usando o Google Chrome ou o Mozilla Firefox.",
@@ -2260,5 +2261,6 @@
     "18512": "Revisar o hist\u00f3rico de sess\u00f5es",
     "18513": "Voc\u00ea quer fechar todas as outras sess\u00f5es? Essa a\u00e7\u00e3o far\u00e1 logout de todas as outras sess\u00f5es ativas, exceto a atual.",
     "18514": "Este \u00e9 o seu pr\u00f3prio link de contato",
-    "18668": "Email n\u00e3o encontrado - tente novamente. Se n\u00e3o conseguir lembrar o endere\u00e7o de email associado \u00e0 sua conta no MEGA, deixe o espa\u00e7o vazio e clique em Iniciar novamente para pular este passo."
+    "18668": "Email n\u00e3o encontrado - tente novamente. Se n\u00e3o conseguir lembrar o endere\u00e7o de email associado \u00e0 sua conta no MEGA, deixe o espa\u00e7o vazio e clique em Iniciar novamente para pular este passo.",
+    "18669": "Write a message to %s..."
 }

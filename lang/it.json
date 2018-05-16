@@ -2169,6 +2169,7 @@
     "18314": "Clicca sul [B]Nome del tuo account[\/B] in alto a sinistra nel Menu.",
     "18315": "Clicca sui tre puntini orizzontali in basso a destra.",
     "18316": "Inserisci la tua nuova password, confermala e clicca [B]Fatto[\/B].",
+    "18340": "Copia la Chiave di Recupero",
     "18347": "Spunta i campi qui sotto",
     "18419": "Inserisci la tua nuova password, confermala e clicca [B]OK[\/B].",
     "18420": "Sfortunatamente, l'apertura di un link protetto da password non \u00e8 supportata dal tuo browser corrente. Per favore, apri il link utilizzando Google Chrome o Mozilla Firefox per accedervi.",
@@ -2260,5 +2261,6 @@
     "18512": "Rivedi la Storia delle Sessioni",
     "18513": "Vuoi chiudere tutte le altre sessioni? Questo ti far\u00e0 uscire da tutte le altre sessioni attive, fatta eccezione per quella corrente.",
     "18514": "Questo \u00e8 il tuo link di contatto personale",
-    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step."
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

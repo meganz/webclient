@@ -2169,6 +2169,7 @@
     "18314": "Tippen Sie auf Ihren [B]Benutzernamen[\/B] in der oberen linken Men\u00fcecke.",
     "18315": "Tippen Sie auf die drei horizontalen Punkte in der unteren rechten Ecke.",
     "18316": "Geben Sie Ihr neues Passwort ein, best\u00e4tigen Sie es und tippen Sie auf [B]Fertig[\/B].",
+    "18340": "Rettungsschl\u00fcssel sichern",
     "18347": "Nach Best\u00e4tigung aller Punkte erhalten Sie Zugang zum n\u00e4chsten Schritt",
     "18419": "Geben Sie Ihr neues Passwort ein, best\u00e4tigen Sie es und klicken Sie auf [B]OK[\/B].",
     "18420": "Leider k\u00f6nnen passwortgesch\u00fctzte Links in Ihrem Browser nicht ge\u00f6ffnet werden. Bitte \u00f6ffnen Sie den Link stattdessen in Google Chrome oder Mozilla Firefox.",
@@ -2260,5 +2261,6 @@
     "18512": "Sitzungsverlauf ansehen",
     "18513": "Alle anderen Sitzungen schlie\u00dfen? Sie werden \u00fcberall au\u00dfer auf diesem Ger\u00e4t ausgeloggt.",
     "18514": "Das ist Ihr eigener Kontaktlink",
-    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step."
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

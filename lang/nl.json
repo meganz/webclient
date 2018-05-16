@@ -2169,6 +2169,7 @@
     "18314": "Tik op uw [B]Account naam[\/B] bij de linker bovenkant van het Menu.",
     "18315": "Tik op de drie horizontale puntjes bij de rechter onderkant.",
     "18316": "Typ uw nieuwe wachtwoord, bevestig het en tik [B]Klaar[\/B].",
+    "18340": "Reservekopie Herstelsleutel",
     "18347": "Controleer alle vakken om door te gaan",
     "18419": "Typ uw nieuwe wachtwoord, bevestig en klik  [B]OK[\/B].",
     "18420": "Helaas is het openen van een met wachtwoord beveiligde koppeling niet ondersteund in uw huidige browser. Open de koppeling door gebruik van Google Chrome of Mozilla Firefox om het te openen.",
@@ -2260,5 +2261,6 @@
     "18512": "Sessie Geschiedenis Weergeven",
     "18513": "Wilt u alle andere sessies sluiten? Dit logt u uit op alle andere actieve sessies behalve de huidige sessie.",
     "18514": "Dit is uw eigen contact koppeling",
-    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step."
+    "18668": "E-mailadres niet gevonden, probeer nogmaals. Als u het geassocieerde e-mailadres van uw MEGA account niet herinnerd, wis het ingevulde veld en klik Opnieuw beginnen om deze stap over te slaan.",
+    "18669": "Write a message to %s..."
 }

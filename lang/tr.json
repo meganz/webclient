@@ -2169,6 +2169,7 @@
     "18314": "Men\u00fcn\u00fcn sol \u00fcst\u00fcndeki [B]Hesap ad\u0131n\u0131za[\/B] bas\u0131n.",
     "18315": "Sa\u011f alttaki \u00fc\u00e7 yatay noktaya bas\u0131n.",
     "18316": "Yeni parolan\u0131z\u0131 girin, onaylay\u0131n ve [B]Tamamland\u0131[\/B] tu\u015funa bas\u0131n.",
+    "18340": "Kurtarma Anahtar\u0131n\u0131 yedekle",
     "18347": "Devam etmek i\u00e7in her kutuyu i\u015faretleyin",
     "18419": "Yeni parolan\u0131z\u0131 girin, onaylay\u0131n ve [B]TAMAM[\/B] tu\u015funa bas\u0131n.",
     "18420": "Maalesef mevcut taray\u0131c\u0131n\u0131zda \u015fifre korumal\u0131 ba\u011flant\u0131 a\u00e7ma desteklenmiyor. L\u00fctfen eri\u015fmek i\u00e7in Google Chrome veya Mozilla Firefox kullanarak ba\u011flant\u0131y\u0131 a\u00e7\u0131n.",
@@ -2260,5 +2261,6 @@
     "18512": "Oturum Ge\u00e7mi\u015fini G\u00f6zden Ge\u00e7irme",
     "18513": "Di\u011fer t\u00fcm oturumlar\u0131 kapatmak istiyor musunuz? Bu, ge\u00e7erli oturumunuz hari\u00e7 di\u011fer t\u00fcm aktif oturumlar\u0131n\u0131z\u0131 kapatacakt\u0131r.",
     "18514": "Bu kendi ileti\u015fim ba\u011flant\u0131n\u0131z",
-    "18668": "Eposta adresi bulunamad\u0131, l\u00fctfen tekrar deneyin. E\u011fer MEGA hesab\u0131n\u0131zla e\u015fle\u015ftirilmi\u015f eposta adresinizi hat\u0131rlayam\u0131yorsan\u0131z, bu ad\u0131m\u0131 ge\u00e7mek i\u00e7in giri\u015f alan\u0131n\u0131 bo\u015f b\u0131rak\u0131p yeniden ba\u015flay\u0131n."
+    "18668": "Eposta adresi bulunamad\u0131, l\u00fctfen tekrar deneyin. E\u011fer MEGA hesab\u0131n\u0131zla e\u015fle\u015ftirilmi\u015f eposta adresinizi hat\u0131rlayam\u0131yorsan\u0131z, bu ad\u0131m\u0131 ge\u00e7mek i\u00e7in giri\u015f alan\u0131n\u0131 bo\u015f b\u0131rak\u0131p yeniden ba\u015flay\u0131n.",
+    "18669": "Write a message to %s..."
 }

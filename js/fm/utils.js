@@ -774,6 +774,7 @@ MegaUtils.prototype.require = function megaUtilsRequire() {
  */
 MegaUtils.prototype.logout = function megaUtilsLogout() {
     M.abortTransfers().then(function() {
+        var step = 2;
         var finishLogout = function() {
             if (--step === 0) {
                 u_logout(true);
@@ -795,9 +796,11 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                     }
                 }
             }
-        }, step = 1;
+        };
 
         loadingDialog.show();
+        mega.config.flush().always(finishLogout);
+
         if (fmdb && fmconfig.dbDropOnLogout) {
             step++;
             var promises = [];

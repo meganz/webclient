@@ -5007,11 +5007,16 @@ React.makeElement = React['createElement'];
 	        var scrollPositionY = ps.getScrollPositionY();
 	        var isAtTop = ps.isAtTop();
 	        var isAtBottom = ps.isAtBottom();
+	        var chatRoom = self.props.chatRoom;
+	        var mb = chatRoom.messagesBuff;
+
+	        if (mb.messages.length === 0) {
+	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
+	            return;
+	        }
 
 	        if (ps.isCloseToBottom(30) === true) {
 	            if (!self.scrolledToBottom) {
-	                var chatRoom = self.props.chatRoom;
-	                var mb = chatRoom.messagesBuff;
 	                mb.detachMessages();
 	            }
 	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
@@ -5020,9 +5025,7 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (isAtTop || ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500) {
-	            var chatRoom = self.props.chatRoom;
-	            var mb = chatRoom.messagesBuff;
-	            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
+	            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull && !mb.isRetrievingHistory) {
 	                ps.disable();
 
 	                self.isRetrievingHistoryViaScrollPull = true;
@@ -8288,6 +8291,8 @@ React.makeElement = React['createElement'];
 	                }
 	            });
 	        }
+	        var placeholder = l[18669];
+	        placeholder = placeholder.replace("%s", room.getRoomTitle(false, true));
 
 	        return React.makeElement(
 	            "div",
@@ -8321,7 +8326,8 @@ React.makeElement = React['createElement'];
 	                        style: textareaScrollBlockStyles },
 	                    React.makeElement("textarea", {
 	                        className: messageTextAreaClasses,
-	                        placeholder: __(l[8009]),
+	                        placeholder: placeholder,
+	                        roomTitle: room.getRoomTitle(),
 	                        onKeyUp: self.onTypeAreaKeyUp,
 	                        onKeyDown: self.onTypeAreaKeyDown,
 	                        onBlur: self.onTypeAreaBlur,
@@ -11638,14 +11644,14 @@ React.makeElement = React['createElement'];
 	    return handlesWithoutMyself;
 	};
 
-	ChatRoom.prototype.getRoomTitle = function (ignoreTopic) {
+	ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
 	        return M.getNameByHandle(participants[0]) || "";
 	    } else {
 	        if (!ignoreTopic && self.topic && self.topic.substr) {
-	            return self.topic.substr(0, 30);
+	            return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
 	        }
 
 	        var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];

@@ -450,7 +450,7 @@ ChatRoom.prototype.getParticipantsExceptMe = function(userHandles) {
  *
  * @returns {string}
  */
-ChatRoom.prototype.getRoomTitle = function(ignoreTopic) {
+ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
@@ -458,7 +458,7 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic) {
     }
     else {
         if (!ignoreTopic && self.topic && self.topic.substr) {
-            return self.topic.substr(0, 30);
+            return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
         }
 
         var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];

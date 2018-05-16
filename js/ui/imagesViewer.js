@@ -687,11 +687,6 @@ var slideshowid;
             }
         }
 
-        if (ua.details.engine === 'Gecko') {
-            // Prevent an issue where some previous images are shown moving to next
-            $overlay.find('.img-wrap img').attr('src', '');
-        }
-
         // Favourite Icon
         slideshow_favourite(n, $overlay);
 
@@ -728,12 +723,18 @@ var slideshowid;
         });
 
         var $dlBut = $overlay.find('.viewer-button.download');
-        $dlBut.rebind('click', function() {
-            var n = M.d[slideshowid];
+        $dlBut.rebind('click', function _dlButClick() {
             var p = previews[n && n.h];
 
             if (p && p.full) {
-                M.saveAs(p.buffer, n.name);
+                M.saveAs(p.buffer, n.name)
+                    .fail(function(ex) {
+                        if (d) {
+                            console.debug(ex);
+                        }
+                        p.full = p.buffer = false;
+                        _dlButClick();
+                    });
                 return false;
             }
 
@@ -1214,6 +1215,10 @@ var slideshowid;
             // Apply img data to necessary image. If replacing preview->original,
             // update only the img's src and percent-label, to preserve any zoomed status.
             if (!replacement || switchedSides) {
+                if (ua.details.engine === 'Gecko') {
+                    // Prevent an issue where some previous images are shown moving to next
+                    $overlay.find('.img-wrap img').attr('src', '');
+                }
                 $imgCount.find('img').removeClass('active');
                 $imgCount.attr('data-count', imgClass);
                 $imgCount.attr('data-image', id);

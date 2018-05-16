@@ -1347,12 +1347,11 @@ MegaUtils.prototype.saveAs = function(data, filename) {
     }
     else {
         this.toArrayBuffer(data)
-            .done(function(ab) {
+            .tryCatch(function(ab) {
                 saveToDisk(new Uint8Array(ab));
-            })
-            .fail(function() {
+            }, function() {
                 promise.reject.apply(promise, arguments);
-            })
+            });
     }
 
     return promise;

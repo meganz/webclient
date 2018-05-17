@@ -272,7 +272,6 @@
     "716": "Kata sandi terkini",
     "717": "Kata sandi baru",
     "718": "Konfirmasi kata sandi baru",
-    "719": "Silahkan masukkan kata sandi terkini anda.",
     "724": "Kata sandi terkini yang anda masukkan salah.",
     "725": "Kata sandi anda telah dirubah.",
     "726": "Selesai",
@@ -1131,7 +1130,6 @@
     "8006": "Lampiran ditambahkan ke Cloud Drive anda.",
     "8007": "Tambah participant...",
     "8008": "Anda tidak memiliki [P]Conversations[\/P]",
-    "8009": "Tulis pesan...",
     "8010": "Cari kontak",
     "8011": "Tambahkan ke Cloud Drive saya",
     "8013": "Dari Cloud Drive saya",
@@ -2191,5 +2189,10 @@
     "18506": "If you are able to provide your account's email address, please do so. If you cannot remember it, please click Start again to skip this step.",
     "18507": "Email Address",
     "18508": "Please enter the email address of the account you wish to recover. If you cannot remember it, please leave the field blank.",
-    "18514": "This is your own contact link"
+    "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
+    "18512": "Review Session History",
+    "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
+    "18514": "This is your own contact link",
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

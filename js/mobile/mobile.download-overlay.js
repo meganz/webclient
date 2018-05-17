@@ -59,7 +59,7 @@ mobile.downloadOverlay = {
         'use strict';
 
         var n = M.d[nodeHandle];
-        var $button = this.$overlay.find('.first.dl-browser');
+        var $button = this.$overlay.find('.second.dl-browser');
         var $label = $button.find('span');
 
         if (dlMethod !== MemoryIO || !dlmanager.openInBrowser(n)) {
@@ -73,14 +73,12 @@ mobile.downloadOverlay = {
 
         this.$overlay.find('.second.dl-browser').off('tap').on('tap', function() {
        
-            $button.off('tap').on('tap', function() {
-
                 // Start the download
                 mobile.downloadOverlay.startFileDownload(nodeHandle);
 
                 // Prevent default anchor link behaviour
                 return false;
-            });
+            
         });
     },
 

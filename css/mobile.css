@@ -5930,7 +5930,7 @@ textarea.mobile.support-text-field {
 .mobile.app-advertisement-text {
     width: calc(100% - 80px);
     display: table-cell;
-    line-height: initial;
+    line-height: 12px;
     text-align: left;
     padding-left: 12px;
     vertical-align: middle;

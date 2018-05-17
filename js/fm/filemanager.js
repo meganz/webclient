@@ -1104,6 +1104,9 @@ FileManager.prototype.initContextUI = function() {
             // Taking care about share dialog button 'Done'/share and scroll
             shareDialogContentCheck();
 
+            // Clear text area message
+            $('.share-message textarea').val(l[6853]);
+
             // Maintain drop down list updated
             updateDialogDropDownList('.share-multiple-input');
 

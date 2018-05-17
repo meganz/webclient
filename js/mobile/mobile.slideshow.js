@@ -68,6 +68,11 @@ mobile.slideshow = {
 
         'use strict';
 
+        // TODO: FIXME
+        if (1) {
+            return;
+        }
+
         // Cache selectors
         var $slideShowBackground = mobile.slideshow.$overlay.find('.slideshow-wrapper, .fs');
         var $slideShowHeader = mobile.slideshow.$overlay.find('.slideshow-header');
@@ -75,7 +80,7 @@ mobile.slideshow = {
         var $slideShowNavButtons = mobile.slideshow.$overlay.find('.slideshow-back-arrow, .slideshow-forward-arrow');
 
         // On clicking the image or black background of the slideshow
-        $slideShowBackground.off().on('tap', function() {
+        $slideShowBackground.off('tap').on('tap', function() {
             if ($slideShowHeader.hasClass('hidden')) {
                 $slideShowHeader.removeClass('hidden');
                 $slideShowFooterButtons.removeClass('hidden');
@@ -187,11 +192,9 @@ mobile.slideshow = {
         // Show the dialog
         mobile.slideshow.$overlay.removeClass('hidden');
 
-        // Store video html block
-        var videoHtmlTemplate = $('.mobile-video-template');
-        var videoHtmlDiv = videoHtmlTemplate.html();
-
         if (is_video(node)) {
+            var videoHtmlTemplate = $('.mobile-video-template');
+            var videoHtmlDiv = videoHtmlTemplate.html();
 
             $image.addClass('hidden');
             mobile.slideshow.$overlay.find('.slides.mid').html(videoHtmlDiv);
@@ -445,6 +448,9 @@ mobile.slideshow = {
 
             // Hide the dialog
             mobile.slideshow.$overlay.addClass('hidden');
+
+            // Destroy any streaming instance
+            $(window).trigger('video-destroy');
 
             // Prevent double taps
             return false;

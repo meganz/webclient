@@ -1569,7 +1569,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             s = tempSel.attrs('id');
         }
 
-        if (M.chat) {
+        if (M.chat && !$.dialog) {
             return true;
         }
 

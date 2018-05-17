@@ -164,7 +164,7 @@
     cursor: default;
 }
 .message.text-block a {
-    color: #2BA6DE;
+    color: #017bb2;
     text-decoration: underline;
 }
 .message.text-block a:hover {
@@ -231,7 +231,7 @@
     line-height: 20px;
     font-family: 'Open Sans Italic';
     display: inline-block;
-    color: #2BA6DE;
+    color: #0387C3;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;

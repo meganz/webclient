@@ -1363,7 +1363,7 @@ ChatRoom.prototype.loadImage = function(node) {
     else if (!self._imagesLoading[node.h]) {
         self._imagesLoading[node.h] = true;
         self._imagesToBeLoaded[node.h] = node;
-        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self));
+        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self), 90);
     }
 };
 
@@ -1465,11 +1465,11 @@ ChatRoom.prototype._doLoadImages = function() {
     "use strict";
 
     var self = this;
+    var dups = Object.create(null);
     var thumbToLoad = Object.create(null);
     var imagesToBeLoaded = self._imagesToBeLoaded;
     self._imagesToBeLoaded = Object.create(null);
 
-    var dups = {};
     // dedup the same .fa's as in fm_thumbnails
     for (var k in imagesToBeLoaded) {
         var node = imagesToBeLoaded[k];
@@ -1509,6 +1509,7 @@ ChatRoom.prototype._doLoadImages = function() {
                 if (!isThumbnail && !previews[h] && is_image(n) && fileext(n.name) !== 'pdf') {
                     preqs[h] = 1;
                     previewimg(h, data, 'image/jpeg');
+                    previews[h].fromChat = Date.now();
                 }
                 else {
                     self._mediaAttachmentsCache[h] = mObjectURL([data.buffer || data], 'image/jpeg');

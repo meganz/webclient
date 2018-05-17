@@ -768,8 +768,14 @@ var slideshowid;
         }
 
         if (previews[n.h]) {
-            previewsrc(n.h);
-            fetchnext();
+            if (previews[n.h].fromChat) {
+                previews[n.h].fromChat = null;
+                fetchsrc(n);
+            }
+            else {
+                previewsrc(n.h);
+                fetchnext();
+            }
         }
         else if (!preqs[n.h]) {
             fetchsrc(n);
@@ -884,6 +890,18 @@ var slideshowid;
 
         if (d) {
             console.debug('slideshow.fetchsrc(%s), preview=%s original=%s', id, loadPreview, loadOriginal, n, n.h);
+        }
+
+        if (previews[n.h] && previews[n.h].buffer && !slideshowplay) {
+            // e.g. hackpatch for chat who already loaded the preview...
+            if (n.s > 1048576) {
+                loadPreview = true;
+                getPreview = preview.bind(null, false, n.h, previews[n.h].buffer);
+            }
+            else {
+                loadPreview = false;
+                preview(false, n.h, previews[n.h].buffer);
+            }
         }
 
         if (loadOriginal) {
@@ -1266,7 +1284,7 @@ var slideshowid;
             time: Date.now(),
             src: myURL.createObjectURL(blob),
             buffer: uint8arr.buffer || uint8arr,
-            full: Object(M.d[id]).s === blob.size
+            full: M.getNodeByHandle(id).s === blob.size
         };
 
         if (id === slideshowid) {

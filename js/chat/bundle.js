@@ -10247,7 +10247,7 @@ React.makeElement = React['createElement'];
 	                                    React.makeElement(
 	                                        'div',
 	                                        { className: 'video-thumb-details' },
-	                                        isPreviewable && React.makeElement('i', { className: 'small-icon small-play-icon' }),
+	                                        v.playtime && React.makeElement('i', { className: 'small-icon small-play-icon' }),
 	                                        React.makeElement(
 	                                            'span',
 	                                            null,
@@ -12369,7 +12369,7 @@ React.makeElement = React['createElement'];
 	    } else if (!self._imagesLoading[node.h]) {
 	        self._imagesLoading[node.h] = true;
 	        self._imagesToBeLoaded[node.h] = node;
-	        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self));
+	        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self), 90);
 	    }
 	};
 
@@ -12438,11 +12438,10 @@ React.makeElement = React['createElement'];
 	    "use strict";
 
 	    var self = this;
+	    var dups = Object.create(null);
 	    var thumbToLoad = Object.create(null);
 	    var imagesToBeLoaded = self._imagesToBeLoaded;
 	    self._imagesToBeLoaded = Object.create(null);
-
-	    var dups = {};
 
 	    for (var k in imagesToBeLoaded) {
 	        var node = imagesToBeLoaded[k];
@@ -12480,6 +12479,7 @@ React.makeElement = React['createElement'];
 	                if (!isThumbnail && !previews[h] && is_image(n) && fileext(n.name) !== 'pdf') {
 	                    preqs[h] = 1;
 	                    previewimg(h, data, 'image/jpeg');
+	                    previews[h].fromChat = Date.now();
 	                } else {
 	                    self._mediaAttachmentsCache[h] = mObjectURL([data.buffer || data], 'image/jpeg');
 	                }

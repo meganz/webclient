@@ -15,6 +15,8 @@
      */
     var CredentialsWarningDialog = function(opts) {
         var self = this;
+        var warningList = {};
+        var curKey = null;
 
         var defaultOptions = {
             /**
@@ -227,6 +229,12 @@
         CredentialsWarningDialog.seenOrVerified = (CredentialsWarningDialog.seenOrVerified === authring.AUTHENTICATION_METHOD.SEEN) ? 'seen' : 'verified';
         CredentialsWarningDialog.previousFingerprint = prevFingerprint;
         CredentialsWarningDialog.newFingerprint = newFingerprint;
+        var key = contactHandle + keyType;
+        warningList[key] = {'contactHandle' : contactHandle,
+                            'keyType' : keyType,
+                            'prevFingerprint' : prevFingerprint,
+                            'newFingerprint' : newFingerprint
+                            };
 
         if (!CredentialsWarningDialog._instance) {
             CredentialsWarningDialog._instance = new CredentialsWarningDialog();
@@ -236,6 +244,7 @@
         }
 
         CredentialsWarningDialog._instance.show();
+        CredentialsWarningDialog._instance.curKey = key;
 
         return CredentialsWarningDialog._instance;
     };

@@ -2018,7 +2018,7 @@
     "17794": "\u521d\u671f\u5316\u4e2d...",
     "17795": "MEGAsync\u304c\u5fdc\u7b54\u3092\u505c\u6b62\u3057\u307e\u3057\u305f\u3002\u9589\u3058\u3089\u308c\u3066\u3044\u308b\u304b\u3001\u30d3\u30b8\u30fc\u72b6\u614b\u306b\u306a\u3063\u3066\u3044\u308b\u53ef\u80fd\u6027\u304c\u3042\u308a\u307e\u3059\u3002",
     "17796": "MEGAsync\u304c\u5fdc\u7b54\u3057\u306a\u3044\u5834\u5408\u3001MEGAsync\u3068\u306e\u63a5\u7d9a\u3092\u518d\u521d\u671f\u5316\u3057\u3066\u3001\u30aa\u30d5\u306b\u3057\u307e\u3059\u304b\uff1f\u3000",
-    "17797": "\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9\u306fMEGASync\u306b\u9001\u4fe1\u3055\u308c\u307e\u3057\u305f",
+    "17797": "\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9\u306fMEGAsync\u306b\u9001\u4fe1\u3055\u308c\u307e\u3057\u305f",
     "17799": "This is so hard to keep the original syntax in Japanese...\r\nBack-translation: folders contain the following number of files:\r\n\r\n\"33 folders containing a total of 8 files\" (in the screenshot) will be actually translated as \"\u5408\u8a088\u30d5\u30a1\u30a4\u30eb\u3092\u542b\u308033\u30d5\u30a9\u30eb\u30c0\". In Japanese syntax, the order of the words translated is kind of reverse this case. More specifically (with order for translation):\r\n33 folders containing a total of 8 files\r\n1. a total of\r\n2. 8 files\r\n3 . containing\r\n4. 33 folders",
     "17800": "\u30d5\u30a1\u30a4\u30eb\u304c\u8ee2\u9001\u30de\u30cd\u30fc\u30b8\u30e3\u306b\u8ffd\u52a0\u3055\u308c\u307e\u3057\u305f",
     "17801": "\u30d5\u30a1\u30a4\u30eb\u304c\u8ee2\u9001\u30de\u30cd\u30fc\u30b8\u30e3\u306b\u8ffd\u52a0\u3055\u308c\u307e\u3057\u305f",

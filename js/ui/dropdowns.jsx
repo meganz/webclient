@@ -127,6 +127,8 @@ var Dropdown = React.createClass({
     },
     render: function() {
         if (this.props.active !== true) {
+
+
             return null;
         }
         else {
@@ -155,11 +157,8 @@ var Dropdown = React.createClass({
             else if (this.props.dropdownItemGenerator) {
                 child = this.props.dropdownItemGenerator(this);
             }
-            if (!child) {
-                Soon(function() {
-                    self.onActiveChange(false);
-                });
-                return null;
+            else {
+                child = null;
             }
 
 

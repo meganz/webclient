@@ -560,21 +560,16 @@ var GenericConversationMessage = React.createClass({
                                         }
 
                                         if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                            dropdown = "<span>" + l[5533] + "</span>";
                                             dbfetch.get(v.h)
                                                 .always(function() {
                                                     if (!M.d[v.h]) {
                                                         NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
                                                         Soon(function() {
-                                                            dd.safeForceUpdate();
-                                                        });
-                                                    }
-                                                    else {
-                                                        Soon(function() {
-                                                            dd.safeForceUpdate();
+                                                            self.safeForceUpdate();
                                                         });
                                                     }
                                                 });
-                                            return <span>{l[5533]}</span>;
                                         }
                                         else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
                                             downloadButton = <DropdownsUI.DropdownItem
@@ -605,9 +600,7 @@ var GenericConversationMessage = React.createClass({
                                                                               openCopyDialog('conversations');
                                                                           }}/>
                                             );
-                                        }
-                                        else if (NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-                                            return null;
+
                                         }
 
                                             return <div>

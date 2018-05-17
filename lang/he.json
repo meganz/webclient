@@ -1108,6 +1108,7 @@
     "7882": "\u05d4\u05d4\u05d5\u05d3\u05e2\u05d4 \u05e0\u05e9\u05dc\u05d7\u05d4",
     "7883": "\u05d0\u05d9\u05e8\u05e2\u05d4 \u05e9\u05d2\u05d9\u05d0\u05d4 \u05d1\u05e2\u05ea \u05e9\u05dc\u05d9\u05d7\u05ea \u05d4\u05d4\u05d5\u05d3\u05e2\u05d4. \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1.",
     "7884": "\u05d4\u05d4\u05d5\u05d3\u05e2\u05d4 \u05e7\u05e6\u05e8\u05d4 \u05de\u05d3\u05d9",
+    "7944": "\u05d4\u05d7\u05e9\u05d1\u05d5\u05df \u05e9\u05dc\u05da \u05e0\u05d7\u05e1\u05dd. \u05d0\u05e0\u05d0 \u05e6\u05d5\u05e8 \u05e7\u05e9\u05e8 \u05e2\u05dd support@mega.nz",
     "7945": "\u05e2\u05dc \u05de\u05e0\u05ea \u05dc\u05d2\u05e9\u05ea \u05dc\u05ea\u05d9\u05e7\u05d9\u05d9\u05d4\/\u05e7\u05d5\u05d1\u05e5 \u05d6\u05d4, \u05ea\u05e6\u05d8\u05e8\u05da \u05d0\u05ea [B]\u05de\u05e4\u05ea\u05d7 \u05d4\u05e4\u05d9\u05e2\u05d5\u05d7[\/B] \u05e9\u05dc\u05d5.",
     "7946": "\u05d0\u05dd \u05d0\u05d9\u05df \u05dc\u05da \u05d0\u05d5\u05ea\u05d5, \u05d1\u05e7\u05e9 \u05d0\u05d5\u05ea\u05d5 \u05de\u05d9\u05d5\u05e6\u05e8 \u05d4\u05e7\u05d9\u05e9\u05d5\u05e8.",
     "7947": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05dc\u05d0 \u05de\u05e4\u05ea\u05d7",
@@ -2095,7 +2096,9 @@
     "17883": "%nbFi files were added to the transfer manager",
     "17884": "%nbFi file was added to the transfer manager",
     "17886": "This user already exists in your contact list",
+    "17958": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05d0 \u05ea\u05e7\u05d9\u05df",
     "18148": "\u05e6\u05d5\u05e8 \u05e7\u05e9\u05e8 \u05e2\u05dd \u05ea\u05de\u05d9\u05db\u05d4",
+    "18192": "Enter a name, an absolute path (wildcards * and? are allowed) or choose which file or folder you want to exclude from the synchronization.",
     "18213": "The download size exceeds the maximum size supported by the browser. You can use MEGAsync to proceed with the download.",
     "18214": "Do you want to turn ON downloading with MEGAsync?",
     "18215": "Upload securely",
@@ -2109,6 +2112,7 @@
     "18231": "Your QR code is deactivated.",
     "18232": "Do you want to reactivate your QR Code?",
     "18233": "Your filter did not match any documents",
+    "18238": "Due to MEGA\u2019s encryption technology you are unable to reset your password without data loss. Please make sure you remember your password.",
     "18254": "Are you logged into your account in another web browser?",
     "18255": "Please check all your browsers (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari etc.) to see if you are still logged into your account. You may have also logged into MEGA on someone else's computer and forgotten to log out.",
     "18256": "Step {NB}",
@@ -2168,6 +2172,7 @@
     "18314": "Tap on your [B]Account name[\/B] at the top left of the Menu.",
     "18315": "Tap on the three horizontal dots at the bottom right.",
     "18316": "Type your new password, confirm it and tap [B]Done[\/B].",
+    "18340": "\u05d2\u05d1\u05d4 \u05de\u05e4\u05ea\u05d7 \u05e9\u05d7\u05d6\u05d5\u05e8",
     "18347": "Check all boxes to continue",
     "18419": "Type your new password, confirm it and click [B]OK[\/B].",
     "18420": "Unfortunately opening a password protected link is not supported in your current browser. Please open the link using Google Chrome or Mozilla Firefox to access it.",
@@ -2258,5 +2263,8 @@
     "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
     "18512": "Review Session History",
     "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
-    "18514": "This is your own contact link"
+    "18514": "This is your own contact link",
+    "18667": "SSL certificate error",
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

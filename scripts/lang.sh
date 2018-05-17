@@ -60,6 +60,7 @@ tar xfvz lang.tar.gz
 # Remove unnecessary files
 rm strings.json
 rm error.json
+rm .ignore
 
 # Add the .json files
 git add *.json
@@ -90,6 +91,7 @@ if [ -n "$mergeResult" ]; then
     # Remove unnecessary files
     rm strings.json
     rm error.json
+    rm .ignore
 
     # Mark conflict resolved and commit changes
     git add *.json
@@ -102,7 +104,7 @@ else
     echo "All merged, you can now push the changes."
 fi
 
-# Cleanup
+# Final cleanup
 rm lang.tar.gz
 
 # Show all clear

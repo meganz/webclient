@@ -1454,7 +1454,7 @@
     "10647": "Termos da assinatura",
     "10648": "As assinaturas mensais e anuais ser\u00e3o renovadas automaticamente segundo o per\u00edodo de assinatura escolhido, exceto se a assinatura for cancelada antes da data de renova\u00e7\u00e3o.No caso das assinaturas estabelecidas atrav\u00e9s das plataformas de compra dos aplicativos Android ou iOS, voc\u00ea deve contatar a Google ou Apple diretamente para informar-se sobre as datas e condi\u00e7\u00f5es da assinatura. Qualquer outra assinatura ser\u00e1 renovada no mesmo dia do m\u00eas em que foi estabelecida, exceto nos casos em que o dia n\u00e3o estiver dispon\u00edvel (por ser um m\u00eas curto), quando a data de renova\u00e7\u00e3o ser\u00e1 movida para o primeiro dia do m\u00eas seguinte.",
     "10649": "Cancelamento da assinatura",
-    "10650": "As assinaturas estabelecidas atrav\u00e9s das plataformas de compra dos aplicativos Android ou iOS devem ser canceladas atrav\u00e9s do servi\u00e7o Google ou Apple diretamente. Qualquer outra assinatura deve ser cancelada navegando a [A]mega.nz\/account[\/A] no seu navegador e selecionando cancelar a sua assinatura. Quaisquer pagamentos processados ap\u00f3s um cancelamento efetivo da assinatura ser\u00e3o prontamente devolvidos pelo Mega. Se uma assinatura for cancelada, o acesso \u00e0 conta pode ser restringido ou bloqueado se o n\u00edvel de utiliza\u00e7\u00e3o est\u00e1 acima dos limites previstos para contas gratuitas naquele momento.",
+    "10650": "As assinaturas estabelecidas atrav\u00e9s das plataformas de compra dos aplicativos Android ou iOS devem ser canceladas atrav\u00e9s do servi\u00e7o Google ou Apple diretamente. Qualquer outra assinatura deve ser cancelada acessando [A]mega.nz\/account[\/A] no seu navegador e selecionando a op\u00e7\u00e3o para cancelar a sua assinatura. Quaisquer pagamentos processados ap\u00f3s um cancelamento efetivo da assinatura ser\u00e3o prontamente devolvidos pelo Mega. Se uma assinatura for cancelada, o acesso \u00e0 conta pode ser restringido ou bloqueado se o n\u00edvel de utiliza\u00e7\u00e3o estiver acima dos limites previstos para contas gratuitas naquele momento.",
     "10651": "Abuso do sistema",
     "10652": "De acordo com os seus Termos de Servi\u00e7o, o Mega ir\u00e1 bloquear as contas que estiverem envolvidas em qualquer abuso dos servi\u00e7os do Mega, incluindo a\u00e7\u00f5es como:",
     "10653": "Abrir v\u00e1rias contas gratuitas",
@@ -2266,5 +2266,5 @@
     "18514": "Este \u00e9 o seu pr\u00f3prio link de contato",
     "18667": "Erro no certificado SSL",
     "18668": "Email n\u00e3o encontrado - tente novamente. Se n\u00e3o conseguir lembrar o endere\u00e7o de email associado \u00e0 sua conta no MEGA, deixe o espa\u00e7o vazio e clique em Iniciar novamente para pular este passo.",
-    "18669": "Write a message to %s..."
+    "18669": "Escrever uma mensagem para %s..."
 }

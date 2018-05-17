@@ -494,10 +494,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                         $menuCMI.filter('.getlink-item').hide();
                         $menuCMI.filter('.embedcode-item').hide();
                         $menuCMI.filter('.colour-label-items').hide();
+                        $menuCMI.filter('.send-to-contact-item').hide();
                     }
                     else if (M.getNodeShare(id).down === 1) {
                         $menuCMI.filter('.copy-item').hide();
                         $menuCMI.filter('.move-item').hide();
+                        $menuCMI.filter('.send-to-contact-item').hide();
                     }
                     else if (items['.getlink-item']) {
                         onIdle(M.setContextMenuGetLinkText.bind(M));

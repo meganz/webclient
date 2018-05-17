@@ -1454,7 +1454,7 @@
     "10647": "Condiciones de la suscripci\u00f3n peri\u00f3dica",
     "10648": "La suscripci\u00f3n peri\u00f3dica se renovar\u00e1 autom\u00e1ticamente de forma mensual o anual en base al tipo de suscripci\u00f3n elegida, a no ser que se cancele antes de la fecha de renovaci\u00f3n. Para la suscripci\u00f3n peri\u00f3dica efectuada a trav\u00e9s de las aplicaciones de Android o iOS, deber\u00e1s consultar Google o Apple para obtener informaci\u00f3n sobre las fechas y las condiciones de la suscripci\u00f3n. Cualquier otra suscripci\u00f3n peri\u00f3dica se repetir\u00e1 el mismo d\u00eda del mes en que se estableci\u00f3, excepto en los casos en que el d\u00eda no est\u00e9 disponible debido a un mes corto, donde dicha fecha se trasladar\u00e1 al primer d\u00eda del mes siguiente.",
     "10649": "Cancelaci\u00f3n de la suscripci\u00f3n",
-    "10650": "Las suscripciones peri\u00f3dicas efectuadas a trav\u00e9s de las aplicaciones de Android o iOS deben cancelarse directamente a trav\u00e9s del servicio de Google o Apple. Puedes cancelar cualquier otra suscripci\u00f3n peri\u00f3dica desde tu navegador, entrando en [A]mega.nz\/#account[\/A] y seleccionando la opci\u00f3n para cancelar tu suscripci\u00f3n. MEGA devolver\u00e1 cualquier pago que se haya procesado despu\u00e9s de que la cancelaci\u00f3n se haya hecho efectiva. Al cancelar la suscripci\u00f3n, el acceso a tu cuenta puede estar restringido o bloqueado si el nivel de uso es superior a los l\u00edmites que se aplican a las cuentas gratuitas en ese momento.",
+    "10650": "Las suscripciones peri\u00f3dicas efectuadas a trav\u00e9s de las aplicaciones de Android o iOS deben cancelarse directamente a trav\u00e9s del servicio de Google o Apple. Puedes cancelar cualquier otra suscripci\u00f3n peri\u00f3dica desde tu navegador, entrando en [A]mega.nz\/account[\/A] y seleccionando la opci\u00f3n para cancelar tu suscripci\u00f3n. MEGA devolver\u00e1 cualquier pago que se haya procesado despu\u00e9s de que la cancelaci\u00f3n se haya hecho efectiva. Al cancelar la suscripci\u00f3n, el acceso a tu cuenta puede estar restringido o bloqueado si el nivel de uso es superior a los l\u00edmites que se aplican a las cuentas gratuitas en ese momento.",
     "10651": "Abuso del sistema",
     "10652": "De acuerdo con sus T\u00e9rminos de servicio, Mega cerrar\u00e1 las cuentas que est\u00e9n involucradas en cualquier abuso de los servicios de Mega, incluyendo acciones tales como:",
     "10653": "Abrir varias cuentas gratuitas",
@@ -1662,7 +1662,7 @@
     "16365": "Logros MEGA",
     "16375": "Amplio [S]espacio de almacenamiento[\/S]",
     "16378": "Deja atr\u00e1s los l\u00edmites de transferencia asociados a las cuentas gratuitas y disfruta de una mayor cuota de transferencia.",
-    "16380": "Accede a funcionalidades PRO como configurar la protecci\u00f3n por contrase\u00f1a o las fechas de caducidad de los archivos p\u00fablicos.",
+    "16380": "Accede a las caracter\u00edsticas PRO, como configurar la protecci\u00f3n por contrase\u00f1a o la fecha de caducidad de archivos p\u00fablicos.",
     "16381": "Notas sobre las transferencias y tu tipo de cuenta:",
     "16383": "Totalmente [S]Equipado[\/S]",
     "16384": "Generosa [S]cuota de transferencia[\/S]",
@@ -2266,5 +2266,5 @@
     "18514": "Este es tu propio enlace de contacto",
     "18667": "Error certificado SSL",
     "18668": "Direcci\u00f3n de correo electr\u00f3nico no encontrada, int\u00e9ntalo de nuevo. Si no recuerdas la direcci\u00f3n de correo electr\u00f3nico asociada a tu cuenta MEGA, no escribas nada en el campo correspondiente y haz clic de nuevo en Empezar para saltar este paso.",
-    "18669": "Write a message to %s..."
+    "18669": "Escribe un mensaje a %s..."
 }

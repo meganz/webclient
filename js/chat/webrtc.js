@@ -372,14 +372,7 @@ RtcModule.prototype._getLocalStream = function(av) {
             return Promise.reject("getLocalStream called re-entrantly from within a getLocalStream callback." +
                 "You should call getLocalStream() asynchronously to resolve this");
         }
-        return self.localMediaPromise
-            .then(function(stream) {
-                if (Object.keys(self.calls).length === 0) {
-                    return Promise.reject(null);
-                } else {
-                    return Promise.resolve(self.gLocalStream);
-                }
-            });
+        return self.localMediaPromise;
     }
     // Mark that we have an ongoing GUM request, but we don't have the
     // actual promise yet. This is because some callbacks may be called
@@ -415,9 +408,9 @@ RtcModule.prototype._getLocalStream = function(av) {
             }
             return Promise.resolve(msg);
         });
-    assert(self.localMediaPromise, "getUserMedia executed synchronously");
-    self.localMediaPromise = pms
-        .then(function(stream) {
+    assert(self.localMediaPromise, "getUserMedia resolved synchronously");
+    self.localMediaPromise = new Promise(function(resolve, reject) {
+        pms.then(function(stream) {
             resolved = true;
             if (typeof stream === 'string') {
                 self.gLocalStream = null;
@@ -433,16 +426,20 @@ RtcModule.prototype._getLocalStream = function(av) {
                 }
             }
             delete self.localMediaPromise;
-            if (Object.keys(self.calls).length !== 0) {// all calls were destroyed meanwhile
-                return Promise.resolve(stream);
+            // if all calls were not destroyed meanwhile
+            if (Object.keys(self.calls).length !== 0) {
+                resolve(stream);
             }
         });
-    setTimeout(function() {
-        if (!resolved) {
-            pms.resolve("timeout");
-        }
-    }, RtcModule.kMediaGetTimeout);
-
+        pms.catch(function(err) {
+            reject(err);
+        });
+        setTimeout(function() {
+            if (!resolved) {
+                reject("timeout");
+            }
+        }, RtcModule.kMediaGetTimeout);
+    });
     return self.localMediaPromise;
 };
 

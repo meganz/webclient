@@ -44,7 +44,7 @@ RtcModule.kApiTimeout = 20000;
 RtcModule.kCallAnswerTimeout = 40000;
 RtcModule.kRingOutTimeout = 30000;
 RtcModule.kIncallPingInterval = 4000;
-RtcModule.kMediaGetTimeout = 20000;
+RtcModule.kMediaGetTimeout = 60000;
 RtcModule.kSessSetupTimeout = 20000;
 
 RtcModule.prototype.logToServer = function(type, data) {
@@ -621,7 +621,6 @@ Call.prototype._getLocalStream = function(av) {
     // getLocalStream currently never fails - if there is error, stream is a string with the error message
     return self.manager._getLocalStream(av)
         .catch(function(err) {
-            assert(false, "RtcModule._getLocalStream promise failed, and it should not. Error: "+err);
             return Promise.reject(err);
         })
         .then(function(stream) {

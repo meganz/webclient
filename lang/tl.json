@@ -1108,6 +1108,7 @@
     "7882": "Naipadala ang mensahe",
     "7883": "Mayroong error sa pagpapadala ng iyong mensahe. Subukang muli na ipadala ito.",
     "7884": "Masyadong maikli ang mensahe",
+    "7944": "Ang iyong account ni-block. Kontakin ang support@mega.nz",
     "7945": "Para ma-access ang folder\/file, kailangan mo ng [B]Decryption key[\/B].",
     "7946": "Kung wala ka nito, tanungin mo ang gumawa ng link.",
     "7947": "Link kahit walang key",
@@ -2095,6 +2096,7 @@
     "17883": "%nbFi files were added to the transfer manager",
     "17884": "%nbFi file was added to the transfer manager",
     "17886": "This user already exists in your contact list",
+    "17958": "Maling link",
     "18148": "Contact Support",
     "18192": "Enter a name, an absolute path (wildcards * and? are allowed) or choose which file or folder you want to exclude from the synchronization.",
     "18213": "The download size exceeds the maximum size supported by the browser. You can use MEGAsync to proceed with the download.",
@@ -2110,6 +2112,7 @@
     "18231": "Your QR code is deactivated.",
     "18232": "Do you want to reactivate your QR Code?",
     "18233": "Your filter did not match any documents",
+    "18238": "Due to MEGA\u2019s encryption technology you are unable to reset your password without data loss. Please make sure you remember your password.",
     "18254": "Are you logged into your account in another web browser?",
     "18255": "Please check all your browsers (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari etc.) to see if you are still logged into your account. You may have also logged into MEGA on someone else's computer and forgotten to log out.",
     "18256": "Step {NB}",
@@ -2261,6 +2264,7 @@
     "18512": "Review Session History",
     "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
     "18514": "This is your own contact link",
+    "18667": "SSL certificate error",
     "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
     "18669": "Write a message to %s..."
 }

@@ -1108,6 +1108,7 @@
     "7882": "Message envoy\u00e9",
     "7883": "Une erreur est survenue lors de la tentative d'envoi de votre message. Veuillez essayer de le renvoyer.",
     "7884": "Message trop court",
+    "7944": "Votre compte a \u00e9t\u00e9 bloqu\u00e9. Veuillez contacter support@mega.nz",
     "7945": "Pour acc\u00e9der \u00e0 ce dossier\/fichier, il vous faudra sa [B] cl\u00e9 de d\u00e9chiffrement[\/B].",
     "7946": "Si vous ne l'avez pas, demander au cr\u00e9ateur du lien.",
     "7947": "Lien sans cl\u00e9",
@@ -2095,6 +2096,7 @@
     "17883": "%nbFi fichiers ont \u00e9t\u00e9 ajout\u00e9s au gestionnaire de transferts",
     "17884": "%nbFi fichier a \u00e9t\u00e9 ajout\u00e9 au gestionnaire de transferts",
     "17886": "Cet utilisateur existe d\u00e9j\u00e0 dans votre liste de contacts",
+    "17958": "Lien invalide",
     "18148": "Contacter le support",
     "18192": "Saisir un nom, un chemin absolu (les m\u00e9tacaract\u00e8res * et ? sont autoris\u00e9s) ou choisir quels fichier ou dossier doit \u00eatre exclu de la synchronisation",
     "18213": "La taille de t\u00e9l\u00e9chargement d\u00e9passe la taille maximale prise en charge par le navigateur. Vous pouvez utiliser MEGAsync pour effectuer le t\u00e9l\u00e9chargement.",
@@ -2110,6 +2112,7 @@
     "18231": "Votre code QR est d\u00e9sactiv\u00e9.",
     "18232": "Souhaitez-vous r\u00e9activer votre code QR\u2009?",
     "18233": "Votre filtre ne correspond \u00e0 aucun document",
+    "18238": "En raison de la technologie de chiffrement de MEGA, vous ne pouvez pas r\u00e9initialiser votre mot de passe sans perte de donn\u00e9es. Veuillez vous assurer de vous rappeler votre mot de passe.",
     "18254": "\u00cates-vous connect\u00e9 \u00e0 votre compte dans un autre navigateur Web\u2009?",
     "18255": "Veuillez v\u00e9rifier tous vos navigateurs (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari etc.) pour avoir si vous \u00eates encore connect\u00e9 \u00e0 votre compte. Vous pourriez aussi vous \u00eatre connect\u00e9 sur l\u2019ordinateur de quelqu\u2019un d\u2019autre et avoir oubli\u00e9 de vous d\u00e9connecter.",
     "18256": "\u00c9tape {NB}",
@@ -2261,6 +2264,7 @@
     "18512": "Examiner l\u2019historique des sessions",
     "18513": "Souhaitez-vous fermer toutes les autres sessions\u2009? Cela vous d\u00e9connectera de toutes les autres sessions, sauf la session actuelle.",
     "18514": "Ce lien de contact est le v\u00f4tre",
+    "18667": "SSL certificate error",
     "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
     "18669": "Write a message to %s..."
 }

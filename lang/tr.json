@@ -1108,6 +1108,7 @@
     "7882": "Mesaj g\u00f6nderildi",
     "7883": "Mesaj\u0131n\u0131z\u0131 g\u00f6ndermeye \u00e7al\u0131\u015f\u0131rken bir hata olu\u015ftu. Yeniden g\u00f6ndermeyi deneyin.",
     "7884": "Mesaj \u00e7ok k\u0131sa",
+    "7944": "Hesab\u0131n\u0131z bloke edilmi\u015ftir.  L\u00fctfen support@mega.nz ile irtibata ge\u00e7iniz",
     "7945": "Bu klas\u00f6re\/dosyaya eri\u015fmek i\u00e7in [B]\u015eifre \u00e7\u00f6zme anahtar\u0131 gerekir[\/B].",
     "7946": "Sizde yoksa, ba\u011flant\u0131y\u0131 olu\u015fturan ki\u015fiden isteyin.",
     "7947": "Anahtar\u0131 olmayan ba\u011flant\u0131",
@@ -2095,6 +2096,7 @@
     "17883": "Aktarma y\u00f6neticisine %nbFi dosya eklendi",
     "17884": "Aktarma y\u00f6neticisine %nbFi dosya eklendi",
     "17886": "Bu kullan\u0131c\u0131 zaten ki\u015fi listenizde",
+    "17958": "Ge\u00e7ersiz ba\u011flant\u0131",
     "18148": "Deste\u011fe Ula\u015f\u0131n",
     "18192": "Bir ad girin, mutlak bir yol (joker karakter * ve ? izin verilir) veya senkronizasyon i\u015fleminden hari\u00e7 tutmak istedi\u011finiz dosyay\u0131 veya klas\u00f6r\u00fc se\u00e7in",
     "18213": "\u0130ndirme boyutu bu taray\u0131c\u0131 taraf\u0131ndan desteklenenin \u00fczerinde. \u0130ndirmeye devam etmek i\u00e7in MEGAsync ile devam edebilirsiniz.",
@@ -2110,6 +2112,7 @@
     "18231": "Kare kodunuz devre d\u0131\u015f\u0131 b\u0131rak\u0131ld\u0131.",
     "18232": "Kare kodunuzu yeniden etkinle\u015ftirmek ister misiniz?",
     "18233": "Filtrelerinizle e\u015fle\u015fen dok\u00fcman bulunamad\u0131",
+    "18238": "MEGA'n\u0131n \u015fifreleme teknolojisi veri kayb\u0131na u\u011framadan parola kurtarmay\u0131 imkans\u0131z k\u0131lar. L\u00fctfen parolan\u0131z\u0131 hat\u0131rlad\u0131\u011f\u0131n\u0131za emin olun.",
     "18254": "Ba\u015fka bir intermet taray\u0131c\u0131s\u0131nda aktif oturumunuz var m\u0131?",
     "18255": "L\u00fctfen olas\u0131 aktif oturum bulmak i\u00e7in t\u00fcm taray\u0131c\u0131lar\u0131n\u0131z\u0131 (Firefox, Chrome, Opera, Edge, Internet Explorer, Safari gibi.) kontrol edin. Ayn\u0131 zamanda ba\u015fka birinin bilgisayar\u0131nda giri\u015f yap\u0131p \u00e7\u0131kmay\u0131 unutmu\u015f da olabilirsiniz.",
     "18256": "Ad\u0131m {NB}",
@@ -2261,6 +2264,7 @@
     "18512": "Oturum Ge\u00e7mi\u015fini G\u00f6zden Ge\u00e7irme",
     "18513": "Di\u011fer t\u00fcm oturumlar\u0131 kapatmak istiyor musunuz? Bu, ge\u00e7erli oturumunuz hari\u00e7 di\u011fer t\u00fcm aktif oturumlar\u0131n\u0131z\u0131 kapatacakt\u0131r.",
     "18514": "Bu kendi ileti\u015fim ba\u011flant\u0131n\u0131z",
+    "18667": "SSL sertifika hatas\u0131",
     "18668": "Eposta adresi bulunamad\u0131, l\u00fctfen tekrar deneyin. E\u011fer MEGA hesab\u0131n\u0131zla e\u015fle\u015ftirilmi\u015f eposta adresinizi hat\u0131rlayam\u0131yorsan\u0131z, bu ad\u0131m\u0131 ge\u00e7mek i\u00e7in giri\u015f alan\u0131n\u0131 bo\u015f b\u0131rak\u0131p yeniden ba\u015flay\u0131n.",
-    "18669": "Write a message to %s..."
+    "18669": "Mesaj yaz: %s..."
 }

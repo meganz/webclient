@@ -1108,6 +1108,7 @@
     "7882": "Tin nh\u1eafn \u0111\u00e3 \u0111\u01b0\u1ee3c g\u1eedi",
     "7883": "L\u1ed7i ph\u00e1t sinh khi g\u1eedi \u0111i tin nh\u1eafn c\u1ee7a b\u1ea1n, xin th\u1eed g\u1eedi l\u1ea1i.",
     "7884": "Tin nh\u1eafn qu\u00e1 ng\u1eafn",
+    "7944": "T\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n b\u1ecb kh\u00f3a. Vui l\u00f2ng li\u00ean h\u1ec7 support@mega.nz",
     "7945": "\u0110\u1ec3 truy c\u1eadp v\u00e0o th\u01b0 m\u1ee5c hay t\u1ec7p tin n\u00e0y, b\u1ea1n c\u00e0n ph\u1ea3i c\u00f3 [B]M\u00e3 gi\u1ea3i kh\u00f3a[\/B]",
     "7946": "N\u1ebfu b\u1ea1n kh\u00f4ng c\u00f3 m\u00e3 gi\u1ea3i kh\u00f3a, xin li\u00ean h\u1ec7 ng\u01b0\u1eddi g\u1eedi link.",
     "7947": "\u0110\u01b0\u1eddng d\u1eabn li\u00ean k\u1ebft kh\u00f4ng k\u00e8m m\u00e3 kh\u00f3a",
@@ -2095,6 +2096,7 @@
     "17883": "%nbFi files were added to the transfer manager",
     "17884": "%nbFi file was added to the transfer manager",
     "17886": "This user already exists in your contact list",
+    "17958": "\u0110\u01b0\u1eddng d\u1eabn li\u00ean k\u1ebft kh\u00f4ng h\u1ee3p l\u1ec7",
     "18148": "Li\u00ean h\u1ec7 H\u1ed7 tr\u1ee3",
     "18192": "Nh\u1eadp t\u00ean, d\u1ea1ng t\u00ean hay \u0111\u01b0\u1eddng d\u1eabn m\u1eabu (\u0111\u01b0\u1ee3c ph\u00e9p s\u1eed d\u1ee5ng c\u00e1c ky t\u1ef1 \u0111\u1eb7ng bi\u1ec7t nh\u01b0 * v\u00e0 ? \u0111\u1ec3 bi\u1ec3u hi\u1ec7n) ho\u1eb7c ch\u1ecdn ra t\u1ec7p tin v\u00e0 th\u01b0 m\u1ee5c b\u1ea1n mu\u1ed1n li\u1ec7t v\u00e0o danh s\u00e1ch ngo\u1ea1i l\u1ec7 kh\u1ecfi qu\u00e1 tr\u00ecnh \u0111\u1ed3ng b\u1ed9",
     "18213": "The download size exceeds the maximum size supported by the browser. You can use MEGAsync to proceed with the download.",
@@ -2110,6 +2112,7 @@
     "18231": "Your QR code is deactivated.",
     "18232": "Do you want to reactivate your QR Code?",
     "18233": "Your filter did not match any documents",
+    "18238": "Due to MEGA\u2019s encryption technology you are unable to reset your password without data loss. Please make sure you remember your password.",
     "18254": "Are you logged into your account in another web browser?",
     "18255": "Please check all your browsers (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari etc.) to see if you are still logged into your account. You may have also logged into MEGA on someone else's computer and forgotten to log out.",
     "18256": "Step {NB}",
@@ -2261,6 +2264,7 @@
     "18512": "Review Session History",
     "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
     "18514": "This is your own contact link",
+    "18667": "SSL certificate error",
     "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
     "18669": "Write a message to %s..."
 }

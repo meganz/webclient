@@ -1108,6 +1108,7 @@
     "7882": "Mensaje enviado",
     "7883": "Se ha producido un error al intentar enviar tu mensaje. Por favor, intenta reenviarlo.",
     "7884": "Mensaje demasiado corto",
+    "7944": "Tu cuenta ha sido bloqueada. Por favor contacta con support@mega.nz",
     "7945": "Para acceder a esta carpeta\/archivo, necesitas la [B]Clave de cifrado[\/B]",
     "7946": "Si no lo tienes, p\u00eddesela al creador del enlace.",
     "7947": "Enlace sin clave",
@@ -2095,6 +2096,7 @@
     "17883": "%nbFi archivos se han a\u00f1adido al gestor de transferencia",
     "17884": "%nbFi archivo se ha a\u00f1adido al gestor de transferencia",
     "17886": "Este usuario ya existe en tu lista de contactos",
+    "17958": "Enlace no v\u00e1lido",
     "18148": "Contactar con Soporte",
     "18192": "Introduce un nombre, una ruta absoluta (comodines * y ? permitidos) o selecciona el archivo o carpeta que quieres excluir de la sincronizaci\u00f3n.",
     "18213": "El tama\u00f1o de la descarga excede la capacidad m\u00e1xima admitida por el navegador. Puedes usar MEGAsync para continuar con la descarga.",
@@ -2110,6 +2112,7 @@
     "18231": "Tu c\u00f3digo QR est\u00e1 desactivado.",
     "18232": "\u00bfQuieres reactivar tu C\u00f3digo QR?",
     "18233": "El filtro no coincide con ning\u00fan documento",
+    "18238": "Debido a la tecnolog\u00eda de cifrado de MEGA, no puedes restablecer la contrase\u00f1a sin perder tus datos. Por favor, aseg\u00farate de recordar tu contrase\u00f1a.",
     "18254": "\u00bfTienes la sesi\u00f3n de tu cuenta abierta en otro navegador web?",
     "18255": "Comprueba todos tus navegadores (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari, etc.) para ver si todav\u00eda est\u00e1s conectado a tu cuenta. Es posible que tambi\u00e9n hayas iniciado sesi\u00f3n en MEGA en el ordenador de otra persona y hayas olvidado cerrar la sesi\u00f3n.",
     "18256": "Paso {NB}",
@@ -2261,6 +2264,7 @@
     "18512": "Revisar historial de sesiones",
     "18513": "\u00bfQuieres cerrar las dem\u00e1s sesiones? Te desconectar\u00e1s de todas sesiones activas excepto la actual.",
     "18514": "Este es tu propio enlace de contacto",
+    "18667": "Error certificado SSL",
     "18668": "Direcci\u00f3n de correo electr\u00f3nico no encontrada, int\u00e9ntalo de nuevo. Si no recuerdas la direcci\u00f3n de correo electr\u00f3nico asociada a tu cuenta MEGA, no escribas nada en el campo correspondiente y haz clic de nuevo en Empezar para saltar este paso.",
     "18669": "Write a message to %s..."
 }

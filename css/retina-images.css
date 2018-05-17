@@ -26,7 +26,7 @@ body.pro:after {
     background-image: url(../images/mega/context-top@2x.png);
     background-size: 27px auto;
 }
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .download.file-icon-wrap, .video .play-video-button {
+.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .video .download.info-block .block-view-file-type, .video .play-video-button {
     background-image: url(../images/mega/download-sprite-v8@2x.png);
     background-size: 257px auto;
 }
@@ -163,8 +163,8 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 267px auto;
 }
 .properties-file-icon div {
-    background-image: url(../images/mega/properties-sprite@2x.png);
-    background-size: 168px auto;
+    background-image: url(../images/mega/properties-sprite_v2@2x.png);
+    background-size: 589px auto;
 }
 .drag-n-drop.header, .drag-n-drop hr, .drag-n-drop.info-block i {
     background-image: url(../images/mega/overlay-sprite@2x.png);

@@ -3934,10 +3934,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-position: -297px -717px;
 }
 .rubbish-bin .nw-fm-tree-item.expanded .nw-fm-tree-folder::before {
-    background-position: -337px -1037px;
+    background-position: -297px -1037px;
 }
 .rubbish-bin .nw-fm-tree-folder.shared-folder::before, .rubbish-bin .nw-fm-tree-shared-folder::before, .rubbish-bin .transfer-filetype-icon.folder-shared, .rubbish-bin .search-path-icon-span.folder-shared  {
-        background-position: -297px -957px;
+    background-position: -297px -957px;
 }
 .rubbish-bin .nw-fm-tree-item.expanded .nw-fm-tree-folder.shared-folder::before, .rubbish-bin .nw-fm-tree-item.expanded .nw-fm-tree-shared-folder::before {
     background-position: -297px -1037px;
@@ -6812,166 +6812,151 @@ table {
 .export-icon.photo-folder, .share-folder-icon div.photo-folder {
     background-position: -113px -4459px;
 }
-
-
 .rubbish-bin .block-view-file-type.folder-shared {
     background-position: 0 -5154px;
 }
 .block-view-file-type.puf-folder {
     background-position: 0 -5274px;
 }
-.rubbish-bin .block-view-file-type.folder-shared {
+.rubbish-bin .block-view-file-type.puf-folder {
     background-position: 0 -5394px;
 }
+
 .properties-file-icon div.word {
-    background-position: center 37px;
+    background-position: 29px 40px;
 }
 .properties-file-icon div.web-lang {
-    background-position: center -203px;
+    background-position: 29px -240px;
 }
 .properties-file-icon div.web-data {
-    background-position: center -443px;
+    background-position: 29px -520px;
 }
 .properties-file-icon div.video {
-    background-position: center -683px;
+    background-position: 29px -800px;
 }
-.properties-file-icon div.video-vob {
-    background-position: center -923px;
+.properties-file-icon div.openoffice {
+    background-position: 29px -1080px;
 }
-.properties-file-icon div.video-subtitles {
-    background-position: center -1163px;
+.properties-file-icon div.keynote {
+    background-position: 29px -1360px;
 }
 .properties-file-icon div.vector {
-    background-position: center -1403px;
+    background-position: 29px -1640px;
 }
-.properties-file-icon div.vcard {
-    background-position: center -1643px;
+.properties-file-icon div.numbers {
+    background-position: 29px -1920px;
 }
 .properties-file-icon div.torrent {
-    background-position: center -1883px;
+    background-position: 29px -2200px;
 }
 .properties-file-icon div.text {
-    background-position: center -2123px;
+    background-position: 29px -2480px;
 }
-.properties-file-icon div.swf {
-    background-position: center -2363px;
+.properties-file-icon div.pages {
+    background-position: 29px -2760px;
 }
 .properties-file-icon div.spreadsheet {
-    background-position: center -2603px;
+    background-position: 29px -3040px;
 }
-.properties-file-icon div.sourcecode {
-    background-position: center -2843px;
+.properties-file-icon div.recovery {
+    background-position: 29px -3320px;
 }
-.properties-file-icon div.real-audio {
-    background-position: center -3083px;
+.properties-file-icon div.dmg {
+    background-position: 29px -3600px;
 }
 .properties-file-icon div.raw {
-    background-position: center -3323px;
+    background-position: 29px -3880px;
 }
 .properties-file-icon div.premiere {
-    background-position: center -3563px;
+    background-position: 29px -4160px;
 }
 .properties-file-icon div.powerpoint {
-    background-position: center -3803px;
+    background-position: 29px -4440px;
 }
-.properties-file-icon div.podcast {
-    background-position: center -4043px;
+.properties-file-icon div.megasync {
+    background-position: 29px -7420px;
 }
-.properties-file-icon div.playlist {
-    background-position: center -4283px;
+.properties-file-icon div.megasync-mac {
+    background-position: 29px -5000px;
 }
 .properties-file-icon div.photoshop {
-    background-position: center -4523px;
+    background-position: 29px -5280px;
 }
 .properties-file-icon div.pdf {
-    background-position: center -4763px;
+    background-position: 29px -5560px;
 }
-.properties-file-icon div.midi {
-    background-position: center -5003px;
-}
-.properties-file-icon div.java {
-    background-position: center -5243px;
+.properties-file-icon div.experience {
+    background-position: 29px -5840px;
 }
 .properties-file-icon div.indesign {
-    background-position: center -5483px;
+    background-position: 29px -6120px;
 }
+
 .properties-file-icon div.image {
-    background-position: center -5723px;
+    background-position: -391px 40px;
 }
 .properties-file-icon div.illustrator {
-    background-position: center -5963px;
+    background-position: -391px -240px;
 }
-.properties-file-icon div.html {
-    background-position: center -6203px;
-}
-.properties-file-icon div.graphic {
-    background-position: center -6443px;
-}
-.properties-file-icon div.gis {
-    background-position: center -6683px;
+.properties-file-icon div.sketch {
+    background-position: -391px -520px;
 }
 .properties-file-icon div.generic {
-    background-position: center -6923px;
+    background-position: -391px -800px;
 }
 .properties-file-icon div.font {
-    background-position: center -7163px;
-}
-.properties-file-icon div.folder {
-    background-position: 36px -7401px;
-}
-.properties-file-icon div.folder-shared {
-    background-position: 36px -7641px;
-}
-.rubbish-bin .properties-file-icon div.folder, .properties-file-icon div.deleted-folder {
-    background-position: 36px -7401px;
-}
-.rubbish-bin .properties-file-icon div.folder-shared, .properties-file-icon div.deleted-shared-folder {
-    background-position: 36px -7641px;
-}
-.properties-file-icon div.flash {
-    background-position: center -8363px;
-}
-.properties-file-icon div.flash-video {
-    background-position: center -8603px;
-}
-.properties-file-icon div.fla-lang {
-    background-position: center -8843px;
+    background-position: -391px -1080px;
 }
 .properties-file-icon div.executable {
-    background-position: center -9083px;
+    background-position: -391px -1360px;
 }
 .properties-file-icon div.exel {
-    background-position: center -9323px;
-}
-.properties-file-icon div.dreamweaver {
-    background-position: center -9563px;
-}
-.properties-file-icon div.database {
-    background-position: center -9803px;
+    background-position: -391px -1640px;
 }
 .properties-file-icon div.compressed {
-    background-position: center -10043px;
+    background-position: -391px -1920px;
 }
 .properties-file-icon div.cad {
-    background-position: center -10283px;
+    background-position: -391px -2200px;
 }
 .properties-file-icon div.audio {
-    background-position: center -10043px;
+    background-position: -391px -2480px;
 }
 .properties-file-icon div.aftereffects {
-    background-position: center -10763px;
+    background-position: -391px -2760px;
 }
 .properties-file-icon div.threed {
-    background-position: center -11003px;
+    background-position: -391px -3040px;
 }
-.properties-file-icon div.win-folder {
-    background-position: center -11243px;
+.properties-file-icon div.folder {
+    background-position: -391px -3320px;
 }
-.properties-file-icon div.apple-folder {
-    background-position: center -11483px;
+.properties-file-icon div.folder-shared {
+    background-position: -391px -5020px;
+}
+.rubbish-bin .properties-file-icon div.folder, .properties-file-icon div.deleted-folder {
+    background-position: -391px -3600px;
+}
+.rubbish-bin .properties-file-icon div.folder-shared, .properties-file-icon div.deleted-shared-folder {
+    background-position: -391px -5300px;
 }
 .properties-file-icon div.photo-folder {
-    background-position: center -11723px;
+    background-position: -391px -3880px;
+}
+.rubbish-bin .properties-file-icon div.photo-folder {
+    background-position: -391px -4160px;
+}
+.properties-file-icon div.inbound-share, .shared-with-me .properties-file-icon div.folder {
+    background-position: -391px -4460px;
+}
+.rubbish-bin .properties-file-icon div.inbound-share {
+    background-position: -391px -4740px;
+}
+.properties-file-icon div.puf-folder {
+    background-position: -391px -5580px;
+}
+.rubbish-bin .properties-file-icon div.puf-folder {
+    background-position: -391px -5860px;
 }
 .thumb .block-view-file-type, .thumb .img-block, .img-block.thumb {
     background-repeat: repeat;
@@ -6993,11 +6978,6 @@ table {
     background-color: black;
     background-image: none;
 }
-/* TODO fix puf folder icon */
-.properties-file-icon div.puf-folder {
-    background-position: center -7403px;
-}
-/* end */
 .transfer-filetype-icon img, .fm-browsers-icon img, .fm-flags-icon img, .fm-member-icon img {
     width: 24px;
     border: 0;
@@ -9553,7 +9533,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 60px;
     width: 64px;
     float: left;
-    margin: 19px 15px 15px 23px;
+    margin: 17px 15px 17px 23px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
     background-position: 0 0;
@@ -9867,8 +9847,8 @@ span.orange {
     top: 0px;
     left: 0;
     display: none;
-    background-image: url(../images/mega/properties-sprite.png);
-    background-position: 0 0;
+    background-image: url(../images/mega/properties-sprite_v2.png);
+    background-position: 29px 40px;
     background-repeat: no-repeat;
     margin: 8px;
 }
@@ -9882,9 +9862,6 @@ span.orange {
 }
 .properties-file-icon div:nth-child(1) {
     display: block;
-}
-.shared-with-me .properties-file-icon div.folder {
-    background-position: 36px -11453px;
 }
 .multiple .properties-float-bl.second span {
     display: none;
@@ -15843,7 +15820,7 @@ span.incoming-call-name {
 }
 .shared-folder-icon {
     background-image: url(../images/mega/files-icons_v3.png);
-    background-position: 0 -14610px;
+    background-position: -217px -4799px;
     background-repeat: no-repeat;
     width: 40px;
     height: 37px;
@@ -15915,19 +15892,19 @@ span.incoming-call-name {
     position: relative;
 }
 .shared-details-icon {
-    width: 100px;
+    width: 80px;
     height: 90px;
     float: left;
-    background-position: center -9747px;
+    background-position: -4px -4791px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
-    margin: 23px 0 0 20px;
+    margin: 17px 0 0 28px;
 }
 .shared-details-info-block {
-    margin-left: 138px;
+    margin-left: 126px;
 }
 .shared-details-pad {
-    padding-top: 28px;
+    padding: 24px 0 2px 2px;
     overflow: hidden;
     min-width: 630px;
     position: relative;
@@ -16149,7 +16126,7 @@ span.incoming-call-name {
     width:24px;
     height:24px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-position: -10px -14751px;
+    background-position: -297px -877px;
     background-repeat: no-repeat;
     position: absolute;
     left: 0;

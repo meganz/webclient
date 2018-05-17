@@ -1181,10 +1181,17 @@ React.makeElement = React['createElement'];
 	    displayName: "ConversationsListItem",
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
+	    specificShouldComponentUpdate: function specificShouldComponentUpdate() {
+	        if (this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown) {
+	            return false;
+	        } else {
+	            return undefined;
+	        }
+	    },
 	    componentWillMount: function componentWillMount() {
 	        var self = this;
 	        self.chatRoomChangeListener = function () {
-	            self.forceUpdate();
+	            self.debouncedForceUpdate(750);
 	        };
 	        self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
 	    },
@@ -1196,6 +1203,7 @@ React.makeElement = React['createElement'];
 	        var classString = "";
 
 	        var megaChat = this.props.chatRoom.megaChat;
+
 	        var chatRoom = this.props.chatRoom;
 	        if (!chatRoom || !chatRoom.chatId) {
 	            return null;
@@ -1227,6 +1235,12 @@ React.makeElement = React['createElement'];
 	            classString += ' groupchat';
 	        } else {
 	            return "unknown room type: " + chatRoom.roomId;
+	        }
+
+	        if (ChatdIntegration._loadingChats[chatRoom.roomId] && ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise && ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise.state() === 'pending' || chatRoom.messagesBuff.messagesHistoryIsLoading() === true || chatRoom.messagesBuff.joined === false || chatRoom.messagesBuff.joined === true && chatRoom.messagesBuff.haveMessages === true && chatRoom.messagesBuff.messagesHistoryIsLoading() === true || chatRoom.messagesBuff.isDecrypting && chatRoom.messagesBuff.isDecrypting.state() === 'pending') {
+	            this.loadingShown = true;
+	        } else {
+	            delete this.loadingShown;
 	        }
 
 	        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
@@ -1303,7 +1317,7 @@ React.makeElement = React['createElement'];
 	        } else {
 	            var lastMsgDivClasses = "conversation-message";
 
-	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
+	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
 
 	            if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
 	                if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
@@ -2040,7 +2054,7 @@ React.makeElement = React['createElement'];
 
 	window.shallowEqual = shallowEqual;
 
-	var MAX_ALLOWED_DEBOUNCED_UPDATES = 1;
+	var MAX_ALLOWED_DEBOUNCED_UPDATES = 5;
 	var DEBOUNCED_UPDATE_TIMEOUT = 60;
 	var REENABLE_UPDATES_AFTER_TIMEOUT = 300;
 
@@ -2071,18 +2085,18 @@ React.makeElement = React['createElement'];
 	        this._uniqueId = this.getReactId().replace(/[^a-zA-Z0-9]/g, "");
 	        return this._uniqueId;
 	    },
-	    debouncedForceUpdate: function() {
+	    debouncedForceUpdate: function(timeout) {
 	        var self = this;
 	        if (typeof(self.skippedUpdates) === 'undefined') {
 	            self.skippedUpdates = 0;
 	        }
 
 	        if (self.debounceTimer) {
-	           clearTimeout(self.debounceTimer);
+	            clearTimeout(self.debounceTimer);
 	            // console.error(self.getUniqueId(), self.skippedUpdates + 1);
-	           self.skippedUpdates++;
+	            self.skippedUpdates++;
 	        }
-	        var TIMEOUT_VAL = DEBOUNCED_UPDATE_TIMEOUT;
+	        var TIMEOUT_VAL = timeout || DEBOUNCED_UPDATE_TIMEOUT;
 
 	        if (self.skippedUpdates > MAX_ALLOWED_DEBOUNCED_UPDATES) {
 	            TIMEOUT_VAL = 0;
@@ -3119,7 +3133,6 @@ React.makeElement = React['createElement'];
 	    },
 	    render: function render() {
 	        if (this.props.active !== true) {
-
 	            return null;
 	        } else {
 	            var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
@@ -3146,8 +3159,12 @@ React.makeElement = React['createElement'];
 	                );
 	            } else if (this.props.dropdownItemGenerator) {
 	                child = this.props.dropdownItemGenerator(this);
-	            } else {
-	                child = null;
+	            }
+	            if (!child) {
+	                Soon(function () {
+	                    self.onActiveChange(false);
+	                });
+	                return null;
 	            }
 
 	            return React.makeElement(
@@ -5007,11 +5024,16 @@ React.makeElement = React['createElement'];
 	        var scrollPositionY = ps.getScrollPositionY();
 	        var isAtTop = ps.isAtTop();
 	        var isAtBottom = ps.isAtBottom();
+	        var chatRoom = self.props.chatRoom;
+	        var mb = chatRoom.messagesBuff;
+
+	        if (mb.messages.length === 0) {
+	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
+	            return;
+	        }
 
 	        if (ps.isCloseToBottom(30) === true) {
 	            if (!self.scrolledToBottom) {
-	                var chatRoom = self.props.chatRoom;
-	                var mb = chatRoom.messagesBuff;
 	                mb.detachMessages();
 	            }
 	            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
@@ -5020,9 +5042,7 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (isAtTop || ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500) {
-	            var chatRoom = self.props.chatRoom;
-	            var mb = chatRoom.messagesBuff;
-	            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
+	            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull && !mb.isRetrievingHistory) {
 	                ps.disable();
 
 	                self.isRetrievingHistoryViaScrollPull = true;
@@ -5115,7 +5135,7 @@ React.makeElement = React['createElement'];
 
 	        var messagesList = [];
 
-	        if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
+	        if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].loadingPromise && ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
 	            self.loadingShown = true;
 	        } else if (room.messagesBuff.joined === true) {
 	            if (!self.isRetrievingHistoryViaScrollPull && room.messagesBuff.haveMoreHistory() === false) {
@@ -8288,6 +8308,8 @@ React.makeElement = React['createElement'];
 	                }
 	            });
 	        }
+	        var placeholder = l[18669];
+	        placeholder = placeholder.replace("%s", room.getRoomTitle(false, true));
 
 	        return React.makeElement(
 	            "div",
@@ -8321,7 +8343,8 @@ React.makeElement = React['createElement'];
 	                        style: textareaScrollBlockStyles },
 	                    React.makeElement("textarea", {
 	                        className: messageTextAreaClasses,
-	                        placeholder: __(l[8009]),
+	                        placeholder: placeholder,
+	                        roomTitle: room.getRoomTitle(),
 	                        onKeyUp: self.onTypeAreaKeyUp,
 	                        onKeyDown: self.onTypeAreaKeyDown,
 	                        onBlur: self.onTypeAreaBlur,
@@ -10097,15 +10120,23 @@ React.makeElement = React['createElement'];
 	                                        }
 
 	                                        if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-	                                            dropdown = "<span>" + l[5533] + "</span>";
 	                                            dbfetch.get(v.h).always(function () {
 	                                                if (!M.d[v.h]) {
 	                                                    NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
 	                                                    Soon(function () {
-	                                                        self.safeForceUpdate();
+	                                                        dd.safeForceUpdate();
+	                                                    });
+	                                                } else {
+	                                                    Soon(function () {
+	                                                        dd.safeForceUpdate();
 	                                                    });
 	                                                }
 	                                            });
+	                                            return React.makeElement(
+	                                                'span',
+	                                                null,
+	                                                l[5533]
+	                                            );
 	                                        } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
 	                                            downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
 	                                                icon: 'rounded-grey-down-arrow',
@@ -10130,6 +10161,8 @@ React.makeElement = React['createElement'];
 	                                                    $.selected = [v.h];
 	                                                    openCopyDialog('conversations');
 	                                                } }));
+	                                        } else if (NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+	                                            return null;
 	                                        }
 
 	                                        return React.makeElement(
@@ -10166,7 +10199,7 @@ React.makeElement = React['createElement'];
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                        onClick: self._startDownload.bind(self, v) }),
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[1988]),
-	                                        onClick: self._addToCloudDrive.bind(self, v) }),
+	                                        onClick: self._addToCloudDrive.bind(self, v, false) }),
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'conversations', label: __(l[17764]),
 	                                        onClick: self._addToCloudDrive.bind(self, v, true) })
 	                                )
@@ -10214,7 +10247,7 @@ React.makeElement = React['createElement'];
 	                                    React.makeElement(
 	                                        'div',
 	                                        { className: 'video-thumb-details' },
-	                                        isPreviewable && React.makeElement('i', { className: 'small-icon small-play-icon' }),
+	                                        v.playtime && React.makeElement('i', { className: 'small-icon small-play-icon' }),
 	                                        React.makeElement(
 	                                            'span',
 	                                            null,
@@ -11638,14 +11671,14 @@ React.makeElement = React['createElement'];
 	    return handlesWithoutMyself;
 	};
 
-	ChatRoom.prototype.getRoomTitle = function (ignoreTopic) {
+	ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
 	        return M.getNameByHandle(participants[0]) || "";
 	    } else {
 	        if (!ignoreTopic && self.topic && self.topic.substr) {
-	            return self.topic.substr(0, 30);
+	            return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
 	        }
 
 	        var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
@@ -12336,7 +12369,7 @@ React.makeElement = React['createElement'];
 	    } else if (!self._imagesLoading[node.h]) {
 	        self._imagesLoading[node.h] = true;
 	        self._imagesToBeLoaded[node.h] = node;
-	        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self));
+	        delay('ChatRoom[' + self.roomId + ']:doLoadImages', self._doLoadImages.bind(self), 90);
 	    }
 	};
 
@@ -12405,11 +12438,10 @@ React.makeElement = React['createElement'];
 	    "use strict";
 
 	    var self = this;
+	    var dups = Object.create(null);
 	    var thumbToLoad = Object.create(null);
 	    var imagesToBeLoaded = self._imagesToBeLoaded;
 	    self._imagesToBeLoaded = Object.create(null);
-
-	    var dups = {};
 
 	    for (var k in imagesToBeLoaded) {
 	        var node = imagesToBeLoaded[k];
@@ -12447,6 +12479,7 @@ React.makeElement = React['createElement'];
 	                if (!isThumbnail && !previews[h] && is_image(n) && fileext(n.name) !== 'pdf') {
 	                    preqs[h] = 1;
 	                    previewimg(h, data, 'image/jpeg');
+	                    previews[h].fromChat = Date.now();
 	                } else {
 	                    self._mediaAttachmentsCache[h] = mObjectURL([data.buffer || data], 'image/jpeg');
 	                }

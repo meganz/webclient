@@ -152,6 +152,9 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/jwagner/smartcrop.js/compare/master...meganz:master)
 
 ---
+[tiff.js]: tiff.js is a port of LibTIFF by compiling the LibTIFF C code with Emscripten.
+
+---
 [videostream.js]: Play html5 video from a file-like object.
 
 > **This is a fork**, [Compare the changes](https://github.com/jhiesey/videostream/compare/master...meganz:master)
@@ -232,6 +235,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
+[tiff.js]: <https://github.com/seikichi/tiff.js>
 [videostream.js]: <https://github.com/meganz/videostream>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/adapter.js]: <https://github.com/webrtc/adapter>

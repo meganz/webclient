@@ -2105,6 +2105,9 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
     if (chatRoom.messagesBuff.messagesBatchFromHistory && chatRoom.messagesBuff.messagesBatchFromHistory.length > 0) {
         chatRoom.messagesBuff.messagesBatchFromHistory.clear();
     }
+    if (chatRoom.messagesBuff && chatRoom.messagesBuff.retrievedAllMessages) {
+        chatRoom.messagesBuff.retrievedAllMessages = false;
+    }
 
     if (oldChatIdMessages) {
         [
@@ -2140,6 +2143,15 @@ Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
 
     if (self.chatdPersist && ChatdPersist.isMasterTab()) {
         promises.push(self.chatdPersist.clearChatHistoryForChat(chatIdEnc));
+    }
+    else {
+        var chatRoom = self.megaChat.getChatById(chatIdEnc);
+        var messageKeys = chatRoom.messagesBuff.messages.keys();
+
+        for (var i = 0; i < messageKeys.length; i++) {
+            var v = chatRoom.messagesBuff.messages[messageKeys[i]];
+            chatRoom.messagesBuff.messages.removeByKey(v.messageId);
+        }
     }
 
     MegaPromise.allDone(promises)

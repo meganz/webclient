@@ -1427,8 +1427,12 @@ function init_page() {
                 };
 
                 $.termsDeny = function () {
-                    u_logout();
-                    document.location.reload();
+                    loadingDialog.show();
+                    ulmanager.abort(null);
+                    Soon(function() {
+                        u_logout();
+                        location.reload();
+                    });
                 };
 
                 dlQueue.pause();
@@ -2028,6 +2032,7 @@ function topmenuUI() {
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'wp', 'start'
             ];
+            var moveTo = {'account': 'fm/account'};
 
             for (var i = subPages.length; i--;) {
                 if (className.indexOf(subPages[i]) > -1) {
@@ -2043,7 +2048,7 @@ function topmenuUI() {
                 mobile.loadCloudDrivePage();
             }
             else if (subpage) {
-                loadSubPage(subpage);
+                loadSubPage(moveTo[subpage] || subpage);
             }
             else if (className.indexOf('feedback') > -1) {
                 // Show the Feedback dialog

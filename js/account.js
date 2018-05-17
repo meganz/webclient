@@ -1001,6 +1001,8 @@ function processEmailChangeActionPacket(ap) {
         localStorage[u_handle + '_fmchash'] = hash;
 
         var promise;
+        timer = false;
+
         if (len < 8) {
             srvlog('config.set: invalid data');
             promise = MegaPromise.reject(EARGS);
@@ -1011,6 +1013,10 @@ function processEmailChangeActionPacket(ap) {
         }
         else {
             promise = mega.attr.set('fmconfig', config, false, true);
+            timer = promise;
+            promise.always(function() {
+                timer = 0;
+            });
         }
 
         return promise;
@@ -1032,14 +1038,7 @@ function processEmailChangeActionPacket(ap) {
         var promise = waiter = new MegaPromise();
 
         mega.attr.get(u_handle, 'fmconfig', false, true)
-            .always(function() {
-                moveLegacySettings();
-
-                // Initialize account notifications.
-                if (!is_mobile) {
-                    mega.notif.setup(fmconfig.anf);
-                }
-            })
+            .always(moveLegacySettings)
             .done(function(result) {
                 result = Object(result);
                 for (var key in result) {
@@ -1100,6 +1099,12 @@ function processEmailChangeActionPacket(ap) {
             .fail(function() {
                 waiter.reject.apply(waiter, arguments);
                 waiter = undefined;
+            })
+            .finally(function() {
+                // Initialize account notifications.
+                if (!is_mobile) {
+                    mega.notif.setup(fmconfig.anf);
+                }
             });
 
         return promise;
@@ -1116,6 +1121,19 @@ function processEmailChangeActionPacket(ap) {
         else {
             Soon(callback);
         }
+    };
+
+    /**
+     * Flush any pending fmconfig storage
+     * @returns {MegaPromise}
+     */
+    ns.flush = function() {
+        if (timer) {
+            delay.cancel('fmconfig:store');
+            return timer instanceof MegaPromise ? timer : store();
+        }
+
+        return MegaPromise.resolve();
     };
 
     /**

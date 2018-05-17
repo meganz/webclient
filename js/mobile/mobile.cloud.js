@@ -37,7 +37,6 @@ mobile.cloud = {
 
         // Render the file manager header, folders, files and footer
         this.renderHeader();
-        this.sortViewAlphabeticallyAscending();
         this.initGridViewToggleHandler();
         this.renderFoldersAndFiles();
         this.renderFoldersAndFilesSubHeader();
@@ -75,7 +74,6 @@ mobile.cloud = {
 
         // Render the file manager header, folders, files and footer
         this.renderHeader();
-        this.sortViewAlphabeticallyAscending();
         this.renderFoldersAndFiles();
         this.renderFoldersAndFilesSubHeader();
         this.showEmptyCloudIfEmpty();
@@ -306,46 +304,6 @@ mobile.cloud = {
         var fileSizesTotalFormattedText = fileSizesTotalFormatted.size + ' ' + fileSizesTotalFormatted.unit;
 
         return fileSizesTotalFormattedText;
-    },
-
-    /**
-     * Sorts the current view alphabetically with A at the top of the cloud drive and Z at the bottom
-     */
-    sortViewAlphabeticallyAscending: function() {
-
-        'use strict';
-
-        var folders = [];
-        var files = [];
-
-        // Loop through top level nodes in the current view (M.v)
-        for (var i = 0; i < M.v.length; i++) {
-
-            var node = M.v[i];
-            var nodeType = node.t;
-
-            // If folder type, group with the folders
-            if (nodeType === 1) {
-                folders.push(node);
-            }
-            else {
-                // Otherwise add to the files group
-                files.push(node);
-            }
-        }
-
-        // Sort folders ascending alphabetically
-        folders.sort(function(nodeA, nodeB) {
-            return nodeA.name.localeCompare(nodeB.name);
-        });
-
-        // Sort files ascending alphabetically
-        files.sort(function(nodeA, nodeB) {
-            return nodeA.name.localeCompare(nodeB.name);
-        });
-
-        // Join the folders and files into an array with folders at the top and update the main view array
-        M.v = folders.concat(files);
     },
 
     /**

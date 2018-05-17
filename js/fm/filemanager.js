@@ -102,7 +102,7 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
-        if (localStorage.awaitingConfirmationAccount) {
+        if ($.dialog === 'pro-login-dialog' || localStorage.awaitingConfirmationAccount) {
             return false;
         }
         closeDialog(ev);
@@ -1104,6 +1104,9 @@ FileManager.prototype.initContextUI = function() {
             // Taking care about share dialog button 'Done'/share and scroll
             shareDialogContentCheck();
 
+            // Clear text area message
+            $('.share-message textarea').val(l[6853]);
+
             // Maintain drop down list updated
             updateDialogDropDownList('.share-multiple-input');
 
@@ -1572,7 +1575,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             s = tempSel.attrs('id');
         }
 
-        if (M.chat) {
+        if (M.chat && !$.dialog) {
             return true;
         }
 
@@ -1724,7 +1727,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             !is_transfers_or_accounts &&
             (e.keyCode === 113 /* F2 */) &&
             (s.length > 0) &&
-            !$.dialog && M.getNodeRights(M.currentdirid) > 1
+            !$.dialog && M.getNodeRights(M.d[s[0]] && M.d[s[0]].h) > 1
         ) {
             renameDialog();
         }

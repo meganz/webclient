@@ -12,10 +12,31 @@ var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
 
 var ConversationsListItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    specificShouldComponentUpdate: function() {
+        if (
+            this.loadingShown ||
+            (this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown) ||
+            (
+                this.props.chatRoom.messagesBuff.isDecrypting &&
+                this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' &&
+                this.loadingShown
+            ) ||
+            (
+                this.props.chatRoom.messagesBuff.isDecrypting &&
+                this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' &&
+                this.loadingShown
+            )
+        ) {
+            return false;
+        }
+        else {
+            return undefined;
+        }
+    },
     componentWillMount: function() {
         var self = this;
         self.chatRoomChangeListener = function() {
-            self.forceUpdate();
+            self.debouncedForceUpdate(750);
         };
         self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
     },
@@ -27,6 +48,7 @@ var ConversationsListItem = React.createClass({
         var classString = "";
 
         var megaChat = this.props.chatRoom.megaChat;
+
         var chatRoom = this.props.chatRoom;
         if (!chatRoom || !chatRoom.chatId) {
             return null;
@@ -65,6 +87,30 @@ var ConversationsListItem = React.createClass({
         }
         else {
             return "unknown room type: " + chatRoom.roomId;
+        }
+
+        if (
+            (
+                ChatdIntegration._loadingChats[chatRoom.roomId] &&
+                ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise &&
+                ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise.state() === 'pending'
+            ) ||
+            chatRoom.messagesBuff.messagesHistoryIsLoading() === true ||
+            chatRoom.messagesBuff.joined === false ||
+            (
+                chatRoom.messagesBuff.joined === true &&
+                chatRoom.messagesBuff.haveMessages === true &&
+                chatRoom.messagesBuff.messagesHistoryIsLoading() === true
+            ) ||
+            (
+                chatRoom.messagesBuff.isDecrypting &&
+                chatRoom.messagesBuff.isDecrypting.state() === 'pending'
+            )
+        ) {
+            this.loadingShown = true;
+        }
+        else {
+            delete this.loadingShown;
         }
 
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
@@ -164,6 +210,7 @@ var ConversationsListItem = React.createClass({
                 (
                     ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' ||
                     chatRoom.messagesBuff.messagesHistoryIsLoading() ||
+                    this.loadingShown ||
                     chatRoom.messagesBuff.joined === false
                     ) ? (
                         l[7006]

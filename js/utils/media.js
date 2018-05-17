@@ -91,8 +91,8 @@ is_image.raw = {
     "SR2": "Sony RAW 2 (TIFF-based)",
     "SRF": "Sony RAW Format (TIFF-based)",
     "SRW": "Samsung RAW format (TIFF-based)",
-    "TIF": "Tagged Image File Format",
-    "TIFF": "Tagged Image File Format",
+    // "TIF": "Tagged Image File Format",
+    // "TIFF": "Tagged Image File Format",
     "X3F": "Sigma/Foveon RAW"
 };
 
@@ -166,6 +166,55 @@ mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
         console.timeEnd('psd-proc');
     }
     cb(result);
+});
+
+mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
+    'use strict';
+
+    M.require('tiffjs').tryCatch(function makeTIF() {
+        if (TIFThumbHandler.working) {
+            if (d) {
+                console.debug('Holding tiff thumb creation...', ab && ab.byteLength);
+            }
+            onIdle(function() {
+                mBroadcaster.once('TIFThumbHandler.ready', makeTIF);
+            });
+            return;
+        }
+        TIFThumbHandler.working = true;
+
+        onIdle(function() {
+            TIFThumbHandler.working = false;
+            mBroadcaster.sendMessage('TIFThumbHandler.ready');
+        });
+
+        var timeTag = 'tiffjs.' + makeUUID();
+
+        if (d) {
+            console.debug('Creating TIFF thumbnail...', ab && ab.byteLength);
+            console.time(timeTag);
+        }
+
+        var tiff = new Tiff(new Uint8Array(ab));
+        ab = dataURLToAB(tiff.toDataURL());
+
+        if (d) {
+            console.timeEnd(timeTag);
+            console.log('tif2png %sx%s (%s bytes)', tiff.width(), tiff.height(), ab.byteLength);
+        }
+
+        try {
+            tiff.close();
+            Tiff.Module.FS_unlink(tiff._filename);
+        }
+        catch (ex) {
+            if (d) {
+                console.debug(ex);
+            }
+        }
+        cb(ab);
+        eventlog(99692);
+    });
 });
 
 mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {

@@ -1499,7 +1499,7 @@ mega.megadrop = (function() {
                     copyToClipboard(uiOpts.dlg.widget.code, l[17620]);
                 }
                 else {
-                    copyToClipboard(uiOpts.dlg.widget.url, l[17619]);
+                    copyToClipboard(uiOpts.dlg.widget.url2 || uiOpts.dlg.widget.url, l[17619]);
                 }
             });
 
@@ -1561,7 +1561,7 @@ mega.megadrop = (function() {
         };
 
         var generateUrl = function uiGenerateUrl(pupHandle) {
-            return getAppBaseUrl() + (is_extension ? '' : '/') + 'megadrop/' + pupHandle;
+            return getAppBaseUrl() + (is_extension ? '#' : '/') + 'megadrop/' + pupHandle;
         };
 
         var _widgetDlgContent = function _uiWidgetDlgContent(handle) {
@@ -1569,8 +1569,9 @@ mega.megadrop = (function() {
 
             if (pupHandle) {
                 uiOpts.dlg.widget.url = generateUrl(pupHandle);
+                uiOpts.dlg.widget.url2 = getBaseUrl() + '/megadrop/' + pupHandle;
                 uiOpts.dlg.widget.code = generateCode(pupHandle);
-                uiOpts.dlg.widget.$.url.text(uiOpts.dlg.widget.url);
+                uiOpts.dlg.widget.$.url.text(uiOpts.dlg.widget.url2);
                 uiOpts.dlg.widget.$.code.text(uiOpts.dlg.widget.code);
             }
         };

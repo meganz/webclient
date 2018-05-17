@@ -272,7 +272,6 @@
     "716": "\u0e23\u0e2b\u0e31\u0e2a\u0e1c\u0e48\u0e32\u0e19\u0e1b\u0e31\u0e08\u0e08\u0e38\u0e1a\u0e31\u0e19",
     "717": "\u0e23\u0e2b\u0e31\u0e2a\u0e1c\u0e48\u0e32\u0e19\u0e43\u0e2b\u0e21\u0e48",
     "718": "\u0e22\u0e37\u0e19\u0e22\u0e31\u0e19\u0e23\u0e2b\u0e31\u0e2a\u0e1c\u0e48\u0e32\u0e19\u0e43\u0e2b\u0e21\u0e48",
-    "719": "\u0e01\u0e23\u0e38\u0e13\u0e32\u0e01\u0e23\u0e2d\u0e01\u0e23\u0e2b\u0e31\u0e2a\u0e1c\u0e48\u0e32\u0e19\u0e1b\u0e31\u0e08\u0e08\u0e38\u0e1a\u0e31\u0e19.",
     "724": "\u0e23\u0e2b\u0e31\u0e2a\u0e1c\u0e48\u0e32\u0e19\u0e1b\u0e31\u0e08\u0e08\u0e38\u0e1a\u0e31\u0e19\u0e17\u0e35\u0e48\u0e04\u0e38\u0e13\u0e01\u0e23\u0e2d\u0e01\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07.",
     "725": "\u0e23\u0e2b\u0e31\u0e2a\u0e1c\u0e48\u0e32\u0e19\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e44\u0e14\u0e49\u0e16\u0e39\u0e01\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e25\u0e49\u0e27",
     "726": "\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22",
@@ -1131,7 +1130,6 @@
     "8006": "\u0e2a\u0e34\u0e48\u0e07\u0e17\u0e35\u0e48\u0e41\u0e19\u0e1a\u0e21\u0e32\u0e16\u0e39\u0e01\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e44\u0e1b\u0e22\u0e31\u0e07\u0e04\u0e25\u0e32\u0e27\u0e14\u0e4c\u0e44\u0e14\u0e23\u0e1f\u0e4c\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e41\u0e25\u0e49\u0e27",
     "8007": "\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e1c\u0e39\u0e49\u0e40\u0e02\u0e49\u0e32\u0e23\u0e48\u0e27\u0e21...",
     "8008": "\u0e04\u0e38\u0e13\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35[P]\u0e01\u0e32\u0e23\u0e2a\u0e19\u0e17\u0e19\u0e32[\/P]\u0e43\u0e14 \u0e46",
-    "8009": "\u0e40\u0e02\u0e35\u0e22\u0e19\u0e02\u0e49\u0e2d\u0e04\u0e27\u0e32\u0e21...",
     "8010": "\u0e04\u0e49\u0e19\u0e2b\u0e32\u0e1c\u0e39\u0e49\u0e15\u0e34\u0e14\u0e15\u0e48\u0e2d",
     "8011": "\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e08\u0e32\u0e01\u0e04\u0e25\u0e32\u0e27\u0e14\u0e4c\u0e44\u0e14\u0e23\u0e4c\u0e1f\u0e02\u0e2d\u0e07\u0e09\u0e31\u0e19",
     "8013": "\u0e08\u0e32\u0e01\u0e04\u0e25\u0e32\u0e27\u0e14\u0e4c\u0e44\u0e14\u0e23\u0e4c\u0e1f\u0e02\u0e2d\u0e07\u0e09\u0e31\u0e19",
@@ -2191,5 +2189,10 @@
     "18506": "If you are able to provide your account's email address, please do so. If you cannot remember it, please click Start again to skip this step.",
     "18507": "Email Address",
     "18508": "Please enter the email address of the account you wish to recover. If you cannot remember it, please leave the field blank.",
-    "18514": "This is your own contact link"
+    "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
+    "18512": "Review Session History",
+    "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
+    "18514": "This is your own contact link",
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

@@ -1398,8 +1398,8 @@ mega.megadrop = (function() {
             var link = getBaseUrl() + '/drop#!' + pupHandle + '!' + theme + '!' + lang;
 
             var source = code
-                .replace('%w', width > 0 ? width : 300)
-                .replace('%h', height > 0 ? height : 100)
+                .replace('%w', width > 0 ? width : 250)
+                .replace('%h', height > 0 ? height : 54)
                 .replace('%s', link);
             source = source.replace('/[\t\n\s]+/g', '');// Minimize
 
@@ -1458,6 +1458,7 @@ mega.megadrop = (function() {
                     .find('span').safeHTML(l[17408]);
                 uiOpts.dlg.widget.$.embedForm.removeClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.addClass('hidden');
+                $('.widget-dialog').addClass('centre');
             });
 
             // Widget dialog url tab
@@ -1470,6 +1471,7 @@ mega.megadrop = (function() {
                     .find('span').safeHTML(l[17835]);
                 uiOpts.dlg.widget.$.embedForm.addClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.removeClass('hidden');
+                $('.widget-dialog').removeClass('centre');
             });
 
             // Widget dialog light theme
@@ -1497,7 +1499,7 @@ mega.megadrop = (function() {
                     copyToClipboard(uiOpts.dlg.widget.code, l[17620]);
                 }
                 else {
-                    copyToClipboard(uiOpts.dlg.widget.url, l[17619]);
+                    copyToClipboard(uiOpts.dlg.widget.url2 || uiOpts.dlg.widget.url, l[17619]);
                 }
             });
 
@@ -1559,7 +1561,7 @@ mega.megadrop = (function() {
         };
 
         var generateUrl = function uiGenerateUrl(pupHandle) {
-            return getAppBaseUrl() + (is_extension ? '' : '/') + 'megadrop/' + pupHandle;
+            return getAppBaseUrl() + (is_extension ? '#' : '/') + 'megadrop/' + pupHandle;
         };
 
         var _widgetDlgContent = function _uiWidgetDlgContent(handle) {
@@ -1567,8 +1569,9 @@ mega.megadrop = (function() {
 
             if (pupHandle) {
                 uiOpts.dlg.widget.url = generateUrl(pupHandle);
+                uiOpts.dlg.widget.url2 = getBaseUrl() + '/megadrop/' + pupHandle;
                 uiOpts.dlg.widget.code = generateCode(pupHandle);
-                uiOpts.dlg.widget.$.url.text(uiOpts.dlg.widget.url);
+                uiOpts.dlg.widget.$.url.text(uiOpts.dlg.widget.url2);
                 uiOpts.dlg.widget.$.code.text(uiOpts.dlg.widget.code);
             }
         };

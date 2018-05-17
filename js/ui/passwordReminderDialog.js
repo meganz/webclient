@@ -351,8 +351,8 @@
         }
     };
 
-    PasswordReminderDialog.prototype.onTopmenuReinit = function() {
-        if (this.topIcon && !document.contains(this.topIcon)) {
+    PasswordReminderDialog.prototype.onTopmenuReinit = function () {
+        if (this.topIcon && !document.body.contains(this.topIcon)) {
             // reinit if the this.topIcon is detached from the DOM.
             if (this.isShown) {
                 this.hide();
@@ -466,7 +466,7 @@
     };
 
     PasswordReminderDialog.prototype.showIcon = function() {
-        if (!this.topIcon || this.topIcon.classList.contains('hidden') || !document.contains(this.topIcon)) {
+        if (!this.topIcon || this.topIcon.classList.contains('hidden') || !document.body.contains(this.topIcon)) {
             // because, we have plenty of top menus, that may not be visible/active
             this.topIcon = $('.top-head:visible .top-icon.pass-reminder')[0];
             assert(this.topIcon, 'topIcon was not found in DOM');

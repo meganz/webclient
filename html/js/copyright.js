@@ -1,7 +1,9 @@
 var copyright = copyright || {};
 
 copyright.updateUI = function() {
-    $('#cn_urls .contenturl').rebind('click', function(e) {
+    'use strict';
+
+    $('#cn_urls .contenturl').rebind('click', function() {
         if ($(this).val() === '') {
             $(this).select();
         }
@@ -9,20 +11,19 @@ copyright.updateUI = function() {
 };
 
 /**
- * Validate the email address, as without a valid email we can not contact the complainant if there is a counter-notice,
- * or to report stats on their complaints.
+ * Validate the email address, as without a valid email we can not contact the complainant
+ * if there is a counter-notice, or to report stats on their complaints.
  * Further email validation may occur in the API
  * @param {String} email The email to validate
  * @return {Boolean} True if passing validation, false otherwise
  */
 copyright.validateEmail = function(email) {
-    var re = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    'use strict';
+    var re1 = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*/;
+    var re2 = /@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    var re = new RegExp(re1.source + re2.source);
     var match = re.exec(email);
-    if (match === null) {
-        return false;
-    }
-
-    return true;
+    return match !== null;
 };
 
 /**
@@ -31,6 +32,10 @@ copyright.validateEmail = function(email) {
  * @return {Number} The (integer) number of handles found
  */
 copyright.validateUrl = function(url) {
+    'use strict';
+    if (!/^\s*https?:\/\/mega\./i.test(url)) {
+        return 0;
+    }
     url = copyright.decodeURIm(url);
     var handles = copyright.getHandles(url);
     return Object.keys(handles).length;
@@ -42,6 +47,7 @@ copyright.validateUrl = function(url) {
  * @return {Object} hashset of handles
  */
 copyright.getHandles = function(data) {
+    'use strict';
 
     var handles = {};
     var passwordLinkPattern = /(#P!)([\w-]+)\b/gi;
@@ -63,7 +69,7 @@ copyright.getHandles = function(data) {
 
     var p = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/gi;
 
-    (data.replace(/<\/?\w[^>]+>/g, '').replace(/\s+/g, '') + data).replace(p, function(a, id, key) {
+    (data.replace(/<\/?\w[^>]+>/g, '').replace(/\s+/g, '') + data).replace(p, function(a, id) {
         if (!handles[id]) {
             handles[id] = 1;
         }
@@ -78,16 +84,17 @@ copyright.getHandles = function(data) {
  * @return {String} the decoded data
  */
 copyright.decodeURIm = function(data) {
-    for (var lmt = 7 ; --lmt && /%[a-f\d]{2}/i.test(data) ; )
-    {
+    'use strict';
+    for (var lmt = 7; --lmt && /%[a-f\d]{2}/i.test(data);) {
         try {
             data = decodeURIComponent(data);
-        } catch(e) {
+        }
+        catch (ex) {
             break;
         }
     }
 
-    while (~data.indexOf('%25')) {
+    while (data.indexOf('%25') !== -1) {
         data = data.replace(/%25/g, '%');
     }
 
@@ -99,6 +106,7 @@ copyright.decodeURIm = function(data) {
  * Puts them into localStorage.copyrightOwnerDetails
  */
 copyright.saveCopyrightOwnerValues = function() {
+    'use strict';
     var details = {
         owner: $('input.copyrightowner').val(),
         jobtitle: $('input.jobtitle').val(),
@@ -121,6 +129,7 @@ copyright.saveCopyrightOwnerValues = function() {
  * Load the complainant details directly into the html elements so they don't have to type them in again
  */
 copyright.loadCopyrightOwnerValues = function() {
+    'use strict';
     if (localStorage.copyrightOwnerDetails) {
         var details = JSON.parse(localStorage.copyrightOwnerDetails);
         $('input.copyrightowner').val(details.owner);
@@ -142,6 +151,7 @@ copyright.loadCopyrightOwnerValues = function() {
  * Initialises the copyright form page, binding the events the form requires
  */
 copyright.init_cn = function() {
+    'use strict';
     var wrong = function(elm) {
         $(elm)
             .addClass("red")
@@ -156,7 +166,7 @@ copyright.init_cn = function() {
             .parent().css('box-shadow', '0px 0px 8px #f00');
     };
 
-    $('.addurlbtn').rebind('click', function(e) {
+    $('.addurlbtn').rebind('click', function() {
         $('#cn_urls').safeAppend('<div class="new-affiliate-label">' +
             '<div class="new-affiliate-star"></div>@@</div>' +
             '<div class="clear"></div>' +
@@ -173,7 +183,7 @@ copyright.init_cn = function() {
         copyright.updateUI();
     });
     copyright.updateUI();
-    $('.step2btn').rebind('click', function(e) {
+    $('.step2btn').rebind('click', function() {
         if (!$('.select.content').hasClass('selected')) {
             msgDialog('warninga', l[135], escapeHTML(l[657]));
         }
@@ -226,35 +236,20 @@ copyright.init_cn = function() {
                 $('.cn.step1').addClass('hidden');
                 $('.cn.step2').removeClass('hidden');
 
-                 // Reload values from local storage if the user has previously been here
+                // Reload values from local storage if the user has previously been here
                 copyright.loadCopyrightOwnerValues();
             }
         }
     });
-    $('.backbtn').rebind('click', function(e) {
+
+    $('.backbtn').rebind('click', function() {
         $('.cn.step1').removeClass('hidden');
         $('.cn.step2').addClass('hidden');
     });
 
-    // Add click and unclick functionality for the custom styled checkboxes
-    $('.cn_check1, .cn_check2, .cn_check3').rebind('click', function(event) {
+    copyright.initCheckboxListeners();
 
-        $input = $(this).find('input');
-        $checkboxDiv = $(this).find('.checkdiv');
-
-        // If unticked, tick the box
-        if ($input.hasClass('checkboxOff')) {
-            $input.removeClass('checkboxOff').addClass('checkboxOn').attr('checked', 'checked');
-            $checkboxDiv.removeClass('checkboxOff').addClass('checkboxOn');
-        }
-        else {
-            // Otherwise untick the box
-            $input.removeClass('checkboxOn').addClass('checkboxOff').removeAttr('checked');
-            $checkboxDiv.removeClass('checkboxOn').addClass('checkboxOff');
-        }
-    });
-
-    $('.select select').rebind('change', function(e) {
+    $('.select select').rebind('change.initcn', function() {
         var c = $(this).attr('class');
         if (c && c.indexOf('type') > -1 && $(this).val() === 4) {
             msgDialog('info',
@@ -264,7 +259,7 @@ copyright.init_cn = function() {
                     .replace('[/A1]', '</A>')
                     .replace('[A2]', '<a href="/copyright" class="red clickurl">')
                     .replace('[/A2]', '</A>'));
-                    clickURLs();
+            clickURLs();
             $(this).val(0);
             $(this).parent().find('.affiliate-select-txt').text(l[1278]);
         }
@@ -274,7 +269,7 @@ copyright.init_cn = function() {
                 .text($(this).find('option[value=\'' + $(this).val() + '\']').text());
         }
     });
-    $('.signbtn').rebind('click', function(e) {
+    $('.signbtn').rebind('click', function() {
         if ($('input.copyrightowner').val() === '') {
             msgDialog('warninga', l[135], escapeHTML(l[661]), false, function() {
                 $('input.copyrightowner').focus();
@@ -291,7 +286,7 @@ copyright.init_cn = function() {
             });
         }
         else if (!copyright.validateEmail($('input.email').val())) {
-             msgDialog('warninga', l[135], escapeHTML(l[198]), false, function() {
+            msgDialog('warninga', l[135], escapeHTML(l[198]), false, function() {
                 $('input.email').focus();
             });
         }
@@ -326,17 +321,17 @@ copyright.init_cn = function() {
             loadingDialog.show();
             api_req({
                 a: 'cn',
+                works: cn_works_json,
                 infr_type: $('.select.content select').val(),
                 takedown_type: $('.select.type select').val(),
-                works: cn_works_json,
-                owner: $('input.copyrightowner').val(),
                 jobtitle: $('input.jobtitle').val(),
+                owner: $('input.copyrightowner').val(),
                 email: $('input.email').val(),
                 fax: $('input.fax').val(),
-                city: $('input.city').val(),
                 postalcode: $('input.zip').val(),
-                name: $('input.agent').val(),
+                city: $('input.city').val(),
                 company: $('input.company').val(),
+                name: $('input.agent').val(),
                 phone: $('input.phone').val(),
                 address: $('input.address').val(),
                 province: $('input.state').val(),
@@ -346,7 +341,7 @@ copyright.init_cn = function() {
                     loadingDialog.hide();
                     msgDialog('info',
                         escapeHTML(l[1287]), escapeHTML(l[1288]), false,
-                        function(e) {
+                        function() {
                             loadSubPage('copyright');
                         });
                 }
@@ -361,4 +356,229 @@ copyright.init_cn = function() {
         }
     }
     $('.select.country select').safeHTML(markup);
+};
+
+copyright.validatePhoneNumber = function(phoneNumber) {
+    'use strict';
+
+    var p = /\d[^\d]*\d[^\d]*\d[^\d]*\d/;
+    var match = p.exec(phoneNumber);
+
+    // if not at least 4 numbers, what is this thing?
+    return match !== null;
+};
+
+copyright.validateDisputeForm = function() {
+    'use strict';
+
+    var copyrightwork = $('.copyrightwork');
+    var explanation = $('.copyrightexplanation');
+    var proceed = true;
+
+    $('.contenturl').each(function(i, e) {
+        proceed = true;
+        if (($(e).val() !== '') && ($(copyrightwork[i]).val() !== '') && ($(explanation[i]).val() === '')) {
+            proceed = false;
+            msgDialog('warninga', l[135], escapeHTML(l[8809]));
+            return false;
+        }
+        else if (($(e).val() !== '') && ($(copyrightwork[i]).val() === '')) {
+            proceed = false;
+            msgDialog('warninga', l[135], escapeHTML(l[8810]));
+            return false;
+        }
+        else if (($(e).val() === '') || ($(copyrightwork[i]).val() === '')) {
+            proceed = false;
+            msgDialog('warninga', l[135], escapeHTML(l[8811]));
+            return false;
+        }
+        else if (!copyright.validateUrl($(e).val())) {
+            proceed = false;
+            msgDialog('warninga', l[135],
+                escapeHTML(l[8812]));
+
+            return false;
+        }
+    });
+
+    if (!proceed) {
+        return false;
+    }
+
+    if ($('input.copyrightowner').val() === '') {
+        msgDialog('warninga', l[135], escapeHTML(l[662]), false, function() {
+            $('input.copyrightowner').focus();
+        });
+        return false;
+    }
+    else if ($('input.phonenumber').val() === '') {
+        msgDialog('warninga', l[135], escapeHTML(l[8813]), false, function() {
+            $('input.phonenumber').focus();
+        });
+        return false;
+    }
+    else if (!copyright.validatePhoneNumber($('input.phonenumber').val())) {
+        msgDialog('warninga', l[135], escapeHTML(l[8814]), false, function() {
+            $('input.phonenumber').focus();
+        });
+        return false;
+    }
+    else if ($('input.email').val() === '') {
+        msgDialog('warninga', l[135], escapeHTML(l[663]), false, function() {
+            $('input.email').focus();
+        });
+        return false;
+    }
+    else if (!copyright.validateEmail($('input.email').val())) {
+        msgDialog('warninga', l[135], escapeHTML(l[198]), false, function() {
+            $('input.email').focus();
+        });
+        return false;
+    }
+    else if ($('input.address').val() === '') {
+        msgDialog('warninga', l[135], escapeHTML(l[8815]), false, function() {
+            $('input.address').focus();
+        });
+        return false;
+    }
+    else if ($('input.city').val() === '') {
+        msgDialog('warninga', l[135], escapeHTML(l[1262]), false, function() {
+            $('input.city').focus();
+        });
+        return false;
+    }
+    else if (!$('.select.country').hasClass('selected')) {
+        msgDialog('warninga', l[135], escapeHTML(l[568]));
+        return false;
+    }
+
+    // The checkboxes depend on the type
+    if (proceed && !$('.cn_check1 .checkinput').attr('checked')) {
+        msgDialog('warninga', l[135], escapeHTML(l[8816]));
+        return false;
+    }
+    else if (!$('.cn_check2 .checkinput').attr('checked')) {
+        msgDialog('warninga', l[135], escapeHTML(l[8817]));
+        return false;
+    }
+
+    return true;
+};
+
+copyright.init_cndispute = function() {
+    'use strict';
+
+    if (typeof (u_attr) !== 'undefined' && typeof (u_attr.email) !== 'undefined' && u_attr.email !== '') {
+        $('input.email').val(u_attr.email);
+    }
+
+    // The sign button needs to validate the form
+    $('.signbtn').rebind('click.copydispute', function() {
+
+        if (copyright.validateDisputeForm()) {
+            // Show loading dialog
+            loadingDialog.show();
+
+            // The 'copyright notice dispute' api request. Pull the values straight from the inputs
+            // as we have already validated them
+            var handles = copyright.getHandles($('input.contenturl').val());
+            api_req({
+                a: 'cnd',
+                ph: Object.keys(handles)[0],
+                desc: $('input.copyrightwork').val(),
+                comments: $('input.copyrightexplanation').val(),
+                name: $('input.copyrightowner').val(),
+                phonenumber: $('input.phonenumber').val(),
+                email: $('input.email').val(),
+                company: $('input.company').val(),
+                address1: $('input.address').val(),
+                address2: $('input.address2').val(),
+                city: $('input.city').val(),
+                province: $('input.state').val(),
+                postalcode: $('input.zip').val(),
+                country: $('.select.country select').val(),
+                otherremarks: $('input.otherremarks').val()
+            }, {
+                callback: function(response) {
+                    loadingDialog.hide();
+
+                    if (!isNaN(parseFloat(response)) && isFinite(response)) {
+                        // Its a number, must be error code of some kind
+                        if (response === -9) {
+                            // ENOENT error
+                            msgDialog('warninga',
+                                escapeHTML(l[135]), escapeHTML(l[8818]), false);
+                            return false;
+                        }
+                        if (response === -12) {
+                            // EEXIST error, they have already made a dispute for this link
+                            msgDialog('warninga',
+                                escapeHTML(l[135]), escapeHTML(l[8819]), false);
+                            return false;
+                        }
+                        else if (response === -11) {
+                            // Access
+                            msgDialog('warninga',
+                                escapeHTML(l[135]), escapeHTML(l[8820]), false);
+                            return false;
+                        }
+                        else {
+                            // Generic (probably args)
+                            msgDialog('warninga',
+                                escapeHTML(l[135]), escapeHTML(l[47]), false);
+                            return false;
+                        }
+                    }
+
+                    msgDialog('info',
+                        escapeHTML(l[1287]), escapeHTML(l[1288]), false,
+                        function() {
+                            loadSubPage('dispute');
+                        });
+                }
+            });
+        }
+    });
+
+    // Add click and unclick functionality for the custom styled checkboxes
+    copyright.initCheckboxListeners();
+
+    $('.cn .select select').rebind('change.copydispute', function() {
+        if ($(this).val() !== 0) {
+            $(this).parent().addClass('selected');
+            $(this).parent().find('.affiliate-select-txt')
+                .text($(this).find('option[value=\'' + $(this).val() + '\']').text());
+        }
+    });
+
+    // Set up the country values
+    var markup = '<OPTION value="0"></OPTION>';
+    for (var country in isoCountries) {
+        if (isoCountries.hasOwnProperty(country)) {
+            markup += '<option value="' + escapeHTML(country) + '">'
+                + escapeHTML(isoCountries[country]) + '</option>';
+        }
+    }
+    $('.cn .select.country select').safeHTML(markup);
+};
+
+// Add click and unclick functionality for the custom styled checkboxes
+copyright.initCheckboxListeners = function() {
+    'use strict';
+
+    $('.cn_check1, .cn_check2, .cn_check3, .cn_check4').rebind('click.copydispute', function() {
+        var $input = $(this).find('input');
+        var $checkboxDiv = $(this).find('.checkdiv');
+
+        // If unticked, tick the box
+        if ($input.hasClass('checkboxOff')) {
+            $input.removeClass('checkboxOff').addClass('checkboxOn').attr('checked', 'checked');
+            $checkboxDiv.removeClass('checkboxOff').addClass('checkboxOn');
+        }
+        else {
+            // Otherwise untick the box
+            $input.removeClass('checkboxOn').addClass('checkboxOff').removeAttr('checked');
+            $checkboxDiv.removeClass('checkboxOn').addClass('checkboxOff');
+        }
+    });
 };

@@ -275,6 +275,8 @@ var extmime = {
     "h261": "video/h261",
     "h263": "video/h263",
     "h264": "video/h264",
+    "heif": "image/heif",
+    "heic": "image/heic",
     "htm": "text/html",
     "html": "text/html",
     "ico": "image/x-icon",

@@ -147,7 +147,9 @@ var mobile = {
 
         // On Mega icon click
         $megaIcon.off('tap').on('tap', function() {
-
+            if ($(this).hasClass('non-responsive')) {
+                return;
+            }
             // Load the cloud drive or start page, if not logged in
             mobile.loadCloudDrivePage();
             return false;

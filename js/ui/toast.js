@@ -7,9 +7,11 @@
      * @param {String} toastClass Custom style for the notification
      * @param {String} notification The text for the toast notification
      * @param {String} [buttonLabel] Optional button label
+     * @param {String} [secondButtonLabel] Optional button label
      * @param {Function} [firstButtonFunction] Optional function to be executed by btn 1
      * @param {Function} [secondButtonFunction] Optional function to be executed by btn 2
-     * @param {Number} [toastTimeoutMs] Optional toast visibility timeout (default =7sec)
+     * @param {Number} [toastTimeoutMs] Optional toast visibility timeout (default 4secs)
+     * @global
      */
     global.showToast = function showToast(toastClass, notification, buttonLabel, secondButtonLabel,
         firstButtonFunction, secondButtonFunction, toastTimeoutMs) {
@@ -19,12 +21,12 @@
 
         $toast.addClass('visible');
 
-        clearTimeout(toastTimeout);
-        var toastTime = 4000;
-        if (toastTimeoutMs && toastTimeoutMs > 1000 && toastTimeoutMs < 15000) {
+        var toastTime = notification === l[16168] ? 3000 : 4000;
+        if (toastTimeoutMs > 1000 && toastTimeoutMs < 15000) {
             toastTime = toastTimeoutMs;
         }
 
+        clearTimeout(toastTimeout);
         toastTimeout = setTimeout(function () {
             hideToast();
         }, toastTime);

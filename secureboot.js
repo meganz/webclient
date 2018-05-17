@@ -47,6 +47,7 @@ var is_firefox_web_ext = location_sub === 'moz-extension://';
 var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
+var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 
@@ -594,8 +595,12 @@ if (!b_u && is_extension)
     }
     else /* Google Chrome */
     {
-        bootstaticpath = chrome.extension.getURL('mega/');
-        urlrootfile = 'mega/secure.html';
+        tmp = 'mega';
+        if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
+            tmp = localStorage.chromextdevpath || tmp;
+        }
+        bootstaticpath = chrome.extension.getURL(tmp + '/');
+        urlrootfile = tmp + '/secure.html';
     }
 
     Object.defineProperty(window, 'eval', {
@@ -1880,6 +1885,7 @@ else if (!b_u) {
     jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
 
     jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
@@ -1948,7 +1954,6 @@ else if (!b_u) {
 
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
-        jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
@@ -2167,6 +2172,7 @@ else if (!b_u) {
         jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
         jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
         jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
         jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});
 
@@ -2235,11 +2241,12 @@ else if (!b_u) {
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
-        'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
         'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
-        'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
+        'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
+        'gdpr': {f:'html/gdpr.html', n: 'gdpr', j:0},
+        'gdpr_js': {f:'html/js/gdpr.js', n: 'gdpr_js', j:1},
         'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
         'general': {f:'html/general.html', n: 'general', j:0},
@@ -2270,6 +2277,7 @@ else if (!b_u) {
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
+        'tiffjs': {f:'js/vendor/tiff.js', n: 'tiffjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
@@ -2364,10 +2372,11 @@ else if (!b_u) {
         'resellers': ['resellers'],
         '!': ['download','download_js'],
         'dispute': ['dispute'],
-        'disputenotice': ['disputenotice', 'disputenotice_js'],
+        'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],
-        'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
+        'copyrightnotice': ['copyrightnotice','copyright_js'],
         'privacy': ['privacy','privacycompany'],
+        'gdpr': ['gdpr', 'gdpr_js'],
         'mega': ['mega'],
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],

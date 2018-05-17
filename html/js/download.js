@@ -371,7 +371,7 @@ function dl_g(res) {
                             }
                         });
                     }
-                    else if (filetype(filename) === 'PDF Document' && Object(previews[dlpage_ph]).buffer) {
+                    else if (Object(previews[dlpage_ph]).full) {
                         onDownloadReady();
                         M.saveAs(previews[dlpage_ph].buffer, filename);
                     }

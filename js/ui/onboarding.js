@@ -784,28 +784,24 @@
         });
     };
 
-    var initOnboarding = function() {
+    mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
         if (!folderlink) {
             assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
             assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
 
-            mega.ui.onboarding = new mega.ui.Onboarding({});
+            if (megaChatIsDisabled) {
+                mega.ui.onboarding = new mega.ui.Onboarding({});
+            }
+            else {
+                ChatdIntegration.mcfHasFinishedPromise.always(function() {
+                    mega.ui.onboarding = new mega.ui.Onboarding({});
+                });
+            }
 
             // we reached our goal, stop listening for fminitialized
             return 0xDEAD;
         }
-    };
-
-    if (megaChatIsDisabled) {
-        mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
-            return initOnboarding();
-        });
-    }
-    else {
-        ChatdIntegration.mcfHasFinishedPromise.always(function() {
-            initOnboarding();
-        });
-    }
+    });
 
     // export
     scope.mega.ui.Onboarding = Onboarding;

@@ -455,7 +455,7 @@ var ConversationsApp = React.createClass({
 
         $(document).rebind('mouseup.megaChatTextAreaFocus', function(e) {
             // prevent recursion!
-            if (e.megaChatHandled) {
+            if (e.megaChatHandled || slideshowid) {
                 return;
             }
 

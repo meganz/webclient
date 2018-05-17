@@ -379,8 +379,8 @@ ul, li {
     vertical-align: middle;
     width: 100%;
 }
-.mobile.text-button {
-    color: #555;
+.mobile.text-button, .upload-overlay .upload-another-file.hidden + .mobile.text-button  {
+    color: #8B9FAA;
     margin: 20px auto 0;
     display: block;
     z-index: 9999;
@@ -389,7 +389,9 @@ ul, li {
     width: 25%;
     height: 44px;
     line-height: 43px;
-    text-decoration: underline;
+}
+.upload-overlay .mobile.text-button {
+    margin: 72px auto 0;
 }
 .mobile.inline-buttons {
     width: 100%;
@@ -6153,7 +6155,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     height: 10px;
     margin: 0 0;
     background-color: #777E82;
-    background-color: /* Oval 2 Copy 2: */;
     border: 1px solid  #7C7C7C;
 }
 .mobile .improved-recovery-steps .progress-meter .progress-point:not(.inactive):hover:before {
@@ -6676,7 +6677,17 @@ body.key .reg-st3-membership-bl.free.hidden {
 .bottom-page .forgot-password-page .mobile.fm-header {
     position: fixed;
 }
-
+.mobile.upload-overlay .upload-progress.complete {
+    width:calc((100% / 2) - 4px );
+    display: inline-block;
+    float: left;
+}
+.mobile.upload-overlay .upload-another-file {
+    width:calc((100% / 2) - 4px );
+    display: inline-block;
+    float: right;
+    margin-top: 0px;
+}
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {
@@ -6793,7 +6804,6 @@ body.key .reg-st3-membership-bl.free.hidden {
         bottom: 0;
         top: 0;
         left: 0;
-        display: ;
         float: left;
     }
     .mobile .improved-recovery-steps {

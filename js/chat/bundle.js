@@ -1181,10 +1181,17 @@ React.makeElement = React['createElement'];
 	    displayName: "ConversationsListItem",
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
+	    specificShouldComponentUpdate: function specificShouldComponentUpdate() {
+	        if (this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown) {
+	            return false;
+	        } else {
+	            return undefined;
+	        }
+	    },
 	    componentWillMount: function componentWillMount() {
 	        var self = this;
 	        self.chatRoomChangeListener = function () {
-	            self.forceUpdate();
+	            self.debouncedForceUpdate(750);
 	        };
 	        self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
 	    },
@@ -1196,6 +1203,7 @@ React.makeElement = React['createElement'];
 	        var classString = "";
 
 	        var megaChat = this.props.chatRoom.megaChat;
+
 	        var chatRoom = this.props.chatRoom;
 	        if (!chatRoom || !chatRoom.chatId) {
 	            return null;
@@ -1227,6 +1235,12 @@ React.makeElement = React['createElement'];
 	            classString += ' groupchat';
 	        } else {
 	            return "unknown room type: " + chatRoom.roomId;
+	        }
+
+	        if (ChatdIntegration._loadingChats[chatRoom.roomId] && ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise && ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise.state() === 'pending' || chatRoom.messagesBuff.messagesHistoryIsLoading() === true || chatRoom.messagesBuff.joined === false || chatRoom.messagesBuff.joined === true && chatRoom.messagesBuff.haveMessages === true && chatRoom.messagesBuff.messagesHistoryIsLoading() === true || chatRoom.messagesBuff.isDecrypting && chatRoom.messagesBuff.isDecrypting.state() === 'pending') {
+	            this.loadingShown = true;
+	        } else {
+	            delete this.loadingShown;
 	        }
 
 	        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
@@ -1303,7 +1317,7 @@ React.makeElement = React['createElement'];
 	        } else {
 	            var lastMsgDivClasses = "conversation-message";
 
-	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
+	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
 
 	            if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
 	                if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
@@ -2040,7 +2054,7 @@ React.makeElement = React['createElement'];
 
 	window.shallowEqual = shallowEqual;
 
-	var MAX_ALLOWED_DEBOUNCED_UPDATES = 1;
+	var MAX_ALLOWED_DEBOUNCED_UPDATES = 5;
 	var DEBOUNCED_UPDATE_TIMEOUT = 60;
 	var REENABLE_UPDATES_AFTER_TIMEOUT = 300;
 
@@ -2071,18 +2085,18 @@ React.makeElement = React['createElement'];
 	        this._uniqueId = this.getReactId().replace(/[^a-zA-Z0-9]/g, "");
 	        return this._uniqueId;
 	    },
-	    debouncedForceUpdate: function() {
+	    debouncedForceUpdate: function(timeout) {
 	        var self = this;
 	        if (typeof(self.skippedUpdates) === 'undefined') {
 	            self.skippedUpdates = 0;
 	        }
 
 	        if (self.debounceTimer) {
-	           clearTimeout(self.debounceTimer);
+	            clearTimeout(self.debounceTimer);
 	            // console.error(self.getUniqueId(), self.skippedUpdates + 1);
-	           self.skippedUpdates++;
+	            self.skippedUpdates++;
 	        }
-	        var TIMEOUT_VAL = DEBOUNCED_UPDATE_TIMEOUT;
+	        var TIMEOUT_VAL = timeout || DEBOUNCED_UPDATE_TIMEOUT;
 
 	        if (self.skippedUpdates > MAX_ALLOWED_DEBOUNCED_UPDATES) {
 	            TIMEOUT_VAL = 0;
@@ -5118,7 +5132,7 @@ React.makeElement = React['createElement'];
 
 	        var messagesList = [];
 
-	        if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
+	        if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].loadingPromise && ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
 	            self.loadingShown = true;
 	        } else if (room.messagesBuff.joined === true) {
 	            if (!self.isRetrievingHistoryViaScrollPull && room.messagesBuff.haveMoreHistory() === false) {

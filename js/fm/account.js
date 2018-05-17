@@ -540,22 +540,22 @@ function accountUI() {
             $('.fm-close-all-sessions').hide();
         }
 
-        $('.fm-close-all-sessions').rebind('click', function() {
-
-            loadingDialog.show();
-            var $this = $(this);
-            var $activeSessionsRows = $('.active-session-txt').parents('tr');
-
-            // Expire all sessions but not the current one
-            api_req({a: 'usr', ko: 1}, {
-                callback: function() {
-                    M.account = null;
-                    /* clear account cache */
-                    $activeSessionsRows.find('.settings-logout').remove();
-                    $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
-                        .addClass('expired-session-txt').text(l[1664]);
-                    $this.hide();
-                    loadingDialog.hide();
+        $('.fm-close-all-sessions').rebind('click', function() {			
+			msgDialog('confirmation', '', l[18513], false, function(e) {
+                if (e) {
+                    loadingDialog.show();
+					var $activeSessionsRows = $('.active-session-txt').parents('tr');
+					// Expire all sessions but not the current one
+					api_req({a: 'usr', ko: 1}, {
+						callback: function() {
+							M.account = null;
+							/* clear account cache */
+							$activeSessionsRows.find('.settings-logout').remove();
+							$activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
+							$('.fm-close-all-sessions').hide();
+							loadingDialog.hide();
+						}
+					});
                 }
             });
         });
@@ -1650,6 +1650,10 @@ function accountUI() {
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {
         loadSubPage('backup');
+    });
+	
+    $('.default-grey-button.reviewsessions').rebind('click', function() {
+        loadSubPage('fm/account/history');
     });
 
     $('.fm-account-button').rebind('click', function() {

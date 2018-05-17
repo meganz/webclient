@@ -581,7 +581,7 @@ function init_page() {
         init_blog();
     }
 
-    
+
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();
@@ -1427,8 +1427,12 @@ function init_page() {
                 };
 
                 $.termsDeny = function () {
-                    u_logout();
-                    document.location.reload();
+                    loadingDialog.show();
+                    ulmanager.abort(null);
+                    Soon(function() {
+                        u_logout();
+                        location.reload();
+                    });
                 };
 
                 dlQueue.pause();

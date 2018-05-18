@@ -105,7 +105,7 @@ function dashboardUI() {
             }
         };
         drawQRCanvas();
-        
+
         $('.qr-widget-w .button.access-qr').rebind('click', function () {
             if (account.contactLink && account.contactLink.length) {
                 openAccessQRDialog();
@@ -227,11 +227,11 @@ function dashboardUI() {
             var $percBlock = $('.storage .account.progress-perc.pr' + i);
             if (percents[i] > 0) {
                 $percBlock.text(Math.round(percents[i]) + ' %');
-                $percBlock.parent().removeClass('empty');
+                $percBlock.parent().removeClass('empty hidden');
             }
             else {
                 $percBlock.text('');
-                $percBlock.parent().addClass('empty');
+                $percBlock.parent().addClass('empty hidden');
             }
         }
         // Cloud drive

@@ -35,7 +35,7 @@
 
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
-        this.currentrootid = this.getNodeRoot(id);
+        this.currentrootid = M.chat ? "chat" : this.getNodeRoot(id);
 
         if (first) {
             fminitialized = true;

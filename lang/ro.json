@@ -1108,6 +1108,7 @@
     "7882": "Mesaj trimis",
     "7883": "A ap\u0103rut o eroare la \u00eencercarea de trimitere a mesajului. Te rug\u0103m s\u0103 \u00eencerci retrimiterea lui.",
     "7884": "Mesaj prea scurt",
+    "7944": "Contul t\u0103u a fost blocat. Te rug\u0103m s\u0103 contactezi support@mega.nz",
     "7945": "Pentru a accesa acest folder\/fi\u015fier, vei avea nevoie de [B]cheia de decriptare[\/B] a acestuia.",
     "7946": "Dac\u0103 nu o ai, \u00eentreab\u0103 creatorul linkului.",
     "7947": "Link f\u0103r\u0103 cheie",
@@ -2095,6 +2096,7 @@
     "17883": "%nbFi files were added to the transfer manager",
     "17884": "%nbFi file was added to the transfer manager",
     "17886": "This user already exists in your contact list",
+    "17958": "Link nevalid",
     "18148": "Contacteaz\u0103 asisten\u0163a",
     "18192": "Introdu un nume, o cale absolut\u0103 (caracterele wildcard * \u015fi ? sunt permise) sau alege care fi\u015fier sau folder dore\u015fti s\u0103-l excluzi de la sincronizare",
     "18213": "The download size exceeds the maximum size supported by the browser. You can use MEGAsync to proceed with the download.",
@@ -2110,6 +2112,7 @@
     "18231": "Your QR code is deactivated.",
     "18232": "Do you want to reactivate your QR Code?",
     "18233": "Your filter did not match any documents",
+    "18238": "Due to MEGA\u2019s encryption technology you are unable to reset your password without data loss. Please make sure you remember your password.",
     "18254": "Are you logged into your account in another web browser?",
     "18255": "Please check all your browsers (Chrome, Firefox, Opera, Edge, Internet Explorer, Safari etc.) to see if you are still logged into your account. You may have also logged into MEGA on someone else's computer and forgotten to log out.",
     "18256": "Step {NB}",
@@ -2261,6 +2264,7 @@
     "18512": "Review Session History",
     "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
     "18514": "This is your own contact link",
+    "18667": "SSL certificate error",
     "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
     "18669": "Write a message to %s..."
 }

@@ -272,7 +272,6 @@
     "716": "Kasalukuyang password",
     "717": "Bagong password",
     "718": "Kompirmahin ang bagong password",
-    "719": "Ilagay ang iyong kasalukuyang password.",
     "724": "Ang password na iyong binigay ay mali.",
     "725": "Nabago na ang iyong passsword.",
     "726": "Tapos na.",
@@ -1131,7 +1130,6 @@
     "8006": "Naisama ang attachment sa iyong Cloud Drive.",
     "8007": "Magdagdag ng kasali...",
     "8008": "Wala kang [P]Conversations[\/P]",
-    "8009": "Magsulat ng mensahe...",
     "8010": "Hanapin ang contacts",
     "8011": "Idagdag galing sa aking Cloud Drive",
     "8013": "Galing sa aking Cloud Drive",
@@ -1648,7 +1646,7 @@
     "16365": "MEGA Achievements",
     "16375": "Malaking [S]storage space[\/S]",
     "16378": "Leave behind the transfer volume limits associated with free accounts and enjoy an increased transfer allowance.",
-    "16380": "Access PRO only features like setting password protection and expiration dates for public files.",
+    "16380": "Access PRO only features like setting password protection and expiry dates for public files.",
     "16381": "Notes regarding transfers and your account type:",
     "16383": "Fully [S]featured[\/S]",
     "16384": "Generous [S]transfer quota[\/S]",
@@ -2191,5 +2189,10 @@
     "18506": "If you are able to provide your account's email address, please do so. If you cannot remember it, please click Start again to skip this step.",
     "18507": "Email Address",
     "18508": "Please enter the email address of the account you wish to recover. If you cannot remember it, please leave the field blank.",
-    "18514": "This is your own contact link"
+    "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
+    "18512": "Review Session History",
+    "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
+    "18514": "This is your own contact link",
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

@@ -2,14 +2,20 @@
 
 define('DIR', substr(__DIR__, 0, strlen(__DIR__) - strlen(basename(__DIR__))));
 
+$excludedFolders=array(DIR . 'js' . DIRECTORY_SEPARATOR . 'vendor');
+
 function dirToArray($dir) {
     $result = array();
 
     $cdir = scandir($dir);
     foreach ($cdir as $key => $value) {
         if (!in_array($value,array(".",".."))) {
-            if (is_dir($dir . DIRECTORY_SEPARATOR . $value)) {
-                $result = array_merge($result, dirToArray($dir . DIRECTORY_SEPARATOR . $value));
+            $f = $dir . DIRECTORY_SEPARATOR . $value;
+            if (is_dir($f)) {
+                if (in_array($f, $GLOBALS['excludedFolders'])) {
+                    continue;
+                }
+                $result = array_merge($result, dirToArray($f));
             } else {
                 $result[] = $dir . '/' . $value;
             }
@@ -37,7 +43,7 @@ function fetchFiles() {
 $ids = array();
 $speical_ids = array('5875', '5876', '1626', '1086', '1088', '1929', '955', '1930');
 
-foreach (fetchFiles("js/", "*.js", "*.html", "html/") as $file) {
+foreach (fetchFiles("js", "*.js", "*.html", "html") as $file) {
     $content = file_get_contents($file);
     preg_match_all("@\Wl\[(\d+)\]|\[\\$(\d+)(\.dqq)?\]@", $content, $numbers);
 

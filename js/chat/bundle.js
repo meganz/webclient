@@ -1027,6 +1027,11 @@ React.makeElement = React['createElement'];
 	        return MegaPromise.resolve(self._emojiData[name]);
 	    } else if (self._emojiDataLoading[name]) {
 	        return self._emojiDataLoading[name];
+	    } else if (name === "categories") {
+
+	        self._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
+
+	        return MegaPromise.resolve(self._emojiData[name]);
 	    } else {
 	        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy($.getJSON(staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json"));
 	        self._emojiDataLoading[name].done(function (data) {
@@ -3146,10 +3151,12 @@ React.makeElement = React['createElement'];
 	            } else if (this.props.dropdownItemGenerator) {
 	                child = this.props.dropdownItemGenerator(this);
 	            }
-	            if (!child) {
-	                Soon(function () {
-	                    self.onActiveChange(false);
-	                });
+	            if (!child && !this.props.forceShowWhenEmpty) {
+	                if (this.props.active !== false) {
+	                    (window.setImmediate || window.setTimeout)(function () {
+	                        self.onActiveChange(false);
+	                    });
+	                }
 	                return null;
 	            }
 
@@ -8479,6 +8486,7 @@ React.makeElement = React['createElement'];
 	            }
 	            this._onScrollChanged(0, nextState);
 	        }
+
 	        if (nextState.isActive === true) {
 	            var self = this;
 	            if (nextState.isLoading === true || !self.loadingPromise && (!self.data_categories || !self.data_emojis)) {
@@ -8831,6 +8839,7 @@ React.makeElement = React['createElement'];
 	                isLoading: self.state.isLoading,
 	                loadFailed: self.state.loadFailed,
 	                visibleCategories: this.state.visibleCategories,
+	                forceShowWhenEmpty: true,
 	                onActiveChange: function onActiveChange(newValue) {
 
 	                    if (newValue === false) {

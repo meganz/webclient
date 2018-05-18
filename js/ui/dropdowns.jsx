@@ -155,10 +155,12 @@ var Dropdown = React.createClass({
             else if (this.props.dropdownItemGenerator) {
                 child = this.props.dropdownItemGenerator(this);
             }
-            if (!child) {
-                Soon(function() {
-                    self.onActiveChange(false);
-                });
+            if (!child && !this.props.forceShowWhenEmpty) {
+                if (this.props.active !== false) {
+                    (window.setImmediate || window.setTimeout)(function () {
+                        self.onActiveChange(false);
+                    });
+                }
                 return null;
             }
 

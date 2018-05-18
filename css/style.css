@@ -3927,6 +3927,17 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     width: 24px;
     height: 24px;
 }
+.transfer-filetype-icon.photo-folder, .search-path-icon-span.photo-folder {
+    background-position: -337px -757px;
+    margin: 0;
+}
+.transfer-filetype-icon.folder {
+    background-position: -337px -717px;
+    margin: 0;
+}
+.transfer-filetype-icon.folder-shared {
+    margin: 0;
+}
 .nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder {
     color: white;
 }
@@ -6540,17 +6551,6 @@ table {
 }
 .rename-input-bl .transfer-filetype-icon.folder, .rename-input-bl .transfer-filetype-icon.folder-shared, .create-folder-input-bl .transfer-filetype-icon.folder {
     background-position: -297px -717px;
-    margin: 0;
-}
-.transfer-filetype-icon.photo-folder, .search-path-icon-span.photo-folder {
-    background-position: -337px -757px;
-    margin: 0;
-}
-.transfer-filetype-icon.folder {
-    background-position: -337px -717px;
-    margin: 0;
-}
-.transfer-filetype-icon.folder-shared {
     margin: 0;
 }
 .block-view-file-type {

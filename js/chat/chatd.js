@@ -66,8 +66,7 @@ var Chatd = function(userId, megaChat, options) {
 
     localStorage.setItem('chatdIdentity', base64urlencode(self.identity));
 
-    self.logger.debug("Generated new client identity: 0x",
-                    Chatd.dumpToHex(self.identity, 0, 0, true));
+    self.logger.debug("Generated new client identity: 0x" + Chatd.dumpToHex(self.identity, 0, 0, true));
     //    } else {
     //        self.identity = base64urldecode(self.identity);
     //        assert(self.identity.length === 8);
@@ -697,6 +696,17 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd) {
         this.logger.log('send:', Chatd.cmdToString(buf, true));
     }
     return this.triggerSendIfAble();
+};
+/*
+ * Same as .cmd, but checks if the shard has a clientId assigned. It may be
+ * connected and fully operational for text chat, but not yet assigned a clientId,
+ * which is needed for webrtc
+ */
+Chatd.Shard.prototype.rtcmd = function(opCode, cmd) {
+    if (!this.clientId) {
+        return false;
+    }
+    return this.cmd(opCode, cmd);
 };
 
 Chatd.Shard.prototype.sendKeepAlive = function(forced) {

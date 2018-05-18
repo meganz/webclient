@@ -6697,6 +6697,15 @@ table {
 .block-view-file-type.folder-shared {
     background-position: 0 -5034px;
 }
+.rubbish-bin .block-view-file-type.folder-shared {
+    background-position: 0 -5154px;
+}
+.block-view-file-type.puf-folder {
+    background-position: 0 -5274px;
+}
+.rubbish-bin .block-view-file-type.puf-folder {
+    background-position: 0 -5394px;
+}
 
 .export-icon.word, .share-folder-icon div.word {
     background-position: -113px 1px;
@@ -6812,14 +6821,23 @@ table {
 .export-icon.photo-folder, .share-folder-icon div.photo-folder {
     background-position: -113px -4459px;
 }
-.rubbish-bin .block-view-file-type.folder-shared {
-    background-position: 0 -5154px;
+.export-icon.inbound-share, .share-folder-icon div.inbound-share {
+    background-position: -113px -4919px;
 }
-.block-view-file-type.puf-folder {
-    background-position: 0 -5274px;
+.rubbish-bin .export-icon.inbound-share, .rubbish-bin .share-folder-icon div.inbound-share {
+    background-position: -113px -4919px;
 }
-.rubbish-bin .block-view-file-type.puf-folder {
-    background-position: 0 -5394px;
+.export-icon.folder-shared, .share-folder-icon div.folder-shared {
+    background-position: -113px -5039px;
+}
+.rubbish-bin .export-icon.folder-shared, .share-folder-icon div.folder-shared {
+    background-position: -113px -5159px;
+}
+.export-icon.puf-folder, .share-folder-icon div.puf-folder {
+    background-position: -113px -5279px;
+}
+.rubbish-bin .export-icon.puf-folder, .share-folder-icon div.puf-folder {
+    background-position: -113px -5399px;
 }
 
 .properties-file-icon div.word {

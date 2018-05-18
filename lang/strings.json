@@ -283,10 +283,6 @@
         "text": "or",
         "context": "This text will go in between two options. Like \"Black or White\". There is only space for up to 3 characters. If your language exceeds this length please put a forward slash \/ instead."
     },
-    "186": {
-        "text": "Sign out",
-        "context": "button to log out"
-    },
     "187": {
         "text": "My Account",
         "context": "Title of My Account section. There you can see your account details"
@@ -325,14 +321,6 @@
     },
     "201": {
         "text": "Incorrect e-mail and\/or password. Please try again.",
-        "context": ""
-    },
-    "205": {
-        "text": "login",
-        "context": ""
-    },
-    "206": {
-        "text": "Your name",
         "context": ""
     },
     "208": {
@@ -430,10 +418,6 @@
     "258": {
         "text": "Downloading",
         "context": "Title header on the download page while the file is downloading."
-    },
-    "367": {
-        "text": "MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.",
-        "context": ""
     },
     "368": {
         "text": "Caution:",
@@ -634,10 +618,6 @@
     "466": {
         "text": "Last [X]",
         "context": "[X] will be replaced by a number. This string is used to populate a select box where the user can select how many entries of a data set he wants to see. For example: \"Last 10\" \/ \"Last 100\" \/ \"Last 1000\" etc."
-    },
-    "468": {
-        "text": "Purchase History",
-        "context": ""
     },
     "469": {
         "text": "Last [X] purchases",
@@ -1179,24 +1159,12 @@
         "text": "Contact",
         "context": "referring to a contact in the contact list of the user"
     },
-    "770": {
-        "text": "Choose your password",
-        "context": ""
-    },
     "776": {
         "text": "Save",
         "context": "Button title to \"Save\" the selected option"
     },
-    "778": {
-        "text": "Don't have a MEGA account?",
-        "context": ""
-    },
     "779": {
         "text": "Register now",
-        "context": ""
-    },
-    "780": {
-        "text": "Already have a MEGA account?",
         "context": ""
     },
     "782": {
@@ -1213,10 +1181,6 @@
     },
     "799": {
         "text": "Used Space",
-        "context": ""
-    },
-    "800": {
-        "text": "Free Space",
         "context": ""
     },
     "808": {
@@ -1310,10 +1274,6 @@
     "871": {
         "text": "[B]Warning:[\/B] Storage quota exceeded. Please delete files or [A]upgrade your account[\/A].",
         "context": "Please make sure you apply the correct tags [B],[\/B], [A], & [\/A] - including backslash in the closing tag (\/)."
-    },
-    "872": {
-        "text": "PRO",
-        "context": "Description of the premium service which gives you more storage space & bandwidth quota"
     },
     "873": {
         "text": "[X] seconds ago",
@@ -1531,10 +1491,6 @@
         "text": "Expires on",
         "context": "Label for the 'Expires on' text into the my account page, indicating the expiration date of a PRO account without a valid subscription - (String as short as possible)."
     },
-    "988": {
-        "text": "Connections:",
-        "context": "header for the social connections, showing the number of contacts the user has"
-    },
     "989": {
         "text": "[X] contacts",
         "context": "[X] will be replaced by a plural number, indicating the total number of contacts the user has"
@@ -1602,10 +1558,6 @@
     "1007": {
         "text": "You cannot undo this action.",
         "context": "Warning message in a dialog that asks for confirmation before deleting something."
-    },
-    "1008": {
-        "text": "PRO transfer quota exceeded.",
-        "context": "PRO refers to the paid membership, which is often \"PRO\" in the same language. "
     },
     "1010": {
         "text": "Storage quota exceeded.",
@@ -1939,10 +1891,6 @@
         "text": "Today, 4000 years later, most major cloud storage providers still have not fully adopted cryptography.",
         "context": ""
     },
-    "1146": {
-        "text": "Complete your account",
-        "context": ""
-    },
     "1147": {
         "text": "Choose your account type",
         "context": ""
@@ -2054,10 +2002,6 @@
     "1187": {
         "text": "Download",
         "context": "Button title which downloads a file\/folder to your device"
-    },
-    "1190": {
-        "text": "to your Cloud Drive",
-        "context": ""
     },
     "1191": {
         "text": "The file you are trying to download is temporary unavailable.",
@@ -2194,10 +2138,6 @@
     "1291": {
         "text": "You have previously clicked on an invitation link. Please create your account.",
         "context": ""
-    },
-    "1295": {
-        "text": "Contact Support",
-        "context": "Label for any 'Contact support' button, link, text, title, etc. - (String as short as possible)."
     },
     "1297": {
         "text": "E-mail address already in use.",
@@ -2507,86 +2447,6 @@
         "text": "You are currently logged in. Would you like to log out and register a new account?",
         "context": "Confirmation message, that we show when the user clicks an invite link to register a new account while the user is logged in."
     },
-    "1825": {
-        "text": "What is MEGAsync?",
-        "context": ""
-    },
-    "1827": {
-        "text": "How do I install MEGAsync?",
-        "context": ""
-    },
-    "1829": {
-        "text": "Can I use MEGAsync on multiple computers?",
-        "context": ""
-    },
-    "1831": {
-        "text": "How can I monitor the sync status of my local files and folders?",
-        "context": ""
-    },
-    "1833": {
-        "text": "MEGAsync stores my login credentials to perform autologin. Isn't that a security concern?",
-        "context": ""
-    },
-    "1839": {
-        "text": "Does MEGAsync perform explicit file versioning?",
-        "context": "e.g. when a user updates a file (a partial write operation), the user would have the ability to go back in time and reverse the operation, which is currently not supported by MEGA"
-    },
-    "1840": {
-        "text": "No. However, you can access overwritten files in the respective debris folders until they are purged.",
-        "context": ""
-    },
-    "1841": {
-        "text": "Does MEGAsync support modifying existing files?",
-        "context": ""
-    },
-    "1845": {
-        "text": "Are there any restrictions with regards to filenames?",
-        "context": ""
-    },
-    "1849": {
-        "text": "How can I make sure that I always have the latest version of MEGAsync?",
-        "context": ""
-    },
-    "1851": {
-        "text": "Will MEGAsync use peer-to-peer transfers to achieve faster syncing between computers in the same local area network?",
-        "context": ""
-    },
-    "1852": {
-        "text": "No. The current incarnation of MEGAsync always syncs via MEGA\u2019s cloud infrastructure.",
-        "context": ""
-    },
-    "1853": {
-        "text": "What happens if conflicting concurrent actions are performed on clients synced to the same cloud location?",
-        "context": ""
-    },
-    "1854": {
-        "text": "The current version of MEGAsync does not resolve such clashes in a deterministic manner. Avoid them if possible.",
-        "context": ""
-    },
-    "1856": {
-        "text": "No. Do not expect these to be replicated to the cloud.",
-        "context": ""
-    },
-    "1857": {
-        "text": "Does MEGAsync support syncing the same local folder to different remote locations or the same remote folder to different local locations?",
-        "context": ""
-    },
-    "1858": {
-        "text": "No, unless you want to run multiple MEGAsync processes in parallel, which is not recommended. As a general rule, each filesystem item must only be visible to MEGAsync once, so avoid syncing subfolders of synced folders or placing multiple links to the same filesystem item in a local synced folder.",
-        "context": "Whether you can sync one local folder to multiple remote folders, which is not possible. Each local folder can only be synced to one remote folder"
-    },
-    "1859": {
-        "text": "Where can I find your iOS app?",
-        "context": ""
-    },
-    "1861": {
-        "text": "Where can I find your Android app?",
-        "context": ""
-    },
-    "1886": {
-        "text": "I am trying to rename a local folder in Explorer, but the name of the corresponding folder in my cloud drive stays the same, no matter what I do.",
-        "context": ""
-    },
     "1888": {
         "text": "Home",
         "context": "Link on the help page to go back to the startpage"
@@ -2642,10 +2502,6 @@
     "1930": {
         "text": "The cloud in your pocket. Access and stream your files from your smartphone or tablet.",
         "context": "Advertising text for mobile apps"
-    },
-    "1932": {
-        "text": "To download files larger than 1 GB, please install MEGAsync or our browser extension.",
-        "context": "When a user attempt to download a file larger than 1GB using Firefox, he will be prompted with a dialog asking him to install our browser extension with this text."
     },
     "1933": {
         "text": "To download files larger than 1 GB, please install MEGAsync, Google Chrome or Opera.",
@@ -2886,10 +2742,6 @@
     "1993": {
         "text": "or [A]create an account[\/A]",
         "context": "New link on the login page, to make it easier for users without an account to find the registration page if they ever end up on the login page."
-    },
-    "1995": {
-        "text": "I just remembered the password of my old account after performing a password reset. How do I get my data back?",
-        "context": "Help section question"
     },
     "2001": {
         "text": "Do you want to upload your files to a new session?",
@@ -3158,14 +3010,6 @@
     "5878": {
         "text": "Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!",
         "context": "This string is shown inside the Add Contact dialog and sent to a user in an email."
-    },
-    "5881": {
-        "text": "Press Releases",
-        "context": ""
-    },
-    "5882": {
-        "text": "Shareholder Reports",
-        "context": ""
     },
     "5884": {
         "text": "End call \u2026",
@@ -3487,18 +3331,6 @@
         "text": "Windows Phone App",
         "context": ""
     },
-    "6243": {
-        "text": "Where do my downloads go?",
-        "context": ""
-    },
-    "6260": {
-        "text": "Audio & Video setup",
-        "context": ""
-    },
-    "6277": {
-        "text": "How do I register for an account?",
-        "context": ""
-    },
     "6690": {
         "text": "Go to My Account",
         "context": ""
@@ -3625,14 +3457,6 @@
     },
     "6841": {
         "text": "We're sorry to see you go",
-        "context": ""
-    },
-    "6842": {
-        "text": "Your account has now been closed",
-        "context": ""
-    },
-    "6843": {
-        "text": "but before you leave we would love to know why you are leaving us",
         "context": ""
     },
     "6844": {
@@ -3939,10 +3763,6 @@
         "text": "Disabled",
         "context": "Label to indicate the user if the feature of exclusion based by size is enabled\/disabled."
     },
-    "7084": {
-        "text": "with MEGAsync",
-        "context": "\"Download\" with MEGAsync"
-    },
     "7086": {
         "text": "Please select your Linux Distro",
         "context": ""
@@ -4139,10 +3959,6 @@
         "text": "Your browser does not have the required audio\/video capabilities for making calls.",
         "context": "Shown when the user's browser does not have the capabilities for making audio\/video calls."
     },
-    "7212": {
-        "text": "Advertisement",
-        "context": "Shown on the download page to inform the user that the image below is an external ad."
-    },
     "7218": {
         "text": "Clear transfer",
         "context": "Context menu item"
@@ -4203,10 +4019,6 @@
         "text": "Payment Failed",
         "context": "A dialog box heading, when the user has tried to pay, but something has gone wrong."
     },
-    "7236": {
-        "text": "To download files larger than 1 GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
-        "context": "Description in a popup dialog when they are trying to download a file larger than 1GB using the browser."
-    },
     "7237": {
         "text": "SUBMIT YOUR FEEDBACK",
         "context": "Feedback dialog submit button label, all capital letters (upper case)"
@@ -4222,6 +4034,10 @@
     "7272": {
         "text": "Wrong data format",
         "context": "Title of the dialog displayed in cases that the user types some data with a wrong format - (String as short as possible)."
+    },
+    "7315": {
+        "text": "Start",
+        "context": "Label for any 'Start' button, link, text, title, etc. - (String as short as possible)."
     },
     "7337": {
         "text": "Security",
@@ -4325,7 +4141,7 @@
     },
     "7611": {
         "text": "1 file moved to the Rubbish Bin",
-        "context": "Success message shown when one file has been moved to the Rubbish Bin"
+        "context": "Success message shown when you have moved 1 file to the rubbish bin"
     },
     "7613": {
         "text": "1 folder moved to the Rubbish Bin",
@@ -4595,18 +4411,6 @@
         "text": "Access to any folders shared with you by selected [X] will be lost.",
         "context": "This is shown on a confirmation message dialog when removing one or more contacts. The placeholder [X] will be replaced with \"contact\" or \"contacts\" depending on how many contacts are being removed."
     },
-    "7873": {
-        "text": "You can download the extension (v%1) below.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user they can download a specific version of the extension further down the page. The placeholder %1 will be replaced with the version of the extension e.g. \"3.2.8\". So the text would read \"You can download the extension (v3.2.8) below.\""
-    },
-    "7874": {
-        "text": "It looks like your current extension (v%1) is out of date. You can download the latest (v%2) below.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is not the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.7\". The placeholder %2 will be replaced with the newest version available for download e.g. \"3.2.8\". So the text would read \"It looks like your current extension (v3.2.7) is out of date. You can download the latest (v3.2.8) below.\""
-    },
-    "7875": {
-        "text": "Your extension (v%1) is up to date.",
-        "context": "This text is on the Chrome or Firefox extension pages and tells the user that the current extension they have installed is the latest version. The placeholder %1 will be replaced with the current version of the extension e.g. \"3.2.8\". So the text would read \"Your extension (v3.2.8) is up to date.\""
-    },
     "7879": {
         "text": "Access to folders shared by [X] was removed.",
         "context": "This is shown in the Notification dialog when a user removes a contact from their contact list. The placeholder [X] will be replaced with the removed contact's email address."
@@ -4806,10 +4610,6 @@
     "8413": {
         "text": "PRO LITE",
         "context": "Label to indicate that the current user has a PRO LITE account."
-    },
-    "8425": {
-        "text": "through your browser",
-        "context": "Button label. Full text: Download through your browser. "
     },
     "8426": {
         "text": "[S]MEGAsync:[\/S] Easy automated syncing between your computers and your MEGA cloud drive",
@@ -5170,14 +4970,6 @@
     "8726": {
         "text": "Invite",
         "context": "A button on a dialog which invites a contact to join MEGA."
-    },
-    "8732": {
-        "text": "Update link",
-        "context": "A right click context menu item. This will let the user update a public link with additional information. For example the public link can now be updated with an expiry time."
-    },
-    "8733": {
-        "text": "Update links",
-        "context": "A right click context menu item. This will let the user update multiple public links with additional information. For example the public links can now be updated with an expiry time."
     },
     "8734": {
         "text": "Get links",
@@ -5611,10 +5403,6 @@
         "text": "Message not sent. Click here if you want to cancel it.",
         "context": "A hint message displayed when the message failed to send. It reminds the user to click it to cancel."
     },
-    "8886": {
-        "text": "This message has been deleted.",
-        "context": "A log message in a chat to indicate that the message has been deleted by the user."
-    },
     "8887": {
         "text": "(edited)",
         "context": "A log message in a chat to indicate that the message has been edited by the user."
@@ -5631,17 +5419,9 @@
         "text": "Start Group Conversation",
         "context": "A button title. The button starts a group chat."
     },
-    "8891": {
-        "text": "Revoke Attachment",
-        "context": "A button title to revoke an attachment in a chat by revoking the access to the attachment so other participants in the chat can not access it. (It does not delete the attachment out of your cloud drive)"
-    },
     "8892": {
         "text": "Revoked access to attachment(s).",
         "context": "A summary message displaying in the chat list when the last message of the chat is somebody revoking an attachment (i.e. removing access to the attachment, it does not delete it from the owners cloud drive)"
-    },
-    "8893": {
-        "text": "Could not revoke access to the attachment. Error code: %s.",
-        "context": "A warning message of not being able to revoke access to a shared attachment. Please keep %s as it will be replaced by the reason at runtime."
     },
     "8894": {
         "text": "Attached: %s",
@@ -5919,38 +5699,6 @@
         "text": "You can add multiple people at once with e-mail addresses separated by commas",
         "context": "Invite dialog default info text, below input box and above Send button."
     },
-    "9094": {
-        "text": "Frequently Asked Questions",
-        "context": "A title for the commonly asked questions in the Help section of the site."
-    },
-    "9095": {
-        "text": "How can we help you today?",
-        "context": "A title for the main page of the Help section of the site. A casual question about how Mega can help the user"
-    },
-    "9096": {
-        "text": "Support Centre",
-        "context": "A button for going back to the Support Centre, the main page of the Help section of the site."
-    },
-    "9098": {
-        "text": "We can't find what you are after",
-        "context": "A message which is displayed when the search query does not return any results"
-    },
-    "9099": {
-        "text": "Please try your search again or contact our support team directly",
-        "context": "A message which is displayed when the search query does not return any results."
-    },
-    "9100": {
-        "text": "Email Support",
-        "context": "A button to contact MEGA support via email."
-    },
-    "9101": {
-        "text": "If you can't find what you are looking for, please contact our support team for direct assistance.",
-        "context": "A message for the Get Support section informing the user to contact MEGA support if they can't find the help they need."
-    },
-    "9102": {
-        "text": "Go Back",
-        "context": "A button in the Help section to take the user back to a previous screen on the website."
-    },
     "9103": {
         "text": "Copy the link below to share the article.",
         "context": "Body for dialog with a link to share an article of our help section"
@@ -5958,10 +5706,6 @@
     "9104": {
         "text": "Share the Article",
         "context": "Title for dialog"
-    },
-    "9105": {
-        "text": "Enter your search here\u2026",
-        "context": "The placeholder text in the search field of the help section."
     },
     "9106": {
         "text": "Email %1 for assistance.",
@@ -6583,10 +6327,6 @@
         "text": "Scriptable",
         "context": "A title on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
     },
-    "16268": {
-        "text": "Import contacts\u2026",
-        "context": "Button label, allows user to import contacts from other services"
-    },
     "16272": {
         "text": "Transfers tooltip:",
         "context": "A heading in the Account Settings - Transfers section. This section lets the user toggle an option to show the transfer tooltip when a transfer is active."
@@ -6602,10 +6342,6 @@
     "16275": {
         "text": "Play Video",
         "context": "The title of a button which allows the user to open the video in a media \/ video player."
-    },
-    "16276": {
-        "text": "Create your free MEGA account",
-        "context": ""
     },
     "16277": {
         "text": "Create your free account and get %1 of complimentary storage space, valid for %2 days.",
@@ -6655,10 +6391,6 @@
         "text": "[S]%1[\/S] transfer quota",
         "context": "The %1 would be replaced by the transfer quota amount, for example: [S]50 GB[\/S] transfer quota"
     },
-    "16289": {
-        "text": "(Expires in [S]%1[\/S] %2)",
-        "context": "%1 will be replaced by a numeric value and %2 will be \"days\" or \"months\", for example (Expires in [S]10[\/S] days)"
-    },
     "16290": {
         "text": "days",
         "context": ""
@@ -6683,10 +6415,6 @@
         "text": "Install",
         "context": "Text placed in some button to tell the user to install something."
     },
-    "16296": {
-        "text": "Base Quota",
-        "context": "The user's achieved base quota"
-    },
     "16297": {
         "text": "Registration Bonus",
         "context": "achievement type"
@@ -6703,10 +6431,6 @@
         "text": "%1 base quota + %2",
         "context": "Initial and achieved storage quota, being %1 and %2 replaced with the value, Eg: 50GB base quota + 90GB"
     },
-    "16301": {
-        "text": "[S]%1[\/S] of %2",
-        "context": "base quota and total, Eg: [S]50GB[\/S] of 200GB"
-    },
     "16302": {
         "text": "Storage Full",
         "context": "Dialog header. Informs user that he\u2019ve reached the full capacity of Cloud Drive for Free accounts."
@@ -6715,17 +6439,9 @@
         "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
         "context": "A dialog message indicating what you can get with a PRO plan. Please leave the placeholders [A], [\/A], [S], [\/S] as they are."
     },
-    "16305": {
-        "text": "Choose a plan",
-        "context": "Button label. Allow user to check available PRO plans."
-    },
     "16306": {
         "text": "Delete old files and [A]clear your Rubbish Bin[\/A] to free up some space.",
         "context": "A dialog message that informs the user how to free up cloud drive space."
-    },
-    "16307": {
-        "text": "Tip: Keep your Rubbish Bin empty to optimise storage usage.",
-        "context": "A dialog message to inform the user how to free up more cloud drive space."
     },
     "16308": {
         "text": "You can unlock more free storage and transfer quota by using our products. Simple. Easy.",
@@ -6779,10 +6495,6 @@
         "text": "Thanks! We have sent that user an invitation email.",
         "context": ""
     },
-    "16321": {
-        "text": "You can now:",
-        "context": "headline of various things the user can now do, such as pasting a URL to the invited user."
-    },
     "16322": {
         "text": "Direct URL to MEGAsync:",
         "context": "URL stands for Uniform Resource Locator, i.e. a web addresss"
@@ -6794,26 +6506,6 @@
     "16325": {
         "text": "Get [S]%1[\/S] free storage and [S]%2[\/S] of transfer quota for each friend who installs a MEGA app",
         "context": "%1 and %2 are replaced by some amount, eg \"50GB\""
-    },
-    "16326": {
-        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive [S]%1[\/S] of complimentary storage plus [S]%2[\/S] of transfer quota, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA (your free quota will be credited once we confirm the activity of the new account, which can take a few days).",
-        "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\"."
-    },
-    "16327": {
-        "text": "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]%1[\/S] of storage space and [S]%2[\/S] of transfer quota.",
-        "context": ""
-    },
-    "16328": {
-        "text": "Do you want to hide this dialog when transfers are ongoing?",
-        "context": "A message in a confirmation dialog which is shown when the user clicks Close on the ongoing transfers popup dialog."
-    },
-    "16329": {
-        "text": "Use Settings -> Advanced -> Transfers to enable it again.",
-        "context": "This message is shown in a confirmation dialog for ongoing transfers. It explains how to re-enable the ongoing transfers popup dialog."
-    },
-    "16330": {
-        "text": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
-        "context": "Describes chat features"
     },
     "16331": {
         "text": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection.",
@@ -6855,10 +6547,6 @@
         "text": "Summary of the achievements completed and the transfer quota bonus already received",
         "context": "Information about completed achievements and earned bonuses."
     },
-    "16341": {
-        "text": "[B]Get 50 GBs free storage[\/B] when you create an account with us. For the full featured experience, download our app or use the site on a PC.",
-        "context": "An introductory sentence on the homepage of the mobile web site. It implies that the best experience comes from using the mobile apps, or the website when viewed on a PC\/desktop rather than a phone."
-    },
     "16342": {
         "text": "Link",
         "context": "A button on the mobile web site to create a public link."
@@ -6878,10 +6566,6 @@
     "16346": {
         "text": "The folder you are trying to view is no longer available.",
         "context": "A message in an error dialog in the mobile web site. This error can occur when the folder link is removed or the link is subject to a takedown notice."
-    },
-    "16347": {
-        "text": "File deleted",
-        "context": "A toast notification which is shown on the mobile web site to say that the file has been deleted successfully."
     },
     "16348": {
         "text": "Failed to copy, try copying manually.",
@@ -7067,21 +6751,9 @@
         "text": "Edited by %1",
         "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
     },
-    "16477": {
-        "text": "Renamed from %1 by %2",
-        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous filename by a particular user. Please keep the placeholders %1 which will be replaced by the filename and %2 which will be replaced by the email address."
-    },
-    "16478": {
-        "text": "current version",
-        "context": "A message to indicate which version is the current version."
-    },
     "16480": {
         "text": "Edited by me",
         "context": "A message which is displayed in the version history that shows that a certain file version was edited by the user themself."
-    },
-    "16481": {
-        "text": "Renamed from %1 by me",
-        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name by the user itself. Please keep the placeholder %1 which will be replaced by the filename."
     },
     "16485": {
         "text": "Duplicate items",
@@ -7098,10 +6770,6 @@
     "16488": {
         "text": "Upload and replace",
         "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
-    },
-    "16489": {
-        "text": "Replace the file in the destination folder with the file you are uploading:",
-        "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
     },
     "16490": {
         "text": "Don't upload",
@@ -7303,10 +6971,6 @@
         "text": "Effortlessly stay connected with our secure cross-platform audio and video calls.",
         "context": "iOS MEGAchat feature description"
     },
-    "16568": {
-        "text": "Coming soon!",
-        "context": "Text to indicate that a feature is coming soon"
-    },
     "16569": {
         "text": "Seamless File Sharing",
         "context": "iOS MEGAchat feature headline"
@@ -7483,10 +7147,6 @@
         "text": "Requires the free [A]Mozilla Thunderbird[\/A] mail client.",
         "context": "MEGAbird text with link to the \"Mozilla Thunderbird\" product."
     },
-    "16615": {
-        "text": "FILE",
-        "context": "Label for a downloadable file, to indicate it is a XX sized file. View screenshot for context."
-    },
     "16616": {
         "text": "Unlike most other cloud storage providers, only you control who has access to your data. Not even MEGA can access it!",
         "context": "Feature description on the startpage"
@@ -7631,14 +7291,6 @@
         "text": "The new password must be different from the old one.",
         "context": "A message on an error dialog which is shown when a user tries to change their account password but the new password is the same as the old one."
     },
-    "16667": {
-        "text": "Back to PRO Plans",
-        "context": "A button on the second Pro page which lets the user return to the first Pro page to change their Pro plan."
-    },
-    "16668": {
-        "text": "Dashboard",
-        "context": "Button description. Opens section with account information."
-    },
     "16671": {
         "text": "Download using the MEGA desktop app for faster downloads.",
         "context": "A message about the MEGAsync application which allows the user to download files faster and more reliably."
@@ -7671,10 +7323,6 @@
         "text": "Unfortunately, %1 has an insufficient buffer to decrypt data in the browser, please install the [A]MEGA desktop app[\/A] to download large files %2",
         "context": "Warning message to be shown when a filesize is too large to be reliably handled in the browser. %1 is replaced with either \"your browser\" or the actual browser's brand. %2 *may* include a hint, just as \"(or use Chrome)\""
     },
-    "16867": {
-        "text": "your browser",
-        "context": "Sentence to be used on %1 under string \"Unfortunately, %1 has a limited buffer to decrypt data....\""
-    },
     "16868": {
         "text": "or use Chrome",
         "context": "Sentence to be used on %2 under string \"Unfortunately, %1 has a limited buffer to decrypt data....%2\""
@@ -7706,10 +7354,6 @@
     "16890": {
         "text": "Your browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
         "context": "An error shown to Chrome users when their download cannot continue because they are running out of disk space."
-    },
-    "16891": {
-        "text": "Your available browser storage for MEGA cannot handle this download size, please free up some disk space.",
-        "context": "An error shown to Chrome users when their download cannot start because they are running out of disk space."
     },
     "16892": {
         "text": "Sorry, we were unable to retrieve the Cloud Drive contents.",
@@ -7823,10 +7467,6 @@
         "text": "The file will be updated with version history: [A]Learn more[\/A]",
         "context": "Clickable block description in duplicate items dialog. Allows user update existing file in folder by by generating a new version, which he is uploading.\r\n"
     },
-    "17126": {
-        "text": "The dashboard is for registered users only.",
-        "context": "A dialog message saying it is forbidden for an ephemeral user to access the dashboard."
-    },
     "17146": {
         "text": "This page is for registered users only.",
         "context": "A dialog message when user is trying to access the page from an ephemeral session which is allowed for registered users only."
@@ -7854,10 +7494,6 @@
     "17152": {
         "text": "1 version",
         "context": "Version message when files only have 1 historical version."
-    },
-    "17153": {
-        "text": "You are about to delete the version history of [X] files. Please note that the current files will not be deleted. Would you like to proceed?",
-        "context": "A warning message for deleting the whole version history of multiple files."
     },
     "17154": {
         "text": "You are about to delete the version history of 1 file. Please note that the current file will not be deleted. Would you like to proceed?",
@@ -8944,7 +8580,7 @@
         "context": "Step 4 in the instructions of using the Android app to reset your password after you choose that you are logged in to MEGA in the app."
     },
     "18290": {
-        "text": "Type your new password, confirm it and tap [B]Change[\/B].",
+        "text": "Type your new password, confirm it and tap [B]Change Password[\/B].",
         "context": "Step 5 in the instructions of using the Android app to reset your password after you choose that you are logged in to MEGA in the app."
     },
     "18291": {
@@ -9046,5 +8682,345 @@
     "18419": {
         "text": "Type your new password, confirm it and click [B]OK[\/B].",
         "context": "step nb 6 in megasync instruction to change the password."
+    },
+    "18420": {
+        "text": "Unfortunately opening a password protected link is not supported in your current browser. Please open the link using Google Chrome or Mozilla Firefox to access it.",
+        "context": "Warning dialog appears to the user when he tries to open a password protected link in a browser which is not supported."
+    },
+    "18421": {
+        "text": "General Data Protection Regulation Disclosure",
+        "context": "The title of the page for the European GDPR requirements."
+    },
+    "18422": {
+        "text": "Introduction",
+        "context": "A sub heading for the introduction section on the GDPR page."
+    },
+    "18423": {
+        "text": "In 2013 MEGA pioneered user-controlled end-to-end encryption through a web browser. It provides the same zero-knowledge security for its cloud storage and chat, whether through a web browser, mobile app, sync app or command line tool. MEGA The Privacy Company provides [B]Privacy by Design[\/B].",
+        "context": "Introductory paragraph for the GDPR page. Please keep the [B] and [\/B] tags which will be used to bolden the text."
+    },
+    "18424": {
+        "text": "As all files uploaded to MEGA are fully encrypted they can't be read or accessed in any manner by MEGA. Files can only be decrypted by the original uploader through a logged-in account, or by other parties who have been provided with file\/folder keys generated by the account user.",
+        "context": "The second paragraph in the Introduction section of the GDPR page."
+    },
+    "18425": {
+        "text": "[B]Personal data is[\/B] [I]Information relating to an identifiable natural person who can be directly or indirectly identified in particular by reference to an identifier.[\/I]",
+        "context": "The third paragraph in the Introduction section of the GDPR page. Please leave the [B] and [\/B] tags which will be used to bolden the text. Also leave the [I] and [\/I] tags which will be used to italicize the text."
+    },
+    "18426": {
+        "text": "MEGA stores the following categories of Personal Data",
+        "context": "A sub heading for a section on the GDPR page. This section details the types of data MEGA collects."
+    },
+    "18427": {
+        "text": "Contact Details",
+        "context": "A title for a list on the GDPR page."
+    },
+    "18428": {
+        "text": "Email addresses",
+        "context": "A list item on the GDPR page."
+    },
+    "18429": {
+        "text": "User's name (if provided)",
+        "context": "A list item on the GDPR page."
+    },
+    "18430": {
+        "text": "Transaction Details",
+        "context": "The title of a list on the GDPR page."
+    },
+    "18431": {
+        "text": "IP address and Source Port for account creation and file uploads",
+        "context": "A list item on the GDPR page."
+    },
+    "18432": {
+        "text": "Country location (inferred by matching IP to Maxmind IP database)",
+        "context": "A list item on the GDPR page."
+    },
+    "18433": {
+        "text": "File size and date uploaded",
+        "context": "A list item on the GDPR page."
+    },
+    "18434": {
+        "text": "Date that file\/folder links are created",
+        "context": "A list item on the GDPR page."
+    },
+    "18435": {
+        "text": "Chat destination contact(s) and time sent",
+        "context": "A list item on the GDPR page."
+    },
+    "18436": {
+        "text": "Call destination contact(s), call start time and call duration",
+        "context": "A list item on the GDPR page."
+    },
+    "18437": {
+        "text": "Subscriptions and payment attempts",
+        "context": "A list item on the GDPR page."
+    },
+    "18438": {
+        "text": "Information provided to a payment processor when processing a subscription payment, such as TaxID number, but not the credit\/debit card number.",
+        "context": "A list item on the GDPR page."
+    },
+    "18439": {
+        "text": "MEGA does not receive or store special categories of personal data or data relating to criminal convictions and offences as any files that are uploaded to Mega are fully encrypted at the user's device so the encrypted data is not able to be decrypted or read by Mega.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18440": {
+        "text": "MEGA doesn't share the data with any other party other than with competent authorities for the purposes of the prevention, investigation, detection or prosecution of criminal offences and as specified in the Privacy Policy clause 11.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18441": {
+        "text": "Purpose",
+        "context": "A section title on the GDPR page."
+    },
+    "18442": {
+        "text": "The purpose of storing the data is to manage account login and activity and to respond to information demands from authorities.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18443": {
+        "text": "Processing",
+        "context": "A section title on the GDPR page."
+    },
+    "18444": {
+        "text": "MEGA stores personal data but does not carry out any other processing activities on such data. This storage of personal data is [B]necessary[\/B] in order to provide the secure login to MEGA's systems and to satisfy compliance obligations.",
+        "context": "A paragraph on the GDPR page. Please leave the [B] and [\/B] tags which will be used to bolden the text."
+    },
+    "18445": {
+        "text": "Lawful Basis of Processing: Contract",
+        "context": "A section title on the GDPR page."
+    },
+    "18446": {
+        "text": "The processing of data is necessary for performance of the contract that MEGA has with each user, which they accepted through the [A]Terms of Service[\/A] when creating their account.",
+        "context": "A paragraph on the GDPR page. Please leave the [A] and [\/A] tags which will be used to create a hyperlink on the text."
+    },
+    "18447": {
+        "text": "The [A]Terms of Service[\/A] clause 2 requires the user to agree to the Terms or otherwise to not use the service. Acknowledging and accepting the [A]Terms of Service[\/A] is a mandatory step in the signup process in all clients - web and mobile.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18448": {
+        "text": "Clauses 50-51 of the [A1]Terms of Service[\/A1] incorporate the [A2]Privacy Policy[\/A2] by reference. The [A2]Privacy Policy[\/A2] specifies the personal information that is stored.",
+        "context": "A paragraph on the GDPR page. Please leave the [A1], [A2], [\/A1] and [\/A2] tags which will be used to create hyperlinks on the text."
+    },
+    "18449": {
+        "text": "Retention of Personal Data",
+        "context": "A section title on the GDPR page."
+    },
+    "18450": {
+        "text": "Personal data is retained indefinitely while the user's account is open. After account closure, MEGA will retain all account information as long as there is any law enforcement request pending but otherwise for 12 months after account closure as users sometimes request that an account be re-activated. After 12 months, identifying information such as email and IP addresses will be anonymised (except that email address records will be retained for reference by the user's contacts or where the user has participated in chats with other MEGA users) but other related database records may be retained.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18451": {
+        "text": "After user deletion of a file all deleted files will be made inaccessible, marked for deletion and deleted fully when the next appropriate file deletion purging process is run.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18452": {
+        "text": "After account closure all stored files will be marked for deletion and deleted fully when the next appropriate file deletion purging process is run.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18453": {
+        "text": "Data Subject's Rights",
+        "context": "A section title on the GDPR page."
+    },
+    "18454": {
+        "text": "Each user has the rights specified in this disclosure notice.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18455": {
+        "text": "Withdrawl of Consent",
+        "context": "A section title on the GDPR page."
+    },
+    "18456": {
+        "text": "Users can only withdraw consent to MEGA collecting the specified personal information if they close their account.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18457": {
+        "text": "Statutory and Contractual Obligations",
+        "context": "A section title on the GDPR page."
+    },
+    "18458": {
+        "text": "Personal Information collected by MEGA is not collected because of any contractual or statutory obligation to third parties.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18459": {
+        "text": "Automated Decision Making and Profiling",
+        "context": "A section title on the GDPR page."
+    },
+    "18460": {
+        "text": "MEGA does not undertake any automated decision making or profiling.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18461": {
+        "text": "The right of access",
+        "context": "A section title on the GDPR page."
+    },
+    "18462": {
+        "text": "Individuals have the right to obtain:",
+        "context": "A sentence on the GDPR page."
+    },
+    "18463": {
+        "text": "confirmation that their data is being processed;",
+        "context": "A list item on the GDPR page."
+    },
+    "18464": {
+        "text": "access to their personal data;",
+        "context": "A list item on the GDPR page."
+    },
+    "18465": {
+        "text": "Any requests should be submitted to [A]gdpr@mega.nz[\/A]. The information will be provided promptly, and at least within 1 month, without charge unless the request is manifestly unfounded or excessive.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18466": {
+        "text": "Rectification",
+        "context": "A section title on the GDPR page."
+    },
+    "18467": {
+        "text": "Individuals are entitled to have personal data rectified if it is inaccurate or incomplete. If MEGA has disclosed the personal data in question to any third party (such as a compliance authority), it will inform them of the rectification where possible and will also inform the individuals about the third parties to whom the data has been disclosed where appropriate. The only third parties that might have had disclosure are compliance authorities.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18468": {
+        "text": "Erasure",
+        "context": "A section title on the GDPR page."
+    },
+    "18469": {
+        "text": "The right to erasure does not provide an absolute 'right to be forgotten'. Individuals have a right to havepersonal data erased and to prevent processing in specific circumstances:",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18470": {
+        "text": "Where the personal data is no longer necessary in relation to the purpose for which it was originally collected\/processed.",
+        "context": "A list item on the GDPR page."
+    },
+    "18471": {
+        "text": "When the individual withdraws consent.",
+        "context": "A list item on the GDPR page."
+    },
+    "18472": {
+        "text": "When the individual objects to the processing and there is no overriding legitimate interest for continuing the processing.",
+        "context": "A list item on the GDPR page."
+    },
+    "18473": {
+        "text": "The personal data was unlawfully processed (i.e. otherwise in breach of the GDPR).",
+        "context": "A list item on the GDPR page."
+    },
+    "18474": {
+        "text": "The personal data has to be erased in order to comply with a legal obligation.",
+        "context": "A list item on the GDPR page."
+    },
+    "18475": {
+        "text": "The personal data is processed in relation to the offer of information society services to a child.",
+        "context": "A list item on the GDPR page."
+    },
+    "18476": {
+        "text": "Any requests for erasure will be considered in detail and would probably result in closure of the user's account.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18477": {
+        "text": "After account closure, MEGA will retain all account information as long as there is any law enforcement request pending but otherwise for 12 months after account closure as users sometimes request that an account be re-activated. After 12 months, identifying information such as email and IP address will be anonymised (except that email address records will be retained for reference by the user's contacts or where the user has participated in chats with other MEGA users) but other related records may be retained.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18478": {
+        "text": "In some cases a person may receive an email from MEGA asking the person to confirm their new account email address, but in fact they haven't tried to open an account - someone else has started the process and used their email address either maliciously or by mistake. In these cases MEGA has an ephemeral\/incomplete account that might be used to upload files. On request, and after proving ownership of the email address, MEGA will arrange for the account to be deleted.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18479": {
+        "text": "MEGA can refuse a request for erasure",
+        "context": "A sentence on the GDPR page."
+    },
+    "18480": {
+        "text": "to comply with a legal obligation for the performance of a public interest task or exercise of official authority.",
+        "context": "A list item on the GDPR page."
+    },
+    "18481": {
+        "text": "for public health purposes in the public interest;",
+        "context": "A list item on the GDPR page."
+    },
+    "18482": {
+        "text": "for the exercise or defence of legal claims.",
+        "context": "A list item on the GDPR page."
+    },
+    "18483": {
+        "text": "The right to restrict processing",
+        "context": "A section title on the GDPR page."
+    },
+    "18484": {
+        "text": "Individuals have a right to 'block' or suppress processing of personal data. When processing is restricted, MEGA is permitted to store the personal data, but not further process it. As MEGA only stores, and doesn't further process the stored personal data, no action will be taken in response to a request to restrict processing.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18485": {
+        "text": "Data Portability",
+        "context": "A section title on the GDPR page."
+    },
+    "18486": {
+        "text": "The right to data portability only applies:",
+        "context": "A sentence on the GDPR page."
+    },
+    "18487": {
+        "text": "to personal data an individual has provided to a controller;",
+        "context": "A list item on the GDPR page."
+    },
+    "18488": {
+        "text": "where the processing is based on the individual's consent or for the performance of a contract; and",
+        "context": "A list item on the GDPR page."
+    },
+    "18489": {
+        "text": "when processing is carried out by automated means.",
+        "context": "A list item on the GDPR page."
+    },
+    "18490": {
+        "text": "On request by email to [A]gdpr@mega.nz[\/A], MEGA will provide a user's personal data in a structured, commonly used and machine readable form such as JSON files.",
+        "context": "A message for not logged in users on the GDPR page."
+    },
+    "18491": {
+        "text": "On request by email to [A]gdpr@mega.nz[\/A] or by clicking the Download button below, MEGA will provide a user's personal data in a structured, commonly used and machine readable form such as JSON files.",
+        "context": "A paragraph on the GDPR page shown to logged in users. Please leave the [A] and [\/A] tags which will be used to create a hyperlink on the text."
+    },
+    "18492": {
+        "text": "Note that all files in a user's account can be downloaded and decrypted through any of the usual clients.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18493": {
+        "text": "Download Your Personal Data",
+        "context": "A section title on the GDPR page."
+    },
+    "18494": {
+        "text": "You can download your Personal Data by clicking the button below.",
+        "context": "A sentence on the GDPR page."
+    },
+    "18495": {
+        "text": "Note: This will provide your account and file metadata, not the actual files stored by you.",
+        "context": "A sentence on the GDPR page."
+    },
+    "18496": {
+        "text": "This feature does not work on iOS. Please try to download again using the desktop web client.",
+        "context": "An error message on the GDPR page for an unsupported phone operating system."
+    },
+    "18497": {
+        "text": "Lead Data Protection Supervisory Authority",
+        "context": "A section title on the GDPR page."
+    },
+    "18498": {
+        "text": "The Lead Data Protection Supervisory Authority is the Luxembourg National Commission for Data Protection. This is the appropriate authority for accepting GDPR complaints about MEGA.",
+        "context": "A paragraph on the GDPR page."
+    },
+    "18499": {
+        "text": "Controller",
+        "context": "A section title on the GDPR page."
+    },
+    "18500": {
+        "text": "Controller's Representative",
+        "context": "A section title on the GDPR page."
+    },
+    "18501": {
+        "text": "Data Protection Regulation",
+        "context": "A main menu item for the GDPR page."
+    },
+    "18506": {
+        "text": "If you are able to provide your account's email address, please do so. If you cannot remember it, please click Start again to skip this step.",
+        "context": "Dialog text which appears to users trying to start recovery process without providing the Email"
+    },
+    "18507": {
+        "text": "Email Address",
+        "context": "Step title (the beginning Step) in account recovery process which requires the user to enter an email"
+    },
+    "18508": {
+        "text": "Please enter the email address of the account you wish to recover. If you cannot remember it, please leave the field blank.",
+        "context": "The email step description in account recovery process."
     }
 }

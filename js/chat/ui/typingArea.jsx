@@ -899,6 +899,8 @@ var TypingArea = React.createClass({
                 }}
             />;
         }
+        var placeholder = l[18669];
+        placeholder = placeholder.replace("%s", room.getRoomTitle(false, true));
 
         return <div className={"typingarea-component" + self.props.className}>
             <div className={"chat-textarea " + self.props.className}>
@@ -923,7 +925,8 @@ var TypingArea = React.createClass({
                      style={textareaScrollBlockStyles}>
                     <textarea
                         className={messageTextAreaClasses}
-                        placeholder={__(l[8009])}
+                        placeholder={placeholder}
+                        roomTitle={room.getRoomTitle()}
                         onKeyUp={self.onTypeAreaKeyUp}
                         onKeyDown={self.onTypeAreaKeyDown}
                         onBlur={self.onTypeAreaBlur}

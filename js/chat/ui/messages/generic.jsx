@@ -218,16 +218,55 @@ var GenericConversationMessage = React.createClass({
     _startDownload: function(v) {
         M.addDownload([v]);
     },
-    _addToCloudDrive: function(v) {
-        M.injectNodes(v, M.RootID, function(res) {
-            if (res === 0) {
-                msgDialog(
-                    'info',
-                    __(l[8005]),
-                    __(l[8006])
-                );
+    _addToCloudDrive: function(v, openSendToChat) {
+        openSaveToDialog(v, function(node, target, isForward) {
+            if (isForward) {
+                megaChat.getMyChatFilesFolder()
+                    .done(function(myChatFolderId) {
+                        M.injectNodes(node, myChatFolderId, function(res) {
+                            if (!Array.isArray(res)) {
+                                if (d) {
+                                    console.error("Failed to inject nodes. Res:", res);
+                                }
+                            }
+                            else {
+                                // TODO:
+                                // megaChat.chats[$.mcselected].attachNodes($.selected); // 17766 // 17767
+                                megaChat.chats[$.mcselected].attachNodes(res);
+                                showToast('send-chat', (res.length > 1) ? l[17767] : l[17766]);
+                            }
+                        })
+                    })
+                    .fail(function() {
+                        if (d) {
+                            console.error("Failed to allocate 'My chat files' folder.", arguments);
+                        }
+                    });
+
             }
-        });
+            else {
+                // is a save/copy to
+                target = target || M.RootID;
+                M.injectNodes(node, target, function(res) {
+                    if (!Array.isArray(res)) {
+                        if (d) {
+                            console.error("Failed to inject nodes. Res:", res);
+                        }
+                    }
+                    else {
+                        if (target === M.RootID) {
+                            // since if the user clicks Save without picking, its a bit weird, where the file went
+                            // we show a simple dialog telling him the file is in Cloud Drive.
+                            msgDialog(
+                                'info',
+                                l[8005],
+                                l[8006]
+                            );
+                        }
+                    }
+                });
+            }
+        }, openSendToChat ? "conversations" : false);
     },
 
     _getLink: function(h, e) {
@@ -483,6 +522,7 @@ var GenericConversationMessage = React.createClass({
                                 </span>;
                             }
                         }
+
                         if (contact.u === u_handle) {
                             dropdown = <ButtonsUI.Button
                                 className="default-white-button tiny-button"
@@ -550,20 +590,31 @@ var GenericConversationMessage = React.createClass({
 
 
                                             self._addFavouriteButtons(v.h, firstGroupOfButtons);
+
+                                            linkButtons.push(
+                                                <DropdownsUI.DropdownItem icon="small-icon conversations"
+                                                                          label={__(l[17764])}
+                                                                          key="sendToChat"
+                                                                          onClick={() => {
+                                                                              $.selected = [v.h];
+                                                                              openCopyDialog('conversations');
+                                                                          }}/>
+                                            );
+
                                         }
 
-                                        return <div>
-                                            {previewButton}
-                                            {firstGroupOfButtons}
-                                            {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr/> : ""}
-                                            {downloadButton}
-                                            {linkButtons}
-                                            {revokeButton && downloadButton ? <hr/> : ""}
-                                            {revokeButton}
-                                        </div>;
-                                    }}
-                                />
-                            </ButtonsUI.Button>;
+                                            return <div>
+                                                {previewButton}
+                                                {firstGroupOfButtons}
+                                                {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
+                                                {downloadButton}
+                                                {linkButtons}
+                                                {revokeButton && downloadButton ? <hr /> : ""}
+                                                {revokeButton}
+                                            </div>;
+                                        }}
+                                    />
+                                </ButtonsUI.Button>;
                         }
                         else {
                             dropdown = <ButtonsUI.Button
@@ -580,11 +631,14 @@ var GenericConversationMessage = React.createClass({
                                     {previewButton}
                                     <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                               onClick={self._startDownload.bind(self, v)}/>
-                                    <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
-                                                              onClick={self._addToCloudDrive.bind(self, v)}/>
+                                    <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}
+                                                              onClick={self._addToCloudDrive.bind(self, v, false)}/>
+                                    <DropdownsUI.DropdownItem icon="conversations" label={__(l[17764])}
+                                                              onClick={self._addToCloudDrive.bind(self, v, true)}/>
                                 </DropdownsUI.Dropdown>
                             </ButtonsUI.Button>;
                         }
+
 
                         var attachmentClasses = "message shared-data";
                         var preview = <div className="data-block-view medium">
@@ -623,7 +677,7 @@ var GenericConversationMessage = React.createClass({
                                                     onClick={isPreviewable && self._startPreview.bind(self, v)}>
                                     {isPreviewable && <div className="play-video-button"></div>}
                                     <div className="video-thumb-details">
-                                        {isPreviewable && <i className="small-icon small-play-icon"></i>}
+                                        {v.playtime && <i className="small-icon small-play-icon"></i>}
                                         <span>{secondsToTimeShort(v.playtime || -1)}</span>
                                     </div>
                                 </div>;
@@ -897,7 +951,10 @@ var GenericConversationMessage = React.createClass({
                     message.deleted = true;
                 }
                 var messageActionButtons = null;
-                if (message.getState() === Message.STATE.NOT_SENT) {
+                if (
+                    message.getState() === Message.STATE.NOT_SENT ||
+                    message.getState() === Message.STATE.NOT_SENT_EXPIRED
+                ) {
                     messageActionButtons = null;
 
                     if (!spinnerElement) {

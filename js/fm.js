@@ -1176,7 +1176,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
                 '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
-                '<div class="clear"></div>', l[1018], l[82]);
+                '<div class="clear"></div>', extraButton || l[1018], l[82]);
 
         $('#msgDialog .default-white-button').eq(0).bind('click', function() {
             closeMsg();
@@ -1410,11 +1410,12 @@ function openContactInfoLink(contactLink) {
         if (ctHandle === u_handle) {
             $('#qr-ctn-add', $dialog).addClass('disabled');
             $('#qr-ctn-add', $dialog).off('click');
+            $('.qr-ct-exist', $dialog).text(l[18514]).removeClass('hidden');
         }
         else if (M.u[ctHandle] && M.u[ctHandle]._data.c) {
             contactStatus = 2;
             $('#qr-ctn-add', $dialog).addClass('disabled');
-            $('.qr-ct-exist', $dialog).removeClass('hidden');
+            $('.qr-ct-exist', $dialog).text(l[17886]).removeClass('hidden');
             $('#qr-ctn-add', $dialog).off('click');
         }
         else {
@@ -1446,7 +1447,10 @@ function openContactInfoLink(contactLink) {
                     QRContactDialogPrepare(res['+a'], res.e, res.fn + ' ' + res.ln, res.h);
                     return $dialog;
                 });
-                
+
+            }
+            else {
+                msgDialog('warningb', l[8531], l[17865]);
             }
         }
     });
@@ -1476,8 +1480,8 @@ function openAccessQRDialog() {
                 text: myHost
             };
             $('.qr-icon-big', $dialog).text('').qrcode(QRoptions);
-            
-            
+
+
             $('.qr-http-link', $dialog).text(myHost);
             var curAvatar = useravatar.contact(u_handle);
             $('.avatar-container-qr', $dialog).html(curAvatar);
@@ -1492,7 +1496,7 @@ function openAccessQRDialog() {
                 }
             };
             mega.attr.get(u_handle, 'clv', -2, 0).done(handleAutoAccept);
-            
+
         }
     };
 
@@ -2433,6 +2437,11 @@ function closeDialog(ev) {
         delete $.moveDialog;
         delete $.copyToShare;
         delete $.copyrightsDialog;
+
+        /* copy/move dialog - chat - save to */
+        delete $.saveToDialogCb;
+        delete $.saveToDialogNode;
+        delete $.dialogIsChatSave;
 
         if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
             delete $.onImportCopyNodes;

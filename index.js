@@ -341,12 +341,16 @@ function init_page() {
     var pageBeginLetters = page.substr(0, 2);
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
-        var ctLink = page.substring(2, page.length);
-        mBroadcaster.once('fm:initialized', function () {
-            openContactInfoLink(ctLink);
-        });
-
-        page = 'fm/contacts';
+        if (!is_mobile) {
+            var ctLink = page.substring(2, page.length);
+            mBroadcaster.once('fm:initialized', function () {
+                openContactInfoLink(ctLink);
+            });
+            page = 'fm/contacts';
+        }
+        else {
+            page = (u_type ? 'fm' : 'start');
+        }
     }
 
     if (pageBeginLetters === 'F!' && page.length > 2) {
@@ -466,7 +470,7 @@ function init_page() {
 
     if ((page.substr(0, 1) !== '!')
         && (page.substr(0, 3) !== 'pro')
-        && (page.substr(0, 5) !== 'start')
+        && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
         && (page !== 'ios')
@@ -533,6 +537,39 @@ function init_page() {
         delete localStorage.beingAccountCancellation;
         return false;
     }
+    // Password protected link decryption dialog
+    if (page.substr(0, 2) === 'P!' && page.length > 2) {
+        // Check if TextEncoder function is available for the stringToByteArray function
+        if (window.TextEncoder) {
+            // Show the password overlay for mobile
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+                mobile.decryptionPasswordOverlay.show(page);
+            }
+            else {
+                // Otherwise insert background page, show the password
+                // decryption dialog and pass in the current URL hash
+                parsepage(pages['placeholder']);
+                exportPassword.decrypt.init(page);
+            }
+        }
+        else { // not supported browser, appologize from user
+            var msgToUser = l[18420];
+            if (u_type) {
+                mBroadcaster.once('boot_done', function () {
+                    setTimeout(
+                        msgDialog('info', 'Pwssword protected link not supported', // not visible
+                            msgToUser), 1000);
+                });
+                page = 'fm';
+            }
+            else {
+                msgDialog('info', 'Pwssword protected link not supported', // not visible
+                    msgToUser);
+                page = 'start';
+            }
+        }
+    }
 
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
@@ -544,20 +581,7 @@ function init_page() {
         init_blog();
     }
 
-    // Password protected link decryption dialog
-    else if (page.substr(0, 2) === 'P!' && page.length > 2) {
 
-        // Show the password overlay for mobile
-        if (is_mobile) {
-            parsepage(pages['mobile']);
-            mobile.decryptionPasswordOverlay.show(page);
-        }
-        else {
-            // Otherwise insert background page, show the password decryption dialog and pass in the current URL hash
-            parsepage(pages['placeholder']);
-            exportPassword.decrypt.init(page);
-        }
-    }
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();
@@ -1403,8 +1427,12 @@ function init_page() {
                 };
 
                 $.termsDeny = function () {
-                    u_logout();
-                    document.location.reload();
+                    loadingDialog.show();
+                    ulmanager.abort(null);
+                    Soon(function() {
+                        u_logout();
+                        location.reload();
+                    });
                 };
 
                 dlQueue.pause();
@@ -1501,6 +1529,7 @@ function loginDialog(close) {
     if (close) {
         $dialog.find('form').empty();
         $dialog.addClass('hidden');
+        $(document).off('keydown.logingpopup');
         return false;
     }
     $dialog.find('form').replaceWith(getTemplate('top-login'));
@@ -1530,13 +1559,38 @@ function loginDialog(close) {
         loginDialog(1);
         loadSubPage('login');
     });
-    $('#login-password, #login-name').rebind('keydown', function (e) {
+    $(document).off('keydown.logingpopup').on('keydown.logingpopup', function (e) {
+        if ($('.dropdown.top-login-popup').hasClass('hidden')) {
+            $(document).off('keydown.logingpopup');
+            return;
+        }
+        if (e.keyCode === 32) { // space
+            if (document.activeElement !== $('#login-name', $dialog)[0]
+                && document.activeElement !== $('#login-password', $dialog)[0]) {
+                var c = $dialog.find('.login-checkbox').attr('class');
+                if (c.indexOf('checkboxOff') > -1) {
+                    $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
+                }
+                else {
+                    $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
+                }
+                return false;
+            }
+        }
+        if (e.keyCode === 13) { // enter
+            tooltiplogin();
+            return false;
+        }
+        
+    });
+    $('#login-password, #login-name', $dialog).rebind('keydown', function (e) {
         $('.top-login-pad').removeClass('both-incorrect-inputs');
         $('.top-login-input-tooltip.both-incorrect').removeClass('active');
         $('.top-login-input-block.password').removeClass('incorrect');
         $('.top-login-input-block.e-mail').removeClass('incorrect');
         if (e.keyCode == 13) {
             tooltiplogin();
+            return false;
         }
     });
 
@@ -1578,6 +1632,7 @@ function loginDialog(close) {
 
 
     $('.dropdown.top-login-popup').removeClass('hidden');
+    $('#login-name', $dialog).focus();
     if ($('body').hasClass('logged')) {
         topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 40);
     }
@@ -2004,6 +2059,7 @@ function topmenuUI() {
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'wp', 'start'
             ];
+            var moveTo = {'account': 'fm/account'};
 
             for (var i = subPages.length; i--;) {
                 if (className.indexOf(subPages[i]) > -1) {
@@ -2019,7 +2075,7 @@ function topmenuUI() {
                 mobile.loadCloudDrivePage();
             }
             else if (subpage) {
-                loadSubPage(subpage);
+                loadSubPage(moveTo[subpage] || subpage);
             }
             else if (className.indexOf('feedback') > -1) {
                 // Show the Feedback dialog

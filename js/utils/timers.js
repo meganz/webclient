@@ -90,6 +90,7 @@ delay.has = function(aProcID) {
 delay.cancel = function(aProcID) {
     if (delay.has(aProcID)) {
         clearTimeout(delay.queue[aProcID]);
+        delete delay.queue[aProcID];
         return true;
     }
     return false;

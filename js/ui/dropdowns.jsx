@@ -127,6 +127,8 @@ var Dropdown = React.createClass({
     },
     render: function() {
         if (this.props.active !== true) {
+
+
             return null;
         }
         else {

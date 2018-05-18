@@ -44,7 +44,7 @@ RtcModule.kApiTimeout = 20000;
 RtcModule.kCallAnswerTimeout = 40000;
 RtcModule.kRingOutTimeout = 30000;
 RtcModule.kIncallPingInterval = 4000;
-RtcModule.kMediaGetTimeout = 20000;
+RtcModule.kMediaGetTimeout = 60000;
 RtcModule.kSessSetupTimeout = 20000;
 
 RtcModule.prototype.logToServer = function(type, data) {
@@ -312,7 +312,7 @@ RtcModule.prototype.cmdEndpoint = function(type, info, payload) {
     if (payload) {
         data += payload;
     }
-    if (!info.shard.cmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
+    if (!info.shard.rtcmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
         throw new Error("cmdEndpoint: Send error trying to send command " + constStateToText(RTCMD, type));
     }
 };
@@ -330,7 +330,7 @@ RtcModule.prototype.cmdBroadcast = function(op, chatid, payload) {
         self.logger.error("cmdBroadcast: No shard for chatid", base64urlencode(chatid));
         return;
     }
-    if (!shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
+    if (!shard.rtcmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
         throw new Error("cmdEndpoint: Send error trying to send command " + constStateToText(RTCMD, op));
     } else {
         return true;
@@ -372,14 +372,7 @@ RtcModule.prototype._getLocalStream = function(av) {
             return Promise.reject("getLocalStream called re-entrantly from within a getLocalStream callback." +
                 "You should call getLocalStream() asynchronously to resolve this");
         }
-        return self.localMediaPromise
-            .then(function(stream) {
-                if (Object.keys(self.calls).length === 0) {
-                    return Promise.reject(null);
-                } else {
-                    return Promise.resolve(self.gLocalStream);
-                }
-            });
+        return self.localMediaPromise;
     }
     // Mark that we have an ongoing GUM request, but we don't have the
     // actual promise yet. This is because some callbacks may be called
@@ -415,9 +408,9 @@ RtcModule.prototype._getLocalStream = function(av) {
             }
             return Promise.resolve(msg);
         });
-    assert(self.localMediaPromise, "getUserMedia executed synchronously");
-    self.localMediaPromise = pms
-        .then(function(stream) {
+    assert(self.localMediaPromise, "getUserMedia resolved synchronously");
+    self.localMediaPromise = new Promise(function(resolve, reject) {
+        pms.then(function(stream) {
             resolved = true;
             if (typeof stream === 'string') {
                 self.gLocalStream = null;
@@ -433,16 +426,20 @@ RtcModule.prototype._getLocalStream = function(av) {
                 }
             }
             delete self.localMediaPromise;
-            if (Object.keys(self.calls).length !== 0) {// all calls were destroyed meanwhile
-                return Promise.resolve(stream);
+            // if all calls were not destroyed meanwhile
+            if (Object.keys(self.calls).length !== 0) {
+                resolve(stream);
             }
         });
-    setTimeout(function() {
-        if (!resolved) {
-            pms.resolve("timeout");
-        }
-    }, RtcModule.kMediaGetTimeout);
-
+        pms.catch(function(err) {
+            reject(err);
+        });
+        setTimeout(function() {
+            if (!resolved) {
+                reject("timeout");
+            }
+        }, RtcModule.kMediaGetTimeout);
+    });
     return self.localMediaPromise;
 };
 
@@ -624,7 +621,6 @@ Call.prototype._getLocalStream = function(av) {
     // getLocalStream currently never fails - if there is error, stream is a string with the error message
     return self.manager._getLocalStream(av)
         .catch(function(err) {
-            assert(false, "RtcModule._getLocalStream promise failed, and it should not. Error: "+err);
             return Promise.reject(err);
         })
         .then(function(stream) {
@@ -642,32 +638,36 @@ Call.prototype.msgCallTerminate = function(packet) {
         self.logger.error("Ignoring CALL_TERMINATE without reason code");
         return;
     }
+    if (self.isGroup) {
+        self.logger.warn("Ignoring CALL_TERMINATE in a group call");
+        return;
+    }
     var code = packet.data.charCodeAt(0);
     var sessions = self.sessions;
     var ci = self._callerInfo;
-    var isCallParticipant = false;
+    var isParticipant = false;
     if (Object.keys(sessions).length) { // Call is in progress, look in sessions
         for (var sid in sessions) {
             var sess = sessions[sid];
             if (sess.peer === packet.fromUser && sess.peerClient === packet.fromClient) {
-                isCallParticipant = true;
+                isParticipant = true;
                 break;
             }
         }
     } else if (self.state <= CallState.kJoining
         && ci
         && ci.fromUser === packet.fromUser
-        && ci.fromClient === packet.fromClient) { // call is in setup phase, only call initiator can abort it
-            isCallParticipant = true;
+        && ci.fromClient === packet.fromClient) { // Caller terminates, in the call setup phase
+            isParticipant = true;
     } else {
-        var retry = self.sessRetries[ci.fromUser + ci.fromClient];
+        var retry = self.sessRetries[packet.fromUser + packet.fromClient];
         if (retry && (Date.now() - retry.active <= RtcModule.kSessSetupTimeout)) {
             // no session to this peer at the moment, but we are in the process of reconnecting to them
-            isCallParticipant = true;
+            isParticipant = true;
         }
     }
 
-    if (!isCallParticipant) {
+    if (!isParticipant) {
         self.logger.warn("Received CALL_TERMINATE from a client that is not in the call, ignoring");
         return;
     }
@@ -783,7 +783,7 @@ Call.prototype._bcastCallData = function(ringing) {
     Chatd.pack16le(10) + self.id +
     String.fromCharCode(ringing?1:0) +
     String.fromCharCode(self._callInitiateAvFlags);
-    if (!self.shard.cmd(Chatd.Opcode.CALLDATA, cmd)) {
+    if (!self.shard.rtcmd(Chatd.Opcode.CALLDATA, cmd)) {
         setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
         return false;
     }
@@ -940,7 +940,7 @@ Call.prototype.cmdBroadcast = function(type, payload) {
     if (payload) {
         data += payload;
     }
-    if (!self.shard.cmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
+    if (!self.shard.rtcmd(Chatd.Opcode.RTMSG_BROADCAST, data)) {
         setTimeout(function() { self._destroy(Term.kErrNetSignalling, false); }, 0);
         return false;
     }
@@ -972,7 +972,7 @@ Call.prototype._broadcastCallReq = function() {
 Call.prototype._startIncallPingTimer = function() {
     var self = this;
     self._inCallPingTimer = setInterval(function() {
-        if (!self.shard.cmd(Chatd.Opcode.INCALL, self.chatid + self.manager.chatd.userId + self.shard.clientId)) {
+        if (!self.shard.rtcmd(Chatd.Opcode.INCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0')) {
             self._destroy(Term.kErrNetSignalling, true);
         }
     }, RtcModule.kIncallPingInterval);
@@ -984,7 +984,7 @@ Call.prototype._stopIncallPingTimer = function() {
         clearInterval(self._inCallPingTimer);
         delete self._inCallPingTimer;
     }
-    self.shard.cmd(Chatd.Opcode.ENDCALL, self.chatid + self.manager.chatd.userId + self.shard.clientId);
+    self.shard.rtcmd(Chatd.Opcode.ENDCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0');
 };
 
 Call.prototype._removeSession = function(sess, reason) {
@@ -1106,7 +1106,7 @@ Call.prototype._cmd = function(cmd, userid, clientid, data) {
     if (data) {
         payload += data;
     }
-    return this.shard.cmd(opcode, payload);
+    return this.shard.rtcmd(opcode, payload);
 };
 
 Call.prototype._join = function(userid) {
@@ -1126,7 +1126,7 @@ Call.prototype._join = function(userid) {
     var data = self.chatid + userid + '\0\0\0\0' + Chatd.pack16le(17) +
         String.fromCharCode(RTCMD.JOIN) + self.id + self.manager.ownAnonId;
     self._setState(CallState.kJoining);
-    if (!self.shard.cmd(opcode, data)) {
+    if (!self.shard.rtcmd(opcode, data)) {
         setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
         return false;
     }
@@ -1150,7 +1150,7 @@ Call.prototype.rejoinPeer = function(userid, clientid) {
     var data = self.chatid + userid + clientid +
         Chatd.pack16le(17) + String.fromCharCode(RTCMD.JOIN) +
         self.id + self.manager.ownAnonId;
-    if (!self.shard.cmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
+    if (!self.shard.rtcmd(Chatd.Opcode.RTMSG_ENDPOINT, data)) {
         setTimeout(function() {
             self._destroy(Term.kErrNetSignalling, true);
         }, 0);
@@ -1697,7 +1697,7 @@ Session.prototype.cmd = function(op, data) {
     if (data) {
         payload += data;
     }
-    if (!self.call.shard.cmd(Chatd.Opcode.RTMSG_ENDPOINT,
+    if (!self.call.shard.rtcmd(Chatd.Opcode.RTMSG_ENDPOINT,
         self.call.chatid + self.peer + self.peerClient +
         Chatd.pack16le(payload.length) + payload)) {
         if (self.state < SessState.kTerminating) {
@@ -2175,8 +2175,10 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
                     return UICallTerm.MISSED;
                 case CallState.kReqSent:
                     return UICallTerm.ABORTED;
-                default:
+                case CallState.kInProgress:
                     return UICallTerm.ENDED;
+                default:
+                    return UICallTerm.FAILED;
             }
             break; // just in case
         case Term.kCallRejected:
@@ -2193,7 +2195,9 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             assert(!isIncoming);
             return UICallTerm.REJECTED;
         case Term.kAppTerminating:
-            return UICallTerm.ENDED;
+            return (self.predestroyState === CallState.kInProgress)
+                ? UICallTerm.ENDED
+                : UICallTerm.FAILED;
         default:
             var name = constStateToText(Term, terminationCode);
             if (RtcModule.termCodeIsError(terminationCode)) {

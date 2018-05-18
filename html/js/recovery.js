@@ -19,6 +19,7 @@ function AccountRecoveryControl() {
     this.checks2 = 0;
     this.emEntered = false;
     this.isBack = false;
+    this.isFlowVisited = true;
     var self = this;
 
     // if mobile we view the related header for top-mobile.html and hide navigation div of desktop
@@ -48,7 +49,10 @@ function AccountRecoveryControl() {
     });
     this.$navigationControl.rebind('click', function () {
         self.isBack = true;
-        if (self.lastStep === 3 && self.currStep === 4) {
+        if (self.currStep === 3 && !self.isFlowVisited) {
+            self.showStep(0);
+        }
+        else if (self.lastStep === 3 && self.currStep === 4) {
             self.showStep(self.lastStep, 1);
         }
         else if (self.lastStep === 3 && self.currStep !== 4) {
@@ -65,10 +69,13 @@ function AccountRecoveryControl() {
 
     $('.progress-points .progress-point', this.$rightContent).rebind('click', function () {
         self.isBack = true;
-        if ($(this).hasClass('step1')) {
+        if (!self.isFlowVisited) {
+            self.showStep(0);
+        }
+        else if ($(this).hasClass('step1')) {
             self.showStep(1);
         }
-        if ($(this).hasClass('step0')) {
+        else if ($(this).hasClass('step0')) {
             self.showStep(0);
         }
         else if ($(this).hasClass('step2')) {
@@ -137,11 +144,22 @@ function AccountRecoveryControl() {
                                 loadingDialog.phide();
                                 if ($.isNumeric(res)) {
                                     if (res === 0) {
-                                        self.showParkWarning(true);
+                                        // self.showParkWarning(true);
+                                        self.isFlowVisited = false;
+                                        self.showStep(3, 0);
                                         return;
                                     }
                                     else if (res === 1) {
                                         self.showStep(1);
+                                        return;
+                                    }
+                                    else if (res === -9) { // invalid email
+                                        $('.progress-point.step' + self.currStep + ' .step-answer',
+                                            self.$rightContent).text('');
+                                        $('.recover-account-email-block .error-message span',
+                                            self.$leftContent).text(l[18668]);
+                                        $('.recover-account-email-block .error-message',
+                                            self.$leftContent).removeClass('hidden');
                                         return;
                                     }
                                     else {
@@ -299,6 +317,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         checkBx2 = escapeHTML(l[18264]); // 'I have checked my computer and/or laptop for the desktop app';
         yesAnswer = l[18265]; // 'Yes, I have the MEGA app installed';
         noAnswer = l[18266]; // 'No, I do not have the MEGA app installed';
+        this.isFlowVisited = true;
     }
     else if ((step === 3 || step === 4) && !branch) {
         question1 = escapeHTML(l[1937]); // 'Do you have a back up of your Recovery Key?';

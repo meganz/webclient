@@ -560,21 +560,16 @@ var GenericConversationMessage = React.createClass({
                                         }
 
                                         if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+                                            dropdown = "<span>" + l[5533] + "</span>";
                                             dbfetch.get(v.h)
                                                 .always(function() {
                                                     if (!M.d[v.h]) {
                                                         NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
                                                         Soon(function() {
-                                                            dd.safeForceUpdate();
-                                                        });
-                                                    }
-                                                    else {
-                                                        Soon(function() {
-                                                            dd.safeForceUpdate();
+                                                            self.safeForceUpdate();
                                                         });
                                                     }
                                                 });
-                                            return <span>{l[5533]}</span>;
                                         }
                                         else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
                                             downloadButton = <DropdownsUI.DropdownItem
@@ -605,9 +600,7 @@ var GenericConversationMessage = React.createClass({
                                                                               openCopyDialog('conversations');
                                                                           }}/>
                                             );
-                                        }
-                                        else if (NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-                                            return null;
+
                                         }
 
                                             return <div>
@@ -639,7 +632,7 @@ var GenericConversationMessage = React.createClass({
                                     <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                               onClick={self._startDownload.bind(self, v)}/>
                                     <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}
-                                                              onClick={self._addToCloudDrive.bind(self, v)}/>
+                                                              onClick={self._addToCloudDrive.bind(self, v, false)}/>
                                     <DropdownsUI.DropdownItem icon="conversations" label={__(l[17764])}
                                                               onClick={self._addToCloudDrive.bind(self, v, true)}/>
                                 </DropdownsUI.Dropdown>
@@ -684,7 +677,7 @@ var GenericConversationMessage = React.createClass({
                                                     onClick={isPreviewable && self._startPreview.bind(self, v)}>
                                     {isPreviewable && <div className="play-video-button"></div>}
                                     <div className="video-thumb-details">
-                                        {isPreviewable && <i className="small-icon small-play-icon"></i>}
+                                        {v.playtime && <i className="small-icon small-play-icon"></i>}
                                         <span>{secondsToTimeShort(v.playtime || -1)}</span>
                                     </div>
                                 </div>;

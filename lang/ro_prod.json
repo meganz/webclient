@@ -272,7 +272,6 @@
     "716": "Parola actual\u0103",
     "717": "Parola nou\u0103",
     "718": "Confirm\u0103 parola nou\u0103",
-    "719": "Te rug\u0103m s\u0103 introduci parola actual\u0103.",
     "724": "Parola actual\u0103 furnizat\u0103 este incorect\u0103.",
     "725": "Parola ta a fost schimbat\u0103.",
     "726": "Gata",
@@ -1131,7 +1130,6 @@
     "8006": "Ata\u015fament ad\u0103ugat unit\u0103\u0163ii tale cloud.",
     "8007": "Adaug\u0103 participant...",
     "8008": "Nu ai nicio [P]conversa\u0163ie[\/P]",
-    "8009": "Scrie un mesaj...",
     "8010": "Caut\u0103 contacte",
     "8011": "Adaug\u0103 din unitatea mea cloud",
     "8013": "Din unitatea mea cloud",
@@ -2191,5 +2189,10 @@
     "18506": "If you are able to provide your account's email address, please do so. If you cannot remember it, please click Start again to skip this step.",
     "18507": "Email Address",
     "18508": "Please enter the email address of the account you wish to recover. If you cannot remember it, please leave the field blank.",
-    "18514": "This is your own contact link"
+    "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
+    "18512": "Review Session History",
+    "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
+    "18514": "This is your own contact link",
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

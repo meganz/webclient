@@ -586,7 +586,7 @@
             handleDialogContent(
                 aTab,
                 'ul',
-                (aTab === 'conversations') ? false : true,
+                true,
                 'copy',
                 (aTab === 'conversations' ? l[1940] : l[776]),
                 undefined,

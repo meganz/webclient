@@ -595,8 +595,12 @@ if (!b_u && is_extension)
     }
     else /* Google Chrome */
     {
-        bootstaticpath = chrome.extension.getURL('mega/');
-        urlrootfile = 'mega/secure.html';
+        tmp = 'mega';
+        if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
+            tmp = localStorage.chromextdevpath || tmp;
+        }
+        bootstaticpath = chrome.extension.getURL(tmp + '/');
+        urlrootfile = tmp + '/secure.html';
     }
 
     Object.defineProperty(window, 'eval', {
@@ -2273,6 +2277,7 @@ else if (!b_u) {
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
+        'tiffjs': {f:'js/vendor/tiff.js', n: 'tiffjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},

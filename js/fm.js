@@ -1176,7 +1176,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
                 '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
-                '<div class="clear"></div>', l[1018], l[82]);
+                '<div class="clear"></div>', extraButton || l[1018], l[82]);
 
         $('#msgDialog .default-white-button').eq(0).bind('click', function() {
             closeMsg();

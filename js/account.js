@@ -927,7 +927,6 @@ function processEmailChangeActionPacket(ap) {
         // set on client side, to simulate a real commit
         var ts = Object(M.u[u_h]).ts;
         var newTs = parseInt(v.split(":")[1], 10);
-        console.error(u_h, v, ts < newTs, ts, newTs);
         if (ts < newTs) {
             Object(M.u[u_h]).ts = newTs;
             _lastUserInteractionCacheInFlight[u_h] = v;

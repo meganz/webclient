@@ -1085,13 +1085,17 @@ var ConversationPanel = React.createClass({
         var scrollPositionY = ps.getScrollPositionY();
         var isAtTop = ps.isAtTop();
         var isAtBottom = ps.isAtBottom();
+        var chatRoom = self.props.chatRoom;
+        var mb = chatRoom.messagesBuff;
 
+        if (mb.messages.length === 0) {
+            self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
+            return;
+        }
 
         // turn on/off auto scroll to bottom.
         if (ps.isCloseToBottom(30) === true) {
             if (!self.scrolledToBottom) {
-                var chatRoom = self.props.chatRoom;
-                var mb = chatRoom.messagesBuff;
                 mb.detachMessages();
             }
             self.props.chatRoom.scrolledToBottom = self.scrolledToBottom = true;
@@ -1102,9 +1106,7 @@ var ConversationPanel = React.createClass({
 
 
         if (isAtTop || (ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500)) {
-            var chatRoom = self.props.chatRoom;
-            var mb = chatRoom.messagesBuff;
-            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
+            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull && !mb.isRetrievingHistory) {
                 ps.disable();
 
 
@@ -1256,7 +1258,8 @@ var ConversationPanel = React.createClass({
         if (
             (
                 ChatdIntegration._loadingChats[room.roomId] &&
-                ChatdIntegration._loadingChats[room.roomId].state() === 'pending'
+                ChatdIntegration._loadingChats[room.roomId].loadingPromise &&
+                ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending'
             ) ||
             (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
             room.messagesBuff.messagesHistoryIsLoading() === true ||

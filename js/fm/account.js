@@ -278,17 +278,17 @@ function accountUI() {
         /* Used Storage progressbar */
         var percents = [
             100 * account.stats[M.RootID].bytes / account.space,
-            100 * account.stats[M.RubbishID].bytes / account.space,
+            100 * account.stats[M.InboxID].bytes / account.space,
             100 * account.stats.inshares.bytes / account.space,
-            100 * account.stats[M.InboxID].bytes / account.space
+            100 * account.stats[M.RubbishID].bytes / account.space
         ];
         for (var i = 0; i < 4; i++) {
             var $percBlock = $('.data-block.storage-data .account.pr-item.pr' + i);
             if (percents[i] > 0) {
-                $percBlock.removeClass('empty');
+                $percBlock.removeClass('empty hidden');
             }
             else {
-                $percBlock.addClass('empty');
+                $percBlock.addClass('empty hidden');
             }
         }
 
@@ -540,22 +540,22 @@ function accountUI() {
             $('.fm-close-all-sessions').hide();
         }
 
-        $('.fm-close-all-sessions').rebind('click', function() {
-
-            loadingDialog.show();
-            var $this = $(this);
-            var $activeSessionsRows = $('.active-session-txt').parents('tr');
-
-            // Expire all sessions but not the current one
-            api_req({a: 'usr', ko: 1}, {
-                callback: function() {
-                    M.account = null;
-                    /* clear account cache */
-                    $activeSessionsRows.find('.settings-logout').remove();
-                    $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
-                        .addClass('expired-session-txt').text(l[1664]);
-                    $this.hide();
-                    loadingDialog.hide();
+        $('.fm-close-all-sessions').rebind('click', function() {			
+			msgDialog('confirmation', '', l[18513], false, function(e) {
+                if (e) {
+                    loadingDialog.show();
+					var $activeSessionsRows = $('.active-session-txt').parents('tr');
+					// Expire all sessions but not the current one
+					api_req({a: 'usr', ko: 1}, {
+						callback: function() {
+							M.account = null;
+							/* clear account cache */
+							$activeSessionsRows.find('.settings-logout').remove();
+							$activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt').addClass('expired-session-txt').text(l[1664]);
+							$('.fm-close-all-sessions').hide();
+							loadingDialog.hide();
+						}
+					});
                 }
             });
         });
@@ -838,35 +838,45 @@ function accountUI() {
             var bYear = String($('.default-select.year .default-dropdown-item.active').attr('data-value') || '');
             var country = String($('.default-select.country .default-dropdown-item.active').attr('data-value') || '');
 
-            // If any of user attributes is changed then update them
-            if ((u_attr.firstname && u_attr.firstname !== firstName)
-                    || (u_attr.lastname && u_attr.lastname !== lastName)
-                    || (u_attr.birthday && u_attr.birthday !== bDay)
-                    || (u_attr.birthmonth && u_attr.birthmonth !== bMonth)
-                    || (u_attr.birthyear && u_attr.birthyear !== bYear)
-                    || (u_attr.country && u_attr.country !== country)) {
+            var apiCallNeeded = false;
+            var userAttrRequest = { a: 'up' };
+
+            if (u_attr.firstname == null || u_attr.firstname !== firstName) {
+                // we want also to catch the 'undefined' or null and replace with the empty string (or given string)
                 u_attr.firstname = firstName || 'Nobody';
+                userAttrRequest.firstname = base64urlencode(to8(u_attr.firstname));
+                apiCallNeeded = true;
+            }
+            if (u_attr.lastname == null || u_attr.lastname !== lastName) {
+                // we want also to catch the 'undefined' or null and replace with the empty string (or given string)
                 u_attr.lastname = lastName;
+                userAttrRequest.lastname = base64urlencode(to8(u_attr.lastname));
+                apiCallNeeded = true;
+            }
+            if (u_attr.birthday == null || u_attr.birthday !== bDay) {
                 u_attr.birthday = bDay;
+                userAttrRequest.birthday = base64urlencode(u_attr.birthday);
+                apiCallNeeded = true;
+            }
+            if (u_attr.birthmonth == null || u_attr.birthmonth !== bMonth) {
                 u_attr.birthmonth = bMonth;
+                userAttrRequest.birthmonth = base64urlencode(u_attr.birthmonth);
+                apiCallNeeded = true;
+            }
+            if (u_attr.birthyear == null || u_attr.birthyear !== bYear) {
                 u_attr.birthyear = bYear;
+                userAttrRequest.birthyear = base64urlencode(u_attr.birthyear);
+                apiCallNeeded = true;
+            }
+            if (u_attr.country == null || u_attr.country !== country) {
                 u_attr.country = country;
+                userAttrRequest.country = base64urlencode(u_attr.country);
+                apiCallNeeded = true;
+            }
 
-                var req = {
-                    a: 'up',
-                    firstname: base64urlencode(to8(u_attr.firstname)),
-                    lastname: base64urlencode(to8(u_attr.lastname))
-                };
-                var opt = ["country", "birthyear", "birthmonth", "birthday"];
-                for (var i = opt.length; i--;) {
-                    var n = opt[i];
-                    if (u_attr[n]) {
-                        req[n] = base64urlencode(u_attr[n]);
-                    }
-                }
-
-                api_req(req, {
-                    callback: function(res) {
+            if (apiCallNeeded) {
+                api_req(userAttrRequest, {
+                    callback: function (res) {
                         if (res === u_handle) {
                             $('.user-name').text(u_attr.name);
                             showToast('settings', l[7698]);
@@ -878,36 +888,7 @@ function accountUI() {
 
             var pws = zxcvbn($('#account-new-password').val());
 
-            /*if ($('#account-password').val() == ''
-                && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== '')) {
-
-                msgDialog('warninga', l[135], l[719], false, function() {
-                    $('#account-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                    $('#account-password').bind('keyup.accpwd', function() {
-                        if ($('#account-new-password').val() === $('#account-confirm-password').val()) {
-                            $('.fm-account-save').removeClass('disabled');
-                            $('#account-password').unbind('keyup.accpwd');
-                        }
-                    });
-                });
-            }
-            else if ($('#account-password').val() !== '' && !checkMyPassword($('#account-password').val())) {
-                msgDialog('warninga', l[135], l[724], false, function() {
-                    $('#account-password').val('');
-                    $('#account-password').focus();
-                    $('.fm-account-save-block').removeClass('hidden');
-                    $('.fm-account-save').addClass('disabled');
-                    $('#account-password').bind('keyup.accpwd', function() {
-                        if ($('#account-new-password').val() === $('#account-confirm-password').val()) {
-                            $('.fm-account-save').removeClass('disabled');
-                            $('#account-password').unbind('keyup.accpwd');
-                        }
-                    });
-                });
-            }
-            else*/ if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
+            if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
                 msgDialog('warninga', l[135], l[715], false, function() {
                     $('#account-new-password').val('');
                     $('#account-confirm-password').val('');
@@ -1669,6 +1650,10 @@ function accountUI() {
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {
         loadSubPage('backup');
+    });
+	
+    $('.default-grey-button.reviewsessions').rebind('click', function() {
+        loadSubPage('fm/account/history');
     });
 
     $('.fm-account-button').rebind('click', function() {

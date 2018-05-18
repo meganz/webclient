@@ -470,7 +470,7 @@ function init_page() {
 
     if ((page.substr(0, 1) !== '!')
         && (page.substr(0, 3) !== 'pro')
-        && (page.substr(0, 5) !== 'start')
+        && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
         && (page !== 'contact')
         && (page !== 'ios')
@@ -581,7 +581,7 @@ function init_page() {
         init_blog();
     }
 
-    
+
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();
@@ -1427,8 +1427,12 @@ function init_page() {
                 };
 
                 $.termsDeny = function () {
-                    u_logout();
-                    document.location.reload();
+                    loadingDialog.show();
+                    ulmanager.abort(null);
+                    Soon(function() {
+                        u_logout();
+                        location.reload();
+                    });
                 };
 
                 dlQueue.pause();
@@ -1525,6 +1529,7 @@ function loginDialog(close) {
     if (close) {
         $dialog.find('form').empty();
         $dialog.addClass('hidden');
+        $(document).off('keydown.logingpopup');
         return false;
     }
     $dialog.find('form').replaceWith(getTemplate('top-login'));
@@ -1554,13 +1559,38 @@ function loginDialog(close) {
         loginDialog(1);
         loadSubPage('login');
     });
-    $('#login-password, #login-name').rebind('keydown', function (e) {
+    $(document).off('keydown.logingpopup').on('keydown.logingpopup', function (e) {
+        if ($('.dropdown.top-login-popup').hasClass('hidden')) {
+            $(document).off('keydown.logingpopup');
+            return;
+        }
+        if (e.keyCode === 32) { // space
+            if (document.activeElement !== $('#login-name', $dialog)[0]
+                && document.activeElement !== $('#login-password', $dialog)[0]) {
+                var c = $dialog.find('.login-checkbox').attr('class');
+                if (c.indexOf('checkboxOff') > -1) {
+                    $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
+                }
+                else {
+                    $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
+                }
+                return false;
+            }
+        }
+        if (e.keyCode === 13) { // enter
+            tooltiplogin();
+            return false;
+        }
+        
+    });
+    $('#login-password, #login-name', $dialog).rebind('keydown', function (e) {
         $('.top-login-pad').removeClass('both-incorrect-inputs');
         $('.top-login-input-tooltip.both-incorrect').removeClass('active');
         $('.top-login-input-block.password').removeClass('incorrect');
         $('.top-login-input-block.e-mail').removeClass('incorrect');
         if (e.keyCode == 13) {
             tooltiplogin();
+            return false;
         }
     });
 
@@ -1602,6 +1632,7 @@ function loginDialog(close) {
 
 
     $('.dropdown.top-login-popup').removeClass('hidden');
+    $('#login-name', $dialog).focus();
     if ($('body').hasClass('logged')) {
         topPopupAlign('.top-head .user-name', '.dropdown.top-login-popup', 40);
     }
@@ -2028,6 +2059,7 @@ function topmenuUI() {
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'wp', 'start'
             ];
+            var moveTo = {'account': 'fm/account'};
 
             for (var i = subPages.length; i--;) {
                 if (className.indexOf(subPages[i]) > -1) {
@@ -2043,7 +2075,7 @@ function topmenuUI() {
                 mobile.loadCloudDrivePage();
             }
             else if (subpage) {
-                loadSubPage(subpage);
+                loadSubPage(moveTo[subpage] || subpage);
             }
             else if (className.indexOf('feedback') > -1) {
                 // Show the Feedback dialog

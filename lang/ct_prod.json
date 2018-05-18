@@ -272,7 +272,6 @@
     "716": "\u73fe\u884c\u5bc6\u78bc",
     "717": "\u65b0\u7684\u5bc6\u78bc",
     "718": "\u78ba\u8a8d\u65b0\u5bc6\u78bc",
-    "719": "\u8acb\u8f38\u5165\u4f60\u7684\u73fe\u884c\u5bc6\u78bc\u3002",
     "724": "\u4f60\u63d0\u4f9b\u7684\u73fe\u884c\u5bc6\u78bc\u4e0d\u6b63\u78ba\u3002",
     "725": "\u4f60\u7684\u5bc6\u78bc\u5df2\u8b8a\u66f4\u3002",
     "726": "\u5b8c\u6210",
@@ -1131,7 +1130,6 @@
     "8006": "\u9644\u4ef6\u5df2\u5132\u5b58\u81f3\u60a8\u7684\u96f2\u7aef\u786c\u789f",
     "8007": "\u65b0\u589e\u6210\u54e1...",
     "8008": "\u60a8\u6c92\u6709\u4efb\u4f55[P]\u5c0d\u8a71[\/P]",
-    "8009": "\u66f8\u5beb\u8a0a\u606f...",
     "8010": "\u641c\u5c0b\u806f\u7d61\u4eba",
     "8011": "\u5f9e\u6211\u7684\u96f2\u7aef\u786c\u789f\u9078\u64c7",
     "8013": "\u5f9e\u6211\u7684\u96f2\u7aef\u786c\u789f",
@@ -2083,7 +2081,7 @@
     "18290": "Type your new password, confirm it and tap [B]Change password[\/B].",
     "18291": "Open the app and tap on [B]My Account[\/B] located on the tab bar.",
     "18292": "Tap on [B]Settings[\/B].",
-    "18293": "Tap on [B]Security Options[\/B].",
+    "18293": "\u9ede\u64ca[B]\u5b89\u5168\u9078\u9805[\/B]\u3002",
     "18294": "Tap on the [B]Change password[\/B] button.",
     "18295": "Type your new password, confirm it and tap [B]Save[\/B].",
     "18296": "Tap on your [B]Account name[\/B] at the bottom left of the Menu.",
@@ -2191,5 +2189,10 @@
     "18506": "If you are able to provide your account's email address, please do so. If you cannot remember it, please click Start again to skip this step.",
     "18507": "Email Address",
     "18508": "Please enter the email address of the account you wish to recover. If you cannot remember it, please leave the field blank.",
-    "18514": "This is your own contact link"
+    "18511": "Review all sessions and devices that have logged into your MEGA account. You can remotely close any active session.",
+    "18512": "Review Session History",
+    "18513": "Do you want to close all other sessions? This will log you out on all other active sessions except the current one.",
+    "18514": "This is your own contact link",
+    "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
+    "18669": "Write a message to %s..."
 }

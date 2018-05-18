@@ -75,15 +75,17 @@ mobile.createFolderOverlay = {
                 $folderNameWarningText.text(l[5644]);           // Folder already exists
             }
             else {
-                // Show loading dialog
-                loadingDialog.show();
+
+
+                // Hide the text and show a loading spinner
+                $createFolderButton.addClass('loading');
 
                 // Try creating the folder
                 M.createFolder(M.currentdirid, trimmedFolderName, promise)
                     .always(function(result) {
 
-                        // Hide the loading dialog
-                        loadingDialog.hide();
+                        // Hide the loading dialog and loading button
+                        $createFolderButton.removeClass('loading');
 
                         // If there was an error, hide loading dialog and show error message
                         if (typeof result === 'number') {

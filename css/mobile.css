@@ -1105,7 +1105,7 @@ ul, li {
     background-image: none;
 }
 .light-overlay, .dark-overlay {
-    background-color: rgba(255, 255, 255, 0.94);
+    background-color: rgba(255, 255, 255, 0.92);
     width: 100%;
     height: 100%;
     left: 0;
@@ -1347,7 +1347,7 @@ ul, li {
     width: 16px;
     z-index: 1;
 }
-.signin-register-block .estimator-loading-icon.loading, .recover-account-page .estimator-loading-icon.loading {
+.signin-register-block .estimator-loading-icon.loading, .recover-account-page .estimator-loading-icon.loading, .mobile.create-new-folder-dialog .red-button.confirm-ok-button  {
     display: block;
 }
 /* Prevent Chrome displaying the default checkbox */
@@ -1492,13 +1492,13 @@ input[type='checkbox'] {
     cursor: pointer;
     opacity: 1;
 }
-.mobile.signin-button .loading-image {
+.mobile.signin-button .loading-image, .mobile.create-new-folder-dialog .red-button.confirm-ok-button .loading-image {
     display: none;
 }
-.mobile.signin-button.loading .label {
+.mobile.signin-button.loading .label, .mobile.create-new-folder-dialog .red-button.confirm-ok-button.loading .label {
     display: none;
 }
-.mobile.signin-button.loading .loading-image {
+.mobile.signin-button.loading .loading-image, .mobile.create-new-folder-dialog .red-button.confirm-ok-button.loading .loading-image {
     display: inline-block;
     height: 28px;
     left: 50%;
@@ -1509,7 +1509,7 @@ input[type='checkbox'] {
     font-size: 0;
     line-height: 0;
 }
-.mobile.signin-button .loading-image img {
+.mobile.signin-button .loading-image img, .mobile.create-new-folder-dialog .red-button.confirm-ok-button img  {
     width: 28px;
     height: 28px;
 }
@@ -4011,7 +4011,7 @@ div.checkboxOn, div.checkboxOff {
     right: 0;
     z-index: 1010;
     -webkit-box-shadow: 0px 0px 65px 3px rgba(0,0,0,0.08);
-    -moz-box-shadow: 0px 0px 65px 3px rgba(0,0,0,0.08));
+    -moz-box-shadow: 0px 0px 65px 3px rgba(0,0,0,0.08);
     box-shadow: 0px 0px 65px 3px rgba(0,0,0,0.08);
     -webkit-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
@@ -4023,8 +4023,8 @@ div.checkboxOn, div.checkboxOff {
     -khtml-opacity: 1;
     opacity: 1;
     padding-left: 8px;
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
+    margin: 0 8px 8px 8px;
+    border-radius: 16px;
 }
 .mobile.context-menu-container.folder {
     border-top: 1px solid #eee;

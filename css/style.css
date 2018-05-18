@@ -3906,10 +3906,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     box-sizing: border-box;
     white-space: nowrap;
     cursor: default;
-    font-size: 13px;
-    line-height: 24px;
-    color: #666666;
-    height: 24px;
+    font-size: 14px;
+    line-height: 25px;
+    color: #121212;
+    height: 25px;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -4251,9 +4251,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-conversations-header, .nw-tree-panel-header, .copy-dialog-panel-header, .move-dialog-panel-header, .share-dialog-panel-header {
     height: 36px;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 36px;
-    color: #666666;
+    color: #414141;
     padding: 0 25px 0 12px;
     position: relative;
     -o-text-overflow: ellipsis;
@@ -4367,9 +4367,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .nw-conversations-name, .fm-tree-panel .nw-contact-name, .fm-dialog-body .nw-contact-item {
     margin: 0 25px 0 32px;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 23px;
-    color: #444;
+    color: #121212;
     padding: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -4854,7 +4854,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 256px;
     height: 100%;
     float: left;
-    background-color: #EEEEEE;
+    background-color: #f5f5f5;
     position: relative;
     z-index: 20;
 }
@@ -5439,9 +5439,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     box-sizing: border-box;
     height: 26px;
     line-height: 25px;
-    font-size: 12px;
+    font-size: 13px;
     padding: 0 10px 0 12px;
-    color: #999999;
+    color: #707070;
     font-weight: normal;
     text-align: left;
     white-space: nowrap;
@@ -6045,11 +6045,11 @@ th.grid-first-th {
     padding: 0 10px;
     height: 30px;
     overflow: hidden;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 30px;
     margin: 0 0 -2px 0;
     text-align: center;
-    color: #666666;
+    color: #333333;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -6224,12 +6224,12 @@ th.grid-first-th {
     width: 100%;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
-    color: #666666;
+    color: #121212;
     padding-left: 12px;
     height: 24px;
     line-height: 23px;
     vertical-align: top;
-    font-size: 13px;
+    font-size: 14px;
     cursor: default;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -6243,7 +6243,7 @@ table {
     border-spacing: transparent;
 }
 .grid-table td, .grid-share-table td, .contacts-grid-table td {
-    height: 24px;
+    height: 25px;
 }
 .contacts-grid-table td {
     height: 52px;
@@ -7108,8 +7108,8 @@ table {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    font-size: 13px;
-    color: #666666;
+    font-size: 14px;
+    color: #121212;
 }
 .tranfer-filetype-txt {
     padding-right: 0;
@@ -7466,7 +7466,7 @@ table {
     background-repeat: no-repeat;
 }
 .fm-breadcrumbs.has-next-button .right-arrow-bg {
-    color: #999999;
+    color: #585858;
     cursor: pointer;
 }
 .deactivated .fm-breadcrumbs:not(.public-links) .right-arrow-bg {
@@ -15936,14 +15936,14 @@ span.incoming-call-name {
 }
 .shared-folder-info-block {
     padding: 0 0 0 51px;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 18px;
     display: block;
     position: relative;
     text-align: left;
 }
 .shared-folder-name, .contact-name {
-    color: #666666;
+    color: #333333;
     display: block;
     white-space: nowrap;
     -o-text-overflow: ellipsis;

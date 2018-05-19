@@ -33,7 +33,7 @@ rm error.json
 tar xfvz lang.tar.gz
 
 # Display any errors from Babel e.g. missing strings to the console
-cat error_tempfail.json
+cat error.json
 
 # If the error.json file does not exist, then this command will fail which is fine, so continue as normal
 if [ $? -ne 0 ]; then
@@ -45,6 +45,7 @@ if [ $? -ne 0 ]; then
     rm strings.json
     rm strings_prod.json
     rm error.json
+    rm .ignore
 
     # Add the .json files
     git add *.json
@@ -65,6 +66,7 @@ else
     rm strings.json
     rm strings_prod.json
     rm error.json
+    rm .ignore
 
     exit 1
 fi

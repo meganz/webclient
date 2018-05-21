@@ -518,7 +518,6 @@ var GenericConversationMessage = React.createClass({
                                 previewButton = <span key="previewButton">
                                     <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
                                                               onClick={self._startPreview.bind(self, v)}/>
-                                    <hr/>
                                 </span>;
                             }
                         }
@@ -603,6 +602,27 @@ var GenericConversationMessage = React.createClass({
 
                                         }
 
+                                            if (
+                                                !previewButton &&
+                                                firstGroupOfButtons.length === 0 &&
+                                                !downloadButton &&
+                                                linkButtons.length === 0 &&
+                                                !revokeButton
+                                            ) {
+                                                return null;
+                                            }
+
+                                            if (
+                                                previewButton && (
+                                                    firstGroupOfButtons.length > 0 ||
+                                                    downloadButton ||
+                                                    linkButtons.length > 0 ||
+                                                    revokeButton
+                                                )
+                                            ) {
+                                                previewButton = [previewButton, <hr key="preview-sep"/>];
+                                            }
+
                                             return <div>
                                                 {previewButton}
                                                 {firstGroupOfButtons}
@@ -629,6 +649,7 @@ var GenericConversationMessage = React.createClass({
                                     vertOffset={3}
                                 >
                                     {previewButton}
+                                    <hr/>
                                     <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                               onClick={self._startDownload.bind(self, v)}/>
                                     <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}

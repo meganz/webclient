@@ -3166,6 +3166,7 @@ React.makeElement = React['createElement'];
 	            } else if (this.props.dropdownItemGenerator) {
 	                child = this.props.dropdownItemGenerator(this);
 	            }
+
 	            if (!child && !this.props.forceShowWhenEmpty) {
 	                if (this.props.active !== false) {
 	                    (window.setImmediate || window.setTimeout)(function () {
@@ -10087,8 +10088,7 @@ React.makeElement = React['createElement'];
 	                                    'span',
 	                                    { key: 'previewButton' },
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
-	                                        onClick: self._startPreview.bind(self, v) }),
-	                                    React.makeElement('hr', null)
+	                                        onClick: self._startPreview.bind(self, v) })
 	                                );
 	                            }
 	                        }
@@ -10165,6 +10165,14 @@ React.makeElement = React['createElement'];
 	                                                } }));
 	                                        }
 
+	                                        if (!previewButton && firstGroupOfButtons.length === 0 && !downloadButton && linkButtons.length === 0 && !revokeButton) {
+	                                            return null;
+	                                        }
+
+	                                        if (previewButton && (firstGroupOfButtons.length > 0 || downloadButton || linkButtons.length > 0 || revokeButton)) {
+	                                            previewButton = [previewButton, React.makeElement('hr', { key: 'preview-sep' })];
+	                                        }
+
 	                                        return React.makeElement(
 	                                            'div',
 	                                            null,
@@ -10196,6 +10204,7 @@ React.makeElement = React['createElement'];
 	                                        vertOffset: 3
 	                                    },
 	                                    previewButton,
+	                                    React.makeElement('hr', null),
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                        onClick: self._startDownload.bind(self, v) }),
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[1988]),

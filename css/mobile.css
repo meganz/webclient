@@ -1,4 +1,4 @@
-﻿@charset "UTF-8";
+@charset "UTF-8";
 @font-face {
     font-family: 'source_sans_prolight';
     src: url('../fonts/SourceSansPro-Light.eot');
@@ -1775,14 +1775,14 @@ div.checkboxOn, div.checkboxOff {
     color: #d22400;
 }
 .data-protection ul {
-	padding-left: 15px;
+    padding-left: 15px;
 }
 .data-protection ul li {
     color: #667;
     font-size: 15px;
     line-height: 1.73;
     list-style-type: disc;
-	padding-left: 3px;
+    padding-left: 3px;
 }
 .data-protection .download-button {
     background: #d90007;
@@ -4799,7 +4799,7 @@ textarea.mobile.support-text-field {
     opacity: 0.3;
 }
 .mobile.upload-recovery-key {
-	display: block;
+    display: block;
 }
 .mobile.recovery-key-page .mobile.recovery-key-download-btn {
     margin-top: 8px;
@@ -4819,8 +4819,8 @@ textarea.mobile.support-text-field {
     opacity: 1;
 }
 .mobile.recover-account-btn-block {
-	display: block;
-	margin: 8px 0 25px 0;
+    display: block;
+    margin: 8px 0 25px 0;
 }
 .mobile.forgot-password-btn-block {
     display: block;
@@ -5856,7 +5856,10 @@ body.key .reg-st3-membership-bl.free.hidden {
 
 /* Recover account styles */
 .mobile .improved-recovery-steps {
-    padding-top: 66px;
+    background-color: #F5F7F9;
+}
+.mobile .fm-dialog-body.improved-recovery-steps {
+    background-color: #fff;
 }
 .mobile .improved-recovery-steps .block-wrapper {
     width: 100%;
@@ -5867,6 +5870,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     height: 100%;
     display: block;
     float: left;
+    max-width: 768px;
 }
 .mobile .improved-recovery-steps .main-right-block {
     display: none;
@@ -5876,7 +5880,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-size: 14px;
     color: #999;
     letter-spacing: 0.2px;
-    padding: 0 0; 
+    padding: 0 0;
     -webkit-margin-before: 1.2em;
     -webkit-margin-after: .6em;
     -webkit-margin-start: 0px;
@@ -5895,13 +5899,13 @@ body.key .reg-st3-membership-bl.free.hidden {
     display: none;
 }
 .mobile .improved-recovery-steps h1 {
-    font-family: 'source_sans_probold';
-    font-size: 1.6em;
-    color: #3C4045;
-    letter-spacing: -0.2px;
-    line-height: 1.5;
-    -webkit-margin-before: .4em;
-    -webkit-margin-after: .4em;
+    font-family: 'source_sans_proregular';
+    font-size: 26px;
+    color: #343A40;
+    letter-spacing: 0.2px;
+    line-height: 36px;
+    -webkit-margin-before: 0.4em;
+    -webkit-margin-after: 0.5em;
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
 }
@@ -5914,20 +5918,22 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps .register-st2-txt-block {
     display: table;
-    min-height: 660px;
-    height: 660px;
     width: 100%;
     margin: 0 0 24px 0;
 }
 .mobile .improved-recovery-steps .vert-container-aligner {
-    /*vertical-align: middle;
-    display: table-cell;*/
+    width: calc(100% - 64px);
+    margin: 80px auto 24px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 40, 100, 0.12);
+    height: auto;
 }
 .mobile .improved-recovery-steps .content-wrapper {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 0 20px;
     position: relative;
+    min-height: 540px;
+    margin: 40px 36px 40px 36px;
+    padding: 0;
 }
 .mobile .improved-recovery-steps .main-right-block .content-wrapper {
     padding: 0 0;
@@ -5937,17 +5943,19 @@ body.key .reg-st3-membership-bl.free.hidden {
     color: #F57223;
 }
 .mobile .improved-recovery-steps p {
-    font-size: 15px;
-    color: #555;
+    font-size: 14px;
+    color: #495057;
     letter-spacing: 0;
-    line-height: 1.8;
+    line-height: 1.7;
+    padding-bottom: 0;
+    margin-bottom: 24px;
 }
 .mobile .improve-recovery-steps .button-container {
     width: 100%;
     height: 100px;
 }
 .mobile .improved-recovery-steps .recover-button {
-    font-size: 16px;
+    font-size: 14px;
     letter-spacing: 0;
     text-align: right;
     line-height: 1.5;
@@ -5991,7 +5999,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .button-container {
     position: relative;
     right: 0;
-    margin-top: 24px;
+    margin: 24px 0 4px;
 }
 .mobile .improved-recovery-steps .button-aligner {
     float: right;
@@ -6061,7 +6069,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     height: 10px;
     margin: 0 0;
     background-color: #777E82;
-    background-color: /* Oval 2 Copy 2: */;
     border: 1px solid  #7C7C7C;
 }
 .mobile .improved-recovery-steps .progress-meter .progress-point:not(.inactive):hover:before {
@@ -6181,8 +6188,8 @@ body.key .reg-st3-membership-bl.free.hidden {
     background-repeat: no-repeat;
     padding: 0 10px 0 35px;
     position: relative;
-    background-color: rgba(250,250,250,0.50);
-    border: 1px solid #eee;
+    background-color: #F8F9FA;
+    border: 1px solid #EBEEF0;
     max-width: 420px;
     min-height: 48px;
 }
@@ -6228,11 +6235,12 @@ body.key .reg-st3-membership-bl.free.hidden {
     border: 1px solid #d90007;
     color: white;
     margin: 0 0;
-    line-height: 20px;
+    line-height: 24px;
     text-decoration: none;
     left: 0;
     padding: 8px 28px;
     border-radius: 4px;
+    text-align: center;
 }
 .mobile .improved-recovery-steps .app-button {
     background-color: #FFFFFF;
@@ -6270,6 +6278,11 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .hidden {
     display: none;
 }
+
+.mobile .improved-recovery-steps .button-aligner.no-float {
+    float: initial;
+}
+
 .mobile .improved-recovery-steps ol.app-instructions-list {
     list-style-type: none;
     -webkit-margin-before: 1em;
@@ -6279,7 +6292,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     -webkit-padding-start: 00;
 }
 .mobile .improved-recovery-steps li.list-point:before{
-    background-color: #eb4444;
     width: 23px;
     text-indent: 8px;
     padding-left: 0px;
@@ -6292,7 +6304,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    color: #fff;
+    color: #444;
     font-weight: 900;
     display: inline-block;
     content: counter(list);
@@ -6424,7 +6436,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     border: 1px solid rgba(42,175,95,0.20);
     border-radius: 2px;
     color: #62C489;
-    margin-top: 64px;
     cursor: pointer;
     font-size: 13px;
     line-height: 1.5;
@@ -6432,6 +6443,11 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .highlight-wrapper {
     display: table;
     min-height: 40px;
+}
+.mobile .content-highlight-block {
+    position: relative;
+    width: 100%;
+    bottom: 0px;
 }
 .mobile .improved-recovery-steps .content-highlight:hover {
     background-color: rgba(250,250,250,0.75);
@@ -6485,6 +6501,45 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps h3.success {
     color: #2AAF5F;
+}
+.mobile .improved-recovery-steps b {
+    font-family: 'source_sans_probold';
+}
+.mobile .improved-recovery-steps .list-point b.megasync-logo {
+    background-position: -6px -773px;
+    width: 24px;
+    height: 24px;
+    background-image: url(../images/mega/top-sprite_v4.png);
+    background-repeat: no-repeat;
+    padding-left: 29px;
+    margin: -16px 2px 2px 3px;
+    padding-bottom: 6px;
+    padding-top: 2px;
+}
+/* Language styles for the MEGAsync icon */
+.mobile.es .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 28px;
+    margin: 0 3px 0 3px;
+}
+.mobile.br .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 32px;
+    margin: 0 3px 0 3px;
+}
+.mobile.de .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 27px;
+    margin: 0 2px 0 4px;
+}
+.mobile.fr .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 29px;
+    margin: 0 2px 0 4px;
+}
+.mobile.it .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 28px;
+    margin: 0 2px 0 4px;
+}
+.mobile.tr .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 28px;
+    margin: 0 2px 0 3px;
 }
 .mobile.fm-dialog.park-account-dialog {
     width: 100%;
@@ -6568,7 +6623,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps .nav-header-block:hover {
     opacity: .8;
     cursor: pointer;
-} 
+}
 .mobile .improved-recovery-steps .nav-header-block:hover h2 {
     text-decoration: underline;
 }
@@ -6576,10 +6631,11 @@ body.key .reg-st3-membership-bl.free.hidden {
     margin-top: 36px;
 }
 .mobile .improved-recovery-steps .recover-account-email-block .error-message{
-    margin-top: 8px;
+    margin-top: 12px;
     color: #eb4444;
     font-size: 13px;
     max-width: 400px;
+    line-height: 21px;
 }
 .bottom-page .forgot-password-page .mobile.fm-header {
     position: fixed;
@@ -6714,33 +6770,17 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile .improved-recovery-steps .backup-input-button.recover-button {
         max-width: 100px;
     }
-    .mobile .improved-recovery-steps .vert-container-aligner {
-        vertical-align: middle;
-        display: table-cell;
-    }
     .mobile .improved-recovery-steps .main-left-block {
-        width: 75%;
-        float: right;
+        margin: 0 auto;
+        float: initial;
     }
     .mobile .improved-recovery-steps .main-right-block {
-        width: 25%;
-        display: block;
-        background-color:#F6F7F8;
-        margin: 36px 0 0 0;
-        bottom: 0;
-        top: 0;
-        left: 0;
-        display: ;
-        float: left;
     }
     .mobile .improved-recovery-steps {
         padding-top: 26px;
     }
-    .mobile .improved-recovery-steps .register-st2-txt-block {
-        min-height: 100vh;
-    }
     .mobile .improved-recovery-steps .content-wrapper {
-        min-height: 580px;
+        min-height: 560px;
     }
     .mobile .improved-recovery-steps .button-container {
         bottom: 0;
@@ -6754,7 +6794,9 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile .improved-recovery-steps .login-register-input {
         margin-bottom: 0;
     }
-
+    .mobile .improved-recovery-steps .button-aligner.no-float {
+        float: right;
+    }
 }
 @media only screen and (orientation:landscape) and (max-width: 800px), only screen and (orientation:portrait) and (max-height: 800px) {
     .mobile.homepage .company-slogan {
@@ -6998,6 +7040,18 @@ body.key .reg-st3-membership-bl.free.hidden {
     .wrong-file .mobile.wrong-file-block, .downloading .mobile.application-txt, .uploading .mobile.application-txt {
         width:calc(100% - 32px);
     }
+    .mobile .improved-recovery-steps .vert-container-aligner {
+        width: calc(100% - 32px);
+        margin: 80px auto 24px;
+    }
+    .mobile .improved-recovery-steps .content-wrapper {
+        margin: 40px 16px 24px;
+        min-height: initial;
+    }
+    .mobile .improved-recovery-steps h1 {
+        font-size: 22px;
+    }
+
 }
 
 @media only screen and (orientation:landscape) and (max-width: 670px) {
@@ -7172,8 +7226,8 @@ body.key .reg-st3-membership-bl.free.hidden {
         margin-right: 19px;
     }
     .mobile.signin-button, .mobile.register-button, .mobile.resend-button {
-        height: 54px;
-        line-height: 54px;
+        height: 48px;
+        line-height: 47px;
         margin-left: 24px;
         margin-right: 24px;
     }
@@ -7217,8 +7271,14 @@ body.key .reg-st3-membership-bl.free.hidden {
     .mobile .improved-recovery-steps .main-right-block {
         display: none;
     }
-    .mobile .improved-recovery-steps {
-        padding-top: 72px;
+    .mobile .improved-recovery-steps .vert-container-aligner {
+        width: calc(100% - 24px);
+    }
+    .mobile .improved-recovery-steps .content-wrapper {
+        margin: 40px 16px;
+    }
+    .mobile .improved-recovery-steps .content-wrapper {
+        min-height: initial;
     }
 }
 /*iphone se portrait styles */
@@ -7251,7 +7311,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     }
 }
 /* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */
-@media only screen and (min-width: 400px) {
+@media only screen and (min-width: 400px) and (max-width: 500px) {
     body:not(.fr):not(.ru) .mobile.membership-step2 .payment-options-list .payment-method {
         float: left;
         width: 153px;
@@ -7283,6 +7343,14 @@ body.key .reg-st3-membership-bl.free.hidden {
     body:not(.fr):not(.ru) .mobile.membership-step2 .option-question.renewal {
         margin-top: 30px;
     }
+    .mobile .improved-recovery-steps .vert-container-aligner {
+        width: calc(100% - 24px);
+        margin: 80px auto 24px;
+    }
+    .mobile .improved-recovery-steps .content-wrapper {
+        margin: 40px 24px 40px 24px;
+        min-height: initial;
+    }
 
 }
 
@@ -7309,6 +7377,10 @@ body.key .reg-st3-membership-bl.free.hidden {
         background-image: url(../images/mega/help2/welcome_icons_v2@2x.png);
         background-size: 250px auto;
     }
+    .mobile .improved-recovery-steps .list-point b.megasync-logo {
+        background-image: url(../images/mega/top-sprite_v4@2x.png);
+        background-size: 38px auto;
+    }
 }
 
  @media screen and (orientation:landscape) {
@@ -7324,7 +7396,8 @@ body.key .reg-st3-membership-bl.free.hidden {
         display: none;
     }
     .mobile .improved-recovery-steps .main-left-block {
-        width: 100%;
+        margin: 0 auto;
+        max-width: 800px;
     }
  }
 

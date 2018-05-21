@@ -2520,10 +2520,11 @@ li.token-input-token-invite .input-close {
     min-height: 44px;
 }
 .improved-recovery-steps .checkbox-container/*, .improved-recovery-steps .app-button-block  .instruction-block */{
-    background-color: rgba(250,250,250,0.5);
+    background-color: #F8F9FA;
+    border: 1px solid #EBEEF0;
+    border-radius: 2px;
     padding: 6px 0;
     margin: 0 0;
-    border: 1px solid #eee;
 }
 /*.improved-recovery-steps  .instruction-block {
     padding: 0 12px;
@@ -2684,7 +2685,7 @@ li.token-input-token-invite .input-close {
 .improved-recovery-steps .checkbox-container .settings-row label {
     line-height: 21px;
     padding-top: 14px;
-    color: #333;
+    color: #495057;
     max-width: initial;
     padding-right: 12px;
     margin-top:0;

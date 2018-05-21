@@ -10,7 +10,7 @@ function AccountRecoveryControl() {
     this.$leftContent = $('.content-wrapper', this.$leftSide);
     this.$rightSide = $('.main-right-block.recover-block.decision-breadcrumb', this.$recoveryPageContainer);
     this.$rightContent = $('.content-wrapper', this.$rightSide);
-    this.$navigationControl = $('.nav-header-block', this.$leftContent);
+    this.$navigationControl = $('.nav-header-block', this.$leftSide);
     this.currStep = 0;
     this.lastStep = -1;
     this.currBranch = 0;
@@ -307,6 +307,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         yesAnswer = escapeHTML(l[7315]); // 'Start';
         noAnswer = '';
         this.lastStep = -5; // igonre
+        
     }
     if (step === 2) {
         question1 = escapeHTML(l[18261]); // 'Do you have the MEGA app installed on your phone, tablet or desktop?';
@@ -365,6 +366,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         checkBx2 = '';
         yesAnswer = l[18278]; // 'Check to see if I have an active/logged-in session';
         noAnswer = l[18279]; // 'No, I want to park my account';
+        
     }
     else if (step === -2 && !branch) {
         this.lastStep = bkStep;
@@ -402,10 +404,12 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
             this.$navigationControl.find('.fm-icon.left').addClass('mega').removeClass('back')
                 .removeClass('non-responsive');
             this.$leftSide.find('.recover-button.yes').addClass('red-button');
+            $('.button-aligner', this.$leftContent).addClass('no-float');
         }
         else {
             this.$navigationControl.addClass('hidden');
             this.$leftSide.find('.recover-button.yes').addClass('default-grey-button');
+            $('.button-aligner', this.$leftContent).removeClass('no-float');
         }
     }
     else {
@@ -426,6 +430,14 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
         $('h3.main-italic-header', this.$leftContent).addClass('hidden');
         $('h3.main-italic-header.main-header', this.$leftContent).removeClass('hidden');
         $('h3.main-italic-header.main-header', this.$leftContent).addClass('success');
+        $('.recover-button.yes', this.$leftContent).addClass('red-button');
+        
+        if (is_mobile) {
+            $('.button-aligner', this.$leftContent).addClass('no-float');
+        }
+        else {
+            $('.button-aligner', this.$leftContent).removeClass('no-float');
+        }
     }
     $('.warning-icon', this.$leftContent).removeClass('warning');
     if (step === -1) {
@@ -444,6 +456,7 @@ AccountRecoveryControl.prototype.showStep = function _showStep(step, branch) {
     }
     else {
         $('.recover-account-body-text', this.$leftContent).addClass('hidden');
+        this.$leftSide.find('.recover-button.yes').removeClass('red-button');
     }
 
     $('.app-instruction-block', this.$leftContent).addClass('hidden');

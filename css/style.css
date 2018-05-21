@@ -12196,6 +12196,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .main-mid-pad.improved-recovery-steps {
     width: 100%;
     padding: 0 0;
+    background-color: #F5F7F9;
 }
 .main-mid-pad.plans {
     padding-bottom: 2px;
@@ -15380,9 +15381,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .backup-recover h3.main-italic-header {
     padding: 30px 0 20px 0;
 }
-.backup-recover h3.main-italic-header.main-header {
-    color:
-}
+
 .backup-recover .main-left-block .register-st2-txt-block {
     padding: 0;
 }
@@ -15566,6 +15565,8 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .backup-recover .recover-block .register-st2-txt-block {
     padding: 0;
+    min-height: 20px;
+    height: 20px;
 }
 .recover-block span.green {
     color: #6BB219;
@@ -23358,49 +23359,49 @@ opacity: 1;
     min-width: 1024px;
 }
 .improved-recovery-steps .main-left-block {
-    width: 75%;
+    width: 100%;
     padding: 0 0;
     height: 100%;
     display: block;
-    float: right;
+    float: left;
 }
 .improved-recovery-steps .main-right-block {
-    background-color:#F6F7F8;
-    width: 25%;
-    margin: 0 0;
-    bottom: 0;
-    top: 0;
-    right: 0;
-    float: left;
+    width: 300px;
+    margin: -12px auto 0;
     display: block;
     padding: 0 0;
+    position: relative;
 }
 .improved-recovery-steps h3.main-italic-header, .improved-recovery-steps h2 {
     font-family: 'source_sans_probold';
-    font-size: 13px;
-    color: #777E82;
+    font-size: 12px;
+    color: #999;
     letter-spacing: 0.2px;
     padding: 0 0;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
 }
 .improved-recovery-steps .checkbox-block h3.main-italic-header, .improved-recovery-steps .app-instruction-block h3.main-italic-header {
     padding: 0 0;
 }
 .improved-recovery-steps .checkbox-block h3.main-italic-header {
-    color: #3C4045;
+    color: #999;
 }
 .improved-recovery-steps h2 {
-    color: #333;
-    font-size: 21px;
+    color: #51585D;
+    font-size: 20px;
     display: inline-block;
+    letter-spacing: 0.2px;
+    font-family: 'source_sans_proregular';
 }
 .improved-recovery-steps h1 {
-    font-family: 'source_sans_probold';
-    font-size: 24px;
-    color: #3C4045;
-    letter-spacing: 0px;
+    font-family: 'source_sans_proregular';
+    font-size: 26px;
+    color: #343A40;
+    letter-spacing: 0.2px;
     line-height: 36px;
-    -webkit-margin-before: 0em;
-    -webkit-margin-after: 0.3em;
+    -webkit-margin-before: 0.2em;
+    -webkit-margin-after: 0.5em;
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
 }
@@ -23410,28 +23411,45 @@ opacity: 1;
     height: 768px;
     width: 100%;
 }
-.improved-recovery-steps .vert-container-aligner {
+/*.improved-recovery-steps .vert-container-aligner {
     vertical-align: middle;
     display: table-cell;
+}*/
+.improved-recovery-steps .vert-container-aligner {
+    width: 900px;
+    min-width: 900px;
+    margin: 0 auto 24px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 40, 100, 0.12);
+    height: auto;
+}
+.improved-recovery-steps .main-right-block .vert-container-aligner {
+    width: 300px;
+    min-width: 300px;
+    background-color: rgba(0,0,0,0);
+    border: 1px solid rgba(0, 40, 100, 0);
+    margin: 0 auto;
 }
 .improved-recovery-steps .content-wrapper {
-    max-width: 672px;
     width: 100%;
-    margin: 0 auto;
-    padding: 0 16px;
+    margin: 40px auto 0;
+    padding: 0;
 }
 .improved-recovery-steps .main-left-block .content-wrapper {
-    min-height: 520px;
     position: relative;
+    width: 750px; 
+    min-height: 540px;
+    margin-bottom: 40px;
 }
 .improved-recovery-steps .main-right-block .content-wrapper {
     width: auto;
-    min-height: 490px;
     position: relative;
     max-width: 340px;
     margin: 0 auto;
     padding: 0 40px;
-
+    min-height: 20px;
+    user-select: none;
 }
 .improved-recovery-steps .content-wrapper p span {
     font-family: 'source_sans_probold';
@@ -23439,17 +23457,18 @@ opacity: 1;
 }
 .improved-recovery-steps p {
     font-size: 14px;
-    color: #333333;
+    color: #495057;
     letter-spacing: 0;
-    line-height: 28px;
-    padding-bottom: 24px;
+    line-height: 1.7;
+    padding-bottom: 0;
+    margin-bottom: 24px;
 }
 .improve-recovery-steps .button-container {
     width: 100%;
     height: 100px;
 }
 .improved-recovery-steps .recover-button {
-    font-size: 15px;
+    font-size: 14px;
     letter-spacing: 0;
     text-align: right;
     line-height: 44px;
@@ -23486,6 +23505,21 @@ opacity: 1;
     text-align: center;
     text-decoration: none;
     line-height: 32px;
+    background: #F0373A;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+.improved-recovery-steps .recover-button.yes.default-grey-button::after {
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
+} 
+.improved-recovery-steps .recover-button.yes.default-grey-button::before {
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
+} 
+.improved-recovery-steps .recover-button.yes.default-grey-button:hover {
+    background: #ff2222;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
 }
 .improved-recovery-steps .recover-button.yes:hover, .recover-button.yes.active {
     background-color: rgba(42,175,95,0.1);
@@ -23516,7 +23550,15 @@ opacity: 1;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     max-width: 400px;
-    padding-top: 36px;
+    padding-top: 0px;
+    opacity: 0.8;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                          supported by Chrome and Opera */
 }
 .improved-recovery-steps .progress-meter .track {
     position: relative;
@@ -23525,11 +23567,13 @@ opacity: 1;
 }
 .improved-recovery-steps .progress-meter .progress-points {
     position: relative;
-    margin: -14px 0 0;
+    margin: 0 auto;
     padding: 0;
     list-style: none;
+    width: fit-content;
+    line-height: 12px;
 }
-.improved-recovery-steps .progress-meter .progress-point {
+.improved-recovery-steps .progress-meter li.progress-point {
     -moz-transition: color 1s;
     -o-transition: color 1s;
     -webkit-transition: color 1s;
@@ -23537,8 +23581,20 @@ opacity: 1;
     position: relative;
     text-align: left;
     cursor: pointer;
-    color: #999;
-    margin-bottom: 80px;
+    color: #aaa;
+    margin-left: 30px;
+    line-height: 12px;
+    display: inline-block;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                          supported by Chrome and Opera */
+}
+.improved-recovery-steps .progress-meter .progress-point:first-of-type {
+    margin-left: 0;
 }
 .improved-recovery-steps .progress-meter .progress-point.inactive {
     cursor: default;
@@ -23566,15 +23622,25 @@ opacity: 1;
     border-radius: 24px;
     content: "";
     display: inline-block;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     margin: 0 0;
     background-color: #777E82;
     border: 1px solid  #777E82;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                          supported by Chrome and Opera */
+
+}
+.improved-recovery-steps .progress-meter ol.progress-points {
 }
 .improved-recovery-steps .progress-meter .progress-point:not(.inactive):hover:before {
     border: 4px solid  #CBCFD1;
-    margin: -4px -3px;
+    margin: -3px -3px;
     -moz-transition: all .2s;
     -o-transition: all .2s;
     -webkit-transition: all .2s;
@@ -23584,8 +23650,8 @@ opacity: 1;
     border-color: #777;
 }
 .improved-recovery-steps .progress-meter .progress-point:hover .progress-track {
-    height: 87px;
-    bottom: 11px;
+    height: 2px;
+    bottom: 6px;
     -moz-transition: all .2s;
     -o-transition: all .2s;
     -webkit-transition: all .2s;
@@ -23614,7 +23680,7 @@ opacity: 1;
 }
 .improved-recovery-steps .progress-meter .progress-point.success:hover:before {
     border: 4px solid  #D4EFDF;
-    margin: -4px -3px;
+    margin: -3px -3px;
     -moz-transition: all .2s;
     -o-transition: all .2s;
     -webkit-transition: all .2s;
@@ -23633,7 +23699,7 @@ opacity: 1;
 }
 .improved-recovery-steps .progress-meter .progress-point.warning:hover:before {
     border: 4px solid  #FDE3D3;
-    margin: -4px -3px;
+    margin: -3px -3px;
     -moz-transition: all .2s;
     -o-transition: all .2s;
     -webkit-transition: all .2s;
@@ -23642,6 +23708,7 @@ opacity: 1;
 
 .improved-recovery-steps .progress-meter .progress-point.warning .progress-track {
     background-color: #FF6406;
+    width: 37px;
 }
 .improved-recovery-steps .progress-meter .progress-point.warning .step-label {
     color: #F57223;
@@ -23666,17 +23733,17 @@ opacity: 1;
 .improved-recovery-steps .progress-meter .progress-content .step-answer {
 }
 .improved-recovery-steps .progress-meter .progress-track {
-    width: 2px;
-    height: 83px;
+    width: 36px;
+    height: 2px;
     display: block;
     background: #777E82;
     position: absolute;
-    bottom: 15px;
-    left: 5px;
+    bottom: 6px;
+    right: 7px;
 }
 .improved-recovery-steps .login-register-input {
-    background-color: rgba(250,250,250,0.50);
-    border: 1px solid #eee;
+    background-color: #F8F9FA;
+    border: 1px solid #EBEEF0;
     border-radius: 2px;
     max-width: 400px;
     margin-bottom: 0;
@@ -23740,9 +23807,6 @@ opacity: 1;
     margin: 0 0 8px 0;
 }
 
-.improved-recovery-steps .hidden {
-    display: none;
-}
 .improved-recovery-steps ol.app-instructions-list {
     list-style-type: none;
     -webkit-margin-before: 1em;
@@ -23752,7 +23816,6 @@ opacity: 1;
     -webkit-padding-start: 00;
 }
 .improved-recovery-steps li.list-point:before {
-    background-color: #EB4444;
     width: 23px;
     text-indent: 8px;
     padding-left: 0px;
@@ -23765,7 +23828,7 @@ opacity: 1;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    color: #FFFFFF;
+    color: #333;
     font-weight: 900;
     display: inline-block;
     content: counter(list);
@@ -23786,9 +23849,34 @@ opacity: 1;
     background-image: url(../images/mega/top-sprite_v4.png);
     background-repeat: no-repeat;
     padding-left: 66px;
-    margin: 0 -39px 0 0;
-
+    margin: 0 -39px 0 0;     
 }
+/* Language styles for the MEGAsync icon */
+.es .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -29px 0 3px;
+}
+.br .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -12px 0 3px;
+}
+.de .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -33px 0 4px;
+}
+.fr .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -31px 0 4px;
+}
+.it .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -31px 0 4px;
+}
+.tr .improved-recovery-steps .list-point b.megasync-logo {
+    padding-left: 68px;
+    margin: 0 -15px 0 4px;
+}
+
 .improved-recovery-steps strong {
     font-family: 'source_sans_probold';
     color: #333;
@@ -23801,14 +23889,18 @@ opacity: 1;
     font-size: 14px;
 }
 .improved-recovery-steps .content-highlight {
-    background-color: rgba(42,175,95,0.03);
-    border: 1px solid rgba(42,175,95,0.15);
+    background-color: rgba(42,175,95,0.04);
+    border: 1px solid #D4EFDF;
     border-radius: 2px;
     line-height: 46px;
-    color: #62C489;
-    margin-top: 80px;
+    color: #55BF7F;
     cursor: pointer;
     font-size: 14px;
+}
+.improved-recovery-steps .content-highlight-block {
+    position: absolute;
+    width: 100%;
+    bottom: 012px;
 }
 .improved-recovery-steps .content-highlight:hover {
     background-color: rgba(42,175,95,0.04);
@@ -23844,40 +23936,50 @@ opacity: 1;
     background-size: 262px auto;
     -webkit-transform: scaleX(-1);
     transform: scaleX(-1);
-    margin: 4px 8px  0 -30px;
+    margin: 5px 8px  0 -30px;
     display: inline-block;
-    opacity: 0.5;
+    opacity: 0.4;
 }
 .improved-recovery-steps .right-header {
     display: block;
-    position: absolute;
+    position: relative;
     opacity: 1;
-    margin-top: -48px;
+    height: 96px;
+    line-height: 72px;
+    width: 900px;
+    min-width: 900px;
+    margin: 36px auto 0;
+    text-align: center;
 }
 .improved-recovery-steps .nav-header-block {
     position: absolute;
-    margin-top: -48px;
     opacity: 1;
-    margin-left: 0;
+    right: 0;
+    bottom: 16px;
+    line-height: 24px;
 }
 .improved-recovery-steps .nav-header-block h2 {
     font-size: 13px;
-    color: #eb4444;
+    color: #9a9fa2;
+    line-height: 24px;
 }
 .improved-recovery-steps  .nav-back-subheading {
     display: none;
 }
 .improved-recovery-steps .nav-header-block:hover {
-    opacity: .6;
     cursor: pointer;
 }
 .improved-recovery-steps .nav-header-block:hover h2 {
     text-decoration: underline;
 }
 .improved-recovery-steps .recover-account-email-block .error-message{
-    margin-top: 8px;
+    margin-top: 16px;
     color: #eb4444;
     font-size: 12px;
     margin-left: 0px;
     max-width: 400px;
+    line-height: 1.6;
+}
+.improved-recovery-steps .hidden {
+    display: none !important /* I will remove important later */;
 }

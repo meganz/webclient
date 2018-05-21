@@ -15,7 +15,7 @@ var extensions = {
     'indesign': [['indd'], 'Adobe InDesign'],
     'keynote': [['key'], 'Apple Keynote'],
     'numbers': [['numbers'], 'Apple Numbers'],
-    'openoffice': [['sxw, stw, sxc, stc, sxi, sti, sxd, std, sxm'], 'OpenOffice'],
+    'openoffice': [['sxw', 'stw', 'sxc', 'stc', 'sxi', 'sti', 'sxd', 'std', 'sxm'], 'OpenOffice'],
     'pages': [['pages'], 'Apple Pages'],
     'pdf': [['pdf'], 'PDF'],
     'photoshop': [['abr', 'psb', 'psd'], 'Adobe Photoshop'],

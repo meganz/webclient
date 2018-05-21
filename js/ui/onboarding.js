@@ -784,23 +784,25 @@
         });
     };
 
-    mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
-        if (!folderlink) {
-            assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
-            assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
-
-            if (megaChatIsDisabled) {
-                mega.ui.onboarding = new mega.ui.Onboarding({});
-            }
-            else {
-                ChatdIntegration.mcfHasFinishedPromise.always(function() {
-                    mega.ui.onboarding = new mega.ui.Onboarding({});
-                });
-            }
-
-            // we reached our goal, stop listening for fminitialized
-            return 0xDEAD;
+    M.onFileManagerReady(function _delayedInitOnboarding() {
+        if (folderlink) {
+            return mBroadcaster.once('fm:initialized', _delayedInitOnboarding);
         }
+
+        assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
+        assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
+
+        if (megaChatIsDisabled) {
+            mega.ui.onboarding = new mega.ui.Onboarding({});
+        }
+        else {
+            ChatdIntegration.mcfHasFinishedPromise.always(function() {
+                mega.ui.onboarding = new mega.ui.Onboarding({});
+            });
+        }
+
+        // we reached our goal, stop listening for fminitialized
+        return 0xDEAD;
     });
 
     // export

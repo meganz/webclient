@@ -30,7 +30,7 @@ mobile.createFolderOverlay = {
         this.initFolderNameTextFieldKeyup();
 
         // Show the Create Folder overlay and the background white overlay
-        this.$overlay.removeClass('hidden');
+        this.$overlay.removeClass('hidden').addClass('overlay');
         this.$lightBackgroundOverlay.removeClass('hidden');
 
         // Clear the input from old dialog openings and open the keyboard for typing

@@ -1105,7 +1105,7 @@ ul, li {
     background-image: none;
 }
 .light-overlay, .dark-overlay {
-    background-color: rgba(255, 255, 255, 0.92);
+    background-color: rgba(255, 255, 255, 0.94);
     width: 100%;
     height: 100%;
     left: 0;
@@ -2923,7 +2923,7 @@ div.checkboxOn, div.checkboxOff {
     left: 0;
     top: 0;
     z-index: 1200;
-    background-color: rgba(0,0,0,0);
+    background-color: rgba(255,255,255,0.88);
     display: table;
 }
 .mobile.center-block {

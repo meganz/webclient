@@ -526,6 +526,10 @@ function fileIcon(node) {
     if (node.t) {
         if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
             icon = 'folder-shared';
+            
+            if(is_mobile){
+                icon = 'folder-shared_v2';
+            }
         }
         else if ( mega.megadrop.pufs[node.h] && mega.megadrop.pufs[node.h].s !== 1) {
             icon = 'puf-folder';

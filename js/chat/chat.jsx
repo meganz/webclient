@@ -1327,6 +1327,13 @@ Chat.prototype.getEmojiDataSet = function(name) {
     else if (self._emojiDataLoading[name]) {
         return self._emojiDataLoading[name];
     }
+    else if (name === "categories") {
+        // reduce the XHRs by one, by simply moving the categories_v2.json to be embedded inline here:
+        self._emojiData[name] = ["people","nature","food","activity","travel","objects","symbols","flags"];
+        // note, when updating categories_vX.json, please update this ^^ manually.
+
+        return MegaPromise.resolve(self._emojiData[name]);
+    }
     else {
         self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy(
             $.getJSON(staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json")

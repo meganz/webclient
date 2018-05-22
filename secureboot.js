@@ -2160,6 +2160,7 @@ else if (!b_u) {
         jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
     }
 
     // We need to keep a consistent order in loaded resources, so that if users

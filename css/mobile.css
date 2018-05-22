@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 @font-face {
     font-family: 'source_sans_prolight';
     src: url('../fonts/SourceSansPro-Light.eot');
@@ -4131,6 +4131,14 @@ div.checkboxOn, div.checkboxOff {
     background-position: -50px -2163px;
     display: block;
     position: relative;
+}
+#mobile-ui-contact-card {
+    top: 0;
+    left: 0;
+    z-index:190;
+}
+#mobile-ui-contact-card .mobile.logo {
+    background-position: -94px -1073px;
 }
 .mobile.my-account-page .user-info {
     margin-left: 60px;

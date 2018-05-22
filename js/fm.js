@@ -1424,7 +1424,7 @@ function openContactInfoLink(contactLink) {
             $('.qr-ct-exist', $dialog).addClass('hidden');
             $('#qr-ctn-add', $dialog).rebind('click', function () {
                 if (contactStatus === 1) {
-                    M.inviteContact(u_attr.email, em, null, contactLink)
+                    M.inviteContact(u_attr.email, em, null, contactLink);
                 }
                 $('#qr-ctn-add', $dialog).off('click');
                 closeDialog();

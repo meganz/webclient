@@ -436,11 +436,17 @@
             var query = pos.substr(1, pos.length);
             var posAt = ($screen.data('positionAt') || "left top");
             var posMy = ($screen.data('positionMy') || "left top");
-            $elem.position({
-                of: query,
+            var attrs = {
                 at: posAt,
                 my: posMy
-            });
+            };
+            if ($(query).size() > 0) {
+                // if a selector is passed to $.position what returns 0 elements, $.position crashed with a JS error,
+                // so we should never do that.
+                attrs['of'] = query;
+            }
+
+            $elem.position(attrs);
         }
         else {
             console.error("invalid pos data attr:" + $screen.data('position'));

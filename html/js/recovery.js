@@ -697,7 +697,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
         $('.mobile #startholder.fmholder').addClass('no-scroll');
     }
     else {
-         $('.mobile #startholder.fmholder').removeClass('no-scroll');
+        $('.mobile #startholder.fmholder').removeClass('no-scroll');
     }
 
     var closeDialogLocal = function _closeDialog() {

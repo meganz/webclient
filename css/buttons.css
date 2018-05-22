@@ -29,7 +29,7 @@
 }
 .button input[type=file]::-webkit-file-upload-button {
     cursor: pointer;
-}    
+}
 .link-button {
     display: block;
     cursor: pointer;
@@ -369,7 +369,12 @@
     margin: 0 auto;
     display: block;
 }
-.contacts-info:hover .tiny-button, .message.content-area:hover > .tiny-button, .default-white-button.tiny-button.active, .shared-link.thumb:hover .tiny-button, .data-block-view:hover .tiny-button {
+.contacts-info:hover .tiny-button,
+.message.content-area:hover > .tiny-button,
+.default-white-button.tiny-button.active,
+.shared-link.thumb:hover .tiny-button,
+.message.shared-data.thumb:hover .tiny-button,
+.data-block-view:hover .tiny-button {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
@@ -551,7 +556,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
 }
 .default-big-button span.label-with-icon {
     padding: 0 16px;
-    
+
 }
 .default-huge-button {
     display: block;

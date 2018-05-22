@@ -1425,8 +1425,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 len = 17;
                 break;
             case Chatd.Opcode.ECHO:
-            case Chatd.Opcode.ADDREACTION:
-            case Chatd.Opcode.DELREACTION:
+                len = 1;
                 self.logger.log("Ignoring received "+constStateToText(Chatd.Opcode, opcode));
                 break;
             default:

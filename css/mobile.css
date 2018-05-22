@@ -713,7 +713,7 @@ ul, li {
 }
 .mobile.fm-header.fm-hr, .mobile.sign-header.fm-hr {
     box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.15);
-    z-index: 1;
+    z-index: 99;
 }
 .mobile.fm-header.folder-link {
     height: 126px;
@@ -6502,9 +6502,6 @@ body.key .reg-st3-membership-bl.free.hidden {
 .mobile .improved-recovery-steps h3.success {
     color: #2AAF5F;
 }
-.mobile .improved-recovery-steps b {
-    font-family: 'source_sans_probold';
-}
 .mobile .improved-recovery-steps .list-point b.megasync-logo {
     background-position: -6px -773px;
     width: 24px;
@@ -6641,6 +6638,9 @@ body.key .reg-st3-membership-bl.free.hidden {
     position: fixed;
 }
 
+body.bottom-pages.mobile .fmholder.no-scroll {
+    overflow: hidden;
+}
 /* Only media queries after here */
 @media only screen and (orientation:portrait) {
     .wrong-file .mobile.content-row, .downloading .mobile.content-row, .uploading .mobile.content-row {

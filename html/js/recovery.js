@@ -693,11 +693,18 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
         $('.parkbtn', $dialog).removeClass('disabled');
         $('.content-highlight.warning', $dialog).removeClass('hidden');
     }
+    else if (is_mobile) {
+        $('.mobile #startholder.fmholder').addClass('no-scroll');
+    }
+    else {
+         $('.mobile #startholder.fmholder').removeClass('no-scroll');
+    }
 
     var closeDialogLocal = function _closeDialog() {
         if (is_mobile) {
             $('.mobile.fm-dialog-container').addClass('hidden');
             fm_hideoverlay();
+            $('.mobile #startholder.fmholder').removeClass('no-scroll');
         }
         else {
             $(document).unbind('keydown.parkwarn');

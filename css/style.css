@@ -3611,14 +3611,14 @@ label.iPhoneCheckLabelOff span {
     opacity: 1;
 }
 .nw-tree-panel-header + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 74px);
-    height: -moz-calc(100% - 74px);
-    height: calc(100% - 74px);
+    height: -webkit-calc(100% - 72px);
+    height: -moz-calc(100% - 72px);
+    height: calc(100% - 72px);
 }
 .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 146px);
-    height: -moz-calc(100% - 146px);
-    height: calc(100% - 146px);
+    height: -webkit-calc(100% - 144px);
+    height: -moz-calc(100% - 144px);
+    height: calc(100% - 144px);
 }
 .fm-contact-requests, .fm-received-requests {
     height: 36px;
@@ -4273,9 +4273,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     color: white;
 }
 .nw-conversations-header, .nw-tree-panel-header, .copy-dialog-panel-header, .move-dialog-panel-header, .share-dialog-panel-header {
-    height: 38px;
+    height: 36px;
     font-size: 15px;
-    line-height: 38px;
+    line-height: 36px;
     color: #666;
     padding: 0 25px 0 12px;
     position: relative;
@@ -4292,7 +4292,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     width: 24px;
     position: absolute;
     right: 2px;
-    top: 7px;
+    top: 6px;
     background-image: url(../images/mega/fm-main-sprite.png);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
@@ -5616,11 +5616,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 100%;
-    height: -webkit-calc(100% - 36px);
-    height: -moz-calc(100% - 36px);
-    height: calc(100% - 36px);
+    height: -webkit-calc(100% - 34px);
+    height: -moz-calc(100% - 34px);
+    height: calc(100% - 34px);
     position: relative;
-    top: -1px;
+    top: -3px;
     overflow: hidden;
 }
 .files-grid-view.contact-details-view {

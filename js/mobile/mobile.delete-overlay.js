@@ -108,7 +108,7 @@ mobile.deleteOverlay = {
 
         'use strict';
 
-        var $closeAndCancelButtons = this.$overlay.find('.fm-dialog-close, .second.cancel');
+        var $closeAndCancelButtons = this.$overlay.find('.fm-dialog-close, .text-button');
 
         // Add click/tap handler
         $closeAndCancelButtons.off('tap').on('tap', function() {

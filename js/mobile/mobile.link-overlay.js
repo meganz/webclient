@@ -254,7 +254,7 @@ mobile.linkOverlay = {
         'use strict';
 
         var $closeButton = this.$overlay.find('.fm-dialog-close');
-        var $closeTextButton =this.$overlay.find('.text-button');
+        var $closeTextButton = this.$overlay.find('.text-button');
 
         // Add tap handler
         $closeButton.off('tap').on('tap', function() {

@@ -549,7 +549,7 @@ mobile.cloud = {
             var fileName = node.name;
 
             // If this is an image, load the preview slideshow
-            if (is_image(fileName) && fileext(fileName) !== 'pdf') {
+            if ((is_image(fileName) && fileext(fileName) !== 'pdf') || (is_video(fileName))){
                 mobile.slideshow.init(nodeHandle);
             }
             else {
@@ -560,17 +560,6 @@ mobile.cloud = {
                 $('.mobile.filetype-img').removeClass('hidden');
                 $('.video-block, .video-controls', $overlay).addClass('hidden');
 
-                if (is_video(node)) {
-                    M.require('videostream').tryCatch(function() {
-                        iniVideoStreamLayout(node, $overlay).then(function(ok) {
-                            if (ok) {
-                                $overlay.addClass('video');
-                                $('.mobile.filetype-img').addClass('hidden');
-                                $('.video-block, .video-controls', $overlay).removeClass('hidden');
-                            }
-                        });
-                    });
-                }
             }
 
             // Prevent pre clicking one of the Open in Browser/App buttons

@@ -1952,6 +1952,9 @@ React.makeElement = React['createElement'];
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this._renderLayer();
+	        if (this.props.popupDidUpdate) {
+	            this.props.popupDidUpdate();
+	        }
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        ReactDOM.unmountComponentAtNode(this.popup);
@@ -3063,7 +3066,7 @@ React.makeElement = React['createElement'];
 	            this.props.onActiveChange(newVal);
 	        }
 	    },
-	    componentDidUpdate: function componentDidUpdate() {
+	    onResized: function onResized() {
 	        var self = this;
 
 	        if (this.props.active === true) {
@@ -3117,11 +3120,28 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 	    },
+	    componentDidMount: function componentDidMount() {
+	        this.onResized();
+	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        this.onResized();
+	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        if (this.props.active) {
 
 	            this.onActiveChange(false);
 	        }
+	    },
+	    doRerender: function doRerender() {
+	        var self = this;
+
+	        setTimeout(function () {
+	            self.safeForceUpdate();
+	        }, 100);
+
+	        setTimeout(function () {
+	            self.onResized();
+	        }, 200);
 	    },
 	    renderChildren: function renderChildren() {
 	        var self = this;
@@ -3138,7 +3158,6 @@ React.makeElement = React['createElement'];
 	    },
 	    render: function render() {
 	        if (this.props.active !== true) {
-
 	            return null;
 	        } else {
 	            var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
@@ -3181,6 +3200,9 @@ React.makeElement = React['createElement'];
 	                { element: document.body, className: classes, style: styles,
 	                    popupDidMount: function popupDidMount(popupElement) {
 	                        self.popupElement = popupElement;
+	                    },
+	                    popupDidUpdate: function popupDidUpdate(popupElement) {
+	                        self.onResized();
 	                    },
 	                    popupWillUnmount: function popupWillUnmount(popupElement) {
 	                        delete self.popupElement;
@@ -10130,15 +10152,19 @@ React.makeElement = React['createElement'];
 	                                        }
 
 	                                        if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-	                                            dropdown = "<span>" + l[5533] + "</span>";
 	                                            dbfetch.get(v.h).always(function () {
 	                                                if (!M.d[v.h]) {
 	                                                    NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
-	                                                    Soon(function () {
-	                                                        self.safeForceUpdate();
-	                                                    });
+	                                                    dd.doRerender();
+	                                                } else {
+	                                                    dd.doRerender();
 	                                                }
 	                                            });
+	                                            return React.makeElement(
+	                                                'span',
+	                                                null,
+	                                                l[5533]
+	                                            );
 	                                        } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
 	                                            downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
 	                                                icon: 'rounded-grey-down-arrow',

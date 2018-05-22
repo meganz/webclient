@@ -35,7 +35,7 @@
     cursor: pointer;
     font-size: 13px;
     line-height: 20px;
-    color: #222222;
+    color: #333;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -233,7 +233,7 @@
     border-radius: 3px;
 }
 .default-white-button.grey-txt, .default-white-button.grey-txt span {
-    color: #777777;
+    color: #666;
 }
 .default-grey-button.semi-small:before, .default-grey-button.semi-small:after, .default-white-button.semi-small::before, .default-white-button.semi-small::after {
     -moz-border-radius: 3px;
@@ -591,7 +591,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(252,252,252,1
     vertical-align: top;
 }
 .default-white-button.grey-txt {
-    color: #777777;
+    color: #666;
 }
 .default-white-button.small-square-button {
     width: 24px;

@@ -3611,14 +3611,14 @@ label.iPhoneCheckLabelOff span {
     opacity: 1;
 }
 .nw-tree-panel-header + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 72px);
-    height: -moz-calc(100% - 72px);
-    height: calc(100% - 72px);
+    height: -webkit-calc(100% - 74px);
+    height: -moz-calc(100% - 74px);
+    height: calc(100% - 74px);
 }
 .contacts-panel .fm-tree-panel {
-    height: -webkit-calc(100% - 144px);
-    height: -moz-calc(100% - 144px);
-    height: calc(100% - 144px);
+    height: -webkit-calc(100% - 146px);
+    height: -moz-calc(100% - 146px);
+    height: calc(100% - 146px);
 }
 .fm-contact-requests, .fm-received-requests {
     height: 36px;
@@ -3630,7 +3630,7 @@ label.iPhoneCheckLabelOff span {
     box-sizing: border-box;
     line-height: 33px;
     font-size: 13px;
-    color: #777777;
+    color: #666;
     padding-left: 40px;
     display: none;
     position: relative;
@@ -3907,9 +3907,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     white-space: nowrap;
     cursor: default;
     font-size: 14px;
-    line-height: 25px;
-    color: #121212;
-    height: 25px;
+    line-height: 24px;
+    color: #333;
+    height: 24px;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -4273,10 +4273,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     color: white;
 }
 .nw-conversations-header, .nw-tree-panel-header, .copy-dialog-panel-header, .move-dialog-panel-header, .share-dialog-panel-header {
-    height: 36px;
+    height: 38px;
     font-size: 15px;
-    line-height: 36px;
-    color: #414141;
+    line-height: 38px;
+    color: #666;
     padding: 0 25px 0 12px;
     position: relative;
     -o-text-overflow: ellipsis;
@@ -4292,7 +4292,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     width: 24px;
     position: absolute;
     right: 2px;
-    top: 6px;
+    top: 7px;
     background-image: url(../images/mega/fm-main-sprite.png);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
@@ -4392,7 +4392,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin: 0 25px 0 32px;
     font-size: 14px;
     line-height: 23px;
-    color: #121212;
+    color: #333;
     padding: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -4615,7 +4615,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin: 5px 6px 0 0;
     display: block;
     line-height: 24px;
-    color: #666666;
+    color: #333;
     font-size: 14px;
     cursor: pointer;
 }
@@ -6245,7 +6245,7 @@ th.grid-first-th {
     width: 100%;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
-    color: #121212;
+    color: #333;
     padding-left: 12px;
     height: 24px;
     line-height: 23px;
@@ -6262,9 +6262,6 @@ th.grid-first-th {
 }
 table {
     border-spacing: transparent;
-}
-.grid-table td, .grid-share-table td, .contacts-grid-table td {
-    height: 25px;
 }
 .contacts-grid-table td {
     height: 52px;
@@ -7023,7 +7020,7 @@ table {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     font-size: 14px;
-    color: #121212;
+    color: #333;
 }
 .tranfer-filetype-txt {
     padding-right: 0;
@@ -15798,8 +15795,9 @@ span.incoming-call-name {
     margin: 0;
 }
 .fm-chat-user-status {
+    font-size: 13px;
     line-height: 18px;
-    color: #999999;
+    color: #777;
 }
 .shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info, .contact-requests-grid td .fm-chat-user-info, .sent-requests-grid td .fm-chat-user-info {
     float: none;
@@ -15862,7 +15860,8 @@ span.incoming-call-name {
     overflow: hidden;
 }
 .shared-folder-info, .contact-email {
-    color: #999999;
+    color: #777;
+    font-size: 13px;
     line-height: 18px;
     display: block;
     white-space: nowrap;
@@ -15875,7 +15874,7 @@ span.incoming-call-name {
     line-height: 18px;
     height: 18px;
     padding-left: 31px;
-    color: #999999;
+    color: #777;
     display: block;
     background-image: url(../images/mega/fm-main-sprite.png);
     background-position: -13px -4292px;
@@ -16171,7 +16170,7 @@ span.incoming-call-name {
     margin: 10px 0 0 0px;
 }
 .shared-details-pad .fm-chat-user {
-    color: #666666;
+    color: #666;
     font-size: 13px;
     padding: 12px 0 0 0;
     font-family: 'source_sans_proregular', Helvetica, Arial;
@@ -16754,13 +16753,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background-position: center -674px;
 }
 .token-input-dropdown-mega .fm-chat-user {
-    color: #666666;
+    color: #333;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
 .token-input-dropdown-mega .fm-chat-user-email {
-    color: #999999;
+    color: #666;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;

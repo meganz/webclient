@@ -1952,9 +1952,6 @@ React.makeElement = React['createElement'];
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this._renderLayer();
-	        if (this.props.popupDidUpdate) {
-	            this.props.popupDidUpdate();
-	        }
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        ReactDOM.unmountComponentAtNode(this.popup);
@@ -3200,9 +3197,6 @@ React.makeElement = React['createElement'];
 	                { element: document.body, className: classes, style: styles,
 	                    popupDidMount: function popupDidMount(popupElement) {
 	                        self.popupElement = popupElement;
-	                    },
-	                    popupDidUpdate: function popupDidUpdate(popupElement) {
-	                        self.onResized();
 	                    },
 	                    popupWillUnmount: function popupWillUnmount(popupElement) {
 	                        delete self.popupElement;

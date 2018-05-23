@@ -10680,7 +10680,7 @@ table {
     font-size: 16px;
     line-height: 18px;
     margin: 3px 0;
-    color: #444;
+    color: #333;
     white-space: pre-line;
     height: 18px;
 }
@@ -10744,15 +10744,15 @@ table {
     left: 0;
     top: 0;
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
-    background: -moz-linear-gradient(top, rgba(238,238,238,0.5) 0%, rgba(238,238,238,1) 100%);
-    background: -webkit-linear-gradient(top, rgba(238,238,238,0.5) 0%, rgba(238,238,238,1) 100%);
-    background: linear-gradient(to bottom, rgba(238,238,238,0.5) 0%, rgba(238,238,238,1) 100%);
+    background: -moz-linear-gradient(top, rgba(245,245,245,0.5) 0%, rgba(245,245,245,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(245,245,245,0.5) 0%, rgba(245,245,245,1) 100%);
+    background: linear-gradient(to bottom, rgba(245,245,245,0.5) 0%, rgba(245,245,245,1) 100%);
 }
 .avatar-bg.colorized::after {
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIwLjciLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
-    background: -moz-linear-gradient(top, rgba(238,238,238,0.7) 0%, rgba(238,238,238,1) 100%);
-    background: -webkit-linear-gradient(top, rgba(238,238,238,0.7) 0%, rgba(238,238,238,1) 100%);
-    background: linear-gradient(to bottom, rgba(238,238,238,0.7) 0%, rgba(238,238,238,1) 100%);
+    background: -moz-linear-gradient(top, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
+    background: linear-gradient(to bottom, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
 }
 .account.user-data-block {
     position: relative;
@@ -10810,7 +10810,7 @@ table {
     cursor: pointer;
     font-size: 16px;
     line-height: 20px;
-    color: #777777;
+    color: #666;
     padding: 4px 24px 0 24px;
     border-bottom: 2px solid transparent;
     float: left;
@@ -10841,6 +10841,9 @@ table {
     line-height: 18px;
     color: #777777;
     padding: 2px 0 0 0;
+}
+.fm-account-notifications .account.radio-buttons {
+    margin-bottom: 24px;
 }
 .account.radio-buttons {
     padding: 9px 0 22px 0;/*width: 530px;*/

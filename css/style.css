@@ -6270,9 +6270,9 @@ table {
 }
 .grid-scrolling-table, .contacts-grid-scrolling-table, .transfer-scrolling-table {
     height: 100%;
-    height: -webkit-calc(100% - 24px);
-    height: -moz-calc(100% - 24px);
-    height: calc(100% - 24px);
+    height: -webkit-calc(100% - 23px);
+    height: -moz-calc(100% - 23px);
+    height: calc(100% - 23px);
 }
 .transfer-scrolling-table {
     /* do not remove, needed for perfect-scrollbar */

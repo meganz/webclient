@@ -3622,14 +3622,14 @@ label.iPhoneCheckLabelOff span {
 }
 .fm-contact-requests, .fm-received-requests {
     height: 36px;
-    background-color: #f6f6f6;
-    border-top: 1px solid #fafafa;
+    background-color: #fafafa;
+    border-top: 1px solid #fefefe;
     border-bottom: 1px solid #e9e9e9;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     line-height: 33px;
-    font-size: 13px;
+    font-size: 14px;
     color: #666;
     padding-left: 40px;
     display: none;
@@ -5460,8 +5460,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    height: 26px;
-    line-height: 25px;
+    height: 24px;
+    line-height: 24px;
     font-size: 13px;
     padding: 0 10px 0 12px;
     color: #707070;
@@ -5676,6 +5676,7 @@ th.grid-first-th {
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
+    margin-top: -1px;
 }
 .grid-sixth-th {
     width: 45px;
@@ -6269,9 +6270,9 @@ table {
 }
 .grid-scrolling-table, .contacts-grid-scrolling-table, .transfer-scrolling-table {
     height: 100%;
-    height: -webkit-calc(100% - 26px);
-    height: -moz-calc(100% - 26px);
-    height: calc(100% - 26px);
+    height: -webkit-calc(100% - 24px);
+    height: -moz-calc(100% - 24px);
+    height: calc(100% - 24px);
 }
 .transfer-scrolling-table {
     /* do not remove, needed for perfect-scrollbar */
@@ -16202,16 +16203,10 @@ span.incoming-call-name {
 .shared-details-buttons .default-white-button {
     min-width: 20px;
 }
-.fm-blocks-view.shared-folder-content {
+.files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
     height: -webkit-calc(100% - 119px);
     height: -moz-calc(100% - 119px);
     height: calc(100% - 119px);
-}
-.files-grid-view.shared-folder-content {
-    height: -webkit-calc(100% - 117px);
-    height: -moz-calc(100% - 117px);
-    height: calc(100% - 117px);
-    top: -2px;
 }
 .shared-details-pad .fm-chat-user-info {
     float: none;

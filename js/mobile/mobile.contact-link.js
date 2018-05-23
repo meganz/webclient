@@ -1,4 +1,9 @@
-﻿function MobileContactLink(contactlink) {
+/**
+ * A class to deal with contacts links cards on mobile
+ * @param {String} contactlink  contact link to work on
+ */
+function MobileContactLink(contactlink) {
+    "use strict";
     this.contactlink = contactlink;
     this.contactName = '';
     this.contactEmail = '';
@@ -6,7 +11,11 @@
     this.contactHandle = '';
 }
 
-MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(userLoginStatus) {
+/**
+ * A function to view the contact card on mobile.
+ */
+MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo() {
+    "use strict";
     var $mobileContactInfoDlg = $('#mobile-ui-contact-card');
     if (!$mobileContactInfoDlg.length) {
         if (!mega.ui.contactLinkCardDialog) {
@@ -19,6 +28,8 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
     var fillContactInfo = function _fillContactInfo(name, email,avatar,handle,ct) {
         $('.mobile.contactname', $mobileContactInfoDlg).text(name);
         $('.mobile.contactemail', $mobileContactInfoDlg).text(email);
+        $('.mobile.red-button.first.add-contact span', $mobileContactInfoDlg).text(l[101]);
+        $('.mobile.text-button.third.cancel span', $mobileContactInfoDlg).text(l[148]);
 
         if (avatar) {
             var ab = base64_to_ab(avatar);
@@ -46,17 +57,15 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
             $('.mobile.red-button.first.add-contact', $mobileContactInfoDlg).off('click');
         }
         else if (u_type && M.u[handle] && M.u[handle]._data.c) {
-            contactStatus = 2;
             $('.mobile.red-button.first.add-contact', $mobileContactInfoDlg).addClass('disabled');
             $('.mobile.red-button.first.add-contact', $mobileContactInfoDlg).off('click');
             $('.mobile.main-avatar', $mobileContactInfoDlg).append(isContactHtml);
         }
         else {
             $('.mobile.red-button.first.add-contact', $mobileContactInfoDlg).removeClass('disabled');
-            // $('.qr-ct-exist', $dialog).addClass('hidden');
             $('.mobile.red-button.first.add-contact', $mobileContactInfoDlg).rebind('click', function () {
                 if (u_type) {
-                    M.inviteContact(u_attr.email, em, null, contactLink);
+                    M.inviteContact(u_attr.email, email, null, ct);
                 }
                 var megaApp = 'mega://C!' + ct;
                 location.replace(megaApp);
@@ -71,17 +80,18 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
                         location.replace(googlePlay);
                     }
                     else {
-                        var page = (u_type ? 'fm' : 'start');
+                        var page = u_type ? 'fm' : 'start';
                         $mobileContactInfoDlg.addClass('hidden');
                         loadSubPage(page);
                     }
-                }
+                };
                 setTimeout(appNotHere, 500);
                 return false;
             });
         }
-        $('.mobile.text-button.third.cancel', $mobileContactInfoDlg).rebind('click', function () {
-            var page = (u_type ? 'fm' : 'start');
+        $('.mobile.text-button.third.cancel, .mobile.fm-dialog-close', $mobileContactInfoDlg)
+            .rebind('click', function () {
+            var page = u_type ? 'fm' : 'start';
             $mobileContactInfoDlg.addClass('hidden');
             loadSubPage(page);
         });
@@ -100,13 +110,8 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
                     self.contactName = res.fn + ' ' + res.ln;
                     self.contactHandle = res.h;
 
-                    
-                    // M.safeShowDialog('qr-contact-mobile', function () {
                     fillContactInfo(self.contactName, self.contactEmail, self.contactAvatar,
                         self.contactHandle, self.contactlink);
-                    //    return $mobileContactInfoDlg;
-                    // });
-
                 }
                 else {
                     msgDialog('warningb', l[8531], l[17865]);

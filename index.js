@@ -373,7 +373,6 @@ function init_page() {
             }
             else {
                 loadSubPage('fm');
-                // page = 'fm'; // nothing will happen (page=tpage)
                 processContactLink();
                 return;
             }

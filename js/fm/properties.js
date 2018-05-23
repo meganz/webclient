@@ -22,7 +22,7 @@
             var status = megaChatIsReady && megaChat.getPresenceAsCssClass(user.u);
 
             shareUsersHtml += '<div class="properties-context-item ustatus ' + escapeHTML(userHandle)
-                + ' ' + (status ? status : '') + ' ' + hidden + '">'
+                + ' ' + (status || '') + ' ' + hidden + '" data-handle="' + escapeHTML(userHandle) + '">'
                 + '<div class="properties-contact-status"></div>'
                 + '<span>' + escapeHTML(M.getNameByHandle(userHandle)) + '</span>'
                 + '</div>';

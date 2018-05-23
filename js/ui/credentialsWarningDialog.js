@@ -222,7 +222,6 @@
 
     /**
      * Render next warning in the waiting list.
-     * @returns {CredentialsWarningDialog._instance}
      */
     CredentialsWarningDialog.rendernext = function() {
 
@@ -233,7 +232,7 @@
             }
             var keys = Object.keys(mega.ui.CredentialsWarningDialog.waitingList);
             if (keys.length > 0) {
-                var key = keys[0];
+                key = keys[0];
                 mega.ui.CredentialsWarningDialog.singleton(
                         mega.ui.CredentialsWarningDialog.waitingList[key].contactHandle,
                         mega.ui.CredentialsWarningDialog.waitingList[key].keyType,

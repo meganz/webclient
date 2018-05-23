@@ -638,8 +638,10 @@ function processEmailChangeActionPacket(ap) {
 }
 
 (function(exportScope) {
-    var _lastUserInteractionCache = window._lastUserInteractionCache = {};
-    var _lastUserInteractionPromiseCache = window._lastUserInteractionPromiseCache = {};
+    "use strict";
+    var _lastUserInteractionCache = {};
+    var _lastUserInteractionCacheInFlight = {};
+    var _lastUserInteractionPromiseCache = {};
 
     /**
      * Compare and return `true` if:
@@ -656,15 +658,171 @@ function processEmailChangeActionPacket(ap) {
         return timestampA > timestampB;
     };
 
+    var throttledSetLastInteractionOps = [];
+    var timerSetLastInteraction = null;
+    var SET_LAST_INTERACTION_TIMER = 1 * 60 * 1000;
 
     /**
-     * Set the last interaction for a contact
+     * Returns a promise which will be resolved with a string, formatted like this "$typeOfInteraction:$timestamp"
+     * Where $typeOfInteraction can be:
+     *  - 0 - cloud drive/sharing
+     *  - 1 - chat
+     *
+     * @param u_h {String}
+     * @param triggeredBySet {boolean}
+     * @returns {MegaPromise}
+     */
+    var getLastInteractionWith = function (u_h, triggeredBySet) {
+        assert(u_handle, "missing u_handle, can't proceed");
+        assert(u_h, "missing argument u_h, can't proceed");
+
+
+        var _renderLastInteractionDone = function (r) {
+            r = r.split(":");
+
+            var ts = parseInt(r[1], 10);
+
+            if (M.u[u_h]) {
+                M.u[u_h].ts = ts;
+            }
+
+            if (triggeredBySet) {
+                return;
+            }
+
+            var $elem = $('.li_' + u_h);
+
+            $elem
+                .removeClass('never')
+                .removeClass('cloud-drive')
+                .removeClass('conversations')
+                .removeClass('unread-conversations');
+
+
+            if (r[0] === "0") {
+                $elem.addClass('cloud-drive');
+            }
+            else if (r[0] === "1" && megaChatIsReady) {
+                var room = megaChat.getPrivateRoom(u_h);
+                if (room && megaChat.plugins && megaChat.plugins.chatNotifications) {
+                    if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomId) > 0) {
+                        $elem.addClass('unread-conversations');
+                    }
+                    else {
+                        $elem.addClass('conversations');
+                    }
+                }
+                else {
+                    $elem.addClass('conversations');
+                }
+            }
+            else {
+                $elem.addClass('never');
+            }
+            if (time2last(ts)) {
+                $elem.text(
+                    time2last(ts)
+                );
+            }
+            else {
+                $elem.text(l[1051]);
+            }
+
+            if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
+                // we need to resort
+                M.contacts();
+            }
+        };
+
+        var _renderLastInteractionFail = function (r) {
+            var $elem = $('.li_' + u_h);
+
+            $elem
+                .removeClass('never')
+                .removeClass('cloud-drive')
+                .removeClass('conversations')
+                .removeClass('unread-conversations');
+
+
+            $elem.addClass('never');
+            $elem.text(l[1051]);
+        };
+
+        var $promise = new MegaPromise();
+
+        $promise
+            .done(_renderLastInteractionDone)
+            .fail(_renderLastInteractionFail);
+
+        if (_lastUserInteractionCacheInFlight[u_h] && _lastUserInteractionCacheInFlight[u_h] !== -1) {
+            $promise.resolve(_lastUserInteractionCacheInFlight[u_h]);
+        }
+        else if (
+            _lastUserInteractionPromiseCache[u_h] &&
+            _lastUserInteractionPromiseCache[u_h].state() === 'pending'
+        ) {
+            return _lastUserInteractionPromiseCache[u_h];
+        }
+        else if (_lastUserInteractionCache[u_h] && _lastUserInteractionCacheInFlight[u_h] !== -1) {
+            $promise.resolve(_lastUserInteractionCache[u_h]);
+        }
+        else if (
+            (!_lastUserInteractionCache[u_h] || _lastUserInteractionCacheInFlight[u_h] === -1) &&
+            (
+                !_lastUserInteractionPromiseCache[u_h] ||
+                _lastUserInteractionPromiseCache[u_h].state() !== 'pending'
+            )
+        ) {
+            if (_lastUserInteractionCacheInFlight[u_h] === -1) {
+                delete _lastUserInteractionCacheInFlight[u_h];
+            }
+            _lastUserInteractionPromiseCache[u_h] = mega.attr.getArrayAttribute(
+                u_handle,
+                'lstint',
+                u_h,
+                false,
+                true
+                )
+                .always(function() {
+                    _lastUserInteractionPromiseCache[u_h] = false;
+                })
+                .done(function (res) {
+                    if (typeof res !== 'number') {
+                        if (typeof res === 'undefined') {
+                            // detected legacy value which was not unserialised properly....should re-initialise as
+                            // empty value, e.g. no last interaction with that user (would be rebuilt by chat messages
+                            // and stuff)
+                            $promise.reject(false);
+                        }
+                        else {
+                            _lastUserInteractionCache[u_h] = res;
+                            $promise.resolve(res);
+                        }
+                    }
+                    else {
+                        $promise.reject(false);
+                        console.error("Failed to retrieve last interaction cache from attrib, response: ", res);
+                    }
+                })
+                .fail(function(res) {
+                    $promise.reject(res);
+                });
+        }
+        else {
+            throw new Error("This should not happen.");
+        }
+
+        return $promise;
+    };
+
+    /**
+     * Set the last interaction for a contact (throttled internally)
      *
      * @param u_h {String} user handle
      * @param v {String} "$typeOfInteraction:$unixTimestamp" (see getLastInteractionWith for the types of int...)
      * @returns {Deferred}
      */
-    var setLastInteractionWith = function (u_h, v) {
+    var _realSetLastInteractionWith = function (u_h, v) {
         assert(u_handle, "missing u_handle, can't proceed");
         assert(u_h, "missing argument u_h, can't proceed");
 
@@ -682,7 +840,7 @@ function processEmailChangeActionPacket(ap) {
         });
 
 
-        getLastInteractionWith(u_h)
+        getLastInteractionWith(u_h, true)
             .done(function (timestamp) {
                 if (_compareLastInteractionStamp(v, timestamp) === false) {
                     // older timestamp found in `v`, resolve the promise with the latest timestamp
@@ -740,143 +898,50 @@ function processEmailChangeActionPacket(ap) {
     };
 
     /**
-     * Returns a promise which will be resolved with a string, formatted like this "$typeOfInteraction:$timestamp"
-     * Where $typeOfInteraction can be:
-     *  - 0 - cloud drive/sharing
-     *  - 1 - chat
+     * Internal method that flushes all queued setLastInteraction operations in one go.
+     * Usually triggered by `setLastInteractionWith`
      *
-     * @param u_h
-     * @returns {MegaPromise}
+     * @private
      */
-    var getLastInteractionWith = function (u_h) {
-        assert(u_handle, "missing u_handle, can't proceed");
-        assert(u_h, "missing argument u_h, can't proceed");
-
-
-        var _renderLastInteractionDone = function (r) {
-
-            r = r.split(":");
-
-            var $elem = $('.li_' + u_h);
-
-            $elem
-                .removeClass('never')
-                .removeClass('cloud-drive')
-                .removeClass('conversations')
-                .removeClass('unread-conversations');
-
-            var ts = parseInt(r[1], 10);
-
-            if (M.u[u_h]) {
-                M.u[u_h].ts = ts;
-            }
-
-            if (r[0] === "0") {
-                $elem.addClass('cloud-drive');
-            }
-            else if (r[0] === "1" && megaChatIsReady) {
-                var room = megaChat.getPrivateRoom(u_h);
-                if (room && megaChat.plugins && megaChat.plugins.chatNotifications) {
-                    if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomId) > 0) {
-                        $elem.addClass('unread-conversations');
-                    }
-                    else {
-                        $elem.addClass('conversations');
-                    }
-                }
-                else {
-                    $elem.addClass('conversations');
-                }
-            }
-            else {
-                $elem.addClass('never');
-            }
-            if (time2last(ts)) {
-                $elem.text(
-                    time2last(ts)
-                );
-            }
-            else {
-                $elem.text(l[1051]);
-            }
-
-            if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
-                // we need to resort
-                M.contacts();
-            }
-        };
-
-        var _renderLastInteractionFail = function (r) {
-            var $elem = $('.li_' + u_h);
-
-            $elem
-                .removeClass('never')
-                .removeClass('cloud-drive')
-                .removeClass('conversations')
-                .removeClass('unread-conversations');
-
-
-            $elem.addClass('never');
-            $elem.text(l[1051]);
-        };
-
-        var $promise = new MegaPromise();
-
-        $promise
-            .done(_renderLastInteractionDone)
-            .fail(_renderLastInteractionFail);
-
-        if (_lastUserInteractionPromiseCache[u_h] && _lastUserInteractionPromiseCache[u_h].state() === 'pending') {
-            return _lastUserInteractionPromiseCache[u_h];
+    var _flushSetLastInteractionWith = function() {
+        timerSetLastInteraction = null;
+        for (var i = throttledSetLastInteractionOps.length - 1; i >= 0; i--) {
+            var op = throttledSetLastInteractionOps[i];
+            throttledSetLastInteractionOps.splice(i, 1);
+            _lastUserInteractionCacheInFlight[op[0]] = -1;
+            op[2].linkDoneAndFailTo(_realSetLastInteractionWith(op[0], op[1]));
         }
-        else if (_lastUserInteractionCache[u_h]) {
-            $promise.resolve(_lastUserInteractionCache[u_h]);
-        }
-        else if (
-                !_lastUserInteractionCache[u_h] &&
-                (
-                    !_lastUserInteractionPromiseCache[u_h] ||
-                    _lastUserInteractionPromiseCache[u_h].state() !== 'pending'
-                )
-            ) {
-            _lastUserInteractionPromiseCache[u_h] = mega.attr.getArrayAttribute(
-                u_handle,
-                'lstint',
-                u_h,
-                false,
-                true
-            )
-                .always(function() {
-                    _lastUserInteractionPromiseCache[u_h] = false;
-                })
-                .done(function (res) {
-                    if (typeof res !== 'number') {
-                        if (typeof res === 'undefined') {
-                            // detected legacy value which was not unserialised properly....should re-initialise as
-                            // empty value, e.g. no last interaction with that user (would be rebuilt by chat messages
-                            // and stuff)
-                            $promise.reject(false);
-                        }
-                        else {
-                            _lastUserInteractionCache[u_h] = res;
-                            $promise.resolve(res);
-                        }
-                    }
-                    else {
-                        $promise.reject(false);
-                        console.error("Failed to retrieve last interaction cache from attrib, response: ", res);
-                    }
-                })
-                .fail(function(res) {
-                    $promise.reject(res);
-                });
-        }
-        else {
-            throw new Error("This should not happen.");
-        }
-
-        return $promise;
     };
+
+
+    /**
+     * Set the last interaction for a contact (throttled internally)
+     *
+     * @param u_h {String} user handle
+     * @param v {String} "$typeOfInteraction:$unixTimestamp" (see getLastInteractionWith for the types of int...)
+     * @returns {Deferred}
+     */
+    var setLastInteractionWith = function(u_h, v) {
+        var promise = new MegaPromise();
+
+        // set on client side, to simulate a real commit
+        var ts = Object(M.u[u_h]).ts;
+        var newTs = parseInt(v.split(":")[1], 10);
+        if (ts < newTs) {
+            Object(M.u[u_h]).ts = newTs;
+            _lastUserInteractionCacheInFlight[u_h] = v;
+        }
+
+        throttledSetLastInteractionOps.push([u_h, v, promise]);
+
+        if (timerSetLastInteraction) {
+            clearTimeout(timerSetLastInteraction);
+        }
+        timerSetLastInteraction = setTimeout(_flushSetLastInteractionWith, SET_LAST_INTERACTION_TIMER);
+
+        return promise;
+    };
+
     exportScope.setLastInteractionWith = setLastInteractionWith;
     exportScope.getLastInteractionWith = getLastInteractionWith;
 })(window);

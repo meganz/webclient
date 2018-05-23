@@ -358,7 +358,9 @@ var attribCache = false;
         var settleFunction = function(res) {
             if (typeof res !== 'number') {
                 attribCache.setItem(cacheKey, JSON.stringify([{"av": savedValue, "v": res[attribute]}, 0]));
-                delete self._versions[cacheKey];
+                if (res[attribute]) {
+                    self._versions[cacheKey] = res[attribute];
+                }
 
                 logger.info('Setting user attribute "'
                     + attribute + '", result: ' + res);
@@ -845,14 +847,17 @@ var attribCache = false;
         var logger = MegaLogger.getLogger('account');
         var cacheKey = userHandle + "_" + attrName;
 
+        if (this._versions[cacheKey] === version) {
+            // dont invalidate if we have the same version in memory.
+            return;
+        }
+
         logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
 
         // XXX: Even if we're using promises here, this is guaranteed to resolve synchronously atm,
         //      so if this ever changes we'll need to make sure it's properly adapted...
 
         var removeItemPromise = attribCache.removeItem(cacheKey);
-
-        delete this._versions[cacheKey];
 
         removeItemPromise
             .always(function _uaPacketParser() {

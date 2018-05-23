@@ -298,7 +298,7 @@ mobile.uploadOverlay = {
         'use strict';
 
         var $overlay = $('.mobile.upload-overlay');
-        var $closeIcon = $overlay.find('.fm-dialog-close');
+        var $closeIcon = $overlay.find('.fm-dialog-close, .close-button' );
 
         // On tapping/clicking the Close icon
         $closeIcon.off('tap').on('tap', function() {

@@ -278,7 +278,7 @@ var EmojiFormattedContent = React.createClass({
     },
     render: function() {
         this._eventuallyUpdateInternalState();
-        
+
         return <span dangerouslySetInnerHTML={{__html: this._formattedContent}}></span>;
     }
 });

@@ -954,9 +954,7 @@ function dlPageCleanup() {
     }
 
     if (dl_node) {
-        if (dl_node.stream) {
-            dl_node.stream.destroy();
-        }
+        $(window).trigger('video-destroy');
         dl_node = false;
     }
 }

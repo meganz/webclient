@@ -25,10 +25,9 @@ mobile.messageOverlay = {
         if (typeof optionalSecondMessage !== 'undefined' && optionalSecondMessage) {
             $optionalSecondMessage.text(optionalSecondMessage);
         }
-
         // Initialise the OK/close button
         this.initConfirmOkButton($overlay, optionalSuccessCallback);
-
+        this.initOverlayCloseButton();
         // Show the error overlay
         $overlay.removeClass('hidden');
     },
@@ -63,5 +62,26 @@ mobile.messageOverlay = {
             // Prevent clicking behind
             return false;
         });
-    }
+    },
+    /**
+     * Initialises the close button on the generic mobile ui error overlay
+     */
+    initOverlayCloseButton: function() {
+
+        'use strict';
+
+        var $overlay = $('#mobile-ui-error');
+        var $closeButton = $overlay.find('.fm-dialog-close, .text-button');
+
+
+        // Add tap handler
+        $closeButton.off('tap').on('tap', function() {
+
+            // Hide overlay with download button options
+            $overlay.addClass('hidden');
+
+            return false;
+        });
+    },
+
 };

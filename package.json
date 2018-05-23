@@ -33,7 +33,7 @@
   "private": true,
   "readmeFilename": "README.md",
   "dependencies": {
-    "babel-core": "^6.3.15",
+    "babel-core": "^6.26.3",
     "babel-loader": "^6.2.0",
     "babel-plugin-react-transform": "^2.0.0-beta1",
     "babel-plugin-transform-react-display-name": "^6.4.0",

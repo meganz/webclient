@@ -436,11 +436,17 @@
             var query = pos.substr(1, pos.length);
             var posAt = ($screen.data('positionAt') || "left top");
             var posMy = ($screen.data('positionMy') || "left top");
-            $elem.position({
-                of: query,
+            var attrs = {
                 at: posAt,
                 my: posMy
-            });
+            };
+            if ($(query).size() > 0) {
+                // if a selector is passed to $.position what returns 0 elements, $.position crashed with a JS error,
+                // so we should never do that.
+                attrs['of'] = query;
+            }
+
+            $elem.position(attrs);
         }
         else {
             console.error("invalid pos data attr:" + $screen.data('position'));
@@ -784,23 +790,25 @@
         });
     };
 
-    mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
-        if (!folderlink) {
-            assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
-            assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
-
-            if (megaChatIsDisabled) {
-                mega.ui.onboarding = new mega.ui.Onboarding({});
-            }
-            else {
-                ChatdIntegration.mcfHasFinishedPromise.always(function() {
-                    mega.ui.onboarding = new mega.ui.Onboarding({});
-                });
-            }
-
-            // we reached our goal, stop listening for fminitialized
-            return 0xDEAD;
+    M.onFileManagerReady(function _delayedInitOnboarding() {
+        if (folderlink) {
+            return mBroadcaster.once('fm:initialized', _delayedInitOnboarding);
         }
+
+        assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
+        assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
+
+        if (megaChatIsDisabled) {
+            mega.ui.onboarding = new mega.ui.Onboarding({});
+        }
+        else {
+            ChatdIntegration.mcfHasFinishedPromise.always(function() {
+                mega.ui.onboarding = new mega.ui.Onboarding({});
+            });
+        }
+
+        // we reached our goal, stop listening for fminitialized
+        return 0xDEAD;
     });
 
     // export

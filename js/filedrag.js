@@ -101,6 +101,7 @@
                 }
                 else {
                     loginDialog();
+                    $.awaitingLoginToUpload = true;
 
                     mBroadcaster.once('fm:initialized', function() {
                         ulQueue.resume();
@@ -291,6 +292,10 @@
 
         $('.drag-n-drop.overlay').addClass('hidden');
         $('body').removeClass('overlayed');
+
+        if ($.awaitingLoginToUpload) {
+            return loginDialog();
+        }
 
         if (
             (

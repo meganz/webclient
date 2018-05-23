@@ -1027,6 +1027,11 @@ React.makeElement = React['createElement'];
 	        return MegaPromise.resolve(self._emojiData[name]);
 	    } else if (self._emojiDataLoading[name]) {
 	        return self._emojiDataLoading[name];
+	    } else if (name === "categories") {
+
+	        self._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
+
+	        return MegaPromise.resolve(self._emojiData[name]);
 	    } else {
 	        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy($.getJSON(staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json"));
 	        self._emojiDataLoading[name].done(function (data) {
@@ -3058,7 +3063,7 @@ React.makeElement = React['createElement'];
 	            this.props.onActiveChange(newVal);
 	        }
 	    },
-	    componentDidUpdate: function componentDidUpdate() {
+	    onResized: function onResized() {
 	        var self = this;
 
 	        if (this.props.active === true) {
@@ -3112,11 +3117,28 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 	    },
+	    componentDidMount: function componentDidMount() {
+	        this.onResized();
+	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        this.onResized();
+	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        if (this.props.active) {
 
 	            this.onActiveChange(false);
 	        }
+	    },
+	    doRerender: function doRerender() {
+	        var self = this;
+
+	        setTimeout(function () {
+	            self.safeForceUpdate();
+	        }, 100);
+
+	        setTimeout(function () {
+	            self.onResized();
+	        }, 200);
 	    },
 	    renderChildren: function renderChildren() {
 	        var self = this;
@@ -3133,7 +3155,6 @@ React.makeElement = React['createElement'];
 	    },
 	    render: function render() {
 	        if (this.props.active !== true) {
-
 	            return null;
 	        } else {
 	            var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
@@ -3160,8 +3181,15 @@ React.makeElement = React['createElement'];
 	                );
 	            } else if (this.props.dropdownItemGenerator) {
 	                child = this.props.dropdownItemGenerator(this);
-	            } else {
-	                child = null;
+	            }
+
+	            if (!child && !this.props.forceShowWhenEmpty) {
+	                if (this.props.active !== false) {
+	                    (window.setImmediate || window.setTimeout)(function () {
+	                        self.onActiveChange(false);
+	                    });
+	                }
+	                return null;
 	            }
 
 	            return React.makeElement(
@@ -8496,6 +8524,7 @@ React.makeElement = React['createElement'];
 	            }
 	            this._onScrollChanged(0, nextState);
 	        }
+
 	        if (nextState.isActive === true) {
 	            var self = this;
 	            if (nextState.isLoading === true || !self.loadingPromise && (!self.data_categories || !self.data_emojis)) {
@@ -8848,6 +8877,7 @@ React.makeElement = React['createElement'];
 	                isLoading: self.state.isLoading,
 	                loadFailed: self.state.loadFailed,
 	                visibleCategories: this.state.visibleCategories,
+	                forceShowWhenEmpty: true,
 	                onActiveChange: function onActiveChange(newValue) {
 
 	                    if (newValue === false) {
@@ -10074,8 +10104,7 @@ React.makeElement = React['createElement'];
 	                                    'span',
 	                                    { key: 'previewButton' },
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
-	                                        onClick: self._startPreview.bind(self, v) }),
-	                                    React.makeElement('hr', null)
+	                                        onClick: self._startPreview.bind(self, v) })
 	                                );
 	                            }
 	                        }
@@ -10117,15 +10146,19 @@ React.makeElement = React['createElement'];
 	                                        }
 
 	                                        if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-	                                            dropdown = "<span>" + l[5533] + "</span>";
 	                                            dbfetch.get(v.h).always(function () {
 	                                                if (!M.d[v.h]) {
 	                                                    NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
-	                                                    Soon(function () {
-	                                                        self.safeForceUpdate();
-	                                                    });
+	                                                    dd.doRerender();
+	                                                } else {
+	                                                    dd.doRerender();
 	                                                }
 	                                            });
+	                                            return React.makeElement(
+	                                                'span',
+	                                                null,
+	                                                l[5533]
+	                                            );
 	                                        } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
 	                                            downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
 	                                                icon: 'rounded-grey-down-arrow',
@@ -10150,6 +10183,14 @@ React.makeElement = React['createElement'];
 	                                                    $.selected = [v.h];
 	                                                    openCopyDialog('conversations');
 	                                                } }));
+	                                        }
+
+	                                        if (!previewButton && firstGroupOfButtons.length === 0 && !downloadButton && linkButtons.length === 0 && !revokeButton) {
+	                                            return null;
+	                                        }
+
+	                                        if (previewButton && (firstGroupOfButtons.length > 0 || downloadButton || linkButtons.length > 0 || revokeButton)) {
+	                                            previewButton = [previewButton, React.makeElement('hr', { key: 'preview-sep' })];
 	                                        }
 
 	                                        return React.makeElement(
@@ -10183,6 +10224,7 @@ React.makeElement = React['createElement'];
 	                                        vertOffset: 3
 	                                    },
 	                                    previewButton,
+	                                    React.makeElement('hr', null),
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                        onClick: self._startDownload.bind(self, v) }),
 	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[1988]),

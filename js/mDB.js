@@ -325,6 +325,7 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
         db.delete().then(function() {
             // Remove the DB name from localStorage so that our getDatabaseNames polyfill doesn't keep returning them
             delete localStorage['_$mdb$' + db.name];
+            delete localStorage[db.name];
 
             fmdb.logger.log("Deleted IndexedDB " + db.name);
         }).catch(function(err){

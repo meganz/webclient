@@ -11,7 +11,7 @@ function is_video(n) {
         return MediaAttribute.getMediaType(n);
     }
 
-    var ext = String(n && n.name || n).split('.').pop().toUpperCase();
+    var ext = fileext(n && n.name || n, true, true);
 
     return is_video.ext[ext];
 }
@@ -35,7 +35,7 @@ function is_image(name) {
         if (typeof name === 'object') {
             name = name.name;
         }
-        var ext = String(name).split('.').pop().toUpperCase();
+        var ext = fileext(name, true, true);
 
         return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
     }
@@ -46,7 +46,7 @@ function is_image(name) {
 function is_rawimage(name, ext) {
     'use strict';
 
-    ext = ext || String(name).split('.').pop().toUpperCase();
+    ext = ext || fileext(name, true, true);
 
     return is_image.raw[ext] && ext;
 }
@@ -112,7 +112,7 @@ var mThumbHandler = {
     has: function(name, ext) {
         'use strict';
 
-        ext = ext || String(name).split('.').pop().toUpperCase();
+        ext = ext || fileext(name, true, true);
 
         return this.sup[ext];
     }
@@ -1123,7 +1123,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         }
 
                         // _makethumb(node, stream);
-                        node.stream = stream;
+                        if (is_embed) {
+                            node.stream = stream;
+                        }
                         stream.play();
                     }).fail(console.warn.bind(console));
 

@@ -82,7 +82,7 @@
         var icons = [];
 
         for (var i = $.selected.length; i--;) {
-            n = M.d[$.selected[i]];
+            n = M.getNodeByHandle($.selected[i]);
             if (!n) {
                 console.error('propertiesDialog: invalid node', $.selected[i]);
                 continue;

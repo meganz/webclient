@@ -58,7 +58,7 @@ MobileContactLink.prototype.showContactLinkInfo = function _showContactLinkInfo(
                 if (u_type) {
                     M.inviteContact(u_attr.email, em, null, contactLink);
                 }
-                var megaApp = 'mega://C!' + ct;
+                var megaApp = 'mega://https://mega.nz/C!' + ct;
                 location.replace(megaApp);
                 var appNotHere = function () {
                     if (is_ios) {

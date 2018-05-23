@@ -100,7 +100,7 @@
 }
 .message.body {
     padding: 3px 24px 0 24px;
-    margin: 16px 0 0 0;
+    margin: 14px 0 0 0;
     position: relative;
     clear: both;
 }
@@ -191,14 +191,15 @@
 .message.user-card-name {
     display: inline-block;
     padding: 0 10px 0 0;
-    color: #000000;
-    font-size: 16px;
+    color: #333;
+    font-size: 15px;
     line-height: 20px;
     vertical-align: top;
     height: 20px;
     max-width: -webkit-calc(100% - 60px);
     max-width: -moz-calc(100% - 60px);
     max-width: calc(100% - 60px);
+    font-family: 'source_sans_probold';
 }
 .message.date-divider {
     font-size: 16px;

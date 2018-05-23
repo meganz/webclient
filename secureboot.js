@@ -1949,7 +1949,6 @@ else if (!b_u) {
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
-    jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
 
     if (!is_mobile) {

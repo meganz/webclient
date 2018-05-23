@@ -226,6 +226,8 @@ function topPopupAlign(button, popup, topPos) {
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
 
+    var mobilePageParsed = false;
+
     if (!window.M) {
         return console.warn('Something went wrong, the initialization did not completed...');
     }
@@ -545,6 +547,7 @@ function init_page() {
             if (is_mobile) {
                 parsepage(pages['mobile']);
                 mobile.decryptionPasswordOverlay.show(page);
+                mobilePageParsed = true;
             }
             else {
                 // Otherwise insert background page, show the password
@@ -555,23 +558,40 @@ function init_page() {
         }
         else { // not supported browser, appologize from user
             var msgToUser = l[18420];
-            if (u_type) {
-                mBroadcaster.once('boot_done', function () {
-                    setTimeout(
-                        msgDialog('info', 'Pwssword protected link not supported', // not visible
-                            msgToUser), 1000);
-                });
-                page = 'fm';
+            if (!is_mobile) {
+                if (u_type) {
+                    mBroadcaster.once('boot_done', function () {
+                        setTimeout(
+                            msgDialog('info', 'Pwssword protected link not supported', // not visible
+                                msgToUser), 1000);
+                    });
+                    page = 'fm';
+                }
+                else {
+                    msgDialog('info', 'Pwssword protected link not supported', // not visible
+                        msgToUser);
+                    page = 'start';
+                }
             }
             else {
+                if (u_type) {
+                    loadSubPage('fm');
+                }
+                else {
+                    parsepage(pages['mobile']);
+                    mobile.signin.show();
+                }
                 msgDialog('info', 'Pwssword protected link not supported', // not visible
                     msgToUser);
-                page = 'start';
+                mobilePageParsed = true;
             }
         }
     }
 
-    if (page.substr(0, 10) == 'blogsearch') {
+    if (mobilePageParsed) {
+        mobilePageParsed = false;
+    }
+    else if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
         if (!blogsearch) {
             loadSubPage('blog');

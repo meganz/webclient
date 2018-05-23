@@ -5616,11 +5616,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 100%;
-    height: -webkit-calc(100% - 34px);
-    height: -moz-calc(100% - 34px);
-    height: calc(100% - 34px);
+    height: -webkit-calc(100% - 36px);
+    height: -moz-calc(100% - 36px);
+    height: calc(100% - 36px);
     position: relative;
-    top: -3px;
+    top: -1px;
     overflow: hidden;
 }
 .files-grid-view.contact-details-view {
@@ -6248,7 +6248,7 @@ th.grid-first-th {
     color: #333;
     padding-left: 12px;
     height: 24px;
-    line-height: 23px;
+    line-height: 24px;
     vertical-align: top;
     font-size: 14px;
     cursor: default;
@@ -15797,7 +15797,7 @@ span.incoming-call-name {
 .fm-chat-user-status {
     font-size: 13px;
     line-height: 18px;
-    color: #777;
+    color: #666;
 }
 .shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info, .contact-requests-grid td .fm-chat-user-info, .sent-requests-grid td .fm-chat-user-info {
     float: none;
@@ -15874,7 +15874,7 @@ span.incoming-call-name {
     line-height: 18px;
     height: 18px;
     padding-left: 31px;
-    color: #777;
+    color: #666;
     display: block;
     background-image: url(../images/mega/fm-main-sprite.png);
     background-position: -13px -4292px;
@@ -15902,7 +15902,7 @@ span.incoming-call-name {
     background-position: -12px -4460px;
 }
 .shared-top-details {
-    height: 123px;
+    height: 121px;
     background-color: white;
     top: -1px;
     margin-bottom: -1px;
@@ -15915,13 +15915,13 @@ span.incoming-call-name {
     background-position: -4px -4791px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
-    margin: 17px 0 0 28px;
+    margin: 15px 0 0 28px;
 }
 .shared-details-info-block {
     margin-left: 126px;
 }
 .shared-details-pad {
-    padding: 24px 0 2px 2px;
+    padding: 22px 0 2px 2px;
     overflow: hidden;
     min-width: 630px;
     position: relative;
@@ -16183,7 +16183,7 @@ span.incoming-call-name {
     right: 0;
     top: 0;
     position: absolute;
-    margin: 75px 0 0 0;
+    margin: 73px 0 0 0;
     padding: 0 18px 0 0;
     background-color: white;
 }
@@ -16202,10 +16202,16 @@ span.incoming-call-name {
 .shared-details-buttons .default-white-button {
     min-width: 20px;
 }
-.files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
-    height: -webkit-calc(100% - 121px);
-    height: -moz-calc(100% - 121px);
-    height: calc(100% - 121px);
+.fm-blocks-view.shared-folder-content {
+    height: -webkit-calc(100% - 119px);
+    height: -moz-calc(100% - 119px);
+    height: calc(100% - 119px);
+}
+.files-grid-view.shared-folder-content {
+    height: -webkit-calc(100% - 117px);
+    height: -moz-calc(100% - 117px);
+    height: calc(100% - 117px);
+    top: -2px;
 }
 .shared-details-pad .fm-chat-user-info {
     float: none;

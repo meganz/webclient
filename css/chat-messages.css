@@ -137,9 +137,9 @@
     margin: 2px 0 0 0;
 }
 .message.text-block {
-    font-size: 15px;
-    line-height: 23px;
-    color: #000000;
+    font-size: 14px;
+    line-height: 24px;
+    color: #222;
     margin: 0 30px 0 0;
     word-wrap: break-word;
     min-height: 20px;
@@ -191,7 +191,7 @@
 .message.user-card-name {
     display: inline-block;
     padding: 0 10px 0 0;
-    color: #000000;
+    color: #222;
     font-size: 15px;
     line-height: 20px;
     vertical-align: top;

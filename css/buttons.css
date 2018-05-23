@@ -49,7 +49,7 @@
     transition: all 200ms ease-in-out;
 }
 .link-button:hover {
-    color: #444444;
+    color: #111;
 }
 .link-button.right {
     margin-left: 27px;

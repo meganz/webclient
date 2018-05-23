@@ -52,7 +52,7 @@
 .user-card-name {
 	font-size: 14px;
 	line-height: 18px;
-	color: #000000;
+	color: #222;
 	font-family: 'source_sans_prosemibold';
 	white-space: nowrap;
 	-o-text-overflow: ellipsis;
@@ -65,7 +65,7 @@
 	position: relative;
 }
 .user-card-name.light {
-    color: #000000;
+    color: #222;
 }
 .user-card-name .grey {
     color: #999999;

@@ -137,8 +137,8 @@
     margin: 2px 0 0 0;
 }
 .message.text-block {
-    font-size: 15px;
-    line-height: 23px;
+    font-size: 14px;
+    line-height: 24px;
     color: #222;
     margin: 0 30px 0 0;
     word-wrap: break-word;
@@ -191,7 +191,7 @@
 .message.user-card-name {
     display: inline-block;
     padding: 0 10px 0 0;
-    color: #333;
+    color: #222;
     font-size: 15px;
     line-height: 20px;
     vertical-align: top;
@@ -199,7 +199,7 @@
     max-width: -webkit-calc(100% - 60px);
     max-width: -moz-calc(100% - 60px);
     max-width: calc(100% - 60px);
-    font-family: 'source_sans_probold';
+    font-family: 'source_sans_prosemibold';
 }
 .message.date-divider {
     font-size: 16px;
@@ -373,7 +373,7 @@
     padding: 0px 4px;
     background-color: #f1f1f1;
     border-radius: 3px;
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: -0.7px;
     white-space: normal;
     font-family: 'source_code_proregular';

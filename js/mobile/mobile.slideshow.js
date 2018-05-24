@@ -158,6 +158,8 @@ mobile.slideshow = {
 
         'use strict';
 
+        mobile.slideshow.cleanupCurrentlyViewedInstance();
+
         // Cache selectors
         var $fileName = mobile.slideshow.$overlay.find('.slideshow-file-name');
         var $currentFileNumAndTotal = mobile.slideshow.$overlay.find('.slideshow-file-number-and-total');
@@ -299,6 +301,15 @@ mobile.slideshow = {
         });
     },
 
+    /**
+     * What the function name says :-P
+     */
+    cleanupCurrentlyViewedInstance: function() {
+        'use strict';
+
+        // Destroy any streaming instance
+        $(window).trigger('video-destroy');
+    },
 
     /**
      * Find the next image handle to be displayed
@@ -449,8 +460,8 @@ mobile.slideshow = {
             // Hide the dialog
             mobile.slideshow.$overlay.addClass('hidden');
 
-            // Destroy any streaming instance
-            $(window).trigger('video-destroy');
+            // Cleanup curr....
+            mobile.slideshow.cleanupCurrentlyViewedInstance();
 
             // Prevent double taps
             return false;

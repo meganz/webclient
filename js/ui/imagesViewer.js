@@ -658,7 +658,7 @@ var slideshowid;
             $controls.unbind('mousemove.idle');
 
             // Slideshow Mode Init
-            if (filemime(n).startsWith('image')) {
+            if (is_image(n) && fileext(n.name) !== 'pdf') {
                 slideshow_imgControls();
 
                 // Autohide controls
@@ -774,8 +774,9 @@ var slideshowid;
             }
             else {
                 previewsrc(n.h);
-                fetchnext();
             }
+
+            fetchnext();
         }
         else if (!preqs[n.h]) {
             fetchsrc(n);
@@ -785,12 +786,18 @@ var slideshowid;
     }
 
     function fetchnext() {
-        var n = M.d[slideshowsteps().forward[0]];
-        if (!n || !n.fa) {
-            return;
-        }
-        if (n.fa.indexOf(':1*') > -1 && !preqs[n.h] && !previews[n.h]) {
-            fetchsrc(n.h);
+        var n = M.getNodeByHandle(slideshowsteps().forward[0]);
+
+        if (String(n.fa).indexOf(':1*') > -1 && !preqs[n.h]) {
+
+            if (!previews[n.h] || previews[n.h].fromChat) {
+
+                if (previews[n.h]) {
+                    previews[n.h].fromChat = null;
+                }
+
+                fetchsrc(n.h);
+            }
         }
     }
 
@@ -892,7 +899,8 @@ var slideshowid;
             console.debug('slideshow.fetchsrc(%s), preview=%s original=%s', id, loadPreview, loadOriginal, n, n.h);
         }
 
-        if (previews[n.h] && previews[n.h].buffer && !slideshowplay) {
+        var isCached = previews[n.h] && previews[n.h].buffer && !slideshowplay;
+        if (isCached) {
             // e.g. hackpatch for chat who already loaded the preview...
             if (n.s > 1048576) {
                 loadPreview = true;
@@ -944,7 +952,7 @@ var slideshowid;
                 if (slideshowid === n.h) {
                     $progressBar.addClass('hidden');
                 }
-                if (loadPreview) {
+                if (loadPreview || isCached) {
                     slideshow_timereset();
                 }
                 else {
@@ -1188,10 +1196,20 @@ var slideshowid;
 
             if (ev.type === 'error') {
                 src1 = noThumbURI;
-                origImgWidth = origImgHeight = 240;
+                if (!replacement) {
+                    origImgWidth = origImgHeight = 240;
+                }
 
                 if (d) {
-                    console.debug('slideshow failed to preview image...', id, src, ev);
+                    console.debug('slideshow failed to preview image...', id, src, previews[id].prev, ev);
+                }
+
+                // Restore last good preview
+                if (previews[id].prev) {
+                    M.neuterArrayBuffer(previews[id].buffer);
+                    URL.revokeObjectURL(previews[id].src);
+                    previews[id] = previews[id].prev;
+                    delete previews[id].prev;
                 }
             }
             else {
@@ -1209,6 +1227,10 @@ var slideshowid;
                 if (d) {
                     console.debug('slideshow loaded image %s:%sx%s, ' +
                         'orientation=%s', id, origImgWidth, origImgHeight, rot);
+                }
+
+                if (previews[id].fromChat !== undefined) {
+                    replacement = false;
                 }
             }
 
@@ -1271,21 +1293,21 @@ var slideshowid;
                 }
                 return;
             }
-            myURL.revokeObjectURL(previews[id].src);
+            previews[id].prev = previews[id];
         }
 
         if (d) {
             console.debug('slideshow.previewimg', id, previews[id]);
         }
 
-        previews[id] = {
+        previews[id] = Object.assign(Object.create(null), previews[id], {
             blob: blob,
             type: type,
             time: Date.now(),
             src: myURL.createObjectURL(blob),
             buffer: uint8arr.buffer || uint8arr,
             full: M.getNodeByHandle(id).s === blob.size
-        };
+        });
 
         if (id === slideshowid) {
             previewsrc(id);

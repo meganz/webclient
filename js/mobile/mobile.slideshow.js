@@ -235,7 +235,7 @@ mobile.slideshow = {
             var nodeHandle = node.h;
 
             // If the node is an image or a video, add it to the array and map
-            if (((is_image(node) && fileext(node.name) !== 'pdf')) || (is_video(node))) {
+            if (is_image3(node) || is_video(node)) {
 
                 mobile.slideshow.imagesInCurrentViewArray.push(nodeHandle);
                 mobile.slideshow.imagesInCurrentViewMap[nodeHandle] = imageNumber;

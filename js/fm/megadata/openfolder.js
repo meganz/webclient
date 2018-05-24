@@ -117,7 +117,7 @@
                 for (var i = Math.min(this.v.length, 200); i--;) {
                     var n = this.v[i];
 
-                    if (String(n.fa).indexOf(':0*') > 0 || is_image(n)
+                    if (String(n.fa).indexOf(':0*') > 0 || is_image2(n)
                         || is_video(n) || MediaInfoLib.isFileSupported(n)) {
 
                         viewmode = 1;

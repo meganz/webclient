@@ -343,15 +343,41 @@ function init_page() {
     var pageBeginLetters = page.substr(0, 2);
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
+        var ctLink = page.substring(2, page.length);
         if (!is_mobile) {
-            var ctLink = page.substring(2, page.length);
+            
             mBroadcaster.once('fm:initialized', function () {
                 openContactInfoLink(ctLink);
             });
             page = 'fm/contacts';
         }
         else {
-            page = (u_type ? 'fm' : 'start');
+            var processContactLink = function () {
+                if (!mega.ui.contactLinkCardDialog) {
+                    // because there's a strange solution applied by someone to clear the top-mobile
+                    // and to re-do everything in the header in mobile.html !!
+                    // --> in order to stop the snow ball of duplication(html code)
+                    // i will get the dialog from memory and store it in memory to be embadded when needed.
+                    var startTokenLine = '<!-- important token to get the below dialog to memory, DONT REMOVE LINE-->';
+                    var endTokenLine = '<!-- important token to get the above dialog to memory, DONT REMOVE LINE-->';
+                    var startPos = pages['top-mobile'].indexOf(startTokenLine) + startTokenLine.length;
+                    var endPos = pages['top-mobile'].indexOf(endTokenLine);
+                    var contactLinkCardHtml = pages['top-mobile'].substring(startPos, endPos);
+                    if (contactLinkCardHtml) {
+                        mega.ui.contactLinkCardDialog = contactLinkCardHtml;
+                    }
+                }
+                var contactInfoCard = new MobileContactLink(ctLink);
+                contactInfoCard.showContactLinkInfo();
+            };
+            if (!u_type) {
+                mBroadcaster.once('HomeStartPageRendered:mobile', processContactLink);
+            }
+            else {
+                loadSubPage('fm');
+                processContactLink();
+                return;
+            }
         }
     }
 
@@ -1470,6 +1496,8 @@ function init_page() {
         $('#startholder').hide();
 
         // Prevent duplicate HTML content breaking things
+        // what a strange solution!  [emptying #startholder!]
+        // we should have fixed duplicated classes, ids in the html..
         if (is_mobile) {
             $('#startholder').empty();
         }

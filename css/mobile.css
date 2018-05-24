@@ -123,7 +123,7 @@ ul, li {
 .mobile.main-block.overlay {
     position: absolute;
     z-index: 100;
-    background-color: rgba(255, 255, 255, 0.97);
+    background-color: rgba(255, 255, 255, 0.92);
     left: 0;
     top: 0;
 }
@@ -303,7 +303,7 @@ ul, li {
     margin: 0 auto;
     position: relative;
 }
-.mobile.filename {
+.mobile.filename, .mobile.contactname {
     font-size: 15px;
     line-height: 1.5;
     color: #444;
@@ -337,6 +337,14 @@ ul, li {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
+.mobile.contactemail {
+    width: calc(100% - 32px);
+    font-size: 14px;
+    line-height: 21px;
+    white-space: pre-wrap;
+    letter-spacing: 0px;
+    margin: 6px auto 18px;
 }
 .downloading .error-overlay {
     z-index: 2000;
@@ -389,6 +397,7 @@ ul, li {
     width: 25%;
     height: 44px;
     line-height: 43px;
+    text-decoration: underline;
 }
 .upload-overlay .mobile.text-button {
     margin: 72px auto 0;
@@ -404,15 +413,16 @@ ul, li {
     margin-top: 0px;
     line-height: 43px;
 }
+.mobile.inline-buttons .mobile.red-button.first 
 .mobile.inline-buttons .mobile.first {
     float: right;
 }
 .mobile.inline-buttons .mobile.second {
     float: left;
     background: #FFFFFF;
-    background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(238,238,238,0.50) 100%);
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(238,238,238,0.75) 100%);
     border: 1px solid #DFDFDF;
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.03);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
     border-radius: 4px;
     color: #555;
 }
@@ -4089,6 +4099,48 @@ div.checkboxOn, div.checkboxOff {
 .mobile.my-account-page .main-avatar .avatar span {
     color: #fff;
 }
+#mobile-ui-contact-card .avatar-wrapper span {
+    line-height: 96px;
+    font-size: 54px;
+    color: #fff;
+    font-family: 'source_sans_prolight';
+}
+#mobile-ui-contact-card .main-avatar {
+    position: relative;
+    display: block;
+    width: 100px;
+    margin: 0 auto 20px;
+}
+#mobile-ui-contact-card .contact-verification {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #fff;
+    background-color: #fff;
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 20px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.25);
+}
+#mobile-ui-contact-card .contact-verification i {
+    width: 36px;
+    height: 36px;
+    background-image: url(../images/mobile/mobile-sprite_v11.png);
+    background-repeat: no-repeat;
+    background-size: -280px -2232px;
+    background-position: -50px -2163px;
+    display: block;
+    position: relative;
+}
+#mobile-ui-contact-card {
+    top: 0;
+    left: 0;
+    z-index:190;
+    border:0;
+}
+#mobile-ui-contact-card .mobile.logo {
+    background-position: -94px -1073px;
+}
 .mobile.my-account-page .user-info {
     margin-left: 60px;
     text-align: left;
@@ -7311,7 +7363,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after {
+    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.download-app, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i {
         background-image: url(../images/mobile/mobile-sprite_v11@2x.png);
         background-size: 280px auto;
     }

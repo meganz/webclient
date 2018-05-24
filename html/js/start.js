@@ -78,6 +78,13 @@ function init_start() {
     if (!is_mobile && page === 'start') {
         InitFileDrag();
     } else if (is_mobile && page === 'start') {
+        if (!mega.ui.contactLinkCardDialog) {
+            var contactLinkCardHtml = $('#mobile-ui-contact-card');
+            if (contactLinkCardHtml && contactLinkCardHtml.length) {
+                contactLinkCardHtml = contactLinkCardHtml[0].outerHTML;
+                mega.ui.contactLinkCardDialog = contactLinkCardHtml;
+            }
+        }
         mobile.initMobileAppButton();
     } else if (page === 'download') {
         $('.widget-block').hide();
@@ -131,6 +138,7 @@ function init_start() {
             }
         }, 1000);
     }
+    mBroadcaster.sendMessage('HomeStartPageRendered:mobile');
 }
 
 var start_countLimit = 0;

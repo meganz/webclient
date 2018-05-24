@@ -51,18 +51,18 @@
     margin: 12px 116px 0 16px;
 }
 .dropdown.popup input::-webkit-input-placeholder {
-    color: #666666;
+    color: #555555;
 }
 .dropdown.popup input:-moz-placeholder {
-    color: #666666;
+    color: #555555;
     opacity: 1;
 }
 .dropdown.popup input::-moz-placeholder {
-    color: #666666;
+    color: #555555;
     opacity: 1;
 }
 .dropdown.popup input:-ms-input-placeholder {
-    color: #666666;
+    color: #555555;
 }
 .dropdown.popup input:focus::-webkit-input-placeholder {
     color: #cccccc;
@@ -120,11 +120,11 @@
     padding: 0 30px 0 79px;
 }
 .contacts-search .user-card-email {
-    font-size: 12px;
+    font-size: 13px;
     line-height: 14px;
 }
 .contacts-search .user-card-name {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 19px;
 }
 .popup.contacts-search .selected-contact-block {

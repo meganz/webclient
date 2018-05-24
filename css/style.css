@@ -3622,15 +3622,15 @@ label.iPhoneCheckLabelOff span {
 }
 .fm-contact-requests, .fm-received-requests {
     height: 36px;
-    background-color: #f6f6f6;
-    border-top: 1px solid #fafafa;
+    background-color: #fafafa;
+    border-top: 1px solid #fefefe;
     border-bottom: 1px solid #e9e9e9;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     line-height: 33px;
-    font-size: 13px;
-    color: #777777;
+    font-size: 14px;
+    color: #666;
     padding-left: 40px;
     display: none;
     position: relative;
@@ -3906,9 +3906,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     box-sizing: border-box;
     white-space: nowrap;
     cursor: default;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 24px;
-    color: #666666;
+    color: #333;
     height: 24px;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -4274,9 +4274,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-conversations-header, .nw-tree-panel-header, .copy-dialog-panel-header, .move-dialog-panel-header, .share-dialog-panel-header {
     height: 36px;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 36px;
-    color: #666666;
+    color: #666;
     padding: 0 25px 0 12px;
     position: relative;
     -o-text-overflow: ellipsis;
@@ -4390,9 +4390,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .nw-conversations-name, .fm-tree-panel .nw-contact-name, .fm-dialog-body .nw-contact-item {
     margin: 0 25px 0 32px;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 23px;
-    color: #444;
+    color: #333;
     padding: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -4615,7 +4615,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin: 5px 6px 0 0;
     display: block;
     line-height: 24px;
-    color: #666666;
+    color: #333;
     font-size: 14px;
     cursor: pointer;
 }
@@ -4877,7 +4877,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 256px;
     height: 100%;
     float: left;
-    background-color: #EEEEEE;
+    background-color: #f5f5f5;
     position: relative;
     z-index: 20;
 }
@@ -5460,11 +5460,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    height: 26px;
-    line-height: 25px;
-    font-size: 12px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 13px;
     padding: 0 10px 0 12px;
-    color: #999999;
+    color: #707070;
     font-weight: normal;
     text-align: left;
     white-space: nowrap;
@@ -5676,6 +5676,7 @@ th.grid-first-th {
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
+    margin-top: -1px;
 }
 .grid-sixth-th {
     width: 45px;
@@ -6066,11 +6067,11 @@ th.grid-first-th {
     padding: 0 10px;
     height: 30px;
     overflow: hidden;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 30px;
     margin: 0 0 -2px 0;
     text-align: center;
-    color: #666666;
+    color: #333333;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -6245,12 +6246,12 @@ th.grid-first-th {
     width: 100%;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
-    color: #666666;
+    color: #333;
     padding-left: 12px;
     height: 24px;
-    line-height: 23px;
+    line-height: 24px;
     vertical-align: top;
-    font-size: 13px;
+    font-size: 14px;
     cursor: default;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -6263,18 +6264,15 @@ th.grid-first-th {
 table {
     border-spacing: transparent;
 }
-.grid-table td, .grid-share-table td, .contacts-grid-table td {
-    height: 24px;
-}
 .contacts-grid-table td {
     height: 52px;
     line-height: 49px;
 }
 .grid-scrolling-table, .contacts-grid-scrolling-table, .transfer-scrolling-table {
     height: 100%;
-    height: -webkit-calc(100% - 26px);
-    height: -moz-calc(100% - 26px);
-    height: calc(100% - 26px);
+    height: -webkit-calc(100% - 23px);
+    height: -moz-calc(100% - 23px);
+    height: calc(100% - 23px);
 }
 .transfer-scrolling-table {
     /* do not remove, needed for perfect-scrollbar */
@@ -7022,8 +7020,8 @@ table {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    font-size: 13px;
-    color: #666666;
+    font-size: 14px;
+    color: #333;
 }
 .tranfer-filetype-txt {
     padding-right: 0;
@@ -7380,7 +7378,7 @@ table {
     background-repeat: no-repeat;
 }
 .fm-breadcrumbs.has-next-button .right-arrow-bg {
-    color: #999999;
+    color: #585858;
     cursor: pointer;
 }
 .deactivated .fm-breadcrumbs:not(.public-links) .right-arrow-bg {
@@ -10690,7 +10688,7 @@ table {
     font-size: 16px;
     line-height: 18px;
     margin: 3px 0;
-    color: #444;
+    color: #333;
     white-space: pre-line;
     height: 18px;
 }
@@ -10754,15 +10752,15 @@ table {
     left: 0;
     top: 0;
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
-    background: -moz-linear-gradient(top, rgba(238,238,238,0.5) 0%, rgba(238,238,238,1) 100%);
-    background: -webkit-linear-gradient(top, rgba(238,238,238,0.5) 0%, rgba(238,238,238,1) 100%);
-    background: linear-gradient(to bottom, rgba(238,238,238,0.5) 0%, rgba(238,238,238,1) 100%);
+    background: -moz-linear-gradient(top, rgba(245,245,245,0.5) 0%, rgba(245,245,245,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(245,245,245,0.5) 0%, rgba(245,245,245,1) 100%);
+    background: linear-gradient(to bottom, rgba(245,245,245,0.5) 0%, rgba(245,245,245,1) 100%);
 }
 .avatar-bg.colorized::after {
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIwLjciLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
-    background: -moz-linear-gradient(top, rgba(238,238,238,0.7) 0%, rgba(238,238,238,1) 100%);
-    background: -webkit-linear-gradient(top, rgba(238,238,238,0.7) 0%, rgba(238,238,238,1) 100%);
-    background: linear-gradient(to bottom, rgba(238,238,238,0.7) 0%, rgba(238,238,238,1) 100%);
+    background: -moz-linear-gradient(top, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
+    background: linear-gradient(to bottom, rgba(245,245,245,0.7) 0%, rgba(245,245,245,1) 100%);
 }
 .account.user-data-block {
     position: relative;
@@ -10820,7 +10818,7 @@ table {
     cursor: pointer;
     font-size: 16px;
     line-height: 20px;
-    color: #777777;
+    color: #666;
     padding: 4px 24px 0 24px;
     border-bottom: 2px solid transparent;
     float: left;
@@ -10851,6 +10849,9 @@ table {
     line-height: 18px;
     color: #777777;
     padding: 2px 0 0 0;
+}
+.fm-account-notifications .account.radio-buttons {
+    margin-bottom: 24px;
 }
 .account.radio-buttons {
     padding: 9px 0 22px 0;/*width: 530px;*/
@@ -15806,8 +15807,9 @@ span.incoming-call-name {
     margin: 0;
 }
 .fm-chat-user-status {
+    font-size: 13px;
     line-height: 18px;
-    color: #999999;
+    color: #666;
 }
 .shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info, .contact-requests-grid td .fm-chat-user-info, .sent-requests-grid td .fm-chat-user-info {
     float: none;
@@ -15855,14 +15857,14 @@ span.incoming-call-name {
 }
 .shared-folder-info-block {
     padding: 0 0 0 51px;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 18px;
     display: block;
     position: relative;
     text-align: left;
 }
 .shared-folder-name, .contact-name {
-    color: #666666;
+    color: #333333;
     display: block;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
@@ -15870,7 +15872,8 @@ span.incoming-call-name {
     overflow: hidden;
 }
 .shared-folder-info, .contact-email {
-    color: #999999;
+    color: #777;
+    font-size: 13px;
     line-height: 18px;
     display: block;
     white-space: nowrap;
@@ -15883,7 +15886,7 @@ span.incoming-call-name {
     line-height: 18px;
     height: 18px;
     padding-left: 31px;
-    color: #999999;
+    color: #666;
     display: block;
     background-image: url(../images/mega/fm-main-sprite.png);
     background-position: -13px -4292px;
@@ -15911,7 +15914,7 @@ span.incoming-call-name {
     background-position: -12px -4460px;
 }
 .shared-top-details {
-    height: 123px;
+    height: 121px;
     background-color: white;
     top: -1px;
     margin-bottom: -1px;
@@ -15924,13 +15927,13 @@ span.incoming-call-name {
     background-position: -4px -4791px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
-    margin: 17px 0 0 28px;
+    margin: 15px 0 0 28px;
 }
 .shared-details-info-block {
     margin-left: 126px;
 }
 .shared-details-pad {
-    padding: 24px 0 2px 2px;
+    padding: 22px 0 2px 2px;
     overflow: hidden;
     min-width: 630px;
     position: relative;
@@ -16179,7 +16182,7 @@ span.incoming-call-name {
     margin: 10px 0 0 0px;
 }
 .shared-details-pad .fm-chat-user {
-    color: #666666;
+    color: #666;
     font-size: 13px;
     padding: 12px 0 0 0;
     font-family: 'source_sans_proregular', Helvetica, Arial;
@@ -16192,7 +16195,7 @@ span.incoming-call-name {
     right: 0;
     top: 0;
     position: absolute;
-    margin: 75px 0 0 0;
+    margin: 73px 0 0 0;
     padding: 0 18px 0 0;
     background-color: white;
 }
@@ -16212,9 +16215,9 @@ span.incoming-call-name {
     min-width: 20px;
 }
 .files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
-    height: -webkit-calc(100% - 121px);
-    height: -moz-calc(100% - 121px);
-    height: calc(100% - 121px);
+    height: -webkit-calc(100% - 119px);
+    height: -moz-calc(100% - 119px);
+    height: calc(100% - 119px);
 }
 .shared-details-pad .fm-chat-user-info {
     float: none;
@@ -16762,13 +16765,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     background-position: center -674px;
 }
 .token-input-dropdown-mega .fm-chat-user {
-    color: #666666;
+    color: #333;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
 .token-input-dropdown-mega .fm-chat-user-email {
-    color: #999999;
+    color: #666;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;

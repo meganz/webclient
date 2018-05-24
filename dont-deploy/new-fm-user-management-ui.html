@@ -206,12 +206,12 @@ $(document).ready(function() {
 		 	</div>
 
 		 	<div class="fm-left-panel ui-resizable user-management-panel" style="width:256px">
-		 	
+
             	<div class="left-pane-drag-handle ui-resizable-handle ui-resizable-e"></div>
            
-            	<div class="user-management-sorting-menu"> 
+            	<div class="user-management-sorting-menu hidden"> 
                     <div class="sorting-menu-arrow"></div>
-                    <p style="color: #FAFAFA; padding:12px 0 12px 16px; font-size: 13px; font-weight:400; margin: 0"> SORT </p>
+                    <p> SORT </p>
 
                     <div class="sorting-menu-item-user-managment">
                     	<div class="user-management-sort-name sort-icon"></div>
@@ -222,66 +222,23 @@ $(document).ready(function() {
                     	<div class="user-management-sort-status sort-icon"></div>
                     	<span>Status</span>
                     </div>
-
-
             	</div>
             
             	<div class="fm-left-menu user-management">
-                <div class="nw-fm-tree-header dashboard">
-                    <span>Dashboard</span>
-                </div>
-                <div class="transfers-header-bl">
-                    <div class="button default-white-button small-height bold-txt install-app hidden">
-                        Faster transfers? <span class="red">Install our app</span>
-                    </div>
-                    <div class="button default-white-button small-height bold-txt grey enable-native-transfers hidden">
-                        <i class="small-icon icons-sprite mega"></i>
-                         App detected: <span class="red">Enable native transfers</span>
-                    </div>
-                </div>
-
-                <div class="nw-fm-tree-header folder-link" style="display: none;">
-                    <input value="Folder Link" placeholder="Folder Link" type="text">
-                    <div class="nw-fm-search-icon" style="display: block;"></div>
-                </div>
-                <div class="nw-fm-tree-header cloud-drive">
-                    <input value="" placeholder="Cloud Drive" type="text">
-                    <div class="nw-fm-search-icon" style="display: block;"></div>
-                </div>
-                <div class="nw-fm-tree-header inbox">
-                    <input value="" placeholder="Inbox" type="text">
-                    <div class="nw-fm-search-icon" style="display: block;"></div>
-                </div>
-                <div class="nw-fm-tree-header shared-with-me">
-                    <input value="" placeholder="Shared with me" type="text">
-                    <div class="nw-fm-search-icon" style="display: block;"></div>
-                </div>
-                <div class="nw-fm-tree-header contacts">
-                    <input value="" placeholder="Contacts" type="text">
-                    <div class="nw-fm-search-icon" style="display: block;"></div>
-                </div>
-                <div class="nw-fm-tree-header user-management">
-                    <input value="" placeholder="User Management" type="text">
-                    <div class="nw-fm-search-icon" style="display: block;"></div>
-                </div>
-                <div class="nw-fm-tree-header rubbish-bin">
-                    <input value="" placeholder="Rubbish Bin" type="text">
-                    <div class="nw-fm-search-icon" style="display: block;"></div>
-                </div>
-                <div class="nw-fm-tree-header account">
-                    <input value="" placeholder="Settings" type="text">
-                    <div class="nw-fm-search-icon" style="display: block;"></div>
-                </div>
+	                <div class="nw-fm-tree-header user-management">
+	                    <input value="" placeholder="User Management" type="text">
+	                    <div class="nw-fm-search-icon" style="display: block;"></div>
+	                </div>
             	</div>
 
             	<div class="user-management-tree-panel-header enabled-accounts active" style="">
-            	<div class="img enabled-accounts"></div>
-                <span>Enabled Accounts</span>
-                <div class="user-management-tree-panel-arrows"></div>
+	            	<div class="img enabled-accounts"></div>
+	                	<span>Enabled Accounts</span>
+	                <div class="user-management-tree-panel-arrows"></div>
             	</div>
         
-	            <div class="fm-tree-panel" style="overflow: hidden; padding: 0px;height: 100%;">    
-	            	<div class="jspContainer" style="height: 100%;">
+	            <div class="fm-tree-panel" style="overflow: hidden; padding: 0px;">    
+	            	<div class="jspContainer" style=" ">
 	                	<div class="jspPane" style="padding: 0px; top: 0px; left: 0px; width: 272px;">
 
 			            	<div class="content-panel user-management active">
@@ -298,16 +255,33 @@ $(document).ready(function() {
 			                        <div class="nw-user-management-name">John Bailey</div>
 			                    </div>
 			                </div>
-
 			            </div>
 		            </div>
 	            </div>
 
-             	<div class="user-management-tree-panel-header disabled-accounts" style="">
+             	<div class="user-management-tree-panel-header disabled-accounts">
             		<div class="img disabled-accounts"></div>
                 	<span>Disabled Accounts</span>
-                	<div class="user-management-tree-panel-arrows hidden"></div>
+                	<div class="user-management-tree-panel-arrows"></div>
             	</div>
+
+            	<div class="fm-tree-panel hidden" style="overflow: hidden; padding: 0px;">    
+	            	<div class="jspContainer" style=" ">
+	                	<div class="jspPane" style="padding: 0px; top: 0px; left: 0px; width: 272px;">
+
+			            	<div class="content-panel user-management active">
+			                    <div class="nw-user-management-item">
+			                        <div class="user-management-status disabled"></div>
+			                        <div class="nw-user-management-name">Jay Pierce</div>
+			                    </div>
+			                    <div class="nw-user-management-item">
+			                        <div class="user-management-status disable"></div>
+			                        <div class="nw-user-management-name">Ollie Gibson</div>
+			                    </div>
+			                </div>
+			            </div>
+		            </div>
+	            </div>
 
 		 		<div class="fm-right-files-block">
 		 		</div>
@@ -368,26 +342,22 @@ $(document).ready(function() {
 
                     <table class="grid-table-user-management" width="100%" cellspacing="0" cellpadding="0" border="0">
 	                      	<tr class="grid-table-header-user-management">
-			                    <th style="width:21px;">  
-		                    		<div class="checkdiv left checkboxOff small-user-management">
-                                    <input checked="" type="checkbox">
+			                    <th>  
+		                    		<div class="checkdiv left checkboxOn small-user-management">
                                 	</div>
 			                    </th>
 			                    <th> <div class="arrow name desc">Name</div> </th>
-			                    <th style="width:112px;"><div class="arrow desc">Status</div></th>
-			                    <th style="width:132px;"><div class="arrow asc">Storage usage</div></th>
-			                    <th style="width:132px;"><div class="arrow desc">Transfer usage</div></th>
-			                    <th style="width:112px;">
-			                    	<div class="disable-icon icon hidden"></div>
-			                    	<div class="edit-icon icon hidden"></div>
-			                    	<div class="view-icon icon hidden"></div>  
+			                    <th><div class="arrow desc">Status</div></th>
+			                    <th><div class="arrow asc">Storage usage</div></th>
+			                    <th><div class="arrow desc">Transfer usage</div></th>
+			                    <th>
+			                    	<div class="disable-icon icon"></div>
 			                    </th>
 	                        </tr>
 
 	                        <tr>
-			                    <td style="width:21px;">  
+			                    <td>  
 		                    		<div class="checkdiv left checkboxOn small-user-management">
-                                    <input checked="" type="checkbox">
                                 	</div>
 			                    </td>
 			                    <td>			                    	
@@ -397,13 +367,13 @@ $(document).ready(function() {
 	                                </div>
 	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
 			                    </td>
-			                    <td style="width:112px;">
+			                    <td>
 			                    	<div class="user-management-status enabled"></div>
 			                    	<span>Active</span>
 			                	</td>
-			                    <td style="width:132px;"><span>0.8 GB</span></td>
-			                    <td style="width:132px;"><span>13.2 GB</span></td>
-			                    <td style="width:112px;">
+			                    <td><span>0.8 GB</span></td>
+			                    <td><span>13.2 GB</span></td>
+			                    <td>
 			                    	<div class="disable-icon icon"></div>
 			                    	<div class="edit-icon icon"></div>
 			                    	<div class="view-icon icon"></div>  	
@@ -411,9 +381,8 @@ $(document).ready(function() {
                        		</tr>
 
 	                        <tr>
-			                    <td style="width:21px;">  
+			                    <td>  
 		                    		<div class="checkdiv left checkboxOn small-user-management">
-                                    <input checked="" type="checkbox">
                                 	</div>
 			                    </td>
 			                    <td>			                    	
@@ -423,13 +392,16 @@ $(document).ready(function() {
 	                                </div>
 	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
 			                    </td>
-			                    <td style="width:112px;">
+			                    <td>
 			                    	<div class="user-management-status pending"></div>
 			                    	<span>Pending</span>
 			                	</td>
-			                    <td style="width:132px;"><span>0.8 GB</span></td>
-			                    <td style="width:132px;"><span>0.8 GB</span></td>
-			                    <td style="width:112px;">	
+			                    <td><span>0.8 GB</span></td>
+			                    <td><span>0.8 GB</span></td>
+			                    <td>
+			                    	<div class="disable-icon icon"></div>
+			                    	<div class="edit-icon icon"></div>
+			                    	<div class="view-icon icon"></div>  	
 			                    </td>
                        		</tr>
                     </table>

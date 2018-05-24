@@ -218,6 +218,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var loader = function() {
             var ThumbFR = new FileReader();
             ThumbFR.onload = function(e) {
+                var thumbData;
                 var orientation;
                 var u8 = new Uint8Array(ThumbFR.result);
 
@@ -247,9 +248,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 }
 
                 if (isRawImage) {
-                    var FS = dcraw.FS,
-                        run = dcraw.run,
-                        thumbData;
+                    var FS = dcraw.FS;
+                    var run = dcraw.run;
                     var filename = file.name || (Math.random() * Date.now()).toString(36) + '.' + isRawImage;
 
                     try {
@@ -331,7 +331,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     }
 
                     if (thumbData) {
-                        file = new Blob([thumbData], {type: 'image/jpg'});
                         api_req({a: 'log', e: 99663, m: 'RAW image processed.'});
                     }
                     else {
@@ -362,7 +361,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     }
                 }
 
-                __render_thumb(img, u8, orientation, file, isRawImage);
+                __render_thumb(img, thumbData || u8, orientation, isRawImage);
                 file = imagedata = undefined;
             };
             if (!file) {
@@ -400,7 +399,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     }
 }
 
-function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
+function __render_thumb(img, u8, orientation, noMagicNumCheck) {
     'use strict';
 
     if (u8 && !noMagicNumCheck) {
@@ -449,30 +448,128 @@ function __render_thumb(img, u8, orientation, blob, noMagicNumCheck) {
             }
             exif = undefined;
         }
-        if (!blob) {
-            blob = new Blob([u8], {
-                type: 'image/jpg'
-            });
-        }
-        M.neuterArrayBuffer(u8);
     }
 
-    if (!u8 || (img.huge && img.dataSize === blob.size)) {
+    if (!u8 || (img.huge && img.dataSize === u8.byteLength)) {
         if (d) {
             console.warn('Unable to generate thumbnail...');
         }
         img.src = noThumbURI;
     }
     else {
-        var mpImg = new MegaPixImage(blob);
-        mpImg.render(img, {
-            maxWidth: 1000,
-            maxHeight: 1000,
-            quality: 0.96,
-            imageType: 'image/png',
-            orientation: orientation
-        });
+        exifImageRotation(img, u8, orientation);
     }
+}
+
+/**
+ * Rotate images as per the extracted EXIF orientation
+ * @param {Image|Object} target Image element where to render the result
+ * @param {ArrayBuffer} buffer The image file data
+ * @param {Number} orientation The EXIF rotation value
+ */
+function exifImageRotation(target, buffer, orientation) {
+    'use strict';
+    var blobURI = mObjectURL([buffer], 'image/jpeg');
+
+    orientation |= 0;
+    if (orientation < 2) {
+        // No rotation needed.
+        target.src = blobURI;
+    }
+    else {
+        var signalError = function() {
+            // let the target reach its onerror...
+            target.src = 'data:text/xml,error';
+        };
+
+        var img = new Image();
+        img.onload = tryCatch(function() {
+            var width = this.naturalWidth;
+            var height = this.naturalHeight;
+
+            if (!width || !height) {
+                if (d) {
+                    console.error('exifImageRotation found invalid width/height values...', width, height);
+                }
+
+                return signalError();
+            }
+
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+
+            ctx.save();
+            switch (orientation) {
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                    canvas.width = height;
+                    canvas.height = width;
+                    break;
+                default:
+                    canvas.width = width;
+                    canvas.height = height;
+            }
+
+            switch (orientation) {
+                case 2:
+                    // horizontal flip
+                    ctx.translate(width, 0);
+                    ctx.scale(-1, 1);
+                    break;
+                case 3:
+                    // 180 rotate left
+                    ctx.translate(width, height);
+                    ctx.rotate(Math.PI);
+                    break;
+                case 4:
+                    // vertical flip
+                    ctx.translate(0, height);
+                    ctx.scale(1, -1);
+                    break;
+                case 5:
+                    // vertical flip + 90 rotate right
+                    ctx.rotate(0.5 * Math.PI);
+                    ctx.scale(1, -1);
+                    break;
+                case 6:
+                    // 90 rotate right
+                    ctx.rotate(0.5 * Math.PI);
+                    ctx.translate(0, -height);
+                    break;
+                case 7:
+                    // horizontal flip + 90 rotate right
+                    ctx.rotate(0.5 * Math.PI);
+                    ctx.translate(width, -height);
+                    ctx.scale(-1, 1);
+                    break;
+                case 8:
+                    // 90 rotate left
+                    ctx.rotate(-0.5 * Math.PI);
+                    ctx.translate(-width, 0);
+                    break;
+                default:
+                    break;
+            }
+
+            ctx.drawImage(img, 0, 0);
+            ctx.restore();
+            target.src = canvas.toDataURL();
+
+        }, img.onerror = function(ev) {
+            if (d) {
+                console.error('exifImageRotation failed...', ev);
+            }
+            signalError();
+        });
+        img.src = blobURI;
+    }
+
+    setTimeout(function() {
+        URL.revokeObjectURL(blobURI);
+        M.neuterArrayBuffer(buffer);
+    }, 1e4);
 }
 
 function ppmtojpeg(ppm) {

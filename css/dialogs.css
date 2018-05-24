@@ -75,7 +75,7 @@
 .fm-dialog-footer-txt {
     text-align: center;
     line-height: 31px;
-    color: #999;
+    color: #777;
 }
 /* Send Contact Dialog */
 .fm-dialog.send-contact {
@@ -115,7 +115,7 @@
 }
 .contacts-search .user-card-name span {
     margin-top: -4px;
-    color: #666666;
+    color: #000000;
 }
 .contacts-search-footer em {
     display: block;

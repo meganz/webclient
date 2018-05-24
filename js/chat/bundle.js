@@ -1552,7 +1552,7 @@ React.makeElement = React['createElement'];
 
 	        $(document).rebind('mouseup.megaChatTextAreaFocus', function (e) {
 
-	            if (e.megaChatHandled) {
+	            if (e.megaChatHandled || slideshowid) {
 	                return;
 	            }
 

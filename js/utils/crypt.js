@@ -719,14 +719,7 @@ var crypt = (function() {
                     warnedFingerprint[userHandle] = {};
                 }
                 if (!warnedFingerprint[userHandle][keyType]) {
-                    // Log occurrence of this dialog.
-                    api_req({
-                        a: 'log',
-                        e: 99606,
-                        m: 'Fingerprint dialog shown to user for key ' + keyType + ' for user ' + userHandle
-                    });
                     mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
-                    warnedFingerprint[userHandle][keyType] = 1;
                 }
             });
         }

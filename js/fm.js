@@ -3160,6 +3160,7 @@ function fingerprintDialog(userid) {
         $('.fm-dialog-close', $dialog).unbind('click');
         $('.dialog-approve-button').unbind('click');
         $('.dialog-skip-button').unbind('click');
+        mega.ui.CredentialsWarningDialog.rendernext();
     };
 
     $dialog.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));

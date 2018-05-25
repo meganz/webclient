@@ -129,7 +129,7 @@ $(document).ready(function() {
 </script>
 </head>
 
-<body id="bodyel" class="logged rk-saved fontsize2 en free">
+<body id="bodyel" class="logged rk-saved fontsize2 en free font-user-management">
 
 <div id="fmholder" class="fmholder" style="display: block;">
 	<div class="main-blur-block">
@@ -213,12 +213,12 @@ $(document).ready(function() {
                     <div class="sorting-menu-arrow"></div>
                     <p> SORT </p>
 
-                    <div class="sorting-menu-item-user-managment">
+                    <div class="sorting-menu-item-user-management">
                     	<div class="user-management-sort-name sort-icon"></div>
                     	<span>Name</span>
                     	<div class="up-arrow-icon"></div>
                     </div>
-                    <div class="sorting-menu-item-user-managment">
+                    <div class="sorting-menu-item-user-management">
                     	<div class="user-management-sort-status sort-icon"></div>
                     	<span>Status</span>
                     </div>
@@ -343,7 +343,7 @@ $(document).ready(function() {
                     <table class="grid-table-user-management" width="100%" cellspacing="0" cellpadding="0" border="0">
 	                      	<tr class="grid-table-header-user-management">
 			                    <th>  
-		                    		<div class="checkdiv left checkboxOn small-user-management">
+		                    		<div class="checkdiv left checkboxOff-user-management small-user-management">
                                 	</div>
 			                    </th>
 			                    <th> <div class="arrow name desc">Name</div> </th>
@@ -357,13 +357,14 @@ $(document).ready(function() {
 
 	                        <tr>
 			                    <td>  
-		                    		<div class="checkdiv left checkboxOff small-user-management">
+		                    		<div class="checkdiv left checkboxOff-user-management small-user-management">
                                 	</div>
 			                    </td>
 			                    <td>			                    	
 	                                <div class="fm-user-management-user">
-	                                	<div class="admin-icon"></div>
-	                                	<div class="tooltip">Sub – administrators</div>	
+	                                	<div class="admin-icon">
+	                                		<div class="tooltip">Sub – administrators</div>
+	                                	</div>	                                		
 	                                    <span>Jay Pierce</span>
 	                                </div>
 	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
@@ -383,7 +384,7 @@ $(document).ready(function() {
 
 	                        <tr>
 			                    <td>  
-		                    		<div class="checkdiv left checkboxOn small-user-management">
+		                    		<div class="checkdiv left checkboxOn-user-management small-user-management">
                                 	</div>
 			                    </td>
 			                    <td>			                    	
@@ -405,6 +406,32 @@ $(document).ready(function() {
 			                    	<div class="view-icon icon"></div>  	
 			                    </td>
                        		</tr>
+
+                       		<tr>
+			                    <td>  
+		                    		<div class="checkdiv left checkboxOff-user-management small-user-management">
+                                	</div>
+			                    </td>
+			                    <td>			                    	
+	                                <div class="fm-user-management-user">
+	                                	<div class="admin-icon" style="visibility: hidden;"></div>	
+	                                    <span>I shouldn't be here</span>
+	                                </div>
+	                                <div class="user-management-email">only to show the disabled status<div> 
+			                    </td>
+			                    <td>
+			                    	<div class="user-management-status disable"></div>
+			                    	<span>Disable</span>
+			                	</td>
+			                    <td><span>0.8 GB</span></td>
+			                    <td><span>0.8 GB</span></td>
+			                    <td>
+			                    	<div class="disable-icon icon"></div>
+			                    	<div class="edit-icon icon"></div>
+			                    	<div class="view-icon icon"></div>  	
+			                    </td>
+                       		</tr>
+
                     </table>
                     
                     </div>

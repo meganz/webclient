@@ -23905,24 +23905,23 @@ opacity: 1;
     display: none !important /* I will remove important later */;
 }
 
+
+
+
 /* codes for user-management */
-.checkboxOn.small-user-management, .checkboxOff.small-user-management{
+
+.font-user-management, .font-user-management td, .font-user-management th{
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+
+.grid-table-user-management tr .small-user-management{
     width: 12px;
     height: 12px;
     margin: 6px 0px;
-}
-
-.checkboxOn.small-user-management::before, .checkboxOff.small-user-management::before {
-    background-position: 0px -2381px;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
-    background-repeat: no-repeat;
-    background-size: 48px 2406px;
-    position: absolute;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    width: 100%;
-    height: 100%;
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
@@ -23930,16 +23929,39 @@ opacity: 1;
     content: "";
 }
 
-.checkboxOn.small-user-management::before {
+.grid-table-user-management tr:not(:first-child) .small-user-management{
+    margin:15px 0 37px 0;
+}
+
+.checkboxOn-user-management.small-user-management::before, .checkboxOff-user-management.small-user-management::before {
+    background-position: 0px -2381px;
+    background-image: url(../images/mega/top-login-sprite_v9.png);
+    background-repeat: no-repeat;
+    background-size: 48px 2406px;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    display: block;
+    content: "";
+}
+
+
+.checkboxOn-user-management.small-user-management::before {
     opacity: 1;
 }
 
-.checkboxOff.small-user-management::before {
+.checkboxOff-user-management.small-user-management::before {
     opacity: 0;
     transition: 0.1s;
 }
 
-.checkboxOff.small-user-management:hover::before {
+.checkboxOff-user-management.small-user-management:hover::before {
     opacity: 0.3;
 }
 
@@ -24325,7 +24347,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding-right: 12px;
 }
 
-.grid-table-user-management th .disable-icon {
+.grid-table-user-management th .disable-icon, .grid-table-user-management th .enable-icon {
     padding-right: 0px;
 }
 
@@ -24410,7 +24432,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     font-size: 13px;   
 }
 
-.grid-table-user-management tr td .fm-user-management-user .admin-icon{
+.grid-table-user-management .admin-icon{
     width:16px;
     height: 18px;
     background-position: -28px -12060px;
@@ -24418,10 +24440,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-repeat: no-repeat;
     padding-right: 8px;
     float: left;
-    z-index: 11;
+    z-index: 1130;
 }
 
-.tooltip{
+.fm-user-management-user .tooltip{
     height: 24px;
     padding: 0 8px;
     background-color: rgba(0,0,0,0.8);
@@ -24436,28 +24458,29 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     white-space: nowrap;
     left: 16px;
     top:-3px;
-    -webkit-transition: left 200ms ease-in-out, opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-    -moz-transition: left 200ms ease-in-out, opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-    -o-transition: left 200ms ease-in-out, opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-    -ms-transition: left 200ms ease-in-out, opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-    transition: left 200ms ease-in-out, opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-    z-index: 10;
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -webkit-transition: left 0.2s ease-in, visibility 0.2s ease-in;
+    -moz-transition: left 0.2s ease-in, visibility 0.2s ease-in;
+    -o-transition: left 0.2s ease-in, visibility 0.2s ease-in;
+    -ms-transition: left 0.2s ease-in, visibility 0.2s ease-in;
+    transition: left 0.2s ease-in, visibility 0.2s ease-in;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=1);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
-    z-index: 1130;
-     visibility: visible;
+    z-index: 1129;
+    visibility: hidden;
 }
 
-.tooltip:hover{
-     filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+.fm-user-management-user .admin-icon:hover .tooltip{
+    visibility: visible;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
     left: 24px;
-    visibility: visible;
 }
+
+
 
 
 .user-management-overview-bar{
@@ -24709,7 +24732,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 
 
 /* dont copy all of them */
-.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-transfers-header::after, .grid-table-header::after, .grid-table-header-user-management::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-widget-head::after, .fm-account-history .grey-bar::after, .fm-account-widget .grey-bar::after, .fm-account-history hr::after, .fm-account-widget hr::after, .fm-account-reseller hr::after, .user-management-border::after{
+.grid-table-header-user-management::after, .user-management-border::after{
     content: '';
     width: 100%;
     height: 1px;
@@ -24719,19 +24742,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: absolute;
 }
 
-.online .nw-contact-status, .online .properties-contact-status, .enabled.user-management-status{
+.enabled.user-management-status{
     background-color: #13E03C;
 }
 
-.away .nw-contact-status, .away .properties-contact-status, .pending.user-management-status{
+.pending.user-management-status{
     background-color: #FFA500;
 }
 
-.black .nw-contact-status, .black .properties-contact-status, .disable.user-management-status {
+.disable.user-management-status {
     background-color: black;
 }
 
-.grid-table td, .grid-table-header, .grid-table-user-management{
+.grid-table-user-management{
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -24754,24 +24777,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(0,0,0,0);
 }
 
-.fm-tree-panel .nw-contact-item:hover, .fm-tree-panel .nw-user-management-item:hover {
+.fm-tree-panel .nw-user-management-item:hover {
     background-color: rgba(119,119,119,0.3);
     color: white;
 }
-.fm-tree-panel .nw-contact-item.selected, .fm-tree-panel .nw-user-management-item.selected {
+.fm-tree-panel .nw-user-management-item.selected {
     background-color: rgba(119,119,119,0.5);
     color: white;
 }
 
-.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name, .nw-user-management-item:hover .nw-user-management-name, .nw-user-management-item.selected .nw-user-management-name {
+.nw-user-management-item:hover .nw-user-management-name, .nw-user-management-item.selected .nw-user-management-name {
     color: white;
 }
 
-.cloud-drive .nw-fm-tree-header.cloud-drive, .folder-link .nw-fm-tree-header.folder-link, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account, .dashboard .nw-fm-tree-header.dashboard, .user-management .nw-fm-tree-header.user-management {
+.user-management .nw-fm-tree-header.user-management {
     display: block;
 }
 
-.fm-right-files-block th::after, .account.tab-content th::after, .transfer-table-wrapper th::after, .grid-table-header th::after, .grid-table-header-user-management th:not(:first-child)::after {
+.grid-table-header-user-management th:not(:first-child)::after {
     content: '';
     position: absolute;
     right: 0;
@@ -24781,14 +24804,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(0,0,0,0.1);
 }
 
-.grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-table.user-management tr:nth-child(even), .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td, .contact-requests-grid tr:nth-child(odd) td, .sent-requests-grid tr:nth-child(odd) td {
+.grid-table.user-management tr:nth-child(even) {
     background-color: rgba(250,250,250,1);
 }
-.fm-account-main .grid-table tr:nth-child(odd) td, .grid-table-user-management tr:nth-child(odd) td, .fm-account-main .grid-table, .grid-table.user-management tr:nth-child(odd) {
+.grid-table-user-management tr:nth-child(odd) td, .grid-table.user-management tr:nth-child(odd) {
     background-color: white;
 }
 
-.fm-right-files-block, .fm-right-files-block-user-management {
+.fm-right-files-block-user-management {
     height: 100%;
     height: -webkit-calc(100% - 36px);
     height: -moz-calc(100% - 36px);
@@ -24796,25 +24819,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: relative;
 }
 
-.fm-files-view-icon.listing-view, .fm-contacts-view-icon.listing-view, .fm-files-view-icon-user-management.listing-view {
+.fm-files-view-icon-user-management.listing-view {
     background-position: -6px -1335px;
 }
 
-.fm-files-view-icon.listing-view:hover, .fm-contacts-view-icon.listing-view:hover, .fm-files-view-icon.block-view:hover, .fm-contacts-view-icon.block-view:hover, .fm-files-view-icon-user-management.block-view:hover, .fm-files-view-icon-user-management.listing-view:hover {
+.fm-files-view-icon-user-management.listing-view:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);
     -moz-opacity: 0.4;
     -khtml-opacity: 0.4;
     opacity: 0.4;
 }
 
-.fm-files-view-icon.listing-view.active, .fm-contacts-view-icon.listing-view.active, .fm-files-view-icon.block-view.active, .fm-contacts-view-icon.block-view.active, .fm-files-view-icon-user-management.block-view.active, .fm-files-view-icon-user-management.listing-view.active {
+.fm-files-view-icon-user-management.block-view.active, .fm-files-view-icon-user-management.listing-view.active {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
     -moz-opacity: 0.7;
     -khtml-opacity: 0.7;
     opacity: 0.7;
 }
 
-.fm-files-view-icon.listing-view.inactive, .fm-contacts-view-icon.listing-view.inactive, .fm-files-view-icon.block-view.inactive, .fm-contacts-view-icon.block-view.inactive, .fm-files-view-icon-user-management.block-view.inactive, .fm-files-view-icon-user-management.listing-view.inactive {
+.fm-files-view-icon-user-management.block-view.inactive, .fm-files-view-icon-user-management.listing-view.inactive {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
     -moz-opacity: 0.05;
     -khtml-opacity: 0.05;

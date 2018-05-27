@@ -24148,7 +24148,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: relative;
 }
 
-.fm-header-buttons-user-management {
+.right-header-user-management-main-page {
     position: absolute;
     top: 0;
     right: 0;
@@ -24162,7 +24162,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     cursor: pointer;
 }
 
-.fm-header-buttons-user-management .default-white-button {
+.right-header-user-management-main-page .default-white-button {
     position: relative;
     width:130px;
     height: 28px;
@@ -24176,17 +24176,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     float: right;
 }
 
-.fm-header-buttons-user-management .default-white-button:hover{
+.right-header-user-management-main-page .default-white-button:hover{
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
     transition: 0.1s;
 }
 
-.fm-header-buttons-user-management .default-green-button:hover{
+.right-header-user-management-main-page .default-green-button:hover{
     box-shadow: 0px 0px 0px 4px rgba(0,100,87,0.2);
     transition: 0.1s;
 }
 
-.fm-header-buttons-user-management .default-green-button {
+.right-header-user-management-main-page .default-green-button {
     position: relative;
     width:130px;
     height: 28px;
@@ -24200,7 +24200,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     float: right;
 }
 
-.fm-header-buttons-user-management .default-white-button span {
+.right-header-user-management-main-page .default-white-button span {
     position: absolute;
     top: 0px;
     left: 48px;
@@ -24210,7 +24210,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width:60px;
 }
 
-.fm-header-buttons-user-management .default-white-button>div, .fm-header-buttons-user-management .default-green-button>div{
+.right-header-user-management-main-page .default-white-button>div, .right-header-user-management-main-page .default-green-button>div{
     width: 24px;
     height: 24px;
     margin:1px 8px 1px 16px;
@@ -24221,19 +24221,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-repeat: no-repeat;
 }
  
-.fm-header-buttons-user-management .default-white-button .overview-img {
+.right-header-user-management-main-page .default-white-button .overview-img {
     background-position: 0px -12033px;
 }
 
-.fm-header-buttons-user-management .default-white-button .account-img {
+.right-header-user-management-main-page .default-white-button .account-img {
     background-position: -24px -12033px;
 }
 
-.fm-header-buttons-user-management .default-green-button .add-users-img {
+.right-header-user-management-main-page .default-green-button .add-users-img {
     background-position: 0 -12057px;
 }
 
-.fm-header-buttons-user-management .default-green-button span {
+.right-header-user-management-main-page .default-green-button span {
     position: absolute;
     top: 0px;
     left: 48px;
@@ -24347,6 +24347,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding-right: 12px;
 }
 
+.grid-table-user-management .enable-icon{
+    background-position: -24px -12291px;
+    padding-right: 12px;
+}
+
+.grid-table-user-management .immigrate-icon{
+    background-position: -0px -12291px;
+}
+
 .grid-table-user-management th .disable-icon, .grid-table-user-management th .enable-icon {
     padding-right: 0px;
 }
@@ -24432,7 +24441,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     font-size: 13px;   
 }
 
-.grid-table-user-management .admin-icon{
+.grid-table-user-management .fm-user-management-user .admin-icon{
     width:16px;
     height: 18px;
     background-position: -28px -12060px;
@@ -24441,6 +24450,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding-right: 8px;
     float: left;
     z-index: 1130;
+    visibility: hidden;
+}
+
+.grid-table-user-management tr:nth-child(2) .admin-icon{
+    visibility: visible;
 }
 
 .fm-user-management-user .tooltip{
@@ -24722,16 +24736,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 
 
-@media only screen and (max-width: 1024px) {
-    .user-management-overview-bar-data .info-block .icon {
-        display: none;
-    }
-}
-
-
-
-
-/* dont copy all of them */
 .grid-table-header-user-management::after, .user-management-border::after{
     content: '';
     width: 100%;
@@ -24817,6 +24821,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: -moz-calc(100% - 36px);
     height: calc(100% - 36px);
     position: relative;
+    margin-left: 304px;
 }
 
 .fm-files-view-icon-user-management.listing-view {
@@ -24844,3 +24849,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     opacity: 0.05;
     cursor: default;
 }
+
+@media only screen and (max-width: 1070px) {
+    .user-management-overview-bar-data .info-block .icon {
+        display: none;
+    }
+}
+
+

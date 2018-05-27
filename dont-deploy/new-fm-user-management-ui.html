@@ -131,7 +131,7 @@ $(document).ready(function() {
 
 <body id="bodyel" class="logged rk-saved fontsize2 en free font-user-management">
 
-<div id="fmholder" class="fmholder" style="display: block;">
+<div id="fmholder" class="fmholder">
 	<div class="main-blur-block">
 		<div class="fm-main default">
 		 	<div class="nw-fm-left-icons-panel">
@@ -205,7 +205,7 @@ $(document).ready(function() {
 	            </div>
 		 	</div>
 
-		 	<div class="fm-left-panel ui-resizable user-management-panel" style="width:256px">
+		 	<div class="fm-left-panel ui-resizable user-management-panel">
 
             	<div class="left-pane-drag-handle ui-resizable-handle ui-resizable-e"></div>
            
@@ -242,7 +242,7 @@ $(document).ready(function() {
 	                	<div class="jspPane" style="padding: 0px; top: 0px; left: 0px; width: 272px;">
 
 			            	<div class="content-panel user-management active">
-			                    <div class="nw-user-management-item">
+			                    <div class="nw-user-management-item selected">
 			                        <div class="user-management-status enabled"></div>
 			                        <div class="nw-user-management-name">Jay Pierce</div>
 			                    </div>
@@ -250,7 +250,7 @@ $(document).ready(function() {
 			                        <div class="user-management-status pending"></div>
 			                        <div class="nw-user-management-name">Ollie Gibson</div>
 			                    </div>
-			                    <div class="nw-user-management-item selected">
+			                    <div class="nw-user-management-item">
 			                        <div class="user-management-status enabled"></div>
 			                        <div class="nw-user-management-name">John Bailey</div>
 			                    </div>
@@ -290,9 +290,10 @@ $(document).ready(function() {
 		 	<div class="top-head user-management-border">
 			</div>
 
-			<div class="fm-right-files-block-user-management" style="margin-left: 304px">
+			<div class="fm-right-files-block-user-management">
+
 				<div class="fm-right-header-user-management fm">
-					<div class="fm-header-buttons-user-management">
+					<div class="right-header-user-management-main-page hidden">
 						<a class="fm-files-view-icon-user-management block-view" title="Thumbnail view"></a>
 						<a class="fm-files-view-icon-user-management listing-view active" title="List view"></a>
 						<div class="default-white-button">
@@ -309,6 +310,11 @@ $(document).ready(function() {
 							<div class="add-users-img"></div>
 							<span>Add Users</span>
 						</div>
+                    </div>
+
+                    <div class="right-header-user-management-view">
+
+                    	
                     </div>
 				</div>
 
@@ -389,7 +395,7 @@ $(document).ready(function() {
 			                    </td>
 			                    <td>			                    	
 	                                <div class="fm-user-management-user">
-	                                	<div class="admin-icon" style="visibility: hidden;"></div>	
+	                                	<div class="admin-icon"></div>	
 	                                    <span>Jay Pierce</span>
 	                                </div>
 	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
@@ -414,7 +420,7 @@ $(document).ready(function() {
 			                    </td>
 			                    <td>			                    	
 	                                <div class="fm-user-management-user">
-	                                	<div class="admin-icon" style="visibility: hidden;"></div>	
+	                                	<div class="admin-icon"></div>	
 	                                    <span>I shouldn't be here</span>
 	                                </div>
 	                                <div class="user-management-email">only to show the disabled status<div> 
@@ -426,8 +432,8 @@ $(document).ready(function() {
 			                    <td><span>0.8 GB</span></td>
 			                    <td><span>0.8 GB</span></td>
 			                    <td>
-			                    	<div class="disable-icon icon"></div>
-			                    	<div class="edit-icon icon"></div>
+			                    	<div class="enable-icon icon"></div>
+			                    	<div class="immigrate-icon icon"></div>
 			                    	<div class="view-icon icon"></div>  	
 			                    </td>
                        		</tr>

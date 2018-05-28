@@ -11,7 +11,8 @@ MegaData.prototype.reset = function() {
     this.tree = Object.create(null);
     this.c.shares = Object.create(null);
     this.c.contacts = Object.create(null);
-
+    delete this.isBusinessAccountMaster;
+    this.suba = Object.create(null);
     if (typeof MegaDataMap !== 'undefined') {
         this.u = new MegaDataMap();
         this.u.addChangeListener(function() {

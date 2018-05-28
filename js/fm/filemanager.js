@@ -589,16 +589,17 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
             fmTabState = {
-                'cloud-drive':     {root: M.RootID,    prev: null},
-                'folder-link':     {root: M.RootID,    prev: null},
-                'shared-with-me':  {root: 'shares',    prev: null},
-                'conversations':   {root: 'chat',      prev: null},
-                'contacts':        {root: 'contacts',  prev: null},
-                'transfers':       {root: 'transfers', prev: null},
-                'account':         {root: 'account',   prev: null},
-                'dashboard':       {root: 'dashboard', prev: null},
-                'inbox':           {root: M.InboxID,   prev: null},
-                'rubbish-bin':     {root: M.RubbishID, prev: null}
+                'cloud-drive':          {root: M.RootID,    prev: null},
+                'folder-link':          {root: M.RootID,    prev: null},
+                'shared-with-me':       {root: 'shares',    prev: null},
+                'conversations':        {root: 'chat',      prev: null},
+                'contacts':             {root: 'contacts',  prev: null},
+                'transfers':            {root: 'transfers', prev: null},
+                'account':              {root: 'account',   prev: null},
+                'dashboard':            {root: 'dashboard', prev: null},
+                'inbox':                {root: M.InboxID,   prev: null},
+                'rubbish-bin':          {root: M.RubbishID, prev: null},
+                'user-management':      {root: 'user-management', prev: null}
             };
         }
 
@@ -3041,6 +3042,9 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     }
     else if (id_r === 'opc') {
         this.onSectionUIOpen('opc');
+    }
+    else if (id_r === 'user-management') {
+        this.onSectionUIOpen('user-management');
     }
     else if (id_r === 'account') {
         this.onSectionUIOpen('account');

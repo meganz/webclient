@@ -2620,10 +2620,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 if (n) {
                     if (max > i) {
                         html.push(
-                            '<div class="transfer-filetype-icon '
-                            + fileIcon(n) + ' tranfer-filetype-txt dragger-entry">'
-                            + str_mtrunc(htmlentities(n.name))
-                            + '</div>'
+                            '<div class="transfer-filetype-icon ' + fileIcon(n) + '"></div>' +
+                            '<div class="tranfer-filetype-txt dragger-entry">' +
+                            str_mtrunc(htmlentities(n.name)) + '</div>'
                         );
                     }
                 }
@@ -2833,9 +2832,9 @@ FileManager.prototype.addTreeUI = function() {
                 }
                 if (id && M.d[id]) {
                     html = (
-                        '<div class="transfer-filetype-icon '
-                        + fileIcon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">'
-                        + str_mtrunc(htmlentities(M.d[id].name)) + '</div>'
+                        '<div class="transfer-filetype-icon ' + fileIcon(M.d[id]) + '"></div>' +
+                        '<div class="tranfer-filetype-txt dragger-entry">' +
+                        str_mtrunc(htmlentities(M.d[id].name)) + '</div>'
                     );
                 }
                 $('#draghelper .dragger-icon').remove();

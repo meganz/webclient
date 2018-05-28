@@ -13,6 +13,7 @@ function BusinessAccount() {
  * @returns {Promise}        Resolves with new add user HANDLE
  */
 BusinessAccount.prototype.addSubAccount = function _addSubAccount(subEmail, subFName, subLName) {
+    "use strict";
     var operationPromise = new MegaPromise();
     if (checkMail(subEmail)) {
         // promise reject/resolve will return: success,errorCode,errorDesc
@@ -55,6 +56,7 @@ BusinessAccount.prototype.addSubAccount = function _addSubAccount(subEmail, subF
  * @returns {Promise}               Resolves deactivate opertation result
  */
 BusinessAccount.prototype.deActivateSubAccount = function _deActivateSubAccount(subUserHandle) {
+    "use strict";
     var operationPromise = new MegaPromise();
     if (!subUserHandle || subUserHandle.length !== 11) {
         return operationPromise.reject(0, 5, 'invalid U_HANDLE');
@@ -91,6 +93,7 @@ BusinessAccount.prototype.deActivateSubAccount = function _deActivateSubAccount(
  * @returns {Promise}               Resolves activate opertation result
  */
 BusinessAccount.prototype.activateSubAccount = function _activateSubAccount(subUserHandle) {
+    "use strict";
     var operationPromise = new MegaPromise();
     if (!subUserHandle || subUserHandle.length !== 11) {
         return operationPromise.reject(0, 5, 'invalid U_HANDLE');
@@ -127,6 +130,7 @@ BusinessAccount.prototype.activateSubAccount = function _activateSubAccount(subU
  * @returns {Promise}               Resolves opertation result
  */
 BusinessAccount.prototype.getSubAccountMKey = function _getSubAccountMKey(subUserHandle) {
+    "use strict";
     var operationPromise = new MegaPromise();
     if (!subUserHandle || subUserHandle.length !== 11) {
         return operationPromise.reject(0, 5, 'invalid U_HANDLE');
@@ -153,4 +157,32 @@ BusinessAccount.prototype.getSubAccountMKey = function _getSubAccountMKey(subUse
     });
 
     return operationPromise;
+};
+
+/**
+ * a function to parse the JSON object recived holding information about a sub-account of a business account.
+ * @param {string} suba    the object to parse, it must contain a sub-account ids
+ * @param {boolean} ignoreDB if we want to skip DB updating
+ */
+BusinessAccount.prototype.parseSUBA = function _parseSUBA(suba, ignoreDB) {
+    "use strict";
+    if (!suba) {
+        return;
+    }
+    if (M) {
+        M.isBusinessAccountMaster = 1; // init it, or re-set it
+        if (!M.suba) {
+            M.suba = [];
+        }
+        M.suba[suba.u] = suba;
+        /**
+         * SUBA object:
+         *      -u: handle
+         *      -p: parent {for future multilevel business accounts}
+         *      -s: status {10=pending confirmation , 11:disabled, 12:deleted, 0:enabled and ok}
+         */
+    }
+    if (fmdb && !ignoreDB && !pfkey && !folderlink) {
+        fmdb.add('sub_accounts', { s_ac: suba.u, d: suba });
+    }
 };

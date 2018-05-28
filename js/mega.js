@@ -1884,6 +1884,7 @@ function loadfm(force) {
                     u      : '&u',             // users - handle
                     ph     : '&h',             // exported links - handle
                     tree   : '&h',             // tree folders - handle
+                    sub_accounts: '&s_ac',     // sub_accounts of master business account
                     opc    : '&p',             // outgoing pending contact - id
                     ipc    : '&p',             // incoming pending contact - id
                     ps     : '&h_p',           // pending share - handle/id
@@ -2817,6 +2818,16 @@ function process_u(u, ignoreDB) {
     /*if (M.currentdirid === 'dashboard') {
         delay('dashboard:updcontacts', dashboardUI.updateContactsWidget);
      }*/
+}
+
+/**
+ * a function to parse the JSON object recived holding information about sub-accounts of a business account.
+ * This object will exist only in business accounts.
+ * @param {string[]} suba    the object to parse, it must contain an array of sub-accounts ids (can be empty)
+ * @param {boolean} ignoreDB if we want to skip DB updating
+ */
+function process_suba(suba, ignoreDB) {
+
 }
 
 function process_ok(ok, ignoreDB) {

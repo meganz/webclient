@@ -589,16 +589,17 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
             fmTabState = {
-                'cloud-drive':     {root: M.RootID,    prev: null},
-                'folder-link':     {root: M.RootID,    prev: null},
-                'shared-with-me':  {root: 'shares',    prev: null},
-                'conversations':   {root: 'chat',      prev: null},
-                'contacts':        {root: 'contacts',  prev: null},
-                'transfers':       {root: 'transfers', prev: null},
-                'account':         {root: 'account',   prev: null},
-                'dashboard':       {root: 'dashboard', prev: null},
-                'inbox':           {root: M.InboxID,   prev: null},
-                'rubbish-bin':     {root: M.RubbishID, prev: null}
+                'cloud-drive':          {root: M.RootID,    prev: null},
+                'folder-link':          {root: M.RootID,    prev: null},
+                'shared-with-me':       {root: 'shares',    prev: null},
+                'conversations':        {root: 'chat',      prev: null},
+                'contacts':             {root: 'contacts',  prev: null},
+                'transfers':            {root: 'transfers', prev: null},
+                'account':              {root: 'account',   prev: null},
+                'dashboard':            {root: 'dashboard', prev: null},
+                'inbox':                {root: M.InboxID,   prev: null},
+                'rubbish-bin':          {root: M.RubbishID, prev: null},
+                'business-user-mng':    {root: 'b-usr-mng', prev: null}
             };
         }
 

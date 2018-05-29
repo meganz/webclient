@@ -307,6 +307,9 @@
         else if (id === 'ipc') {
             id = 'ipc';
         }
+        else if (id === 'user-management') {
+            id = 'user-management'; // dummy assignment, needed to exit if-else!
+        }
         else if (id === 'shares') {
             id = 'shares';
         }

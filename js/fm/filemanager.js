@@ -599,7 +599,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 'dashboard':            {root: 'dashboard', prev: null},
                 'inbox':                {root: M.InboxID,   prev: null},
                 'rubbish-bin':          {root: M.RubbishID, prev: null},
-                'business-user-mng':    {root: 'b-usr-mng', prev: null}
+                'user-management':      {root: 'user-management', prev: null}
             };
         }
 

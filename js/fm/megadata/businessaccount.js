@@ -166,15 +166,27 @@ BusinessAccount.prototype.getSubAccountMKey = function _getSubAccountMKey(subUse
  */
 BusinessAccount.prototype.parseSUBA = function _parseSUBA(suba, ignoreDB) {
     "use strict";
-    if (!suba) {
-        return;
-    }
     if (M) {
         M.isBusinessAccountMaster = 1; // init it, or re-set it
+
+        if (mega.config.get('isBusinessMasterAcc') !== '1') {
+            mega.config.set('isBusinessMasterAcc', '1');
+            // i used config to store user type (if he's a master business account). because this was
+            // the only possible way considering that API team [Jon] decided to provide user status 
+            // in a:f [get user tree] response in [suba] array, and to deduce the type of the user by 
+            // the existance of this array!
+            // the problem is when we load using our local DB, we cant tell if the empty "sub account" table we have
+            // is to due to non-master-business account, or due to a master account without sub-accounts yet.
+            // The applied solution by API is ineffecient. 
+            // --> the applied soultion is not logical [storing user type in configuration]
+        }
+        if (!suba) {
+            return;
+        }
         if (!M.suba) {
             M.suba = [];
         }
-        M.suba[suba.u] = suba;
+        M.suba[suba.u] = suba; // i will keep deleted in sub-accounts in DB and MEM as long as i recieve them
         /**
          * SUBA object:
          *      -u: handle
@@ -183,6 +195,6 @@ BusinessAccount.prototype.parseSUBA = function _parseSUBA(suba, ignoreDB) {
          */
     }
     if (fmdb && !ignoreDB && !pfkey && !folderlink) {
-        fmdb.add('sub_accounts', { s_ac: suba.u, d: suba });
+        fmdb.add('suba', { s_ac: suba.u, d: suba });
     }
 };

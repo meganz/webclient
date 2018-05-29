@@ -266,7 +266,7 @@ function accountUI() {
         });
 
         // Upgrade Account Button
-        $('.default-white-button.upgrade-to-pro').rebind('click', function() {
+        $('.upgrade-to-pro').rebind('click', function() {
             loadSubPage('pro');
         });
 
@@ -1326,13 +1326,61 @@ function accountUI() {
 
         $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
         var i = 13;
-        if (fmconfig.rubsched) {
+        if (u_attr.flags.ssrs > 0) {
+            var value = 90; // days
+            $('.rubsched-options').removeClass('hidden');
+
+            // non-pro users cannot disable it
+            if (!u_attr.p) {
+                value = 30; // days
+            }
+            $('.rubschedopt-none').addClass('hidden');
+
+            if (M.account.ssrs !== undefined) {
+                value = M.account.ssrs;
+            }
+            i = 14;
+            $('#rad' + i + '_opt').val(value);
+            $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+            $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+            i = value ? 12 : 13;
+        }
+        else if (fmconfig.rubsched) {
             i = 12;
-            $('#rubsched_options').removeClass('hidden');
+            $('.rubsched-options').removeClass('hidden');
             var opt = String(fmconfig.rubsched).split(':');
             $('#rad' + opt[0] + '_opt').val(opt[1]);
             $('#rad' + opt[0] + '_div').removeClass('radioOff').addClass('radioOn');
             $('#rad' + opt[0]).removeClass('radioOff').addClass('radioOn');
+        }
+        if (!u_attr.p) {
+            // hide on/off switches
+            $('.pro-rubsched-options').addClass('hidden');
+        }
+        else {
+            // show on/off switches
+            $('.pro-rubsched-options').removeClass('hidden');
+
+            $('.rubsched input').rebind('click', function(e) {
+                var id = $(this).attr('id');
+                if (id == 'rad13') {
+                    mega.config.setn('rubsched', 0);
+                    $('.rubsched-options').addClass('hidden');
+                }
+                else if (id == 'rad12') {
+                    $('.rubsched-options').removeClass('hidden');
+                    if (!fmconfig.rubsched) {
+                        mega.config.setn('rubsched', "14:15");
+                        var defOption = 14;
+                        $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
+                        $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
+                    }
+                }
+                $('.rubsched').removeClass('radioOn').addClass('radioOff');
+                $(this).addClass('radioOn').removeClass('radioOff');
+                $(this).parent().addClass('radioOn').removeClass('radioOff');
+                initAccountScroll(1);
+            });
         }
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
@@ -1345,31 +1393,32 @@ function accountUI() {
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             initAccountScroll(1);
         });
-        $('.rubsched_textopt').rebind('click keyup', function(e) {
+        $('.rubsched_textopt').rebind('click blur keypress', function(e) {
+            var val = parseInt($(this).val());
+            var minVal = 7;
+            var maxVal = 30;
+
+            // Do not save value until user leave input or click Enter button
+            if(e.which && e.which !== 13) {
+                return;
+            }
+
+            if (val === 0) {
+                $('.rubsched input').trigger("click");
+            }
+            else if (!val || (val < minVal && val !== 0)) {
+                $(this).val(minVal);
+                val = minVal;
+            }
+            else if (!u_attr.p && val > maxVal) {
+                $(this).val(maxVal);
+                val = maxVal;
+            }
+
             var id = String($(this).attr('id')).split('_')[0];
             $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
             $('#' + id + ',#' + id + '_div').addClass('radioOn').removeClass('radioOff');
-            mega.config.setn('rubsched', id.substr(3) + ':' + $(this).val());
-            initAccountScroll(1);
-        });
-        $('.rubsched input').rebind('click', function(e) {
-            var id = $(this).attr('id');
-            if (id == 'rad13') {
-                mega.config.setn('rubsched', 0);
-                $('#rubsched_options').addClass('hidden');
-            }
-            else if (id == 'rad12') {
-                $('#rubsched_options').removeClass('hidden');
-                if (!fmconfig.rubsched) {
-                    mega.config.setn('rubsched', "14:15");
-                    var defOption = 14;
-                    $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
-                    $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
-                }
-            }
-            $('.rubsched').removeClass('radioOn').addClass('radioOff');
-            $(this).addClass('radioOn').removeClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            mega.config.setn('rubsched', id.substr(3) + ':' + val);
             initAccountScroll(1);
         });
 

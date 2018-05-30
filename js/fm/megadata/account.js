@@ -76,6 +76,15 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             }
         });
 
+        api_req({a: 'uga', u: u_handle, ua: '^!rubbishtime', v: 1}, {
+            account: account,
+            callback: function(res, ctx) {
+                if (typeof res === 'object') {
+                    ctx.account.ssrs = base64urldecode(String(res.av || res)) | 0;
+                }
+            }
+        });
+
         api_req({a: 'utt'}, {
             account: account,
             callback: function(res, ctx) {

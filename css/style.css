@@ -11334,7 +11334,7 @@ table {
     margin: 7px 0 0 0;
     max-width: 100%;
 }
-.button.upgrade-account, .button.upgrade-to-pro {
+.button.upgrade-account, .button.upgrade-to-pro:not(.rubschedt) {
     text-transform: capitalize;
 }
 .account.left-pane .default-grey-button {
@@ -23974,7 +23974,7 @@ opacity: 1;
     padding: 8px;
     margin: 0 0 16px 0;
 }
-.free .green-notification.body {
+.free .green-notification.body:not(.hidden) {
     display: table;
 }
 .green-notification.cell {
@@ -23990,7 +23990,7 @@ opacity: 1;
     width: auto;
     padding-right: 20px;
 }
-.green-notification .sheduler {
+.green-notification .xscheduler {
     margin: 0 11px 0 3px;
 }
 .green-notification .button {

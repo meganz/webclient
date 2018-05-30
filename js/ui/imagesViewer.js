@@ -26,12 +26,12 @@ var slideshowid;
         var ii = [];
         var ci;
         var filter = function(n) {
-            return is_image(n) || is_video(n);
+            return is_image2(n) || is_video(n);
         };
 
         if (slideshowplay) {
             filter = function(n) {
-                return n.s && is_image(n) && fileext(n.name) !== 'pdf';
+                return n.s && is_image3(n);
             };
         }
 
@@ -658,7 +658,7 @@ var slideshowid;
             $controls.unbind('mousemove.idle');
 
             // Slideshow Mode Init
-            if (is_image(n) && fileext(n.name) !== 'pdf') {
+            if (is_image3(n)) {
                 slideshow_imgControls();
 
                 // Autohide controls

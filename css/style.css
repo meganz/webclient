@@ -23359,7 +23359,7 @@ opacity: 1;
 }
 .improved-recovery-steps .main-left-block .content-wrapper {
     position: relative;
-    width: 750px; 
+    width: 750px;
     min-height: 540px;
     margin-bottom: 40px;
 }
@@ -23433,10 +23433,10 @@ opacity: 1;
 }
 .improved-recovery-steps .recover-button.yes.default-grey-button::after {
     box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
-} 
+}
 .improved-recovery-steps .recover-button.yes.default-grey-button::before {
     box-shadow: 0 0 1px 0 rgba(0,0,0,0.05);
-} 
+}
 .improved-recovery-steps .recover-button.yes.default-grey-button:hover {
     background: #ff2222;
     border: 1px solid rgba(0,0,0,0.05);
@@ -23770,7 +23770,7 @@ opacity: 1;
     background-image: url(../images/mega/top-sprite_v4.png);
     background-repeat: no-repeat;
     padding-left: 66px;
-    margin: 0 -39px 0 0;     
+    margin: 0 -39px 0 0;
 }
 /* Language styles for the MEGAsync icon */
 .es .improved-recovery-steps .list-point b.megasync-logo {
@@ -23903,6 +23903,58 @@ opacity: 1;
 }
 .improved-recovery-steps .hidden {
     display: none !important /* I will remove important later */;
+}
+
+.dragger-block {
+    position: absolute;
+    z-index: 900;
+    min-height: 20px;
+    left: 200px;
+    top: 200px;
+}
+.dragger-content {
+    min-height: 20px;
+    position: absolute;
+    background-color: rgba(255,255,255,0.9);
+    border: 2px solid rgba(0,0,0,0.05);
+    border-radius: 8px;
+    padding: 7px 13px 7px 13px;
+    margin: -34px 0 0 -65px;
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+    background-clip: padding-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: auto !important;
+}
+.dragger-entry {
+    white-space: nowrap;
+    word-break: keep-all;
+    width: auto;
+    position: relative;
+    padding-top: 4px;
+    overflow: visible;
+    margin: 0;
+}
+.dragger-files-number {
+    min-width: 14px;
+    height: 14px;
+    position: absolute;
+    margin: -40px 0 0 -70px;
+    background-color: #D32200;
+    padding: 0 4px;
+    text-align: center;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    color: white;
+    font-size: 11px;
+    line-height: 13px;
+    display: none;
 }
 
 /* Account settings-rubbish bin notification */

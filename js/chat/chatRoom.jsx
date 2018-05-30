@@ -77,17 +77,11 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     self.members = {};
 
-    if (type === "private") {
-        users.forEach(function(userHandle) {
-            self.members[userHandle] = 3;
-        });
-    }
-    else {
-        users.forEach(function(userHandle) {
-            // while loading, set permissions to read only
-            self.members[userHandle] = 0;
-        });
-    }
+    users.forEach(function(userHandle) {
+        // while loading, set permissions to read only
+        self.members[userHandle] = 0;
+    });
+
     this.options = {
 
         /**

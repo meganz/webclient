@@ -1883,42 +1883,24 @@ var exportExpiry = {
 
     /**
      * Removes public link for file or folder.
-     * @param {Boolean} [quiet] No loading overlay
-     * @returns {MegaPromise}
      */
-    ExportLink.prototype.removeExportLink = function(quiet) {
-        var self = this;
-        var promises = [];
-        var handles = self.options.nodesToProcess || [];
+    ExportLink.prototype.removeExportLink = function() {
 
-        if (handles.length) {
-            if (!quiet) {
-                loadingDialog.show();
-            }
+        var self = this;
+
+        if (self.options.nodesToProcess.length) {
+            loadingDialog.show();
             self.logger.debug('removeExportLink');
 
-            $.each(handles, function(index, h) {
-                var n = M.d[h];
-
-                if (n) {
-                    if (n.t) {
-                        promises.push(self._removeFolderExportLinkRequest(h, quiet));
-                    }
-                    else {
-                        promises.push(self._removeFileExportLinkRequest(h, quiet));
-                    }
+            $.each(self.options.nodesToProcess, function(index, nodeId) {
+                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
+                    self._removeFolderExportLinkRequest(nodeId);
                 }
-                else if (d) {
-                    console.warn('removeExportLink: node not found.', h);
+                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
+                    self._removeFileExportLinkRequest(nodeId);
                 }
             });
         }
-
-        if (!promises.length) {
-            return MegaPromise.reject(EARGS);
-        }
-
-        return MegaPromise.allDone(promises);
     };
 
     /**
@@ -2035,13 +2017,10 @@ var exportExpiry = {
     /**
      * A 'Private' function, send folder delete public link request.
      * @param {String} nodeId The node ID.
-     * @param {Boolean} [quiet] No loading overlay
-     * @returns {MegaPromise}
      */
-    ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId, quiet) {
+    ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId) {
 
         var self = this;
-        var masterPromise = new MegaPromise();
 
         api_req({ a: 's2', n:  nodeId, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti }, {
             nodeId: nodeId,
@@ -2058,34 +2037,26 @@ var exportExpiry = {
                     if (is_mobile) {
                         mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
                     }
-
-                    masterPromise.resolve();
                 }
                 else {
                     // Error
                     self.logger.warn('_removeFolerExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
-                    masterPromise.reject(result);
                 }
 
-                if (!--self.nodesLeft && !quiet) {
-                    loadingDialog.phide();
+                if (!--self.nodesLeft) {
+                    loadingDialog.hide();
                 }
             }
         });
-
-        return masterPromise;
     };
 
     /**
      * A 'Private' function, send file delete public link request.
      * @param {String} nodeId The node IDs.
-     * @param {Boolean} [quiet] No loading overlay
-     * @returns {MegaPromise}
      */
-    ExportLink.prototype._removeFileExportLinkRequest = function(nodeId, quiet) {
+    ExportLink.prototype._removeFileExportLinkRequest = function(nodeId) {
 
         var self = this;
-        var promise = new MegaPromise();
 
         api_req({ a: 'l', n: nodeId, d: 1, i:requesti }, {
             nodeId: nodeId,
@@ -2102,22 +2073,17 @@ var exportExpiry = {
                     if (is_mobile) {
                         mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
                     }
-
-                    promise.resolve();
                 }
                 else {
                     // Error
                     self.logger.warn('_removeFileExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
-                    promise.reject(result);
                 }
 
-                if (!--self.nodesLeft && !quiet) {
-                    loadingDialog.phide();
+                if (!--self.nodesLeft) {
+                    loadingDialog.hide();
                 }
             }
         });
-
-        return promise;
     };
 
     /**

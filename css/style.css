@@ -23301,6 +23301,7 @@ opacity: 1;
     padding: 0 0;
     -webkit-margin-before: 0em;
     -webkit-margin-after: 0em;
+    margin: 0 0;
 }
 .improved-recovery-steps .checkbox-block h3.main-italic-header, .improved-recovery-steps .app-instruction-block h3.main-italic-header {
     padding: 0 0;
@@ -23735,6 +23736,7 @@ opacity: 1;
     -webkit-margin-start: 0;
     -webkit-margin-end: 0;
     -webkit-padding-start: 00;
+    padding: 0;
 }
 .improved-recovery-steps li.list-point:before {
     width: 23px;
@@ -23769,7 +23771,7 @@ opacity: 1;
     height: 24px;
     background-image: url(../images/mega/top-sprite_v4.png);
     background-repeat: no-repeat;
-    padding-left: 66px;
+    padding-left: 68px;
     margin: 0 -39px 0 0;     
 }
 /* Language styles for the MEGAsync icon */
@@ -23795,6 +23797,9 @@ opacity: 1;
 }
 .tr .improved-recovery-steps .list-point b.megasync-logo {
     padding-left: 68px;
+    margin: 0 -15px 0 4px;
+}
+.ru .improved-recovery-steps .list-point b.megasync-logo {
     margin: 0 -15px 0 4px;
 }
 
@@ -23883,6 +23888,7 @@ opacity: 1;
     font-size: 13px;
     color: #9a9fa2;
     line-height: 24px;
+    white-space: nowrap;
 }
 .improved-recovery-steps  .nav-back-subheading {
     display: none;

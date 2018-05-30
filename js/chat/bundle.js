@@ -11426,16 +11426,11 @@ React.makeElement = React['createElement'];
 
 	    self.members = {};
 
-	    if (type === "private") {
-	        users.forEach(function (userHandle) {
-	            self.members[userHandle] = 3;
-	        });
-	    } else {
-	        users.forEach(function (userHandle) {
+	    users.forEach(function (userHandle) {
 
-	            self.members[userHandle] = 0;
-	        });
-	    }
+	        self.members[userHandle] = 0;
+	    });
+
 	    this.options = {
 
 	        'dontResendAutomaticallyQueuedMessagesOlderThen': 1 * 60,

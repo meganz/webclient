@@ -191,7 +191,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     items['.clearprevious-versions'] = 1;
                 }
             }
-            if (is_image(selNode)) {
+            if (is_image2(selNode)) {
                 items['.preview-item'] = 1;
             }
             else {
@@ -264,6 +264,13 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     }
     else if (sourceRoot === M.RubbishID && !folderlink) {
         items['.move-item'] = 1;
+
+        for (var j = $.selected.length; j--;) {
+            if (M.getNodeByHandle($.selected[j]).rr) {
+                items['.revert-item'] = 1;
+                break;
+            }
+        }
     }
 
     if (selNode) {

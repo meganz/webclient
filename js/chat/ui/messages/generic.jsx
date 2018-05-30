@@ -1150,16 +1150,7 @@ var GenericConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
-
-                if (message.currentCallCounter) {
-                    tmpMsg += " " +
-                        textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
-                }
-                textMessage = tmpMsg;
-                textMessage = textMessage
-                    .replace("[[ ", "<span className=\"grey-color\">")
-                    .replace("]]", "</span>");
+                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage, true);
             }
             else {
                 textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));

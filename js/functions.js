@@ -2574,3 +2574,25 @@ function invalidLinkError() {
         mobile.notFoundOverlay.show();
     }
 }
+
+// https://tc39.github.io/ecma262/#sec-%typedarray%.prototype.slice
+if (!Uint8Array.prototype.slice) {
+    Object.defineProperty(Uint8Array.prototype, 'slice', {
+        value: Array.prototype.slice
+    });
+}
+
+function bytearray_to_string(a) {
+    var len = a.length;
+    var buffLen = 30000;
+    if (len > buffLen) {
+        var s = "";
+        for (var i = 0; i < len; i += buffLen) {
+            s += String.fromCharCode.apply(null, a.slice(i, i + buffLen));
+        }
+        return s;
+    }
+    else {
+        return String.fromCharCode.apply(null, a);
+    }
+}

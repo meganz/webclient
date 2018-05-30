@@ -117,17 +117,7 @@ Message._getTextContentsForDialogType = function(message) {
             );
         }
         else if (textMessage.splice) {
-            var tmpMsg = textMessage[0].replace("[X]", contactName);
-            tmpMsg = tmpMsg.replace("%s", contactName);
-
-            if (message.currentCallCounter) {
-                tmpMsg += " " +
-                    textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
-            }
-            textMessage = tmpMsg;
-            textMessage = textMessage
-                .replace("[[ ", " ")
-                .replace("]]", "");
+            textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
         }
         else {
             textMessage = textMessage.replace("[X]", contactName);

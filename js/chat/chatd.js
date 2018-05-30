@@ -472,10 +472,7 @@ Chatd.Shard.prototype.reconnect = function() {
         self.disconnect();
     }
 
-    var chatdTag = (localStorage.chatdTag ? localStorage.chatdTag : '1');
-    if (this.url.indexOf("mcd270n314") === -1) {
-        chatdTag = '1';
-    }
+    var chatdTag = (localStorage.chatdTag ? localStorage.chatdTag : '2');
     self.s = new WebSocket(this.url + '/' + chatdTag);
     self.s.binaryType = "arraybuffer";
 
@@ -1036,12 +1033,13 @@ Chatd.Shard.prototype.exec = function(a) {
 
     // TODO: find more optimised way of doing this...fromCharCode may also cause exceptions if too big array is passed
     var cmd = ab_to_str(a);
+    if (self.loggerIsEnabled) {
+        self.logger.log("recv:", Chatd.cmdToString(cmd, false));
+    }
+
     var len;
 
     while (cmd.length) {
-        if (self.loggerIsEnabled) {
-            self.logger.log("recv:", Chatd.cmdToString(cmd, false));
-        }
         var opcode = cmd.charCodeAt(0);
         switch (opcode) {
             case Chatd.Opcode.KEEPALIVE:

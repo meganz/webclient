@@ -264,6 +264,13 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     }
     else if (sourceRoot === M.RubbishID && !folderlink) {
         items['.move-item'] = 1;
+
+        for (var j = $.selected.length; j--;) {
+            if (M.getNodeByHandle($.selected[j]).rr) {
+                items['.revert-item'] = 1;
+                break;
+            }
+        }
     }
 
     if (selNode) {

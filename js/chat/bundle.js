@@ -10082,7 +10082,7 @@ React.makeElement = React['createElement'];
 	                        }
 
 	                        var icon = fileIcon(v);
-	                        var isImage = is_image(v);
+	                        var isImage = is_image2(v);
 	                        var isVideo = is_video(v) > 0;
 	                        var showThumbnail = v.fa && isImage || String(v.fa).indexOf(':0*') > 0;
 	                        var isPreviewable = isImage || isVideo;
@@ -12505,7 +12505,7 @@ React.makeElement = React['createElement'];
 	            h = n.h;
 
 	            if (data !== 0xDEAD) {
-	                if (!isThumbnail && !previews[h] && is_image(n) && fileext(n.name) !== 'pdf') {
+	                if (!isThumbnail && !previews[h] && is_image3(n)) {
 	                    preqs[h] = 1;
 	                    previewimg(h, data, 'image/jpeg');
 	                    previews[h].fromChat = Date.now();

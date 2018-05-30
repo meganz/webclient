@@ -191,7 +191,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     items['.clearprevious-versions'] = 1;
                 }
             }
-            if (is_image(selNode)) {
+            if (is_image2(selNode)) {
                 items['.preview-item'] = 1;
             }
             else {

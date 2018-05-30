@@ -1506,7 +1506,7 @@ ChatRoom.prototype._doLoadImages = function() {
             h = n.h;
 
             if (data !== 0xDEAD) {
-                if (!isThumbnail && !previews[h] && is_image(n) && fileext(n.name) !== 'pdf') {
+                if (!isThumbnail && !previews[h] && is_image3(n)) {
                     preqs[h] = 1;
                     previewimg(h, data, 'image/jpeg');
                     previews[h].fromChat = Date.now();

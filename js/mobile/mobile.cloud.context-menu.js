@@ -74,7 +74,7 @@ mobile.cloud.contextMenu = {
         }
         else {
             // If the file is previewable, show the preview button
-            if (((is_image(node) && fileext(node.name) !== 'pdf')) || (is_video(node))) {
+            if (is_image3(node) || is_video(node)) {
                 $previewButton.removeClass('hidden');
             }
             else {

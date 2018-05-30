@@ -805,8 +805,11 @@ FileManager.prototype.updFileManagerUI = function() {
         if (newNode.su) {
             newshare = true;
         }
-        if (newNode.p && newNode.t) {
+        if (newNode.p && (newNode.t || newNode.needUiUpdate)) {
             treebuild[newNode.p] = 1;
+            if (newNode.needUiUpdate) {
+                delete newNode.needUiUpdate;
+            }
         }
         if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
             UImain = true;
@@ -1147,11 +1150,6 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.advanced-item, ' + c + '.move-item').rebind('click', openMoveDialog);
 
     $(c + '.copy-item').rebind('click', openCopyDialog);
-
-    $(c + '.revert-item').rebind('click', function() {
-        loadingDialog.pshow();
-        M.revertRubbishNodes($.selected).always(loadingDialog.phide.bind(loadingDialog));
-    });
 
     $(c + '.import-item').rebind('click', function() {
         ASSERT(folderlink, 'Import needs to be used in folder links.');

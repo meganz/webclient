@@ -2267,13 +2267,13 @@
     "18667": "Errore del certificato SSL",
     "18668": "Indirizzo email non trovato, per favore riprova. Se non riesci a ricordare l'indirizzo email associato al tuo account MEGA, pulisci il campo e clicca nuovamente su Inizia per saltare questo step.",
     "18669": "Scrivi un messaggio a %s...",
-    "18678": "Do you want a longer retention period?",
-    "18679": "Enable rich URL previews",
-    "18680": "Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.",
-    "18681": "Always Allow",
-    "18682": "Not Now",
-    "18683": "Insert preview",
-    "18684": "Remove preview",
-    "18685": "The Rubbish Bin can be cleaned for you automatically. The minimum period is 7 days.",
-    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days."
+    "18678": "Vuoi un periodo di ritenzione pi\u00f9 lungo?",
+    "18679": "Attiva le anteprime arricchite degli URL",
+    "18680": "Migliora l'esperienza di MEGAchat. I contenuti URL verranno recuperati senza la criptazione end-to-end.",
+    "18681": "Permetti sempre",
+    "18682": "Non adesso",
+    "18683": "Inserisci anteprima",
+    "18684": "Rimuovi anteprima",
+    "18685": "Il Cestino pu\u00f2 essere svuotato per te automaticamente. Il periodo minimo \u00e8 di 7 giorni.",
+    "18686": "Il Cestino viene svuotato per te automaticamente. Il periodo minimo \u00e8 di 7 giorni ed il periodo massimo \u00e8 di 30 giorni."
 }

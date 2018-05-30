@@ -2267,13 +2267,13 @@
     "18667": "SSL sertifika hatas\u0131",
     "18668": "Eposta adresi bulunamad\u0131, l\u00fctfen tekrar deneyin. E\u011fer MEGA hesab\u0131n\u0131zla e\u015fle\u015ftirilmi\u015f eposta adresinizi hat\u0131rlayam\u0131yorsan\u0131z, bu ad\u0131m\u0131 ge\u00e7mek i\u00e7in giri\u015f alan\u0131n\u0131 bo\u015f b\u0131rak\u0131p yeniden ba\u015flay\u0131n.",
     "18669": "Mesaj yaz: %s...",
-    "18678": "Do you want a longer retention period?",
-    "18679": "Enable rich URL previews",
-    "18680": "Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.",
-    "18681": "Always Allow",
-    "18682": "Not Now",
-    "18683": "Insert preview",
-    "18684": "Remove preview",
-    "18685": "The Rubbish Bin can be cleaned for you automatically. The minimum period is 7 days.",
-    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days."
+    "18678": "Daha uzun saklama s\u00fcresi mi istiyorsunuz?",
+    "18679": "Zengin URL \u00f6nizlemelerini etkinle\u015ftir",
+    "18680": "MEGAchat deneyiminizi geli\u015ftirin. URL i\u00e7eri\u011fi u\u00e7tan uca \u015fifreleme olmadan al\u0131nacakt\u0131r.",
+    "18681": "Her Zaman \u0130zin Ver",
+    "18682": "\u015eimdi De\u011fil",
+    "18683": "\u00d6nizleme ekle",
+    "18684": "\u00d6nizlemeyi kald\u0131r",
+    "18685": "\u00c7\u00f6p kutusu sizin yerinize otomatik olarak temizlenebilir. Asgari s\u00fcre 7 g\u00fcnd\u00fcr.",
+    "18686": "\u00c7\u00f6p kutusu sizin yerinize otomatik olarak temizlenebilir. Asgari s\u00fcre 7 g\u00fcnd\u00fcr ve sizin azami s\u00fcreniz 30 g\u00fcn."
 }

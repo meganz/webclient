@@ -2267,13 +2267,13 @@
     "18667": "SSL certificate error",
     "18668": "Unbekannte E-Mail-Adresse - bitte versuchen Sie es noch einmal. Sollten Sie sich an die E-Mail-Adresse Ihres MEGA-Accounts nicht mehr erinnern k\u00f6nnen, l\u00f6schen Sie das Eingabefeld und klicken Sie erneut auf Start, um diesen Schritt zu \u00fcberspringen.",
     "18669": "Nachricht an %s...",
-    "18678": "Do you want a longer retention period?",
-    "18679": "Enable rich URL previews",
-    "18680": "Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.",
-    "18681": "Always Allow",
-    "18682": "Not Now",
-    "18683": "Insert preview",
-    "18684": "Remove preview",
-    "18685": "The Rubbish Bin can be cleaned for you automatically. The minimum period is 7 days.",
-    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days."
+    "18678": "W\u00fcnschen Sie eine l\u00e4ngere Aufbewahrung?",
+    "18679": "URL-Ansicht aktivieren",
+    "18680": "URLs in MEGAchat-Nachrichten werden ohne Ende-zu-Ende-Verschl\u00fcsselung abgerufen und kompakt angezeigt.",
+    "18681": "Immer erlauben",
+    "18682": "Jetzt nicht",
+    "18683": "URL-Ansicht einf\u00fcgen",
+    "18684": "URL-Ansicht entfernen",
+    "18685": "Der Papierkorb wird automatisch f\u00fcr Sie geleert. Die Mindestaufbewahrungsfrist f\u00fcr gel\u00f6schte Dateien und Ordner betr\u00e4gt sieben Tage.",
+    "18686": "Der Papierkorb wird automatisch f\u00fcr Sie geleert. Im Papierkorb befindliche Dateien und Ordner werden nach fr\u00fchestens sieben und sp\u00e4testens 30 Tagen gel\u00f6scht."
 }

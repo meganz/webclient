@@ -462,6 +462,8 @@ mobile.slideshow = {
 
             // Cleanup curr....
             mobile.slideshow.cleanupCurrentlyViewedInstance();
+            mobile.slideshow.$overlay.find('.slides.mid img').remove();
+            mobile.slideshow.$overlay.find('.slides.mid').prepend('<img alt="" /></div>');
 
             // Prevent double taps
             return false;

@@ -293,7 +293,7 @@ $(document).ready(function() {
 
 			<div class="fm-right-files-block-user-management">
 
-				<div class="fm-right-header-user-management fm">
+				<div class="fm-right-header-user-management">
 					<div class="right-header-user-management-main-page hidden">
 						<a class="fm-files-view-icon-user-management block-view" title="Thumbnail view"></a>
 						<a class="fm-files-view-icon-user-management listing-view active" title="List view"></a>
@@ -314,19 +314,37 @@ $(document).ready(function() {
                     </div>
 
                     <div class="right-header-user-management-view">
-                        <div class="view-breadcrumbs-user-management">
+                        <div class="view-breadcrumbs-user-management hidden">
                             <div class="user-management-icon"></div>
                             <div class="user-management-next-arrow"></div>
                             <div class="user-management-subuser-avatars">
                             	<div class="user-management-subuser-image"></div>
-                            	<span>Jay Pierce</span>
                             </div>
-                        </div>  
+                            <div class="user-management-subuser-name">Jay Pierce</div>
+                        </div>
+
+                        <div class="view-breadcrumbs-user-management">
+                            <div class="user-management-icon"></div>
+                            <div class="user-management-next-arrow"></div>
+							<div class="user-management-breadcrumbs-img overview-img"></div>
+							<div class="user-management-subuser-name">Overview</div>
+                        </div>
+
+                        <div class="view-button-user-management">
+							<div class="default-white-button-user-management">
+								<div class="export-pdf-img img"></div>
+								Export to PDF
+							</div>
+							<div class="default-white-button-user-management">
+								<div class="overview-img img"></div>
+								View Plans
+							</div>
+                        </div>
                     </div>
 				</div>
 
 				<div class="files-grid-view user-management-view">  
-					<div class="user-management-overview-bar hidden">
+					<div class="user-management-overview-bar">
 						<div class="user-management-overview-bar-data">
 							<div class="info-block">
 								<div class="number-of-user-icon icon"></div>
@@ -347,8 +365,7 @@ $(document).ready(function() {
 								<span class="title2"> GB</span>
 							</div>
 							<div class="default-white-button-user-management">
-								<div class="view-plan-icon img"></div>
-								View Plans 
+								<div class="overview-img img"></div>View Plans
 							</div>
 						</div>
 					</div>
@@ -446,7 +463,7 @@ $(document).ready(function() {
                    		</tr>
                     </table>
 
-                    <div class="user-management-subuser-profile-container">
+                    <div class="user-management-subuser-profile-container hidden">
                     	<div class="user-management-subuser-image-big"></div>
                     	<div class="user-management-subuser-profile">                 		
                     		<span>Jay Pierce</span>
@@ -463,7 +480,7 @@ $(document).ready(function() {
                     	</div>
                     </div>
 
-                    <div class="user-management-view-data">
+                    <div class="user-management-view-data hidden">
                     	<div class="user-management-view-overall-usage">
                     		<div class="view-title">Overall Usage</div>
                     		<div class="user-management-storage">
@@ -556,9 +573,122 @@ $(document).ready(function() {
                                 <div class="folder-occupy">758.6 MB</div>
                                 <div class="clear"></div>
                             </div>
-
                     	</div>
                     </div>
+
+                    <div class="user-management-overview-container">
+	                    <div class="user-analysis-container">
+                    		<div class="view-title">User Analytics</div>
+                    		<div class="user-segments-container">
+                    			<div class="user-segment-title">Users in Total:</div>
+                    			<div class="user-segment-number">24</div>
+                    			<div class="user-segment-trend">
+                    				<b>&#8679; (4%) </b> over the last 30 days
+                    			</div>
+                    		</div>
+							<div class="user-segments-container">
+                    			<div class="user-segment-title">Active Users:</div>
+                    			<div class="user-segment-number">18</div>
+                    			<div class="user-segment-trend">
+                					<b class="bond-color">&#8679; 2  </b> over the last 30 days
+                				</div>
+							</div>
+							<div class="user-segments-container">
+								<div class="user-segment-title">Pending Users:</div>
+                    			<div class="user-segment-number">3</div>
+							</div>
+							<div class="user-segments-container">
+								<div class="user-segment-title">Disabled Users:</div>
+                    			<div class="user-segment-number">3</div>
+							</div>
+                    	</div>
+
+                    	<div class="data-analysis-container">
+                    		<div class="storage-analysis-container">
+                    			<div class="view-title">Storage Analytics</div>
+                    			<div class="storage-big-circle">
+                    				<div class="storage-small-circle">
+                    					<span class="total-storage-title">Total Storage</span>
+                    					<span class="total-storage-number">102.7 GB</span>
+                    				</div>
+                    			</div>
+                    			<div class="storage-division-container">
+                    				<div class="storage-division-per cloud-drive-color">72%</div>
+                    				<div class="storage-division-name">Cloud Drive</div>
+                    				<div class="storage-division-num">356 GB</div>
+                    			</div>
+
+                    			<div class="storage-division-container">
+                    				<div class="storage-division-per inbox-color">0.2%</div>
+                    				<div class="storage-division-name">Inbox</div>
+                    				<div class="storage-division-num">356 GB</div>
+                    			</div>
+
+                    			<div class="storage-division-container">
+                    				<div class="storage-division-per incoming-color">11%</div>
+                    				<div class="storage-division-name">Incoming Shares</div>
+                    				<div class="storage-division-num">356 GB</div>
+                    			</div>
+
+                    			<div class="storage-division-container">
+                    				<div class="storage-division-per rubbish-color">11%</div>
+                    				<div class="storage-division-name">Rubbish bin</div>
+                    				<div class="storage-division-num">356 GB</div>
+                    			</div>
+                    		</div>
+
+                    		<div class="transfer-analysis-container">
+                    			<div class="view-title">Transfer Analytics</div>
+                    			<div class="transfer-analysis-summary">
+	                    			<div class="total-transfer-title">Total Transfer:</div>
+	                    			<div class="total-transfer-number">310.3 GB</div>
+	                    			<div class="total-transfer-trend">
+	                    				<b class="bond-color">&#8679; 2.3 GB </b>
+	                    				(+1.2%) over the last 30 days
+	                    			</div>
+                    			</div>
+                    			<div class="daily-transfer-container">
+                    				<div class="daily-transfer-title">Daily Transfer:</div>
+                    				<div class="default-white-drop-user-management right">
+                    					<span>December, 2017</span>
+                    					<div class="user-management-list-arrow"></div>
+                    				</div>
+
+                    				<div class="daily-transfer-flow-container">
+                    					<div class="daily-transfer-flow">
+                    						<span>500</span>
+                    						<span>0</span>
+                    					</div>
+                    					<div class="daily-transfer-measure">
+                    						<div class="daily-transfer-flow-background"></div>
+                    						<div class="daily-transfer-flow-background"></div>
+                    						<div class="daily-transfer-flow-background"></div>
+                    						<div class="daily-transfer-flow-background"></div>
+                    						<div class="daily-transfer-flow-background"></div>
+                    					</div>
+                    					<div class="daily-transfer-data">
+                    						<div class="daily-transfer-flow-block"></div>
+                    					</div>           		
+                    					<div class="daily-transfer-date"></div>
+                    				</div>
+
+
+
+                    				<span>Use your mouse to see statistics from particular day</span>
+                    				<span>Unit: GB</span>
+                    			</div>
+
+                    		</div>
+                    	</div>
+
+
+
+                    </div>
+
+
+
+
+
                 </div>
        		</div>
 

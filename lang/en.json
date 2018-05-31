@@ -2266,5 +2266,14 @@
     "18514": "This is your own contact link",
     "18667": "SSL certificate error",
     "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
-    "18669": "Write a message to %s..."
+    "18669": "Write a message to %s...",
+    "18678": "Do you want a longer retention period?",
+    "18679": "Enable rich URL previews",
+    "18680": "Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.",
+    "18681": "Always Allow",
+    "18682": "Not Now",
+    "18683": "Insert preview",
+    "18684": "Remove preview",
+    "18685": "The Rubbish Bin can be cleaned for you automatically. The minimum period is 7 days.",
+    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days."
 }

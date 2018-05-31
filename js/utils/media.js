@@ -28,21 +28,51 @@ if (!isMediaSourceSupported()) {
     };
 }
 
-function is_image(name) {
+/**
+ * Returns a truthy value whenever we can get a previewable image for a file/node.
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function}
+ *      {Number}: Build-in support in browsers,
+ *      {String}: RAW Image file type
+ *      {Function}: Handler we can use to get a preview image out of the file/node data
+ */
+function is_image(n, ext) {
     'use strict';
-
-    if (name) {
-        if (typeof name === 'object') {
-            name = name.name;
-        }
-        var ext = fileext(name, true, true);
-
-        return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
-    }
-
-    return false;
+    ext = ext || fileext(n && n.name || n, true, true);
+    return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
 }
 
+/**
+ * Same as is_image(), additionally checking whether the node has an image file attribute we can preview
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+function is_image2(n, ext) {
+    'use strict';
+    ext = ext || fileext(n && n.name || n, true, true);
+    return is_image(n, ext) || (filemime(n).startsWith('image') && String(n.fa).indexOf(':1*') > 0);
+}
+
+/**
+ * Same as is_image2(), additionally skipping non-image files regardless of file attributes or generation handlers
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+function is_image3(n, ext) {
+    'use strict';
+    ext = ext || fileext(n && n.name || n, true, true);
+    return ext !== 'PDF' && is_image2(n, ext);
+}
+
+/**
+ * Check whether a file/node is a RAW image.
+ * @param {String|MegaNode|Object} name An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {String}
+ */
 function is_rawimage(name, ext) {
     'use strict';
 
@@ -56,8 +86,7 @@ is_image.def = {
     'JPEG': 1,
     'GIF': 1,
     'BMP': 1,
-    'PNG': 1,
-    'HEIC': -1
+    'PNG': 1
 };
 
 is_image.raw = {

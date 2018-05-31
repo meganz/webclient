@@ -1674,7 +1674,7 @@ FileManager.prototype.initUIKeyEvents = function() {
                 if (n && n.t) {
                     M.openFolder(n.h);
                 }
-                else if ($.selected.length < 2 && (is_image(n) || is_video(n))) {
+                else if ($.selected.length < 2 && (is_image2(n) || is_video(n))) {
                     slideshow($.selected[0]);
                 }
                 else {
@@ -2620,10 +2620,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 if (n) {
                     if (max > i) {
                         html.push(
-                            '<div class="transfer-filetype-icon '
-                            + fileIcon(n) + ' tranfer-filetype-txt dragger-entry">'
-                            + str_mtrunc(htmlentities(n.name))
-                            + '</div>'
+                            '<div class="transfer-filetype-icon ' + fileIcon(n) + '"></div>' +
+                            '<div class="tranfer-filetype-txt dragger-entry">' +
+                            str_mtrunc(htmlentities(n.name)) + '</div>'
                         );
                     }
                 }
@@ -2763,8 +2762,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $('.top-context-menu').hide();
             M.openFolder(h);
         }
-        else if (is_image(n) || is_video(n)) {
-            if (!is_image(n)) {
+        else if (is_image2(n) || is_video(n)) {
+            if (is_video(n)) {
                 $.autoplay = h;
             }
             slideshow(h);
@@ -2833,9 +2832,9 @@ FileManager.prototype.addTreeUI = function() {
                 }
                 if (id && M.d[id]) {
                     html = (
-                        '<div class="transfer-filetype-icon '
-                        + fileIcon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">'
-                        + str_mtrunc(htmlentities(M.d[id].name)) + '</div>'
+                        '<div class="transfer-filetype-icon ' + fileIcon(M.d[id]) + '"></div>' +
+                        '<div class="tranfer-filetype-txt dragger-entry">' +
+                        str_mtrunc(htmlentities(M.d[id].name)) + '</div>'
                     );
                 }
                 $('#draghelper .dragger-icon').remove();

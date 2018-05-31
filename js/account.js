@@ -795,7 +795,9 @@ function processEmailChangeActionPacket(ap) {
                             $promise.reject(false);
                         }
                         else {
-                            _lastUserInteractionCache[u_h] = res;
+                            if (!triggeredBySet) {
+                                _lastUserInteractionCache[u_h] = res;
+                            }
                             $promise.resolve(res);
                         }
                     }
@@ -823,6 +825,7 @@ function processEmailChangeActionPacket(ap) {
      * @returns {Deferred}
      */
     var _realSetLastInteractionWith = function (u_h, v) {
+
         assert(u_handle, "missing u_handle, can't proceed");
         assert(u_h, "missing argument u_h, can't proceed");
 
@@ -905,6 +908,7 @@ function processEmailChangeActionPacket(ap) {
      */
     var _flushSetLastInteractionWith = function() {
         timerSetLastInteraction = null;
+
         for (var i = throttledSetLastInteractionOps.length - 1; i >= 0; i--) {
             var op = throttledSetLastInteractionOps[i];
             throttledSetLastInteractionOps.splice(i, 1);
@@ -919,7 +923,7 @@ function processEmailChangeActionPacket(ap) {
      *
      * @param u_h {String} user handle
      * @param v {String} "$typeOfInteraction:$unixTimestamp" (see getLastInteractionWith for the types of int...)
-     * @returns {Deferred}
+     * @returns {Deferred|MegaPromise}
      */
     var setLastInteractionWith = function(u_h, v) {
         var promise = new MegaPromise();
@@ -932,12 +936,29 @@ function processEmailChangeActionPacket(ap) {
             _lastUserInteractionCacheInFlight[u_h] = v;
         }
 
-        throttledSetLastInteractionOps.push([u_h, v, promise]);
-
         if (timerSetLastInteraction) {
             clearTimeout(timerSetLastInteraction);
         }
         timerSetLastInteraction = setTimeout(_flushSetLastInteractionWith, SET_LAST_INTERACTION_TIMER);
+
+        for (var i = 0; i < throttledSetLastInteractionOps.length; i++) {
+            var entry = throttledSetLastInteractionOps[i];
+            var u_h2 = entry[0];
+            var ts2 = parseInt(entry[1].split(":")[1], 10);
+
+            if (u_h2 === u_h) {
+                if (newTs < ts2) {
+                    return MegaPromise.resolve(entry[1]);
+                }
+                else {
+                    entry[1] = v;
+                    return entry[2];
+                }
+
+            }
+        }
+        throttledSetLastInteractionOps.push([u_h, v, promise]);
+
 
         return promise;
     };

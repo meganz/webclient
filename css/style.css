@@ -15206,6 +15206,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .search-path-icon.folder, .search-path-icon.shared-folder {
     background-position: -337px -717px;
+    background-image: url(../images/mega/files-icons_v3.png);
 }
 .search-path-icon.recycle-item {
     background-position: -1px -8035px;

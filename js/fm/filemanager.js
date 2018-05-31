@@ -3043,6 +3043,9 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (id_r === 'opc') {
         this.onSectionUIOpen('opc');
     }
+    else if (id_r === 'user-management') {
+        this.onSectionUIOpen('user-management');
+    }
     else if (id_r === 'account') {
         this.onSectionUIOpen('account');
     }

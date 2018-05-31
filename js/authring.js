@@ -406,6 +406,11 @@ var authring = (function () {
 
             return '';
         }
+        if (!key) {
+            logger.error('Invalid key for: ' + keyType);
+
+            return '';
+        }
         format = format || 'hex';
         keyType = keyType || 'Ed25519';
 

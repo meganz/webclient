@@ -13,7 +13,7 @@
     "23": "El archivo ya no es accesible",
     "24": "Error al descifrar",
     "34": "Advertencia:",
-    "47": "Oops, algo salio mal. \u00a1Lo sentimos!",
+    "47": "Ups, algo ha salido mal. \u00a1Lo sentimos!",
     "55": "Solo lectura",
     "56": "Lectura y escritura",
     "57": "Acceso completo",
@@ -2266,5 +2266,14 @@
     "18514": "Este es tu propio enlace de contacto",
     "18667": "Error certificado SSL",
     "18668": "Direcci\u00f3n de correo electr\u00f3nico no encontrada, int\u00e9ntalo de nuevo. Si no recuerdas la direcci\u00f3n de correo electr\u00f3nico asociada a tu cuenta MEGA, no escribas nada en el campo correspondiente y haz clic de nuevo en Empezar para saltar este paso.",
-    "18669": "Escribe un mensaje a %s..."
+    "18669": "Escribe un mensaje a %s...",
+    "18678": "Do you want a longer retention period?",
+    "18679": "Enable rich URL previews",
+    "18680": "Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.",
+    "18681": "Always Allow",
+    "18682": "Not Now",
+    "18683": "Insert preview",
+    "18684": "Remove preview",
+    "18685": "The Rubbish Bin can be cleaned for you automatically. The minimum period is 7 days.",
+    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days."
 }

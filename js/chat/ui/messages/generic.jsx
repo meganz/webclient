@@ -497,7 +497,7 @@ var GenericConversationMessage = React.createClass({
 
                         // generate preview/icon
                         var icon = fileIcon(v);
-                        var isImage = is_image(v);
+                        var isImage = is_image2(v);
                         var isVideo = is_video(v) > 0;
                         var showThumbnail = v.fa && isImage || String(v.fa).indexOf(':0*') > 0;
                         var isPreviewable = isImage || isVideo;

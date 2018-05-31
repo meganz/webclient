@@ -8,6 +8,7 @@
 <title>MEGA 2.0</title>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <link rel="stylesheet" type="text/css" href="../css/style.css" />
+<link rel="stylesheet" type="text/css" href="../css/retina-images.css" />
 <script type="text/javascript" src="../js/jquery-1.8.1.js"></script>
 <script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
 <script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
@@ -129,9 +130,9 @@ $(document).ready(function() {
 </script>
 </head>
 
-<body id="bodyel" class="logged rk-saved fontsize2 en free">
+<body id="bodyel" class="logged rk-saved fontsize2 en free font-user-management">
 
-<div id="fmholder" class="fmholder" style="display: block;">
+<div id="fmholder" class="fmholder">
 	<div class="main-blur-block">
 		<div class="fm-main default">
 		 	<div class="nw-fm-left-icons-panel">
@@ -205,7 +206,7 @@ $(document).ready(function() {
 	            </div>
 		 	</div>
 
-		 	<div class="fm-left-panel ui-resizable user-management-panel" style="width:256px">
+		 	<div class="fm-left-panel ui-resizable user-management-panel">
 
             	<div class="left-pane-drag-handle ui-resizable-handle ui-resizable-e"></div>
            
@@ -213,12 +214,12 @@ $(document).ready(function() {
                     <div class="sorting-menu-arrow"></div>
                     <p> SORT </p>
 
-                    <div class="sorting-menu-item-user-managment">
+                    <div class="sorting-menu-item-user-management">
                     	<div class="user-management-sort-name sort-icon"></div>
                     	<span>Name</span>
                     	<div class="up-arrow-icon"></div>
                     </div>
-                    <div class="sorting-menu-item-user-managment">
+                    <div class="sorting-menu-item-user-management">
                     	<div class="user-management-sort-status sort-icon"></div>
                     	<span>Status</span>
                     </div>
@@ -227,7 +228,7 @@ $(document).ready(function() {
             	<div class="fm-left-menu user-management">
 	                <div class="nw-fm-tree-header user-management">
 	                    <input value="" placeholder="User Management" type="text">
-	                    <div class="nw-fm-search-icon" style="display: block;"></div>
+	                    <div class="nw-fm-search-icon"></div>
 	                </div>
             	</div>
 
@@ -237,12 +238,12 @@ $(document).ready(function() {
 	                <div class="user-management-tree-panel-arrows"></div>
             	</div>
         
-	            <div class="fm-tree-panel" style="overflow: hidden; padding: 0px;">    
-	            	<div class="jspContainer" style=" ">
-	                	<div class="jspPane" style="padding: 0px; top: 0px; left: 0px; width: 272px;">
+	            <div class="fm-tree-panel">    
+	            	<div class="jspContainer">
+	                	<div class="jspPane">
 
 			            	<div class="content-panel user-management active">
-			                    <div class="nw-user-management-item">
+			                    <div class="nw-user-management-item selected">
 			                        <div class="user-management-status enabled"></div>
 			                        <div class="nw-user-management-name">Jay Pierce</div>
 			                    </div>
@@ -250,7 +251,7 @@ $(document).ready(function() {
 			                        <div class="user-management-status pending"></div>
 			                        <div class="nw-user-management-name">Ollie Gibson</div>
 			                    </div>
-			                    <div class="nw-user-management-item selected">
+			                    <div class="nw-user-management-item">
 			                        <div class="user-management-status enabled"></div>
 			                        <div class="nw-user-management-name">John Bailey</div>
 			                    </div>
@@ -265,9 +266,9 @@ $(document).ready(function() {
                 	<div class="user-management-tree-panel-arrows"></div>
             	</div>
 
-            	<div class="fm-tree-panel hidden" style="overflow: hidden; padding: 0px;">    
-	            	<div class="jspContainer" style=" ">
-	                	<div class="jspPane" style="padding: 0px; top: 0px; left: 0px; width: 272px;">
+            	<div class="fm-tree-panel hidden" >    
+	            	<div class="jspContainer">
+	                	<div class="jspPane">
 
 			            	<div class="content-panel user-management active">
 			                    <div class="nw-user-management-item">
@@ -290,127 +291,406 @@ $(document).ready(function() {
 		 	<div class="top-head user-management-border">
 			</div>
 
-			<div class="fm-right-files-block-user-management" style="margin-left: 304px">
-				<div class="fm-right-header-user-management fm">
-					<div class="fm-header-buttons-user-management">
+			<div class="fm-right-files-block-user-management">
+
+				<div class="fm-right-header-user-management">
+					<div class="right-header-user-management-main-page hidden">
 						<a class="fm-files-view-icon-user-management block-view" title="Thumbnail view"></a>
 						<a class="fm-files-view-icon-user-management listing-view active" title="List view"></a>
-						<div class="default-white-button">
-							<div class="overview-img"></div>
-							<span>Overview</span>
+						<div class="default-white-button-user-management">
+							<div class="overview-img img"></div>
+							Overview
 						</div>
 
-						<div class="default-white-button">
-							<div class="account-img"></div>
-							<span>Account</span> 
+						<div class="default-white-button-user-management">
+							<div class="account-img img"></div>
+							Account
 						</div>
 
-						<div class="default-green-button">
-							<div class="add-users-img"></div>
-							<span>Add Users</span>
+						<div class="default-green-button-user-management">
+							<div class="add-users-img img"></div>
+							Add Users
 						</div>
+                    </div>
+
+                    <div class="right-header-user-management-view">
+                        <div class="view-breadcrumbs-user-management hidden">
+                            <div class="user-management-icon"></div>
+                            <div class="user-management-next-arrow"></div>
+                            <div class="user-management-subuser-avatars">
+                            	<div class="user-management-subuser-image"></div>
+                            </div>
+                            <div class="user-management-subuser-name">Jay Pierce</div>
+                        </div>
+
+                        <div class="view-breadcrumbs-user-management">
+                            <div class="user-management-icon"></div>
+                            <div class="user-management-next-arrow"></div>
+							<div class="user-management-breadcrumbs-img overview-img"></div>
+							<div class="user-management-subuser-name">Overview</div>
+                        </div>
+
+                        <div class="view-button-user-management">
+							<div class="default-white-button-user-management">
+								<div class="export-pdf-img img"></div>
+								Export to PDF
+							</div>
+							<div class="default-white-button-user-management">
+								<div class="overview-img img"></div>
+								View Plans
+							</div>
+                        </div>
                     </div>
 				</div>
 
 				<div class="files-grid-view user-management-view">  
 					<div class="user-management-overview-bar">
 						<div class="user-management-overview-bar-data">
-								<div class="info-block">
-									<div class="number-of-user-icon icon"></div>
-									<span class="title">Number Of Users:</span>
-									<span class="number">11</span>
-								</div>
+							<div class="info-block">
+								<div class="number-of-user-icon icon"></div>
+								<span class="title">Number Of Users:</span>
+								<span class="number">11</span>
+							</div>
 
-								<div class="info-block">
-									<div class="total-storage-usage-icon icon"></div>
-									<span class="title">Total Storage Usage:</span>
-									<span class="number">12.4</span>
-									<span class="title2"> GB</span>
-								</div>
-								<div class="info-block">
-									<div class="total-transfer-usage-icon icon"></div>
-									<span class="title">Total Transfer Usage:</span>
-									<span class="number">1.4</span>
-									<span class="title2"> GB</span>
-								</div>
-								<div class="user-management-overview-bar-button">
-									<div class="view-plan-icon"></div>
-									<span>View Plans</span>  
-								</div>
+							<div class="info-block">
+								<div class="total-storage-usage-icon icon"></div>
+								<span class="title">Total Storage Usage:</span>
+								<span class="number">12.4</span>
+								<span class="title2"> GB</span>
+							</div>
+							<div class="info-block">
+								<div class="total-transfer-usage-icon icon"></div>
+								<span class="title">Total Transfer Usage:</span>
+								<span class="number">1.4</span>
+								<span class="title2"> GB</span>
+							</div>
+							<div class="default-white-button-user-management">
+								<div class="overview-img img"></div>View Plans
+							</div>
 						</div>
 					</div>
 
-                    <table class="grid-table-user-management" width="100%" cellspacing="0" cellpadding="0" border="0">
-	                      	<tr class="grid-table-header-user-management">
-			                    <th>  
-		                    		<div class="checkdiv left checkboxOn small-user-management">
-                                	</div>
-			                    </th>
-			                    <th> <div class="arrow name desc">Name</div> </th>
-			                    <th><div class="arrow desc">Status</div></th>
-			                    <th><div class="arrow asc">Storage usage</div></th>
-			                    <th><div class="arrow desc">Transfer usage</div></th>
-			                    <th>
-			                    	<div class="disable-icon icon"></div>
-			                    </th>
-	                        </tr>
+                    <table class="grid-table-user-management hidden">
+                      	<tr class="grid-table-header-user-management">
+		                    <th>  
+	                    		<div class="checkdiv left checkboxOff-user-management small-user-management">
+                            	</div>
+		                    </th>
+		                    <th> <div class="arrow name desc">Name</div> </th>
+		                    <th><div class="arrow desc">Status</div></th>
+		                    <th><div class="arrow asc">Storage usage</div></th>
+		                    <th><div class="arrow desc">Transfer usage</div></th>
+		                    <th>
+		                    	<div class="disable-icon icon"></div>
+		                    </th>
+                        </tr>
 
-	                        <tr>
-			                    <td>  
-		                    		<div class="checkdiv left checkboxOff small-user-management">
-                                	</div>
-			                    </td>
-			                    <td>			                    	
-	                                <div class="fm-user-management-user">
-	                                	<div class="admin-icon"></div>
-	                                	<div class="tooltip">Sub – administrators</div>	
-	                                    <span>Jay Pierce</span>
-	                                </div>
-	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
-			                    </td>
-			                    <td>
-			                    	<div class="user-management-status enabled"></div>
-			                    	<span>Active</span>
-			                	</td>
-			                    <td><span>0.8 GB</span></td>
-			                    <td><span>13.2 GB</span></td>
-			                    <td>
-			                    	<div class="disable-icon icon"></div>
-			                    	<div class="edit-icon icon"></div>
-			                    	<div class="view-icon icon"></div>  	
-			                    </td>
-                       		</tr>
+                        <tr>
+		                    <td>  
+	                    		<div class="checkdiv left checkboxOff-user-management small-user-management">
+                            	</div>
+		                    </td>
+		                    <td>			                    	
+                                <div class="fm-user-management-user">
+                                	<div class="admin-icon">
+                                		<div class="tooltip">Sub – administrators</div>
+                                	</div>	                                		
+                                    <span>Jay Pierce</span>
+                                </div>
+                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
+		                    </td>
+		                    <td>
+		                    	<div class="user-management-status enabled"></div>
+		                    	<span>Active</span>
+		                	</td>
+		                    <td><span>0.8 GB</span></td>
+		                    <td><span>13.2 GB</span></td>
+		                    <td>
+		                    	<div class="disable-icon icon"></div>
+		                    	<div class="edit-icon icon"></div>
+		                    	<div class="view-icon icon"></div>  	
+		                    </td>
+                   		</tr>
 
-	                        <tr>
-			                    <td>  
-		                    		<div class="checkdiv left checkboxOn small-user-management">
-                                	</div>
-			                    </td>
-			                    <td>			                    	
-	                                <div class="fm-user-management-user">
-	                                	<div class="admin-icon" style="visibility: hidden;"></div>	
-	                                    <span>Jay Pierce</span>
-	                                </div>
-	                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
-			                    </td>
-			                    <td>
-			                    	<div class="user-management-status pending"></div>
-			                    	<span>Pending</span>
-			                	</td>
-			                    <td><span>0.8 GB</span></td>
-			                    <td><span>0.8 GB</span></td>
-			                    <td>
-			                    	<div class="disable-icon icon"></div>
-			                    	<div class="edit-icon icon"></div>
-			                    	<div class="view-icon icon"></div>  	
-			                    </td>
-                       		</tr>
+                        <tr>
+		                    <td>  
+	                    		<div class="checkdiv left checkboxOn-user-management small-user-management">
+                            	</div>
+		                    </td>
+		                    <td>			                    	
+                                <div class="fm-user-management-user">
+                                	<div class="admin-icon"></div>	
+                                    <span>Jay Pierce</span>
+                                </div>
+                                <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
+		                    </td>
+		                    <td>
+		                    	<div class="user-management-status pending"></div>
+		                    	<span>Pending</span>
+		                	</td>
+		                    <td><span>0.8 GB</span></td>
+		                    <td><span>0.8 GB</span></td>
+		                    <td>
+		                    	<div class="disable-icon icon"></div>
+		                    	<div class="edit-icon icon"></div>
+		                    	<div class="view-icon icon"></div>  	
+		                    </td>
+                   		</tr>
+
+                   		<tr>
+		                    <td>  
+	                    		<div class="checkdiv left checkboxOff-user-management small-user-management">
+                            	</div>
+		                    </td>
+		                    <td>			                    	
+                                <div class="fm-user-management-user">
+                                	<div class="admin-icon"></div>	
+                                    <span>I shouldn't be here</span>
+                                </div>
+                                <div class="user-management-email">only to show the disabled status<div> 
+		                    </td>
+		                    <td>
+		                    	<div class="user-management-status disable"></div>
+		                    	<span>Disable</span>
+		                	</td>
+		                    <td><span>0.8 GB</span></td>
+		                    <td><span>0.8 GB</span></td>
+		                    <td>
+		                    	<div class="enable-icon icon"></div>
+		                    	<div class="immigrate-icon icon"></div>
+		                    	<div class="view-icon icon"></div>  	
+		                    </td>
+                   		</tr>
                     </table>
-                    
-                    </div>
-           		</div>
-			</div>
 
+                    <div class="user-management-subuser-profile-container hidden">
+                    	<div class="user-management-subuser-image-big"></div>
+                    	<div class="user-management-subuser-profile">                 		
+                    		<span>Jay Pierce</span>
+                    		<span>hermiston_alessandra@janie.net</span>
+                    		<div class="user-management-view-status enabled"></div>
+	                    	<span class="user-management-view-status text">Active</span>
+
+	                    	<div class="admin-icon">
+	                    		<div class="admin-text">Sub – administrators</div>
+	                    	</div>
+                    		<div class="default-white-button-user-management">View Account</div>
+                    		<div class="default-white-button-user-management">Edit Profile</div>
+                    		<div class="default-gray-button-user-management">Disable Account</div>
+                    	</div>
+                    </div>
+
+                    <div class="user-management-view-data hidden">
+                    	<div class="user-management-view-overall-usage">
+                    		<div class="view-title">Overall Usage</div>
+                    		<div class="user-management-storage">
+                    			<div class="storage-img img"></div>
+                    			<div class="view-info">
+	                    			<div class="storage-transfer-text">STORAGE</div>
+                    				<div class="storage-transfer-data">30.3 GB</div>
+                    			</div>
+                    		</div>
+
+                    		<div class="user-management-transfer">
+                    			<div class="transfer-img img"></div>
+                    			<div class="view-info">
+	                    			<div class="storage-transfer-text">TRANSFER</div>
+                    				<div class="storage-transfer-data">16.7 GB</div>
+                    			</div>
+                    		</div>
+                    	</div>
+
+                    	<div class="user-management-view-used-storage">
+                    		<div class="view-title">Used Storage</div>
+                    		<div class="used-storage-info">
+                                <i class="folder-small-icon cloud"></i>
+                                <div class="folder-name">
+                                    Cloud Drive
+                                </div>
+                                <div class="folder-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info">
+                                <i class="folder-small-icon inbox"></i>
+                                <div class="folder-name">
+                                    Inbox
+                                </div>
+                                <div class="folder-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info">
+                                <i class="folder-small-icon income"></i>
+                                <div class="folder-name">
+                                    Incoming Shares
+                                </div>
+                                <div class="folder-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info">
+                                <i class="folder-small-icon rubbish"></i>
+                                <div class="folder-name">
+                                    Rubbish bin
+                                </div>
+                                <div class="folder-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                    	</div>
+
+                    	<div class="user-management-view-used-storage">
+                    		<div class="view-title">Data</div>
+                    		<div class="used-storage-info">
+                                <i class="folder-small-icon files"></i>
+                                <div class="folder-name">Files</div>
+                                <div class="folder-number">322 files</div>
+                                <div class="folder-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                    		<div class="used-storage-info">
+                                <i class="folder-small-icon cloud"></i>
+                                <div class="folder-name">Cloud Drive</div>
+                                <div class="folder-number">322 files</div>
+                                <div class="folder-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info">
+                                <i class="folder-small-icon inbox"></i>
+                                <div class="folder-name">Inbox</div>
+                                <div class="folder-number">322 files</div>
+                                <div class="folder-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info">
+                                <i class="folder-small-icon income"></i>
+                                <div class="folder-name">Incoming Shares</div>
+                                <div class="folder-number">322 files</div>
+                                <div class="folder-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="used-storage-info">
+                                <i class="folder-small-icon rubbish"></i>
+                                <div class="folder-name">Rubbish bin</div>
+                                <div class="folder-number">322 files</div>
+                                <div class="folder-occupy">758.6 MB</div>
+                                <div class="clear"></div>
+                            </div>
+                    	</div>
+                    </div>
+
+                    <div class="user-management-overview-container">
+	                    <div class="user-analysis-container">
+                    		<div class="view-title">User Analytics</div>
+                    		<div class="user-segments-container">
+                    			<div class="user-segment-title">Users in Total:</div>
+                    			<div class="user-segment-number">24</div>
+                    			<div class="user-segment-trend">
+                    				<b>&#8679; (4%) </b> over the last 30 days
+                    			</div>
+                    		</div>
+							<div class="user-segments-container">
+                    			<div class="user-segment-title">Active Users:</div>
+                    			<div class="user-segment-number">18</div>
+                    			<div class="user-segment-trend">
+                					<b class="bond-color">&#8679; 2  </b> over the last 30 days
+                				</div>
+							</div>
+							<div class="user-segments-container">
+								<div class="user-segment-title">Pending Users:</div>
+                    			<div class="user-segment-number">3</div>
+							</div>
+							<div class="user-segments-container">
+								<div class="user-segment-title">Disabled Users:</div>
+                    			<div class="user-segment-number">3</div>
+							</div>
+                    	</div>
+
+                    	<div class="data-analysis-container">
+                    		<div class="storage-analysis-container">
+                    			<div class="view-title">Storage Analytics</div>
+                    			<div class="storage-big-circle">
+                    				<div class="storage-small-circle">
+                    					<span class="total-storage-title">Total Storage</span>
+                    					<span class="total-storage-number">102.7 GB</span>
+                    				</div>
+                    			</div>
+                    			<div class="storage-division-container">
+                    				<div class="storage-division-per cloud-drive-color">72%</div>
+                    				<div class="storage-division-name">Cloud Drive</div>
+                    				<div class="storage-division-num">356 GB</div>
+                    			</div>
+
+                    			<div class="storage-division-container">
+                    				<div class="storage-division-per inbox-color">0.2%</div>
+                    				<div class="storage-division-name">Inbox</div>
+                    				<div class="storage-division-num">356 GB</div>
+                    			</div>
+
+                    			<div class="storage-division-container">
+                    				<div class="storage-division-per incoming-color">11%</div>
+                    				<div class="storage-division-name">Incoming Shares</div>
+                    				<div class="storage-division-num">356 GB</div>
+                    			</div>
+
+                    			<div class="storage-division-container">
+                    				<div class="storage-division-per rubbish-color">11%</div>
+                    				<div class="storage-division-name">Rubbish bin</div>
+                    				<div class="storage-division-num">356 GB</div>
+                    			</div>
+                    		</div>
+
+                    		<div class="transfer-analysis-container">
+                    			<div class="view-title">Transfer Analytics</div>
+                    			<div class="transfer-analysis-summary">
+	                    			<div class="total-transfer-title">Total Transfer:</div>
+	                    			<div class="total-transfer-number">310.3 GB</div>
+	                    			<div class="total-transfer-trend">
+	                    				<b class="bond-color">&#8679; 2.3 GB </b>
+	                    				(+1.2%) over the last 30 days
+	                    			</div>
+                    			</div>
+                    			<div class="daily-transfer-container">
+                    				<div class="daily-transfer-title">Daily Transfer:</div>
+                    				<div class="default-white-drop-user-management right">
+                    					<span>December, 2017</span>
+                    					<div class="user-management-list-arrow"></div>
+                    				</div>
+
+                    				<div class="daily-transfer-flow-container">
+                    					<div class="daily-transfer-flow">
+                    						<span>500</span>
+                    						<span>0</span>
+                    					</div>
+                    					<div class="daily-transfer-measure">
+                    						<div class="daily-transfer-flow-background"></div>
+                    						<div class="daily-transfer-flow-background"></div>
+                    						<div class="daily-transfer-flow-background"></div>
+                    						<div class="daily-transfer-flow-background"></div>
+                    						<div class="daily-transfer-flow-background"></div>
+                    					</div>
+                    					<div class="daily-transfer-data">
+                    						<div class="daily-transfer-flow-block"></div>
+                    					</div>           		
+                    					<div class="daily-transfer-date"></div>
+                    				</div>
+
+
+
+                    				<span>Use your mouse to see statistics from particular day</span>
+                    				<span>Unit: GB</span>
+                    			</div>
+
+                    		</div>
+                    	</div>
+
+
+
+                    </div>
+
+
+
+
+
+                </div>
+       		</div>
 
 		 </div>
 	</div>

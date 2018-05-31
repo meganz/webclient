@@ -1013,7 +1013,7 @@
     "7352": "Estado",
     "7354": "Renovaci\u00f3n el",
     "7368": "Mensaje",
-    "7371": "Contactos en MEGA ",
+    "7371": "Contactos en MEGA",
     "7375": "Aceptado",
     "7379": "Pendiente",
     "7381": "Desconocido",
@@ -2267,6 +2267,7 @@
     "18667": "Error certificado SSL",
     "18668": "Direcci\u00f3n de correo electr\u00f3nico no encontrada, int\u00e9ntalo de nuevo. Si no recuerdas la direcci\u00f3n de correo electr\u00f3nico asociada a tu cuenta MEGA, no escribas nada en el campo correspondiente y haz clic de nuevo en Empezar para saltar este paso.",
     "18669": "Escribe un mensaje a %s...",
+    "18677": "User Management",
     "18678": "\u00bfQuieres un per\u00edodo de retenci\u00f3n m\u00e1s largo?",
     "18679": "Activa la vista previa de la URL enriquecida",
     "18680": "Mejora tu experiencia con MEGAchat. El contenido de la URL se recuperar\u00e1 sin cifrado punto a punto.",
@@ -2275,5 +2276,6 @@
     "18683": "Insertar vista previa",
     "18684": "Eliminar vista previa",
     "18685": "La Papelera se puede vaciar de forma autom\u00e1tica. El per\u00edodo m\u00ednimo es de 7 d\u00edas.",
-    "18686": "La Papelera se vac\u00eda de forma autom\u00e1tica. El per\u00edodo m\u00ednimo es de 7 d\u00edas y el m\u00e1ximo es de 30 d\u00edas."
+    "18686": "La Papelera se vac\u00eda de forma autom\u00e1tica. El per\u00edodo m\u00ednimo es de 7 d\u00edas y el m\u00e1ximo es de 30 d\u00edas.",
+    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?"
 }

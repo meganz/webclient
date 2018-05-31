@@ -2267,6 +2267,7 @@
     "18667": "Errore del certificato SSL",
     "18668": "Indirizzo email non trovato, per favore riprova. Se non riesci a ricordare l'indirizzo email associato al tuo account MEGA, pulisci il campo e clicca nuovamente su Inizia per saltare questo step.",
     "18669": "Scrivi un messaggio a %s...",
+    "18677": "Gestione dell'utente",
     "18678": "Vuoi un periodo di ritenzione pi\u00f9 lungo?",
     "18679": "Attiva le anteprime arricchite degli URL",
     "18680": "Migliora l'esperienza di MEGAchat. I contenuti URL verranno recuperati senza la criptazione end-to-end.",
@@ -2275,5 +2276,6 @@
     "18683": "Inserisci anteprima",
     "18684": "Rimuovi anteprima",
     "18685": "Il Cestino pu\u00f2 essere svuotato per te automaticamente. Il periodo minimo \u00e8 di 7 giorni.",
-    "18686": "Il Cestino viene svuotato per te automaticamente. Il periodo minimo \u00e8 di 7 giorni ed il periodo massimo \u00e8 di 30 giorni."
+    "18686": "Il Cestino viene svuotato per te automaticamente. Il periodo minimo \u00e8 di 7 giorni ed il periodo massimo \u00e8 di 30 giorni.",
+    "18687": "Stai disattivando l'anteprima ricca degli URL permanentemente. Puoi riattivare l'anteprima ricca degli URL nelle tue Impostazioni. Vuoi procedere?"
 }

@@ -2267,6 +2267,7 @@
     "18667": "Erro no certificado SSL",
     "18668": "Email n\u00e3o encontrado - tente novamente. Se n\u00e3o conseguir lembrar o endere\u00e7o de email associado \u00e0 sua conta no MEGA, deixe o espa\u00e7o vazio e clique em Iniciar novamente para pular este passo.",
     "18669": "Escrever uma mensagem para %s...",
+    "18677": "User Management",
     "18678": "Voc\u00ea quer que os seus dados eliminados sejam guardados por mais tempo?",
     "18679": "Ativar visualiza\u00e7\u00e3o de URLs avan\u00e7adas",
     "18680": "Aprimore a sua experi\u00eancia no MEGAchat. O conte\u00fado de URLs ser\u00e1 recuperado sem criptografia de ponta a ponta.",
@@ -2275,5 +2276,6 @@
     "18683": "Inserir visualiza\u00e7\u00e3o",
     "18684": "Remover visualiza\u00e7\u00e3o",
     "18685": "Podemos limpar a sua lixeira automaticamente. O per\u00edodo m\u00ednimo \u00e9 de 7 dias.",
-    "18686": "Vamos limpar a sua lixeira automaticamente. O per\u00edodo m\u00ednimo \u00e9 de 7 dias e o per\u00edodo m\u00e1ximo \u00e9 de 30 dias."
+    "18686": "Vamos limpar a sua lixeira automaticamente. O per\u00edodo m\u00ednimo \u00e9 de 7 dias e o per\u00edodo m\u00e1ximo \u00e9 de 30 dias.",
+    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?"
 }

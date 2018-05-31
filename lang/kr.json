@@ -2148,7 +2148,7 @@
     "18287": "[B]\ub0b4 \uacc4\uc815[\/B]\uc5d0 \uc811\uadfc\ud558\uae30 \uc704\ud574 \uc704\uc758 [B]\ud504\ub85c\ud544 \uc544\ubc14\ud0c0[\/B]\ub97c \ud0ed\ud558\uc138\uc694.",
     "18288": "\ud654\uba74 \uc624\ub978\ucabd \uc0c1\ub2e8\uc758 [B]\ucf58\ud14d\uc2a4\ud2b8 \uba54\ub274 (\uc218\uc9c1 \uc810 3\uac1c)[\/B]\ub97c \ud0ed\ud558\uc138\uc694",
     "18289": "[B]\ube44\ubc00\ubc88\ud638 \ubcc0\uacbd[\/B] \ubc84\ud2bc\uc744 \ud0ed\ud558\uc138\uc694.",
-    "18290": "\uc0c8 \ube44\ubc00\ubc88\ud638\ub97c \uc785\ub825\ud558\uace0, \ud655\uc778\ud558\uace0 [B]\ube44\ubc00\ubc88\ud638 \ubcc0\uacbd[\/B]\uc744 \ud0ed\ud558\uc138\uc694.\r\n\r\n                                ",
+    "18290": "\uc0c8 \ube44\ubc00\ubc88\ud638\ub97c \uc785\ub825\ud558\uace0, \ud655\uc778\ud558\uace0 [B]\ube44\ubc00\ubc88\ud638 \ubcc0\uacbd[\/B]\uc744 \ud0ed\ud558\uc138\uc694.\r\n\r\n",
     "18291": "\uc571\uc744 \uc5f4\uace0 \ud0ed \ubc14\uc5d0\uc11c [B]\ub0b4 \uacc4\uc815[\/B]\uc744 \ud0ed\ud558\uc138\uc694.",
     "18292": "[B]\uc124\uc815[\/B]\uc744 \ud0ed\ud558\uc138\uc694.",
     "18293": "Tap on [B]Security Options[\/B].",
@@ -2267,6 +2267,7 @@
     "18667": "SSL certificate error",
     "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
     "18669": "Write a message to %s...",
+    "18677": "User Management",
     "18678": "Do you want a longer retention period?",
     "18679": "Enable rich URL previews",
     "18680": "Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.",
@@ -2275,5 +2276,6 @@
     "18683": "Insert preview",
     "18684": "Remove preview",
     "18685": "The Rubbish Bin can be cleaned for you automatically. The minimum period is 7 days.",
-    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days."
+    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days.",
+    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?"
 }

@@ -3992,7 +3992,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder::before, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder::before, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder::before, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder::before, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder::before, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder::before, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder::before, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder::before, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder::before, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder::before, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder::before, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder::before {
     background-position: -377px -997px;
 }
-.inbound-share::before {
+.nw-fm-tree-folder.inbound-share::before {
     background-position: -337px -877px;
     margin: 0;
 }
@@ -15204,13 +15204,9 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-position: -5px -999px;
     background-image: url(../images/mega/fm-main-sprite.png);
 }
-.search-path-icon.folder {
-    background-position: -10px -14871px;
+.search-path-icon.folder, .search-path-icon.shared-folder {
+    background-position: -337px -717px;
     background-image: url(../images/mega/files-icons_v3.png);
-}
-.search-path-icon.shared-folder {
-    background-position: -12px -4369px;
-    background-image: url(../images/mega/fm-main-sprite.png);
 }
 .search-path-icon.recycle-item {
     background-position: -1px -8035px;

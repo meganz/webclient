@@ -2878,8 +2878,6 @@ function fm_resize_handler(force) {
         console.time('fm_resize_handler');
     }
 
-    M.zoomLevelNotification();
-
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         var tfse = M.getTransferElements();
 

@@ -2277,5 +2277,10 @@
     "18684": "Remove preview",
     "18685": "The Rubbish Bin can be cleaned for you automatically. The minimum period is 7 days.",
     "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days.",
-    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?"
+    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?",
+    "18688": "Call from [X] was not answered in a timely manner.",
+    "18689": "Call to [X] ended.",
+    "18690": "Call to [X] failed.",
+    "18691": "Call to [X] was rejected.",
+    "18692": "Call to [X] was canceled."
 }

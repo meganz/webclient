@@ -2277,5 +2277,10 @@
     "18684": "Eliminar vista previa",
     "18685": "La Papelera se puede vaciar de forma autom\u00e1tica. El per\u00edodo m\u00ednimo es de 7 d\u00edas.",
     "18686": "La Papelera se vac\u00eda de forma autom\u00e1tica. El per\u00edodo m\u00ednimo es de 7 d\u00edas y el m\u00e1ximo es de 30 d\u00edas.",
-    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?"
+    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?",
+    "18688": "Call from [X] was not answered in a timely manner.",
+    "18689": "Call to [X] ended.",
+    "18690": "Call to [X] failed.",
+    "18691": "Call to [X] was rejected.",
+    "18692": "Call to [X] was canceled."
 }

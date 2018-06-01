@@ -2,7 +2,7 @@
     "1": "Abonnement PRO",
     "2": "Abonnement PRO",
     "12": "Nul ne sera l\u2019objet d\u2019immixtions arbitraires dans sa vie priv\u00e9e, sa famille, son domicile ou sa correspondance ni d\u2019atteintes \u00e0 son honneur et \u00e0 sa r\u00e9putation. Toute personne a droit \u00e0 la protection de la loi contre de telles immixtions ou de telles atteintes.",
-    "13": "D\u00e9claration universelle des droits de la personne.",
+    "13": "D\u00e9claration universelle des droits de l\u2019homme.",
     "14": "Confirmer la suppression",
     "15": "Voulez-vous vraiment supprimer d\u00e9finitivement toutes les donn\u00e9es de votre corbeille ?",
     "16": "Erreur interne",
@@ -1819,7 +1819,7 @@
     "16645": "Presse",
     "16646": "Des services nuagiques chiffr\u00e9s par l\u2019utilisateur",
     "16647": "L\u2019entreprise qui vous respecte.",
-    "16648": "D\u00e9claration universelle des droits de la personne, article 12.",
+    "16648": "D\u00e9claration universelle des droits de l\u2019homme, article 12.",
     "16649": "\u00c9conomisez %1",
     "16653": "Pour une exp\u00e9rience compl\u00e8te, t\u00e9l\u00e9chargez note appli ou utilisez ce site sur un ordinateur.",
     "16664": "Le nouveau mot de passe doit \u00eatre diff\u00e9rent de l'ancien.",
@@ -2267,7 +2267,7 @@
     "18667": "Erreur de certificat SSL",
     "18668": "L\u2019adresse courriel est introuvable, veuillez ressayer. Si vous ne vous rappelez pas l\u2019adresse courriel associ\u00e9e \u00e0 votre compte MEGA, effacez le champ de saisie et cliquez sur D\u00e9marrer de nouveau pour sauter cette \u00e9tape.",
     "18669": "R\u00e9diger un message pour %s...",
-    "18677": "User Management",
+    "18677": "Gestion des utilisateurs",
     "18678": "Souhaitez-vous une p\u00e9riode de conservation plus longue\u2009?",
     "18679": "Activer les aper\u00e7us d\u2019URL enrichis",
     "18680": "Am\u00e9liorez l\u2019exp\u00e9rience MEGAchat. Le contenu des URL sera r\u00e9cup\u00e9r\u00e9 sans chiffrement de bout en bout.",
@@ -2277,5 +2277,10 @@
     "18684": "Supprimer l\u2019aper\u00e7u",
     "18685": "La corbeille peut \u00eatre vid\u00e9e pour vous automatiquement. La p\u00e9riode minimale est de 7 jours.",
     "18686": "La corbeille est vid\u00e9e pour vous automatiquement. La p\u00e9riode minimale est de 7 jours et votre p\u00e9riode maximale est de 30 jours.",
-    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?"
+    "18687": "Vous \u00eates sur le point de d\u00e9sactiver les aper\u00e7us d\u2019URL enrichis en permanence. Vous pourrez r\u00e9activer les aper\u00e7us d\u2019URL enrichis dans vos param\u00e8tres. Souhaitez-vous poursuivre\u2009?",
+    "18688": "Call from [X] was not answered in a timely manner.",
+    "18689": "Call to [X] ended.",
+    "18690": "Call to [X] failed.",
+    "18691": "Call to [X] was rejected.",
+    "18692": "Call to [X] was canceled."
 }

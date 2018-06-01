@@ -2267,6 +2267,7 @@
     "18667": "SSL certificate error",
     "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
     "18669": "Write a message to %s...",
+    "18677": "User Management",
     "18678": "Do you want a longer retention period?",
     "18679": "Enable rich URL previews",
     "18680": "Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.",
@@ -2275,5 +2276,11 @@
     "18683": "Insert preview",
     "18684": "Remove preview",
     "18685": "The Rubbish Bin can be cleaned for you automatically. The minimum period is 7 days.",
-    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days."
+    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days.",
+    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?",
+    "18688": "Call from [X] was not answered in a timely manner.",
+    "18689": "Call to [X] ended.",
+    "18690": "Call to [X] failed.",
+    "18691": "Call to [X] was rejected.",
+    "18692": "Call to [X] was canceled."
 }

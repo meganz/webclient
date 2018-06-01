@@ -1023,18 +1023,20 @@
                 }
                 else {
                     var userHandles = [u_handle, $.mcselected];
-                    var room = new ChatRoom(megaChat, $.mcselected, 'private', userHandles,
-                        unixtime(), undefined, undefined, undefined, undefined, true);
-                    // the final parameter at ChatRoom constructor is to prevent 'onRoomCreated' event from triggering
-                    // as i need to add temporary members to ChatRoom object to distinguish copy dialog case.
-                    // [the only stopped behavior is: openning the chat room page]
-                    var sendAttachments = function _sendAttachments() {
-                        megaChat.chats[room.roomId].attachNodes($.selected);
-                        showToast('send-chat', ($.selected.length > 1) ? l[17767] : l[17766]);
-                    };
-                    room.inCpyDialog = sendAttachments;
-                    megaChat.plugins.chatdIntegration._attachToChatRoom(room);
-                    megaChat.chats.set(room.roomId, room);
+                    var result = megaChat.openChat(userHandles, "private");
+                    if (result && result[1] && result[2]) {
+                        var room = result[1];
+                        var chatInitDonePromise = result[2];
+                        chatInitDonePromise.done(function() {
+                            createTimeoutPromise(function() {
+                                return room.state === ChatRoom.STATE.READY;
+                            }, 300, 5000)
+                                .done(function() {
+                                    room.attachNodes(selectedNodes);
+                                    showToast('send-chat', (selectedNodes.length > 1) ? l[17767] : l[17766]);
+                                });
+                        });
+                    }
                 }
             }
 

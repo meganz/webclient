@@ -915,17 +915,6 @@ CallManagerCall.prototype.onCallFailed = function (e) {
 CallManagerCall.prototype.onCallMissed = function (e) {
     var self = this;
 
-    var peer = self.room.getParticipantsExceptMe()[0];
-
-    self.room.appendMessage(
-        new ChatDialogMessage({
-            messageId: 'call-missed-' + self.id,
-            type: 'call-missed',
-            authorContact: M.u[peer],
-            delay: unixtime()
-        })
-    );
-
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 CallManagerCall.prototype.onCallTimeout = function (e) {
@@ -947,6 +936,8 @@ CallManagerCall.prototype.onCallTerminated = function () {
         self._removeTempMessages();
     }
     self.room.messagesBuff.removeMessageByType("call-started");
+    self.room.messagesBuff.removeMessageByType("call-starting");
+    self.room.messagesBuff.removeMessageByType("call-initialising");
 
     if (self.room.callManagerCall === self) {
         delete self.room.callManagerCall;

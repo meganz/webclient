@@ -116,6 +116,41 @@ Message._getTextContentsForDialogType = function(message) {
                 '"' + htmlentities(message.meta.topic) + '"'
             );
         }
+        else if (message.dialogType === "remoteCallEnded") {
+            var meta = message.meta;
+
+            if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CALL_ENDED) {
+                textMessage = mega.ui.chat.getMessageString("call-ended");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.REJECTED) {
+                textMessage = mega.ui.chat.getMessageString("call-rejected");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED) {
+                textMessage = mega.ui.chat.getMessageString("call-canceled");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u !== u_handle) {
+                textMessage = mega.ui.chat.getMessageString("call-missed");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u === u_handle) {
+                textMessage = mega.ui.chat.getMessageString("call-timeout");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.FAILED) {
+                textMessage = mega.ui.chat.getMessageString("call-failed");
+            }
+            else {
+                if (d) {
+                    console.error("Unknown (remote) CALL_ENDED reason: ", meta.reason, meta);
+                }
+            }
+
+            if (textMessage.splice) {
+                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
+            }
+            else {
+                textMessage = textMessage.replace("[X]", contactName);
+                textMessage = textMessage.replace("%s", contactName);
+            }
+        }
         else if (textMessage.splice) {
             textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
         }
@@ -126,7 +161,7 @@ Message._getTextContentsForDialogType = function(message) {
 
 
         if (textMessage) {
-            return (contactName ? contactName + " " : "") + textMessage;
+            return textMessage;
         }
         else {
             return false;

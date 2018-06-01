@@ -765,8 +765,12 @@ React.makeElement = React['createElement'];
 	        if (room) {
 	            room.show();
 	        }
+	    }
+
+	    if (setAsActive === false) {
+	        room.showAfterCreation = false;
 	    } else {
-	        if (room) {}
+	        room.showAfterCreation = true;
 	    }
 
 	    room.setState(ChatRoom.STATE.JOINING);

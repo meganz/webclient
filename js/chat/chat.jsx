@@ -755,10 +755,14 @@ Chat.prototype.reorderContactTree = function() {
 
 
 /**
- * Open (and show) a new chat
+ * Open (and (optionally) show) a new chat
  *
  * @param userHandles {Array} list of user handles
  * @param type {String} "private" or "group"
+ * @param [chatId] {String}
+ * @param [chatShard]  {String}
+ * @param [chatdUrl]  {String}
+ * @param [setAsActive] {Boolean}
  * @returns [roomId {string}, room {MegaChatRoom}, {Deferred}]
  */
 Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUrl, setAsActive) {
@@ -935,21 +939,20 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
 
     var tmpRoomId = room.roomId;
 
-//    $promise.done(function(roomId, room) {
-//        assert(roomId, "missing room jid");
+    if (self.currentlyOpenedChat === tmpRoomId) {
+        self.currentlyOpenedChat = room.roomId;
+        if (room) {
+            room.show();
+        }
+    }
 
-        if (self.currentlyOpenedChat === tmpRoomId) {
-            self.currentlyOpenedChat = room.roomId;
-            if (room) {
-                room.show();
-            }
-        }
-        else {
-            if (room) {
-                //room.refreshUI();
-            }
-        }
-//    });
+    if (setAsActive === false) {
+        room.showAfterCreation = false;
+    }
+    else {
+        room.showAfterCreation = true;
+    }
+
 
 
 

@@ -2,7 +2,7 @@
  * a class to apply actions on business account in collaboration with API
  */
 function BusinessAccount() {
-
+    this.QuotaUpdateFreq = 15000; // 15 sec - default threshold to update quotas info
 }
 
 /**
@@ -10,9 +10,9 @@ function BusinessAccount() {
  * @param {String} subEmail  email address of new user
  * @param {String} subFName  First name of new user
  * @param {String} subLName  Last name of new user
- * @returns {Promise}        Resolves with new add user HANDLE
+ * @returns {Promise}        Resolves with new add user HANDLE + password
  */
-BusinessAccount.prototype.addSubAccount = function _addSubAccount(subEmail, subFName, subLName) {
+BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName) {
     "use strict";
     var operationPromise = new MegaPromise();
     if (checkMail(subEmail)) {
@@ -38,7 +38,7 @@ BusinessAccount.prototype.addSubAccount = function _addSubAccount(subEmail, subF
             if ($.isNumeric(res)) {
                 operationPromise.reject(0, res, 'API returned error');
             }
-            else if (typeof res === 'string') {
+            else if (typeof res === 'object') {
                 operationPromise.resolve(1, res); // new added user handle
             }
             else {
@@ -55,7 +55,7 @@ BusinessAccount.prototype.addSubAccount = function _addSubAccount(subEmail, subF
  * @param {String} subUserHandle    sub user handle to deactivate
  * @returns {Promise}               Resolves deactivate opertation result
  */
-BusinessAccount.prototype.deActivateSubAccount = function _deActivateSubAccount(subUserHandle) {
+BusinessAccount.prototype.deActivateSubAccount = function (subUserHandle) {
     "use strict";
     var operationPromise = new MegaPromise();
     if (!subUserHandle || subUserHandle.length !== 11) {
@@ -92,7 +92,7 @@ BusinessAccount.prototype.deActivateSubAccount = function _deActivateSubAccount(
  * @param {String} subUserHandle    sub user handle to activate
  * @returns {Promise}               Resolves activate opertation result
  */
-BusinessAccount.prototype.activateSubAccount = function _activateSubAccount(subUserHandle) {
+BusinessAccount.prototype.activateSubAccount = function (subUserHandle) {
     "use strict";
     var operationPromise = new MegaPromise();
     if (!subUserHandle || subUserHandle.length !== 11) {
@@ -129,7 +129,7 @@ BusinessAccount.prototype.activateSubAccount = function _activateSubAccount(subU
  * @param {String} subUserHandle    sub user handle to get the master key of
  * @returns {Promise}               Resolves opertation result
  */
-BusinessAccount.prototype.getSubAccountMKey = function _getSubAccountMKey(subUserHandle) {
+BusinessAccount.prototype.getSubAccountMKey = function (subUserHandle) {
     "use strict";
     var operationPromise = new MegaPromise();
     if (!subUserHandle || subUserHandle.length !== 11) {
@@ -160,11 +160,56 @@ BusinessAccount.prototype.getSubAccountMKey = function _getSubAccountMKey(subUse
 };
 
 /**
+ * Function to get Quota usage info for the master account and each sub account.
+ * @param {boolan} forceUpdate      a flag to force updating the cached values
+ */
+BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+    if (!forceUpdate) {
+        if (mega.buinsessAccount && mega.buinsessAccount.quotas) {
+            var currTime = new Date().getTime();
+            if (mega.buinsessAccount.quotas.timestamp &&
+                (currTime - mega.buinsessAccount.quotas.timestamp) < this.QuotaUpdateFreq) {
+                return operationPromise.resolve(1, mega.buinsessAccount.quotas);
+            }
+        }
+    }
+
+    var request = {
+        "a": "sbu", // business sub account operation
+        "aa": "q" // get quota info
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                var currTime = new Date().getTime();
+                res.timestamp = currTime;
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                mega.buinsessAccount.quotas = res;
+                operationPromise.resolve(1, res); // quota info
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+
+    return operationPromise;
+};
+
+
+/**
  * a function to parse the JSON object recived holding information about a sub-account of a business account.
  * @param {string} suba    the object to parse, it must contain a sub-account ids
  * @param {boolean} ignoreDB if we want to skip DB updating
  */
-BusinessAccount.prototype.parseSUBA = function _parseSUBA(suba, ignoreDB) {
+BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB) {
     "use strict";
     if (M) {
         M.isBusinessAccountMaster = 1; // init it, or re-set it
@@ -180,11 +225,11 @@ BusinessAccount.prototype.parseSUBA = function _parseSUBA(suba, ignoreDB) {
             // The applied solution by API is ineffecient. 
             // --> the applied soultion is not logical [storing user type in configuration]
         }
-        if (!suba) {
-            return;
-        }
         if (!M.suba) {
             M.suba = [];
+        }
+        if (!suba) {
+            return;
         }
         M.suba[suba.u] = suba; // i will keep deleted in sub-accounts in DB and MEM as long as i recieve them
         /**
@@ -192,9 +237,81 @@ BusinessAccount.prototype.parseSUBA = function _parseSUBA(suba, ignoreDB) {
          *      -u: handle
          *      -p: parent {for future multilevel business accounts}
          *      -s: status {10=pending confirmation , 11:disabled, 12:deleted, 0:enabled and ok}
+         *      -e: email
+         *      -firstname
+         *      -lastname
          */
     }
     if (fmdb && !ignoreDB && !pfkey && !folderlink) {
         fmdb.add('suba', { s_ac: suba.u, d: suba });
     }
+};
+
+/**
+ * Function to check if the current logged in user is a Business Account Master
+ * @returns {boolean}   true if the user is a Master B-Account
+ */
+BusinessAccount.prototype.isBusinessMasterAcc = function () {
+    if (M.isBusinessAccountMaster || M.suba && M.suba.length) {
+        return true;
+    }
+    return false;
+};
+
+/**
+ * Decrypting the link sent to sub-account using a password 
+ * @param {string} link         invitation link #businesssignup<link> without #businesssignup prefix
+ * @param {string} password     The passowrd which the sub-user entered to decrypt the link
+ * @returns {string}            base64 signup-code (decryption result)
+ */
+BusinessAccount.prototype.decryptSubAccountInvitationLink = function (link, password) {
+    if (!link || !password) {
+        return null;
+    }
+    try {
+        var keyFromPassword = base64_to_a32(password);
+        var aesCipher = new sjcl.cipher.aes(keyFromPassword);
+        var decryptedTokenArray32 = aesCipher.decrypt(base64_to_a32(link));
+        var decryptedTokenArray8 = a32_to_ab(decryptedTokenArray32);
+        decryptedTokenArray8 = decryptedTokenArray8.slice(0, 15);
+        var decryptedTokenBase64 = ab_to_base64(decryptedTokenArray8);
+        return decryptedTokenBase64;
+    }
+    catch (exp) {
+        console.error(exp);
+        if (exp.stack) {
+            console.error(exp.stack);
+        }
+        return null;
+    }
+    
+};
+
+/**
+ * Get info assosiated with signup code
+ * @param {string} signupCode       signup code to fetch infor for
+ * @returns {Promise}                Promise resolves an object contains fetched info
+ */
+BusinessAccount.prototype.getSignupCodeInfo = function (signupCode) {
+    if (!signupCode) {
+        return null;
+    }
+    var operationPromise = new MegaPromise();
+    var request = {
+        "a": "uv2", // business sub account operation - get signupcode info
+        "c": signupCode // the code
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if (typeof res === 'object') {
+                operationPromise.resolve(1, res); // sub-user info
+            }
+            else {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+        }
+    });
+
+    return operationPromise;
 };

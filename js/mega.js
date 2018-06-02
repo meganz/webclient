@@ -2829,15 +2829,26 @@ function process_u(u, ignoreDB) {
  */
 function process_suba(suba, ignoreDB) {
     "use strict";
-    var bAccount = new BusinessAccount();
-    if (suba.length) {
-        for (var k = 0; k < suba.length; k++) {
-            bAccount.parseSUBA(suba[k], ignoreDB);
+    M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+
+        // the resposne is an array of users's handles (Masters). this means at least it will contain
+        // the current user handle.
+        // later-on we need to iterate on all of them. For now we dont know how to treat sub-masters yet
+        // --> we will target only current users's subs
+        var bAccount = new BusinessAccount();
+        //if (!suba || !suba[u_handle]) {
+        //    return;
+        //}
+        //suba = suba[u_handle];
+        if (suba.length) {
+            for (var k = 0; k < suba.length; k++) {
+                bAccount.parseSUBA(suba[k], ignoreDB);
+            }
         }
-    }
-    else {
-        bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
-    }
+        else {
+            bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
+        }
+    });
 }
 
 function process_ok(ok, ignoreDB) {
@@ -2995,7 +3006,9 @@ function loadfm_callback(res) {
         processOPC(res.opc);
     }
     if (res.suba) {
-        process_suba(res.suba);
+        if (!is_mobile) {
+            process_suba(res.suba);
+        }
     }
     if (res.ipc) {
         processIPC(res.ipc);

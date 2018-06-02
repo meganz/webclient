@@ -2829,15 +2829,17 @@ function process_u(u, ignoreDB) {
  */
 function process_suba(suba, ignoreDB) {
     "use strict";
-    var bAccount = new BusinessAccount();
-    if (suba.length) {
-        for (var k = 0; k < suba.length; k++) {
-            bAccount.parseSUBA(suba[k], ignoreDB);
+    M.require('businessAcc_js').always(function () {
+        var bAccount = new BusinessAccount();
+        if (suba.length) {
+            for (var k = 0; k < suba.length; k++) {
+                bAccount.parseSUBA(suba[k], ignoreDB);
+            }
         }
-    }
-    else {
-        bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
-    }
+        else {
+            bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
+        }
+    });
 }
 
 function process_ok(ok, ignoreDB) {
@@ -2995,7 +2997,9 @@ function loadfm_callback(res) {
         processOPC(res.opc);
     }
     if (res.suba) {
-        process_suba(res.suba);
+        if (!is_mobile) {
+            process_suba(res.suba);
+        }
     }
     if (res.ipc) {
         processIPC(res.ipc);

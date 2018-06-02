@@ -198,3 +198,14 @@ BusinessAccount.prototype.parseSUBA = function _parseSUBA(suba, ignoreDB) {
         fmdb.add('suba', { s_ac: suba.u, d: suba });
     }
 };
+
+/**
+ * Function to check if the current logged in user is a Business Account Master
+ * @returns {boolean}   true if the user is a Master B-Account
+ */
+BusinessAccount.prototype.isBusinessMasterAcc = function _isBusinessMasterAcc() {
+    if (M.isBusinessAccountMaster || M.suba && M.suba.length) {
+        return true;
+    }
+    return false;
+};

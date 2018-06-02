@@ -236,7 +236,7 @@
                 <div class="dark-tooltip">[$5902]</div>
                 <div class="beta-text"></div>
             </div>
-            <div class="nw-fm-left-icon user-management ui-droppable hidden">
+            <div class="nw-fm-left-icon user-management">
                 <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">[$18677]</div>
                 <div class="beta-text"></div>
@@ -341,10 +341,24 @@
                     <input type="text" value="" placeholder="[$823]" />
                     <div class="nw-fm-search-icon"></div>
                 </div>
+                <div class="nw-fm-tree-header user-management">
+                    <input value="" placeholder="[$18677]" type="text">
+                    <div class="nw-fm-search-icon"></div>
+                </div>
             </div>
             <div class="nw-tree-panel-header">
                 <span>[$5916]</span>
                 <div class="nw-tree-panel-arrows"></div>
+            </div>
+            <div class="user-management-tree-panel-header enabled-accounts hidden">
+                <div class="img enabled-accounts"></div>
+                <span>Enabled Accounts</span>
+                <div class="user-management-tree-panel-arrows"></div>
+            </div>
+            <div class="user-management-tree-panel-header disabled-accounts hidden">
+                <div class="img disabled-accounts"></div>
+                <span>Disabled Accounts</span>
+                <div class="user-management-tree-panel-arrows"></div>
             </div>
             <div class="fm-tree-panel">
 
@@ -359,6 +373,20 @@
                 <div class="content-panel contacts">
                 </div>
                 <div class="content-panel rubbish-bin">
+                </div>
+                <div class="content-panel user-management">
+                    <div class="nw-user-management-item">
+                        <div class="user-management-status enabled"></div>
+                        <div class="nw-user-management-name">Jay Pierce</div>
+                    </div>
+                    <div class="nw-user-management-item">
+                        <div class="user-management-status pending"></div>
+                        <div class="nw-user-management-name">Ollie Gibson</div>
+                    </div>
+                    <div class="nw-user-management-item">
+                        <div class="user-management-status enabled"></div>
+                        <div class="nw-user-management-name">John Bailey</div>
+                    </div>
                 </div>
                 <div class="content-panel dashboard">
                     <div class="account user-data-block">
@@ -542,23 +570,52 @@
 
             </div>
             <!-- Users Managment Header -->
-            <div class="fm-right-header-user-management fm hidden">
-                <div class="fm-header-buttons-user-management">
+            <div class="fm-right-header-user-management">
+                <div class="right-header-user-management-main-page ">
                     <a class="fm-files-view-icon-user-management block-view" title="Thumbnail view"></a>
                     <a class="fm-files-view-icon-user-management listing-view active" title="List view"></a>
-                    <div class="default-white-button">
-                        <div class="overview-img"></div>
-                        <span>Overview</span>
+                    <div class="default-white-button-user-management">
+                        <div class="overview-img img"></div>
+                        Overview
                     </div>
 
-                    <div class="default-white-button">
-                        <div class="account-img"></div>
-                        <span>Account</span>
+                    <div class="default-white-button-user-management">
+                        <div class="account-img img"></div>
+                        Account
                     </div>
 
-                    <div class="default-green-button">
-                        <div class="add-users-img"></div>
-                        <span>Add Users</span>
+                    <div class="default-green-button-user-management">
+                        <div class="add-users-img img"></div>
+                        Add Users
+                    </div>
+                </div>
+
+                <div class="right-header-user-management-view hidden">
+                    <div class="view-breadcrumbs-user-management hidden">
+                        <div class="user-management-icon"></div>
+                        <div class="user-management-next-arrow"></div>
+                        <div class="user-management-subuser-avatars">
+                            <div class="user-management-subuser-image"></div>
+                        </div>
+                        <div class="user-management-subuser-name">Jay Pierce</div>
+                    </div>
+
+                    <div class="view-breadcrumbs-user-management">
+                        <div class="user-management-icon"></div>
+                        <div class="user-management-next-arrow"></div>
+                        <div class="user-management-breadcrumbs-img overview-img"></div>
+                        <div class="user-management-subuser-name">Overview</div>
+                    </div>
+
+                    <div class="view-button-user-management">
+                        <div class="default-white-button-user-management">
+                            <div class="export-pdf-img img"></div>
+                            Export to PDF
+                        </div>
+                        <div class="default-white-button-user-management">
+                            <div class="overview-img img"></div>
+                            View Plans
+                        </div>
                     </div>
                 </div>
             </div>

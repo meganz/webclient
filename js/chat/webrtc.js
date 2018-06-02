@@ -2226,7 +2226,7 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             assert(!isIncoming);
             return UICallTerm.REJECTED;
         case Term.kAppTerminating:
-            return (self.predestroyState === CallState.kInProgress)
+            return (self.predestroyState === CallState.kInProgress && self._hasConnectedSession)
                 ? UICallTerm.ENDED
                 : UICallTerm.FAILED;
         default:
@@ -2281,7 +2281,7 @@ Call.prototype.termCodeToHistCallEndedCode = function(terminationCode) {
             assert(!isIncoming);
             return CallManager.CALL_END_REMOTE_REASON.REJECTED;
         case Term.kAppTerminating:
-            return (self.predestroyState === CallState.kInProgress)
+            return (self.predestroyState === CallState.kInProgress && self._hasConnectedSession)
                 ? CallManager.CALL_END_REMOTE_REASON.CALL_ENDED
                 : CallManager.CALL_END_REMOTE_REASON.FAILED;
         default:

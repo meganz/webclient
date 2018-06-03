@@ -656,9 +656,11 @@ var slideshowid;
             clearTimeout(mouseIdleTimer);
             $document.unbind('mousemove.idle');
             $controls.unbind('mousemove.idle');
+            $('.viewer-short-controls.img-controls', $overlay).addClass('hidden');
 
             // Slideshow Mode Init
             if (is_image3(n)) {
+                $('.viewer-short-controls.img-controls', $overlay).removeClass('hidden');
                 slideshow_imgControls();
 
                 // Autohide controls

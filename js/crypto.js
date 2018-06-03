@@ -1380,11 +1380,6 @@ function api_setattr(n, idtag) {
         }
     };
 
-    if (!crypto_keyok(n)) {
-        logger.warn('Unable to set node attributes, invalid key on %s', n.h, n);
-        return MegaPromise.reject(EKEY);
-    }
-
     try {
         var at = ab_to_base64(crypto_makeattr(n));
 

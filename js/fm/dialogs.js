@@ -1023,14 +1023,22 @@
                 }
                 else {
                     var userHandles = [u_handle, $.mcselected];
-                    var result = megaChat.openChat(userHandles, "private");
+                    var result = megaChat.openChat(
+                        userHandles,
+                        "private",
+                        undefined,
+                        undefined,
+                        undefined,
+                        false
+                    );
+
                     if (result && result[1] && result[2]) {
                         var room = result[1];
                         var chatInitDonePromise = result[2];
                         chatInitDonePromise.done(function() {
                             createTimeoutPromise(function() {
                                 return room.state === ChatRoom.STATE.READY;
-                            }, 300, 5000)
+                            }, 300, 30000)
                                 .done(function() {
                                     room.attachNodes(selectedNodes);
                                     showToast('send-chat', (selectedNodes.length > 1) ? l[17767] : l[17766]);

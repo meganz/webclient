@@ -11927,7 +11927,9 @@ React.makeElement = React['createElement'];
 	ChatRoom.prototype.sendMessage = function (message) {
 	    var self = this;
 	    var megaChat = this.megaChat;
-
+	    if (d && self.state !== ChatRoom.STATE.READY) {
+	        console.warn("Tried to do a .sendMessage while the room is not ready");
+	    }
 	    var messageId = megaChat.generateTempMessageId(self.roomId, message);
 
 	    var msgObject = new Message(self, self.messagesBuff, {

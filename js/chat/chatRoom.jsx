@@ -77,10 +77,17 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     self.members = {};
 
-    users.forEach(function(userHandle) {
-        // while loading, set permissions to read only
-        self.members[userHandle] = 0;
-    });
+    if (type === "private") {
+        users.forEach(function(userHandle) {
+            self.members[userHandle] = 3;
+        });
+    }
+    else {
+        users.forEach(function(userHandle) {
+            // while loading, set permissions to read only
+            self.members[userHandle] = 0;
+        });
+    }
 
     this.options = {
 
@@ -1203,7 +1210,8 @@ ChatRoom.prototype.isReadOnly = function() {
         (this.members && this.members[u_handle] === 0) ||
         this.privateReadOnlyChat ||
         this.state === ChatRoom.STATE.LEAVING ||
-        this.state === ChatRoom.STATE.LEFT
+        this.state === ChatRoom.STATE.LEFT ||
+        this.state !== ChatRoom.STATE.READY
     );
 };
 ChatRoom.prototype.iAmOperator = function() {

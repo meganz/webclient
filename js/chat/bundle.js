@@ -11430,10 +11430,16 @@ React.makeElement = React['createElement'];
 
 	    self.members = {};
 
-	    users.forEach(function (userHandle) {
+	    if (type === "private") {
+	        users.forEach(function (userHandle) {
+	            self.members[userHandle] = 3;
+	        });
+	    } else {
+	        users.forEach(function (userHandle) {
 
-	        self.members[userHandle] = 0;
-	    });
+	            self.members[userHandle] = 0;
+	        });
+	    }
 
 	    this.options = {
 
@@ -12265,7 +12271,7 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.isReadOnly = function () {
-	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
+	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT || this.state !== ChatRoom.STATE.READY;
 	};
 	ChatRoom.prototype.iAmOperator = function () {
 	    return this.type === "private" || this.members && this.members[u_handle] === 3;

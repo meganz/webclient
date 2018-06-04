@@ -2829,7 +2829,7 @@ function process_u(u, ignoreDB) {
  */
 function process_suba(suba, ignoreDB) {
     "use strict";
-    M.require('businessAcc_js').always(function () {
+    M.require('businessAcc_js','businessAccUI_js').done(function () {
         var bAccount = new BusinessAccount();
         if (suba.length) {
             for (var k = 0; k < suba.length; k++) {

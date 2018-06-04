@@ -909,13 +909,13 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
     self._clearCallOutTimer();
     var reasonNoPeer = code & ~Term.kPeer; // jscs:ignore disallowImplicitTypeConversion
     var pms = new Promise(function(resolve, reject) {
-        self.logger.warn("Terminating call in state", constStateToText(CallState, self.predestroyState),
+        self.logger.log("Terminating call in state", constStateToText(CallState, self.predestroyState),
             "with reason", constStateToText(Term, reasonNoPeer));
         if (self.predestroyState !== CallState.kRingIn && reasonNoPeer !== Term.kBusy) {
             // kBusy is a local thing, there is another call in the room
             self._bcastCallData(CallDataType.kTerminated, self.termCodeToHistCallEndedCode(code));
         } else {
-            self.logger.warn("Not posting termination CALLDATA because term code is",
+            self.logger.log("Not posting termination CALLDATA because term code is",
                 constStateToText(Term, reasonNoPeer),
                 "and call state is", constStateToText(CallState, self.predestroyState));
         }
@@ -1692,7 +1692,7 @@ Session.prototype.msgSdpOfferSendAnswer = function(packet) {
 Session.prototype.msgSdpAnswer = function(packet) {
     var self = this;
     if (self.state !== SessState.kWaitSdpAnswer) {
-        self.logger.warn("Ingoring unexpected SDP_ANSWER");
+        self.logger.warn("Ignoring unexpected SDP_ANSWER");
         return;
     }
     // SDP_ANSWER sid.8 fprHash.32 av.1 sdpLen.2 sdpAnswer.sdpLen

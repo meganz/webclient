@@ -118,10 +118,6 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/encr-sprite@2x_v1.png);
     background-size: 216px;
 }
-.zoom-overlay-icon, .zoom-overlay-key::after {
-    background-image: url(../images/mega/zoom-sprite_v1@2x.png);
-    background-size: 160px auto;
-}
 .huge-white-icon, .shared-link.small-icon {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;

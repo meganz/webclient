@@ -1974,6 +1974,7 @@
     "17620": "O c\u00f3digo-fonte da pasta MEGAdrop foi copiado para a \u00e1rea de transfer\u00eancia.",
     "17621": "Sincronizar",
     "17626": "Ao fazer isso, voc\u00ea cancelar\u00e1 a configura\u00e7\u00e3o do  MEGAdrop em v\u00e1rias pastas.",
+    "17669": "Enviou o seguinte arquivo:",
     "17686": "Atualmente, n\u00e3o suportamos links MEGAdrop em navegadores m\u00f3veis, mas voc\u00ea pode usar qualquer um dos navegadores web suportados.",
     "17687": "N\u00e3o suportado",
     "17688": "Voc\u00ea lembra da sua senha?",
@@ -2278,9 +2279,9 @@
     "18685": "Podemos limpar a sua lixeira automaticamente. O per\u00edodo m\u00ednimo \u00e9 de 7 dias.",
     "18686": "Vamos limpar a sua lixeira automaticamente. O per\u00edodo m\u00ednimo \u00e9 de 7 dias e o per\u00edodo m\u00e1ximo \u00e9 de 30 dias.",
     "18687": "Voc\u00ea vai desativar permanentemente a visualiza\u00e7\u00e3o de URL avan\u00e7ada. Voc\u00ea pode reativ\u00e1-la nas suas configura\u00e7\u00f5es. Voc\u00ea quer prosseguir?",
-    "18688": "Call from [X] was not answered in a timely manner.",
-    "18689": "Call to [X] ended.",
-    "18690": "Call to [X] failed.",
-    "18691": "Call to [X] was rejected.",
-    "18692": "Call to [X] was canceled."
+    "18688": "A chamada de [X] n\u00e3o foi atendida a tempo.",
+    "18689": "A chamada para [X] terminou.",
+    "18690": "A chamada para [X] falhou.",
+    "18691": "A chamada para [X] foi recusada.",
+    "18692": "A chamada para [X] foi cancelada."
 }

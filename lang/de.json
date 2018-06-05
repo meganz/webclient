@@ -1974,6 +1974,7 @@
     "17620": "Der MEGAdrop-Code wurde in die Zwischenablage kopiert.",
     "17621": "Sync",
     "17626": "Hiermit l\u00f6schen Sie die MEGAdrop-Konfiguration f\u00fcr mehrere Ordner.",
+    "17669": "Hat diese Datei hochgeladen:",
     "17686": "Mobilbrowserunterst\u00fctzung f\u00fcr MEGAdrop ist noch in Arbeit. Bitte verwenden Sie vor\u00fcbergehend einen Desktop-Browser.",
     "17687": "Noch nicht verf\u00fcgbar",
     "17688": "Erinnern Sie sich noch an Ihr Passwort?",
@@ -2280,7 +2281,7 @@
     "18687": "Sie schalten die URL-Vorschau dauerhaft ab (eine Reaktivierung ist jedoch \u00fcber Ihre Benutzereinstellungen m\u00f6glich). Fortfahren?",
     "18688": "Der Anruf von [X] wurde nicht angenommen.\r\n                                \r\n                                ",
     "18689": "Gespr\u00e4ch mit [X] beendet",
-    "18690": "Gespr\u00e4ch mit [X] fehlgeschlagen",
+    "18690": "Rufaufbau zu [X] erfolglos.",
     "18691": "[X] hat den Anruf abgewiesen.",
-    "18692": "Anrufaufbau zu [X] abgebrochen."
+    "18692": "Rufaufbau zu [X] abgebrochen."
 }

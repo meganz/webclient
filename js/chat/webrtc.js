@@ -713,7 +713,7 @@ Call.prototype.msgCallReqDecline = function(packet) {
         this.logger.warn("Ignoring unexpected CALL_REQ_DECLINE while in state", constStateToText(this.state));
         return;
     }
-    this._destroy(code | Term.kPeer, false);
+    this.hangup(code | Term.kPeer);
 };
 
 Call.prototype.msgCallReqCancel = function(packet) {
@@ -1210,41 +1210,37 @@ Call.prototype.answer = function(av) {
 };
 
 Call.prototype.hangup = function(reason) {
-    var term;
+    var reasonNoPeer;
+    if (reason != null) {
+        reasonNoPeer = reason & ~Term.kPeer;
+    }
+
     switch (this.state) {
     case CallState.kReqSent:
-        if (typeof reason === 'undefined') {
+        if (reasonNoPeer == null) {
             reason = Term.kUserHangup;
-        } else {
-            assert(reason === Term.kUserHangup
-                || reason === Term.kAnswerTimeout
-                || reason === Term.kRingOutTimeout,
-                "Invalid reason "+reason+" for hangup of outgoing call request");
         }
-        this._cmd(RTCMD.CALL_REQ_CANCEL, 0, 0, this.id+String.fromCharCode(reason));
+        this.cmdBroadcast(RTCMD.CALL_REQ_CANCEL, this.id+String.fromCharCode(reason));
         return this._destroy(reason, false);
     case CallState.kRingIn:
-        if (typeof reason === 'undefined') {
-            term = Term.kCallRejected;
-        } else if (reason === Term.kBusy) {
-            term = Term.kBusy;
+        if (reason == null) {
+            reason = Term.kCallRejected;
         } else {
-            assert(false, "Hangup reason can only be undefined or kBusy when hanging up call in state kRingIn");
+            assert(reasonNoPeer === Term.kBusy, "Hangup reason can only be undefined or kBusy when hanging up call in state kRingIn");
         }
         var cinfo = this._callerInfo;
         assert(cinfo);
         assert(Object.keys(this.sessions).length === 0);
-        this.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, cinfo.callid + String.fromCharCode(term));
-        return this._destroy(term, false);
+        this.cmdBroadcast(RTCMD.CALL_REQ_DECLINE, cinfo.callid + String.fromCharCode(reason));
+        return this._destroy(reason, false);
     case CallState.kJoining:
     case CallState.kInProgress:
     case CallState.kWaitLocalStream:
         // TODO: For group calls, check if the sender is the call host and only then destroy the call
         if (reason == null) { // covers both 'undefined' and 'null'
-            term = Term.kUserHangup;
+            reason = Term.kUserHangup;
         } else {
-            assert(reason === Term.kUserHangup || RtcModule.termCodeIsError(reason));
-            term = reason;
+            assert(reasonNoPeer === Term.kUserHangup || RtcModule.termCodeIsError(reasonNoPeer));
         }
         break;
     case CallState.kTerminating:
@@ -1252,12 +1248,12 @@ Call.prototype.hangup = function(reason) {
         this.logger.debug("hangup: Call already terminating/terminated");
         return Promise.resolve();
     default:
-        term = Term.kUserHangup;
-        this.logger.warn("Don't know what term code to send in state", constStateToText(Term, this.state));
+        reason = Term.kUserHangup;
+        this.logger.warn("Don't know what term code to send in state", constStateToText(CallState, this.state));
         break;
     }
     // in any state, we just have to send CALL_TERMINATE and that's all
-    return this._destroy(term, true);
+    return this._destroy(reason, true);
 };
 
 Call.prototype._onUserOffline = function(userid, clientid) {

@@ -150,6 +150,7 @@ var ChatdIntegration = function(megaChat) {
         })
             .done(function(r) {
                 // no need to do anything, the triggered action packet would trigger the code for joining the room.
+                megaChat._chatsAwaitingAps[r.id] = true;
             })
             .fail(function() {
                 self.logger.error(
@@ -427,13 +428,16 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                 }
             }
 
+            var setAsActive = megaChat._chatsAwaitingAps[actionPacket.id] === true;
+            delete megaChat._chatsAwaitingAps[actionPacket.id];
+
             var r = self.megaChat.openChat(
                 userHandles,
                 actionPacket.g === 1 ? "group" : "private",
                 actionPacket.id,
                 actionPacket.cs,
                 actionPacket.url,
-                false
+                setAsActive
             );
             chatRoom = r[1];
             if (!chatRoom) {

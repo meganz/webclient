@@ -225,6 +225,7 @@ var Chat = function() {
     this.plugins = {};
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
+    self._chatsAwaitingAps = {};
 
     return this;
 };

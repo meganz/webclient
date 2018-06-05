@@ -734,6 +734,10 @@ function init_page() {
             alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
         }
     }
+    else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
+        var signupCodeEncrypted = page.substring(14, page.length);
+
+    }
     else if (page.substr(0, 6) == 'signup') {
         var signupcode = page.substr(6, page.length - 1);
         loadingDialog.show();

@@ -2829,8 +2829,22 @@ function process_u(u, ignoreDB) {
  */
 function process_suba(suba, ignoreDB) {
     "use strict";
-    M.require('businessAcc_js','businessAccUI_js').done(function () {
+    M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+
+        // the resposne is an array of users's handles (Masters). this means at least it will contain
+        // the current user handle.
+        // later-on we need to iterate on all of them. For now we dont know how to treat sub-masters yet
+        // --> we will target only current users's subs
         var bAccount = new BusinessAccount();
+        //if (!suba || !suba[u_handle]) {
+        //    return;
+        //}
+        //suba = suba[u_handle];
+        if (localStorage.businessTestDate) {
+            if (!suba.length) {
+                suba.push({ u: 'thecaptin1', p: u_handle, s: '0' });
+            }
+        }
         if (suba.length) {
             for (var k = 0; k < suba.length; k++) {
                 bAccount.parseSUBA(suba[k], ignoreDB);

@@ -314,7 +314,11 @@
             id = 'ipc';
         }
         else if (id === 'user-management') {
-            id = 'user-management'; // dummy assignment, needed to exit if-else!
+            id = 'user-management';
+            M.require('businessAccUI_js').done(function () {
+                var usersM = new BusinessAccountUI();
+                M.onFileManagerReady(usersM.viewSubAccountListUI);
+            });
         }
         else if (id === 'shares') {
             id = 'shares';

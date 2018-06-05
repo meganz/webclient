@@ -36,4 +36,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function _viewSubAccountListU
         subAccountsView = $('.fm-blocks-view.user-management-view');
     }
 
+    subAccountsView.removeClass('hidden');
+    $('.grid-table-user-management', subAccountsView).removeClass('hidden');
 };

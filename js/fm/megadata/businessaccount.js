@@ -38,7 +38,7 @@ BusinessAccount.prototype.addSubAccount = function _addSubAccount(subEmail, subF
             if ($.isNumeric(res)) {
                 operationPromise.reject(0, res, 'API returned error');
             }
-            else if (typeof res === 'string') {
+            else if (typeof res === 'object') {
                 operationPromise.resolve(1, res); // new added user handle
             }
             else {
@@ -180,11 +180,11 @@ BusinessAccount.prototype.parseSUBA = function _parseSUBA(suba, ignoreDB) {
             // The applied solution by API is ineffecient. 
             // --> the applied soultion is not logical [storing user type in configuration]
         }
-        if (!suba) {
-            return;
-        }
         if (!M.suba) {
             M.suba = [];
+        }
+        if (!suba) {
+            return;
         }
         M.suba[suba.u] = suba; // i will keep deleted in sub-accounts in DB and MEM as long as i recieve them
         /**

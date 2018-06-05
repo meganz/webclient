@@ -277,7 +277,7 @@ CallManager.prototype.forEachCallManagerCall = function (cb) {
  * To be used internally by Message._getTextContentsForDialogType
  * @param message {Message|ChatDialogMessage}
  * @param textMessage {String}
- * @param html {boolean} pass true to return (eventually) HTML formatted messages
+ * @param [html] {boolean} pass true to return (eventually) HTML formatted messages
  */
 CallManager._getMultiStringTextContentsForMessage = function(message, textMessage, html) {
     var tmpMsg;

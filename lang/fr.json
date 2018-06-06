@@ -921,6 +921,7 @@
     "6971": "Renouvellement",
     "6972": "Votre mot de passe d'origine n'a pas \u00e9t\u00e9 renseign\u00e9 correctement.",
     "6973": "Voulez-vous vraiment supprimer votre avatar ?",
+    "6974": "Supprimer l'avatar",
     "6975": "Choisir votre mode de paiement ci-dessous.",
     "6976": "Vous avez choisi l'offre %1",
     "6978": "[A]Obtenez 2 mois gratuits[\/A] en vous abonnant \u00e0 une offre PRO d'un an.",
@@ -1974,6 +1975,7 @@
     "17620": "Le code source de MEGAdrop a \u00e9t\u00e9 copi\u00e9 avec succ\u00e8s dans le presse-papiers.",
     "17621": "Syncro",
     "17626": "En faisant cela, vous annulerez votre configuration MEGAdrop pour plusieurs dossiers.",
+    "17669": "Ce fichier a \u00e9t\u00e9 t\u00e9l\u00e9vers\u00e9\u00a0:",
     "17686": "Nous ne prenons actuellement pas en charge les liens MEGAdrop dans les navigateurs mobiles. Veuillez plut\u00f4t utiliser l\u2019un des navigateurs Web pris en charge.",
     "17687": "Non pris en charge",
     "17688": "Pouvez-vous vous souvenir de votre mot de passe\u2009?",
@@ -2278,9 +2280,11 @@
     "18685": "La corbeille peut \u00eatre vid\u00e9e pour vous automatiquement. La p\u00e9riode minimale est de 7 jours.",
     "18686": "La corbeille est vid\u00e9e pour vous automatiquement. La p\u00e9riode minimale est de 7 jours et votre p\u00e9riode maximale est de 30 jours.",
     "18687": "Vous \u00eates sur le point de d\u00e9sactiver les aper\u00e7us d\u2019URL enrichis en permanence. Vous pourrez r\u00e9activer les aper\u00e7us d\u2019URL enrichis dans vos param\u00e8tres. Souhaitez-vous poursuivre\u2009?",
-    "18688": "Call from [X] was not answered in a timely manner.",
-    "18689": "Call to [X] ended.",
-    "18690": "Call to [X] failed.",
-    "18691": "Call to [X] was rejected.",
-    "18692": "Call to [X] was canceled."
+    "18688": "L\u2019appel de [X] n\u2019a pas re\u00e7u de r\u00e9ponse \u00e0 temps.",
+    "18689": "Fin de l\u2019appel avec [X].",
+    "18690": "\u00c9chec d\u2019appel vers [X].",
+    "18691": "L\u2019appel vers [X] a \u00e9t\u00e9 refus\u00e9.",
+    "18692": "L\u2019appel vers [X] a \u00e9t\u00e9 annul\u00e9.",
+    "18698": "Call to [X] was not answered in a timely manner.",
+    "18699": "Confirm Remove Avatar"
 }

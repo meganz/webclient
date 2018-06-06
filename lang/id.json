@@ -921,6 +921,7 @@
     "6971": "Renews",
     "6972": "Password original anda salah",
     "6973": "Apakah anda yakin anda ingin menghapus avatar anda?",
+    "6974": "Hapus avatar",
     "6975": "Pilih metode pembayaran anda dibawah.",
     "6976": "Anda telah memilih %1 plan",
     "6978": "[A]Dapatkan 2 bulan gratis[\/A] jika anda subscribe ke satu-tahun PRO plan.",
@@ -1974,6 +1975,7 @@
     "17620": "Kode sumber MEGAdrop berhasil disalin ke clipboard.",
     "17621": "Sync",
     "17626": "Dengan melakukan ini, Anda akan membatalkan pengaturan MEGAdrop Anda untuk beberapa folder.",
+    "17669": "Unggah file ini:",
     "17686": "Saat ini kami tidak mendukung tautan MEGAdrop di peramban seluler, harap gunakan salah satu dari peramban web yang didukung.",
     "17687": "Tidak didukung\r\n",
     "17688": "Bisakah Anda mengingat kata sandi Anda?",
@@ -2282,5 +2284,7 @@
     "18689": "Call to [X] ended.",
     "18690": "Call to [X] failed.",
     "18691": "Call to [X] was rejected.",
-    "18692": "Call to [X] was canceled."
+    "18692": "Call to [X] was canceled.",
+    "18698": "Call to [X] was not answered in a timely manner.",
+    "18699": "Confirm Remove Avatar"
 }

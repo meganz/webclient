@@ -921,6 +921,7 @@
     "6971": "Vernieuwingen",
     "6972": "Uw oorspronkelijke wachtwoord is niet correct ingevoerd",
     "6973": "Bent u zeker dat u uw Avatar afbeelding wilt verwijderen?",
+    "6974": "Verwijder avatar",
     "6975": "Kies hieronder uw betaalmethode.",
     "6976": "U heeft de %1 abonnement geselecteerd",
     "6978": "[A]Krijg 2 maanden gratis[\/A] als u zich abonneert op \u00e9\u00e9n jarig PRO abonnement.",
@@ -1974,6 +1975,7 @@
     "17620": "MEGAdrop bron code was succesvol gekopieerd naar uw klembord.",
     "17621": "Sync",
     "17626": "Door dit te doen annuleert u uw MEGAdrop instelling voor meerdere mappen.",
+    "17669": "Dit bestand ge\u00fcpload:",
     "17686": "Momenteel ondersteunen wij geen MEGAdrop koppelingen in mobiele browsers, gebruik elk van de ondersteunende web browsers.",
     "17687": "Niet ondersteund",
     "17688": "Kunt u uw wachtwoord herinneren?",
@@ -2278,9 +2280,11 @@
     "18685": "De Prullenbak kan automatisch voor u worden gewist. De minimale periode is 7 dagen.",
     "18686": "De Prullenbak wordt automatisch voor u gewist. De minimale periode is 7 dagen en uw maximale periode is 30 dagen.",
     "18687": "U schakelt rijke URL weergave permanent uit. U kunt rijke URL weergave opnieuw inschakelen in uw instellingen. Wilt u doorgaan?",
-    "18688": "Call from [X] was not answered in a timely manner.",
-    "18689": "Call to [X] ended.",
-    "18690": "Call to [X] failed.",
-    "18691": "Call to [X] was rejected.",
-    "18692": "Call to [X] was canceled."
+    "18688": "Oproep van [X] was niet op tijd beantwoord.",
+    "18689": "Oproep naar [X] be\u00ebindigd.",
+    "18690": "Oproep naar [X] mislukt.",
+    "18691": "Oproep naar [X] was afgewezen.",
+    "18692": "Oproep naar [X] was geannuleerd.",
+    "18698": "Call to [X] was not answered in a timely manner.",
+    "18699": "Confirm Remove Avatar"
 }

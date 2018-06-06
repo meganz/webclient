@@ -921,6 +921,7 @@
     "6971": "Re\u00eennoiri",
     "6972": "Parola original\u0103 nu a fost introdus\u0103 corect",
     "6973": "Sigur vrei s\u0103 elimini avatarul?",
+    "6974": "Elimin\u0103 avatarul",
     "6975": "Alege metoda de plat\u0103 de mai jos.",
     "6976": "Ai selectat planul %1",
     "6978": "[A]Ob\u0163ine 2 uni gratuit[\/A] dac\u0103 te abonezi la un plan PRO pentru un an.",
@@ -1974,6 +1975,7 @@
     "17620": "MEGAdrop source code was successfully copied to clipboard.",
     "17621": "Sync",
     "17626": "By doing this you will cancel your MEGAdrop setup for multiple folders.",
+    "17669": "Uploaded this file:",
     "17686": "Currently we are not supporting MEGAdrop links in mobile browsers, please use any of the supported web browsers.",
     "17687": "Nesuportat",
     "17688": "Can you remember your password?",
@@ -2282,5 +2284,7 @@
     "18689": "Call to [X] ended.",
     "18690": "Call to [X] failed.",
     "18691": "Call to [X] was rejected.",
-    "18692": "Call to [X] was canceled."
+    "18692": "Call to [X] was canceled.",
+    "18698": "Call to [X] was not answered in a timely manner.",
+    "18699": "Confirm Remove Avatar"
 }

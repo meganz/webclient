@@ -921,6 +921,7 @@
     "6971": "Rinnovo",
     "6972": "La password originale non \u00e8 stato immessa correttamente",
     "6973": "Sei sicuro di voler rimuovere il tuo avatar?",
+    "6974": "Rimuovi avatar",
     "6975": "Scegli il metodo di pagamento di seguito.",
     "6976": "Hai selezionato il piano %1",
     "6978": "[A]Ottieni 2 mesi gratis[\/A] se sottoscrivi ad un abbonamento PRO annuale.",
@@ -1974,6 +1975,7 @@
     "17620": "Il codice sorgente di MEGAdrop \u00e8 stato copiato con successo negli appunti.",
     "17621": "Sincronizza",
     "17626": "Effettuando questa operazione cancellerai la tua impostazione MEGAdrop per le cartelle multiple.",
+    "17669": "Questo file \u00e8 stato caricato:",
     "17686": "Al momento non supportiamo i link MEGAdrop nei browser mobile, per favore utilizza uno qualsiasi dei browser supportati.",
     "17687": "Non supportato",
     "17688": "Ricordi la tua password?",
@@ -2282,5 +2284,7 @@
     "18689": "Chiamata a [X] terminata.",
     "18690": "Chiamata a [X] fallita.",
     "18691": "Chiamata a [X] rifiutata.",
-    "18692": "Chiamata a [X] annullata."
+    "18692": "Chiamata a [X] annullata.",
+    "18698": "Chiamata a [X] senza risposta in modo tempestivo.",
+    "18699": "Conferma rimozione avatar"
 }

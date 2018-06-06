@@ -16,7 +16,7 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
+var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
     var self = this;
 
     this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -88,6 +88,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             self.members[userHandle] = 0;
         });
     }
+
     this.options = {
 
         /**
@@ -225,9 +226,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             getLastInteractionWith(contact.u);
         }
     });
-    if (!noUI) {
-        self.megaChat.trigger('onRoomCreated', [self]);
-    }
+    // This line of code should always be called, no matter what. Plugins rely on onRoomCreated
+    // so that they can hook/add event listeners to newly created rooms.
+    self.megaChat.trigger('onRoomCreated', [self]);
 
     $(window).rebind("focus." + self.roomId, function() {
         if (self.isCurrentlyActive) {
@@ -764,7 +765,9 @@ ChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
 ChatRoom.prototype.sendMessage = function(message) {
     var self = this;
     var megaChat = this.megaChat;
-
+    if (d && self.state !== ChatRoom.STATE.READY) {
+        console.warn("Tried to do a .sendMessage while the room is not ready");
+    }
     var messageId = megaChat.generateTempMessageId(self.roomId, message);
 
     var msgObject = new Message(
@@ -1207,7 +1210,8 @@ ChatRoom.prototype.isReadOnly = function() {
         (this.members && this.members[u_handle] === 0) ||
         this.privateReadOnlyChat ||
         this.state === ChatRoom.STATE.LEAVING ||
-        this.state === ChatRoom.STATE.LEFT
+        this.state === ChatRoom.STATE.LEFT ||
+        this.state !== ChatRoom.STATE.READY
     );
 };
 ChatRoom.prototype.iAmOperator = function() {

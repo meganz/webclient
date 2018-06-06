@@ -1604,7 +1604,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 var inRub = (M.RubbishID === M.currentrootid);
 
                 handles.map(function(handle) {
-                    M.delNode(handle, true);    // must not update DB pre-API
+                    // M.delNode(handle, true);    // must not update DB pre-API
                     api_req({a: 'd', n: handle/*, i: requesti*/});
 
                     if (inRub) {

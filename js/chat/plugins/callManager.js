@@ -867,6 +867,17 @@ CallManagerCall.prototype.onCallEnded = function (e, reason) {
 
 CallManagerCall.prototype.onCallRejected = function (e, reason) {
     var self = this;
+    if (reason === Term.kBusy) {
+        self.room.appendMessage(
+            new ChatDialogMessage({
+                messageId: 'call-rejected-' + self.id,
+                type: 'call-rejected',
+                authorContact: self.getPeer(),
+                delay: unixtime(),
+                persist: false
+            })
+        );
+    }
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 CallManagerCall.prototype.onCallAborted = function (e, reason) {

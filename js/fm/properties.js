@@ -505,12 +505,12 @@
                     if (String(h).length === 11 && M.c[h]) {
                         shares = shares.concat(Object.keys(M.c[h]));
                     }
-                    else if (!M.getNodeByHandle(h)) {
+                    else {
                         return true;
                     }
                 });
-            nodes = nodes.concat(shares);
-            var promise = dbfetch.geta(nodes);
+            $.selected = nodes.concat(shares);
+            var promise = dbfetch.geta($.selected);
 
             promise.always(function() {
                 _propertiesDialog();

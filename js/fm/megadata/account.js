@@ -141,14 +141,23 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     }
                 }
 
+                if (!ctx.account.downbw_used) {
+                    ctx.account.downbw_used = 0;
+                }
+
                 if (pstatus !== u_attr.p) {
                     ctx.account.justUpgraded = Date.now();
 
                     M.checkStorageQuota(2);
                 }
 
-                if (!u_attr.p && uqres) {
-                    ctx.account.servbw_used = 0;
+                if (uqres) {
+                    if (!u_attr.p) {
+                        if (uqres.tal) {
+                            ctx.account.bw = uqres.tal;
+                        }
+                        ctx.account.servbw_used = 0;
+                    }
 
                     if (uqres.tah) {
                         var bwu = 0;
@@ -157,10 +166,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                             bwu += uqres.tah[w];
                         }
 
-                        ctx.account.downbw_used = bwu;
-                        if (uqres.tal) {
-                            ctx.account.bw = uqres.tal;
-                        }
+                        ctx.account.downbw_used += bwu;
                     }
                 }
 

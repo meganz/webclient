@@ -9347,7 +9347,7 @@ React.makeElement = React['createElement'];
 	            MESSAGE_STRINGS = {
 	                'outgoing-call': l[5891],
 	                'incoming-call': l[5893],
-	                'call-timeout': [["Call to %s was not answered in a timely manner."]],
+	                'call-timeout': [[l[18698]]],
 	                'call-starting': l[7206],
 	                'call-feedback': l[7998],
 	                'call-initialising': l[7207],

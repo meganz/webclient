@@ -1484,6 +1484,7 @@ var ConversationPanel = React.createClass({
                                     self.lastScrollPositionPerc = 1;
                                 }
                                 else if (messageContents) {
+                                    $(room).trigger('onMessageUpdating', v);
                                     room.megaChat.plugins.chatdIntegration.updateMessage(
                                         room,
                                         v.internalId ? v.internalId : v.orderValue,
@@ -1491,7 +1492,10 @@ var ConversationPanel = React.createClass({
                                     );
                                     if (
                                         v.getState &&
-                                        v.getState() === Message.STATE.NOT_SENT &&
+                                        (
+                                            v.getState() === Message.STATE.NOT_SENT ||
+                                            v.getState() === Message.STATE.SENT
+                                        ) &&
                                         !v.requiresManualRetry
                                     ) {
                                         if (v.textContents) {
@@ -1517,6 +1521,8 @@ var ConversationPanel = React.createClass({
                                                 messageContents
                                             ]
                                         );
+
+                                        megaChat.plugins.richpreviewsFilter.processMessage({}, v);
                                     }
 
                                     self.messagesListScrollable.scrollToBottom(true);
@@ -1621,6 +1627,9 @@ var ConversationPanel = React.createClass({
                         msg.getState() === Message.STATE.DELIVERED ||
                         msg.getState() === Message.STATE.NOT_SENT) {
                         chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+                        msg.deleted = true;
+                        msg.textContents = "";
+                        room.messagesBuff.removeMessageById(msg.messageId);
                     }
                     else if (
                         msg.getState() === Message.STATE.NOT_SENT_EXPIRED

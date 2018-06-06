@@ -178,8 +178,8 @@
 
 /* Delete message dialog */
 .fm-dialog.delete-message {
-    width: 484px;
-    margin: -134px 0 0 -242px;
+    width: 524px;
+    margin: -134px 0 0 -262px;
 }
 .dialog.secondary-header {
     text-align: center;
@@ -2164,7 +2164,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {

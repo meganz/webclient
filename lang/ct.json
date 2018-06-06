@@ -921,6 +921,7 @@
     "6971": "\u7e8c\u7d04",
     "6972": "\u60a8\u539f\u672c\u7684\u5bc6\u78bc\u4e26\u672a\u6b63\u78ba\u8f38\u5165",
     "6973": "\u60a8\u78ba\u5b9a\u8981\u79fb\u9664\u982d\u50cf?",
+    "6974": "\u79fb\u9664\u982d\u50cf",
     "6975": "\u9078\u64c7\u4ed8\u6b3e\u65b9\u5f0f",
     "6976": "\u60a8\u5df2\u9078 %1\u5957\u9910",
     "6978": "\u7c3d\u7d04\u4e00\u5e74\u5c08\u696d\u7248\u65b9\u6848 [A]\u7372\u5f97\u5305\u542b2\u500b\u6708\u514d\u8cbb[\/A]",
@@ -1974,6 +1975,7 @@
     "17620": "\u5df2\u6210\u529f\u8907\u88fdMEGAdrop\u539f\u59cb\u78bc\u81f3\u526a\u8cbc\u7c3f\u4e2d\u3002",
     "17621": "Sync",
     "17626": "\u56e0\u542b\u6709\u591a\u500b\u5b50\u8cc7\u6599\u593e\uff0c\u78ba\u5b9a\u57f7\u884c\u4e4b\u5f8c\uff0c\u5c07\u6703\u540c\u6642\u53d6\u6d88\u60a8MEGAdrop\u591a\u500b\u8cc7\u6599\u593e\u7684\u8a2d\u5b9a\u3002",
+    "17669": "\u5df2\u4e0a\u50b3\u9019\u4efd\u6a94\u6848\uff1a",
     "17686": "\u76ee\u524d\u6211\u5011\u4e0d\u652f\u63f4\u624b\u6a5f\u700f\u89bd\u5668\u4e2d\u7684MEGAdrop\u9023\u7d50\uff0c\u8acb\u4f7f\u7528\u5176\u4ed6\u53ef\u652f\u63f4\u7684\u7db2\u9801\u700f\u89bd\u5668\u3002",
     "17687": "\u4e0d\u652f\u63f4",
     "17688": "\u4f60\u80fd\u8a18\u4f4f\u4f60\u7684\u5bc6\u78bc\u55ce\uff1f",
@@ -2267,6 +2269,7 @@
     "18667": "SSL certificate error",
     "18668": "Email address not found, please try again. If you cannot remember the email address associated with your MEGA account, clear the input field and click Start again to skip this step.",
     "18669": "Write a message to %s...",
+    "18677": "User Management",
     "18678": "Do you want a longer retention period?",
     "18679": "Enable rich URL previews",
     "18680": "Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.",
@@ -2275,5 +2278,13 @@
     "18683": "Insert preview",
     "18684": "Remove preview",
     "18685": "The Rubbish Bin can be cleaned for you automatically. The minimum period is 7 days.",
-    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days."
+    "18686": "The Rubbish Bin is cleaned for you automatically. The minimum period is 7 days and your maximum period is 30 days.",
+    "18687": "You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?",
+    "18688": "Call from [X] was not answered in a timely manner.",
+    "18689": "Call to [X] ended.",
+    "18690": "Call to [X] failed.",
+    "18691": "Call to [X] was rejected.",
+    "18692": "Call to [X] was canceled.",
+    "18698": "Call to [X] was not answered in a timely manner.",
+    "18699": "Confirm Remove Avatar"
 }

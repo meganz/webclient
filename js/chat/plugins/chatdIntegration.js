@@ -983,6 +983,28 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
             // don't show anything if this is a 'revoke' message
             return null;
         }
+        else if (
+            textContents.substr &&
+            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META &&
+            textContents.substr(2, 1) === Message.MESSAGE_META_TYPE.RICH_PREVIEW
+        ) {
+            var meta = textContents.substr(3, textContents.length);
+            try {
+                meta = JSON.parse(meta);
+                textContents = meta.textMessage;
+                message.textContents = textContents;
+                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
+                delete meta.textMessage;
+                message.metaType = Message.MESSAGE_META_TYPE.RICH_PREVIEW;
+                message.meta = meta;
+            }
+            catch (e) {
+                message.textContents = "";
+                this.logger.warn("Failed to parse META message:", message);
+            }
+            message.trackDataChange();
+
+        }
         else {
             return null;
         }

@@ -540,7 +540,7 @@ function accountUI() {
             $('.fm-close-all-sessions').hide();
         }
 
-        $('.fm-close-all-sessions').rebind('click', function() {			
+        $('.fm-close-all-sessions').rebind('click', function() {
 			msgDialog('confirmation', '', l[18513], false, function(e) {
                 if (e) {
                     loadingDialog.show();
@@ -1651,7 +1651,7 @@ function accountUI() {
     $('.backup-master-key').rebind('click', function() {
         loadSubPage('backup');
     });
-	
+
     $('.default-grey-button.reviewsessions').rebind('click', function() {
         loadSubPage('fm/account/history');
     });
@@ -2370,6 +2370,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         presenceInt.userPresence.ui_setautoaway(newVal);
     };
 
+
     if (autoawaytimeout !== false) {
 
         accountUI.initCheckbox(
@@ -2440,6 +2441,20 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             })
             .val(lastValidNumber);
     }
+
+    accountUI.initCheckbox(
+        'richpreviews-confirmation',
+        $sectionContainerChat,
+        RichpreviewsFilter.previewGenerationConfirmation === true,
+        function(newVal) {
+            if (newVal) {
+                RichpreviewsFilter.confirmationDoConfirm();
+            }
+            else {
+                RichpreviewsFilter.confirmationDoNever();
+            }
+        }
+    );
 
     $('.versioning-switch')
     .rebind('click', function() {

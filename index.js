@@ -2646,8 +2646,4 @@ mBroadcaster.once('boot_done', function () {
     M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
     attribCache.bitMapsManager = new MegaDataBitMapManager();
-
-    $(window).rebind('resize.subpage', function () {
-        M.zoomLevelNotification();
-    });
 });

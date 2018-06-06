@@ -392,10 +392,11 @@ mega.megadrop = (function() {
         /**
          * Removes public upload folder (PUF)
          * @param {Object} list MEGAdrop folders id list
-         * @param {Boolean} [quiet] No loading overlay
-         * @returns {MegaPromise}
+         * @param {String} selection Selected folders id
+         * @param {String} cb Callback function
+         * @returns {Promise}
          */
-        var remove = function pufRemove(list, quiet) {
+        var remove = function pufRemove(list) {
             if (d) {
                 console.log('puf.remove');
             }
@@ -418,9 +419,7 @@ mega.megadrop = (function() {
             };
 
             if (len) {
-                if (!quiet) {
-                    loadingDialog.show();
-                }
+                loadingDialog.show();
                 for (var k = len; k--;) {
                     if (!pufOpts.items[list[k]]) {
                         continue;
@@ -442,7 +441,7 @@ mega.megadrop = (function() {
             MegaPromise.allDone(requestPromises)
             .always(function () {
                 masterPromise.resolve([collectedData, failedRequests]);
-                if (!quiet && failedRequests.length) {
+                if (failedRequests.length) {
                     loadingDialog.hide();
                 }
             });

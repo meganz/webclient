@@ -1220,13 +1220,14 @@ Call.prototype.hangup = function(reason) {
         if (reasonNoPeer == null) {
             reason = Term.kUserHangup;
         }
-        this.cmdBroadcast(RTCMD.CALL_REQ_CANCEL, this.id+String.fromCharCode(reason));
+        this.cmdBroadcast(RTCMD.CALL_REQ_CANCEL, this.id + String.fromCharCode(reason));
         return this._destroy(reason, false);
     case CallState.kRingIn:
         if (reason == null) {
             reason = Term.kCallRejected;
         } else {
-            assert(reasonNoPeer === Term.kBusy, "Hangup reason can only be undefined or kBusy when hanging up call in state kRingIn");
+            assert(reasonNoPeer === Term.kBusy,
+                "Hangup reason can only be undefined or kBusy when hanging up call in state kRingIn");
         }
         var cinfo = this._callerInfo;
         assert(cinfo);

@@ -234,6 +234,7 @@ React.makeElement = React['createElement'];
 	    this.plugins = {};
 
 	    self.filePicker = null;
+	    self._chatsAwaitingAps = {};
 
 	    return this;
 	};
@@ -11373,7 +11374,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(11);
 
-	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
+	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
 	    var self = this;
 
 	    this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -11554,9 +11555,8 @@ React.makeElement = React['createElement'];
 	            getLastInteractionWith(contact.u);
 	        }
 	    });
-	    if (!noUI) {
-	        self.megaChat.trigger('onRoomCreated', [self]);
-	    }
+
+	    self.megaChat.trigger('onRoomCreated', [self]);
 
 	    $(window).rebind("focus." + self.roomId, function () {
 	        if (self.isCurrentlyActive) {

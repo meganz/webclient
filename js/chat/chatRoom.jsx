@@ -16,7 +16,7 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
+var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
     var self = this;
 
     this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -226,9 +226,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             getLastInteractionWith(contact.u);
         }
     });
-    if (!noUI) {
-        self.megaChat.trigger('onRoomCreated', [self]);
-    }
+    // This line of code should always be called, no matter what. Plugins rely on onRoomCreated
+    // so that they can hook/add event listeners to newly created rooms.
+    self.megaChat.trigger('onRoomCreated', [self]);
 
     $(window).rebind("focus." + self.roomId, function() {
         if (self.isCurrentlyActive) {

@@ -921,6 +921,7 @@
     "6971": "N\u00e4chste Zahlung",
     "6972": "Das bestehende Passwort ist nicht korrekt.",
     "6973": "Wollen Sie Ihr Avatar-Bild wirklich l\u00f6schen?",
+    "6974": "Avatar l\u00f6schen",
     "6975": "W\u00e4hlen Sie die gew\u00fcnschte Zahlungsart.",
     "6976": "Sie haben sich f\u00fcr %1 entschieden",
     "6978": "[A]Zwei Monate kostenlos[\/A] beim Abschlu\u00df eines Jahresabonnements.",
@@ -2283,5 +2284,7 @@
     "18689": "Gespr\u00e4ch mit [X] beendet",
     "18690": "Rufaufbau zu [X] erfolglos.",
     "18691": "[X] hat den Anruf abgewiesen.",
-    "18692": "Rufaufbau zu [X] abgebrochen."
+    "18692": "Rufaufbau zu [X] abgebrochen.",
+    "18698": "Keine Antwort von [X]",
+    "18699": "L\u00f6schung des Profilbilds"
 }

@@ -921,6 +921,7 @@
     "6971": "Panibago",
     "6972": "Ang inyong orihinal na password ay hindi nailagay ng tama.",
     "6973": "Sigurado ka bang tatanggalin na ang avatar?",
+    "6974": "Alisin ang avatar",
     "6975": "Pumili nang paraan ng pagbabayad sa ibaba.",
     "6976": "Pinili mo ang %1 na plano",
     "6978": "[A]Makakuha ng 2 buwang libre0[\/A] at mag-subscribe ng isang-taong PRO plan.",
@@ -2283,5 +2284,7 @@
     "18689": "Call to [X] ended.",
     "18690": "Call to [X] failed.",
     "18691": "Call to [X] was rejected.",
-    "18692": "Call to [X] was canceled."
+    "18692": "Call to [X] was canceled.",
+    "18698": "Call to [X] was not answered in a timely manner.",
+    "18699": "Confirm Remove Avatar"
 }

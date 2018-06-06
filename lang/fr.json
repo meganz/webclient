@@ -921,6 +921,7 @@
     "6971": "Renouvellement",
     "6972": "Votre mot de passe d'origine n'a pas \u00e9t\u00e9 renseign\u00e9 correctement.",
     "6973": "Voulez-vous vraiment supprimer votre avatar ?",
+    "6974": "Supprimer l'avatar",
     "6975": "Choisir votre mode de paiement ci-dessous.",
     "6976": "Vous avez choisi l'offre %1",
     "6978": "[A]Obtenez 2 mois gratuits[\/A] en vous abonnant \u00e0 une offre PRO d'un an.",
@@ -2283,5 +2284,7 @@
     "18689": "Fin de l\u2019appel avec [X].",
     "18690": "\u00c9chec d\u2019appel vers [X].",
     "18691": "L\u2019appel vers [X] a \u00e9t\u00e9 refus\u00e9.",
-    "18692": "L\u2019appel vers [X] a \u00e9t\u00e9 annul\u00e9."
+    "18692": "L\u2019appel vers [X] a \u00e9t\u00e9 annul\u00e9.",
+    "18698": "Call to [X] was not answered in a timely manner.",
+    "18699": "Confirm Remove Avatar"
 }

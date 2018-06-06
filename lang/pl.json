@@ -921,6 +921,7 @@
     "6971": "Odn\u00f3w",
     "6972": "Twoje oryginalne has\u0142a nie zosta\u0142o wprowadzone prawid\u0142owo",
     "6973": "Czy na pewno chcesz usun\u0105\u0107 swoje zdj\u0119cie?",
+    "6974": "Usu\u0144 zdj\u0119cie",
     "6975": "Wybierz metod\u0119 p\u0142atno\u015bci",
     "6976": "Wybra\u0142e\u015b konto %1",
     "6978": "[A]Odbierz 2 miesi\u0105ce darmowe[\/A] je\u017celi wybierzesz roczn\u0105 subskrypcj\u0119 konta PRO.",
@@ -2283,5 +2284,7 @@
     "18689": "Po\u0142\u0105czenie z [X] zako\u0144czy\u0142o si\u0119.",
     "18690": "Po\u0142\u0105czenie z [X] nie powiod\u0142o si\u0119.",
     "18691": "Po\u0142\u0105czenie do [X] zosta\u0142o odrzucone.",
-    "18692": "Po\u0142\u0105czenie z [X] zosta\u0142o anulowane."
+    "18692": "Po\u0142\u0105czenie z [X] zosta\u0142o anulowane.",
+    "18698": "Call to [X] was not answered in a timely manner.",
+    "18699": "Confirm Remove Avatar"
 }

@@ -921,6 +921,7 @@
     "6971": "\u7e8c\u7d04",
     "6972": "\u60a8\u539f\u672c\u7684\u5bc6\u78bc\u4e26\u672a\u6b63\u78ba\u8f38\u5165",
     "6973": "\u60a8\u78ba\u5b9a\u8981\u79fb\u9664\u982d\u50cf?",
+    "6974": "\u79fb\u9664\u982d\u50cf",
     "6975": "\u9078\u64c7\u4ed8\u6b3e\u65b9\u5f0f",
     "6976": "\u60a8\u5df2\u9078 %1\u5957\u9910",
     "6978": "\u7c3d\u7d04\u4e00\u5e74\u5c08\u696d\u7248\u65b9\u6848 [A]\u7372\u5f97\u5305\u542b2\u500b\u6708\u514d\u8cbb[\/A]",
@@ -2283,5 +2284,7 @@
     "18689": "Call to [X] ended.",
     "18690": "Call to [X] failed.",
     "18691": "Call to [X] was rejected.",
-    "18692": "Call to [X] was canceled."
+    "18692": "Call to [X] was canceled.",
+    "18698": "Call to [X] was not answered in a timely manner.",
+    "18699": "Confirm Remove Avatar"
 }

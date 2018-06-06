@@ -921,6 +921,7 @@
     "6971": "Yenilenir",
     "6972": "As\u0131l parolan\u0131z do\u011fru girilmemi\u015f",
     "6973": "Profil resminizi kald\u0131rmak istedi\u011finizden emin misiniz?",
+    "6974": "Profil resmini kald\u0131r",
     "6975": "\u00d6deme y\u00f6ntemininizi a\u015fa\u011f\u0131dan se\u00e7in.",
     "6976": "%1 plan\u0131n\u0131 se\u00e7tiniz",
     "6978": "[A]2 ay \u00fccretsiz al\u0131n[\/A] bir y\u0131ll\u0131k PRO plana abone olursan\u0131z.",
@@ -2283,5 +2284,7 @@
     "18689": "[X] ile g\u00f6r\u00fc\u015fme sonland\u0131.",
     "18690": "[X] ile g\u00f6r\u00fc\u015fme ba\u015far\u0131s\u0131z oldu.",
     "18691": "[X] ile g\u00f6r\u00fc\u015fme reddedildi.",
-    "18692": "[X] ile g\u00f6r\u00fc\u015fme iptal edildi."
+    "18692": "[X] ile g\u00f6r\u00fc\u015fme iptal edildi.",
+    "18698": "[X] ki\u015fisine yap\u0131lan \u00e7a\u011fr\u0131 zaman\u0131nda cevapland\u0131r\u0131lmam\u0131\u015ft\u0131r.",
+    "18699": "Avatar\u0131 Kald\u0131rmay\u0131 Onayla"
 }

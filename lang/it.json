@@ -921,6 +921,7 @@
     "6971": "Rinnovo",
     "6972": "La password originale non \u00e8 stato immessa correttamente",
     "6973": "Sei sicuro di voler rimuovere il tuo avatar?",
+    "6974": "Rimuovi avatar",
     "6975": "Scegli il metodo di pagamento di seguito.",
     "6976": "Hai selezionato il piano %1",
     "6978": "[A]Ottieni 2 mesi gratis[\/A] se sottoscrivi ad un abbonamento PRO annuale.",
@@ -2283,5 +2284,7 @@
     "18689": "Chiamata a [X] terminata.",
     "18690": "Chiamata a [X] fallita.",
     "18691": "Chiamata a [X] rifiutata.",
-    "18692": "Chiamata a [X] annullata."
+    "18692": "Chiamata a [X] annullata.",
+    "18698": "Chiamata a [X] senza risposta in modo tempestivo.",
+    "18699": "Conferma rimozione avatar"
 }

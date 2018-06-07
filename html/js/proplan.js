@@ -155,6 +155,7 @@ pro.proplan = {
         // Cache selectors
         var $stepOne = $('.plans-block');
         var $pricingBoxes = $stepOne.find('.reg-st3-membership-bl');
+        var oneLocalPriceFound = false;
 
         // Update each pricing block with details from the API
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
@@ -178,13 +179,46 @@ pro.proplan = {
                 var $storageUnit = $pricingBox.find('.storage-unit');
                 var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
                 var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
+                var $euroPrice = $('.euro-price', $price);
+
+                var monthlyBasePrice;
+                var monthlyBasePriceCurrencySign;
+                var euroSign = '\u20ac';
+                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                    $pricingBoxes.addClass('local-currency');
+                    $euroPrice.removeClass('hidden');
+                    $euroPrice.text(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] +
+                        ' ' + euroSign);
+                    // Calculate the monthly base price in local currency
+                    monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+                    monthlyBasePriceCurrencySign = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSYMBOL];
+                    oneLocalPriceFound = true;
+                }
+                else {
+                    $pricingBoxes.removeClass('local-currency');
+                    $euroPrice.addClass('hidden');
+
+                    // Calculate the monthly base price
+                    monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE];
+                    monthlyBasePriceCurrencySign = euroSign;
+                }
 
                 // Calculate the monthly base price
-                var monthlyBasePrice = pro.membershipPlans[i][pro.UTQA_RES_INDEX_MONTHLYBASEPRICE];
                 var monthlyBasePriceParts = monthlyBasePrice.split('.');
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
-                var monthlyBasePriceCents = monthlyBasePriceParts[1];
-
+                var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
+                // if (monthlyBasePrice.length > 10) {
+                    if (monthlyBasePriceDollars.length > 7) {
+                        monthlyBasePriceDollars = monthlyBasePriceDollars.substr(0, 7);
+                        monthlyBasePriceDollars = Number.parseInt(monthlyBasePriceDollars) + 1;
+                        monthlyBasePriceCents = '00';
+                    }
+                    else {
+                        monthlyBasePriceCents = monthlyBasePriceCents.substr(0, 2);
+                        monthlyBasePriceCents = Number.parseInt(monthlyBasePriceCents) + 1;
+                        monthlyBasePriceCents = (monthlyBasePriceCents + '0').substr(0, 2);
+                    }
+                // }
                 // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
                 var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
                 var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
@@ -200,7 +234,8 @@ pro.proplan = {
                 // Update the plan name and price
                 $planName.text(planName);
                 $priceDollars.text(monthlyBasePriceDollars);
-                $priceCents.text('.' + monthlyBasePriceCents + ' \u20ac');    // EUR symbol
+                $priceCents.text('.' + monthlyBasePriceCents + ' ' +
+                    monthlyBasePriceCurrencySign);
 
                 // Update storage
                 $storageAmount.text(storageSizeRounded);
@@ -210,6 +245,12 @@ pro.proplan = {
                 $bandwidthAmount.text(bandwidthSizeRounded);
                 $bandwidthUnit.text(bandwidthFormatted.unit);
             }
+        }
+        if (oneLocalPriceFound) {
+            $('.reg-st3-txt-localcurrencyprogram').removeClass('hidden');
+        }
+        else {
+            $('.reg-st3-txt-localcurrencyprogram').addClass('hidden');
         }
     },
 

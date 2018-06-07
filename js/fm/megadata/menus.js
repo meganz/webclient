@@ -89,14 +89,22 @@
 MegaData.prototype.menuItems = function menuItems() {
     "use strict";
 
+    var rrnodes = [];
     var promise = new MegaPromise();
     var nodes = ($.selected || []).concat();
 
     for (var i = nodes.length; i--;) {
-        if (M.d[nodes[i]]) {
+        var n = M.d[nodes[i]];
+
+        if (n) {
             nodes.splice(i, 1);
+
+            if (n.rr) {
+                rrnodes.push(n.rr);
+            }
         }
     }
+    nodes = nodes.concat(rrnodes);
 
     var checkMegaSync = function _checkMegaSync(preparedItems) {
         $('.dropdown-item.download-item').addClass('contains-submenu');
@@ -145,6 +153,7 @@ MegaData.prototype.menuItems = function menuItems() {
 MegaData.prototype.menuItemsSync = function menuItemsSync() {
     "use strict";
 
+    var n;
     var items = Object.create(null);
     var selNode = M.d[$.selected[0]] || false;
     var sourceRoot = M.getNodeRoot($.selected[0]);
@@ -264,6 +273,18 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     }
     else if (sourceRoot === M.RubbishID && !folderlink) {
         items['.move-item'] = 1;
+
+        for (var j = $.selected.length; j--;) {
+            n = M.getNodeByHandle($.selected[j]);
+
+            if (M.d[n.rr] && M.getNodeRoot(n.rr) !== M.RubbishID && M.getNodeRights(n.rr) > 1) {
+                items['.revert-item'] = 1;
+            }
+            else if (items['.revert-item']) {
+                delete items['.revert-item'];
+                break;
+            }
+        }
     }
 
     if (selNode) {

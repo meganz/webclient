@@ -76,7 +76,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var imageType = 'image/jpeg';
         var canStoreAttr = !n || !n.u || (n.u === u_handle && n.f !== u_handle);
 
-        if (img.isPNG) {
+        if (img.doesSupportAlpha) {
             var transparent;
 
             canvas = document.createElement('canvas');
@@ -243,6 +243,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     return thumbHandler(u8.buffer, function(ab) {
                         if (ab) {
                             __render_thumb(img, ab);
+                        }
+                        else {
+                            if (d) {
+                                console.debug('%s failed to process the resource...', thumbHandler.name);
+                            }
+                            img.src = 'data:text/xml,decoderror';
                         }
                     });
                 }
@@ -417,10 +423,14 @@ function __render_thumb(img, u8, orientation, noMagicNumCheck) {
                 if (dv.byteLength > 24 && dv.getUint32(20) === 0x68656963) { // HEIC
                     break;
                 }
+                if (dv.byteLength > 12 && dv.getUint32(8) === 0x57454250) { // WEBP
+                    img.doesSupportAlpha = true;
+                    break;
+                }
                 switch (dv.getUint32(0)) {
                     case 0x89504e47: // PNG
-                        img.isPNG = true;
-                    /* fallthrough */
+                        img.doesSupportAlpha = true;
+                        break;
                     case 0x47494638: // GIF8
                     case 0x47494639: // GIF9
                         break;

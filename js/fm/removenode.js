@@ -175,7 +175,6 @@ function fmremovesync(selectedNodes) {
     var foldercnt = 0;
     var contactcnt = 0;
     var removesharecnt = 0;
-    var widgets = [];
     var title = '';
     var message = '';
 
@@ -195,7 +194,6 @@ function fmremovesync(selectedNodes) {
         }
         else if (n && n.t) {
             foldercnt++;
-            widgets.push(selectedNodes[i]);
         }
         else {
             filecnt++;
@@ -340,111 +338,21 @@ function fmremovesync(selectedNodes) {
         }
     }
     else {
-        if (localStorage.skipDelWarning) {
-            if (M.currentrootid === 'shares') {
-                M.copyNodes(selectedNodes, M.RubbishID, true);
-            }
-            else {
-                M.moveNodes(selectedNodes, M.RubbishID);
-            }
+        var moveToRubbish = function() {
+            loadingDialog.pshow();
+            M.moveToRubbish(selectedNodes).always(loadingDialog.phide.bind(loadingDialog));
+        };
 
-            mega.megadrop.pufRemove(mega.megadrop.isDropExist(widgets));// Remove PUF/PUP
+        if (localStorage.skipDelWarning) {
+            moveToRubbish();
         }
         else {
-            // Contains complete directory structure of selected nodes, their ids
-            var selected = [], dirTree = [];
-
-            for (i = 0; i < selectedNodes.length; i++) {
-                selected.push(selectedNodes[i]);
-                var nodes = M.getNodesSync(selectedNodes[i], true);
-                dirTree = dirTree.concat(nodes);
-            }
-
-            // Additional message in case that there's a shared node
-            var share = new mega.Share({});
-            var delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
             title = l[1003];
-            message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo;
+            message = escapeHTML(l[1004]).replace('[X]', fm_contains(filecnt, foldercnt));
 
-            msgDialog('remove', title, message, false, function(e) {
-                if (e) {
-                    if (M.currentrootid === 'shares') {
-                        M.copyNodes(selectedNodes, M.RubbishID, true);
-                    }
-                    else {
-                        var delctx = {pending: 1, selected: selected};
-
-                        mega.megadrop.pufRemove(mega.megadrop.isDropExist(widgets));// Remove PUF/PUP
-
-                        // Remove all shares related to selected nodes
-                        for (var i = dirTree.length; i--;) {
-                            var h = dirTree[i];
-
-                            // remove established shares
-                            for (var share in Object(M.d[dirTree[i]]).shares) {
-                                delctx.pending++;
-                                api_req({
-                                    a: 's2',
-                                    n: h,
-                                    s: [{u: M.d[h].shares[share].u, r: ''}],
-                                    ha: '',
-                                    i: requesti
-                                }, {
-                                    n: h,
-                                    u: M.d[h].shares[share].u,
-                                    delctx: delctx,
-                                    callback: function(res, ctx) {
-                                        if (typeof res == 'object') {
-                                            // FIXME: verify error codes in res.r
-                                            M.delNodeShare(ctx.n, ctx.u);
-                                            setLastInteractionWith(ctx.u, "0:" + unixtime());
-                                        }
-                                        else {
-                                            // FIXME: display error to user
-                                        }
-
-                                        if (!--ctx.delctx.pending) {
-                                            M.moveNodes(ctx.delctx.selected, M.RubbishID);
-                                        }
-                                    }
-                                });
-                            }
-
-                            // remove pending shares
-                            for (var pendingUserId in M.ps[h]) {
-                                var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
-                                delctx.pending++;
-                                api_req({
-                                    a: 's2',
-                                    n: h,
-                                    s: [{u: userEmailOrID, r: ''}],
-                                    ha: '',
-                                    i: requesti
-                                }, {
-                                    n: h,
-                                    u: pendingUserId,
-                                    delctx: delctx,
-                                    callback: function(res, ctx) {
-                                        if (typeof res == 'object') {
-                                            // FIXME: verify error codes in res.r
-                                            M.deletePendingShare(ctx.n, ctx.u);
-                                        }
-                                        else {
-                                            // FIXME: display error to user
-                                        }
-
-                                        if (!--ctx.delctx.pending) {
-                                            M.moveNodes(ctx.delctx.selected, M.RubbishID);
-                                        }
-                                    }
-                                });
-                            }
-                        }
-
-                        if (!--delctx.pending) {
-                            M.moveNodes(delctx.selected, M.RubbishID);
-                        }
-                    }
+            msgDialog('remove', title, message, l[1952] + ' ' + l[7410], function(yes) {
+                if (yes) {
+                    moveToRubbish();
                 }
             }, true);
         }

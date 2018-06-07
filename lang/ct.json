@@ -2286,5 +2286,7 @@
     "18691": "Call to [X] was rejected.",
     "18692": "Call to [X] was canceled.",
     "18698": "Call to [X] was not answered in a timely manner.",
-    "18699": "Confirm Remove Avatar"
+    "18699": "Confirm Remove Avatar",
+    "18700": "Too short",
+    "18701": "Your password needs to be at least 8 characters long."
 }

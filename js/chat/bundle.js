@@ -235,6 +235,7 @@ React.makeElement = React['createElement'];
 	    this.plugins = {};
 
 	    self.filePicker = null;
+	    self._chatsAwaitingAps = {};
 
 	    return this;
 	};
@@ -766,8 +767,12 @@ React.makeElement = React['createElement'];
 	        if (room) {
 	            room.show();
 	        }
+	    }
+
+	    if (setAsActive === false) {
+	        room.showAfterCreation = false;
 	    } else {
-	        if (room) {}
+	        room.showAfterCreation = true;
 	    }
 
 	    room.setState(ChatRoom.STATE.JOINING);
@@ -11913,7 +11918,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(11);
 
-	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
+	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
 	    var self = this;
 
 	    this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -11980,6 +11985,7 @@ React.makeElement = React['createElement'];
 	            self.members[userHandle] = 0;
 	        });
 	    }
+
 	    this.options = {
 
 	        'dontResendAutomaticallyQueuedMessagesOlderThen': 1 * 60,
@@ -12093,9 +12099,8 @@ React.makeElement = React['createElement'];
 	            getLastInteractionWith(contact.u);
 	        }
 	    });
-	    if (!noUI) {
-	        self.megaChat.trigger('onRoomCreated', [self]);
-	    }
+
+	    self.megaChat.trigger('onRoomCreated', [self]);
 
 	    $(window).rebind("focus." + self.roomId, function () {
 	        if (self.isCurrentlyActive) {
@@ -12472,7 +12477,9 @@ React.makeElement = React['createElement'];
 	ChatRoom.prototype.sendMessage = function (message) {
 	    var self = this;
 	    var megaChat = this.megaChat;
-
+	    if (d && self.state !== ChatRoom.STATE.READY) {
+	        console.warn("Tried to do a .sendMessage while the room is not ready");
+	    }
 	    var messageId = megaChat.generateTempMessageId(self.roomId, message);
 
 	    var msgObject = new Message(self, self.messagesBuff, {
@@ -12808,7 +12815,7 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.isReadOnly = function () {
-	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
+	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT || this.state !== ChatRoom.STATE.READY;
 	};
 	ChatRoom.prototype.iAmOperator = function () {
 	    return this.type === "private" || this.members && this.members[u_handle] === 3;

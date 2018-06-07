@@ -1486,16 +1486,16 @@ function openAccessQRDialog() {
             var curAvatar = useravatar.contact(u_handle);
             $('.avatar-container-qr', $dialog).html(curAvatar);
             var handleAutoAccept = function _handleAutoAccept(autoAcc) {
-                if (autoAcc === '1') {
-                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').addClass('toggle-on')
-                        .find('.dialog-feature-switch').css('marginLeft', '22px');
-                }
-                else {
+                if (autoAcc === '0') {
                     $dialog.find('.qr-dialog-label .dialog-feature-toggle').removeClass('toggle-on')
                         .find('.dialog-feature-switch').css('marginLeft', '2px');
                 }
+                else { // if  it's 1 or not set
+                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').addClass('toggle-on')
+                        .find('.dialog-feature-switch').css('marginLeft', '22px');
+                }
             };
-            mega.attr.get(u_handle, 'clv', -2, 0).done(handleAutoAccept);
+            mega.attr.get(u_handle, 'clv', -2, 0).always(handleAutoAccept);
 
         }
     };
@@ -2877,8 +2877,6 @@ function fm_resize_handler(force) {
     if (d) {
         console.time('fm_resize_handler');
     }
-
-    M.zoomLevelNotification();
 
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         var tfse = M.getTransferElements();

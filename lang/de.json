@@ -2286,5 +2286,7 @@
     "18691": "[X] hat den Anruf abgewiesen.",
     "18692": "Rufaufbau zu [X] abgebrochen.",
     "18698": "Keine Antwort von [X]",
-    "18699": "L\u00f6schung des Profilbilds"
+    "18699": "L\u00f6schung des Profilbilds",
+    "18700": "Too short",
+    "18701": "Your password needs to be at least 8 characters long."
 }

@@ -9,7 +9,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/vibornoff/asmcrypto.js/compare/master...meganz:master)
 >
 > NB: We are using a custom, unobfuscated build which was created using:
-> 
+>
 > ```bash
 > git clone https://github.com/meganz/asmcrypto.js.git
 > cd asmcrypto.js
@@ -106,7 +106,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jsbn.js]: Basic BigInteger implementation, just enough for RSA encryption and not much more.
 
 > **This is a fork**, [See the changes](https://github.com/meganz/jsbn.js/commits/master/jsbn.js)
-  
+
 [jsbn2.js]: The rest of the library, including most public BigInteger methods.
 
 ---
@@ -160,10 +160,15 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/jhiesey/videostream/compare/master...meganz:master)
 
 ---
+[webp.js]: library to encode and decode images in WebP format.
+
+> **This is a fork**, [Compare the changes](https://github.com/webmproject/libwebp/compare/master...meganz:master)
+
+---
 [zxcvbn.js]: A realistic password strength estimator.
 
 > NB: We are using a custom, unobfuscated build which was created using:
-> 
+>
 > ```bash
 > git clone https://github.com/dropbox/zxcvbn.git
 > cd zxcvbn
@@ -180,7 +185,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 > NB: We had to fork the project and remove the UTF characters from adapter.js, so we are using the repo:
 > https://github.com/meganz/adapter
-> 
+>
 > ```bash
 > git clone https://github.com/webrtc/adapter
 > cd release
@@ -193,7 +198,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 > NB: We had to fork the project and remove the UTF characters from twemoji.js, so we are using the repo:
 > https://github.com/meganz/twemoji
-> 
+>
 > ```bash
 > git clone https://github.com/meganz/twemoji
 > cd twemoji/2/
@@ -237,5 +242,6 @@ Unless otherwise noted, they were released under a [MIT License].
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [tiff.js]: <https://github.com/seikichi/tiff.js>
 [videostream.js]: <https://github.com/meganz/videostream>
+[webp.js]: <https://github.com/meganz/libwebp>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/adapter.js]: <https://github.com/webrtc/adapter>

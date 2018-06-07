@@ -53,6 +53,19 @@ var CallManager = function (megaChat) {
 
 makeObservable(CallManager);
 
+
+/**
+* Used for the remote call ended reason types
+* @type {*}
+*/
+CallManager.CALL_END_REMOTE_REASON = {
+    "CALL_ENDED": 0x01,
+    "REJECTED": 0x02,
+    "NO_ANSWER": 0x03,
+    "FAILED": 0x04,
+    "CANCELED": 0x05
+};
+
 /**
  * Entry point, for attaching the chat store to a specific `Chat` instance
  *
@@ -258,6 +271,150 @@ CallManager.prototype.forEachCallManagerCall = function (cb) {
     return Object.keys(self._calls).forEach(function (idx) {
         return cb(self._calls[idx], idx);
     });
+};
+
+/**
+ * To be used internally by Message._getTextContentsForDialogType
+ * @param message {Message|ChatDialogMessage}
+ * @param textMessage {String}
+ * @param [html] {boolean} pass true to return (eventually) HTML formatted messages
+ */
+CallManager._getMultiStringTextContentsForMessage = function(message, textMessage, html) {
+    var tmpMsg;
+    var contact = Message.getContactForMessage(message);
+    var contactName = "";
+    if (contact) {
+        contactName = htmlentities(M.getNameByHandle(contact.u));
+    }
+    var otherContactName = "";
+    if (message.chatRoom && message.chatRoom.type === "private") {
+        // TODO: group calls?
+        var otherContact = message.chatRoom.getParticipantsExceptMe()[0];
+        if (otherContact) {
+            otherContactName = htmlentities(M.getNameByHandle(otherContact));
+        }
+    }
+    else {
+        console.error("TBD.");
+    }
+
+    if (!$.isArray(textMessage[0])) {
+        tmpMsg = textMessage[0].replace("[X]", contactName);
+        tmpMsg = tmpMsg.replace("%s", contactName);
+    }
+    else {
+        if (contact.u === u_handle) {
+            tmpMsg = textMessage[0][0].replace("[X]", otherContactName);
+        }
+        else {
+            tmpMsg = textMessage[0][1].replace("[X]", contactName);
+        }
+        tmpMsg = tmpMsg.replace("%s", contactName);
+    }
+
+    if (message.currentCallCounter) {
+        tmpMsg += " " +
+            textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
+    }
+
+    textMessage = tmpMsg;
+    if (!html) {
+        textMessage = textMessage
+            .replace("[[ ", " ")
+            .replace("]]", "");
+    }
+    else {
+        textMessage = textMessage
+            .replace("[[ ", "<span className=\"grey-color\">")
+            .replace("]]", "</span>");
+    }
+
+    return textMessage;
+};
+
+CallManager.prototype.remoteEndCallToDialogMsg = function(chatRoom, msgInstance) {
+    var self = this;
+
+    var result = false;
+    var meta = msgInstance.meta;
+    var authorContact = M.u[meta.userId];
+    var delay = msgInstance.delay;
+    if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CALL_ENDED) {
+        var msgId;
+        var type;
+        var cssClasses = [];
+        var currentCallCounter;
+        if (meta.duration && meta.duration > 0) {
+            msgId = 'call-ended-' + msgInstance.messageId;
+            type = "call-ended";
+            cssClasses = ['fm-chat-call-reason-' + meta.reason];
+            currentCallCounter = meta.duration;
+        }
+        else {
+            msgId = 'call-failed-' + msgInstance.messageId;
+            type = 'call-failed';
+        }
+
+        result = new ChatDialogMessage({
+            messageId: msgId,
+            type: type,
+            authorContact: authorContact,
+            delay: delay,
+            cssClasses: cssClasses,
+            currentCallCounter: currentCallCounter,
+            meta: meta
+        });
+    }
+    else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.REJECTED) {
+        result = new ChatDialogMessage({
+            messageId: 'call-rejected-' + msgInstance.messageId,
+            type: 'call-rejected',
+            authorContact: authorContact,
+            delay: delay,
+            meta: meta
+        });
+    }
+    else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED) {
+        result = new ChatDialogMessage({
+            messageId: 'call-canceled-' + msgInstance.messageId,
+            type: 'call-canceled',
+            authorContact: authorContact,
+            delay: delay,
+            meta: meta
+        });
+    }
+    else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && authorContact.u !== u_handle) {
+        result = new ChatDialogMessage({
+            messageId: 'call-missed-' + msgInstance.messageId,
+            type: 'call-missed',
+            authorContact: authorContact,
+            delay: delay,
+            meta: meta
+        });
+    }
+    else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && authorContact.u === u_handle) {
+        result = new ChatDialogMessage({
+            messageId: 'call-timeout-' + msgInstance.messageId,
+            type: 'call-timeout',
+            authorContact: authorContact,
+            delay: delay,
+            meta: meta
+        });
+    }
+    else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.FAILED) {
+        result = new ChatDialogMessage({
+            messageId: 'call-failed-' + msgInstance.messageId,
+            type: 'call-failed',
+            authorContact: authorContact,
+            delay: delay,
+            meta: meta
+        });
+    }
+    else {
+        self.logger.error("Unknown (remote) CALL_ENDED reason: ", meta.reason, meta);
+    }
+
+    return result;
 };
 
 CallManager.assert = function (cond) {
@@ -693,21 +850,7 @@ CallManagerCall.prototype.onCallStarted = function () {
 CallManagerCall.prototype.onCallEnded = function (e, reason) {
     var self = this;
 
-
-    if (self.room._currentCallCounter) {
-        self.room.appendMessage(
-            new ChatDialogMessage({
-                messageId: 'call-ended-' + self.id,
-                type: 'call-ended',
-                authorContact: self.getPeer(),
-                delay: unixtime(),
-                cssClasses: ['fm-chat-call-reason-' + reason],
-                currentCallCounter: self.room._currentCallCounter
-            })
-        );
-        delete self.room._currentCallCounter;
-    }
-    else if (self.room._currentCallCounter === 0) {
+    if (self.room._currentCallCounter === 0) {
         self.room.appendMessage(
             new ChatDialogMessage({
                 messageId: 'call-failed-' + self.id,
@@ -724,26 +867,21 @@ CallManagerCall.prototype.onCallEnded = function (e, reason) {
 
 CallManagerCall.prototype.onCallRejected = function (e, reason) {
     var self = this;
-    self.room.appendMessage(
-        new ChatDialogMessage({
-            messageId: 'call-rejected-' + self.id,
-            type: 'call-rejected',
-            authorContact: self.getPeer(),
-            delay: unixtime()
-        })
-    );
+    if (reason === Term.kBusy) {
+        self.room.appendMessage(
+            new ChatDialogMessage({
+                messageId: 'call-rejected-' + self.id,
+                type: 'call-rejected',
+                authorContact: self.getPeer(),
+                delay: unixtime(),
+                persist: false
+            })
+        );
+    }
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 CallManagerCall.prototype.onCallAborted = function (e, reason) {
     var self = this;
-    self.room.appendMessage(
-        new ChatDialogMessage({
-            messageId: 'call-ended-' + self.id,
-            type: 'call-canceled',
-            authorContact: self.getPeer(),
-            delay: unixtime(),
-        })
-    );
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
@@ -788,32 +926,10 @@ CallManagerCall.prototype.onCallFailed = function (e) {
 CallManagerCall.prototype.onCallMissed = function (e) {
     var self = this;
 
-    var peer = self.room.getParticipantsExceptMe()[0];
-
-    self.room.appendMessage(
-        new ChatDialogMessage({
-            messageId: 'call-missed-' + self.id,
-            type: 'call-missed',
-            authorContact: M.u[peer],
-            delay: unixtime()
-        })
-    );
-
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 CallManagerCall.prototype.onCallTimeout = function (e) {
     var self = this;
-
-    var peer = self.room.getParticipantsExceptMe()[0];
-
-    self.room.appendMessage(
-        new ChatDialogMessage({
-            messageId: 'call-timeout-' + self.id,
-            type: 'call-timeout',
-            authorContact: M.u[peer],
-            delay: unixtime()
-        })
-    );
 
 
     self.getCallManager().trigger('CallTerminated', [self, e]);
@@ -830,6 +946,9 @@ CallManagerCall.prototype.onCallTerminated = function () {
 
         self._removeTempMessages();
     }
+    self.room.messagesBuff.removeMessageByType("call-started");
+    self.room.messagesBuff.removeMessageByType("call-starting");
+    self.room.messagesBuff.removeMessageByType("call-initialising");
 
     if (self.room.callManagerCall === self) {
         delete self.room.callManagerCall;

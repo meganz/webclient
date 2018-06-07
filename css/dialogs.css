@@ -178,8 +178,8 @@
 
 /* Delete message dialog */
 .fm-dialog.delete-message {
-    width: 484px;
-    margin: -134px 0 0 -242px;
+    width: 524px;
+    margin: -134px 0 0 -262px;
 }
 .dialog.secondary-header {
     text-align: center;
@@ -1222,12 +1222,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v2.png);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/fm-main-sprite.png);
+    background-image: url(../images/mega/fm-main-sprite_v2.png);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }
@@ -1456,14 +1456,20 @@ li.token-input-token-invite .input-close {
 }
 .duplicate-conflict.info-block {
     padding: 9px 0;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
 .duplicate-conflict.file-info {
     padding-left: 78px;
     font-size: 0;
-    min-height: 61px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    width: 100%;
+    height: 60px;
+    display: table-cell;
+    vertical-align: middle;
 }
 .duplicate-conflict.file-info .info-txt {
     line-height: 20px;
@@ -1475,7 +1481,7 @@ li.token-input-token-invite .input-close {
     text-overflow: ellipsis;
 }
 .duplicate-conflict .export-icon {
-    margin: 2px 0 0 -4px;
+    margin: 0 0 0 -4px;
     position: absolute;
 }
 .duplicate-conflict.file-date span, .duplicate-conflict.file-date i {
@@ -1499,14 +1505,11 @@ li.token-input-token-invite .input-close {
     height: 14px;
     background-color: rgba(0,0,0,0.1);
 }
-.multiple-files .duplicate-conflict.file-info {
-    padding-top: 11px;
-}
 .multiple-files.duplicate-conflict .export-icon:nth-child(2) {
-    margin: 0 0 0 -4px;
+    margin: 4px 0 0 -4px;
 }
 .multiple-files.duplicate-conflict .export-icon:nth-child(1) {
-    margin: -8px 0 0 4px;
+    margin: -4px 0 0 4px;
 }
 /* end of Dublicate conflict dialog */
 
@@ -2164,7 +2167,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {

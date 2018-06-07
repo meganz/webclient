@@ -2,6 +2,9 @@ var React = require("react");
 var utils = require('./../../../ui/utils.jsx');
 var getMessageString = require('./utils.jsx').getMessageString;
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+var MetaRichpreview = require('./metaRichpreview.jsx').MetaRichpreview;
+var MetaRichpreviewConfirmation = require('./metaRichpreviewConfirmation.jsx').MetaRichpreviewConfirmation;
+var MetaRichpreviewMegaLinks = require('./metaRichpreviewMegaLinks.jsx').MetaRichpreviewMegaLinks;
 var ContactsUI = require('./../contacts.jsx');
 var TypingAreaUI = require('./../typingArea.jsx');
 
@@ -329,6 +332,9 @@ var GenericConversationMessage = React.createClass({
         var spinnerElement = null;
         var messageNotSendIndicator = null;
         var messageIsNowBeingSent = false;
+        var subMessageComponent = [];
+
+        var extraPreButtons = [];
 
         if (this.props.className) {
             additionalClasses += this.props.className;
@@ -341,7 +347,7 @@ var GenericConversationMessage = React.createClass({
 
         // if this is a text msg.
         if (message instanceof Message) {
-            if (!message.wasRendered) {
+            if (!message.wasRendered || !message.messageHtml) {
                 // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
                 message.messageHtml = htmlentities(
                     message.textContents
@@ -624,6 +630,7 @@ var GenericConversationMessage = React.createClass({
                                                 previewButton = [previewButton, <hr key="preview-sep"/>];
                                             }
 
+
                                             return <div>
                                                 {previewButton}
                                                 {firstGroupOfButtons}
@@ -720,7 +727,8 @@ var GenericConversationMessage = React.createClass({
                             <div className={attachmentClasses} key={v.h}>
                                 <div className="message shared-info">
                                     <div className="message data-title">
-                                        {v.name}
+                                        {__(l[17669])}
+                                        <span className="file-name">{v.name}</span>
                                     </div>
                                     <div className="message file-size">
                                         {bytesToSize(v.s)}
@@ -972,6 +980,100 @@ var GenericConversationMessage = React.createClass({
                 if (message.textContents === "" && !message.dialogType) {
                     message.deleted = true;
                 }
+
+                if (!message.deleted) {
+                    if (message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW) {
+                        if (!message.meta.requiresConfirmation) {
+                            subMessageComponent.push(<MetaRichpreview
+                                key={"richprev"}
+                                message={message}
+                                chatRoom={chatRoom}
+                            />);
+                            if (message.isEditable()) {
+                                if (!message.meta.isLoading) {
+                                    extraPreButtons.push(
+                                        <DropdownsUI.DropdownItem
+                                            key="remove-link-preview"
+                                            icon="icons-sprite bold-crossed-eye"
+                                            label={l['18684']}
+                                            className=""
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+
+                                                chatRoom.megaChat.plugins.richpreviewsFilter.revertToText(
+                                                    chatRoom,
+                                                    message
+                                                );
+                                            }}
+                                        />
+                                    );
+                                }
+                                else {
+                                    // still loading, cancel loading?
+                                    extraPreButtons.push(
+                                        <DropdownsUI.DropdownItem
+                                            icon="icons-sprite bold-crossed-eye"
+                                            key="stop-link-preview"
+                                            label={l['18684']}
+                                            className=""
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+
+                                                chatRoom.megaChat.plugins.richpreviewsFilter.cancelLoading(
+                                                    chatRoom,
+                                                    message
+                                                );
+                                            }}
+                                        />
+                                    );
+                                }
+                            }
+                        }
+                        else if (!self.isBeingEdited()) {
+                            if (
+                                message.source === Message.SOURCE.SENT ||
+                                message.confirmed === true
+                            ) {
+                                additionalClasses += " preview-requires-confirmation-container";
+                                subMessageComponent.push(
+                                    <MetaRichpreviewConfirmation
+                                        key={"confirm"}
+                                        message={message}
+                                        chatRoom={chatRoom}
+                                    />
+                                );
+                            }
+                            else {
+                                extraPreButtons.push(
+                                    <DropdownsUI.DropdownItem
+                                        key="insert-link-preview"
+                                        icon="icons-sprite bold-eye"
+                                        label={l['18683']}
+                                        className=""
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+
+                                            chatRoom.megaChat.plugins.richpreviewsFilter.insertPreview(message);
+                                        }}
+                                    />
+                                );
+                            }
+                        }
+
+
+                    }
+                    if (message.megaLinks) {
+                        subMessageComponent.push(<MetaRichpreviewMegaLinks
+                            key={"richprevml"}
+                            message={message}
+                            chatRoom={chatRoom}
+                        />);
+                    }
+                }
+
                 var messageActionButtons = null;
                 if (
                     message.getState() === Message.STATE.NOT_SENT ||
@@ -1064,7 +1166,7 @@ var GenericConversationMessage = React.createClass({
                     return null;
                 }
                 else {
-                    if (message.updated > 0) {
+                    if (message.updated > 0 && !message.metaType) {
                         textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
                     }
                     if (self.props.initTextScrolling) {
@@ -1096,8 +1198,9 @@ var GenericConversationMessage = React.createClass({
                                 positionAt="right bottom"
                                 horizOffset={4}
                             >
+                                {extraPreButtons}
                                 <DropdownsUI.DropdownItem
-                                    icon="writing-pen"
+                                    icon="icons-sprite writing-pencil"
                                     label={__(l[1342])}
                                     className=""
                                     onClick={(e) => {
@@ -1132,6 +1235,7 @@ var GenericConversationMessage = React.createClass({
                             {self.props.hideActionButtons ? null : messageActionButtons}
                             {messageNotSendIndicator}
                             {messageDisplayBlock}
+                            {subMessageComponent}
                             {buttonsBlock}
                             {spinnerElement}
                         </div>
@@ -1150,16 +1254,7 @@ var GenericConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
-
-                if (message.currentCallCounter) {
-                    tmpMsg += " " +
-                        textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
-                }
-                textMessage = tmpMsg;
-                textMessage = textMessage
-                    .replace("[[ ", "<span className=\"grey-color\">")
-                    .replace("]]", "</span>");
+                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage, true);
             }
             else {
                 textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));

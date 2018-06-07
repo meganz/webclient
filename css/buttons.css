@@ -112,7 +112,7 @@
 .big-button:hover .dashed-conversation {
     background-position: 1px -1694px;
 }
-.default-white-button, .default-grey-button, .default-red-button {
+.default-white-button, .default-grey-button, .default-red-button, .default-green-button {
     display: block;
     font-size: 14px;
     -moz-border-radius: 4px;
@@ -166,6 +166,13 @@
 }
 .default-white-button .red {
     color: #F0373A;
+}
+.default-green-button {
+    background-color: #00BFA5;
+    color: white;
+    font-family: 'source_sans_prosemibold';
+    font-size: 13px;
+    min-width: 132px;
 }
 .default-grey-button {
     color: white;
@@ -226,6 +233,8 @@
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
+    padding: 0 9px;
+    min-width: 30px;
 }
 .default-grey-button.small::before, .default-grey-button.small::after, .default-white-button.small::before, .default-white-button.small::after {
     -moz-border-radius: 3px;
@@ -240,7 +249,7 @@
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-.default-grey-button::before, .default-grey-button::after, .default-white-button::before, .default-white-button::after, .default-red-button::before, .default-red-button::after {
+.default-grey-button::before, .default-grey-button::after, .default-white-button::before, .default-white-button::after, .default-red-button::before, .default-red-button::after, .default-green-button::before {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -254,6 +263,11 @@
     -moz-border-radius: inherit;
     -webkit-border-radius: inherit;
     border-radius: inherit;
+}
+.default-green-button::before {
+    -webkit-box-shadow: 0 0 0 1px #00B098;
+    -moz-box-shadow: 0 0 0 1px #00B098;
+    box-shadow: 0 0 0 1px #00B098;
 }
 .default-white-button.small-text {
     font-size: 13px;
@@ -339,7 +353,7 @@
     opacity: 0.6;
 }
 .icon-dropdown:not(.disabled):hover, .icon-dropdown.active {
-    background-image: url(../images/mega/new-chat-sprite.png);
+    background-image: url(../images/mega/new-chat-sprite_v1.png);
     background-repeat: no-repeat;
     background-position: -64px -657px;
 }

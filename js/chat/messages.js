@@ -23,7 +23,7 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'sent': Message.STATE.NOT_SENT,
             'deleted': false,
             'revoked': false,
-            'attachmentMeta': false,
+            'attachmentMeta': false
         },
         true,
         vals
@@ -116,18 +116,43 @@ Message._getTextContentsForDialogType = function(message) {
                 '"' + htmlentities(message.meta.topic) + '"'
             );
         }
-        else if (textMessage.splice) {
-            var tmpMsg = textMessage[0].replace("[X]", contactName);
-            tmpMsg = tmpMsg.replace("%s", contactName);
+        else if (message.dialogType === "remoteCallEnded") {
+            var meta = message.meta;
 
-            if (message.currentCallCounter) {
-                tmpMsg += " " +
-                    textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
+            if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CALL_ENDED) {
+                textMessage = mega.ui.chat.getMessageString("call-ended");
             }
-            textMessage = tmpMsg;
-            textMessage = textMessage
-                .replace("[[ ", " ")
-                .replace("]]", "");
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.REJECTED) {
+                textMessage = mega.ui.chat.getMessageString("call-rejected");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED) {
+                textMessage = mega.ui.chat.getMessageString("call-canceled");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u !== u_handle) {
+                textMessage = mega.ui.chat.getMessageString("call-missed");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u === u_handle) {
+                textMessage = mega.ui.chat.getMessageString("call-timeout");
+            }
+            else if (meta.reason === CallManager.CALL_END_REMOTE_REASON.FAILED) {
+                textMessage = mega.ui.chat.getMessageString("call-failed");
+            }
+            else {
+                if (d) {
+                    console.error("Unknown (remote) CALL_ENDED reason: ", meta.reason, meta);
+                }
+            }
+
+            if (textMessage.splice) {
+                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
+            }
+            else {
+                textMessage = textMessage.replace("[X]", contactName);
+                textMessage = textMessage.replace("%s", contactName);
+            }
+        }
+        else if (textMessage.splice) {
+            textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage);
         }
         else {
             textMessage = textMessage.replace("[X]", contactName);
@@ -136,7 +161,7 @@ Message._getTextContentsForDialogType = function(message) {
 
 
         if (textMessage) {
-            return (contactName ? contactName + " " : "") + textMessage;
+            return textMessage;
         }
         else {
             return false;
@@ -284,6 +309,12 @@ Message.MANAGEMENT_MESSAGE_TYPES = {
     "ATTACHMENT": "\x10",
     "REVOKE_ATTACHMENT": "\x11",
     "CONTACT": "\x12",
+    "CONTAINS_META": "\x13",
+
+};
+
+Message.MESSAGE_META_TYPE = {
+    "RICH_PREVIEW": "\0",
 };
 
 
@@ -299,6 +330,7 @@ Message.prototype.isRenderableManagement = function() {
     }
     return this.textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT && (
             this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT ||
+            this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META ||
             this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT
         );
 };
@@ -313,7 +345,7 @@ Message.prototype.getManagementMessageSummaryText = function() {
     if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __(l[8894]).replace("%s", nodes[0].name);
+            return __(l[8894]).replace("%s", htmlentities(nodes[0].name));
         }
         else {
             return __(l[8895]).replace("%s", nodes.length);
@@ -322,10 +354,17 @@ Message.prototype.getManagementMessageSummaryText = function() {
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
-            return __(l[8896]).replace("%s", nodes[0].name);
+            return __(l[8896]).replace("%s", htmlentities(nodes[0].name));
         }
         else {
             return __(l[8897]).replace("%s", nodes.length);
+        }
+    }
+    else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META) {
+        var metaType = this.textContents.substr(2, 1);
+        var meta = JSON.parse(this.textContents.substr(3, this.textContents.length));
+        if (metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW) {
+            return meta.textMessage;
         }
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
@@ -351,7 +390,8 @@ Message.prototype.toPersistableObject = function() {
         'updated',
         'textContents',
         'references',
-        'msgIdentity'
+        'msgIdentity',
+        'metaType'
     ].forEach(function(k) {
         if (typeof self[k] !== 'undefined') {
             r[k] = self[k];
@@ -741,6 +781,16 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     }
 
                     msgObject.pendingMessageId = foundMessage.messageId;
+
+                    [
+                        'meta',
+                        'metaType',
+                        'pendingMessageId'
+                    ].forEach(function(k) {
+                        if (foundMessage[k]) {
+                            msgObject[k] = foundMessage[k];
+                        }
+                    });
                 }
 
                 self.messagesBatchFromHistory.push(msgObject);
@@ -751,6 +801,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     self.setLastReceived(eventData.messageId);
                 }
                 $(self).trigger('onNewMessageReceived', msgObject);
+
+                if (eventData.pendingid) {
+                    $(chatRoom).trigger('onPendingMessageConfirmed', msgObject);
+                }
             }
         }
     });
@@ -786,9 +840,21 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             if (!chatRoom.messagesBuff.messages[eventData.messageId]) {
                 if (!eventData.isRetry) {
                     eventData.isRetry = true;
-                    $(chatRoom).one('onHistoryDecrypted.dbgverify', function () {
-                        self.chatd.trigger('onMessageUpdated.messagesBuff' + chatRoomId, eventData);
-                    });
+                    if (chatRoom.messagesBuff.messagesBatchFromHistory[eventData.messageId]) {
+                        // NEWMSG already in the "to be decrypted/decrypting" buffer, wait for it first!
+                        var bufferedMsg = chatRoom.messagesBuff.messagesBatchFromHistory[eventData.messageId];
+                        bufferedMsg.addChangeListener(function() {
+                            if (bufferedMsg.decrypted === true) {
+                                // done decrypting
+                                self.chatd.trigger('onMessageUpdated.messagesBuff' + chatRoomId, eventData);
+                                return 0xDEAD;
+                            }
+                        });
+                    } else {
+                        $(chatRoom).one('onHistoryDecrypted.dbgverify', function () {
+                            self.chatd.trigger('onMessageUpdated.messagesBuff' + chatRoomId, eventData);
+                        });
+                    }
                 }
                 else {
                     if (self.chatd.chatdPersist) {
@@ -874,9 +940,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     );
 
 
-
-
                     chatRoom.messagesBuff.messages.replace(editedMessage.messageId, editedMessage);
+
+                    $(chatRoom).trigger('onMessageUpdateDecrypted', editedMessage);
 
                     if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                         var messageKeys = chatRoom.messagesBuff.messages.keys();
@@ -892,8 +958,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
                         self._removeMessagesBefore(editedMessage.messageId);
                     }
-
-
                 }
                 else {
                     self.messages.removeByKey(eventData.messageId);
@@ -1506,7 +1570,7 @@ MessagesBuff.prototype.getMessageById = function(messageId) {
     var found = false;
     for (var i = 0; i < self.messages.length; i++) {
         var v = self.messages.getItem(i);
-        if (v.messageId === messageId) {
+        if (v && v.messageId === messageId) {
             return v;
         }
     }

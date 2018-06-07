@@ -38,6 +38,35 @@ UrlFilter.prototype.processMessage = function(e, eventData) {
         className: 'chatlink',
         newWindow: true,
         stripPrefix: true,
-        twitter: false
+        twitter: false,
+        replaceFn : function(match) {
+            switch (match.getType()) {
+                case 'url' :
+                    var link = match.getUrl();
+
+                    if (LinkInfoHelper.isMegaLink(link)) {
+                        // skip MEGA links.
+                        var tag = match.buildTag();
+                        tag.addClass('red');
+                        return tag;
+                    }
+
+                    if (link.indexOf("http://") !== 0 && link.indexOf("https://") !== 0) {
+                        return false;
+                    }
+
+                    return true;  // let Autolinker perform its normal anchor tag replacement
+                default:
+                    return true;
+            }
+        }
     });
+
+    if (!eventData.message.megaLinks) {
+        var megaLinks = LinkInfoHelper.extractMegaLinksFromString(textContents);
+        if (megaLinks && megaLinks.length > 0) {
+            eventData.message.megaLinks = megaLinks;
+        }
+    }
+
 };

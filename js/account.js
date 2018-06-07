@@ -1136,6 +1136,15 @@ function processEmailChangeActionPacket(ap) {
                     }
                 }
 
+                if (localStorage.testServerSideRubbishScheduler) {
+                    u_attr.flags.ssrs = 1;
+                }
+
+                // disable client-side rubbish scheduler
+                if (u_attr.flags.ssrs > 0) {
+                    mega.config.set('rubsched', undefined);
+                }
+
                 if (fminitialized) {
                     var view = Object(fmconfig.viewmodes)[M.currentdirid];
                     var sort = Object(fmconfig.sortmodes)[M.currentdirid];
@@ -1278,7 +1287,16 @@ function processEmailChangeActionPacket(ap) {
         delay('fmconfig:setn.' + key, function() {
             var toast = false;
 
-            if (mega.config.get(key) !== value) {
+            if (key === 'rubsched' && u_attr.flags.ssrs > 0) {
+                value = String(value).split(':').pop() | 0;
+
+                if (M.account.ssrs !== value) {
+                    M.account.ssrs = value;
+                    mega.attr.set('rubbishtime', String(value), -2, 1);
+                    toast = true;
+                }
+            }
+            else if (mega.config.get(key) !== value) {
                 mega.config.set(key, value);
                 toast = true;
             }

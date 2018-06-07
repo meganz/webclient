@@ -2097,6 +2097,7 @@ else if (!b_u) {
     jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
     jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
+    jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2278,6 +2279,7 @@ else if (!b_u) {
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'tiffjs': {f:'js/vendor/tiff.js', n: 'tiffjs', j:1},
+        'webpjs': {f:'js/vendor/webp.js', n: 'webpjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
@@ -2343,6 +2345,7 @@ else if (!b_u) {
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
             'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
+            'richpreviewsFilt_js': {f:'js/chat/plugins/richpreviewsFilter.js', n: 'richpreviewsFilt_js', j:1, w:1},
             'chatStats_js': {f:'js/chat/plugins/chatStats.js', n: 'chatStats_js', j:1, w:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},

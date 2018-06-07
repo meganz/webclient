@@ -140,6 +140,11 @@ function easeOutCubic(t, b, c, d) {
 }
 
 function ellipsis(text, location, maxCharacters) {
+    "use strict";
+    if (!text) {
+        return "";
+    }
+
     if (text.length > 0 && text.length > maxCharacters) {
         if (typeof location === 'undefined') {
             location = 'end';
@@ -1604,7 +1609,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 var inRub = (M.RubbishID === M.currentrootid);
 
                 handles.map(function(handle) {
-                    M.delNode(handle, true);    // must not update DB pre-API
+                    // M.delNode(handle, true);    // must not update DB pre-API
                     api_req({a: 'd', n: handle/*, i: requesti*/});
 
                     if (inRub) {

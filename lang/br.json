@@ -2286,11 +2286,7 @@
     "18691": "A chamada para [X] foi recusada.",
     "18692": "A chamada para [X] foi cancelada.",
     "18698": "A chamada para [X] n\u00e3o foi atendida em tempo h\u00e1bil.",
-<<<<<<< HEAD
-    "18699": "Confirmar a remo\u00e7\u00e3o do avatar"
-=======
     "18699": "Confirmar a remo\u00e7\u00e3o do avatar",
     "18700": "Too short",
     "18701": "Your password needs to be at least 8 characters long."
->>>>>>> fb3ef7848497217e1af0b036e63280286ef4be27
 }

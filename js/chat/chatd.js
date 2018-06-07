@@ -93,7 +93,6 @@ var Chatd = function(userId, megaChat, options) {
         // 'onMessageLastReceived',
         // 'onRetentionChanged',
         // 'onMembersUpdated',
-        // 'onMessagesKeyIdDone',
         // 'onMessagesHistoryDone',
         // 'onMessagesHistoryRequest',
         // 'onMessageDiscard',
@@ -659,6 +658,17 @@ Chatd.cmdToString = function(cmd, tx) {
 
                     result += " (chatId) " + chatId + " (fromMsgId) " + fromMsg + " (toMsgId) " + toMsg;
                     break;
+                case Chatd.Opcode.MSGUPD:
+                    var chatId = base64urlencode(cmd.substr(1, 8));
+                    var msgxid = base64urlencode(cmd.substr(17, 8));
+                    var updated = Chatd.unpack16le(cmd.substr(29, 2));
+                    var keyid = Chatd.unpack32le(cmd.substr(31, 4));
+                    var msgLength = Chatd.unpack32le(cmd.substr(35, 4));
+                    var msg = cmd.substr(39, msgLength);
+
+                    result += " (chatId) " + chatId + " (msgxid) " + msgxid + " (updated) " + updated +
+                    " (keyid) " + keyid + " (message.length) " + msgLength + " (message) " + msg;
+                    break;
                 default:
                     if (cmd.length > 64) {
                         result += ' ' + Chatd.dumpToHex(cmd, 1, 64) + '...';
@@ -940,7 +950,8 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                             'meta',
                             'dialogType',
                             'references',
-                            'msgIdentity'
+                            'msgIdentity',
+                            'metaType'
                         ].forEach(function(k) {
                             if (typeof msgObj[k] !== 'undefined') {
                                 msg[k] = msgObj[k];
@@ -1721,14 +1732,26 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
         self.persist(messagekey);
     }
     else if (self.buf[msgnum]) {
+        var updated = mintimestamp - self.buf[msgnum][Chatd.MsgField.TIMESTAMP];
+
         messagekey = self.getmessagekey(self.buf[msgnum][Chatd.MsgField.MSGID], Chatd.MsgType.EDIT);
+        // a very quick udpate, then add by 1
+        if (self.sending[messagekey]) {
+            updated = self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.UPDATED] + 1;
+        } else {
+            updated = updated + 1;
+            if (updated === self.buf[msgnum][Chatd.MsgField.UPDATED]) {
+                updated = updated + 1;
+            }
+        }
+
         self.sendingbuf[++self.sendingnum] = [
             self.buf[msgnum][Chatd.MsgField.MSGID],
             self.buf[msgnum][Chatd.MsgField.USERID],
             self.buf[msgnum][Chatd.MsgField.TIMESTAMP],
             message,
             self.buf[msgnum][Chatd.MsgField.KEYID],
-            mintimestamp - self.buf[msgnum][Chatd.MsgField.TIMESTAMP] + 1,
+            updated,
             Chatd.MsgType.EDIT
         ];
 
@@ -1738,7 +1761,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
 
         if (self.chatd.chatIdShard[self.chatId].isOnline()) {
             self.chatd.chatIdShard[self.chatId].msgupd(self.chatId, self.buf[msgnum][Chatd.MsgField.MSGID],
-                mintimestamp - self.buf[msgnum][Chatd.MsgField.TIMESTAMP] + 1,
+                updated,
                 message, self.buf[msgnum][Chatd.MsgField.KEYID]);
         }
     }
@@ -1763,6 +1786,7 @@ Chatd.Messages.prototype.clearpending = function() {
         });
         self.removefrompersist(msgxid);
     });
+
     this.sending = {};
     this.sendingList = [];
     this.sendingbuf = {};
@@ -1793,7 +1817,10 @@ Chatd.Messages.prototype.resend = function(restore) {
     var lastexpiredpendingkey = null;
     var trivialmsgs = [];
     this.sendingList.forEach(function(msgxid) {
-        if (mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) {
+        if (!self.sending[msgxid] || !self.sendingbuf[self.sending[msgxid]]) {
+            trivialmsgs.push(msgxid);
+        }
+        else if (mintimestamp - self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TIMESTAMP] <= MESSAGE_EXPIRY) {
             if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
                 lastexpiredpendingkey = null;
             }
@@ -2415,7 +2442,11 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, ts, updated, keyid,
                     messageId : base64urlencode(msgid),
                     updated: updated
                 });
-                this.discard(messagekey);
+
+                if (this.sending[messagekey] && this.sendingbuf[this.sending[messagekey]]
+                    && updated >= this.sendingbuf[this.sending[messagekey]][Chatd.MsgField.UPDATED]) {
+                    this.discard(messagekey);
+                }
             }
 
             if (keyid !== 0) {

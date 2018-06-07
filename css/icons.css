@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite.png);
+    background-image: url(../images/mega/new-chat-sprite_v1.png);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite.png);
+    background-image: url(../images/mega/new-chat-sprite_v1.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -368,7 +368,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite.png);
+    background-image: url(../images/mega/new-chat-sprite_v1.png);
     background-repeat: no-repeat;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
@@ -530,7 +530,7 @@
     width: 18px;
 }
 .medium-icon.icons-img, .semi-big-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -855,15 +855,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -871,7 +871,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1000,6 +1000,24 @@
     width: 22px;
     height: 22px;
     margin: 5px 13px 1px -1px;
+}
+.small-icon.icons-sprite.bold-eye {
+    background-position: 0px -461px;
+}
+.small-icon.icons-sprite.bold-crossed-eye {
+    background-position: 1px -1498px;
+}
+.small-icon.icons-sprite.writing-pencil {
+    background-position: -201px -226px;
+}
+.dropdown-item:hover .small-icon.icons-sprite.writing-pencil {
+    background-position: -241px -226px;
+}
+.dropdown-item:hover .small-icon.icons-sprite.bold-eye {
+    background-position: -40px -461px;
+}
+.dropdown-item:hover .small-icon.icons-sprite.bold-crossed-eye {
+    background-position: -39px -1498px;
 }
 .dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
@@ -1262,7 +1280,7 @@
     background-position: -192px -781px;
 }
 i.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;

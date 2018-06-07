@@ -140,6 +140,11 @@ function easeOutCubic(t, b, c, d) {
 }
 
 function ellipsis(text, location, maxCharacters) {
+    "use strict";
+    if (!text) {
+        return "";
+    }
+
     if (text.length > 0 && text.length > maxCharacters) {
         if (typeof location === 'undefined') {
             location = 'end';

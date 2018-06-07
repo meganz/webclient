@@ -233,6 +233,8 @@
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
+    padding: 0 9px;
+    min-width: 30px;
 }
 .default-grey-button.small::before, .default-grey-button.small::after, .default-white-button.small::before, .default-white-button.small::after {
     -moz-border-radius: 3px;
@@ -351,7 +353,7 @@
     opacity: 0.6;
 }
 .icon-dropdown:not(.disabled):hover, .icon-dropdown.active {
-    background-image: url(../images/mega/new-chat-sprite.png);
+    background-image: url(../images/mega/new-chat-sprite_v1.png);
     background-repeat: no-repeat;
     background-position: -64px -657px;
 }

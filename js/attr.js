@@ -909,6 +909,11 @@ var attribCache = false;
                 delay('fv:uvi^dv', fileversioning.updateVersionInfo.bind(fileversioning), 4e3);
             }
         };
+        uaPacketParserHandler['*!rp'] = function() {
+            if (fminitialized) {
+                mBroadcaster.sendMessage('attr:rp');
+            }
+        };
 
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;

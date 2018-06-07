@@ -2421,6 +2421,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         presenceInt.userPresence.ui_setautoaway(newVal);
     };
 
+
     if (autoawaytimeout !== false) {
 
         accountUI.initCheckbox(
@@ -2491,6 +2492,20 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             })
             .val(lastValidNumber);
     }
+
+    accountUI.initCheckbox(
+        'richpreviews-confirmation',
+        $sectionContainerChat,
+        RichpreviewsFilter.previewGenerationConfirmation === true,
+        function(newVal) {
+            if (newVal) {
+                RichpreviewsFilter.confirmationDoConfirm();
+            }
+            else {
+                RichpreviewsFilter.confirmationDoNever();
+            }
+        }
+    );
 
     $('.versioning-switch')
     .rebind('click', function() {

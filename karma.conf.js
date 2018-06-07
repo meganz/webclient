@@ -147,6 +147,7 @@ module.exports = function(config) {
 
         // Our chat code.
         'js/chat/strongvelope.js',
+        'js/fm/linkinfohelper.js',
         'js/chat/plugins/urlFilter.js',
         'js/chat/plugins/emoticonShortcutsFilter.js',
         'js/chat/plugins/emoticonsFilter.js',

@@ -52,7 +52,8 @@ function is_image(n, ext) {
 function is_image2(n, ext) {
     'use strict';
     ext = ext || fileext(n && n.name || n, true, true);
-    return is_image(n, ext) || (filemime(n).startsWith('image') && String(n.fa).indexOf(':1*') > 0);
+    return (is_image(n, ext) && (!mega.chrome || !n || n.s < 6e8))
+        || (filemime(n).startsWith('image') && String(n.fa).indexOf(':1*') > 0);
 }
 
 /**

@@ -690,7 +690,7 @@ var GenericConversationMessage = React.createClass({
                                 v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
                             }
 
-                            var thumbClass = "";
+                            var thumbClass = src === window.noThumbURI ? " no-thumb" : "";
                             var thumbOverlay = null;
 
                             if (isImage) {

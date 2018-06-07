@@ -396,6 +396,10 @@
     padding: 10px 0 6px 0;
 }
 
+.shared-link.thumb.video.no-thumb img {
+    opacity: 0;
+}
+
 .message.richpreview.previews-container {
     padding-right: 27px;
 }

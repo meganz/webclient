@@ -849,12 +849,25 @@ function avatarDialog(close) {
                     '<div  class="default-white-button right" id="fm-cancel-avatar">' +
                         '<span>@@</span>' +
                     '</div>' +
+                    '<div  class="default-white-button right" id="fm-remove-avatar">' +
+                    '<span>@@</span>' +
+                    '</div>' +
                     '<div class="clear"></div>' +
                 '</div>' +
             '</div>' +
-        '</div>', l[1016], l[1017], l[82]);
+        '</div>', l[1016], l[1017], l[82], l[6974]);
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
+    $('#fm-remove-avatar').hide();
+
+    mega.attr.get(u_handle, 'a', true, false)
+        .fail()
+        .done(function(res) {
+            if (res !== null && res !== undefined && res !== "none"){
+                $('#fm-remove-avatar').show();
+            }
+        });
+
     var imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
         {
             cropButton: $('#fm-change-avatar'),
@@ -879,6 +892,7 @@ function avatarDialog(close) {
                 $('.image-upload-field-replacement.fm-account-change-avatar').hide();
                 $('#fm-change-avatar').show();
                 $('#fm-cancel-avatar').show();
+                $('#fm-remove-avatar').hide();
             },
             onImageUploadError: function()
             {
@@ -888,6 +902,16 @@ function avatarDialog(close) {
     $('#fm-cancel-avatar,.fm-dialog.avatar-dialog .fm-dialog-close').rebind('click', function(e)
     {
         avatarDialog(1);
+    });
+
+    $("#fm-remove-avatar").rebind('click', function()
+    {
+        msgDialog('confirmation', "confirm-remove-avatar", l[18699], l[6973], function(response) {
+            if (response){
+                mega.attr.set('a', "none", true, false);
+                avatarDialog(1);
+            }
+        });
     });
 }
 

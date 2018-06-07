@@ -1412,6 +1412,14 @@ var ConversationPanel = React.createClass({
                     }
                 }
 
+                if (
+                    v.dialogType === "remoteCallEnded" &&
+                    v &&
+                    v.wrappedChatDialogMessage
+                ) {
+                    v = v.wrappedChatDialogMessage;
+                }
+
 
                 if (v.dialogType) {
                     var messageInstance = null;

@@ -5282,6 +5282,10 @@ React.makeElement = React['createElement'];
 	                    }
 	                }
 
+	                if (v.dialogType === "remoteCallEnded" && v && v.wrappedChatDialogMessage) {
+	                    v = v.wrappedChatDialogMessage;
+	                }
+
 	                if (v.dialogType) {
 	                    var messageInstance = null;
 	                    if (v.dialogType === 'alterParticipants') {
@@ -9355,17 +9359,18 @@ React.makeElement = React['createElement'];
 	            MESSAGE_STRINGS = {
 	                'outgoing-call': l[5891],
 	                'incoming-call': l[5893],
-	                'call-timeout': l[5890],
+	                'call-timeout': [[l[18698]]],
 	                'call-starting': l[7206],
 	                'call-feedback': l[7998],
 	                'call-initialising': l[7207],
-	                'call-ended': [l[5889], l[7208]],
+	                'call-ended': [[l[18689], l[5889]], l[7208]],
+	                'remoteCallEnded': [[l[18689], l[5889]], l[7208]],
 	                'call-failed-media': l[7204],
-	                'call-failed': [l[7209], l[7208]],
+	                'call-failed': [[l[18690], l[7209]], l[7208]],
 	                'call-handled-elsewhere': l[5895],
 	                'call-missed': l[7210],
-	                'call-rejected': l[5892],
-	                'call-canceled': l[5894],
+	                'call-rejected': [[l[18691], l[5892]]],
+	                'call-canceled': [[l[18692], l[5894]]],
 	                'call-started': l[5888],
 	                'alterParticipants': undefined,
 	                'privilegeChange': l[8915],
@@ -10849,13 +10854,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            if (textMessage.splice) {
-	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
-
-	                if (message.currentCallCounter) {
-	                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
-	                }
-	                textMessage = tmpMsg;
-	                textMessage = textMessage.replace("[[ ", "<span className=\"grey-color\">").replace("]]", "</span>");
+	                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage, true);
 	            } else {
 	                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 	            }

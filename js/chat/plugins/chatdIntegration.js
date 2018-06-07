@@ -1006,6 +1006,12 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
             return null;
         }
     }
+    else if (message.dialogType === "remoteCallEnded") {
+        message.wrappedChatDialogMessage = chatRoom.megaChat.plugins.callManager.remoteEndCallToDialogMsg(
+            chatRoom,
+            message
+        );
+    }
 };
 
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
@@ -1525,6 +1531,24 @@ ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInst
         else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
             // this is a system message
             msgInstance.protocol = true;
+        }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.CALL_END) {
+            // this is a system message
+            msgInstance.meta = {
+                userId: decryptedResult.sender,
+                callId: decryptedResult.callId,
+                reason: decryptedResult.reason,
+                duration: decryptedResult.duration,
+                participants: decryptedResult.participants
+            };
+
+            msgInstance.dialogType = "remoteCallEnded";
+            // remove any locally generated FAILEDs
+            chatRoom.messagesBuff.removeMessageBy(function (v) {
+                if (v.type === "call-failed" && !v.meta) {
+                    return true;
+                }
+            });
         }
         else {
             self.logger.error("Could not decrypt: ", decryptedResult);

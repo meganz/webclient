@@ -209,7 +209,7 @@
     float: left;
 }
 .toast-close-button.qr-toast-close {
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
     background-position: -136px -206px;
     margin-top: -4px;
     margin-left: 226px;
@@ -246,7 +246,7 @@
     display: inline-block;
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/icons-sprite_v19.png);
+    background-image: url(../images/mega/icons-sprite_v20.png);
     vertical-align: top;
     margin: 2px 9px 0 1px;
     background-position: -198px -1240px;

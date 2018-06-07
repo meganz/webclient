@@ -162,7 +162,8 @@ var Chat = function() {
             'presencedIntegration': PresencedIntegration,
             'persistedTypeArea': PersistedTypeArea,
             'btRtfFilter': BacktickRtfFilter,
-            'rtfFilter': RtfFilter
+            'rtfFilter': RtfFilter,
+            'richpreviewsFilter': RichpreviewsFilter
         },
         'chatNotificationOptions': {
             'textMessages': {

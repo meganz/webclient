@@ -1,4 +1,4 @@
-v@font-face {
+@font-face {
     font-family: 'brandon_textbold_italic';
     src: url('../fonts/brandontext-bolditalic-webfont.eot');
     src: url('../fonts/brandontext-bolditalic-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/brandontext-bolditalic-webfont.woff') format('woff'), url('../fonts/brandontext-bolditalic-webfont.ttf') format('truetype'), url('../fonts/brandontext-bolditalic-webfont_v2.svg#brandon_textbold_italic') format('svg');

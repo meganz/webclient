@@ -241,6 +241,11 @@ MegaData.prototype.getPath = function(id) {
 MegaData.prototype.clearRubbish = function(all) {
     "use strict";
 
+    if (all) {
+        loadingDialog.show();
+        return M.req('dr').finally(loadingDialog.hide.bind(loadingDialog));
+    }
+
     var selids;
     var success = 0;
     var idtag = mRandomToken('cr');

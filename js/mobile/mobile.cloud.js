@@ -549,7 +549,7 @@ mobile.cloud = {
             var fileName = node.name;
 
             // If this is an image, load the preview slideshow
-            if ((is_image(fileName) && fileext(fileName) !== 'pdf') || (is_video(fileName))){
+            if (is_image(node) && fileext(fileName) !== 'pdf' || is_video(node)) {
                 mobile.slideshow.init(nodeHandle);
             }
             else {

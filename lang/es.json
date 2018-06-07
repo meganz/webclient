@@ -2286,5 +2286,11 @@
     "18691": "La llamada a [X] ha sido rechazada.",
     "18692": "La llamada a [X] ha sido cancelada.",
     "18698": "La llamada a [X] no ha sido contestada a tiempo.",
+<<<<<<< HEAD
     "18699": "Eliminar imagen del perfil"
+=======
+    "18699": "Eliminar imagen del perfil",
+    "18700": "Too short",
+    "18701": "Your password needs to be at least 8 characters long."
+>>>>>>> fb3ef7848497217e1af0b036e63280286ef4be27
 }

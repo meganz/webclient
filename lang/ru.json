@@ -2286,5 +2286,11 @@
     "18691": "\u0417\u0432\u043e\u043d\u043e\u043a \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044e [X] \u0431\u044b\u043b \u043e\u0442\u043a\u043b\u043e\u043d\u0451\u043d.",
     "18692": "\u0417\u0432\u043e\u043d\u043e\u043a \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044e [X] \u0431\u044b\u043b \u043e\u0442\u043c\u0435\u043d\u0451\u043d.",
     "18698": "Call to [X] was not answered in a timely manner.",
+<<<<<<< HEAD
     "18699": "Confirm Remove Avatar"
+=======
+    "18699": "Confirm Remove Avatar",
+    "18700": "Too short",
+    "18701": "Your password needs to be at least 8 characters long."
+>>>>>>> fb3ef7848497217e1af0b036e63280286ef4be27
 }

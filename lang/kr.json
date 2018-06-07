@@ -2286,5 +2286,11 @@
     "18691": "[X]\ub2d8\uc5d0\uac8c \uac74 \uc804\ud654\uac00 \uac70\uc808\ub428.",
     "18692": "[X]\ub2d8\uc5d0\uac8c \uac74 \uc804\ud654\uac00 \ucde8\uc18c\ub428.",
     "18698": "[X]\ub2d8\uc5d0\uac8c \uac74 \uc804\ud654\uac00 \uc801\uc808\ud55c \uc2dc\uac04\uc5d0 \uc751\ub2f5\ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4.",
+<<<<<<< HEAD
     "18699": "\uc544\ubc14\ud0c0 \uc0ad\uc81c \ud655\uc778"
+=======
+    "18699": "\uc544\ubc14\ud0c0 \uc0ad\uc81c \ud655\uc778",
+    "18700": "Too short",
+    "18701": "Your password needs to be at least 8 characters long."
+>>>>>>> fb3ef7848497217e1af0b036e63280286ef4be27
 }

@@ -1163,9 +1163,9 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
             var n = M.getNodeByHandle(h);
             var t = n.rr;
 
-            if (!t || !M.d[t]) {
+            if (!t || !M.d[t] || M.getNodeRoot(t) === M.RubbishID) {
                 if (d) {
-                    console.warn('No revert parent available, falling back to cloud root for %s.', h, t, n);
+                    console.warn('Reverting falling back to cloud root for %s.', h, t, n);
                 }
                 t = M.RootID;
             }
@@ -1209,6 +1209,7 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
                     if (error) {
                         // Caught error found, copyNodes/moveNodes should have shown a msgDialog() to the user.
                         loadingDialog.hide();
+                        masterPromise.reject(error);
                         return;
                     }
 

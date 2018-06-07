@@ -102,7 +102,9 @@
         <!--submenues goes here-->
         <a class="dropdown-item copy-item"><i class="small-icon context cloned-files"></i>[$63]</a>
         <a class="dropdown-item import-item"><i class="small-icon context plus"></i>[$236]</a>
-        <a class="dropdown-item revert-item"><i class="small-icon context icons-sprite reverted-clock"></i>[$16475]</a>
+        <a class="dropdown-item revert-item">
+            <i class="small-icon context icons-sprite reverted-clock"></i>Restore
+        </a>
         <hr />
     </div>
     <div class="dropdown-section">
@@ -1969,59 +1971,81 @@
                                 </div>
                                 </div>
 
-                                 <div id="rubbish_cleaning_scheduler">
-                                      <div class="fm-account-header">[$7226]</div>
-                                      <div class="account radio-buttons">
-                                          <div class="rubsched radioOn" id="rad12_div">
-                                              <input type="radio" id="rad12" class="rubsched radioOn" value="1">
-                                          </div>
-                                          <div class="radio-txt">[$1021]</div>
-                                          <div class="rubsched radioOff" id="rad13_div">
-                                              <input type="radio" id="rad13" class="rubsched radioOff" value="2"  >
-                                          </div>
-                                          <div class="radio-txt">[$1022]</div>
-                                          <div class="clear"></div>
+                                <div class="rubbish-settings" id="rubbish_cleaning_scheduler">
+                                    <div class="fm-account-header">[$7226]</div>
+                                    <div class="account radio-buttons">
+                                        <div class="pro-rubsched-options">
+                                            <div class="rubsched radioOn" id="rad12_div">
+                                                <input type="radio" id="rad12" class="rubsched radioOn" value="1">
+                                            </div>
+                                            <div class="radio-txt">[$1021]</div>
+                                            <div class="rubsched radioOff" id="rad13_div">
+                                                <input type="radio" id="rad13" class="rubsched radioOff" value="2">
+                                            </div>
+                                            <div class="radio-txt">[$1022]</div>
+                                            <div class="clear"></div>
+                                        </div>
 
-                                          <div id="rubsched_options" class="account sub-inputs hidden">
-                                              <div class="account rubbish-inputs left">
-                                                  <div class="rubschedopt radioOn" id="rad14_div">
-                                                      <input type="radio" id="rad14" class="rubschedopt radioOn" value="1">
-                                                  </div>
-                                                  <div class="radio-txt">[$16154]</div>
-                                                  <div class="clear"></div>
-                                               </div>
-                                               <div class="account left">
-                                                  <div class="account-counter-number">
-                                                      <input type="text" value="15" id="rad14_opt" class="rubsched_textopt" />
-                                                  </div>
-                                                  <div class="radio-txt">[$17695]</div>
-                                                  <div class="clear"></div>
-                                               </div>
-                                               <div class="clear"></div>
+                                        <div class="account sub-inputs rubsched-options hidden">
+                                            <div class="account rubbish-inputs left">
+                                                <div class="rubschedopt radioOn" id="rad14_div">
+                                                    <input type="radio" id="rad14" class="rubschedopt radioOn"
+                                                           value="1">
+                                                </div>
+                                                <div class="radio-txt">[$16154]</div>
+                                                <div class="clear"></div>
+                                            </div>
+                                            <div class="account left">
+                                                <div class="account-counter-number">
+                                                    <input type="number" value="15" id="rad14_opt"
+                                                           class="rubsched_textopt"/>
+                                                </div>
+                                                <div class="radio-txt">[$17695]</div>
+                                                <div class="clear"></div>
+                                            </div>
+                                            <div class="clear"></div>
 
-                                               <div class="account rubbish-inputs left">
-                                                  <div class="rubschedopt radioOn" id="rad15_div">
-                                                      <input type="radio" id="rad15" class="rubschedopt radioOn" value="1">
-                                                  </div>
-                                                  <div class="radio-txt">[$16155]</div>
-                                                  <div class="clear"></div>
-                                              </div>
+                                            <div class="account rubbish-inputs left rubschedopt-none">
+                                                <div class="rubschedopt radioOn" id="rad15_div">
+                                                    <input type="radio" id="rad15" class="rubschedopt radioOn"
+                                                           value="1">
+                                                </div>
+                                                <div class="radio-txt">[$16155]</div>
+                                                <div class="clear"></div>
+                                            </div>
 
-                                              <div class="account left">
-                                                  <div class="account-counter-number">
-                                                      <input type="text" value="2" id="rad15_opt" class="rubsched_textopt" />
-                                                  </div>
-                                                  <div class="radio-txt">[$17696]</div>
-                                                  <div class="clear"></div>
-                                              </div>
-                                              <div class="clear"></div>
+                                            <div class="account left rubschedopt-none">
+                                                <div class="account-counter-number">
+                                                    <input type="number" value="2" id="rad15_opt"
+                                                           class="rubsched_textopt"/>
+                                                </div>
+                                                <div class="radio-txt">[$17696]</div>
+                                                <div class="clear"></div>
+                                            </div>
+                                            <div class="clear"></div>
 
-                                          </div>
-                                          <div class="clear"></div>
-                                      </div>
-                                      <!-- Use rad20 as next radio button to allow further rubsched options -->
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
 
+                                    <div class="account-italic-txt bottom-pad rubbish-desc hidden">Lorem ipsum</div>
+
+                                    <div class="green-notification body hidden">
+                                        <div class="green-notification cell">
+                                            <i class="semi-big-icon xscheduler"></i>
+                                        </div>
+                                        <div class="green-notification cell">
+                                            [$18678]
+                                        </div>
+                                        <div class="green-notification cell">
+                                            <div class="button default-green-button upgrade-to-pro rubschedt">
+                                                [$129]
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+
+
                                 <div id="enable-versioning" class="versioning-block">
                                     <div class="fm-account-header">[$17596]
                                     </div>

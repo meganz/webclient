@@ -412,10 +412,9 @@ ul, li {
     display: inline-block;
     height: 44px;
     margin-top: 0px;
-    line-height: 43px;
+    line-height: 42px;
 }
-.mobile.inline-buttons .mobile.red-button.first 
-.mobile.inline-buttons .mobile.first {
+.mobile.inline-buttons .mobile.red-button.first  {
     float: right;
 }
 .mobile.inline-buttons .mobile.second {

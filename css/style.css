@@ -6813,7 +6813,7 @@ table {
 .export-icon.threed, .share-folder-icon div.threed {
     background-position: -113px -4199px;
 }
-.export-icon.folder, .share-folder-icon div.folder {
+.export-icon.folder, .export-icon.folderConflict, .share-folder-icon div.folder {
     background-position: -113px -4319px;
 }
 .export-icon.photo-folder, .share-folder-icon div.photo-folder {
@@ -21966,8 +21966,9 @@ opacity: 1;
 }
 .reg-st3-txt-achprogram {
     font-size: 16px;
+    line-height: 20px;
     font-family: 'source_sans_proregular';
-    margin-top: 14px;
+    margin-top: 8px;
     color: #666666;
 }
 .public-links-cnt {

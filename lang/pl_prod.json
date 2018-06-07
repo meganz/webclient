@@ -2196,6 +2196,11 @@
     "18669": "Napisz wiadomo\u015b\u0107 do %s...",
     "18678": "Czy potrzebujesz wi\u0119cej czasu?",
     "18679": "W\u0142\u0105cz podgl\u0105d link\u00f3w",
+    "18680": "Zwi\u0119ksz mo\u017cliwo\u015bci MEGAchat. Linki b\u0119d\u0105 pobierane bez szyfrowania.",
+    "18681": "Pozwalaj zawsze",
+    "18682": "Nie teraz",
+    "18683": "Ddoaj podgl\u0105d",
+    "18684": "Usu\u0144 podgl\u0105d",
     "18685": "Kosz mo\u017ce by\u0107 opr\u00f3\u017cniany automatycznie. Minimalny okres to 8 dni.",
     "18686": "Kosz jest opr\u00f3\u017cniany autoatycznie. Minimalny okres pomi\u0119dzy kt\u00f3rym nast\u0119puje oczyszczenie kosza to mi\u0119dzy 7 a 30 dni.",
     "18687": "Podgl\u0105d link\u00f3w zostanie zablokowany. Mo\u017cesz to zmieni\u0107\u00a0p\u00f3\u017aniej w ustawieniach. Czy chcesz kontynuowa\u0107?",
@@ -2203,6 +2208,6 @@
     "18690": "Po\u0142\u0105czenie z [X] nie powiod\u0142o si\u0119.",
     "18691": "Po\u0142\u0105czenie do [X] zosta\u0142o odrzucone.",
     "18692": "Po\u0142\u0105czenie z [X] zosta\u0142o anulowane.",
-    "18698": "Call to [X] was not answered in a timely manner.",
-    "18699": "Confirm Remove Avatar"
+    "18698": "Po\u0142\u0105czenie z [X] nie zosta\u0142o odebrane w odpowiednim czasie.",
+    "18699": "Potwierd\u017a usuni\u0119cie awatara"
 }

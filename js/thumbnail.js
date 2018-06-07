@@ -1,3 +1,5 @@
+/* jshint -W003 */// 'noThumbURI' was used before it was defined.
+
 function createnodethumbnail(node, aes, id, imagedata, opt, ph, file) {
     storedattr[id] = Object.assign(Object.create(null), {'$ph': ph, target: node});
     createthumbnail(file || false, aes, id, imagedata, node, opt);
@@ -370,6 +372,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
                 M.neuterArrayBuffer(imagedata);
             }
+            if (mega.chrome && file.size > 6e8) {
+                console.warn('Aborting thumbnail creation due https://crbug.com/536816 ...');
+                img.src = 'data:text/xml,overflow';
+                return;
+            }
             ThumbFR.readAsArrayBuffer(file);
         };
         var timeout = parseInt(localStorage.delayedThumbnailCreation) || 350 + Math.floor(Math.random() * 600);
@@ -730,22 +737,15 @@ function benchmarkireq() {
 }
 
 // Do not change this to a remote URL since it'll cause a CORS issue (tainted canvas)
-var noThumbURI = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXR' +
-'mLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxOS4wLjAsIFNWRyBFeHBvcnQgUG' +
-'x1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0' +
-'i0KHQu9C+0LlfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0ia' +
-'HR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiDQoJIHdpZHRoPSIyNDBweCI' +
-'gaGVpZ2h0PSIyNDBweCIgdmlld0JveD0iLTE4NSAyNzcgMjQwIDI0MCIgc3R5bGU9ImVuYWJsZS' +
-'1iYWNrZ3JvdW5kOm5ldyAtMTg1IDI3NyAyNDAgMjQwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+D' +
-'Qo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7b3BhY2l0eTowLjE4O30NCjwvc3R5bGU+' +
-'DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNLTY1LDQwOWM2LjYsMCwxMi01LjQsMTItMTJjMC0yLjM' +
-'tMC42LTQuNC0xLjgtNi4ybC0xNi41LDE2LjVDLTY5LjQsNDA4LjMtNjcuMyw0MDktNjUsNDA5ei' +
-'BNLTg2LjcsNDE0LjcNCgljLTMuOS00LjgtNi4zLTExLTYuMy0xNy43YzAtMTUuNSwxMi41LTI4L' +
-'DI4LTI4YzYuNywwLDEyLjksMi40LDE3LjcsNi4zbDEwLjUtMTAuNUMtNDUsMzYwLjItNTQuNCwz' +
-'NTctNjUsMzU3DQoJYy0zMiwwLTUyLjQsMjguNi02NCw0MGM3LDYuOCwxNy4xLDE5LjgsMzAuOSw' +
-'yOS4xTC04Ni43LDQxNC43eiBNLTMxLjksMzY3LjlsLTExLjQsMTEuNGMzLjksNC44LDYuMywxMS' +
-'w2LjMsMTcuNw0KCWMwLDE1LjUtMTIuNSwyOC0yOCwyOGMtNi43LDAtMTIuOS0yLjQtMTcuNy02L' +
-'jNsLTEwLjUsMTAuNWM4LjIsNC42LDE3LjUsNy44LDI4LjIsNy44YzMyLDAsNTIuNC0yOC42LDY0' +
-'LTQwDQoJQy04LDM5MC4yLTE4LjEsMzc3LjItMzEuOSwzNjcuOUwtMzEuOSwzNjcuOXogTS02NSw' +
-'zODVjLTYuNiwwLTEyLDUuNC0xMiwxMmMwLDIuMywwLjcsNC40LDEuOCw2LjJsMTYuNS0xNi41DQ' +
-'oJQy02MC42LDM4NS43LTYyLjcsMzg1LTY1LDM4NXoiLz4NCjwvc3ZnPg0K';
+// Neither change it to base64, just a URL-encoded Data URI
+var noThumbURI =
+    'data:image/svg+xml;charset-utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22240' +
+    'pt%22%20height%3D%22240pt%22%20viewBox%3D%220%200%20240%20240%22%3E%3Cpath%20fill%3D%22rgb(80%25,79.607843%25' +
+    ',79.607843%25)%22%20fill-rule%3D%22evenodd%22%20d%3D%22M120%20132c6.63%200%2012-5.37%2012-12%200-2.3-.65-4.42' +
+    '-1.76-6.24l-16.48%2016.48c1.82%201.1%203.95%201.76%206.24%201.76zm-21.7%205.7c-3.93-4.83-6.3-11-6.3-17.7%200-' +
+    '15.47%2012.54-28%2028-28%206.7%200%2012.87%202.37%2017.7%206.3l10.48-10.48C140%2083.18%20130.65%2080%20120%20' +
+    '80c-32%200-52.37%2028.57-64%2040%206.96%206.84%2017.05%2019.8%2030.88%2029.13zm54.83-46.82L141.7%20102.3c3.93' +
+    '%204.83%206.3%2011%206.3%2017.7%200%2015.47-12.54%2028-28%2028-6.7%200-12.87-2.37-17.7-6.3l-10.48%2010.48C100' +
+    '%20156.82%20109.35%20160%20120%20160c32%200%2052.37-28.57%2064-40-6.96-6.84-17.05-19.8-30.88-29.13zM120%20108' +
+    'c-6.63%200-12%205.37-12%2012%200%202.3.65%204.42%201.76%206.24l16.48-16.48c-1.82-1.1-3.95-1.76-6.24-1.76zm0%2' +
+    '00%22%2F%3E%3C%2Fsvg%3E';

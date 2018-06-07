@@ -389,3 +389,6 @@
 .message.content-area .buttons-block {
     padding: 10px 0 6px 0;
 }
+.shared-link.thumb.video.no-thumb img {
+    opacity: 0;
+}

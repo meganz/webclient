@@ -10259,7 +10259,7 @@ React.makeElement = React['createElement'];
 	                                v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
 	                            }
 
-	                            var thumbClass = "";
+	                            var thumbClass = src === window.noThumbURI ? " no-thumb" : "";
 	                            var thumbOverlay = null;
 
 	                            if (isImage) {

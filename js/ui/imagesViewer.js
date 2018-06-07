@@ -804,12 +804,20 @@ var slideshowid;
     }
 
     function fetchsrc(id) {
-        function eot(id, err) {
-            delete preqs[id];
-            delete pfails[id];
-            M.addDownload([id], false, err ? -1 : true);
+        var n = slideshow_node(id);
+        if (!n) {
+            console.error('Node "%s" not found...', id);
+            return false;
         }
 
+        var eot = function eot(id, err) {
+            delete preqs[id];
+            delete pfails[id];
+            if (n.s > 13e7) {
+                return previewimg(id, null);
+            }
+            M.addDownload([id], false, err ? -1 : true);
+        };
         eot.timeout = 8500;
 
         var preview = function preview(ctx, h, u8) {
@@ -824,11 +832,6 @@ var slideshowid;
             delete pfails[h];
         };
 
-        var n = slideshow_node(id);
-        if (!n) {
-            console.error('Node "%s" not found...', id);
-            return false;
-        }
 
         if (d) {
             console.debug('slideshow.fetchsrc', id, n, n.h);
@@ -845,19 +848,10 @@ var slideshowid;
                         console.warn('Failed to retrieve PDF, failing back to broken eye image...', ev);
                     }
 
-                    var svg = decodeURIComponent(noThumbURI.substr(noThumbURI.indexOf(',') + 1));
-                    var u8 = new Uint8Array(svg.length);
-                    for (var i = svg.length; i--;) {
-                        u8[i] = svg.charCodeAt(i);
-                    }
-                    previewimg(n.h, u8, 'image/svg+xml');
+                    previewimg(n.h, null);
                     delete previews[n.h].buffer;
                     preqs[n.h] = 0; // to retry again
-                    if (ev && ev.target && ev.target.status === 509) {
-                        dlmanager.setUserFlags();
-                        dlmanager.showOverQuotaDialog();
-                    }
-                    else if (ev === EOVERQUOTA) {
+                    if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
                         dlmanager.setUserFlags();
                         dlmanager.showOverQuotaDialog();
                     }
@@ -1199,7 +1193,8 @@ var slideshowid;
             if (ev.type === 'error') {
                 src1 = noThumbURI;
                 if (!replacement) {
-                    origImgWidth = origImgHeight = 240;
+                    // noThumbURI is a 240pt svg image over a 320pt container...
+                    origImgWidth = origImgHeight = 320;
                 }
 
                 if (d) {
@@ -1276,6 +1271,20 @@ var slideshowid;
 
     function previewimg(id, uint8arr, type) {
         var blob;
+
+        if (uint8arr === null) {
+            if (d) {
+                console.debug('Using broken-eye image for %s...', id);
+            }
+
+            var svg = decodeURIComponent(noThumbURI.substr(noThumbURI.indexOf(',') + 1));
+            var u8 = new Uint8Array(svg.length);
+            for (var i = svg.length; i--;) {
+                u8[i] = svg.charCodeAt(i);
+            }
+            uint8arr = u8;
+            type = 'image/svg+xml';
+        }
 
         type = typeof type === 'string' && type || 'image/jpeg';
 

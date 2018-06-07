@@ -10614,7 +10614,7 @@ React.makeElement = React['createElement'];
 	                                    extraPreButtons.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                                        key: 'remove-link-preview',
 	                                        icon: 'icons-sprite bold-crossed-eye',
-	                                        label: l['18684'],
+	                                        label: l[18684],
 	                                        className: '',
 	                                        onClick: function onClick(e) {
 	                                            e.stopPropagation();
@@ -10628,7 +10628,7 @@ React.makeElement = React['createElement'];
 	                                    extraPreButtons.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                                        icon: 'icons-sprite bold-crossed-eye',
 	                                        key: 'stop-link-preview',
-	                                        label: l['18684'],
+	                                        label: l[18684],
 	                                        className: '',
 	                                        onClick: function onClick(e) {
 	                                            e.stopPropagation();
@@ -10651,7 +10651,7 @@ React.makeElement = React['createElement'];
 	                                extraPreButtons.push(React.makeElement(DropdownsUI.DropdownItem, {
 	                                    key: 'insert-link-preview',
 	                                    icon: 'icons-sprite bold-eye',
-	                                    label: l['18683'],
+	                                    label: l[18683],
 	                                    className: '',
 	                                    onClick: function onClick(e) {
 	                                        e.stopPropagation();
@@ -11274,7 +11274,7 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "span",
 	                    null,
-	                    l['1051']
+	                    l[1051]
 	                )
 	            );
 	        }
@@ -11288,7 +11288,7 @@ React.makeElement = React['createElement'];
 	            React.makeElement(
 	                "span",
 	                null,
-	                l['18682']
+	                l[18682]
 	            )
 	        );
 
@@ -11315,13 +11315,13 @@ React.makeElement = React['createElement'];
 	                            React.makeElement(
 	                                "span",
 	                                { className: "message richpreview title" },
-	                                l['18679']
+	                                l[18679]
 	                            )
 	                        ),
 	                        React.makeElement(
 	                            "div",
 	                            { className: "message richpreview desc" },
-	                            l['18680']
+	                            l[18680]
 	                        ),
 	                        React.makeElement(
 	                            "div",
@@ -11334,7 +11334,7 @@ React.makeElement = React['createElement'];
 	                                React.makeElement(
 	                                    "span",
 	                                    null,
-	                                    l['18681']
+	                                    l[18681]
 	                                )
 	                            ),
 	                            notNowButton,

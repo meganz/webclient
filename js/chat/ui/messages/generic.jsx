@@ -995,7 +995,7 @@ var GenericConversationMessage = React.createClass({
                                         <DropdownsUI.DropdownItem
                                             key="remove-link-preview"
                                             icon="icons-sprite bold-crossed-eye"
-                                            label={l['18684']}
+                                            label={l[18684]}
                                             className=""
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -1015,7 +1015,7 @@ var GenericConversationMessage = React.createClass({
                                         <DropdownsUI.DropdownItem
                                             icon="icons-sprite bold-crossed-eye"
                                             key="stop-link-preview"
-                                            label={l['18684']}
+                                            label={l[18684]}
                                             className=""
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -1050,7 +1050,7 @@ var GenericConversationMessage = React.createClass({
                                     <DropdownsUI.DropdownItem
                                         key="insert-link-preview"
                                         icon="icons-sprite bold-eye"
-                                        label={l['18683']}
+                                        label={l[18683]}
                                         className=""
                                         onClick={(e) => {
                                             e.stopPropagation();

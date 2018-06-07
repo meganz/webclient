@@ -61,7 +61,7 @@ var MetaRichpreviewConfirmation = React.createClass({
                                onClick={function(e) {
                                    self.doNever();
                                }}>
-                <span>{l['1051']}</span>
+                <span>{l[1051]}</span>
             </div>;
         }
 
@@ -69,7 +69,7 @@ var MetaRichpreviewConfirmation = React.createClass({
                             onClick={function (e) {
                                 self.doNotNow();
                             }}>
-            <span>{l['18682']}</span>
+            <span>{l[18682]}</span>
         </div>;
 
 
@@ -84,16 +84,16 @@ var MetaRichpreviewConfirmation = React.createClass({
                     </div>
                     <div className="message richpreview inner-wrapper">
                         <div className="message richpreview data-title">
-                            <span className="message richpreview title">{l['18679']}</span>
+                            <span className="message richpreview title">{l[18679]}</span>
                         </div>
                         <div className="message richpreview desc">
-                            {l['18680']}
+                            {l[18680]}
                         </div>
                         <div className="buttons-block">
                             <div className="default-grey-button small-text small right" onClick={function(e) {
                                 self.doAllow();
                             }}>
-                                <span>{l['18681']}</span>
+                                <span>{l[18681]}</span>
                             </div>
                             {notNowButton}
                             {neverButton}

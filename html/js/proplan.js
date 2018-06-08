@@ -156,6 +156,8 @@ pro.proplan = {
         var $stepOne = $('.plans-block');
         var $pricingBoxes = $stepOne.find('.reg-st3-membership-bl');
         var oneLocalPriceFound = false;
+        var euroSign = '\u20ac';
+        var localS;
 
         // Update each pricing block with details from the API
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
@@ -180,23 +182,29 @@ pro.proplan = {
                 var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
                 var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
                 var $euroPrice = $('.euro-price', $price);
+                var $currncyAbbrev = $('.local-currency-code', $price);
+
+                $priceDollars.removeClass('tooBig tooBig2');
+                $priceCents.removeClass('toosmall toosmall2');
 
                 var monthlyBasePrice;
                 var monthlyBasePriceCurrencySign;
-                var euroSign = '\u20ac';
+                
                 if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                    $pricingBoxes.addClass('local-currency');
                     $euroPrice.removeClass('hidden');
+                    $currncyAbbrev.removeClass('hidden');
+                    $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
                     $euroPrice.text(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] +
                         ' ' + euroSign);
                     // Calculate the monthly base price in local currency
                     monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
                     monthlyBasePriceCurrencySign = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSYMBOL];
+                    localS = monthlyBasePriceCurrencySign;
                     oneLocalPriceFound = true;
                 }
                 else {
-                    $pricingBoxes.removeClass('local-currency');
                     $euroPrice.addClass('hidden');
+                    $currncyAbbrev.addClass('hidden');
 
                     // Calculate the monthly base price
                     monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE];
@@ -208,15 +216,25 @@ pro.proplan = {
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
                 // if (monthlyBasePrice.length > 10) {
-                    if (monthlyBasePriceDollars.length > 7) {
-                        monthlyBasePriceDollars = monthlyBasePriceDollars.substr(0, 7);
+                    if (monthlyBasePriceDollars.length > 6) {
+                        if (monthlyBasePriceDollars.length > 9) {
+                            $priceDollars.addClass('tooBig2');
+                            $priceCents.addClass('toosmall2');
+                            monthlyBasePriceCents = '0';
+                        }
+                        else {
+                            $priceDollars.addClass('tooBig');
+                            $priceCents.addClass('toosmall');
+                            monthlyBasePriceCents = '00';
+                        }
                         monthlyBasePriceDollars = Number.parseInt(monthlyBasePriceDollars) + 1;
-                        monthlyBasePriceCents = '00';
                     }
                     else {
-                        monthlyBasePriceCents = monthlyBasePriceCents.substr(0, 2);
-                        monthlyBasePriceCents = Number.parseInt(monthlyBasePriceCents) + 1;
-                        monthlyBasePriceCents = (monthlyBasePriceCents + '0').substr(0, 2);
+                        if (monthlyBasePriceCents.length > 2) {
+                            monthlyBasePriceCents = monthlyBasePriceCents.substr(0, 2);
+                            monthlyBasePriceCents = Number.parseInt(monthlyBasePriceCents) + 1;
+                            monthlyBasePriceCents = (monthlyBasePriceCents + '0').substr(0, 2);
+                        }
                     }
                 // }
                 // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
@@ -246,11 +264,18 @@ pro.proplan = {
                 $bandwidthUnit.text(bandwidthFormatted.unit);
             }
         }
+        var $pricingBoxFree = $pricingBoxes.filter('.free');
+        var $priceFree = $pricingBoxFree.find('.price');
+        var $priceCentsFree = $priceFree.find('.small');
         if (oneLocalPriceFound) {
             $('.reg-st3-txt-localcurrencyprogram').removeClass('hidden');
+            $pricingBoxes.addClass('local-currency');
+            $priceCentsFree.text('.00 ' + localS);
         }
         else {
             $('.reg-st3-txt-localcurrencyprogram').addClass('hidden');
+            $priceCentsFree.text('.00 ' + euroSign);
+            $pricingBoxes.removeClass('local-currency');
         }
     },
 

@@ -3,6 +3,16 @@ var achieve_data = false;
 function init_start() {
     "use strict";
 
+    // Load the membership plans
+    pro.loadMembershipPlans(function () {
+
+        // Render the plan details
+        pro.proplan.populateMembershipPlans();
+
+        // Check which plans are applicable or grey them out if not
+        pro.proplan.checkApplicablePlans();
+    });
+
     if (u_type > 0) {
         $('.startpage.register').text(l[164]);
         $('.startpage.register').rebind('click', function () {
@@ -20,15 +30,7 @@ function init_start() {
         });
         $('.startpage.try-mega').text(l[16535]);
 
-        // Load the membership plans
-        pro.loadMembershipPlans(function () {
-
-            // Render the plan details
-            pro.proplan.populateMembershipPlans();
-
-            // Check which plans are applicable or grey them out if not
-            pro.proplan.checkApplicablePlans();
-        });
+        
 
         $('.startpage.try-mega').rebind('click', function () {
             if (u_type === false) {

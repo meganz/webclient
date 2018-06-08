@@ -23882,8 +23882,6 @@ opacity: 1;
     height: 11px;
     display: inline-block;
     margin-top: 10px;
-    display: none;
-    position: absolute;
     margin-left: 4px;
 }
 
@@ -23920,26 +23918,48 @@ opacity: 1;
 .local-currency .num .big {
     font-size: 36px;
 }
+.local-currency .num .big.tooBig {
+    font-size: 24px;
+}
+.local-currency .num .big.tooBig2 {
+    font-size: 18px;
+}
 
 .local-currency .num .small {
     font-size: 24px;
+}
+.local-currency .num .small.toosmall {
+    font-size: 18px;
+}
+.local-currency .num .small.toosmall2 {
+    font-size: 14px;
 }
 
 .local-currency .reg-st3-storage {
     padding-top: 32px;
 }
-.local-currency .local-currency-code {
+.reg-st3-bott-title.price .local-currency-code {
+    display: none;
+}
+.local-currency .reg-st3-bott-title.price .local-currency-code {
     font-size: 10px;
     color: #888;
     line-height: 16px;
-    margin-top: -8px;
+    margin-top: -5px;
     margin-bottom: 4px;
+    display: block;
 }
+
 .local-currency .local-code-block {
     display: block;
     font-size: 16px;
     line-height: initial;
 }
 .local-currency .num {
-    line-height: 1em;
+    line-height: 40px;
+}
+
+.limited-bandwidth-dialog .local-currency .reg-st3-bott-title.price .local-currency-code {
+    margin-top: 2px;
+    margin-bottom: 0px;
 }

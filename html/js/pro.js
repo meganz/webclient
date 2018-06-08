@@ -7,6 +7,8 @@ var pro = {
     /** An array of the possible membership plans from the API */
     membershipPlans: [],
 
+    lastLoginStatus: -99, // a var to store the user login status when prices feteched
+
     /** The last payment provider ID used */
     lastPaymentProviderId: null,
 
@@ -34,7 +36,7 @@ var pro = {
         loadedCallback = loadedCallback || function() { };
 
         // If this data has already been fetched, re-use it and run the callback function
-        if (pro.membershipPlans.length > 0) {
+        if (pro.membershipPlans.length > 0 && !(!pro.lastLoginStatus && u_type > 0)) {
             loadedCallback();
         }
         else {
@@ -63,6 +65,7 @@ var pro = {
 
                     // Store globally
                     pro.membershipPlans = plans;
+                    pro.lastLoginStatus = u_type;
 
                     // Run the callback function
                     loadedCallback();

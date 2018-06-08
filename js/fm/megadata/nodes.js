@@ -241,6 +241,11 @@ MegaData.prototype.getPath = function(id) {
 MegaData.prototype.clearRubbish = function(all) {
     "use strict";
 
+    if (M.account) {
+        // reset cached account data
+        M.account.lastupdate = 0;
+    }
+
     if (all) {
         loadingDialog.show();
         return M.req('dr').finally(loadingDialog.hide.bind(loadingDialog));

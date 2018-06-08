@@ -23869,8 +23869,10 @@ opacity: 1;
     width: 12px;
     background-size: 12px 12px;
     height: 11px;
-    margin-bottom: 16px;
+    margin-top: 10px;
     display: none;
+    position: absolute;
+    margin-left: 4px;
 }
 
 .reg-st3-txt-localcurrencyprogram .green-star-img {
@@ -23879,6 +23881,10 @@ opacity: 1;
     background-size: 12px 12px;
     height: 11px;
     display: inline-block;
+    margin-top: 10px;
+    display: none;
+    position: absolute;
+    margin-left: 4px;
 }
 
 .reg-st3-txt-localcurrencyprogram {
@@ -23901,12 +23907,14 @@ opacity: 1;
     border-radius: 6px;
     margin: 14px auto;
     width: -webkit-max-content;
+    width: -moz-fit-content;
     color: #9aa0ac;
     padding: 0 12px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.06);
 }
 
 .local-currency .membership-gray-block {
-    height: 108px;
+    height: 124px;
 }
 
 .local-currency .num .big {
@@ -23919,4 +23927,19 @@ opacity: 1;
 
 .local-currency .reg-st3-storage {
     padding-top: 32px;
+}
+.local-currency .local-currency-code {
+    font-size: 10px;
+    color: #888;
+    line-height: 16px;
+    margin-top: -8px;
+    margin-bottom: 4px;
+}
+.local-currency .local-code-block {
+    display: block;
+    font-size: 16px;
+    line-height: initial;
+}
+.local-currency .num {
+    line-height: 1em;
 }

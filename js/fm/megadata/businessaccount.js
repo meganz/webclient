@@ -10,7 +10,7 @@ function BusinessAccount() {
  * @param {String} subEmail  email address of new user
  * @param {String} subFName  First name of new user
  * @param {String} subLName  Last name of new user
- * @returns {Promise}        Resolves with new add user HANDLE
+ * @returns {Promise}        Resolves with new add user HANDLE + password
  */
 BusinessAccount.prototype.addSubAccount = function _addSubAccount(subEmail, subFName, subLName) {
     "use strict";

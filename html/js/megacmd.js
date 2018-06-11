@@ -62,7 +62,7 @@ function initMegacmdDownload() {
 /**
  * Init Linux Dropdown
  */
-function linuxMegacmdDropdown() {alert(1);
+function linuxMegacmdDropdown() {
     var $content = $('.bottom-page.megacmd');
     var $button = $content.find('.pages-nav.nav-button.linux');
     var $dropdown = $content.find('.megaapp-dropdown'); 

@@ -14,7 +14,7 @@ function initMegacmd() {
     var pf = navigator.platform.toUpperCase();
     var $content = $('.bottom-page.megacmd');
     $content.find('.megaapp-linux:visible').addClass('hidden');
-    $content.find('.bottom-page.megacmd').removeClass('linux');
+    $content.removeClass('linux');
     $content.find('.nav-buttons-bl a.linux').removeClass('disabled');
 
     if (pf.indexOf('LINUX') >= 0) {
@@ -70,7 +70,7 @@ function linuxMegacmdDropdown() {
     var $list = $dropdown.find('.megaapp-dropdown-list');
     $button.addClass('disabled').attr('data-link','');
     $content.find('.megaapp-linux').removeClass('hidden');
-    $content.find('.bottom-page.megacmd').addClass('linux');
+    $content.addClass('linux');
 
     CMS.get('cmd', function(err, content) {
         linuxnameindex = {};

@@ -2143,6 +2143,10 @@ function topmenuUI() {
         return false;
     });
 
+    $topMenu.find('.top-social-bl a').rebind('click', function () {
+        window.open($(this).attr('href'));
+    });
+
     // Initialise the language sub menu for mobile
     if (is_mobile) {
         mobile.languageMenu.init();

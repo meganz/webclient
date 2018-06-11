@@ -2,7 +2,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     "use strict";
 
     var account = Object(this.account);
-    var reuseData = (account.lastupdate > Date.now() - 30000) && !force;
+    var reuseData = (account.lastupdate > Date.now() - 10000) && !force;
 
     if (reuseData && (!account.stats || !account.stats[M.RootID])) {
         if (d) {
@@ -72,6 +72,15 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             callback: function(res, ctx) {
                 if (typeof res === 'object') {
                     ctx.account.maf = res;
+                }
+            }
+        });
+
+        api_req({a: 'uga', u: u_handle, ua: '^!rubbishtime', v: 1}, {
+            account: account,
+            callback: function(res, ctx) {
+                if (typeof res === 'object') {
+                    ctx.account.ssrs = base64urldecode(String(res.av || res)) | 0;
                 }
             }
         });

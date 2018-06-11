@@ -1420,7 +1420,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
         }
         $tr.find('.uploaded-size').html(bytesToSize(bl, 1, 1));
         if (retime > 0) {
-            $tr.find('.eta').safeHTML(secondsToTime(retime, 1)).removeClass('unknown');
+            $tr.find('.eta').html(secondsToTime(retime, 1)).removeClass('unknown');
         }
         else {
             $tr.find('.eta').addClass('unknown').text('');

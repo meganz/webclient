@@ -52,7 +52,8 @@ function is_image(n, ext) {
 function is_image2(n, ext) {
     'use strict';
     ext = ext || fileext(n && n.name || n, true, true);
-    return is_image(n, ext) || (filemime(n).startsWith('image') && String(n.fa).indexOf(':1*') > 0);
+    return (is_image(n, ext) && (!mega.chrome || !n || n.s < 6e8))
+        || (filemime(n).startsWith('image') && String(n.fa).indexOf(':1*') > 0);
 }
 
 /**
@@ -244,6 +245,62 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
         cb(ab);
         eventlog(99692);
     });
+});
+
+mThumbHandler.add('WEBP', function WEBPThumbHandler(ab, cb) {
+    'use strict';
+
+    M.require('webpjs').tryCatch(function() {
+        var timeTag = 'webpjs.' + makeUUID();
+
+        if (d) {
+            console.debug('Creating WEBP thumbnail...', ab && ab.byteLength);
+            console.time(timeTag);
+        }
+
+        var canvas = webpToCanvas(new Uint8Array(ab), ab.byteLength);
+
+        if (d) {
+            console.timeEnd(timeTag);
+        }
+
+        if (canvas) {
+            ab = dataURLToAB(canvas.toDataURL());
+
+            if (d) {
+                console.log('webp2png %sx%s (%s bytes)', canvas.width, canvas.height, ab.byteLength);
+            }
+        }
+        else {
+            if (d) {
+                console.debug('WebP thumbnail creation failed.');
+            }
+            ab = null;
+        }
+        cb(ab);
+    });
+});
+
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    var img = new Image();
+    img.onload = function() {
+        // This browser does natively support WebP
+        delete mThumbHandler.sup.WEBP;
+        is_image.def.WEBP = 1;
+
+        if (d) {
+            console.debug('Using build in WebP support...');
+        }
+    };
+    img.onerror = function() {
+        if (d) {
+            console.debug('This browser does not support WebP, we will use libwebp...', ua);
+        }
+    };
+    img.src = 'data:image/webp;base64,' +
+        'UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
 });
 
 mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {

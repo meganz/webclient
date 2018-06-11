@@ -58,7 +58,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var ConversationsUI = __webpack_require__(4);
-	var ChatRoom = __webpack_require__(28);
+	var ChatRoom = __webpack_require__(32);
 
 	var EMOJI_DATASET_VERSION = 2;
 
@@ -181,7 +181,8 @@ React.makeElement = React['createElement'];
 	            'presencedIntegration': PresencedIntegration,
 	            'persistedTypeArea': PersistedTypeArea,
 	            'btRtfFilter': BacktickRtfFilter,
-	            'rtfFilter': RtfFilter
+	            'rtfFilter': RtfFilter,
+	            'richpreviewsFilter': RichpreviewsFilter
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {
@@ -234,6 +235,7 @@ React.makeElement = React['createElement'];
 	    this.plugins = {};
 
 	    self.filePicker = null;
+	    self._chatsAwaitingAps = {};
 
 	    return this;
 	};
@@ -765,8 +767,12 @@ React.makeElement = React['createElement'];
 	        if (room) {
 	            room.show();
 	        }
+	    }
+
+	    if (setAsActive === false) {
+	        room.showAfterCreation = false;
 	    } else {
-	        if (room) {}
+	        room.showAfterCreation = true;
 	    }
 
 	    room.setState(ChatRoom.STATE.JOINING);
@@ -4077,10 +4083,10 @@ React.makeElement = React['createElement'];
 	var ParticipantsList = __webpack_require__(21).ParticipantsList;
 
 	var GenericConversationMessage = __webpack_require__(22).GenericConversationMessage;
-	var AlterParticipantsConversationMessage = __webpack_require__(24).AlterParticipantsConversationMessage;
-	var TruncatedMessage = __webpack_require__(25).TruncatedMessage;
-	var PrivilegeChange = __webpack_require__(26).PrivilegeChange;
-	var TopicChange = __webpack_require__(27).TopicChange;
+	var AlterParticipantsConversationMessage = __webpack_require__(28).AlterParticipantsConversationMessage;
+	var TruncatedMessage = __webpack_require__(29).TruncatedMessage;
+	var PrivilegeChange = __webpack_require__(30).PrivilegeChange;
+	var TopicChange = __webpack_require__(31).TopicChange;
 
 	var ConversationRightArea = React.createClass({
 	    displayName: "ConversationRightArea",
@@ -5276,6 +5282,10 @@ React.makeElement = React['createElement'];
 	                    }
 	                }
 
+	                if (v.dialogType === "remoteCallEnded" && v && v.wrappedChatDialogMessage) {
+	                    v = v.wrappedChatDialogMessage;
+	                }
+
 	                if (v.dialogType) {
 	                    var messageInstance = null;
 	                    if (v.dialogType === 'alterParticipants') {
@@ -5341,8 +5351,9 @@ React.makeElement = React['createElement'];
 	                                self.messagesListScrollable.scrollToBottom(true);
 	                                self.lastScrollPositionPerc = 1;
 	                            } else if (messageContents) {
+	                                $(room).trigger('onMessageUpdating', v);
 	                                room.megaChat.plugins.chatdIntegration.updateMessage(room, v.internalId ? v.internalId : v.orderValue, messageContents);
-	                                if (v.getState && v.getState() === Message.STATE.NOT_SENT && !v.requiresManualRetry) {
+	                                if (v.getState && (v.getState() === Message.STATE.NOT_SENT || v.getState() === Message.STATE.SENT) && !v.requiresManualRetry) {
 	                                    if (v.textContents) {
 	                                        v.textContents = messageContents;
 	                                    }
@@ -5357,6 +5368,8 @@ React.makeElement = React['createElement'];
 	                                    }
 
 	                                    $(v).trigger('onChange', [v, "textContents", "", messageContents]);
+
+	                                    megaChat.plugins.richpreviewsFilter.processMessage({}, v);
 	                                }
 
 	                                self.messagesListScrollable.scrollToBottom(true);
@@ -5455,6 +5468,9 @@ React.makeElement = React['createElement'];
 	                        var chatdint = room.megaChat.plugins.chatdIntegration;
 	                        if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED || msg.getState() === Message.STATE.NOT_SENT) {
 	                            chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+	                            msg.deleted = true;
+	                            msg.textContents = "";
+	                            room.messagesBuff.removeMessageById(msg.messageId);
 	                        } else if (msg.getState() === Message.STATE.NOT_SENT_EXPIRED) {
 	                            chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                        }
@@ -9343,17 +9359,18 @@ React.makeElement = React['createElement'];
 	            MESSAGE_STRINGS = {
 	                'outgoing-call': l[5891],
 	                'incoming-call': l[5893],
-	                'call-timeout': l[5890],
+	                'call-timeout': [[l[18698]]],
 	                'call-starting': l[7206],
 	                'call-feedback': l[7998],
 	                'call-initialising': l[7207],
-	                'call-ended': [l[5889], l[7208]],
+	                'call-ended': [[l[18689], l[5889]], l[7208]],
+	                'remoteCallEnded': [[l[18689], l[5889]], l[7208]],
 	                'call-failed-media': l[7204],
-	                'call-failed': [l[7209], l[7208]],
+	                'call-failed': [[l[18690], l[7209]], l[7208]],
 	                'call-handled-elsewhere': l[5895],
 	                'call-missed': l[7210],
-	                'call-rejected': l[5892],
-	                'call-canceled': l[5894],
+	                'call-rejected': [[l[18691], l[5892]]],
+	                'call-canceled': [[l[18692], l[5894]]],
 	                'call-started': l[5888],
 	                'alterParticipants': undefined,
 	                'privilegeChange': l[8915],
@@ -9669,6 +9686,9 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var getMessageString = __webpack_require__(20).getMessageString;
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var MetaRichpreview = __webpack_require__(24).MetaRichpreview;
+	var MetaRichpreviewConfirmation = __webpack_require__(26).MetaRichpreviewConfirmation;
+	var MetaRichpreviewMegaLinks = __webpack_require__(27).MetaRichpreviewMegaLinks;
 	var ContactsUI = __webpack_require__(10);
 	var TypingAreaUI = __webpack_require__(16);
 
@@ -9953,6 +9973,9 @@ React.makeElement = React['createElement'];
 	        var spinnerElement = null;
 	        var messageNotSendIndicator = null;
 	        var messageIsNowBeingSent = false;
+	        var subMessageComponent = [];
+
+	        var extraPreButtons = [];
 
 	        if (this.props.className) {
 	            additionalClasses += this.props.className;
@@ -9964,7 +9987,7 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (message instanceof Message) {
-	            if (!message.wasRendered) {
+	            if (!message.wasRendered || !message.messageHtml) {
 
 	                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
 
@@ -10259,7 +10282,7 @@ React.makeElement = React['createElement'];
 	                                v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
 	                            }
 
-	                            var thumbClass = "";
+	                            var thumbClass = src === window.noThumbURI ? " no-thumb" : "";
 	                            var thumbOverlay = null;
 
 	                            if (isImage) {
@@ -10307,7 +10330,12 @@ React.makeElement = React['createElement'];
 	                                React.makeElement(
 	                                    'div',
 	                                    { className: 'message data-title' },
-	                                    v.name
+	                                    __(l[17669]),
+	                                    React.makeElement(
+	                                        'span',
+	                                        { className: 'file-name' },
+	                                        v.name
+	                                    )
 	                                ),
 	                                React.makeElement(
 	                                    'div',
@@ -10572,6 +10600,78 @@ React.makeElement = React['createElement'];
 	                if (message.textContents === "" && !message.dialogType) {
 	                    message.deleted = true;
 	                }
+
+	                if (!message.deleted) {
+	                    if (message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW) {
+	                        if (!message.meta.requiresConfirmation) {
+	                            subMessageComponent.push(React.makeElement(MetaRichpreview, {
+	                                key: "richprev",
+	                                message: message,
+	                                chatRoom: chatRoom
+	                            }));
+	                            if (message.isEditable()) {
+	                                if (!message.meta.isLoading) {
+	                                    extraPreButtons.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                                        key: 'remove-link-preview',
+	                                        icon: 'icons-sprite bold-crossed-eye',
+	                                        label: l[18684],
+	                                        className: '',
+	                                        onClick: function onClick(e) {
+	                                            e.stopPropagation();
+	                                            e.preventDefault();
+
+	                                            chatRoom.megaChat.plugins.richpreviewsFilter.revertToText(chatRoom, message);
+	                                        }
+	                                    }));
+	                                } else {
+
+	                                    extraPreButtons.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                                        icon: 'icons-sprite bold-crossed-eye',
+	                                        key: 'stop-link-preview',
+	                                        label: l[18684],
+	                                        className: '',
+	                                        onClick: function onClick(e) {
+	                                            e.stopPropagation();
+	                                            e.preventDefault();
+
+	                                            chatRoom.megaChat.plugins.richpreviewsFilter.cancelLoading(chatRoom, message);
+	                                        }
+	                                    }));
+	                                }
+	                            }
+	                        } else if (!self.isBeingEdited()) {
+	                            if (message.source === Message.SOURCE.SENT || message.confirmed === true) {
+	                                additionalClasses += " preview-requires-confirmation-container";
+	                                subMessageComponent.push(React.makeElement(MetaRichpreviewConfirmation, {
+	                                    key: "confirm",
+	                                    message: message,
+	                                    chatRoom: chatRoom
+	                                }));
+	                            } else {
+	                                extraPreButtons.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                                    key: 'insert-link-preview',
+	                                    icon: 'icons-sprite bold-eye',
+	                                    label: l[18683],
+	                                    className: '',
+	                                    onClick: function onClick(e) {
+	                                        e.stopPropagation();
+	                                        e.preventDefault();
+
+	                                        chatRoom.megaChat.plugins.richpreviewsFilter.insertPreview(message);
+	                                    }
+	                                }));
+	                            }
+	                        }
+	                    }
+	                    if (message.megaLinks) {
+	                        subMessageComponent.push(React.makeElement(MetaRichpreviewMegaLinks, {
+	                            key: "richprevml",
+	                            message: message,
+	                            chatRoom: chatRoom
+	                        }));
+	                    }
+	                }
+
 	                var messageActionButtons = null;
 	                if (message.getState() === Message.STATE.NOT_SENT || message.getState() === Message.STATE.NOT_SENT_EXPIRED) {
 	                    messageActionButtons = null;
@@ -10673,7 +10773,7 @@ React.makeElement = React['createElement'];
 	                } else if (message.deleted) {
 	                    return null;
 	                } else {
-	                    if (message.updated > 0) {
+	                    if (message.updated > 0 && !message.metaType) {
 	                        textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
 	                    }
 	                    if (self.props.initTextScrolling) {
@@ -10702,8 +10802,9 @@ React.makeElement = React['createElement'];
 	                                    positionAt: 'right bottom',
 	                                    horizOffset: 4
 	                                },
+	                                extraPreButtons,
 	                                React.makeElement(DropdownsUI.DropdownItem, {
-	                                    icon: 'writing-pen',
+	                                    icon: 'icons-sprite writing-pencil',
 	                                    label: __(l[1342]),
 	                                    className: '',
 	                                    onClick: function onClick(e) {
@@ -10739,6 +10840,7 @@ React.makeElement = React['createElement'];
 	                        self.props.hideActionButtons ? null : messageActionButtons,
 	                        messageNotSendIndicator,
 	                        messageDisplayBlock,
+	                        subMessageComponent,
 	                        buttonsBlock,
 	                        spinnerElement
 	                    )
@@ -10752,13 +10854,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            if (textMessage.splice) {
-	                var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
-
-	                if (message.currentCallCounter) {
-	                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] ";
-	                }
-	                textMessage = tmpMsg;
-	                textMessage = textMessage.replace("[[ ", "<span className=\"grey-color\">").replace("]]", "</span>");
+	                textMessage = CallManager._getMultiStringTextContentsForMessage(message, textMessage, true);
 	            } else {
 	                textMessage = textMessage.replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 	            }
@@ -10959,6 +11055,458 @@ React.makeElement = React['createElement'];
 	var ContactsUI = __webpack_require__(10);
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(20).getMessageString;
+	var MetaRichPreviewLoading = __webpack_require__(25).MetaRichpreviewLoading;
+
+	var MetaRichpreview = React.createClass({
+	    displayName: "MetaRichpreview",
+
+	    mixins: [ConversationMessageMixin],
+	    getBase64Url: function getBase64Url(b64incoming) {
+	        if (!b64incoming || !b64incoming.split) {
+	            return;
+	        }
+	        var exti = b64incoming.split(":");
+	        var b64i = exti[1];
+	        exti = exti[0];
+	        return "data:image/" + exti + ";base64," + b64i;
+	    },
+	    render: function render() {
+	        var self = this;
+	        var cssClasses = "message body";
+
+	        var message = this.props.message;
+	        var megaChat = this.props.message.chatRoom.megaChat;
+	        var chatRoom = this.props.message.chatRoom;
+
+	        var output = [];
+
+	        var metas = message.meta && message.meta.extra ? message.meta.extra : [];
+	        var failedToLoad = message.meta.isLoading && unixtime() - message.meta.isLoading > 60 * 5;
+	        var isLoading = !!message.meta.isLoading;
+	        if (failedToLoad) {
+	            return null;
+	        }
+
+	        for (var i = 0; i < metas.length; i++) {
+	            var meta = metas[i];
+
+	            if (!meta.d && !meta.t && !message.meta.isLoading) {
+	                continue;
+	            }
+	            var previewCss = {};
+	            if (meta.i) {
+	                previewCss['backgroundImage'] = "url(" + self.getBase64Url(meta.i) + ")";
+	                previewCss['backgroundRepeat'] = "no-repeat";
+	                previewCss['backgroundPosition'] = "center center";
+	            }
+
+	            var previewContainer = undefined;
+
+	            if (isLoading) {
+	                previewContainer = React.makeElement(MetaRichPreviewLoading, { message: message, isLoading: message.meta.isLoading });
+	            } else {
+	                var domainName = meta.url;
+	                domainName = domainName.replace("https://", "").replace("http://", "").split("/")[0];
+	                previewContainer = React.makeElement(
+	                    "div",
+	                    { className: "message richpreview body" },
+	                    meta.i ? React.makeElement(
+	                        "div",
+	                        { className: "message richpreview img-wrapper" },
+	                        React.makeElement("div", { className: "message richpreview preview", style: previewCss })
+	                    ) : undefined,
+	                    React.makeElement(
+	                        "div",
+	                        { className: "message richpreview inner-wrapper" },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview data-title" },
+	                            React.makeElement(
+	                                "span",
+	                                { className: "message richpreview title" },
+	                                meta.t
+	                            )
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview desc" },
+	                            ellipsis(meta.d, 'end', 82)
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview url-container" },
+	                            meta.ic ? React.makeElement(
+	                                "span",
+	                                { className: "message richpreview url-favicon" },
+	                                React.makeElement("img", { src: self.getBase64Url(meta.ic), width: 16, height: 16,
+	                                    onError: function onError(e) {
+	                                        e.target.parentNode.removeChild(e.target);
+	                                    },
+	                                    alt: ""
+	                                })
+	                            ) : "",
+	                            React.makeElement(
+	                                "span",
+	                                { className: "message richpreview url" },
+	                                domainName
+	                            )
+	                        )
+	                    )
+	                );
+	            }
+
+	            output.push(React.makeElement(
+	                "div",
+	                { key: meta.url, className: "message richpreview container " + (meta.i ? "have-preview" : "no-preview") + " " + (meta.d ? "have-description" : "no-description") + " " + (isLoading ? "is-loading" : "done-loading"),
+	                    onClick: function (url) {
+	                        if (!message.meta.isLoading) {
+	                            window.open(url, "_blank");
+	                        }
+	                    }.bind(this, meta.url) },
+	                previewContainer,
+	                React.makeElement("div", { className: "clear" })
+	            ));
+	        }
+	        return React.makeElement(
+	            "div",
+	            { className: "message richpreview previews-container" },
+	            output
+	        );
+	    }
+	});
+
+	module.exports = {
+	    MetaRichpreview: MetaRichpreview
+	};
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var utils = __webpack_require__(5);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+
+	var MetaRichpreviewLoading = React.createClass({
+	    displayName: "MetaRichpreviewLoading",
+
+	    mixins: [ConversationMessageMixin],
+	    render: function render() {
+	        return React.makeElement(
+	            "div",
+	            { className: "loading-spinner light small" },
+	            React.makeElement("div", { className: "main-loader" })
+	        );
+	    }
+	});
+
+	module.exports = {
+	    MetaRichpreviewLoading: MetaRichpreviewLoading
+	};
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var utils = __webpack_require__(5);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ContactsUI = __webpack_require__(10);
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
+
+	var MetaRichpreviewConfirmation = React.createClass({
+	    displayName: "MetaRichpreviewConfirmation",
+
+	    mixins: [ConversationMessageMixin],
+	    doAllow: function doAllow() {
+	        var self = this;
+	        var message = this.props.message;
+	        var megaChat = this.props.message.chatRoom.megaChat;
+
+	        delete message.meta.requiresConfirmation;
+	        RichpreviewsFilter.confirmationDoConfirm();
+	        megaChat.plugins.richpreviewsFilter.processMessage({}, message);
+	        message.trackDataChange();
+	    },
+	    doNotNow: function doNotNow() {
+	        var self = this;
+	        var message = this.props.message;
+	        delete message.meta.requiresConfirmation;
+	        RichpreviewsFilter.confirmationDoNotNow();
+	        message.trackDataChange();
+	    },
+	    doNever: function doNever() {
+	        var self = this;
+	        var message = this.props.message;
+	        msgDialog('confirmation', l[870], l[18687], '', function (e) {
+	            if (e) {
+	                delete message.meta.requiresConfirmation;
+	                RichpreviewsFilter.confirmationDoNever();
+	                message.trackDataChange();
+	            } else {}
+	        });
+	    },
+	    render: function render() {
+	        var self = this;
+
+	        var message = this.props.message;
+	        var megaChat = this.props.message.chatRoom.megaChat;
+	        var chatRoom = this.props.message.chatRoom;
+
+	        var notNowButton = null;
+	        var neverButton = null;
+
+	        if (RichpreviewsFilter.confirmationCount >= 2) {
+	            neverButton = React.makeElement(
+	                "div",
+	                { className: "default-white-button small-text small right red",
+	                    onClick: function onClick(e) {
+	                        self.doNever();
+	                    } },
+	                React.makeElement(
+	                    "span",
+	                    null,
+	                    l[1051]
+	                )
+	            );
+	        }
+
+	        notNowButton = React.makeElement(
+	            "div",
+	            { className: "default-white-button small-text small grey-txt right",
+	                onClick: function onClick(e) {
+	                    self.doNotNow();
+	                } },
+	            React.makeElement(
+	                "span",
+	                null,
+	                l[18682]
+	            )
+	        );
+
+	        return React.makeElement(
+	            "div",
+	            { className: "message richpreview previews-container" },
+	            React.makeElement(
+	                "div",
+	                { className: "message richpreview container confirmation" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "message richpreview body" },
+	                    React.makeElement(
+	                        "div",
+	                        { className: "message richpreview img-wrapper" },
+	                        React.makeElement("div", { className: "message richpreview preview confirmation-icon" })
+	                    ),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "message richpreview inner-wrapper" },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview data-title" },
+	                            React.makeElement(
+	                                "span",
+	                                { className: "message richpreview title" },
+	                                l[18679]
+	                            )
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview desc" },
+	                            l[18680]
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "buttons-block" },
+	                            React.makeElement(
+	                                "div",
+	                                { className: "default-grey-button small-text small right", onClick: function onClick(e) {
+	                                        self.doAllow();
+	                                    } },
+	                                React.makeElement(
+	                                    "span",
+	                                    null,
+	                                    l[18681]
+	                                )
+	                            ),
+	                            notNowButton,
+	                            neverButton
+	                        )
+	                    )
+	                ),
+	                React.makeElement("div", { className: "clear" })
+	            )
+	        );
+	    }
+	});
+
+	module.exports = {
+	    MetaRichpreviewConfirmation: MetaRichpreviewConfirmation
+	};
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var utils = __webpack_require__(5);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ContactsUI = __webpack_require__(10);
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
+	var MetaRichPreviewLoading = __webpack_require__(25).MetaRichpreviewLoading;
+
+	var MetaRichpreviewMegaLinks = React.createClass({
+	    displayName: "MetaRichpreviewMegaLinks",
+
+	    mixins: [ConversationMessageMixin],
+	    render: function render() {
+	        var self = this;
+	        var cssClasses = "message body";
+
+	        var message = this.props.message;
+	        var megaChat = this.props.message.chatRoom.megaChat;
+	        var chatRoom = this.props.message.chatRoom;
+	        var previewContainer;
+
+	        var output = [];
+
+	        var megaLinks = message.megaLinks && message.megaLinks ? message.megaLinks : [];
+	        for (var i = 0; i < megaLinks.length; i++) {
+	            var megaLinkInfo = megaLinks[i];
+	            if (megaLinkInfo.failed) {
+	                continue;
+	            }
+
+	            if (megaLinkInfo.hadLoaded() === false) {
+	                if (megaLinkInfo.startedLoading() === false) {
+	                    megaLinkInfo.getInfo().always(function () {
+	                        message.trackDataChange();
+	                    });
+	                }
+
+	                previewContainer = React.makeElement(MetaRichPreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
+	            } else {
+	                var desc;
+
+	                var is_icon = megaLinkInfo.is_dir ? true : !(megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url);
+
+	                if (!megaLinkInfo.is_dir) {
+	                    desc = bytesToSize(megaLinkInfo.info.size);
+	                } else {
+	                    if (!megaLinkInfo.info || !megaLinkInfo.info.s) {
+	                        debugger;
+	                    }
+	                    desc = React.makeElement(
+	                        "span",
+	                        null,
+	                        fm_contains(megaLinkInfo.info.s[1], megaLinkInfo.info.s[2] - 1),
+	                        React.makeElement("br", null),
+	                        bytesToSize(megaLinkInfo.info.size)
+	                    );
+	                }
+
+	                previewContainer = React.makeElement(
+	                    "div",
+	                    { className: "message richpreview body " + (is_icon ? "have-icon" : "no-icon") },
+	                    megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ? React.makeElement(
+	                        "div",
+	                        { className: "message richpreview img-wrapper" },
+	                        React.makeElement("div", { className: "message richpreview preview",
+	                            style: { "backgroundImage": 'url(' + megaLinkInfo.info.preview_url + ')' } })
+	                    ) : React.makeElement(
+	                        "div",
+	                        { className: "message richpreview img-wrapper" },
+	                        React.makeElement("div", { className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) })
+	                    ),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "message richpreview inner-wrapper" },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview data-title" },
+	                            React.makeElement(
+	                                "span",
+	                                { className: "message richpreview title" },
+	                                megaLinkInfo.info.name
+	                            )
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview desc" },
+	                            desc
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview url-container" },
+	                            React.makeElement(
+	                                "span",
+	                                { className: "message richpreview url-favicon" },
+	                                React.makeElement("img", { src: "https://mega.nz/favicon.ico?v=3&c=1", width: 16, height: 16,
+	                                    onError: function onError(e) {
+	                                        e.target.parentNode.removeChild(e.target);
+	                                    },
+	                                    alt: ""
+	                                })
+	                            ),
+	                            React.makeElement(
+	                                "span",
+	                                { className: "message richpreview url" },
+	                                ellipsis(megaLinkInfo.getLink(), 'end', 40)
+	                            )
+	                        )
+	                    )
+	                );
+	            }
+
+	            output.push(React.makeElement(
+	                "div",
+	                { key: megaLinkInfo.node_key + "_" + output.length, className: "message richpreview container " + (megaLinkInfo.havePreview() ? "have-preview" : "no-preview") + " " + (megaLinkInfo.d ? "have-description" : "no-description") + " " + (!megaLinkInfo.hadLoaded() ? "is-loading" : "done-loading"),
+	                    onClick: function (url) {
+	                        if (megaLinkInfo.hadLoaded()) {
+	                            window.open(url, "_blank");
+	                        }
+	                    }.bind(this, megaLinkInfo.getLink()) },
+	                previewContainer,
+	                React.makeElement("div", { className: "clear" })
+	            ));
+	        }
+	        return React.makeElement(
+	            "div",
+	            { className: "message richpreview previews-container" },
+	            output
+	        );
+	    }
+	});
+
+	module.exports = {
+	    MetaRichpreviewMegaLinks: MetaRichpreviewMegaLinks
+	};
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var utils = __webpack_require__(5);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ContactsUI = __webpack_require__(10);
+	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(20).getMessageString;
 
 	var AlterParticipantsConversationMessage = React.createClass({
 	    displayName: "AlterParticipantsConversationMessage",
@@ -11093,7 +11641,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 25 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11182,7 +11730,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 26 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11277,7 +11825,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 27 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11358,18 +11906,18 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 28 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-	var utils = __webpack_require__(29);
+	var utils = __webpack_require__(33);
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(11);
 
-	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI) {
+	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
 	    var self = this;
 
 	    this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -11436,6 +11984,7 @@ React.makeElement = React['createElement'];
 	            self.members[userHandle] = 0;
 	        });
 	    }
+
 	    this.options = {
 
 	        'dontResendAutomaticallyQueuedMessagesOlderThen': 1 * 60,
@@ -11549,9 +12098,8 @@ React.makeElement = React['createElement'];
 	            getLastInteractionWith(contact.u);
 	        }
 	    });
-	    if (!noUI) {
-	        self.megaChat.trigger('onRoomCreated', [self]);
-	    }
+
+	    self.megaChat.trigger('onRoomCreated', [self]);
 
 	    $(window).rebind("focus." + self.roomId, function () {
 	        if (self.isCurrentlyActive) {
@@ -11928,7 +12476,9 @@ React.makeElement = React['createElement'];
 	ChatRoom.prototype.sendMessage = function (message) {
 	    var self = this;
 	    var megaChat = this.megaChat;
-
+	    if (d && self.state !== ChatRoom.STATE.READY) {
+	        console.warn("Tried to do a .sendMessage while the room is not ready");
+	    }
 	    var messageId = megaChat.generateTempMessageId(self.roomId, message);
 
 	    var msgObject = new Message(self, self.messagesBuff, {
@@ -12264,7 +12814,7 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.isReadOnly = function () {
-	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
+	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT || this.state !== ChatRoom.STATE.READY;
 	};
 	ChatRoom.prototype.iAmOperator = function () {
 	    return this.type === "private" || this.members && this.members[u_handle] === 3;
@@ -12548,7 +13098,7 @@ React.makeElement = React['createElement'];
 	module.exports = ChatRoom;
 
 /***/ }),
-/* 29 */
+/* 33 */
 /***/ (function(module, exports) {
 
 	'use strict';

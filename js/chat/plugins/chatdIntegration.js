@@ -150,6 +150,7 @@ var ChatdIntegration = function(megaChat) {
         })
             .done(function(r) {
                 // no need to do anything, the triggered action packet would trigger the code for joining the room.
+                megaChat._chatsAwaitingAps[r.id] = true;
             })
             .fail(function() {
                 self.logger.error(
@@ -427,13 +428,16 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                 }
             }
 
+            var setAsActive = megaChat._chatsAwaitingAps[actionPacket.id] === true;
+            delete megaChat._chatsAwaitingAps[actionPacket.id];
+
             var r = self.megaChat.openChat(
                 userHandles,
                 actionPacket.g === 1 ? "group" : "private",
                 actionPacket.id,
                 actionPacket.cs,
                 actionPacket.url,
-                false
+                setAsActive
             );
             chatRoom = r[1];
             if (!chatRoom) {
@@ -451,26 +455,19 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
                 }
-                if (!chatRoom.inCpyDialog) {
+
+                if (chatRoom.showAfterCreation) {
                     loadSubPage(chatRoom.getRoomUrl());
                 }
-                else {
-                    chatRoom.inCpyDialog();
-                    delete chatRoom.inCpyDialog;
-                }
+
+                delete chatRoom.showAfterCreation;
             }
             if (!chatRoom.lastActivity && actionPacket.ts) {
                 chatRoom.lastActivity = actionPacket.ts;
             }
 
             if (wasActive) {
-                if (!chatRoom.inCpyDialog) {
-                    loadSubPage(chatRoom.getRoomUrl());
-                }
-                else {
-                    chatRoom.inCpyDialog();
-                    delete chatRoom.inCpyDialog;
-                }
+                loadSubPage(chatRoom.getRoomUrl());
             }
         }
         else {
@@ -983,9 +980,37 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
             // don't show anything if this is a 'revoke' message
             return null;
         }
+        else if (
+            textContents.substr &&
+            textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META &&
+            textContents.substr(2, 1) === Message.MESSAGE_META_TYPE.RICH_PREVIEW
+        ) {
+            var meta = textContents.substr(3, textContents.length);
+            try {
+                meta = JSON.parse(meta);
+                textContents = meta.textMessage;
+                message.textContents = textContents;
+                message.messageHtml = htmlentities(message.textContents).replace(/\n/gi, "<br/>");
+                delete meta.textMessage;
+                message.metaType = Message.MESSAGE_META_TYPE.RICH_PREVIEW;
+                message.meta = meta;
+            }
+            catch (e) {
+                message.textContents = "";
+                this.logger.warn("Failed to parse META message:", message);
+            }
+            message.trackDataChange();
+
+        }
         else {
             return null;
         }
+    }
+    else if (message.dialogType === "remoteCallEnded") {
+        message.wrappedChatDialogMessage = chatRoom.megaChat.plugins.callManager.remoteEndCallToDialogMsg(
+            chatRoom,
+            message
+        );
     }
 };
 
@@ -1506,6 +1531,24 @@ ChatdIntegration.prototype._processDecryptedMessage = function(chatRoom, msgInst
         else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
             // this is a system message
             msgInstance.protocol = true;
+        }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.CALL_END) {
+            // this is a system message
+            msgInstance.meta = {
+                userId: decryptedResult.sender,
+                callId: decryptedResult.callId,
+                reason: decryptedResult.reason,
+                duration: decryptedResult.duration,
+                participants: decryptedResult.participants
+            };
+
+            msgInstance.dialogType = "remoteCallEnded";
+            // remove any locally generated FAILEDs
+            chatRoom.messagesBuff.removeMessageBy(function (v) {
+                if (v.type === "call-failed" && !v.meta) {
+                    return true;
+                }
+            });
         }
         else {
             self.logger.error("Could not decrypt: ", decryptedResult);

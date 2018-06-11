@@ -39,3 +39,29 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function _viewSubAccountListU
     subAccountsView.removeClass('hidden');
     $('.grid-table-user-management', subAccountsView).removeClass('hidden');
 };
+
+
+
+
+BusinessAccountUI.prototype.showLinkPasswordDialog = function _showLinkPasswordDialog(invitationLink) {
+    var $dialog = $('.fm-dialog.sub-account-link-password');
+    var prepareSubAccountLinkDialog = function () {
+
+        $('.default-dialog-bottom', $dialog).off('click');
+        $('.dialog-link-pwd', $dialog).off('keydown');
+
+        $('.fm-dialog-link-pwd-pad input', $dialog).on('keydown', function () {
+            $('.dialog-link-pwd-empty', $dialog).addClass('hidden');
+        });
+        $('.fm-dialog-link-pwd-button', $dialog).on('click', function () {
+            if (!$('.fm-dialog-link-pwd-pad input', $dialog).val().length) {
+                $('.dialog-link-pwd-empty', $dialog).removeClass('hidden');
+                return false;
+            }
+        });
+        return $dialog;
+    };
+
+    M.safeShowDialog('invite-link-pwd', prepareSubAccountLinkDialog);
+
+};

@@ -736,6 +736,11 @@ function init_page() {
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
         var signupCodeEncrypted = page.substring(14, page.length);
+        //$('.fm-dialog.sub-account-link-password').removeClass('hidden');
+        M.require('businessAccUI_js').done(function () {
+            var business = new BusinessAccountUI();
+            business.showLinkPasswordDialog(signupCodeEncrypted);
+        });
 
     }
     else if (page.substr(0, 6) == 'signup') {

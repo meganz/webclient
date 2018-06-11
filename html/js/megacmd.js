@@ -5,96 +5,56 @@ var linuxnameindex = {};
 var linuxurl = 'https://mega.nz/linux/MEGAsync/';
 var windowsurl = 'https://mega.nz/MEGAcmdSetup.exe';
 var osxurl = 'https://mega.nz/MEGAcmdSetup.dmg';
-/**
- * Switch OS 
- */
-function cmd_switchOS(os) {
-    var url;
-    var $content = $('.bottom-page.megacmd');
-    $content.find('.download-megacmd').removeClass('disabled');
-    $content.find('.megaapp-linux:visible').addClass('hidden');
-    $content.find('.bottom-page.megacmd').removeClass('linux');
-    $content.find('.bottom-page.megacmd').removeClass('linux');
-
-    if (os === 'windows') {
-        $content.find('.megaapp-button-info').safeHTML(l[12485]);
-        url = windowsurl;
-    }
-    else if (os === 'mac') {
-        $content.find('.megaapp-button-info').safeHTML(l[12487]);
-        url = osxurl;
-    }
-    else if (os === 'linux') {
-        $content.find('.megaapp-button-info').safeHTML(l[12486]);
-        $content.find('.megaapp-linux-default').text(l[7086]);
-        $content.find('.megaapp-linux').removeClass('hidden');
-        $content.addClass('linux');
-        linuxMegacmdDropdown();
-    }
-
-    $('.megaapp-button-info a').rebind('click', function(e) {
-        if ($(this).hasClass('windows')) {
-            cmd_switchOS('windows');
-        }
-        else if ($(this).hasClass('mac')) {
-            cmd_switchOS('mac');
-        }
-        else if ($(this).hasClass('linux')) {
-            cmd_switchOS('linux');
-        }
-        return false;
-    });
-
-    if (url) {
-        initMegacmdDownload(url);
-    }
-}
 
 /**
  * Init MEGAcmd functions
  */
 function initMegacmd() {
+    var url;
     var pf = navigator.platform.toUpperCase();
+    var $content = $('.bottom-page.megacmd');
+    $content.find('.megaapp-linux:visible').addClass('hidden');
+    $content.find('.bottom-page.megacmd').removeClass('linux');
+    $content.find('.nav-buttons-bl a.linux').removeClass('disabled');
 
-    $('.download-megacmd').removeClass('disabled');
-
-    if (pf.indexOf('MAC') >= 0) {
-        cmd_switchOS('mac');
-    }
-    else if (pf.indexOf('LINUX') >= 0) {
-        cmd_switchOS('linux');
-    }
-    else {
-        cmd_switchOS('windows');
+    if (pf.indexOf('LINUX') >= 0) {
+        linuxMegacmdDropdown();
     }
 
-    $('.megacmd .megaapp-button-info a').rebind('click', function(e) {
-        if ($(this).hasClass('windows')) {
-            cmd_switchOS('windows');
+    $content.find('.tab-button').rebind('click', function() {
+        var $this = $(this);
+        var className = $this.attr('data-class');
+
+        if (!$this.hasClass('active')) {
+            $content.find('.tab-button, .tab-body, .dark-tab-img').removeClass('active');
+            $this.addClass('active');
+            $content.find('.' + className).addClass('active');
         }
-        else if ($(this).hasClass('mac')) {
-            cmd_switchOS('mac');
-        }
-        else if ($(this).hasClass('linux')) {
-            cmd_switchOS('linux');
-        }
-        return false;
     });
+
+    initMegacmdDownload();
 }
 
 /**
  * Init MEGAcmd download button
  */
-function initMegacmdDownload(url) {
-    var $button = $('.download-megacmd');
-    $button.rebind('click', function() {
-        if (!$(this).hasClass('disabled')) {
-            if (url) {
-                window.location = url;
-            }
-            else {
-                window.location = $button.attr('data-link');
-            }      
+function initMegacmdDownload() {
+
+    $('.bottom-page.nav-buttons-bl a').rebind('click', function() {
+        var $this = $(this);
+        var osData = $this.attr('data-os');
+
+        if (osData === 'windows') {
+            window.location = windowsurl;
+        }
+        else if (osData === 'mac') {
+            window.location = osxurl;
+        }
+        else if (osData === 'linux' && $this.attr('data-link')) {
+            window.location = $this.attr('data-link');
+        }
+        else {
+            linuxMegacmdDropdown();
         }
     });
 }
@@ -102,13 +62,15 @@ function initMegacmdDownload(url) {
 /**
  * Init Linux Dropdown
  */
-function linuxMegacmdDropdown() {
-
-    var $button = $('.download-megacmd');
-    var $dropdown = $('.megaapp-dropdown'); 
+function linuxMegacmdDropdown() {alert(1);
+    var $content = $('.bottom-page.megacmd');
+    var $button = $content.find('.pages-nav.nav-button.linux');
+    var $dropdown = $content.find('.megaapp-dropdown'); 
     var $select = $dropdown.find('.megaapp-scr-pad');
     var $list = $dropdown.find('.megaapp-dropdown-list');
     $button.addClass('disabled').attr('data-link','');
+    $content.find('.megaapp-linux').removeClass('hidden');
+    $content.find('.bottom-page.megacmd').addClass('linux');
 
     CMS.get('cmd', function(err, content) {
         linuxnameindex = {};
@@ -235,21 +197,24 @@ function linuxMegacmdDropdownResizeHandler() {
  * Turn on/off the 32/64bit radio button based on the selected linux distribution.
  */
 function changeLinux(linuxdist, i) {
+    var $content = $('.bottom-page.megacmd');
+    var $button = $content.find('.pages-nav.nav-button.linux');
+
     if (linuxdist[i]) {
         if (linuxdist[i]['32']) {
-            $('.linux32').parent().show();
-            $('.radio-txt.32').show();
+            $content.find('.linux32').parent().show();
+            $content.find('.radio-txt.32').show();
         }
         else {
-            $('.linux32').parent().hide();
-            $('.radio-txt.32').hide();
-            $('#rad1').attr('checked', false).parent().switchClass('radioOn', 'radioOff');
-            $('#rad2').attr('checked', true).parent().switchClass('radioOff', 'radioOn');
+            $content.find('.linux32').parent().hide();
+            $content.find('.radio-txt.32').hide();
+            $content.find('#rad1').attr('checked', false).parent().switchClass('radioOn', 'radioOff');
+            $content.find('#rad2').attr('checked', true).parent().switchClass('radioOff', 'radioOn');
             platformsel = '64';
         }
         var link = linuxurl+linuxdist[i][platformsel];
         if (link) {
-            initMegacmdDownload(link);
+            $button.attr('data-link', link);
         }
     }
 }

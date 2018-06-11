@@ -140,6 +140,55 @@
 .default-white-button.light-grey-txt {
     color: #777777;
 }
+.default-white-button.light, .default-white-button.low-shadow {
+    font-size: 16px;
+    line-height: 33px;
+    height: 34px;
+    color: #666666;
+    background-color: #FAFAFA;
+    padding: 0 25px;
+}
+.default-white-button.light.inline {
+    margin-left: 0;
+    margin-right: 0;
+}
+.default-white-button.low-shadow {
+    background-color: #FFFFFF;
+    padding: 0 30px;
+}
+.default-white-button.light.white {
+    background-color: #00BFA5;
+    color: #FAFAFA;
+}
+.default-white-button.light.grey {
+    background-color: #F5F5F5;
+    color: #666666;
+}
+.default-white-button.light::after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.12);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.12);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.12);
+}
+.default-white-button.low-shadow::after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+}
+.default-white-button.low-shadow::before {
+    -webkit-box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
+    box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
+}
+.default-white-button.light.white::after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(255,255,255,0.96);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(255,255,255,0.96);
+    box-shadow: 0px 0px 0px 1px rgba(255,255,255,0.96);
+}
+.default-white-button.light.grey::after {
+    -webkit-box-shadow: 0px 0px 0px 1px #666666;
+    -moz-box-shadow: 0px 0px 0px 1px #666666;
+    box-shadow: 0px 0px 0px 1px #666666;
+}
 .default-white-button::first-letter {
     text-transform: uppercase;
 }
@@ -240,7 +289,7 @@
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-.default-grey-button::before, .default-grey-button::after, .default-white-button::before, .default-white-button::after, .default-red-button::before, .default-red-button::after {
+.default-grey-button::before, .default-grey-button::after, .default-white-button:not(.light)::before, .default-white-button::after, .default-red-button::before, .default-red-button::after {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -267,6 +316,16 @@
     -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+}
+.default-white-button.light.white:hover {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
+    box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
+}
+.default-white-button.light.grey:hover {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 }
 .default-grey-button::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);

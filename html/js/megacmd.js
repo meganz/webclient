@@ -7,19 +7,53 @@ var windowsurl = 'https://mega.nz/MEGAcmdSetup.exe';
 var osxurl = 'https://mega.nz/MEGAcmdSetup.dmg';
 
 /**
+ * Reset MEGAcmd to default
+ */
+function resetMegacmd() {
+    var $content = $('.bottom-page.megacmd');
+    var $linuxBlock = $content.find('.megaapp-linux');
+
+    $content.removeClass('linux');
+    $content.find('.nav-buttons-bl a.linux').removeClass('download disabled')
+        .attr('data-link','');
+    $linuxBlock.addClass('hidden');
+    $linuxBlock.find('.megaapp-linux-default').text(l[7086]);
+    $linuxBlock.find('.radio-buttons label, .architecture-checkbox').removeClass('hidden');
+}
+
+/**
  * Init MEGAcmd functions
  */
 function initMegacmd() {
     var url;
     var pf = navigator.platform.toUpperCase();
     var $content = $('.bottom-page.megacmd');
-    $content.find('.megaapp-linux:visible').addClass('hidden');
-    $content.removeClass('linux');
-    $content.find('.nav-buttons-bl a.linux').removeClass('disabled');
+
+    resetMegacmd();
 
     if (pf.indexOf('LINUX') >= 0) {
         linuxMegacmdDropdown();
     }
+
+    $('.bottom-page.nav-buttons-bl a').rebind('click', function() {
+        var $this = $(this);
+        var osData = $this.attr('data-os');
+
+        if (osData === 'windows') {
+            window.location = windowsurl;
+            resetMegacmd();
+        }
+        else if (osData === 'mac') {
+            window.location = osxurl;
+            resetMegacmd();
+        }
+        else if (osData === 'linux' && $this.attr('data-link')) {
+            window.location = $this.attr('data-link');
+        }
+        else {
+            linuxMegacmdDropdown();
+        }
+    });
 
     $content.find('.tab-button').rebind('click', function() {
         var $this = $(this);
@@ -29,32 +63,6 @@ function initMegacmd() {
             $content.find('.tab-button, .tab-body, .dark-tab-img').removeClass('active');
             $this.addClass('active');
             $content.find('.' + className).addClass('active');
-        }
-    });
-
-    initMegacmdDownload();
-}
-
-/**
- * Init MEGAcmd download button
- */
-function initMegacmdDownload() {
-
-    $('.bottom-page.nav-buttons-bl a').rebind('click', function() {
-        var $this = $(this);
-        var osData = $this.attr('data-os');
-
-        if (osData === 'windows') {
-            window.location = windowsurl;
-        }
-        else if (osData === 'mac') {
-            window.location = osxurl;
-        }
-        else if (osData === 'linux' && $this.attr('data-link')) {
-            window.location = $this.attr('data-link');
-        }
-        else {
-            linuxMegacmdDropdown();
         }
     });
 }
@@ -94,7 +102,6 @@ function linuxMegacmdDropdown() {
         // Dropdown item click event
         $('.default-dropdown-item', $dropdown).rebind('click', function() {
             $dropdown.find('span').text($(this).text());
-            $button.removeClass('disabled');
 
             cmdsel = linuxnameindex[$(this).text()];
             changeLinux(linuxClients, cmdsel);
@@ -202,19 +209,19 @@ function changeLinux(linuxdist, i) {
 
     if (linuxdist[i]) {
         if (linuxdist[i]['32']) {
-            $content.find('.linux32').parent().show();
-            $content.find('.radio-txt.32').show();
+            $content.find('.linux32').parent().removeClass('hidden');
+            $content.find('.radio-txt.32').removeClass('hidden');
         }
         else {
-            $content.find('.linux32').parent().hide();
-            $content.find('.radio-txt.32').hide();
+            $content.find('.linux32').parent().addClass('hidden');
+            $content.find('.radio-txt.32').addClass('hidden');
             $content.find('#rad1').attr('checked', false).parent().switchClass('radioOn', 'radioOff');
             $content.find('#rad2').attr('checked', true).parent().switchClass('radioOff', 'radioOn');
             platformsel = '64';
         }
         var link = linuxurl+linuxdist[i][platformsel];
         if (link) {
-            $button.attr('data-link', link);
+            $button.removeClass('disabled').addClass('download').attr('data-link', link);
         }
     }
 }

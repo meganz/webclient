@@ -35,7 +35,7 @@ function initMegacmd() {
         linuxMegacmdDropdown();
     }
 
-    $('.bottom-page.nav-buttons-bl a').rebind('click', function() {
+    $content.find('.nav-buttons-bl a').rebind('click', function() {
         var $this = $(this);
         var osData = $this.attr('data-os');
 
@@ -63,6 +63,15 @@ function initMegacmd() {
             $content.find('.tab-button, .tab-body, .dark-tab-img').removeClass('active');
             $this.addClass('active');
             $content.find('.' + className).addClass('active');
+        }
+    });
+
+    $content.find('div.default-white-button.learn-more').rebind('click', function() {
+        var $this = $(this);
+        var url = $this.attr('data-href');
+
+        if (url ) {
+            window.open(url);
         }
     });
 }

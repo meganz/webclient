@@ -1187,7 +1187,7 @@ html.gbot {
 }
 .bottom-page.top-title {
     font-size: 56px;
-    line-height: 68px;
+    line-height: 56px;
     letter-spacing: 1.56px;
     padding: 0 0 0 0;
     color: #333333;
@@ -1218,14 +1218,15 @@ html.gbot {
     vertical-align: top;
     width: 56px;
     height: 48px;
-    margin: 9px 32px 0 0px;
+    margin: 4px 32px 0 0px;
     background-image: url(../images/mega/pages-sprite_v2.png);
     background-position: -10px -2132px;
     background-repeat: no-repeat;
 }
 .bottom-page.top-title span {
     display: inline-block;
-    vertical-align: top;
+    vertical-align: middle;
+    height: 66px;
 }
 .bottom-page.dark-big-header {
     font-size: 36px;
@@ -1252,7 +1253,7 @@ html.gbot {
     color: #333333;
     max-width: 790px;
     margin: 0 auto;
-    padding: 3.5% 20px 0 20px;
+    padding: 3.2% 20px 0 20px;
 }
 .bottom-page.top-dark-info.small {
     font-size: 18px;
@@ -1592,9 +1593,13 @@ html.gbot {
 }
 .bottom-page.top-title {
     font-size: 40px;
+    line-height: 40px;
+}
+.bottom-page.top-title span {
+    height: 48px;
 }
 .bottom-page.top-title::before {
-    margin-top: 10px;
+    margin-top: -5px;
 }
 .mobile .bottom-page.top-title {
     line-height: 49px;
@@ -1618,6 +1623,9 @@ html.gbot {
 }
 .bottom-page.top-title {
     line-height: 49px;
+}
+.bottom-page.top-title span {
+    height: auto;
 }
 .bottom-page.top-title::before {
     display: none;

@@ -54,9 +54,18 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function _showLinkPasswordD
             $('.dialog-link-pwd-empty', $dialog).addClass('hidden');
         });
         $('.fm-dialog-link-pwd-button', $dialog).on('click', function () {
-            if (!$('.fm-dialog-link-pwd-pad input', $dialog).val().length) {
+            var enteredPassword = $('.fm-dialog-link-pwd-pad input', $dialog).val();
+            if (!enteredPassword.length) {
                 $('.dialog-link-pwd-empty', $dialog).removeClass('hidden');
                 return false;
+            }
+            else {
+                var keyFromPassword = base64_to_a32(enteredPassword);
+                var aesCipher = new sjcl.cipher.aes(keyFromPassword);
+                var decryptedToken = aesCipher.decrypt(base64urldecode(invitationLink));
+                alert(invitationLink + ' ----- ' +
+                    enteredPassword + ' ----- ' +
+                    decryptedToken);
             }
         });
         return $dialog;

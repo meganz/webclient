@@ -66,13 +66,10 @@ function initMegacmd() {
         }
     });
 
-    $content.find('div.default-white-button.learn-more').rebind('click', function() {
-        var $this = $(this);
-        var url = $this.attr('data-href');
-
-        if (url ) {
-            window.open(url);
-        }
+    $content.find('.bottom-page.scroll-button').rebind('click', function() {
+        $('html, body').animate({
+            scrollTop: $('.bottom-page.full-block').offset().top
+        }, 1000);
     });
 }
 

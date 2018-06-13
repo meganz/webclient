@@ -87,7 +87,7 @@ html.gbot {
     background-position: -6px -773px;
 }
 .bottom-page.top-bl {
-    max-height: 900px;
+    max-height: 800px;
     min-height: 555px;
     table-layout: fixed;
 }
@@ -1343,6 +1343,13 @@ html.gbot {
     color: #666666;
     padding: 16px 0 0 0;
 }
+.bottom-page.dark-txt a {
+    color: #666666;
+    text-decoration: underline;
+}
+.bottom-page.dark-txt a:hover {
+    text-decoration: none;
+}
 .default-select.megaapp-dropdown {
     width: 228px;
     float: none;
@@ -1448,7 +1455,7 @@ html.gbot {
 .mobile .bottom-page.nav-buttons-bl.contrast, .mobile .bottom-page.top-dark-info.small {
     display: none;
 }
-.mobile .bottom-page.scroll-button {
+.mobile .megacmd .bottom-page.scroll-button {
     display: block;
 }
 .cmd-top-img {

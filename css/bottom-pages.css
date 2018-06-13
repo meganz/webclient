@@ -1733,6 +1733,21 @@ html.gbot {
     bottom: 90px;
 }
 }
+@media only screen and (max-width: 360px) and (max-height: 450px) {
+.cmd-top-img {
+    background-size: 300px auto !important;
+    height: 156px;
+    background-position: center -2592px;
+}
+.bottom-page.top-dark-info.big, .linux .bottom-page.top-dark-info.big {
+    font-size: 22px;
+    line-height: 33px;
+}
+.mobile .bottom-page.top-title {
+    line-height: 38px;
+    font-size: 34px;
+}
+}
 /* end of MEGAcmd */
 
 

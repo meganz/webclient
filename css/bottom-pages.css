@@ -1473,8 +1473,6 @@ html.gbot {
     line-height: 52px;
 }
 .linux .bottom-page.top-dark-info.big {
-    font-size: 38px;
-    line-height: 48px;
     padding: 20px 0 0 0;
 }
 .linux .bottom-page.nav-buttons-bl.contrast {
@@ -1611,9 +1609,11 @@ html.gbot {
 .mobile .bottom-page.top-title {
     line-height: 49px;
 }
-.bottom-page.top-dark-info.big {
+.bottom-page.top-dark-info.big, .linux .bottom-page.top-dark-info.big {
     font-size: 24px;
     line-height: 36px;
+}
+.bottom-page.top-dark-info.big {
     padding-top: 15px;
 }
 }

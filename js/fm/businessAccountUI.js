@@ -12,7 +12,7 @@ function BusinessAccountUI() {
  * @param {boolean} isBlockView     by default "Grid" view will be used, this param when True will change to "Block"
  * @returns {boolean}               true if OK, false if something went wrong
  */
-BusinessAccountUI.prototype.viewSubAccountListUI = function _viewSubAccountListUI(subAccounts, isBlockView) {
+BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView) {
     if (!M.isBusinessAccountMaster) {
         return false;
     }
@@ -43,7 +43,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function _viewSubAccountListU
 
 
 
-BusinessAccountUI.prototype.showLinkPasswordDialog = function _showLinkPasswordDialog(invitationLink) {
+BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
     var $dialog = $('.fm-dialog.sub-account-link-password');
     var prepareSubAccountLinkDialog = function () {
 
@@ -60,13 +60,36 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function _showLinkPasswordD
                 return false;
             }
             else {
-                var keyFromPassword = base64_to_a32(enteredPassword);
-                var aesCipher = new sjcl.cipher.aes(keyFromPassword);
-                var decryptedToken = aesCipher.decrypt(base64urldecode(invitationLink));
-                alert(invitationLink + ' ----- ' +
-                    enteredPassword + ' ----- ' +
-                    decryptedToken);
+                var business = new BusinessAccount();
+
+                var failureAction = function (st, res, desc) {
+                    closeDialog();
+                    var msg = l[17920]; // not valid password
+                    if (res) {
+                        msg = l[1290]; // not valid link
+                        console.error(st, res, desc);
+                    }
+                    msgDialog('warninga', '', msg, '', function () {
+                        loadSubPage('start');
+                    });
+                };
+
+                var decryptedTokenBase64 = business.decryptSubAccountInvitationLink(invitationLink, enteredPassword);
+                if (decryptedTokenBase64) {
+                    var getInfoPromise = business.getSignupCodeInfo(decryptedTokenBase64);
+                    
+                    getInfoPromise.fail(failureAction);
+
+                    getInfoPromise.done(function (status,res) {
+
+                    });
+
+                }
+                else {
+                    failureAction();
+                }
             }
+            return false;
         });
         return $dialog;
     };

@@ -3139,7 +3139,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     // view or hide left icon for business account
-    if (new BusinessAccount().isBusinessMasterAcc()) {
+    if (typeof BusinessAccount !== 'undefined' && new BusinessAccount().isBusinessMasterAcc()) {
         $('.nw-fm-left-icon.user-management').removeClass('hidden');
     }
     else {

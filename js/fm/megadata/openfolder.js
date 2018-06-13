@@ -315,7 +315,7 @@
         }
         else if (id === 'user-management') {
             id = 'user-management';
-            M.require('businessAccUI_js').done(function () {
+            M.require('businessAcc_js', 'businessAccUI_js').done(function () {
                 var usersM = new BusinessAccountUI();
                 M.onFileManagerReady(usersM.viewSubAccountListUI);
             });

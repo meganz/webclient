@@ -2277,8 +2277,13 @@
     "18690": "Oproep naar [X] mislukt.",
     "18691": "Oproep naar [X] was afgewezen.",
     "18692": "Oproep naar [X] was geannuleerd.",
-    "18698": "Call to [X] was not answered in a timely manner.",
-    "18699": "Confirm Remove Avatar",
-    "18700": "Too short",
-    "18701": "Your password needs to be at least 8 characters long."
+    "18698": "Oproep naar [X] was niet op tijd beantwoord.",
+    "18699": "Avatar |Verwijdering Bevestigen",
+    "18700": "Te kort",
+    "18701": "Uw wachtwoord moet tenminste 8 letters lang zijn.",
+    "18770": "De prijs in uw lokale valuta is alleen een geschatte waarde. U krijgt de weergegeven prijs rekening in Euro's voor alle transacties.",
+    "18771": "Invitation Link Password",
+    "18772": "Please enter your invitation link password to proceed with your account activation.",
+    "18773": "Invitation link password",
+    "18774": "Please enter the password in the password field"
 }

@@ -25,7 +25,7 @@
     "63": "Copiar",
     "64": "Permisos",
     "68": "Nueva carpeta",
-    "71": "A\u00f1adir un contacto",
+    "71": "A\u00f1adir contacto",
     "78": "S\u00ed",
     "79": "No",
     "81": "Aceptar",
@@ -2279,6 +2279,11 @@
     "18692": "La llamada a [X] ha sido cancelada.",
     "18698": "La llamada a [X] no ha sido contestada a tiempo.",
     "18699": "Eliminar imagen del perfil",
-    "18700": "Too short",
-    "18701": "Your password needs to be at least 8 characters long."
+    "18700": "Demasiado corta.",
+    "18701": "Tu contrase\u00f1a debe tener al menos 8 caracteres.",
+    "18770": "El precio en tu moneda local es solo una estimaci\u00f3n. Se te cobrar\u00e1 el precio mostrado en euros para todas las transacciones.",
+    "18771": "Contrase\u00f1a del enlace de invitaci\u00f3n",
+    "18772": "Escribe la contrase\u00f1a del enlace de invitaci\u00f3n para continuar con la activaci\u00f3n de tu cuenta.",
+    "18773": "Contrase\u00f1a del enlace de invitaci\u00f3n",
+    "18774": "Escribe la contrase\u00f1a en el campo de la contrase\u00f1a"
 }

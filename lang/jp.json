@@ -2280,5 +2280,10 @@
     "18698": "[X]\u3055\u3093\u3078\u306e\u7740\u4fe1\u306f\u30bf\u30a4\u30df\u30f3\u30b0\u826f\u304f\u5fdc\u7b54\u3055\u308c\u307e\u305b\u3093\u3067\u3057\u305f\u3002",
     "18699": "\u30a2\u30d0\u30bf\u30fc\u306e\u524a\u9664\u3092\u78ba\u8a8d\u3059\u308b",
     "18700": "\u77ed\u3059\u304e\u307e\u3059",
-    "18701": "\u30d1\u30b9\u30ef\u30fc\u30c9\u306f8\u6587\u5b57\u4ee5\u4e0a\u5fc5\u8981\u3067\u3059\u3002"
+    "18701": "\u30d1\u30b9\u30ef\u30fc\u30c9\u306f8\u6587\u5b57\u4ee5\u4e0a\u5fc5\u8981\u3067\u3059\u3002",
+    "18770": "The price in your local currency is an estimate only. You will be charged the displayed price in Euros for all transactions.",
+    "18771": "Invitation Link Password",
+    "18772": "Please enter your invitation link password to proceed with your account activation.",
+    "18773": "Invitation link password",
+    "18774": "Please enter the password in the password field"
 }

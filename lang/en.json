@@ -1076,8 +1076,8 @@
     "7703": "One or more items have been the subject of a takedown notice.",
     "7704": "This file has been the subject of a takedown notice.",
     "7705": "This folder has been the subject of a takedown notice.",
-    "7706": "Your MEGA voucher for %1 &euro; was redeemed successfully",
-    "7707": "Your balance is now %1 &euro;.",
+    "7706": "Your MEGA voucher for %1 \u20ac was redeemed successfully",
+    "7707": "Your balance is now %1 \u20ac.",
     "7708": "We suggest the %1 plan based on your account balance.",
     "7709": "Click [S]COMPLETE UPGRADE[\/S] and enjoy your new %1 plan.",
     "7710": "COMPLETE UPGRADE",
@@ -2280,5 +2280,10 @@
     "18698": "Call to [X] was not answered in a timely manner.",
     "18699": "Confirm Remove Avatar",
     "18700": "Too short",
-    "18701": "Your password needs to be at least 8 characters long."
+    "18701": "Your password needs to be at least 8 characters long.",
+    "18770": "The price in your local currency is an estimate only. You will be charged the displayed price in Euros for all transactions.",
+    "18771": "Invitation Link Password",
+    "18772": "Please enter your invitation link password to proceed with your account activation.",
+    "18773": "Invitation link password",
+    "18774": "Please enter the password in the password field"
 }

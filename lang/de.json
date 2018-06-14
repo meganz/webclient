@@ -1249,7 +1249,7 @@
     "8736": "G\u00fcltig bis",
     "8737": "25 May - International Missing Children\u2019s Day",
     "8738": "In support of missing and exploited children, MEGA confirms that it does not tolerate use of its systems to share illegal content and will support authorities with investigation and prosecution of all allegations of child pornography and child abuse material.",
-    "8742": "Weitere Informationen zu diesem Thema",
+    "8742": "Mehr erfahren",
     "8743": "Sie haben in diesem Browser in der Vergangenheit bereits einen MEGA-Account genutzt. Wollen Sie sich wirklich neu registrieren?",
     "8744": "Erneut senden",
     "8745": "Sie wurden erfolgreich eingeloggt.",
@@ -1647,7 +1647,7 @@
     "16351": "Die E-Mail wurde erfolgreich neu versandt.",
     "16352": "Bonusprogramm",
     "16353": "Verf\u00fcgbare PRO-Pakete",
-    "16354": "Weitere Informationen zu diesem Thema",
+    "16354": "Mehr erfahren",
     "16355": "Hinweis: Dieses Limit kann dynamisch wechseln und h\u00e4ngt von unserer Gesamtauslastung ab.",
     "16356": "Die zu \u00fcbertragende Datenmenge \u00fcberschreitet das verbleibende Transfervolumen Ihres Accounts. Die \u00dcbertragung k\u00f6nnte daher unterbrochen werden.",
     "16357": "Die zu \u00fcbertragende Datenmenge \u00fcberschreitet das verbleibende Freivolumen Ihrer IP-Adresse. Die \u00dcbertragung k\u00f6nnte daher unterbrochen werden.",
@@ -2279,6 +2279,11 @@
     "18692": "Rufaufbau zu [X] abgebrochen.",
     "18698": "Keine Antwort von [X]",
     "18699": "L\u00f6schung des Profilbilds",
-    "18700": "Too short",
-    "18701": "Your password needs to be at least 8 characters long."
+    "18700": "Zu kurz",
+    "18701": "Ihr Passwort ist zu kurz. Die Mindestl\u00e4nge betr\u00e4gt acht Zeichen.",
+    "18770": "Der Preis in Ihrer lokalen W\u00e4hrung basiert auf dem aktuellen Umrechnungskurs. Sie zahlen stets den Originalpreis in EUR.",
+    "18771": "Link-Passwort ung\u00fcltig",
+    "18772": "Bitte geben Sie das zugeordnete Passwort ein, um die Aktivierung fortzusetzen.",
+    "18773": "Einladungslinkpasswort",
+    "18774": "Bitte geben Sie das Passwort in das daf\u00fcr vorgesehene Feld ein:"
 }

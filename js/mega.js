@@ -270,7 +270,7 @@ function sc_fetcher() {
                     for (var i = bunch.length; i--;) {
                         var h = bunch[i];
 
-                        if (M.d[h] && !M.d[h].t && M.d[h].tf) {
+                        if (M.d[h] && !M.d[h].t && M.d[h].tvf) {
                             versions[h] = 1;
                         }
                     }

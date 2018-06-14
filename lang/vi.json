@@ -1962,7 +1962,7 @@
     "17603": "Download retrying in MEGAsync",
     "17604": "Download completing in MEGAsync",
     "17605": "Download failed in MEGAsync",
-    "17606": "No response from MEGAsync",
+    "17606": "Kh\u00f4ng co\u0301 pha\u0309n h\u00f4\u0300i t\u01b0\u0300 MEGAsync",
     "17617": "T\u1ea1o th\u01b0 m\u1ee5c",
     "17618": "T\u1ea2I L\u00caN T\u1ec6P TIN KH\u00c1C",
     "17619": "\u0110\u01b0\u1eddng d\u1eabn URL t\u1edbi th\u01b0 m\u1ee5c MEGAdrop \u0111\u00e3 \u0111\u01b0\u1ee3c ghi v\u00e0o b\u1ed9 nh\u1edb.",
@@ -2280,5 +2280,10 @@
     "18698": "Call to [X] was not answered in a timely manner.",
     "18699": "Confirm Remove Avatar",
     "18700": "Too short",
-    "18701": "Your password needs to be at least 8 characters long."
+    "18701": "Your password needs to be at least 8 characters long.",
+    "18770": "The price in your local currency is an estimate only. You will be charged the displayed price in Euros for all transactions.",
+    "18771": "Invitation Link Password",
+    "18772": "Please enter your invitation link password to proceed with your account activation.",
+    "18773": "Invitation link password",
+    "18774": "Please enter the password in the password field"
 }

@@ -2280,5 +2280,10 @@
     "18698": "[X]\ub2d8\uc5d0\uac8c \uac74 \uc804\ud654\uac00 \uc801\uc808\ud55c \uc2dc\uac04\uc5d0 \uc751\ub2f5\ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4.",
     "18699": "\uc544\ubc14\ud0c0 \uc0ad\uc81c \ud655\uc778",
     "18700": "Too short",
-    "18701": "Your password needs to be at least 8 characters long."
+    "18701": "Your password needs to be at least 8 characters long.",
+    "18770": "The price in your local currency is an estimate only. You will be charged the displayed price in Euros for all transactions.",
+    "18771": "Invitation Link Password",
+    "18772": "Please enter your invitation link password to proceed with your account activation.",
+    "18773": "Invitation link password",
+    "18774": "Please enter the password in the password field"
 }

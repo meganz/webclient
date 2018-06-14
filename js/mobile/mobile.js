@@ -237,6 +237,7 @@ var mobile = {
 mega.ui.tpp = {
     reset: function() {},
     setTotalProgress: function() {},
+    pause: function() {},
     resume: function() {},
     getTime: function() {},
     start: function() {},

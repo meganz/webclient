@@ -1343,7 +1343,7 @@ html.gbot {
     color: #666666;
     padding: 16px 0 0 0;
 }
-.bottom-page.dark-txt a {
+.bottom-page.dark-txt a, .bottom-page.dark-txt a:link, .bottom-page.dark-txt a:visited, .bottom-page.dark-txt a:active {
     color: #666666;
     text-decoration: underline;
 }

@@ -1347,7 +1347,7 @@ html.gbot {
     color: #666666;
     text-decoration: underline;
 }
-.bottom-page.dark-txt a:hover {
+.body:not(.mobile) .bottom-page.dark-txt a:hover {
     text-decoration: none;
 }
 .default-select.megaapp-dropdown {

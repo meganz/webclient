@@ -615,6 +615,9 @@ ul, li {
 .mobile.download-progress, .mobile.upload-progress, .downloading .inline-buttons .mobile.red-button, .downloading .mobile.red-button, .uploading .mobile.red-button {
     display: none;
 }
+.downloading #mobile-ui-delete .mobile.red-button, .downloading #mobile-ui-copy-link .inline-buttons .mobile.red-button  {
+    display: block;
+}
 .downloading .error-overlay .mobile.red-button, .uploading .error-overlay .mobile.red-button {
     display: block;
 }

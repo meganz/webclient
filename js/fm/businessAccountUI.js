@@ -50,11 +50,16 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
         $('.default-dialog-bottom', $dialog).off('click');
         $('.dialog-link-pwd', $dialog).off('keydown');
 
-        $('.fm-dialog-link-pwd-pad input', $dialog).on('keydown', function () {
+        $('.fm-dialog-link-pwd-pad input', $dialog).on('keydown', function (e) {
             $('.dialog-link-pwd-empty', $dialog).addClass('hidden');
+            if (e.keyCode === 13 || e.code === 'Enter' || e.key === 'Enter') {
+                return $('.fm-dialog-link-pwd-button', $dialog).trigger('click');
+            }
+            
         });
         $('.fm-dialog-link-pwd-button', $dialog).on('click', function () {
             var enteredPassword = $('.fm-dialog-link-pwd-pad input', $dialog).val();
+            $('.fm-dialog-link-pwd-pad input', $dialog).val('');
             if (!enteredPassword.length) {
                 $('.dialog-link-pwd-empty', $dialog).removeClass('hidden');
                 return false;
@@ -80,8 +85,36 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                     
                     getInfoPromise.fail(failureAction);
 
-                    getInfoPromise.done(function (status,res) {
-
+                    getInfoPromise.done(function (status, res) {
+                        if (localStorage.d) {
+                            console.log(res);
+                        }
+                        if (!res.e || !res.firstname || !res.mpubk || !res.mu) {
+                            failureAction(1, res, 'uv2 not complete response');
+                        }
+                        else {
+                            if (u_type === false) {
+                                res.signupcode = decryptedTokenBase64;
+                                localStorage.businessSubAc = JSON.stringify(res);
+                                loadSubPage('register');
+                            }
+                            else {
+                                var msgTxt = l[18795];
+                                // 'You are currently logged in. ' +
+                                //  'Would you like to log out and proceed with business account registration ? ';
+                                closeDialog();
+                                msgDialog('confirmation', l[968], msgTxt, '', function (e) {
+                                    if (e) {
+                                        mLogout();
+                                    }
+                                    else {
+                                        loadSubPage('');
+                                    }
+                                });
+                            }
+                        }
+                        // a32_to_str(base64_to_a32('a2QrNHNhbmQgbWVnYQ'))
+                        // if(res.e && res.)
                     });
 
                 }

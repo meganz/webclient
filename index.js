@@ -240,6 +240,10 @@ function init_page() {
             return false;
         }
     }
+    // cleaning local-storage used attr for business signup
+    if (localStorage.businessSubAc && page !== 'register') {
+        delete localStorage.businessSubAc;
+    }
 
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {

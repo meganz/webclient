@@ -298,7 +298,11 @@
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-.default-grey-button::before, .default-grey-button::after, .default-white-button:not(.light)::before, .default-white-button::after, .default-red-button::before, .default-red-button::after, .default-green-button::before {
+<<<<<<< HEAD
+.default-grey-button::before, .default-grey-button::after, .default-white-button:not(.light)::before, .default-white-button::after, .default-red-button::before, .default-red-button::after {
+=======
+.default-grey-button::before, .default-grey-button::after, .default-white-button::before, .default-white-button::after, .default-red-button::before, .default-red-button::after, .default-green-button::before {
+>>>>>>> develop
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);

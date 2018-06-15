@@ -592,6 +592,10 @@ mBroadcaster.once('startMega', function populate_l() {
     l[18490] = l[18490].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
     l[18491] = l[18491].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
 
+    l[18787] = l[18787]
+        .replace('[A]', '<a href="https://github.com/meganz/MEGAcmd" rel="noreferrer" target="_blank">')
+        .replace('[/A]', '</a>');
+
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
         16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444

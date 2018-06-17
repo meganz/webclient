@@ -265,7 +265,8 @@ function pageregister() {
                 u_storage = init_storage(localStorage);
                 var signupcode = localStorage.signupcode;
                 if (localStorage.businessSubAc) {
-                    signupcode = JSON.parse(localStorage.businessSubAc).signupcode;
+                    window.businessSubAc = JSON.parse(localStorage.businessSubAc);
+                    signupcode = window.businessSubAc.signupcode;
                 }
                 var ctx = {
                     checkloginresult: function(u_ctx, r) {
@@ -288,7 +289,7 @@ function pageregister() {
                     signupcode,
                     $('#register-firstname').val() + ' ' + $('#register-lastname').val(), uh);
                 delete localStorage.signupcode;
-                delete localStorage.businessSubAc
+                delete localStorage.businessSubAc;
             }
             else if (u_type === false) {
                 loadingDialog.show();

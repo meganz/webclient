@@ -54,7 +54,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         if (!previousSubs) {
             return true;
         }
-        if (subs.length !== previousSubs.length) {
+        if (Object.keys(subs).length !== Object.keys(previousSubs).length) {
             return true;
         }
         for (var k in subs) {
@@ -71,9 +71,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     };
 
     // private function to fill html table for sub users
-    var fillSubUsersTable = function (subUsers) {
+    var fillSubUsersTable = function (subUsers,uiBusiness) {
         var $tr = $('tr', $usersTable);
-        var $tr_user = $tr.get(1).clone(true); // the first one is the table header
+        var $tr_user = $($tr.get(1)).clone(true); // the first one is the table header
 
         // remove all elements from template on html file
         for (var k = 1; k < $tr.length; k++) {
@@ -81,15 +81,26 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
 
         // now let's fill the table with subusers data
-        for (var h = 0; h < subUsers.length; h++) {
+        for (var h in subUsers) {
             var $currUser = $tr_user.clone(true);
             $currUser.attr('id', subUsers[h].u);
             $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
             $currUser.find('.fm-user-management-user span').text(subUsers[h].firstname + ' ' +
                 (subUsers[h].lastname || ''));
             $currUser.find('.user-management-email').text(subUsers[h].e);
-
-
+            $currUser.find('.user-management-status').removeClass('enabled pending disable');
+            if (subUsers[h].s === 0) {
+                $currUser.find('.user-management-status').addClass('enabled');
+            }
+            else if (subUsers[h].s === 10) {
+                $currUser.find('.user-management-status').addClass('pending');
+            }
+            else {
+                $currUser.find('.user-management-status').addClass('disable');
+            }
+            $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
+            // still usage data.
+            $usersTable.append($currUser);
         }
     };
 
@@ -98,10 +109,27 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         return true; // ok
     }
     
-
+    fillSubUsersTable(subAccounts, this);
 };
 
 
+BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
+    if (statusCode === 0) {
+        return l[7666]; // active
+    }
+    else if (statusCode === 10) {
+        return l[7379]; // pending
+    }
+    else if (statusCode === 11) {
+        return l[7070]; // disabled
+    }
+    else if (statusCode === 12) {
+        return l[7376]; // deleted
+    }
+    else {
+        return l[7381]; // unknown
+    }
+};
 
 /**
  * show the password dialog for invitation link

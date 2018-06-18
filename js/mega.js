@@ -2840,11 +2840,6 @@ function process_suba(suba, ignoreDB) {
         //    return;
         //}
         //suba = suba[u_handle];
-        if (localStorage.businessTestDate) {
-            if (!suba.length) {
-                suba.push({ u: 'thecaptin1', p: u_handle, s: '0' });
-            }
-        }
         if (suba.length) {
             for (var k = 0; k < suba.length; k++) {
                 bAccount.parseSUBA(suba[k], ignoreDB);

@@ -192,6 +192,9 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB) {
          *      -u: handle
          *      -p: parent {for future multilevel business accounts}
          *      -s: status {10=pending confirmation , 11:disabled, 12:deleted, 0:enabled and ok}
+         *      -e: email
+         *      -firstname
+         *      -lastname
          */
     }
     if (fmdb && !ignoreDB && !pfkey && !folderlink) {

@@ -42,6 +42,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         subAccountsView = $('.fm-blocks-view.user-management-view');
     }
 
+    //if (subAccounts.length) { // no subs, some new ui
+
+    //    return;
+    //}
     subAccountsView.removeClass('hidden');
     var $usersTable = $('.grid-table-user-management', subAccountsView).removeClass('hidden');
 
@@ -68,20 +72,41 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     // private function to fill html table for sub users
     var fillSubUsersTable = function (subUsers) {
-        var entryLineHtml = '';
+        var $tr = $('tr', $usersTable);
+        var $tr_user = $tr.get(1).clone(true); // the first one is the table header
+
+        // remove all elements from template on html file
+        for (var k = 1; k < $tr.length; k++) {
+            $tr.get(k).remove();
+        }
+
+        // now let's fill the table with subusers data
+        for (var h = 0; h < subUsers.length; h++) {
+            var $currUser = $tr_user.clone(true);
+            $currUser.attr('id', subUsers[h].u);
+            $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
+            $currUser.find('.fm-user-management-user span').text(subUsers[h].firstname + ' ' +
+                (subUsers[h].lastname || ''));
+            $currUser.find('.user-management-email').text(subUsers[h].e);
+
+
+        }
     };
 
     var reDraw = isRedrawNeeded(subAccounts, this.business.previousSubList);
     if (!reDraw) {
         return true; // ok
     }
-    var $tr_user = $('tr', $usersTable).get(1).clone(); // the first one is the table header
+    
 
 };
 
 
 
-
+/**
+ * show the password dialog for invitation link
+ * @param {string} invitationLink :         sub-user invitation link
+ */
 BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
     var $dialog = $('.fm-dialog.sub-account-link-password');
     var prepareSubAccountLinkDialog = function () {
@@ -152,8 +177,6 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                                 });
                             }
                         }
-                        // a32_to_str(base64_to_a32('a2QrNHNhbmQgbWVnYQ'))
-                        // if(res.e && res.)
                     });
 
                 }

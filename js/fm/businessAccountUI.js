@@ -3,7 +3,13 @@
  * A UI control Class to perfrom Business Account related UI
  */
 function BusinessAccountUI() {
-    
+    if (!mega.buinsessController) {
+        this.business = new BusinessAccount();
+        mega.buinsessController = this.business;
+    }
+    else {
+        this.business = mega.buinsessController;
+    }
 }
 
 /**
@@ -37,7 +43,40 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     }
 
     subAccountsView.removeClass('hidden');
-    $('.grid-table-user-management', subAccountsView).removeClass('hidden');
+    var $usersTable = $('.grid-table-user-management', subAccountsView).removeClass('hidden');
+
+    // private function to check if new drawing is needed
+    var isRedrawNeeded = function (subs, previousSubs) {
+        if (!previousSubs) {
+            return true;
+        }
+        if (subs.length !== previousSubs.length) {
+            return true;
+        }
+        for (var k in subs) {
+            if (!previousSubs[k]) {
+                return true;
+            }
+            for (var h in subs[k]) {
+                if (subs[k][h] !== previousSubs[k][k]) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    // private function to fill html table for sub users
+    var fillSubUsersTable = function (subUsers) {
+        var entryLineHtml = '';
+    };
+
+    var reDraw = isRedrawNeeded(subAccounts, this.business.previousSubList);
+    if (!reDraw) {
+        return true; // ok
+    }
+    var $tr_user = $('tr', $usersTable).get(1).clone(); // the first one is the table header
+
 };
 
 

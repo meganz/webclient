@@ -317,7 +317,9 @@
             id = 'user-management';
             M.require('businessAcc_js', 'businessAccUI_js').done(function () {
                 var usersM = new BusinessAccountUI();
-                M.onFileManagerReady(usersM.viewSubAccountListUI);
+                M.onFileManagerReady(function () {
+                    usersM.viewSubAccountListUI();
+                });
             });
         }
         else if (id === 'shares') {

@@ -1761,6 +1761,7 @@ var ConversationPanel = React.createClass({
                 chatRoom={room}
                 title={__(l[8871])}
                 name="truncate-conversation"
+                dontShowAgainCheckbox={false}
                 onClose={() => {
                     self.setState({'truncateDialog': false});
                 }}

@@ -5583,6 +5583,7 @@ React.makeElement = React['createElement'];
 	                    chatRoom: room,
 	                    title: __(l[8871]),
 	                    name: "truncate-conversation",
+	                    dontShowAgainCheckbox: false,
 	                    onClose: function onClose() {
 	                        self.setState({ 'truncateDialog': false });
 	                    },
@@ -6309,6 +6310,7 @@ React.makeElement = React['createElement'];
 	        return {
 	            'confirmLabel': __(l[6826]),
 	            'cancelLabel': __(l[82]),
+	            'dontShowAgainCheckbox': true,
 	            'hideable': true
 	        };
 	    },
@@ -6352,7 +6354,7 @@ React.makeElement = React['createElement'];
 	    render: function render() {
 	        var self = this;
 
-	        if (mega.config.get('confirmModal_' + self.props.name) === true) {
+	        if (self.props.dontShowAgainCheckbox && mega.config.get('confirmModal_' + self.props.name) === true) {
 	            if (this.props.onConfirmClicked) {
 
 	                setTimeout(function () {
@@ -6365,6 +6367,28 @@ React.makeElement = React['createElement'];
 
 	        var classes = "delete-message " + self.props.name + " " + self.props.className;
 
+	        var dontShowCheckbox = null;
+	        if (self.props.dontShowAgainCheckbox) {
+	            dontShowCheckbox = React.makeElement(
+	                "div",
+	                { className: "footer-checkbox" },
+	                React.makeElement(
+	                    Forms.Checkbox,
+	                    {
+	                        name: "delete-confirm",
+	                        id: "delete-confirm",
+	                        onLabelClick: function onLabelClick(e, state) {
+	                            if (state === true) {
+	                                mega.config.set('confirmModal_' + self.props.name, true);
+	                            } else {
+	                                mega.config.set('confirmModal_' + self.props.name, false);
+	                            }
+	                        }
+	                    },
+	                    l[7039]
+	                )
+	            );
+	        }
 	        return React.makeElement(
 	            ModalDialog,
 	            {
@@ -6399,25 +6423,7 @@ React.makeElement = React['createElement'];
 	            React.makeElement(
 	                ExtraFooterElement,
 	                null,
-	                React.makeElement(
-	                    "div",
-	                    { className: "footer-checkbox" },
-	                    React.makeElement(
-	                        Forms.Checkbox,
-	                        {
-	                            name: "delete-confirm",
-	                            id: "delete-confirm",
-	                            onLabelClick: function onLabelClick(e, state) {
-	                                if (state === true) {
-	                                    mega.config.set('confirmModal_' + self.props.name, true);
-	                                } else {
-	                                    mega.config.set('confirmModal_' + self.props.name, false);
-	                                }
-	                            }
-	                        },
-	                        l[7039]
-	                    )
-	                )
+	                dontShowCheckbox
 	            )
 	        );
 	    }

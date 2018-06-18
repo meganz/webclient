@@ -23,7 +23,8 @@ var pro = {
     UTQA_RES_INDEX_MONTHLYBASEPRICE: 7,
     UTQA_RES_INDEX_LOCALPRICE: 8,
     UTQA_RES_INDEX_LOCALPRICECURRENCY: 9,
-    UTQA_RES_INDEX_LOCALPRICECURRENCYSYMBOL: 10,
+    UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE: 10,
+    UTQA_RES_INDEX_LOCALPRICEZERO: 11,
 
     /**
      * Load pricing plan information from the API. The data will be loaded into 'pro.membershipPlans'.
@@ -59,7 +60,8 @@ var pro = {
                             results[i]['mbp'],   // monthly base price
                             results[i]['lp'],    // NEW 'local price'
                             results[i]['lpc'],   // NEW 'local price currency'
-                            results[i]['lps']    // NEW 'local price symbol'
+                            results[i]['lps'],   // NEW 'local price symbol'
+                            results[i]['lp0']    // NEW 'local price Zero val'
                         ]);
                     }
 

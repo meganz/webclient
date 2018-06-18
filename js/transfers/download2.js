@@ -1609,7 +1609,6 @@ var dlmanager = {
                         ' ' + euroSign);
                     // Calculate the monthly base price in local currency
                     monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-                    monthlyBasePriceCurrencySign = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSYMBOL];
                     $('.reg-st3-txt-localcurrencyprogram', $dialog).removeClass('hidden');
                 }
                 else {
@@ -1652,9 +1651,15 @@ var dlmanager = {
                 var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
                 var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
                 $planName.text(planName);
-                $priceDollars.text(monthlyBasePriceDollars);
-                $priceCents.text('.' + monthlyBasePriceCents + ' ' +
-                    monthlyBasePriceCurrencySign);
+                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                    $priceDollars.text(monthlyBasePrice);
+                    $priceCents.text('');
+                }
+                else {
+                    $priceDollars.text(monthlyBasePriceDollars);
+                    $priceCents.text('.' + monthlyBasePriceCents + ' ' +
+                        monthlyBasePriceCurrencySign);
+                }
                 $storageAmount.text(storageSizeRounded);
                 $storageUnit.text(storageFormatted.unit);
                 $bandwidthAmount.text(bandwidthSizeRounded);

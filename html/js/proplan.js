@@ -157,7 +157,6 @@ pro.proplan = {
         var $pricingBoxes = $stepOne.find('.reg-st3-membership-bl');
         var oneLocalPriceFound = false;
         var euroSign = '\u20ac';
-        var localS;
 
         // Update each pricing block with details from the API
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
@@ -189,6 +188,7 @@ pro.proplan = {
 
                 var monthlyBasePrice;
                 var monthlyBasePriceCurrencySign;
+                var zeroPrice;
                 
                 if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                     $euroPrice.removeClass('hidden');
@@ -198,8 +198,7 @@ pro.proplan = {
                         ' ' + euroSign);
                     // Calculate the monthly base price in local currency
                     monthlyBasePrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-                    monthlyBasePriceCurrencySign = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSYMBOL];
-                    localS = monthlyBasePriceCurrencySign;
+                    zeroPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICEZERO];
                     oneLocalPriceFound = true;
                 }
                 else {
@@ -251,9 +250,15 @@ pro.proplan = {
 
                 // Update the plan name and price
                 $planName.text(planName);
-                $priceDollars.text(monthlyBasePriceDollars);
-                $priceCents.text('.' + monthlyBasePriceCents + ' ' +
-                    monthlyBasePriceCurrencySign);
+                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                    $priceDollars.text(monthlyBasePrice);
+                    $priceCents.text('');
+                }
+                else {
+                    $priceDollars.text(monthlyBasePriceDollars);
+                    $priceCents.text('.' + monthlyBasePriceCents + ' ' +
+                        monthlyBasePriceCurrencySign);
+                }
 
                 // Update storage
                 $storageAmount.text(storageSizeRounded);
@@ -267,15 +272,18 @@ pro.proplan = {
         var $pricingBoxFree = $pricingBoxes.filter('.free');
         var $priceFree = $pricingBoxFree.find('.price');
         var $priceCentsFree = $priceFree.find('.small');
+        var $priceDollarsFree = $priceFree.find('.big');
         if (oneLocalPriceFound) {
             $('.reg-st3-txt-localcurrencyprogram').removeClass('hidden');
             $pricingBoxes.addClass('local-currency');
-            $priceCentsFree.text('.00 ' + localS);
+            $priceCentsFree.text('');
+            $priceDollarsFree.text(zeroPrice);
         }
         else {
             $('.reg-st3-txt-localcurrencyprogram').addClass('hidden');
             $priceCentsFree.text('.00 ' + euroSign);
             $pricingBoxes.removeClass('local-currency');
+            $priceDollarsFree.text('0');
         }
     },
 

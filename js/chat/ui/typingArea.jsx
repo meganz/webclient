@@ -635,7 +635,6 @@ var TypingArea = React.createClass({
         var viewRatio = 0;
 
 
-
         // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
         if (
             keyEvents &&
@@ -726,6 +725,11 @@ var TypingArea = React.createClass({
                 jsp.scrollToY(textareaCloneSpanHeight - self.textareaLineHeight);
             } else if (jsp) {
                 jsp.scrollToY(0);
+
+                // because jScrollPane may think that there is no scrollbar, it would NOT scroll back to 0?!
+                if (scrPos < 0) {
+                    $textareaScrollBlock.find('.jspPane').css('top', 0);
+                }
             }
         }
 

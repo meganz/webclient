@@ -7,6 +7,8 @@ var pro = {
     /** An array of the possible membership plans from the API */
     membershipPlans: [],
 
+    lastLoginStatus: -99, // a var to store the user login status when prices feteched
+
     /** The last payment provider ID used */
     lastPaymentProviderId: null,
 
@@ -19,6 +21,10 @@ var pro = {
     UTQA_RES_INDEX_PRICE: 5,
     UTQA_RES_INDEX_CURRENCY: 6,
     UTQA_RES_INDEX_MONTHLYBASEPRICE: 7,
+    UTQA_RES_INDEX_LOCALPRICE: 8,
+    UTQA_RES_INDEX_LOCALPRICECURRENCY: 9,
+    UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE: 10,
+    UTQA_RES_INDEX_LOCALPRICEZERO: 11,
 
     /**
      * Load pricing plan information from the API. The data will be loaded into 'pro.membershipPlans'.
@@ -31,7 +37,7 @@ var pro = {
         loadedCallback = loadedCallback || function() { };
 
         // If this data has already been fetched, re-use it and run the callback function
-        if (pro.membershipPlans.length > 0) {
+        if (pro.membershipPlans.length > 0 && !(!pro.lastLoginStatus && u_type > 0)) {
             loadedCallback();
         }
         else {
@@ -51,12 +57,17 @@ var pro = {
                             results[i]['m'],     // months
                             results[i]['p'],     // price
                             results[i]['c'],     // currency
-                            results[i]['mbp']    // monthly base price
+                            results[i]['mbp'],   // monthly base price
+                            results[i]['lp'],    // NEW 'local price'
+                            results[i]['lpc'],   // NEW 'local price currency'
+                            results[i]['lps'],   // NEW 'local price symbol'
+                            results[i]['lp0']    // NEW 'local price Zero val'
                         ]);
                     }
 
                     // Store globally
                     pro.membershipPlans = plans;
+                    pro.lastLoginStatus = u_type;
 
                     // Run the callback function
                     loadedCallback();

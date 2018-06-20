@@ -23,9 +23,11 @@ var Chatd = function(userId, megaChat, options) {
     self.destroyed = false;
 
     if (
-        ua.details.browser === "Chrome" ||
-        ua.details.browser === "Firefox" ||
-        ua.details.browser === "Opera"
+        (
+            ua.details.browser === "Chrome" ||
+            ua.details.browser === "Firefox" ||
+            ua.details.browser === "Opera"
+        ) && ChatdPersist.isMasterTab()
     ) {
         self.chatdPersist = new ChatdPersist(self);
     }

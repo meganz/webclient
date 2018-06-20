@@ -1,7 +1,7 @@
 (function(scope) {
     "use strict";
 
-    var VERSION = 4;
+    var VERSION = 5;
 
     /**
      * ChatdPersist is a container that manages the (local/clientside) chat history (and keys) persistence for chatd.

@@ -745,7 +745,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     });
 
                     if (!streamer.hasAudio) {
-                        $('.volume-control', $wrapper).addClass('no-audio');
+                        var $vc = $('.volume-control', $wrapper).addClass('no-audio');
+                        var title = l[19061];
+
+                        if (streamer.hasUnsupportedAudio) {
+                            eventlog(99693, streamer.hasUnsupportedAudio);
+                            title = escapeHTML(l[19060]).replace('%1', streamer.hasUnsupportedAudio);
+                        }
+                        $vc.attr('title', title);
                     }
 
                     hideControls();

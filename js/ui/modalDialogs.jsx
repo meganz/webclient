@@ -241,6 +241,7 @@ var ConfirmDialog = React.createClass({
         return {
             'confirmLabel': __(l[6826]),
             'cancelLabel': __(l[82]),
+            'dontShowAgainCheckbox': true,
             'hideable': true
         }
     },
@@ -289,7 +290,7 @@ var ConfirmDialog = React.createClass({
     render: function() {
         var self = this;
 
-        if (mega.config.get('confirmModal_' + self.props.name) === true)  {
+        if (self.props.dontShowAgainCheckbox && mega.config.get('confirmModal_' + self.props.name) === true)  {
             if (this.props.onConfirmClicked) {
                 // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
                 setTimeout(function() {
@@ -302,6 +303,25 @@ var ConfirmDialog = React.createClass({
 
         var classes = "delete-message " + self.props.name + " " + self.props.className;
 
+        var dontShowCheckbox = null;
+        if (self.props.dontShowAgainCheckbox) {
+            dontShowCheckbox = <div className="footer-checkbox">
+                <Forms.Checkbox
+                    name="delete-confirm"
+                    id="delete-confirm"
+                    onLabelClick={(e, state) => {
+                        if (state === true) {
+                            mega.config.set('confirmModal_' + self.props.name, true);
+                        }
+                        else {
+                            mega.config.set('confirmModal_' + self.props.name, false);
+                        }
+                    }}
+                >
+                    {l[7039]}
+                </Forms.Checkbox>
+            </div>;
+        }
         return (
             <ModalDialog
                 title={this.props.title}
@@ -334,22 +354,7 @@ var ConfirmDialog = React.createClass({
                     {self.props.children}
                 </div>
                 <ExtraFooterElement>
-                    <div className="footer-checkbox">
-                        <Forms.Checkbox
-                            name="delete-confirm"
-                            id="delete-confirm"
-                            onLabelClick={(e, state) => {
-                                if (state === true) {
-                                    mega.config.set('confirmModal_' + self.props.name, true);
-                                }
-                                else {
-                                    mega.config.set('confirmModal_' + self.props.name, false);
-                                }
-                            }}
-                            >
-                            {l[7039]}
-                            </Forms.Checkbox>
-                    </div>
+                    {dontShowCheckbox}
                 </ExtraFooterElement>
             </ModalDialog>
         );

@@ -9243,8 +9243,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: relative;
     text-align: left;
 }
-.default-select::before, .ui-selectmenu-button::before {
+.default-select::before, .ui-selectmenu-button::before, .fm-share-dropdown::before, .share-dialog-permissions::before, .share-dialog-icon.permissions-icon::before, .fm-dialogs-select::before {
     content: '';
+    display: block;
     position: absolute;
     width: 100%;
     height: 32px;
@@ -9259,7 +9260,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     left: 0;
 }
-.default-select span, .ui-selectmenu-button span {
+.default-select span, .ui-selectmenu-button span, .fm-share-dropdown span, .share-dialog-permissions span, .share-dialog-icon.permissions-icon span, .fm-dialogs-select span {
     display: block;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
@@ -16917,11 +16918,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select {
     float: left;
     margin-top: 8px;
-    overflow: hidden;
     text-overflow: ellipsis;
     min-width: 162px;
     padding-left: 43px;
     width: auto;
+    max-width: 190px;
 }
 .share-dialog-permissions {
     float: right;

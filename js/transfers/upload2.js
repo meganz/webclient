@@ -615,6 +615,7 @@ var ulmanager = {
         file.ul_intransit = 0;
         file.ul_inflight = {};
         file.ul_sendchunks = {};
+        file.ul_lastProgressUpdate = 0;
         file.ul_aes = new sjcl.cipher.aes([
             file.ul_key[0], file.ul_key[1], file.ul_key[2], file.ul_key[3]
         ]);
@@ -622,17 +623,34 @@ var ulmanager = {
         if (file.size) {
             var pp;
             var p = 0;
-            var tasks = {};
-            for (i = 1; i <= 8 && p < file.size - i * ulmanager.ulBlockSize; i++) {
-                tasks[p] = new ChunkUpload(file, p, i * ulmanager.ulBlockSize);
-                pp = p;
-                p += i * ulmanager.ulBlockSize;
+            var tasks = Object.create(null);
+            var ulBlockExtraSize = ulmanager.ulBlockExtraSize;
+            var boost = !mega.chrome || parseInt(ua.details.version) < 69;
+
+            if (file.size > 0x1880000 && boost) {
+                tasks[p] = new ChunkUpload(file, p, 0x480000);
+                p += 0x480000;
+
+                for (i = 2; i < 4; i++) {
+                    tasks[p] = new ChunkUpload(file, p, i * 0x400000);
+                    pp = p;
+                    p += i * 0x400000;
+                }
+
+                ulBlockExtraSize = 16 * 1048576;
+            }
+            else {
+                for (i = 1; i <= 8 && p < file.size - i * ulmanager.ulBlockSize; i++) {
+                    tasks[p] = new ChunkUpload(file, p, i * ulmanager.ulBlockSize);
+                    pp = p;
+                    p += i * ulmanager.ulBlockSize;
+                }
             }
 
             while (p < file.size) {
-                tasks[p] = new ChunkUpload(file, p, ulmanager.ulBlockExtraSize);
+                tasks[p] = new ChunkUpload(file, p, ulBlockExtraSize);
                 pp = p;
-                p += ulmanager.ulBlockExtraSize;
+                p += ulBlockExtraSize;
             }
 
             if (file.size - pp > 0) {
@@ -1001,9 +1019,7 @@ ChunkUpload.prototype.updateprogress = function() {
     var p = this.file.progress;
     var tp = this.file.sent || 0;
     for (var i in p) {
-        if (p.hasOwnProperty(i)) {
-            tp += p[i];
-        }
+        tp += p[i];
     }
 
     // only start measuring progress once the TCP buffers are filled
@@ -1050,8 +1066,12 @@ ChunkUpload.prototype.onXHRprogress = function(xhrEvent) {
     if (!this.file || !this.file.progress || this.file.abort) {
         return this.done && this.done();
     }
-    this.file.progress[this.start] = xhrEvent.loaded;
-    this.updateprogress();
+    var now = Date.now();
+    if ((now - this.file.ul_lastProgressUpdate) > 200) {
+        this.file.ul_lastProgressUpdate = now;
+        this.file.progress[this.start] = xhrEvent.loaded;
+        this.updateprogress();
+    }
 };
 
 ChunkUpload.prototype.onXHRerror = function(args, xhr, reason) {
@@ -1246,13 +1266,51 @@ ChunkUpload.prototype.io_ready = function(task, args) {
             }
         }
     }
+    else if (this.start === 0 && this.bytes.length === 0x480000) {
+        // split to chunk boundaries
+        var offset = 0;
+        var chunks = 8;
+        var data = this.bytes;
+        var nonce = this.file.ul_keyNonce;
+        var blockSize = ulmanager.ulBlockSize;
+        var ack = function() {
+            if (!--chunks) {
+                this.upload();
+            }
+        };
+
+        for (var i = 1; i <= 8; i++) {
+            Encrypter.push([this, nonce, offset / 16, data.slice(offset, offset + (i * blockSize))], ack, this);
+            offset += i * blockSize;
+        }
+
+        this.appendMode = true;
+    }
+    /*else if (this.bytes.length > 0x100000) {
+        var chunks = 0;
+        var data = this.bytes;
+        var nonce = this.file.ul_keyNonce;
+        var ack = function() {
+            if (!--chunks) {
+                this.upload();
+            }
+        };
+
+        console.assert(!(data.length % 0x100000), 'check this..');
+
+        for (var i = 0; i < data.length; i += 0x100000) {
+            Encrypter.push([this, nonce, i / 16, data.slice(i, i + 0x100000)], ack, this);
+            chunks++;
+        }
+
+        this.appendMode = true;
+    }*/
     else {
         task = [this, this.file.ul_keyNonce, this.start / 16, this.bytes];
         // TODO: Modify CreateWorkers() and use this gid to terminate over cancelled uploads
         task[this.gid] = 1;
         Encrypter.push(task, this.upload, this);
     }
-    this.bytes = null;
 };
 
 ChunkUpload.prototype.done = function(ee) {
@@ -1479,7 +1537,7 @@ ulQueue.poke = function(file, meth) {
 
         file.retries = 0;
         file.sent = 0;
-        file.progress = {};
+        file.progress = Object.create(null);
         file.posturl = "";
         file.completion = [];
         file.abort = true;
@@ -1511,7 +1569,7 @@ ulQueue.poke = function(file, meth) {
 
     if (meth !== 0xdead) {
         file.sent = 0;
-        file.progress = {};
+        file.progress = Object.create(null);
         file.completion = [];
         file.owner = new FileUpload(file);
         ulQueue[meth || 'push'](file.owner);
@@ -1563,16 +1621,24 @@ mBroadcaster.once('startMega', function _setupEncrypter() {
             return typeof e.data === 'string' || done();
         }
 
+        // target byteOffset as defined at CreateWorkers()
+        var offset = e.target.byteOffset;// || context.start;
+
         if (typeof e.data === 'string') {
             if (e.data[0] === '[') {
-                file.ul_macs[context.start] = JSON.parse(e.data);
+                file.ul_macs[offset] = JSON.parse(e.data);
             }
             else {
                 encrypter.logger.info('WORKER:', e.data);
             }
         }
         else {
-            context.bytes = new Uint8Array(e.data.buffer || e.data);
+            if (context.appendMode) {
+                context.bytes.set(new Uint8Array(e.data.buffer || e.data), offset);
+            }
+            else {
+                context.bytes = new Uint8Array(e.data.buffer || e.data);
+            }
             context.suffix = '/' + context.start + '?c=' + base64urlencode(chksum(context.bytes.buffer));
             done();
         }

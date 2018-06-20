@@ -1849,7 +1849,7 @@ a.blog-button:hover {
     background-position: -1px -1451px;
 }
 .notification-popup .jspDrag {
-    width: 4px;
+    width: 6px;
 }
 .notification-avatar .avatar-wrapper {
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
@@ -1877,7 +1877,7 @@ a.blog-button:hover {
     box-sizing: border-box;
     display: table-cell;
     min-height: 64px;
-    padding: 8px 8px 6px 0;
+    padding: 8px 12px 6px 0;
     vertical-align: middle;
 }
 .nt-popup .notification-content {
@@ -2227,7 +2227,7 @@ a.nt-settings-button:hover span {
     position: relative;
 }
 .jspDrag {
-    background-color: rgb(102, 102, 102);
+    background-color: rgb(0, 0, 0);
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
     border-radius: 8px;
@@ -2241,7 +2241,6 @@ a.nt-settings-button:hover span {
     -o-transition: opacity 250ms ease-in-out;
     -ms-transition: opacity 250ms ease-in-out;
     transition: opacity 250ms ease-in-out;
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     -moz-opacity: 0.2;
     -khtml-opacity: 0.2;
     opacity: 0.2;
@@ -2250,10 +2249,9 @@ a.nt-settings-button:hover span {
     height: 8px !important;
 }
 .jspDrag.jspHover, .jspDrag.jspScroll, .jspDrag.jspActive {
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
 }
 .jspHorizontalBar .jspTrack, .jspHorizontalBar .jspDrag {
     float: left;
@@ -9303,7 +9301,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     text-align: left;
 }
 .default-select-dropdown .jspDrag {
-    width: 4px;
+    width: 6px;
 }
 .default-select-dropdown .jspVerticalBar {
     width: auto;

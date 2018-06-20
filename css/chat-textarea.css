@@ -66,9 +66,6 @@
     box-sizing: border-box;
     display: block;
 }
-.chat-textarea-scroll .jspDrag, .message.textarea-scroll .jspDrag,  .message.textarea-block .jspDrag {
-    width: 6px;
-}
 .chat-textarea-scroll textarea + div,  .message.textarea-block textarea + div {
     position: absolute;
     height: auto;

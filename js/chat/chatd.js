@@ -375,7 +375,7 @@ Chatd.Shard = function(chatd, shard) {
     );
 
     if (!AppActivityHandler.hasSubscriber("chatdShard" + shard)) {
-        self.userIsActive = true;
+        self.userIsActive = AppActivityHandler.getGlobalAppActivityHandler().isActive;
         AppActivityHandler.addSubscriber("chatdShard" + shard, function(isActive) {
             // restart would also "start" the keepalive tracker, which is not something we want in case chatd is not
             // yet connected.
@@ -503,6 +503,9 @@ Chatd.Shard.prototype.reconnect = function() {
         // relation with the UI related actions on pending messages (persistence, user can click resend/cancel/etc).
         // self.resendpending();
         self.triggerEventOnAllChats('onRoomConnected');
+        if (!self.userIsActive) {
+            self.sendKeepAlive(true);
+        }
     };
 
     self.s.onerror = function(e) {

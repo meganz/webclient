@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm21_';
+    var dbpfx = 'fm22_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -1775,7 +1775,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     var folders = [];
                     for (var i = handles.length; i--;) {
                         var h = handles[i];
-                        if (M.d[h] && (M.d[h].t || M.d[h].tf)) {
+                        if (M.d[h] && (M.d[h].t || M.d[h].tvf)) {
                             folders.push(h);
                         }
                     }

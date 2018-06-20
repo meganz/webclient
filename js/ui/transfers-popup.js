@@ -612,6 +612,10 @@ mega.ui.tpp = function () {
     });
 
     return {
+        shouldProcessData: function() {
+            // TODO: This damn thing needs an huge rewrite!
+            return this.isVisible() && this.isCached() && this.isEnabled();
+        },
         isCached: isCached,
         isEnabled: isEnabled,
         show: show,

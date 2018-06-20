@@ -1170,7 +1170,7 @@
         self.db.transaction('rw', self.db.msgs, function(msgs, trans) {
                 var currentActionIndex = 0;
                 var next = function() {
-                    var i = ++currentActionIndex;
+                    var i = currentActionIndex++;
                     var queueEntry = queue.actions[i];
                     if (!queueEntry) {
                         return;

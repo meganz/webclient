@@ -2199,19 +2199,19 @@ a.nt-settings-button:hover span {
     position: absolute;
     top: 0;
     right: 0;
-    width: 8px;
+    width: 11px;
     height: 100%;
 }
 .fm-tree-panel .jspVerticalBar {
-    right: 2px;
-    width: 6px;
+    right: 3px;
+    width: 8px;
 }
 .jspHorizontalBar {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 8px;
+    height: 11px;
 }
 .jspVerticalBar *, .jspHorizontalBar * {
     margin: 0;
@@ -2231,7 +2231,7 @@ a.nt-settings-button:hover span {
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
     border-radius: 8px;
-    width: 6px;
+    width: 8px;
     position: relative;
     top: 0;
     left: 0;
@@ -2247,7 +2247,7 @@ a.nt-settings-button:hover span {
     opacity: 0.2;
 }
 .jspHorizontalBar .jspDrag {
-    height: 6px !important;
+    height: 8px !important;
 }
 .jspDrag.jspHover, .jspDrag.jspScroll, .jspDrag.jspActive {
  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
@@ -2268,10 +2268,10 @@ a.nt-settings-button:hover span {
     cursor: default;
 }
 .jspVerticalBar .jspArrow {
-    height: 2px;
+    height: 3px;
 }
 .jspHorizontalBar .jspArrow {
-    width: 2px;
+    width: 3px;
     float: left;
     height: 100%;
 }
@@ -3823,11 +3823,11 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     transition: all 150ms ease-in-out;
 }
 .nw-fm-tree-item.linked {
-    padding-right: 34px;
+    padding-right: 37px;
 }
 .nw-fm-tree-item .data-item-icon {
     top: 2px;
-    right: 9px;
+    right: 12px;
 }
 .nw-fm-tree-item:hover, .nw-fm-tree-item.hovered {
     background-color: rgba(217,0,7,0.2);
@@ -4306,6 +4306,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
     opacity: 0.3;
+}
+.nw-tree-panel-arrows {
+    right: 4px;
 }
 .nw-tree-panel-arrows:hover, .copy-dialog-panel-arrows:hover, .move-dialog-panel-arrows:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -5426,9 +5429,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .transfer-table td:nth-child(2), .transfer-table-header th:nth-child(2) {
     width: 100%;
-    width: -webkit-calc(100% -871px);
-    width: -moz-calc(100% - 871px);
-    width: calc(100% - 872px);
+    width: -webkit-calc(100% -972px);
+    width: -moz-calc(100% - 972px);
+    width: calc(100% - 972px);
     padding-left: 0;
 }
 .transfer-table td:nth-child(3), .transfer-table-header th:nth-child(3) {
@@ -5744,7 +5747,7 @@ th.grid-first-th {
 }
 .nw-fm-tree-item .data-item-icon {
     top: 2px;
-    right: 9px;
+    right: 11px;
     left: auto;
 }
 .data-block-view .file-status-icon.star, .data-block-view.linked .data-item-icon, .data-block-view.taken-down .file-status-icon, .data-block-view.undecryptable .file-status-icon {
@@ -5795,7 +5798,7 @@ th.grid-first-th {
     color: #FFA500;
 }
 .own-data .data-item-icon {
-    left: 31px;
+    left: 28px;
     top: 2px;
     position: absolute;
     height: 20px;
@@ -5884,6 +5887,10 @@ th.grid-first-th {
 
 .file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling {
     height: 100%;
+    padding-right: 14px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     /*
     height: -webkit-calc(100% - 25px);
     height: -moz-calc(100% - 25px);
@@ -6155,7 +6162,7 @@ th.grid-first-th {
     position: absolute;
     background-color: white;
     top: 4px;
-    left: 12px;
+    left: 9px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -6168,19 +6175,19 @@ th.grid-first-th {
     opacity: 0;
 }
 .grid-url-header-nw {
-    width: 47px;
+    width: 53px;
 }
 .grid-url-header-nw .grid-url-arrow {
     top: 16px;
     left: auto;
-    right: 11px;
+    right: 14px;
 }
 .clear-transfer-icon {
-    left: 42px;
+    left: 39px;
     width: 16px;
 }
 .own-data .grid-url-arrow {
-    left: 57px;
+    left: 54px;
 }
 .file-settings-icon {
     left: auto;
@@ -6190,7 +6197,7 @@ th.grid-first-th {
     z-index: 10;
 }
 .contacts-blocks-scrolling .file-settings-icon {
-    right: 6px;
+    right: 9px;
     bottom: 56px;
 }
 .grid-url-arrow::before, .file-settings-icon::before, .clear-transfer-icon::before {
@@ -7994,8 +8001,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     box-sizing: border-box;
     padding: 6px 0 5px 0;
 }
+.add-user-nt-scrolling .jspVerticalBar, .share-message-scrolling .jspVerticalBar, .cancel-textarea-scroll .jspVerticalBar {
+    width: 9px;
+}
 .add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .cancel-textarea-scroll .jspDrag {
-    width: 4px;
+    width: 6px;
 }
 .add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden, .feedback-hidden, .cancel-textarea-scroll textarea, .cancel-hidden {
     border: 0;
@@ -8918,7 +8928,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .versioning-indicator {
     display: none;
     position: absolute;
-    left: 7px;
+    left: 4px;
     top: 2px;
 }
 .dialog.versioning-indicator {
@@ -16355,7 +16365,7 @@ ul.token-input-list-mega {
     overflow: hidden;
 }
 .add-user-popup-pad ul.token-input-list-mega {
-    padding: 0 10px 4px 31px;
+    padding: 0 15px 4px 31px;
 }
 .multiple-input {
     -moz-border-radius: 5px;
@@ -17425,9 +17435,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -khtml-opacity: 0.5;
     opacity: 0.5;
 }
+.share-dialog-contacts .jspVerticalBar, .multiple-input .jspVerticalBar, .fm-dialog-body .jspVerticalBar, .fm-call-dialog .jspVerticalBar {
+    width: 9px;
+}
 .share-dialog-contacts .jspDrag, .multiple-input .jspDrag, .fm-dialog-body .jspDrag, .fm-call-dialog .jspDrag {
-    width: 4px;
-    background-color: black;
+    width: 6px;
+}
+.share-dialog-contacts .nw-fm-tree-item .data-item-icon, .fm-dialog-body .nw-fm-tree-item .data-item-icon {
+    right: 11px;
 }
 .import-contacts-dialog {
     position: absolute;
@@ -21882,11 +21897,11 @@ table.speed-table {
 }
 .ps-container > .ps-scrollbar-y-rail {
     right: 0 !important;
-    width: 8px;
+    width: 11px;
 }
 .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
-    right: 2px !important;
-    width: 6px !important;
+    right: 3px !important;
+    width: 8px !important;
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail, .perfectScrollbarContainer.ps-container:hover > .ps-scrollbar-y-rail,
 .megaList.ps-container > .ps-scrollbar-y-rail, .megaList.ps-container:hover > .ps-scrollbar-y-rail {
@@ -21897,14 +21912,14 @@ table.speed-table {
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y,
 .megaList.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
-    background-color: rgb(102, 102, 102) !important;
-    width: 6px;
+    background-color: rgb(0, 0, 0) !important;
+    width: 8px;
     opacity: 0.2;
-    -webkit-transition: opacity 100ms ease-in-out;
-    -moz-transition: opacity 100ms ease-in-out;
-    -o-transition: opacity 100ms ease-in-out;
-    -ms-transition: opacity 100ms ease-in-out;
-    transition: opacity 100ms ease-in-out;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
     cursor: pointer;
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
@@ -21915,20 +21930,20 @@ div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
     border-radius: 8px;
-    height: 6px;
+    height: 8px;
     bottom: 2px;
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y,
 .megaList.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
-    opacity: 0.5 !important;
-    background-color: rgb(102, 102, 102) !important;
+    opacity: 0.3 !important;
+    background-color: rgb(0, 0, 0) !important;
 }
 body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-start-conversation, body.megaChatDisabled .nw-contact-name .button.start-chat-button {
     display: none;
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail {
     right: 0px !important;
-    margin: 2px 0;
+    margin: 3px 0;
     z-index: 7;
 }
 .bp-main .jspPane {

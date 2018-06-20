@@ -50,7 +50,7 @@
     margin: 0 0 0 20px;
 }
 .chat-textarea-scroll textarea, .chat-textarea-scroll textarea + div, .message.textarea-scroll textarea,  .message.textarea-block textarea + div {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
     width: 100%;
     border: 0;
@@ -65,6 +65,9 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     display: block;
+}
+.chat-textarea-scroll .jspDrag, .message.textarea-scroll .jspDrag,  .message.textarea-block .jspDrag {
+    width: 6px;
 }
 .chat-textarea-scroll textarea + div,  .message.textarea-block textarea + div {
     position: absolute;

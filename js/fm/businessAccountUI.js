@@ -1,6 +1,6 @@
 ﻿
 /**
- * A UI control Class to perfrom Business Account related UI
+ * A UI control Class to perform Business Account related UI
  */
 function BusinessAccountUI() {
     if (!mega.buinsessController) {
@@ -42,7 +42,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         subAccountsView = $('.fm-blocks-view.user-management-view');
     }
 
-    //if (subAccounts.length) { // no subs, some new ui
+    //if (subAccounts.length) { // no subs, some new UI
 
     //    return;
     //}
@@ -62,7 +62,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 return true;
             }
             for (var h in subs[k]) {
-                if (subs[k][h] !== previousSubs[k][k]) {
+                if (subs[k][h] !== previousSubs[k][h]) {
                     return true;
                 }
             }
@@ -70,23 +70,23 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         return false;
     };
 
-    // private function to fill html table for sub users
+    // private function to fill HTML table for sub users
     var fillSubUsersTable = function (subUsers,uiBusiness) {
         var $tr = $('tr', $usersTable);
         var $tr_user = $($tr.get(1)).clone(true); // the first one is the table header
 
-        // remove all elements from template on html file
+        // remove all elements from template on HTML file
         for (var k = 1; k < $tr.length; k++) {
             $tr.get(k).remove();
         }
 
-        // now let's fill the table with subusers data
+        // now let's fill the table with sub-users data
         for (var h in subUsers) {
             var $currUser = $tr_user.clone(true);
             $currUser.attr('id', subUsers[h].u);
             $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
-            $currUser.find('.fm-user-management-user span').text(subUsers[h].firstname + ' ' +
-                (subUsers[h].lastname || ''));
+            $currUser.find('.fm-user-management-user span').text(a32_to_str(base64_to_a32(subUsers[h].firstname)) + ' ' +
+                a32_to_str(base64_to_a32((subUsers[h].lastname || ''))));
             $currUser.find('.user-management-email').text(subUsers[h].e);
             $currUser.find('.user-management-status').removeClass('enabled pending disable');
             if (subUsers[h].s === 0) {
@@ -106,10 +106,11 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     var reDraw = isRedrawNeeded(subAccounts, this.business.previousSubList);
     if (!reDraw) {
-        return true; // ok
+        return true; // OK
     }
     
     fillSubUsersTable(subAccounts, this);
+    this.business.previousSubList = subAccounts; // storing current drawn sub-users to prevent not needed redraw
 };
 
 

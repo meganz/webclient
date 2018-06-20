@@ -215,8 +215,8 @@ pro.proplan = {
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
                 // if (monthlyBasePrice.length > 10) {
-                    if (monthlyBasePriceDollars.length > 6) {
-                        if (monthlyBasePriceDollars.length > 9) {
+                    if (monthlyBasePriceDollars.length > 9) {
+                        if (monthlyBasePriceDollars.length > 11) {
                             $priceDollars.addClass('tooBig2');
                             $priceCents.addClass('toosmall2');
                             monthlyBasePriceCents = '0';

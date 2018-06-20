@@ -1622,8 +1622,8 @@ var dlmanager = {
                 var monthlyBasePriceParts = monthlyBasePrice.split('.');
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
-                if (monthlyBasePriceDollars.length > 3) {
-                    if (monthlyBasePriceDollars.length > 6) {
+                if (monthlyBasePriceDollars.length > 7) {
+                    if (monthlyBasePriceDollars.length > 9) {
                         $priceDollars.addClass('tooBig2');
                         $priceCents.addClass('toosmall2');
                         monthlyBasePriceCents = '0';

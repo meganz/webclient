@@ -448,9 +448,9 @@ pro.propay = {
             var localParts = localPrice.split('.');
             localD = localParts[0];
             localC = localParts[1] || '00';
-            if (localD.length > 6) {
+            if (localD.length > 9) {
                 // localD = localD.substr(0, 5);
-                if (localD.length > 9) {
+                if (localD.length > 11) {
                     $priceDollars.addClass('tooBig2');
                     $priceCents.addClass('toosmall2');
                     localC = '0';

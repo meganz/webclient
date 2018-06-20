@@ -58,14 +58,6 @@
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
             delay(fmtopUI);
-
-            // Update M.v it's used for at least preview slideshow
-            for (var k = this.v.length; k--;) {
-                if (this.v[k].h === h) {
-                    this.v.splice(k, 1);
-                    break;
-                }
-            }
         }
 
         if (this.d[h] && !this.d[h].t && this.d[h].tvf) {
@@ -738,14 +730,6 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
             var h = n.h;
             var p = n.p;
             var tn = [];
-
-            // Update M.v it's used for slideshow preview at least
-            for (i = M.v.length; i--;) {
-                if (M.v[i].h === h) {
-                    M.v.splice(i, 1);
-                    break;
-                }
-            }
 
             // allow to revert nodes sent to the rubbish bin
             if (t === M.RubbishID && M.getNodeRoot(h) !== M.RubbishID) {

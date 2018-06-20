@@ -594,6 +594,7 @@ var slideshowid;
         else {
             $.selected = [n.h];
         }
+        mBroadcaster.sendMessage('slideshow:open', n);
 
         // Turn off pick and pan mode
         slideshow_pickpan($overlay, 1);
@@ -609,6 +610,9 @@ var slideshowid;
                 }
                 else if (e.keyCode === 39 && slideshowid) {
                     slideshow_next();
+                }
+                else if (e.keyCode === 46 && fullScreenManager) {
+                    fullScreenManager.exitFullscreen();
                 }
                 else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
                     if ($.dialog) {
@@ -984,6 +988,7 @@ var slideshowid;
                     mBroadcaster.removeListener(preqs[n.h].ev1);
                     mBroadcaster.removeListener(preqs[n.h].ev2);
                     mBroadcaster.removeListener(preqs[n.h].ev3);
+                    mBroadcaster.removeListener(preqs[n.h].ev4);
 
                     preqs[n.h].destroy();
                     preqs[n.h] = false;
@@ -1000,7 +1005,8 @@ var slideshowid;
 
                 preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
                 preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
-                preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:close', destroy);
+                preqs[n.h].ev3 = mBroadcaster.addListener('slideshow:open', destroy);
+                preqs[n.h].ev4 = mBroadcaster.addListener('slideshow:close', destroy);
 
                 // If video is playing
                 preqs[n.h].on('playing', function() {
@@ -1380,6 +1386,7 @@ var slideshowid;
     global.slideshow = slideshow;
     global.slideshow_next = slideshow_next;
     global.slideshow_prev = slideshow_prev;
+    global.slideshow_steps = slideshowsteps;
     global.previewsrc = previewsrc;
     global.previewimg = previewimg;
 

@@ -50,7 +50,7 @@
     margin: 0 0 0 20px;
 }
 .chat-textarea-scroll textarea, .chat-textarea-scroll textarea + div, .message.textarea-scroll textarea,  .message.textarea-block textarea + div {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
     width: 100%;
     border: 0;

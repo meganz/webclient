@@ -16,6 +16,21 @@ function removeUInode(h, parent) {
         }
     }
 
+    // Update M.v it's used for at least preview slideshow
+    for (var k = M.v.length; k--;) {
+        if (M.v[k].h === h) {
+            if (slideshowid === h) {
+                (function(h) {
+                    onIdle(function() {
+                        slideshow(h, !h);
+                    });
+                })(slideshow_steps().backward[0]);
+            }
+            M.v.splice(k, 1);
+            break;
+        }
+    }
+
     var hasItems = !!M.v.length;
     switch (M.currentdirid) {
         case "shares":

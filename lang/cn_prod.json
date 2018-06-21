@@ -713,6 +713,7 @@
     "5687": "\u5982\u4f55\u4e0a\u4f20",
     "5700": "\u77e5\u9053\u4e86",
     "5710": "\u60a8\u786e\u5b9a\u8981\u4e2d\u6b62\u6ce8\u518c\u5417?",
+    "5726": "\u6062\u590d",
     "5737": "\u6ca1\u6709\u8054\u7cfb\u4eba",
     "5738": "\u5783\u573e\u6876",
     "5740": "\u6b63\u5728\u4e0b\u8f7d...",
@@ -2207,6 +2208,7 @@
     "18692": "\u547c\u53eb[X]\u88ab\u53d6\u6d88\u3002",
     "18698": "\u81f4\u7535[X]\u6ca1\u6709\u53ca\u65f6\u5e94\u7b54\u3002",
     "18699": "\u786e\u8ba4\u5220\u9664\u5934\u50cf",
+    "18770": "\u672c\u5730\u5e01\u503c\u4ec5\u4f9b\u53c2\u8003\uff0c\u6240\u6709\u5b9e\u9645\u4ea4\u6613\u5c06\u6309\u6807\u793a\u7684\u6b27\u5143\u4ef7\u683c\u8fdb\u884c\u3002",
     "18775": "A command line tool to work with your MEGA account and files.",
     "18776": "Download MEGAcmd for your platform",
     "18777": "Choose your Linux version to download:",
@@ -2226,5 +2228,7 @@
     "18791": "User Guide",
     "18792": "Describes MEGAcmd\u2019s usage with examples and explains in detail how each of the commands works.",
     "18793": "Public Source",
-    "18794": "Enabling independent verification of the correctness of our crypto model."
+    "18794": "Enables independent verification of the correctness of our crypto model.",
+    "19060": "Unsupported audio codec (%1)",
+    "19061": "This video has no audio track."
 }

@@ -713,6 +713,7 @@
     "5687": "How to upload",
     "5700": "Got it",
     "5710": "Are you sure you want to abort the registration?",
+    "5726": "Restore",
     "5737": "No contacts",
     "5738": "Rubbish bin",
     "5740": "Downloading\u2026",
@@ -2207,6 +2208,7 @@
     "18692": "Call to [X] was canceled.",
     "18698": "Call to [X] was not answered in a timely manner.",
     "18699": "Confirm Remove Avatar",
+    "18770": "The price in your local currency is an estimate only. You will be charged the displayed price in Euros for all transactions.",
     "18775": "A command line tool to work with your MEGA account and files.",
     "18776": "Download MEGAcmd for your platform",
     "18777": "Choose your Linux version to download:",
@@ -2226,5 +2228,7 @@
     "18791": "User Guide",
     "18792": "Describes MEGAcmd\u2019s usage with examples and explains in detail how each of the commands works.",
     "18793": "Public Source",
-    "18794": "Enabling independent verification of the correctness of our crypto model."
+    "18794": "Enables independent verification of the correctness of our crypto model.",
+    "19060": "Unsupported audio codec (%1)",
+    "19061": "This video has no audio track."
 }

@@ -713,6 +713,7 @@
     "5687": "\u05d0\u05d9\u05da \u05dc\u05d4\u05e2\u05dc\u05d5\u05ea",
     "5700": "\u05d4\u05d1\u05e0\u05ea\u05d9",
     "5710": "\u05d4\u05d0\u05dd \u05d4\u05d9\u05e0\u05da \u05d1\u05d8\u05d5\u05d7 \u05e9\u05d1\u05e8\u05e6\u05d5\u05e0\u05da \u05dc\u05d1\u05d8\u05dc \u05d0\u05ea \u05d4\u05d4\u05e8\u05e9\u05de\u05d4?",
+    "5726": "\u05e9\u05d7\u05d6\u05e8",
     "5737": "\u05d0\u05d9\u05df \u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8",
     "5738": "\u05e4\u05d7 \u05d0\u05e9\u05e4\u05d4",
     "5740": "\u05de\u05d5\u05e8\u05d9\u05d3...",
@@ -2207,6 +2208,7 @@
     "18692": "Call to [X] was canceled.",
     "18698": "Call to [X] was not answered in a timely manner.",
     "18699": "Confirm Remove Avatar",
+    "18770": "The price in your local currency is an estimate only. You will be charged the displayed price in Euros for all transactions.",
     "18775": "A command line tool to work with your MEGA account and files.",
     "18776": "Download MEGAcmd for your platform",
     "18777": "Choose your Linux version to download:",
@@ -2226,5 +2228,7 @@
     "18791": "User Guide",
     "18792": "Describes MEGAcmd\u2019s usage with examples and explains in detail how each of the commands works.",
     "18793": "Public Source",
-    "18794": "Enabling independent verification of the correctness of our crypto model."
+    "18794": "Enables independent verification of the correctness of our crypto model.",
+    "19060": "Unsupported audio codec (%1)",
+    "19061": "This video has no audio track."
 }

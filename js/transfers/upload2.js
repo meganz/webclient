@@ -625,7 +625,7 @@ var ulmanager = {
             var p = 0;
             var tasks = Object.create(null);
             var ulBlockExtraSize = ulmanager.ulBlockExtraSize;
-            var boost = !mega.chrome || parseInt(ua.details.version) < 69;
+            var boost = !mega.chrome || parseInt(ua.details.version) < 68;
 
             if (file.size > 0x1880000 && boost) {
                 tasks[p] = new ChunkUpload(file, p, 0x480000);

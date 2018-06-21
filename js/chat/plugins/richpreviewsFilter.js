@@ -268,7 +268,7 @@ RichpreviewsFilter._updateMessageToPreview = function(chatRoom, msgObj, response
         'extra': []
     };
 
-    var foundValidResponses = true;
+    var foundValidResponses = false;
     responses.forEach(function(response) {
         if (response && response.result) {
             foundValidResponses = true;
@@ -284,7 +284,7 @@ RichpreviewsFilter._updateMessageToPreview = function(chatRoom, msgObj, response
         }
     });
 
-    if (foundValidResponses) {
+    if (foundValidResponses && meta.extra.length > 0) {
         var messageContents = (
             Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
             Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META + Message.MESSAGE_META_TYPE.RICH_PREVIEW +
@@ -296,6 +296,11 @@ RichpreviewsFilter._updateMessageToPreview = function(chatRoom, msgObj, response
             msgObj.orderValue,
             messageContents
         );
+    }
+    else {
+        msgObj.meta = {};
+        delete msgObj.metaType;
+        msgObj.trackDataChange();
     }
 };
 

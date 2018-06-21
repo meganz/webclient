@@ -264,8 +264,8 @@ UFSSizeCache.prototype.delNode = function(h, ignoreDB) {
             td = n.td + 1;
             tf = n.tf;
             tb = n.tb;
-            tvf = n.tvf;
-            tvb = n.tvb;
+            tvf = n.tvf || 0;
+            tvb = n.tvb || 0;
 
             this.delTreeNode(n.h, n.p);
         }

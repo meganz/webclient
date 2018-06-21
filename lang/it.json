@@ -2545,5 +2545,7 @@
     "19036": "Sahara occidentale",
     "19037": "Yemen",
     "19038": "Zambia",
-    "19039": "Zimbabwe"
+    "19039": "Zimbabwe",
+    "19060": "Unsupported audio codec (%1)",
+    "19061": "This video has no audio track."
 }

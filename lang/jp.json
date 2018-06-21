@@ -2545,5 +2545,7 @@
     "19036": "\u897f\u30b5\u30cf\u30e9",
     "19037": "\u30a4\u30a8\u30e1\u30f3",
     "19038": "\u30b6\u30f3\u30d3\u30a2",
-    "19039": "\u30b8\u30f3\u30d0\u30d6\u30a8"
+    "19039": "\u30b8\u30f3\u30d0\u30d6\u30a8",
+    "19060": "Unsupported audio codec (%1)",
+    "19061": "This video has no audio track."
 }

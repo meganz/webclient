@@ -2545,5 +2545,7 @@
     "19036": "S\u00e1hara Occidental",
     "19037": "Yemen",
     "19038": "Zambia",
-    "19039": "Zimbabue"
+    "19039": "Zimbabue",
+    "19060": "Unsupported audio codec (%1)",
+    "19061": "This video has no audio track."
 }

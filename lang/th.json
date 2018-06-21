@@ -2545,5 +2545,7 @@
     "19036": "\u0e0b\u0e32\u0e2e\u0e32\u0e23\u0e32\u0e15\u0e30\u0e27\u0e31\u0e19\u0e15\u0e01",
     "19037": "\u0e40\u0e22\u0e40\u0e21\u0e19",
     "19038": "\u0e41\u0e0b\u0e21\u0e40\u0e1a\u0e35\u0e22",
-    "19039": "\u0e0b\u0e34\u0e21\u0e1a\u0e31\u0e1a\u0e40\u0e27"
+    "19039": "\u0e0b\u0e34\u0e21\u0e1a\u0e31\u0e1a\u0e40\u0e27",
+    "19060": "Unsupported audio codec (%1)",
+    "19061": "This video has no audio track."
 }

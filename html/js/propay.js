@@ -224,6 +224,11 @@ pro.propay = {
 
                 // Get the price and number of months duration
                 var price = currentPlan[pro.UTQA_RES_INDEX_PRICE];
+                var currencySymbol = ' \u20ac';
+                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                    price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+                    currencySymbol = '';
+                }
                 var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
                 var monthsWording = l[922];     // 1 month
 
@@ -243,19 +248,24 @@ pro.propay = {
                 $durationOption.attr('data-plan-index', i);
                 $durationOption.attr('data-plan-months', numOfMonths);
                 $durationOption.find('.duration').text(monthsWording);
-                $durationOption.find('.price').text(price);
+                $durationOption.find('.price').text(price + currencySymbol);
 
                 // Show amount they will save
                 if (numOfMonths === 12) {
-
-                    // Calculate the discount price (the current yearly price is 10 months worth)
-                    var priceOneMonth = (price / 10);
-                    var priceTenMonths = (priceOneMonth * 10);
-                    var priceTwelveMonths = (priceOneMonth * 12);
-                    var discount = (priceTwelveMonths - priceTenMonths).toFixed(2);
+                    var discount;
+                    if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                        discount = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE];
+                    }
+                    else {
+                        // Calculate the discount price (the current yearly price is 10 months worth)
+                        var priceOneMonth = (price / 10);
+                        var priceTenMonths = (priceOneMonth * 10);
+                        var priceTwelveMonths = (priceOneMonth * 12);
+                        discount = (priceTwelveMonths - priceTenMonths).toFixed(2);
+                    }
 
                     $durationOption.find('.save-money').removeClass('hidden');
-                    $durationOption.find('.save-money .amount').text(discount);
+                    $durationOption.find('.save-money .amount').text(discount + currencySymbol);
                 }
 
                 // Update the list of duration options
@@ -359,9 +369,10 @@ pro.propay = {
         var price = currentPlan[pro.UTQA_RES_INDEX_PRICE].split('.');
 
         // If less than 12 months is selected, use the monthly base price instead
-        if (numOfMonths !== 12) {
-            price = currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE].split('.');
-        }
+        //if (numOfMonths !== 12) {
+        //    price = currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE].split('.');
+        //}
+
         var dollars = price[0];
         var cents = price[1];
 
@@ -382,7 +393,7 @@ pro.propay = {
         var $chargeAmount = $step2.find('.charge-information .amount');
         var $pricingBox = $step2.find('.membership-pad-bl');
         var $planName = $pricingBox.find('.reg-st3-bott-title.title');
-        var $priceNum = $pricingBox.find('.reg-st3-bott-title.price .num');
+        var $priceNum = $pricingBox.find('.reg-st3-bott-title.price');
         var $priceDollars = $priceNum.find('.big');
         var $priceCents = $priceNum.find('.small');
         var $pricePeriod = $pricingBox.find('.reg-st3-bott-title.price .period');
@@ -390,6 +401,32 @@ pro.propay = {
         var $storageUnit = $pricingBox.find('.storage-unit');
         var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
         var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
+        var $euroPrice = $('.euro-price', $priceNum);
+        var $currncyAbbrev = $('.local-currency-code', $priceNum);
+
+        $priceDollars.removeClass('tooBig tooBig2');
+        $priceCents.removeClass('toosmall toosmall2');
+
+        var euroSign = '\u20ac';
+        var localPrice;
+        var localD;
+        var localC;
+        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+            $pricingBox.addClass('local-currency');
+            $euroPrice.removeClass('hidden');
+            $currncyAbbrev.removeClass('hidden');
+            $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
+            $euroPrice.text(currentPlan[pro.UTQA_RES_INDEX_PRICE] +
+                ' ' + euroSign);
+            localPrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+            $('.reg-st3-txt-localcurrencyprogram').removeClass('hidden');
+        }
+        else {
+            $pricingBox.removeClass('local-currency');
+            $euroPrice.addClass('hidden');
+            $currncyAbbrev.addClass('hidden');
+            $('.reg-st3-txt-localcurrencyprogram').addClass('hidden');
+        }
 
         // If mobile, set the plan icon and name at the top
         if (is_mobile) {
@@ -405,13 +442,44 @@ pro.propay = {
         $pricingBox.attr('data-payment', pro.propay.planNum);
         $planName.text(pro.propay.planName);
 
+        // Update the price of the plan and the /month or /year next to the price box
+        // work for local currency if present
+        if (localPrice) {
+            var localParts = localPrice.split('.');
+            localD = localParts[0];
+            localC = localParts[1] || '00';
+            if (localD.length > 9) {
+                // localD = localD.substr(0, 5);
+                if (localD.length > 11) {
+                    $priceDollars.addClass('tooBig2');
+                    $priceCents.addClass('toosmall2');
+                    localC = '0';
+                }
+                else {
+                    $priceDollars.addClass('tooBig');
+                    $priceCents.addClass('toosmall');
+                    localC = '00';
+                }
+                localD = Number.parseInt(localD) + 1;
+            }
+            else {
+                if (localC.length > 2) {
+                    localC = localC.substr(0, 2);
+                    localC = Number.parseInt(localC) + 1;
+                    localC = (localC + '0').substr(0, 2);
+                }
+            }
+            $priceDollars.text(localPrice);
+            $priceCents.text('');
+        }
+        else {
+            $priceDollars.text(dollars);
+            $priceCents.text('.' + cents + ' ' + euroSign);    // EUR symbol
+        }
+        $pricePeriod.text('/' + monthOrYearWording);
+
         // Update the charge information for question 3
         $chargeAmount.text(dollars + '.' + cents);
-
-        // Update the price of the plan and the /month or /year next to the price box
-        $priceDollars.text(dollars);
-        $priceCents.text('.' + cents + ' \u20ac');    // EUR symbol
-        $pricePeriod.text('/' + monthOrYearWording);
 
         // Update storage
         $storageAmount.text(storageSizeRounded);
@@ -446,6 +514,9 @@ pro.propay = {
         var currentPlan = pro.membershipPlans[planIndex];
         var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
         var price = currentPlan[pro.UTQA_RES_INDEX_PRICE] + ' \u20ac';     // 0.00 EUR symbol
+        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+            price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+        }
 
         // Get the value for whether the user wants the plan to renew automatically
         var recurringEnabled = false;

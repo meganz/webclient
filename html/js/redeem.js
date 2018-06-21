@@ -137,7 +137,11 @@ var redeem = {
                         result[i]['m'],  // months
                         result[i]['p'],  // price
                         result[i]['c'],  // currency
-                        result[i]['mbp'] // monthly base price
+                        result[i]['mbp'], // monthly base price
+                        result[i]['lp'], // NEW 'local price'
+                        result[i]['lpc'], // NEW 'local price currency'
+                        result[i]['lps'], // NEW 'local price symbol'
+                        result[i]['lp0']
                     ]);
                 }
 

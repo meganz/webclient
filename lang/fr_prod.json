@@ -2229,6 +2229,6 @@
     "18792": "D\u00e9crit l\u2019utilisation de MEGAcmd avec des exemples et explique en d\u00e9tail comment fonctionne chaque commande.",
     "18793": "Source publique",
     "18794": "Permet la v\u00e9rification ind\u00e9pendante de la justesse de notre mod\u00e8le cryptographique.",
-    "19060": "Unsupported audio codec (%1)",
-    "19061": "This video has no audio track."
+    "19060": "Un codec audio n\u2019est pas pris en charge (%1)",
+    "19061": "Cette vid\u00e9o n\u2019a pas de piste audio."
 }

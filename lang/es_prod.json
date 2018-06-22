@@ -2229,6 +2229,6 @@
     "18792": "Describe el uso de MEGAcmd con ejemplos y explica en detalle c\u00f3mo funciona cada uno de los comandos.",
     "18793": "Dominio p\u00fablico",
     "18794": "Permite la verificaci\u00f3n independiente de la exactitud de nuestro modelo de cifrado.",
-    "19060": "Unsupported audio codec (%1)",
-    "19061": "This video has no audio track."
+    "19060": "C\u00f3dec de audio no soportado (%1)",
+    "19061": "Este video no tiene audio."
 }

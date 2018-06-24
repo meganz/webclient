@@ -71,6 +71,7 @@
         }
         else if (id && (id.substr(0, 7) !== 'account')
             && (id.substr(0, 9) !== 'dashboard')
+            && (id.substr(0, 15) !== 'user-management')
             && (id.substr(0, 13) !== 'notifications')) {
 
             $('.fm-right-files-block').removeClass('hidden');
@@ -163,12 +164,12 @@
                     this.v.push(this.ipc[h]);
                 }
             }
-            else if (this.currentdirid === 'user-management') {
-                this.v = [];
-                for (var k in this.suba) {
-                    this.v.push(this.suba[k]);
-                }
-            }
+            // else if (this.currentdirid === 'user-management') {
+            //    this.v = [];
+            //    for (var k in this.suba) {
+            //        this.v.push(this.suba[k]);
+            //    }
+            // }
 
             this.renderMain();
 
@@ -318,6 +319,7 @@
             M.require('businessAcc_js', 'businessAccUI_js').done(function () {
                 var usersM = new BusinessAccountUI();
                 M.onFileManagerReady(function () {
+                    M.onSectionUIOpen('user-management');
                     usersM.viewSubAccountListUI();
                 });
             });

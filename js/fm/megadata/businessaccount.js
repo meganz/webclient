@@ -2,7 +2,7 @@
  * a class to apply actions on business account in collaboration with API
  */
 function BusinessAccount() {
-
+    this.QuotaUpdateFreq = 15000; // 15 sec - default threshold to update quotas info
 }
 
 /**
@@ -158,6 +158,51 @@ BusinessAccount.prototype.getSubAccountMKey = function (subUserHandle) {
 
     return operationPromise;
 };
+
+/**
+ * Function to get Quota usage info for the master account and each sub account.
+ * @param {boolan} forceUpdate      a flag to force updating the cached values
+ */
+BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+    if (!forceUpdate) {
+        if (mega.buinsessAccount && mega.buinsessAccount.quotas) {
+            var currTime = new Date().getTime();
+            if (mega.buinsessAccount.quotas.timestamp &&
+                (currTime - mega.buinsessAccount.quotas.timestamp) < this.QuotaUpdateFreq) {
+                return operationPromise.resolve(1, mega.buinsessAccount.quotas);
+            }
+        }
+    }
+
+    var request = {
+        "a": "sbu", // business sub account operation
+        "aa": "q" // get quota info
+    };
+
+    api_req(request, {
+        callback: function (res) {
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                var currTime = new Date().getTime();
+                res.timestamp = currTime;
+                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                mega.buinsessAccount.quotas = res;
+                operationPromise.resolve(1, res); // quota info
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+
+    });
+
+    return operationPromise;
+};
+
 
 /**
  * a function to parse the JSON object recived holding information about a sub-account of a business account.

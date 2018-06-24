@@ -3,6 +3,7 @@
  * A UI control Class to perform Business Account related UI
  */
 function BusinessAccountUI() {
+    "use strict";
     if (!mega.buinsessController) {
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
@@ -19,6 +20,7 @@ function BusinessAccountUI() {
  * @returns {boolean}               true if OK, false if something went wrong
  */
 BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView) {
+    "use strict";
     if (!M.isBusinessAccountMaster) {
         return false;
     }
@@ -30,9 +32,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             return false;
         }
     }
-
+    
     // hide any possible grid or block view.
     $('.files-grid-view, .fm-blocks-view').addClass('hidden');
+    M.megaRender.cleanupLayout(false, [], '');
 
     var subAccountsView;
     if (!isBlockView) {
@@ -41,13 +44,14 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     else {
         subAccountsView = $('.fm-blocks-view.user-management-view');
     }
+    $('.fm-right-files-block').removeClass('hidden');
 
-    //if (subAccounts.length) { // no subs, some new UI
+    if (subAccounts.length) { // no subs, some new UI
 
-    //    return;
-    //}
+        return;
+    }
+    
     subAccountsView.removeClass('hidden');
-    var $usersTable = $('.grid-table-user-management', subAccountsView).removeClass('hidden');
 
     // private function to check if new drawing is needed
     var isRedrawNeeded = function (subs, previousSubs) {
@@ -71,7 +75,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     };
 
     // private function to fill HTML table for sub users
-    var fillSubUsersTable = function (subUsers,uiBusiness) {
+    var fillSubUsersTable = function (subUsers, uiBusiness) {
+        var $usersTable = $('.grid-table-user-management', subAccountsView).removeClass('hidden');
         var $tr = $('tr', $usersTable);
         var $tr_user = $($tr.get(1)).clone(true); // the first one is the table header
 
@@ -84,7 +89,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         for (var h in subUsers) {
             var $currUser = $tr_user.clone(true);
             $currUser.attr('id', subUsers[h].u);
-            $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
+            // now we will hide icon and role, since we are not ready to support yet.
+            // $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
+            $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
+
             $currUser.find('.fm-user-management-user span').text(a32_to_str(base64_to_a32(subUsers[h].firstname)) + ' ' +
                 a32_to_str(base64_to_a32((subUsers[h].lastname || ''))));
             $currUser.find('.user-management-email').text(subUsers[h].e);
@@ -102,19 +110,92 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             // still usage data.
             $usersTable.append($currUser);
         }
+
+
+        /// events handlers
+        $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).off('click.subuser');
+        $('.business-sub-checkbox-td, .business-sub-checkbox-th', $usersTable).on('click.subuser',
+            function subUserCheckBoxHandler() {
+                var $me = $(this).find('.checkdiv');
+                if ($me.hasClass('checkboxOff-user-management')) {
+                    $me.removeClass('checkboxOff-user-management').addClass('checkboxOn-user-management');
+                    if ($(this).hasClass('business-sub-checkbox-th')) {
+                        $('.business-sub-checkbox-td .checkdiv', $usersTable).
+                            removeClass('checkboxOff-user-management').addClass('checkboxOn-user-management');
+                    }
+                }
+                else {
+                    $me.addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
+                    if ($(this).hasClass('business-sub-checkbox-th')) {
+                        $('.business-sub-checkbox-td .checkdiv', $usersTable).
+                            addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
+                    }
+                    else {
+                        $('.business-sub-checkbox-th .checkdiv', $usersTable).
+                            addClass('checkboxOff-user-management').removeClass('checkboxOn-user-management');
+                    }
+                }
+            });
+
+    };
+
+
+    // private function to get users quota usage
+    var fillSubUsersUsage = function (st, quotas) {
+        if (!quotas) {
+            return;
+        }
+
+        var numberOfSubs = 0;
+        var totalStorage = 0;
+        var totalBandwidth = 0;
+
+        var $usersTable = $('.grid-table-user-management', subAccountsView);
+        for (var sub in quotas) {
+            if (sub === 'timestamp') {
+                continue; // embedded attribute 
+            }
+            numberOfSubs++;
+            totalStorage += quotas[sub][0] || 0;
+            totalBandwidth += quotas[sub][3] || 0;
+            var $subTr = $('#' + sub, $usersTable);
+            if ($subTr.length) {
+                var storage = numOfBytes(quotas[sub][0] || 0, 2);
+                var bandwidth = numOfBytes(quotas[sub][3] || 0, 2);
+                $('.business-sub-storage-use span', $subTr).text(storage.size + ' ' + storage.unit);
+                $('.business-sub-transfer-use span', $subTr).text(bandwidth.size + ' ' + bandwidth.unit);
+            }
+        }
+        var totalStorageFormatted = numOfBytes(totalStorage, 2);
+        var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
+
+        $('.info-block.nb-sub-users .number', '.user-management-overview-bar').text(numberOfSubs);
+
+        $('.info-block.storage-sub-users .number', '.user-management-overview-bar').text(totalStorageFormatted.size);
+        $('.info-block.storage-sub-users .title2', '.user-management-overview-bar').text(totalStorageFormatted.unit);
+
+        $('.info-block.bandwidth-sub-users .number', '.user-management-overview-bar')
+            .text(totalBandwidthFormatted.size);
+        $('.info-block.bandwidth-sub-users .title2', '.user-management-overview-bar')
+            .text(totalBandwidthFormatted.unit);
     };
 
     var reDraw = isRedrawNeeded(subAccounts, this.business.previousSubList);
-    if (!reDraw) {
-        return true; // OK
+
+    if (reDraw) {
+        fillSubUsersTable(subAccounts, this);
+        this.business.previousSubList = subAccounts; // storing current drawn sub-users to prevent not needed redraw
     }
-    
-    fillSubUsersTable(subAccounts, this);
-    this.business.previousSubList = subAccounts; // storing current drawn sub-users to prevent not needed redraw
+
+    // getting quotas
+    var quotasPromise = this.business.getQuotaUsage();
+    quotasPromise.done(fillSubUsersUsage);
+
 };
 
 
 BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
+    "use strict";
     if (statusCode === 0) {
         return l[7666]; // active
     }
@@ -137,6 +218,7 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
  * @param {string} invitationLink :         sub-user invitation link
  */
 BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
+    "use strict";
     var $dialog = $('.fm-dialog.sub-account-link-password');
     var prepareSubAccountLinkDialog = function () {
 

@@ -24906,13 +24906,15 @@ opacity: 1;
 
 
 .user-management-tree-panel-header.disabled-accounts{
-    position: relative;
+    position: absolute;
     border-top: 1px solid rgba(0,0,0,0.1);
     font-size: 14px;
+    bottom: 0;
 }
 
 .user-management-tree-panel-header.disabled-accounts.active {
     border-top:transparent;
+    position: relative;
     border-bottom: 1px solid rgba(0,0,0,0.1);
     background-color: #ffffff;
     box-shadow:0 0.5px 1px 0 rgba(0,0,0,0.05);
@@ -24946,6 +24948,7 @@ opacity: 1;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     min-width: 100%;
+    position: relative;
 }
 
 .user-management-tree-panel-arrows {
@@ -25458,8 +25461,9 @@ opacity: 1;
 }
 
 .fm-user-management-user{
-    position: relative;
-    top: -3px;
+    position: absolute;
+    top: 12px;
+    left: 0;
 }
 
 .user-management-list-table tr th:first-child,.user-management-list-table tr td:first-child {
@@ -25476,7 +25480,9 @@ opacity: 1;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    position: relative;
+    position: absolute;
+    left: 24px;
+    top: 0;
 }
 
 .user-management-list-table tr td .user-management-email{
@@ -25487,7 +25493,9 @@ opacity: 1;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    position: relative;  
+    position: absolute; 
+    left: 0px;
+    top: 32px; 
 }
 
 
@@ -25497,17 +25505,17 @@ opacity: 1;
     background-position: -28px -12060px;
     background-image: url(../images/mega/fm-main-sprite.png);
     background-repeat: no-repeat; 
+    position: absolute;
 }
 
 .user-management-list-table .fm-user-management-user .admin-icon{
     padding-right: 8px;
     float: left;
     z-index: 1130;
-    visibility: hidden;
 }
 
 .user-management-list-table tr:nth-child(2) .admin-icon{
-    visibility: visible;
+    
 }
 
 .user-management-list-table .fm-user-management-user .admin-icon .tooltip{
@@ -27026,7 +27034,7 @@ opacity: 1;
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
-    z-index: 9;
+    z-index: 999;
     visibility: hidden;
 }
 
@@ -27315,7 +27323,7 @@ opacity: 1;
     -webkit-filter: blur(0.25em);
 }
 
-.user-management-dialog .dialog {
+.user-management-dialog .dialog, .user-management-view .dialog {
     position: absolute;
     border-radius: 8px;
     border:1px solid rgba(0,0,0,0.1);
@@ -28044,7 +28052,7 @@ opacity: 1;
         background-color: rgba(0,191,165,1);
 }
 
-.user-management-account-settings form span {
+.user-management-account-settings form span,  .user-management-account-settings form .option-with-varible{
     font-size: 14px;
     color:#666666;
     position: relative;

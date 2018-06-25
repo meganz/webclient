@@ -1042,6 +1042,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     videoFile.flushRetryQueue();
                 });
             }
+            else if (navigator.onLine && this.currentTime < this.duration) {
+                var data = [1, s.hasVideo, s.hasAudio, ~~s.getProperty('bitrate'), s.getProperty('server')];
+
+                if (d) {
+                    console.log(ev.type, data, this);
+                }
+                eventlog(99694, JSON.stringify(data), true);
+            }
 
             return true; // continue listening
         });

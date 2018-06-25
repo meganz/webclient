@@ -1820,6 +1820,7 @@
     "16653": "Untuk pengalaman berfitur lengkap, unduh aplikasi kami atau gunakan situs ini di PC.",
     "16664": "Password baru harus berbeda dari yang lama.",
     "16671": "Download menggunakan aplikasi desktop MEGA untuk download lebih cepat.",
+    "16689": "Arsipkan",
     "16763": "Disalin ke clipboard",
     "16861": "Install klien MEGA desktop",
     "16862": "Meningkatkan kinerja transfer file dari browser Anda",
@@ -2547,5 +2548,13 @@
     "19038": "Zambia",
     "19039": "Zimbabwe",
     "19060": "Unsupported audio codec (%1)",
-    "19061": "This video has no audio track."
+    "19061": "This video has no audio track.",
+    "19062": "Accept all",
+    "19063": "Unarchive Chat",
+    "19064": "Are you sure you want to unarchive this conversation?",
+    "19065": "Unarchive",
+    "19066": "Archived chats",
+    "19067": "Archived",
+    "19068": "Archive Chat",
+    "19069": "Are you sure you want to archive this conversation?"
 }

@@ -1820,6 +1820,7 @@
     "16653": "F\u00fcr optimale Leistung empfehlen wir die Installation unserer App oder die Nutzung auf einem Laptop oder PC.",
     "16664": "Das neue Passwort muss sich vom aktuellen unterscheiden.",
     "16671": "Mit der MEGA Desktop-App schneller herunterladen.",
+    "16689": "Archive",
     "16763": "In die Zwischenablage kopiert",
     "16861": "Installieren Sie die MEGA Desktop App",
     "16862": "Effizientere Daten\u00fcbertragung",
@@ -2547,5 +2548,13 @@
     "19038": "Sambia",
     "19039": "Simbabwe",
     "19060": "Unsupported audio codec (%1)",
-    "19061": "This video has no audio track."
+    "19061": "This video has no audio track.",
+    "19062": "Accept all",
+    "19063": "Unarchive Chat",
+    "19064": "Are you sure you want to unarchive this conversation?",
+    "19065": "Unarchive",
+    "19066": "Archived chats",
+    "19067": "Archived",
+    "19068": "Archive Chat",
+    "19069": "Are you sure you want to archive this conversation?"
 }

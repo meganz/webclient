@@ -1820,6 +1820,7 @@
     "16653": "Aby wykorzysta\u0107 dost\u0119pne funkcjonalno\u015bci, pobierz nasz\u0105 aplikacje na PC.",
     "16664": "Nowe has\u0142o musi by\u0107 inne od poprzednich.",
     "16671": "Zainstaluj aplikacj\u0119 MEGA desktop i pobieraj pliki szybciej.",
+    "16689": "Archiwum",
     "16763": "Skopiowana do schowka",
     "16861": "Zainstaluj aplikacj\u0119 MEGA desktop",
     "16862": "Zwi\u0119ksz wydajno\u015b\u0107 przesy\u0142ania plik\u00f3w w przegl\u0105darce",
@@ -2547,5 +2548,13 @@
     "19038": "Zambia",
     "19039": "Zimbabwe",
     "19060": "Unsupported audio codec (%1)",
-    "19061": "This video has no audio track."
+    "19061": "This video has no audio track.",
+    "19062": "Accept all",
+    "19063": "Unarchive Chat",
+    "19064": "Are you sure you want to unarchive this conversation?",
+    "19065": "Unarchive",
+    "19066": "Archived chats",
+    "19067": "Archived",
+    "19068": "Archive Chat",
+    "19069": "Are you sure you want to archive this conversation?"
 }

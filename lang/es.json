@@ -1820,6 +1820,7 @@
     "16653": "Para obtener la experiencia completa, descarga nuestra aplicaci\u00f3n o usa la web desde un PC.",
     "16664": "La nueva contrase\u00f1a tiene que ser diferente a la anterior.",
     "16671": "Usa la aplicaci\u00f3n de escritorio para descargar m\u00e1s r\u00e1pido.",
+    "16689": "Archivados",
     "16763": "Copiado en el portapapeles",
     "16861": "Instala nuestra aplicaci\u00f3n de escritorio",
     "16862": "Mejora el rendimiento de las transferencias de archivos en tu navegador",
@@ -2547,5 +2548,13 @@
     "19038": "Zambia",
     "19039": "Zimbabue",
     "19060": "C\u00f3dec de audio no soportado (%1)",
-    "19061": "Este video no tiene audio."
+    "19061": "Este video no tiene audio.",
+    "19062": "Accept all",
+    "19063": "Unarchive Chat",
+    "19064": "Are you sure you want to unarchive this conversation?",
+    "19065": "Unarchive",
+    "19066": "Archived chats",
+    "19067": "Archived",
+    "19068": "Archive Chat",
+    "19069": "Are you sure you want to archive this conversation?"
 }

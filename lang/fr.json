@@ -1820,6 +1820,7 @@
     "16653": "Pour une exp\u00e9rience compl\u00e8te, t\u00e9l\u00e9chargez note appli ou utilisez ce site sur un ordinateur.",
     "16664": "Le nouveau mot de passe doit \u00eatre diff\u00e9rent de l'ancien.",
     "16671": "T\u00e9l\u00e9charger plus rapidement en utilisant l'appli pour ordinateur de MEGA.",
+    "16689": "Archive",
     "16763": "Copi\u00e9 vers le presse-papiers",
     "16861": "Installer le client pour ordinateur de MEGA",
     "16862": "Des performances de transfert de fichiers am\u00e9lior\u00e9es \u00e0 partir de votre navigateur",
@@ -2547,5 +2548,13 @@
     "19038": "Zambie",
     "19039": "Zimbabwe",
     "19060": "Un codec audio n\u2019est pas pris en charge (%1)",
-    "19061": "Cette vid\u00e9o n\u2019a pas de piste audio."
+    "19061": "Cette vid\u00e9o n\u2019a pas de piste audio.",
+    "19062": "Accept all",
+    "19063": "Unarchive Chat",
+    "19064": "Are you sure you want to unarchive this conversation?",
+    "19065": "Unarchive",
+    "19066": "Archived chats",
+    "19067": "Archived",
+    "19068": "Archive Chat",
+    "19069": "Are you sure you want to archive this conversation?"
 }

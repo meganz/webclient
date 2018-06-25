@@ -1820,6 +1820,7 @@
     "16653": "For the full featured experience, download our app or use the site on a PC.",
     "16664": "The new password must be different from the old one.",
     "16671": "Download using the MEGA desktop app for faster downloads.",
+    "16689": "Archive",
     "16763": "Copied to the clipboard",
     "16861": "Install the MEGA desktop client",
     "16862": "Enhance file transfer performance from your browser",
@@ -2547,5 +2548,13 @@
     "19038": "Zambia",
     "19039": "Zimbabwe",
     "19060": "Unsupported audio codec (%1)",
-    "19061": "This video has no audio track."
+    "19061": "This video has no audio track.",
+    "19062": "Accept all",
+    "19063": "Unarchive Chat",
+    "19064": "Are you sure you want to unarchive this conversation?",
+    "19065": "Unarchive",
+    "19066": "Archived chats",
+    "19067": "Archived",
+    "19068": "Archive Chat",
+    "19069": "Are you sure you want to archive this conversation?"
 }

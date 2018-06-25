@@ -1820,6 +1820,7 @@
     "16653": "\u8bf7\u4e0b\u8f7d\u6211\u4eec\u7684\u5e94\u7528\u7a0b\u5e8f\uff0c\u6216\u4f7f\u7528\u7535\u8111\u5f00\u542f\u7f51\u7ad9\uff0c\u4ee5\u4f53\u9a8c\u6211\u4eec\u6700\u5b8c\u6574\u7684\u7279\u8272\u529f\u80fd\u3002",
     "16664": "\u65b0\u5bc6\u7801\u5fc5\u987b\u4e0e\u65e7\u5bc6\u7801\u4e0d\u540c\u3002",
     "16671": "\u4f7f\u7528MEGA\u684c\u9762\u5e94\u7528\u7a0b\u5e8f\uff0c\u4e0b\u8f7d\u6587\u4ef6\u66f4\u5feb\u901f\u3002",
+    "16689": "\u5b58\u6863",
     "16763": "\u5df2\u590d\u5236\u81f3\u7c98\u8d34\u677f",
     "16861": "\u5b89\u88c5MEGA\u684c\u9762\u5e94\u7528\u7a0b\u5e8f",
     "16862": "\u4e8e\u60a8\u7684\u6d4f\u89c8\u5668\u4e2d\u589e\u5f3a\u6587\u4ef6\u4f20\u8f93\u6027\u80fd",
@@ -2547,5 +2548,13 @@
     "19038": "\u8d5e\u6bd4\u4e9a",
     "19039": "\u6d25\u5df4\u5e03\u97e6",
     "19060": "Unsupported audio codec (%1)",
-    "19061": "This video has no audio track."
+    "19061": "This video has no audio track.",
+    "19062": "Accept all",
+    "19063": "Unarchive Chat",
+    "19064": "Are you sure you want to unarchive this conversation?",
+    "19065": "Unarchive",
+    "19066": "Archived chats",
+    "19067": "Archived",
+    "19068": "Archive Chat",
+    "19069": "Are you sure you want to archive this conversation?"
 }

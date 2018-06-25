@@ -302,7 +302,7 @@ var slideshowid;
 
         // Clicking the percent value will reset the view to 100%
         $percLabel.rebind('click', function() {
-            $percLabel.attr('data-perc', 90);
+            $percLabel.attr('data-perc', NaN);
             $zoomInButton.trigger('click');
             return false;
         });
@@ -414,27 +414,22 @@ var slideshowid;
     function slideshow_zoom($overlay, zoomout) {
         var $img = $overlay.find('img.active');
         var $percLabel = $overlay.find('.viewer-button-label.zoom');
-        var perc = Math.round(parseInt($percLabel.attr('data-perc')) / 10) * 10;
-        var newPerc = (perc + 10) / 100;
-        var newImgWidth;
-        var newImgHeight;
+        var perc = parseFloat($percLabel.attr('data-perc'));
+        var newPerc = ((perc * (zoomout ? .90 : 1.10) / 100) || 1) / devicePixelRatio;
+        var newImgWidth = origImgWidth * newPerc;
+        var newImgHeight = origImgHeight * newPerc;
 
-        if (zoomout) {
-            newPerc = (perc - 10 > 0) ?  (perc - 10) / 100 : 0;
+        if (newImgHeight * newImgWidth > 240) {
+            $img.css({
+                'width': switchedSides ? newImgHeight : newImgWidth,
+                'height': switchedSides ? newImgWidth : newImgHeight
+            });
+
+            zoom_mode = true;
+
+            // Set zoom, position values and init pick and pan
+            slideshow_imgPosition($overlay);
         }
-
-        newImgWidth = origImgWidth * newPerc;
-        newImgHeight = origImgHeight * newPerc;
-
-        $img.css({
-            'width': switchedSides ? newImgHeight : newImgWidth,
-            'height': switchedSides ? newImgWidth : newImgHeight
-        });
-
-        zoom_mode = true;
-
-        // Set zoom, position values and init pick and pan
-        slideshow_imgPosition($overlay);
     }
 
     // Sets zoom percents and image position
@@ -518,8 +513,8 @@ var slideshowid;
             'left': (viewerWidth - imgWidth) / 2,
             'top': (viewerHeight - imgHeight) / 2,
         });
-        w_perc = Math.round(imgWidth / origImgWidth * 100);
-        $percLabel.attr('data-perc', w_perc).text(w_perc + '%');
+        w_perc = (imgWidth / origImgWidth * 100 * devicePixelRatio);
+        $percLabel.attr('data-perc', w_perc).text(Math.round(w_perc) + '%');
     }
 
     // Viewer Init
@@ -1262,8 +1257,8 @@ var slideshowid;
                 $img.attr('src', src1).addClass('active');
 
                 // adjust zoom percent label
-                var perc = Math.round($img.width() / origImgWidth * 100);
-                $overlay.find('.viewer-button-label.zoom').attr('data-perc', perc).text(perc + '%');
+                var perc = ($img.width() / origImgWidth * 100 * devicePixelRatio);
+                $overlay.find('.viewer-button-label.zoom').attr('data-perc', perc).text(Math.round(perc) + '%');
             }
 
             // Apply exit orientation

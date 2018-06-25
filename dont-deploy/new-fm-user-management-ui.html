@@ -137,7 +137,7 @@ $(document).ready(function() {
 		
 	<!-- Dialog -->
 	<div class="user-management-dialog hidden">
-		<div class="invite-people-dialog dialog">
+		<div class="invite-people-dialog dialog hidden">
 			<div class="mega-54px-icon"></div>
 			<div class="dialog-title">Invite People to Team</div>
 			<div class="dialog-subtitle">User management help you to organise all the sub user accounts in one place. Get start with inviting people to the team.</div>
@@ -244,15 +244,15 @@ $(document).ready(function() {
 			<div class="dialog-input-container">
 				<div class="dialog-input-title-ontop">
 					Name<br>
-					<input class="dialog-input correctinput" type="text" value="Iwata Takanori" autofocus>
+					<input class="dialog-input correct-input" type="text" value="Iwata Takanori" autofocus>
 				</div>
 				<div class="dialog-input-title-ontop">
 					Email<br>
-					<input class="dialog-input correctinput" type="text" value="Jay_Pierce@janie.net">
+					<input class="dialog-input correct-input" type="text" value="Jay_Pierce@janie.net">
 				</div>
 				<div class="dialog-input-title-ontop">
 					Role<br>
-					<div class="dialog-input correctinput">
+					<div class="dialog-input correct-input">
                         <div class="list-arrow"></div>
                         <select size="1">
                             <option value=" ">Sub-administrator</option>
@@ -291,7 +291,6 @@ $(document).ready(function() {
 		</div>
 
 		<div class="re-enable-disable-user-dialog dialog hidden">
-			<div class="delete-img icon"></div>
 			<div class="re-enable-large-icon large-img"></div>
 			<div class="dialog-text-container">
 				<div class="dialog-text-one">Are you sure you want to re-enable the account of <b>Jay Pierce</b>?</div>
@@ -307,12 +306,11 @@ $(document).ready(function() {
 			</div>				
 		</div>
 
-		<div class="re-enable-disable-user-dialog dialog hidden">
-			<div class="delete-img icon"></div>
+		<div class="re-enable-disable-user-dialog dialog">
 			<div class="disable-large-icon large-img"></div>
 			<div class="dialog-text-container">
-				<div class="dialog-text-one">Are you sure you want to dise the account of <b>Jay Pierce</b>?</div>
-				<span class="dialog-text-two">Note: You can re-enable it in the disable list.</span>
+				<div class="dialog-text-one">Are you sure you want to dise the account of <b>Jay Pierce</b>? </div>
+				<span class="dialog-text-two">Note: You can re-enable it in the disable list. </span>
 			</div>
 			<div class="dialog-button-container">
 				<div class="default-gray-button-user-management">
@@ -457,7 +455,7 @@ $(document).ready(function() {
          	<div class="user-management-tree-panel-header disabled-accounts">
          		<div class="img disabled-accounts"></div>
             	Disabled Accounts
-            	<div class="user-management-tree-panel-arrows"></div>
+            	<div class="user-management-tree-panel-arrows hidden"></div>
         	</div>
 
         	<div class="fm-tree-panel-user-management hidden" >    
@@ -568,7 +566,71 @@ $(document).ready(function() {
                 </div>
 			</div>
 
-			<div class="files-grid-view user-management-vision">  
+			<div class="files-grid-view user-management-view">
+				<div class="user-management-landing-page hidden">
+					<div class="user-management-dialog">
+						<div class="invite-people-dialog dialog">
+						<div class="mega-54px-icon"></div>
+						<div class="dialog-title">Invite People to Team</div>
+						<div class="dialog-subtitle">User management help you to organise all the sub user accounts in one place. Get start with inviting people to the team.</div>
+						<div class="dialog-input-container">
+							<div class="input-user">
+								<div class="indi-input">
+									<input type="text" class="dialog-input focus" value="FirstName LastName" autofocus>	
+								</div>
+								<div class="indi-input">
+									<input type="text" class="dialog-input placeholder" value="Email">
+								</div>
+								<div class="delete-img icon"></div>	
+							</div>
+							<div class="input-user hidden">
+								<div class="indi-input">
+									<input type="text" class="dialog-input focus" value="FirstName LastName">	
+								</div>
+								<div class="indi-input">
+									<input type="text" class="dialog-input placeholder" value="Email">
+								</div>
+								<div class="delete-img icon"></div>	
+							</div>
+							<div class="input-user hidden">
+								<div class="indi-input">
+									<input type="text" class="dialog-input correct-input" value="Iwata Takanori">
+									<div class="confirm-img icon"></div>
+								</div>
+								<div class="indi-input">
+									<input type="text" class="dialog-input error" value="Email">
+									<div class="error-message">Error message</div>	
+								</div>
+								<div class="delete-img icon"></div>	
+							</div>
+						</div>
+
+						<div class="dialog-button-container">
+							<div class="default-button-no-border">
+								<div class="add-more-img icon"></div>
+								Add More
+							</div>
+							<div class="default-button-no-border">
+								<div class="import-contact-img icon"></div>
+								Import Contacts
+							</div>
+
+						<!--Please make the hover function disabled as well when the button is in disabled mode -->	
+							<div class="default-green-button-user-management disabled">
+								Invite & Get Started
+							</div>
+						</div>
+						<div class="licence-bar">
+							<div class="notification-img icon"></div>
+							5 sub account licences used.
+							<div class="default-white-button-user-management">
+							View Plans
+							</div>
+						</div>
+						</div>
+					</div>
+				</div>
+
                 <table class="user-management-list-table hidden">
                   	<tr class="grid-table-header-user-management">
 	                    <th>  
@@ -632,7 +694,6 @@ $(document).ready(function() {
                             	<div class="admin-icon"></div>	
                                 <div class="user-management-name">Jay Pierce</div>
                             </div>
-                            </div>
                             <div class="user-management-email">alvah_powlowski@yahoo.com</div> 
 	                    </td>
 	                    <td>
@@ -676,7 +737,7 @@ $(document).ready(function() {
 	                    	<div class="enable-icon icon">
 	                    		<div class="tooltip">Re-enable Account</div>
 	                    	</div>
-	                    	</div>
+	                
 	                    	<div class="view-icon icon"> 
 	                    		<div class="tooltip">View Account</div>
 	                    	</div>
@@ -687,7 +748,7 @@ $(document).ready(function() {
                		</tr>
                 </table>
 
-                <div class="user-management-subaccount-view-container hidden">
+                <div class="user-management-subaccount-view-container">
                 	<div class="user-management-subuser-profile-container hidden">
                     	<div class="subaccount-img-big"></div>
                     	<div class="user-management-subuser-profile">                 		
@@ -1131,7 +1192,7 @@ $(document).ready(function() {
 					</a>
                 </div>
 
-                <div class="user-management-account-settings scroll-auto">
+                <div class="user-management-account-settings scroll-auto hidden">
                 	<div class="auto-save">
                 		<div class="confirm-white-img icon"></div>
                 		Setting saved
@@ -1589,21 +1650,19 @@ $(document).ready(function() {
 								<form>
 									<div class="checked"><input type="radio"> <span>Users are allowed to empty their recycle bins</span></div>
 									<div><input type="radio"> <span>Users cannot empty their recycle bins</span></div>
-									<div><input type="radio"> <span>Users cannot empty their recycle bins, files are permanently deleted after<div class="recycle-days">30</div>days</span></div>
+									<div><input type="radio"> 
+										<div>Users cannot empty their recycle bins, files are permanently deleted after
+											<div class="recycle-days">30</div>
+										days</div>
+									</div>
 								</form>	                		
                     		</div> 
 						</div>
                 	</div>
 				</div>
-
-
-
-			<!--the following div is for user-management-vision-->
             </div>
    		</div>
 	</div>
-
-</div>
 </div>
 
 </body>

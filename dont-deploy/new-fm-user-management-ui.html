@@ -133,7 +133,6 @@ $(document).ready(function() {
 <body id="bodyel" class="logged rk-saved fontsize2 en free font-user-management">
 
 <div id="fmholder" class="fmholder">
-<div class="whole-page-user-management">
 		
 	<!-- Dialog -->
 	<div class="user-management-dialog hidden">
@@ -425,12 +424,18 @@ $(document).ready(function() {
                 </div>
         	</div>
 
-        	<div class="user-management-tree-panel-header enabled-accounts active">
+        	<div class="user-management-tree-panel-header enabled-accounts">
         		<div class="img enabled-accounts"></div>
                 Enabled Accounts
                 <div class="user-management-tree-panel-arrows"></div>
         	</div>
-    
+
+         	<div class="user-management-tree-panel-header disabled-accounts active">
+         		<div class="img disabled-accounts"></div>
+            	Disabled Accounts
+            	<div class="user-management-tree-panel-arrows hidden"></div>
+        	</div>
+
             <div class="fm-tree-panel-user-management">    
             	<div class="jspContainer">
                 	<div class="jspPane"> 
@@ -446,30 +451,6 @@ $(document).ready(function() {
 		                    <div class="nw-user-management-item selected">
 		                        <div class="user-management-status enabled"></div>
 		                        <div class="nw-user-management-name">John Bailey</div>
-		                    </div>
-		                </div>
-		            </div>
-	            </div>
-            </div>
-
-         	<div class="user-management-tree-panel-header disabled-accounts">
-         		<div class="img disabled-accounts"></div>
-            	Disabled Accounts
-            	<div class="user-management-tree-panel-arrows hidden"></div>
-        	</div>
-
-        	<div class="fm-tree-panel-user-management hidden" >    
-            	<div class="jspContainer">
-                	<div class="jspPane">
-
-		            	<div class="content-panel user-management active">
-		                    <div class="nw-user-management-item">
-		                        <div class="user-management-status disabled"></div>
-		                        <div class="nw-user-management-name">Jay Pierce</div>
-		                    </div>
-		                    <div class="nw-user-management-item">
-		                        <div class="user-management-status disabled"></div>
-		                        <div class="nw-user-management-name">Ollie Gibson</div>
 		                    </div>
 		                </div>
 		            </div>
@@ -512,7 +493,7 @@ $(document).ready(function() {
 
 		<div class="fm-right-files-block-user-management">
 			<div class="fm-right-header-user-management">
-				<div class="user-management-main-page-buttons">
+				<div class="user-management-main-page-buttons hidden">
 					<a class="fm-files-view-icon-user-management block-view" title="Thumbnail view"></a>
 					<a class="fm-files-view-icon-user-management listing-view active" title="List view"></a>
 					<div class="default-white-button-user-management">
@@ -554,7 +535,7 @@ $(document).ready(function() {
 					<div class="user-management-subuser-name">Account</div>
                 </div>
 
-                <div class="user-management-overview-buttons hidden">
+                <div class="user-management-overview-buttons">
 					<div class="default-white-button-user-management">
 						<div class="export-pdf-icon icon"></div>
 						Export to PDF
@@ -631,7 +612,7 @@ $(document).ready(function() {
 					</div>
 				</div>
 
-                <table class="user-management-list-table hidden">
+                <table class="user-management-list-table">
                   	<tr class="grid-table-header-user-management">
 	                    <th>  
                     		<div class="checkdiv left checkboxOff-user-management small-user-management">
@@ -658,7 +639,7 @@ $(document).ready(function() {
 	                    </td>
 	                    <td>			                    	
                             <div class="fm-user-management-user">
-                            	<div class="admin-icon">
+                            	<div class="admin-icon hidden">
                             		<div class="tooltip">Sub – administrators</div>
                             	</div>	                                		
                                <div class="user-management-name">Jay Pierce</div>
@@ -748,7 +729,7 @@ $(document).ready(function() {
                		</tr>
                 </table>
 
-                <div class="user-management-subaccount-view-container">
+                <div class="user-management-subaccount-view-container hidden">
                 	<div class="user-management-subuser-profile-container hidden">
                     	<div class="subaccount-img-big"></div>
                     	<div class="user-management-subuser-profile">                 		
@@ -1651,7 +1632,7 @@ $(document).ready(function() {
 									<div class="checked"><input type="radio"> <span>Users are allowed to empty their recycle bins</span></div>
 									<div><input type="radio"> <span>Users cannot empty their recycle bins</span></div>
 									<div><input type="radio"> 
-										<div>Users cannot empty their recycle bins, files are permanently deleted after
+										<div class="option-with-varible">Users cannot empty their recycle bins, files are permanently deleted after
 											<div class="recycle-days">30</div>
 										days</div>
 									</div>
@@ -1662,7 +1643,7 @@ $(document).ready(function() {
 				</div>
             </div>
    		</div>
-	</div>
+   	</div>
 </div>
 
 </body>

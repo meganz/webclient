@@ -350,7 +350,7 @@
                 <span>[$5916]</span>
                 <div class="nw-tree-panel-arrows"></div>
             </div>
-            <div class="user-management-tree-panel-header enabled-accounts hidden">
+            <div class="user-management-tree-panel-header enabled-accounts active hidden">
                 <div class="img enabled-accounts"></div>
                 <span>Enabled Accounts</span>
                 <div class="user-management-tree-panel-arrows"></div>
@@ -375,7 +375,7 @@
                 <div class="content-panel rubbish-bin">
                 </div>
                 <div class="content-panel user-management">
-                    <div class="nw-user-management-item">
+                    <div class="nw-user-management-item selected">
                         <div class="user-management-status enabled"></div>
                         <div class="nw-user-management-name">Jay Pierce</div>
                     </div>
@@ -571,51 +571,81 @@
             </div>
             <!-- Users Management Header -->
             <div class="fm-right-header-user-management">
-                <div class="right-header-user-management-main-page ">
+                <div class="user-management-main-page-buttons">
                     <a class="fm-files-view-icon-user-management block-view" title="Thumbnail view"></a>
                     <a class="fm-files-view-icon-user-management listing-view active" title="List view"></a>
                     <div class="default-white-button-user-management">
-                        <div class="overview-img img"></div>
+                        <div class="overview-icon icon"></div>
                         Overview
                     </div>
 
                     <div class="default-white-button-user-management">
-                        <div class="account-img img"></div>
+                        <div class="account-icon icon"></div>
                         Account
                     </div>
 
                     <div class="default-green-button-user-management">
-                        <div class="add-users-img img"></div>
+                        <div class="add-users-icon icon"></div>
                         Add Users
                     </div>
                 </div>
 
-                <div class="right-header-user-management-view hidden">
-                    <div class="view-breadcrumbs-user-management hidden">
-                        <div class="user-management-icon"></div>
-                        <div class="user-management-next-arrow"></div>
-                        <div class="user-management-subuser-avatars">
-                            <div class="user-management-subuser-image"></div>
-                        </div>
-                        <div class="user-management-subuser-name">Jay Pierce</div>
+                <div class="user-management-breadcrumb subaccount hidden">
+                    <div class="user-management-icon"></div>
+                    <div class="user-management-next-arrow"></div>
+                    <div class="user-management-subuser-avatars">
+                        <div class="user-management-subuser-image"></div>
+                    </div>
+                    <div class="user-management-subuser-name">Jay Pierce</div>
+                </div>
+
+                <div class="user-management-breadcrumb overview hidden">
+                    <div class="user-management-icon"></div>
+                    <div class="user-management-next-arrow"></div>
+                    <div class="user-management-breadcrumbs-img overview-icon"></div>
+                    <div class="user-management-subuser-name">Overview</div>
+                </div>
+
+                <div class="user-management-breadcrumb hidden">
+                    <div class="user-management-icon"></div>
+                    <div class="user-management-next-arrow"></div>
+                    <div class="user-management-breadcrumbs-img account-icon"></div>
+                    <div class="user-management-subuser-name">Account</div>
+                </div>
+
+                <div class="user-management-overview-buttons hidden">
+                    <div class="default-white-button-user-management">
+                        <div class="export-pdf-icon icon"></div>
+                        Export to PDF
+                    </div>
+                    <div class="default-white-button-user-management">
+                        <div class="view-plan-icon icon"></div>
+                        View Plans
+                    </div>
+                </div>
+            </div>
+            <div class="user-management-overview-bar hidden">
+                <div class="user-management-overview-bar-data">
+                    <div class="info-block nb-sub-users">
+                        <div class="number-of-user-icon icon"></div>
+                        <span class="title">Number Of Users:</span>
+                        <span class="number">11</span>
                     </div>
 
-                    <div class="view-breadcrumbs-user-management">
-                        <div class="user-management-icon"></div>
-                        <div class="user-management-next-arrow"></div>
-                        <div class="user-management-breadcrumbs-img overview-img"></div>
-                        <div class="user-management-subuser-name">Overview</div>
+                    <div class="info-block storage-sub-users">
+                        <div class="total-storage-usage-icon icon"></div>
+                        <span class="title">Total Storage Usage:</span>
+                        <span class="number">12.4</span>
+                        <span class="title2"> GB</span>
                     </div>
-
-                    <div class="view-button-user-management">
-                        <div class="default-white-button-user-management">
-                            <div class="export-pdf-img img"></div>
-                            Export to PDF
-                        </div>
-                        <div class="default-white-button-user-management">
-                            <div class="overview-img img"></div>
-                            View Plans
-                        </div>
+                    <div class="info-block bandwidth-sub-users">
+                        <div class="total-transfer-usage-icon icon"></div>
+                        <span class="title">Total Transfer Usage:</span>
+                        <span class="number">1.4</span>
+                        <span class="title2"> GB</span>
+                    </div>
+                    <div class="default-white-button-user-management">
+                        <div class="overview-img img"></div>View Plans
                     </div>
                 </div>
             </div>
@@ -793,32 +823,39 @@
 
 
             <!-- USERS managment right block -->
-            <div class="files-grid-view user-management-view hidden">
-                <div class="user-management-overview-bar">
-                    <div class="user-management-overview-bar-data">
-                        <div class="info-block nb-sub-users">
-                            <div class="number-of-user-icon icon"></div>
-                            <span class="title">Number Of Users:</span>
-                            <span class="number">11</span>
-                        </div>
 
-                        <div class="info-block storage-sub-users">
-                            <div class="total-storage-usage-icon icon"></div>
-                            <span class="title">Total Storage Usage:</span>
-                            <span class="number">12.4</span>
-                            <span class="title2"> GB</span>
-                        </div>
-                        <div class="info-block bandwidth-sub-users">
-                            <div class="total-transfer-usage-icon icon"></div>
-                            <span class="title">Total Transfer Usage:</span>
-                            <span class="number">1.4</span>
-                            <span class="title2"> GB</span>
-                        </div>
-                        <div class="default-white-button-user-management">
-                            <div class="overview-img img"></div>View Plans
-                        </div>
-                    </div>
-                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <div class="files-grid-view user-management-view hidden">
+
 
                 <table class="grid-table-user-management hidden">
                     <tr class="grid-table-header-user-management">

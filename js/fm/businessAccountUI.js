@@ -109,7 +109,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             $currUserLeftPane.removeClass('selected');
             var uName = a32_to_str(base64_to_a32(subUsers[h].firstname)) + ' ' +
                 a32_to_str(base64_to_a32((subUsers[h].lastname || '')));
-            $currUser.find('.fm-user-management-user span').text(uName);
+            $currUser.find('.fm-user-management-user .user-management-name').text(uName);
             $currUserLeftPane.find('.nw-user-management-name').text(uName);
 
             $currUser.find('.user-management-email').text(subUsers[h].e);

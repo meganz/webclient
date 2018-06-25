@@ -81,7 +81,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     // private function to fill HTML table for sub users
     var fillSubUsersTable = function (subUsers, uiBusiness) {
-        var $usersTable = $('.grid-table-user-management', subAccountsView).removeClass('hidden');
+        var $usersTable = $('.user-management-list-table', subAccountsView).removeClass('hidden');
         var $tr = $('tr', $usersTable);
         var $tr_user = $($tr.get(1)).clone(true); // the first one is the table header
 
@@ -104,7 +104,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             $currUserLeftPane.attr('id', subUsers[h].u);
             // now we will hide icon and role, since we are not ready to support yet.
             // $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
-            $currUser.find('.fm-user-management-user .admin-icon').addClass('disappear');
+            $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
 
             $currUserLeftPane.removeClass('selected');
             var uName = a32_to_str(base64_to_a32(subUsers[h].firstname)) + ' ' +
@@ -231,7 +231,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         var totalStorage = 0;
         var totalBandwidth = 0;
 
-        var $usersTable = $('.grid-table-user-management', subAccountsView);
+        var $usersTable = $('.user-management-list-table', subAccountsView);
         for (var sub in quotas) {
             if (sub === 'timestamp') {
                 continue; // embedded attribute 

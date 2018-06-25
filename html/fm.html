@@ -824,40 +824,10 @@
 
             <!-- USERS managment right block -->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             <div class="files-grid-view user-management-view hidden">
 
 
-                <table class="grid-table-user-management hidden">
+                <table class="user-management-list-table hidden">
                     <tr class="grid-table-header-user-management">
                         <th class="business-sub-checkbox-th">
                             <div class="checkdiv left checkboxOff-user-management small-user-management">
@@ -868,7 +838,12 @@
                         <th><div class="arrow asc">Storage usage</div></th>
                         <th><div class="arrow desc">Transfer usage</div></th>
                         <th>
-                            <div class="disable-icon icon"></div>
+                            <div class="disabled-icon icon">
+                                <div class="tooltip">Disable User</div>
+                            </div>
+                            <div class="resend-email-icon icon">
+                                <div class="tooltip">Re-send Verification Email</div>
+                            </div>
                         </th>
                     </tr>
 
@@ -893,63 +868,18 @@
                         <td class="business-sub-storage-use"><span>0.0 GB</span></td>
                         <td class="business-sub-transfer-use"><span>0.0 GB</span></td>
                         <td>
-                            <div class="disable-icon icon"></div>
-                            <div class="edit-icon icon"></div>
-                            <div class="view-icon icon"></div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="checkdiv left checkboxOn-user-management small-user-management">
+                            <div class="disabled-icon icon">
+                                <div class="tooltip">Disable Account</div>
                             </div>
-                        </td>
-                        <td>
-                            <div class="fm-user-management-user">
-                                <div class="admin-icon"></div>
-                                <span>Jay Pierce</span>
+                            <div class="edit-icon icon">
+                                <div class="tooltip">Edit Profile</div>
                             </div>
-                            <div class="user-management-email">alvah_powlowski@yahoo.com</div>
-                        </td>
-                        <td>
-                            <div class="user-management-status pending"></div>
-                            <span>Pending</span>
-                        </td>
-                        <td><span>0.8 GB</span></td>
-                        <td><span>0.8 GB</span></td>
-                        <td>
-                            <div class="disable-icon icon"></div>
-                            <div class="edit-icon icon"></div>
-                            <div class="view-icon icon"></div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="checkdiv left checkboxOff-user-management small-user-management">
+                            <div class="view-icon icon">
+                                <div class="tooltip">View Account</div>
                             </div>
-                        </td>
-                        <td>
-                            <div class="fm-user-management-user">
-                                <div class="admin-icon"></div>
-                                <span>I shouldn't be here</span>
-                            </div>
-                            <div class="user-management-email">only to show the disabled status</div>
-                        </td>
-                        <td>
-                            <div class="user-management-status disable"></div>
-                            <span>Disable</span>
-                        </td>
-                        <td><span>0.8 GB</span></td>
-                        <td><span>0.8 GB</span></td>
-                        <td>
-                            <div class="enable-icon icon"></div>
-                            <div class="immigrate-icon icon"></div>
-                            <div class="view-icon icon"></div>
                         </td>
                     </tr>
                 </table>
-
             </div>
             <!-- End of USERS managment right block -->
 

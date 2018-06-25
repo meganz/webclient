@@ -24061,6 +24061,7 @@ opacity: 1;
     border-top: 1px solid rgba(0,0,0,0.1);
     font-size: 14px;
     bottom: 0;
+    z-index: 5;
 }
 
 .user-management-tree-panel-header.disabled-accounts.active {
@@ -24093,8 +24094,8 @@ opacity: 1;
     background-position: -24px -12009px;
 }
 
-.fm-tree-panel-user-management {
-    height: calc(100% - 132px);
+.content-panel.user-management {
+    height: calc(100% - 160px);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -24634,6 +24635,7 @@ opacity: 1;
     position: absolute;
     left: 24px;
     top: 0;
+    width: 300px;
 }
 
 .user-management-list-table tr td .user-management-email{
@@ -24749,7 +24751,7 @@ opacity: 1;
     bottom: 0px;
     left: 304px;
     background-color: rgba(250,250,250,1);
-    z-index: 98;
+    z-index: 102;
     display: block;
 }
 
@@ -24992,7 +24994,7 @@ opacity: 1;
 }
 
 
-.fm-tree-panel-user-management .nw-user-management-item {
+.content-panel.user-management .nw-user-management-item {
     height: 24px;
     padding-right: 30px;
     overflow: hidden;
@@ -25010,11 +25012,11 @@ opacity: 1;
     cursor: pointer;
 }
 
-.fm-tree-panel-user-management .nw-user-management-item:hover {
+.content-panel.user-management .nw-user-management-item:hover {
     background-color: rgba(119,119,119,0.3);
     color: white;
 }
-.fm-tree-panel-user-management .nw-user-management-item.selected {
+.content-panel.user-management .nw-user-management-item.selected {
     background-color: rgba(119,119,119,0.5);
     color: white;
 }
@@ -25316,6 +25318,7 @@ opacity: 1;
 .files-grid-view.user-management-view {
     display: block;
     height: 100%;
+    z-index: 101;
 }
 
 .files-grid-view.user-management-view .user-management-view-data{

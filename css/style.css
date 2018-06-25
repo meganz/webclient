@@ -24767,13 +24767,6 @@ opacity: 1;
     font-family: 'Source Sans Pro', sans-serif;
 }
 
-.whole-page-user-management{
-    overflow: hidden;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-}
-
 .fm-main-user-management {
     height: 100%;
     width: 100%;
@@ -24781,7 +24774,7 @@ opacity: 1;
     background-color: rgba(250,250,250,1);
 }
 
-.whole-page-user-management .small-user-management{
+.user-management-view .small-user-management{
     width: 12px;
     height: 12px;
     margin: 6px 0px;
@@ -24796,11 +24789,11 @@ opacity: 1;
 }
 
 
-.whole-page-user-management .user-management-list-table tr:not(:first-child) .small-user-management{
+.user-management-view .user-management-list-table tr:not(:first-child) .small-user-management{
     margin:13px 0 39px 0;
 }
 
-.whole-page-user-management .checkboxOn-user-management.small-user-management::before, .checkboxOff-user-management.small-user-management::before {
+.user-management-view .checkboxOn-user-management.small-user-management::before, .checkboxOff-user-management.small-user-management::before {
     background-position: 0px -2381px;
     background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
@@ -24819,16 +24812,16 @@ opacity: 1;
     cursor: pointer;
 }
 
-.whole-page-user-management .checkboxOn-user-management.small-user-management::before {
+.user-management-view .checkboxOn-user-management.small-user-management::before {
     opacity: 1;
 }
 
-.whole-page-user-management .checkboxOff-user-management.small-user-management::before {
+.user-management-view .checkboxOff-user-management.small-user-management::before {
     opacity: 0;
     transition: 0.1s;
 }
 
-.whole-page-user-management .checkboxOff-user-management.small-user-management:hover::before {
+.user-management-view .checkboxOff-user-management.small-user-management:hover::before {
     opacity: 0.3;
 }
 
@@ -24841,7 +24834,7 @@ opacity: 1;
 }
 
 
-.whole-page-user-management .user-management-status{
+.user-management-panel .user-management-status, .user-management-view .user-management-status {
     background-image: url(../images/mega/fm-main-sprite.png);
     width: 8px;
     height: 8px;
@@ -24855,20 +24848,20 @@ opacity: 1;
     border-radius: 100%;
 }
 
-.whole-page-user-management .enabled.user-management-status{
+.user-management-panel .enabled.user-management-status, .user-management-view .enabled.user-management-status{
     background-position: -4px -12244px;
 }
 
-.whole-page-user-management .pending.user-management-status{
+.user-management-panel .pending.user-management-status, .user-management-view .pending.user-management-status{
     background-position: -19px -12244px;
 }
 
-.whole-page-user-management .disabled.user-management-status{
+.user-management-panel .disabled.user-management-status, .user-management-view .disabled.user-management-status{
     background-position: -33px -12244px;
     opacity: 0.8;
 }
 
-.whole-page-user-management .user-management-list-table .user-management-status{
+.user-management-view .user-management-list-table .user-management-status{
     margin:28px 8px 0 0;
 } 
 
@@ -24890,7 +24883,8 @@ opacity: 1;
 .user-management-tree-panel-header:hover {
     background-color: rgba(253,253,253,1);
     transition: 0.1s;
-}
+    opacity: 0.9;
+} 
 
 .user-management-tree-panel-header:hover .user-management-tree-panel-arrows, .user-management-tree-panel-header.active .user-management-tree-panel-arrows {
     display: inline-block;
@@ -24899,6 +24893,7 @@ opacity: 1;
 .user-management-tree-panel-header.enabled-accounts{
     position: relative;
     border-bottom: 1px solid rgba(0,0,0,0.1);
+    font-size: 14px;
 }
 
 .user-management-tree-panel-header.enabled-accounts.active {
@@ -24906,12 +24901,14 @@ opacity: 1;
     box-shadow:0 0.5px 1px 0 rgba(0,0,0,0.05);
     cursor: default;
     opacity: 1;
+    font-weight: 600;
 }
 
 
 .user-management-tree-panel-header.disabled-accounts{
     position: relative;
     border-top: 1px solid rgba(0,0,0,0.1);
+    font-size: 14px;
 }
 
 .user-management-tree-panel-header.disabled-accounts.active {
@@ -24921,6 +24918,7 @@ opacity: 1;
     box-shadow:0 0.5px 1px 0 rgba(0,0,0,0.05);
     cursor: default;
     opacity: 1;
+    font-weight: 600;
 }
 
 .user-management-tree-panel-header .img{
@@ -24978,16 +24976,6 @@ opacity: 1;
     -khtml-opacity: 0.7;
     opacity: 0.7;
 }
-/*
-.user-management-tree-panel-arrows.active {
-    background-position: -12px -7916px;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-    -moz-opacity: 0.7;
-    -khtml-opacity: 0.7;
-    opacity: 0.7;
-}
-
-*/
 
 .nw-user-management-name{
     font-size: 13px;
@@ -25048,15 +25036,14 @@ opacity: 1;
     box-shadow:0 0.5px 1px 0 rgba(0,0,0,0.05);
     position: relative;
     font-size: 14px;
-    line-height: 32px;
+    line-height: 30px;
     padding: 0 16px;
     cursor: pointer;
     transition: 0.1s;
     display: inline-block;
 }
 
-.default-white-button-user-management.disabled,.default-green-button-user-management.disabled, .default-gray-button-user-management.disabled {
-    opacity: 0.3;
+.default-white-button-user-management.disabled, .default-green-button-user-management.disabled, .default-gray-button-user-management.disabled {
     cursor: default;
 }
 
@@ -25175,41 +25162,28 @@ opacity: 1;
     padding:0;     
 }
 
-/*
 
-.files-grid-view.user-management-vision .icon {
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-repeat: no-repeat; 
-    width:24px;
-    height:24px;
-    cursor: pointer;
-    overflow: visible;
-    position: relative;
-}
-*/
-
-
-.files-grid-view.user-management-vision .user-management-list-table .icon:hover{
+.files-grid-view.user-management-view .user-management-list-table .icon:hover{
     opacity: 0.7;
 }
 
 
-.files-grid-view.user-management-vision .user-management-list-table tr .icon {
+.files-grid-view.user-management-view .user-management-list-table tr .icon {
     display: none;
 }
 
-.files-grid-view.user-management-vision .user-management-list-table tr:hover .icon {
+.files-grid-view.user-management-view .user-management-list-table tr:hover .icon {
    display: inline-block;
 }
 
-.files-grid-view.user-management-vision .user-management-list-table tr td .icon {
+.files-grid-view.user-management-view .user-management-list-table tr td .icon {
     margin:20px 0px 20px 4px;
     float: right;
     position: relative;
     cursor: pointer;
 }
 
-.files-grid-view.user-management-vision .user-management-list-table tr th .icon {
+.files-grid-view.user-management-view .user-management-list-table tr th .icon {
     margin-left: 4px;
     float: right;
 }
@@ -25217,199 +25191,199 @@ opacity: 1;
 
 
 
-.files-grid-view.user-management-vision .view-icon {
+.files-grid-view.user-management-view .view-icon, .user-management-dialog .view-icon {
     background-position: 0px -12086px;
     opacity: 0.5;
 }
 
-.files-grid-view.user-management-vision .edit-icon {
+.files-grid-view.user-management-view .edit-icon, .user-management-dialog .edit-icon  {
     background-position: -24px -12086px;
     opacity: 0.5;
 }
 
-.files-grid-view.user-management-vision .disabled-icon {
+.files-grid-view.user-management-view .disabled-icon, .user-management-dialog .disabled-icon {
     background-position: 0px -12110px;
     opacity: 0.5;
 }
 
-.files-grid-view.user-management-vision .disabled-red-icon {
+.files-grid-view.user-management-view .disabled-red-icon, .user-management-dialog .disabled-red-icon {
     background-position: 0px -12328px;
 }
 
-.files-grid-view.user-management-vision .enabled-green-icon {
+.files-grid-view.user-management-view .enabled-green-icon, .user-management-dialog .enabled-green-icon  {
     background-position: -24px -12328px;
 }
 
-.files-grid-view.user-management-vision .enable-icon {
+.files-grid-view.user-management-view .enable-icon, .user-management-dialog .enable-icon{
     background-position: -24px -12257px;
     padding-right: 12px;
     opacity: 0.5;
 }
 
-.whole-page-user-management .overview-icon, .user-management-breadcrumbs-img.overview-icon {
+.user-management-view .overview-icon, .fm-right-header-user-management .overview-icon, .user-management-breadcrumbs-img.overview-icon, .user-management-dialog .overview-icon {
     background-position: 0px -12033px;
     opacity: 0.5;
 }
 
-.whole-page-user-management .account-icon {
+.user-management-view .account-icon, .fm-right-header-user-management .account-icon,.user-management-dialog .account-icon  {
     background-position: -24px -12033px;
     opacity: 0.5;
 }
 
-.whole-page-user-management .add-users-icon {
+.user-management-view .add-users-icon, .fm-right-header-user-management .add-users-icon, .user-management-dialog .add-users-icon {
     background-position: 0 -12057px;
 }
 
-.files-grid-view.user-management-vision .migrate-icon {
+.user-management-view .migrate-icon, .fm-right-header-user-management .migrate-icon, .user-management-dialog .migrate-icon{
     background-position: -0px -12257px;
     opacity: 0.5;
 }
 
-.files-grid-view.user-management-vision .resend-email-icon {
+.user-management-view .resend-email-icon, .fm-right-header-user-management .resend-email-icon, .user-management-dialog .resend-email-icon{
     background-position: -0px -12352px;
     opacity: 0.5;
 }
 
-.whole-page-user-management .view-plan-icon {
+.user-management-view .view-plan-icon, .fm-right-header-user-management .view-plan-icon, .user-management-dialog .view-plan-icon, .user-management-overview-bar .view-plan-icon{
     background-position: -24px -12165px;
     opacity: 0.6;
 }
 
-.whole-page-user-management .export-pdf-icon {
+.user-management-view .export-pdf-icon, .fm-right-header-user-management .export-pdf-icon, .user-management-dialog .export-pdf-icon{
     background-position: -24px -12281px;
     opacity: 0.6;
 }
 
-.whole-page-user-management .change-icon {
+.user-management-view .change-icon, .fm-right-header-user-management .change-icon, .user-management-dialog .change-icon{
     background-position: -24px -12520px;
     opacity: 0.5;
 }
 
-.whole-page-user-management .unfold-icon {
+.user-management-view .unfold-icon, .fm-right-header-user-management .unfold-icon, .user-management-dialog .unfold-icon{
     background-position: -24px -12544px;
     opacity: 0.5;
 }
 
-.whole-page-user-management .fold-icon {
+.user-management-view .fold-icon, .fm-right-header-user-management .fold-icon, .user-management-dialog .fold-icon{
     background-position: -0px -12544px;
     opacity: 0.5;
 }
 
-.whole-page-user-management .close-icon {
+.user-management-view .close-icon, .fm-right-header-user-management .close-icon, .user-management-dialog .close-icon{
     background-position: -24px -12568px;
     opacity: 0.5;
 }
 
-.whole-page-user-management .add-white-icon {
+.user-management-view .add-white-icon, .fm-right-header-user-management .add-white-icon, .user-management-dialog .add-white-icon {
     background-position: -0px -12592px;
 }
 
-.whole-page-user-management .quick-edit-icon {
+.user-management-view .quick-edit-icon, .fm-right-header-user-management .quick-edit-icon, .user-management-dialog .quick-edit-icon{
     background-position: -0px -12568px;
     opacity: 0.5;
 }
 
-.files-grid-view.user-management-vision .pw-white-icon {
+.files-grid-view.user-management-view .pw-white-icon, .fm-right-header-user-management .pw-white-icon, .user-management-dialog .pw-white-icon{
     background-position: -0px -12424px;
     opacity: 1;
 }
 
-.files-grid-view.user-management-vision .show-pw-white-icon {
+.files-grid-view.user-management-view .show-pw-white-icon, .fm-right-header-user-management .show-pw-white-icon, .user-management-dialog .show-pw-white-icon{
     background-position: -0px -12472px;
     opacity: 1;
 }
 
-.files-grid-view.user-management-vision .hide-pw-white-icon {
+.files-grid-view.user-management-view .hide-pw-white-icon, .fm-right-header-user-management .hide-pw-white-icon, .user-management-dialog .hide-pw-white-icon{
     background-position: -24px -12472px;
     opacity: 1;
 }
 
-.files-grid-view.user-management-vision .show-pw-black-icon {
+.files-grid-view.user-management-view .show-pw-black-icon, .fm-right-header-user-management .show-pw-black-icon, .user-management-dialog .show-pw-black-icon {
     background-position: -0px -12448px;
     opacity: 0.8;
 }
 
-.files-grid-view.user-management-vision .hide-pw-black-icon {
+.files-grid-view.user-management-view .hide-pw-black-icon, .fm-right-header-user-management .hide-pw-black-icon, .user-management-dialog .hide-pw-black-icon{
     background-position: -24px -12448px;
     opacity: 0.8;
 }
 
-.whole-page-user-management .add-more-img {
+.user-management-view .add-more-img, .fm-right-header-user-management .add-more-img, .user-management-dialog .add-more-img {
     background-position: 0 -12376px;
 }
 
-.whole-page-user-management .import-contact-img {
+.user-management-view .import-contact-img, .fm-right-header-user-management .import-contact-img, .user-management-dialog .import-contact-img{
     background-position: -24px -12352px;
 }
 
-.whole-page-user-management .notification-img {
+.user-management-view .notification-img, .fm-right-header-user-management .notification-img, .user-management-dialog .notification-img {
     background-position: -24px -12376px; 
 }
 
-.whole-page-user-management .delete-img {
+.user-management-view .delete-img, .fm-right-header-user-management .delete-img, .user-management-dialog .delete-img{
     background-position: 0px -12400px;
     opacity: 0.5;
     cursor: pointer;
 }
 
-.whole-page-user-management .delete-img:hover {
+.user-management-view .delete-img:hover, .fm-right-header-user-management .delete-img:hover, .user-management-dialog .delete-img:hover{
     opacity: 0.8;
 }
 
-.whole-page-user-management .confirm-img {
+.user-management-view .confirm-img, .fm-right-header-user-management .confirm-img, .user-management-dialog .confirm-img {
     background-position: -24px -12400px;
 }
 
-.whole-page-user-management .confirm-white-img {
+.user-management-view .confirm-white-img, .fm-right-header-user-management .confirm-white-img, .user-management-dialog .confirm-white-img{
     background-position: -24px -12616px;
 }
 
-.whole-page-user-management .folder-icon {
+.user-management-view .folder-icon,  .fm-right-header-user-management .folder-icon, .user-management-dialog .folder-icon{
     background-position: -0px -12640px;
 }
 
-.whole-page-user-management .folder-gray-icon {
+.user-management-view .folder-gray-icon,  .fm-right-header-user-management .folder-gray-icon, .user-management-dialog .folder-gray-icon{
     background-position: -295px -717px;
 }
 
-.whole-page-user-management .file-icon {
+.user-management-view .file-icon, .fm-right-header-user-management .file-icon, .user-management-dialog .file-icon{
     background-position: -335px -357px;
 }
 
-.whole-page-user-management .drop-down-icon {
+.user-management-view .drop-down-icon, .fm-right-header-user-management .drop-down-icon, .user-management-dialog .drop-down-icon {
     background-position: -11px -9850px;
 }
 
-.whole-page-user-management .drop-up-icon {
+.user-management-view .drop-up-icon, .fm-right-header-user-management .drop-up-icon, .user-management-dialog .drop-up-icon{
     background-position: -11px -9850px;
     -ms-transform: rotate(180deg); /* IE 9 */
     -webkit-transform: rotate(180deg); /* Safari */
     transform: rotate(180deg); /* Standard syntax */
 }
 
-.whole-page-user-management .cloud24-icon {
+.user-management-view .cloud24-icon, .fm-right-header-user-management .cloud24-icon, .user-management-dialog .cloud24-icon{
     background-position: -24px -12592px;
     opacity: 0.4;
 }
 
-.whole-page-user-management .rubbish24-icon {
+.user-management-view .rubbish24-icon, .fm-right-header-user-management .rubbish24-icon, .user-management-dialog .rubbish24-icon{
     background-position: -1px -8035px;
 }
 
-.whole-page-user-management .share24-icon {
+.user-management-view .share24-icon,  .fm-right-header-user-management .share24-icon, .user-management-dialog .share24-icon{
     background-position: -1px -8095px;
 }
 
-.whole-page-user-management .contact24-icon {
+.user-management-view .contact24-icon,  .fm-right-header-user-management .contact24-icon, .user-management-dialog .contact24-icon{
     background-position: -1px -8135px;
 }
 
-.whole-page-user-management .chat24-icon {
+.user-management-view .chat24-icon, .fm-right-header-user-management .chat24-icon, .user-management-dialog .chat24-icon{
     background-position: -0px -12640px;
     opacity: 0.4;
 } 
 
-.whole-page-user-management .search-icon {
+.user-management-view .search-icon, .fm-right-header-user-management .search-icon, .user-management-dialog .search-icon{
     background-position: -0px -12616px;
     opacity: 0.4;
 }
@@ -25422,7 +25396,7 @@ opacity: 1;
     padding-right: 12px;
 }
 
-.whole-page-user-management tr th, .whole-page-user-management tr td {
+.user-management-view tr th, .user-management-view tr td {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -25517,7 +25491,7 @@ opacity: 1;
 }
 
 
-.whole-page-user-management .admin-icon{
+.user-management-view .admin-icon{
     width:16px;
     height: 18px;
     background-position: -28px -12060px;
@@ -25974,7 +25948,7 @@ opacity: 1;
     margin:0px 12px;
 }
 
-.whole-page-user-management .user-management-subuser-avatars {
+.user-management-view .user-management-subuser-avatars, .fm-right-header-user-management .user-management-subuser-avatars, .user-management-dialog .user-management-subuser-avatars{
     margin: 0;
     padding: 0;
     width:24px;
@@ -25986,7 +25960,7 @@ opacity: 1;
     display: inline-block;
 }
 
-.whole-page-user-management .user-management-subuser-image {
+.user-management-view .user-management-subuser-image, .fm-right-header-user-management .user-management-subuser-image, .user-management-dialog .user-management-subuser-image{
     margin: 1px;
     padding: 0;
     height: 20px;
@@ -26016,7 +25990,7 @@ opacity: 1;
     display: block;
 }
 
-.files-grid-view.user-management-vision .subaccount-img-big {
+.files-grid-view.user-management-view .subaccount-img-big {
     width: 162px;
     height: 162px;
     border-radius: 4px;
@@ -26060,7 +26034,7 @@ opacity: 1;
     position: relative;
 }
 
-.user-management-view-status.enabled, .whole-page-user-management .user-management-view-status.disabled, .user-management-view-status.pending{
+.user-management-view-status.enabled, .user-management-view-status.disabled, .user-management-view-status.pending{
     width:10px;
     height: 10px;
     border-radius: 100%;
@@ -26076,7 +26050,7 @@ opacity: 1;
     background-position: -3px -12243px;
 }
 
-.whole-page-user-management .user-management-view-status.disabled{
+.user-management-view-status.disabled{
     background-color: black;
     background-position: -32px -12243px;
     opacity: 0.8;
@@ -26180,12 +26154,12 @@ opacity: 1;
     right: 60px;
 }
 
-.files-grid-view.user-management-vision {
+.files-grid-view.user-management-view {
     display: block;
     height: 100%;
 }
 
-.files-grid-view.user-management-vision .user-management-view-data{
+.files-grid-view.user-management-view .user-management-view-data{
     width:100%;
     height: 500px;
     box-sizing:border-box;
@@ -26347,16 +26321,14 @@ opacity: 1;
     display: inline-block;
     margin-left: 12px;
     float: left;
-    width: 220px;
-    max-width: 250px;
+    width: 75%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .subaccount-view-used-storage-transfer .used-storage-info.transfer .folder-name{
-    max-width: 220px;
-    width: 160px;
+    width: 55%;
 }
 
 .subaccount-view-used-storage-transfer .used-storage-info .folder-occupy{
@@ -26374,7 +26346,7 @@ opacity: 1;
     color: #999999;
     line-height: 24px;
     position: absolute;
-    right: 100px;
+    right: 130px;
     display: inline-block;
     margin-left: 12px;
 }
@@ -26850,7 +26822,7 @@ opacity: 1;
     position: absolute;
 }
 
-.whole-page-user-management .default-white-drop-box {
+.user-management-view .default-white-drop-box, .fm-right-header-user-management .default-white-drop-box{
     box-sizing: border-box;
     border: 1px solid rgba(0,0,0,0.1);
     border-radius: 4px;
@@ -26862,7 +26834,7 @@ opacity: 1;
     overflow: hidden;
 }
 
-.whole-page-user-management .default-white-drop-box select {
+.user-management-view .default-white-drop-box select, .fm-right-header-user-management .default-white-drop-box select{
     background:transparent;
     border:none;
     font-size: 14px;
@@ -26873,12 +26845,12 @@ opacity: 1;
     font-family: 'Source Sans Pro', sans-serif; 
 }
 
-.whole-page-user-management .default-white-drop-box:hover {
+.user-management-view .default-white-drop-box:hover {
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
     transition: 0.1s;
 }
 
-.whole-page-user-management .default-white-drop-box .list-arrow, .whole-page-user-management .user-management-dialog .list-arrow {
+.user-management-view .default-white-drop-box .list-arrow, .user-management-dialog .list-arrow {
     width: 16px;
     height: 16px;
     margin:8px;
@@ -26889,7 +26861,7 @@ opacity: 1;
     position: absolute;
 }
 
-.whole-page-user-management .user-management-overview-container .default-white-drop-box {
+.user-management-view .user-management-overview-container .default-white-drop-box {
     margin-right: 24px;
     top:32px;
     right: 0;
@@ -27343,7 +27315,7 @@ opacity: 1;
     -webkit-filter: blur(0.25em);
 }
 
-.whole-page-user-management .dialog, .nw-drag-drop-dialog.dialog {
+.user-management-dialog .dialog {
     position: absolute;
     border-radius: 8px;
     border:1px solid rgba(0,0,0,0.1);
@@ -27353,7 +27325,7 @@ opacity: 1;
     z-index: 500;
 } 
 
-.whole-page-user-management .user-management-dialog .dialog, .nw-drag-drop-dialog.dialog {
+.user-management-dialog .dialog {
     left: 50%;
     top: 50%;
 }
@@ -27364,7 +27336,7 @@ opacity: 1;
     margin-top: -300px;
 }
 
-.whole-page-user-management .user-management-dialog .invite-people-dialog .mega-54px-icon {
+.user-management-dialog .invite-people-dialog .mega-54px-icon {
     background-image: url(../images/mega/fm-user-management-big-icons.png);
     background-repeat: no-repeat;
     width: 54px;
@@ -27376,7 +27348,7 @@ opacity: 1;
     position: relative;
 }
 
-.user-management-dialog .dialog-title, .nw-drag-drop-dialog .dialog-title{
+.user-management-dialog .dialog-title {
     font-size: 20px;
     color: #333333;
     line-height: 24px;
@@ -27387,7 +27359,7 @@ opacity: 1;
     display: block;
 }
 
-.user-management-dialog .dialog-subtitle, .nw-drag-drop-dialog .dialog-subtitle {
+.user-management-dialog .dialog-subtitle {
     font-size: 14px;
     color: #999999;
     line-height: 24px;
@@ -27475,50 +27447,50 @@ opacity: 1;
     left: 220px;
 }
 
-.user-management-dialog .dialog-input.placeholder, .nw-drag-drop-dialog .summary-input.placeholder {
+.user-management-dialog .dialog-input.placeholder {
     background-color: rgba(0,0,0,0.02);
     color: #bbbbbb;
     border:1px solid rgba(0,0,0,0.07);
 }
 
-.user-management-dialog .dialog-input.hover, .nw-drag-drop-dialog .summary-input.hover {
+.user-management-dialog .dialog-input.hover{
     background-color: rgba(0,0,0,0.02);
     color: #999999;
     border:1px solid rgba(0,0,0,0.07);
 }
 
-.user-management-dialog .dialog-input.focus, .nw-drag-drop-dialog .summary-input.focus {
+.user-management-dialog .dialog-input.focus{
     background-color: #ffffff;
     color: #cccccc;
     border:1px solid rgba(0,0,0,0.2);
 }
 
-.user-management-dialog .dialog-input.active, .nw-drag-drop-dialog .summary-input.active {
+.user-management-dialog .dialog-input.active{
     background-color: #ffffff;
     color: #333333;
     border:1px solid rgba(0,0,0,0.2);
 }
 
-.user-management-dialog .dialog-input.correct-input, .nw-drag-drop-dialog .summary-input.correct-input {
+.user-management-dialog .dialog-input.correct-input{
     background-color: #ffffff;
     color: #888888;
     border:1px solid rgba(0,0,0,0.1);
 }
 
-.user-management-dialog .dialog-input.error, .nw-drag-drop-dialog .summary-input.error{
+.user-management-dialog .dialog-input.error{
     background-color: rgba(0,0,0,0.05);
     color: #333333;
     border:1px solid rgba(217,0,7,0.5);
 }
 
-.user-management-dialog .dialog-input.disable, .nw-drag-drop-dialog .summary-input.disable{
+.user-management-dialog .dialog-input.disable{
     background-color: rgba(0,0,0,0.02);
     color: #999999;
     border:1px solid rgba(0,0,0,0.2);
     opacity: 0.2;
 }
 
-.user-management-dialog .dialog-input.error-message, .nw-drag-drop-dialog .summary-input.error-message {
+.user-management-dialog .dialog-input.error-message{
     color: #333333;
 }
 
@@ -27542,37 +27514,37 @@ opacity: 1;
     position: relative;
 }
 
-.whole-page-user-management .default-button-no-border {
+.user-management-dialog .default-button-no-border, .fm-right-header-user-management .default-button-no-border, .user-management-view .default-button-no-border{
     transition: 0.2s;
     height: 24px;
     width: auto;
     display: inline-block;
     box-sizing: border-box;
     padding: 0;
-    color: #999999;
+    color: #999;
     font-size: 14px;
     line-height: 24px;
     cursor: pointer;
     margin:4px 0;
 }
 
-.whole-page-user-management .user-management-dialog .default-button-no-border {
+.user-management-dialog .default-button-no-border {
         float: left;
 }
 
-.whole-page-user-management .user-management-dialog .dialog-button-container .default-button-no-border:nth-child(2){
+.user-management-dialog .dialog-button-container .default-button-no-border:nth-child(2){
     margin-left: 24px;
 }
 
 
-.whole-page-user-management .icon, .nw-drag-drop-dialog .icon {
+.user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon, .user-management-overview-bar .icon{
     background-image: url(../images/mega/fm-main-sprite.png);
     background-repeat: no-repeat; 
     width:24px;
     height:24px;
 }
 
-.whole-page-user-management .default-button-no-border .icon{
+.user-management-view .default-button-no-border .icon, .fm-right-header-user-management .default-button-no-border .icon, .user-management-dialog .default-button-no-border .icon {
     cursor: pointer;
     position: relative;
     float: left;
@@ -27581,25 +27553,21 @@ opacity: 1;
     transition: 0.1s;
 }
 
-.whole-page-user-management .user-management-dialog .icon.delete-img, .nw-drag-drop-dialog .icon.delete-img{
-    opacity: 0.3;
-} 
-
-.whole-page-user-management .licence-bar .icon {
+.user-management-view .licence-bar .icon, .user-management-dialog .licence-bar .icon{
     opacity: 0.8;
     float: left;
     margin: 16px 4px 16px 24px;
 }
 
-.whole-page-user-management .default-button-no-border:hover {
-    color:#333333;
+.user-management-view .default-button-no-border:hover, .user-management-dialog .default-button-no-border:hover, .fm-right-header-user-management .default-button-no-border:hover{
+    color:#666;
 }
 
-.whole-page-user-management .default-button-no-border:hover .icon {
-    opacity: 0.8;
+.user-management-view .default-button-no-border:hover .icon, .user-management-dialog .default-button-no-border:hover .icon, .fm-right-header-user-management .default-button-no-border:hover .icon{
+    opacity: 0.7;
 }
 
-.whole-page-user-management .user-management-dialog .invite-people-dialog .default-green-button-user-management {
+.user-management-dialog .invite-people-dialog .default-green-button-user-management {
     height: 36px;
     width: auto;
     padding: 8px 36px;
@@ -27608,7 +27576,7 @@ opacity: 1;
     font-size: 16px;
 }
 
-.whole-page-user-management .user-management-dialog .licence-bar {
+.user-management-dialog .licence-bar {
     width: 100%;
     height: 56px;
     background-color: rgba(250,250,250,1);
@@ -27623,7 +27591,7 @@ opacity: 1;
 
 }
 
-.whole-page-user-management .user-management-dialog .licence-bar::before {
+.user-management-dialog .licence-bar::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -27633,25 +27601,24 @@ opacity: 1;
     left: 0;
 }
 
-.whole-page-user-management .user-management-dialog .licence-bar .default-white-button-user-management {
+.user-management-dialog .licence-bar .default-white-button-user-management {
     position: absolute;
     right: 24px;
     top:12px;
     color: #666666;
 }
 
-.whole-page-user-management .user-management-dialog .dialog-input-container .input-user .delete-img {
+.user-management-dialog .dialog-input-container .input-user .delete-img.icon {
     position: absolute;
     right: 0;
     margin: 4px 28px 4px 4px;
-    opacity: 0.5;
     visibility: hidden;
     cursor: pointer;
     transition: 0.2s;
     top: 0;
 }
 
-.whole-page-user-management .user-management-dialog .dialog-input-container .input-user:hover .delete-img {
+.user-management-dialog .dialog-input-container .input-user:hover .delete-img.icon {
     visibility: visible;
 }
 
@@ -27689,7 +27656,7 @@ opacity: 1;
     margin-top: -270px;
 }
 
-.whole-page-user-management .edit-profile-dialog .user-management-subuser-avatars {
+.user-management-dialog .edit-profile-dialog .user-management-subuser-avatars {
     float: left;
     margin: 20px 12px 0 32px;
     cursor: pointer;
@@ -27735,7 +27702,7 @@ opacity: 1;
     font-family: 'Source Sans Pro', sans-serif;
 }
 
-.whole-page-user-management .user-management-dialog .dialog-input-title-ontop .dialog-input select {
+.user-management-dialog .dialog-input-title-ontop .dialog-input select {
     background:transparent;
     border:none;
     font-size: 14px;
@@ -27791,8 +27758,8 @@ opacity: 1;
 }
 
 .user-management-dialog .re-enable-disable-user-dialog {
-    width: 448px;
-    margin-left: -224px;
+    width: 460px;
+    margin-left: -230px;
     margin-top: -102px;
 }
 
@@ -27802,9 +27769,10 @@ opacity: 1;
     display: inline-block;
     width:56px;
     height: 56px;
-    margin:46px 32px 46px 40px;
+    margin: 40px 32px auto 40px;
     display: inline-block;
     position: relative;
+    vertical-align: top;
 }
 
 .user-management-dialog .re-enable-disable-user-dialog .re-enable-large-icon {
@@ -27817,9 +27785,9 @@ opacity: 1;
 
 .user-management-dialog .re-enable-disable-user-dialog .dialog-text-container {
     display: inline-block;
-    width:280px;
-    margin:32px 0 32px 0px;
-    position: absolute;
+    width:292px;
+    margin:32px 0;
+    position: relative;
 
 }
 
@@ -27842,7 +27810,7 @@ opacity: 1;
     display: inline-block;
 }
 
-.whole-page-user-management .user-management-account-settings .auto-save {
+.user-management-view .user-management-account-settings .auto-save {
     position: fixed;
     top: 30px;
     left: 50%;
@@ -27862,12 +27830,12 @@ opacity: 1;
     opacity: 0;
 }
 
-.whole-page-user-management .user-management-account-settings .auto-save:hover {
+.user-management-account-settings .auto-save:hover {
     top:50px;
     opacity: 0.9;
 }
 
-.whole-page-user-management .user-management-account-settings .auto-save .icon {
+.user-management-account-settings .auto-save .icon {
     float: left;
     margin-right: 12px;
 }
@@ -27914,7 +27882,7 @@ opacity: 1;
     left: 0;
 }
 
-.whole-page-user-management .icon48 {
+.user-management-view .icon48, .user-management-dialog .icon48{
     background-image: url(../images/mega/fm-user-management-big-icons.png);
     background-repeat: no-repeat;
     display: inline-block;
@@ -27971,22 +27939,22 @@ opacity: 1;
 }
 
 
-.whole-page-user-management .contact-icon48.icon48 {
+.user-management-view .contact-icon48.icon48 {
     background-position: 0 -172px;
     opacity: 0.2;
 }
 
-.whole-page-user-management .share-icon48.icon48 {
+.user-management-view .share-icon48.icon48 {
     background-position: -48px -172px;
      opacity: 0.2;
 }
 
-.whole-page-user-management .admin-icon48.icon48 {
+.user-management-view .admin-icon48.icon48 {
     background-position: -96px -172px;
      opacity: 0.2;
 }
 
-.whole-page-user-management .other-icon48.icon48 {
+.user-management-view .other-icon48.icon48 {
     background-position: -144px -172px;
      opacity: 0.2;
 }
@@ -28098,7 +28066,7 @@ opacity: 1;
 .user-management-account-settings .sub-option {
     position: relative;
     height: auto;
-    width: 800px;
+    width: 85%;
     margin-top: 12px;
     margin-left: 24px;
 }
@@ -28585,13 +28553,42 @@ opacity: 1;
     float: right;
 }
 
-.whole-page-user-management .scroll-auto {
+.user-management-landing-page {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: relative;
+    display: block;
+    top: 0px;
+}
+
+.user-management-landing-page::before {
+    
+}
+
+.user-management-view .ff-icon, .user-management-dialog .ff-icon {
+    background-image: url(../images/mega/files-icons_v3.png);
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+}
+
+
+
+
+
+
+
+
+
+.user-management-view .scroll-auto, .user-management-dialog .scroll-auto,  {
     overflow: auto;
     height: 100%;
     width: 100%;
 }
 
-.whole-page-user-management .border {
+.user-management-view .border, .user-management-dialog .border, .fm-right-header-user-management .border{
     content: " ";
     width: 100%;
     height: 1px;
@@ -28601,12 +28598,12 @@ opacity: 1;
     margin-bottom: 24px;
 }
 
-.whole-page-user-management .disappear {
+.user-management-view .disappear, .user-management-dialog .disappear, .user-management-overview-bar .disappear, .user-management-panel .disappear, .fm-right-header-user-management .disappear{
     visibility: hidden;
 }
 
-.whole-page-user-management .disabled {
-    opacity: 0.2;
+.user-management-view .disabled, .user-management-dialog .disabled, .user-management-overview-bar .disabled, .user-management-panel .disabled, .fm-right-header-user-management .disabled{
+    opacity: 0.3;
 }
 
 @media only screen and (max-width: 1270px) {
@@ -28616,6 +28613,10 @@ opacity: 1;
 
     .user-management-list-table tr td .user-management-name, .user-management-list-table tr td .user-management-email{
         width: 200px;
+    }
+
+    .subaccount-view-used-storage-transfer .used-storage-info .folder-number{
+    right: 100px;
     }
 
     .user-management-overview-bar-data {
@@ -28642,771 +28643,4 @@ opacity: 1;
     .user-management-account-settings .sub-admin-table tr td:nth-child(6) .icon {
     margin-left: 4px;
     }
-
-    .user-management-account-settings .sub-heading {
-    max-width: 450px;
-    }
-
 }
-
-
-
-
-
-/* new drag and drop dialog */
-
-.nw-drag-drop-dialog {
-    width: 620px;
-    margin-left: -310px;
-    margin-top: -300px;
-    position: absolute;
-}
-
-.whole-page-user-management .ff-icon, .nw-drag-drop-dialog .ff-icon {
-    background-image: url(../images/mega/files-icons_v3.png);
-    background-repeat: no-repeat;
-    width: 24px;
-    height: 24px;
-}
-
-.nw-drag-drop-dialog .summary-container {
-    width: 100%;
-    height: auto;
-    background-color: rgba(250,250,250,1);
-    position: relative;
-}
-
-.nw-drag-drop-dialog .summary-container::before {
-    content: " ";
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: relative;
-    display: block;
-    top: 0px;
-    left: 0px;
-}
-
-.nw-drag-drop-dialog .summary-container::after {
-    content: " ";
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: relative ;
-    display: block;
-    bottom: 0px;
-    left: 0px;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row {
-    margin: 24px;
-    position: relative;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-title {
-    font-size: 15px;
-    color: #333333;
-    line-height: 20px;
-    margin: 4px 12px 0 0;
-    display: inline-block;
-    width: 105px;
-    position: relative;
-    text-align: right;
-    vertical-align: top;
-}
-
-/* make summary-input flexible to fit other language */
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input {
-    width: 422px;
-    height: auto;
-    max-height: 160px;
-    display: inline-block;
-    border-radius: 4px;
-    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
-    box-sizing: border-box;
-    padding: 0px;
-    font-size: 14px;
-    font-family: 'Source Sans Pro', sans-serif;
-    position: relative;
-    cursor: text;
-    vertical-align: top;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .item-row {
-    width: 100%;
-    position: relative;
-    transition: 0.1s;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .item-row .summary-ff-name {
-    left: 0px;
-    height: 38px;
-    max-width: 340px;
-    line-height: 38px;
-    position: relative;
-    display: inline-block;
-    white-space: nowrap;
-    vertical-align: top;
-    overflow: hidden;
-    text-overflow:ellipsis;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .item-row:first-child .summary-ff-name {
-    max-width: 250px;
-} 
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .item-row .delete-img.icon {
-    position: absolute;
-    right: 8px;
-    top: 0px;
-    display: none;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .item-row .delete-img.icon:hover {
-    opacity: 0.7;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .item-row:hover {
-    background-color: rgba(0,0,0,0.02);
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .item-row:hover .delete-img.icon {
-    display: inline-block;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .item-row:not(:last-child):before {
-    content: " ";
-    width: calc(100% - 16px);
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    bottom: 0;
-    left: 8px;
-}
-
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .ff-icon {
-    margin: 6px 4px 6px 8px;
-    display: inline-block;
-    position: relative;
-    vertical-align: top;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .item-row span {
-    left: 0px;
-    height: 38px;
-    max-width: 300px;
-    line-height: 38px;
-    position: relative;
-    white-space: nowrap;
-    vertical-align: top;
-    overflow: hidden;
-    text-overflow:ellipsis;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .link-row {
-    left: 0px;
-    height: 38px;
-    max-width: 412px;
-    line-height: 38px;
-    position: relative;
-    white-space: nowrap;
-    vertical-align: top;
-    overflow: hidden;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .link-row .link-row-block {
-    left: 0;
-    display: inline-block;
-    max-width: 412px;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .icon {
-    display: inline-block;
-    vertical-align: top;
-    margin:7px 4px 0 8px;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .next-arrow {
-    display: inline-block;
-    vertical-align: top;
-    margin-top:7px;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .summary-input .ff-name {
-    display: inline-block;
-    vertical-align: top;
-    line-height: 38px;
-    max-width: 90px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow:ellipsis;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row > .icon {
-    position: absolute;
-    right: 0px;
-    border-radius: 4px;
-    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
-    box-sizing: border-box;
-    border:1px solid rgba(0,0,0,0.1);
-    background-color: #ffffff;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: 0.1s;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row > .icon:hover {
-    opacity: 0.8;
-    border:1px solid rgba(0,0,0,0.2);
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .drop-down-icon.icon{
-    top: 8px;
-}
-
-.nw-drag-drop-dialog .summary-container .summary-row .drop-up-icon.icon{
-    bottom: 8px;
-} 
-
-.nw-drag-drop-dialog .summary-container .summary-row .add-more-img.icon{
-    bottom: 8px;
-}
-
-.nw-drag-drop-dialog .folder-container { 
-    width: 100%;
-    height: auto;
-    display: block;
-    position: relative;
-}
-
-.nw-drag-drop-dialog .dialog-button-container {
-    height: 56px;
-}
-
-.nw-drag-drop-dialog .dialog-button-container .default-white-button-user-management {
-    position: relative;
-    margin:12px 0px;
-    padding: 0 24px;
-}
-
-.nw-drag-drop-dialog .dialog-button-container .default-white-button-user-management.left {
-    margin-left: 24px;
-}
-
-.nw-drag-drop-dialog .side-pane {
-    position: relative;
-    left: 0;
-    top: 0;
-    width: 56px;
-    height: 216px;
-    box-sizing: border-box;
-    display: inline-block;
-}
-
-.nw-drag-drop-dialog .side-pane::after {
-    content: " ";
-    height: 100%;
-    width: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    display: block;
-    bottom: 0px;
-    right: 0px;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container {
-    width: 100%;
-    height: 72px;
-    position: relative;
-    cursor: pointer;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container::before {
-    content: "";
-    background-image: url(../images/mega/fm-user-management-big-icons.png);
-    background-repeat: no-repeat;
-    width: 56px;
-    height: 56px;
-    position: absolute;
-    top: 8px;
-    left: 0;
-    transition: 0.1s;
-    opacity: 0.3;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container:hover::before {
-     opacity: 0.7;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container.cloud56-icon::before {
-     background-position: -112px -224px;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container.share56-icon::before {
-     background-position: -56px -224px;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container.contact56-icon::before {
-     background-position: 0 -224px;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container.rubbish56-icon::before {
-     background-position: 0 -280px;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container.chat56-icon::before {
-     background-position: -56px -280px;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container .tooltip {
-    height: 20px;
-    padding: 0 8px;
-    background-color: rgba(0,0,0,1);
-    line-height: 20px;
-    color: #CCCCCC;
-    font-size: 13px;
-    position: absolute;
-    margin: 2px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    white-space: nowrap;
-    left: 44px;
-    bottom: 24px;
-    -webkit-transition: left 0.5s ease-in, visibility 2s, opacity 0.3s ease-in;
-    -moz-transition: left 0.5s ease-in, visibility 2s, opacity 0.3s ease-in;
-    -o-transition: left 0.5s ease-in, visibility 2s, opacity 0.3s ease-in;
-    -ms-transition: left 0.5s ease-in, visibility 2s, opacity 0.3s ease-in;
-    transition: left 0.5s ease-in, visibility 2s, opacity 0.3s ease-in;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=1);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-    z-index: 1129;
-    visibility: hidden;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container:hover .tooltip {
-    visibility: visible;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    left: 50px;
-}
-
-.nw-drag-drop-dialog .icon-container .left-border {
-    width: 3px;
-    height:72px;
-    top: 0;
-    left: 0;
-    position: absolute;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container.active{
-    cursor: default;
-}
-
-.nw-drag-drop-dialog .side-pane .icon-container.active::before{
-    opacity: 0.7;
-}
-
-.nw-drag-drop-dialog .icon-container.cloud56-icon.active .left-border{
-    background-color: rgba(255,51,58,1);
-}
-
-.nw-drag-drop-dialog .icon-container.share56-icon.active .left-border{
-    background-color: rgba(255,211,0,1);
-}
-
-.nw-drag-drop-dialog .icon-container.contact56-icon.active .left-border{
-    background-color: #03c4b1;
-}
-
-.nw-drag-drop-dialog .icon-container.chat56-icon.active .left-border{
-    background-color: rgba(43,166,222,1);
-}
-
-.nw-drag-drop-dialog .icon-container.rubbish56-icon.active .left-border{
-    background-color: rgba(39,183,0,0.3);
-}
-
-.nw-drag-drop-dialog .right-pane {
-    display: inline-block;
-    position: relative;
-    height: 100%;
-    width: calc(100% - 59px);
-    vertical-align: top;
-}
-
-.nw-drag-drop-dialog .folder-container .header {
-    height: 40px;
-    width: 100%;
-    position: relative;
-}
-
-.nw-drag-drop-dialog .folder-container .header span {
-    font-size: 14px;
-    line-height: 40px;
-    color: #333;
-    padding-left: 24px;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    display: inline-block;
-    vertical-align: top;
-}
-
-.nw-drag-drop-dialog .folder-container .header .copy-dialog-panel-arrows {
-    position: relative;
-    top: 8px;
-    left: 8px;
-    background-position: -10px -9768px;
-    display: inline-block;
-    vertical-align: top;
-}
-
-.nw-drag-drop-dialog .folder-container .header .copy-dialog-panel-arrows.active {
-    background-position: -12px -7916px;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-    -moz-opacity: 0.7;
-    -khtml-opacity: 0.7;
-    opacity: 0.7;
-}
-
-.nw-drag-drop-dialog .folder-container .header .user-management-sorting-menu {
-    position: relative;
-    top: auto;
-    right: auto;
-    left: 8px;
-    width: 220px;
-    display: inline-block;
-}
-
-.nw-drag-drop-dialog .folder-container .header .user-management-sorting-menu .sorting-menu-item-user-management span {
-    position: absolute;
-    color: #ffffff;
-    font-size: 14px;
-    padding:0 12px;
-    line-height: 32px;
-}
-
-.nw-drag-drop-dialog .search-bar {
-    width:190px;
-    height: 24px;
-    position: absolute;
-    right: 24px;
-    top: 8px;
-    border-radius: 2px;
-    line-height: 24px;
-    padding-left: 8px;
-    padding-right: 32px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    box-sizing: border-box;
-    cursor: text;
-}
-
-.nw-drag-drop-dialog .search-bar .icon {
-    position: absolute;
-    right: 0;
-    top: 0;
-    transition: 0.1s;
-    cursor: pointer;
-}
-
-.nw-drag-drop-dialog .search-bar .icon:hover {
-    opacity: 0.7;
-}
-
-.nw-drag-drop-dialog .folder-container .right-pane .dialog-content-block {
-    height: 168px;
-    margin: 8px 0 0 0;
-    position: relative;
-}
-
-.nw-drag-drop-dialog .folder-container .right-pane .dialog-content-block span {
-    font-size: 13px;
-    color: #666;
-}
-
-.nw-drag-drop-dialog ul {
-    list-style-type: none;
-    margin:0;
-    padding:0;
-}
-
-.nw-drag-drop-dialog ul .nw-fm-tree-item {
-    padding-left: 24px;
-}
-.nw-drag-drop-dialog ul ul .nw-fm-tree-item {
-    padding-left: 48px;
-}
-.nw-drag-drop-dialog ul ul ul .nw-fm-tree-item {
-    padding-left: 72px;
-}
-.nw-drag-drop-dialog ul ul ul ul .nw-fm-tree-item {
-    padding-left: 96px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 120px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 144px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 168px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 192px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 216px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 240px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 264px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 288px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 312px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 336px;
-}
-.nw-drag-drop-dialog ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-    padding-left: 360px;
-}
-
-.nw-drag-drop-dialog .nw-fm-tree-folder {
-    padding-left: 30px;
-    max-width: -webkit-calc(100% - 40px);
-    max-width: -moz-calc(100% - 40px);
-    max-width: calc(100% - 40px);
-}
-
-.nw-drag-drop-dialog .nw-fm-tree-item:hover, .nw-drag-drop-dialog .nw-fm-tree-item.dragover, .nw-drag-drop-dialog .contact-row:hover,  .nw-drag-drop-dialog .contact-row.dragover{
-    background-color: rgba(0,191,165,0.4);
-    color: white;
-}
-
-.nw-drag-drop-dialog .nw-fm-tree-item.selected, .nw-drag-drop-dialog .contact-row.selected {
-    background-color: rgba(0,191,165,1);
-    color: white;
-}
-
-.nw-drag-drop-dialog .nw-fm-tree-item.expanded.selected .nw-fm-tree-folder::before, .nw-drag-drop-dialog .nw-fm-tree-item.expanded:hover .nw-fm-tree-folder::before, .nw-drag-drop-dialog .nw-fm-tree-item.expanded.dragover .nw-fm-tree-folder::before {
-    background-position: -375px -1037px;
-}
-
-.nw-drag-drop-dialog .dialog-content-block .nw-fm-tree-item.selected span, .nw-drag-drop-dialog .dialog-content-block .nw-fm-tree-item.dragover span,.nw-drag-drop-dialog .dialog-content-block .nw-fm-tree-item:hover span {
-    color: white;
-} 
-
-.nw-drag-drop-dialog .nw-fm-tree-item.selected.linked .data-item-icon,.nw-drag-drop-dialog .nw-fm-tree-item.dragover.linked .data-item-icon,.nw-drag-drop-dialog .nw-fm-tree-item.linked:hover .data-item-icon {
-    background-position: -11px -4962px;
-} 
-
-.nw-drag-drop-dialog .nw-fm-tree-item.disabled, .dropdown-item.disabled {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
-}
-
-.nw-drag-drop-dialog .nw-fm-tree-item.linked {
-    position: relative;
-}
-
-.nw-drag-drop-dialog .nw-fm-tree-item.linked .data-item-icon{
-    height: 24px;
-    width: 24px;
-    display: block;
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-repeat: no-repeat;
-    background-position: -11px -4822px;
-    right: 24px;
-    position: absolute;
-}
-
-.nw-drag-drop-dialog .contact-row {
-    height: 24px;
-    width: 100%;
-    transition: 0.1s;
-    position: relative;
-}
-
-.nw-drag-drop-dialog .contact-row.selected .contact-name, .nw-drag-drop-dialog .contact-row.selected .contact-email{
-    color: #fff;
-}
-
-
-.nw-drag-drop-dialog .contact-row .nw-contact-status {
-    margin: 9px 18px 9px 21px;
-}
-
-.nw-drag-drop-dialog .contact-row .contact-name {
-    position: relative;
-    width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    box-sizing: border-box;
-    font-size: 14px;
-    line-height: 24px;
-    color: #666;
-    float: left;
-}
-
-.nw-drag-drop-dialog .contact-row:hover .contact-name, .nw-drag-drop-dialog .contact-row:hover .contact-email {
-    color: #fff;
-}
-
-.nw-drag-drop-dialog .contact-row .contact-email {
-    position: relative;
-    padding-left: 12px;
-    width: 240px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    box-sizing: border-box;
-    font-size: 14px;
-    line-height: 24px;
-    color: #999;
-    float: left;
-}
-
-.nw-drag-drop-dialog .contact-row .contact-checkboxOn.small12, .nw-drag-drop-dialog .contact-row .contact-checkboxOff.small12 {
-    width: 12px;
-    height: 12px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    margin: 6px 24px 6px 0;
-    padding: 0;
-    position: relative;
-    float: right;
-    cursor: pointer;
-
-}
-
-.nw-drag-drop-dialog .contact-row .contact24-icon.icon {
-    display: inline-block;
-    float: left;
-    margin:0 8px 0 12px;
-}
-
-.nw-drag-drop-dialog .contact-row.selected .contact24-icon.icon {
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-repeat: no-repeat; 
-    background-position: -24px -12640px;
-}
-
-.nw-drag-drop-dialog .contact-row .contact-checkboxOn.small12::before,  .nw-drag-drop-dialog .contact-row .contact-checkboxOff.small12::before{
-    background-position: 0px -2381px;
-    background-image: url(../images/mega/top-login-sprite_v9.png);
-    background-repeat: no-repeat;
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
-    display: block;
-    content: " ";
-    transition: 0.1s;
-}
-
-.nw-drag-drop-dialog .contact-row .contact-checkboxOn.small12::before {
-    opacity: 1;
-}
-
-.nw-drag-drop-dialog .contact-row .contact-checkboxOff.small12::before {
-    opacity: 0;
-}
-
-.nw-drag-drop-dialog .contact-row .contact-checkboxOff.small12:hover::before {
-    opacity: 0.3;
-}
-
-.nw-drag-drop-dialog .contact-row:hover .contact-checkboxOff, .nw-drag-drop-dialog .contact-row.selected .contact-checkboxOn{
-    display: inline-block;
-}
-
-.nw-drag-drop-dialog .contact-row.selected .contact-checkboxOn.small12, .nw-drag-drop-dialog .contact-row:hover .small12 {
-    -webkit-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
-    -moz-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
-}
-
-.nw-drag-drop-dialog .contact-row.selected .contact-checkboxOn.small12::before, .nw-drag-drop-dialog .contact-row:hover .small12::before {
-    -webkit-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
-    -moz-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-position: -11px -2244px;
-}
-
-.nw-drag-drop-dialog .folder-container .my-chat-list {
-    width:308px;
-    height: 310px;
-    box-sizing: border-box;
-    position: relative;
-    display: inline-block;
-}
-
-.nw-drag-drop-dialog .folder-container .selected-list {
-    width:308px;
-    height: 310px;
-    box-sizing: border-box;
-    position: absolute;
-    right: 0;
-    top: 0;
-    display: inline-block;
-}
-
-.nw-drag-drop-dialog .folder-container .my-chat-list::after {
-    content: " ";
-    width: 1px;
-    height: 100%;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    display: block;
-    top: 0px;
-    right: 0px;
-}
-
-.nw-drag-drop-dialog .folder-container .dialog-content-block {
-    height: 270px;
-    width: 100%;
-}
-
-.nw-drag-drop-dialog .folder-container .dialog-content-block .delete-img.icon {
-    position: absolute;
-    right: 24px;
-    top: 0;
-}
-
-.nw-drag-drop-dialog .folder-container .dialog-content-block .delete-img.icon:hover {
-    opacity: 0.6;
-}
-

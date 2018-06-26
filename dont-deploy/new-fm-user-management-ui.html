@@ -611,7 +611,7 @@ $(document).ready(function() {
 					</div>
 				</div>
 
-                <table class="user-management-list-table">
+                <table class="user-management-list-table hidden">
                   	<tr class="grid-table-header-user-management">
 	                    <th>  
                     		<div class="checkdiv left checkboxOff-user-management small-user-management">
@@ -728,14 +728,14 @@ $(document).ready(function() {
                		</tr>
                 </table>
 
-                <div class="user-management-subaccount-view-container hidden">
-                	<div class="user-management-subuser-profile-container hidden">
+                <div class="user-management-subaccount-view-container">
+                	<div class="user-management-subuser-profile-container">
                     	<div class="subaccount-img-big"></div>
-                    	<div class="user-management-subuser-profile">                 		
-                    		<span>Jay Pierce</span>
-                    		<span>hermiston_alessandra@janie.net</span>
+                    	<div class="user-management-subuser-profile">
+                    		<div class="subuser-name">Jay Pierce</div>
+                    		<div class="subuser-email">hermiston_alessandra@janie.net</div>
 
-                    		<div class="view-status-row">
+                   			<div class="view-status-row">
                     			<div class="user-management-view-status pending"></div>
                     			<span class="user-management-view-status text">Pending</span>
                     			<div class="initial-pw-bar">
@@ -746,44 +746,48 @@ $(document).ready(function() {
 	                    		</div>
                     		</div>
 
-	                    	<div class="admin-icon">
-	                    		<div class="admin-text">Developer</div>
+	                    	<div class="admin-icon role hidden">
+	                    		<div class="admin-text">Sub-adminstrator</div>
 	                    	</div>
+		                    <div class="profile-button-container">
                     		<div class="default-white-button-user-management">Re-send Verification Email</div>
                     		<div class="default-white-button-user-management">Edit Profile</div>
                     		<div class="default-gray-button-user-management">Disable Account</div>
+		                	</div>
                     	</div>
                 	</div>
 
                 	<div class="user-management-subuser-profile-container hidden">
                     	<div class="subaccount-img-big"></div>
-                    	<div class="user-management-subuser-profile">                 		
-                    		<span>Jay Pierce</span>
-                    		<span>hermiston_alessandra@janie.net</span>
+                    	<div class="user-management-subuser-profile">
+                    		<div class="subuser-name">Jay Pierce</div>
+                    		<div class="subuser-email">hermiston_alessandra@janie.net</div>
 
                     		<div class="view-status-row">
                     			<div class="user-management-view-status enabled"></div>
-                    			<span class="user-management-view-status text">Active</span>
+                    			<span class="user-management-view-status text">Enabled</span>
                     			<div class="initial-pw-bar disappear">
 		                    		<div class="pw-white-icon icon"></div>
 		                    		<span><b>Initial password: </b> h0oo-M4ZPse3l586mV0MNg</span>
 	                    		</div>
                     		</div>
 
-	                    	<div class="admin-icon">
+	                    	<div class="admin-icon role">
 	                    		<div class="admin-text">Sub-adminstrator</div>
 	                    	</div>
-                    		<div class="default-white-button-user-management">View Account</div>
-                    		<div class="default-white-button-user-management">Edit Profile</div>
-                    		<div class="default-gray-button-user-management">Disable Account</div>
+		                    <div class="profile-button-container">
+		                		<div class="default-white-button-user-management">View Account</div>
+		                		<div class="default-white-button-user-management">Edit Data</div>
+		                		<div class="default-gray-button-user-management">Disable Account</div>
+		                	</div>
                     	</div>
                 	</div>
 
-                	<div class="user-management-subuser-profile-container">
+                	<div class="user-management-subuser-profile-container hidden">
                     	<div class="subaccount-img-big"></div>
-                    	<div class="user-management-subuser-profile">                 		
-                    		<span>Jay Pierce</span>
-                    		<span>hermiston_alessandra@janie.net</span>
+                    	<div class="user-management-subuser-profile">
+                    		<div class="subuser-name">Jay Pierce</div>
+                    		<div class="subuser-email">hermiston_alessandra@janie.net</div>
 
                     		<div class="view-status-row">
                     			<div class="user-management-view-status disabled"></div>
@@ -794,12 +798,14 @@ $(document).ready(function() {
 	                    		</div>
                     		</div>
 
-	                    	<div class="admin-icon">
+	                    	<div class="admin-icon role hidden">
 	                    		<div class="admin-text">Sub-adminstrator</div>
 	                    	</div>
-                    		<div class="default-white-button-user-management">View Account</div>
-                    		<div class="default-white-button-user-management">Migrate Data</div>
-                    		<div class="default-green-button-user-management">Re-enable Account</div>
+		                    <div class="profile-button-container">
+		                		<div class="default-white-button-user-management">View Account</div>
+		                		<div class="default-white-button-user-management">Migrate Data</div>
+		                		<div class="default-green-button-user-management">Re-enable Account</div>
+		                	</div>
                     	</div>
                 	</div>
 

@@ -25172,20 +25172,20 @@ opacity: 1;
     height: auto;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile span:first-child{
+.user-management-subuser-profile-container .user-management-subuser-profile .subuser-name{
     color:#333333;
     font-size: 24px;
     line-height: 32px;
-    padding:0;
+    padding-top:4px;
     position: relative;
     display: block;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile span:nth-child(2){
+.user-management-subuser-profile-container .user-management-subuser-profile .subuser-email{
     color:#666666;
     font-size: 14px;
     line-height: 18px;
-    margin:8px 0;
+    margin:12px 0;
     position: relative;
     display: block;
 }
@@ -25195,6 +25195,7 @@ opacity: 1;
     width: 100%;
     display: block;
     position: relative;
+    margin-bottom: 8px;
 }
 
 .user-management-view-status.enabled, .user-management-view-status.disabled, .user-management-view-status.pending{
@@ -25294,18 +25295,25 @@ opacity: 1;
     margin:0;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .admin-icon{
+.user-management-subuser-profile-container .user-management-subuser-profile .admin-icon.role{
+    margin:0px 12px 0px 0;
+    position: relative;
     width: 100%;
-    margin:8px 12px 24px 0;
-    display: block;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile .admin-icon .admin-text{
     position: relative;
-    margin: 0px 28px;
+    margin-left: 28px;
     color: #666666;
     font-size: 14px;
     line-height: 18px;
+    width: auto;
+}
+
+.user-management-subuser-profile-container .profile-button-container {
+    display: block;
+    position: relative;
+    margin-top: 24px;
 }
 
 .user-management-subuser-profile-container .default-white-button-user-management{

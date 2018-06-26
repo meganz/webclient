@@ -12271,7 +12271,7 @@ React.makeElement = React['createElement'];
 	                names.push(M.u[contactHash] ? M.getNameByHandle(contactHash) : "non contact");
 	            }
 	        });
-	        return names.length > 0 ? names.join(", ") : __(l[8888]);
+	        return names.length > 0 ? names.join(", ") : __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
 	    }
 	};
 
@@ -12280,8 +12280,6 @@ React.makeElement = React['createElement'];
 
 	    self._leaving = true;
 	    self._closing = triggerLeaveRequest;
-
-	    self.members[u_handle] = 0;
 
 	    if (triggerLeaveRequest) {
 	        if (self.type == "group") {

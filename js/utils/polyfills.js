@@ -120,6 +120,18 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    if (typeof window.devicePixelRatio === 'undefined') {
+        Object.defineProperty(window, 'devicePixelRatio', {
+            get: function() {
+                return (screen.deviceXDPI / screen.logicalXDPI) || 1;
+            }
+        });
+    }
+});
+
 mBroadcaster.once('boot_done', function() {
     'use strict';
     var mg;

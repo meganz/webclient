@@ -12482,9 +12482,6 @@ React.makeElement = React['createElement'];
 	ChatRoom.prototype.sendMessage = function (message) {
 	    var self = this;
 	    var megaChat = this.megaChat;
-	    if (d && self.state !== ChatRoom.STATE.READY) {
-	        console.warn("Tried to do a .sendMessage while the room is not ready");
-	    }
 	    var messageId = megaChat.generateTempMessageId(self.roomId, message);
 
 	    var msgObject = new Message(self, self.messagesBuff, {
@@ -12820,7 +12817,7 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.isReadOnly = function () {
-	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT || this.state !== ChatRoom.STATE.READY;
+	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
 	};
 	ChatRoom.prototype.iAmOperator = function () {
 	    return this.type === "private" || this.members && this.members[u_handle] === 3;

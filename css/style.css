@@ -23985,7 +23985,7 @@ opacity: 1;
 }
 
 
-.user-management-panel .user-management-status, .user-management-view .user-management-status {
+.content-panel.user-management .user-management-status, .user-management-view .user-management-status {
     background-image: url(../images/mega/fm-main-sprite.png);
     width: 8px;
     height: 8px;
@@ -23999,15 +23999,15 @@ opacity: 1;
     border-radius: 100%;
 }
 
-.user-management-panel .enabled.user-management-status, .user-management-view .enabled.user-management-status{
+.content-panel.user-management .enabled.user-management-status, .user-management-view .enabled.user-management-status{
     background-position: -4px -12244px;
 }
 
-.user-management-panel .pending.user-management-status, .user-management-view .pending.user-management-status{
+.content-panel.user-management .pending.user-management-status, .user-management-view .pending.user-management-status{
     background-position: -19px -12244px;
 }
 
-.user-management-panel .disabled.user-management-status, .user-management-view .disabled.user-management-status{
+.content-panel.user-management .disabled.user-management-status, .user-management-view .disabled.user-management-status{
     background-position: -33px -12244px;
     opacity: 0.8;
 }
@@ -24572,6 +24572,10 @@ opacity: 1;
     color: #666666;
 }
 
+.user-management-list-table tr .name {
+    padding: 0px 15px;
+}
+
 .user-management-list-table tr th:nth-child(1), .user-management-list-table tr td:nth-child(1){
     width:32px;
 }
@@ -24628,14 +24632,12 @@ opacity: 1;
     font-size: 14px;
     padding: 0;
     color: #333333;
-    width: 80%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     position: absolute;
     left: 24px;
     top: 0;
-    width: 300px;
 }
 
 .user-management-list-table tr td .user-management-email{

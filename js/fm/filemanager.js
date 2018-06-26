@@ -3257,8 +3257,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.fm-blocks-view.user-management-view').addClass('hidden');
         $('.user-management-overview-bar').addClass('hidden');
         $('.fm-left-panel .nw-tree-panel-header').removeClass('hidden');
-        $('.fm-left-panel .user-management-tree-panel-header.enabled-accounts').addClass('hidden');
-        $('.fm-left-panel .user-management-tree-panel-header.disabled-accounts').addClass('hidden');
     }
 
     if (id !== 'opc') {

@@ -23939,11 +23939,6 @@ opacity: 1;
     content: " ";
 }
 
-
-.user-management-view .user-management-list-table tr:not(:first-child) .small-user-management{
-    margin:13px 0 39px 0;
-}
-
 .user-management-view .checkboxOn-user-management.small-user-management::before, .checkboxOff-user-management.small-user-management::before {
     background-position: 0px -2381px;
     background-image: url(../images/mega/top-login-sprite_v9.png);
@@ -23980,11 +23975,6 @@ opacity: 1;
     float: left;
 }
 
-.user-management-list-table tr td .checkboxOn.small-user-management, .user-management-list-table tr td .checkboxOff.small-user-management{
-    margin: 15px 0 37px 0px;
-}
-
-
 .content-panel.user-management .user-management-status, .user-management-view .user-management-status {
     background-image: url(../images/mega/fm-main-sprite.png);
     width: 8px;
@@ -24011,10 +24001,6 @@ opacity: 1;
     background-position: -33px -12244px;
     opacity: 0.8;
 }
-
-.user-management-view .user-management-list-table .user-management-status{
-    margin:28px 8px 0 0;
-} 
 
 .user-management-tree-panel-header{
     height: 48px;
@@ -24055,13 +24041,11 @@ opacity: 1;
     font-weight: 600;
 }
 
-
 .user-management-tree-panel-header.disabled-accounts{
     position: absolute;
     border-top: 1px solid rgba(0,0,0,0.1);
     font-size: 14px;
     bottom: 0;
-    z-index: 5;
 }
 
 .user-management-tree-panel-header.disabled-accounts.active {
@@ -24280,71 +24264,9 @@ opacity: 1;
     margin-left: 16px;
 }
 
- .fm-files-view-icon-user-management.block-view:hover, .fm-files-view-icon-user-management.listing-view:hover{
+.fm-files-view-icon-user-management.block-view:hover, .fm-files-view-icon-user-management.listing-view:hover{
     opacity: 0.6;
  }
-
-.user-management-list-table tr:first-child {
-    height: 24px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    white-space: nowrap;
-    background-color: #ffffff;
-    position: relative;
-    overflow: visible;
-}
-
-.user-management-list-table tr {
-    height: 64px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    white-space: nowrap;
-    position: relative;
-    overflow: hidden;
-}
-
-
-.user-management-list-table tr:not(:first-child):hover td {
-    background-color:rgba(245,245,245,1);
-}
-
-.user-management-list-table tr td span {
-    line-height: 64px;
-    font-size: 14px;
-    color: #999999;
-    padding:0;     
-}
-
-
-.files-grid-view.user-management-view .user-management-list-table .icon:hover{
-    opacity: 0.7;
-}
-
-
-.files-grid-view.user-management-view .user-management-list-table tr .icon {
-    display: none;
-}
-
-.files-grid-view.user-management-view .user-management-list-table tr:hover .icon {
-   display: inline-block;
-}
-
-.files-grid-view.user-management-view .user-management-list-table tr td .icon {
-    margin:20px 0px 20px 4px;
-    float: right;
-    position: relative;
-    cursor: pointer;
-}
-
-.files-grid-view.user-management-view .user-management-list-table tr th .icon {
-    margin-left: 4px;
-    float: right;
-}
-
-
-
 
 .files-grid-view.user-management-view .view-icon, .user-management-dialog .view-icon {
     background-position: 0px -12086px;
@@ -24543,209 +24465,6 @@ opacity: 1;
     opacity: 0.4;
 }
 
-.user-management-list-table th .disabled-icon, .user-management-list-table th .enabled-icon {
-    padding-right: 0px;
-}
-
-.user-management-list-table tr .disabled-icon {
-    padding-right: 12px;
-}
-
-.user-management-view tr th, .user-management-view tr td {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    font-weight: normal;
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: hidden;
-    text-overflow: ellipsis;
-    position: relative;
-    padding: 0;
-}
-
-.user-management-list-table tr th{
-    line-height: 24px;
-    font-size: 13px;
-    padding: 0px 12px;
-    color: #666666;
-}
-
-.user-management-list-table tr .name {
-    padding: 0px 15px;
-}
-
-.user-management-list-table tr th:nth-child(1), .user-management-list-table tr td:nth-child(1){
-    width:32px;
-}
-
-.user-management-list-table tr th:nth-child(2), .user-management-list-table tr td:nth-child(2){
-    min-width:220px;
-}
-
-.user-management-list-table tr th:nth-child(3), .user-management-list-table tr td:nth-child(3){
-    min-width:122px;
-    width: 180px;
-}
-
-.user-management-list-table tr th:nth-child(4), .user-management-list-table tr td:nth-child(4){
-    min-width:118px;
-    width: 200px;
-}
-
-.user-management-list-table tr th:nth-child(5), .user-management-list-table tr td:nth-child(5){
-    min-width:118px;
-    width: 200px;
-}
-
-.user-management-list-table tr th:nth-child(6), .user-management-list-table tr td:nth-child(6){
-    min-width:110px;
-    width: 180px;
-    padding:0;
-    overflow: visible;
-}
-
-.user-management-list-table tr td:not(:first-child){
-    color: #666666;
-    size: 13px;
-    padding-left: 12px;
-}
-
-.user-management-list-table tr td:last-child{
-    padding-left: 0px;
-}
-
-.fm-user-management-user{
-    position: absolute;
-    top: 12px;
-    left: 0;
-}
-
-.user-management-list-table tr th:first-child,.user-management-list-table tr td:first-child {
-     padding-left: 8px;
-     margin: 0;
-}
-
-.user-management-list-table tr td .user-management-name{
-    line-height: 18px;
-    font-size: 14px;
-    padding: 0;
-    color: #333333;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    position: absolute;
-    left: 24px;
-    top: 0;
-}
-
-.user-management-list-table tr td .user-management-email{
-    padding: 4px 0 0 24px; 
-    color: #999999;
-    font-size: 13px; 
-    width: 80%;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    position: absolute; 
-    left: 0px;
-    top: 32px; 
-}
-
-
-.user-management-view .admin-icon{
-    width:16px;
-    height: 18px;
-    background-position: -28px -12060px;
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-repeat: no-repeat; 
-    position: absolute;
-}
-
-.user-management-list-table .fm-user-management-user .admin-icon{
-    padding-right: 8px;
-    float: left;
-    z-index: 1130;
-}
-
-.user-management-list-table tr:nth-child(2) .admin-icon{
-    
-}
-
-.user-management-list-table .fm-user-management-user .admin-icon .tooltip{
-    height: 24px;
-    padding: 0 8px;
-    background-color: rgba(0,0,0,0.8);
-    line-height: 24px;
-    color: #CCCCCC;
-    font-size: 13px;
-    position: absolute;
-    margin: 0;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    white-space: nowrap;
-    left: 16px;
-    top:-3px;
-    -webkit-transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
-    -moz-transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
-    -o-transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
-    -ms-transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
-    transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=1);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-    z-index: 1129;
-    visibility: hidden;
-}
-
-.user-management-list-table .fm-user-management-user .admin-icon:hover .tooltip{
-    visibility: visible;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    left: 24px;
-}
-
-.user-management-list-table tr th .icon .tooltip, .user-management-list-table tr td .icon .tooltip {
-    height: 20px;
-    padding: 0 8px;
-    background-color: rgba(0,0,0,1);
-    line-height: 20px;
-    color: #CCCCCC;
-    font-size: 13px;
-    position: absolute;
-    margin: 2px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    white-space: nowrap;
-    right: 0px;
-    bottom: -22px;
-    -webkit-transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
-    -moz-transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
-    -o-transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
-    -ms-transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
-    transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=1);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-    z-index: 1129;
-    visibility: hidden;
-}
-
-.user-management-list-table tr th .icon:hover .tooltip, .user-management-list-table tr td .icon:hover .tooltip {
-    visibility: visible;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-}
-
 .user-management-overview-bar{
     height:64px;
     width:calc(100% - 304px);
@@ -24842,6 +24561,13 @@ opacity: 1;
     margin:4px 8px 4px 0px;
 }
 
+.fm-left-panel.user-management-panel .jspContainer{
+    height: -webkit-calc(100% - 132px);
+    height: -moz-calc(100% - 132px);
+    height: calc(100% - 132px);
+    min-height: auto;
+}
+
 .fm-left-menu.user-management {
        background-color: rgba(255,81,21,1);
 }
@@ -24858,15 +24584,6 @@ opacity: 1;
     position: absolute;
     bottom: 144px;
 }
-
-.grid-table.user-managementtd td:first-child{
-    padding: 
-}
-
-.fm-right-files-block-user-management th:last-child::after,{
-    display: none;
-}
-
 
 .user-management-sorting-menu{
     right: -198px;
@@ -24962,17 +24679,6 @@ opacity: 1;
 
 .user-management{
     background-position: center -11961px;
-}
-
-
-.grid-table-header-user-management::after, .user-management-border::after{
-    content: '';
-    width: 100%;
-    height: 1px;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
 }
 
 .enabled.user-management-status{
@@ -25325,12 +25031,6 @@ opacity: 1;
     right: 60px;
 }
 
-.files-grid-view.user-management-view {
-    display: block;
-    height: 100%;
-    z-index: 101;
-}
-
 .files-grid-view.user-management-view .user-management-view-data{
     width:100%;
     height: 500px;
@@ -25391,7 +25091,7 @@ opacity: 1;
 
 
 .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img{
-    background-image: url(../images/mega/fm-user-management-big-icons.png);
+    background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
     width: 86px;
     height: 86px;
@@ -25813,10 +25513,6 @@ opacity: 1;
         -o-transform: rotate(290deg); /* Opera */
         transform:rotate(290deg);
     }
-
-
-
-
 
 
 
@@ -26488,6 +26184,18 @@ opacity: 1;
     -webkit-filter: blur(0.25em);
 }
 
+.user-management-landing-page{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.user-management-landing-page .user-management-dialog {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
 .user-management-dialog .dialog, .user-management-view .dialog {
     position: absolute;
     border-radius: 8px;
@@ -26501,24 +26209,6 @@ opacity: 1;
 .user-management-dialog .dialog {
     left: 50%;
     top: 50%;
-}
-
-.user-management-dialog .invite-people-dialog {
-    width: 620px;
-    margin-left: -310px;
-    margin-top: -300px;
-}
-
-.user-management-dialog .invite-people-dialog .mega-54px-icon {
-    background-image: url(../images/mega/fm-user-management-big-icons.png);
-    background-repeat: no-repeat;
-    width: 54px;
-    height: 54px;
-    left: 50%;
-    display: inline-block;
-    background-position: -129px -100px;
-    margin:48px auto 12px -27px;
-    position: relative;
 }
 
 .user-management-dialog .dialog-title {
@@ -26937,7 +26627,7 @@ opacity: 1;
 }
 
 .user-management-dialog .re-enable-disable-user-dialog .large-img{
-    background-image: url(../images/mega/fm-user-management-big-icons.png);
+    background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
     display: inline-block;
     width:56px;
@@ -26961,7 +26651,6 @@ opacity: 1;
     width:292px;
     margin:32px 0;
     position: relative;
-
 }
 
 .user-management-dialog .re-enable-disable-user-dialog .dialog-text-container .dialog-text-one {
@@ -27056,7 +26745,7 @@ opacity: 1;
 }
 
 .user-management-view .icon48, .user-management-dialog .icon48{
-    background-image: url(../images/mega/fm-user-management-big-icons.png);
+    background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
     display: inline-block;
     width:48px;
@@ -27393,6 +27082,20 @@ opacity: 1;
     margin: 0 4px 0 0;
 }
 
+.user-management-view tr th, .user-management-view tr td {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    padding: 0;
+}
+
 .user-management-account-settings table {
     width: 100%;
     position: relative;
@@ -27627,7 +27330,6 @@ opacity: 1;
 
 .user-management-account-settings .sub-admin-table tr th:nth-child(3), .user-management-account-settings .sub-admin-table tr td:nth-child(3) {
     min-width: 55px;
-
     padding:0px;
 }
 
@@ -27726,19 +27428,53 @@ opacity: 1;
     float: right;
 }
 
-.user-management-landing-page {
+
+.user-management-landing-page{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: #fff;
+}
+
+.user-management-landing-page::before {
     content: " ";
     width: 100%;
     height: 1px;
     background-color: rgba(0,0,0,0.1);
     position: relative;
     display: block;
-    top: 0px;
+    top: 0;
 }
 
-.user-management-landing-page::before {
-    
+.user-management-landing-page .user-management-dialog {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
 }
+.user-management-dialog .invite-people-dialog.dialog {
+    width: 620px;
+    margin-left: -310px;
+    margin-top: -308px;
+    left: 50%;
+    top: 50%;
+    border:none;
+}
+
+.user-management-dialog .invite-people-dialog .mega-54px-icon {
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    width: 54px;
+    height: 54px;
+    left: 50%;
+    display: inline-block;
+    background-position: -129px -100px;
+    margin:48px auto 12px -27px;
+    position: relative;
+}
+
+
 
 .user-management-view .ff-icon, .user-management-dialog .ff-icon {
     background-image: url(../images/mega/files-icons_v3.png);
@@ -27747,7 +27483,7 @@ opacity: 1;
     height: 24px;
 }
 
-.subaccount-img-big .avatar, .subaccount-img-big .avatar img{
+.subaccount-img-big .avatar {
     width: 162px;
     height: 162px;
     margin: 0;
@@ -27763,11 +27499,16 @@ opacity: 1;
     margin-left: 36%;
 }
 
-.user-management-view .scroll-auto, .user-management-dialog .scroll-auto,  {
-    overflow: auto;
-    height: 100%;
-    width: 100%;
+.subaccount-img-big .avatar, .subaccount-img-big .avatar img{
+    width: 162px;
+    height: 162px;
+    margin: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
 }
+
+
 
 .user-management-view .border, .user-management-dialog .border, .fm-right-header-user-management .border{
     content: " ";
@@ -27786,6 +27527,338 @@ opacity: 1;
 .user-management-view .disabled, .user-management-dialog .disabled, .user-management-overview-bar .disabled, .user-management-panel .disabled, .fm-right-header-user-management .disabled{
     opacity: 0.3;
 }
+
+.user-management-view .shared-grid-view {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 100%;
+    position: relative;
+    top: -1px;
+    overflow: hidden;
+}
+
+.files-grid-view.user-management-view {
+    display: block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 100%;
+    height: -webkit-calc(100% - 148px);
+    height: -moz-calc(100% - 148px);
+    height: calc(100% - 148px);
+    position: relative;
+    top: -1px;
+    overflow: hidden;
+}
+
+.user-management-view .user-management-list-table {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.header-table-user-management {
+    border-collapse: collapse;
+    width: 100%;
+    height: 24px;
+}
+
+.header-table-user-management .grid-table-header-user-management {
+    width: 100%;
+    height: 24px;
+}
+
+.user-management-list-table .grid-scrolling-table .jspPane{
+    background-size: auto 128px;
+    height: 100%;
+    overflow: auto;
+}
+
+.user-management-list-table .grid-table-user-management {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.grid-table-header-user-management::after, .user-management-border::after{
+    content: '';
+    width: 100%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+}
+
+.user-management-view .user-management-list-table tr:not(:first-child) .small-user-management{
+    margin:13px 0 39px 0;
+}
+
+.user-management-list-table tr td .checkboxOn.small-user-management, .user-management-list-table tr td .checkboxOff.small-user-management{
+    margin: 15px 0 37px 0px;
+}
+
+.user-management-view .user-management-list-table .user-management-status{
+    margin:28px 8px 0 0;
+}
+
+.user-management-list-table tr:first-child {
+    height: 24px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: nowrap;
+    background-color: #ffffff;
+    position: relative;
+    overflow: visible;
+}
+
+.user-management-list-table .grid-table-user-management tr {
+    height: 64px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-management-list-table .grid-table-user-management tr:nth-child(odd) td{
+    background-color: rgba(250,250,250,1);
+} 
+
+.user-management-list-table .grid-table-user-management tr:nth-child(even) td{
+    background-color: #fff;
+}
+
+.user-management-list-table .grid-table-user-management tr:hover td {
+    background-color:rgba(245,245,245,1);
+}
+
+.user-management-list-table tr td span {
+    line-height: 64px;
+    font-size: 14px;
+    color: #999999;
+    padding:0;     
+}
+
+.files-grid-view.user-management-view .user-management-list-table .icon:hover{
+    opacity: 0.7;
+}
+
+
+.files-grid-view.user-management-view .user-management-list-table tr .icon {
+    display: none;
+}
+
+.files-grid-view.user-management-view .user-management-list-table tr:hover .icon {
+   display: inline-block;
+}
+
+.files-grid-view.user-management-view .user-management-list-table tr td .icon {
+    margin:20px 0px 20px 4px;
+    float: right;
+    position: relative;
+    cursor: pointer;
+}
+
+.files-grid-view.user-management-view .user-management-list-table tr th .icon {
+    margin-left: 4px;
+    float: right;
+}
+
+.user-management-list-table th .disabled-icon, .user-management-list-table th .enabled-icon {
+    padding-right: 0px;
+}
+
+.user-management-list-table tr .disabled-icon {
+    padding-right: 12px;
+}
+
+.user-management-list-table .grid-table-header-user-management th{
+    line-height: 24px;
+    font-size: 13px;
+    padding: 0px 12px;
+    color: #666666;
+}
+
+.user-management-list-table tr .name {
+    padding: 0px 15px;
+}
+
+.user-management-list-table .header-table-user-management tr th:nth-child(1), .user-management-list-table tr td:nth-child(1){
+    width:32px;
+}
+
+.user-management-list-table .header-table-user-management tr th:nth-child(2), .user-management-list-table tr td:nth-child(2){
+    min-width:220px;
+}
+
+
+.user-management-list-table .header-table-user-management tr th:nth-child(3), .user-management-list-table tr td:nth-child(3){
+    min-width:122px;
+    width: 180px;
+}
+
+.user-management-list-table .header-table-user-management tr th:nth-child(4), .user-management-list-table tr td:nth-child(4){
+    min-width:118px;
+    width: 200px;
+}
+
+.user-management-list-table .header-table-user-management tr th:nth-child(5), .user-management-list-table tr td:nth-child(5){
+    min-width:118px;
+    width: 200px;
+}
+
+.user-management-list-table .header-table-user-management tr th:nth-child(6), .user-management-list-table tr td:nth-child(6){
+    min-width:110px;
+    width: 180px;
+    padding:0;
+    overflow: visible;
+}
+
+
+.user-management-list-table tr td:not(:first-child){
+    color: #666666;
+    size: 13px;
+    padding-left: 12px;
+}
+
+.user-management-list-table tr td:last-child{
+    padding-left: 0px;
+}
+
+.fm-user-management-user{
+    position: absolute;
+    top: 12px;
+    left: 0;
+}
+
+.user-management-list-table tr th:first-child,.user-management-list-table tr td:first-child {
+     padding-left: 8px;
+     margin: 0;
+}
+
+.user-management-list-table tr td .user-management-name{
+    line-height: 18px;
+    font-size: 14px;
+    padding: 0;
+    color: #333333;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: absolute;
+    left: 24px;
+    top: 0;
+}
+
+.user-management-list-table tr td .user-management-email{
+    padding: 4px 0 0 24px; 
+    color: #999999;
+    font-size: 13px; 
+    width: 80%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: absolute; 
+    left: 0px;
+    top: 32px; 
+}
+
+.user-management-view .admin-icon{
+    width:16px;
+    height: 18px;
+    background-position: -28px -12060px;
+    background-image: url(../images/mega/fm-main-sprite.png);
+    background-repeat: no-repeat; 
+    position: absolute;
+}
+
+.user-management-list-table .fm-user-management-user .admin-icon{
+    padding-right: 8px;
+    float: left;
+    z-index: 1130;
+}
+
+.user-management-list-table .fm-user-management-user .admin-icon .tooltip{
+    height: 24px;
+    padding: 0 8px;
+    background-color: rgba(0,0,0,0.8);
+    line-height: 24px;
+    color: #CCCCCC;
+    font-size: 13px;
+    position: absolute;
+    margin: 0;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    left: 16px;
+    top:-3px;
+    -webkit-transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
+    -moz-transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
+    -o-transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
+    -ms-transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
+    transition: opacity 0.2s ease-in,left 0.5s ease-in, visibility 0.5s ease-in;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=1);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    z-index: 1129;
+    visibility: hidden;
+}
+
+.user-management-list-table .fm-user-management-user .admin-icon:hover .tooltip{
+    visibility: visible;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    left: 24px;
+}
+
+.user-management-list-table tr th .icon .tooltip, .user-management-list-table tr td .icon .tooltip {
+    height: 20px;
+    padding: 0 8px;
+    background-color: rgba(0,0,0,1);
+    line-height: 20px;
+    color: #CCCCCC;
+    font-size: 13px;
+    position: absolute;
+    margin: 2px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    right: 0px;
+    bottom: -22px;
+    -webkit-transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
+    -moz-transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
+    -o-transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
+    -ms-transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
+    transition: opacity 0.2s ease-in, visibility 0.5s ease-in;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=1);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    z-index: 1129;
+    visibility: hidden;
+}
+
+.user-management-list-table tr th .icon:hover .tooltip, .user-management-list-table tr td .icon:hover .tooltip {
+    visibility: visible;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+
+.user-management-view .scroll-auto, .user-management-dialog .scroll-auto {
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+}
+
 
 @media only screen and (max-width: 1270px) {
     .user-management-list-table tr th:nth-child(2), .user-management-list-table tr td:nth-child(2){

@@ -726,19 +726,20 @@ function accountUI() {
         var html = '', sel = '';
         $('.default-select.country span').text(l[996]);
 
-        for (var country in isoCountries) {
-            if (!isoCountries.hasOwnProperty(country)) {
+        var countries = M.getCountries();
+        for (var country in countries) {
+            if (!countries.hasOwnProperty(country)) {
                 continue;
             }
             if (u_attr.country && country == u_attr.country) {
                 sel = 'active';
-                $('.default-select.country span').text(isoCountries[country]);
+                $('.default-select.country span').text(countries[country]);
             }
             else {
                 sel = '';
             }
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
-                + isoCountries[country]
+                + countries[country]
                 + '</div>';
         }
         $('.default-select.country .default-select-scroll').safeHTML(html);

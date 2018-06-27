@@ -26276,6 +26276,7 @@ opacity: 1;
    font-size: 48px;
    font-weight: 100;
    line-height: 60px;
+   font-family:source_sans_prolight;
 }
 
 .subaccount-view-used-storage-transfer, .user-management-view-used-data{
@@ -28595,13 +28596,21 @@ opacity: 1;
     height: 24px;
 }
 
-
-
-
-
-
-
-
+.subaccount-img-big .avatar, .subaccount-img-big .avatar img{
+    width: 162px;
+    height: 162px;
+    margin: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+}
+.subaccount-img-big .avatar span {
+    color: white;
+    font-size: 74px;
+    float: left;
+    margin-top: 38%;
+    margin-left: 36%;
+}
 
 .user-management-view .scroll-auto, .user-management-dialog .scroll-auto,  {
     overflow: auto;

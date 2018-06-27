@@ -68,11 +68,6 @@ mobile.slideshow = {
 
         'use strict';
 
-        // TODO: FIXME
-        if (1) {
-            return;
-        }
-
         // Cache selectors
         var $slideShowBackground = mobile.slideshow.$overlay.find('.slideshow-wrapper, .fs');
         var $slideShowHeader = mobile.slideshow.$overlay.find('.slideshow-header');
@@ -80,7 +75,11 @@ mobile.slideshow = {
         var $slideShowNavButtons = mobile.slideshow.$overlay.find('.slideshow-back-arrow, .slideshow-forward-arrow');
 
         // On clicking the image or black background of the slideshow
-        $slideShowBackground.off('tap').on('tap', function() {
+        $slideShowBackground.off().on('tap', SoonFc(function(ev) {
+            if ($(ev.target).closest('.video-controls').length) {
+                return false;
+            }
+
             if ($slideShowHeader.hasClass('hidden')) {
                 $slideShowHeader.removeClass('hidden');
                 $slideShowFooterButtons.removeClass('hidden');
@@ -92,7 +91,7 @@ mobile.slideshow = {
                 $slideShowFooterButtons.addClass('hidden');
                 $slideShowNavButtons.addClass('hidden');
             }
-        });
+        }));
     },
 
 

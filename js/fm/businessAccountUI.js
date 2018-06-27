@@ -11,6 +11,30 @@ function BusinessAccountUI() {
     else {
         this.business = mega.buinsessController;
     }
+
+    // private function to hide all business accounts UI divs.
+    this.initUItoRender = function () {
+        var $businessAccountContianer = $('.files-grid-view.user-management-view');
+        $('.user-management-list-table', $businessAccountContianer).addClass('hidden');
+        $('.user-management-subaccount-view-container', $businessAccountContianer).addClass('hidden');
+        $('.user-management-overview-container', $businessAccountContianer).addClass('hidden');
+
+        // hide any possible grid or block view.
+        $('.files-grid-view, .fm-blocks-view').addClass('hidden');
+        M.megaRender.cleanupLayout(false, [], '');
+
+        // view left panel tabs headers [enabled and disabled] account
+        $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
+        $('.fm-left-panel .user-management-tree-panel-header.enabled-accounts').removeClass('hidden');
+        $('.fm-left-panel .user-management-tree-panel-header.disabled-accounts').removeClass('hidden');
+
+        // headers
+        $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
+        $('.fm-right-header-user-management .user-management-breadcrumb.subaccount').addClass('hidden');
+        $('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
+        $('.fm-right-header-user-management .user-management-breadcrumb').addClass('hidden');
+        $('.fm-right-header-user-management .user-management-overview-buttons').addClass('hidden');
+    };
 }
 
 /**
@@ -32,15 +56,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             return false;
         }
     }
-
-    // view left panel tabs headers [enabled and disabled] account
-    $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
-    $('.fm-left-panel .user-management-tree-panel-header.enabled-accounts').removeClass('hidden');
-    $('.fm-left-panel .user-management-tree-panel-header.disabled-accounts').removeClass('hidden');
     
-    // hide any possible grid or block view.
-    $('.files-grid-view, .fm-blocks-view').addClass('hidden');
-    M.megaRender.cleanupLayout(false, [], '');
+    this.initUItoRender();
+
+    var mySelf = this;
 
     var subAccountsView;
     if (!isBlockView) {
@@ -55,8 +74,17 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
         return;
     }
-    
-    subAccountsView.removeClass('hidden');
+
+    subAccountsView.removeClass('hidden'); // un-hide the container
+    $('.user-management-list-table', subAccountsView).removeClass('hidden'); // unhide the list table
+    $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden'); // unhide header
+    $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+
+    // header events handlers
+    $('.fm-right-header-user-management .user-management-main-page-buttons .ba-overview').off('click.subuser')
+        .on('click.subuser', function overviewHeaderButtonHandler() {
+            mySelf.viewBusinessAccountOverview();
+        });
 
     // private function to check if new drawing is needed
     var isRedrawNeeded = function (subs, previousSubs) {
@@ -96,48 +124,50 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
 
         // now let's fill the table with sub-users data
-        for (var h in subUsers) {
-            var $currUser = $tr_user.clone(true); // sub-users table
-            var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
+        // for (var a = 0; a < 50; a++) {
+            for (var h in subUsers) {
+                var $currUser = $tr_user.clone(true); // sub-users table
+                var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
 
-            $currUser.attr('id', subUsers[h].u);
-            $currUserLeftPane.attr('id', subUsers[h].u);
-            // now we will hide icon and role, since we are not ready to support yet.
-            // $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
-            $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
+                $currUser.attr('id', subUsers[h].u);
+                $currUserLeftPane.attr('id', subUsers[h].u);
+                // now we will hide icon and role, since we are not ready to support yet.
+                // $currUser.find('.fm-user-management-user .admin-icon .tooltip').text('Sub-Account');
+                $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
 
-            $currUserLeftPane.removeClass('selected');
-            var uName = a32_to_str(base64_to_a32(subUsers[h].firstname)) + ' ' +
-                a32_to_str(base64_to_a32((subUsers[h].lastname || '')));
-            $currUser.find('.fm-user-management-user .user-management-name').text(uName);
-            $currUserLeftPane.find('.nw-user-management-name').text(uName);
+                $currUserLeftPane.removeClass('selected');
+                var uName = a32_to_str(base64_to_a32(subUsers[h].firstname)) + ' ' +
+                    a32_to_str(base64_to_a32((subUsers[h].lastname || '')));
+                $currUser.find('.fm-user-management-user .user-management-name').text(uName);
+                $currUserLeftPane.find('.nw-user-management-name').text(uName);
 
-            $currUser.find('.user-management-email').text(subUsers[h].e);
-            $currUser.find('.user-management-status').removeClass('enabled pending disable');
-            if (subUsers[h].s === 0) {
-                $currUser.find('.user-management-status').addClass('enabled');
-                $currUserLeftPane.find('.user-management-status').removeClass('pending disable')
-                    .addClass('enabled');
+                $currUser.find('.user-management-email').text(subUsers[h].e);
+                $currUser.find('.user-management-status').removeClass('enabled pending disabled');
+                if (subUsers[h].s === 0) {
+                    $currUser.find('.user-management-status').addClass('enabled');
+                    $currUserLeftPane.find('.user-management-status').removeClass('pending disabled')
+                        .addClass('enabled');
+                }
+                else if (subUsers[h].s === 10) {
+                    $currUser.find('.user-management-status').addClass('pending');
+                    $currUserLeftPane.find('.user-management-status').removeClass('enabled disabled')
+                        .addClass('pending');
+                }
+                else {
+                    $currUser.find('.user-management-status').addClass('disabled');
+                    $currUser.addClass('hidden');
+                    $currUserLeftPane.find('.user-management-status').removeClass('enabled pending')
+                        .addClass('disabled');
+                    $currUserLeftPane.addClass('hidden');
+                }
+                $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
+                // still usage data.
+                $usersTable.append($currUser);
+
+                // left pane part
+                $usersLeftPanel.append($currUserLeftPane);
             }
-            else if (subUsers[h].s === 10) {
-                $currUser.find('.user-management-status').addClass('pending');
-                $currUserLeftPane.find('.user-management-status').removeClass('enabled disable')
-                    .addClass('pending');
-            }
-            else {
-                $currUser.find('.user-management-status').addClass('disable');
-                $currUser.addClass('hidden');
-                $currUserLeftPane.find('.user-management-status').removeClass('enabled pending')
-                    .addClass('disable');
-                $currUserLeftPane.addClass('hidden');
-            }
-            $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
-            // still usage data.
-            $usersTable.append($currUser);
-
-            // left pane part
-            $usersLeftPanel.append($currUserLeftPane);
-        }
+        // }
 
 
         /// events handlers
@@ -178,7 +208,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
             for (var k = 0; k < $subUsers.length; k++) {
                 if (me.hasClass('enabled-accounts')) {
-                    if (!$($subUsers[k]).find('.user-management-status').hasClass('disable')) {
+                    if (!$($subUsers[k]).find('.user-management-status').hasClass('disabled')) {
                         $($subUsers[k]).removeClass('hidden');
                     }
                     else {
@@ -186,7 +216,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     }
                 }
                 else {
-                    if ($($subUsers[k]).find('.user-management-status').hasClass('disable')) {
+                    if ($($subUsers[k]).find('.user-management-status').hasClass('disabled')) {
                         $($subUsers[k]).removeClass('hidden');
                     }
                     else {
@@ -199,7 +229,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
             for (var h = 1; h < $subUsersTableRow.length; h++) {
                 if (me.hasClass('enabled-accounts')) {
-                    if (!$($subUsersTableRow[h]).find('.user-management-status').hasClass('disable')) {
+                    if (!$($subUsersTableRow[h]).find('.user-management-status').hasClass('disabled')) {
                         $($subUsersTableRow[h]).removeClass('hidden');
                     }
                     else {
@@ -207,7 +237,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     }
                 }
                 else {
-                    if ($($subUsersTableRow[h]).find('.user-management-status').hasClass('disable')) {
+                    if ($($subUsersTableRow[h]).find('.user-management-status').hasClass('disabled')) {
                         $($subUsersTableRow[h]).removeClass('hidden');
                     }
                     else {
@@ -217,6 +247,35 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             }
             
         });
+
+        // 3- on clicking on a sub-user to view his info (from left pane or row)
+        $('.user-management-list-table .view-icon.icon, .content-panel.user-management .nw-user-management-item')
+            .off('click.subuser');
+        $('.user-management-list-table .view-icon.icon, .content-panel.user-management .nw-user-management-item')
+            .on('click.subuser', function subUserViewInfoClickHandler() {
+
+                $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+
+                var userHandle = false;
+
+                if ($(this).hasClass('nw-user-management-item')) { // left pane
+                    userHandle = $(this).attr('id');
+                }
+                else if ($(this).hasClass('view-icon')) { // user row
+                    userHandle = $(this).closest('tr').attr('id');
+                }
+                else {
+                    console.error('click handler fired in business account pages on wrong element');
+                    return;
+                }
+                if (!userHandle) {
+                    console.error('click handler fired in business account pages on wrong element');
+                    return;
+                }
+                $('.content-panel.user-management .nw-user-management-item#' + userHandle).addClass('selected');
+                uiBusiness.viewSubAccountInfoUI(userHandle);
+
+            });
 
     };
 
@@ -384,4 +443,112 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
 
     M.safeShowDialog('invite-link-pwd', prepareSubAccountLinkDialog);
 
+};
+
+/**
+ * A function to show the sub-user info page
+ * @param {string} subUserHandle        sub-user handle to view the info page for
+ */
+BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
+    "use strict";
+    this.initUItoRender();
+
+    var $businessAccountContainer = $('.files-grid-view.user-management-view');
+    var $subAccountContainer = $('.user-management-subaccount-view-container', $businessAccountContainer);
+
+    var subUser = M.suba[subUserHandle];
+
+    if (!subUser) {
+        console.error('at view sub-user info, with a handle we cant find!');
+        return;
+    }
+
+    var uName = a32_to_str(base64_to_a32(subUser.firstname)) + ' ' +
+        a32_to_str(base64_to_a32((subUser.lastname || '')));
+
+    $('.subuser-name', $subAccountContainer).text(uName);
+    $('.subuser-email', $subAccountContainer).text(subUser.e);
+
+    $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
+    if (subUser.s === 0) {
+        $subAccountContainer.find('div.user-management-view-status').addClass('enabled');
+    }
+    else if (subUser.s === 10) {
+        $subAccountContainer.find('div.user-management-view-status').addClass('pending');
+    }
+    else {
+        $subAccountContainer.find('div.user-management-view-status').addClass('disabled');
+    }
+    $subAccountContainer.find('.user-management-view-status.text').text(this.subUserStatus(subUser.s));
+    
+    var subUserDefaultAvatar = useravatar.contact(subUserHandle);
+    $('.subaccount-img-big', $subAccountContainer).html(subUserDefaultAvatar);
+
+    // private function to fill quota info
+    var fillQuotaInfo = function (st, quotas) {
+        if (!quotas) {
+            return;
+        }
+        
+        var totalStorage = 0;
+        var totalBandwidth = 0;
+        var inboxHandle = quotas[subUserHandle][2]["4"];
+        var rootHandle = quotas[subUserHandle][2]["2"];
+        var rubbishHandle = quotas[subUserHandle][2]["3"];
+        var inboxTotal = quotas[subUserHandle][1][inboxHandle][0] || 0;
+        var rootTotal = quotas[subUserHandle][1][rootHandle][0] || 0;
+        var rubbishTotal = quotas[subUserHandle][1][rubbishHandle][0] || 0;
+        var inshareTotal = 0;
+
+
+        totalStorage = quotas[subUserHandle][0] || 0;
+        totalBandwidth = quotas[subUserHandle][3] || 0;
+            
+        var totalStorageFormatted = numOfBytes(totalStorage, 2);
+        var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
+        var inboxTotalFormatted = numOfBytes(inboxTotal, 2);
+        var rootTotalFormatted = numOfBytes(rootTotal, 2);
+        var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
+        var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
+
+        $('.user-management-view-data .user-management-storage .storage-transfer-data',
+            $subAccountContainer).text(totalStorageFormatted.size + ' ' + totalStorageFormatted.unit);
+        $('.user-management-view-data .user-management-transfer .storage-transfer-data',
+            $subAccountContainer).text(totalBandwidthFormatted.size + ' ' + totalBandwidthFormatted.unit);
+        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.root',
+        //    $subAccountContainer).text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
+        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.inbox',
+        //    $subAccountContainer).text(inboxTotalFormatted.size + ' ' + inboxTotalFormatted.unit);
+        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.inshare',
+        //    $subAccountContainer).text(inshareTotalFormatted.size + ' ' + inshareTotalFormatted.unit);
+        //$('.user-management-view-data .subaccount-view-used-storage-transfer .folder-occupy.rubbish',
+        //    $subAccountContainer).text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+    };
+
+    // getting quotas
+    var quotasPromise = this.business.getQuotaUsage();
+    quotasPromise.done(fillQuotaInfo);
+    
+
+    $businessAccountContainer.removeClass('hidden'); // BA container
+    $subAccountContainer.removeClass('hidden'); // sub-info container
+    $('.fm-right-header-user-management .user-management-breadcrumb.subaccount').removeClass('hidden');
+};
+
+
+/** show business account over view page
+ * */
+BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
+    "use strict";
+
+    this.initUItoRender();
+
+    var $businessAccountContainer = $('.files-grid-view.user-management-view');
+    var $overviewContainer = $('.user-management-overview-container', $businessAccountContainer)
+        .removeClass('hidden');
+
+    // header
+    $('.fm-right-header-user-management .user-management-breadcrumb.overview').removeClass('hidden');
+    $('.fm-right-header-user-management .user-management-overview-buttons').removeClass('hidden');
+    
 };

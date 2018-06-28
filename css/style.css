@@ -24046,6 +24046,7 @@ opacity: 1;
     border-top: 1px solid rgba(0,0,0,0.1);
     font-size: 14px;
     bottom: 0;
+    z-index: 20;
 }
 
 .user-management-tree-panel-header.disabled-accounts.active {
@@ -24079,12 +24080,15 @@ opacity: 1;
 }
 
 .content-panel.user-management {
-    height: calc(100% - 160px);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     min-width: 100%;
     position: relative;
+    height: -webkit-calc(100% - 132px);
+    height: -moz-calc(100% - 132px);
+    height: calc(100% - 132px);
+    min-height: auto;
 }
 
 .user-management-tree-panel-arrows {
@@ -24399,12 +24403,12 @@ opacity: 1;
 
 .user-management-view .delete-img, .fm-right-header-user-management .delete-img, .user-management-dialog .delete-img{
     background-position: 0px -12400px;
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: pointer;
 }
 
 .user-management-view .delete-img:hover, .fm-right-header-user-management .delete-img:hover, .user-management-dialog .delete-img:hover{
-    opacity: 0.8;
+    opacity: 0.7;
 }
 
 .user-management-view .confirm-img, .fm-right-header-user-management .confirm-img, .user-management-dialog .confirm-img {
@@ -24551,6 +24555,7 @@ opacity: 1;
     font-weight: 300;
     line-height: 32px;
     float: left;
+    font-family: source_sans_prolight;
 }
 
 .user-management-overview-bar-data .default-white-button-user-management {
@@ -24561,11 +24566,12 @@ opacity: 1;
     margin:4px 8px 4px 0px;
 }
 
-.fm-left-panel.user-management-panel .jspContainer{
+.fm-left-panel.user-management .fm-tree-panel{
     height: -webkit-calc(100% - 132px);
     height: -moz-calc(100% - 132px);
     height: calc(100% - 132px);
     min-height: auto;
+    overflow: auto;
 }
 
 .fm-left-menu.user-management {
@@ -24754,6 +24760,7 @@ opacity: 1;
     background-color: white;
 }
 
+/*
 .fm-right-files-block-user-management {
     height: 100%;
     width:auto;
@@ -24761,6 +24768,7 @@ opacity: 1;
     margin-left: 304px;
     display: block;
 }
+*/
 
 
 .fm-files-view-icon-user-management.listing-view {
@@ -24993,7 +25001,7 @@ opacity: 1;
 
 .user-management-subuser-profile-container .user-management-subuser-profile .initial-pw-bar span b {
     color:#fafafa;
-    font-weight: 900;
+    font-weight: 600;
     margin:0 12px 0 0;
 }
 
@@ -25042,7 +25050,7 @@ opacity: 1;
     position: relative;
 }
 
-.fm-right-files-block-user-management .view-title{
+.user-management-view .view-title{
     color:#333333;
     font-size: 18px;
     padding:24px 0;
@@ -25125,7 +25133,7 @@ opacity: 1;
 
 .user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-data {
    font-size: 48px;
-   font-weight: 100;
+   font-weight: 300;
    line-height: 60px;
    font-family:source_sans_prolight;
 }
@@ -25294,7 +25302,7 @@ opacity: 1;
     background-color: rgba(0,0,0,0.1);
 }
 
-.fm-right-files-block-user-management .user-management-overview-container .view-title {
+.user-management-view .user-management-overview-container .view-title {
     color:#333333;
     font-size: 18px;
     padding:12px 0 12px 24px;
@@ -25334,6 +25342,7 @@ opacity: 1;
     font-weight: 300;
     line-height: 72px;
     margin-bottom:4px;
+   font-family:source_sans_prolight;
 }
 
 .user-management-overview-container .user-analysis-container .user-segments-container .user-segment-trend{
@@ -25544,6 +25553,7 @@ opacity: 1;
     font-size: 30px;
     font-weight: 300;
      margin: 62px auto 8px auto;
+    font-family:source_sans_prolight;
 }
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container {
@@ -25655,6 +25665,7 @@ opacity: 1;
     color: #333333;
     float: left;
     position: relative;
+   font-family:source_sans_prolight;
 }
 
 .user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary .total-transfer-trend{
@@ -25666,6 +25677,7 @@ opacity: 1;
     top: 35px;
     position: absolute;
     max-width: 320px;
+    font-family:source_sans_prolight;
 }
 
 .user-management-overview-container .bond-color {
@@ -26204,6 +26216,7 @@ opacity: 1;
     background-color: #ffffff;
     height: auto;
     z-index: 500;
+    box-sizing: border-box;
 } 
 
 .user-management-dialog .dialog {
@@ -26224,11 +26237,11 @@ opacity: 1;
 
 .user-management-dialog .dialog-subtitle {
     font-size: 14px;
-    color: #999999;
+    color: #999;
     line-height: 24px;
-    width: 380px;
+    width: 390px;
     left: 50%;
-    margin-left: -190px;
+    margin-left: -195px;
     margin-bottom: 24px;
     height: auto;
     text-align: center;
@@ -26476,7 +26489,6 @@ opacity: 1;
     right: 0;
     margin: 4px 28px 4px 4px;
     visibility: hidden;
-    cursor: pointer;
     transition: 0.2s;
     top: 0;
 }
@@ -26506,11 +26518,66 @@ opacity: 1;
     height: 24px;
     top: 16px;
     right: 16px;
-    cursor: pointer;
 }
 
-.user-management-dialog .delete-img.icon:hover {
-    opacity: 0.8;
+.user-management-dialog .verification-email-dialog {
+    width: 620px;
+    margin-left: -310px;
+    margin-top: -210px;
+}
+
+.user-management-dialog .verification-email-dialog .dialog-title {
+    margin-top: 40px;
+}
+
+.user-management-dialog .verification-email-dialog .dialog-subtitle {
+    margin-bottom: 40px;
+}
+
+.user-management-dialog .verification-email-dialog .verification-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    max-height: 305px;
+    display: block;
+    background-color: rgba(250,250,250,1); 
+    padding:32px 40px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.user-management-dialog .verification-email-dialog .verification-container::before {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.user-management-dialog .verification-email-dialog .verification-container::after {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.user-management-dialog .verification-email-dialog .verification-user-container {
+    position: relative;
+    display: block;
+    height: 48px;
+    width: 540px;
+    margin-bottom: 48px;
+}
+
+.user-management-dialog .verification-email-dialog .verification-user-container:last-child {
+    margin-bottom: 0px;
 }
 
 .user-management-dialog .edit-profile-dialog {
@@ -26661,7 +26728,7 @@ opacity: 1;
 }
 
 .user-management-dialog .re-enable-disable-user-dialog .dialog-text-container .dialog-text-one b {
-    font-weight: 900;
+    font-weight: 600;
 }
 
 .user-management-dialog .re-enable-disable-user-dialog .dialog-text-container .dialog-text-two {
@@ -27203,7 +27270,7 @@ opacity: 1;
     opacity: 0.8;
 }
 
-.user-management-account-settings .delete-img.icon:hover, .user-management-account-settings .quick-edit-icon:hover {
+.user-management-account-settings .quick-edit-icon:hover {
     opacity: 0.8;
 }
 
@@ -27508,8 +27575,6 @@ opacity: 1;
     border-radius: 0;
 }
 
-
-
 .user-management-view .border, .user-management-dialog .border, .fm-right-header-user-management .border{
     content: " ";
     width: 100%;
@@ -27520,11 +27585,11 @@ opacity: 1;
     margin-bottom: 24px;
 }
 
-.user-management-view .disappear, .user-management-dialog .disappear, .user-management-overview-bar .disappear, .user-management-panel .disappear, .fm-right-header-user-management .disappear{
+.user-management-view .disappear, .user-management-dialog .disappear, .user-management-overview-bar .disappear, .fm-left-panel.user-management .disappear, .fm-right-header-user-management .disappear{
     visibility: hidden;
 }
 
-.user-management-view .disabled, .user-management-dialog .disabled, .user-management-overview-bar .disabled, .user-management-panel .disabled, .fm-right-header-user-management .disabled{
+.user-management-view .disabled, .user-management-dialog .disabled, .user-management-overview-bar .disabled, .fm-left-panel.user-management .disabled, .fm-right-header-user-management .disabled{
     opacity: 0.3;
 }
 
@@ -27572,7 +27637,6 @@ opacity: 1;
 .user-management-list-table .grid-scrolling-table .jspPane{
     background-size: auto 128px;
     height: 100%;
-    overflow: auto;
 }
 
 .user-management-list-table .grid-table-user-management {
@@ -27590,6 +27654,51 @@ opacity: 1;
     position: absolute;
 }
 
+.user-management-list-table .header-table-user-management tr {
+    height: 24px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background-color: #fff;
+    position: relative;
+    overflow: visible;
+}
+
+.user-management-list-table .header-table-user-management tr th{
+    line-height: 24px;
+    font-size: 13px;
+    color: #666;
+    padding: 0 12px;
+}
+
+.user-management-list-table .grid-table-user-management tr {
+    height: 64px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-management-list-table .grid-scrolling-table tr td {
+    padding:0 12px;
+}
+
+.user-management-list-table tr th:first-child,.user-management-list-table tr td:first-child {
+     padding-left: 8px;
+     margin: 0;
+}
+
+.fm-user-management-user{
+    position: absolute;
+    top: 12px;
+    left: 0;
+}
+
 .user-management-view .user-management-list-table tr:not(:first-child) .small-user-management{
     margin:13px 0 39px 0;
 }
@@ -27600,27 +27709,6 @@ opacity: 1;
 
 .user-management-view .user-management-list-table .user-management-status{
     margin:28px 8px 0 0;
-}
-
-.user-management-list-table tr:first-child {
-    height: 24px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    white-space: nowrap;
-    background-color: #ffffff;
-    position: relative;
-    overflow: visible;
-}
-
-.user-management-list-table .grid-table-user-management tr {
-    height: 64px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    white-space: nowrap;
-    position: relative;
-    overflow: hidden;
 }
 
 .user-management-list-table .grid-table-user-management tr:nth-child(odd) td{
@@ -27656,30 +27744,15 @@ opacity: 1;
 }
 
 .files-grid-view.user-management-view .user-management-list-table tr td .icon {
-    margin:20px 0px 20px 4px;
-    float: right;
+    margin:20px 2px 20px 2px;
+    float: left;
     position: relative;
     cursor: pointer;
 }
 
 .files-grid-view.user-management-view .user-management-list-table tr th .icon {
-    margin-left: 4px;
-    float: right;
-}
-
-.user-management-list-table th .disabled-icon, .user-management-list-table th .enabled-icon {
-    padding-right: 0px;
-}
-
-.user-management-list-table tr .disabled-icon {
-    padding-right: 12px;
-}
-
-.user-management-list-table .grid-table-header-user-management th{
-    line-height: 24px;
-    font-size: 13px;
-    padding: 0px 12px;
-    color: #666666;
+    margin: 0 2px;
+    float: left;
 }
 
 .user-management-list-table tr .name {
@@ -27717,33 +27790,11 @@ opacity: 1;
     overflow: visible;
 }
 
-
-.user-management-list-table tr td:not(:first-child){
-    color: #666666;
-    size: 13px;
-    padding-left: 12px;
-}
-
-.user-management-list-table tr td:last-child{
-    padding-left: 0px;
-}
-
-.fm-user-management-user{
-    position: absolute;
-    top: 12px;
-    left: 0;
-}
-
-.user-management-list-table tr th:first-child,.user-management-list-table tr td:first-child {
-     padding-left: 8px;
-     margin: 0;
-}
-
 .user-management-list-table tr td .user-management-name{
     line-height: 18px;
     font-size: 14px;
     padding: 0;
-    color: #333333;
+    color: #111;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

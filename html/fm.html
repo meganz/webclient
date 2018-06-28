@@ -825,59 +825,77 @@
             <!-- USERS managment right block -->
 
             <div class="files-grid-view user-management-view hidden">
-                <table class="user-management-list-table hidden">
-                    <tr class="grid-table-header-user-management">
-                        <th class="business-sub-checkbox-th">
-                            <div class="checkdiv left checkboxOff-user-management small-user-management">
-                            </div>
-                        </th>
-                        <th> <div class="arrow name desc">Name</div> </th>
-                        <th><div class="arrow desc">Status</div></th>
-                        <th><div class="arrow asc">Storage usage</div></th>
-                        <th><div class="arrow desc">Transfer usage</div></th>
-                        <th>
-                            <div class="disabled-icon icon">
-                                <div class="tooltip">Disable User</div>
-                            </div>
-                            <div class="resend-email-icon icon">
-                                <div class="tooltip">Re-send Verification Email</div>
-                            </div>
-                        </th>
-                    </tr>
+                <div class="user-management-list-table hidden">
+                    <table class="header-table-user-management">
+                        <tbody>
+                            <tr class="grid-table-header-user-management">
+                                <th class="business-sub-checkbox-th">
+                                    <div class="checkdiv left checkboxOff-user-management small-user-management">
+                                    </div>
+                                </th>
+                                <th> <div class="arrow name desc">Name</div> </th>
+                                <th><div class="arrow desc">Status</div></th>
+                                <th><div class="arrow asc">Storage usage</div></th>
+                                <th><div class="arrow desc">Transfer usage</div></th>
+                                <th>
+                                    <div class="disabled-icon icon">
+                                        <div class="tooltip">Disable User</div>
+                                    </div>
+                                    <div class="resend-email-icon icon">
+                                        <div class="tooltip">Re-send Verification Email</div>
+                                    </div>
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="grid-scrolling-table">
+                        <div class="jspContainer">
+                            <div class="jspPane">
+                                <table class="grid-table-user-management">
+                                    <tr>
+                                        <td class="business-sub-checkbox-td">
+                                            <div class="checkdiv left checkboxOff-user-management small-user-management">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fm-user-management-user">
+                                                <div class="admin-icon hidden">
+                                                    <div class="tooltip">Sub – administrators</div>
+                                                </div>
+                                                <div class="user-management-name">Jay Pierce</div>
+                                            </div>
+                                            <div class="user-management-email">alvah_powlowski@yahoo.com</div>
+                                        </td>
+                                        <td>
+                                            <div class="user-management-status enabled"></div>
+                                            <span class="user-management-status-txt">Active</span>
+                                        </td>
+                                        <td class="business-sub-storage-use"><span>0.8 GB</span></td>
+                                        <td class="business-sub-transfer-use"><span>13.2 GB</span></td>
+                                        <td>
+                                            <div class="disabled-icon icon">
+                                                <div class="tooltip">Disable Account</div>
+                                            </div>
+                                            <div class="edit-icon icon">
+                                                <div class="tooltip">Edit Profile</div>
+                                            </div>
+                                            <div class="view-icon icon">
+                                                <div class="tooltip">View Account</div>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                    <tr>
-                        <td class="business-sub-checkbox-td">
-                            <div class="checkdiv left checkboxOff-user-management small-user-management">
+                                </table>
                             </div>
-                        </td>
-                        <td>
-                            <div class="fm-user-management-user">
-                                <div class="admin-icon">
-                                    <div class="tooltip">Sub – administrators</div>
-                                </div>
-                                <div class="user-management-name">Jay Pierce</div>
-                            </div>
-                            <div class="user-management-email">alvah_powlowski@yahoo.com</div>
-                        </td>
-                        <td>
-                            <div class="user-management-status enabled"></div>
-                            <span class="user-management-status-txt">Active</span>
-                        </td>
-                        <td class="business-sub-storage-use"><span>0.0 GB</span></td>
-                        <td class="business-sub-transfer-use"><span>0.0 GB</span></td>
-                        <td>
-                            <div class="disabled-icon icon">
-                                <div class="tooltip">Disable Account</div>
-                            </div>
-                            <div class="edit-icon icon">
-                                <div class="tooltip">Edit Profile</div>
-                            </div>
-                            <div class="view-icon icon">
-                                <div class="tooltip">View Account</div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+                        </div>
+                        <!--<div class="ps-scrollbar-x-rail">
+                            <div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                        </div>
+                        <div class="ps-scrollbar-y-rail">
+                            <div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 200px;"></div>
+                        </div>-->
+                    </div>
+                </div>
 
 
                 <div class="user-management-subaccount-view-container hidden">

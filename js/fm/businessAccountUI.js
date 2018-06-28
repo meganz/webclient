@@ -27,6 +27,7 @@ function BusinessAccountUI() {
         $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
         $('.fm-left-panel .user-management-tree-panel-header.enabled-accounts').removeClass('hidden');
         $('.fm-left-panel .user-management-tree-panel-header.disabled-accounts').removeClass('hidden');
+        $('.fm-left-panel').addClass('user-management');
 
         // headers
         $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
@@ -112,6 +113,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         var $usersTable = $('.user-management-list-table', subAccountsView).removeClass('hidden');
         var $tr = $('tr', $usersTable);
         var $tr_user = $($tr.get(1)).clone(true); // the first one is the table header
+        var $detailListTable = $('.grid-table-user-management', $usersTable);
 
         var $usersLeftPanel = $('.fm-tree-panel .content-panel.user-management');
         var $userLaeftPanelItems = $('.nw-user-management-item ', $usersLeftPanel);
@@ -124,7 +126,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
 
         // now let's fill the table with sub-users data
-        // for (var a = 0; a < 50; a++) {
+         for (var a = 0; a < 50; a++) {
             for (var h in subUsers) {
                 var $currUser = $tr_user.clone(true); // sub-users table
                 var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
@@ -162,12 +164,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 }
                 $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
                 // still usage data.
-                $usersTable.append($currUser);
+                $detailListTable.append($currUser);
 
                 // left pane part
                 $usersLeftPanel.append($currUserLeftPane);
             }
-        // }
+         }
 
 
         /// events handlers

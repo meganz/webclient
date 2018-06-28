@@ -126,7 +126,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
 
         // now let's fill the table with sub-users data
-         for (var a = 0; a < 50; a++) {
+         //for (var a = 0; a < 50; a++) {
             for (var h in subUsers) {
                 var $currUser = $tr_user.clone(true); // sub-users table
                 var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
@@ -169,7 +169,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 // left pane part
                 $usersLeftPanel.append($currUserLeftPane);
             }
-         }
+         //}
 
 
         /// events handlers
@@ -497,7 +497,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var inboxHandle = quotas[subUserHandle][2]["4"];
         var rootHandle = quotas[subUserHandle][2]["2"];
         var rubbishHandle = quotas[subUserHandle][2]["3"];
-        var inboxTotal = quotas[subUserHandle][1][inboxHandle][0] || 0;
+        // var inboxTotal = quotas[subUserHandle][1][inboxHandle][0] || 0;
         var rootTotal = quotas[subUserHandle][1][rootHandle][0] || 0;
         var rubbishTotal = quotas[subUserHandle][1][rubbishHandle][0] || 0;
         var inshareTotal = 0;
@@ -508,7 +508,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
-        var inboxTotalFormatted = numOfBytes(inboxTotal, 2);
+        // var inboxTotalFormatted = numOfBytes(inboxTotal, 2);
         var rootTotalFormatted = numOfBytes(rootTotal, 2);
         var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
         var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
@@ -552,5 +552,102 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     // header
     $('.fm-right-header-user-management .user-management-breadcrumb.overview').removeClass('hidden');
     $('.fm-right-header-user-management .user-management-overview-buttons').removeClass('hidden');
+
+
+
+    // private function to populate the dashboard
+    var populateDashboard = function (st,quotas) {
+        if(!quotas) {
+            return;
+        }
+
+        var numberOfSubs = 0;
+        var activeSubs = 0;
+        var pendingSubs = 0;
+        var disabledSubs = 0;
+        var totalStorage = 0;
+        var totalBandwidth = 0;
+        var inshareTotal = 0;
+        var rootTotal = 0;
+        var rubbishTotal = 0;
+
+        for (var sub in quotas) {
+            if (sub === 'timestamp') {
+                continue; // embedded attribute 
+            }
+            numberOfSubs++;
+            if (sub === u_handle) {
+                activeSubs++;
+            }
+            else if (M.suba[sub] && M.suba[sub].s === 0) {
+                activeSubs++;
+            }
+            else if (M.suba[sub] && M.suba[sub].s === 10) {
+                pendingSubs++;
+            }
+            else {
+                disabledSubs++;
+            }
+
+            totalStorage += quotas[sub][0] || 0;
+            totalBandwidth += quotas[sub][3] || 0;
+
+            var rootHandle = quotas[sub][2]["2"];
+            var rubbishHandle = quotas[sub][2]["3"];
+            var inboxHandle = quotas[sub][2]["4"];
+            var inshareHandle = '';
+
+            rootTotal += (quotas[sub][1][rootHandle][0] || 0);
+            rubbishTotal += (quotas[sub][1][rubbishHandle][0] || 0);
+
+            for (var hh in quotas[sub][1]) {
+                if (hh !== rootHandle && hh !== rubbishHandle && hh !== inboxHandle) {
+                    inshareHandle = hh;
+                    break;
+                }
+            }
+            inshareTotal += (quotas[sub][1][inshareHandle][0] || 0);
+
+        }
+
+        var totalStorageFormatted = numOfBytes(totalStorage, 2);
+        var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
+        var rootTotalFormatted = numOfBytes(rootTotal, 2);
+        var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
+        var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
+
+        var rootPrecentage = rootTotal / totalStorage;
+        var insharePrecentage = inshareTotal / totalStorage;
+        var rubbishPrecentage = rubbishTotal / totalStorage;
+
+        $overviewContainer.find('.user-segments-container.all-subs .user-segment-number').text(numberOfSubs);
+        $overviewContainer.find('.user-segments-container.active-subs .user-segment-number').text(activeSubs);
+        $overviewContainer.find('.user-segments-container.pending-sub .user-segment-number').text(pendingSubs);
+        $overviewContainer.find('.user-segments-container.disabled-subs .user-segment-number').text(disabledSubs);
+
+        $overviewContainer.find('.storage-small-circle .total-storage-number')
+            .text(totalStorageFormatted.size + ' ' + totalStorageFormatted.unit);
+
+        $overviewContainer.find('.storage-division-container.cloud-node .storage-division-num')
+            .text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
+        $overviewContainer.find('.storage-division-container.cloud-node .storage-division-per')
+            .text(Math.round(rootPrecentage) + '%');
+        $overviewContainer.find('.storage-division-container.inshare-node .storage-division-num')
+            .text(inshareTotalFormatted.size + ' ' + inshareTotalFormatted.unit);
+        $overviewContainer.find('.storage-division-container.inshare-node .storage-division-per')
+            .text(Math.round(insharePrecentage) + '%');
+        $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-num')
+            .text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+        $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-per')
+            .text(Math.round(rubbishPrecentage) + '%');
+        $overviewContainer.find('.storage-division-container.inbox-node').addClass('hidden');
+
+        
+    }
+
+
+    // getting quotas
+    var quotasPromise = this.business.getQuotaUsage();
+    quotasPromise.done(populateDashboard);
     
 };

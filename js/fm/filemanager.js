@@ -3252,6 +3252,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.fm-blocks-view.contacts-view').addClass('hidden');
     }
     if (id !== 'user-management') {
+        $('.fm-left-panel').removeClass('user-management');
         $('.user-management-tree-panel-header').addClass('hidden');
         $('.files-grid-view.user-management-view').addClass('hidden');
         $('.fm-blocks-view.user-management-view').addClass('hidden');

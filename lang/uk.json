@@ -1758,7 +1758,7 @@
     "16588": "MEGAsync moves deleted files to special folders on your local computer and in your MEGA account so they can be restored if you need to.",
     "16589": "Browser Transfer Accelerator",
     "16590": "MEGAsync securely interacts with your browser, handling MEGA file transfers for enhanced performance.",
-    "16591": "Windows Phone app",
+    "16591": "The MEGA Windows Phone App",
     "16592": "Our Windows Phone app puts the cloud in your pocket.",
     "16593": "Access and stream your files on your phone or tablet, upload and sync your photos and videos.",
     "16594": "Universally MEGA",
@@ -2586,5 +2586,10 @@
     "19067": "Archived",
     "19068": "Archive Chat",
     "19069": "Are you sure you want to archive this conversation?",
-    "19077": "Chat created on %s1"
+    "19077": "Chat created on %s1",
+    "19078": "Bonaire, Sint Eustatius and Saba",
+    "19079": "Cura\u00e7ao",
+    "19080": "Heard Island and McDonald Islands",
+    "19081": "Saint Barth\u00e9lemy",
+    "19082": "Sint Maarten (Dutch part)"
 }

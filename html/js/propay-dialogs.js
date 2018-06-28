@@ -1216,7 +1216,7 @@ var addressDialog = {
         var $statesSelect = this.$dialog.find('.states');
 
         // Build options
-        $.each(isoStates, function(isoCode, stateName) {
+        $.each(M.getStates(), function(isoCode, stateName) {
 
             // Create the option and set the ISO code and state name
             var $stateOption = $('<option>').val(isoCode).text(stateName);
@@ -1247,7 +1247,7 @@ var addressDialog = {
         var $countriesSelect = this.$dialog.find('.countries');
 
         // Build options
-        $.each(isoCountries, function(isoCode, countryName) {
+        $.each(M.getCountries(), function(isoCode, countryName) {
 
             // Create the option and set the ISO code and country name
             var $countryOption = $('<option>').val(isoCode).text(countryName);
@@ -1763,7 +1763,7 @@ var cardDialog = {
         var $countriesDropDown = $countriesSelect.find('.default-select-scroll');
 
         // Build options
-        $.each(isoCountries, function(isoCode, countryName) {
+        $.each(M.getCountries(), function(isoCode, countryName) {
             countryOptions += '<div class="default-dropdown-item " data-value="' + isoCode + '">'
                             +     countryName
                             + '</div>';

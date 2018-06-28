@@ -180,7 +180,7 @@ function megatitle(nperc) {
 
 function countrydetails(isocode) {
     var cdetails = {
-        name: isoCountries[isocode],
+        name: M.getCountryName(isocode),
         icon: isocode.toLowerCase() + '.gif'
     };
     return cdetails;

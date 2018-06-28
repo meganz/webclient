@@ -1779,45 +1779,49 @@
             [$16106]
         </div>
 
-        <div class="payment-half-block first">
+        <div class="payment-form-header">
             <div class="payment-form-title">[$10632]:</div>
+            <div class="payment-icons">
+                <div class="payment-cc-icon visa"></div>
+                <div class="payment-cc-icon mastercard"></div>
+            </div>
             <div class="clear"></div>
+        </div>
+
+        <select id="address-dialog-countries" class="countries default-select" tabindex="1">
+            <option value="">[$481]</option>
+        </select>
+
+        <div class="payment-half-block first">
             <div class="fm-account-input">
-                <input class="first-name" type="text" value="" placeholder="[$1096]" tabindex="1">
+                <input class="first-name" type="text" value="" placeholder="[$1096]" tabindex="2">
             </div>
             <div class="fm-account-input">
-                <input class="address1" type="text" value="" placeholder="[$561] 1" tabindex="3">
+                <input class="address1" type="text" value="" placeholder="[$561] 1" tabindex="4">
             </div>
             <div class="fm-account-input">
-                <input class="city" type="text" value="" placeholder="[$565]" tabindex="5">
+                <input class="city" type="text" value="" placeholder="[$565]" tabindex="6">
             </div>
-            <select id="address-dialog-countries" class="countries default-select" tabindex="6">
-                <option value="">[$481]</option>
-            </select>
             <div class="fm-account-input code">
-                <input class="postcode" type="text" value="" placeholder="[$10659]" tabindex="7">
+                <input class="postcode" type="text" value="" placeholder="[$10659]" tabindex="8">
             </div>
             <div class="clear"></div>
         </div>
 
         <div class="payment-half-block second">
-            <div class="payment-icons">
-                <div class="payment-cc-icon visa"></div>
-                <div class="payment-cc-icon mastercard"></div>
+            <div class="fm-account-input">
+                <input class="last-name" type="text" value="" placeholder="[$1097]" tabindex="3">
             </div>
             <div class="fm-account-input">
-                <input class="last-name" type="text" value="" placeholder="[$1097]" tabindex="2">
+                <input class="address2" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="5">
             </div>
-            <div class="fm-account-input">
-                <input class="address2" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="4">
-            </div>
-            <select id="address-dialog-states" class="states default-select" tabindex="8" disabled>
+            <select id="address-dialog-states" class="states default-select" tabindex="7" disabled>
                 <option value="">[$7352]</option>
             </select>
-            <div class="payment-buy-now">[$6190]</div>
-            <div class="error-message hidden">[$10633]</div>
         </div>
         <div class="clear"></div>
+        <div class="payment-buy-now">[$6190]</div>
+        <div class="error-message hidden">[$10633]</div>
         <div class="payment-note-second">
             [$10634]<br>
             [$10635]

@@ -27909,6 +27909,13 @@ opacity: 1;
     height: 100%;
     width: 100%;
 }
+.fm-left-panel.user-management .fm-tree-panel {
+    height: -webkit-calc(100% - 132px);
+    height: -moz-calc(100% - 132px);
+    height: calc(100% - 132px);
+    min-height: auto;
+    overflow: auto;
+}
 
 
 @media only screen and (max-width: 1270px) {

@@ -1884,6 +1884,7 @@ function loadfm(force) {
                     u      : '&u',             // users - handle
                     ph     : '&h',             // exported links - handle
                     tree   : '&h',             // tree folders - handle
+                    suba   : '&s_ac',          // sub_accounts of master business account
                     opc    : '&p',             // outgoing pending contact - id
                     ipc    : '&p',             // incoming pending contact - id
                     ps     : '&h_p',           // pending share - handle/id
@@ -2022,6 +2023,7 @@ function dbfetchfm() {
                             opc: processOPC,
                             ipc: processIPC,
                             ps: processPS,
+                            suba: process_suba,
                             puf: mega.megadrop.pufProcessDb,
                             pup: mega.megadrop.pupProcessDb,
                             tree: function(r) {
@@ -2819,6 +2821,36 @@ function process_u(u, ignoreDB) {
      }*/
 }
 
+/**
+ * a function to parse the JSON object recived holding information about sub-accounts of a business account.
+ * This object will exist only in business accounts.
+ * @param {string[]} suba    the object to parse, it must contain an array of sub-accounts ids (can be empty)
+ * @param {boolean} ignoreDB if we want to skip DB updating
+ */
+function process_suba(suba, ignoreDB) {
+    "use strict";
+    M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+
+        // the resposne is an array of users's handles (Masters). this means at least it will contain
+        // the current user handle.
+        // later-on we need to iterate on all of them. For now we dont know how to treat sub-masters yet
+        // --> we will target only current users's subs
+        var bAccount = new BusinessAccount();
+        //if (!suba || !suba[u_handle]) {
+        //    return;
+        //}
+        //suba = suba[u_handle];
+        if (suba.length) {
+            for (var k = 0; k < suba.length; k++) {
+                bAccount.parseSUBA(suba[k], ignoreDB);
+            }
+        }
+        else {
+            bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
+        }
+    });
+}
+
 function process_ok(ok, ignoreDB) {
     "use strict";
 
@@ -2972,6 +3004,11 @@ function loadfm_callback(res) {
     }
     if (res.opc) {
         processOPC(res.opc);
+    }
+    if (res.suba) {
+        if (!is_mobile) {
+            process_suba(res.suba);
+        }
     }
     if (res.ipc) {
         processIPC(res.ipc);

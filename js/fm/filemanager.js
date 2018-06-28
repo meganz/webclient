@@ -589,16 +589,17 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
             fmTabState = {
-                'cloud-drive':     {root: M.RootID,    prev: null},
-                'folder-link':     {root: M.RootID,    prev: null},
-                'shared-with-me':  {root: 'shares',    prev: null},
-                'conversations':   {root: 'chat',      prev: null},
-                'contacts':        {root: 'contacts',  prev: null},
-                'transfers':       {root: 'transfers', prev: null},
-                'account':         {root: 'account',   prev: null},
-                'dashboard':       {root: 'dashboard', prev: null},
-                'inbox':           {root: M.InboxID,   prev: null},
-                'rubbish-bin':     {root: M.RubbishID, prev: null}
+                'cloud-drive':          {root: M.RootID,    prev: null},
+                'folder-link':          {root: M.RootID,    prev: null},
+                'shared-with-me':       {root: 'shares',    prev: null},
+                'conversations':        {root: 'chat',      prev: null},
+                'contacts':             {root: 'contacts',  prev: null},
+                'transfers':            {root: 'transfers', prev: null},
+                'account':              {root: 'account',   prev: null},
+                'dashboard':            {root: 'dashboard', prev: null},
+                'inbox':                {root: M.InboxID,   prev: null},
+                'rubbish-bin':          {root: M.RubbishID, prev: null},
+                'user-management':      {root: 'user-management', prev: null}
             };
         }
 
@@ -3042,6 +3043,9 @@ FileManager.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (id_r === 'opc') {
         this.onSectionUIOpen('opc');
     }
+    else if (id_s === 'user-management') {
+        this.onSectionUIOpen('user-management');
+    }
     else if (id_r === 'account') {
         this.onSectionUIOpen('account');
     }
@@ -3134,6 +3138,14 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.nw-fm-left-icon.inbox').addClass('hidden');
     }
 
+    // view or hide left icon for business account
+    if (typeof BusinessAccount !== 'undefined' && new BusinessAccount().isBusinessMasterAcc()) {
+        $('.nw-fm-left-icon.user-management').removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.user-management').addClass('hidden');
+    }
+
     $('.content-panel').removeClass('active');
 
     if (id === 'opc' || id === 'ipc') {
@@ -3160,7 +3172,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     $('.fm-left-menu').removeClass(
         'cloud-drive folder-link shared-with-me rubbish-bin contacts ' +
-        'conversations opc ipc inbox account dashboard transfers'
+        'conversations opc ipc inbox account dashboard transfers user-management'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
@@ -3199,7 +3211,14 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     if (id !== 'conversations') {
-        $('.fm-right-header').removeClass('hidden');
+        if (id !== 'user-management') {
+            $('.fm-right-header').removeClass('hidden');
+            $('.fm-right-header-user-management').addClass('hidden');
+        }
+        else {
+            $('.fm-right-header').addClass('hidden');
+            $('.fm-right-header-user-management').removeClass('hidden');
+        }
         $('.fm-chat-block').addClass('hidden');
         $('.section.conversations').addClass('hidden');
     }
@@ -3231,6 +3250,14 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.contacts-details-block').addClass('hidden');
         $('.files-grid-view.contacts-view').addClass('hidden');
         $('.fm-blocks-view.contacts-view').addClass('hidden');
+    }
+    if (id !== 'user-management') {
+        $('.fm-left-panel').removeClass('user-management');
+        $('.user-management-tree-panel-header').addClass('hidden');
+        $('.files-grid-view.user-management-view').addClass('hidden');
+        $('.fm-blocks-view.user-management-view').addClass('hidden');
+        $('.user-management-overview-bar').addClass('hidden');
+        $('.fm-left-panel .nw-tree-panel-header').removeClass('hidden');
     }
 
     if (id !== 'opc') {
@@ -3290,6 +3317,9 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             break;
         case 'rubbish-bin':
             headertxt = l[6771];
+            break;
+        case 'user-management':
+            headertxt = l[18677];
             break;
     }
 

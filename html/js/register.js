@@ -260,9 +260,14 @@ function pageregister() {
             msgDialog('warninga', l[1117], l[1118]);
         }
         else {
-            if (localStorage.signupcode) {
+            if (localStorage.signupcode || localStorage.businessSubAc) {
                 loadingDialog.show();
                 u_storage = init_storage(localStorage);
+                var signupcode = localStorage.signupcode;
+                if (localStorage.businessSubAc) {
+                    window.businessSubAc = JSON.parse(localStorage.businessSubAc);
+                    signupcode = window.businessSubAc.signupcode;
+                }
                 var ctx = {
                     checkloginresult: function(u_ctx, r) {
                         if (typeof r[0] === 'number' && r[0] < 0) {
@@ -273,16 +278,18 @@ function pageregister() {
                             u_type = r;
                             loadSubPage('fm');
                         }
-                    }
+                    },
+                    businessUser: localStorage.businessSubAc
                 };
                 var passwordaes = new sjcl.cipher.aes(prepare_key_pw($('#register-password').val()));
                 var uh = stringhash($('#register-email').val().toLowerCase(), passwordaes);
                 u_checklogin(ctx,
                     true,
                     prepare_key_pw($('#register-password').val()),
-                    localStorage.signupcode,
+                    signupcode,
                     $('#register-firstname').val() + ' ' + $('#register-lastname').val(), uh);
                 delete localStorage.signupcode;
+                delete localStorage.businessSubAc;
             }
             else if (u_type === false) {
                 loadingDialog.show();
@@ -411,6 +418,19 @@ function init_register() {
             $('#register-lastname').focus();
         }
     });
+
+    // business sub-account registeration
+    if (localStorage.businessSubAc) {
+        var userInfo = JSON.parse(localStorage.businessSubAc);
+        // we know here that userInfo contain all needed attr, othrewise higher layers wont allow us
+        // to get here.
+        $('#register-email').val(userInfo.e);
+        $('#register-email').attr('readonly', true);
+        $('#register-lastname').val(a32_to_str(base64_to_a32(userInfo.lastname)));
+        $('#register-lastname').attr('readonly', true);
+        $('#register-firstname').val(a32_to_str(base64_to_a32(userInfo.firstname)));
+        $('#register-firstname').attr('readonly', true);
+    }
 }
 
 

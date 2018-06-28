@@ -71,6 +71,7 @@
         }
         else if (id && (id.substr(0, 7) !== 'account')
             && (id.substr(0, 9) !== 'dashboard')
+            && (id.substr(0, 15) !== 'user-management')
             && (id.substr(0, 13) !== 'notifications')) {
 
             $('.fm-right-files-block').removeClass('hidden');
@@ -153,16 +154,22 @@
 
             if (this.currentdirid === 'opc') {
                 this.v = [];
-                for (var i in this.opc) {
-                    this.v.push(this.opc[i]);
+                for (var a in this.opc) {
+                    this.v.push(this.opc[a]);
                 }
             }
             else if (this.currentdirid === 'ipc') {
                 this.v = [];
-                for (var i in this.ipc) {
-                    this.v.push(this.ipc[i]);
+                for (var h in this.ipc) {
+                    this.v.push(this.ipc[h]);
                 }
             }
+            // else if (this.currentdirid === 'user-management') {
+            //    this.v = [];
+            //    for (var k in this.suba) {
+            //        this.v.push(this.suba[k]);
+            //    }
+            // }
 
             this.renderMain();
 
@@ -177,9 +184,9 @@
                 }
 
                 if ($('#treea_' + currentdirid).length === 0) {
-                    var n = this.d[currentdirid];
-                    if (n && n.p) {
-                        M.onTreeUIOpen(n.p, false, true);
+                    var n1 = this.d[currentdirid];
+                    if (n1 && n1.p) {
+                        M.onTreeUIOpen(n1.p, false, true);
                     }
                 }
                 M.onTreeUIOpen(currentdirid, currentdirid === 'contacts');
@@ -246,7 +253,7 @@
      * @param {String}  id      The folder id
      * @param {Boolean} [force] If that folder is already open, re-render it
      * @param {Boolean} [chat]  Some chat flag..
-     * @returns {MegaPromise}
+     * @returns {MegaPromise} revoked when opening finishes
      */
     MegaData.prototype.openFolder = function(id, force, chat) {
         var newHashLocation;
@@ -306,6 +313,16 @@
         }
         else if (id === 'ipc') {
             id = 'ipc';
+        }
+        else if (id === 'user-management') {
+            id = 'user-management';
+            M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+                var usersM = new BusinessAccountUI();
+                M.onFileManagerReady(function () {
+                    M.onSectionUIOpen('user-management');
+                    usersM.viewSubAccountListUI();
+                });
+            });
         }
         else if (id === 'shares') {
             id = 'shares';

@@ -2296,7 +2296,9 @@ else if (!b_u) {
         'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
         'megadrop': {f:'html/megadrop.html', n: 'megadrop', j: 0 },
         'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j: 0 },
-        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 }
+        'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j: 1 },
+        'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
+        'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 }
     };
 
     var jsl3 = {

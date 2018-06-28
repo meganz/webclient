@@ -240,6 +240,10 @@ function init_page() {
             return false;
         }
     }
+    // cleaning local-storage used attr for business signup
+    if (localStorage.businessSubAc && page !== 'register') {
+        delete localStorage.businessSubAc;
+    }
 
     dlkey = false;
     if (page[0] === '!' && page.length > 1) {
@@ -733,6 +737,15 @@ function init_page() {
             // Show message
             alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
         }
+    }
+    else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
+        var signupCodeEncrypted = page.substring(14, page.length);
+        //$('.fm-dialog.sub-account-link-password').removeClass('hidden');
+        M.require('businessAcc_js', 'businessAccUI_js').done(function () {
+            var business = new BusinessAccountUI();
+            business.showLinkPasswordDialog(signupCodeEncrypted);
+        });
+
     }
     else if (page.substr(0, 6) == 'signup') {
         var signupcode = page.substr(6, page.length - 1);

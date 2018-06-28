@@ -24887,7 +24887,7 @@ opacity: 1;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile .subuser-name{
-    color:#333333;
+    color:#333;
     font-size: 24px;
     line-height: 32px;
     padding-top:4px;
@@ -25138,16 +25138,16 @@ opacity: 1;
    font-family:source_sans_prolight;
 }
 
-.subaccount-view-used-storage-transfer, .user-management-view-used-data{
-    width:50%;
+.subaccount-view-used-storage-transfer {
+    width:100%;
     box-sizing: border-box;
     height: auto;
     position: relative;
     display: block;
     padding:0px 40px;
-    float: left;
 }
 
+/*
 .subaccount-view-used-storage-transfer::after{
     content: '';
     display: inline-block;
@@ -25158,6 +25158,8 @@ opacity: 1;
     top: 24px;
     background-color: rgba(0,0,0,0.1);
 }
+
+*/
 
 .subaccount-view-used-storage-transfer .used-storage-info{
     width:100%;
@@ -25194,7 +25196,11 @@ opacity: 1;
     background-position: -4px -11022px;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .folder-name{
+.subaccount-view-used-storage-transfer .used-storage-info .folder-small-icon.tiny-clock{
+    background-position: -13px -728px;
+}
+
+.subaccount-view-used-storage-transfer .used-storage-info .ff-name{
     font-size: 14px;
     color: #666666;
     line-height: 24px;
@@ -25202,34 +25208,51 @@ opacity: 1;
     display: inline-block;
     margin-left: 12px;
     float: left;
-    width: 75%;
+    width: 250px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info.transfer .folder-name{
-    width: 55%;
+.subaccount-view-used-storage-transfer .used-storage-info * {
+    float: left;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .folder-occupy{
+.subaccount-view-used-storage-transfer .used-storage-info .ff-number{
+    font-size: 14px;
+    color: #999;
+    line-height: 24px;
+    position: relative;
+    display: inline-block;
+    width:400px;
+}
+
+.subaccount-view-used-storage-transfer .used-storage-info .file-number,.subaccount-view-used-storage-transfer .used-storage-info .folder-number{
+    font-size: 14px;
+    color: #999;
+    line-height: 24px;
+    position: relative;
+    display: inline-block;
+    padding:0 12px;
+}
+.subaccount-view-used-storage-transfer .used-storage-info .folder-number::after {
+    content: " ";
+    height: 16px;
+    width: 2px;
+    background-color: rgba(0,0,0,0.1);
+    right: 0;
+    top: 4px;
+    display: block;
+    position: absolute;
+}
+
+.subaccount-view-used-storage-transfer .used-storage-info .ff-occupy{
     font-size: 14px;
     color: #999999;
     line-height: 24px;
-    position: absolute;
+    position: relative;
     display: inline-block;
-    margin-left: 12px;
-    right: 24px;
-}
-
-.subaccount-view-used-storage-transfer .used-storage-info .folder-number{
-    font-size: 14px;
-    color: #999999;
-    line-height: 24px;
-    position: absolute;
-    right: 130px;
-    display: inline-block;
-    margin-left: 12px;
+    width: 200px;
 }
 
 .user-management-breadcrumbs-img {
@@ -27609,9 +27632,9 @@ opacity: 1;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 100%;
-    height: -webkit-calc(100% - 148px);
-    height: -moz-calc(100% - 148px);
-    height: calc(100% - 148px);
+    height: -webkit-calc(100% - 112px);
+    height: -moz-calc(100% - 112px);
+    height: calc(100% - 112px);
     position: relative;
     top: -1px;
     overflow: hidden;
@@ -27794,7 +27817,7 @@ opacity: 1;
     line-height: 18px;
     font-size: 14px;
     padding: 0;
-    color: #111;
+    color: #333;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -27919,16 +27942,22 @@ opacity: 1;
 
 
 @media only screen and (max-width: 1270px) {
+    .subaccount-view-used-storage-transfer .used-storage-info .ff-name{
+        width: 200px;
+    }
+    .subaccount-view-used-storage-transfer .used-storage-info .ff-number{
+        width: 300px;
+    }
+    .subaccount-view-used-storage-transfer .used-storage-info .ff-occupy{
+        width: 100px;
+    }
+
     .user-management-list-table tr th:nth-child(2), .user-management-list-table tr td:nth-child(2){
     width:220px;
     }
 
     .user-management-list-table tr td .user-management-name, .user-management-list-table tr td .user-management-email{
         width: 200px;
-    }
-
-    .subaccount-view-used-storage-transfer .used-storage-info .folder-number{
-    right: 100px;
     }
 
     .user-management-overview-bar-data {

@@ -951,7 +951,7 @@ input, textarea {
 	width: 24px;
 	height: 11px;
 	z-index: 123;
-	background-image: url(../images/mega/top-login-sprite_v9.png);
+	background-image: url(../images/mega/top-login-sprite_v10.png);
 	background-repeat: no-repeat;
 	background-position: 0 -2249px;
 }
@@ -1065,7 +1065,7 @@ input, textarea {
 	right: 8px;
 	top: 50%;
 	margin: -4px 0 0 0;
-	background-image: url(../images/mega/top-login-sprite_v9.png);
+	background-image: url(../images/mega/top-login-sprite_v10.png);
 	background-repeat: no-repeat;
 	background-position: -30px -1816px;
 }

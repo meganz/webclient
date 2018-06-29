@@ -112,7 +112,7 @@
 .big-button:hover .dashed-conversation {
     background-position: 1px -1694px;
 }
-.default-white-button, .default-grey-button, .default-red-button, .default-green-button {
+.default-white-button, .default-grey-button, .default-red-button, .default-green-button, .default-light-green-button {
     display: block;
     font-size: 14px;
     -moz-border-radius: 4px;
@@ -231,6 +231,10 @@
     background: -webkit-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
     background: linear-gradient(to bottom, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
 }
+.default-light-green-button {
+    background-color: rgba(0,191,165,1);
+    color: #ffffff;
+}
 .default-red-button {
     color: white;
     background: rgb(255,102,107);
@@ -298,7 +302,7 @@
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-.default-grey-button::before, .default-grey-button::after, .default-white-button:not(.light)::before, .default-white-button::after, .default-red-button::before, .default-red-button::after, .default-green-button::before {
+.default-grey-button::before, .default-grey-button::after, .default-white-button:not(.light)::before, .default-white-button::after, .default-red-button::before, .default-red-button::after, .default-green-button::before, .default-light-green-button::before, .default-light-green-button::after {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -317,6 +321,16 @@
     -webkit-box-shadow: 0 0 0 1px #00B098;
     -moz-box-shadow: 0 0 0 1px #00B098;
     box-shadow: 0 0 0 1px #00B098;
+}
+.default-light-green-button::after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
+    box-shadow: 0px 0px 0px 1px rgba(0,145,125,0.5);
+}
+.default-light-green-button:not(.disabled):hover {
+    -webkit-box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
+    -moz-box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
+    box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
 }
 .default-white-button.small-text {
     font-size: 13px;
@@ -472,10 +486,10 @@
 .blue.big-button:hover {
     background-color: #2BA6DE;
 }
-.default-white-button.left, .default-grey-button.left {
+.default-white-button.left, .default-grey-button.left, .default-light-green-button.left {
     margin-right: 12px;
 }
-.default-white-button.right, .default-grey-button.right {
+.default-white-button.right, .default-grey-button.right, .default-light-green-button.right {
     margin-left: 12px;
 }
 .red {

@@ -26255,6 +26255,10 @@ opacity: 1;
     top: 50%;
 }
 
+.user-management-dialog .dialog-tree-panel-scroll {
+    overflow:hidden;
+}
+
 .user-management-dialog .dialog-title {
     font-size: 20px;
     color: #333333;
@@ -26280,13 +26284,17 @@ opacity: 1;
     display: block;
 }
 
+.user-management-dialog .dialog-tree-panel-scroll.add-user {
+    width:100%;
+    height:auto;
+    max-height: 200px;
+}
+
 .user-management-dialog .dialog-input-container  {
     width:100%;
     height:auto;
-    max-height: 618px;
     position: relative;
     padding:24px 0;
-    overflow: visible;
 }
 
 .user-management-dialog .dialog-input-container::before {
@@ -26551,18 +26559,18 @@ opacity: 1;
     right: 16px;
 }
 
-.user-management-dialog .verification-email-dialog {
+.user-management-dialog .verification-dialog {
     width: 620px;
     margin-left: -310px;
     margin-top: -265px;
     position: absolute;
 }
 
-.user-management-dialog .verification-email-dialog .dialog-title {
+.user-management-dialog .verification-dialog .dialog-title {
     margin-top: 40px;
 }
 
-.user-management-dialog .verification-email-dialog .dialog-subtitle {
+.user-management-dialog .verification-dialog .dialog-subtitle {
     margin-bottom: 40px;
 }
 
@@ -26576,18 +26584,23 @@ opacity: 1;
     position: absolute;
 }
 
-.user-management-dialog .verification-email-dialog .verification-container {
+.user-management-dialog .verification-dialog .dialog-tree-panel-scroll.verification {
+    height: auto;
+    max-height: 305px;
+    overflow: hidden;
+}
+
+.user-management-dialog .verification-dialog .verification-container {
     position: relative;
     width: 100%;
     height: auto;
-    max-height: 305px;
     display: block;
     background-color: rgba(250,250,250,1); 
     padding:32px 40px;
     box-sizing: border-box;
 }
 
-.user-management-dialog .verification-email-dialog .dialog-button-container::before {
+.user-management-dialog .verification-dialog .dialog-button-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -26598,7 +26611,7 @@ opacity: 1;
     left: 0;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container {
+.user-management-dialog .verification-dialog .verification-user-container {
     position: relative;
     display: block;
     height: 48px;
@@ -26606,11 +26619,11 @@ opacity: 1;
     margin-bottom: 48px;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container:last-child {
+.user-management-dialog .verification-dialog .verification-user-container:last-child {
     margin-bottom: 0px;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container .avatars {
+.user-management-dialog .verification-dialog .verification-user-container .avatars {
     width:48px;
     height: 48px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26622,7 +26635,7 @@ opacity: 1;
     display: inline-block;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container .avatars .subuser-image {
+.user-management-dialog .verification-dialog .verification-user-container .avatars .subuser-image {
     width:38px;
     height: 38px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26632,14 +26645,14 @@ opacity: 1;
     position: absolute;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container .avatars .subuser-image img{
+.user-management-dialog .verification-dialog .verification-user-container .avatars .subuser-image img{
     width:38px;
     height: 38px;
     border-radius: 100%;
     position: absolute;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container .verification-user-info {
+.user-management-dialog .verification-dialog .verification-user-container .verification-user-info {
     width: 320px;
     margin-left: 24px;
     position: relative;
@@ -26650,29 +26663,29 @@ opacity: 1;
     vertical-align: top;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container .verification-user-info * {
+.user-management-dialog .verification-dialog .verification-user-container .verification-user-info * {
     font-size: 14px;
     color: #666;
     line-height: 18px;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container .verification-user-info .verification-user-email {
+.user-management-dialog .verification-dialog .verification-user-container .verification-user-info .verification-user-email {
     margin-bottom: 12px;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container .verification-user-info b {
+.user-management-dialog .verification-dialog .verification-user-container .verification-user-info b {
     font-weight: 600;
     color: #333;
     margin-right: 12px;
 }
 
-.user-management-dialog .verification-email-dialog .verification-user-container .default-white-button-user-management {
+.user-management-dialog .verification-dialog .verification-user-container .default-white-button-user-management {
     float: right;
     margin:8px 0;
 }
 
 
-.user-management-dialog .verification-email-dialog .dialog-button-container .default-green-button-user-management {
+.user-management-dialog .verification-dialog .dialog-button-container .default-green-button-user-management {
     margin:12px 24px;
 }
 

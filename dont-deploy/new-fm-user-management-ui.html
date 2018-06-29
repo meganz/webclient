@@ -136,58 +136,105 @@ $(document).ready(function() {
 		
 	<!-- Dialog -->
 	<div class="user-management-dialog">
-		<div class="add-user-dialog dialog hidden"> 
-			<div class="dialog-title">Invite People to Team</div>
-			<div class="delete-img icon"></div>
-			<div class="dialog-input-container">
-				<div class="input-user">
-					<div class="indi-input">
-						<input type="text" class="dialog-input focus" value="FirstName LastName" autofocus>	
-					</div>
-					<div class="indi-input">
-						<input type="text" class="dialog-input placeholder" value="Email">
-					</div>
-					<div class="delete-img icon"></div>	
-				</div>
-			</div>
-
-			<div class="dialog-button-container">
-				<div class="default-button-no-border">
-					<div class="add-more-img icon"></div>
-					Add More
-				</div>
-				<div class="default-button-no-border">
-					<div class="import-contact-img icon"></div>
-					Import Contacts
-				</div>
-				<div class="default-green-button-user-management disabled">
-					Add Users
-				</div>
-			</div>
-			<div class="licence-bar">
-				<div class="notification-img icon"></div>
-				5 sub account licences used.
-				<div class="default-white-button-user-management">
-				View Plans
-				</div>
-			</div>
-		</div>
-
-		<div class="verification-email-dialog dialog">
-			<div class="dialog-title">Verification emails have been sent</div>
-			<div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
-			<div class="user-management-border"></div>
-
-            <div class="dialog-tree-panel-scroll">
-                <div class="dialog-content-block">
+        <div class="add-user-dialog dialog hidden"> 
+            <div class="dialog-title">Invite People to Team</div>
+            <div class="delete-img icon"></div>
+            <div class="dialog-tree-panel-scroll add-user">
+                <div class="dialog-input-container">
+                    <div class="input-user">
+                        <div class="indi-input">
+                            <input type="text" class="dialog-input focus" value="Name" autofocus> 
+                        </div>
+                        <div class="indi-input">
+                            <input type="text" class="dialog-input placeholder" value="Email">
+                        </div>
+                        <div class="delete-img icon"></div> 
+                    </div>
                 </div>
             </div>
-			<div class="dialog-button-container">
-				<div class="default-green-button-user-management right">
-					OK
-				</div>
-			</div>			
-		</div>
+            <div class="dialog-button-container">
+                <div class="default-button-no-border">
+                    <div class="add-more-img icon"></div>
+                    Add More
+                </div>
+                <div class="default-button-no-border">
+                    <div class="import-contact-img icon"></div>
+                    Import Contacts
+                </div>
+                <div class="default-green-button-user-management disabled">
+                    Add Users
+                </div>
+            </div>
+            <div class="licence-bar">
+                <div class="notification-img icon"></div>
+                5 sub account licences used.
+                <div class="default-white-button-user-management">
+                View Plans
+                </div>
+            </div>
+        </div>
+
+    <div class="verification-dialog dialog hidden">
+        <!--Header-->
+        <div class="dialog-title">Verification emails have been sent</div>
+        <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
+        <div class="user-management-border"></div>
+
+        <!--Folder container-->
+        <div class="dialog-tree-panel-scroll verification">
+            <div class="dialog-content-block verification-container">
+                <div class="verification-user-container">
+                    <div class="avatars">
+                        <div class="subuser-image">
+                            <img src="" class="hidden">
+                        </div>
+                    </div>
+                    <div class="verification-user-info">
+                        <div class="verification-user-email"><b>Email:</b>major@126.com</div>
+                        <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
+                    </div>
+                </div>
+                <div class="verification-user-container">
+                    <div class="avatars">
+                        <div class="subuser-image">
+                            <img src="" class="hidden">
+                        </div>
+                    </div>
+                    <div class="verification-user-info">
+                        <div class="verification-user-email"><b>Email:</b>major@126.com</div>
+                        <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
+                    </div>
+                </div>
+                <div class="verification-user-container">
+                    <div class="avatars">
+                        <div class="subuser-image">
+                            <img src="" class="hidden">
+                        </div>
+                    </div>
+                    <div class="verification-user-info">
+                        <div class="verification-user-email"><b>Email:</b>major@126.com</div>
+                        <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
+                    </div>
+                </div>
+                <div class="verification-user-container">
+                    <div class="avatars">
+                        <div class="subuser-image">
+                            <img src="" class="hidden">
+                        </div>
+                    </div>
+                    <div class="verification-user-info">
+                        <div class="verification-user-email"><b>Email:</b>major@126.com</div>
+                        <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
+                    </div>
+                </div>                                      
+            </div>
+        </div> <!--END folder container-->
+        <div class="dialog-button-container">
+            <div class="default-green-button-user-management right">
+                OK
+            </div>
+        </div><!--Buttons-->  
+    </div><!--END verification dialog-->  
 
 		<div class="edit-profile-dialog dialog hidden">
 	        <div class="user-management-subuser-avatars">

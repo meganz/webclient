@@ -28422,14 +28422,6 @@ opacity: 1;
     height: 24px;
 }
 
-.subaccount-img-big .avatar {
-    width: 162px;
-    height: 162px;
-    margin: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    border-radius: 0;
-}
 .subaccount-img-big .avatar span {
     color: white;
     font-size: 74px;
@@ -28445,6 +28437,32 @@ opacity: 1;
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
+}
+.subaccount-img-big .avatar img{
+    float: left;
+    margin-left: -2px;
+    margin-top: -2px;
+}
+.user-management-breadcrumb.subaccount .user-management-subuser-avatars {
+    border:unset;
+}
+.user-management-breadcrumb.subaccount .user-management-subuser-avatars .avatar, .user-management-breadcrumb.subaccount .user-management-subuser-avatars .avatar img {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+}
+.user-management-breadcrumb.subaccount .user-management-subuser-avatars .avatar img {
+    float: left;
+    margin-left: -2px;
+    margin-top: -2px;
+}
+.user-management-breadcrumb.subaccount .user-management-subuser-avatars .avatar span {
+    color: white;
+    font-size: 10px;
+    float: left;
+    margin-top: 6%;
+    margin-left: 33%;
+    line-height: initial;
 }
 
 .user-management-view .border, .user-management-dialog .border, .fm-right-header-user-management .border{

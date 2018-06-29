@@ -454,9 +454,11 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
 BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     "use strict";
     this.initUItoRender();
+    var mySelf = this;
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $subAccountContainer = $('.user-management-subaccount-view-container', $businessAccountContainer);
+    var $subHeader = $('.fm-right-header-user-management .user-management-breadcrumb.subaccount');
 
     var subUser = M.suba[subUserHandle];
 
@@ -469,6 +471,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         a32_to_str(base64_to_a32((subUser.lastname || '')));
 
     $('.subuser-name', $subAccountContainer).text(uName);
+    $('.user-management-subuser-name', $subHeader).text(uName);
     $('.subuser-email', $subAccountContainer).text(subUser.e);
 
     $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
@@ -485,6 +488,13 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
     $('.subaccount-img-big', $subAccountContainer).html(subUserDefaultAvatar);
+    $('.user-management-subuser-avatars', $subHeader).html(subUserDefaultAvatar);
+
+    // event handler for clicking on the header
+    $('.user-management-icon', $subHeader).off('click.subuser')
+        .on('click.subuser', function navigationHeaderClickHandler() {
+            mySelf.viewSubAccountListUI();
+        });
 
     // private function to fill quota info
     var fillQuotaInfo = function (st, quotas) {
@@ -527,6 +537,9 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         //    $subAccountContainer).text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
     };
 
+    // viewing the right buttons
+
+
     // getting quotas
     var quotasPromise = this.business.getQuotaUsage();
     quotasPromise.done(fillQuotaInfo);
@@ -534,7 +547,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 
     $businessAccountContainer.removeClass('hidden'); // BA container
     $subAccountContainer.removeClass('hidden'); // sub-info container
-    $('.fm-right-header-user-management .user-management-breadcrumb.subaccount').removeClass('hidden');
+    $subHeader.removeClass('hidden');
 };
 
 

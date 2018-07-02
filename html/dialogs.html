@@ -4743,7 +4743,7 @@
 
 
 <!-- user management dialog !-->
-<div class="user-management-add-user-dialog user-management-dialog hidden">
+<div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden">
     <div class="dialog-title">Invite People to Team</div>
     <div class="delete-img icon"></div>
     <div class="dialog-tree-panel-scroll add-user">
@@ -4781,7 +4781,7 @@
     </div>
 </div>
 
-<div class="user-management-verification-dialog user-management-dialog hidden">
+<div class="user-management-verification-dialog user-management-dialog fm-dialog hidden">
     <!--Header-->
     <div class="dialog-title">Verification emails have been sent</div>
     <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
@@ -4810,7 +4810,7 @@
     </div><!--Buttons-->
 </div><!--END verification dialog-->
 
-<div class="user-management-edit-profile-dialog user-management-dialog hidden">
+<div class="user-management-edit-profile-dialog user-management-dialog fm-dialog hidden">
     <div class="user-management-subuser-avatars">
         <div class="user-management-subuser-image"></div>
     </div>
@@ -4865,11 +4865,27 @@
     </div>
 </div>
 
-<div class="fm-dialog user-management-able-user-dialog user-management-dialog hidden">
+<div class="user-management-able-user-dialog user-management-dialog fm-dialog">
+    <div class="re-enable-large-icon icon56"></div>
+    <div class="dialog-text-container">
+        <div class="dialog-text-one">Are you sure you want to re-enable the account of <b>Jay Pierce</b>?</div>
+        <span class="dialog-text-two">Note: This action will take up user quota.</span>
+    </div>
+    <div class="dialog-button-container">
+        <div class="default-green-button-user-management">
+            Yes
+        </div>
+        <div class="default-white-button-user-management">
+            Cancel
+        </div>
+    </div>
+</div>
+
+<div class="user-management-able-user-dialog user-management-dialog fm-dialog hidden">
     <div class="disable-large-icon icon56"></div>
     <div class="dialog-text-container">
-        <div class="dialog-text-one">Are you sure you want to dise the account of <b>Jay Pierce</b>? </div>
-        <span class="dialog-text-two">Note: You can re-enable it in the disable list. </span>
+        <div class="dialog-text-one">Are you sure you want to disable the account of <b>Jay Pierce</b>? </div>
+        <span class="dialog-text-two">Note: You can re-enable the account at any later stage from the disabled accounts list.</span>
     </div>
     <div class="dialog-button-container">
         <div class="default-gray-button-user-management dlg-btn yes-answer">
@@ -4880,41 +4896,3 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

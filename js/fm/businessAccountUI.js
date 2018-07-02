@@ -727,7 +727,7 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
     }
     dialogQuestion = dialogQuestion.replace('[B]', '<b>').replace('[/B]', '</b>')
         .replace('{0}', userName);
-    $dialog.find('.dialog-text-one').text(dialogQuestion);
+    $dialog.find('.dialog-text-one').html(dialogQuestion);
     $dialog.find('.dialog-text-two').text(note);
     
     $dialog.find('.dialog-button-container .dlg-btn').off('click.subuser')
@@ -746,4 +746,8 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
     M.safeShowDialog('sub-user-disable-cnf-dlg', function () {
         return $dialog;
     });
+};
+
+BusinessAccountUI.prototype.showAddSubUserDialog = function () {
+
 };

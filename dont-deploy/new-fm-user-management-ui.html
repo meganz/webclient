@@ -136,7 +136,7 @@ $(document).ready(function() {
 		
 	<!-- Dialog -->
 
-    <div class="user-management-add-user-dialog user-management-dialog"> 
+    <div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden"> 
         <div class="dialog-title">Invite People to Team</div>
         <div class="delete-img icon"></div>
         <div class="dialog-tree-panel-scroll add-user">
@@ -174,7 +174,7 @@ $(document).ready(function() {
         </div>
     </div>
 
-    <div class="user-management-verification-dialog user-management-dialog hidden">
+    <div class="user-management-verification-dialog user-management-dialog fm-dialog hidden">
         <!--Header-->
         <div class="dialog-title">Verification emails have been sent</div>
         <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
@@ -203,7 +203,7 @@ $(document).ready(function() {
         </div><!--Buttons-->  
     </div><!--END verification dialog-->  
 
-		<div class="user-management-edit-profile-dialog user-management-dialog hidden">
+		<div class="user-management-edit-profile-dialog user-management-dialog fm-dialog hidden">
       <div class="user-management-subuser-avatars">
         <div class="user-management-subuser-image"></div>
       </div>
@@ -258,7 +258,7 @@ $(document).ready(function() {
 			</div>
 		</div>
 
-		<div class="user-management-able-user-dialog user-management-dialog hidden">
+		<div class="user-management-able-user-dialog user-management-dialog fm-dialog hidden">
 			<div class="re-enable-large-icon icon56"></div>
 			<div class="dialog-text-container">
 				<div class="dialog-text-one">Are you sure you want to re-enable the account of <b>Jay Pierce</b>?</div>
@@ -274,7 +274,7 @@ $(document).ready(function() {
 			</div>				
 		</div>
 
-		<div class="user-management-able-user-dialog user-management-dialog hidden">
+		<div class="user-management-able-user-dialog user-management-dialog fm-dialog hidden">
 			<div class="disable-large-icon icon56"></div>
 			<div class="dialog-text-container">
 				<div class="dialog-text-one">Are you sure you want to dise the account of <b>Jay Pierce</b>? </div>
@@ -409,66 +409,6 @@ $(document).ready(function() {
         	<div class="jspContainer">
             	<div class="jspPane"> 
 	            	<div class="content-panel user-management active">
-	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status pending"></div>
-	                        <div class="nw-user-management-name">Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item selected">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">John Bailey</div>
-	                    </div>
-	                    	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status pending"></div>
-	                        <div class="nw-user-management-name">Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item selected">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">John Bailey</div>
-	                    </div>
-	                    	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status pending"></div>
-	                        <div class="nw-user-management-name">Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item selected">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">John Bailey</div>
-	                    </div>
-	                    	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status pending"></div>
-	                        <div class="nw-user-management-name">Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item selected">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">John Bailey</div>
-	                    </div>
-	                    	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item">
-	                        <div class="user-management-status pending"></div>
-	                        <div class="nw-user-management-name">Ollie Gibson</div>
-	                    </div>
-	                    <div class="nw-user-management-item selected">
-	                        <div class="user-management-status enabled"></div>
-	                        <div class="nw-user-management-name">John Bailey</div>
-	                    </div>
 	              </div>
 	            </div>
           </div>
@@ -566,30 +506,31 @@ $(document).ready(function() {
 		<div class="files-grid-view user-management-view">
 			<div class="user-management-landing-page">
         <div class="landing-page-container">
-            <div class="mega-54px-icon"></div>
-            <div class="landing-title">Welcome to MEGA User Management</div>
-            <div class="landing-sub-title">User management help you to organise all the sub user accounts in one place.  You are able to add users, modify account settings and overview the business account status here.</div>
-            <div class="landing-sub-container">
-              <div class="add-user-icon56 icon56"></div>
-              <div class="landing-container-title">Add Users</div>
-              <div class="landing-container-subtitle">Get start with inviting people to the team</div>
-              <div class="default-white-button-user-management">Add Users</div>
+          <div class="mega-56px-icon"></div>
+          <div class="landing-title">Welcome to MEGA User Management</div>
+          <div class="landing-sub-title">User management help you to organise all the sub user accounts in one place.  You are able to add users, modify account settings and overview the business account status here.</div>
+          <div class="landing-sub-container">
+            <div class="add-user-icon56 icon56"></div>
+            <div class="landing-container-title">Add Users</div>
+            <div class="landing-container-subtitle">Get start with inviting people to the team</div>
+            <div class="default-white-button-user-management">Add Users</div>
+          </div>
+          <div class="landing-sub-container">
+            <div class="accounts-icon56 icon56"></div>
+            <div class="landing-container-title">Accounts</div>
+            <div class="landing-container-subtitle">Modify account settings</div>
+            <div class="default-white-button-user-management">Accounts</div>
+          </div>
+          <div class="licence-bar">
+            <div class="notification-white-img icon"></div>
+            <span>5 sub account licences used.</span>
+            <div class="default-white-button-user-management">
+            View Plans
             </div>
-            <div class="landing-sub-container">
-              <div class="accounts-icon56 icon56"></div>
-              <div class="landing-container-title">Accounts</div>
-              <div class="landing-container-subtitle">Modify account settings</div>
-              <div class="default-white-button-user-management">Accounts</div>
-            </div>
+          </div>
         </div>
 
-				<div class="licence-bar">
-					<div class="notification-img icon"></div>
-					5 sub account licences used.
-					<div class="default-white-button-user-management">
-					View Plans
-					</div>
-				</div>
+
 			</div>
 
             <table class="user-management-list-table hidden">

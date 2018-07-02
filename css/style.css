@@ -25106,7 +25106,8 @@ opacity: 1;
 
 
 .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img{
-    background-image: url(../images/mega/big-icons.png);
+    background-image: url(../images/mega/big-icons@2x.png);
+    background-size: 192px auto;
     background-repeat: no-repeat;
     width: 86px;
     height: 86px;

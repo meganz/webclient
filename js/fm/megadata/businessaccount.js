@@ -79,6 +79,9 @@ BusinessAccount.prototype.deActivateSubAccount = function (subUserHandle) {
             }
             else {
                 operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+                if (d) {
+                    console.error('API returned error, ret=' + res);
+                }
             }
         }
 

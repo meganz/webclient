@@ -8237,6 +8237,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+
+
+
 .fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.network-testing {
     min-width: 440px;
     margin: -77px 0 0 -220px;
@@ -24202,7 +24206,7 @@ opacity: 1;
     box-shadow: 0px 0px 0px 0px rgba(0,0,0,0);
 };
 
-.default-white-button-user-management{
+.default-white-button-user-management {
     background-color: rgba(255,255,255,1);
     color: #666666;
 }
@@ -24409,6 +24413,10 @@ opacity: 1;
 
 .user-management-view .notification-img, .fm-right-header-user-management .notification-img, .user-management-dialog .notification-img {
     background-position: -24px -12376px; 
+}
+
+.user-management-view .notification-white-img, .fm-right-header-user-management .notificationp-white-img, .user-management-dialog .notification-white-img {
+    background-position: -24px -12691px; 
 }
 
 .user-management-view .delete-img, .fm-right-header-user-management .delete-img, .user-management-dialog .delete-img{
@@ -24769,17 +24777,6 @@ opacity: 1;
 .user-management-list-table tr:nth-child(odd) td, .grid-table.user-management tr:nth-child(odd) {
     background-color: white;
 }
-
-/*
-.fm-right-files-block-user-management {
-    height: 100%;
-    width:auto;
-    position: relative;
-    margin-left: 304px;
-    display: block;
-}
-*/
-
 
 .fm-files-view-icon-user-management.listing-view {
     background-position: -6px -1335px;
@@ -26229,19 +26226,6 @@ opacity: 1;
     -webkit-filter: blur(0.25em);
 }
 
-.user-management-dialog {
-    position: absolute;
-    border-radius: 8px;
-    border:1px solid rgba(0,0,0,0.1);
-    box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
-    background-color: #ffffff;
-    height: auto;
-    z-index: 500;
-    box-sizing: border-box;
-    left: 50%;
-    top: 50%;
-} 
-
 .user-management-dialog .dialog-tree-panel-scroll {
     overflow:hidden;
 }
@@ -26465,7 +26449,7 @@ opacity: 1;
     transition: 0.1s;
 }
 
-.user-management-view .licence-bar .icon, .user-management-add-user-dialog .licence-bar .icon{
+.user-management-add-user-dialog .licence-bar .icon{
     opacity: 0.8;
     float: left;
     margin: 16px 4px 16px 24px;
@@ -26514,7 +26498,7 @@ opacity: 1;
     position: absolute;
     right: 24px;
     top:12px;
-    color: #666666;
+    color: #666;
 }
 
 .user-management-add-user-dialog .dialog-input-container .input-user .delete-img.icon {
@@ -26594,17 +26578,6 @@ opacity: 1;
     height: 56px;
     display: block;
     box-sizing: border-box;
-}
-
-.user-management-verification-dialog .dialog-button-container::before {
-    content: " ";
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 .user-management-verification-dialog .verification-user-container {
@@ -26747,20 +26720,14 @@ opacity: 1;
     font-family: 'Source Sans Pro', sans-serif; 
 } 
 
-.user-management-add-user-dialog .dialog-button-container {
-    margin: 16px 56px 24px 56px;
-    box-sizing: border-box;
-    position: relative;
-    display: block;
-}
-
 .user-management-edit-profile-dialog .dialog-button-container, .user-management-able-user-dialog .dialog-button-container {
     height: 56px;
     background-color: rgba(250,250,250,1);
     position: relative;
+    border-radius: 0 0 8px 8px;
 }
 
-.user-management-edit-profile-dialog .dialog-button-container::before, .user-management-able-user-dialog .dialog-button-container::before, .user-management-edit-profile-dialog .dialog-button-container::before {
+.user-management-verification-dialog .dialog-button-container::before, .user-management-edit-profile-dialog .dialog-button-container::before, .user-management-able-user-dialog .dialog-button-container::before, .user-management-edit-profile-dialog .dialog-button-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -26859,34 +26826,33 @@ opacity: 1;
 }
 
 .user-management-landing-page .landing-page-container{
-    width:540px;
-    height: auto;
+    width:632px;
+    height: 540px;
     left: 50%;
     top: 50%;
-    margin-left: -270px;
-    margin-top: -250px;
+    margin-left: -316px;
+    margin-top: -300px;
     display: inline-block;
     position: relative;
 }
 
-.user-management-landing-page .mega-54px-icon{
+.user-management-landing-page .mega-56px-icon{
     background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
-    width: 54px;
-    height: 54px;
+    width: 56px;
+    height: 56px;
     left: 50%;
     display: inline-block;
-    background-position: -129px -100px;
-    margin: 0 auto 32px -27px;
+    background-position: -129px -98px;
+    margin: 0 16px 32px -28px;
     position: relative;
 }
 
 .user-management-landing-page .landing-title {
     font-size: 24px;
     line-height: 32px;
-    margin:auto;
+    width: 100%;
     font-weight: 600;
-    width: 540px;
     text-align: center;
 }
 
@@ -26894,43 +26860,68 @@ opacity: 1;
     font-size:14px;
     line-height: 24px;
     color: #888;
-    width: 540px;
+    width: 100%;
     text-align: center;
-    margin:24px auto 56px auto;
+    margin:24px 0px 56px 0px;
 }
 
 .user-management-landing-page .landing-sub-container {
-    width: 100%;
     height: auto;
+    width: 600px;
     display: inline-block;
     position: relative;
-    box-sizing: border-box;
+    transition: 0.2s;
+    padding: 0 16px;
+    cursor: pointer;
+}
+
+.user-management-landing-page .landing-sub-container:hover {
+    -ms-transform: scale(1.05,1.05); /* IE 9 */
+    -webkit-transform: scale(1.05,1.05); /* Safari */
+    transform: scale(1.05,1.05);
+    border-radius: 8px;
+    box-shadow: 0 0 4px 0 rgba(0,0,0,0.1);
+    background-color: rgba(253,253,253,1);
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.user-management-landing-page .landing-sub-container:hover::before, .user-management-landing-page .landing-sub-container:hover::after{
+        display: none;
+    background-color: rgba(0,0,0,0);
 }
 
 .user-management-landing-page .landing-sub-container::before {
     content: "";
-    width: 100%;
+    width: -webkit-calc(100% - 32px);
+    width: -moz-calc(100% - 32px);
+    width: calc(100% - 32px);
     height: 1px;
     display: block;
     background-color: rgba(0,0,0,0.1);
     position: absolute;
     top: 0;
-    left: 0;
+    left: 16px;;
 }
+
 
 .user-management-landing-page .landing-sub-container::after {
     content: "";
-    width: 100%;
+    width: -webkit-calc(100% - 32px);
+    width: -moz-calc(100% - 32px);
+    width: calc(100% - 32px);
     height: 1px;
     display: block;
     background-color: rgba(0,0,0,0.1);
     position: absolute;
     bottom: 0;
-    left: 0;
+    left: 16px;
 }
 
-.user-management-landing-page .landing-sub-container:last-child::before {
+
+
+.user-management-landing-page .landing-page-container .landing-sub-container:nth-child(5)::before {
     display: none;
+    background-color: rgba(0,0,0,0);
 }
 
 .user-management-landing-page .landing-sub-container .icon56 {
@@ -26961,18 +26952,44 @@ opacity: 1;
 
 .user-management-landing-page .landing-sub-container .default-white-button-user-management{
     position: absolute;
-    right: 0;
+    right: 16px;
     top: 28px;
 }
 
 .user-management-landing-page .licence-bar {
     width:680px;
+    height: 48px;
     position: absolute;
-    bottom: 32px;
     left: 50%;
+    bottom: 0;
     margin-left: -340px;
+    background-color: #333;
+    border-radius: 8px;
+    padding:12px 60px 12px 0;
+    box-sizing: border-box;
 }
 
+.user-management-landing-page .licence-bar .icon{
+    float: left;
+    margin: 0px 4px 0px 24px;
+    position: relative;
+}
+
+.user-management-landing-page .licence-bar span {
+    color: #fafafa;
+    font-size: 14px;
+    line-height: 24px;
+    position: relative;
+    vertical-align: top;
+}
+
+.user-management-landing-page .licence-bar .default-white-button-user-management {
+    position: absolute;
+    right: 24px;
+    top: 8px;
+    opacity: 1;
+    background-color: #fafafa;
+}
 
 .user-management-view .user-management-account-settings .auto-save {
     position: fixed;
@@ -27813,9 +27830,9 @@ opacity: 1;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 100%;
-    height: -webkit-calc(100% - 112px);
-    height: -moz-calc(100% - 112px);
-    height: calc(100% - 112px);
+    height: -webkit-calc(100% - 48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
     position: relative;
     top: -1px;
     overflow: hidden;

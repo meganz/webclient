@@ -710,16 +710,26 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
 /**
  * Shows the confirmation dialog for sub-user disabling 
- * @param {function} actionFuncHandler  user response handler - function accepts 1 boolean parameter
- * @param {string} userName                sub-user name
+ * @param {function} actionFuncHandler      user response handler - function accepts 1 boolean parameter
+ * @param {string} userName                 sub-user name
+ * @param {boolean} isEnable                a flag to tell that we want enabling conformation
  */
-BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFuncHandler, userName) {
-    var $dialog = $('.disable-user-dialog');
+BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFuncHandler, userName, isEnable) {
+    var $dialog = $('.user-management-able-user-dialog.user-management-dialog');
 
     var dialogQuestion = l[19098];
+    var note = l[19099];
+    $dialog.find('.icon56').removeClass('re-enable-large-icon').addClass('disable-large-icon');
+    if (isEnable) {
+        dialogQuestion = l[19101];
+        note = l[19102];
+        $dialog.find('.icon56').removeClass('disable-large-icon').addClass('re-enable-large-icon');
+    }
     dialogQuestion = dialogQuestion.replace('[B]', '<b>').replace('[/B]', '</b>')
         .replace('{0}', userName);
-
+    $dialog.find('.dialog-text-one').text(dialogQuestion);
+    $dialog.find('.dialog-text-two').text(note);
+    
     $dialog.find('.dialog-button-container .dlg-btn').off('click.subuser')
         .on('click.subuser', function disableSubUserConfirmationDialogHandler() {
             closeDialog();

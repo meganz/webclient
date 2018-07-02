@@ -434,7 +434,7 @@ ul, li {
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.03);
     color:  #555;
 }
-.mobile.red-button, .mobile.download-progress .bar, .mobile.upload-progress .bar {
+.mobile.red-button, .mobile.download-progress .bar, .mobile.upload-progress .bar, .membership-bott-button, .payment-address-dialog .payment-buy-now {
     color: white;
     font-size: 13px;
     display: block;
@@ -1982,12 +1982,14 @@ div.checkboxOn, div.checkboxOff {
 }
 
 /* Pro payment page step 2 */
-.mobile.membership-step2 .page-title {
+.mobile.membership-step2 .page-title, .payment-address-dialog .main-title {
     color: #333;
-    font-family: 'source_sans_prolight', sans-serif;
-    font-size: 32px;
-    line-height: 40px;
-    margin: 36px 24px 55px 24px;
+    font-size: 24px;
+    line-height: 36px;
+    margin: 28px 24px 55px 24px;
+}
+.payment-address-dialog .main-title {
+    margin: 28px 0 32px 0;
 }
 .mobile.membership-step2 .external-payment-options {
     color: #667;
@@ -2009,7 +2011,7 @@ div.checkboxOn, div.checkboxOff {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    padding: 0 25px 25px 25px;
+    padding: 0 20px 25px 20px;
     margin-top: -75px;
     position: relative;
     -moz-border-radius: 3px;
@@ -2119,12 +2121,11 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-step2 .main-mid-pad.third-section {
     padding: 0;
 }
-.mobile.membership-step2 .option-question {
-    color: #999;
+.mobile.membership-step2 .option-question, .payment-address-dialog .container-box-title {
+    color: #777;
     display: block;
-    font-family: 'source_sans_prolight', sans-serif;
-    font-size: 24px;
-    line-height: 31px;
+    font-size: 18px;
+    line-height: 27px;
 }
 .mobile.membership-step2 .option-question.provider {
     margin: 30px 0 32px 0;
@@ -2273,7 +2274,7 @@ div.checkboxOn, div.checkboxOff {
     font-size: 16px;
     display: block;
     line-height: 20px;
-    margin-top: 35px;
+    margin-top: 44px;
     margin-left: 28px;
 }
 .mobile.membership-step2 .renewal-options-list .membership-radio-label {
@@ -2575,36 +2576,30 @@ div.checkboxOn, div.checkboxOff {
 }
 .mobile.membership-step2 .charge-information-container {
     height: 55px;
-    margin-top: 50px;
-    margin-bottom: 24px;
+    margin-top: 24px;
+    margin-bottom: 10px;
 }
 .mobile.membership-step2 .charge-information {
     background-color: #f7f8fa;
     color: #939da3;
     font-size: 15px;
     line-height: 19px;
-    padding: 18px 24px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: 0 -25px;
+    padding: 12px 0;
     letter-spacing: initial;
+    text-align: center;
+    border-radius: 6px;
 }
 .mobile.membership-step2 .membership-bott-button {
-    background-color: #ff4444;
-    border-radius: 2px;
-    color: #fff;
     cursor: pointer;
     font-size: 15px;
-    padding: 15px 0;
-    line-height: 19px;
     margin: 0;
     text-align: center;
     text-transform: capitalize;
     float: none;
     display: block;
     box-sizing: initial;
-    height: auto;
+    height: 44px;
+    line-height: 41px;
     min-width: 0;
     transition: initial;
 }
@@ -3152,13 +3147,7 @@ div.checkboxOn, div.checkboxOff {
     text-align: initial;
 }
 .payment-address-dialog-body {
-    padding: 24px 49px;
-}
-.payment-address-dialog .main-title {
-    color: #333;
-    font-family: "source_sans_prolight", sans-serif;
-    font-size: 32px;
-    line-height: 40px;
+    padding: 24px 20px;
 }
 .payment-address-dialog .payment-note-first {
     color: #667;
@@ -3166,30 +3155,10 @@ div.checkboxOn, div.checkboxOff {
     line-height: 26px;
 }
 .payment-address-dialog .grey-container-box {
-    background-color: #f6f7f8;
-    padding: 25px 23px;
-}
-.payment-address-dialog .white-container-box {
-    box-sizing: border-box;
-    background-color: #fff;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    padding: 13px;
-    position: relative;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+    padding: 0 4px 24px;
 }
 .payment-address-dialog .container-box-title {
-    padding-top: 0;
-    color: #999;
-    font-family: "source_sans_prolight", sans-serif;
-    font-size: 24px;
-    line-height: 31px;
-    margin-bottom: 24px;
-    margin-left: 12px;
-    margin-top: 12px;
+    margin: 12px 20px 24px 16px;
 }
 .payment-address-dialog .payment-note-first {
     color: #666;
@@ -3209,13 +3178,13 @@ div.checkboxOn, div.checkboxOff {
 }
 .payment-address-dialog .mobile.signin-input {
     background-color: #F8F8F8;
-    height: 60px;
-    padding: 19px 55px 0 12px;
+    height: 48px;
+    padding: 12px 55px 0 12px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
-    margin-bottom: 2px;
+    margin-bottom: 8px;
 }
 /* Styling for jQueryUI selectmenu in use with address dialog */
 .ui-selectmenu-button {
@@ -3223,7 +3192,6 @@ div.checkboxOn, div.checkboxOff {
 }
 #address-dialog-countries-button {
     display: block;
-    margin-top: 4px;
     float: none;
 }
 #address-dialog-states-button {
@@ -3313,11 +3281,11 @@ div.checkboxOn, div.checkboxOff {
     padding: 0 30px 0 10px;
     color: gray;
     cursor: pointer;
-    margin: -7px 0 0 0;
+    margin: 0 16px 12px;
     border: 0;
-    height: 60px;
+    height: 48px;
     font-size: 14px;
-    line-height: 59px;
+    line-height: 49px;
     min-width: 150px;
     background-color: rgba(255,255,255,1);
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.10);
@@ -3328,7 +3296,7 @@ div.checkboxOn, div.checkboxOff {
     -webkit-border-radius: 4px;
     background-image: url(../images/mobile/mobile-sprite_v11.png);
     background-repeat: no-repeat;
-    background-position: right -2053px;
+    background-position: right -2059px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -3339,7 +3307,7 @@ div.checkboxOn, div.checkboxOff {
     content: '';
     position: absolute;
     width: 100%;
-    height: 60px;
+    height: 48px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -3398,22 +3366,17 @@ div.checkboxOn, div.checkboxOff {
     text-transform: uppercase;
 }
 .payment-address-dialog .payment-buy-now {
-    color: #fff;
-    padding: 0 15px 0 15px;
     font-size: 15px;
     line-height: 48px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
+    height: 48px;
     display: block;
-    background-color: #ff4444;
     cursor: pointer;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     text-align: center;
     text-transform: lowercase;
-    margin-bottom: 8px;
+    margin: 0 16px 8px;
     position: relative;
 }
 .payment-address-dialog .payment-buy-now:first-letter {
@@ -3421,8 +3384,9 @@ div.checkboxOn, div.checkboxOff {
 }
 .payment-address-dialog .error-message {
     color: #ff4444;
-    margin-top: 5px;
+    margin-top: 16px;
     text-align: center;
+    font-size: 14px;
 }
 .payment-address-dialog .error-message.hidden {
     display: block;
@@ -3440,19 +3404,15 @@ div.checkboxOn, div.checkboxOff {
 }
 .payment-address-dialog .redirect-information-container {
     position: relative;
-    height: 55px;
-    margin-top: 40px;
-    margin-bottom: 20px;
+    margin: 12px 16px;
 }
 .payment-address-dialog .redirect-information {
     background-color: #f7f8fa;
     color: #939da3;
-    font-size: 15px;
-    line-height: 19px;
-    padding: 18px 24px;
-    position: absolute;
-    left: -13px;
-    right: -13px;
+    font-size: 14px;
+    line-height: 21px;
+    padding: 12px 16px;
+    text-align: center;
 }
 /* End of Credit card billing address dialog */
 
@@ -6785,6 +6745,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .bottom-page .forgot-password-page .mobile.fm-header {
     position: fixed;
+    background-color: #fff;
 }
 body.bottom-pages.mobile .fmholder.no-scroll {
     overflow: hidden;
@@ -6930,7 +6891,7 @@ body.bottom-pages.mobile .fmholder.no-scroll {
 }
 
 .local-currency .membership-gray-block {
-    height: 124px;
+    height: 132px;
 }
 
 .local-currency .num .big {
@@ -6966,11 +6927,11 @@ body.bottom-pages.mobile .fmholder.no-scroll {
 }
 
 .local-currency .reg-st3-bott-title.price .local-currency-code {
-    font-size: 10px;
-    color: #888;
+    font-size: 12px;
+    color: #666;
     line-height: 16px;
-    margin-top: -5px;
-    margin-bottom: 4px;
+    margin-top: -2px;
+    margin-bottom: 8px;
     display: block;
 }
 

@@ -1464,11 +1464,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
     }
     delay('percent_megatitle', percent_megatitle, 50);
 
-    if (mega.megadrop.isInit()) {
-        mega.megadrop.uiUpdateItem(id, bps, retime, perc, bl);
-    }
-
-    if (page.substr(0, 2) !== 'fm' && page.substr(0, 8) !== 'megadrop') {
+    if (page.substr(0, 2) !== 'fm') {
         $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
         $('.widget-icon.uploading').removeClass('hidden');
         $('.widget-speed-block.ulspeed').text(bytesToSize(bps, 1) + '/s');

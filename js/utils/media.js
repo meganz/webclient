@@ -528,6 +528,7 @@ function FullScreenManager($button, $element) {
         else {
             $element.fullScreen(true);
         }
+        return false;
     };
 
     if (state === null) {
@@ -797,6 +798,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             else {
                 videoElement.pause();
             }
+            return false;
         });
 
         // Volume Bar control
@@ -876,6 +878,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 changeButtonState('mute');
                 updateVolumeBar();
             }
+            return false;
         });
 
         var progressBarElementStyle = $progressBar.get(0).style;

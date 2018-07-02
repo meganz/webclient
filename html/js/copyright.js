@@ -349,10 +349,11 @@ copyright.init_cn = function() {
         }
     });
     var markup = '<OPTION value="0"></OPTION>';
-    for (var country in isoCountries) {
-        if (isoCountries.hasOwnProperty(country)) {
+    var countries = M.getCountries();
+    for (var country in countries) {
+        if (countries.hasOwnProperty(country)) {
             markup += '<option value="' + escapeHTML(country) + '">'
-                + escapeHTML(isoCountries[country]) + '</option>';
+                + escapeHTML(countries[country]) + '</option>';
         }
     }
     $('.select.country select').safeHTML(markup);
@@ -553,10 +554,11 @@ copyright.init_cndispute = function() {
 
     // Set up the country values
     var markup = '<OPTION value="0"></OPTION>';
-    for (var country in isoCountries) {
-        if (isoCountries.hasOwnProperty(country)) {
+    var countries = M.getCountries();
+    for (var country in countries) {
+        if (countries.hasOwnProperty(country)) {
             markup += '<option value="' + escapeHTML(country) + '">'
-                + escapeHTML(isoCountries[country]) + '</option>';
+                + escapeHTML(countries[country]) + '</option>';
         }
     }
     $('.cn .select.country select').safeHTML(markup);

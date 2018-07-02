@@ -1380,14 +1380,14 @@ mega.megadrop = (function() {
         };
 
         var _queueScroll = function _uiQueueScroll(itemsNum) {
-            var SCROLL_TRIGGER = 6;
+            var SCROLL_TRIGGER = 5;
             var queueDOM = uiOpts.window.class + ' ' + uiOpts.window.queueClass;
 
-            if (itemsNum > SCROLL_TRIGGER) {// Adapt scroll to new height
-                jScrollReinitialize(queueDOM);
-            }
-            else if (itemsNum === SCROLL_TRIGGER) {// Add scroll
+            if (itemsNum > SCROLL_TRIGGER) {
                 dialogScroll(queueDOM);
+            }
+            else {
+                deleteScrollPanel(queueDOM, 'jsp');
             }
         };
 

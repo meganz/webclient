@@ -4743,12 +4743,9 @@
 
 
 <!-- user management dialog !-->
-<div class="user-management-dialog">
-<!-- add user dialog !-->
-    <div class="add-user-dialog dialog"> 
+    <div class="user-management-add-user-dialog user-management-dialog"> 
         <div class="dialog-title">Invite People to Team</div>
         <div class="delete-img icon"></div>
-     <!--Folder container-->           
         <div class="dialog-tree-panel-scroll add-user">
             <div class="dialog-input-container">
                 <div class="input-user">
@@ -4761,7 +4758,7 @@
                     <div class="delete-img icon"></div> 
                 </div>
             </div>
-        </div><!--END folder container-->
+        </div>
         <div class="dialog-button-container">
             <div class="default-button-no-border">
                 <div class="add-more-img icon"></div>
@@ -4781,19 +4778,17 @@
             <div class="default-white-button-user-management">
             View Plans
             </div>
-        </div><!--Buttons-->  
-    </div><!--END add user dialog-->  
+        </div>
+    </div>
 
-<!-- verification dialog !-->
-    <div class="verification-dialog dialog hidden">
+    <div class="user-management-verification-dialog user-management-dialog hidden">
         <!--Header-->
         <div class="dialog-title">Verification emails have been sent</div>
         <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
         <div class="user-management-border"></div>
-
         <!--Folder container-->
         <div class="dialog-tree-panel-scroll verification">
-            <div class="verification-container">
+            <div class="dialog-content-block verification-container">
                 <div class="verification-user-container">
                     <div class="avatars">
                         <div class="subuser-image">
@@ -4805,31 +4800,7 @@
                         <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
                     </div>
                     <div class="default-white-button-user-management">View Account</div>
-                </div>
-                <div class="verification-user-container">
-                    <div class="avatars">
-                        <div class="subuser-image">
-                            <img src="" class="hidden">
-                        </div>
-                    </div>
-                    <div class="verification-user-info">
-                        <div class="verification-user-email"><b>Email:</b>major@126.com</div>
-                        <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
-                    </div>
-                    <div class="default-white-button-user-management">View Account</div>
-                </div>
-                <div class="verification-user-container">
-                    <div class="avatars">
-                        <div class="subuser-image">
-                            <img src="" class="hidden">
-                        </div>
-                    </div>
-                    <div class="verification-user-info">
-                        <div class="verification-user-email"><b>Email:</b>major@126.com</div>
-                        <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
-                    </div>
-                    <div class="default-white-button-user-management">View Account</div>
-                </div>                                     
+                </div>                                    
             </div>
         </div> <!--END folder container-->
         <div class="dialog-button-container">
@@ -4839,97 +4810,92 @@
         </div><!--Buttons-->  
     </div><!--END verification dialog-->  
 
-<!-- edit profile dialog !-->
-    <div class="edit-profile-dialog dialog hidden">
-        <div class="user-management-subuser-avatars">
-            <div class="user-management-subuser-image"></div>
-        </div>
-        <div class="dialog-title">Edit Profile</div>
-        <div class="delete-img icon"></div>
-
-        <div class="dialog-input-container">
-            <div class="dialog-input-title-ontop">
-                Name<br>
-                <input class="dialog-input correct-input" type="text" value="Iwata Takanori" autofocus>
-            </div>
-            <div class="dialog-input-title-ontop">
-                Email<br>
-                <input class="dialog-input correct-input" type="text" value="Jay_Pierce@janie.net">
-            </div>
-            <div class="dialog-input-title-ontop">
-                Role<br>
-                <div class="dialog-input correct-input">
-                    <div class="list-arrow"></div>
-                    <select size="1">
-                        <option value=" ">Sub-administrator</option>
-                        <option value=" ">Product manager</option>
-                        <option value=" ">Developer</option>
-                        <option value=" ">Designer</option>
-                    </select>
+        <div class="user-management-edit-profile-dialog user-management-dialog hidden">
+      <div class="user-management-subuser-avatars">
+        <div class="user-management-subuser-image"></div>
+      </div>
+            <div class="dialog-title">Edit Profile</div>
+            <div class="delete-img icon"></div>
+            <div class="dialog-input-container">
+                <div class="dialog-input-title-ontop">
+                    Name<br>
+                    <input class="dialog-input correct-input" type="text" value="Iwata Takanori" autofocus>
+                </div>
+                <div class="dialog-input-title-ontop">
+                    Email<br>
+                    <input class="dialog-input correct-input" type="text" value="Jay_Pierce@janie.net">
+                </div>
+                <div class="dialog-input-title-ontop">
+                    Role<br>
+                    <div class="dialog-input correct-input">
+                        <div class="list-arrow"></div>
+                        <select size="1">
+                            <option value=" ">Sub-administrator</option>
+                            <option value=" ">Product manager</option>
+                            <option value=" ">Developer</option>
+                            <option value=" ">Designer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="border"></div>
+                <div class="dialog-input-title-ontop">
+                    Position<br>
+                    <input class="dialog-input placeholder" type="text" value="Position">
+                </div>
+                <div class="dialog-input-title-ontop">
+                    ID number<br>
+                    <input class="dialog-input placeholder" type="text" value="000">
+                </div>
+                <div class="dialog-input-title-ontop">
+                    Phone number<br>
+                    <input class="dialog-input placeholder" type="text" value="(123) 000 000">
+                </div>
+                <div class="dialog-input-title-ontop">
+                    Location<br>
+                    <input class="dialog-input placeholder" type="text" value="New Zealand">
                 </div>
             </div>
-            <div class="border"></div>
-            <div class="dialog-input-title-ontop">
-                Position<br>
-                <input class="dialog-input placeholder" type="text" value="Position">
-            </div>
-            <div class="dialog-input-title-ontop">
-                ID number<br>
-                <input class="dialog-input placeholder" type="text" value="000">
-            </div>
-            <div class="dialog-input-title-ontop">
-                Phone number<br>
-                <input class="dialog-input placeholder" type="text" value="(123) 000 000">
-            </div>
-            <div class="dialog-input-title-ontop">
-                Location<br>
-                <input class="dialog-input placeholder" type="text" value="New Zealand">
+            <div class="dialog-button-container">
+                <div class="default-green-button-user-management">
+                    Save Changes
+                </div>
+                <div class="default-white-button-user-management">
+                    Cancel
+                </div>
             </div>
         </div>
-        <div class="dialog-button-container">
-            <div class="default-green-button-user-management">
-                Save Changes
-            </div>
-            <div class="default-white-button-user-management">
-                Cancel
-            </div>
-        </div>
-    </div><!--END edit proflie dialog-->
 
-<!-- re-enable user dialog !-->
-    <div class="re-enable-disable-user-dialog dialog hidden">
-        <div class="re-enable-large-icon large-img"></div>
-        <div class="dialog-text-container">
-            <div class="dialog-text-one">Are you sure you want to re-enable the account of <b>Jay Pierce</b>?</div>
-            <span class="dialog-text-two">Note: This action will take up user quota.</span>
+        <div class="user-management-able-user-dialog user-management-dialog hidden">
+            <div class="re-enable-large-icon icon56"></div>
+            <div class="dialog-text-container">
+                <div class="dialog-text-one">Are you sure you want to re-enable the account of <b>Jay Pierce</b>?</div>
+                <span class="dialog-text-two">Note: This action will take up user quota.</span>
+            </div>
+            <div class="dialog-button-container">
+                <div class="default-green-button-user-management">
+                    Yes
+                </div>
+                <div class="default-white-button-user-management">
+                    Cancel
+                </div>
+            </div>              
         </div>
-        <div class="dialog-button-container">
-            <div class="default-green-button-user-management">
-                Yes
-            </div>
-            <div class="default-white-button-user-management">
-                Cancel
-            </div>
-        </div>              
-    </div><!--END re-enable user dialog-->
 
-<!-- disable user dialog !-->
-    <div class="re-enable-disable-user-dialog dialog hidden">
-        <div class="disable-large-icon large-img"></div>
-        <div class="dialog-text-container">
-            <div class="dialog-text-one">Are you sure you want to dise the account of <b>Jay Pierce</b>? </div>
-            <span class="dialog-text-two">Note: You can re-enable it in the disable list. </span>
+        <div class="user-management-able-user-dialog user-management-dialog hidden">
+            <div class="disable-large-icon icon56"></div>
+            <div class="dialog-text-container">
+                <div class="dialog-text-one">Are you sure you want to dise the account of <b>Jay Pierce</b>? </div>
+                <span class="dialog-text-two">Note: You can re-enable it in the disable list. </span>
+            </div>
+            <div class="dialog-button-container">
+                <div class="default-gray-button-user-management">
+                    Yes
+                </div>
+                <div class="default-white-button-user-management">
+                    Cancel
+                </div>
+            </div>              
         </div>
-        <div class="dialog-button-container">
-            <div class="default-gray-button-user-management">
-                Yes
-            </div>
-            <div class="default-white-button-user-management">
-                Cancel
-            </div>
-        </div>              
-    </div><!--END disnable user dialog-->
-</div>
 
 
 

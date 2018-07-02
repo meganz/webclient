@@ -135,51 +135,50 @@ $(document).ready(function() {
 <div id="fmholder" class="fmholder">
 		
 	<!-- Dialog -->
-	<div class="user-management-dialog">
-        <div class="add-user-dialog dialog hidden"> 
-            <div class="dialog-title">Invite People to Team</div>
-            <div class="delete-img icon"></div>
-            <div class="dialog-tree-panel-scroll add-user">
-                <div class="dialog-input-container">
-                    <div class="input-user">
-                        <div class="indi-input">
-                            <input type="text" class="dialog-input focus" value="Name" autofocus> 
-                        </div>
-                        <div class="indi-input">
-                            <input type="text" class="dialog-input placeholder" value="Email">
-                        </div>
-                        <div class="delete-img icon"></div> 
+
+    <div class="user-management-add-user-dialog user-management-dialog"> 
+        <div class="dialog-title">Invite People to Team</div>
+        <div class="delete-img icon"></div>
+        <div class="dialog-tree-panel-scroll add-user">
+            <div class="dialog-input-container">
+                <div class="input-user">
+                    <div class="indi-input">
+                        <input type="text" class="dialog-input focus" value="Name" autofocus> 
                     </div>
-                </div>
-            </div>
-            <div class="dialog-button-container">
-                <div class="default-button-no-border">
-                    <div class="add-more-img icon"></div>
-                    Add More
-                </div>
-                <div class="default-button-no-border">
-                    <div class="import-contact-img icon"></div>
-                    Import Contacts
-                </div>
-                <div class="default-green-button-user-management disabled">
-                    Add Users
-                </div>
-            </div>
-            <div class="licence-bar">
-                <div class="notification-img icon"></div>
-                5 sub account licences used.
-                <div class="default-white-button-user-management">
-                View Plans
+                    <div class="indi-input">
+                        <input type="text" class="dialog-input placeholder" value="Email">
+                    </div>
+                    <div class="delete-img icon"></div> 
                 </div>
             </div>
         </div>
+        <div class="dialog-button-container">
+            <div class="default-button-no-border">
+                <div class="add-more-img icon"></div>
+                Add More
+            </div>
+            <div class="default-button-no-border">
+                <div class="import-contact-img icon"></div>
+                Import Contacts
+            </div>
+            <div class="default-green-button-user-management disabled">
+                Add Users
+            </div>
+        </div>
+        <div class="licence-bar">
+            <div class="notification-img icon"></div>
+            5 sub account licences used.
+            <div class="default-white-button-user-management">
+            View Plans
+            </div>
+        </div>
+    </div>
 
-    <div class="verification-dialog dialog hidden">
+    <div class="user-management-verification-dialog user-management-dialog hidden">
         <!--Header-->
         <div class="dialog-title">Verification emails have been sent</div>
         <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
         <div class="user-management-border"></div>
-
         <!--Folder container-->
         <div class="dialog-tree-panel-scroll verification">
             <div class="dialog-content-block verification-container">
@@ -193,40 +192,8 @@ $(document).ready(function() {
                         <div class="verification-user-email"><b>Email:</b>major@126.com</div>
                         <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
                     </div>
-                </div>
-                <div class="verification-user-container">
-                    <div class="avatars">
-                        <div class="subuser-image">
-                            <img src="" class="hidden">
-                        </div>
-                    </div>
-                    <div class="verification-user-info">
-                        <div class="verification-user-email"><b>Email:</b>major@126.com</div>
-                        <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
-                    </div>
-                </div>
-                <div class="verification-user-container">
-                    <div class="avatars">
-                        <div class="subuser-image">
-                            <img src="" class="hidden">
-                        </div>
-                    </div>
-                    <div class="verification-user-info">
-                        <div class="verification-user-email"><b>Email:</b>major@126.com</div>
-                        <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
-                    </div>
-                </div>
-                <div class="verification-user-container">
-                    <div class="avatars">
-                        <div class="subuser-image">
-                            <img src="" class="hidden">
-                        </div>
-                    </div>
-                    <div class="verification-user-info">
-                        <div class="verification-user-email"><b>Email:</b>major@126.com</div>
-                        <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
-                    </div>
-                </div>                                      
+                    <div class="default-white-button-user-management">View Account</div>
+                </div>                                    
             </div>
         </div> <!--END folder container-->
         <div class="dialog-button-container">
@@ -236,13 +203,12 @@ $(document).ready(function() {
         </div><!--Buttons-->  
     </div><!--END verification dialog-->  
 
-		<div class="edit-profile-dialog dialog hidden">
-	        <div class="user-management-subuser-avatars">
-            	<div class="user-management-subuser-image"></div>
-            </div>
+		<div class="user-management-edit-profile-dialog user-management-dialog hidden">
+      <div class="user-management-subuser-avatars">
+        <div class="user-management-subuser-image"></div>
+      </div>
 			<div class="dialog-title">Edit Profile</div>
 			<div class="delete-img icon"></div>
-
 			<div class="dialog-input-container">
 				<div class="dialog-input-title-ontop">
 					Name<br>
@@ -292,8 +258,8 @@ $(document).ready(function() {
 			</div>
 		</div>
 
-		<div class="re-enable-disable-user-dialog dialog hidden">
-			<div class="re-enable-large-icon large-img"></div>
+		<div class="user-management-able-user-dialog user-management-dialog hidden">
+			<div class="re-enable-large-icon icon56"></div>
 			<div class="dialog-text-container">
 				<div class="dialog-text-one">Are you sure you want to re-enable the account of <b>Jay Pierce</b>?</div>
 				<span class="dialog-text-two">Note: This action will take up user quota.</span>
@@ -308,8 +274,8 @@ $(document).ready(function() {
 			</div>				
 		</div>
 
-		<div class="re-enable-disable-user-dialog dialog hidden">
-			<div class="disable-large-icon large-img"></div>
+		<div class="user-management-able-user-dialog user-management-dialog hidden">
+			<div class="disable-large-icon icon56"></div>
 			<div class="dialog-text-container">
 				<div class="dialog-text-one">Are you sure you want to dise the account of <b>Jay Pierce</b>? </div>
 				<span class="dialog-text-two">Note: You can re-enable it in the disable list. </span>
@@ -323,11 +289,11 @@ $(document).ready(function() {
 				</div>
 			</div>				
 		</div>
-	</div>
+
 
 	<!-- the blur class is main-blur-block-->
-	<div class="fm-main-user-management main-blur-block">
-		<div class="overlay"></div>
+	<div class="fm-main-user-management">
+		<div class="overlay hidden"></div>
 
 		<!-- left icon pane -->
 	 	<div class="nw-fm-left-icons-panel">
@@ -403,124 +369,120 @@ $(document).ready(function() {
 
 	 	<!-- Left list pane -->
 	 	<div class="fm-left-panel ui-resizable user-management">
-        	<div class="left-pane-drag-handle ui-resizable-handle ui-resizable-e"></div>
+    	<div class="left-pane-drag-handle ui-resizable-handle ui-resizable-e"></div>
        
-        	<div class="user-management-sorting-menu hidden"> 
-                <div class="sorting-menu-arrow"></div>
-                <p> SORT </p>
+    	<div class="user-management-sorting-menu hidden"> 
+            <div class="sorting-menu-arrow"></div>
+            <p> SORT </p>
 
-                <div class="sorting-menu-item-user-management">
-                	<div class="user-management-sort-name sort-icon"></div>
-                	<span>Name</span>
-                	<div class="up-arrow-icon"></div>
-                </div>
-                <div class="sorting-menu-item-user-management">
-                	<div class="user-management-sort-status sort-icon"></div>
-                	<span>Status</span>
-                </div>
-        	</div>
+            <div class="sorting-menu-item-user-management">
+            	<div class="user-management-sort-name sort-icon"></div>
+            	<span>Name</span>
+            	<div class="up-arrow-icon"></div>
+            </div>
+            <div class="sorting-menu-item-user-management">
+            	<div class="user-management-sort-status sort-icon"></div>
+            	<span>Status</span>
+            </div>
+    	</div>
         
-        	<div class="fm-left-menu user-management">
-                <div class="nw-fm-tree-header user-management">
-                    <input value="" placeholder="User Management" type="text">
-                    <div class="nw-fm-search-icon"></div>
-                </div>
-        	</div>
+    	<div class="fm-left-menu user-management">
+            <div class="nw-fm-tree-header user-management">
+                <input value="" placeholder="User Management" type="text">
+                <div class="nw-fm-search-icon"></div>
+            </div>
+    	</div>
 
-        	<div class="user-management-tree-panel-header enabled-accounts active">
-        		<div class="img enabled-accounts"></div>
-                <span>Enabled Accounts</span>
-                <div class="user-management-tree-panel-arrows"></div>
-        	</div>
+    	<div class="user-management-tree-panel-header enabled-accounts active">
+    		<div class="img enabled-accounts"></div>
+            <span>Enabled Accounts</span>
+            <div class="user-management-tree-panel-arrows"></div>
+    	</div>
 
-         	<div class="user-management-tree-panel-header disabled-accounts">
-         		<div class="img disabled-accounts"></div>
-            	<span>Disabled Accounts</span>
-            	<div class="user-management-tree-panel-arrows hidden"></div>
-        	</div>
-	    	<div class="fm-tree-panel">
-	        	<div class="jspContainer">
-	            	<div class="jspPane"> 
-		            	<div class="content-panel user-management active">
-		                    <div class="nw-user-management-item">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item">
-		                        <div class="user-management-status pending"></div>
-		                        <div class="nw-user-management-name">Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item selected">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">John Bailey</div>
-		                    </div>
-		                    	                    <div class="nw-user-management-item">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item">
-		                        <div class="user-management-status pending"></div>
-		                        <div class="nw-user-management-name">Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item selected">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">John Bailey</div>
-		                    </div>
-		                    	                    <div class="nw-user-management-item">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item">
-		                        <div class="user-management-status pending"></div>
-		                        <div class="nw-user-management-name">Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item selected">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">John Bailey</div>
-		                    </div>
-		                    	                    <div class="nw-user-management-item">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item">
-		                        <div class="user-management-status pending"></div>
-		                        <div class="nw-user-management-name">Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item selected">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">John Bailey</div>
-		                    </div>
-		                    	                    <div class="nw-user-management-item">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item">
-		                        <div class="user-management-status pending"></div>
-		                        <div class="nw-user-management-name">Ollie Gibson</div>
-		                    </div>
-		                    <div class="nw-user-management-item selected">
-		                        <div class="user-management-status enabled"></div>
-		                        <div class="nw-user-management-name">John Bailey</div>
-		                    </div>
-		                </div>
-		            </div>
-			        <div class="ps-scrollbar-x-rail">
-					<div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
-					</div>
-					<div class="ps-scrollbar-y-rail">
-					<div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 200px;"></div>
-					</div>
+     	<div class="user-management-tree-panel-header disabled-accounts">
+     		<div class="img disabled-accounts"></div>
+        	<span>Disabled Accounts</span>
+        	<div class="user-management-tree-panel-arrows hidden"></div>
+    	</div>
+
+    	<div class="fm-tree-panel">
+        	<div class="jspContainer">
+            	<div class="jspPane"> 
+	            	<div class="content-panel user-management active">
+	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status pending"></div>
+	                        <div class="nw-user-management-name">Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item selected">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">John Bailey</div>
+	                    </div>
+	                    	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status pending"></div>
+	                        <div class="nw-user-management-name">Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item selected">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">John Bailey</div>
+	                    </div>
+	                    	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status pending"></div>
+	                        <div class="nw-user-management-name">Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item selected">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">John Bailey</div>
+	                    </div>
+	                    	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status pending"></div>
+	                        <div class="nw-user-management-name">Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item selected">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">John Bailey</div>
+	                    </div>
+	                    	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">Jay Pierce Ollie Gibson Ollie Gibson Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item">
+	                        <div class="user-management-status pending"></div>
+	                        <div class="nw-user-management-name">Ollie Gibson</div>
+	                    </div>
+	                    <div class="nw-user-management-item selected">
+	                        <div class="user-management-status enabled"></div>
+	                        <div class="nw-user-management-name">John Bailey</div>
+	                    </div>
+	              </div>
 	            </div>
-	   		</div>
+          </div>
+   		</div>
+
 	 		<div class="fm-right-files-block">
 	 		</div>
 	 	</div>
 
 	 	<!-- Right field -->
-	 	<div class="top-head user-management-border">
+	 	<div class="top-head">
 		</div>
 
-		<div class="user-management-overview-bar">
+		<div class="user-management-overview-bar hidden">
 			<div class="user-management-overview-bar-data">
 				<div class="info-block">
 					<div class="number-of-user-icon icon"></div>
@@ -546,7 +508,7 @@ $(document).ready(function() {
 			</div>
 		</div>
 
-		<div class="fm-right-header-user-management">
+		<div class="fm-right-header-user-management hidden">
 			<div class="user-management-main-page-buttons hidden">
 				<a class="fm-files-view-icon-user-management block-view" title="Thumbnail view"></a>
 				<a class="fm-files-view-icon-user-management listing-view active" title="List view"></a>
@@ -564,104 +526,68 @@ $(document).ready(function() {
 					<div class="add-users-icon icon"></div>
 					Add Users
 				</div>
-            </div>
+      </div>
 
-            <div class="user-management-breadcrumb subaccount hidden">
-                <div class="user-management-icon"></div>
-                <div class="user-management-next-arrow"></div>
-                <div class="user-management-subuser-avatars">
-                	<div class="user-management-subuser-image"></div>
-                </div>
-                <div class="user-management-subuser-name">Jay Pierce</div>
-            </div>
+      <div class="user-management-breadcrumb subaccount hidden">
+          <div class="user-management-icon"></div>
+          <div class="user-management-next-arrow"></div>
+          <div class="user-management-subuser-avatars">
+          	<div class="user-management-subuser-image"></div>
+          </div>
+          <div class="user-management-subuser-name">Jay Pierce</div>
+      </div>
 
-            <div class="user-management-breadcrumb overview hidden">
-                <div class="user-management-icon"></div>
-                <div class="user-management-next-arrow"></div>
-				<div class="user-management-breadcrumbs-img overview-icon"></div>
-				<div class="user-management-subuser-name">Overview</div>
-            </div>
+      <div class="user-management-breadcrumb overview hidden">
+          <div class="user-management-icon"></div>
+          <div class="user-management-next-arrow"></div>
+  				<div class="user-management-breadcrumbs-img overview-icon"></div>
+  				<div class="user-management-subuser-name">Overview</div>
+      </div>
 
-            <div class="user-management-breadcrumb hidden">
-                <div class="user-management-icon"></div>
-                <div class="user-management-next-arrow"></div>
-				<div class="user-management-breadcrumbs-img account-icon"></div>
-				<div class="user-management-subuser-name">Account</div>
-            </div>
+      <div class="user-management-breadcrumb hidden">
+          <div class="user-management-icon"></div>
+          <div class="user-management-next-arrow"></div>
+  				<div class="user-management-breadcrumbs-img account-icon"></div>
+  				<div class="user-management-subuser-name">Account</div>
+      </div>
 
-            <div class="user-management-overview-buttons">
+      <div class="user-management-overview-buttons">
 				<div class="default-white-button-user-management">
-					<div class="export-pdf-icon icon"></div>
-					Export to PDF
-	 			</div>
-				<div class="default-white-button-user-management">
-					<div class="view-plan-icon icon"></div>
-					View Plans
+  				<div class="export-pdf-icon icon"></div>
+  				Export to PDF
+   			</div>
+  			<div class="default-white-button-user-management">
+  				<div class="view-plan-icon icon"></div>
+  				View Plans
 				</div>
-            </div>
+      </div>
 		</div>
 
 		<div class="files-grid-view user-management-view">
-			<div class="user-management-landing-page hidden">
-				<div class="user-management-dialog">
-					<div class="invite-people-dialog dialog">
-					<div class="mega-54px-icon"></div>
-					<div class="dialog-title">Invite People to Team</div>
-					<div class="dialog-subtitle">User management help you to organise all the sub user accounts in one place. Get start with inviting people to the team.</div>
-					<div class="dialog-input-container">
-						<div class="input-user">
-							<div class="indi-input">
-								<input type="text" class="dialog-input focus" value="FirstName LastName" autofocus>	
-							</div>
-							<div class="indi-input">
-								<input type="text" class="dialog-input placeholder" value="Email">
-							</div>
-							<div class="delete-img icon"></div>	
-						</div>
-						<div class="input-user hidden">
-							<div class="indi-input">
-								<input type="text" class="dialog-input focus" value="FirstName LastName">	
-							</div>
-							<div class="indi-input">
-								<input type="text" class="dialog-input placeholder" value="Email">
-							</div>
-							<div class="delete-img icon"></div>	
-						</div>
-						<div class="input-user hidden">
-							<div class="indi-input">
-								<input type="text" class="dialog-input correct-input" value="Iwata Takanori">
-								<div class="confirm-img icon"></div>
-							</div>
-							<div class="indi-input">
-								<input type="text" class="dialog-input error" value="Email">
-								<div class="error-message">Error message</div>	
-							</div>
-							<div class="delete-img icon"></div>	
-						</div>
-					</div>
+			<div class="user-management-landing-page">
+        <div class="landing-page-container">
+            <div class="mega-54px-icon"></div>
+            <div class="landing-title">Welcome to MEGA User Management</div>
+            <div class="landing-sub-title">User management help you to organise all the sub user accounts in one place.  You are able to add users, modify account settings and overview the business account status here.</div>
+            <div class="landing-sub-container">
+              <div class="add-user-icon56 icon56"></div>
+              <div class="landing-container-title">Add Users</div>
+              <div class="landing-container-subtitle">Get start with inviting people to the team</div>
+              <div class="default-white-button-user-management">Add Users</div>
+            </div>
+            <div class="landing-sub-container">
+              <div class="accounts-icon56 icon56"></div>
+              <div class="landing-container-title">Accounts</div>
+              <div class="landing-container-subtitle">Modify account settings</div>
+              <div class="default-white-button-user-management">Accounts</div>
+            </div>
+        </div>
 
-					<div class="dialog-button-container">
-						<div class="default-button-no-border">
-							<div class="add-more-img icon"></div>
-							Add More
-						</div>
-						<div class="default-button-no-border">
-							<div class="import-contact-img icon"></div>
-							Import Contacts
-						</div>
-
-					<!--Please make the hover function disabled as well when the button is in disabled mode -->	
-						<div class="default-green-button-user-management disabled">
-							Invite & Get Started
-						</div>
-					</div>
-					<div class="licence-bar disappear">
-						<div class="notification-img icon"></div>
-						5 sub account licences used.
-						<div class="default-white-button-user-management">
-						View Plans
-						</div>
-					</div>
+				<div class="licence-bar">
+					<div class="notification-img icon"></div>
+					5 sub account licences used.
+					<div class="default-white-button-user-management">
+					View Plans
 					</div>
 				</div>
 			</div>

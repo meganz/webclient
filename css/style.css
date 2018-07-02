@@ -24198,6 +24198,10 @@ opacity: 1;
     cursor: default;
 }
 
+.default-white-button-user-management.disabled:hover, .default-green-button-user-management.disabled:hover, .default-gray-button-user-management.disabled:hover {
+    box-shadow: 0px 0px 0px 0px rgba(0,0,0,0);
+};
+
 .default-white-button-user-management{
     background-color: rgba(255,255,255,1);
     color: #666666;
@@ -24227,13 +24231,11 @@ opacity: 1;
 
 .default-white-button-user-management:hover, .default-gray-button-user-management:hover{
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
-    transition: 0.1s;
 }
 
 
 .default-green-button-user-management:hover {
     box-shadow: 0px 0px 0px 4px rgba(0,100,87,0.2);
-    transition: 0.1s;
 }
 
 .user-management-main-page-buttons .default-white-button-user-management, .user-management-main-page-buttons .default-green-button-user-management {
@@ -26227,19 +26229,7 @@ opacity: 1;
     -webkit-filter: blur(0.25em);
 }
 
-.user-management-landing-page{
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.user-management-landing-page .user-management-dialog {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.user-management-dialog .dialog, .user-management-view .dialog {
+.user-management-dialog {
     position: absolute;
     border-radius: 8px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26248,12 +26238,9 @@ opacity: 1;
     height: auto;
     z-index: 500;
     box-sizing: border-box;
-} 
-
-.user-management-dialog .dialog {
     left: 50%;
     top: 50%;
-}
+} 
 
 .user-management-dialog .dialog-tree-panel-scroll {
     overflow:hidden;
@@ -26284,7 +26271,7 @@ opacity: 1;
     display: block;
 }
 
-.user-management-dialog .dialog-tree-panel-scroll.add-user {
+.user-management-add-user-dialog .dialog-tree-panel-scroll.add-user {
     width:100%;
     height:auto;
     max-height: 200px;
@@ -26305,18 +26292,6 @@ opacity: 1;
     position: absolute;
     top: 0px;
     left: 0px;
-    background-color: rgba(0,0,0,0.1);
-}
-
-
-.user-management-dialog .invite-people-dialog .dialog-input-container::before {
-    content: "";
-    width: 508px;
-    height: 1px;
-    margin: 0 auto;
-    position: absolute;
-    top: 0px;
-    left: 56px;
     background-color: rgba(0,0,0,0.1);
 }
 
@@ -26415,13 +26390,7 @@ opacity: 1;
     border:1px solid rgba(217,0,7,0.5);
 } 
 
-.nw-drag-drop-dialog .summary-input.high-light {
-    background-color: rgba(0,191,165,0.05);
-    color: #999999;
-    border:1px solid rgba(0,191,165,0.5);
-} 
-
-.user-management-dialog .invite-people-dialog .dialog-button-container, .user-management-dialog .add-user-dialog .dialog-button-container{
+.user-management-add-user-dialog .dialog-button-container{
     margin:0 56px 24px 56px;
     height: 36px;
     width: 508px;
@@ -26443,11 +26412,11 @@ opacity: 1;
     margin:4px 0;
 }
 
-.user-management-dialog .default-button-no-border {
-        float: left;
+.user-management-add-user-dialog .default-button-no-border {
+    float: left;
 }
 
-.user-management-dialog .dialog-button-container .default-button-no-border:nth-child(2){
+.user-management-add-user-dialog .dialog-button-container .default-button-no-border:nth-child(2){
     margin-left: 24px;
 }
 
@@ -26459,6 +26428,34 @@ opacity: 1;
     height:24px;
 }
 
+.user-management-view .icon48, .user-management-dialog .icon48{
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    display: inline-block;
+    width:48px;
+    height: 48px;
+    display: inline-block;
+    position: relative;
+}
+
+.user-management-view .icon56, .user-management-dialog .icon56 {
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    display: inline-block;
+    width:56px;
+    height: 56px;
+    display: inline-block;
+    position: relative;
+}
+
+.user-management-view .add-user-icon56 {
+    background-position: 0 -332px;
+}
+
+.user-management-view .accounts-icon56 {
+    background-position: -64px -332px;
+}
+
 .user-management-view .default-button-no-border .icon, .fm-right-header-user-management .default-button-no-border .icon, .user-management-dialog .default-button-no-border .icon {
     cursor: pointer;
     position: relative;
@@ -26468,7 +26465,7 @@ opacity: 1;
     transition: 0.1s;
 }
 
-.user-management-view .licence-bar .icon, .user-management-dialog .licence-bar .icon{
+.user-management-view .licence-bar .icon, .user-management-add-user-dialog .licence-bar .icon{
     opacity: 0.8;
     float: left;
     margin: 16px 4px 16px 24px;
@@ -26482,16 +26479,13 @@ opacity: 1;
     opacity: 0.7;
 }
 
-.user-management-dialog .invite-people-dialog .default-green-button-user-management {
-    height: 36px;
-    width: auto;
-    padding: 8px 36px;
-    float: right;
-    line-height: 20px;
-    font-size: 16px;
+.user-management-add-user-dialog  {
+    width: 620px;
+    margin-left: -310px;
+    margin-top: -265px;
 }
 
-.user-management-dialog .licence-bar {
+.user-management-add-user-dialog .licence-bar {
     width: 100%;
     height: 56px;
     background-color: rgba(250,250,250,1);
@@ -26506,7 +26500,7 @@ opacity: 1;
 
 }
 
-.user-management-dialog .licence-bar::before {
+.user-management-add-user-dialog .licence-bar::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -26523,7 +26517,7 @@ opacity: 1;
     color: #666666;
 }
 
-.user-management-dialog .dialog-input-container .input-user .delete-img.icon {
+.user-management-add-user-dialog .dialog-input-container .input-user .delete-img.icon {
     position: absolute;
     right: 0;
     margin: 4px 28px 4px 4px;
@@ -26532,17 +26526,11 @@ opacity: 1;
     top: 0;
 }
 
-.user-management-dialog .dialog-input-container .input-user:hover .delete-img.icon {
+.user-management-add-user-dialog .dialog-input-container .input-user:hover .delete-img.icon {
     visibility: visible;
 }
 
-.user-management-dialog .add-user-dialog  {
-    width: 620px;
-    margin-left: -310px;
-    margin-top: -265px;
-}
-
-.user-management-dialog .add-user-dialog .default-green-button-user-management {
+.user-management-add-user-dialog .default-green-button-user-management {
     height: 36px;
     width: auto;
     padding: 8px 24px;
@@ -26551,7 +26539,7 @@ opacity: 1;
     font-size: 16px;
 }
 
-.user-management-dialog .add-user-dialog .delete-img.icon, .user-management-dialog .edit-profile-dialog .delete-img.icon, .user-management-dialog .re-enable-disable-user-dialog .delete-img{
+.user-management-add-user-dialog .delete-img.icon, .user-management-edit-profile-dialog .delete-img.icon, .user-management-able-user-dialog .delete-img{
     position: absolute;
     width: 24px;
     height: 24px;
@@ -26559,18 +26547,18 @@ opacity: 1;
     right: 16px;
 }
 
-.user-management-dialog .verification-dialog {
+.user-management-verification-dialog {
     width: 620px;
     margin-left: -310px;
     margin-top: -265px;
     position: absolute;
 }
 
-.user-management-dialog .verification-dialog .dialog-title {
+.user-management-verification-dialog .dialog-title {
     margin-top: 40px;
 }
 
-.user-management-dialog .verification-dialog .dialog-subtitle {
+.user-management-verification-dialog .dialog-subtitle {
     margin-bottom: 40px;
 }
 
@@ -26584,13 +26572,13 @@ opacity: 1;
     position: absolute;
 }
 
-.user-management-dialog .verification-dialog .dialog-tree-panel-scroll.verification {
+.user-management-verification-dialog .dialog-tree-panel-scroll.verification {
     height: auto;
     max-height: 305px;
     overflow: hidden;
 }
 
-.user-management-dialog .verification-dialog .verification-container {
+.user-management-verification-dialog .verification-container {
     position: relative;
     width: 100%;
     height: auto;
@@ -26600,7 +26588,15 @@ opacity: 1;
     box-sizing: border-box;
 }
 
-.user-management-dialog .verification-dialog .dialog-button-container::before {
+.user-management-verification-dialog .dialog-button-container {
+    position: relative;
+    width: 100%;
+    height: 56px;
+    display: block;
+    box-sizing: border-box;
+}
+
+.user-management-verification-dialog .dialog-button-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -26611,7 +26607,7 @@ opacity: 1;
     left: 0;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container {
+.user-management-verification-dialog .verification-user-container {
     position: relative;
     display: block;
     height: 48px;
@@ -26619,11 +26615,11 @@ opacity: 1;
     margin-bottom: 48px;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container:last-child {
+.user-management-verification-dialog .verification-user-container:last-child {
     margin-bottom: 0px;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container .avatars {
+.user-management-verification-dialog .verification-user-container .avatars {
     width:48px;
     height: 48px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26635,7 +26631,7 @@ opacity: 1;
     display: inline-block;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container .avatars .subuser-image {
+.user-management-verification-dialog .verification-user-container .avatars .subuser-image {
     width:38px;
     height: 38px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26645,14 +26641,14 @@ opacity: 1;
     position: absolute;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container .avatars .subuser-image img{
+.user-management-verification-dialog .verification-user-container .avatars .subuser-image img{
     width:38px;
     height: 38px;
     border-radius: 100%;
     position: absolute;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container .verification-user-info {
+.user-management-verification-dialog .verification-user-container .verification-user-info {
     width: 320px;
     margin-left: 24px;
     position: relative;
@@ -26663,50 +26659,50 @@ opacity: 1;
     vertical-align: top;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container .verification-user-info * {
+.user-management-verification-dialog .verification-user-container .verification-user-info * {
     font-size: 14px;
     color: #666;
     line-height: 18px;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container .verification-user-info .verification-user-email {
+.user-management-verification-dialog .verification-user-container .verification-user-info .verification-user-email {
     margin-bottom: 12px;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container .verification-user-info b {
+.user-management-verification-dialog .verification-user-container .verification-user-info b {
     font-weight: 600;
     color: #333;
     margin-right: 12px;
 }
 
-.user-management-dialog .verification-dialog .verification-user-container .default-white-button-user-management {
+.user-management-verification-dialog .verification-user-container .default-white-button-user-management {
     float: right;
     margin:8px 0;
 }
 
 
-.user-management-dialog .verification-dialog .dialog-button-container .default-green-button-user-management {
+.user-management-verification-dialog .dialog-button-container .default-green-button-user-management {
     margin:12px 24px;
 }
 
-.user-management-dialog .edit-profile-dialog {
+.user-management-edit-profile-dialog {
     width: 620px;
     margin-left: -310px;
     margin-top: -270px;
 }
 
-.user-management-dialog .edit-profile-dialog .user-management-subuser-avatars {
+.user-management-edit-profile-dialog .user-management-subuser-avatars {
     float: left;
     margin: 20px 12px 0 32px;
     cursor: pointer;
 }
 
-.user-management-dialog .edit-profile-dialog .dialog-input-container {
+.user-management-edit-profile-dialog .dialog-input-container {
     padding:24px 0 8px 0;
 }
 
 
-.user-management-dialog .edit-profile-dialog .dialog-title {
+.user-management-edit-profile-dialog .dialog-title {
     text-align: left;
 }
 
@@ -26751,21 +26747,20 @@ opacity: 1;
     font-family: 'Source Sans Pro', sans-serif; 
 } 
 
-.user-management-dialog .dialog-button-container, .nw-drag-drop-dialog .dialog-button-container {
-    margin:0;
-    width: 100%;
+.user-management-add-user-dialog .dialog-button-container {
+    margin: 16px 56px 24px 56px;
     box-sizing: border-box;
     position: relative;
     display: block;
-    border-radius: 0 0 8px 8px;
 }
 
-.user-management-dialog .edit-profile-dialog .dialog-button-container, .user-management-dialog .re-enable-disable-user-dialog .dialog-button-container {
+.user-management-edit-profile-dialog .dialog-button-container, .user-management-able-user-dialog .dialog-button-container {
     height: 56px;
     background-color: rgba(250,250,250,1);
+    position: relative;
 }
 
-.user-management-dialog .edit-profile-dialog .dialog-button-container::before, .user-management-dialog .re-enable-disable-user-dialog .dialog-button-container::before, .nw-drag-drop-dialog .dialog-button-container::before {
+.user-management-edit-profile-dialog .dialog-button-container::before, .user-management-able-user-dialog .dialog-button-container::before, .user-management-edit-profile-dialog .dialog-button-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -26773,80 +26768,211 @@ opacity: 1;
     position: absolute;
     display: block;
     top: 0;
+    left: 0;
 }
 
-.user-management-dialog .edit-profile-dialog .dialog-button-container .default-green-button-user-management, .user-management-dialog .re-enable-disable-user-dialog .dialog-button-container .default-green-button-user-management, .nw-drag-drop-dialog .dialog-button-container .default-green-button-user-management{
+.user-management-edit-profile-dialog .dialog-button-container .default-green-button-user-management, .user-management-able-user-dialog .dialog-button-container .default-green-button-user-management {
     position: relative;
     margin:12px 24px 12px 12px;
     float: right;
     padding: 0 24px;
 }
 
-.user-management-dialog .re-enable-disable-user-dialog .dialog-button-container .default-gray-button-user-management{
+.user-management-able-user-dialog {
+    width: 460px;
+    margin-left: -230px;
+    margin-top: -102px;
+}
+
+.user-management-able-user-dialog .dialog-button-container .default-gray-button-user-management{
     position: relative;
     margin:12px 16px 12px 12px;
     float: right;
     padding: 0 24px;
 }
 
-.user-management-dialog .edit-profile-dialog .dialog-button-container .default-white-button-user-management, .user-management-dialog .re-enable-disable-user-dialog .dialog-button-container .default-white-button-user-management {
+.user-management-edit-profile-dialog .dialog-button-container .default-white-button-user-management, .user-management-able-user-dialog .dialog-button-container .default-white-button-user-management {
     position: relative;
     margin:12px 0px;
     float: right;
     padding: 0 24px;
 }
 
-.user-management-dialog .re-enable-disable-user-dialog {
-    width: 460px;
-    margin-left: -230px;
-    margin-top: -102px;
-}
-
-.user-management-dialog .re-enable-disable-user-dialog .large-img{
-    background-image: url(../images/mega/big-icons.png);
-    background-repeat: no-repeat;
-    display: inline-block;
-    width:56px;
-    height: 56px;
+.user-management-able-user-dialog .icon56{
     margin: 40px 32px auto 40px;
     display: inline-block;
     position: relative;
     vertical-align: top;
 }
 
-.user-management-dialog .re-enable-disable-user-dialog .re-enable-large-icon {
+.user-management-able-user-dialog .re-enable-large-icon {
     background-position: -64px -98px;
 }
 
-.user-management-dialog .re-enable-disable-user-dialog .disable-large-icon {
+.user-management-able-user-dialog .disable-large-icon {
     background-position: -4px -98px;
 }
 
-.user-management-dialog .re-enable-disable-user-dialog .dialog-text-container {
+.user-management-able-user-dialog .dialog-text-container {
     display: inline-block;
     width:292px;
     margin:32px 0;
     position: relative;
 }
 
-.user-management-dialog .re-enable-disable-user-dialog .dialog-text-container .dialog-text-one {
+.user-management-able-user-dialog .dialog-text-container .dialog-text-one {
     font-size: 14px;
     color: #666666;
     line-height: 28px;
     display: inline-block;
 }
 
-.user-management-dialog .re-enable-disable-user-dialog .dialog-text-container .dialog-text-one b {
+.user-management-able-user-dialog .dialog-text-container .dialog-text-one b {
     font-weight: 600;
 }
 
-.user-management-dialog .re-enable-disable-user-dialog .dialog-text-container .dialog-text-two {
+.user-management-able-user-dialog .dialog-text-container .dialog-text-two {
     font-size: 13px;
     color: #999999;
     line-height: 20px;
     margin-top: 8px;
     display: inline-block;
 }
+
+.user-management-landing-page{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: #fff;
+}
+
+.user-management-landing-page::before {
+    content: "";
+    width: 100%;
+    height: 1px;
+    display: block;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.user-management-landing-page .landing-page-container{
+    width:540px;
+    height: auto;
+    left: 50%;
+    top: 50%;
+    margin-left: -270px;
+    margin-top: -250px;
+    display: inline-block;
+    position: relative;
+}
+
+.user-management-landing-page .mega-54px-icon{
+    background-image: url(../images/mega/big-icons.png);
+    background-repeat: no-repeat;
+    width: 54px;
+    height: 54px;
+    left: 50%;
+    display: inline-block;
+    background-position: -129px -100px;
+    margin: 0 auto 32px -27px;
+    position: relative;
+}
+
+.user-management-landing-page .landing-title {
+    font-size: 24px;
+    line-height: 32px;
+    margin:auto;
+    font-weight: 600;
+    width: 540px;
+    text-align: center;
+}
+
+.user-management-landing-page .landing-sub-title {
+    font-size:14px;
+    line-height: 24px;
+    color: #888;
+    width: 540px;
+    text-align: center;
+    margin:24px auto 56px auto;
+}
+
+.user-management-landing-page .landing-sub-container {
+    width: 100%;
+    height: auto;
+    display: inline-block;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.user-management-landing-page .landing-sub-container::before {
+    content: "";
+    width: 100%;
+    height: 1px;
+    display: block;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.user-management-landing-page .landing-sub-container::after {
+    content: "";
+    width: 100%;
+    height: 1px;
+    display: block;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.user-management-landing-page .landing-sub-container:last-child::before {
+    display: none;
+}
+
+.user-management-landing-page .landing-sub-container .icon56 {
+    position: relative;
+    float: left;
+    margin: 16px 24px 16px 0;
+}
+
+.user-management-landing-page .landing-sub-container .landing-container-title {
+    position: absolute;
+    top: 18px;
+    left: 80px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    line-height: 24px;
+
+}
+
+.user-management-landing-page .landing-sub-container .landing-container-subtitle {
+    position: absolute;
+    top: 46px;
+    left: 80px;
+    font-size: 14px;
+    color: #888;
+    line-height: 24px;
+}
+
+.user-management-landing-page .landing-sub-container .default-white-button-user-management{
+    position: absolute;
+    right: 0;
+    top: 28px;
+}
+
+.user-management-landing-page .licence-bar {
+    width:680px;
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    margin-left: -340px;
+}
+
 
 .user-management-view .user-management-account-settings .auto-save {
     position: fixed;
@@ -26918,16 +27044,6 @@ opacity: 1;
     position: absolute;
     bottom: 0;
     left: 0;
-}
-
-.user-management-view .icon48, .user-management-dialog .icon48{
-    background-image: url(../images/mega/big-icons.png);
-    background-repeat: no-repeat;
-    display: inline-block;
-    width:48px;
-    height: 48px;
-    display: inline-block;
-    position: relative;
 }
 
 .user-management-account-settings .setting-block {
@@ -27604,31 +27720,6 @@ opacity: 1;
     float: right;
 }
 
-
-.user-management-landing-page{
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: block;
-    background-color: #fff;
-}
-
-.user-management-landing-page::before {
-    content: " ";
-    width: 100%;
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: relative;
-    display: block;
-    top: 0;
-}
-
-.user-management-landing-page .user-management-dialog {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: block;
-}
 .user-management-dialog .invite-people-dialog.dialog {
     width: 620px;
     margin-left: -310px;
@@ -27637,20 +27728,6 @@ opacity: 1;
     top: 50%;
     border:none;
 }
-
-.user-management-dialog .invite-people-dialog .mega-54px-icon {
-    background-image: url(../images/mega/big-icons.png);
-    background-repeat: no-repeat;
-    width: 54px;
-    height: 54px;
-    left: 50%;
-    display: inline-block;
-    background-position: -129px -100px;
-    margin:48px auto 12px -27px;
-    position: relative;
-}
-
-
 
 .user-management-view .ff-icon, .user-management-dialog .ff-icon {
     background-image: url(../images/mega/files-icons_v3.png);

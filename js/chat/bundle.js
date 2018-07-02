@@ -1727,7 +1727,7 @@ React.makeElement = React['createElement'];
 	            if (!chatRoom || !chatRoom.roomId) {
 	                return;
 	            }
-	            if (!chatRoom.flags & 0x00000001) {
+	            if (!chatRoom.isArchived()) {
 	                return;
 	            }
 	            if (chatRoom.chatId !== room.chatId) {
@@ -1748,23 +1748,6 @@ React.makeElement = React['createElement'];
 	            'confirmUnarchiveDialogShown': true,
 	            'confirmUnarchiveChat': room.roomId
 	        });
-	    },
-	    currentCallClicked: function currentCallClicked(e) {
-	        var activeCallSession = this.props.megaChat.activeCallSession;
-	        if (activeCallSession) {
-	            this.conversationClicked(activeCallSession.room, e);
-	        }
-	    },
-	    contactClicked: function contactClicked(contact, e) {
-	        loadSubPage("fm/chat/" + contact.u);
-	        e.stopPropagation();
-	    },
-	    endCurrentCall: function endCurrentCall(e) {
-	        var activeCallSession = this.props.megaChat.activeCallSession;
-	        if (activeCallSession) {
-	            activeCallSession.endCall('hangup');
-	            this.conversationClicked(activeCallSession.room, e);
-	        }
 	    },
 	    onSortNameClicked: function onSortNameClicked(e) {
 	        this.setState({
@@ -1792,26 +1775,6 @@ React.makeElement = React['createElement'];
 
 	        var megaChat = this.props.megaChat;
 
-	        var activeCallSession = megaChat.activeCallSession;
-	        if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
-	            var room = activeCallSession.room;
-	            var user = room.getParticipantsExceptMe()[0];
-	            user = megaChat.getContactFromJid(user);
-
-	            if (user) {
-	                currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.userPresenceToCssClass(user.presence);
-	                currentCallingContactStatusProps['data-jid'] = room.roomId;
-
-	                if (room.roomId == megaChat.currentlyOpenedChat) {
-	                    currentCallingContactStatusProps.className += " selected";
-	                }
-	            } else {
-	                currentCallingContactStatusProps.className += ' hidden';
-	            }
-	        } else {
-	            currentCallingContactStatusProps.className += ' hidden';
-	        }
-
 	        var currConvsList = [];
 
 	        var sortedConversations = obj_values(this.props.chats.toJS());
@@ -1836,7 +1799,7 @@ React.makeElement = React['createElement'];
 	            if (!chatRoom || !chatRoom.roomId) {
 	                return;
 	            }
-	            if (!chatRoom.flags & 0x00000001) {
+	            if (!chatRoom.isArchived()) {
 	                return;
 	            }
 
@@ -2115,9 +2078,9 @@ React.makeElement = React['createElement'];
 	        loadSubPage('fm/chat/archived');
 	    },
 	    calcArchiveChats: function calcArchiveChats() {
-	        var Conversations = obj_values(this.props.megaChat.chats.toJS());
+	        var conversations = obj_values(this.props.megaChat.chats.toJS());
 	        var count = 0;
-	        Conversations.forEach(function (chatRoom) {
+	        conversations.forEach(function (chatRoom) {
 	            if (!chatRoom || !chatRoom.roomId) {
 	                return;
 	            }
@@ -12796,6 +12759,56 @@ React.makeElement = React['createElement'];
 	ChatRoom.prototype.isDisplayable = function () {
 	    var self = this;
 	    return self.showArchived === true || !self.isArchived();
+	};
+
+	ChatRoom.prototype.persistToFmdb = function () {
+	    var self = this;
+	    if (fmdb) {
+	        var users = [];
+	        if (self.members) {
+	            Object.keys(self.members).forEach(function (user_handle) {
+	                users.push({
+	                    u: user_handle,
+	                    p: self.members[user_handle]
+	                });
+	            });
+	        }
+	        if (self.chatId && self.chatShard !== undefined) {
+	            var roomInfo = {
+	                'id': self.chatId,
+	                'cs': self.chatShard,
+	                'g': self.type === "group" ? 1 : 0,
+	                'u': users,
+	                'ts': self.ctime,
+	                'ct': self.ct,
+	                'f': self.flags
+	            };
+	            fmdb.add('mcf', { id: roomInfo.id, d: roomInfo });
+	        }
+	    }
+	};
+
+	ChatRoom.prototype.updateFlags = function (f) {
+	    var self = this;
+	    self.flags = f;
+	    self.archivedSelected = false;
+	    if (self.isArchived()) {
+	        megaChat.archivedChatsCount++;
+	        self.showArchived = false;
+	    } else {
+	        megaChat.archivedChatsCount--;
+	    }
+
+	    if (megaChat.currentlyOpenedChat && megaChat.chats[megaChat.currentlyOpenedChat] && megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
+	        loadSubPage('fm/chat/');
+	    } else {
+	        megaChat.refreshConversations();
+	    }
+
+	    if (megaChat.$conversationsAppInstance) {
+	        megaChat.$conversationsAppInstance.safeForceUpdate();
+	    }
+	    self.persistToFmdb();
 	};
 
 	ChatRoom.stateToText = function (state) {

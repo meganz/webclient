@@ -1180,46 +1180,7 @@ scparser.$add('mcfc', function(a) {
     if (typeof megaChat !== "undefined") {
         var room = megaChat.getChatById(a.id);
         if (room) {
-
-            room.flags = a.f;
-            room.archivedSelected = false;
-            if (room.isArchived()) {
-                megaChat.archivedChatsCount++;
-                room.showArchived = false;
-            }
-            else {
-                megaChat.archivedChatsCount--;
-            }
-            if (megaChat.currentlyOpenedChat &&
-                megaChat.chats[megaChat.currentlyOpenedChat] &&
-                megaChat.chats[megaChat.currentlyOpenedChat].chatId === room.chatId) {
-                loadSubPage('fm/chat/');
-            }
-            else {
-                megaChat.refreshConversations();
-            }
-
-            if (megaChat.$conversationsAppInstance) {
-                megaChat.$conversationsAppInstance.safeForceUpdate();
-            }
-            if (fmdb) {
-                var users = [];
-                Object.keys(room.members).forEach(function(user_handle) {
-                    users.push({
-                        u: user_handle,
-                        p: room.members[user_handle]
-                    });
-                });
-                var roomInfo = {
-                    'id': room.chatId,
-                    'cs': room.chatShard,
-                    'g': (room.type === "group") ? 1 : 0,
-                    'u': users,
-                    'ts': room.ctime,
-                    'f': room.flags
-                };
-                fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
-            }
+            room.updateFlags(a.f);
         }
         else {
             cachemcfc(a);
@@ -2915,7 +2876,7 @@ function processMCF(mcfResponse, ignoreDB) {
             }
 
             if (chatRoomInfo.n) {
-                for (var i=0;i < chatRoomInfo.n.length; i++) {
+                for (var i = 0; i < chatRoomInfo.n.length; i++) {
                     var member = chatRoomInfo.n[i];
                     // was removed from the chat.
                     if (member.u === u_handle && member.p === -1) {

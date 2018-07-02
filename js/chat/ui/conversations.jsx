@@ -571,7 +571,7 @@ var ArchivedConversationsList = React.createClass({
             if (!chatRoom || !chatRoom.roomId) {
                 return;
             }
-            if (!chatRoom.flags & 0x00000001) {
+            if (!chatRoom.isArchived()) {
                 return;
             }
             if (chatRoom.chatId !== room.chatId) {
@@ -593,23 +593,6 @@ var ArchivedConversationsList = React.createClass({
             'confirmUnarchiveDialogShown': true,
             'confirmUnarchiveChat': room.roomId
         });
-    },
-    currentCallClicked: function(e) {
-        var activeCallSession = this.props.megaChat.activeCallSession;
-        if (activeCallSession) {
-            this.conversationClicked(activeCallSession.room, e);
-        }
-    },
-    contactClicked: function(contact, e) {
-        loadSubPage("fm/chat/" + contact.u);
-        e.stopPropagation();
-    },
-    endCurrentCall: function(e) {
-        var activeCallSession = this.props.megaChat.activeCallSession;
-        if (activeCallSession) {
-            activeCallSession.endCall('hangup');
-            this.conversationClicked(activeCallSession.room, e);
-        }
     },
     onSortNameClicked: function(e) {
         this.setState({
@@ -637,29 +620,6 @@ var ArchivedConversationsList = React.createClass({
 
         var megaChat = this.props.megaChat;
 
-        var activeCallSession = megaChat.activeCallSession;
-        if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
-            var room = activeCallSession.room;
-            var user = room.getParticipantsExceptMe()[0];
-            user = megaChat.getContactFromJid(user);
-
-            if (user) {
-                currentCallingContactStatusProps.className += " " + user.u +
-                    " " + megaChat.userPresenceToCssClass(user.presence);
-                currentCallingContactStatusProps['data-jid'] = room.roomId;
-
-                if (room.roomId == megaChat.currentlyOpenedChat) {
-                    currentCallingContactStatusProps.className += " selected";
-                }
-            }
-            else {
-                currentCallingContactStatusProps.className += ' hidden';
-            }
-        }
-        else {
-            currentCallingContactStatusProps.className += ' hidden';
-        }
-
         var currConvsList = [];
 
         var sortedConversations = obj_values(this.props.chats.toJS());
@@ -684,7 +644,7 @@ var ArchivedConversationsList = React.createClass({
             if (!chatRoom || !chatRoom.roomId) {
                 return;
             }
-            if (!chatRoom.flags & 0x00000001) {
+            if (!chatRoom.isArchived()) {
                 return;
             }
 
@@ -965,9 +925,9 @@ var ConversationsApp = React.createClass({
         loadSubPage('fm/chat/archived');
     },
     calcArchiveChats : function() {
-        var Conversations = obj_values(this.props.megaChat.chats.toJS());
+        var conversations = obj_values(this.props.megaChat.chats.toJS());
         var count = 0;
-        Conversations.forEach((chatRoom) => {
+        conversations.forEach((chatRoom) => {
             if (!chatRoom || !chatRoom.roomId) {
                 return;
             }

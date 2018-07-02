@@ -456,6 +456,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
             if (loadfm.chatmcfc && typeof loadfm.chatmcfc[actionPacket.id] !== 'undefined') {
                 chatRoom.flags = loadfm.chatmcfc[actionPacket.id];
                 delete loadfm.chatmcfc[actionPacket.id];
+                chatRoom.persistToFmdb();
             }
             if (chatRoom.isArchived()) {
                 megaChat.archivedChatsCount++;

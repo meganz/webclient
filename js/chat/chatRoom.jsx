@@ -356,6 +356,69 @@ ChatRoom.prototype.isDisplayable = function() {
 };
 
 /**
+ * Save chat into info fmdb.
+ *
+ */
+ChatRoom.prototype.persistToFmdb = function() {
+    var self = this;
+    if (fmdb) {
+        var users = [];
+        if (self.members) {
+            Object.keys(self.members).forEach(function(user_handle) {
+                users.push({
+                    u: user_handle,
+                    p: self.members[user_handle]
+                });
+            });
+        }
+        if (self.chatId && self.chatShard !== undefined) {
+            var roomInfo = {
+                'id': self.chatId,
+                'cs': self.chatShard,
+                'g' : (self.type === "group") ? 1 : 0,
+                'u' : users,
+                'ts': self.ctime,
+                'ct': self.ct,
+                'f': self.flags
+            };
+            fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
+        }
+    }
+};
+
+/**
+ * Save the chat info into fmdb.
+ * @param f {binary} new flags
+ */
+ChatRoom.prototype.updateFlags = function(f) {
+    var self = this;
+    self.flags = f;
+    self.archivedSelected = false;
+    if (self.isArchived()) {
+        megaChat.archivedChatsCount++;
+        self.showArchived = false;
+    }
+    else {
+        megaChat.archivedChatsCount--;
+    }
+
+    if (megaChat.currentlyOpenedChat &&
+        megaChat.chats[megaChat.currentlyOpenedChat] &&
+        megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
+        loadSubPage('fm/chat/');
+    }
+    else {
+        megaChat.refreshConversations();
+    }
+
+    if (megaChat.$conversationsAppInstance) {
+        megaChat.$conversationsAppInstance.safeForceUpdate();
+    }
+    self.persistToFmdb();
+};
+
+
+/**
  * Convert state to text (helper function)
  *
  * @param state {Number}

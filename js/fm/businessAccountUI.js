@@ -126,7 +126,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         }
 
         // now let's fill the table with sub-users data
-         for (var a = 0; a < 50; a++) {
+         //for (var a = 0; a < 50; a++) {
             for (var h in subUsers) {
                 var $currUser = $tr_user.clone(true); // sub-users table
                 var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
@@ -169,7 +169,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 // left pane part
                 $usersLeftPanel.append($currUserLeftPane);
             }
-         }
+         //}
 
 
         /// events handlers
@@ -454,9 +454,11 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
 BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     "use strict";
     this.initUItoRender();
+    var mySelf = this;
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $subAccountContainer = $('.user-management-subaccount-view-container', $businessAccountContainer);
+    var $subHeader = $('.fm-right-header-user-management .user-management-breadcrumb.subaccount');
 
     var subUser = M.suba[subUserHandle];
 
@@ -469,35 +471,86 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         a32_to_str(base64_to_a32((subUser.lastname || '')));
 
     $('.subuser-name', $subAccountContainer).text(uName);
+    $('.user-management-subuser-name', $subHeader).text(uName);
     $('.subuser-email', $subAccountContainer).text(subUser.e);
 
     $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
+    // $subAccountContainer.find('.profile-button-container .disable-account').removeClass('hidden');
+    $subAccountContainer.find('.profile-button-container .disable-account').text(l[19092])
+        .removeClass('default-green-button-user-management').addClass('default-gray-button-user-management')
+        .addClass('sub-disable').removeClass('sub-enable');
+    $subAccountContainer.find('.profile-button-container .edit-profile').text(l[16735]);
+    $subAccountContainer.find('.profile-button-container .resend-verification').addClass('hidden');
     if (subUser.s === 0) {
         $subAccountContainer.find('div.user-management-view-status').addClass('enabled');
     }
     else if (subUser.s === 10) {
         $subAccountContainer.find('div.user-management-view-status').addClass('pending');
+        $subAccountContainer.find('.profile-button-container .resend-verification').text(l[19097])
+            .removeClass('hidden');
     }
     else {
         $subAccountContainer.find('div.user-management-view-status').addClass('disabled');
+
+        $subAccountContainer.find('.profile-button-container .disable-account').text(l[19094])
+            .removeClass('default-gray-button-user-management').addClass('default-green-button-user-management')
+            .addClass('sub-enable').removeClass('sub-disable');
+        $subAccountContainer.find('.profile-button-container .edit-profile').text(l[19095]);
     }
     $subAccountContainer.find('.user-management-view-status.text').text(this.subUserStatus(subUser.s));
     
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
     $('.subaccount-img-big', $subAccountContainer).html(subUserDefaultAvatar);
+    $('.user-management-subuser-avatars', $subHeader).html(subUserDefaultAvatar);
+
+    // event handler for clicking on the header
+    $('.user-management-icon', $subHeader).off('click.subuser')
+        .on('click.subuser', function navigationHeaderClickHandler() {
+            mySelf.viewSubAccountListUI();
+        });
+
+    // event handler for enable/disable account
+    $subAccountContainer.find('.profile-button-container .disable-account').off('click.subuser')
+        .on('click.subuser', function enable_disableClickHandler() {
+            if ($(this).hasClass('sub-disable')) { // button now in disable status
+
+                var confirmationDlgResultHandler = function (adminAnswer) {
+                    if (adminAnswer) {
+                        var opPromise = mySelf.business.deActivateSubAccount(subUserHandle);
+                        opPromise.done(
+                            function () {
+                                mySelf.viewSubAccountInfoUI(subUserHandle);
+                            }
+                        ).fail(
+                            function () {
+                                msgDialog('warningb', '', l[19100]);
+                            }
+                        );
+                    }
+                };
+
+                mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler, uName);
+            }
+            else {
+
+            }
+        });
 
     // private function to fill quota info
     var fillQuotaInfo = function (st, quotas) {
+
+        return;
+
         if (!quotas) {
             return;
         }
         
         var totalStorage = 0;
         var totalBandwidth = 0;
-        var inboxHandle = quotas[subUserHandle][2]["4"];
+        // var inboxHandle = quotas[subUserHandle][2]["4"];
         var rootHandle = quotas[subUserHandle][2]["2"];
         var rubbishHandle = quotas[subUserHandle][2]["3"];
-        var inboxTotal = quotas[subUserHandle][1][inboxHandle][0] || 0;
+        // var inboxTotal = quotas[subUserHandle][1][inboxHandle][0] || 0;
         var rootTotal = quotas[subUserHandle][1][rootHandle][0] || 0;
         var rubbishTotal = quotas[subUserHandle][1][rubbishHandle][0] || 0;
         var inshareTotal = 0;
@@ -508,7 +561,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
-        var inboxTotalFormatted = numOfBytes(inboxTotal, 2);
+        // var inboxTotalFormatted = numOfBytes(inboxTotal, 2);
         var rootTotalFormatted = numOfBytes(rootTotal, 2);
         var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
         var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
@@ -527,6 +580,9 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         //    $subAccountContainer).text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
     };
 
+    // viewing the right buttons
+
+
     // getting quotas
     var quotasPromise = this.business.getQuotaUsage();
     quotasPromise.done(fillQuotaInfo);
@@ -534,7 +590,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 
     $businessAccountContainer.removeClass('hidden'); // BA container
     $subAccountContainer.removeClass('hidden'); // sub-info container
-    $('.fm-right-header-user-management .user-management-breadcrumb.subaccount').removeClass('hidden');
+    $subHeader.removeClass('hidden');
 };
 
 
@@ -552,5 +608,142 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     // header
     $('.fm-right-header-user-management .user-management-breadcrumb.overview').removeClass('hidden');
     $('.fm-right-header-user-management .user-management-overview-buttons').removeClass('hidden');
+
+
+
+    // private function to populate the dashboard
+    var populateDashboard = function (st,quotas) {
+        if(!quotas) {
+            return;
+        }
+
+        var numberOfSubs = 0;
+        var activeSubs = 0;
+        var pendingSubs = 0;
+        var disabledSubs = 0;
+        var totalStorage = 0;
+        var totalBandwidth = 0;
+        var inshareTotal = 0;
+        var rootTotal = 0;
+        var rubbishTotal = 0;
+
+        for (var sub in quotas) {
+            if (sub === 'timestamp') {
+                continue; // embedded attribute 
+            }
+            numberOfSubs++;
+            if (sub === u_handle) {
+                activeSubs++;
+            }
+            else if (M.suba[sub] && M.suba[sub].s === 0) {
+                activeSubs++;
+            }
+            else if (M.suba[sub] && M.suba[sub].s === 10) {
+                pendingSubs++;
+            }
+            else {
+                disabledSubs++;
+            }
+
+            totalStorage += quotas[sub][0] || 0;
+            totalBandwidth += quotas[sub][3] || 0;
+
+            var rootHandle = quotas[sub][2]["2"];
+            var rubbishHandle = quotas[sub][2]["3"];
+            var inboxHandle = quotas[sub][2]["4"];
+            var inshareHandle = '';
+
+            rootTotal += (quotas[sub][1][rootHandle][0] || 0);
+            rubbishTotal += (quotas[sub][1][rubbishHandle][0] || 0);
+
+            for (var hh in quotas[sub][1]) {
+                if (hh !== rootHandle && hh !== rubbishHandle && hh !== inboxHandle) {
+                    inshareHandle = hh;
+                    break;
+                }
+            }
+            inshareTotal += (quotas[sub][1][inshareHandle][0] || 0);
+
+        }
+
+        var totalStorageFormatted = numOfBytes(totalStorage, 2);
+        var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
+        var rootTotalFormatted = numOfBytes(rootTotal, 2);
+        var rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
+        var inshareTotalFormatted = numOfBytes(inshareTotal, 2);
+
+        var rootPrecentage = rootTotal / totalStorage;
+        var insharePrecentage = inshareTotal / totalStorage;
+        var rubbishPrecentage = rubbishTotal / totalStorage;
+
+        $overviewContainer.find('.user-segments-container.all-subs .user-segment-number').text(numberOfSubs);
+        $overviewContainer.find('.user-segments-container.active-subs .user-segment-number').text(activeSubs);
+        $overviewContainer.find('.user-segments-container.pending-sub .user-segment-number').text(pendingSubs);
+        $overviewContainer.find('.user-segments-container.disabled-subs .user-segment-number').text(disabledSubs);
+
+        $overviewContainer.find('.storage-small-circle .total-storage-number')
+            .text(totalStorageFormatted.size + ' ' + totalStorageFormatted.unit);
+
+        $overviewContainer.find('.storage-division-container.cloud-node .storage-division-num')
+            .text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
+        $overviewContainer.find('.storage-division-container.cloud-node .storage-division-per')
+            .text(Math.round(rootPrecentage) + '%');
+        $overviewContainer.find('.storage-division-container.inshare-node .storage-division-num')
+            .text(inshareTotalFormatted.size + ' ' + inshareTotalFormatted.unit);
+        $overviewContainer.find('.storage-division-container.inshare-node .storage-division-per')
+            .text(Math.round(insharePrecentage) + '%');
+        $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-num')
+            .text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+        $overviewContainer.find('.storage-division-container.rubbish-node .storage-division-per')
+            .text(Math.round(rubbishPrecentage) + '%');
+        $overviewContainer.find('.storage-division-container.inbox-node').addClass('hidden');
+
+        
+    }
+
+
+    // getting quotas
+    var quotasPromise = this.business.getQuotaUsage();
+    quotasPromise.done(populateDashboard);
     
+};
+
+/**
+ * Shows the confirmation dialog for sub-user disabling 
+ * @param {function} actionFuncHandler      user response handler - function accepts 1 boolean parameter
+ * @param {string} userName                 sub-user name
+ * @param {boolean} isEnable                a flag to tell that we want enabling conformation
+ */
+BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFuncHandler, userName, isEnable) {
+    var $dialog = $('.user-management-able-user-dialog.user-management-dialog');
+
+    var dialogQuestion = l[19098];
+    var note = l[19099];
+    $dialog.find('.icon56').removeClass('re-enable-large-icon').addClass('disable-large-icon');
+    if (isEnable) {
+        dialogQuestion = l[19101];
+        note = l[19102];
+        $dialog.find('.icon56').removeClass('disable-large-icon').addClass('re-enable-large-icon');
+    }
+    dialogQuestion = dialogQuestion.replace('[B]', '<b>').replace('[/B]', '</b>')
+        .replace('{0}', userName);
+    $dialog.find('.dialog-text-one').text(dialogQuestion);
+    $dialog.find('.dialog-text-two').text(note);
+    
+    $dialog.find('.dialog-button-container .dlg-btn').off('click.subuser')
+        .on('click.subuser', function disableSubUserConfirmationDialogHandler() {
+            closeDialog();
+            if (actionFuncHandler && typeof actionFuncHandler === 'function') {
+                if ($(this).hasClass('yes-answer')) {
+                    return actionFuncHandler(true);
+                }
+                else {
+                    return actionFuncHandler(false);
+                }
+            }
+        });
+
+    M.safeShowDialog('sub-user-disable-cnf-dlg', function () {
+        return $dialog;
+    });
 };

@@ -475,14 +475,27 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $('.subuser-email', $subAccountContainer).text(subUser.e);
 
     $subAccountContainer.find('.user-management-view-status').removeClass('enabled pending disabled');
+    // $subAccountContainer.find('.profile-button-container .disable-account').removeClass('hidden');
+    $subAccountContainer.find('.profile-button-container .disable-account').text(l[19092])
+        .removeClass('default-green-button-user-management').addClass('default-gray-button-user-management')
+        .addClass('sub-disable').removeClass('sub-enable');
+    $subAccountContainer.find('.profile-button-container .edit-profile').text(l[16735]);
+    $subAccountContainer.find('.profile-button-container .resend-verification').addClass('hidden');
     if (subUser.s === 0) {
         $subAccountContainer.find('div.user-management-view-status').addClass('enabled');
     }
     else if (subUser.s === 10) {
         $subAccountContainer.find('div.user-management-view-status').addClass('pending');
+        $subAccountContainer.find('.profile-button-container .resend-verification').text(l[19097])
+            .removeClass('hidden');
     }
     else {
         $subAccountContainer.find('div.user-management-view-status').addClass('disabled');
+
+        $subAccountContainer.find('.profile-button-container .disable-account').text(l[19094])
+            .removeClass('default-gray-button-user-management').addClass('default-green-button-user-management')
+            .addClass('sub-enable').removeClass('sub-disable');
+        $subAccountContainer.find('.profile-button-container .edit-profile').text(l[19095]);
     }
     $subAccountContainer.find('.user-management-view-status.text').text(this.subUserStatus(subUser.s));
     
@@ -496,15 +509,45 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             mySelf.viewSubAccountListUI();
         });
 
+    // event handler for enable/disable account
+    $subAccountContainer.find('.profile-button-container .disable-account').off('click.subuser')
+        .on('click.subuser', function enable_disableClickHandler() {
+            if ($(this).hasClass('sub-disable')) { // button now in disable status
+
+                var confirmationDlgResultHandler = function (adminAnswer) {
+                    if (adminAnswer) {
+                        var opPromise = mySelf.business.deActivateSubAccount(subUserHandle);
+                        opPromise.done(
+                            function () {
+                                mySelf.viewSubAccountInfoUI(subUserHandle);
+                            }
+                        ).fail(
+                            function () {
+                                msgDialog('warningb', '', l[19100]);
+                            }
+                        );
+                    }
+                };
+
+                mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler, uName);
+            }
+            else {
+
+            }
+        });
+
     // private function to fill quota info
     var fillQuotaInfo = function (st, quotas) {
+
+        return;
+
         if (!quotas) {
             return;
         }
         
         var totalStorage = 0;
         var totalBandwidth = 0;
-        var inboxHandle = quotas[subUserHandle][2]["4"];
+        // var inboxHandle = quotas[subUserHandle][2]["4"];
         var rootHandle = quotas[subUserHandle][2]["2"];
         var rubbishHandle = quotas[subUserHandle][2]["3"];
         // var inboxTotal = quotas[subUserHandle][1][inboxHandle][0] || 0;
@@ -663,4 +706,34 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     var quotasPromise = this.business.getQuotaUsage();
     quotasPromise.done(populateDashboard);
     
+};
+
+/**
+ * Shows the confirmation dialog for sub-user disabling 
+ * @param {function} actionFuncHandler  user response handler - function accepts 1 boolean parameter
+ * @param {string} userName                sub-user name
+ */
+BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFuncHandler, userName) {
+    var $dialog = $('.disable-user-dialog');
+
+    var dialogQuestion = l[19098];
+    dialogQuestion = dialogQuestion.replace('[B]', '<b>').replace('[/B]', '</b>')
+        .replace('{0}', userName);
+
+    $dialog.find('.dialog-button-container .dlg-btn').off('click.subuser')
+        .on('click.subuser', function disableSubUserConfirmationDialogHandler() {
+            closeDialog();
+            if (actionFuncHandler && typeof actionFuncHandler === 'function') {
+                if ($(this).hasClass('yes-answer')) {
+                    return actionFuncHandler(true);
+                }
+                else {
+                    return actionFuncHandler(false);
+                }
+            }
+        });
+
+    M.safeShowDialog('sub-user-disable-cnf-dlg', function () {
+        return $dialog;
+    });
 };

@@ -352,7 +352,9 @@ ChatRoom.prototype.isArchived = function() {
  */
 ChatRoom.prototype.isDisplayable = function() {
     var self = this;
-    return ((self.showArchived === true) || !self.isArchived());
+    return ((self.showArchived === true) ||
+            !self.isArchived() ||
+            (self.callManagerCall && self.callManagerCall.isActive()));
 };
 
 /**

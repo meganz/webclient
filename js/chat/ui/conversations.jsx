@@ -494,10 +494,8 @@ var ConversationsList = React.createClass({
             if (!chatRoom || !chatRoom.roomId) {
                 return;
             }
-            if (chatRoom.isArchived()) {
-                if (!chatRoom.showArchived) {
-                    return;
-                }
+            if (!chatRoom.isDisplayable()) {
+                return;
             }
             if (chatRoom.type === "private") {
                 contact = chatRoom.getParticipantsExceptMe()[0];

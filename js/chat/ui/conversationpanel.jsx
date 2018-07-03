@@ -203,7 +203,7 @@ var ConversationRightArea = React.createClass({
                     />
                     <ButtonsUI.Button
                         className="add-chat-contact"
-                        label={__(l[19083])}
+                        label={__(l[8007])}
                         contacts={this.props.contacts}
                         disabled={
                             /* Disable in case I don't have any more contacts to add ... */

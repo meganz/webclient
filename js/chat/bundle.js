@@ -1650,10 +1650,8 @@ React.makeElement = React['createElement'];
 	            if (!chatRoom || !chatRoom.roomId) {
 	                return;
 	            }
-	            if (chatRoom.isArchived()) {
-	                if (!chatRoom.showArchived) {
-	                    return;
-	                }
+	            if (!chatRoom.isDisplayable()) {
+	                return;
 	            }
 	            if (chatRoom.type === "private") {
 	                contact = chatRoom.getParticipantsExceptMe()[0];
@@ -4715,7 +4713,7 @@ React.makeElement = React['createElement'];
 	                        ButtonsUI.Button,
 	                        {
 	                            className: "add-chat-contact",
-	                            label: __(l[19083]),
+	                            label: __(l[8007]),
 	                            contacts: this.props.contacts,
 	                            disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
 	                        },
@@ -12758,7 +12756,7 @@ React.makeElement = React['createElement'];
 
 	ChatRoom.prototype.isDisplayable = function () {
 	    var self = this;
-	    return self.showArchived === true || !self.isArchived();
+	    return self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive();
 	};
 
 	ChatRoom.prototype.persistToFmdb = function () {

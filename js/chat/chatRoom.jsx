@@ -380,8 +380,7 @@ ChatRoom.prototype.persistToFmdb = function() {
                 'g' : (self.type === "group") ? 1 : 0,
                 'u' : users,
                 'ts': self.ctime,
-                'ct': self.ct,
-                'f': self.flags
+                'ct': self.ct
             };
             fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
         }
@@ -389,10 +388,26 @@ ChatRoom.prototype.persistToFmdb = function() {
 };
 
 /**
+ * Save chat flags info fmdb.
+ *
+ */
+ChatRoom.prototype.persistFlagsToFmdb = function() {
+    var self = this;
+    if (fmdb) {
+        var mcfcInfo = {
+            'id': self.chatId,
+            'f': self.flags
+        };
+        fmdb.add('mcfc', {id: mcfcInfo.id, d: mcfcInfo});
+    }
+};
+
+/**
  * Save the chat info into fmdb.
  * @param f {binary} new flags
+ * @param updateUI {Boolen} flag to indicate whether to update UI.
  */
-ChatRoom.prototype.updateFlags = function(f) {
+ChatRoom.prototype.updateFlags = function(f, updateUI) {
     var self = this;
     self.flags = f;
     self.archivedSelected = false;
@@ -403,20 +418,23 @@ ChatRoom.prototype.updateFlags = function(f) {
     else {
         megaChat.archivedChatsCount--;
     }
+    self.persistFlagsToFmdb();
 
-    if (megaChat.currentlyOpenedChat &&
-        megaChat.chats[megaChat.currentlyOpenedChat] &&
-        megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
-        loadSubPage('fm/chat/');
-    }
-    else {
-        megaChat.refreshConversations();
-    }
 
-    if (megaChat.$conversationsAppInstance) {
-        megaChat.$conversationsAppInstance.safeForceUpdate();
+    if (updateUI) {
+        if (megaChat.currentlyOpenedChat &&
+            megaChat.chats[megaChat.currentlyOpenedChat] &&
+            megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
+            loadSubPage('fm/chat/');
+        }
+        else {
+            megaChat.refreshConversations();
+        }
+
+        if (megaChat.$conversationsAppInstance) {
+            megaChat.$conversationsAppInstance.safeForceUpdate();
+        }
     }
-    self.persistToFmdb();
 };
 
 

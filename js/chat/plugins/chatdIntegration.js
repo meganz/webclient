@@ -350,9 +350,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
             id: actionPacket.id,
             p: actionPacket.p,
             ts: actionPacket.ts,
-            u: actionPacket.u,
-            f: actionPacket.f,
-            cs: actionPacket.cs
+            u: actionPacket.u
         });
     }
 
@@ -454,13 +452,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
             }
             // apply the flags if any received during loading.
             if (loadfm.chatmcfc && typeof loadfm.chatmcfc[actionPacket.id] !== 'undefined') {
-                chatRoom.flags = loadfm.chatmcfc[actionPacket.id];
+                chatRoom.updateFlags(loadfm.chatmcfc[actionPacket.id]);
                 delete loadfm.chatmcfc[actionPacket.id];
-                chatRoom.persistToFmdb();
             }
-            if (chatRoom.isArchived()) {
-                megaChat.archivedChatsCount++;
-            }
+
             self.decryptTopic(chatRoom);
             // handler of the same room was cached before, then restore the keys.
             if (self._cachedHandlers[roomId] && chatRoom.protocolHandler) {

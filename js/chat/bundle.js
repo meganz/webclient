@@ -1546,7 +1546,11 @@ React.makeElement = React['createElement'];
 	                    React.makeElement(
 	                        "div",
 	                        { className: "user-card-name conversation-name" },
-	                        chatRoom.getRoomTitle()
+	                        React.makeElement(
+	                            utils.EmojiFormattedContent,
+	                            null,
+	                            chatRoom.getRoomTitle()
+	                        )
 	                    ),
 	                    lastMessageDiv,
 	                    lastMessageDatetimeDiv

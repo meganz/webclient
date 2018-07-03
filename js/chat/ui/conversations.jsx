@@ -407,7 +407,7 @@ var ArchivedConversationsListItem = React.createClass({
                 <td className="calculated-width">
                 <div className="fm-chat-user-info todo-star">
                     <div className="user-card-name conversation-name">
-                        {chatRoom.getRoomTitle()}
+                        <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>
                     </div>
                     {lastMessageDiv}
                     {lastMessageDatetimeDiv}

@@ -4199,8 +4199,9 @@ React.makeElement = React['createElement'];
 	        if (room.isReadOnly()) {}
 	        var excludedParticipants = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getParticipants() : room.getParticipants();
 
-	        array.remove(excludedParticipants, u_handle, false);
-
+	        if (excludedParticipants.indexOf(u_handle) >= 0) {
+	            array.remove(excludedParticipants, u_handle, false);
+	        }
 	        var dontShowTruncateButton = false;
 	        if (!room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
 	            dontShowTruncateButton = true;

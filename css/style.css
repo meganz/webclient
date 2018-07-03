@@ -26261,11 +26261,12 @@ opacity: 1;
     max-height: 200px;
 }
 
-.user-management-dialog .dialog-input-container  {
-    width:100%;
-    height:auto;
+.user-management-dialog .dialog-input-container {
+    width: 620px;
+    height: auto;
     position: relative;
-    padding:24px 0;
+    padding: 24px 0;
+    height: 200px;
 }
 
 .user-management-dialog .dialog-input-container::before {

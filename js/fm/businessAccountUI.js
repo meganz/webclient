@@ -35,6 +35,7 @@ function BusinessAccountUI() {
         $('.fm-right-header-user-management .user-management-breadcrumb.overview').addClass('hidden');
         $('.fm-right-header-user-management .user-management-breadcrumb').addClass('hidden');
         $('.fm-right-header-user-management .user-management-overview-buttons').addClass('hidden');
+        $('.user-management-overview-bar').addClass('hidden');
     };
 }
 
@@ -85,6 +86,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     $('.fm-right-header-user-management .user-management-main-page-buttons .ba-overview').off('click.subuser')
         .on('click.subuser', function overviewHeaderButtonHandler() {
             mySelf.viewBusinessAccountOverview();
+        });
+    $('.fm-right-header-user-management .user-management-main-page-buttons .add-sub-user').off('click.subuser')
+        .on('click.subuser', function addSubUserHeaderButtonHandler() {
+            mySelf.showAddSubUserDialog();
         });
 
     // private function to check if new drawing is needed
@@ -532,7 +537,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
                 mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler, uName);
             }
             else {
-
+                // enable on
             }
         });
 
@@ -612,8 +617,8 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
 
 
     // private function to populate the dashboard
-    var populateDashboard = function (st,quotas) {
-        if(!quotas) {
+    var populateDashboard = function (st, quotas) {
+        if (!quotas) {
             return;
         }
 
@@ -698,8 +703,8 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
             .text(Math.round(rubbishPrecentage) + '%');
         $overviewContainer.find('.storage-division-container.inbox-node').addClass('hidden');
 
-        
-    }
+
+    };
 
 
     // getting quotas
@@ -729,7 +734,8 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
         .replace('{0}', userName);
     $dialog.find('.dialog-text-one').html(dialogQuestion);
     $dialog.find('.dialog-text-two').text(note);
-    
+
+    // event handler for clicking on "Yes" or "Cancel" buttons
     $dialog.find('.dialog-button-container .dlg-btn').off('click.subuser')
         .on('click.subuser', function disableSubUserConfirmationDialogHandler() {
             closeDialog();
@@ -748,6 +754,65 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
     });
 };
 
+/**
+ *  showes the add sub-user dialog
+ * */
 BusinessAccountUI.prototype.showAddSubUserDialog = function () {
+    var $dialog = $('.user-management-add-user-dialog.user-management-dialog');
 
+    // set the "Add User" button to disabled
+    $('.default-green-button-user-management', $dialog).addClass('disabled');
+
+    var clearDialog = function () {
+        var usersRows = $('.dialog-tree-panel-scroll.add-user .input-user', $dialog);
+        if (usersRows.length > 1) {
+            for (var k = 1; k < usersRows.length; k++) {
+                usersRows.get(k).remove();
+            }
+        }
+        $('input', usersRows).val('');
+    };
+
+    clearDialog(); // remove any previous data
+
+    // event handler for "X" icon to close the dialog or "X" on the row.
+    $('.delete-img.icon', $dialog).off('click.subuser')
+        .on('click.subuser', function exitIconClickHandler() {
+            if ($(this).hasClass('ex-dlg')) {
+                closeDialog();
+            }
+            else {
+                if ($('.dialog-tree-panel-scroll.add-user .input-user', $dialog).length > 1) {
+                    $(this).parent().remove();
+                    $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
+                        .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+                }
+            }
+        });
+
+    // event handler for clicking on "add more"
+    $('.default-button-no-border.add-more', $dialog).off('click.subuser')
+        .on('click.subuser', function addMoreClickHandler() {
+            var newRow = userRow.clone(true);
+            $('.dialog-tree-panel-scroll.add-user .dialog-input-container .jspPane', $dialog).append(newRow);
+            $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
+                .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+        });
+
+    var row = $('.dialog-tree-panel-scroll.add-user .input-user', $dialog);
+    var userRow = $(row).clone(true);
+    userRow.find('input').val('');
+
+    //row.attr('id', 'add-sub-user-0');
+    $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
+        .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+    //jScrollFade('.dialog-tree-panel-scroll.add-user .dialog-input-container');
+    
+
+    
+
+
+    M.safeShowDialog('sub-user-adding-dlg', function () {
+        return $dialog;
+    });
 };

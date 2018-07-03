@@ -1180,7 +1180,7 @@ scparser.$add('mcfc', function(a) {
     if (typeof megaChat !== "undefined") {
         var room = megaChat.getChatById(a.id);
         if (room) {
-            room.updateFlags(a.f);
+            room.updateFlags(a.f, true);
         }
         else {
             cachemcfc(a);
@@ -1919,7 +1919,8 @@ function loadfm(force) {
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k', // queued chat messages - k
-                    pta: '&k' // persisted type messages - k
+                    pta: '&k', // persisted type messages - k
+                    mcfc   : '&id'            // chats - id
                 }, {
                     chatqueuedmsgs : 1,
                     pta: 1
@@ -2053,7 +2054,8 @@ function dbfetchfm() {
                                     ufsc.addTreeNode(r[i], true);
                                 }
                             },
-                            mcf: 1
+                            mcf: 1,
+                            mcfc: 2
                         };
 
                         // Prevent MEGAdrop tables being created for mobile
@@ -2069,6 +2071,16 @@ function dbfetchfm() {
                                         // only set chatmcf is there is anything returned
                                         // if not, this would force the chat to do a 'mcf' call
                                         loadfm.chatmcf = r;
+                                    }
+                                }
+                                else if (tables[t] === 2) {
+                                    if (r.length > 0) {
+                                        if (!loadfm.chatmcfc) {
+                                            loadfm.chatmcfc = {};
+                                        }
+                                        for (var i = 0; i < r.length; i++) {
+                                            loadfm.chatmcfc[r[i].id] = r[i].f;
+                                        }
                                     }
                                 }
                                 else {
@@ -2857,6 +2869,16 @@ function process_ok(ok, ignoreDB) {
     }
 }
 
+function persistMCFC(mcfcResponse) {
+    if (typeof mcfcResponse !== 'undefined' && typeof mcfcResponse.length !== 'undefined' && mcfcResponse.forEach) {
+        mcfcResponse.forEach(function (mcfcInfo) {
+            if (fmdb) {
+                fmdb.add('mcfc', { id : mcfcInfo.id, d : mcfcInfo });
+            }
+        });
+    }
+}
+
 function processMCF(mcfResponse, ignoreDB) {
 
     if (typeof ChatdIntegration !== 'undefined') {
@@ -2889,6 +2911,10 @@ function processMCF(mcfResponse, ignoreDB) {
             }
 
             if (typeof ChatdIntegration !== 'undefined') {
+                if (typeof loadfm.chatmcfc[chatRoomInfo.id] !== 'undefined') {
+                    chatRoomInfo.f = loadfm.chatmcfc[chatRoomInfo.id];
+                    delete loadfm.chatmcfc[chatRoomInfo.id];
+                }
                 ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
             }
         });
@@ -3019,14 +3045,16 @@ function loadfm_callback(res) {
         // cf will include the flags (like whether it is archived) and chatid,
         // so it needs to combine it before processing it.
         if (res.mcf.cf) {
+            if (!loadfm.chatmcfc) {
+                loadfm.chatmcfc = {};
+            }
             for (var i = 0; i < res.mcf.cf.length; i++) {
-                if (res.mcf.cf[i].id === loadfm.chatmcf[i].id) {
-                    loadfm.chatmcf[i].f = res.mcf.cf[i].f;
-                }
+                loadfm.chatmcfc[res.mcf.cf[i].id] = res.mcf.cf[i].f;
             }
         }
         // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
         processMCF(loadfm.chatmcf);
+        persistMCFC(res.mcf.cf);
     }
     M.avatars();
     loadfm.fromapi = true;
@@ -3163,6 +3191,7 @@ function loadfm_done(mDBload) {
                             if (loadfm.chatmcf) {
                                 processMCF(loadfm.chatmcf, true);
                                 loadfm.chatmcf = null;
+                                loadfm.chatmcfc = null;
                             }
                             init_chat();
                         }

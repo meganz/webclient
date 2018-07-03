@@ -12782,15 +12782,25 @@ React.makeElement = React['createElement'];
 	                'g': self.type === "group" ? 1 : 0,
 	                'u': users,
 	                'ts': self.ctime,
-	                'ct': self.ct,
-	                'f': self.flags
+	                'ct': self.ct
 	            };
 	            fmdb.add('mcf', { id: roomInfo.id, d: roomInfo });
 	        }
 	    }
 	};
 
-	ChatRoom.prototype.updateFlags = function (f) {
+	ChatRoom.prototype.persistFlagsToFmdb = function () {
+	    var self = this;
+	    if (fmdb) {
+	        var mcfcInfo = {
+	            'id': self.chatId,
+	            'f': self.flags
+	        };
+	        fmdb.add('mcfc', { id: mcfcInfo.id, d: mcfcInfo });
+	    }
+	};
+
+	ChatRoom.prototype.updateFlags = function (f, updateUI) {
 	    var self = this;
 	    self.flags = f;
 	    self.archivedSelected = false;
@@ -12800,17 +12810,19 @@ React.makeElement = React['createElement'];
 	    } else {
 	        megaChat.archivedChatsCount--;
 	    }
+	    self.persistFlagsToFmdb();
 
-	    if (megaChat.currentlyOpenedChat && megaChat.chats[megaChat.currentlyOpenedChat] && megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
-	        loadSubPage('fm/chat/');
-	    } else {
-	        megaChat.refreshConversations();
-	    }
+	    if (updateUI) {
+	        if (megaChat.currentlyOpenedChat && megaChat.chats[megaChat.currentlyOpenedChat] && megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
+	            loadSubPage('fm/chat/');
+	        } else {
+	            megaChat.refreshConversations();
+	        }
 
-	    if (megaChat.$conversationsAppInstance) {
-	        megaChat.$conversationsAppInstance.safeForceUpdate();
+	        if (megaChat.$conversationsAppInstance) {
+	            megaChat.$conversationsAppInstance.safeForceUpdate();
+	        }
 	    }
-	    self.persistToFmdb();
 	};
 
 	ChatRoom.stateToText = function (state) {

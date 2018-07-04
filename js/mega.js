@@ -2911,7 +2911,7 @@ function processMCF(mcfResponse, ignoreDB) {
             }
 
             if (typeof ChatdIntegration !== 'undefined') {
-                if (typeof loadfm.chatmcfc[chatRoomInfo.id] !== 'undefined') {
+                if (loadfm.chatmcfc && typeof loadfm.chatmcfc[chatRoomInfo.id] !== 'undefined') {
                     chatRoomInfo.f = loadfm.chatmcfc[chatRoomInfo.id];
                     delete loadfm.chatmcfc[chatRoomInfo.id];
                 }

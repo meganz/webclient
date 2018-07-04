@@ -1916,11 +1916,11 @@ function loadfm(force) {
                     _sn    : '&i',             // sn - fixed index 1
                     puf    : '&ph',            // public upload folder - handle
                     pup    : '&p',             // public upload page - handle
+                    mcfc   : '&id',            // chats - id
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k', // queued chat messages - k
-                    pta: '&k', // persisted type messages - k
-                    mcfc   : '&id'            // chats - id
+                    pta: '&k' // persisted type messages - k
                 }, {
                     chatqueuedmsgs : 1,
                     pta: 1

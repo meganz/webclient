@@ -53,7 +53,7 @@ var ParticipantsList = React.createClass({
         var $parentContainer = $node.closest('.chat-right-pad');
         var maxHeight = (
             $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) -
-                $('.chat-right-head', $parentContainer).outerHeight(true)
+                $('.chat-right-head', $parentContainer).outerHeight(true) - 72
         );
 
         if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {

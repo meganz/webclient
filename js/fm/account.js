@@ -1126,8 +1126,8 @@ function accountUI() {
                 $('.upload-settings .numbers.val' + ui.value).addClass('active');
             }
         });
-        $('.upload-settings .numbers.active').removeClass('active');
-        $('.upload-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
+        $('.download-settings .numbers.active').removeClass('active');
+        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
 
         $('#slider-range-max').slider({
             min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
@@ -1142,8 +1142,8 @@ function accountUI() {
                 $('.download-settings .numbers.val' + ui.value).addClass('active');
             }
         });
-        $('.download-settings .numbers.active').removeClass('active');
-        $('.download-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
+        $('.upload-settings .numbers.active').removeClass('active');
+        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
 
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
         var i = 3;

@@ -839,30 +839,47 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
                     var sub = $(subUsers[h]);
                     var subName = sub.find('input.dialog-input.sub-n').val(); // i know it's 2 parts at least
                     var subEmail = sub.find('input.dialog-input.sub-m').val();
-                    var subFnLn = subName.split(' ', 2);
+                    var subFnLn = subName.split(' ');
 
                     if (subFnLn.length < 2) {
                         console.error('name does not consist of 2 parts, how did we get here?');
                         return;
                     }
 
-                    var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn[0], subFnLn[1]);
+                    var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '));
                     promises.push(subPromise);
 
                 }
 
                 var finalizeOperation = function (args) {
                     loadingDialog.phide();
+                    var results = [];
+
                     for (var a = 0; a < args.length; a++) {
                         var curRes = args[a];
+                        var resObj = Object.create(null);
+                        resObj.status = curRes[0];
+                        
+                        if (curRes[0] === 1) {
+                            resObj.email = curRes[2].m;
+                            resObj.initPass = curRes[1].lp;
+                            resObj.handle = curRes[1].u;
+                        }
+                        else {
+                            resObj.email = curRes[3].m;
+                        }
+                        results.push(resObj);
                     }
-                    console.info(args);
+
+                    mySelf.showAddSubUserResultDialog(results);
+
                 };
 
                 var all = MegaPromise.allDone(promises);
                 all.done(finalizeOperation);
-                all.fail(function () {
+                all.fail(function (args) {
                     msgDialog('warninga', 'Error', l[1679]);
+                    console.error(args);
                 });
             }
         });
@@ -892,7 +909,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
 
 /**
  * show the adding result for a list of sub-users
- * @param {object[]} results        array of sub-user object {email,status,initPass}
+ * @param {object[]} results        array of sub-user object {email,status,initPass,handle}
  */
 BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
     var $dialog = $('.user-management-verification-dialog.user-management-dialog');
@@ -900,11 +917,35 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
     if (!results || !results.length) {
         return;
     }
-    var userRow = $('.dialog-content-block verification-container .verification-user-container', $dialog);
-    var userTemplate = userRow.clone();
+    var $usersContainer = $('.um-dialog-content-block.verification-container', $dialog);
+    var $userRow = $('.um-dialog-content-block.verification-container .verification-user-container', $dialog);
+    var $userTemplate;
+
+    if ($userRow.length > 1) {
+        $userTemplate = $($userRow[0]).clone(true);
+    }
+    else {
+        $userTemplate = $userRow.clone(true);
+    }
+    $userRow.remove();
 
     for (var k = 0; k < results.length; k++) {
-
+        var $currSubUser = $userTemplate.clone(true);
+        if (results[k].status === 1) {
+            var subUserDefaultAvatar = useravatar.contact(results[k].handle);
+            $('.subuser-image', $currSubUser).html(subUserDefaultAvatar);
+            $('.sub-e', $currSubUser).text(results[k].email);
+            $('.sub-p', $currSubUser).text(results[k].initPass);
+        }
+        else {
+            $('.sub-e', $currSubUser).text(results[k].email);
+            $('.sub-p', $currSubUser).text('Error - FAILED');
+        }
+        $usersContainer.append($currSubUser);
+    }
+    if (results.length > 3) {
+        $usersContainer
+            .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     }
 
     M.safeShowDialog('sub-user-adding-res-dlg', function () {

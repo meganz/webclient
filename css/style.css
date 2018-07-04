@@ -26623,7 +26623,7 @@ opacity: 1;
 }
 
 .user-management-verification-dialog .verification-user-container .verification-user-info {
-    width: 320px;
+    width: 400px;
     margin-left: 24px;
     position: relative;
     display: inline-block;
@@ -26638,7 +26638,12 @@ opacity: 1;
     color: #666;
     line-height: 18px;
 }
-
+.user-management-verification-dialog .verification-user-container .verification-user-info .sub-e {
+    display:inline;
+}
+.user-management-verification-dialog .verification-user-container .verification-user-info .sub-p {
+    display:inline;
+}
 .user-management-verification-dialog .verification-user-container .verification-user-info .verification-user-email {
     margin-bottom: 12px;
 }

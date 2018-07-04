@@ -1113,7 +1113,7 @@ function accountUI() {
             $('.bandwith-settings').removeClass('hidden');
         }
 
-        $('#slider-range-max').slider({
+        $('#slider-range-max2').slider({
             min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
@@ -1127,9 +1127,9 @@ function accountUI() {
             }
         });
         $('.upload-settings .numbers.active').removeClass('active');
-        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
+        $('.upload-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
 
-        $('#slider-range-max2').slider({
+        $('#slider-range-max').slider({
             min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
@@ -1143,7 +1143,7 @@ function accountUI() {
             }
         });
         $('.download-settings .numbers.active').removeClass('active');
-        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
+        $('.download-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
 
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
         var i = 3;

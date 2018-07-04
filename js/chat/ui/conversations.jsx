@@ -404,7 +404,7 @@ var ArchivedConversationsListItem = React.createClass({
         return (
             <tr className={classString} id={id} data-room-id={roomId} data-jid={contactId}
                 onClick={this.props.onConversationSelected} onDoubleClick={this.props.onConversationClicked}>
-                <td className="calculated-width">
+                <td className="">
                 <div className="fm-chat-user-info todo-star">
                     <div className="user-card-name conversation-name">
                         <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>

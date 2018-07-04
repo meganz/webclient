@@ -36,13 +36,13 @@ BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName
     api_req(request, {
         callback: function (res) {
             if ($.isNumeric(res)) {
-                operationPromise.reject(0, res, 'API returned error');
+                operationPromise.reject(0, res, 'API returned error', request);
             }
             else if (typeof res === 'object') {
-                operationPromise.resolve(1, res); // new added user handle
+                operationPromise.resolve(1, res, request); // new added user handle
             }
             else {
-                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res, request);
             }
         }
     });

@@ -759,9 +759,10 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
  * */
 BusinessAccountUI.prototype.showAddSubUserDialog = function () {
     var $dialog = $('.user-management-add-user-dialog.user-management-dialog');
+    var mySelf = this;
 
     // set the "Add User" button to disabled
-    $('.default-green-button-user-management', $dialog).addClass('disabled');
+    // $('.default-green-button-user-management', $dialog).addClass('disabled');
 
     var clearDialog = function () {
         var usersRows = $('.dialog-tree-panel-scroll.add-user .input-user', $dialog);
@@ -799,20 +800,114 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
                 .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
         });
 
+    // event handler for adding sub-users
+    $('.default-green-button-user-management.add-sub-user', $dialog).off('click.subuser')
+        .on('click.subuser', function addSubUserClickHandler() {
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
+            var isOK = true;
+            var inputs = $('.input-user input', $dialog);
+            for (var k = 0; k < inputs.length; k++) {
+                var $currInput = $(inputs[k]);
+                if (!$currInput.hasClass('error')) {
+                    if ($currInput.hasClass('sub-n')) {
+                        if (!$currInput.val().length || $currInput.val().split(' ', 2).length < 2) {
+                            $currInput.addClass('error');
+                            $currInput.parent().append('<div class="error-message">' + l[1098] + '</div>');
+                            isOK = false;
+                        }
+                    }
+                    else if ($currInput.hasClass('sub-m')) {
+                        if (checkMail($currInput.val())) {
+                            $currInput.addClass('error');
+                            $currInput.parent().append('<div class="error-message">' + l[5705] + '</div>');
+                            isOK = false;
+                        }
+                    }
+                }
+                else {
+                    isOK = false;
+                }
+            }
+            if (isOK) {
+                closeDialog();
+                loadingDialog.pshow();
+                var subUsers = $('.input-user', $dialog);
+                var promises = [];
+                for (var h = 0; h < subUsers.length; h++) {
+                    var sub = $(subUsers[h]);
+                    var subName = sub.find('input.dialog-input.sub-n').val(); // i know it's 2 parts at least
+                    var subEmail = sub.find('input.dialog-input.sub-m').val();
+                    var subFnLn = subName.split(' ', 2);
+
+                    if (subFnLn.length < 2) {
+                        console.error('name does not consist of 2 parts, how did we get here?');
+                        return;
+                    }
+
+                    var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn[0], subFnLn[1]);
+                    promises.push(subPromise);
+
+                }
+
+                var finalizeOperation = function (args) {
+                    loadingDialog.phide();
+                    for (var a = 0; a < args.length; a++) {
+                        var curRes = args[a];
+                    }
+                    console.info(args);
+                };
+
+                var all = MegaPromise.allDone(promises);
+                all.done(finalizeOperation);
+                all.fail(function () {
+                    msgDialog('warninga', 'Error', l[1679]);
+                });
+            }
+        });
+
+    
+    // event handler for key-down on inputs
+    $('.input-user input', $dialog).off('keydown.subuser')
+        .on('keydown.subuser', function inputFieldsKeyDoownHandler() {
+            var $me = $(this);
+            if ($me.hasClass('error')) {
+                $me.removeClass('error');
+                $me.parent().find('.error-message').remove();
+            }
+        });
+
     var row = $('.dialog-tree-panel-scroll.add-user .input-user', $dialog);
     var userRow = $(row).clone(true);
     userRow.find('input').val('');
 
-    //row.attr('id', 'add-sub-user-0');
     $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
         .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
-    //jScrollFade('.dialog-tree-panel-scroll.add-user .dialog-input-container');
-    
-
-    
-
 
     M.safeShowDialog('sub-user-adding-dlg', function () {
+        return $dialog;
+    });
+};
+
+/**
+ * show the adding result for a list of sub-users
+ * @param {object[]} results        array of sub-user object {email,status,initPass}
+ */
+BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
+    var $dialog = $('.user-management-verification-dialog.user-management-dialog');
+
+    if (!results || !results.length) {
+        return;
+    }
+    var userRow = $('.dialog-content-block verification-container .verification-user-container', $dialog);
+    var userTemplate = userRow.clone();
+
+    for (var k = 0; k < results.length; k++) {
+
+    }
+
+    M.safeShowDialog('sub-user-adding-res-dlg', function () {
         return $dialog;
     });
 };

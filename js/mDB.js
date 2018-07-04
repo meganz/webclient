@@ -118,9 +118,6 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         fmdb.db = false;
                     });
                 }
-
-                // force no-treecache gettree
-                localStorage.force = 1;
             }
 
             result(sn);

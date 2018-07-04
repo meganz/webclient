@@ -1539,7 +1539,7 @@ React.makeElement = React['createElement'];
 	                onClick: this.props.onConversationSelected, onDoubleClick: this.props.onConversationClicked },
 	            React.makeElement(
 	                "td",
-	                { className: "calculated-width" },
+	                { className: "" },
 	                React.makeElement(
 	                    "div",
 	                    { className: "fm-chat-user-info todo-star" },

@@ -4743,71 +4743,54 @@
 
 
 <!-- user management dialog !-->
-<div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden">
-    <div class="dialog-title">[$19104]</div>
-    <div class="delete-img icon ex-dlg"></div>
-    <div class="dialog-tree-panel-scroll add-user">
-        <div class="dialog-input-container">
+<div class="user-management-add-user-dialog user-management-dialog fm-dialog"> 
+    <div class="dialog-title">Invite People to Team</div>
+    <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
+    <div class="delete-img icon"></div>
+        <div class="dialog-input-container hidden">
             <div class="input-user">
                 <div class="indi-input">
-                    <input type="text" class="dialog-input sub-n focus" placeholder="Name" autofocus>
+                    <input type="text" class="dialog-input focus" value="Name" autofocus>
+                    <div class="error-message">Server error, please try again.</div> 
                 </div>
                 <div class="indi-input">
-                    <input type="text" class="dialog-input sub-m placeholder" placeholder="Email">
+                    <input type="text" class="dialog-input placeholder" value="Email">
                 </div>
-                <div class="delete-img icon"></div>
-            </div>
+            </div>                
         </div>
-    </div>
-    <div class="dialog-button-container">
-        <div class="default-button-no-border add-more">
-            <div class="add-more-img icon"></div>
-            [$19103]
-        </div>
-        <div class="default-button-no-border">
-            <div class="import-contact-img icon"></div>
-            [$16268]
-        </div>
-        <div class="default-green-button-user-management add-sub-user">
-            [$19084]
-        </div>
-    </div>
-    <div class="licence-bar">
-        <div class="notification-img icon"></div>
-        5 (WAIT 4 API) sub account license used.
-        <div class="default-white-button-user-management">
-            [$19090]
-        </div>
-    </div>
-</div>
-
-<div class="user-management-verification-dialog user-management-dialog fm-dialog hidden">
-    <!--Header-->
-    <div class="dialog-title">Verification emails have been sent</div> <!--19116-->
-    <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
-    <div class="user-management-border"></div> <!--19117-->
-    <!--Folder container-->
-    <div class="dialog-tree-panel-scroll verification">
-        <div class="dialog-content-block verification-container">
-            <div class="verification-user-container">
+        <div class="verification-container">
                 <div class="avatars">
                     <div class="subuser-image">
                         <img src="" class="hidden">
                     </div>
                 </div>
                 <div class="verification-user-info">
-                    <div class="verification-user-email"><b>[$7434]:</b><div class="sub-e">major@126.com</div></div>
-                    <div class="verification-user-pw"><b>[$18771]:</b><div class="sub-p">major@126.com</div></div>
+                    <div class="verification-user-email"><b>Email:</b>major@126.com</div>
+                    <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
                 </div>
-            </div>
-        </div>
-    </div> <!--END folder container-->
+                <div class="checked-icon56 icon56"></div>                                   
+        </div><!--END folder container-->
     <div class="dialog-button-container">
-        <div class="default-green-button-user-management right">
-            [$81]
+        <div class="default-white-button-user-management">
+           <div class="add-more-img icon"></div>
+           Add More
+        </div>               
+        <div class="default-white-button-user-management hidden">
+          <div class="import-contact-img icon"></div>
+          Import Contacts
+        </div>  
+        <div class="default-green-button-user-management">Ok</div> 
+    </div>
+    <div class="licence-bar hidden">
+        <div class="notification-img icon"></div>
+        5 sub account licences used.
+        <div class="default-white-button-user-management">
+        View Plans
         </div>
-    </div><!--Buttons-->
-</div><!--END verification dialog-->
+    </div>
+</div><!--END add user dialog-->
+
+
 
 <div class="user-management-edit-profile-dialog user-management-dialog fm-dialog hidden">
     <div class="user-management-subuser-avatars">

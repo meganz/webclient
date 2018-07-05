@@ -24224,7 +24224,7 @@ opacity: 1;
 .default-white-button-user-management .icon, .default-green-button-user-management .icon, .default-gray-button-user-management .icon{
     width: 24px;
     height: 24px;
-    margin:4px 8px 4px 0px;
+    margin:3px 8px 4px 0px;
     background-image: url(../images/mega/fm-main-sprite.png);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -24409,6 +24409,7 @@ opacity: 1;
 
 .user-management-view .import-contact-img, .fm-right-header-user-management .import-contact-img, .user-management-dialog .import-contact-img{
     background-position: -24px -12352px;
+    opacity: 0.8;
 }
 
 .user-management-view .notification-img, .fm-right-header-user-management .notification-img, .user-management-dialog .notification-img {
@@ -26237,7 +26238,7 @@ opacity: 1;
     line-height: 24px;
     font-weight: 600;
     position: relative;
-    margin:20px auto;
+    margin:24px auto;
     text-align: center;
     display: block;
 }
@@ -26246,20 +26247,13 @@ opacity: 1;
     font-size: 14px;
     color: #999;
     line-height: 24px;
-    width: 390px;
-    left: 50%;
-    margin-left: -195px;
+    width: 618px;
     margin-bottom: 24px;
+    padding:0 100px;
+    box-sizing: border-box;
     height: auto;
     text-align: center;
     position: relative;
-    display: block;
-}
-
-.user-management-add-user-dialog .dialog-tree-panel-scroll.add-user {
-    width:100%;
-    height:auto;
-    max-height: 200px;
 }
 
 .user-management-dialog .dialog-input-container {
@@ -26292,13 +26286,13 @@ opacity: 1;
     height: 64px;
     float: left;
     position: relative;
-    margin-right: 16px;
 }
 
 .user-management-dialog .dialog-input-container .input-user .indi-input .error-message {
     font-size: 13px;
-    padding:4px 0 0 8px;
+    padding:8px 0 0 8px;
     color: rgba(229,76,81,1);
+    width:500px;
 }
 
 .user-management-dialog .dialog-input-container .input-user .dialog-input {
@@ -26376,9 +26370,9 @@ opacity: 1;
 } 
 
 .user-management-add-user-dialog .dialog-button-container{
-    margin:0 56px 24px 56px;
+    margin:0 24px 12px 24px;
     height: 36px;
-    width: 508px;
+    width: 570px;
     box-sizing: border-box;
     position: relative;
 }
@@ -26434,11 +26428,15 @@ opacity: 1;
 }
 
 .user-management-view .add-user-icon56 {
-    background-position: 0 -332px;
+    background-position: 0 -343px;
 }
 
 .user-management-view .accounts-icon56 {
-    background-position: -64px -332px;
+    background-position: -64px -343px;
+}
+
+.user-management-dialog .checked-icon56 {
+    background-position: -124px -280px;
 }
 
 .user-management-view .default-button-no-border .icon, .fm-right-header-user-management .default-button-no-border .icon, .user-management-dialog .default-button-no-border .icon {
@@ -26448,12 +26446,6 @@ opacity: 1;
     margin-right: 4px;
     opacity: 0.5;
     transition: 0.1s;
-}
-
-.user-management-add-user-dialog .licence-bar .icon{
-    opacity: 0.8;
-    float: left;
-    margin: 16px 4px 16px 24px;
 }
 
 .user-management-view .default-button-no-border:hover, .user-management-dialog .default-button-no-border:hover, .fm-right-header-user-management .default-button-no-border:hover{
@@ -26470,12 +26462,26 @@ opacity: 1;
     margin-top: -265px;
 }
 
+.user-management-add-user-dialog .default-green-button-user-management {
+    height: 32px;
+    width: auto;
+    padding: 6px 24px;
+    float: right;
+    line-height: 20px;
+    font-size: 14px;
+}
+
+.user-management-add-user-dialog .default-white-button-user-management {
+    float: left;
+    height: 32px;
+    margin-right: 12px;
+}
+
 .user-management-add-user-dialog .licence-bar {
     width: 100%;
     height: 56px;
     background-color: rgba(250,250,250,1);
     position: relative;
-    display: block; 
     border-radius: 0px 0 8px 8px;
     box-sizing: border-box;
     padding: 0;
@@ -26495,33 +26501,18 @@ opacity: 1;
     left: 0;
 }
 
+.user-management-add-user-dialog .licence-bar .icon{
+    opacity: 0.8;
+    float: left;
+    margin: 16px 4px 16px 24px;
+}
+
 .user-management-dialog .licence-bar .default-white-button-user-management {
     position: absolute;
-    right: 24px;
+    right: 0px;
     top:12px;
     color: #666;
-}
-
-.user-management-add-user-dialog .dialog-input-container .input-user .delete-img.icon {
-    position: absolute;
-    right: 0;
-    margin: 4px 28px 4px 4px;
-    visibility: hidden;
-    transition: 0.2s;
-    top: 0;
-}
-
-.user-management-add-user-dialog .dialog-input-container .input-user:hover .delete-img.icon {
-    visibility: visible;
-}
-
-.user-management-add-user-dialog .default-green-button-user-management {
-    height: 36px;
-    width: auto;
-    padding: 8px 24px;
-    float: right;
-    line-height: 20px;
-    font-size: 16px;
+    margin-right: 24px;
 }
 
 .user-management-add-user-dialog .delete-img.icon, .user-management-edit-profile-dialog .delete-img.icon, .user-management-able-user-dialog .delete-img{
@@ -26532,68 +26523,37 @@ opacity: 1;
     right: 16px;
 }
 
-.user-management-verification-dialog {
-    width: 620px;
-    margin-left: -310px;
-    margin-top: -265px;
-    position: absolute;
-}
-
-.user-management-verification-dialog .dialog-title {
-    margin-top: 40px;
-}
-
-.user-management-verification-dialog .dialog-subtitle {
-    margin-bottom: 40px;
-}
-
-.user-management-border{
-    content: '';
-    width: 100%;
-    height: 1px;
-    top:171px;
-    left: 0;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-}
-
-.user-management-verification-dialog .dialog-tree-panel-scroll.verification {
-    height: auto;
-    max-height: 305px;
-    overflow: hidden;
-}
-
-.user-management-verification-dialog .verification-container {
+.user-management-add-user-dialog .verification-container {
     position: relative;
     width: 100%;
     height: auto;
-    display: block;
     background-color: rgba(250,250,250,1); 
     padding:32px 40px;
+    margin-bottom: 12px;
     box-sizing: border-box;
 }
 
-.user-management-verification-dialog .dialog-button-container {
-    position: relative;
+.user-management-add-user-dialog .verification-container::before {
+    content: " ";
     width: 100%;
-    height: 56px;
-    display: block;
-    box-sizing: border-box;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
-.user-management-verification-dialog .verification-user-container {
-    position: relative;
-    display: block;
-    height: 48px;
-    width: 540px;
-    margin-bottom: 48px;
+.user-management-add-user-dialog .verification-container::after {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    bottom: 0;
+    left: 0;
 }
 
-.user-management-verification-dialog .verification-user-container:last-child {
-    margin-bottom: 0px;
-}
-
-.user-management-verification-dialog .verification-user-container .avatars {
+.user-management-add-user-dialog .verification-container .avatars {
     width:48px;
     height: 48px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26603,9 +26563,10 @@ opacity: 1;
     background-color: #fff;
     position: relative;
     display: inline-block;
+    vertical-align: top;
 }
 
-.user-management-verification-dialog .verification-user-container .avatars .subuser-image {
+.user-management-add-user-dialog .verification-container .avatars .subuser-image {
     width:38px;
     height: 38px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26615,14 +26576,14 @@ opacity: 1;
     position: absolute;
 }
 
-.user-management-verification-dialog .verification-user-container .avatars .subuser-image img{
+.user-management-add-user-dialog .verification-container .avatars .subuser-image img{
     width:38px;
     height: 38px;
     border-radius: 100%;
     position: absolute;
 }
 
-.user-management-verification-dialog .verification-user-container .verification-user-info {
+.user-management-add-user-dialog .verification-container .verification-user-info {
     width: 320px;
     margin-left: 24px;
     position: relative;
@@ -26633,30 +26594,26 @@ opacity: 1;
     vertical-align: top;
 }
 
-.user-management-verification-dialog .verification-user-container .verification-user-info * {
+.user-management-add-user-dialog .verification-container .verification-user-info * {
     font-size: 14px;
     color: #666;
     line-height: 18px;
 }
 
-.user-management-verification-dialog .verification-user-container .verification-user-info .verification-user-email {
+.user-management-add-user-dialog .verification-container .verification-user-info .verification-user-email {
     margin-bottom: 12px;
 }
 
-.user-management-verification-dialog .verification-user-container .verification-user-info b {
+.user-management-add-user-dialog .verification-container .verification-user-info b {
     font-weight: 600;
     color: #333;
     margin-right: 12px;
 }
 
-.user-management-verification-dialog .verification-user-container .default-white-button-user-management {
-    float: right;
-    margin:8px 0;
-}
-
-
-.user-management-verification-dialog .dialog-button-container .default-green-button-user-management {
-    margin:12px 24px;
+.user-management-add-user-dialog .verification-container .checked-icon56.icon56 {
+    position: absolute;
+    right: 40px;
+    top: 32px;
 }
 
 .user-management-edit-profile-dialog {
@@ -26667,7 +26624,7 @@ opacity: 1;
 
 .user-management-edit-profile-dialog .user-management-subuser-avatars {
     float: left;
-    margin: 20px 12px 0 32px;
+    margin: 24px 12px 0 32px;
     cursor: pointer;
 }
 
@@ -26723,7 +26680,7 @@ opacity: 1;
 
 .user-management-edit-profile-dialog .dialog-button-container, .user-management-able-user-dialog .dialog-button-container {
     height: 56px;
-    background-color: rgba(250,250,250,1);
+    background-color: #fff;
     position: relative;
     border-radius: 0 0 8px 8px;
 }

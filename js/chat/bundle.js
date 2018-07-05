@@ -1215,7 +1215,7 @@ React.makeElement = React['createElement'];
 	var DropdownsUI = __webpack_require__(10);
 	var ContactsUI = __webpack_require__(11);
 	var ConversationPanelUI = __webpack_require__(12);
-	var ModalDialogsUI = __webpack_require__(12);
+	var ModalDialogsUI = __webpack_require__(13);
 
 	var renderMessageSummary = function renderMessageSummary(lastMessage) {
 	    var renderableSummary;

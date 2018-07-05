@@ -1191,6 +1191,9 @@ scparser.$add('_fm', function() {
     loadfm_done();
 });
 
+// sub-user status change in business account
+scparser.$add('ssc', process_businessAccountSubUsers_SC);
+
 scparser.$notify = function(a) {
     // only show a notification if we did not trigger the action ourselves
     if (!pfid && u_attr && a.ou !== u_attr.u) {
@@ -2822,7 +2825,7 @@ function process_u(u, ignoreDB) {
 }
 
 /**
- * a function to parse the JSON object recived holding information about sub-accounts of a business account.
+ * a function to parse the JSON object received holding information about sub-accounts of a business account.
  * This object will exist only in business accounts.
  * @param {string[]} suba    the object to parse, it must contain an array of sub-accounts ids (can be empty)
  * @param {boolean} ignoreDB if we want to skip DB updating
@@ -2831,7 +2834,7 @@ function process_suba(suba, ignoreDB) {
     "use strict";
     M.require('businessAcc_js', 'businessAccUI_js').done(function () {
 
-        // the resposne is an array of users's handles (Masters). this means at least it will contain
+        // the response is an array of users's handles (Masters). this means at least it will contain
         // the current user handle.
         // later-on we need to iterate on all of them. For now we dont know how to treat sub-masters yet
         // --> we will target only current users's subs
@@ -2849,6 +2852,38 @@ function process_suba(suba, ignoreDB) {
             bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
         }
     });
+}
+
+/**
+ * A function to precess the action packets received related to business account sub-users
+ * @param {object} packet
+ */
+function process_businessAccountSubUsers_SC(packet) {
+    if (!packet) { // no packet
+        return;
+    }
+    if (!M.suba) { // no sub-users in memory
+        return;
+    }
+    if (!packet.a) { // no packet type/operation
+        return;
+    }
+    if (!packet.u) { // no user handle
+        return;
+    }
+
+    var subUser = M.suba[packet.u];
+    if (!subUser) { // sub-user not found
+        return;
+    }
+
+    if (!packet.s) { // no new status!
+        return;
+    }
+    subUser.s = packet.s;
+    var bAccount = new BusinessAccount();
+    bAccount.parseSUBA(subUser, false);
+
 }
 
 function process_ok(ok, ignoreDB) {

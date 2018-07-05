@@ -886,8 +886,8 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
 
     
     // event handler for key-down on inputs
-    $('.input-user input', $dialog).off('keydown.subuser')
-        .on('keydown.subuser', function inputFieldsKeyDoownHandler() {
+    $('.input-user input', $dialog).off('keydown.subuserresd')
+        .on('keydown.subuserresd', function inputFieldsKeyDoownHandler() {
             var $me = $(this);
             if ($me.hasClass('error')) {
                 $me.removeClass('error');
@@ -933,7 +933,7 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
         var $currSubUser = $userTemplate.clone(true);
         if (results[k].status === 1) {
             var subUserDefaultAvatar = useravatar.contact(results[k].handle);
-            $('.subuser-image', $currSubUser).html(subUserDefaultAvatar);
+            $('.new-sub-user.avatar', $currSubUser).html(subUserDefaultAvatar);
             $('.sub-e', $currSubUser).text(results[k].email);
             $('.sub-p', $currSubUser).text(results[k].initPass);
         }
@@ -947,6 +947,18 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
         $usersContainer
             .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
     }
+
+    $('.dialog-button-container .ok-done', $dialog).off('click.subuser')
+        .on('click.subuser', function addSubUserDoneClickHandler() {
+            $('.dialog-button-container .ok-done', $dialog).off('keydown.subuserresd');
+            closeDialog();
+        });
+    $('.dialog-button-container .ok-done', $dialog).off('keydown.subuserresd')
+        .on('keydown.subuserresd', function addSubUserDoneKeydownHandler(key) {
+            if (key.keyCode === 27 || key.key === 'Escape' || key.code === 'Escape' || key.which === 27) {
+                return false;
+            }
+        });
 
     M.safeShowDialog('sub-user-adding-res-dlg', function () {
         return $dialog;

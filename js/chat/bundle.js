@@ -12817,7 +12817,7 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.isReadOnly = function () {
-	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
+	    return this.members && this.members[u_handle] <= 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
 	};
 	ChatRoom.prototype.iAmOperator = function () {
 	    return this.type === "private" || this.members && this.members[u_handle] === 3;

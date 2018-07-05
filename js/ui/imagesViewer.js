@@ -242,6 +242,7 @@ var slideshowid;
             $pauseButton.attr('data-state', 'pause');
             $pauseButton.find('i').removeClass('play').addClass('pause');
             clearTimeout(slideshowTimer);
+            slideshowsteps(); // update x of y counter
         }
 
         // Bind Slideshow Mode button

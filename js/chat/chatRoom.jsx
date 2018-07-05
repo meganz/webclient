@@ -373,6 +373,7 @@ ChatRoom.prototype.persistToFmdb = function() {
                 });
             });
         }
+
         if (self.chatId && self.chatShard !== undefined) {
             var roomInfo = {
                 'id': self.chatId,
@@ -380,25 +381,11 @@ ChatRoom.prototype.persistToFmdb = function() {
                 'g' : (self.type === "group") ? 1 : 0,
                 'u' : users,
                 'ts': self.ctime,
-                'ct': self.ct
+                'ct': self.ct,
+                'f' : self.flags
             };
             fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
         }
-    }
-};
-
-/**
- * Save chat flags info fmdb.
- *
- */
-ChatRoom.prototype.persistFlagsToFmdb = function() {
-    var self = this;
-    if (fmdb) {
-        var mcfcInfo = {
-            'id': self.chatId,
-            'f': self.flags
-        };
-        fmdb.add('mcfc', {id: mcfcInfo.id, d: mcfcInfo});
     }
 };
 
@@ -409,6 +396,7 @@ ChatRoom.prototype.persistFlagsToFmdb = function() {
  */
 ChatRoom.prototype.updateFlags = function(f, updateUI) {
     var self = this;
+    var flagChange = (self.flags !== f);
     self.flags = f;
     self.archivedSelected = false;
     if (self.isArchived()) {
@@ -418,10 +406,10 @@ ChatRoom.prototype.updateFlags = function(f, updateUI) {
     else {
         megaChat.archivedChatsCount--;
     }
-    self.persistFlagsToFmdb();
+    self.persistToFmdb();
 
 
-    if (updateUI) {
+    if (updateUI && flagChange) {
         if (megaChat.currentlyOpenedChat &&
             megaChat.chats[megaChat.currentlyOpenedChat] &&
             megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
@@ -632,15 +620,15 @@ ChatRoom.prototype.archive = function() {
     var flags = ChatRoom.ARCHIVED;
 
     asyncApiReq({
-        'a': 'mcsf',
+        'a' : 'mcsf',
         'id': self.chatId,
-        'm':mask, 'f':flags,
-        'v': Chatd.VERSION}
+        'm' : mask,
+        'f' : flags,
+        'v' : Chatd.VERSION}
         )
         .done(function(r) {
             if (r === 0) {
-                self.flags |= ChatRoom.ARCHIVED;
-                loadSubPage('fm/chat/');
+                self.updateFlags(flags, true);
             }
         });
 };
@@ -651,8 +639,8 @@ ChatRoom.prototype.archive = function() {
  */
 ChatRoom.prototype.unarchive = function() {
     var self = this;
-    var mask = self.flags;
-    var flags = ChatRoom.ARCHIVED^0xFF;
+    var mask = 0x01;
+    var flags = 0x00;
 
     asyncApiReq({
         'a': 'mcsf',
@@ -662,8 +650,7 @@ ChatRoom.prototype.unarchive = function() {
         )
         .done(function(r) {
             if (r === 0) {
-                self.flags = 0x00;
-                self.megaChat.refreshConversations();
+                self.updateFlags(flags, true);
             }
         });
 };

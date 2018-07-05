@@ -1916,7 +1916,6 @@ function loadfm(force) {
                     _sn    : '&i',             // sn - fixed index 1
                     puf    : '&ph',            // public upload folder - handle
                     pup    : '&p',             // public upload page - handle
-                    mcfc   : '&id',            // chats - id
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k', // queued chat messages - k
@@ -2054,8 +2053,7 @@ function dbfetchfm() {
                                     ufsc.addTreeNode(r[i], true);
                                 }
                             },
-                            mcf: 1,
-                            mcfc: 2
+                            mcf: 1
                         };
 
                         // Prevent MEGAdrop tables being created for mobile
@@ -2071,16 +2069,6 @@ function dbfetchfm() {
                                         // only set chatmcf is there is anything returned
                                         // if not, this would force the chat to do a 'mcf' call
                                         loadfm.chatmcf = r;
-                                    }
-                                }
-                                else if (tables[t] === 2) {
-                                    if (r.length > 0) {
-                                        if (!loadfm.chatmcfc) {
-                                            loadfm.chatmcfc = {};
-                                        }
-                                        for (var i = 0; i < r.length; i++) {
-                                            loadfm.chatmcfc[r[i].id] = r[i].f;
-                                        }
                                     }
                                 }
                                 else {
@@ -2869,16 +2857,6 @@ function process_ok(ok, ignoreDB) {
     }
 }
 
-function persistMCFC(mcfcResponse) {
-    if (typeof mcfcResponse !== 'undefined' && typeof mcfcResponse.length !== 'undefined' && mcfcResponse.forEach) {
-        mcfcResponse.forEach(function (mcfcInfo) {
-            if (fmdb) {
-                fmdb.add('mcfc', { id : mcfcInfo.id, d : mcfcInfo });
-            }
-        });
-    }
-}
-
 function processMCF(mcfResponse, ignoreDB) {
 
     if (typeof ChatdIntegration !== 'undefined') {
@@ -2892,7 +2870,7 @@ function processMCF(mcfResponse, ignoreDB) {
     // reopen chats from the MCF response.
     if (typeof mcfResponse !== 'undefined' && typeof mcfResponse.length !== 'undefined' && mcfResponse.forEach) {
         mcfResponse.forEach(function (chatRoomInfo) {
-            if (chatRoomInfo.active && chatRoomInfo.active === 0) {
+            if (chatRoomInfo.active === 0) {
                 // skip non active chats for now...
                 return;
             }
@@ -2911,10 +2889,6 @@ function processMCF(mcfResponse, ignoreDB) {
             }
 
             if (typeof ChatdIntegration !== 'undefined') {
-                if (loadfm.chatmcfc && typeof loadfm.chatmcfc[chatRoomInfo.id] !== 'undefined') {
-                    chatRoomInfo.f = loadfm.chatmcfc[chatRoomInfo.id];
-                    delete loadfm.chatmcfc[chatRoomInfo.id];
-                }
                 ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
             }
         });
@@ -3045,16 +3019,12 @@ function loadfm_callback(res) {
         // cf will include the flags (like whether it is archived) and chatid,
         // so it needs to combine it before processing it.
         if (res.mcf.cf) {
-            if (!loadfm.chatmcfc) {
-                loadfm.chatmcfc = {};
-            }
             for (var i = 0; i < res.mcf.cf.length; i++) {
-                loadfm.chatmcfc[res.mcf.cf[i].id] = res.mcf.cf[i].f;
+                loadfm.chatmcf[i].f = res.mcf.cf[i].f;
             }
         }
         // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
         processMCF(loadfm.chatmcf);
-        persistMCFC(res.mcf.cf);
     }
     M.avatars();
     loadfm.fromapi = true;
@@ -3218,7 +3188,6 @@ function loadfm_done(mDBload) {
                             if (loadfm.chatmcf) {
                                 processMCF(loadfm.chatmcf, true);
                                 loadfm.chatmcf = null;
-                                loadfm.chatmcfc = null;
                             }
                             init_chat();
                         }

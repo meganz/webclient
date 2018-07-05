@@ -345,13 +345,18 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
 
     // is isMcf and triggered by a missingMcf in the 'f' treecache, trigger an immediate store in the fmdb
     if (isMcf && missingMcf && fmdb) {
-        fmdb.add('mcf', {
-            g: actionPacket.g,
-            id: actionPacket.id,
-            p: actionPacket.p,
-            ts: actionPacket.ts,
-            u: actionPacket.u
-        });
+        if (actionPacket.id && actionPacket.cs !== undefined) {
+            var roomInfo = {
+                'id': actionPacket.id,
+                'cs': actionPacket.cs,
+                'g' : actionPacket.g,
+                'u' : actionPacket.u,
+                'ts': actionPacket.ts,
+                'ct': actionPacket.ct,
+                'f' : actionPacket.f
+            };
+            fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
+        }
     }
 
     loadingDialog.hide();
@@ -444,10 +449,11 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
             if (!chatRoom) {
                 return masterPromise.reject();
             }
+
             if (actionPacket.ct) {
                 chatRoom.ct = actionPacket.ct;
             }
-            if (actionPacket.f) {
+            if (typeof actionPacket.f !== 'undefined') {
                 chatRoom.flags = actionPacket.f;
             }
             // apply the flags if any received during loading.
@@ -1076,7 +1082,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
 
         if (foundChatRoom.roomId === chatRoom.roomId) {
-            chatRoom.chatShard = null;
             chatRoom.chatdUrl = null;
             if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
                 chatRoom.setState(

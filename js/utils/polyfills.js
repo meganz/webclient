@@ -86,6 +86,8 @@ mBroadcaster.once('startMega', function() {
 
     if (!ArrayBuffer.prototype.slice) {
         Object.defineProperty(ArrayBuffer.prototype, 'slice', {
+            writable: true,
+            configurable: true,
             value: function(from, to) {
                 var length = this.byteLength;
                 var begin = clamp(from, length);
@@ -113,6 +115,8 @@ mBroadcaster.once('startMega', function() {
 
     if (!Uint8Array.prototype.slice) {
         Object.defineProperty(Uint8Array.prototype, 'slice', {
+            writable: true,
+            configurable: true,
             value: function(from, to) {
                 return new Uint8Array(this.buffer.slice(from, to));
             }

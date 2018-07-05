@@ -72,10 +72,15 @@
     position: absolute;
     right: 0;
 }
-.fm-dialog-footer-txt {
+.fm-dialog-footer-txt, .de .contacts-search.popup.add-participant-selector .fm-dialog-footer-txt  {
     text-align: center;
     line-height: 31px;
     color: #777;
+}
+.de .contacts-search.popup .fm-dialog-footer-txt {
+    text-align: right;
+    line-height: 1.5;
+    max-width: 240px;
 }
 /* Send Contact Dialog */
 .fm-dialog.send-contact {

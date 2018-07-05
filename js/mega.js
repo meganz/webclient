@@ -3059,6 +3059,11 @@ function loadfm_callback(res) {
     M.avatars();
     loadfm.fromapi = true;
 
+    if (localStorage['treefixup$' + u_handle]) {
+        // We found inconsistent tree nodes and forced a reload, log it.
+        eventlog(99695);
+    }
+
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
         // Check if the key for a folderlink was correct
@@ -3112,11 +3117,6 @@ function loadfm_callback(res) {
         // decrypt hitherto undecrypted nodes
         crypto_fixmissingkeys(missingkeys);
 
-        // commit transaction and set sn
-        setsn(res.sn);
-        currsn = res.sn;
-        mega.fcv_fsn = res.sn;
-
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
@@ -3132,6 +3132,10 @@ function loadfm_callback(res) {
         // Time to save the ufs-size-cache, from which M.tree nodes will be created and being
         // those dependant on in-memory-nodes from the initial load to set flags such SHARED.
         ufsc.save();
+
+        // commit transaction and set sn
+        setsn(res.sn);
+        currsn = res.sn;
 
         // retrieve initial batch of action packets, if any
         // we'll then complete the process using loadfm_done
@@ -3166,6 +3170,29 @@ function loadfm_done(mDBload) {
     mega.loadReport.stepTimeStamp = Date.now();
 
     if (!pfid && u_type == 3) {
+
+        // Ensure tree nodes consistency...
+        var tlen = Object.keys(M.tree[M.RootID] || {}).length;
+        var clen = Object.keys(M.c[M.RootID] || {}).filter(function(h) { return M.c[M.RootID][h] > 1 }).length;
+
+        if (tlen < clen) {
+            if (localStorage['treefixup$' + u_handle]) {
+                // The force reload attempt did not helped on getting tree nodes consistency back (?!)
+                eventlog(99696);
+            }
+            else if ((Date.now() - parseInt(localStorage['treeic$' + u_handle] || 0)) < 864e6) {
+                // The user suffered again from inconsistent tree nodes within the
+                // last 10 days, we are not force reloading his account on this case.
+                eventlog(99697);
+            }
+            else {
+                // Force reload the account to get tree nodes consistency back...
+                localStorage['treeic$' + u_handle] = Date.now();
+                localStorage['treefixup$' + u_handle] = 1;
+                return fm_forcerefresh();
+            }
+        }
+        delete localStorage['treefixup$' + u_handle];
 
         // load/initialise the authentication system
         mega.config.fetch()

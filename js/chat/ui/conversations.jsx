@@ -2,6 +2,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../ui/utils.jsx');
+var getMessageString = require('./messages/utils.jsx').getMessageString;
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;

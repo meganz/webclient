@@ -717,6 +717,7 @@
     "5645": "Map aangemaakt",
     "5687": "Uploaden met",
     "5700": "Ik snap het",
+    "5705": "Ongeldige email",
     "5710": "Weet u zeker dat u de registratie wilt afbreken?",
     "5726": "Herstellen",
     "5737": "Geen contacten",
@@ -2606,7 +2607,7 @@
     "19087": "Aantal Gebruikers",
     "19088": "Totaal Opslag Verbruik",
     "19089": "Totaal Overdracht Verbruik",
-    "19090": "View Plan",
+    "19090": "Abonnement Weergeven",
     "19091": "Overdracht verbruik",
     "19092": "Gebruiker Uitschakelen",
     "19093": "Gebruiker Weergeven",
@@ -2616,7 +2617,7 @@
     "19098": "Weet u zeker dat u de gebruiker's [B]{0}[\/B] wilt uitschakelen?",
     "19099": "Noteer:U kunt de gebruiker heractiveren op elk later moment vanuit de uitgeschakelde gebruikerslijst.",
     "19100": "Het uitschakelen van de gebruiker werkte niet.",
-    "19101": "Weet u zeker dat u de gebruiker's [B]{0}[\/B]wilt inschakelen?",
-    "19102": "Noteer: Deze actie gebruikt gebruikers tegoed.",
-    "19103": "Add More"
+    "19101": "Weet u zeker dat u de gebruiker's [B]{0}[\/B] wilt inschakelen?",
+    "19102": "Noteer: Dit verhoogt het aantal gebruikte licenties.",
+    "19103": "Meer Toevoegen"
 }

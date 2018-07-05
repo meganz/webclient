@@ -717,6 +717,7 @@
     "5645": "Carpeta creada",
     "5687": "Como subir",
     "5700": "Entendido",
+    "5705": "Correo electr\u00f3nico inv\u00e1lido",
     "5710": "\u00bfSeguro que quieres abandonar el registro?",
     "5726": "Restaurar",
     "5737": "No tienes Contactos",
@@ -2606,7 +2607,7 @@
     "19087": "N\u00famero de usuarios",
     "19088": "Uso total de almacenamiento",
     "19089": "Uso total de transferencia",
-    "19090": "View Plan",
+    "19090": "Ver Plan",
     "19091": "Uso de transferencia",
     "19092": "Desactivar usuario",
     "19093": "Ver usuario",
@@ -2617,6 +2618,6 @@
     "19099": "Aviso: Puedes reactivar el usuario cuando quieras desde la lista de usuarios desactivados.",
     "19100": "No se ha podido desactivar el usuario",
     "19101": "\u00bfSeguro que quieres reactivar el usuario de [B]{0}[\/B]?",
-    "19102": "Aviso: Esta acci\u00f3n tomar\u00e1 la cuota del usuario.",
-    "19103": "Add More"
+    "19102": "Aviso: esta acci\u00f3n aumentar\u00e1 la cantidad de licencias utilizadas.",
+    "19103": "A\u00f1adir m\u00e1s"
 }

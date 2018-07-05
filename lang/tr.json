@@ -717,6 +717,7 @@
     "5645": "Klas\u00f6r olu\u015fturuldu",
     "5687": "Nas\u0131l y\u00fcklenir",
     "5700": "Anlad\u0131m",
+    "5705": "Ge\u00e7ersiz e-posta",
     "5710": "Kayd\u0131 iptal etmek istedi\u011finizden emin misiniz?",
     "5726": "Geri y\u00fckle",
     "5737": "Ki\u015fi yok",
@@ -2606,7 +2607,7 @@
     "19087": "Kullan\u0131c\u0131 Say\u0131s\u0131",
     "19088": "Toplam Depolama Alan\u0131 Kullan\u0131m\u0131",
     "19089": "Toplam Aktar\u0131m Kullan\u0131m\u0131",
-    "19090": "View Plan",
+    "19090": "Tarifeleri G\u00f6r\u00fcnt\u00fcle",
     "19091": "Aktar\u0131m kullan\u0131m\u0131",
     "19092": "Kullan\u0131c\u0131y\u0131 Devre D\u0131\u015f\u0131 B\u0131rak",
     "19093": "Kullan\u0131c\u0131y\u0131 G\u00f6r\u00fcnt\u00fcle",
@@ -2616,7 +2617,7 @@
     "19098": "[B]{0}[\/B]\u2019s kullan\u0131c\u0131s\u0131n\u0131 devre d\u0131\u015f\u0131 b\u0131rakmak istedi\u011finizden emin misiniz?",
     "19099": "Not: Kullan\u0131c\u0131y\u0131, engelli kullan\u0131c\u0131lar listesinden daha sonraki a\u015famada yeniden etkinle\u015ftirebilirsiniz.",
     "19100": "Kullan\u0131c\u0131n\u0131n devre d\u0131\u015f\u0131 b\u0131rak\u0131lmas\u0131 i\u015fe yaramad\u0131.",
-    "19101": "[B]{0}[\/B]?\u2019s kullan\u0131c\u0131s\u0131n\u0131 yeniden etkinle\u015ftirmek istedi\u011finizden emin misiniz?",
-    "19102": "Not: Bu i\u015flem, kullan\u0131c\u0131 kotas\u0131n\u0131 kullanacakt\u0131r.",
-    "19103": "Add More"
+    "19101": "[B]{0}[\/B] ki\u015fisinin kullan\u0131c\u0131s\u0131n\u0131 yeniden etkinle\u015ftirmek istedi\u011finizden emin misiniz?",
+    "19102": "Not: Bu i\u015flem kullan\u0131lan lisans say\u0131s\u0131n\u0131 artt\u0131racakt\u0131r.",
+    "19103": "Daha Fazla Ekle"
 }

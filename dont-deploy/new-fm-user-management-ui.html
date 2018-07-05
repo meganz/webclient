@@ -138,51 +138,20 @@ $(document).ready(function() {
 
     <div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden"> 
         <div class="dialog-title">Invite People to Team</div>
+        <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
         <div class="delete-img icon"></div>
-        <div class="dialog-tree-panel-scroll add-user">
-            <div class="dialog-input-container">
+            <div class="dialog-input-container hidden">
                 <div class="input-user">
                     <div class="indi-input">
-                        <input type="text" class="dialog-input focus" value="Name" autofocus> 
+                        <input type="text" class="dialog-input focus" value="Name" autofocus>
+                        <div class="error-message">Server error, please try again.</div> 
                     </div>
                     <div class="indi-input">
                         <input type="text" class="dialog-input placeholder" value="Email">
                     </div>
-                    <div class="delete-img icon"></div> 
-                </div>
+                </div>                
             </div>
-        </div>
-        <div class="dialog-button-container">
-            <div class="default-button-no-border">
-                <div class="add-more-img icon"></div>
-                Add More
-            </div>
-            <div class="default-button-no-border">
-                <div class="import-contact-img icon"></div>
-                Import Contacts
-            </div>
-            <div class="default-green-button-user-management disabled">
-                Add Users
-            </div>
-        </div>
-        <div class="licence-bar">
-            <div class="notification-img icon"></div>
-            5 sub account licences used.
-            <div class="default-white-button-user-management">
-            View Plans
-            </div>
-        </div>
-    </div>
-
-    <div class="user-management-verification-dialog user-management-dialog fm-dialog hidden">
-        <!--Header-->
-        <div class="dialog-title">Verification emails have been sent</div>
-        <div class="dialog-subtitle">Users accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.</div>
-        <div class="user-management-border"></div>
-        <!--Folder container-->
-        <div class="dialog-tree-panel-scroll verification">
-            <div class="dialog-content-block verification-container">
-                <div class="verification-user-container">
+            <div class="verification-container">
                     <div class="avatars">
                         <div class="subuser-image">
                             <img src="" class="hidden">
@@ -192,16 +161,27 @@ $(document).ready(function() {
                         <div class="verification-user-email"><b>Email:</b>major@126.com</div>
                         <div class="verification-user-pw"><b>Initial Password:</b>major@126.com</div>
                     </div>
-                    <div class="default-white-button-user-management">View Account</div>
-                </div>                                    
-            </div>
-        </div> <!--END folder container-->
+                    <div class="checked-icon56 icon56"></div>                                   
+            </div><!--END folder container-->
         <div class="dialog-button-container">
-            <div class="default-green-button-user-management right">
-                OK
+            <div class="default-white-button-user-management">
+               <div class="add-more-img icon"></div>
+               Add More
+            </div>               
+            <div class="default-white-button-user-management hidden">
+              <div class="import-contact-img icon"></div>
+              Import Contacts
+            </div>  
+            <div class="default-green-button-user-management">Ok</div> 
+        </div>
+        <div class="licence-bar hidden">
+            <div class="notification-img icon"></div>
+            5 sub account licences used.
+            <div class="default-white-button-user-management">
+            View Plans
             </div>
-        </div><!--Buttons-->  
-    </div><!--END verification dialog-->  
+        </div>
+    </div><!--END add user dialog-->  
 
 		<div class="user-management-edit-profile-dialog user-management-dialog fm-dialog hidden">
       <div class="user-management-subuser-avatars">
@@ -221,13 +201,13 @@ $(document).ready(function() {
 				<div class="dialog-input-title-ontop">
 					Role<br>
 					<div class="dialog-input correct-input">
-                        <div class="list-arrow"></div>
-                        <select size="1">
-                            <option value=" ">Sub-administrator</option>
-                            <option value=" ">Product manager</option>
-                            <option value=" ">Developer</option>
-                            <option value=" ">Designer</option>
-                        </select>
+            <div class="list-arrow"></div>
+            <select size="1">
+                <option value=" ">Sub-administrator</option>
+                <option value=" ">Product manager</option>
+                <option value=" ">Developer</option>
+                <option value=" ">Designer</option>
+            </select>
 					</div>
 				</div>
 				<div class="border"></div>
@@ -508,24 +488,24 @@ $(document).ready(function() {
         <div class="landing-page-container">
           <div class="mega-56px-icon"></div>
           <div class="landing-title">Welcome to MEGA User Management</div>
-          <div class="landing-sub-title">User management help you to organise all the sub user accounts in one place.  You are able to add users, modify account settings and overview the business account status here.</div>
+          <div class="landing-sub-title">User management helps you to organise all users of your organization in one place.  You are able to add/edit/disable users, modify user settings and get overview of your business account status here.</div>
           <div class="landing-sub-container">
             <div class="add-user-icon56 icon56"></div>
             <div class="landing-container-title">Add Users</div>
-            <div class="landing-container-subtitle">Get start with inviting people to the team</div>
+            <div class="landing-container-subtitle">Get started with inviting people to your team</div>
             <div class="default-white-button-user-management">Add Users</div>
           </div>
           <div class="landing-sub-container">
             <div class="accounts-icon56 icon56"></div>
             <div class="landing-container-title">Accounts</div>
-            <div class="landing-container-subtitle">Modify account settings</div>
-            <div class="default-white-button-user-management">Accounts</div>
+            <div class="landing-container-subtitle">Modify user settings</div>
+            <div class="default-white-button-user-management">Manage Users</div>
           </div>
           <div class="licence-bar">
             <div class="notification-white-img icon"></div>
             <span>5 sub account licences used.</span>
             <div class="default-white-button-user-management">
-            View Plans
+            View Plan
             </div>
           </div>
         </div>

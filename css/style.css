@@ -26262,11 +26262,11 @@ opacity: 1;
     max-height: 200px;
 }
 
-.user-management-dialog .dialog-input-container  {
-    width:100%;
-    height:auto;
+.user-management-dialog .dialog-input-container {
+    width: 620px;
+    height: auto;
     position: relative;
-    padding:24px 0;
+    padding: 24px 0;
 }
 
 .user-management-dialog .dialog-input-container::before {
@@ -26874,12 +26874,15 @@ opacity: 1;
     transition: 0.2s;
     padding: 0 16px;
     cursor: pointer;
+    border: 1px solid rgba(0,0,0,0);
 }
 
 .user-management-landing-page .landing-sub-container:hover {
-    -ms-transform: scale(1.05,1.05); /* IE 9 */
-    -webkit-transform: scale(1.05,1.05); /* Safari */
+    /*
+    -ms-transform: scale(1.05,1.05); 
+    -webkit-transform: scale(1.05,1.05); /
     transform: scale(1.05,1.05);
+    */
     border-radius: 8px;
     box-shadow: 0 0 4px 0 rgba(0,0,0,0.1);
     background-color: rgba(253,253,253,1);
@@ -26887,7 +26890,7 @@ opacity: 1;
 }
 
 .user-management-landing-page .landing-sub-container:hover::before, .user-management-landing-page .landing-sub-container:hover::after{
-        display: none;
+    display: none;
     background-color: rgba(0,0,0,0);
 }
 

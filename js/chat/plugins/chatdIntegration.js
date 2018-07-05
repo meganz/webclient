@@ -499,6 +499,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf, missi
                                                 chatRoom
                                             );
                                         }
+                                        delete chatRoom.members[user_handle];
                                     });
                                 }
                                 chatRoom.leave(false);
@@ -1112,13 +1113,23 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     chatRoom.membersLoaded = true;
                 }
             }
-            else if (eventData.priv === 255) {
+            else if (eventData.priv === 255 || eventData.priv === -1) {
                 var deleteParticipant = function deleteParticipant() {
-                    // remove group participant in strongvelope
-                    chatRoom.protocolHandler.removeParticipant(eventData.userId);
-                    // also remove from our list
-                    delete chatRoom.members[eventData.userId];
-
+                    if (eventData.userId === u_handle) {
+                        // remove all participants from the room.
+                        Object.keys(chatRoom.members).forEach(function(userId) {
+                            // remove group participant in strongvelope
+                            chatRoom.protocolHandler.removeParticipant(userId);
+                            // also remove from our list
+                            delete chatRoom.members[userId];
+                        });
+                    }
+                    else {
+                        // remove group participant in strongvelope
+                        chatRoom.protocolHandler.removeParticipant(eventData.userId);
+                        // also remove from our list
+                        delete chatRoom.members[eventData.userId];
+                    }
                     if (
                         M.u[eventData.userId].c === 0 &&
                         typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'

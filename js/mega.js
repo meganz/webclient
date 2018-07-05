@@ -2850,6 +2850,16 @@ function processMCF(mcfResponse, ignoreDB) {
                 // skip non active chats for now...
                 return;
             }
+
+            if (chatRoomInfo.n) {
+                for (var i = 0; i < chatRoomInfo.n.length; i++) {
+                    var member = chatRoomInfo.n[i];
+                    // was removed from the chat.
+                    if (member.u === u_handle && member.p === -1) {
+                        return;
+                    }
+                }
+            }
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
             }

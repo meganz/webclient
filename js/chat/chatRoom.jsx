@@ -471,7 +471,8 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
                 );
             }
         });
-        return names.length > 0 ? names.join(", ") : __(l[8888]);
+        return names.length > 0 ? names.join(", ")
+                                : __(l[19077]).replace('%s1', (new Date(self.ctime * 1000)).toLocaleString());
     }
 };
 
@@ -488,9 +489,6 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
     self._leaving = true;
     self._closing = triggerLeaveRequest;
-
-
-    self.members[u_handle] = 0;
 
 
     if (triggerLeaveRequest) {
@@ -1204,7 +1202,7 @@ ChatRoom.prototype._clearChatMessagesFromChatd = function() {
 
 ChatRoom.prototype.isReadOnly = function() {
     return (
-        (this.members && this.members[u_handle] === 0) ||
+        (this.members && this.members[u_handle] <= 0) ||
         this.privateReadOnlyChat ||
         this.state === ChatRoom.STATE.LEAVING ||
         this.state === ChatRoom.STATE.LEFT

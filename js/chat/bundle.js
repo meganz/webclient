@@ -1180,13 +1180,14 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
-	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
+	var getMessageString = __webpack_require__(7).getMessageString;
+	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(8);
-	var DropdownsUI = __webpack_require__(9);
-	var ContactsUI = __webpack_require__(10);
-	var ConversationPanelUI = __webpack_require__(11);
+	var ButtonsUI = __webpack_require__(9);
+	var DropdownsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
+	var ConversationPanelUI = __webpack_require__(12);
 
 	var ConversationsListItem = React.createClass({
 	    displayName: "ConversationsListItem",
@@ -2561,6 +2562,49 @@ React.makeElement = React['createElement'];
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	var getMessageString;
+	(function () {
+	    var MESSAGE_STRINGS;
+	    getMessageString = function getMessageString(type) {
+	        if (!MESSAGE_STRINGS) {
+	            MESSAGE_STRINGS = {
+	                'outgoing-call': l[5891],
+	                'incoming-call': l[5893],
+	                'call-timeout': [[l[18698]]],
+	                'call-starting': l[7206],
+	                'call-feedback': l[7998],
+	                'call-initialising': l[7207],
+	                'call-ended': [[l[18689], l[5889]], l[7208]],
+	                'remoteCallEnded': [[l[18689], l[5889]], l[7208]],
+	                'call-failed-media': l[7204],
+	                'call-failed': [[l[18690], l[7209]], l[7208]],
+	                'call-handled-elsewhere': l[5895],
+	                'call-missed': l[7210],
+	                'call-rejected': [[l[18691], l[5892]]],
+	                'call-canceled': [[l[18692], l[5894]]],
+	                'call-started': l[5888],
+	                'alterParticipants': undefined,
+	                'privilegeChange': l[8915],
+	                'truncated': l[8905]
+
+	            };
+	        }
+	        return MESSAGE_STRINGS[type];
+	    };
+	})();
+
+	mega.ui.chat.getMessageString = getMessageString;
+
+	module.exports = {
+	    getMessageString: getMessageString
+	};
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2840,7 +2884,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3020,7 +3064,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3029,8 +3073,8 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
-	var ContactsUI = __webpack_require__(10);
-	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
+	var ContactsUI = __webpack_require__(11);
+	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
 
 	var Dropdown = React.createClass({
 	    displayName: "Dropdown",
@@ -3360,7 +3404,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3369,7 +3413,7 @@ React.makeElement = React['createElement'];
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var utils = __webpack_require__(5);
-	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
+	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
 
 	var ContactsListItem = React.createClass({
 	    displayName: "ContactsListItem",
@@ -3584,8 +3628,8 @@ React.makeElement = React['createElement'];
 
 	        var contextMenu;
 	        if (!this.props.noContextMenu) {
-	            var ButtonsUI = __webpack_require__(8);
-	            var DropdownsUI = __webpack_require__(9);
+	            var ButtonsUI = __webpack_require__(9);
+	            var DropdownsUI = __webpack_require__(10);
 
 	            var moreDropdowns = this.props.dropdowns ? $.extend([], this.props.dropdowns) : [];
 
@@ -4060,7 +4104,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4070,16 +4114,16 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(8);
-	var ModalDialogsUI = __webpack_require__(12);
-	var CloudBrowserModalDialog = __webpack_require__(15);
-	var DropdownsUI = __webpack_require__(9);
-	var ContactsUI = __webpack_require__(10);
+	var ButtonsUI = __webpack_require__(9);
+	var ModalDialogsUI = __webpack_require__(13);
+	var CloudBrowserModalDialog = __webpack_require__(16);
+	var DropdownsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 	var ConversationsUI = __webpack_require__(4);
-	var TypingAreaUI = __webpack_require__(16);
-	var WhosTyping = __webpack_require__(19).WhosTyping;
-	var getMessageString = __webpack_require__(20).getMessageString;
-	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
+	var TypingAreaUI = __webpack_require__(17);
+	var WhosTyping = __webpack_require__(20).WhosTyping;
+	var getMessageString = __webpack_require__(7).getMessageString;
+	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
 	var ParticipantsList = __webpack_require__(21).ParticipantsList;
 
 	var GenericConversationMessage = __webpack_require__(22).GenericConversationMessage;
@@ -4199,8 +4243,9 @@ React.makeElement = React['createElement'];
 	        if (room.isReadOnly()) {}
 	        var excludedParticipants = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getParticipants() : room.getParticipants();
 
-	        array.remove(excludedParticipants, u_handle, false);
-
+	        if (excludedParticipants.indexOf(u_handle) >= 0) {
+	            array.remove(excludedParticipants, u_handle, false);
+	        }
 	        var dontShowTruncateButton = false;
 	        if (!room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
 	            dontShowTruncateButton = true;
@@ -6070,7 +6115,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6079,10 +6124,10 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var Tooltips = __webpack_require__(13);
-	var Forms = __webpack_require__(14);
+	var Tooltips = __webpack_require__(14);
+	var Forms = __webpack_require__(15);
 
-	var ContactsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 
 	var ExtraFooterElement = React.createClass({
 	    displayName: "ExtraFooterElement",
@@ -6437,7 +6482,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6634,7 +6679,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6703,7 +6748,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6712,8 +6757,8 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var Tooltips = __webpack_require__(13);
-	var ModalDialogsUI = __webpack_require__(12);
+	var Tooltips = __webpack_require__(14);
+	var ModalDialogsUI = __webpack_require__(13);
 
 	var BrowserCol = React.createClass({
 	    displayName: "BrowserCol",
@@ -7582,7 +7627,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -7592,13 +7637,13 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var RenderDebugger = __webpack_require__(6).RenderDebugger;
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(8);
-	var ModalDialogsUI = __webpack_require__(12);
-	var DropdownsUI = __webpack_require__(9);
-	var ContactsUI = __webpack_require__(10);
+	var ButtonsUI = __webpack_require__(9);
+	var ModalDialogsUI = __webpack_require__(13);
+	var DropdownsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 	var ConversationsUI = __webpack_require__(4);
-	var DropdownEmojiSelector = __webpack_require__(17).DropdownEmojiSelector;
-	var EmojiAutocomplete = __webpack_require__(18).EmojiAutocomplete;
+	var DropdownEmojiSelector = __webpack_require__(18).DropdownEmojiSelector;
+	var EmojiAutocomplete = __webpack_require__(19).EmojiAutocomplete;
 
 	var TypingArea = React.createClass({
 	    displayName: "TypingArea",
@@ -8419,7 +8464,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8429,8 +8474,8 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var DropdownsUI = __webpack_require__(9);
-	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
+	var DropdownsUI = __webpack_require__(10);
+	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
 
 	var DropdownEmojiSelector = React.createClass({
 	    displayName: "DropdownEmojiSelector",
@@ -8924,7 +8969,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8932,7 +8977,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(8);
+	var ButtonsUI = __webpack_require__(9);
 
 	var EmojiAutocomplete = React.createClass({
 	    displayName: "EmojiAutocomplete",
@@ -9210,7 +9255,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9352,49 +9397,6 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 20 */
-/***/ (function(module, exports) {
-
-	'use strict';
-
-	var getMessageString;
-	(function () {
-	    var MESSAGE_STRINGS;
-	    getMessageString = function getMessageString(type) {
-	        if (!MESSAGE_STRINGS) {
-	            MESSAGE_STRINGS = {
-	                'outgoing-call': l[5891],
-	                'incoming-call': l[5893],
-	                'call-timeout': [[l[18698]]],
-	                'call-starting': l[7206],
-	                'call-feedback': l[7998],
-	                'call-initialising': l[7207],
-	                'call-ended': [[l[18689], l[5889]], l[7208]],
-	                'remoteCallEnded': [[l[18689], l[5889]], l[7208]],
-	                'call-failed-media': l[7204],
-	                'call-failed': [[l[18690], l[7209]], l[7208]],
-	                'call-handled-elsewhere': l[5895],
-	                'call-missed': l[7210],
-	                'call-rejected': [[l[18691], l[5892]]],
-	                'call-canceled': [[l[18692], l[5894]]],
-	                'call-started': l[5888],
-	                'alterParticipants': undefined,
-	                'privilegeChange': l[8915],
-	                'truncated': l[8905]
-
-	            };
-	        }
-	        return MESSAGE_STRINGS[type];
-	    };
-	})();
-
-	mega.ui.chat.getMessageString = getMessageString;
-
-	module.exports = {
-	    getMessageString: getMessageString
-	};
-
-/***/ }),
 /* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9403,11 +9405,11 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(8);
-	var ModalDialogsUI = __webpack_require__(12);
-	var DropdownsUI = __webpack_require__(9);
-	var ContactsUI = __webpack_require__(10);
-	var PerfectScrollbar = __webpack_require__(7).PerfectScrollbar;
+	var ButtonsUI = __webpack_require__(9);
+	var ModalDialogsUI = __webpack_require__(13);
+	var DropdownsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
+	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
 
 	var ParticipantsList = React.createClass({
 	    displayName: "ParticipantsList",
@@ -9690,13 +9692,13 @@ React.makeElement = React['createElement'];
 
 	var React = __webpack_require__(2);
 	var utils = __webpack_require__(5);
-	var getMessageString = __webpack_require__(20).getMessageString;
+	var getMessageString = __webpack_require__(7).getMessageString;
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
 	var MetaRichpreview = __webpack_require__(24).MetaRichpreview;
 	var MetaRichpreviewConfirmation = __webpack_require__(26).MetaRichpreviewConfirmation;
 	var MetaRichpreviewMegaLinks = __webpack_require__(27).MetaRichpreviewMegaLinks;
-	var ContactsUI = __webpack_require__(10);
-	var TypingAreaUI = __webpack_require__(16);
+	var ContactsUI = __webpack_require__(11);
+	var TypingAreaUI = __webpack_require__(17);
 
 	var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
 
@@ -11058,9 +11060,9 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(20).getMessageString;
+	var getMessageString = __webpack_require__(7).getMessageString;
 	var MetaRichPreviewLoading = __webpack_require__(25).MetaRichpreviewLoading;
 
 	var MetaRichpreview = React.createClass({
@@ -11224,9 +11226,9 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(20).getMessageString;
+	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var MetaRichpreviewConfirmation = React.createClass({
 	    displayName: "MetaRichpreviewConfirmation",
@@ -11368,9 +11370,9 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(20).getMessageString;
+	var getMessageString = __webpack_require__(7).getMessageString;
 	var MetaRichPreviewLoading = __webpack_require__(25).MetaRichpreviewLoading;
 
 	var MetaRichpreviewMegaLinks = React.createClass({
@@ -11510,9 +11512,9 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(20).getMessageString;
+	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var AlterParticipantsConversationMessage = React.createClass({
 	    displayName: "AlterParticipantsConversationMessage",
@@ -11656,9 +11658,9 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(20).getMessageString;
+	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TruncatedMessage = React.createClass({
 	    displayName: "TruncatedMessage",
@@ -11745,9 +11747,9 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(20).getMessageString;
+	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var PrivilegeChange = React.createClass({
 	    displayName: "PrivilegeChange",
@@ -11840,9 +11842,9 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(10);
+	var ContactsUI = __webpack_require__(11);
 	var ConversationMessageMixin = __webpack_require__(23).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(20).getMessageString;
+	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TopicChange = React.createClass({
 	    displayName: "TopicChange",
@@ -11921,7 +11923,7 @@ React.makeElement = React['createElement'];
 
 	var utils = __webpack_require__(33);
 	var React = __webpack_require__(2);
-	var ConversationPanelUI = __webpack_require__(11);
+	var ConversationPanelUI = __webpack_require__(12);
 
 	var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
 	    var self = this;
@@ -12271,7 +12273,7 @@ React.makeElement = React['createElement'];
 	                names.push(M.u[contactHash] ? M.getNameByHandle(contactHash) : "non contact");
 	            }
 	        });
-	        return names.length > 0 ? names.join(", ") : __(l[8888]);
+	        return names.length > 0 ? names.join(", ") : __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
 	    }
 	};
 
@@ -12280,8 +12282,6 @@ React.makeElement = React['createElement'];
 
 	    self._leaving = true;
 	    self._closing = triggerLeaveRequest;
-
-	    self.members[u_handle] = 0;
 
 	    if (triggerLeaveRequest) {
 	        if (self.type == "group") {
@@ -12817,7 +12817,7 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.isReadOnly = function () {
-	    return this.members && this.members[u_handle] === 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
+	    return this.members && this.members[u_handle] <= 0 || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
 	};
 	ChatRoom.prototype.iAmOperator = function () {
 	    return this.type === "private" || this.members && this.members[u_handle] === 3;

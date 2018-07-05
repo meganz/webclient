@@ -148,8 +148,9 @@ var ConversationRightArea = React.createClass({
             )   :
             room.getParticipants();
 
-        array.remove(excludedParticipants, u_handle, false);
-
+        if (excludedParticipants.indexOf(u_handle) >= 0) {
+            array.remove(excludedParticipants, u_handle, false);
+        }
         var dontShowTruncateButton = false;
         if (
             !room.iAmOperator() ||

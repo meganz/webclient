@@ -26606,10 +26606,10 @@ opacity: 1;
     color: #666;
     line-height: 18px;
 }
-.user-management-verification-dialog .verification-user-container .verification-user-info .sub-e {
+.verification-user-container .verification-user-info .sub-e {
     display:inline;
 }
-.user-management-verification-dialog .verification-user-container .verification-user-info .sub-p {
+.verification-user-container .verification-user-info .sub-p {
     display:inline;
 }
 .user-management-verification-dialog .verification-user-container .verification-user-info .verification-user-email {

@@ -1820,7 +1820,6 @@
     "16653": "\u0110\u1ec3 c\u00f3 tr\u1ea3i nhi\u1ec7m t\u1ed1i \u01b0u, t\u1ea3i v\u00e0 c\u00e0i \u0111\u1eb7t \u1ee9ng d\u1ee5ng MEGA ho\u1eb7c d\u00f9ng phi\u00ean b\u1ea3n web tr\u00ean PC.",
     "16664": "M\u1eadt kh\u1ea9u m\u1edbi kh\u00f4ng \u0111\u01b0\u1ee3c tr\u00f9ng v\u1edbi c\u00e1i c\u0169.",
     "16671": "C\u00e0i tr\u00ecnh MEGA tr\u00ean m\u00e1y t\u00ednh \u0111\u1ec3 c\u00f3 t\u1ed1c \u0111\u1ed9 t\u1ea3i nhanh h\u01a1n.",
-    "16735": "S\u1eeda trang th\u00f4ng tin",
     "16763": "\u0110\u00e3 sao ch\u00e9p v\u00e0o b\u1ed9 ghi nh\u1edb",
     "16861": "C\u00e0i \u0111\u1eb7t MEGA cho m\u00e1y t\u00ednh",
     "16862": "T\u0103ng c\u01b0\u1eddng hi\u1ec7u su\u1ea5t truy\u1ec1n t\u1ea3i t\u1ec7p tin cho tr\u00ecnh duy\u1ec7t web",
@@ -2604,6 +2603,7 @@
     "19087": "Number Of Users",
     "19088": "Total Storage Usage",
     "19089": "Total Transfer Usage",
+    "19090": "View Plan",
     "19091": "Transfer usage",
     "19092": "Disable User",
     "19093": "View User",
@@ -2613,6 +2613,14 @@
     "19098": "Are you sure you want to disable [B]{0}[\/B]\u2019s user?",
     "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "Disabling the user did not work.",
-    "19101": "Are you sure you want to re-enable [B]{0}[\/B]?\u2019s user?",
-    "19102": "Note: This action will take up user quota."
+    "19101": "Are you sure you want to re-enable [B]{0}[\/B]\u2019s user?",
+    "19102": "Note: This will increase the number of licences used.",
+    "19103": "Add More",
+    "19104": "Invite People to Team",
+    "19116": "Verification emails have been sent",
+    "19117": "User accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.",
+    "19119": "Ch\u1ecdn ra c\u00e1c t\u00ean li\u00ean l\u1ea1c trong danh b\u1ea1 c\u1ee7a \u0111i\u1ec7n tho\u1ea1i ho\u1eb7c \u0111i\u1ec1n c\u00e1c \u0111\u1ecba ch\u1ec9 email.",
+    "19120": "Line up the QR code to scan it with your device\u2019s camera",
+    "19121": "Due to MEGA\u2019s encryption technology you are unable to reset your password without data loss. Please make sure you remember your password.",
+    "19122": "Don\u2019t show me again"
 }

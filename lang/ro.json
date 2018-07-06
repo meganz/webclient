@@ -1820,7 +1820,6 @@
     "16653": "Pentru experien\u0163a cu caracteristici complete, descarc\u0103-ne aplica\u0163ia sau folose\u015fte site-ul pe PC.",
     "16664": "Parola nou\u0103 trebuie s\u0103 fie diferit\u0103 de cea veche.",
     "16671": "Descarc\u0103 folosind aplica\u0163ia desktop MEGA pentru desc\u0103rc\u0103ri mai rapide.",
-    "16735": "Editeaz\u0103 profilul",
     "16763": "Copiat \u00een clipboard",
     "16861": "Instaleaz\u0103 clientul desktop MEGA",
     "16862": "\u00cembun\u0103t\u0103\u0163e\u015fte performan\u0163a transferului de fi\u015fiere din browser",
@@ -2604,6 +2603,7 @@
     "19087": "Number Of Users",
     "19088": "Total Storage Usage",
     "19089": "Total Transfer Usage",
+    "19090": "View Plan",
     "19091": "Transfer usage",
     "19092": "Disable User",
     "19093": "View User",
@@ -2613,6 +2613,14 @@
     "19098": "Are you sure you want to disable [B]{0}[\/B]\u2019s user?",
     "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "Disabling the user did not work.",
-    "19101": "Are you sure you want to re-enable [B]{0}[\/B]?\u2019s user?",
-    "19102": "Note: This action will take up user quota."
+    "19101": "Are you sure you want to re-enable [B]{0}[\/B]\u2019s user?",
+    "19102": "Note: This will increase the number of licences used.",
+    "19103": "Add More",
+    "19104": "Invite People to Team",
+    "19116": "Verification emails have been sent",
+    "19117": "User accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.",
+    "19119": "Selecteaz\u0103 contacte din lista de contacte a telefonului sau introdu mai multe adrese de e-mail.",
+    "19120": "Line up the QR code to scan it with your device\u2019s camera",
+    "19121": "Due to MEGA\u2019s encryption technology you are unable to reset your password without data loss. Please make sure you remember your password.",
+    "19122": "Nu-mi afi\u015fa din nou"
 }

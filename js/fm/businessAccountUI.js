@@ -765,123 +765,101 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
     // $('.default-green-button-user-management', $dialog).addClass('disabled');
 
     var clearDialog = function () {
-        var usersRows = $('.dialog-tree-panel-scroll.add-user .input-user', $dialog);
-        if (usersRows.length > 1) {
-            for (var k = 1; k < usersRows.length; k++) {
-                usersRows.get(k).remove();
-            }
-        }
-        $('input', usersRows).val('');
+        var $adduserContianer = $('.dialog-input-container', $dialog);
+        // if (usersRows.length > 1) {
+        //    for (var k = 1; k < usersRows.length; k++) {
+        //        usersRows.get(k).remove();
+        //    }
+        // }
+        $('input', $adduserContianer).val('');
+        $adduserContianer.removeClass('hidden');
+        $('.error-message', $adduserContianer).addClass('hidden');
+        $('.verification-container', $dialog).addClass('hidden');
+        $('.dialog-button-container .add-more', $dialog).addClass('hidden');
+        $('.dialog-button-container .add-sub-user', $dialog).text(l[19084]).removeClass('a-ok-btn');
+        $('.licence-bar', $dialog).removeClass('hidden');
     };
 
     clearDialog(); // remove any previous data
 
-    // event handler for "X" icon to close the dialog or "X" on the row.
+    // event handler for "X" icon to close the dialog
     $('.delete-img.icon', $dialog).off('click.subuser')
         .on('click.subuser', function exitIconClickHandler() {
-            if ($(this).hasClass('ex-dlg')) {
-                closeDialog();
-            }
-            else {
-                if ($('.dialog-tree-panel-scroll.add-user .input-user', $dialog).length > 1) {
-                    $(this).parent().remove();
-                    $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
-                        .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
-                }
-            }
+            closeDialog();
         });
 
     // event handler for clicking on "add more"
-    $('.default-button-no-border.add-more', $dialog).off('click.subuser')
+    $('.dialog-button-container .add-more', $dialog).off('click.subuser')
         .on('click.subuser', function addMoreClickHandler() {
-            var newRow = userRow.clone(true);
-            $('.dialog-tree-panel-scroll.add-user .dialog-input-container .jspPane', $dialog).append(newRow);
-            $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
-                .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+            clearDialog();
         });
 
     // event handler for adding sub-users
-    $('.default-green-button-user-management.add-sub-user', $dialog).off('click.subuser')
+    $('.dialog-button-container .add-sub-user', $dialog).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
             if ($(this).hasClass('disabled')) {
                 return;
             }
-            var isOK = true;
-            var inputs = $('.input-user input', $dialog);
-            for (var k = 0; k < inputs.length; k++) {
-                var $currInput = $(inputs[k]);
-                if (!$currInput.hasClass('error')) {
-                    if ($currInput.hasClass('sub-n')) {
-                        if (!$currInput.val().length || $currInput.val().split(' ', 2).length < 2) {
-                            $currInput.addClass('error');
-                            $currInput.parent().append('<div class="error-message">' + l[1098] + '</div>');
-                            isOK = false;
-                        }
-                    }
-                    else if ($currInput.hasClass('sub-m')) {
-                        if (checkMail($currInput.val())) {
-                            $currInput.addClass('error');
-                            $currInput.parent().append('<div class="error-message">' + l[5705] + '</div>');
-                            isOK = false;
-                        }
-                    }
+            if ($(this).hasClass('a-ok-btn')) {
+                closeDialog();
+            }
+
+            var $uName = $('.input-user input.sub-n', $dialog);
+            var $uEmail = $('.input-user input.sub-m', $dialog);
+
+            if (!$uName.val().length || $uName.val().split(' ', 2).length < 2) {
+                $uName.addClass('error');
+                $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1098]);
+                return;
+            }
+            if (checkMail($uEmail.val())) {
+                $uEmail.addClass('error');
+                $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[5705]);
+                return;
+            }
+
+            loadingDialog.pshow();
+
+            var subName = $uName.val(); // i know it's 2 parts at least
+            var subEmail = $uEmail.val();
+            var subFnLn = subName.split(' ');
+
+            if (subFnLn.length < 2) {
+                console.error('name does not consist of 2 parts, how did we get here?');
+                return;
+            }
+
+            var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '));
+
+
+            var finalizeOperation = function (st,res,req) {
+                var $addContianer = $('.dialog-input-container', $dialog);
+                var $resultContianer = $('.verification-container', $dialog);
+
+                if (st === 1) {
+                    var subUserDefaultAvatar = useravatar.contact(res.u);
+                    $('.new-sub-user.avatar', $resultContianer).html(subUserDefaultAvatar);
+                    $('.sub-e', $resultContianer).text(req.m);
+                    $('.sub-p', $resultContianer).text(res.lp);
+
+                    $addContianer.addClass('hidden');
+                    $resultContianer.removeClass('hidden');
+                    $('.dialog-button-container .add-more', $dialog).removeClass('hidden');
+                    $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
+                    $('.licence-bar', $dialog).addClass('hidden');
                 }
                 else {
-                    isOK = false;
-                }
-            }
-            if (isOK) {
-                closeDialog();
-                loadingDialog.pshow();
-                var subUsers = $('.input-user', $dialog);
-                var promises = [];
-                for (var h = 0; h < subUsers.length; h++) {
-                    var sub = $(subUsers[h]);
-                    var subName = sub.find('input.dialog-input.sub-n').val(); // i know it's 2 parts at least
-                    var subEmail = sub.find('input.dialog-input.sub-m').val();
-                    var subFnLn = subName.split(' ');
-
-                    if (subFnLn.length < 2) {
-                        console.error('name does not consist of 2 parts, how did we get here?');
-                        return;
-                    }
-
-                    var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '));
-                    promises.push(subPromise);
-
+                    $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);
                 }
 
-                var finalizeOperation = function (args) {
-                    loadingDialog.phide();
-                    var results = [];
+                loadingDialog.phide();
+            };
 
-                    for (var a = 0; a < args.length; a++) {
-                        var curRes = args[a];
-                        var resObj = Object.create(null);
-                        resObj.status = curRes[0];
-                        
-                        if (curRes[0] === 1) {
-                            resObj.email = curRes[2].m;
-                            resObj.initPass = curRes[1].lp;
-                            resObj.handle = curRes[1].u;
-                        }
-                        else {
-                            resObj.email = curRes[3].m;
-                        }
-                        results.push(resObj);
-                    }
-
-                    mySelf.showAddSubUserResultDialog(results);
-
-                };
-
-                var all = MegaPromise.allDone(promises);
-                all.done(finalizeOperation);
-                all.fail(function (args) {
-                    msgDialog('warninga', 'Error', l[1679]);
-                    console.error(args);
-                });
-            }
+            subPromise.always(finalizeOperation);
+            // subPromise.fail(function (args) {
+            //    msgDialog('warninga', 'Error', l[1679]);
+            //    console.error(args);
+            // });
         });
 
     
@@ -891,16 +869,9 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
             var $me = $(this);
             if ($me.hasClass('error')) {
                 $me.removeClass('error');
-                $me.parent().find('.error-message').remove();
+                $('.dialog-input-container .error-message', $dialog).addClass('hidden')
             }
         });
-
-    var row = $('.dialog-tree-panel-scroll.add-user .input-user', $dialog);
-    var userRow = $(row).clone(true);
-    userRow.find('input').val('');
-
-    $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
-        .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
 
     M.safeShowDialog('sub-user-adding-dlg', function () {
         return $dialog;

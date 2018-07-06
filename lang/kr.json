@@ -1820,7 +1820,6 @@
     "16653": "\uc644\uc804\ud55c \uae30\ub2a5\uc744 \uccb4\ud5d8\ud558\ub824\uba74, \uc6b0\ub9ac \uc571\uc744 \ub2e4\uc6b4 \ubc1b\uac70\ub098 PC\uc5d0\uc11c \uc0ac\uc774\ud2b8\uc5d0 \uc811\uc18d\ud558\uc138\uc694.",
     "16664": "\uc0c8 \ube44\ubc00\ubc88\ud638\ub294 \uae30\uc874 \ube44\ubc00\ubc88\ud638\uc640 \ub2ec\ub77c\uc57c \ud569\ub2c8\ub2e4.",
     "16671": "\ub354 \ube60\ub978 \ub2e4\uc6b4\ub85c\ub4dc\ub97c \uc704\ud574 MEGA \ub370\uc2a4\ud06c\ud1b1 \uc571\uc744 \uc0ac\uc6a9\ud558\uc5ec \ub2e4\uc6b4\ub85c\ub4dc",
-    "16735": "\ud504\ub85c\ud544 \uc218\uc815",
     "16763": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428",
     "16861": "MEGA \ub370\uc2a4\ud06c\ud1b1 \ud074\ub77c\uc774\uc5b8\ud2b8\ub97c \uc124\uce58\ud558\uc138\uc694",
     "16862": "\ube0c\ub77c\uc6b0\uc800\uc5d0\uc11c \ud5a5\uc0c1\ub41c \ud30c\uc77c \uc804\uc1a1 \uc131\ub2a5",
@@ -2604,6 +2603,7 @@
     "19087": "Number Of Users",
     "19088": "Total Storage Usage",
     "19089": "Total Transfer Usage",
+    "19090": "View Plan",
     "19091": "Transfer usage",
     "19092": "Disable User",
     "19093": "View User",
@@ -2613,6 +2613,14 @@
     "19098": "Are you sure you want to disable [B]{0}[\/B]\u2019s user?",
     "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "Disabling the user did not work.",
-    "19101": "Are you sure you want to re-enable [B]{0}[\/B]?\u2019s user?",
-    "19102": "Note: This action will take up user quota."
+    "19101": "Are you sure you want to re-enable [B]{0}[\/B]\u2019s user?",
+    "19102": "Note: This will increase the number of licences used.",
+    "19103": "Add More",
+    "19104": "Invite People to Team",
+    "19116": "Verification emails have been sent",
+    "19117": "User accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.",
+    "19119": "\ud734\ub300\uc804\ud654\uc758 \uc5f0\ub77d\ucc98 \ubaa9\ub85d\uc5d0\uc11c \uc120\ud0dd\ud558\uac70\ub098 \uc5ec\ub7ec \uc774\uba54\uc77c \uc8fc\uc18c\ub97c \uc785\ub825\ud558\uc138\uc694.",
+    "19120": "\uc2a4\uce94\ud560 QR \ucf54\ub4dc\ub97c \uae30\uae30\uc758 \uce74\uba54\ub77c\uc640 \uc815\ub82c\ud558\uc138\uc694",
+    "19121": "MEGA\uc758 \uc554\ud638\ud654 \uae30\uc220\ub85c \uc778\ud558\uc5ec \ub370\uc774\ud130 \uc190\uc2e4 \uc5c6\uc774 \ube44\ubc00\ubc88\ud638\ub97c \ucd08\uae30\ud654\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \ube44\ubc00\ubc88\ud638\ub97c \ubc18\ub4dc\uc2dc \uae30\uc5b5\ud558\ub3c4\ub85d \ud558\uc138\uc694.\r\n                                ",
+    "19122": "\ub2e4\uc2dc \ubcf4\uc5ec\uc8fc\uc9c0 \ub9c8\uc138\uc694"
 }

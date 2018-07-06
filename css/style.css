@@ -26547,41 +26547,44 @@ opacity: 1;
     left: 0;
 }
 
-.user-management-verification-dialog .verification-user-container .avatar {
-    width:48px;
+.verification-container .avatar {
+    width: 48px;
     height: 48px;
-    border:1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
     border-radius: 100%;
-    padding:4px;
+    padding: 0;
     box-sizing: border-box;
     background-color: #fff;
     position: relative;
     display: inline-block;
     vertical-align: top;
+    margin: 0;
+    margin-right: 18px;
+    margin-top: -6px;
 }
 
-.user-management-verification-dialog .verification-user-container .avatar .subuser-image {
-    width:38px;
+.verification-container .avatar .subuser-image {
+    width: 38px;
     height: 38px;
-    border:1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
     border-radius: 100%;
     box-sizing: border-box;
     background-color: DodgerBlue;
     position: absolute;
 }
 
-.user-management-verification-dialog .verification-user-container .avatar .subuser-image img{
-    width:38px;
+.verification-container .avatar .subuser-image img {
+    width: 38px;
     height: 38px;
     border-radius: 100%;
     position: absolute;
 }
-.user-management-verification-dialog .verification-user-container .avatar span {
+.verification-container .avatar span {
     color: white;
     font-size: 24px;
     float: left;
-    margin-top: 0%;
-    margin-left: 29%;
+    margin-top: 15%;
+    margin-left: 36%;
 }
 
 .user-management-verification-dialog .verification-user-container .verification-user-info {
@@ -26600,11 +26603,11 @@ opacity: 1;
     color: #666;
     line-height: 18px;
 }
-.verification-user-container .verification-user-info .sub-e {
-    display:inline;
+.verification-container .verification-user-info .sub-e {
+    display: inline;
 }
-.verification-user-container .verification-user-info .sub-p {
-    display:inline;
+.verification-container .verification-user-info .sub-p {
+    display: inline;
 }
 .user-management-verification-dialog .verification-user-container .verification-user-info .verification-user-email {
     margin-bottom: 12px;

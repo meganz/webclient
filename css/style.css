@@ -25337,14 +25337,17 @@ opacity: 1;
     opacity: 0.4;
 }
 
+.fm-right-files-block {
+    margin-left: 304px;
+}
+
 .user-management-overview-bar{
     height:64px;
-    width:calc(100% - 304px);
-    position: fixed;
+    width: 100%;
+    position: absolute;
     bottom: 0px;
     background-color: rgba(250,250,250,1);
     z-index: 102;
-    display: block;
 }
 
 .user-management-overview-bar::before{
@@ -25356,9 +25359,10 @@ opacity: 1;
 }
 
 .user-management-overview-bar-data{
-    width:1000px;
-    position: relative;
-    margin:auto;
+    width:990px;
+    position: absolute;
+    margin-left: -455px;
+    left:50%;
 }
 
 
@@ -25405,7 +25409,7 @@ opacity: 1;
     line-height: 18px;
     padding: 7px 8px 0 0;
     float: left;
-    width: 125px;
+    max-width: 180px;
 }
 
 .user-management-overview-bar-data .info-block .title2 {
@@ -25606,20 +25610,6 @@ opacity: 1;
     color: white;
 }
 
-.user-management .nw-fm-tree-header.user-management {
-    display: block;
-}
-
-.grid-table-header-user-management th:not(:first-child)::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    bottom: 1px;
-    height: 20px;
-    width: 1px;
-    background-color: rgba(0,0,0,0.1);
-}
-
 .grid-table.user-management tr:nth-child(even) {
     background-color: rgba(250,250,250,1);
 }
@@ -25720,13 +25710,13 @@ opacity: 1;
     border-bottom: 1px solid rgba(0,0,0,0.1);
     background-color: #ffffff;
     position: relative;
-    display: block;
 }
 
 .files-grid-view.user-management-view .subaccount-img-big {
     width: 162px;
     height: 162px;
     border-radius: 4px;
+    transition: 0.1s;
 }
 
 .user-management-subuser-profile-container .subaccount-img-big {
@@ -25881,13 +25871,13 @@ opacity: 1;
 }
 
 .user-management-subuser-profile-container .profile-button-container {
-    display: block;
     position: relative;
     margin-top: 24px;
 }
 
 .user-management-subuser-profile-container .default-white-button-user-management{
     margin-right: 12px;
+    vertical-align: top;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile .default-gray-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
@@ -25917,7 +25907,6 @@ opacity: 1;
     width:auto;
     height: auto;
     position: relative;
-    display: block;
     padding:0 40px;
 }
 
@@ -25995,7 +25984,7 @@ opacity: 1;
    font-family:source_sans_prolight;
 }
 
-.subaccount-view-used-storage-transfer {
+.subaccount-view-used-data {
     width:100%;
     box-sizing: border-box;
     height: auto;
@@ -26004,27 +25993,13 @@ opacity: 1;
     padding:0px 40px;
 }
 
-/*
-.subaccount-view-used-storage-transfer::after{
-    content: '';
-    display: inline-block;
-    width:1px;
-    height: 100%;
-    position: absolute;
-    right: 0;
-    top: 24px;
-    background-color: rgba(0,0,0,0.1);
-}
-
-*/
-
-.subaccount-view-used-storage-transfer .used-storage-info{
+.subaccount-view-used-data .used-storage-info{
     width:100%;
     height: 24px;
     margin-bottom: 16px;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .folder-small-icon{
+.subaccount-view-used-data .used-storage-info .folder-small-icon{
     width:16px;
     height: 16px;
     margin:4px 0;
@@ -26033,31 +26008,31 @@ opacity: 1;
     float: left;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .folder-small-icon.cloud{
+.subaccount-view-used-data .used-storage-info .folder-small-icon.cloud{
     background-position: -3px -11896px;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .folder-small-icon.inbox{
+.subaccount-view-used-data .used-storage-info .folder-small-icon.inbox{
     background-position: -29px -11896px;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .folder-small-icon.income{
+.subaccount-view-used-data .used-storage-info .folder-small-icon.income{
     background-position: -3px -11917px;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .folder-small-icon.rubbish{
+.subaccount-view-used-data .used-storage-info .folder-small-icon.rubbish{
     background-position: -28px -11917px;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .folder-small-icon.files{
+.subaccount-view-used-data .used-storage-info .folder-small-icon.files{
     background-position: -4px -11022px;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .folder-small-icon.tiny-clock{
+.subaccount-view-used-data .used-storage-info .folder-small-icon.tiny-clock{
     background-position: -13px -728px;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .ff-name{
+.subaccount-view-used-data .used-storage-info .ff-name{
     font-size: 14px;
     color: #666666;
     line-height: 24px;
@@ -26071,11 +26046,11 @@ opacity: 1;
     text-overflow: ellipsis;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info * {
+.subaccount-view-used-data .used-storage-info * {
     float: left;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .ff-number{
+.subaccount-view-used-data .used-storage-info .ff-number{
     font-size: 14px;
     color: #999;
     line-height: 24px;
@@ -26084,7 +26059,7 @@ opacity: 1;
     width:400px;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .file-number,.subaccount-view-used-storage-transfer .used-storage-info .folder-number{
+.subaccount-view-used-data .used-storage-info .file-number,.subaccount-view-used-data .used-storage-info .folder-number{
     font-size: 14px;
     color: #999;
     line-height: 24px;
@@ -26092,7 +26067,7 @@ opacity: 1;
     display: inline-block;
     padding:0 12px;
 }
-.subaccount-view-used-storage-transfer .used-storage-info .folder-number::after {
+.subaccount-view-used-data .used-storage-info .folder-number::after {
     content: " ";
     height: 16px;
     width: 2px;
@@ -26103,7 +26078,7 @@ opacity: 1;
     position: absolute;
 }
 
-.subaccount-view-used-storage-transfer .used-storage-info .ff-occupy{
+.subaccount-view-used-data .used-storage-info .ff-occupy{
     font-size: 14px;
     color: #999999;
     line-height: 24px;
@@ -26160,11 +26135,10 @@ opacity: 1;
 .user-management-overview-container .user-analysis-container {
     position: relative;
     min-width: 695px;
-    max-width:1200px;
+    max-width:1400px;
     width: 90%;
-    height: 210px;
+    height: 242px;
     margin: 24px auto 12px auto;
-    display: block;
     box-sizing: border-box;
     box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
     background-color: #ffffff;
@@ -26192,10 +26166,9 @@ opacity: 1;
 
 .user-management-overview-container .user-analysis-container .user-segments-container {
     width:25%;
-    height: 162px;
+    height: 194px;
     float: left;
-    position: relative;
-    display: block;  
+    position: relative; 
 }
 
 .user-management-overview-container .user-analysis-container .user-segments-container:nth-child(2) {
@@ -26221,18 +26194,19 @@ opacity: 1;
     font-size: 64px;
     font-weight: 300;
     line-height: 72px;
-    margin-bottom:4px;
+    margin-bottom:12px;
    font-family:source_sans_prolight;
 }
 
 .user-management-overview-container .user-analysis-container .user-segments-container .user-segment-trend{
-    width:100%;
+    width:96%;
     text-align: center;
     color:#999999;
     font-size: 13px;
-    line-height: 14px;
+    line-height: 20px;
     margin-top: 0px;
     margin-bottom:24px;
+    margin-left: 2%;
     min-width: 175px;
 
 }
@@ -26256,7 +26230,7 @@ opacity: 1;
 .user-management-overview-container .data-analysis-container {
     position: relative;
     min-width: 695px;
-    max-width:1200px;
+    max-width:1400px;
     width: 90%;
     height: auto;
     margin: 12px auto 12px auto;
@@ -26266,7 +26240,7 @@ opacity: 1;
 
 .user-management-overview-container .data-analysis-container .storage-analysis-container {
     position: relative;
-    width: 40%;
+    width: 35%;
     height: auto;
     margin: 0 12px 12px 1px;
     display: inline-block;
@@ -26440,7 +26414,6 @@ opacity: 1;
     position: relative;
     height: 18px;
     width: auto;
-    display: block;
     margin:0 24px 16px 24px;
 }
 
@@ -26497,9 +26470,8 @@ opacity: 1;
 .user-management-overview-container .data-analysis-container .transfer-analysis-container {
     position: relative;
     right: 1px;
-    width: 58.5%;
+    width: 63.5%;
     height: auto;
-    display: inline-block;
     box-sizing: border-box;
     box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
     background-color: #ffffff;
@@ -26556,7 +26528,7 @@ opacity: 1;
     right: 24px;
     top: 35px;
     position: absolute;
-    max-width: 320px;
+    margin-left: 300px;
     font-family:source_sans_prolight;
 }
 
@@ -26569,7 +26541,6 @@ opacity: 1;
     width: 100%;
     height: auto;
     position: relative;
-    display: block;
 }
 
 .user-management-overview-container .daily-transfer-container .daily-transfer-title {
@@ -26634,14 +26605,12 @@ opacity: 1;
     width:90%;
     height: 150px;
     position: relative;
-    display: block;
     margin: 60px auto 24px auto;
 }
 
 .user-management-overview-container .daily-transfer-flow-container .daily-transfer-flow {
     width:7%;
     height: 120px;
-    display: block;
     box-sizing: border-box;
     float: left;
     position: relative;
@@ -26668,7 +26637,6 @@ opacity: 1;
 .user-management-overview-container .daily-transfer-flow-container .daily-transfer-measure {
     width:93%;
     height: 120px;
-    display: block;
     box-sizing: border-box;
     position: absolute;
     right: 0;
@@ -26686,7 +26654,6 @@ opacity: 1;
 .user-management-overview-container .daily-transfer-flow-container .daily-transfer-data {
     width:93%;
     height: 120px;
-    display: block;
     box-sizing: border-box;
     position: absolute;
     right: 0;
@@ -26726,7 +26693,6 @@ opacity: 1;
 .user-management-overview-container .daily-transfer-flow-container .daily-transfer-date {
     width:100%;
     height: 30px;
-    display: block;
     box-sizing: border-box;
     position: absolute;
     bottom: 0;
@@ -26737,7 +26703,6 @@ opacity: 1;
     color: #999999;
     position: relative;
     float: left;
-    display: inline-block;
     margin-top:12px;
 }
 
@@ -26842,7 +26807,6 @@ opacity: 1;
     margin:16px 0 0 12px;
     float: left;
     position: relative;
-    display: inline-block;
     content: ""; 
     background-color: #ffffff;
     border: 1px solid rgba(0,0,0,0.1);
@@ -26852,18 +26816,17 @@ opacity: 1;
     transition: 0.2s;
 }
 
-.user-management-grid-table a:hover .subaccount-selection-button, .user-management-grid-table a:hover .subaccount-button, .user-management-grid-table a:hover .subaccount-selection-button::before {
-    visibility: visible;
-}
-
 .user-management-grid-table a:hover {
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+}
+
+.user-management-grid-table a:hover .subaccount-selection-button, .user-management-grid-table a:hover .subaccount-button, .user-management-grid-table a:hover .subaccount-selection-button::before {
+    display: inline-block;
 }
 
 .user-management-grid-table .subaccount-img-big {
     margin: 4px 4px 0 4px;
     position: relative;
-    display: inline-block;
     box-sizing: border-box;
     border-radius: 2px;
     background-color: lightblue;
@@ -26876,7 +26839,6 @@ opacity: 1;
     border-radius: 100%;
     border:1px solid rgba(0,0,0,0.1);
     background-color: #ffffff;
-    display: inline-block;
     position: absolute;
     right: 8px;
     top: 8px;
@@ -26918,7 +26880,6 @@ opacity: 1;
     border:1px solid rgba(0,0,0,0.1);
     box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
     background-color: #ffffff;
-    display: inline-block;
     position: absolute;
     right: 8px;
     bottom: 8px;
@@ -26954,7 +26915,7 @@ opacity: 1;
     position: relative;
     margin:8px 0 2px 8px;
     float: left;
-        max-width: 130px;
+    max-width: 130px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -27261,8 +27222,6 @@ opacity: 1;
     background-repeat: no-repeat;
     display: inline-block;
     width:48px;
-    height: 48px;
-    display: inline-block;
     position: relative;
 }
 
@@ -27272,7 +27231,6 @@ opacity: 1;
     display: inline-block;
     width:56px;
     height: 56px;
-    display: inline-block;
     position: relative;
 }
 
@@ -27414,13 +27372,12 @@ opacity: 1;
     display: inline-block;
     vertical-align: top;
     margin: 0;
-    margin-right: 18px;
-    margin-top: -6px;
 }
 
 .verification-container .avatar .subuser-image {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
+    margin:2px;
     border: 1px solid rgba(0,0,0,0.1);
     border-radius: 100%;
     box-sizing: border-box;
@@ -27429,8 +27386,8 @@ opacity: 1;
 }
 
 .verification-container .avatar .subuser-image img {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
     border-radius: 100%;
     position: absolute;
 }
@@ -27443,7 +27400,7 @@ opacity: 1;
 }
 
 .user-management-add-user-dialog .verification-container .verification-user-info {
-    width: 320px;
+    width: 400px;
     margin-left: 24px;
     position: relative;
     display: inline-block;
@@ -27466,8 +27423,9 @@ opacity: 1;
     display: inline;
     user-select: text;
 }
-.user-management-verification-dialog .verification-user-container .verification-user-info .verification-user-email {
+.user-management-add-user-dialog .verification-container .verification-user-info .verification-user-email {
     margin-bottom: 12px;
+
 }
 
 .user-management-add-user-dialog .verification-container .verification-user-info b {
@@ -27479,7 +27437,7 @@ opacity: 1;
 .user-management-add-user-dialog .verification-container .checked-icon56.icon56 {
     position: absolute;
     right: 40px;
-    top: 32px;
+    top: 28px;
 }
 
 .user-management-edit-profile-dialog {
@@ -27551,7 +27509,7 @@ opacity: 1;
     border-radius: 0 0 8px 8px;
 }
 
-.user-management-verification-dialog .dialog-button-container::before, .user-management-edit-profile-dialog .dialog-button-container::before, .user-management-able-user-dialog .dialog-button-container::before, .user-management-edit-profile-dialog .dialog-button-container::before {
+.user-management-edit-profile-dialog .dialog-button-container::before, .user-management-able-user-dialog .dialog-button-container::before, .user-management-edit-profile-dialog .dialog-button-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -27591,7 +27549,6 @@ opacity: 1;
 
 .user-management-able-user-dialog .icon56{
     margin: 40px 32px auto 40px;
-    display: inline-block;
     position: relative;
     vertical-align: top;
 }
@@ -27630,23 +27587,23 @@ opacity: 1;
     display: inline-block;
 }
 
+.files-grid-view.user-management-view {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: -webkit-calc(100% - 48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
+    position: relative;
+    top: -1px;
+    overflow: hidden;
+}
+
 .user-management-landing-page{
     position: relative;
     width: 100%;
     height: 100%;
-    display: block;
     background-color: #fff;
-}
-
-.user-management-landing-page::before {
-    content: "";
-    width: 100%;
-    height: 1px;
-    display: block;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 .user-management-landing-page .landing-page-container{
@@ -27815,7 +27772,7 @@ opacity: 1;
     background-color: #fafafa;
 }
 
-.user-management-view .user-management-account-settings .auto-save {
+.user-management-account-settings .auto-save {
     position: fixed;
     top: 30px;
     left: 50%;
@@ -27992,10 +27949,23 @@ opacity: 1;
     display: block;
     position: relative;
     margin-bottom: 24px;
-}
+}xs
 
 .user-management-account-settings .option-group .list {
     max-height: 200px;
+}
+
+.user-management-account-settings .dialog{
+    border: 1px solid rgba(0,0,0,0.15);
+    background-color: white;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 
@@ -28487,12 +28457,6 @@ opacity: 1;
     display: none;
 }
 
-.user-management-account-settings .sub-admin-table tr:hover td:nth-child(6) .icon {
-    display: inline-block;
-}
-
-
-
 .user-management-account-settings .sub-admin-table tr td .checkdiv {
     margin-left: 2px;
 }
@@ -28630,10 +28594,6 @@ opacity: 1;
     margin-bottom: 24px;
 }
 
-.user-management-view .disappear, .user-management-dialog .disappear, .user-management-overview-bar .disappear, .fm-left-panel.user-management .disappear, .fm-right-header-user-management .disappear{
-    visibility: hidden;
-}
-
 .user-management-view .disabled, .user-management-dialog .disabled, .user-management-overview-bar .disabled, .fm-left-panel.user-management .disabled, .fm-right-header-user-management .disabled{
     opacity: 0.3;
 }
@@ -28643,20 +28603,6 @@ opacity: 1;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     height: 100%;
-    position: relative;
-    top: -1px;
-    overflow: hidden;
-}
-
-.files-grid-view.user-management-view {
-    /*display: block;*/
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    height: 100%;
-    height: -webkit-calc(100% - 48px);
-    height: -moz-calc(100% - 48px);
-    height: calc(100% - 48px);
     position: relative;
     top: -1px;
     overflow: hidden;
@@ -28674,32 +28620,27 @@ opacity: 1;
     height: 24px;
 }
 
-.header-table-user-management .grid-table-header-user-management {
-    width: 100%;
-    height: 24px;
-}
-
 .user-management-list-table .grid-scrolling-table .jspPane{
+    -webkit-background-size: auto 128px;
+    -moz-background-size: auto 128px;
     background-size: auto 128px;
+    background-repeat: repeat;
+    background-image: url(../images/mega/grid-bg3.svg);
+    background-position: left top;
+
 }
 
-.user-management-list-table .grid-table-user-management {
+.user-management-view .user-management-list-table .grid-scrolling-table {
     width: 100%;
+    height: calc(100% - 84px);
+    height: -webkit-calc(100% - 84px);
+    height: -moz-calc(100% - 84px);
     border-collapse: collapse;
-}
-
-.grid-table-header-user-management::after {
-    content: '';
-    width: 100%;
-    height: 1px;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
 }
 
 .user-management-list-table .header-table-user-management tr {
     height: 24px;
+    width: 100%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -28710,11 +28651,36 @@ opacity: 1;
     overflow: visible;
 }
 
+.user-management-list-table .header-table-user-management tr::before {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    top: 23px;
+    left: 0;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+}
+
 .user-management-list-table .header-table-user-management tr th{
     line-height: 24px;
     font-size: 14px;
     color: #666;
     padding: 0 12px;
+}
+
+.user-management-list-table .header-table-user-management tr th:not(:first-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 1px;
+    height: 20px;
+    width: 1px;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.user-management-list-table .grid-table-user-management{
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .user-management-list-table .grid-table-user-management tr {
@@ -28730,6 +28696,10 @@ opacity: 1;
 
 .user-management-list-table .grid-scrolling-table tr td {
     padding:0 12px;
+}
+
+.user-management-list-table .grid-scrolling-table .business-sub-storage-use span, .user-management-list-table .grid-scrolling-table .business-sub-transfer-use span{
+    margin:32px;
 }
 
 .user-management-list-table tr th:first-child,.user-management-list-table tr td:first-child {
@@ -28754,18 +28724,15 @@ opacity: 1;
 .user-management-view .user-management-list-table .user-management-status{
     margin:28px 8px 0 0;
 }
-
-.user-management-list-table .grid-table-user-management tr td {
-    background-color: #fff;
-}
-
-.user-management-list-table .grid-table-user-management tr.tr-gray td {
+/*
+.user-management-list-table .grid-table-user-management tr:nth-child(odd) td{
     background-color: rgba(250,250,250,1);
 }
 
 .user-management-list-table .grid-table-user-management tr.tr-white td {
     background-color: #fff;
 }
+*/
 
 .user-management-list-table .grid-table-user-management tr:hover td {
     background-color:rgba(245,245,245,1);
@@ -28787,7 +28754,7 @@ opacity: 1;
     display: none;
 }
 
-.files-grid-view.user-management-view .user-management-list-table tr:hover .icon {
+.files-grid-view.user-management-view .user-management-list-table .grid-table-user-management tr:hover .icon {
    display: inline-block;
 }
 
@@ -28807,12 +28774,16 @@ opacity: 1;
     padding: 0px 15px;
 }
 
+.user-management-list-table .header-table-user-management tr th, .user-management-list-table tr td {
+    overflow: hidden;
+}
+
 .user-management-list-table .header-table-user-management tr th:nth-child(1), .user-management-list-table tr td:nth-child(1){
     width:32px;
 }
 
 .user-management-list-table .header-table-user-management tr th:nth-child(2), .user-management-list-table tr td:nth-child(2){
-    min-width:220px;
+    min-width:200px;
 }
 
 
@@ -28822,12 +28793,12 @@ opacity: 1;
 }
 
 .user-management-list-table .header-table-user-management tr th:nth-child(4), .user-management-list-table tr td:nth-child(4){
-    min-width:118px;
+    min-width:128px;
     width: 200px;
 }
 
 .user-management-list-table .header-table-user-management tr th:nth-child(5), .user-management-list-table tr td:nth-child(5){
-    min-width:118px;
+    min-width:128px;
     width: 200px;
 }
 
@@ -28952,11 +28923,6 @@ opacity: 1;
     opacity: 1;
 }
 
-.user-management-view .scroll-auto, .user-management-dialog .scroll-auto {
-    overflow: auto;
-    height: 100%;
-    width: 100%;
-}
 .fm-left-panel.user-management .fm-tree-panel {
     height: -webkit-calc(100% - 132px);
     height: -moz-calc(100% - 132px);
@@ -28969,13 +28935,13 @@ opacity: 1;
 
 
 @media only screen and (max-width: 1270px) {
-    .subaccount-view-used-storage-transfer .used-storage-info .ff-name{
+    .subaccount-view-used-data .used-storage-info .ff-name{
         width: 200px;
     }
-    .subaccount-view-used-storage-transfer .used-storage-info .ff-number{
-        width: 300px;
+    .subaccount-view-used-data .used-storage-info .ff-number{
+        width: 240px;
     }
-    .subaccount-view-used-storage-transfer .used-storage-info .ff-occupy{
+    .subaccount-view-used-data .used-storage-info .ff-occupy{
         width: 100px;
     }
 
@@ -28987,12 +28953,25 @@ opacity: 1;
         width: 200px;
     }
 
+    .user-management-subuser-profile-container .default-white-button-user-management{
+        max-width: 188px;
+        left: -32px;
+        height: auto;
+    }
+
+    .user-management-subuser-profile-container .user-management-subuser-profile .default-gray-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
+        right: 24px;
+    }
+
     .user-management-overview-bar-data {
         width: 640px;
+        left: 50%;
+        margin-left: -320px;
     }
 
     .user-management-overview-bar-data .info-block .title {
-    max-width: 110px;
+       max-width: 130px;
+       min-width: 110px;
     }    
 
     .user-management-overview-bar-data .info-block .icon, .user-management-overview-bar-data .default-white-button-user-management {

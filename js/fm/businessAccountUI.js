@@ -7,6 +7,7 @@ function BusinessAccountUI() {
     if (!mega.buinsessController) {
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
+        mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler);
     }
     else {
         this.business = mega.buinsessController;
@@ -132,9 +133,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
         // now let's fill the table with sub-users data
          //for (var a = 0; a < 50; a++) {
+        var isGray = true;
+        var colorBg = false;
             for (var h in subUsers) {
                 var $currUser = $tr_user.clone(true); // sub-users table
                 var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
+                colorBg = false;
 
                 $currUser.attr('id', subUsers[h].u);
                 $currUserLeftPane.attr('id', subUsers[h].u);
@@ -154,11 +158,13 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     $currUser.find('.user-management-status').addClass('enabled');
                     $currUserLeftPane.find('.user-management-status').removeClass('pending disabled')
                         .addClass('enabled');
+                    colorBg = true;
                 }
                 else if (subUsers[h].s === 10) {
                     $currUser.find('.user-management-status').addClass('pending');
                     $currUserLeftPane.find('.user-management-status').removeClass('enabled disabled')
                         .addClass('pending');
+                    colorBg = true;
                 }
                 else {
                     $currUser.find('.user-management-status').addClass('disabled');
@@ -168,7 +174,17 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     $currUserLeftPane.addClass('hidden');
                 }
                 $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
-                // still usage data.
+
+                if (colorBg) {
+                    if (isGray) {
+                        $currUser.addClass('tr-gray');
+                    }
+                    else {
+                        $currUser.removeClass('tr-gray');
+                    }
+                    isGray = !isGray;
+                }
+
                 $detailListTable.append($currUser);
 
                 // left pane part
@@ -233,11 +249,21 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             }
 
             var $subUsersTableRow = $('tr', $usersTable);
+            var isGray = true;
 
             for (var h = 1; h < $subUsersTableRow.length; h++) {
                 if (me.hasClass('enabled-accounts')) {
                     if (!$($subUsersTableRow[h]).find('.user-management-status').hasClass('disabled')) {
                         $($subUsersTableRow[h]).removeClass('hidden');
+                        if (isGray) {
+                            $($subUsersTableRow[h]).addClass('tr-gray');
+                        }
+                        else {
+                            $($subUsersTableRow[h]).removeClass('tr-gray');
+                        }
+                        isGray = !isGray;
+                        $($subUsersTableRow[h]).find('.dis-en-icon').removeClass('enable-icon')
+                            .addClass('disabled-icon').find('.tooltip').text(l[19092]);
                     }
                     else {
                         $($subUsersTableRow[h]).addClass('hidden');
@@ -246,6 +272,15 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 else {
                     if ($($subUsersTableRow[h]).find('.user-management-status').hasClass('disabled')) {
                         $($subUsersTableRow[h]).removeClass('hidden');
+                        if (isGray) {
+                            $($subUsersTableRow[h]).addClass('tr-gray');
+                        }
+                        else {
+                            $($subUsersTableRow[h]).removeClass('tr-gray');
+                        }
+                        isGray = !isGray;
+                        $($subUsersTableRow[h]).find('.dis-en-icon').removeClass('disabled-icon')
+                            .addClass('enable-icon').find('.tooltip').text(l[16141]);
                     }
                     else {
                         $($subUsersTableRow[h]).addClass('hidden');
@@ -332,7 +367,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     if (reDraw) {
         fillSubUsersTable(subAccounts, this);
-        this.business.previousSubList = subAccounts; // storing current drawn sub-users to prevent not needed redraw
+        // storing current drawn sub-users to prevent not needed redraw
+        this.business.previousSubList = JSON.parse(JSON.stringify(subAccounts));
     }
 
     // getting quotas
@@ -524,6 +560,8 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
                         var opPromise = mySelf.business.deActivateSubAccount(subUserHandle);
                         opPromise.done(
                             function () {
+                                // action packet will update DB. [+ memory]
+                                // subUser.s = 11; // disabled
                                 mySelf.viewSubAccountInfoUI(subUserHandle);
                             }
                         ).fail(
@@ -538,6 +576,22 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             }
             else {
                 // enable on
+                var confirmationDlgResultHandler2 = function (adminAnswer) {
+                    if (adminAnswer) {
+                        var opPromise = mySelf.business.activateSubAccount(subUserHandle);
+                        opPromise.done(
+                            function (st,res,req) {
+                                mySelf.viewSubAccountInfoUI(subUserHandle);
+                            }
+                        ).fail(
+                            function () {
+                                msgDialog('warningb', '', l[19128]);
+                            }
+                        );
+                    }
+                };
+
+                mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler2, uName, true);
             }
         });
 
@@ -594,8 +648,9 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     
 
     $businessAccountContainer.removeClass('hidden'); // BA container
-    $subAccountContainer.removeClass('hidden'); // sub-info container
+    $subAccountContainer.removeClass('hidden').attr('id', 'sub-' + subUserHandle); // sub-info container
     $subHeader.removeClass('hidden');
+    $subAccountContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
 };
 
 
@@ -765,123 +820,104 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
     // $('.default-green-button-user-management', $dialog).addClass('disabled');
 
     var clearDialog = function () {
-        var usersRows = $('.dialog-tree-panel-scroll.add-user .input-user', $dialog);
-        if (usersRows.length > 1) {
-            for (var k = 1; k < usersRows.length; k++) {
-                usersRows.get(k).remove();
-            }
-        }
-        $('input', usersRows).val('');
+        var $adduserContianer = $('.dialog-input-container', $dialog);
+        // if (usersRows.length > 1) {
+        //    for (var k = 1; k < usersRows.length; k++) {
+        //        usersRows.get(k).remove();
+        //    }
+        // }
+        $('input', $adduserContianer).val('');
+        $adduserContianer.removeClass('hidden');
+        $('.error-message', $adduserContianer).addClass('hidden');
+        $('.verification-container', $dialog).addClass('hidden');
+        $('.dialog-subtitle', $dialog).addClass('hidden');
+        $('.dialog-button-container .add-more', $dialog).addClass('hidden');
+        $('.dialog-button-container .add-sub-user', $dialog).text(l[19084]).removeClass('a-ok-btn');
+        $('.licence-bar', $dialog).removeClass('hidden');
     };
 
     clearDialog(); // remove any previous data
 
-    // event handler for "X" icon to close the dialog or "X" on the row.
+    // event handler for "X" icon to close the dialog
     $('.delete-img.icon', $dialog).off('click.subuser')
         .on('click.subuser', function exitIconClickHandler() {
-            if ($(this).hasClass('ex-dlg')) {
-                closeDialog();
-            }
-            else {
-                if ($('.dialog-tree-panel-scroll.add-user .input-user', $dialog).length > 1) {
-                    $(this).parent().remove();
-                    $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
-                        .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
-                }
-            }
+            closeDialog();
         });
 
     // event handler for clicking on "add more"
-    $('.default-button-no-border.add-more', $dialog).off('click.subuser')
+    $('.dialog-button-container .add-more', $dialog).off('click.subuser')
         .on('click.subuser', function addMoreClickHandler() {
-            var newRow = userRow.clone(true);
-            $('.dialog-tree-panel-scroll.add-user .dialog-input-container .jspPane', $dialog).append(newRow);
-            $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
-                .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+            clearDialog();
         });
 
     // event handler for adding sub-users
-    $('.default-green-button-user-management.add-sub-user', $dialog).off('click.subuser')
+    $('.dialog-button-container .add-sub-user', $dialog).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
             if ($(this).hasClass('disabled')) {
                 return;
             }
-            var isOK = true;
-            var inputs = $('.input-user input', $dialog);
-            for (var k = 0; k < inputs.length; k++) {
-                var $currInput = $(inputs[k]);
-                if (!$currInput.hasClass('error')) {
-                    if ($currInput.hasClass('sub-n')) {
-                        if (!$currInput.val().length || $currInput.val().split(' ', 2).length < 2) {
-                            $currInput.addClass('error');
-                            $currInput.parent().append('<div class="error-message">' + l[1098] + '</div>');
-                            isOK = false;
-                        }
-                    }
-                    else if ($currInput.hasClass('sub-m')) {
-                        if (checkMail($currInput.val())) {
-                            $currInput.addClass('error');
-                            $currInput.parent().append('<div class="error-message">' + l[5705] + '</div>');
-                            isOK = false;
-                        }
-                    }
+            if ($(this).hasClass('a-ok-btn')) {
+                closeDialog();
+                return;
+            }
+
+            var $uName = $('.input-user input.sub-n', $dialog);
+            var $uEmail = $('.input-user input.sub-m', $dialog);
+
+            if (!$uName.val().length || $uName.val().split(' ', 2).length < 2) {
+                $uName.addClass('error');
+                $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1098]);
+                return;
+            }
+            if (checkMail($uEmail.val())) {
+                $uEmail.addClass('error');
+                $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[5705]);
+                return;
+            }
+
+            loadingDialog.pshow();
+
+            var subName = $uName.val(); // i know it's 2 parts at least
+            var subEmail = $uEmail.val();
+            var subFnLn = subName.split(' ');
+
+            if (subFnLn.length < 2) {
+                console.error('name does not consist of 2 parts, how did we get here?');
+                return;
+            }
+
+            var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '));
+
+
+            var finalizeOperation = function (st,res,req) {
+                var $addContianer = $('.dialog-input-container', $dialog);
+                var $resultContianer = $('.verification-container', $dialog);
+
+                if (st === 1) {
+                    var subUserDefaultAvatar = useravatar.contact(res.u);
+                    $('.new-sub-user', $resultContianer).html(subUserDefaultAvatar);
+                    $('.sub-e', $resultContianer).text(req.m);
+                    $('.sub-p', $resultContianer).text(res.lp);
+
+                    $addContianer.addClass('hidden');
+                    $resultContianer.removeClass('hidden');
+                    $('.dialog-button-container .add-more', $dialog).removeClass('hidden');
+                    $('.dialog-button-container .add-sub-user', $dialog).text(l[81]).addClass('a-ok-btn'); // OK
+                    $('.licence-bar', $dialog).addClass('hidden');
+                    $('.dialog-subtitle', $dialog).removeClass('hidden');
                 }
                 else {
-                    isOK = false;
-                }
-            }
-            if (isOK) {
-                closeDialog();
-                loadingDialog.pshow();
-                var subUsers = $('.input-user', $dialog);
-                var promises = [];
-                for (var h = 0; h < subUsers.length; h++) {
-                    var sub = $(subUsers[h]);
-                    var subName = sub.find('input.dialog-input.sub-n').val(); // i know it's 2 parts at least
-                    var subEmail = sub.find('input.dialog-input.sub-m').val();
-                    var subFnLn = subName.split(' ');
-
-                    if (subFnLn.length < 2) {
-                        console.error('name does not consist of 2 parts, how did we get here?');
-                        return;
-                    }
-
-                    var subPromise = mySelf.business.addSubAccount(subEmail, subFnLn.shift(), subFnLn.join(' '));
-                    promises.push(subPromise);
-
+                    $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);
                 }
 
-                var finalizeOperation = function (args) {
-                    loadingDialog.phide();
-                    var results = [];
+                loadingDialog.phide();
+            };
 
-                    for (var a = 0; a < args.length; a++) {
-                        var curRes = args[a];
-                        var resObj = Object.create(null);
-                        resObj.status = curRes[0];
-                        
-                        if (curRes[0] === 1) {
-                            resObj.email = curRes[2].m;
-                            resObj.initPass = curRes[1].lp;
-                            resObj.handle = curRes[1].u;
-                        }
-                        else {
-                            resObj.email = curRes[3].m;
-                        }
-                        results.push(resObj);
-                    }
-
-                    mySelf.showAddSubUserResultDialog(results);
-
-                };
-
-                var all = MegaPromise.allDone(promises);
-                all.done(finalizeOperation);
-                all.fail(function (args) {
-                    msgDialog('warninga', 'Error', l[1679]);
-                    console.error(args);
-                });
-            }
+            subPromise.always(finalizeOperation);
+            // subPromise.fail(function (args) {
+            //    msgDialog('warninga', 'Error', l[1679]);
+            //    console.error(args);
+            // });
         });
 
     
@@ -891,16 +927,9 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
             var $me = $(this);
             if ($me.hasClass('error')) {
                 $me.removeClass('error');
-                $me.parent().find('.error-message').remove();
+                $('.dialog-input-container .error-message', $dialog).addClass('hidden')
             }
         });
-
-    var row = $('.dialog-tree-panel-scroll.add-user .input-user', $dialog);
-    var userRow = $(row).clone(true);
-    userRow.find('input').val('');
-
-    $('.dialog-tree-panel-scroll.add-user .dialog-input-container', $dialog)
-        .jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
 
     M.safeShowDialog('sub-user-adding-dlg', function () {
         return $dialog;
@@ -963,4 +992,55 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
     M.safeShowDialog('sub-user-adding-res-dlg', function () {
         return $dialog;
     });
+};
+
+BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
+    if (!subuser) {
+        return;
+    }
+
+    // private function to update left panel
+    var updateLeftSubUserPanel = function (subuser) {
+        var $usersLeftPanel = $('.fm-tree-panel .content-panel.user-management');
+        var $userRow = $('#' + subuser.u, $usersLeftPanel);
+        if (!$userRow.length) {
+            return;
+        }
+        if (subuser.s === 0) {
+            $userRow.find('.user-management-status').removeClass('pending disabled')
+                .addClass('enabled');
+        }
+        else if (subuser.s === 10) {
+            $userRow.find('.user-management-status').removeClass('enabled disabled')
+                .addClass('pending');
+        }
+        else {
+            
+            $userRow.find('.user-management-status').removeClass('enabled pending')
+                .addClass('disabled');
+            $userRow.addClass('hidden');
+        }
+        $('.user-management-tree-panel-header.disabled-accounts').trigger('click.subuser');
+    };
+
+    // if we are in table view
+    if (!$('.user-management-list-table').hasClass('hidden')) {
+        // safe to create new object.
+        var busUI = new BusinessAccountUI();
+        busUI.viewSubAccountListUI();
+    }
+    // if we are in sub-user view
+    else if (!$('.files-grid-view.user-management-view .user-management-subaccount-view-container')
+        .hasClass('hidden')) {
+        var viewedUserId =
+            $('.files-grid-view.user-management-view .user-management-subaccount-view-container').attr('id');
+        var updatedUser = 'sub-' + subuser.u;
+        if (viewedUserId === updatedUser) {
+            // safe to create new object.
+            var busUI = new BusinessAccountUI();
+            busUI.viewSubAccountInfoUI(subuser.u);
+            // update the left pane
+            updateLeftSubUserPanel(subuser);
+        }
+    } 
 };

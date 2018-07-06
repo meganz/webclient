@@ -1820,7 +1820,6 @@
     "16653": "Untuk pengalaman berfitur lengkap, unduh aplikasi kami atau gunakan situs ini di PC.",
     "16664": "Password baru harus berbeda dari yang lama.",
     "16671": "Download menggunakan aplikasi desktop MEGA untuk download lebih cepat.",
-    "16735": "Edit profile",
     "16763": "Disalin ke clipboard",
     "16861": "Install klien MEGA desktop",
     "16862": "Meningkatkan kinerja transfer file dari browser Anda",
@@ -2604,6 +2603,7 @@
     "19087": "Number Of Users",
     "19088": "Total Storage Usage",
     "19089": "Total Transfer Usage",
+    "19090": "View Plan",
     "19091": "Transfer usage",
     "19092": "Disable User",
     "19093": "View User",
@@ -2613,6 +2613,14 @@
     "19098": "Are you sure you want to disable [B]{0}[\/B]\u2019s user?",
     "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "Disabling the user did not work.",
-    "19101": "Are you sure you want to re-enable [B]{0}[\/B]?\u2019s user?",
-    "19102": "Note: This action will take up user quota."
+    "19101": "Are you sure you want to re-enable [B]{0}[\/B]\u2019s user?",
+    "19102": "Note: This will increase the number of licences used.",
+    "19103": "Add More",
+    "19104": "Invite People to Team",
+    "19116": "Verification emails have been sent",
+    "19117": "User accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.",
+    "19119": "Pilih kontak dari daftar kontak ponsel Anda atau masukkan beberapa alamat email.",
+    "19120": "Sejajarkan kode QR untuk memindainya dengan kamera perangkat Anda",
+    "19121": "Karena teknologi enkripsi MEGA, Anda tidak dapat mengatur ulang kata sandi tanpa kehilangan data. Harap pastikan Anda mengingat kata sandi Anda.",
+    "19122": "Jangan tunjukkan saya lagi"
 }

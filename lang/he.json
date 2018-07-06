@@ -1820,7 +1820,6 @@
     "16653": "\u05dc\u05d7\u05d5\u05d5\u05d9\u05d4 \u05d4\u05e9\u05dc\u05de\u05d4, \u05d4\u05d5\u05e8\u05d3 \u05d0\u05ea \u05d4\u05e4\u05dc\u05d9\u05e7\u05e6\u05d9\u05d4 \u05e9\u05dc\u05e0\u05d5 \u05d0\u05d5 \u05d4\u05e9\u05ea\u05de\u05e9 \u05d1\u05d0\u05ea\u05e8 \u05d1\u05de\u05d7\u05e9\u05d1.",
     "16664": "\u05d4\u05e1\u05d9\u05e1\u05de\u05d0 \u05d4\u05d7\u05d3\u05e9\u05d4 \u05e6\u05e8\u05d9\u05db\u05d4 \u05dc\u05d4\u05d9\u05d5\u05ea \u05e9\u05d5\u05e0\u05d4 \u05de\u05d4\u05d9\u05e9\u05e0\u05d4.",
     "16671": "\u05d4\u05d5\u05e8\u05d3 \u05e2\u05dd \u05d4\u05ea\u05db\u05e0\u05d4 \u05e9\u05dc MEGA \u05dc\u05d4\u05d5\u05e8\u05d3\u05d4 \u05de\u05d4\u05d9\u05e8\u05d4 \u05d9\u05d5\u05ea\u05e8.",
-    "16735": "\u05e2\u05e8\u05d5\u05da \u05e4\u05e8\u05d5\u05e4\u05d9\u05dc",
     "16763": "\u05d4\u05d5\u05e2\u05ea\u05e7",
     "16861": "\u05d4\u05ea\u05e7\u05df \u05d0\u05ea \u05ea\u05db\u05e0\u05ea MEGA",
     "16862": "\u05e9\u05e4\u05e8 \u05d1\u05d9\u05e6\u05d5\u05e2\u05d9 \u05d4\u05e2\u05d1\u05e8\u05ea \u05e7\u05d1\u05e6\u05d9\u05dd \u05de\u05d4\u05d3\u05e4\u05d3\u05e4\u05df \u05e9\u05dc\u05da",
@@ -2604,6 +2603,7 @@
     "19087": "Number Of Users",
     "19088": "Total Storage Usage",
     "19089": "Total Transfer Usage",
+    "19090": "View Plan",
     "19091": "Transfer usage",
     "19092": "Disable User",
     "19093": "View User",
@@ -2613,6 +2613,14 @@
     "19098": "Are you sure you want to disable [B]{0}[\/B]\u2019s user?",
     "19099": "Note: You can re-activate the user at any later stage from the disabled users list.",
     "19100": "Disabling the user did not work.",
-    "19101": "Are you sure you want to re-enable [B]{0}[\/B]?\u2019s user?",
-    "19102": "Note: This action will take up user quota."
+    "19101": "Are you sure you want to re-enable [B]{0}[\/B]\u2019s user?",
+    "19102": "Note: This will increase the number of licences used.",
+    "19103": "Add More",
+    "19104": "Invite People to Team",
+    "19116": "Verification emails have been sent",
+    "19117": "User accounts will be activated after the link in the verification emails have been confirmed and the user sets their own password.",
+    "19119": "Select contacts from your phone\u2019s contact list or enter multiple email addresses.",
+    "19120": "Line up the QR code to scan it with your device\u2019s camera",
+    "19121": "Due to MEGA\u2019s encryption technology you are unable to reset your password without data loss. Please make sure you remember your password.",
+    "19122": "Don\u2019t show me again"
 }

@@ -26546,7 +26546,7 @@ opacity: 1;
     left: 0;
 }
 
-.user-management-add-user-dialog .verification-container .avatars {
+.user-management-verification-dialog .verification-user-container .avatar {
     width:48px;
     height: 48px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26559,7 +26559,7 @@ opacity: 1;
     vertical-align: top;
 }
 
-.user-management-add-user-dialog .verification-container .avatars .subuser-image {
+.user-management-verification-dialog .verification-user-container .avatar .subuser-image {
     width:38px;
     height: 38px;
     border:1px solid rgba(0,0,0,0.1);
@@ -26569,15 +26569,22 @@ opacity: 1;
     position: absolute;
 }
 
-.user-management-add-user-dialog .verification-container .avatars .subuser-image img{
+.user-management-verification-dialog .verification-user-container .avatar .subuser-image img{
     width:38px;
     height: 38px;
     border-radius: 100%;
     position: absolute;
 }
+.user-management-verification-dialog .verification-user-container .avatar span {
+    color: white;
+    font-size: 24px;
+    float: left;
+    margin-top: 0%;
+    margin-left: 29%;
+}
 
-.user-management-add-user-dialog .verification-container .verification-user-info {
-    width: 320px;
+.user-management-verification-dialog .verification-user-container .verification-user-info {
+    width: 400px;
     margin-left: 24px;
     position: relative;
     display: inline-block;
@@ -26592,8 +26599,13 @@ opacity: 1;
     color: #666;
     line-height: 18px;
 }
-
-.user-management-add-user-dialog .verification-container .verification-user-info .verification-user-email {
+.verification-user-container .verification-user-info .sub-e {
+    display:inline;
+}
+.verification-user-container .verification-user-info .sub-p {
+    display:inline;
+}
+.user-management-verification-dialog .verification-user-container .verification-user-info .verification-user-email {
     margin-bottom: 12px;
 }
 

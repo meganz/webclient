@@ -24488,12 +24488,15 @@ opacity: 1;
     opacity: 0.4;
 }
 
+.fm-right-files-block {
+    margin-left: 304px;
+}
+
 .user-management-overview-bar{
     height:64px;
-    width:calc(100% - 304px);
-    position: fixed;
+    width: 100%;
+    position: ab;
     bottom: 0px;
-    left: 304px;
     background-color: rgba(250,250,250,1);
     z-index: 102;
     display: block;
@@ -24760,16 +24763,6 @@ opacity: 1;
 
 .user-management .nw-fm-tree-header.user-management {
     display: block;
-}
-
-.grid-table-header-user-management th:not(:first-child)::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    bottom: 1px;
-    height: 20px;
-    width: 1px;
-    background-color: rgba(0,0,0,0.1);
 }
 
 .grid-table.user-management tr:nth-child(even) {
@@ -26764,23 +26757,24 @@ opacity: 1;
     display: inline-block;
 }
 
+.files-grid-view.user-management-view {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: -webkit-calc(100% - 48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
+    position: relative;
+    top: -1px;
+    overflow: hidden;
+}
+
 .user-management-landing-page{
     position: relative;
     width: 100%;
     height: 100%;
     display: block;
     background-color: #fff;
-}
-
-.user-management-landing-page::before {
-    content: "";
-    width: 100%;
-    height: 1px;
-    display: block;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 .user-management-landing-page .landing-page-container{
@@ -27785,20 +27779,6 @@ opacity: 1;
     overflow: hidden;
 }
 
-.files-grid-view.user-management-view {
-    display: block;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    height: 100%;
-    height: -webkit-calc(100% - 48px);
-    height: -moz-calc(100% - 48px);
-    height: calc(100% - 48px);
-    position: relative;
-    top: -1px;
-    overflow: hidden;
-}
-
 .user-management-view .user-management-list-table {
     position: relative;
     height: 100%;
@@ -27811,32 +27791,23 @@ opacity: 1;
     height: 24px;
 }
 
-.header-table-user-management .grid-table-header-user-management {
-    width: 100%;
-    height: 24px;
-}
-
 .user-management-list-table .grid-scrolling-table .jspPane{
+    -webkit-background-size: auto 128px;
+    -moz-background-size: auto 128px;
     background-size: auto 128px;
 }
 
-.user-management-list-table .grid-table-user-management {
+.user-management-view .user-management-list-table .grid-scrolling-table {
     width: 100%;
+    height: calc(100% - 84px);
+    height: -webkit-calc(100% - 84px);
+    height: -moz-calc(100% - 84px);
     border-collapse: collapse;
-}
-
-.grid-table-header-user-management::after {
-    content: '';
-    width: 100%;
-    height: 1px;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
 }
 
 .user-management-list-table .header-table-user-management tr {
     height: 24px;
+    width: 100%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -27847,11 +27818,31 @@ opacity: 1;
     overflow: visible;
 }
 
+.user-management-list-table .header-table-user-management tr::after {
+    content: '';
+    width: 100%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+}
+
 .user-management-list-table .header-table-user-management tr th{
     line-height: 24px;
     font-size: 14px;
     color: #666;
     padding: 0 12px;
+}
+
+.user-management-list-table .header-table-user-management tr th:not(:first-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 1px;
+    height: 20px;
+    width: 1px;
+    background-color: rgba(0,0,0,0.1);
 }
 
 .user-management-list-table .grid-table-user-management tr {
@@ -27920,7 +27911,7 @@ opacity: 1;
     display: none;
 }
 
-.files-grid-view.user-management-view .user-management-list-table tr:hover .icon {
+.files-grid-view.user-management-view .user-management-list-table .grid-table-user-management tr:hover .icon {
    display: inline-block;
 }
 

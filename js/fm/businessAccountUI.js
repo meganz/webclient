@@ -7,6 +7,7 @@ function BusinessAccountUI() {
     if (!mega.buinsessController) {
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
+        mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler);
     }
     else {
         this.business = mega.buinsessController;
@@ -332,7 +333,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     if (reDraw) {
         fillSubUsersTable(subAccounts, this);
-        this.business.previousSubList = subAccounts; // storing current drawn sub-users to prevent not needed redraw
+        // storing current drawn sub-users to prevent not needed redraw
+        this.business.previousSubList = JSON.parse(JSON.stringify(subAccounts));
     }
 
     // getting quotas
@@ -524,6 +526,8 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
                         var opPromise = mySelf.business.deActivateSubAccount(subUserHandle);
                         opPromise.done(
                             function () {
+                                // action packet will update DB. [+ memory]
+                                // subUser.s = 11; // disabled
                                 mySelf.viewSubAccountInfoUI(subUserHandle);
                             }
                         ).fail(
@@ -594,7 +598,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     
 
     $businessAccountContainer.removeClass('hidden'); // BA container
-    $subAccountContainer.removeClass('hidden'); // sub-info container
+    $subAccountContainer.removeClass('hidden').attr('id', 'sub-' + subUserHandle); // sub-info container
     $subHeader.removeClass('hidden');
 };
 
@@ -937,4 +941,34 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
     M.safeShowDialog('sub-user-adding-res-dlg', function () {
         return $dialog;
     });
+};
+
+BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
+    if (!subuser) {
+        return;
+    }
+
+    // private function to update left panel
+    var updateLeftSubUserPanel = function () {
+
+    };
+
+    // if we are in table view
+    if (!$('.user-management-list-table').hasClass('hidden')) {
+        // safe to create new object.
+        var busUI = new BusinessAccountUI();
+        busUI.viewSubAccountListUI();
+    }
+    // if we are in sub-user view
+    else if (!$('.files-grid-view.user-management-view .user-management-subaccount-view-container')
+        .hasClass('hidden')) {
+        var viewedUserId =
+            $('.files-grid-view.user-management-view .user-management-subaccount-view-container').attr('id');
+        var updatedUser = 'sub-' + subuser.u;
+        if (viewedUserId === updatedUser) {
+            // safe to create new object.
+            var busUI = new BusinessAccountUI();
+            busUI.viewSubAccountInfoUI(subuser.u);
+        }
+    } 
 };

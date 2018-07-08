@@ -949,8 +949,27 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
     }
 
     // private function to update left panel
-    var updateLeftSubUserPanel = function () {
-
+    var updateLeftSubUserPanel = function (subuser) {
+        var $usersLeftPanel = $('.fm-tree-panel .content-panel.user-management');
+        var $userRow = $('#' + subuser.u, $usersLeftPanel);
+        if (!$userRow.length) {
+            return;
+        }
+        if (subuser.s === 0) {
+            $userRow.find('.user-management-status').removeClass('pending disabled')
+                .addClass('enabled');
+        }
+        else if (subuser.s === 10) {
+            $userRow.find('.user-management-status').removeClass('enabled disabled')
+                .addClass('pending');
+        }
+        else {
+            
+            $userRow.find('.user-management-status').removeClass('enabled pending')
+                .addClass('disabled');
+            $userRow.addClass('hidden');
+        }
+        $('.user-management-tree-panel-header.disabled-accounts').trigger('click.subuser');
     };
 
     // if we are in table view
@@ -969,6 +988,8 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             // safe to create new object.
             var busUI = new BusinessAccountUI();
             busUI.viewSubAccountInfoUI(subuser.u);
+            // update the left pane
+            updateLeftSubUserPanel(subuser);
         }
     } 
 };

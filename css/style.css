@@ -27801,7 +27801,7 @@ opacity: 1;
 }
 
 .files-grid-view.user-management-view {
-    display: block;
+    /*display: block;*/
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

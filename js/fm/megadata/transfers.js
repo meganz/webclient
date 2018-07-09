@@ -750,6 +750,7 @@ MegaData.prototype.dlerror = function(dl, error) {
         // case ETEMPUNAVAIL:         errorstr = l[233]; break;
         default:
             errorstr = l[x = 233];
+            eventlog(99698, error, true);
             break;
     }
 

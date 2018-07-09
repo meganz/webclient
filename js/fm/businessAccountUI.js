@@ -133,9 +133,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
         // now let's fill the table with sub-users data
          //for (var a = 0; a < 50; a++) {
+        var isGray = true;
+        var colorBg = false;
             for (var h in subUsers) {
                 var $currUser = $tr_user.clone(true); // sub-users table
                 var $currUserLeftPane = $userLaeftPanelRow.clone(true); // left pane list
+                colorBg = false;
 
                 $currUser.attr('id', subUsers[h].u);
                 $currUserLeftPane.attr('id', subUsers[h].u);
@@ -155,11 +158,13 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     $currUser.find('.user-management-status').addClass('enabled');
                     $currUserLeftPane.find('.user-management-status').removeClass('pending disabled')
                         .addClass('enabled');
+                    colorBg = true;
                 }
                 else if (subUsers[h].s === 10) {
                     $currUser.find('.user-management-status').addClass('pending');
                     $currUserLeftPane.find('.user-management-status').removeClass('enabled disabled')
                         .addClass('pending');
+                    colorBg = true;
                 }
                 else {
                     $currUser.find('.user-management-status').addClass('disabled');
@@ -169,7 +174,17 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     $currUserLeftPane.addClass('hidden');
                 }
                 $currUser.find('.user-management-status-txt').text(uiBusiness.subUserStatus(subUsers[h].s));
-                // still usage data.
+
+                if (colorBg) {
+                    if (isGray) {
+                        $currUser.addClass('tr-gray');
+                    }
+                    else {
+                        $currUser.removeClass('tr-gray');
+                    }
+                    isGray = !isGray;
+                }
+
                 $detailListTable.append($currUser);
 
                 // left pane part
@@ -234,11 +249,21 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             }
 
             var $subUsersTableRow = $('tr', $usersTable);
+            var isGray = true;
 
             for (var h = 1; h < $subUsersTableRow.length; h++) {
                 if (me.hasClass('enabled-accounts')) {
                     if (!$($subUsersTableRow[h]).find('.user-management-status').hasClass('disabled')) {
                         $($subUsersTableRow[h]).removeClass('hidden');
+                        if (isGray) {
+                            $($subUsersTableRow[h]).addClass('tr-gray');
+                        }
+                        else {
+                            $($subUsersTableRow[h]).removeClass('tr-gray');
+                        }
+                        isGray = !isGray;
+                        $($subUsersTableRow[h]).find('.dis-en-icon').removeClass('enable-icon')
+                            .addClass('disabled-icon').find('.tooltip').text(l[19092]);
                     }
                     else {
                         $($subUsersTableRow[h]).addClass('hidden');
@@ -247,6 +272,15 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 else {
                     if ($($subUsersTableRow[h]).find('.user-management-status').hasClass('disabled')) {
                         $($subUsersTableRow[h]).removeClass('hidden');
+                        if (isGray) {
+                            $($subUsersTableRow[h]).addClass('tr-gray');
+                        }
+                        else {
+                            $($subUsersTableRow[h]).removeClass('tr-gray');
+                        }
+                        isGray = !isGray;
+                        $($subUsersTableRow[h]).find('.dis-en-icon').removeClass('disabled-icon')
+                            .addClass('enable-icon').find('.tooltip').text(l[16141]);
                     }
                     else {
                         $($subUsersTableRow[h]).addClass('hidden');
@@ -600,6 +634,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $businessAccountContainer.removeClass('hidden'); // BA container
     $subAccountContainer.removeClass('hidden').attr('id', 'sub-' + subUserHandle); // sub-info container
     $subHeader.removeClass('hidden');
+    $subAccountContainer.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
 };
 
 

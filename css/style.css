@@ -26611,9 +26611,11 @@ opacity: 1;
 }
 .verification-container .verification-user-info .sub-e {
     display: inline;
+    user-select: text;
 }
 .verification-container .verification-user-info .sub-p {
     display: inline;
+    user-select: text;
 }
 .user-management-verification-dialog .verification-user-container .verification-user-info .verification-user-email {
     margin-bottom: 12px;
@@ -27907,11 +27909,15 @@ opacity: 1;
     margin:28px 8px 0 0;
 }
 
-.user-management-list-table .grid-table-user-management tr:nth-child(odd) td{
-    background-color: rgba(250,250,250,1);
-} 
+.user-management-list-table .grid-table-user-management tr td {
+    background-color: #fff;
+}
 
-.user-management-list-table .grid-table-user-management tr:nth-child(even) td{
+.user-management-list-table .grid-table-user-management tr.tr-gray td {
+    background-color: rgba(250,250,250,1);
+}
+
+.user-management-list-table .grid-table-user-management tr.tr-white td {
     background-color: #fff;
 }
 

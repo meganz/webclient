@@ -2877,13 +2877,29 @@ function process_businessAccountSubUsers_SC(packet) {
         return;
     }
 
-    if (!packet.s) { // no new status!
-        return;
-    }
-    subUser.s = packet.s;
-    var bAccount = new BusinessAccount();
-    bAccount.parseSUBA(subUser, false, true);
+    var valChanged = false;
 
+    if (packet.s && packet.s !== subUser.s) { // new status
+        subUser.s = packet.s;
+        valChanged = true;
+    }
+    if (packet.e && packet.e !== subUser.e) { // new email
+        subUser.e = packet.e;
+        valChanged = true;
+    }
+    if (packet.firstname && packet.firstname !== subUser.firstname) { // new first-name
+        subUser.firstname = packet.firstname;
+        valChanged = true;
+    }
+    if (packet.lastname && packet.lastname !== subUser.lastname) { // new last-name
+        subUser.lastname = packet.lastname;
+        valChanged = true;
+    }
+    if (valChanged) {
+        // var bAccount = new BusinessAccount();
+        // bAccount.parseSUBA(subUser, false, true);
+        mBroadcaster.sendMessage('business:subuserUpdate', subUser);
+    }
 }
 
 function process_ok(ok, ignoreDB) {

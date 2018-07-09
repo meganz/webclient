@@ -110,12 +110,10 @@ BusinessAccount.prototype.activateSubAccount = function (subUserHandle) {
     api_req(request, {
         callback: function (res) {
             if ($.isNumeric(res)) {
-                if (res !== 0) {
-                    operationPromise.reject(0, res, 'API returned error');
-                }
-                else {
-                    operationPromise.resolve(1); // user activated successfully
-                }
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                operationPromise.resolve(1, res, request); // user activated successfully
             }
             else {
                 operationPromise.reject(0, 4, 'API returned error, ret=' + res);

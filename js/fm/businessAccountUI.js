@@ -576,6 +576,22 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             }
             else {
                 // enable on
+                var confirmationDlgResultHandler2 = function (adminAnswer) {
+                    if (adminAnswer) {
+                        var opPromise = mySelf.business.activateSubAccount(subUserHandle);
+                        opPromise.done(
+                            function (st,res,req) {
+                                mySelf.viewSubAccountInfoUI(subUserHandle);
+                            }
+                        ).fail(
+                            function () {
+                                msgDialog('warningb', '', l[19128]);
+                            }
+                        );
+                    }
+                };
+
+                mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler2, uName, true);
             }
         });
 

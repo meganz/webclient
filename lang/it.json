@@ -717,6 +717,7 @@
     "5645": "Cartella creata",
     "5687": "Come caricare",
     "5700": "Capisco",
+    "5705": "Email non valido",
     "5710": "Sei sicuro di voler interrompere la registrazione?",
     "5726": "Ripristina",
     "5737": "Nessun contatto",
@@ -2606,7 +2607,7 @@
     "19087": "Numero di utenti",
     "19088": "Spazio totale utilizzato",
     "19089": "Banda di trasferimento utilizzata",
-    "19090": "View Plan",
+    "19090": "Vedi piano",
     "19091": "Banda utilizzata",
     "19092": "Disabilita utente",
     "19093": "Vedi utente",
@@ -2617,6 +2618,6 @@
     "19099": "Ricorda: puoi riabilitare l'utente in qualsiasi momento dalla lista di utenti disabilitati.",
     "19100": "Errore nella disabilitazione dell'utente.",
     "19101": "Sei sicuro di voler riabilitare l'utente di [B]{0}[\/B]?",
-    "19102": "Ricorda: questa azione consumer\u00e0 banda di trasferimento dell'utente.",
-    "19103": "Add More"
+    "19102": "Ricorda: questa azione aumenter\u00e0 il numero di licenze utilizzate.",
+    "19103": "Aggiungi"
 }

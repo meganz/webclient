@@ -25028,6 +25028,7 @@ opacity: 1;
 
 .user-management-subuser-profile-container .default-white-button-user-management{
     margin-right: 12px;
+    vertical-align: top;
 }
 
 .user-management-subuser-profile-container .user-management-subuser-profile .default-gray-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
@@ -27861,6 +27862,10 @@ opacity: 1;
     padding:0 12px;
 }
 
+.user-management-list-table .grid-scrolling-table .business-sub-storage-use span, .user-management-list-table .grid-scrolling-table .business-sub-transfer-use span{
+    margin:32px;
+}
+
 .user-management-list-table tr th:first-child,.user-management-list-table tr td:first-child {
      padding-left: 8px;
      margin: 0;
@@ -27883,7 +27888,7 @@ opacity: 1;
 .user-management-view .user-management-list-table .user-management-status{
     margin:28px 8px 0 0;
 }
-
+/*
 .user-management-list-table .grid-table-user-management tr:nth-child(odd) td{
     background-color: rgba(250,250,250,1);
 } 
@@ -27891,6 +27896,7 @@ opacity: 1;
 .user-management-list-table .grid-table-user-management tr:nth-child(even) td{
     background-color: #fff;
 }
+*/
 
 .user-management-list-table .grid-table-user-management tr:hover td {
     background-color:rgba(245,245,245,1);
@@ -27932,12 +27938,16 @@ opacity: 1;
     padding: 0px 15px;
 }
 
+.user-management-list-table .header-table-user-management tr th, .user-management-list-table tr td {
+    overflow: hidden;
+}
+
 .user-management-list-table .header-table-user-management tr th:nth-child(1), .user-management-list-table tr td:nth-child(1){
     width:32px;
 }
 
 .user-management-list-table .header-table-user-management tr th:nth-child(2), .user-management-list-table tr td:nth-child(2){
-    min-width:220px;
+    min-width:200px;
 }
 
 
@@ -27947,12 +27957,12 @@ opacity: 1;
 }
 
 .user-management-list-table .header-table-user-management tr th:nth-child(4), .user-management-list-table tr td:nth-child(4){
-    min-width:118px;
+    min-width:128px;
     width: 200px;
 }
 
 .user-management-list-table .header-table-user-management tr th:nth-child(5), .user-management-list-table tr td:nth-child(5){
-    min-width:118px;
+    min-width:128px;
     width: 200px;
 }
 
@@ -28093,7 +28103,7 @@ opacity: 1;
         width: 200px;
     }
     .subaccount-view-used-data .used-storage-info .ff-number{
-        width: 300px;
+        width: 240px;
     }
     .subaccount-view-used-data .used-storage-info .ff-occupy{
         width: 100px;
@@ -28105,6 +28115,16 @@ opacity: 1;
 
     .user-management-list-table tr td .user-management-name, .user-management-list-table tr td .user-management-email{
         width: 200px;
+    }
+
+    .user-management-subuser-profile-container .default-white-button-user-management{
+        max-width: 188px;
+        left: -32px;
+        height: auto;
+    }
+
+    .user-management-subuser-profile-container .user-management-subuser-profile .default-gray-button-user-management, .user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
+        right: 24px;
     }
 
     .user-management-overview-bar-data {

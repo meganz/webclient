@@ -1139,11 +1139,18 @@ scparser.$add('usc', function() {
     fm_forcerefresh();
 });
 
+// Payment received
 scparser.$add('psts', function(a) {
     if (!pfid && u_type) {
         M.checkStorageQuota(2000);
     }
     pro.processPaymentReceived(a);
+});
+
+// Payment reminder
+scparser.$add('pses', function(a) {
+    'use strict';
+    notify.notifyFromActionPacket(a);
 });
 
 scparser.$add('mcc', function(a) {

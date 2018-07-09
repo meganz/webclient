@@ -2882,7 +2882,7 @@ function process_businessAccountSubUsers_SC(packet) {
     }
     subUser.s = packet.s;
     var bAccount = new BusinessAccount();
-    bAccount.parseSUBA(subUser, false);
+    bAccount.parseSUBA(subUser, false, true);
 
 }
 

@@ -211,8 +211,9 @@ BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
  * a function to parse the JSON object recived holding information about a sub-account of a business account.
  * @param {string} suba    the object to parse, it must contain a sub-account ids
  * @param {boolean} ignoreDB if we want to skip DB updating
+ * @param {boolean} fireUIEvent if we want to fire a n event to update ui
  */
-BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB) {
+BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
     "use strict";
     if (M) {
         M.isBusinessAccountMaster = 1; // init it, or re-set it
@@ -247,6 +248,9 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB) {
     }
     if (fmdb && !ignoreDB && !pfkey && !folderlink) {
         fmdb.add('suba', { s_ac: suba.u, d: suba });
+    }
+    if (fireUIEvent) {
+        mBroadcaster.sendMessage('business:subuserUpdate', suba);
     }
 };
 

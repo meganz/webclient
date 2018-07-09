@@ -27758,6 +27758,19 @@ opacity: 1;
     overflow: hidden;
 }
 
+.files-grid-view.user-management-view {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 100%;
+    height: -webkit-calc(100% - 48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
+    position: relative;
+    top: -1px;
+    overflow: hidden;
+}
+
 .user-management-view .user-management-list-table {
     position: relative;
     height: 100%;

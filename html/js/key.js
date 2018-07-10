@@ -45,12 +45,17 @@ function ui_keycomplete() {
         }
 
         // if this is a sub-user in a business account.
-        if (u_attr.b && u_attr.mu) {
-            loadSubPage('fm');
-            return; // go out
+        if (u_attr.b && u_attr.b.mu) {
+            if (page === 'fm') {
+                loadSubPage('start');
+            }
+            else {
+                loadSubPage('fm');
+            }
         }
-
-        // Load the Pro page to choose plan
-        loadSubPage('pro');
+        else {
+            // Load the Pro page to choose plan
+            loadSubPage('pro');
+        }
     }
 }

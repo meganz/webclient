@@ -37,7 +37,7 @@
  *
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
-function MegaQueue(worker, limit, name, setTimeoutValue) {
+function MegaQueue(worker, limit, name) {
     var parentLogger;
     this._limit = limit || 5;
     this._queue = [];
@@ -46,7 +46,6 @@ function MegaQueue(worker, limit, name, setTimeoutValue) {
     this._noTaskCount = 0;
     this._qpaused = {};
     this._pending = [];
-    this._setTimeoutValue = setTimeoutValue;
 
     Object.defineProperty(this, "qname", {
         value: String(name || 'unk'),
@@ -391,7 +390,7 @@ MegaQueue.prototype._process = function(ms, sp) {
     this._later = setTimeout(function() {
         queue.process(sp);
         queue = undefined;
-    }, ms || (typeof(this._setTimeoutValue) !== 'undefined' ? this._setTimeoutValue : 300));
+    }, ms || 10);
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {

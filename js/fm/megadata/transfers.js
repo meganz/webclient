@@ -1140,6 +1140,10 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
             M.onFileManagerReady(function() {
                 mega.ui.tpp.started('ul');
 
+                if (ulmanager.ulOverStorageQuota) {
+                    ulmanager.ulShowOverStorageQuotaDialog();
+                }
+
                 if (mBroadcaster.hasListener('upload:start')) {
                     var data = Object.create(null);
 
@@ -1347,8 +1351,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders) {
         ulOpSize += u[j].size;
     }
 
-    // makeDirProc();
-    M.checkGoingOverStorageQuota(ulOpSize).done(makeDirProc);
+    makeDirProc();
+    // M.checkGoingOverStorageQuota(ulOpSize).done(makeDirProc);
 
     makeDirPromise
         .done(function() {
@@ -1431,7 +1435,13 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
         domElement._elmLProgress.style.transform = 'rotate(' + (transferDeg - 180) + 'deg)';
     }
     domElement._elmStatus.textContent = perc + '%';
-    domElement._elmSentSize.textContent = bytesToSize(bl, 1);
+
+    if (perc > 99) {
+        domElement._elmSentSize.textContent = bytesToSize(bt, 2);
+    }
+    else {
+        domElement._elmSentSize.textContent = bytesToSize(bl, 1, -1);
+    }
 
     if (retime > 0) {
         if (!domElement._elmTimeLeft.textContent) {
@@ -1524,7 +1534,8 @@ MegaData.prototype.ulerror = function(ul, error) {
             }
             mega.ui.tpp.hide();
             ulmanager.abort(null);
-            $("tr[id^='ul_'] .transfer-status").text(l[1010]);
+            $("tr[id^='ul_']").addClass('transfer-error')
+                .removeClass('transfer-completed').find('.transfer-status').text(l[1010]);
 
             // Inform user that upload MEGAdrop is not available anymore
             if (page.substr(0, 8) === 'megadrop') {

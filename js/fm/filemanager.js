@@ -1352,19 +1352,37 @@ FileManager.prototype.initContextUI = function() {
         delay('fm_tfsupdate', fm_tfsupdate);
     });
 
-    $(c + '.transfer-play').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').attrs('id').map(fm_tfsresume);
-        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        if (uldl_hold) {
-            dlQueue.resume();
-            ulQueue.resume();
-            uldl_hold = false;
-        }
-    });
+    $(c + '.transfer-play, ' + c + '.transfer-pause').rebind('click', function() {
+        var $trs = $('.transfer-table tr.ui-selected');
 
-    $(c + '.transfer-pause').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').attrs('id').map(fm_tfspause);
-        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
+        if ($trs.filter('.transfer-upload').length) {
+            if (ulmanager.ulOverStorageQuota) {
+                ulmanager.ulShowOverStorageQuotaDialog();
+                return;
+            }
+        }
+
+        if (dlmanager.isOverQuota) {
+            dlmanager.showOverQuotaDialog();
+            return;
+        }
+
+        var ids = $trs.attrs('id');
+
+        if ($(this).hasClass('transfer-play')) {
+            ids.map(fm_tfsresume);
+
+            if (uldl_hold) {
+                dlQueue.resume();
+                ulQueue.resume();
+                uldl_hold = false;
+            }
+        }
+        else {
+            ids.map(fm_tfspause);
+        }
+
+        $trs.removeClass('ui-selected');
     });
 
     $(c + '.canceltransfer-item,' + c + '.transfer-clear').rebind('click', function() {
@@ -2095,6 +2113,11 @@ FileManager.prototype.addTransferPanelUI = function() {
 
         if (dlmanager.isOverQuota) {
             return dlmanager.showOverQuotaDialog();
+        }
+
+        if (ulmanager.ulOverStorageQuota) {
+            ulmanager.ulShowOverStorageQuotaDialog();
+            return false;
         }
 
         if (!$(this).hasClass('disabled')) {

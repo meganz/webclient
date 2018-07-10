@@ -67,9 +67,9 @@
 }
 .user-card-name.light {
     color: #222;
-    max-width: -webkit-calc(100% - 24px);
-    max-width: -moz-calc(100% - 24px);
-    max-width: calc(100% - 24px);
+    max-width: -webkit-calc(100% - 40px);
+    max-width: -moz-calc(100% - 40px);
+    max-width: calc(100% - 40px);
     display: inline-block;
 }
 .user-card-name .grey {

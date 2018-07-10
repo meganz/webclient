@@ -146,6 +146,10 @@ describe("Transfers Unit Test", function() {
             file.ul_key[i] = rand(0x100000000);
         }
         file.ul_keyNonce = JSON.stringify(file.ul_key);
+        file.ul_offsets = [{
+            byteOffset: 0,
+            byteLength: file.size
+        }];
         GlobalProgress[gid] = {working: []};
 
         var chunk = new ChunkUpload(file, 0, file.size);

@@ -2005,6 +2005,7 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/transfers/meths.js', n: 'dl_meths', j: 1, w: 3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
+    jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
 
     // Everything else...

@@ -6,10 +6,9 @@
  * @param {String} url Script url/filename
  * @param {Function} message Worker's message dispatcher
  * @param {Number} [size] Number of workers
- * @param {Number} [setTimeoutValue] the setTimeout interval for throttling of the queue processing
  * @returns {MegaQueue}
  */
-function CreateWorkers(url, message, size, setTimeoutValue) {
+function CreateWorkers(url, message, size) {
     "use strict";
 
     var worker = [];
@@ -138,7 +137,7 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
                 worker[i].postMessage(t);
             }
         });
-    }, size, url.split('/').pop().split('.').shift() + '-worker', setTimeoutValue);
+    }, size, url.split('/').pop().split('.').shift() + '-worker');
 }
 
 
@@ -170,9 +169,7 @@ function CreateWorkers(url, message, size, setTimeoutValue) {
                     backgroundNacl.workers = CreateWorkers('naclworker.js',
                         function(ctx, e, release) {
                             release(e.data);
-                        },
-                        0,
-                        0
+                        }
                     );
 
                     backgroundNacl.workers._taggedTasks = {};

@@ -128,7 +128,7 @@ BusinessAccount.prototype.activateSubAccount = function (subUserHandle) {
 /**
  * Function to get the master key of a sub user in business account
  * @param {String} subUserHandle    sub user handle to get the master key of
- * @returns {Promise}               Resolves opertation result
+ * @returns {Promise}               Resolves operation result
  */
 BusinessAccount.prototype.getSubAccountMKey = function (subUserHandle) {
     "use strict";
@@ -163,6 +163,7 @@ BusinessAccount.prototype.getSubAccountMKey = function (subUserHandle) {
 /**
  * Function to get Quota usage info for the master account and each sub account.
  * @param {boolan} forceUpdate      a flag to force updating the cached values
+ * @returns {Promise}               Resolves operation result
  */
 BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
     "use strict";
@@ -216,17 +217,17 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
     if (M) {
         M.isBusinessAccountMaster = 1; // init it, or re-set it
 
-        if (mega.config.get('isBusinessMasterAcc') !== '1') {
-            mega.config.set('isBusinessMasterAcc', '1');
-            // i used config to store user type (if he's a master business account). because this was
-            // the only possible way considering that API team [Jon] decided to provide user status 
-            // in a:f [get user tree] response in [suba] array, and to deduce the type of the user by 
-            // the existance of this array!
-            // the problem is when we load using our local DB, we cant tell if the empty "sub account" table we have
-            // is to due to non-master-business account, or due to a master account without sub-accounts yet.
-            // The applied solution by API is ineffecient. 
-            // --> the applied soultion is not logical [storing user type in configuration]
-        }
+        //if (mega.config.get('isBusinessMasterAcc') !== '1') {
+        //    mega.config.set('isBusinessMasterAcc', '1');
+        //    // i used config to store user type (if he's a master business account). because this was
+        //    // the only possible way considering that API team [Jon] decided to provide user status 
+        //    // in a:f [get user tree] response in [suba] array, and to deduce the type of the user by 
+        //    // the existance of this array!
+        //    // the problem is when we load using our local DB, we cant tell if the empty "sub account" table we have
+        //    // is to due to non-master-business account, or due to a master account without sub-accounts yet.
+        //    // The applied solution by API is ineffecient. 
+        //    // --> the applied soultion is not logical [storing user type in configuration]
+        //}
         if (!M.suba) {
             M.suba = [];
         }
@@ -257,7 +258,7 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
  * @returns {boolean}   true if the user is a Master B-Account
  */
 BusinessAccount.prototype.isBusinessMasterAcc = function () {
-    if (M.isBusinessAccountMaster || M.suba && M.suba.length) {
+    if ((u_attr.b && !u_attr.b.mu) || M.isBusinessAccountMaster || (M.suba && M.suba.length)) {
         return true;
     }
     return false;

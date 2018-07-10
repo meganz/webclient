@@ -24493,7 +24493,6 @@ opacity: 1;
     width:calc(100% - 304px);
     position: fixed;
     bottom: 0px;
-    left: 304px;
     background-color: rgba(250,250,250,1);
     z-index: 102;
     display: block;

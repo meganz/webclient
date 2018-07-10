@@ -124,6 +124,9 @@
     font-size: 14px;
     display: inline-block;
     line-height: 19px;
+    width: -webkit-calc(100% - 24px);
+    width: -moz-calc(100% - 24px);
+    width: calc(100% - 24px);
 }
 .popup.contacts-search .selected-contact-block {
     height: auto;

@@ -1557,9 +1557,7 @@ function init_page() {
     }
 
     // Initialise the Public Service Announcement system
-    if (typeof psa !== 'undefined') {
-        psa.init();
-    }
+    psa.init();
 
     // Initialise the update check system
     if (typeof alarm !== 'undefined') {

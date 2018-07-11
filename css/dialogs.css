@@ -683,6 +683,24 @@
 .fm-dialog.exceeded.pro.slider .checkboxOff, .fm-dialog.exceeded.pro.slider .checkboxOn {
     margin-top: 10px;
 }
+
+.fm-dialog.limited-bandwidth-dialog .storage-icon {
+    display: none;
+}
+
+.fm-dialog.limited-bandwidth-dialog.uploads .dialog-top-icon {
+    display: none !important;
+}
+
+.fm-dialog.limited-bandwidth-dialog.uploads .storage-icon {
+    display: inline-block;
+}
+
+.fm-dialog.exceeded.uploads .transfer-overquota-txt,
+.fm-dialog.exceeded.uploads .msg-prewarning,
+.fm-dialog.exceeded.uploads .bottom-tips {
+    display: none;
+}
 /* End of Transfer quota exceeded dialog */
 
 /* Achievement dialog */
@@ -2732,7 +2750,7 @@ li.token-input-token-invite .input-close {
 }
 .park-account-dialog .fm-dialog-title {
     font-size: 17px;
-    padding-top: 24px; 
+    padding-top: 24px;
 }
 .park-account-dialog .improved-recovery-steps .content-text {
     margin-left: 60px;

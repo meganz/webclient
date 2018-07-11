@@ -49,6 +49,8 @@ var ulmanager = {
     ulSetupQueue: false,
     ulStartingPhase: false,
     ulCompletingPhase: false,
+    ulOverStorageQuota: false,
+    ulOverStorageQueue: [],
     ulPendingCompletion: [],
     ulBlockSize: 131072,
     ulBlockExtraSize: 1048576,
@@ -72,6 +74,85 @@ var ulmanager = {
         var keys = Object.keys(this.ulErrorMap);
         var values = obj_values(this.ulErrorMap);
         return keys[values.indexOf(code)] || code;
+    },
+
+    ulShowOverStorageQuotaDialog: function(aFileUpload) {
+        'use strict';
+
+        var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
+
+        ulQueue.pause();
+        mega.ui.tpp.hide();
+        this.ulOverStorageQuota = true;
+
+        // clear completed uploads and set over quota for the rest.
+        if ($.removeTransferItems) {
+            $.removeTransferItems();
+        }
+        $("tr[id^='ul_']").addClass('transfer-error').find('.transfer-status').text(l[1010]);
+
+        // Store the entry whose upload ticket failed to resume it later
+        if (aFileUpload) {
+            this.ulOverStorageQueue.push(aFileUpload);
+        }
+
+        // Inform user that upload MEGAdrop is not available anymore
+        if (page.substr(0, 8) === 'megadrop') {
+            mBroadcaster.sendMessage('MEGAdrop:overquota');
+        }
+
+        // Load and fill membership plans.
+        pro.loadMembershipPlans(function() {
+            dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
+        });
+
+        M.safeShowDialog('upload-overquota', function() {
+            $dialog.removeClass('registered achievements pro slider').addClass('uploads exceeded');
+            $('.header-before-icon.exceeded', $dialog).text(l[19135]);
+            $('.p-after-icon.msg-overquota', $dialog).text(l[19136]);
+
+            $('.reg-st3-membership-bl', $dialog).rebind('click', function() {
+                eventlog(99700, true);
+                open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
+                return false;
+            });
+
+            $('.fm-dialog-close', $dialog).rebind('click', closeDialog);
+
+            eventlog(99699, true);
+            return $dialog;
+        });
+    },
+
+    ulResumeOverStorageQuotaState: function() {
+        'use strict';
+
+        if ($('.fm-dialog.limited-bandwidth-dialog').is(':visible')) {
+            closeDialog();
+        }
+
+        ulQueue.resume();
+        this.ulOverStorageQuota = false;
+
+        if (!this.ulOverStorageQueue.length) {
+            if (d) {
+                ulmanager.logger.info('ulResumeOverStorageQuotaState: Nothing to resume.');
+            }
+        }
+        else {
+            // clear completed uploads and remove over quota state for the rest.
+            if ($.removeTransferItems) {
+                $.removeTransferItems();
+            }
+            $("tr[id^='ul_']").removeClass('transfer-error').find('.transfer-status').text(l[7227]);
+
+            this.ulOverStorageQueue.forEach(function(aFileUpload) {
+                aFileUpload.ul.uReqFired = null;
+                ulmanager.ulStart(aFileUpload);
+            });
+        }
+
+        this.ulOverStorageQueue = [];
     },
 
     getGID: function UM_GetGID(ul) {
@@ -421,7 +502,7 @@ var ulmanager = {
             if (res === EOVERQUOTA || res === EGOINGOVERQUOTA) {
 
                 // Show a warning popup
-                M.ulerror(ul_queue[ctx.reqindex], res);
+                ulmanager.ulShowOverStorageQuotaDialog(File, res);
 
                 // Return early so it does not retry automatically and spam the API server with requests
                 return false;

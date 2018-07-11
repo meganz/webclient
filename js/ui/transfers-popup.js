@@ -139,8 +139,10 @@ mega.ui.tpp = function () {
     var show = function show() {
         var visible = isVisible();
         var enabled = isEnabled();
+        var overquota = dlmanager.isOverQuota || ulmanager.ulOverStorageQuota;
+        var hasTransfers = M.currentdirid !== 'transfers' && M.hasPendingTransfers();
 
-        if (isCached() && enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
+        if (isCached() && enabled && !visible && hasTransfers && !overquota) {
             if (getTotal('ul') > 0 || getTotal('dl') > 0) {
                 opts.dlg.$.show(opts.duration);
                 setStatus(true);

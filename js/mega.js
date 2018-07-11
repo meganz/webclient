@@ -1145,6 +1145,13 @@ scparser.$add('psts', function(a) {
         M.checkStorageQuota(2000);
     }
     pro.processPaymentReceived(a);
+
+    if (ulmanager.ulOverStorageQuota) {
+        eventlog(99701);
+        onIdle(function() {
+            ulmanager.ulResumeOverStorageQuotaState();
+        });
+    }
 });
 
 // Payment reminder

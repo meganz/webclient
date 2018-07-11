@@ -1671,16 +1671,6 @@ var dlmanager = {
     showLimitedBandwidthDialog: function(res, callback, flags) {
         'use strict';
 
-        var $dialog = $('.limited-bandwidth-dialog').removeClass('exceeded');
-        var myself = this;
-        // Load the membership plans
-        pro.loadMembershipPlans(function () {
-
-            // Render the plan details
-            myself.prepareLimitedBandwidthDialogPlans($dialog);
-        });
-
-        this.prepareLimitedBandwidthDialogPlans($dialog);
         loadingDialog.hide();
         this.onLimitedBandwidth = function() {
             if (callback) {
@@ -1711,19 +1701,29 @@ var dlmanager = {
             this.lmtUserFlags = flags;
         }
 
-        api_req({a: 'log', e: 99617, m: 'overquota pre-warning shown.'});
+        M.safeShowDialog('download-pre-warning', function() {
+            var $dialog = $('.limited-bandwidth-dialog');
 
-        uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
-        this._overquotaClickListeners($dialog, flags, res || true);
+            eventlog(99617);// overquota pre-warning shown.
 
-        if (is_mobile) {
-            $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
-                $dialog.addClass('hidden');
-                fm_hideoverlay();
+            // Load the membership plans
+            pro.loadMembershipPlans(function() {
+
+                // Render the plan details
+                dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
             });
-        }
 
-        M.safeShowDialog('download-pre-warning', $dialog);
+            uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
+            this._overquotaClickListeners($dialog, flags, res || true);
+
+            if (is_mobile) {
+                $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
+                    $dialog.addClass('hidden');
+                    fm_hideoverlay();
+                });
+            }
+            return $dialog.removeClass('exceeded');
+        });
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask, flags) {
@@ -1751,17 +1751,16 @@ var dlmanager = {
         var asyncTaskID = false;
         var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
 
-        var myself = this;
         // Load the membership plans
         pro.loadMembershipPlans(function () {
 
             // Render the plan details
-            myself.prepareLimitedBandwidthDialogPlans($dialog);
+            dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
         });
 
         this._setOverQuotaState(dlTask);
 
-        if ($dialog.is(':visible')) {
+        if ($dialog.is(':visible') && !$dialog.hasClass('uploads')) {
             this.logger.info('showOverQuotaDialog', 'visible already.');
             return;
         }
@@ -1771,65 +1770,70 @@ var dlmanager = {
             return;
         }
 
-        $dialog
-            .removeClass('registered achievements exceeded pro slider')
-            .find('.transfer-overquota-txt')
-            .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
-            .end();
-
-        if (flags & this.LMT_ISPRO) {
-            $dialog.addClass('pro');
-
-            asyncTaskID = 'mOverQuota.' + makeUUID();
-
-            if (M.account) {
-                // Force data retrieval from API
-                M.account.lastupdate = 0;
-            }
-            M.accountData(function(account) {
-                var tfsQuotaLimit = bytesToSize(account.bw, 0).split(' ');
-                var tfsQuotaUsed = (account.downbw_used + account.servbw_used);
-                var perc = Math.min(100, Math.ceil(tfsQuotaUsed * 100 / account.bw));
-
-                $('.chart.data .size-txt', $dialog).text(bytesToSize(tfsQuotaUsed, 0));
-                $('.chart.data .pecents-txt', $dialog).text(tfsQuotaLimit[0]);
-                $('.chart.data .gb-txt', $dialog).text(tfsQuotaLimit[1]);
-                $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
-                $('.chart.data .perc-txt', $dialog).text(perc + '%');
-
-                // if they granted quota to other users
-                if (account.servbw_limit > 0) {
-                    $dialog.addClass('slider');
-
-                    $('.bandwidth-slider', $dialog).slider({
-                        min: 0, max: 100, range: 'min', value: account.servbw_limit,
-                        change: function(e, ui) {
-                            if (ui.value < account.servbw_limit) {
-                                // retry download if less quota was chosen...
-                                loadingDialog.show();
-                                M.req({a: 'up', srvratio: ui.value})
-                                    .always(function() {
-                                        loadingDialog.hide();
-                                        dlmanager._onQuotaRetry(true);
-                                    });
-                            }
-                        }
-                    });
-                }
-
-                mBroadcaster.sendMessage(asyncTaskID);
-                asyncTaskID = null;
-            });
-        }
-
-        if (is_mobile) {
-            $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
-                $dialog.addClass('hidden');
-                fm_hideoverlay();
-            });
-        }
-
         M.safeShowDialog('download-overquota', function() {
+
+            $dialog
+                .removeClass('registered achievements exceeded pro slider uploads')
+                .find('.transfer-overquota-txt')
+                .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
+                .end();
+
+            // restore contents in case they were changed for the uploads over storage quota dialog
+            $('.p-after-icon.msg-overquota', $dialog).text(l[120]);
+            $('.header-before-icon.exceeded', $dialog).text(l[17]);
+
+            if (flags & dlmanager.LMT_ISPRO) {
+                $dialog.addClass('pro');
+
+                asyncTaskID = 'mOverQuota.' + makeUUID();
+
+                if (M.account) {
+                    // Force data retrieval from API
+                    M.account.lastupdate = 0;
+                }
+                M.accountData(function(account) {
+                    var tfsQuotaLimit = bytesToSize(account.bw, 0).split(' ');
+                    var tfsQuotaUsed = (account.downbw_used + account.servbw_used);
+                    var perc = Math.min(100, Math.ceil(tfsQuotaUsed * 100 / account.bw));
+
+                    $('.chart.data .size-txt', $dialog).text(bytesToSize(tfsQuotaUsed, 0));
+                    $('.chart.data .pecents-txt', $dialog).text(tfsQuotaLimit[0]);
+                    $('.chart.data .gb-txt', $dialog).text(tfsQuotaLimit[1]);
+                    $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
+                    $('.chart.data .perc-txt', $dialog).text(perc + '%');
+
+                    // if they granted quota to other users
+                    if (account.servbw_limit > 0) {
+                        $dialog.addClass('slider');
+
+                        $('.bandwidth-slider', $dialog).slider({
+                            min: 0, max: 100, range: 'min', value: account.servbw_limit,
+                            change: function(e, ui) {
+                                if (ui.value < account.servbw_limit) {
+                                    // retry download if less quota was chosen...
+                                    loadingDialog.show();
+                                    M.req({a: 'up', srvratio: ui.value})
+                                        .always(function() {
+                                            loadingDialog.hide();
+                                            dlmanager._onQuotaRetry(true);
+                                        });
+                                }
+                            }
+                        });
+                    }
+
+                    mBroadcaster.sendMessage(asyncTaskID);
+                    asyncTaskID = null;
+                });
+            }
+
+            if (is_mobile) {
+                $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {
+                    $dialog.addClass('hidden');
+                    fm_hideoverlay();
+                });
+            }
+
             var doCloseModal = function closeModal() {
                 if (!$('.download.transfer-overquota-txt').is(':visible')) {
                     clearInterval(dlmanager._overQuotaTimeLeftTick);

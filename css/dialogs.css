@@ -2787,3 +2787,35 @@ li.token-input-token-invite .input-close {
 .widget-dialog .copy-widget-code {
     text-transform: capitalize;
 }
+/* Private chat dialog */
+.create-private-chat {
+    width: 560px;
+    margin: -190px 0 0 -280px;
+    overflow: visible;
+}
+.create-private-chat .fm-dialog-title {
+    font-size: 20px;
+    color: #666666;
+    text-align: center;
+}
+.create-private-chat .wrapper {
+    width: 460px;
+    margin: 24px auto 44px;
+}
+.create-private-chat .fm-body-text {
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+}
+.create-private-chat .default-huge-button.make-private {
+    display: table;
+    margin: 24px auto;
+    font-family: 'montserrat';
+    background-color: #F0373A;
+    box-shadow: 0 1px 2px 0 rgba(217,0,7,0.30), inset 0 1px 1px 0 rgba(255,255,255,0.20);
+    line-height: 65px;
+}
+.private-chat-illustration .bottom-page.big-icon.top-pad {
+    display: table;
+    margin: 24px auto;
+}

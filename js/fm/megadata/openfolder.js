@@ -314,13 +314,18 @@
             }
             else {
                 this.chat = true;
-
+                megaChat.displayArchivedChats = false;
                 megaChat.refreshConversations();
                 M.addTreeUI();
                 var room = megaChat.renderListing();
 
                 if (room) {
                     newHashLocation = room.getRoomUrl();
+                }
+                else {
+                    if (megaChat.$conversationsAppInstance) {
+                        megaChat.$conversationsAppInstance.safeForceUpdate();
+                    }
                 }
             }
         }

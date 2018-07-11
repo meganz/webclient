@@ -13,14 +13,14 @@ var ParticipantsList = React.createClass({
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,
-            'contactCardHeight': 49
+            'contactCardHeight': 36
 
         }
     },
     getInitialState: function() {
         return {
             'scrollPositionY': 0,
-            'scrollHeight': 49*4
+            'scrollHeight': 36*4
         };
     },
     onUserScroll: function() {
@@ -53,14 +53,14 @@ var ParticipantsList = React.createClass({
         var $parentContainer = $node.closest('.chat-right-pad');
         var maxHeight = (
             $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) -
-                $('.chat-right-head', $parentContainer).outerHeight(true)
+                $('.chat-right-head', $parentContainer).outerHeight(true) - 72
         );
 
         if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {
-            fitHeight = Math.max(fitHeight /* margin! */, 48);
+            fitHeight = Math.max(fitHeight /* margin! */, 53);
         }
         else if (maxHeight < fitHeight) {
-            fitHeight = Math.max(maxHeight, 48);
+            fitHeight = Math.max(maxHeight, 53);
         }
 
         var $contactsList = $('.chat-contacts-list', $parentContainer);
@@ -123,9 +123,9 @@ var ParticipantsListInner = React.createClass({
     getDefaultProps: function() {
         return {
             'requiresUpdateOnResize': true,
-            'contactCardHeight': 49,
+            'contactCardHeight': 32,
             'scrollPositionY': 0,
-            'scrollHeight': 49*4
+            'scrollHeight': 32*4
 
         }
     },
@@ -167,9 +167,9 @@ var ParticipantsListInner = React.createClass({
                     room.getParticipantsExceptMe()
             )   :
             room.getParticipantsExceptMe();
-
-        array.remove(contacts, u_handle, true);
-
+        if (contacts.indexOf(u_handle) >= 0) {
+            array.remove(contacts, u_handle, true);
+        }
         var firstVisibleUserNum = Math.floor(self.props.scrollPositionY/self.props.contactCardHeight);
         var visibleUsers = Math.ceil(self.props.scrollHeight/self.props.contactCardHeight);
         var lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
@@ -314,7 +314,7 @@ var ParticipantsListInner = React.createClass({
                         }
                         dropdownIconClasses={dropdownIconClasses}
                         style={{
-                            width: 234,
+                            width: 249,
                             position: 'absolute',
                             top: i * self.props.contactCardHeight
                         }}

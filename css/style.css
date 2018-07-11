@@ -4128,6 +4128,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-image: url(../images/mega/grid-bg2.svg);
     background-position: left top;
 }
+.grid-scrolling-table.archive-chat-list .jspPane {
+    background-image: initial;
+}
 .files-grid-view.fm .grid-scrolling-table, .files-grid-view.fm .grid-scrolling-table .jspPane, .transfer-scrolling-table, .transfer-scrolling-table .jspPane {
     background-image: url(../images/mega/grid-bg.svg);
 }
@@ -5612,7 +5615,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -khtml-opacity: 1;
     opacity: 1;
 }
-.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper {
+.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper, .files-grid-view.archived-chat-view {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -5623,6 +5626,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     position: relative;
     top: -1px;
     overflow: hidden;
+}
+.files-grid-view.archived-chat-view {
+    height: -webkit-calc(100% );
+    height: -moz-calc(100%);
+    height: calc(100%);
 }
 .files-grid-view.contact-details-view {
     height: 100%;
@@ -6278,6 +6286,12 @@ table {
     height: -webkit-calc(100% - 23px);
     height: -moz-calc(100% - 23px);
     height: calc(100% - 23px);
+}
+.archived-chats .grid-scrolling-table {
+    height: 100%;
+    height: -webkit-calc(100% - 36px);
+    height: -moz-calc(100% - 36px);
+    height: calc(100% - 36px);
 }
 .transfer-scrolling-table {
     /* do not remove, needed for perfect-scrollbar */
@@ -10509,6 +10523,9 @@ table {
     position: relative;
     font-size: 0;
     white-space: nowrap;
+}
+.conversations .grid-table-header th {
+    margin-top: 12px;
 }
 .transfer-table-header th:first-child span {
     display: block;
@@ -21564,7 +21581,7 @@ body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
     cursor: ew-resize;
     position: absolute;
     width: 4px;
-    z-index: 10;
+    z-index: 999;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -21603,7 +21620,7 @@ body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/new-chat-sprite_v1.png);
+    background-image: url(../images/mega/new-chat-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -7px -1353px;
     -webkit-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);

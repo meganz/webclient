@@ -44,7 +44,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             chatShard: undefined,
             members: {},
             membersLoaded: false,
-            topic: ""
+            topic: "",
+            flags: 0x00,
+            archivedSelected: false
         },
         true
     );
@@ -277,6 +279,7 @@ ChatRoom.STATE = {
 };
 
 ChatRoom.INSTANCE_INDEX = 0;
+ChatRoom.ARCHIVED = 0x01;
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
     var self = this;
@@ -331,6 +334,97 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
 ChatRoom.prototype._resetCallStateInCall = function() {
 
 };
+
+/**
+ * Check whether a chat is archived or not.
+ *
+ * @returns {Boolen}
+ */
+ChatRoom.prototype.isArchived = function() {
+    var self = this;
+    return (self.flags & ChatRoom.ARCHIVED);
+};
+
+/**
+ * Check whether a chat is displayable.
+ *
+ * @returns {Boolen}
+ */
+ChatRoom.prototype.isDisplayable = function() {
+    var self = this;
+    return ((self.showArchived === true) ||
+            !self.isArchived() ||
+            (self.callManagerCall && self.callManagerCall.isActive()));
+};
+
+/**
+ * Save chat into info fmdb.
+ *
+ */
+ChatRoom.prototype.persistToFmdb = function() {
+    var self = this;
+    if (fmdb) {
+        var users = [];
+        if (self.members) {
+            Object.keys(self.members).forEach(function(user_handle) {
+                users.push({
+                    u: user_handle,
+                    p: self.members[user_handle]
+                });
+            });
+        }
+
+        if (self.chatId && self.chatShard !== undefined) {
+            var roomInfo = {
+                'id': self.chatId,
+                'cs': self.chatShard,
+                'g' : (self.type === "group") ? 1 : 0,
+                'u' : users,
+                'ts': self.ctime,
+                'ct': self.ct,
+                'f' : self.flags
+            };
+            fmdb.add('mcf', {id: roomInfo.id, d: roomInfo});
+        }
+    }
+};
+
+/**
+ * Save the chat info into fmdb.
+ * @param f {binary} new flags
+ * @param updateUI {Boolen} flag to indicate whether to update UI.
+ */
+ChatRoom.prototype.updateFlags = function(f, updateUI) {
+    var self = this;
+    var flagChange = (self.flags !== f);
+    self.flags = f;
+    self.archivedSelected = false;
+    if (self.isArchived()) {
+        megaChat.archivedChatsCount++;
+        self.showArchived = false;
+    }
+    else {
+        megaChat.archivedChatsCount--;
+    }
+    self.persistToFmdb();
+
+
+    if (updateUI && flagChange) {
+        if (megaChat.currentlyOpenedChat &&
+            megaChat.chats[megaChat.currentlyOpenedChat] &&
+            megaChat.chats[megaChat.currentlyOpenedChat].chatId === self.chatId) {
+            loadSubPage('fm/chat/');
+        }
+        else {
+            megaChat.refreshConversations();
+        }
+
+        if (megaChat.$conversationsAppInstance) {
+            megaChat.$conversationsAppInstance.safeForceUpdate();
+        }
+    }
+};
+
 
 /**
  * Convert state to text (helper function)
@@ -514,6 +608,51 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     else {
         self.setState(ChatRoom.STATE.LEFT);
     }
+};
+
+/**
+ * Archive this chat room
+ *
+ */
+ChatRoom.prototype.archive = function() {
+    var self = this;
+    var mask = 0x01;
+    var flags = ChatRoom.ARCHIVED;
+
+    asyncApiReq({
+        'a' : 'mcsf',
+        'id': self.chatId,
+        'm' : mask,
+        'f' : flags,
+        'v' : Chatd.VERSION}
+        )
+        .done(function(r) {
+            if (r === 0) {
+                self.updateFlags(flags, true);
+            }
+        });
+};
+
+/**
+ * Unarchive this chat room
+ *
+ */
+ChatRoom.prototype.unarchive = function() {
+    var self = this;
+    var mask = 0x01;
+    var flags = 0x00;
+
+    asyncApiReq({
+        'a': 'mcsf',
+        'id': self.chatId,
+        'm':mask, 'f':flags,
+        'v': Chatd.VERSION}
+        )
+        .done(function(r) {
+            if (r === 0) {
+                self.updateFlags(flags, true);
+            }
+        });
 };
 
 /**

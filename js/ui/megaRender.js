@@ -347,7 +347,7 @@
                 initOpcGridScrolling();
                 initIpcGridScrolling();
 
-                $('.grid-table tr').remove();
+                $('.grid-table:not(.arc-chat-messages-block) tr').remove();
                 $('.file-block-scrolling a').remove();
                 $('.contacts-blocks-scrolling a').remove();
 

@@ -9,11 +9,20 @@
     height: calc(100% + 36px);
     margin: -36px 0 0 0;
 }
-.content-panel.conversations {
+.content-panel.conversations, .archived-chats .archive-chat-list {
     background-image: url(../images/mega/nw-chat-bg_v1.svg);
     background-repeat: repeat;
     min-height: 100%;
     display: block;
+}
+.archived-chats .archive-chat-list {
+    min-height: initial;
+}
+.conversation-reduce-height {
+    position: relative;
+    height: -webkit-calc(100% - 37px) !important;
+    height:    -moz-calc(100% - 37px) !important;
+    height:         calc(100% - 37px) !important;
 }
 .conversations-pane li {
     padding: 8px 12px;
@@ -24,10 +33,10 @@
     box-sizing: border-box;
     cursor: pointer;
 }
-.conversations-pane li:nth-child(even) {
+.conversations-pane li:nth-child(even), .arc-chat-messages-block tr.arc-chat-list:nth-child(even) {
     background-color: #FFFFFF;
 }
-.conversations-pane li:nth-child(odd) {
+.conversations-pane li:nth-child(odd), .arc-chat-messages-block tr.arc-chat-list:nth-child(odd) {
     background-color: #FAFAFA;
 }
 .user-card-name.conversation-name {
@@ -155,4 +164,57 @@
 }
 .unread-messages + .call-duration + .conversation-message {
     margin-right: 150px;
+}
+
+.arc-conversation-btn-block {
+    position: absolute;
+    bottom: 0;
+    height: 36px;
+    background-color: #fafafa;
+    width: 100%;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    cursor: pointer;
+    -webkit-transition: all 300ms ease;
+    -moz-transition: all 300ms ease;
+    -ms-transition: all 300ms ease;
+    -o-transition: all 300ms ease;
+    transition: all 300ms ease;
+}
+.arc-conversation-btn-block:hover {
+    background-color: #f2f2f2;
+    color: #222;
+    -webkit-transition: all 300ms ease;
+    -moz-transition: all 300ms ease;
+    -ms-transition: all 300ms ease;
+    -o-transition: all 300ms ease;
+    transition: all 300ms ease;
+}
+.arc-conversation-btn-block.active {
+    background-color: #66BCE3;
+}
+.arc-conversation-icon {
+    display: inline-block;
+    margin: 8px 12px;
+    float:left;
+}
+.arc-conversation-heading {
+    display: inline-block;
+    float:left;
+    line-height: 36px;
+}
+.arc-conversation-btn-block.active .arc-conversation-heading {
+    color: #fff;
+}
+.arc-conversation-number {
+    float: right;
+    font-size: 11px;
+    color: white;
+    padding: 1px 6px;
+    background-color: #777;
+    border-radius: 4px;
+    margin: 10px 12px;
+}
+.arc-conversation-btn-block.active .arc-conversation-number {
+    color: #66BCE3;
+    background-color: #fff;
 }

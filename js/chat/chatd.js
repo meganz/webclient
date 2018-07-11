@@ -2590,7 +2590,9 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
             self.removefrompersist(trivialkeys[keyidmsgid]);
         }
         // remove the key message from the local pending list.
-        array.remove(self.sendingList, firstkeyxkey);
+        if (self.sendingList.indexOf(firstkeyxkey) >= 0) {
+            array.remove(self.sendingList, firstkeyxkey);
+        }
         delete self.sendingbuf[self.sending[firstkeyxkey]];
         delete self.sending[firstkeyxkey];
         self.updatekeyid(keyid);

@@ -1175,6 +1175,23 @@ scparser.$add('mcc', function(a) {
     }
 });
 
+// MEGAchat archive/unarchive
+scparser.$add('mcfc', function(a) {
+    'use strict';
+
+    if (window.megaChatIsReady) {
+        var room = megaChat.getChatById(a.id);
+        if (room) {
+            return room.updateFlags(a.f, true);
+        }
+    }
+
+    if (!loadfm.chatmcfc) {
+        loadfm.chatmcfc = {};
+    }
+    loadfm.chatmcfc[a.id] = a.f;
+});
+
 scparser.$add('_sn', function(a) {
     // sn update?
     if (d) {
@@ -2999,6 +3016,13 @@ function loadfm_callback(res) {
     if (res.mcf) {
         // save the response to be processed later once chat files were loaded
         loadfm.chatmcf = res.mcf.c || res.mcf;
+        // cf will include the flags (like whether it is archived) and chatid,
+        // so it needs to combine it before processing it.
+        if (res.mcf.cf) {
+            for (var i = 0; i < res.mcf.cf.length; i++) {
+                loadfm.chatmcf[i].f = res.mcf.cf[i].f;
+            }
+        }
         // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
         processMCF(loadfm.chatmcf);
     }

@@ -1222,13 +1222,14 @@ React.makeElement = React['createElement'];
 	    if (lastMessage.renderableSummary) {
 	        renderableSummary = lastMessage.renderableSummary;
 	    } else {
-	        renderableSummary = lastMessage.textContents ? removeHTML(lastMessage.textContents, true) : "";
-
 	        if (lastMessage.isManagement && lastMessage.isManagement()) {
 	            renderableSummary = lastMessage.getManagementMessageSummaryText();
 	        } else if (!lastMessage.textContents && lastMessage.dialogType) {
 	            renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+	        } else {
+	            renderableSummary = lastMessage.textContents;
 	        }
+	        renderableSummary = renderableSummary && removeHTML(renderableSummary, true) || '';
 
 	        var escapeUnescapeArgs = [{ 'type': 'onPreBeforeRenderMessage', 'textOnly': true }, { 'message': { 'textContents': renderableSummary } }, ['textContents', 'messageHtml'], 'messageHtml'];
 

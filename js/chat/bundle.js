@@ -4047,8 +4047,9 @@ React.makeElement = React['createElement'];
 	        var self = this;
 
 	        var foundKeys = Object.keys(self.props);
-	        array.remove(foundKeys, 'dropdowns', true);
-
+	        if (foundKeys.indexOf('dropdowns') >= 0) {
+	            array.remove(foundKeys, 'dropdowns', true);
+	        }
 	        var shouldUpdate = undefined;
 	        foundKeys.forEach(function (k) {
 	            if (typeof shouldUpdate === 'undefined') {
@@ -4342,7 +4343,9 @@ React.makeElement = React['createElement'];
 	                            self.props.onSelected(selected);
 	                        }
 	                    } else {
-	                        array.remove(selected, contactHash);
+	                        if (selected.indexOf(contactHash) >= 0) {
+	                            array.remove(selected, contactHash);
+	                        }
 	                        if (self.props.onSelected) {
 	                            self.props.onSelected(selected);
 	                        }
@@ -4497,7 +4500,9 @@ React.makeElement = React['createElement'];
 	                                self.props.onSelected(selected);
 	                            }
 	                        } else {
-	                            array.remove(selected, contactHash);
+	                            if (selected.indexOf(contactHash) >= 0) {
+	                                array.remove(selected, contactHash);
+	                            }
 	                            if (self.props.onSelected) {
 	                                self.props.onSelected(selected);
 	                            }
@@ -10124,9 +10129,9 @@ React.makeElement = React['createElement'];
 	        var contactsList = [];
 
 	        contacts = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getParticipantsExceptMe() : room.getParticipantsExceptMe();
-
-	        array.remove(contacts, u_handle, true);
-
+	        if (contacts.indexOf(u_handle) >= 0) {
+	            array.remove(contacts, u_handle, true);
+	        }
 	        var firstVisibleUserNum = Math.floor(self.props.scrollPositionY / self.props.contactCardHeight);
 	        var visibleUsers = Math.ceil(self.props.scrollHeight / self.props.contactCardHeight);
 	        var lastVisibleUserNum = firstVisibleUserNum + visibleUsers;

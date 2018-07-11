@@ -156,8 +156,9 @@ var ContactCard = React.createClass({
         var self = this;
 
         var foundKeys = Object.keys(self.props);
-        array.remove(foundKeys, 'dropdowns', true);
-
+        if (foundKeys.indexOf('dropdowns') >= 0) {
+            array.remove(foundKeys, 'dropdowns', true);
+        }
         var shouldUpdate = undefined;
         foundKeys.forEach(function(k) {
             if (typeof(shouldUpdate) === 'undefined') {
@@ -451,7 +452,9 @@ var ContactPickerWidget = React.createClass({
                         }
                     }
                     else {
-                        array.remove(selected, contactHash);
+                        if (selected.indexOf(contactHash) >= 0) {
+                            array.remove(selected, contactHash);
+                        }
                         if (self.props.onSelected) {
                             self.props.onSelected(selected);
                         }
@@ -599,7 +602,9 @@ var ContactPickerWidget = React.createClass({
                                 }
                             }
                             else {
-                                array.remove(selected, contactHash);
+                                if (selected.indexOf(contactHash) >= 0) {
+                                    array.remove(selected, contactHash);
+                                }
                                 if (self.props.onSelected) {
                                     self.props.onSelected(selected);
                                 }

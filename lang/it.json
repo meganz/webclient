@@ -1822,6 +1822,7 @@
     "16653": "Per un'esperienza piena di opzioni, scarica la nostra app o utilizza il nostro sito su un PC.",
     "16664": "La nuova password deve essere differente dalla precedente.",
     "16671": "Scarica utilizzando l'app desktop di MEGA per dei download pi\u00f9 veloci.",
+    "16689": "Archivio",
     "16763": "Copiato negli appunti",
     "16861": "Installa il client desktop di MEGA",
     "16862": "Aumenta la performance del trasferimento dei file dal tuo browser",
@@ -2641,7 +2642,14 @@
     "19123": "Guadagna bonus",
     "19124": "Ottieni spazio di archiviazione e banda di trasferimento gratuita per ogni amico che installa un'app di MEGA",
     "19125": "Inizia chiamata...",
-    "19134": "Transferred",
-    "19135": "Your upload(s) cannot proceed because your account is full",
-    "19136": "Please upgrade to pro by clicking one of the options below and your upload(s) will resume automatically."
+    "19126": "Contact Reinvite",
+    "19127": "%1 has been reinvited and will appear in your contact list once accepted.",
+    "19128": "Enabling the selected user has failed",
+    "19129": "Create your [A]business[\/A] user account",
+    "19130": "While MEGA does not have access to you data, your organization administrators do have the ability to control and view your data, chats and other information in your user account. If you do not consent to this please contact your organization administrators and discuss with them.If you wish to use MEGA for personal reasons please sign up for an individual account.",
+    "19131": "Never enter your password on a device that is not approved by your organization administrators. Do not log into your account from a shared or public computer.",
+    "19132": "Your account is a business user account.",
+    "19134": "Trasferiti",
+    "19135": "Il tuo o i tuoi upload non possono procedere poich\u00e9 il tuo account \u00e8 pieno.",
+    "19136": "Per favore, aggiorna il tuo account ad uno PRO cliccando su una delle opzioni qui sotto e il tuo o i tuoi upload riprenderanno automaticamente."
 }

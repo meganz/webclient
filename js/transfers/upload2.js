@@ -306,85 +306,6 @@ var ulmanager = {
             });
     },
 
-    ulFileReader: function UM_ul_filereader(file) {
-        var handler;
-        if (is_chrome_firefox && "u8" in file) {
-            if (d > 1) {
-                ulmanager.logger.info('Using Firefox ulReader');
-            }
-
-            handler = function ulReader(task, done) {
-                var error = null;
-
-                try {
-                    task.bytes = file.u8(task.start, task.end);
-                }
-                catch (e) {
-                    error = e;
-                }
-                Soon(function() {
-                    done(error);
-                });
-            };
-        }
-        if (!handler) {
-            var fs = new FileReader();
-
-            handler = function(task, done) {
-                var end = task.start + task.end;
-                var blob;
-
-                fs.pos = task.start;
-                fs.onerror = function(evt) {
-                    done(new Error(evt));
-                    done = null;
-                };
-                fs.onloadend = function(evt) {
-                    if (done) {
-                        var target = evt.target;
-                        var error = true;
-                        if (target.readyState === FileReader.DONE) {
-                            if (target.result instanceof ArrayBuffer) {
-                                try {
-                                    task.bytes = new Uint8Array(target.result);
-                                    error = null;
-                                }
-                                catch (e) {
-                                    handler.logger.error(e);
-                                    error = e;
-                                }
-                            }
-                        }
-                        done(error);
-                    }
-                    blob = undefined;
-                };
-                try {
-                    if (file.slice || file.mozSlice) {
-                        if (file.slice) {
-                            blob = file.slice(task.start, end);
-                        }
-                        else {
-                            blob = file.mozSlice(task.start, end);
-                        }
-                        xhr_supports_typed_arrays = true;
-                    }
-                    else {
-                        blob = file.webkitSlice(task.start, end);
-                    }
-                    fs.readAsArrayBuffer(blob);
-                }
-                catch (e) {
-                    handler.logger.error(e);
-                    done(e);
-                    done = null;
-                }
-            };
-        }
-        handler = new MegaQueue(handler, 1, 'ul-filereader');
-        return handler;
-    },
-
     ulFinalize: function UM_ul_finalize(file, target) {
         if (d) {
             ulmanager.logger.info(file.name, "ul_finalize", file.target, target);
@@ -607,15 +528,10 @@ var ulmanager = {
             }
         }
 
-        file.ul_keyNonce = JSON.stringify(file.ul_key);
-        file.ul_macs = Object.create(null);
-        file.totalbytessent = 0;
-        file.ul_readq = [];
-        file.ul_plainq = {};
-        file.ul_intransit = 0;
-        file.ul_inflight = {};
-        file.ul_sendchunks = {};
+        file.ul_offsets = [];
         file.ul_lastProgressUpdate = 0;
+        file.ul_macs = Object.create(null);
+        file.ul_keyNonce = JSON.stringify(file.ul_key);
         file.ul_aes = new sjcl.cipher.aes([
             file.ul_key[0], file.ul_key[1], file.ul_key[2], file.ul_key[3]
         ]);
@@ -659,10 +575,13 @@ var ulmanager = {
             }
 
             // if (d) ulmanager.logger.info('ulTasks', tasks);
-            Object.keys(tasks).reverse().forEach(function(s) {
-                    ulQueue.pushFirst(tasks[s]);
+            Object.keys(tasks).reverse().forEach(function(k) {
+                file.ul_offsets.push({
+                    byteOffset: parseInt(k),
+                    byteLength: tasks[k].end
                 });
-
+                ulQueue.pushFirst(tasks[k]);
+            });
         }
         else {
             ulQueue.pushFirst(new ChunkUpload(file, 0, 0));
@@ -1249,17 +1168,19 @@ ChunkUpload.prototype.upload = function() {
     this.xhr = xhr;
 };
 
-ChunkUpload.prototype.io_ready = function(task, args) {
-    if (args[0] || !this.file || !this.file.ul_keyNonce) {
+ChunkUpload.prototype.io_ready = function(res) {
+    'use strict';
+
+    if (res < 0 || !this.file || !this.file.ul_keyNonce) {
         if (this.file) {
             if (d) {
-                this.logger.error('UL IO Error', args[0]);
+                this.logger.error('UL IO Error', res);
             }
 
             if (this.file.done_starting) {
                 this.file.done_starting();
             }
-            ulmanager.retry(this.file, this, "IO failed: " + args[0]);
+            ulmanager.retry(this.file, this, "IO failed: " + res);
         }
         else {
             if (d) {
@@ -1267,50 +1188,11 @@ ChunkUpload.prototype.io_ready = function(task, args) {
             }
         }
     }
-    else if (this.start === 0 && this.bytes.length === 0x480000) {
-        // split to chunk boundaries
-        var offset = 0;
-        var chunks = 8;
-        var data = this.bytes;
-        var nonce = this.file.ul_keyNonce;
-        var blockSize = ulmanager.ulBlockSize;
-        var ack = function() {
-            if (!--chunks) {
-                this.upload();
-            }
-        };
-
-        for (var i = 1; i <= 8; i++) {
-            Encrypter.push([this, nonce, offset / 16, data.slice(offset, offset + (i * blockSize))], ack, this);
-            offset += i * blockSize;
-        }
-
-        this.appendMode = true;
-    }
-    /*else if (this.bytes.length > 0x100000) {
-        var chunks = 0;
-        var data = this.bytes;
-        var nonce = this.file.ul_keyNonce;
-        var ack = function() {
-            if (!--chunks) {
-                this.upload();
-            }
-        };
-
-        console.assert(!(data.length % 0x100000), 'check this..');
-
-        for (var i = 0; i < data.length; i += 0x100000) {
-            Encrypter.push([this, nonce, i / 16, data.slice(i, i + 0x100000)], ack, this);
-            chunks++;
-        }
-
-        this.appendMode = true;
-    }*/
     else {
-        task = [this, this.file.ul_keyNonce, this.start / 16, this.bytes];
-        // TODO: Modify CreateWorkers() and use this gid to terminate over cancelled uploads
-        task[this.gid] = 1;
-        Encrypter.push(task, this.upload, this);
+        this.bytes = res.bytes;
+        this.suffix = res.suffix;
+        Object.assign(this.file.ul_macs, res.file.ul_macs);
+        this.upload();
     }
 };
 
@@ -1337,9 +1219,19 @@ ChunkUpload.prototype.run = function(done) {
     else {
         this.logger.info('.run');
         if (!this.file.ul_reader) {
-            this.file.ul_reader = ulmanager.ulFileReader(this.file);
+            this.file.ul_reader = new FileUploadReader(this.file);
+
+            if (d > 1) {
+                if (!window.ul_reader) {
+                    window.ul_reader = [];
+                }
+                window.ul_reader.push(this.file.ul_reader);
+            }
         }
-        this.file.ul_reader.push(this, this.io_ready, this);
+        var self = this;
+        this.file.ul_reader.getChunk(this.start, function(res) {
+            self.io_ready(res);
+        });
     }
     array.remove(GlobalProgress[this.gid].working, this, 1);
     GlobalProgress[this.gid].working.push(this);
@@ -1556,7 +1448,6 @@ ulQueue.poke = function(file, meth) {
             ulQueue.resume();
         }
         if (file.ul_reader) {
-            file.ul_reader.filter(gid);
             file.ul_reader.destroy();
             file.ul_reader = null;
         }

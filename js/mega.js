@@ -1175,28 +1175,21 @@ scparser.$add('mcc', function(a) {
     }
 });
 
+// MEGAchat archive/unarchive
 scparser.$add('mcfc', function(a) {
-    // MEGAchat archive/unarchive
-    var cachemcfc = function (a) {
-        if (!loadfm.chatmcfc) {
-            loadfm.chatmcfc = {};
-        }
-        loadfm.chatmcfc[a.id] = a.f;
-    };
+    'use strict';
 
-    if (typeof megaChat !== "undefined") {
+    if (window.megaChatIsReady) {
         var room = megaChat.getChatById(a.id);
         if (room) {
-            room.updateFlags(a.f, true);
-        }
-        else {
-            cachemcfc(a);
+            return room.updateFlags(a.f, true);
         }
     }
-    // if megaChat is not created yet.
-    else {
-        cachemcfc(a);
+
+    if (!loadfm.chatmcfc) {
+        loadfm.chatmcfc = {};
     }
+    loadfm.chatmcfc[a.id] = a.f;
 });
 
 scparser.$add('_sn', function(a) {

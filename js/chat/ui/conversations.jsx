@@ -18,14 +18,16 @@ var renderMessageSummary = function(lastMessage) {
         renderableSummary = lastMessage.renderableSummary;
     }
     else {
-        renderableSummary = lastMessage.textContents ? removeHTML(lastMessage.textContents, true) : "";
-
         if (lastMessage.isManagement && lastMessage.isManagement()) {
             renderableSummary = lastMessage.getManagementMessageSummaryText();
         }
         else if (!lastMessage.textContents && lastMessage.dialogType) {
             renderableSummary = Message._getTextContentsForDialogType(lastMessage);
         }
+        else {
+            renderableSummary = lastMessage.textContents;
+        }
+        renderableSummary = renderableSummary && removeHTML(renderableSummary, true) || '';
 
         var escapeUnescapeArgs = [
             {'type': 'onPreBeforeRenderMessage', 'textOnly': true},

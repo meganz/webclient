@@ -187,11 +187,15 @@ function u_checklogin3a(res, ctx) {
         }
         u_attr.flags = Object(u_attr.flags);
 
-        var name = u_attr.firstname || '';
-        if (u_attr.lastname) {
-            name += (name.length ? ' ' : '') + u_attr.lastname;
-        }
-        u_attr.fullname = String(name || u_attr.name || '').trim();
+        Object.defineProperty(u_attr, 'fullname', {
+            get: function() {
+                var name = this.firstname || '';
+                if (this.lastname) {
+                    name += (name.length ? ' ' : '') + this.lastname;
+                }
+                return String(name || this.name || '').trim();
+            }
+        });
 
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
         if (typeof alarm !== 'undefined' && u_attr.lup !== undefined && !is_mobile) {

@@ -253,7 +253,7 @@ function bytesToSize(bytes, precision, format) {
 
     if (!bytes) {
         resultSize = 0;
-        resultUnit = s_mb;
+        resultUnit = s_b;
     }
     else if ((bytes >= 0) && (bytes < kilobyte)) {
         resultSize = parseInt(bytes);

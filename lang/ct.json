@@ -2651,5 +2651,8 @@
     "19132": "Your account is a business user account.",
     "19134": "Transferred",
     "19135": "Your upload(s) cannot proceed because your account is full",
-    "19136": "Please upgrade to pro by clicking one of the options below and your upload(s) will resume automatically."
+    "19136": "Please upgrade to PRO by clicking one of the options below and your upload(s) will resume automatically.",
+    "19137": "Welcome to MEGA User Management",
+    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify users settings, migrate users data and get an overview of your business account status here.",
+    "19139": "Get started by inviting people to your team"
 }

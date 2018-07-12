@@ -1408,7 +1408,7 @@ var dlmanager = {
 
                 $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
 
-                $('.download.over-transfer-quota', $dlPageTW).removeClass('hidden');
+                $('.download.video .download.over-transfer-quota').removeClass('hidden');
                 $('.download.in-progress, .video-mode-wrapper', $dlPageTW).addClass('over-quota');
             }
         }

@@ -1671,6 +1671,8 @@ var dlmanager = {
     showLimitedBandwidthDialog: function(res, callback, flags) {
         'use strict';
 
+        var $dialog = $('.limited-bandwidth-dialog');
+
         loadingDialog.hide();
         this.onLimitedBandwidth = function() {
             if (callback) {
@@ -1702,8 +1704,6 @@ var dlmanager = {
         }
 
         M.safeShowDialog('download-pre-warning', function() {
-            var $dialog = $('.limited-bandwidth-dialog');
-
             eventlog(99617);// overquota pre-warning shown.
 
             // Load the membership plans

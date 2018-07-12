@@ -1297,6 +1297,12 @@ ChunkUpload.prototype.run = function(done) {
         this.logger.info('.run', 'Reusing previously encrypted data.');
         this.upload();
     }
+    else if (this.file.size === 0) {
+        this.logger.info('.run', 'Uploading 0-bytes file...');
+        this.bytes = new Uint8Array(0);
+        this.suffix = '/0?c=AAAAAAAAAAAAAAAA';
+        this.upload();
+    }
     else {
         this.logger.info('.run');
         if (!this.file.ul_reader) {

@@ -1714,7 +1714,7 @@ var dlmanager = {
             });
 
             uiCheckboxes($dialog, 'ignoreLimitedBandwidth');
-            this._overquotaClickListeners($dialog, flags, res || true);
+            dlmanager._overquotaClickListeners($dialog, flags, res || true);
 
             if (is_mobile) {
                 $dialog.find('.fm-dialog-close, .mobile.upgrade-to-pro').rebind('click', function() {

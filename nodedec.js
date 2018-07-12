@@ -145,7 +145,7 @@ function crypto_decryptnode(n) {
         }
         else if (n.k[11] == ':' && u_handle === n.k.substr(0, 11)) {
             id = u_handle;
-            p = u_handle.length+1;
+            p = 12; // save calculation.  u_handle.length+1;
         } else {
             // do we have a suitable sharekey?
             for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {

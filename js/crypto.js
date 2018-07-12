@@ -461,7 +461,13 @@ function api_init(channel, service, split) {
     };
 }
 
-// queue request on API channel
+
+/**
+ * queue request on API channel
+ * @param {object} request              request object to be sent to API
+ * @param {object} context              context object to be returned with response, has 'callback' func to be called
+ * @param {number} channel              optional - channel number to use (default =0) 
+ */
 function api_req(request, context, channel) {
     "use strict";
 

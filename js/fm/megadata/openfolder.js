@@ -314,13 +314,37 @@
         else if (id === 'ipc') {
             id = 'ipc';
         }
-        else if (id === 'user-management') {
-            id = 'user-management';
+        else if (id && id.substr(0, 15) === 'user-management') {
+            // id = 'user-management';
             M.require('businessAcc_js', 'businessAccUI_js').done(function () {
-                var usersM = new BusinessAccountUI();
+                
                 M.onFileManagerReady(function () {
+                    var usersM = new BusinessAccountUI();
                     M.onSectionUIOpen('user-management');
-                    usersM.viewSubAccountListUI();
+                    // checking if we loaded sub-users and drew them
+                    if (!usersM.initialized) {
+                        // if not, then the fastest way is to render the business home page
+                        usersM.viewSubAccountListUI();
+                    }
+                    var subPage = id.replace('/', '').split('user-management')[1];
+                    if (subPage && subPage.length > 2) {
+                        if (subPage === 'overview') {
+
+                        }
+                        else if (subPage === 'blablabla') {
+
+                        }
+                        else if (subPage.length === 11) {
+                            usersM.viewSubAccountInfoUI(subPage);
+                        }
+                    }
+                    else {
+                        // check if the current object is not the first instance
+                        // because if it's there's no need to render again
+                        if (usersM.initialized) {
+                            usersM.viewSubAccountListUI();
+                        }
+                    }
                 });
             });
         }

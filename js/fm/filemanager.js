@@ -2394,6 +2394,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.contacts-details-block').addClass('hidden');
     $('.files-grid-view.contact-details-view').addClass('hidden');
     $('.fm-blocks-view.contact-details-view').addClass('hidden');
+    $('.files-grid-view.user-management-view').addClass('hidden');
 
     if (this.currentdirid === 'contacts') {
         $('.files-grid-view.contacts-view').removeClass('hidden');
@@ -2422,6 +2423,10 @@ FileManager.prototype.addGridUI = function(refresh) {
             $.detailsGridHeader();
             initGridScrolling();
         }
+    }
+    else if (this.currentdirid === 'user-management') {
+        $('.files-grid-view.user-management-view').removeClass('hidden');
+        initGridScrolling();
     }
     else {
         $('.files-grid-view.fm').removeClass('hidden');

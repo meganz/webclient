@@ -2879,7 +2879,7 @@ function process_businessAccountSubUsers_SC(packet) {
 
     var valChanged = false;
 
-    if (packet.s && packet.s !== subUser.s) { // new status
+    if ('s' in packet && packet.s !== subUser.s) { // new status
         subUser.s = packet.s;
         valChanged = true;
     }
@@ -2896,9 +2896,9 @@ function process_businessAccountSubUsers_SC(packet) {
         valChanged = true;
     }
     if (valChanged) {
-        // var bAccount = new BusinessAccount();
-        // bAccount.parseSUBA(subUser, false, true);
-        mBroadcaster.sendMessage('business:subuserUpdate', subUser);
+        var bAccount = new BusinessAccount();
+        bAccount.parseSUBA(subUser, false, true);
+        // mBroadcaster.sendMessage('business:subuserUpdate', subUser);
     }
 }
 

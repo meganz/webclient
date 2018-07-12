@@ -333,7 +333,7 @@ MegaData.prototype.injectNodes = function(nodes, target, callback) {
 
 /**
  * @param {Array}       cn            Array of nodes that needs to be copied
- * @param {String}      t             Destination node
+ * @param {String}      t             Destination node handle
  * @param {Boolean}     [del]         Should we delete the node after copying? (Like a move operation)
  * @param {MegaPromise} [promise]     promise to notify completion on (Optional)
  * @param {Array}       [tree]        optional tree from M.getCopyNodes

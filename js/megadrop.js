@@ -232,6 +232,8 @@ mega.megadrop = (function() {
             var folderName = '';
             var state = 2;
 
+            var opPromise = new MegaPromise();
+
             if (nodeId) {
                 if (!pufOpts.items[nodeId]) {
                     pufOpts.items[nodeId] = Object.create(null);
@@ -248,6 +250,7 @@ mega.megadrop = (function() {
                         if (d) {
                             console.error('Missing node info M.d ', nodeId);
                         }
+                        return opPromise.reject();
                     }
                     pufOpts.items[nodeId].fn = folderName;
 
@@ -261,12 +264,15 @@ mega.megadrop = (function() {
                             }
                         });
                     }
+                    opPromise.resolve();
                 });
+                return opPromise;
             }
             else {
                 if (d) {
                     console.error('puf.add nodeHandle is not provided.');
                 }
+                return opPromise.reject();
             }
         };
 
@@ -312,10 +318,11 @@ mega.megadrop = (function() {
                     }
                 }
                 else {
-                    add(puh);
-                    if (requesti === puh.i) {
-                        pup.create(puh.h);
-                    }
+                    add(puh).done(function () {
+                        if (requesti === puh.i) {
+                            pup.create(puh.h);
+                        }
+                    });
                 }
             }
         };

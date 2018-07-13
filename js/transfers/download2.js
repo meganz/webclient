@@ -1276,6 +1276,11 @@ var dlmanager = {
                     var $countdown = $dialog.find('.countdown').removeClass('hidden');
                     $countdown.safeHTML(secondsToTime(timeLeft, 1));
 
+                    if ($dlPageCountdown) {
+                        var html = '<span class="countdown">' + secondsToTime(timeLeft) + '</span>';
+                        $dlPageCountdown.safeHTML(escapeHTML(l[7100]).replace('%1', html));
+                    }
+
                     this._overQuotaTimeLeftTick =
                         setInterval(function() {
                             var time = secondsToTime(timeLeft--, 1);

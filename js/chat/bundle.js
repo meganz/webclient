@@ -10335,6 +10335,10 @@ React.makeElement = React['createElement'];
 
 	                return;
 	            }
+	            if (e.target.classList.contains('no-thumb-prev')) {
+
+	                return;
+	            }
 
 	            var $block;
 	            if ($(e.target).is('.shared-data')) {
@@ -10521,6 +10525,10 @@ React.makeElement = React['createElement'];
 	    },
 
 	    _startPreview: function _startPreview(v, e) {
+	        if ($(e && e.target).is('.tiny-button')) {
+
+	            return;
+	        }
 	        var chatRoom = this.props.message.chatRoom;
 	        assert(M.chat, 'Not in chat.');
 	        chatRoom._rebuildAttachmentsImmediate();
@@ -10690,9 +10698,10 @@ React.makeElement = React['createElement'];
 	                        var isPreviewable = isImage || isVideo;
 
 	                        var dropdown = null;
+	                        var noThumbPrev = '';
 	                        var previewButton = null;
 
-	                        if (showThumbnail) {
+	                        if (showThumbnail || isImage) {
 	                            var imagesListKey = message.messageId + "_" + v.h;
 	                            if (!chatRoom.images.exists(imagesListKey)) {
 	                                v.id = imagesListKey;
@@ -10700,15 +10709,19 @@ React.makeElement = React['createElement'];
 	                                v.messageId = message.messageId;
 	                                chatRoom.images.push(v);
 	                            }
-	                            if (isPreviewable) {
-	                                var previewLabel = isVideo ? l[17732] : l[1899];
-	                                previewButton = React.makeElement(
-	                                    'span',
-	                                    { key: 'previewButton' },
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
-	                                        onClick: self._startPreview.bind(self, v) })
-	                                );
+	                        }
+
+	                        if (isPreviewable) {
+	                            if (!showThumbnail) {
+	                                noThumbPrev = 'no-thumb-prev';
 	                            }
+	                            var previewLabel = isVideo ? l[17732] : l[1899];
+	                            previewButton = React.makeElement(
+	                                'span',
+	                                { key: 'previewButton' },
+	                                React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
+	                                    onClick: self._startPreview.bind(self, v) })
+	                            );
 	                        }
 
 	                        if (contact.u === u_handle) {
@@ -10840,7 +10853,8 @@ React.makeElement = React['createElement'];
 	                        var attachmentClasses = "message shared-data";
 	                        var preview = React.makeElement(
 	                            'div',
-	                            { className: 'data-block-view medium' },
+	                            { className: "data-block-view medium " + noThumbPrev,
+	                                onClick: isPreviewable && self._startPreview.bind(self, v) },
 	                            dropdown,
 	                            React.makeElement(
 	                                'div',

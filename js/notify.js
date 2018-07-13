@@ -640,16 +640,18 @@ var notify = {
 
             // Get the folder ID from the HTML5 data attribute
             var folderOrFileId = $(this).attr('data-folder-or-file-id');
-            var parentFolderId = M.d[folderOrFileId].p;
+            var parentFolderId = M.getNodeByHandle(folderOrFileId).p;
 
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
 
-            // Open the folder
-            M.openFolder(parentFolderId)
-                .always(function() {
-                    reselect(true);
-                });
+            if (parentFolderId) {
+                // Open the folder
+                M.openFolder(parentFolderId)
+                    .always(function() {
+                        reselect(true);
+                    });
+            }
         });
     },
 

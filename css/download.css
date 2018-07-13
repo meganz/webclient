@@ -1045,7 +1045,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
 .video-theatre-mode .download .pause-transfer.square {
     width: 48px;
 }
-.download.in-progress.over-quota, .video-theatre-mode .video-mode-wrapper.over-quota {
+.download.video .download.in-progress.over-quota, .video-theatre-mode .video-mode-wrapper.over-quota {
     display: none;
 }
 .download.over-transfer-quota {
@@ -1113,7 +1113,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     height: 34px;
     margin-left: 12px;
 }
-.video-mode-wrapper .share.big-button::after, .share.big-button::after {  
+.video-mode-wrapper .share.big-button::after, .share.big-button::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);

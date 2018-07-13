@@ -636,11 +636,8 @@ MegaData.prototype.syncUsersFullname = function(userId) {
             u_attr.lastname = lastName;
             u_attr.name = self.u[userId].name;
 
-            $('.user-name').text(u_attr.name);
-
-            $('.membership-big-txt.name:visible').text(
-                u_attr.name
-            );
+            $('.user-name').text(u_attr.fullname);
+            $('.membership-big-txt.name').text(u_attr.fullname);
         }
     });
 };

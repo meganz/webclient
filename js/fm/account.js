@@ -1947,12 +1947,7 @@ accountUI.userUIUpdate = function() {
 
 
     // Show first name or last name
-    if (u_attr.firstname) {
-        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
-    }
-    else {
-        $('.membership-big-txt.name').text(u_attr.name);
-    }
+    $('.membership-big-txt.name').text(u_attr.fullname);
 
     // Show email address
     if (u_attr.email) {

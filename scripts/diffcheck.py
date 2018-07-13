@@ -478,6 +478,19 @@ def inspectcss(file, ln, line, result):
 
     return fatal
 
+def inspecthtml(file, ln, line, result):
+    fatal = 0
+    line = line.strip()
+    indent = ' ' * (len(file)+len(str(ln))+3)
+
+    # check for hidden-less fm-dialogs
+    match = re.search(r'fm-dialog ', line)
+    if match and not re.search(r'hidden[\'"\s]', line):
+        fatal += 1
+        result.append('{}:{}: {}\n{}^ Missing hidden class on fm-dialog.'.format(file, ln, line, indent))
+
+    return fatal
+
 def inspectjs(file, ln, line, result):
     fatal = 0
     line = line.strip()
@@ -582,7 +595,7 @@ def reduce_validator(file_line_mapping, **extra):
             continue
 
         # Ignore this specific file types
-        if file_extension in ['.json','.py','.sh', '.svg', '.html']:
+        if file_extension in ['.json','.py','.sh', '.svg']:
             continue
 
         # If .min.js is in the filename (most basic detection), then log it and move onto the next file
@@ -592,7 +605,7 @@ def reduce_validator(file_line_mapping, **extra):
                           .format(file_path, warning))
             # continue
 
-        if os.path.getsize(file_path) > 120000 and file_extension != '.css':
+        if os.path.getsize(file_path) > 120000 and not file_extension in ['.css', '.html']:
             result.append('The file "{}" has turned too big, '
                           'any new functions must be moved elsewhere.'.format(file_path))
             # continue
@@ -611,6 +624,11 @@ def reduce_validator(file_line_mapping, **extra):
                 # Analyse CSS files...
                 if file_extension == '.css':
                     fatal += inspectcss(file_path, line_number, line, result)
+                    continue
+
+                # Analyse HTML files...
+                if file_extension == '.html':
+                    fatal += inspecthtml(file_path, line_number, line, result)
                     continue
 
                 # If line length exceeded, log it and move onto the next file

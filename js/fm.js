@@ -2478,6 +2478,13 @@ function closeDialog(ev) {
         delete $.termsAgree;
     }
 
+    if ($.dialog === 'createfolder') {
+        if ($.cfpromise) {
+            $.cfpromise.reject();
+            delete $.cfpromise;
+        }
+    }
+
     delete $.dialog;
     delete $.mcImport;
 
@@ -2491,7 +2498,7 @@ function closeDialog(ev) {
         $.dialog = $.copyDialog || $.moveDialog;
 
         $('.fm-dialog').addClass('arrange-to-back');
-        $('.fm-dialog.' + $.dialog + '-dialog').removeClass('arrange-to-back');
+        $('.fm-dialog.fm-picker-dialog').removeClass('arrange-to-back');
     }
     if ($.copyDialogContactsChangeToken) {
         // a listner for contacts changes is added at copy dialog
@@ -2547,16 +2554,23 @@ function createFolderDialog(close) {
         }
 
         loadingDialog.pshow();
+        $dialog.addClass('hidden');
+
         M.createFolder(target, v, new MegaPromise())
             .done(function(h) {
                 if (d) {
                     console.log('Created new folder %s->%s', target, h);
                 }
                 loadingDialog.phide();
+                if ($.cfpromise) {
+                    $.cfpromise.resolve(h);
+                    delete $.cfpromise;
+                }
                 createFolderDialog(1);
             })
             .fail(function(error) {
                 loadingDialog.phide();
+                $dialog.removeClass('hidden');
                 msgDialog('warninga', l[135], l[47], api_strerror(error));
             });
     };

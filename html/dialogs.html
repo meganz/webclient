@@ -302,42 +302,78 @@
     </div>
 </div>
 
-<!--ToDo: Change strings with appropriated lang.json-->
-<!-- copy-dialog can be replaced by nw-drag-drop-dialog in JS -->
-<div class="fm-dialog copy-dialog nw-drag-drop-dialog hidden">
-    <!--Header-->
-    <div class="dialog-title">
-        <!-- Please add "active" classname to necessary "copy-dialog-txt" block !-->
-        [$63]
-    </div><!--END Header-->
+<div class="fm-dialog fm-picker-dialog hidden">
+    <div class="fm-picker-dialog-title">[$63]</div>
+
+    <!-- Templates -->
+    <div class="fm-picker-dialog-panel-header">
+        <span>[$5916]</span>
+        <div class="fm-picker-dialog-panel-arrows"></div>
+        <div class="dialog-sorting-menu hidden">
+            <div class="context-menu-section">
+                <div class="sorting-menu-arrow"></div>
+                <div data-by="name" class="sorting-menu-item active">[$86]</div>
+                <div data-by="label" class="sorting-menu-item">[$17398]</div>
+                <!--
+                <div data-by="status" class="sorting-menu-item">[$89]</div>
+                <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
+                -->
+                <div class="sorting-item-divider"></div>
+            </div>
+            <div class="context-menu-section">
+                <div data-dir="1" class="sorting-menu-item active">[$6773]</div>
+                <div data-dir="-1" class="sorting-menu-item">[$6774]</div>
+            </div>
+        </div>
+        <div class="search-bar summary-input placeholder">
+            <input type="text" placeholder="[$102]">
+            <div class="search-icon icon"></div>
+        </div>
+    </div>
+    <!-- END Templates -->
 
     <!--Summary container-->
     <div class="summary-container">
-        <div class="summary-row">
+        <div class="summary-row unfold">
             <div class="summary-title">Selected items:</div>
-            <div class="summary-input correct-input scroll-auto">
-                <div class="item-row">
-                    <div class="transfer-filetype-icon generic file"></div>
-                    <div class="summary-ff-name">Travel image01. jpg Travel image01. jpg Travel image01. jpg</div>
-                    <span class=" "> (And 4 more...) </span>
-                    <div class="delete-img icon"></div>
+            <!--Add auto scroll-->
+            <div class="summary-input correct-input scroll-auto unfold">
+                <div class="item-row-group">
+                    <div class="item-row">
+                        <div class="transfer-filetype-icon generic file"></div>
+                        <div class="summary-ff-name">Travel image01. jpg Travel image01. jpg Travel image01. jpg</div>
+                        <div class="delete-img icon"></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="transfer-filetype-icon generic file"></div>
+                        <div class="summary-ff-name">Travel image01. jpg Travel image01. jpg Travel image01. jpg</div>
+                        <div class="delete-img icon"></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="transfer-filetype-icon generic file"></div>
+                        <div class="summary-ff-name">Travel image01. jpg Travel image01. jpg Travel image01. jpg</div>
+                        <div class="delete-img icon"></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="transfer-filetype-icon generic file"></div>
+                        <div class="summary-ff-name">Travel image01. jpg Travel image01. jpg Travel image01. jpg</div>
+                        <div class="delete-img icon"></div>
+                    </div>
+                    <div class="item-row">
+                        <div class="transfer-filetype-icon generic file"></div>
+                        <div class="summary-ff-name">Travel image01. jpg Travel image01. jpg Travel image01. jpg</div>
+                        <div class="delete-img icon"></div>
+                    </div>
                 </div>
             </div>
-            <div class="drop-down-icon icon"></div>
-            <div class="drop-up-icon icon hidden"></div>
+            <div class="drop-down-icon icon hidden"></div>
+            <div class="drop-up-icon icon"></div>
         </div>
         <div class="summary-row">
             <div class="summary-title">Target:</div>
-            <div class="summary-input placeholder">
-                <div class="link-row">
-                   <a class="fm-breadcrumbs cloud-drive has-next-button">
-                       <span class="right-arrow-bg"><span>Cloud drive</span></span>
-                   </a>
-                   <a class="fm-breadcrumbs folder">
-                       <span class="right-arrow-bg"><span>!qqqqwwww</span></span>
-                   </a>
-                   <div class="clear"></div>
-                </div>
+            <div class="summary-input high-light">
+                <div class="transfer-filetype-icon folder"></div>
+                <div class="summary-ff-name">Please choose a folder to paste the items.</div>
             </div>
         </div>
     </div><!--END summary-->
@@ -345,120 +381,55 @@
     <!--Folder container-->
     <div class="fm-dialog-body">
         <div class="side-pane">
-            <div class="copy-dialog-button cloud-drive cloud56-icon">
+            <!-- Please add "active" classname to necessary "fm-picker-dialog-button" block !-->
+            <div class="fm-picker-dialog-button cloud-drive cloud56-icon">
                 <div class="left-border"></div>
                 <div class="tooltip">[$1687]</div>
             </div>
-            <div class="copy-dialog-button shared-with-me share56-icon">
+            <div class="fm-picker-dialog-button shared-with-me share56-icon">
                 <div class="left-border"></div>
                 <div class="tooltip">[$5589]</div>
             </div>
-        <!--
-            <div class="copy-dialog-button conversations chat56-icon">
+            <div class="fm-picker-dialog-button conversations chat56-icon">
                 <div class="left-border"></div>
                 <div class="tooltip">[$17764]</div>
             </div>
 
-            <div class="copy-dialog-button rubbish56-icon">
+            <div class="fm-picker-dialog-button rubbish-bin rubbish56-icon">
                 <div class="left-border"></div>
-                <div class="tooltip">Rubbish Bin</div>
+                <div class="tooltip">[$167]</div>
             </div>
-        -->
         </div>
 
-        <div class="right-pane copy-dialog-tree-panel cloud-drive">
-            <div class="copy-dialog-panel-header">
-                <span>[$5916]</span>
-                <div class="copy-dialog-panel-arrows"></div>
-                <div class="dialog-sorting-menu hidden">
-                    <div class="context-menu-section">
-                        <div class="sorting-menu-arrow"></div>
-                        <div data-by="name" class="sorting-menu-item active">[$86]</div>
-                        <div data-by="label" class="sorting-menu-item">[$17398]</div>
-                        <!--
-                        <div data-by="status" class="sorting-menu-item">[$89]</div>
-                        <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
-                         -->
-                        <div class="sorting-item-divider"></div>
-                    </div>
-                    <div class="context-menu-section">
-                        <div data-dir="1" class="sorting-menu-item active">[$6773]</div>
-                        <div data-dir="-1" class="sorting-menu-item">[$6774]</div>
-                    </div>
-                </div>
-                <div class="search-bar summary-input placeholder">
-                    <input type="text" placeholder="Search">
-                    <div class="search-icon icon"></div>
-                </div>
-            </div>
+        <!-- Tab Sections -->
+        <div class="right-pane fm-picker-dialog-tree-panel cloud-drive">
+            <!--div class="fm-picker-dialog-panel-header"></div-->
             <div class="dialog-tree-panel-scroll">
-                <div class="dialog-content-block">
-                </div>
+                <div class="dialog-content-block"></div>
             </div>
         </div>
-        <div class="right-pane copy-dialog-tree-panel shared-with-me">
-            <div class="copy-dialog-panel-header">
-                <span>[$5916]</span>
-                <div class="copy-dialog-panel-arrows"></div>
-                <div class="dialog-sorting-menu hidden">
-                    <div class="context-menu-section">
-                        <div class="sorting-menu-arrow"></div>
-                        <div data-by="name" class="sorting-menu-item active">[$86]</div>
-                        <div data-by="label" class="sorting-menu-item">[$17398]</div>
-                        <!--
-                        <div data-by="status" class="sorting-menu-item">[$89]</div>
-                        <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
-                         -->
-                        <div class="sorting-item-divider"></div>
-                    </div>
-                    <div class="context-menu-section">
-                        <div data-dir="1" class="sorting-menu-item active">[$6773]</div>
-                        <div data-dir="-1" class="sorting-menu-item">[$6774]</div>
-                    </div>
-                </div>
-                <div class="search-bar summary-input placeholder">
-                    <input type="text" placeholder="Search">
-                    <div class="search-icon icon"></div>
-                </div>
-            </div>
+        <div class="right-pane fm-picker-dialog-tree-panel shared-with-me">
+            <!--div class="fm-picker-dialog-panel-header"></div-->
             <div class="dialog-tree-panel-scroll">
-                <div class="dialog-content-block">
-                    <!-- Insert list for conversatios/contacts here-->
-                    <!-- Use the JSP scroll thing -->
-                    <ul>
-                        <li>
-                            <!--Single contact-->
-                            <span class="nw-contact-item single-contact online">
-                                <span class="nw-contact-status"></span>
-                                <span class="nw-contact-name"></span>
-                                <span class="nw-contact-email"></span>
-                            </span>
-                            <!--End of Single contact-->
-                        </li>
-                        <li>
-                            <!--Multi contact-->
-                            <!--Tooltip to reveal users in group -->
-                            <div class="properties-context-menu hidden">
-                                <div class="properties-context-arrow"></div>
-                                <div class="properties-context-item away">
-                                    <div class="properties-contact-status"></div>
-                                    <span></span>
-                                </div>
-                            </div>
-                            <!--End of Tooltup -->
-                            <span class="nw-contact-item multi-contact">
-                                <span class="nw-contact-group-icon"></span>
-                                <span class="nw-contact-name group"></span>
-                                <span class="nw-contact-group">6 chat members</span>
-                            </span>
-                            <!--End of Multi contact-->
-                        </li>
-                    </ul>
-                </div>
+                <div class="dialog-content-block"></div>
             </div>
         </div>
-        <!-- Please add "active" classname to necessary "copy-dialog-empty" block !-->
-        <div class="dialog-empty-block copy cloud-drive">
+        <div class="right-pane fm-picker-dialog-tree-panel conversations">
+            <!--div class="fm-picker-dialog-panel-header"></div-->
+            <div class="dialog-tree-panel-scroll">
+                <div class="dialog-content-block"></div>
+            </div>
+        </div>
+        <div class="right-pane fm-picker-dialog-tree-panel rubbish-bin">
+            <!--div class="fm-picker-dialog-panel-header"></div-->
+            <div class="dialog-tree-panel-scroll">
+                <div class="dialog-content-block"></div>
+            </div>
+        </div>
+        <!-- END Tab Sections -->
+
+        <!-- Please add "active" classname to necessary "fm-picker-dialog-empty" block !-->
+        <div class="dialog-empty-block cloud-drive">
             <div class="dialog-empty-pad">
                 <div class="dialog-empty-icon"></div>
                 <div class="dialog-empty-header">
@@ -466,7 +437,7 @@
                 </div>
             </div>
         </div>
-        <div class="dialog-empty-block copy shared-with-me">
+        <div class="dialog-empty-block shared-with-me">
             <div class="dialog-empty-pad">
                 <div class="dialog-empty-icon"></div>
                 <div class="dialog-empty-header">
@@ -474,7 +445,15 @@
                 </div>
             </div>
         </div>
-        <div class="dialog-empty-block copy rubbish-bin">
+        <div class="dialog-empty-block conversations">
+            <div class="dialog-empty-pad">
+                <div class="dialog-empty-icon"></div>
+                <div class="dialog-empty-header">
+                    [$8000]
+                </div>
+            </div>
+        </div>
+        <div class="dialog-empty-block rubbish-bin">
             <div class="dialog-empty-pad">
                 <div class="dialog-empty-icon"></div>
                 <div class="dialog-empty-header">
@@ -485,10 +464,9 @@
 
     </div><!--END folder container-->
 
-
     <!--Buttons-->
     <div class="fm-notifications-bottom">
-        <div class="default-light-green-button right dialog-copy-button">
+        <div class="default-light-green-button right dialog-picker-button">
              [$16176]
         </div>
         <div class="default-white-button right dialog-cancel-button">
@@ -498,7 +476,7 @@
             [$68]
         </div>
 
-        <div class="permissions-menu hidden">
+        <div class="permissions-menu left hidden">
             <div class="permissions-menu-arrow"></div>
             <div class="permissions-menu-item read-only active"><span></span>[$7534]</div>
             <div class="permissions-menu-item read-and-write"><span></span>[$56]</div>
@@ -509,121 +487,7 @@
         </div>
         <div class="clear"></div>
     </div>
-</div><!--END copy-dialog-->
-
-<!--ToDo: Change strings with appropriated lang.json-->
-<div class="fm-dialog move-dialog hidden">
-    <!--Header-->
-    <div class="fm-dialog-header">
-        <!-- Please add "active" classname to necessary "move-dialog-txt" block !-->
-        <div class="fm-dialog-title">
-            [$62]
-            <span class="move-dialog-txt cloud-drive">([$1687])</span>
-            <span class="move-dialog-txt shared-with-me">([$5589])</span>
-            <span class="move-dialog-txt rubbish-bin">([$5738])</span>
-        </div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div><!--END Header-->
-    <div class="fm-dialog-body">
-        <div class="dropdown body dropdown-arrow down-arrow contact-preview hidden">
-            <i class="dropdown-white-arrow"></i>
-            <div class="contacts-info body">
-            </div>
-        </div>
-        <div class="move-dialog-button cloud-drive"></div>
-        <div class="move-dialog-button shared-with-me"></div>
-        <div class="move-dialog-button rubbish-bin"></div>
-        <div class="clear"></div>
-        <div class="dialog-sorting-menu hidden">
-            <div class="context-menu-section">
-                <div class="sorting-menu-arrow"></div>
-                <div data-by="name" class="sorting-menu-item active">[$86]</div>
-                <div data-by="label" class="sorting-menu-item">[$17398]</div>
-                <div data-by="status" class="sorting-menu-item">[$89]</div>
-                <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
-                <div class="sorting-item-divider"></div>
-            </div>
-            <div class="context-menu-section">
-                <div data-dir="1" class="sorting-menu-item active">[$6773]</div>
-                <div data-dir="-1" class="sorting-menu-item">[$6774]</div>
-            </div>
-        </div>
-
-        <!-- Please add "active" classname to necessary "move-dialog-tree-panel" block !-->
-        <div class="move-dialog-tree-panel cloud-drive">
-            <div class="move-dialog-panel-header">
-                <span>[$5916]</span>
-                <div class="move-dialog-panel-arrows"></div>
-            </div>
-            <div class="dialog-tree-panel-scroll">
-                <div class="dialog-content-block">
-                </div>
-            </div>
-        </div>
-        <!--Shared with me-->
-        <div class="move-dialog-tree-panel shared-with-me">
-            <div class="move-dialog-panel-header">
-                <span>[$5873]</span>
-                <div class="move-dialog-panel-arrows"></div>
-            </div>
-            <div class="dialog-tree-panel-scroll">
-                <div class="dialog-content-block">
-                </div>
-            </div>
-        </div>
-        <!--Rubbish Bin-->
-        <div class="move-dialog-tree-panel rubbish-bin">
-            <div class="move-dialog-panel-header">
-                <span>[$6771]</span>
-                <div class="move-dialog-panel-arrows"></div>
-            </div>
-            <div class="dialog-tree-panel-scroll">
-                <div class="dialog-content-block">
-                </div>
-            </div>
-        </div>
-        <!-- Please add "active" classname to necessary "move-dialog-empty" block !-->
-        <div class="dialog-empty-block move cloud-drive">
-            <div class="dialog-empty-pad">
-                <div class="dialog-empty-icon"></div>
-                <div class="dialog-empty-header">
-                    [$1343]
-                </div>
-            </div>
-        </div>
-        <div class="dialog-empty-block move shared-with-me">
-            <div class="dialog-empty-pad">
-                <div class="dialog-empty-icon"></div>
-                <div class="dialog-empty-header">
-                    [$6871]
-                </div>
-            </div>
-        </div>
-        <div class="dialog-empty-block move rubbish-bin">
-            <div class="dialog-empty-pad">
-                <div class="dialog-empty-icon"></div>
-                <div class="dialog-empty-header">
-                    [$7740]
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <!--Buttons-->
-    <div class="fm-notifications-bottom">
-        <div class="default-white-button left dialog-newfolder-button">
-            <span>[$68]</span>
-        </div>
-        <div class="default-white-button right dialog-move-button">
-            <span>[$62]</span>
-        </div>
-        <div class="default-white-button right dialog-cancel-button">
-            <span>[$82]</span>
-        </div>
-        <div class="clear"></div>
-    </div>
-</div><!--END move-dialog-->
+</div><!--END fm-picker-dialog-->
 
 <div class="fm-dialog hidden" id="msgDialog">
     <div class="fm-dialog-header">

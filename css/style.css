@@ -3712,7 +3712,7 @@ label.iPhoneCheckLabelOff span {
 }
 
 
-.fm-move-dialog-body ul, .fm-dialog-body ul {
+.fm-picker-dialog-body ul, .fm-dialog-body ul {
     padding: 0;
     margin: 0;
     list-style: none;
@@ -3876,7 +3876,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .rubbish-bin .nw-fm-tree-item.dragover {
     background-color: rgba(39,183,0,0.4);
 }
-.fm-tree-panel li, .fm-move-dialog-body li, .fm-dialog-body li {
+.fm-tree-panel li, .fm-picker-dialog-body li, .fm-dialog-body li {
     display: block;
     list-style: none;
     padding: 0;
@@ -4302,7 +4302,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .fm-left-menu.dashboard + .nw-tree-panel-header {
     display: none;
 }
-.nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows, .share-dialog-panel-arrows {
+.nw-tree-panel-arrows, .fm-picker-dialog-panel-arrows, .fm-picker-dialog-panel-arrows, .share-dialog-panel-arrows {
     height: 24px;
     width: 24px;
     position: absolute;
@@ -4325,13 +4325,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-tree-panel-arrows {
     right: 4px;
 }
-.nw-tree-panel-arrows:hover, .copy-dialog-panel-arrows:hover, .move-dialog-panel-arrows:hover {
+.nw-tree-panel-arrows:hover, .fm-picker-dialog-panel-arrows:hover, .fm-picker-dialog-panel-arrows:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
     -moz-opacity: 0.7;
     -khtml-opacity: 0.7;
     opacity: 0.7;
 }
-.nw-tree-panel-arrows.active, .copy-dialog-panel-arrows.active, .move-dialog-panel-arrows.active {
+.nw-tree-panel-arrows.active, .fm-picker-dialog-panel-arrows.active, .fm-picker-dialog-panel-arrows.active {
     background-position: -12px -7916px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
     -moz-opacity: 0.7;
@@ -8360,7 +8360,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 
 
-.fm-dialog.copy-dialog, .fm-dialog.move-dialog {
+.fm-dialog.fm-picker-dialog, .fm-dialog.fm-picker-dialog {
     width: 604px;
     margin: -220px 0 0 -302px;
 }
@@ -9170,7 +9170,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .active .fm-dialog-add-contact-input input {
     color: #9a9a9a;
 }
-.fm-move-dialog-body {
+.fm-picker-dialog-body {
     height: 205px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -9189,7 +9189,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #f2f2f2;
     margin-top: 15px;
 }
-.fm-move-dialog-list {
+.fm-picker-dialog-list {
     padding: 15px 0
 }
 .fm-notifications-bottom .default-white-button, .fm-notifications-bottom .default-grey-button, .fm-notifications-bottom .default-light-green-button {
@@ -9361,7 +9361,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 
 
-.copy-dialog .permissions-menu {
+.fm-picker-dialog .permissions-menu {
     margin: -1px 0 0 -4px;
 }
 
@@ -17638,25 +17638,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 
 
 /* can be removed
-.copy-dialog .fm-dialog-body, .move-dialog .fm-dialog-body {
+.fm-picker-dialog .fm-dialog-body, .fm-picker-dialog .fm-dialog-body {
     padding: 14px 0 0 0;
 }
 
-.copy-dialog-button-block.hidden {
+.fm-picker-dialog-button-block.hidden {
     display: none;
 }
 */
 
-/* copy-dialog-button properties are changed */
+/* fm-picker-dialog-button properties are changed */
 
-.copy-dialog-button, .move-dialog-button  {
+.fm-picker-dialog-button, .fm-picker-dialog-button  {
     width: 100%;
     height: 72px;
     position: relative;
     cursor: pointer;
 }
 
-.copy-dialog-button::before {
+.fm-picker-dialog-button::before {
     content: " ";
     background-image: url(../images/mega/big-icons.png);
     background-repeat: no-repeat;
@@ -17669,35 +17669,35 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     opacity: 0.3;
 }
 
-.copy-dialog-button:hover::before {
+.fm-picker-dialog-button:hover::before {
      opacity: 0.7;
 }
 
-.copy-dialog-button:hover::before {
+.fm-picker-dialog-button:hover::before {
      opacity: 0.7;
 }
 
-.nw-drag-drop-dialog .side-pane .copy-dialog-button.cloud56-icon::before {
+.fm-picker-dialog .side-pane .fm-picker-dialog-button.cloud56-icon::before {
      background-position: -112px -224px;
 }
 
-.nw-drag-drop-dialog .side-pane .copy-dialog-button.share56-icon::before {
+.fm-picker-dialog .side-pane .fm-picker-dialog-button.share56-icon::before {
      background-position: -56px -224px;
 }
 
-.nw-drag-drop-dialog .side-pane .copy-dialog-button.contact56-icon::before {
+.fm-picker-dialog .side-pane .fm-picker-dialog-button.contact56-icon::before {
      background-position: 0 -224px;
 }
 
-.nw-drag-drop-dialog .side-pane .copy-dialog-button.rubbish56-icon::before {
+.fm-picker-dialog .side-pane .fm-picker-dialog-button.rubbish56-icon::before {
      background-position: 0 -280px;
 }
 
-.nw-drag-drop-dialog .side-pane .copy-dialog-button.chat56-icon::before {
+.fm-picker-dialog .side-pane .fm-picker-dialog-button.chat56-icon::before {
      background-position: -56px -280px;
 }
 
-.nw-drag-drop-dialog .side-pane .copy-dialog-button .tooltip {
+.fm-picker-dialog .side-pane .fm-picker-dialog-button .tooltip {
     height: 20px;
     padding: 0 8px;
     background-color: rgba(0,0,0,1);
@@ -17725,7 +17725,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     visibility: hidden;
 }
 
-.nw-drag-drop-dialog .side-pane .copy-dialog-button:hover .tooltip {
+.fm-picker-dialog .side-pane .fm-picker-dialog-button:hover .tooltip {
     visibility: visible;
     filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
@@ -17734,7 +17734,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     left: 50px;
 }
 
-.nw-drag-drop-dialog .copy-dialog-button .left-border {
+.fm-picker-dialog .fm-picker-dialog-button .left-border {
     width: 3px;
     height:72px;
     top: 0;
@@ -17747,64 +17747,64 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     transition: all 200ms ease-in-out;
 }
 
-.nw-drag-drop-dialog .side-pane .copy-dialog-button.active{
+.fm-picker-dialog .side-pane .fm-picker-dialog-button.active{
     cursor: default;
 }
 
-.nw-drag-drop-dialog .side-pane .copy-dialog-button.active::before{
+.fm-picker-dialog .side-pane .fm-picker-dialog-button.active::before{
     opacity: 0.7;
 }
 
-.nw-drag-drop-dialog .copy-dialog-button.cloud56-icon.active .left-border{
+.fm-picker-dialog .fm-picker-dialog-button.cloud56-icon.active .left-border{
     background-color: rgba(255,51,58,1);
 }
 
-.nw-drag-drop-dialog .copy-dialog-button.share56-icon.active .left-border{
+.fm-picker-dialog .fm-picker-dialog-button.share56-icon.active .left-border{
     background-color: rgba(255,211,0,1);
 }
 
-.nw-drag-drop-dialog .copy-dialog-button.contact56-icon.active .left-border{
+.fm-picker-dialog .fm-picker-dialog-button.contact56-icon.active .left-border{
     background-color: #03c4b1;
 }
 
-.nw-drag-drop-dialog .copy-dialog-button.chat56-icon.active .left-border{
+.fm-picker-dialog .fm-picker-dialog-button.chat56-icon.active .left-border{
     background-color: rgba(43,166,222,1);
 }
 
-.nw-drag-drop-dialog .copy-dialog-button.rubbish56-icon.active .left-border{
+.fm-picker-dialog .fm-picker-dialog-button.rubbish56-icon.active .left-border{
     background-color: rgba(39,183,0,0.3);
 }
 
 /* can be removed
-.copy-dialog .fm-dialog-body.two-tabs .copy-dialog-button.conversations {
+.fm-picker-dialog .fm-dialog-body.two-tabs .fm-picker-dialog-button.conversations {
     display: none;
 }
-.copy-dialog .fm-dialog-body.two-tabs .copy-dialog-button {
+.fm-picker-dialog .fm-dialog-body.two-tabs .fm-picker-dialog-button {
     width: 300px;
 }
-.copy-dialog-button.cloud-drive, .move-dialog-button.cloud-drive {
+.fm-picker-dialog-button.cloud-drive, .fm-picker-dialog-button.cloud-drive {
     background-position: center 8px;
 }
-.copy-dialog-button.shared-with-me, .move-dialog-button.shared-with-me {
+.fm-picker-dialog-button.shared-with-me, .fm-picker-dialog-button.shared-with-me {
     background-position: center -87px;
     width: 200px;
 }
-.copy-dialog-button.conversations, .move-dialog-button.conversations {
+.fm-picker-dialog-button.conversations, .fm-picker-dialog-button.conversations {
     background-position: center -184px;
 }
-.copy-dialog-button.rubbish-bin, .move-dialog-button.rubbish-bin {
+.fm-picker-dialog-button.rubbish-bin, .fm-picker-dialog-button.rubbish-bin {
     background-position: center -453px;
 }
-.copy-dialog-button.cloud-drive.active, .move-dialog-button.cloud-drive.active {
+.fm-picker-dialog-button.cloud-drive.active, .fm-picker-dialog-button.cloud-drive.active {
     background-color: rgba(220,0,0,1);
 }
-.copy-dialog-button.shared-with-me.active, .move-dialog-button.shared-with-me.active {
+.fm-picker-dialog-button.shared-with-me.active, .fm-picker-dialog-button.shared-with-me.active {
     background-color: rgba(255,166,0,1);
 }
-.copy-dialog-button.conversations.active, .move-dialog-button.conversations.active {
+.fm-picker-dialog-button.conversations.active, .fm-picker-dialog-button.conversations.active {
     background-color: rgba(31,165,224,1);
 }
-.copy-dialog-button.rubbish-bin.active, .move-dialog-button.rubbish-bin.active {
+.fm-picker-dialog-button.rubbish-bin.active, .fm-picker-dialog-button.rubbish-bin.active {
     background-color: rgba(49,181,0,1);
 }
 */
@@ -17819,10 +17819,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     height: 312px;
     display: block;
 }
-.move-dialog-button {
+.fm-picker-dialog-button {
     width: 200px;
 }
-.move-dialog-button.shared-with-me {
+.fm-picker-dialog-button.shared-with-me {
     width: 200px;
 }
 .dialog-empty-icon {
@@ -17867,7 +17867,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .fm-dialog-body .nw-fm-tree-item:hover {
     border: 0;
 }
-.copy-dialog-tree-panel, .move-dialog-tree-panel {
+.fm-picker-dialog-tree-panel, .fm-picker-dialog-tree-panel {
     height: 280px;
     display: none;
 }
@@ -17883,7 +17883,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 
 /* can be removed
-.copy-dialog-panel-header, .move-dialog-panel-header, .share-dialog-panel-header {
+.fm-picker-dialog-panel-header, .fm-picker-dialog-panel-header, .share-dialog-panel-header {
     height: 48px;
     padding: 12px 2px 0 24px;
     -moz-box-sizing: border-box;
@@ -17893,7 +17893,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 */
 
-.copy-dialog-panel-arrows, .move-dialog-panel-arrows, .share-dialog-panel-arrows {
+.fm-picker-dialog-panel-arrows, .fm-picker-dialog-panel-arrows, .share-dialog-panel-arrows {
     right: 11px;
     top: 11px;
 }
@@ -17905,25 +17905,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     padding-left: 13px;
     border: 0;
 }
-.copy-dialog-txt, .move-dialog-txt {
+.fm-picker-dialog-txt, .fm-picker-dialog-txt {
     display: none;
 }
-.copy-dialog-txt.cloud-drive, .move-dialog-txt.cloud-drive {
+.fm-picker-dialog-txt.cloud-drive, .fm-picker-dialog-txt.cloud-drive {
     color: #DF0000;
 }
-.copy-dialog-txt.shared-with-me, .move-dialog-txt.shared-with-me {
+.fm-picker-dialog-txt.shared-with-me, .fm-picker-dialog-txt.shared-with-me {
     color: #FFA600;
 }
-.copy-dialog-txt.conversations, .move-dialog-txt.conversations {
+.fm-picker-dialog-txt.conversations, .fm-picker-dialog-txt.conversations {
     color: #1FA5DF;
 }
-.copy-dialog-txt.rubbish-bin, .move-dialog-txt.rubbish-bin {
+.fm-picker-dialog-txt.rubbish-bin, .fm-picker-dialog-txt.rubbish-bin {
     color: #26B700;
 }
-.copy-dialog-txt.active, .move-dialog-txt.active {
+.fm-picker-dialog-txt.active, .fm-picker-dialog-txt.active {
     display: inline;
 }
-.dialog-empty-block.active, .copy-dialog-tree-panel.active, .move-dialog-tree-panel.active, .share-dialog-tree-panel.active {
+.dialog-empty-block.active, .fm-picker-dialog-tree-panel.active, .fm-picker-dialog-tree-panel.active, .share-dialog-tree-panel.active {
     display: block;
 }
 .dialog-content-block {
@@ -21544,7 +21544,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 
 
 /* Small font-size settings option */
-.fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .copy-dialog-panel-header, .fontsize1 .move-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-user-status-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .dropdown.body.submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .dark-tooltip, .fontsize1 .new-notification-info {
+.fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .fm-picker-dialog-panel-header, .fontsize1 .fm-picker-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-user-status-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .dropdown.body.submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .dark-tooltip, .fontsize1 .new-notification-info {
     font-size: 12px;
 }
 .fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .toast-notification, .fontsize1 .fm-notification-info p {
@@ -22063,12 +22063,10 @@ table.speed-table {
     color: #1DA1E9;
 }
 
-/* can be removed 
-.fm-dialog.copy-dialog .share-dialog-permissions {
+.fm-dialog.fm-picker-dialog .share-dialog-permissions {
     margin-top: 12px;
     float: left;
 }
-*/
 
 .perfectScrollbarContainer {
     position: relative;
@@ -24212,7 +24210,7 @@ opacity: 1;
 /* new drag and drop dialog */
 
 
-.fm-dialog.copy-dialog.nw-drag-drop-dialog {
+.fm-dialog.fm-picker-dialog.fm-picker-dialog {
     position: absolute;
     border-radius: 8px;
     border:1px solid rgba(0,0,0,0.1);
@@ -24226,30 +24224,30 @@ opacity: 1;
     margin-top: -300px;
     position: absolute;
     z-index: 1119;
-} 
+}
 
-.fm-dialog.copy-dialog.nw-drag-drop-dialog.arrange-to-back {
+.fm-dialog.fm-picker-dialog.fm-picker-dialog.arrange-to-back {
     z-index: 500;
 }
 
 
-.nw-drag-drop-dialog .icon {
+.fm-picker-dialog .icon {
     background-image: url(../images/mega/fm-main-sprite_v3.png);
     background-size: 48px auto;
-    background-repeat: no-repeat; 
+    background-repeat: no-repeat;
     width:24px;
     height:24px;
 
 }
 
-.nw-drag-drop-dialog .summary-container {
+.fm-picker-dialog .summary-container {
     width: 100%;
     height: auto;
     background-color: rgba(250,250,250,1);
     position: relative;
 }
 
-.nw-drag-drop-dialog .summary-container::before {
+.fm-picker-dialog .summary-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -24260,7 +24258,7 @@ opacity: 1;
     left: 0px;
 }
 
-.nw-drag-drop-dialog .summary-container::after {
+.fm-picker-dialog .summary-container::after {
     content: " ";
     width: 100%;
     height: 1px;
@@ -24271,12 +24269,12 @@ opacity: 1;
     left: 0px;
 }
 
-.nw-drag-drop-dialog .summary-row {
+.fm-picker-dialog .summary-row {
     margin: 24px;
     position: relative;
 }
 
-.nw-drag-drop-dialog .summary-row .summary-title {
+.fm-picker-dialog .summary-row .summary-title {
     font-size: 15px;
     color: #333333;
     line-height: 20px;
@@ -24291,7 +24289,7 @@ opacity: 1;
     vertical-align: middle;
 }
 
-.nw-drag-drop-dialog .summary-row .summary-input {
+.fm-picker-dialog .summary-row .summary-input {
     width: 422px;
     height: auto;
     max-height: 160px;
@@ -24309,16 +24307,35 @@ opacity: 1;
     transition: 0.1s;
 }
 
-.nw-drag-drop-dialog .summary-input .item-row {
+.fm-picker-dialog .summary-input .item-row {
     width: 100%;
     position: relative;
     transition: 0.1s;
     box-sizing: border-box;
+    left: 0px;
+    height: 38px;
+    line-height: 37px;
+    white-space: nowrap;
+    vertical-align: top;
+    overflow: hidden;
 }
 
+.fm-picker-dialog .summary-input .item-row:hover {
+    background-color: #fafafa;
+    border-radius: 8px;
+}
 
+.fm-picker-dialog .summary-input .item-row:not(:last-child)::before {
+    content: " ";
+    width: calc(100% - 16px);
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    bottom: 0;
+    left: 8px;
+}
 
-.nw-drag-drop-dialog .summary-input .item-row .summary-ff-name {
+.fm-picker-dialog .summary-input .summary-ff-name {
     height: 38px;
     max-width: 340px;
     line-height: 37px;
@@ -24336,17 +24353,17 @@ opacity: 1;
 .summary-container .transfer-filetype-icon.folder {
     margin: 7px 0 0 9px;
 }
-.nw-drag-drop-dialog .fm-breadcrumbs {
+.fm-picker-dialog .fm-breadcrumbs {
     margin-top: 8px;
 }
-.nw-drag-drop-dialog .fm-breadcrumbs:first-child .right-arrow-bg {
+.fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg {
     padding: 0 0 0 35px;
     margin: 0 0 0 -3px;
 }
-.nw-drag-drop-dialog .fm-breadcrumbs:first-child .right-arrow-bg span {
+.fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg span {
     display: block !important;
 }
-.nw-drag-drop-dialog .item-row .summary-status {
+.fm-picker-dialog .item-row .summary-status {
     height: 38px;
     line-height: 37px;
     padding: 0 10px 0 36px;
@@ -24358,36 +24375,26 @@ opacity: 1;
     text-overflow: ellipsis;
 }
 
-.nw-drag-drop-dialog .summary-input .item-row:first-child .summary-ff-name {
+.fm-picker-dialog .summary-input .item-row:first-child .summary-ff-name {
     max-width: 250px;
-} 
+}
 
-.nw-drag-drop-dialog .summary-input .item-row .delete-img.icon {
+.fm-picker-dialog .summary-input .item-row .delete-img.icon {
     position: absolute;
     right: 8px;
     top: 0px;
     display: none;
 }
 
-.nw-drag-drop-dialog .summary-input .item-row .delete-img.icon:hover {
+.fm-picker-dialog .summary-input .item-row .delete-img.icon:hover {
     opacity: 0.7;
 }
 
-.nw-drag-drop-dialog .summary-input .item-row:hover .delete-img.icon {
+.fm-picker-dialog .summary-input .item-row:hover .delete-img.icon {
     display: inline-block;
 }
 
-.nw-drag-drop-dialog .summary-input .item-row:not(:last-child):before {
-    content: " ";
-    width: calc(100% - 16px);
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    bottom: 0;
-    left: 8px;
-}
-
-.nw-drag-drop-dialog .summary-input .item-row span {
+.fm-picker-dialog .summary-input .item-row span {
     left: 0px;
     height: 38px;
     max-width: 300px;
@@ -24399,30 +24406,19 @@ opacity: 1;
     text-overflow:ellipsis;
 }
 
-.nw-drag-drop-dialog .summary-input .link-row {
-    left: 0px;
-    height: 38px;
-    max-width: 412px;
-    line-height: 37px;
-    position: relative;
-    white-space: nowrap;
-    vertical-align: top;
-    overflow: hidden;
-}
-
-.nw-drag-drop-dialog .summary-input .link-row .link-row-block {
+.fm-picker-dialog .summary-input .link-row .link-row-block {
     left: 0;
     display: inline-block;
     max-width: 412px;
 }
 
-.nw-drag-drop-dialog .summary-row .summary-input .icon {
+.fm-picker-dialog .summary-row .summary-input .icon {
     display: inline-block;
     vertical-align: top;
     margin:7px 4px 0 8px;
 }
 
-.nw-drag-drop-dialog .next-arrow {
+.fm-picker-dialog .next-arrow {
     background-image: url(../images/mega/fm-main-sprite_v3.png);
     background-position: -41px -1433px;
     width: 7px;
@@ -24433,7 +24429,7 @@ opacity: 1;
     vertical-align: top;
 }
 
-.nw-drag-drop-dialog .summary-input .ff-name {
+.fm-picker-dialog .summary-input .ff-name {
     display: inline-block;
     vertical-align: top;
     line-height: 38px;
@@ -24443,7 +24439,7 @@ opacity: 1;
     text-overflow:ellipsis;
 }
 
-.nw-drag-drop-dialog .summary-row > .icon {
+.fm-picker-dialog .summary-row > .icon {
     position: absolute;
     right: 0px;
     -moz-border-radius: 4px;
@@ -24458,7 +24454,7 @@ opacity: 1;
     opacity: 0.6;
     transition: 0.1s;
 }
-.nw-drag-drop-dialog .summary-row > .icon::before {
+.fm-picker-dialog .summary-row > .icon::before {
     content: "";
     width: 100%;
     height: 100%;
@@ -24470,26 +24466,26 @@ opacity: 1;
     -moz-box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
     box-shadow: 0 0.5px 2px 0 rgba(0,0,0,0.05);
 }
-.nw-drag-drop-dialog .summary-row > .icon:hover {
+.fm-picker-dialog .summary-row > .icon:hover {
     opacity: 0.8;
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
 }
 
-.nw-drag-drop-dialog .summary-row .drop-down-icon.icon{
+.fm-picker-dialog .summary-row .drop-down-icon.icon{
     top: 8px;
 }
 
-.nw-drag-drop-dialog .summary-row .drop-up-icon.icon{
-    bottom: 8px;
-} 
-
-.nw-drag-drop-dialog .summary-row .add-more-img.icon{
+.fm-picker-dialog .summary-row .drop-up-icon.icon{
     bottom: 8px;
 }
 
-.nw-drag-drop-dialog .fm-dialog-body { 
+.fm-picker-dialog .summary-row .add-more-img.icon{
+    bottom: 8px;
+}
+
+.fm-picker-dialog .fm-dialog-body {
     width: 100%;
     height: 216px;
     display: block;
@@ -24497,7 +24493,7 @@ opacity: 1;
     padding: 0;
 }
 
-.nw-drag-drop-dialog .side-pane {
+.fm-picker-dialog .side-pane {
     position: relative;
     left: 0;
     top: 0;
@@ -24507,7 +24503,7 @@ opacity: 1;
     display: inline-block;
 }
 
-.nw-drag-drop-dialog .side-pane::after {
+.fm-picker-dialog .side-pane::after {
     content: " ";
     height: 100%;
     width: 1px;
@@ -24518,7 +24514,7 @@ opacity: 1;
     right: 0px;
 }
 
-.nw-drag-drop-dialog .right-pane.copy-dialog-tree-panel {
+.fm-picker-dialog .right-pane.fm-picker-dialog-tree-panel, .fm-picker-dialog .dialog-empty-block {
     position: absolute;
     height: 100%;
     right: 0;
@@ -24526,13 +24522,13 @@ opacity: 1;
     top: 0;
 }
 
-.nw-drag-drop-dialog .copy-dialog-panel-header {
+.fm-picker-dialog .fm-picker-dialog-panel-header {
     height: 40px;
     width: 100%;
     position: relative;
 }
 
-.nw-drag-drop-dialog .copy-dialog-panel-header span {
+.fm-picker-dialog .fm-picker-dialog-panel-header span {
     font-size: 14px;
     line-height: 40px;
     color: #333;
@@ -24547,7 +24543,7 @@ opacity: 1;
 }
 
 
-.nw-drag-drop-dialog .copy-dialog-panel-header .copy-dialog-panel-arrows {
+.fm-picker-dialog .fm-picker-dialog-panel-header .fm-picker-dialog-panel-arrows:not(.hidden) {
     position: relative;
     top: 8px;
     left: 8px;
@@ -24556,7 +24552,7 @@ opacity: 1;
 }
 
 
-.nw-drag-drop-dialog .dialog-sorting-menu {
+.fm-picker-dialog .dialog-sorting-menu {
     position: relative;
     padding: 8px 0;
     left: 130px;
@@ -24564,7 +24560,7 @@ opacity: 1;
     width: 200px;
 }
 
-.nw-drag-drop-dialog .search-bar {
+.fm-picker-dialog .search-bar {
     width:190px;
     height: 26px;
     position: absolute;
@@ -24580,7 +24576,7 @@ opacity: 1;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.nw-drag-drop-dialog .search-bar input {
+.fm-picker-dialog .search-bar input {
     background-color: transparent;
     border: 0;
     padding: 0;
@@ -24590,82 +24586,82 @@ opacity: 1;
     line-height: 22px;
     font-size: 14px;
 }
-.nw-drag-drop-dialog .search-bar input::-webkit-input-placeholder {
+.fm-picker-dialog .search-bar input::-webkit-input-placeholder {
     color: #bbbbbb;
 }
-.nw-drag-drop-dialog .search-bar input:-moz-placeholder {
-    color: #bbbbbb;
-    opacity: 1;
-}
-.nw-drag-drop-dialog .search-bar input::-moz-placeholder {
+.fm-picker-dialog .search-bar input:-moz-placeholder {
     color: #bbbbbb;
     opacity: 1;
 }
-.nw-drag-drop-dialog .search-bar input:-ms-input-placeholder {
+.fm-picker-dialog .search-bar input::-moz-placeholder {
+    color: #bbbbbb;
+    opacity: 1;
+}
+.fm-picker-dialog .search-bar input:-ms-input-placeholder {
     color: #bbbbbb;
 }
-.nw-drag-drop-dialog .search-bar .icon {
+.fm-picker-dialog .search-bar .icon {
     position: absolute;
     right: 0;
     top: 0;
     transition: 0.1s;
     cursor: pointer;
 }
-.nw-drag-drop-dialog .search-bar .icon:hover {
+.fm-picker-dialog .search-bar .icon:hover {
     opacity: 0.7;
 }
-.nw-drag-drop-dialog .right-pane .dialog-tree-panel-scroll {
+.fm-picker-dialog .right-pane .dialog-tree-panel-scroll {
     height: 168px;
     margin: 8px 0 0 0;
     position: relative;
 }
-.nw-drag-drop-dialog .right-pane .dialog-tree-panel-scroll span {
+.fm-picker-dialog .right-pane .dialog-tree-panel-scroll span {
     font-size: 13px;
     color: #666;
 }
-.nw-drag-drop-dialog .nw-fm-tree-folder {
+.fm-picker-dialog .nw-fm-tree-folder {
     padding-left: 30px;
     max-width: -webkit-calc(100% - 40px);
     max-width: -moz-calc(100% - 40px);
     max-width: calc(100% - 40px);
 }
-.nw-drag-drop-dialog .nw-fm-tree-item:hover, .nw-drag-drop-dialog .nw-fm-tree-item.dragover, .nw-drag-drop-dialog .contact-row:hover,  .nw-drag-drop-dialog .contact-row.dragover{
+.fm-picker-dialog .nw-fm-tree-item:hover, .fm-picker-dialog .nw-fm-tree-item.dragover, .fm-picker-dialog .contact-row:hover,  .fm-picker-dialog .contact-row.dragover{
     background-color: rgba(0,191,165,0.6);
     color: white;
 }
-.nw-drag-drop-dialog .nw-fm-tree-item.selected, .nw-drag-drop-dialog .contact-row.selected {
+.fm-picker-dialog .nw-fm-tree-item.selected, .fm-picker-dialog .contact-row.selected {
     background-color: rgba(0,191,165,1);
     color: white;
 }
 .dialog-tree-panel-scroll .nw-fm-tree-item.selected span, .dialog-tree-panel-scroll .nw-fm-tree-item.dragover span, .dialog-tree-panel-scroll .nw-fm-tree-item:hover span {
     color: white;
-} 
-.nw-drag-drop-dialog .nw-fm-tree-item.disabled, .dropdown-item.disabled {
+}
+.fm-picker-dialog .nw-fm-tree-item.disabled, .dropdown-item.disabled {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
 }
-.nw-drag-drop-dialog .nw-fm-tree-item.linked {
+.fm-picker-dialog .nw-fm-tree-item.linked {
     position: relative;
 }
-.nw-drag-drop-dialog .nw-fm-tree-item.linked .data-item-icon {
+.fm-picker-dialog .nw-fm-tree-item.linked .data-item-icon {
     right: 22px;
     top: 2px;
 }
-.nw-drag-drop-dialog .contact-row {
+.fm-picker-dialog .contact-row {
     height: 24px;
     width: 100%;
     transition: 0.1s;
     position: relative;
 }
-.nw-drag-drop-dialog .contact-row.selected .contact-name, .nw-drag-drop-dialog .contact-row.selected .contact-email{
+.fm-picker-dialog .contact-row.selected .contact-name, .fm-picker-dialog .contact-row.selected .contact-email{
     color: #fff;
 }
-.nw-drag-drop-dialog .contact-row .nw-contact-status {
+.fm-picker-dialog .contact-row .nw-contact-status {
     margin: 9px 18px 9px 21px;
 }
-.nw-drag-drop-dialog .contact-row .contact-name {
+.fm-picker-dialog .contact-row .contact-name {
     position: relative;
     width: 200px;
     overflow: hidden;
@@ -24677,10 +24673,10 @@ opacity: 1;
     color: #666;
     float: left;
 }
-.nw-drag-drop-dialog .contact-row:hover .contact-name, .nw-drag-drop-dialog .contact-row:hover .contact-email {
+.fm-picker-dialog .contact-row:hover .contact-name, .fm-picker-dialog .contact-row:hover .contact-email {
     color: #fff;
 }
-.nw-drag-drop-dialog .contact-row .contact-email {
+.fm-picker-dialog .contact-row .contact-email {
     position: relative;
     padding-left: 12px;
     width: 240px;
@@ -24693,7 +24689,7 @@ opacity: 1;
     color: #999;
     float: left;
 }
-.nw-drag-drop-dialog .contact-row .contact-checkboxOn.small12, .nw-drag-drop-dialog .contact-row .contact-checkboxOff.small12 {
+.fm-picker-dialog .contact-row .contact-checkboxOn.small12, .fm-picker-dialog .contact-row .contact-checkboxOff.small12 {
     width: 12px;
     height: 12px;
     -moz-border-radius: 3px;
@@ -24708,17 +24704,17 @@ opacity: 1;
     float: right;
     cursor: pointer;
 }
-.nw-drag-drop-dialog .contact-row .contact24-icon.icon {
+.fm-picker-dialog .contact-row .contact24-icon.icon {
     display: inline-block;
     float: left;
     margin:0 8px 0 12px;
 }
-.nw-drag-drop-dialog .contact-row.selected .contact24-icon.icon {
+.fm-picker-dialog .contact-row.selected .contact24-icon.icon {
     background-image: url(../images/mega/fm-main-sprite_v3.png);
-    background-repeat: no-repeat; 
+    background-repeat: no-repeat;
     background-position: -24px -12640px;
 }
-.nw-drag-drop-dialog .contact-row .contact-checkboxOn.small12::before,  .nw-drag-drop-dialog .contact-row .contact-checkboxOff.small12::before{
+.fm-picker-dialog .contact-row .contact-checkboxOn.small12::before,  .fm-picker-dialog .contact-row .contact-checkboxOff.small12::before{
     background-position: 0px -2381px;
     background-image: url(../images/mega/top-login-sprite_v10.png);
     background-repeat: no-repeat;
@@ -24735,38 +24731,38 @@ opacity: 1;
     content: " ";
     transition: 0.1s;
 }
-.nw-drag-drop-dialog .contact-row .contact-checkboxOn.small12::before {
+.fm-picker-dialog .contact-row .contact-checkboxOn.small12::before {
     opacity: 1;
 }
-.nw-drag-drop-dialog .contact-row .contact-checkboxOff.small12::before {
+.fm-picker-dialog .contact-row .contact-checkboxOff.small12::before {
     opacity: 0;
 }
-.nw-drag-drop-dialog .contact-row .contact-checkboxOff.small12:hover::before {
+.fm-picker-dialog .contact-row .contact-checkboxOff.small12:hover::before {
     opacity: 0.3;
 }
-.nw-drag-drop-dialog .contact-row:hover .contact-checkboxOff, .nw-drag-drop-dialog .contact-row.selected .contact-checkboxOn{
+.fm-picker-dialog .contact-row:hover .contact-checkboxOff, .fm-picker-dialog .contact-row.selected .contact-checkboxOn{
     display: inline-block;
 }
-.nw-drag-drop-dialog .contact-row.selected .contact-checkboxOn.small12, .nw-drag-drop-dialog .contact-row:hover .small12 {
+.fm-picker-dialog .contact-row.selected .contact-checkboxOn.small12, .fm-picker-dialog .contact-row:hover .small12 {
     -webkit-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     -moz-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
 }
-.nw-drag-drop-dialog .contact-row.selected .contact-checkboxOn.small12::before, .nw-drag-drop-dialog .contact-row:hover .small12::before {
+.fm-picker-dialog .contact-row.selected .contact-checkboxOn.small12::before, .fm-picker-dialog .contact-row:hover .small12::before {
     -webkit-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     -moz-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     background-image: url(../images/mega/fm-main-sprite_v3.png);
     background-position: -11px -2244px;
 }
-.nw-drag-drop-dialog .my-chat-list {
+.fm-picker-dialog .my-chat-list {
     width:308px;
     height: 310px;
     box-sizing: border-box;
     position: relative;
     display: inline-block;
 }
-.nw-drag-drop-dialog .selected-list {
+.fm-picker-dialog .selected-list {
     width:308px;
     height: 310px;
     box-sizing: border-box;
@@ -24775,7 +24771,7 @@ opacity: 1;
     top: 0;
     display: inline-block;
 }
-.nw-drag-drop-dialog .my-chat-list::after {
+.fm-picker-dialog .my-chat-list::after {
     content: " ";
     width: 1px;
     height: 100%;
@@ -24785,59 +24781,59 @@ opacity: 1;
     top: 0px;
     right: 0px;
 }
-.nw-drag-drop-dialog .dialog-tree-panel-scroll {
+.fm-picker-dialog .dialog-tree-panel-scroll {
     height: 270px;
     width: 100%;
 }
-.nw-drag-drop-dialog .dialog-tree-panel-scroll .delete-img.icon {
+.fm-picker-dialog .dialog-tree-panel-scroll .delete-img.icon {
     position: absolute;
     right: 24px;
     top: 0;
 }
-.nw-drag-drop-dialog .delete-img {
+.fm-picker-dialog .delete-img {
     background-position: 0px -12400px;
     opacity: 0.3;
     cursor: pointer;
 }
-.nw-drag-drop-dialog .delete-img:hover {
+.fm-picker-dialog .delete-img:hover {
     opacity: 0.6;
 }
-.nw-drag-drop-dialog .drop-down-icon {
+.fm-picker-dialog .drop-down-icon {
     background-position: -11px -9850px;
 }
-.nw-drag-drop-dialog .drop-up-icon{
+.fm-picker-dialog .drop-up-icon{
     background-position: -11px -9850px;
     -ms-transform: rotate(180deg); /* IE 9 */
     -webkit-transform: rotate(180deg); /* Safari */
     transform: rotate(180deg); /* Standard syntax */
 }
-.nw-drag-drop-dialog .cloud24-icon{
+.fm-picker-dialog .cloud24-icon{
     background-position: -24px -12592px;
     opacity: 0.4;
 }
-.nw-drag-drop-dialog .rubbish24-icon{
+.fm-picker-dialog .rubbish24-icon{
     background-position: -1px -8035px;
 }
-.nw-drag-drop-dialog .share24-icon{
+.fm-picker-dialog .share24-icon{
     background-position: -1px -8095px;
 }
-.nw-drag-drop-dialog .contact24-icon{
+.fm-picker-dialog .contact24-icon{
     background-position: -1px -8135px;
 }
-.nw-drag-drop-dialog .chat24-icon{
+.fm-picker-dialog .chat24-icon{
     background-position: -0px -12640px;
     opacity: 0.4;
-} 
-.nw-drag-drop-dialog .search-icon{
+}
+.fm-picker-dialog .search-icon{
     background-position: -14px -2971px;
     opacity: 0.4;
     height: 22px;
 }
-.nw-drag-drop-dialog .add-more-img {
+.fm-picker-dialog .add-more-img {
     background-position: 0 -12376px;
 }
 
-.nw-drag-drop-dialog .dialog-title {
+.fm-picker-dialog-title {
     font-size: 20px;
     color: #333333;
     line-height: 24px;
@@ -24852,9 +24848,9 @@ opacity: 1;
     height: 18px;
     background-position: -28px -12060px;
     background-image: url(../images/mega/fm-main-sprite_v3.png);
-    background-repeat: no-repeat; 
+    background-repeat: no-repeat;
 }
-.nw-drag-drop-dialog .dialog-subtitle {
+.fm-picker-dialog .dialog-subtitle {
     font-size: 14px;
     color: #999999;
     line-height: 24px;
@@ -24867,13 +24863,13 @@ opacity: 1;
     position: relative;
     display: block;
 }
-.nw-drag-drop-dialog .dialog-button-container {
+.fm-picker-dialog .dialog-button-container {
     height: 56px;
     width: 100%;
     display: block;
     position: relative;
 }
-.nw-drag-drop-dialog .dialog-button-container::before {
+.fm-picker-dialog .dialog-button-container::before {
     content: " ";
     width: 100%;
     height: 1px;
@@ -24882,93 +24878,92 @@ opacity: 1;
     display: block;
     top: 0;
 }
-.nw-drag-drop-dialog .dialog-button-container .default-white-button-user-management {
+.fm-picker-dialog .dialog-button-container .default-white-button-user-management {
     position: relative;
     margin:12px 0px;
     padding: 0 24px;
 }
-.nw-drag-drop-dialog .dialog-button-container .default-white-button-user-management.left {
+.fm-picker-dialog .dialog-button-container .default-white-button-user-management.left {
     margin-left: 24px;
 }
 
 
 /* input type */
-.nw-drag-drop-dialog .summary-input.placeholder {
+.fm-picker-dialog .summary-input.placeholder {
     background-color: rgba(0,0,0,0.02);
     border:1px solid rgba(0,0,0,0.07);
 }
 
-.nw-drag-drop-dialog .summary-input.placeholder span {
+.fm-picker-dialog .summary-input.placeholder span {
     color: #bbbbbb;
 }
 
-.nw-drag-drop-dialog .summary-input.placeholder:hover {
+.fm-picker-dialog .summary-input.placeholder:hover {
     border:1px solid rgba(0,191,165,0.5);
     background-color: rgba(0,0,0,0.01);
 }
 
-.nw-drag-drop-dialog .summary-input.focus {
+.fm-picker-dialog .summary-input.focus {
     background-color: #ffffff;
     border:1px solid rgba(0,0,0,0.2);
 }
 
-.nw-drag-drop-dialog .summary-input.focus span {
+.fm-picker-dialog .summary-input.focus span {
     color: #cccccc;
 }
 
-.nw-drag-drop-dialog .summary-input.active {
+.fm-picker-dialog .summary-input.active {
     background-color: #ffffff;
     border:1px solid rgba(0,0,0,0.2);
 }
 
-.nw-drag-drop-dialog .summary-input.active span {
+.fm-picker-dialog .summary-input.active span {
         color: #333333;
 }
 
-.nw-drag-drop-dialog .summary-input.correct-input {
+.fm-picker-dialog .summary-input.correct-input {
     background-color: #ffffff;
     border:1px solid rgba(0,0,0,0.2);
 }
 
-.nw-drag-drop-dialog .summary-input.correct-input span {
+.fm-picker-dialog .summary-input.correct-input span {
     color: #888888;
 }
 
 
-.nw-drag-drop-dialog .summary-input.correct-input:hover {
+.fm-picker-dialog .summary-input.correct-input:hover {
     border:1px solid rgba(0,191,165,0.5);
 }
 
-.nw-drag-drop-dialog .summary-input.error {
+.fm-picker-dialog .summary-input.error {
     background-color: rgba(0,0,0,0.05);
     border:1px solid rgba(217,0,7,0.5);
 }
 
-.nw-drag-drop-dialog .summary-input.error span {
+.fm-picker-dialog .summary-input.error span {
     color: #333333;
 }
 
-.nw-drag-drop-dialog .summary-input.disable{
+.fm-picker-dialog .summary-input.disable{
     background-color: rgba(0,0,0,0.02);
     border:1px solid rgba(0,0,0,0.2);
     opacity: 0.3;
 }
 
-.nw-drag-drop-dialog .summary-input.disable span {
+.fm-picker-dialog .summary-input.disable span {
     color: #888;
 }
 
-.nw-drag-drop-dialog .summary-input.error-message{
+.fm-picker-dialog .summary-input.error-message{
     color: #333333;
 }
 
-
-.nw-drag-drop-dialog .summary-input.high-light {
+.fm-picker-dialog .summary-input.high-light {
     background-color: rgba(0,191,165,0.05);
     border:1px solid rgba(0,191,165,0.5);
-} 
+}
 
-.nw-drag-drop-dialog .summary-input.high-light span {
+.fm-picker-dialog .summary-input.high-light span {
     color: #888;
 }
 

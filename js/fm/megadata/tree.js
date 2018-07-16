@@ -15,42 +15,6 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
         console.error('Invalid node passed to M.buildtree');
         return MegaPromise.reject();
     }
-    var levels = 1;
-    var promise = new MegaPromise();
-    var args = toArray.apply(null, arguments);
-
-    // Retrieve whole cloud for copy/move dialogs...
-    // FIXME: find a proper way to retrieve folders only
-    /* TODO: make move/copy dialogs logic async
-     if (dialog === 'copy-dialog' || dialog === 'move-dialog') {
-     levels = -1;
-     }*/
-    /*
-     if (dialog !== M.buildtree.FORCE_REBUILD && levels > 0 || pfid) {
-     _buildtree.apply(M, args);
-     promise.resolve();
-     }
-     else {
-     var folders;
-
-     if (n.h === 'shares') {
-
-     folders = Object.keys(M.c[n.h] || {});
-     }
-     else {
-     folders = [n.h];
-     }
-
-     dbfetch.geta(folders)
-     .always(function() {
-     _buildtree.apply(M, args);
-     promise.resolve();
-     });
-     }
-
-     return promise;
-     };
-     var _buildtree = function(n, dialog, stype) {*/
 
     var folders = [],
         _ts_l = (typeof treesearch !== 'undefined' && treesearch) ? treesearch.toLowerCase() : undefined,
@@ -127,10 +91,10 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
     // Detect copy and move dialogs, make sure that right DOMtree will be sorted.
     // copy and move dialogs have their own trees and sorting is done independently
     if (dialog) {
-        if (dialog.indexOf('copy-dialog') !== -1) {
+        if ($.copyDialog) {
             prefix = 'Copy' + stype;
         }
-        else if (dialog.indexOf('move-dialog') !== -1) {
+        else if ($.moveDialog) {
             prefix = 'Move' + stype;
         }
     }

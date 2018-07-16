@@ -4352,6 +4352,8 @@ React.makeElement = React['createElement'];
 	                        }
 	                    }
 	                    self.setState({ 'selected': selected });
+	                    self.setState({ 'searchValue': '' });
+	                    self.refs.contactSearchField.focus();
 	                }
 	                self.clickTime = new Date();
 	                self.lastClicked = contactHash;
@@ -4509,6 +4511,8 @@ React.makeElement = React['createElement'];
 	                            }
 	                        }
 	                        self.setState({ 'selected': selected });
+	                        self.setState({ 'searchValue': '' });
+	                        self.refs.contactSearchField.focus();
 	                    }
 	                    self.clickTime = new Date();
 	                    self.lastClicked = contactHash;

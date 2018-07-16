@@ -1068,6 +1068,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         if (foundChatRoom.roomId === chatRoom.roomId) {
             chatRoom.chatShard = null;
             chatRoom.chatdUrl = null;
+            if (chatRoom.messagesBuff) {
+                chatRoom.messagesBuff.sendingListFlushed = false;
+            }
             if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
                 chatRoom.setState(
                     ChatRoom.STATE.JOINING,

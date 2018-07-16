@@ -1663,9 +1663,10 @@ Chatd.Messages.prototype.submit = function(messages, keyId) {
             "type":message.type
             });
     }
-
+    var chatRoom = this.chatd.megaChat.getChatById(base64urlencode(this.chatId));
     // if we believe to be online, send immediately
-    if (this.chatd.chatIdShard[this.chatId].isOnline()) {
+    if (this.chatd.chatIdShard[this.chatId].isOnline() &&
+            chatRoom && chatRoom.messagesBuff && chatRoom.messagesBuff.sendingListFlushed) {
         this.chatd.chatIdShard[this.chatId].msg(this.chatId, messageConstructs);
     }
     return this.sendingnum >>> 0;

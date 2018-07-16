@@ -541,6 +541,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.haveMessages = false;
     self.joined = false;
+    self.sendingListFlushed = false;
     self.messageOrders = {};
 
     var loggerIsEnabled = localStorage['messagesBuffLogger'] === '1';
@@ -655,11 +656,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         if (chatRoom.roomId === self.chatRoom.roomId) {
 
-
             var requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
-
+            self.sendingListFlushed = true;
 
             if (
                 typeof(self.expectedMessagesCount) === 'undefined' ||

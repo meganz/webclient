@@ -1303,6 +1303,9 @@ ChunkUpload.prototype.run = function(done) {
         this.suffix = '/0?c=AAAAAAAAAAAAAAAA';
         this.upload();
     }
+    else if (!this.start && localStorage.ulFailTest) {
+        this.logger.warn('Intentionally blocking the first chunk.');
+    }
     else {
         this.logger.info('.run');
         if (!this.file.ul_reader) {
@@ -1519,6 +1522,7 @@ ulQueue.poke = function(file, meth) {
         file.sent = 0;
         file.progress = Object.create(null);
         file.posturl = "";
+        file.uReqFired = null;
         file.completion = [];
         file.abort = true;
 

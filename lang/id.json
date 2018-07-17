@@ -576,6 +576,8 @@
     "1513": "Alamat email anda salah",
     "1514": "Koneksi jaringan bermasalah, harap coba kembali beberapa saat lagi",
     "1517": "Pemilik file ini telah di block",
+    "1565": "Audio",
+    "1566": "Video",
     "1578": "Kesalahan",
     "1585": "Peringatan",
     "1595": "Import ke cloud drive saya",
@@ -1033,6 +1035,7 @@
     "7431": "E-mail atau password tidak sah. Harap coba kembali",
     "7434": "Email",
     "7534": "Read only",
+    "7537": "Pilihan",
     "7557": "Semua",
     "7585": "Signature dari %1 key dari pengguna %2 tidak benar.",
     "7597": "Folder kosong",
@@ -2616,6 +2619,6 @@
     "19135": "Your upload(s) cannot proceed because your account is full",
     "19136": "Please upgrade to PRO by clicking one of the options below and your upload(s) will resume automatically.",
     "19137": "Welcome to MEGA User Management",
-    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify users settings, migrate users data and get an overview of your business account status here.",
+    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify user\u2019s settings, migrate user\u2019s data and get an overview of your business account status here.",
     "19139": "Get started by inviting people to your team"
 }

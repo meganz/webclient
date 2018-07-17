@@ -576,6 +576,8 @@
     "1513": "Ung\u00fcltige E-Mail Adresse",
     "1514": "Problem mit der Netzwerkverbindung. Bitte probieren Sie es sp\u00e4ter noch einmal",
     "1517": "Der Besitzer dieser Datei ist gesperrt",
+    "1565": "Audio",
+    "1566": "Video",
     "1578": "Fehler",
     "1585": "Achtung",
     "1595": "Importieren",
@@ -1033,6 +1035,7 @@
     "7431": "Ung\u00fcltige E-Mail-Adresse und\/oder Passwort. Bitte versuchen Sie es noch einmal.",
     "7434": "E-mail",
     "7534": "Nur lesen",
+    "7537": "Optionen",
     "7557": "Alle",
     "7585": "Die Signatur des %1-Schl\u00fcssels von Benutzer %2 ist nicht korrekt.",
     "7597": "Leerer Ordner",
@@ -2616,6 +2619,6 @@
     "19135": "Sie haben Ihr Speicherplatzlimit erreicht. Ihr Upload wurde daher angehalten.",
     "19136": "Erweitern Sie Ihren Speicherplatz mit PRO - Ihr Upload werden dann automatisch fortgesetzt.",
     "19137": "Welcome to MEGA User Management",
-    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify users settings, migrate users data and get an overview of your business account status here.",
+    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify user\u2019s settings, migrate user\u2019s data and get an overview of your business account status here.",
     "19139": "Get started by inviting people to your team"
 }

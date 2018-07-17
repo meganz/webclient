@@ -576,6 +576,8 @@
     "1513": "\u05db\u05ea\u05d5\u05d1\u05ea \u05d4\u05d3\u05d5\u05d0\"\u05dc \u05d0\u05d9\u05e0\u05e0\u05d4 \u05ea\u05e7\u05d9\u05e0\u05d4",
     "1514": "\u05d1\u05e2\u05d9\u05d4 \u05d1\u05d7\u05d9\u05d1\u05d5\u05e8 \u05dc\u05e8\u05e9\u05ea, \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1 \u05de\u05d0\u05d5\u05d7\u05e8 \u05d9\u05d5\u05ea\u05e8",
     "1517": "\u05d1\u05e2\u05dc \u05d4\u05d4\u05e7\u05d5\u05d1\u05e5 \u05d7\u05e1\u05d5\u05dd",
+    "1565": "\u05d0\u05d5\u05d3\u05d9\u05d5",
+    "1566": "\u05d5\u05d9\u05d3\u05d0\u05d5",
     "1578": "\u05e9\u05d2\u05d9\u05d0\u05d4",
     "1585": "\u05d0\u05d6\u05d4\u05e8\u05d4",
     "1595": "\u05d9\u05d9\u05d1\u05d5 \u05dc\u05db\u05d5\u05e0\u05df \u05d4\u05e2\u05e0\u05df \u05e9\u05dc\u05d9",
@@ -1033,6 +1035,7 @@
     "7431": "\u05db\u05ea\u05d5\u05d1\u05ea \u05de\u05d9\u05d9\u05dc \u05d5\\\u05d0\u05d5 \u05e1\u05d9\u05e1\u05de\u05d0 \u05dc\u05d0 \u05ea\u05e7\u05d9\u05e0\u05d9\u05dd. \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1",
     "7434": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc",
     "7534": "\u05dc\u05e7\u05e8\u05d5\u05d0 \u05d1\u05dc\u05d1\u05d3",
+    "7537": "\u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea",
     "7557": "\u05d4\u05db\u05dc",
     "7585": "\u05d4\u05d7\u05ea\u05d9\u05de\u05d4 \u05e9\u05dc \u05de\u05e4\u05ea\u05d7 \u05d4-%1 \u05e9\u05dc \u05d4\u05de\u05e9\u05ea\u05de\u05e9 %2 \u05d0\u05d9\u05e0\u05e0\u05d4 \u05ea\u05e7\u05d9\u05e0\u05d4.",
     "7597": "\u05ea\u05d9\u05e7\u05d9\u05d9\u05d4 \u05e8\u05d9\u05e7\u05d4",
@@ -2616,6 +2619,6 @@
     "19135": "Your upload(s) cannot proceed because your account is full",
     "19136": "Please upgrade to PRO by clicking one of the options below and your upload(s) will resume automatically.",
     "19137": "Welcome to MEGA User Management",
-    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify users settings, migrate users data and get an overview of your business account status here.",
+    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify user\u2019s settings, migrate user\u2019s data and get an overview of your business account status here.",
     "19139": "Get started by inviting people to your team"
 }

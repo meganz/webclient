@@ -866,7 +866,7 @@ MegaData.prototype.getTransferTableLengths = function() {
         return false;
     }
     var used = te.domTable.querySelectorAll('tr').length;
-    var size = Math.ceil(parseInt(te.domScrollingTable.style.height) / 24);
+    var size = (Math.ceil(parseInt(te.domScrollingTable.style.height) / 24) | 0) + 1;
 
     return { size: size, used: used, left: size - used };
 };

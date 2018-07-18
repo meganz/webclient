@@ -59,6 +59,7 @@ a.shared-link.show-more {
 }
 .shared-link.thumb.video {
     background-color: black;
+    background-image: none;
     min-width: 128px;
     min-height: 128px;
 }

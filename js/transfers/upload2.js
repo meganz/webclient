@@ -668,7 +668,7 @@ var ulmanager = {
             ulQueue.pushFirst(new ChunkUpload(file, 0, 0));
         }
 
-        if (!file.faid) {
+        if (!file.faid && !window.omitthumb) {
             var img = is_image(file.name);
             var vid = is_video(file.name);
 
@@ -837,7 +837,7 @@ var ulmanager = {
             return ulmanager.ulStart(File);
         }
         if (d) {
-            ulmanager.logger.debug('[%s] deduplicating file %s', n.h, File.file.name, n);
+            ulmanager.logger.info('[%s] deduplicating file %s', n.h, File.file.name, n);
         }
         api_req({
             a: 'g',
@@ -850,10 +850,10 @@ var ulmanager = {
             skipfile: (fmconfig.ul_skipIdentical && identical),
             callback: function(res, ctx) {
                 if (d) {
-                    ulmanager.logger.debug('[%s] deduplication result:', ctx.n.h, res.e, res, ctx.skipfile);
+                    ulmanager.logger.info('[%s] deduplication result:', ctx.n.h, res.e, res, ctx.skipfile);
                 }
                 if (oIsFrozen(File)) {
-                    ulmanager.logger.debug('Upload aborted on deduplication...', File);
+                    ulmanager.logger.warn('Upload aborted on deduplication...', File);
                 }
                 else if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
                     ctx.uq.repair = ctx.n.k;
@@ -876,6 +876,20 @@ var ulmanager = {
                     File.file.ddfa = ctx.n.fa;
                     File.file.path = ctx.uq.path;
                     File.file.name = ctx.uq.name;
+
+                    var eventData = ulmanager.ulEventData[File.file.id];
+                    if (eventData) {
+                        var efa = ctx.n.fa ? String(ctx.n.fa).split('/').length : 0;
+
+                        if (eventData.efa !== efa) {
+                            if (d) {
+                                ulmanager.logger.info('[%s] Fixing up efa on deduplication ' +
+                                    'for the chat to be aware... (%s != %s)', ctx.n.h, eventData.efa, efa);
+                            }
+                            eventData.efa = efa;
+                        }
+                    }
+
                     // File.file.done_starting();
                     ulmanager.ulFinalize(File.file);
                 }

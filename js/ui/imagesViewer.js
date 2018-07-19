@@ -1065,6 +1065,10 @@ var slideshowid;
                 previews[id].poster = uri;
 
                 if (id === slideshowid) {
+                    if ($video.length && !$video[0].parentNode) {
+                        // The video element got already destroyed/replaced due an error
+                        $video = $overlay.find('.viewer-image-bl video');
+                    }
                     $video.attr('poster', uri);
                     $overlay.find('.viewer-image-bl').removeClass('default-state');
                 }

@@ -3177,6 +3177,10 @@ function loadfm_done(mDBload) {
                 authring.initAuthenticationSystem();
             });
     }
+    else if (pfid && u_type == 3) {
+        // logged in user opening a folder link
+        mega.config.fetch();
+    }
 
     // This function is invoked once the M.openFolder()'s promise (through renderfm()) is fulfilled.
     var _completion = function() {

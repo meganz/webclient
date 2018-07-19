@@ -1413,6 +1413,7 @@ function init_page() {
             fminitialized = false;
             loadfm.loaded = false;
             loadfm.loading = false;
+            fmconfig = Object.create(null);
 
             stopapi();
             api_reset();

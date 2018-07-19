@@ -167,6 +167,15 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
     if (!folderlink && (z || preview || !fmconfig.dlThroughMEGAsync)) {
         return webdl();
     }
+    // if in folder link and logged-in and download using mSync is set to 0
+    if (folderlink && u_type) {
+        if (fmconfig.dlThroughMEGAsync === 0) {
+            if (typeof fmconfig.tpp === 'undefined') {
+                mega.ui.tpp.setEnabled(1);
+            }
+            return webdl();
+        }
+    }
 
     dlmanager.isMEGAsyncRunning(0x02010100)
         .done(function (sync) {

@@ -728,7 +728,7 @@ var slideshowid;
         $dlBut.rebind('click', function _dlButClick() {
             var p = previews[n && n.h];
 
-            if (p && p.full) {
+            if (p && p.full && Object(p.buffer).byteLength) {
                 M.saveAs(p.buffer, n.name)
                     .fail(function(ex) {
                         if (d) {

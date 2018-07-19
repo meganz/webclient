@@ -576,6 +576,8 @@
     "1513": "Adres\u0103 de e-mail nevalid\u0103",
     "1514": "Problem\u0103 cu conexiunea de re\u0163ea, te rug\u0103m s\u0103 re\u00eencerci mai t\u00e2rziu",
     "1517": "Proprietarul acestui cont este blocat",
+    "1565": "Audio",
+    "1566": "Video",
     "1578": "Eroare",
     "1585": "Avertisment",
     "1595": "Import\u0103 \u00een unitatea mea cloud",
@@ -1033,6 +1035,7 @@
     "7431": "E-mailul \u015fi\/sau parola nevalide. Te rug\u0103m s\u0103 \u00eencerci din nou",
     "7434": "E-mail",
     "7534": "Numai citire",
+    "7537": "Op\u0163iuni",
     "7557": "Toate",
     "7585": "Semn\u0103tura cheii %1 pentru utilizatorul %2 este incorect\u0103.",
     "7597": "Folder gol",
@@ -2616,6 +2619,6 @@
     "19135": "Your upload(s) cannot proceed because your account is full",
     "19136": "Please upgrade to PRO by clicking one of the options below and your upload(s) will resume automatically.",
     "19137": "Welcome to MEGA User Management",
-    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify users settings, migrate users data and get an overview of your business account status here.",
+    "19138": "User management helps you administer all users of your organization in one place. You can add\/edit\/disable users, modify user\u2019s settings, migrate user\u2019s data and get an overview of your business account status here.",
     "19139": "Get started by inviting people to your team"
 }

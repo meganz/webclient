@@ -1804,7 +1804,7 @@
     "16653": "Aby wykorzysta\u0107 dost\u0119pne funkcjonalno\u015bci, pobierz nasz\u0105 aplikacje na PC.",
     "16664": "Nowe has\u0142o musi by\u0107 inne od poprzednich.",
     "16671": "Zainstaluj aplikacj\u0119 MEGA desktop i pobieraj pliki szybciej.",
-    "16689": "Archiwum",
+    "16689": "Archiwizuj",
     "16763": "Skopiowana do schowka",
     "16861": "Zainstaluj aplikacj\u0119 MEGA desktop",
     "16862": "Zwi\u0119ksz wydajno\u015b\u0107 przesy\u0142ania plik\u00f3w w przegl\u0105darce",
@@ -2076,7 +2076,7 @@
     "18288": "Kliknij w menu kontekstowe [B](trzy pionowe kropki)[\/B] w prawym g\u00f3rnym rogu ekranu.",
     "18289": "Stuknij przycisk [B]Zmie\u0144 has\u0142o[\/B].",
     "18290": "Wpisz nowe has\u0142o, potwierd\u017a je i kliknij [B]Zmie\u0144 has\u0142o[\/B].",
-    "18291": "Otw\u00f3rz aplikacj\u0119 i kliknij [B]Moje konto[\/B] na pasku kart.",
+    "18291": "Otw\u00f3rz aplikacj\u0119 i dotknij przycisku [B]Menu[\/B] znajduj\u0105cego si\u0119 na pasku kart.",
     "18292": "Kliknij w [B]Ustawienia[\/B].",
     "18293": "Tap on [B]Security Options[\/B].",
     "18294": "Stuknij przycisk [B]Zmie\u0144 has\u0142o[\/B].",
@@ -2488,7 +2488,7 @@
     "19080": "Heard Island and McDonald Islands",
     "19081": "Saint Barth\u00e9lemy",
     "19082": "Sint Maarten (Dutch part)",
-    "19134": "Transferred",
-    "19135": "Your upload(s) cannot proceed because your account is full",
-    "19136": "Please upgrade to PRO by clicking one of the options below and your upload(s) will resume automatically."
+    "19134": "Przeniesione",
+    "19135": "Twoje przes\u0142anie nie mo\u017ce by\u0107 kontynuowane, poniewa\u017c Twoje konto jest pe\u0142ne",
+    "19136": "Uaktualnij do PRO, klikaj\u0105c jedn\u0105 z opcji poni\u017cej, a Twoje pliki zostan\u0105 automatycznie wznowione."
 }

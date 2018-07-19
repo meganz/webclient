@@ -129,6 +129,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 }
             }
             else {
+                imageType = 'image/png';
+
                 ctx.drawImage(this,
                     (options.width / 2) - (this.naturalWidth / 2),
                     (options.height / 2) - (this.naturalHeight / 2));

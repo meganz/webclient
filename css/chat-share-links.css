@@ -39,8 +39,8 @@ a.shared-link.show-more {
 	width: auto;
 	height: auto;
     display: table-cell;
-    min-width: 33px;
-    min-height: 33px;
+    width: 33px;
+    height: 33px;
     text-align: center;
     vertical-align: middle;
     font-size: 0;
@@ -49,12 +49,17 @@ a.shared-link.show-more {
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
     overflow: hidden;
-    -moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+    background-repeat: repeat;
+    background-size: 24px 24px;
+    background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+    background-image: linear-gradient(45deg, rgba(222,222,222,0.72) 25%, transparent 25%), linear-gradient(-45deg, rgba(222,222,222,0.72) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(222,222,222,0.72) 75%), linear-gradient(-45deg, transparent 75%, rgba(222,222,222,0.72) 75%);
+}
+.shared-link.thumb.no-thumb {
+    background-image: none;
 }
 .shared-link.thumb.video {
     background-color: black;
+    background-image: none;
     min-width: 128px;
     min-height: 128px;
 }

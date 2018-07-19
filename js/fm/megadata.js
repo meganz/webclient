@@ -123,7 +123,7 @@ function MegaData() {
         }
 
         var ttl;
-        if (ev.type === 'ps-y-reach-end') {
+        if (ev.type === 'ps-y-reach-end' && !$.isTfsPsUpdate) {
             ttl = M.getTransferTableLengths();
             if (ttl.left > -100) {
                 this.doFlushTransfersDynList(ttl.size);

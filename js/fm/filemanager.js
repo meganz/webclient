@@ -2026,7 +2026,16 @@ FileManager.prototype.addTransferPanelUI = function() {
         $tmp = undefined;
 
         // initTransferScroll(domScrollingTable);
-        delay('tfs-ps-update', Ps.update.bind(Ps, domScrollingTable));
+        delay('tfs-ps-update', function() {
+            // XXX: This update will fire ps-y-reach-end, set a flag to ignore it...
+
+            $.isTfsPsUpdate = true;
+            Ps.update(domScrollingTable);
+
+            onIdle(function() {
+                $.isTfsPsUpdate = false;
+            });
+        });
     };
 
     $.transferClose = function() {

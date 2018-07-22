@@ -27887,6 +27887,17 @@ opacity: 1;
 }
 */
 
+
+
+.user-management-list-table .grid-table-user-management tr td {
+    background-color: #fff;
+}
+
+.user-management-list-table .grid-table-user-management tr.tr-gray td {
+    background-color: rgba(250,250,250,1);
+}
+
+
 .user-management-list-table .grid-table-user-management tr:hover td {
     background-color:rgba(245,245,245,1);
 }

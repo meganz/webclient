@@ -147,8 +147,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 $currUser.find('.fm-user-management-user .admin-icon').addClass('hidden');
 
                 $currUserLeftPane.removeClass('selected');
-                var uName = a32_to_str(base64_to_a32(subUsers[h].firstname)) + ' ' +
-                    a32_to_str(base64_to_a32((subUsers[h].lastname || '')));
+                var uName = base64urldecode(subUsers[h].firstname) + ' ' +
+                    base64urldecode(subUsers[h].lastname);
+                uName = uName.trim();
                 $currUser.find('.fm-user-management-user .user-management-name').text(uName);
                 $currUserLeftPane.find('.nw-user-management-name').text(uName);
 
@@ -184,9 +185,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     }
                     isGray = !isGray;
                 }
-                $currUser.find('.edit-icon.icon').off('click.subuser').on('click.subuser', function editSubUserClickHandler() {
-                    mySelf.showEditSubUserDialog(subUsers[h].u);
-                });
 
                 $detailListTable.append($currUser);
 
@@ -294,9 +292,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         });
 
         // 3- on clicking on a sub-user to view his info (from left pane or row)
-        $('.user-management-list-table .view-icon.icon, .content-panel.user-management .nw-user-management-item')
+        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item')
             .off('click.subuser');
-        $('.user-management-list-table .view-icon.icon, .content-panel.user-management .nw-user-management-item')
+        $('.grid-table-user-management .view-icon.icon, .content-panel.user-management .nw-user-management-item')
             .on('click.subuser', function subUserViewInfoClickHandler() {
 
                 $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
@@ -320,6 +318,13 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 $('.content-panel.user-management .nw-user-management-item#' + userHandle).addClass('selected');
                 uiBusiness.viewSubAccountInfoUI(userHandle);
 
+            });
+
+        // 4- on clicking on a sub-user row to edit his info (edit  icon)
+        $('.grid-table-user-management .edit-icon.icon').off('click.subuser').on('click.subuser',
+            function editSubUserClickHandler() {
+                var userHandle = $(this).closest('tr').attr('id');
+                mySelf.showEditSubUserDialog(userHandle);
             });
 
     };
@@ -511,8 +516,9 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         return;
     }
 
-    var uName = a32_to_str(base64_to_a32(subUser.firstname)) + ' ' +
-        a32_to_str(base64_to_a32((subUser.lastname || '')));
+    var uName = base64urldecode(subUser.firstname) + ' ' +
+        base64urldecode(subUser.lastname);
+    uName = uName.trim();
 
     $('.subuser-name', $subAccountContainer).text(uName);
     $('.user-management-subuser-name', $subHeader).text(uName);
@@ -956,8 +962,9 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     var $nameInput = $('input.edit-sub-name', $usersContainer);
     var $emailInput = $('input.edit-sub-email', $usersContainer);
 
-    var uName = a32_to_str(base64_to_a32(subUser.firstname)) + ' ' +
-        a32_to_str(base64_to_a32((subUser.lastname || '')));
+    var uName = base64urldecode(subUser.firstname) + ' ' +
+        base64urldecode(subUser.lastname);
+    uName = uName.trim();
 
     $nameInput.val(uName);
     $emailInput.val(subUser.e);

@@ -775,6 +775,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
  * @param {boolean} isEnable                a flag to tell that we want enabling conformation
  */
 BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFuncHandler, userName, isEnable) {
+    "use strict";
     var $dialog = $('.user-management-able-user-dialog.user-management-dialog');
 
     var dialogQuestion = l[19098];
@@ -936,11 +937,23 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function () {
     });
 };
 
+
+BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
+    "use strict";
+    if (!subUserHandle) {
+        return;
+    }
+
+    var $dialog = $('.user-management-edit-profile-dialog.user-management-dialog');
+};
+
+
 /**
  * show the adding result for a list of sub-users
  * @param {object[]} results        array of sub-user object {email,status,initPass,handle}
  */
 BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
+    "use strict";
     var $dialog = $('.user-management-verification-dialog.user-management-dialog');
 
     if (!results || !results.length) {
@@ -995,6 +1008,7 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
 };
 
 BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
+    "use strict";
     if (!subuser) {
         return;
     }

@@ -184,6 +184,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     }
                     isGray = !isGray;
                 }
+                $currUser.find('.edit-icon.icon').off('click.subuser').on('click.subuser', function editSubUserClickHandler() {
+                    mySelf.showEditSubUserDialog(subUsers[h].u);
+                });
 
                 $detailListTable.append($currUser);
 
@@ -943,8 +946,25 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     if (!subUserHandle) {
         return;
     }
+    if (!M.suba[subUserHandle]) {
+        return;
+    }
+    var subUser = M.suba[subUserHandle];
 
     var $dialog = $('.user-management-edit-profile-dialog.user-management-dialog');
+    var $usersContainer = $('.dialog-input-container', $dialog);
+    var $nameInput = $('input.edit-sub-name', $usersContainer);
+    var $emailInput = $('input.edit-sub-email', $usersContainer);
+
+    var uName = a32_to_str(base64_to_a32(subUser.firstname)) + ' ' +
+        a32_to_str(base64_to_a32((subUser.lastname || '')));
+
+    $nameInput.val(uName);
+    $emailInput.val(subUser.e);
+
+    M.safeShowDialog('sub-user-editting-dlg', function () {
+        return $dialog;
+    });
 };
 
 
